@@ -20,12 +20,17 @@
 package org.geotools.metadata.iso.quality;
 
 // J2SE dependencies and extension
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import javax.units.Unit;
 
 // OpenGIS dependencies
 import org.opengis.metadata.quality.QuantitativeResult;
 import org.opengis.util.InternationalString;
+import org.opengis.util.RecordType;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
@@ -50,12 +55,12 @@ public class QuantitativeResultImpl extends ResultImpl implements QuantitativeRe
     /**
      * Quantitative value or values, content determined by the evaluation procedure used.
      */    
-    private double[] values;
+    private List/*<Double>*/ values;
 
     /**
      * Value type for reporting a data quality result, or {@code null} if none.
      */
-    private Class valueType;
+    private RecordType valueType;
 
     /**
      * Value unit for reporting a data quality result, or {@code null} if none.
@@ -83,11 +88,11 @@ public class QuantitativeResultImpl extends ResultImpl implements QuantitativeRe
     /**
      * Quantitative value or values, content determined by the evaluation procedure used.
      */
-    public synchronized double[] getValues() {
+    public synchronized Collection getValues() {
         if (isModifiable()) {
             return values;
         } else {
-            return (double[]) values.clone();
+            return Collections.unmodifiableList( values );            
         }
     }
 
@@ -96,13 +101,20 @@ public class QuantitativeResultImpl extends ResultImpl implements QuantitativeRe
      */
     public synchronized void setValues(final double[] newValues) {
         checkWritePermission();
-        values = (double[]) newValues.clone();
+        values = new ArrayList();
+        for( int i=0; i<newValues.length;i++){
+            values.add( new Double( newValues[i]));            
+        }
     }
 
+    public synchronized void setValues( List newValues ){
+        values = newValues;
+    }
+    
     /**
      * Value type for reporting a data quality result, or {@code null} if none.
      */
-    public Class getValueType()  {
+    public RecordType getValueType()  {
         return valueType;
     }
 
@@ -111,7 +123,7 @@ public class QuantitativeResultImpl extends ResultImpl implements QuantitativeRe
      *
      * @todo Verify if the value is of the requested type.
      */
-    public synchronized void setValueType(final Class newValue) {
+    public synchronized void setValueType(final RecordType newValue) {
         checkWritePermission();
         valueType = newValue;
     }
@@ -151,8 +163,8 @@ public class QuantitativeResultImpl extends ResultImpl implements QuantitativeRe
      */
     protected void freeze() {
         super.freeze();
-        values         = (double[])            unmodifiable(values);
-        valueType      = (Class)               unmodifiable(valueType);
+        values         = (List)            unmodifiable(values);
+        valueType      = (RecordType)          unmodifiable(valueType);
         valueUnit      = (Unit)                unmodifiable(valueUnit);
         errorStatistic = (InternationalString) unmodifiable(errorStatistic);
     }
@@ -166,7 +178,7 @@ public class QuantitativeResultImpl extends ResultImpl implements QuantitativeRe
         }
         if (object!=null && object.getClass().equals(getClass())) {
             final QuantitativeResultImpl that = (QuantitativeResultImpl) object; 
-            return    Arrays.equals(this.values,         that.values         ) &&
+            return Utilities.equals(this.values,         that.values         ) &&
                    Utilities.equals(this.valueType,      that.valueType      ) &&
                    Utilities.equals(this.valueUnit,      that.valueUnit      ) &&
                    Utilities.equals(this.errorStatistic, that.errorStatistic ) ;

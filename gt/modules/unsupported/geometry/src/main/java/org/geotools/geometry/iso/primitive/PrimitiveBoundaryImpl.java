@@ -37,7 +37,7 @@
 package org.geotools.geometry.iso.primitive;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.opengis.spatialschema.geometry.primitive.PrimitiveBoundary;
+import org.opengis.geometry.primitive.PrimitiveBoundary;
 
 /**
  * 

@@ -14,7 +14,7 @@ import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
-import org.opengis.spatialschema.geometry.primitive.OrientableSurface;
+import org.opengis.geometry.primitive.OrientableSurface;
 
 
 public class RelateOperatorsTest extends TestCase {

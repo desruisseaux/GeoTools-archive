@@ -16,11 +16,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.complex.CompositeSurface;
-import org.opengis.spatialschema.geometry.primitive.OrientablePrimitive;
-import org.opengis.spatialschema.geometry.primitive.Primitive;
-import org.opengis.spatialschema.geometry.primitive.Surface;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.complex.CompositeSurface;
+import org.opengis.geometry.primitive.OrientablePrimitive;
+import org.opengis.geometry.primitive.Primitive;
+import org.opengis.geometry.primitive.Surface;
 
 import org.geotools.geometry.jts.spatialschema.geometry.GeometryImpl;
 import org.geotools.geometry.jts.JTSGeometry;

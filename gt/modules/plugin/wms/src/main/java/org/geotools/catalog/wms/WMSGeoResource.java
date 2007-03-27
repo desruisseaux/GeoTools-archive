@@ -167,7 +167,7 @@ public class WMSGeoResource extends AbstractGeoResource {
             WebMapServer wms = parent.getWMS( monitor );
             WMSCapabilities caps = wms.getCapabilities();
             
-            org.opengis.spatialschema.geometry.Envelope env = null;
+            org.opengis.geometry.Envelope env = null;
             CoordinateReferenceSystem crs = null;
             try {
                 crs = CRS.decode("EPSG:4326"); //$NON-NLS-1$

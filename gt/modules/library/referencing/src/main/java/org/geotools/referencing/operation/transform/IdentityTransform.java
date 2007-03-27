@@ -27,7 +27,7 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.geometry.DirectPosition;
 
 // Geotools dependencies
 import org.geotools.geometry.GeneralDirectPosition;

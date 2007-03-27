@@ -17,8 +17,8 @@ package org.geotools.data.ows;
 
 import org.geotools.geometry.GeneralDirectPosition;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
 
 /**
  * A pair of coordinates and a reference system that represents a section of

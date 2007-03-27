@@ -37,7 +37,7 @@ import org.opengis.referencing.operation.*;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.geometry.Envelope;
 
 // Geotools dependencies
 import org.geotools.TestData;

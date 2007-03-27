@@ -27,7 +27,7 @@ import java.util.Arrays;
 import org.opengis.coverage.grid.Grid;      // For javadoc
 import org.opengis.coverage.grid.GridPoint; // For javadoc
 import org.opengis.coverage.grid.GridCoordinates;
-import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.geometry.DirectPosition;
 
 
 /**

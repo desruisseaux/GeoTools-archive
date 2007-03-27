@@ -51,9 +51,9 @@ import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;

@@ -13,12 +13,12 @@ package org.geotools.geometry.jts.spatialschema.geometry.primitive;
 import org.geotools.geometry.jts.spatialschema.geometry.BoundaryImpl;
 
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.primitive.PrimitiveBoundary;
+import org.opengis.geometry.primitive.PrimitiveBoundary;
 
 
 /**
  * The boundary of {@linkplain Primitive primitive} objects. This is the root for the various
- * return types of the {@link org.opengis.spatialschema.geometry.Geometry#getBoundary getBoundary()} method for
+ * return types of the {@link org.opengis.geometry.coordinate.#getBoundary getBoundary()} method for
  * subtypes of {@link Primitive}. Since points have no boundary, no special subclass is needed
  * for their boundary.
  *

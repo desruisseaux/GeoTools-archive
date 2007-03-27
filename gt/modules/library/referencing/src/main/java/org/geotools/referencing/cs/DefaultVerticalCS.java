@@ -26,7 +26,7 @@ import java.util.Map;
 import org.opengis.referencing.cs.VerticalCS;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.measure.Measure;

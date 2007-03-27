@@ -40,8 +40,8 @@ package org.geotools.geometry.iso.complex;
 import java.util.List;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.opengis.spatialschema.geometry.complex.Composite;
-import org.opengis.spatialschema.geometry.primitive.Primitive;
+import org.opengis.geometry.complex.Composite;
+import org.opengis.geometry.primitive.Primitive;
 
 /**
  * A geometric composite, Composite, shall be a geometric complex with an

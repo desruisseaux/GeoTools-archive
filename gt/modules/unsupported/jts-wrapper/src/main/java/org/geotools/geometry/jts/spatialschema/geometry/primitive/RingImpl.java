@@ -10,13 +10,13 @@
 package org.geotools.geometry.jts.spatialschema.geometry.primitive;
 
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-//import org.opengis.spatialschema.geometry.Geometry;
-import org.opengis.spatialschema.geometry.complex.CompositeCurve;
-//import org.opengis.spatialschema.geometry.geometry.LineString;
-import org.opengis.spatialschema.geometry.primitive.OrientableCurve;
-import org.opengis.spatialschema.geometry.primitive.Ring;
-import org.opengis.spatialschema.geometry.primitive.Shell;
-import org.opengis.spatialschema.geometry.primitive.SurfaceBoundary;
+//import org.opengis.geometry.Geometry;
+import org.opengis.geometry.complex.CompositeCurve;
+//import org.opengis.geometry.coordinate.LineString;
+import org.opengis.geometry.primitive.OrientableCurve;
+import org.opengis.geometry.primitive.Ring;
+import org.opengis.geometry.primitive.Shell;
+import org.opengis.geometry.primitive.SurfaceBoundary;
 
 import org.geotools.geometry.jts.spatialschema.geometry.complex.CompositeCurveImpl;
 import org.geotools.geometry.jts.JTSUtils;

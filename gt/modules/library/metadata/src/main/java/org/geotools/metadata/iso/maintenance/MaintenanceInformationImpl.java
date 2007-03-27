@@ -20,6 +20,8 @@
 package org.geotools.metadata.iso.maintenance;
 
 // J2SE direct dependencies
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 
 // OpenGIS dependencies
@@ -27,6 +29,7 @@ import org.opengis.metadata.maintenance.MaintenanceInformation;
 import org.opengis.metadata.maintenance.MaintenanceFrequency;
 import org.opengis.metadata.maintenance.ScopeCode;
 import org.opengis.metadata.maintenance.ScopeDescription;
+import org.opengis.temporal.PeriodDuration;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
@@ -66,7 +69,7 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
     /**
      * Maintenance period other than those defined, in milliseconds.
      */
-    private long userDefinedMaintenanceFrequency;
+    private PeriodDuration userDefinedMaintenanceFrequency;
 
     /**
      * Scope of data to which maintenance is applied.
@@ -133,14 +136,14 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
      *
      * @return The period, in milliseconds.
      */
-    public long getUserDefinedMaintenanceFrequency() {
+    public PeriodDuration getUserDefinedMaintenanceFrequency() {
         return userDefinedMaintenanceFrequency;
     }
 
     /**
      * Maintenance period other than those defined.
      */
-    public synchronized void setUserDefinedMaintenanceFrequency(final long newValue) {
+    public synchronized void setUserDefinedMaintenanceFrequency(final PeriodDuration newValue) {
         checkWritePermission();
         userDefinedMaintenanceFrequency = newValue;
     }
@@ -237,4 +240,18 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
         }
         return "";
     }
+
+
+public Collection getContacts() {
+    // TODO Auto-generated method stub
+    return null;
+}
+
+public Collection getUpdateScopeDescriptions() {
+    // TODO Auto-generated method stub
+    return Collections.EMPTY_LIST;
+}
+
+public Collection getUpdateScopes() {
+    return Collections.EMPTY_LIST;}
 }

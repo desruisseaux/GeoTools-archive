@@ -13,13 +13,13 @@ import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
-import org.opengis.spatialschema.geometry.Boundary;
-import org.opengis.spatialschema.geometry.complex.Complex;
-import org.opengis.spatialschema.geometry.complex.CompositeCurve;
-import org.opengis.spatialschema.geometry.complex.CompositePoint;
-import org.opengis.spatialschema.geometry.complex.CompositeSurface;
-import org.opengis.spatialschema.geometry.geometry.Position;
-import org.opengis.spatialschema.geometry.primitive.CurveSegment;
+import org.opengis.geometry.Boundary;
+import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.complex.CompositeCurve;
+import org.opengis.geometry.complex.CompositePoint;
+import org.opengis.geometry.complex.CompositeSurface;
+import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.primitive.CurveSegment;
 
 public class ClosureTest extends TestCase {
 

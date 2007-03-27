@@ -39,9 +39,9 @@ package org.geotools.geometry.iso.aggregate;
 import java.util.Set;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.opengis.spatialschema.geometry.Boundary;
-import org.opengis.spatialschema.geometry.aggregate.MultiCurve;
-import org.opengis.spatialschema.geometry.primitive.OrientableCurve;
+import org.opengis.geometry.Boundary;
+import org.opengis.geometry.aggregate.MultiCurve;
+import org.opengis.geometry.primitive.OrientableCurve;
 
 public class MultiCurveImpl extends MultiPrimitiveImpl implements MultiCurve {
 
@@ -55,7 +55,7 @@ public class MultiCurveImpl extends MultiPrimitiveImpl implements MultiCurve {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.aggregate.MultiCurve#length()
+	 * @see org.opengis.geometry.coordinate.aggregate.MultiCurve#length()
 	 */
 	public double length() {
 		// TODO Auto-generated method stub

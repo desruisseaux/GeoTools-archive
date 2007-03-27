@@ -33,7 +33,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.geometry.DirectPosition;
 
 // Geotools dependencies
 import org.geotools.referencing.CRS;

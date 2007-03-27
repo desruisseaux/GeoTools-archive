@@ -10,13 +10,13 @@
 package org.geotools.geometry.jts.spatialschema.geometry.geometry;
 
 // OpenGIS direct dependencies
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.geometry.GenericSurface;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.coordinate.GenericSurface;
 
 
 /**
- * Common interface for {@linkplain org.opengis.spatialschema.geometry.primitive.Surface surface} and
- * {@linkplain org.opengis.spatialschema.geometry.primitive.SurfacePatch surface patch}. {@code Surface}
+ * Common interface for {@linkplain org.opengis.geometry.primitive.Surface surface} and
+ * {@linkplain org.opengis.geometry.primitive.SurfacePatch surface patch}. {@code Surface}
  * and {@code SurfacePatch} represent sections of surface geometry,
  * and therefore share a number of operation signatures.
  *
@@ -26,7 +26,7 @@ import org.opengis.spatialschema.geometry.geometry.GenericSurface;
  * @version 2.0
  *
  * @revisit Why this interface is not defined in the primitive package, since the sub-interfaces
- *          ({@link org.opengis.spatialschema.geometry.primitive.Surface} and {@link org.opengis.spatialschema.geometry.primitive.SurfacePatch})
+ *          ({@link org.opengis.geometry.primitive.Surface} and {@link org.opengis.geometry.primitive.SurfacePatch})
  *          belong to that package?
  */
 public abstract class GenericSurfaceImpl implements GenericSurface {

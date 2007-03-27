@@ -23,8 +23,8 @@ import java.io.Serializable;
 // OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection; // For javadoc
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.resources.i18n.Errors;
@@ -145,7 +145,7 @@ public class GeneralDirectPosition implements DirectPosition, Serializable {
 
     /**
      * Returns always {@code this}, the direct position for this
-     * {@linkplain org.opengis.spatialschema.geometry.geometry.Position position}.
+     * {@linkplain org.opengis.geometry.coordinate.Position position}.
      */
     public DirectPosition getPosition() {
         return this;

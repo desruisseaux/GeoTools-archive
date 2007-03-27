@@ -39,7 +39,7 @@ package org.geotools.geometry.iso.complex;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.primitive.BoundaryImpl;
-import org.opengis.spatialschema.geometry.complex.ComplexBoundary;
+import org.opengis.geometry.complex.ComplexBoundary;
 
 
 /**

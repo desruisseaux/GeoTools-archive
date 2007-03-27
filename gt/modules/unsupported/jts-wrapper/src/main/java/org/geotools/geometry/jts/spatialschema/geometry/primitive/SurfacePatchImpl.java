@@ -10,12 +10,12 @@
 package org.geotools.geometry.jts.spatialschema.geometry.primitive;
 
 // OpenGIS direct dependencies
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.primitive.Ring;
-import org.opengis.spatialschema.geometry.primitive.Surface;
-import org.opengis.spatialschema.geometry.primitive.SurfaceBoundary;
-import org.opengis.spatialschema.geometry.primitive.SurfaceInterpolation;
-import org.opengis.spatialschema.geometry.primitive.SurfacePatch;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.primitive.Ring;
+import org.opengis.geometry.primitive.Surface;
+import org.opengis.geometry.primitive.SurfaceBoundary;
+import org.opengis.geometry.primitive.SurfaceInterpolation;
+import org.opengis.geometry.primitive.SurfacePatch;
 
 import org.geotools.geometry.jts.spatialschema.geometry.geometry.GenericSurfaceImpl;
 import org.geotools.geometry.jts.JTSGeometry;
@@ -103,7 +103,7 @@ public abstract class SurfacePatchImpl extends GenericSurfaceImpl implements Sur
     /**
      * @param point
      * @return
-     * @see com.polexis.lite.spatialschema.geometry.geometry.GenericSurfaceImpl#getUpNormal(org.opengis.spatialschema.geometry.DirectPosition)
+     * @see com.polexis.lite.spatialschema.geometry.geometry.GenericSurfaceImpl#getUpNormal(org.opengis.geometry.coordinate.DirectPosition)
      */
     public final double[] getUpNormal(DirectPosition point) {
         return new double [] { 0, 0, 1 };

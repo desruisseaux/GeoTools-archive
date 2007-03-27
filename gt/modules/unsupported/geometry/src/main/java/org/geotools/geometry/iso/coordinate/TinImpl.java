@@ -42,8 +42,8 @@ import java.util.List;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
-import org.opengis.spatialschema.geometry.geometry.Triangle;
-import org.opengis.spatialschema.geometry.primitive.SurfacePatch;
+import org.opengis.geometry.coordinate.Triangle;
+import org.opengis.geometry.primitive.SurfacePatch;
 
 /**
  * @author Jackson Roehrig & Sanjay Jena

@@ -25,7 +25,7 @@ import java.util.Map;
 // OpenGIS dependencies
 import org.opengis.referencing.cs.LinearCS;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.measure.Measure;

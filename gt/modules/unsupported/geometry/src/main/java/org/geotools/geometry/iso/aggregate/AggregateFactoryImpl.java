@@ -39,15 +39,15 @@ package org.geotools.geometry.iso.aggregate;
 import java.util.Set;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.opengis.spatialschema.geometry.aggregate.AggregateFactory;
-import org.opengis.spatialschema.geometry.aggregate.MultiCurve;
-import org.opengis.spatialschema.geometry.aggregate.MultiPoint;
-import org.opengis.spatialschema.geometry.aggregate.MultiPrimitive;
-import org.opengis.spatialschema.geometry.aggregate.MultiSurface;
-import org.opengis.spatialschema.geometry.primitive.OrientableCurve;
-import org.opengis.spatialschema.geometry.primitive.OrientableSurface;
-import org.opengis.spatialschema.geometry.primitive.Point;
-import org.opengis.spatialschema.geometry.primitive.Primitive;
+import org.opengis.geometry.aggregate.AggregateFactory;
+import org.opengis.geometry.aggregate.MultiCurve;
+import org.opengis.geometry.aggregate.MultiPoint;
+import org.opengis.geometry.aggregate.MultiPrimitive;
+import org.opengis.geometry.aggregate.MultiSurface;
+import org.opengis.geometry.primitive.OrientableCurve;
+import org.opengis.geometry.primitive.OrientableSurface;
+import org.opengis.geometry.primitive.Point;
+import org.opengis.geometry.primitive.Primitive;
 
 /**
  * 

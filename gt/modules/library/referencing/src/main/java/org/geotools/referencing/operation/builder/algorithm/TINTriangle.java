@@ -17,7 +17,7 @@ package org.geotools.referencing.operation.builder.algorithm;
 
 import org.geotools.geometry.DirectPosition2D;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.geometry.DirectPosition;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

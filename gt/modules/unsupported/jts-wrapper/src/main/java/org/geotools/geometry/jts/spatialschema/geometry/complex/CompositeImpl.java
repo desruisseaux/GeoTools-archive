@@ -13,7 +13,7 @@ package org.geotools.geometry.jts.spatialschema.geometry.complex;
 import java.util.List;
 
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.complex.Composite;
+import org.opengis.geometry.complex.Composite;
 
 /**
  * A geometric complex with an underlying core geometry that is isomorphic to a primitive. Thus,
@@ -42,7 +42,7 @@ public abstract class CompositeImpl
      * Returns a homogeneous collection of {@linkplain Primitive primitives} whose union would be
      * the core geometry of the composite. The complex would include all primitives in the generator
      * and all primitives on the boundary of these primitives, and so forth until
-     * {@linkplain org.opengis.spatialschema.geometry.primitive.Point points} are included. Thus the
+     * {@linkplain org.opengis.geometry.primitive.Point points} are included. Thus the
      * {@code generators} on {@code Composite} is a subset of the
      * {@linkplain Complex#getElements elements} on {@linkplain Complex complex}.
      *

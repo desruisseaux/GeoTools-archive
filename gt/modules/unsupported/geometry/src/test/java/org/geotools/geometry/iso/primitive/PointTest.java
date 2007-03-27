@@ -6,9 +6,9 @@ import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.coordinate.CoordinateFactoryImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
-import org.opengis.spatialschema.geometry.complex.Complex;
-import org.opengis.spatialschema.geometry.complex.CompositePoint;
-import org.opengis.spatialschema.geometry.primitive.Point;
+import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.complex.CompositePoint;
+import org.opengis.geometry.primitive.Point;
 
 /**
  * @author sanjay

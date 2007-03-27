@@ -40,24 +40,24 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.geotools.geometry.iso.primitive.RingImpl;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.aggregate.MultiCurve;
-import org.opengis.spatialschema.geometry.aggregate.MultiPoint;
-import org.opengis.spatialschema.geometry.aggregate.MultiPrimitive;
-import org.opengis.spatialschema.geometry.aggregate.MultiSurface;
-import org.opengis.spatialschema.geometry.complex.CompositeCurve;
-import org.opengis.spatialschema.geometry.complex.CompositePoint;
-import org.opengis.spatialschema.geometry.geometry.PointArray;
-import org.opengis.spatialschema.geometry.geometry.Position;
-import org.opengis.spatialschema.geometry.primitive.Curve;
-import org.opengis.spatialschema.geometry.primitive.CurveSegment;
-import org.opengis.spatialschema.geometry.primitive.OrientableCurve;
-import org.opengis.spatialschema.geometry.primitive.Point;
-import org.opengis.spatialschema.geometry.primitive.Primitive;
-import org.opengis.spatialschema.geometry.primitive.Ring;
-import org.opengis.spatialschema.geometry.primitive.Surface;
-import org.opengis.spatialschema.geometry.primitive.SurfaceBoundary;
-import org.opengis.spatialschema.geometry.Geometry;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.aggregate.MultiCurve;
+import org.opengis.geometry.aggregate.MultiPoint;
+import org.opengis.geometry.aggregate.MultiPrimitive;
+import org.opengis.geometry.aggregate.MultiSurface;
+import org.opengis.geometry.complex.CompositeCurve;
+import org.opengis.geometry.complex.CompositePoint;
+import org.opengis.geometry.coordinate.PointArray;
+import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.primitive.Curve;
+import org.opengis.geometry.primitive.CurveSegment;
+import org.opengis.geometry.primitive.OrientableCurve;
+import org.opengis.geometry.primitive.Point;
+import org.opengis.geometry.primitive.Primitive;
+import org.opengis.geometry.primitive.Ring;
+import org.opengis.geometry.primitive.Surface;
+import org.opengis.geometry.primitive.SurfaceBoundary;
+import org.opengis.geometry.Geometry;
 
 public class GeometryToWKTString {
 	

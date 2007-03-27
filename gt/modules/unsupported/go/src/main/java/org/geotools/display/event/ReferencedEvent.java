@@ -23,7 +23,7 @@ package org.geotools.display.event;
 import java.awt.geom.Point2D;
 
 // OpenGIS dependencies
-import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.geometry.DirectPosition;
 
 
 /**

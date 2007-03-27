@@ -42,7 +42,7 @@ import junit.framework.TestSuite;
 
 // OpenGIS dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.geometry.Envelope;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;

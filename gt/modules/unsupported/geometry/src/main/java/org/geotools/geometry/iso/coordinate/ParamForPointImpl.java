@@ -38,9 +38,9 @@ package org.geotools.geometry.iso.coordinate;
 
 import java.util.ArrayList;
 
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.geometry.GenericCurve;
-import org.opengis.spatialschema.geometry.geometry.ParamForPoint;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.coordinate.GenericCurve;
+import org.opengis.geometry.coordinate.ParamForPoint;
 
 
 public class ParamForPointImpl extends ArrayList<Double> implements

@@ -26,7 +26,7 @@ import javax.units.Unit;
 // OpenGIS dependencies
 import org.opengis.go.display.canvas.Canvas;  // For javadoc
 import org.opengis.go.display.canvas.map2d.Map2DState;
-import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies

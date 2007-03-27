@@ -45,10 +45,10 @@ import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.util.DoubleOperation;
 import org.geotools.geometry.iso.util.algorithmND.AlgoPointND;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.geometry.LineSegment;
-import org.opengis.spatialschema.geometry.geometry.PointArray;
-import org.opengis.spatialschema.geometry.geometry.Position;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.coordinate.LineSegment;
+import org.opengis.geometry.coordinate.PointArray;
+import org.opengis.geometry.coordinate.Position;
 
 /**
  * Many of the geometric constructs in this International Standard require the
@@ -257,7 +257,7 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.geometry.PointArray#length()
+	 * @see org.opengis.geometry.coordinate.PointArray#length()
 	 */
 	public int length() {
 		// Implementation OK
@@ -325,14 +325,14 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.geometry.PointArray#getCoordinateReferenceSystem()
+	 * @see org.opengis.geometry.coordinate.PointArray#getCoordinateReferenceSystem()
 	 */
 	public CoordinateReferenceSystem getCoordinateReferenceSystem() {
         return crs;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.geometry.PointArray#get(int, org.opengis.spatialschema.geometry.DirectPosition)
+	 * @see org.opengis.geometry.coordinate.PointArray#get(int, org.opengis.geometry.coordinate.DirectPosition)
 	 */
 	public DirectPositionImpl getPosition(int col, DirectPosition dest)
 			throws IndexOutOfBoundsException {
@@ -358,7 +358,7 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.geometry.PointArray#set(int, org.opengis.spatialschema.geometry.DirectPosition)
+	 * @see org.opengis.geometry.coordinate.PointArray#set(int, org.opengis.geometry.coordinate.DirectPosition)
 	 */
 	public void setPosition(int index, DirectPosition position)
 			throws IndexOutOfBoundsException, UnsupportedOperationException {
@@ -389,7 +389,7 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.geometry.PointArray#positions()
+	 * @see org.opengis.geometry.coordinate.PointArray#positions()
 	 */
 	public List positions() {
 		// Test ok
@@ -569,7 +569,7 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.geometry.PointArray#getDimension()
+	 * @see org.opengis.geometry.coordinate.PointArray#getDimension()
 	 */
 	public int getDimension() {
 		return crs.getCoordinateSystem().getDimension();

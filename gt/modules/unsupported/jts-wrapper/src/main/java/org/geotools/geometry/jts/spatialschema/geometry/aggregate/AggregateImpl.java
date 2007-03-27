@@ -15,7 +15,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.aggregate.Aggregate;
+import org.opengis.geometry.aggregate.Aggregate;
 
 import org.geotools.geometry.jts.spatialschema.geometry.GeometryImpl;
 import org.geotools.geometry.jts.JTSGeometry;

@@ -5,7 +5,6 @@ import org.geotools.geometry.iso.complex.ComplexTestSuite;
 import org.geotools.geometry.iso.coordinate.CoordinateTestSuite;
 import org.geotools.geometry.iso.operations.OperationsTestSuite;
 import org.geotools.geometry.iso.primitive.PrimitiveTestSuite;
-import org.geotools.geometry.iso.util.AlgorithmND.AlgorithmNDTestSuite;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -29,10 +28,6 @@ public class ISO19107TestSuite {
 
         // *** OPERATIONS
         suite.addTest(OperationsTestSuite.suite());
-
-        // *** UTILS
-        suite.addTest(AlgorithmNDTestSuite.suite());
-
         
         return suite;
     }

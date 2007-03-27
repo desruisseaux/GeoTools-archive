@@ -18,7 +18,7 @@ package org.geotools.geometry.jts;
 // OpenGIS dependencies
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.geometry.MismatchedDimensionException;
 
 // JTS dependencies
 import com.vividsolutions.jts.geom.Coordinate;

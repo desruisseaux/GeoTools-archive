@@ -107,11 +107,11 @@ import org.geotools.geometry.iso.topograph2D.CoordinateList;
 import org.geotools.geometry.iso.topograph2D.util.CoordinateArrays;
 import org.geotools.geometry.iso.topograph2D.util.UniqueCoordinateArrayFilter;
 import org.geotools.geometry.iso.util.Assert;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.geometry.Position;
-import org.opengis.spatialschema.geometry.primitive.OrientableCurve;
-import org.opengis.spatialschema.geometry.primitive.OrientableSurface;
-import org.opengis.spatialschema.geometry.Geometry;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.primitive.OrientableCurve;
+import org.opengis.geometry.primitive.OrientableSurface;
+import org.opengis.geometry.Geometry;
 
 /**
  * Computes the convex hull of a {@link Geometry}. The convex hull is the

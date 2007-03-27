@@ -43,11 +43,11 @@ import java.util.Set;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.io.GeometryToString;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.complex.Complex;
-import org.opengis.spatialschema.geometry.primitive.Ring;
-import org.opengis.spatialschema.geometry.primitive.SurfaceBoundary;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.primitive.Ring;
+import org.opengis.geometry.primitive.SurfaceBoundary;
 
 /**
  * The boundary of Surfaces shall be represented as SurfaceBoundary.
@@ -147,7 +147,7 @@ public class SurfaceBoundaryImpl extends PrimitiveBoundaryImpl implements
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.primitive.SurfaceBoundary#getExterior()
+	 * @see org.opengis.geometry.primitive.SurfaceBoundary#getExterior()
 	 */
 	public RingImpl getExterior() {
 		// Return exterior ring of this boundary
@@ -155,7 +155,7 @@ public class SurfaceBoundaryImpl extends PrimitiveBoundaryImpl implements
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.primitive.SurfaceBoundary#getInteriors()
+	 * @see org.opengis.geometry.primitive.SurfaceBoundary#getInteriors()
 	 */
 	public List<Ring> getInteriors() {
 		// Return interior rings of this boundary
@@ -182,7 +182,7 @@ public class SurfaceBoundaryImpl extends PrimitiveBoundaryImpl implements
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#isSimple()
+	 * @see org.opengis.geometry.coordinate.root.Geometry#isSimple()
 	 */
 	public boolean isSimple() {
 		// TODO semantic JR, SJ
@@ -196,7 +196,7 @@ public class SurfaceBoundaryImpl extends PrimitiveBoundaryImpl implements
 	}
 
 	/* (non-Javadoc)
-	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getDimension(org.opengis.spatialschema.geometry.DirectPosition)
+	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getDimension(org.opengis.geometry.coordinate.DirectPosition)
 	 */
 	public int getDimension(DirectPosition point) {
 		// TODO What is going to happen with the point parameter?!

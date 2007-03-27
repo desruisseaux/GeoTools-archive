@@ -41,8 +41,8 @@ import java.util.List;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.complex.CompositeSurfaceImpl;
-import org.opengis.spatialschema.geometry.primitive.OrientableSurface;
-import org.opengis.spatialschema.geometry.primitive.Shell;
+import org.opengis.geometry.primitive.OrientableSurface;
+import org.opengis.geometry.primitive.Shell;
 
 /**
  * 

@@ -37,7 +37,7 @@
 package org.geotools.geometry.iso.primitive;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.opengis.spatialschema.geometry.primitive.OrientableCurve;
+import org.opengis.geometry.primitive.OrientableCurve;
 
 /**
  * 

@@ -29,7 +29,7 @@ import java.lang.reflect.UndeclaredThrowableException;
 // OpenGIS dependencies
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.geometry.Envelope;
 
 // Geotools dependencies
 import org.geotools.resources.i18n.Errors;

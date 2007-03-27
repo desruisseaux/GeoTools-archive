@@ -65,8 +65,8 @@ import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
-import org.opengis.spatialschema.geometry.BoundingBox;
-import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.geometry.BoundingBox;
+import org.opengis.geometry.Envelope;
 
 import com.esri.sde.sdk.client.SeColumnDefinition;
 import com.esri.sde.sdk.client.SeException;

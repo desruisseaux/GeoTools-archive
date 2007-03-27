@@ -39,8 +39,8 @@ import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.geometry.Envelope2D;

@@ -19,7 +19,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.geotools.geometry.DirectPosition2D;
-import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.geometry.DirectPosition;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

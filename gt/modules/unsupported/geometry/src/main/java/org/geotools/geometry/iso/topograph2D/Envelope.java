@@ -79,7 +79,7 @@ package org.geotools.geometry.iso.topograph2D;
 
 import java.io.Serializable;
 
-import org.opengis.spatialschema.geometry.Geometry;
+import org.opengis.geometry.Geometry;
 
 
 /**

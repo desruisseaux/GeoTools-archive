@@ -17,19 +17,19 @@ import org.opengis.go.CommonFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.Geometry;
-import org.opengis.spatialschema.geometry.aggregate.MultiPrimitive;
-import org.opengis.spatialschema.geometry.geometry.GeometryFactory;
-import org.opengis.spatialschema.geometry.geometry.LineString;
-import org.opengis.spatialschema.geometry.geometry.Polygon;
-import org.opengis.spatialschema.geometry.geometry.PolyhedralSurface;
-import org.opengis.spatialschema.geometry.primitive.Curve;
-import org.opengis.spatialschema.geometry.primitive.Point;
-import org.opengis.spatialschema.geometry.primitive.PrimitiveFactory;
-import org.opengis.spatialschema.geometry.primitive.Ring;
-import org.opengis.spatialschema.geometry.primitive.SurfaceBoundary;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.Geometry;
+import org.opengis.geometry.aggregate.MultiPrimitive;
+import org.opengis.geometry.coordinate.GeometryFactory;
+import org.opengis.geometry.coordinate.LineString;
+import org.opengis.geometry.coordinate.Polygon;
+import org.opengis.geometry.coordinate.PolyhedralSurface;
+import org.opengis.geometry.primitive.Curve;
+import org.opengis.geometry.primitive.Point;
+import org.opengis.geometry.primitive.PrimitiveFactory;
+import org.opengis.geometry.primitive.Ring;
+import org.opengis.geometry.primitive.SurfaceBoundary;
 
 //**This comment is left from the polexis implementation**
 // This class depends on only two non-GO1 objects.  FactoryManager is used to

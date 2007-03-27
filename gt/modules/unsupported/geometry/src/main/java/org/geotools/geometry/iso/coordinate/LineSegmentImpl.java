@@ -43,10 +43,10 @@ import java.util.List;
 import org.geotools.geometry.iso.util.DoubleOperation;
 import org.geotools.geometry.iso.util.algorithmND.AlgoPointND;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-import org.opengis.spatialschema.geometry.geometry.LineSegment;
-import org.opengis.spatialschema.geometry.geometry.Position;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.geometry.coordinate.LineSegment;
+import org.opengis.geometry.coordinate.Position;
 
 /**
  * 
@@ -143,7 +143,7 @@ public class LineSegmentImpl extends LineStringImpl implements LineSegment {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#forParam(double)
+	 * @see org.opengis.geometry.coordinate.GenericCurve#forParam(double)
 	 * @version Shall this method override the LineString method? correctness
 	 *          not verified.
 	 */

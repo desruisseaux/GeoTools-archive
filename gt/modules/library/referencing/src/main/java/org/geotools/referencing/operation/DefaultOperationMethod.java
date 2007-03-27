@@ -31,7 +31,7 @@ import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.Projection;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationMethod;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies

@@ -20,9 +20,9 @@ import java.net.URISyntaxException;
 import java.util.Iterator;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
+import org.opengis.geometry.DirectPosition;
 import org.opengis.metadata.Identifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.DirectPosition;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.CRS;
 

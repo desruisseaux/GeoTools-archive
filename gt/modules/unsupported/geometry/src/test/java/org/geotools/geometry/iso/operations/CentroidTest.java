@@ -14,10 +14,10 @@ import org.geotools.geometry.iso.io.wkt.WKTReader;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
-import org.opengis.spatialschema.geometry.primitive.Curve;
-import org.opengis.spatialschema.geometry.primitive.OrientableCurve;
-import org.opengis.spatialschema.geometry.primitive.OrientableSurface;
-import org.opengis.spatialschema.geometry.primitive.Point;
+import org.opengis.geometry.primitive.Curve;
+import org.opengis.geometry.primitive.OrientableCurve;
+import org.opengis.geometry.primitive.OrientableSurface;
+import org.opengis.geometry.primitive.Point;
 
 public class CentroidTest extends TestCase {
 	

@@ -24,8 +24,9 @@ import java.util.Date;
 
 // OpenGIS dependencies
 import org.opengis.metadata.extent.TemporalExtent;
-import org.opengis.spatialschema.geometry.primitive.Primitive;
-import org.opengis.spatialschema.geometry.primitive.PrimitiveBoundary;
+import org.opengis.temporal.TemporalPrimitive;
+import org.opengis.geometry.primitive.Primitive;
+import org.opengis.geometry.primitive.PrimitiveBoundary;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
@@ -142,7 +143,7 @@ public class TemporalExtentImpl extends MetadataEntity implements TemporalExtent
     /**
      * TODO What is needed here?
      */
-    public Primitive getExtent() {
+    public TemporalPrimitive getExtent() {
         return null;
     }
     

@@ -27,7 +27,7 @@ import javax.units.Unit;
 // OpenGIS dependencies
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies

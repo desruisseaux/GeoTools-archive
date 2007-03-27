@@ -44,8 +44,8 @@ import java.util.TreeSet;
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
-import org.opengis.spatialschema.geometry.complex.Complex;
-import org.opengis.spatialschema.geometry.primitive.Primitive;
+import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.primitive.Primitive;
 
 /**
  * 
@@ -193,7 +193,7 @@ public abstract class ComplexImpl extends GeometryImpl implements Complex {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.complex.Complex#getSuperComplexes()
+	 * @see org.opengis.geometry.complex.Complex#getSuperComplexes()
 	 */
 	public Complex[] getSuperComplexes() {
 		return (this.superComplex == null) ? null : this.superComplex
@@ -201,7 +201,7 @@ public abstract class ComplexImpl extends GeometryImpl implements Complex {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.complex.Complex#getSubComplexes()
+	 * @see org.opengis.geometry.complex.Complex#getSubComplexes()
 	 */
 	public Complex[] getSubComplexes() {
 		return (this.subComplex == null) ? null : this.subComplex
@@ -235,7 +235,7 @@ public abstract class ComplexImpl extends GeometryImpl implements Complex {
 	 * 
 	 */
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#getMaximalComplex()
+	 * @see org.opengis.geometry.coordinate.root.Geometry#getMaximalComplex()
 	 */
 	public Set<Complex> getMaximalComplex() {
 		TreeSet<Complex> result = new TreeSet<Complex>();

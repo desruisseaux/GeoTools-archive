@@ -19,8 +19,8 @@ import org.geotools.geometry.jts.CoordinateSequenceTransformer;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.MismatchedDimensionException;
 
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
@@ -103,35 +103,35 @@ public class InPlaceCoordinateSequenceTransformer implements CoordinateSequenceT
         }
         
         /**
-         * @see org.opengis.spatialschema.geometry.DirectPosition#getDimension()
+         * @see org.opengis.geometry.coordinate.DirectPosition#getDimension()
          */
         public int getDimension() {
             return dimension;
         }
 
         /**
-         * @see org.opengis.spatialschema.geometry.DirectPosition#getCoordinates()
+         * @see org.opengis.geometry.coordinate.DirectPosition#getCoordinates()
          */
         public double[] getCoordinates() {
             return new double[]{ sequence.getX(offset), sequence.getY(offset), sequence.getOrdinate(offset, CoordinateSequence.Z)};
         }
 
         /**
-         * @see org.opengis.spatialschema.geometry.DirectPosition#getOrdinate(int)
+         * @see org.opengis.geometry.coordinate.DirectPosition#getOrdinate(int)
          */
         public double getOrdinate( int arg0 ) throws IndexOutOfBoundsException {
             return sequence.getOrdinate(offset, arg0);
         }
 
         /**
-         * @see org.opengis.spatialschema.geometry.DirectPosition#setOrdinate(int, double)
+         * @see org.opengis.geometry.coordinate.DirectPosition#setOrdinate(int, double)
          */
         public void setOrdinate( int arg0, double arg1 ) throws IndexOutOfBoundsException {
             sequence.setOrdinate(offset, arg0, arg1);
         }
 
         /**
-         * @see org.opengis.spatialschema.geometry.DirectPosition#getCoordinateReferenceSystem()
+         * @see org.opengis.geometry.coordinate.DirectPosition#getCoordinateReferenceSystem()
          */
         public CoordinateReferenceSystem getCoordinateReferenceSystem() {
             //TODO implement method body
@@ -139,14 +139,14 @@ public class InPlaceCoordinateSequenceTransformer implements CoordinateSequenceT
         }
 
         /**
-         * @see org.opengis.spatialschema.geometry.DirectPosition#clone()
+         * @see org.opengis.geometry.coordinate.DirectPosition#clone()
          */
         public Object clone() {
             throw new UnsupportedOperationException();
         }
 
         /**
-         * @see org.opengis.spatialschema.geometry.geometry.Position#getPosition()
+         * @see org.opengis.geometry.coordinate.Position#getPosition()
          */
         public DirectPosition getPosition() {
             return this;

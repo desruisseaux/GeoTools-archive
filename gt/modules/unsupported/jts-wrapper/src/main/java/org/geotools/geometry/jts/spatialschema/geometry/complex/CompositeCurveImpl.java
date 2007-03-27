@@ -16,11 +16,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.complex.Complex;
-import org.opengis.spatialschema.geometry.complex.CompositeCurve;
-import org.opengis.spatialschema.geometry.primitive.OrientableCurve;
-import org.opengis.spatialschema.geometry.primitive.OrientablePrimitive;
-import org.opengis.spatialschema.geometry.primitive.Primitive;
+import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.complex.CompositeCurve;
+import org.opengis.geometry.primitive.OrientableCurve;
+import org.opengis.geometry.primitive.OrientablePrimitive;
+import org.opengis.geometry.primitive.Primitive;
 
 import org.geotools.geometry.jts.JTSGeometry;
 
@@ -39,8 +39,8 @@ import org.geotools.geometry.jts.JTSGeometry;
  * @author <A HREF="http://www.opengis.org">OpenGIS&reg; consortium</A>
  * @version 2.0
  *
- * @revisit This interface extends (indirectly) both {@link org.opengis.spatialschema.geometry.primitive.Primitive} and
- *          {@link org.opengis.spatialschema.geometry.complex.Complex}. Concequently, there is a clash in the semantics
+ * @revisit This interface extends (indirectly) both {@link org.opengis.geometry.primitive.Primitive} and
+ *          {@link org.opengis.geometry.complex.Complex}. Concequently, there is a clash in the semantics
  *          of some set theoretic operation. Specifically, {@code Primitive.contains(...)}
  *          (returns FALSE for end points) is different from {@code Complex.contains(...)}
  *          (returns TRUE for end points).
@@ -66,8 +66,8 @@ public class CompositeCurveImpl extends CompositeImpl implements CompositeCurve 
      * Returns the list of orientable curves in this composite.
      *
      * To get a full representation of the elements in the {@linkplain Complex complex},
-     * the {@linkplain org.opengis.spatialschema.geometry.primitive.Point points} on the boundary of the
-     * generator set of {@linkplain org.opengis.spatialschema.geometry.primitive.Curve curve} would be
+     * the {@linkplain org.opengis.geometry.primitive.Point points} on the boundary of the
+     * generator set of {@linkplain org.opengis.geometry.primitive.Curve curve} would be
      * added to the curves in the generator list.
      *
      * @return The list of orientable curves in this composite.

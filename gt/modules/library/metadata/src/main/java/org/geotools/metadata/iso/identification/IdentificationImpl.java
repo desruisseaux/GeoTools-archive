@@ -21,6 +21,7 @@ package org.geotools.metadata.iso.identification;
 
 // J2SE direct dependencies
 import java.util.Collection;
+import java.util.Collections;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
@@ -399,5 +400,10 @@ public class IdentificationImpl extends MetadataEntity implements Identification
      */
     public String toString() {
         return String.valueOf(resourceMaintenance);
+    }
+
+    /** @return Collection<AggregateInformation> */
+    public Collection getAggregationInfo() {
+        return Collections.EMPTY_LIST; // TODO: store provided information
     }
 }

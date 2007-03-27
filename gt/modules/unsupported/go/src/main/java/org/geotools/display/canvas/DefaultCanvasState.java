@@ -26,8 +26,8 @@ import java.io.Serializable;
 import org.opengis.util.Cloneable;
 import org.opengis.go.display.canvas.Canvas;        // For javadoc
 import org.opengis.go.display.canvas.CanvasState;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.DirectPosition;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;

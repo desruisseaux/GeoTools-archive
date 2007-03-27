@@ -106,8 +106,8 @@ public class CoverageDescriptionImpl extends ContentInformationImpl implements C
     /**
      * Returns the information on the dimensions of the cell measurement value.
      */
-    public Collection getDimension() {
-        return Collections.singleton(dimension);
+    public RangeDimension getDimension() {
+        return dimension;
     }
 
     /**
@@ -162,5 +162,9 @@ public class CoverageDescriptionImpl extends ContentInformationImpl implements C
      */
     public String toString() {
         return String.valueOf(attributeDescription);
+    }
+
+    public Collection getDimensions(){
+        return Collections.singleton( dimension);
     }
 }

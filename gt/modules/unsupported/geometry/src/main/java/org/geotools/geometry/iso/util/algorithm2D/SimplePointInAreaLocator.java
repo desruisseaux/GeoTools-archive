@@ -82,7 +82,7 @@ import org.geotools.geometry.iso.root.GeometryImpl;
 import org.geotools.geometry.iso.topograph2D.Coordinate;
 import org.geotools.geometry.iso.topograph2D.Location;
 import org.geotools.geometry.iso.topograph2D.util.CoordinateArrays;
-import org.opengis.spatialschema.geometry.Geometry;
+import org.opengis.geometry.Geometry;
 
 /**
  * Computes whether a point lies in the interior of an area {@link Geometry}.

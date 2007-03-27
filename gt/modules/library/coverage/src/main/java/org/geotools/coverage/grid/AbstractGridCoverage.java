@@ -43,7 +43,7 @@ import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.GridNotEditableException;
 import org.opengis.coverage.grid.InvalidRangeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.geometry.DirectPosition;
 
 // Geotools dependencies
 import org.geotools.coverage.AbstractCoverage;

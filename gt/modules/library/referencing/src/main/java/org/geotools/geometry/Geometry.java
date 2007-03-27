@@ -40,7 +40,7 @@ import org.geotools.referencing.operation.TransformPathNotFoundException;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public abstract class Geometry implements org.opengis.spatialschema.geometry.Geometry, Serializable {
+public abstract class Geometry implements org.opengis.geometry.Geometry, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -104,7 +104,7 @@ public abstract class Geometry implements org.opengis.spatialschema.geometry.Geo
      * @return The transformed {@code Geometry}.
      * @throws TransformException if the transformation failed.
      */
-    public org.opengis.spatialschema.geometry.Geometry
+    public org.opengis.geometry.Geometry
             transform(CoordinateReferenceSystem newCRS) throws TransformException
     {
         if (coordinateOperationFactory == null) {

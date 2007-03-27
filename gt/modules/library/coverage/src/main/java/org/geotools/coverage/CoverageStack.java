@@ -49,9 +49,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.TemporalCRS;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
 
 // Geotools dependencies
 import org.geotools.coverage.grid.GridCoverage2D;

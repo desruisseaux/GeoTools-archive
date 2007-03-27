@@ -41,12 +41,12 @@ import org.geotools.geometry.iso.primitive.CurveBoundaryImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.util.DoubleOperation;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.geometry.ParamForPoint;
-import org.opengis.spatialschema.geometry.geometry.Position;
-import org.opengis.spatialschema.geometry.primitive.CurveInterpolation;
-import org.opengis.spatialschema.geometry.primitive.CurveSegment;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.coordinate.ParamForPoint;
+import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.primitive.CurveInterpolation;
+import org.opengis.geometry.primitive.CurveSegment;
 
 /**
  * 
@@ -162,7 +162,7 @@ public abstract class CurveSegmentImpl implements CurveSegment {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.primitive.CurveSegment#getBoundary()
+	 * @see org.opengis.geometry.primitive.CurveSegment#getBoundary()
 	 */
 	public CurveBoundaryImpl getBoundary() {
 		PrimitiveFactoryImpl pf = this.getCurve().getGeometryFactory()
@@ -198,7 +198,7 @@ public abstract class CurveSegmentImpl implements CurveSegment {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.primitive.CurveSegment#getCurve()
+	 * @see org.opengis.geometry.primitive.CurveSegment#getCurve()
 	 * @version Implementation OK
 	 */
 	public CurveImpl getCurve() {
@@ -282,7 +282,7 @@ public abstract class CurveSegmentImpl implements CurveSegment {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#getStartParam()
+	 * @see org.opengis.geometry.coordinate.GenericCurve#getStartParam()
 	 * @version Implementation OK
 	 */
 	public double getStartParam() {
@@ -299,7 +299,7 @@ public abstract class CurveSegmentImpl implements CurveSegment {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#getEndParam()
+	 * @see org.opengis.geometry.coordinate.GenericCurve#getEndParam()
 	 * @version Implementation OK
 	 */
 	public double getEndParam() {
@@ -318,7 +318,7 @@ public abstract class CurveSegmentImpl implements CurveSegment {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#getStartConstructiveParam()
+	 * @see org.opengis.geometry.coordinate.GenericCurve#getStartConstructiveParam()
 	 */
 	public double getStartConstructiveParam() {
 		// OK
@@ -328,7 +328,7 @@ public abstract class CurveSegmentImpl implements CurveSegment {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#getEndConstructiveParam() @
+	 * @see org.opengis.geometry.coordinate.GenericCurve#getEndConstructiveParam() @
 	 */
 	public double getEndConstructiveParam() {
 		// OK
@@ -338,8 +338,8 @@ public abstract class CurveSegmentImpl implements CurveSegment {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#length(org.opengis.spatialschema.geometry.geometry.Position,
-	 *      org.opengis.spatialschema.geometry.geometry.Position)
+	 * @see org.opengis.geometry.coordinate.GenericCurve#length(org.opengis.geometry.coordinate.Position,
+	 *      org.opengis.geometry.coordinate.Position)
 	 * @version Not verified whether this methods works correctly and
 	 *          appropriately
 	 */
@@ -379,7 +379,7 @@ public abstract class CurveSegmentImpl implements CurveSegment {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#length(double,
+	 * @see org.opengis.geometry.coordinate.GenericCurve#length(double,
 	 *      double)
 	 */
 	public double length(double par1, double par2) {

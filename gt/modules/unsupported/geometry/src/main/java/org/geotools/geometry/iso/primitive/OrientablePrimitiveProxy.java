@@ -42,15 +42,15 @@ import java.util.Set;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.Precision;
-import org.opengis.spatialschema.geometry.TransfiniteSet;
-import org.opengis.spatialschema.geometry.complex.Complex;
-import org.opengis.spatialschema.geometry.primitive.OrientablePrimitive;
-import org.opengis.spatialschema.geometry.primitive.Primitive;
-import org.opengis.spatialschema.geometry.primitive.PrimitiveBoundary;
-import org.opengis.spatialschema.geometry.Geometry;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.Precision;
+import org.opengis.geometry.TransfiniteSet;
+import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.primitive.OrientablePrimitive;
+import org.opengis.geometry.primitive.Primitive;
+import org.opengis.geometry.primitive.PrimitiveBoundary;
+import org.opengis.geometry.Geometry;
 
 /**
  * OrientablePrimitive objects are essentially references to geometric

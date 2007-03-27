@@ -40,9 +40,9 @@ package org.geotools.geometry.iso.primitive;
 import java.util.Set;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.opengis.spatialschema.geometry.complex.Complex;
-import org.opengis.spatialschema.geometry.primitive.OrientablePrimitive;
-import org.opengis.spatialschema.geometry.primitive.Primitive;
+import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.primitive.OrientablePrimitive;
+import org.opengis.geometry.primitive.Primitive;
 
 /**
  * 

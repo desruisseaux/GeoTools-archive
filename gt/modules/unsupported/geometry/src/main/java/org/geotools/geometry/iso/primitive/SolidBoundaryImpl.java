@@ -41,11 +41,11 @@ import java.util.ArrayList;
 import java.util.Set;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.complex.Complex;
-import org.opengis.spatialschema.geometry.primitive.Shell;
-import org.opengis.spatialschema.geometry.primitive.SolidBoundary;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.primitive.Shell;
+import org.opengis.geometry.primitive.SolidBoundary;
 
 /**
  * The boundary of Solids shall be represented as SolidBoundary.

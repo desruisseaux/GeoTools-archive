@@ -14,8 +14,8 @@ import org.geotools.geometry.jts.GeometryUtils;
 import javax.units.NonSI;
 
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
 
 /**
  * A minimum bounding box or rectangle. Regardless of dimension, an {@code Envelope} can
@@ -69,7 +69,7 @@ public class EnvelopeImpl implements Envelope {
 
     /**
      * @inheritDoc
-     * @see org.opengis.spatialschema.geometry.Envelope#getDimension()
+     * @see org.opengis.geometry.coordinate.Envelope#getDimension()
      */
     public final int getDimension() {
         return upperCorner.getDimension();
@@ -77,7 +77,7 @@ public class EnvelopeImpl implements Envelope {
 
     /**
      * @inheritDoc
-     * @see org.opengis.spatialschema.geometry.Envelope#getMinimum(int)
+     * @see org.opengis.geometry.coordinate.Envelope#getMinimum(int)
      */
     public final double getMinimum(int dimension) {
         return lowerCorner.getOrdinate(dimension);
@@ -85,7 +85,7 @@ public class EnvelopeImpl implements Envelope {
 
     /**
      * @inheritDoc
-     * @see org.opengis.spatialschema.geometry.Envelope#getMaximum(int)
+     * @see org.opengis.geometry.coordinate.Envelope#getMaximum(int)
      */
     public final double getMaximum(int dimension) {
         return upperCorner.getOrdinate(dimension);
@@ -93,7 +93,7 @@ public class EnvelopeImpl implements Envelope {
 
     /**
      * @inheritDoc
-     * @see org.opengis.spatialschema.geometry.Envelope#getCenter(int)
+     * @see org.opengis.geometry.coordinate.Envelope#getCenter(int)
      */
     public final double getCenter(int dimension) {
         return 0.5 * (upperCorner.getOrdinate(dimension) + lowerCorner.getOrdinate(dimension));
@@ -101,7 +101,7 @@ public class EnvelopeImpl implements Envelope {
 
     /**
      * @inheritDoc
-     * @see org.opengis.spatialschema.geometry.Envelope#getLength(int)
+     * @see org.opengis.geometry.coordinate.Envelope#getLength(int)
      */
     public final double getLength(int dimension) {
         return upperCorner.getOrdinate(dimension) - lowerCorner.getOrdinate(dimension);
@@ -109,7 +109,7 @@ public class EnvelopeImpl implements Envelope {
 
     /**
      * @inheritDoc
-     * @see org.opengis.spatialschema.geometry.Envelope#getUpperCorner()
+     * @see org.opengis.geometry.coordinate.Envelope#getUpperCorner()
      */
     public final DirectPosition getUpperCorner() {
         return (DirectPosition) upperCorner.clone();
@@ -117,7 +117,7 @@ public class EnvelopeImpl implements Envelope {
 
     /**
      * @inheritDoc
-     * @see org.opengis.spatialschema.geometry.Envelope#getLowerCorner()
+     * @see org.opengis.geometry.coordinate.Envelope#getLowerCorner()
      */
     public final DirectPosition getLowerCorner() {
         return (DirectPosition) lowerCorner.clone();

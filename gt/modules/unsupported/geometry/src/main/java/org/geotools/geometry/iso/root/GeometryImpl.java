@@ -68,19 +68,19 @@ import org.geotools.geometry.iso.util.algorithmND.CentroidPoint;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.Boundary;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.Precision;
-import org.opengis.spatialschema.geometry.TransfiniteSet;
-import org.opengis.spatialschema.geometry.aggregate.MultiPoint;
-import org.opengis.spatialschema.geometry.complex.Complex;
-import org.opengis.spatialschema.geometry.complex.ComplexFactory;
-import org.opengis.spatialschema.geometry.primitive.OrientableCurve;
-import org.opengis.spatialschema.geometry.primitive.OrientableSurface;
-import org.opengis.spatialschema.geometry.primitive.Point;
-import org.opengis.spatialschema.geometry.primitive.Ring;
-import org.opengis.spatialschema.geometry.Geometry;
+import org.opengis.geometry.Boundary;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.Precision;
+import org.opengis.geometry.TransfiniteSet;
+import org.opengis.geometry.aggregate.MultiPoint;
+import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.complex.ComplexFactory;
+import org.opengis.geometry.primitive.OrientableCurve;
+import org.opengis.geometry.primitive.OrientableSurface;
+import org.opengis.geometry.primitive.Point;
+import org.opengis.geometry.primitive.Ring;
+import org.opengis.geometry.Geometry;
 
 /**
  * 
@@ -139,35 +139,35 @@ public abstract class GeometryImpl implements Geometry {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#getBoundary()
+	 * @see org.opengis.geometry.coordinate.root.Geometry#getBoundary()
 	 */
 	public abstract Boundary getBoundary();
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#getDimension(org.opengis.spatialschema.geometry.DirectPosition)
+	 * @see org.opengis.geometry.coordinate.root.Geometry#getDimension(org.opengis.geometry.coordinate.DirectPosition)
 	 */
 	public abstract int getDimension(DirectPosition point);
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#getEnvelope()
+	 * @see org.opengis.geometry.coordinate.root.Geometry#getEnvelope()
 	 */
 	public abstract Envelope getEnvelope();
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#getRepresentativePoint()
+	 * @see org.opengis.geometry.coordinate.root.Geometry#getRepresentativePoint()
 	 */
 	public abstract DirectPosition getRepresentativePoint();
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#isMutable()
+	 * @see org.opengis.geometry.coordinate.root.Geometry#isMutable()
 	 */
 	public boolean isMutable() {
 		// TODO semantic JR, SJ
@@ -180,7 +180,7 @@ public abstract class GeometryImpl implements Geometry {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#toImmutable()
+	 * @see org.opengis.geometry.coordinate.root.Geometry#toImmutable()
 	 */
 	public Geometry toImmutable() {
 		// TODO semantic JR, SJ
@@ -204,7 +204,7 @@ public abstract class GeometryImpl implements Geometry {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#getCoordinateReferenceSystem()
+	 * @see org.opengis.geometry.coordinate.root.Geometry#getCoordinateReferenceSystem()
 	 */
 	public CoordinateReferenceSystem getCoordinateReferenceSystem() {
 		// TODO semantic JR, SJ
@@ -220,7 +220,7 @@ public abstract class GeometryImpl implements Geometry {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#getCoordinateDimension()
+	 * @see org.opengis.geometry.coordinate.root.Geometry#getCoordinateDimension()
 	 */
 	public int getCoordinateDimension() {
 		// Return the dimension of the coordinates of this geometry
@@ -230,7 +230,7 @@ public abstract class GeometryImpl implements Geometry {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#transform(org.opengis.referencing.crs.CoordinateReferenceSystem)
+	 * @see org.opengis.geometry.coordinate.root.Geometry#transform(org.opengis.referencing.crs.CoordinateReferenceSystem)
 	 */
 	public Geometry transform(CoordinateReferenceSystem newCRS)
 			throws TransformException {
@@ -244,7 +244,7 @@ public abstract class GeometryImpl implements Geometry {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#transform(org.opengis.referencing.crs.CoordinateReferenceSystem,
+	 * @see org.opengis.geometry.coordinate.root.Geometry#transform(org.opengis.referencing.crs.CoordinateReferenceSystem,
 	 *      org.opengis.referencing.operation.MathTransform)
 	 */
 	public Geometry transform(CoordinateReferenceSystem newCRS,
@@ -259,7 +259,7 @@ public abstract class GeometryImpl implements Geometry {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#getDistance(org.opengis.spatialschema.geometry.root.Geometry)
+	 * @see org.opengis.geometry.coordinate.root.Geometry#getDistance(org.opengis.geometry.coordinate.root.Geometry)
 	 */
 	public final double getDistance(Geometry geometry) {
 		// TODO semantic JR, SJ
@@ -273,7 +273,7 @@ public abstract class GeometryImpl implements Geometry {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#getBuffer(double)
+	 * @see org.opengis.geometry.coordinate.root.Geometry#getBuffer(double)
 	 */
 	public Geometry getBuffer(double distance) {
 		// TODO semantic JR, SJ
@@ -288,7 +288,7 @@ public abstract class GeometryImpl implements Geometry {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#getMbRegion()
+	 * @see org.opengis.geometry.coordinate.root.Geometry#getMbRegion()
 	 */
 	public Geometry getMbRegion() {
 		// TODO test
@@ -300,7 +300,7 @@ public abstract class GeometryImpl implements Geometry {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#getCentroid()
+	 * @see org.opengis.geometry.coordinate.root.Geometry#getCentroid()
 	 */
 	public DirectPosition getCentroid() {
 	
@@ -366,7 +366,7 @@ public abstract class GeometryImpl implements Geometry {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#getConvexHull()
+	 * @see org.opengis.geometry.coordinate.root.Geometry#getConvexHull()
 	 */
 	public Geometry getConvexHull() {
 		ConvexHull ch = new ConvexHull(this);
@@ -420,7 +420,7 @@ public abstract class GeometryImpl implements Geometry {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.TransfiniteSet#contains(org.opengis.spatialschema.geometry.TransfiniteSet)
+	 * @see org.opengis.geometry.coordinate.TransfiniteSet#contains(org.opengis.geometry.coordinate.TransfiniteSet)
 	 */
 	public boolean contains(TransfiniteSet pointSet) {
 		GeometryImpl geom = GeometryImpl.castToGeometryImpl(pointSet);
@@ -484,7 +484,7 @@ public abstract class GeometryImpl implements Geometry {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.TransfiniteSet#contains(org.opengis.spatialschema.geometry.DirectPosition)
+	 * @see org.opengis.geometry.coordinate.TransfiniteSet#contains(org.opengis.geometry.coordinate.DirectPosition)
 	 */
 	public boolean contains(DirectPosition point) {
 
@@ -501,7 +501,7 @@ public abstract class GeometryImpl implements Geometry {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.TransfiniteSet#intersects(org.opengis.spatialschema.geometry.TransfiniteSet)
+	 * @see org.opengis.geometry.coordinate.TransfiniteSet#intersects(org.opengis.geometry.coordinate.TransfiniteSet)
 	 */
 	public boolean intersects(TransfiniteSet pointSet) {
 		// Intersects = !Disjoint
@@ -573,7 +573,7 @@ public abstract class GeometryImpl implements Geometry {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.TransfiniteSet#equals(org.opengis.spatialschema.geometry.TransfiniteSet)
+	 * @see org.opengis.geometry.coordinate.TransfiniteSet#equals(org.opengis.geometry.coordinate.TransfiniteSet)
 	 */
 	public boolean equals(TransfiniteSet pointSet) {
 		GeometryImpl geom = GeometryImpl.castToGeometryImpl(pointSet);
@@ -849,7 +849,7 @@ public abstract class GeometryImpl implements Geometry {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.TransfiniteSet#union(org.opengis.spatialschema.geometry.TransfiniteSet)
+	 * @see org.opengis.geometry.coordinate.TransfiniteSet#union(org.opengis.geometry.coordinate.TransfiniteSet)
 	 */
 	public TransfiniteSet union(TransfiniteSet pointSet) {
 		GeometryImpl otherGeom = GeometryImpl.castToGeometryImpl(pointSet);
@@ -866,7 +866,7 @@ public abstract class GeometryImpl implements Geometry {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.TransfiniteSet#intersection(org.opengis.spatialschema.geometry.TransfiniteSet)
+	 * @see org.opengis.geometry.coordinate.TransfiniteSet#intersection(org.opengis.geometry.coordinate.TransfiniteSet)
 	 */
 	public TransfiniteSet intersection(TransfiniteSet pointSet) {
 		// Return the result geometry of the Intersection operation between the
@@ -883,7 +883,7 @@ public abstract class GeometryImpl implements Geometry {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.TransfiniteSet#difference(org.opengis.spatialschema.geometry.TransfiniteSet)
+	 * @see org.opengis.geometry.coordinate.TransfiniteSet#difference(org.opengis.geometry.coordinate.TransfiniteSet)
 	 */
 	public TransfiniteSet difference(TransfiniteSet pointSet) {
 		// Return the result geometry of the Difference operation between the
@@ -900,7 +900,7 @@ public abstract class GeometryImpl implements Geometry {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.TransfiniteSet#symmetricDifference(org.opengis.spatialschema.geometry.TransfiniteSet)
+	 * @see org.opengis.geometry.coordinate.TransfiniteSet#symmetricDifference(org.opengis.geometry.coordinate.TransfiniteSet)
 	 */
 	public TransfiniteSet symmetricDifference(TransfiniteSet pointSet) {
 		// Return the result geometry of the Symmetric Difference operation
@@ -918,7 +918,7 @@ public abstract class GeometryImpl implements Geometry {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#getClosure()
+	 * @see org.opengis.geometry.coordinate.root.Geometry#getClosure()
 	 */
 	public Complex getClosure() {
 		ComplexFactory cf = this.factory.getComplexFactory();
@@ -953,7 +953,7 @@ public abstract class GeometryImpl implements Geometry {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.Geometry#isCycle()
+	 * @see org.opengis.geometry.coordinate.#isCycle()
 	 */
 	public boolean isCycle() {
 		// The object is a cycle, if the boundary is empty: isCycle() = boundary().isEmpty()

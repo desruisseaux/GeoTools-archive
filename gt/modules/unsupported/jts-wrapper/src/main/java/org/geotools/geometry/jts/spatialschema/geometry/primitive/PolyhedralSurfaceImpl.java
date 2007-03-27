@@ -1,7 +1,7 @@
 package org.geotools.geometry.jts.spatialschema.geometry.primitive;
 
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.geometry.PolyhedralSurface;
+import org.opengis.geometry.coordinate.PolyhedralSurface;
 
 /**
  * The {@code PolyhedralSurfaceImpl} class/interface...

@@ -27,9 +27,9 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.BoundingBox;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.geometry.BoundingBox;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.MismatchedDimensionException;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -38,7 +38,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * A JTS envelope associated with a
  * {@linkplain CoordinateReferenceSystem coordinate reference system}. In
  * addition, this JTS envelope also implements the GeoAPI
- * {@linkplain org.opengis.spatialschema.geometry.Envelope envelope} interface
+ * {@linkplain org.opengis.geometry.coordinate.Envelope envelope} interface
  * for interoperability with GeoAPI.
  * 
  * @since 2.2
@@ -53,7 +53,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @see org.opengis.metadata.extent.GeographicBoundingBox
  */
 public class ReferencedEnvelope extends Envelope implements
-		org.opengis.spatialschema.geometry.Envelope, BoundingBox {
+		org.opengis.geometry.Envelope, BoundingBox {
     /**
      * Serial number for compatibility with different versions.
      */
@@ -123,7 +123,7 @@ public class ReferencedEnvelope extends Envelope implements
      * @since 2.3
      */
     public ReferencedEnvelope(
-            final org.opengis.spatialschema.geometry.Envelope envelope,
+            final org.opengis.geometry.Envelope envelope,
             final CoordinateReferenceSystem crs) throws MismatchedDimensionException
     {
         super(getJTSEnvelope(envelope, crs));
@@ -151,7 +151,7 @@ public class ReferencedEnvelope extends Envelope implements
      * Get a JTS envelope out of an OGC Envelope
      */
     private static Envelope getJTSEnvelope(
-            org.opengis.spatialschema.geometry.Envelope envelope,
+            org.opengis.geometry.Envelope envelope,
             CoordinateReferenceSystem crs) throws MismatchedDimensionException
     {
         // Note: the following constructor may throws a MismatchedDimensionException.

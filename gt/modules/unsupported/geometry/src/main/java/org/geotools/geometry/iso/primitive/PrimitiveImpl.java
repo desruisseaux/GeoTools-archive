@@ -42,10 +42,10 @@ import java.util.TreeSet;
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.complex.ComplexImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
-import org.opengis.spatialschema.geometry.complex.Complex;
-import org.opengis.spatialschema.geometry.primitive.OrientablePrimitive;
-import org.opengis.spatialschema.geometry.primitive.Primitive;
-import org.opengis.spatialschema.geometry.primitive.PrimitiveBoundary;
+import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.primitive.OrientablePrimitive;
+import org.opengis.geometry.primitive.Primitive;
+import org.opengis.geometry.primitive.PrimitiveBoundary;
 
 /**
  * 
@@ -151,21 +151,21 @@ public abstract class PrimitiveImpl extends GeometryImpl implements Primitive {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.primitive.Primitive#getContainingPrimitives()
+	 * @see org.opengis.geometry.primitive.Primitive#getContainingPrimitives()
 	 */
 	public Set<Primitive> getContainingPrimitives() {
 		return this.containingPrimitive;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.primitive.Primitive#getContainedPrimitives()
+	 * @see org.opengis.geometry.primitive.Primitive#getContainedPrimitives()
 	 */
 	public Set<Primitive> getContainedPrimitives() {
 		return this.containedPrimitive;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.primitive.Primitive#getComplexes()
+	 * @see org.opengis.geometry.primitive.Primitive#getComplexes()
 	 */
 	public Set<Complex> getComplexes() {
 		return this.complex;
@@ -231,7 +231,7 @@ public abstract class PrimitiveImpl extends GeometryImpl implements Primitive {
 	 * 
 	 */
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#getMaximalComplex()
+	 * @see org.opengis.geometry.coordinate.root.Geometry#getMaximalComplex()
 	 */
 	public Set<Complex> getMaximalComplex() {
 		if (this.complex == null)
@@ -250,7 +250,7 @@ public abstract class PrimitiveImpl extends GeometryImpl implements Primitive {
 	
 	
     /* (non-Javadoc)
-     * @see org.opengis.spatialschema.geometry.primitive.Primitive#getProxy()
+     * @see org.opengis.geometry.primitive.Primitive#getProxy()
      */
     public abstract OrientablePrimitive[] getProxy();
 

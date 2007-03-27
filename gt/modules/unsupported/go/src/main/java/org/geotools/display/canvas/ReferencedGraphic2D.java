@@ -29,7 +29,7 @@ import java.beans.PropertyChangeEvent; // For javadoc
 
 // OpenGIS dependencies
 import org.opengis.go.display.canvas.Canvas;
-import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 

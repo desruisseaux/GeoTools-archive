@@ -40,9 +40,9 @@ import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.util.DoubleOperation;
 import org.geotools.geometry.iso.util.algorithmND.AlgoPointND;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-import org.opengis.spatialschema.geometry.geometry.Position;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.geometry.coordinate.Position;
 
 /**
  * @author Jackson Roehrig & Sanjay Jena
@@ -159,7 +159,7 @@ public class DirectPositionImpl implements DirectPosition {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.DirectPosition#getDimension()
+	 * @see org.opengis.geometry.coordinate.DirectPosition#getDimension()
 	 */
 	public int getDimension() {
 		return crs.getCoordinateSystem().getDimension();
@@ -168,7 +168,7 @@ public class DirectPositionImpl implements DirectPosition {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.DirectPosition#getCoordinates()
+	 * @see org.opengis.geometry.coordinate.DirectPosition#getCoordinates()
 	 */
 	public double[] getCoordinates() {
 		return (double[]) this.coordinate.clone(); // JG: modified to return clone each time
@@ -177,7 +177,7 @@ public class DirectPositionImpl implements DirectPosition {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.DirectPosition#getOrdinate(int)
+	 * @see org.opengis.geometry.coordinate.DirectPosition#getOrdinate(int)
 	 */
 	public double getOrdinate(int dimension) throws IndexOutOfBoundsException {
 		return this.coordinate[dimension];
@@ -186,7 +186,7 @@ public class DirectPositionImpl implements DirectPosition {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.DirectPosition#setOrdinate(int,
+	 * @see org.opengis.geometry.coordinate.DirectPosition#setOrdinate(int,
 	 *      double)
 	 */
 	public void setOrdinate(int dimension, double value)
@@ -202,7 +202,7 @@ public class DirectPositionImpl implements DirectPosition {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.DirectPosition#getCoordinateReferenceSystem()
+	 * @see org.opengis.geometry.coordinate.DirectPosition#getCoordinateReferenceSystem()
 	 */
 	public CoordinateReferenceSystem getCoordinateReferenceSystem() {
 		// TODO semantic JR
@@ -215,7 +215,7 @@ public class DirectPositionImpl implements DirectPosition {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.DirectPosition#clone()
+	 * @see org.opengis.geometry.coordinate.DirectPosition#clone()
 	 */
 	public DirectPositionImpl clone() {
 		// Cloning the double array (in parameter) is important!
@@ -436,7 +436,7 @@ public class DirectPositionImpl implements DirectPosition {
 	// TODO This method exists because of the extend of Position
 	// Is this extend really correct??? Check interfaces!!!
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.geometry.Position#getPosition()
+	 * @see org.opengis.geometry.coordinate.Position#getPosition()
 	 */
 	public DirectPosition getPosition() {
 		return this;

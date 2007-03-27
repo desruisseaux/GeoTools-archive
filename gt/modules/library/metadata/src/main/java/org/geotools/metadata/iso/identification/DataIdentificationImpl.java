@@ -21,6 +21,7 @@ package org.geotools.metadata.iso.identification;
 
 // J2SE direct dependencies
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Locale;
 import java.nio.charset.Charset;
 
@@ -29,6 +30,7 @@ import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.identification.DataIdentification;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.metadata.identification.CharacterSet;
 import org.opengis.metadata.identification.Resolution;
 import org.opengis.metadata.identification.TopicCategory;
 import org.opengis.metadata.spatial.SpatialRepresentationType;
@@ -73,7 +75,7 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
     /**
      * Full name of the character coding standard used for the dataset.
      */
-    private Charset characterSet;
+    private CharacterSet characterSet;
 
     /**
      * Main theme(s) of the datset.
@@ -180,13 +182,16 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
      * Full name of the character coding standard used for the dataset.
      */
     public Charset getCharacterSet() {
-        return characterSet;
+        return characterSet.toCharset();
+    }
+    public Collection getCharacterSets() {
+        return Collections.singleton( characterSet );
     }
 
     /**
      * Set the full name of the character coding standard used for the dataset.
      */
-    public synchronized void setCharacterSet(final Charset newValue)  {
+    public synchronized void setCharacterSet(final CharacterSet newValue)  {
         checkWritePermission();
         characterSet = newValue;
     }
@@ -293,7 +298,7 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
         spatialRepresentationTypes = (Collection)          unmodifiable(spatialRepresentationTypes);
         spatialResolutions         = (Collection)          unmodifiable(spatialResolutions);
         language                   = (Collection)          unmodifiable(language);
-        characterSet               = (Charset)             unmodifiable(characterSet);
+        characterSet               = (CharacterSet)        unmodifiable(characterSet);
         topicCategories            = (Collection)          unmodifiable(topicCategories);
         geographicBox              = (Collection)          unmodifiable(geographicBox);
         geographicDescription      = (Collection)          unmodifiable(geographicDescription);

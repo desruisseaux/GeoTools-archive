@@ -355,7 +355,7 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
         }
         return getAccuracy0(operation);
     }
-
+    
     /**
      * Implementation of {@code getAccuracy} methods, both the ordinary and the
      * static member variants. The {@link #getAccuracy()} method can't invoke
@@ -365,14 +365,24 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
     private static double getAccuracy0(final CoordinateOperation operation) {
         final Collection accuracies = operation.getPositionalAccuracy();
         for (final Iterator it=accuracies.iterator(); it.hasNext();) {
-            final Result accuracy = ((PositionalAccuracy) it.next()).getResult();
-            if (accuracy instanceof QuantitativeResult) {
-                final QuantitativeResult quantity = (QuantitativeResult) accuracy;
-                final double[] r = quantity.getValues();
-                if (r!=null && r.length!=0) {
-                    final Unit unit = quantity.getValueUnit();
-                    if (unit!=null && SI.METER.isCompatible(unit)) {
-                        return unit.getConverterTo(SI.METER).convert(r[0]);
+            Collection results = ((PositionalAccuracy) it.next()).getResult();
+            for( Iterator it2 = results.iterator(); it2.hasNext(); ){
+                final Result accuracy = (Result) it2.next(); 
+                if (accuracy instanceof QuantitativeResult) {
+                    final QuantitativeResult quantity = (QuantitativeResult) accuracy;
+                    Collection r = quantity.getValues();
+                    
+                    if (r!=null && r.size() !=0) {
+                        final Unit unit = quantity.getValueUnit();
+                        if (unit!=null && SI.METER.isCompatible(unit)) {
+                            for( Iterator i=r.iterator();i.hasNext();){
+                                Double d = (Double) i.next();
+                                if( d != null ){
+                                    double value = d.doubleValue();
+                                    return unit.getConverterTo(SI.METER).convert( value );        
+                                }
+                            }                        
+                        }
                     }
                 }
             }

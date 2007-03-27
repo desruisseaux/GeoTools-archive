@@ -27,7 +27,7 @@ import java.util.List;
 import org.opengis.metadata.spatial.CellGeometry;
 import org.opengis.metadata.spatial.Georectified;
 import org.opengis.metadata.spatial.PixelOrientation;
-import org.opengis.spatialschema.geometry.primitive.Point;
+import org.opengis.geometry.primitive.Point;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies

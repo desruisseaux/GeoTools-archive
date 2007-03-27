@@ -20,7 +20,9 @@
 package org.geotools.metadata.iso.quality;
 
 // J2SE direct dependencies
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 
 // OpenGIS dependencies
@@ -204,14 +206,16 @@ public class ElementImpl extends MetadataEntity implements Element {
      * The array length is 1 for a single date, or 2 for a range. Returns
      * {@code null} if this information is not available.
      */
-    public synchronized Date[] getDate() {
+    public synchronized Collection getDate() {
         if (date1 == Long.MIN_VALUE) {
             return null;
         }
         if (date2 == Long.MIN_VALUE) {
-            return new Date[] {new Date(date1)};
+            return Collections.singleton( new Date(date1) );
         }
-        return new Date[] {new Date(date1), new Date(date2)};
+        return Arrays.asList(
+            new Date[] {new Date(date1), new Date(date2)}
+        );
     }
 
     /**
@@ -236,8 +240,8 @@ public class ElementImpl extends MetadataEntity implements Element {
      * the out come of evaluating the obtained value (or set of values) against a specified
      * acceptable conformance quality level.
      */
-    public Result getResult() {
-        return result;
+    public Collection getResult() {
+        return Collections.singleton( result );
     }
 
     /**

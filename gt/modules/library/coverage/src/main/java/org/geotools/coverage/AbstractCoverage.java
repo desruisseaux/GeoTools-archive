@@ -82,9 +82,9 @@ import org.opengis.coverage.processing.GridCoverageProcessor; // For javadoc
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.Geometry;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.Geometry;
 import org.opengis.temporal.Period;
 import org.opengis.util.InternationalString;
 import org.opengis.util.Record;

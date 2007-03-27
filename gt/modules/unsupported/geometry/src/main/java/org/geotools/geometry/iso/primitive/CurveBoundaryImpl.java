@@ -40,10 +40,10 @@ import java.util.Set;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.complex.Complex;
-import org.opengis.spatialschema.geometry.primitive.CurveBoundary;
-import org.opengis.spatialschema.geometry.primitive.Point;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.primitive.CurveBoundary;
+import org.opengis.geometry.primitive.Point;
 
 /**
  * The boundary of Curves shall be represented as CurveBoundary.
@@ -94,7 +94,7 @@ public class CurveBoundaryImpl extends PrimitiveBoundaryImpl implements
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.primitive.CurveBoundary#getStartPoint()
+	 * @see org.opengis.geometry.primitive.CurveBoundary#getStartPoint()
 	 */
 	public PointImpl getStartPoint() {
 		// TODO test
@@ -105,7 +105,7 @@ public class CurveBoundaryImpl extends PrimitiveBoundaryImpl implements
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.primitive.CurveBoundary#getEndPoint()
+	 * @see org.opengis.geometry.primitive.CurveBoundary#getEndPoint()
 	 */
 	public PointImpl getEndPoint() {
 		// TODO test
@@ -121,7 +121,7 @@ public class CurveBoundaryImpl extends PrimitiveBoundaryImpl implements
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getDimension(org.opengis.spatialschema.geometry.DirectPosition)
+	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getDimension(org.opengis.geometry.coordinate.DirectPosition)
 	 */
 	public int getDimension(final DirectPosition point) {
 		// TODO semantic JR, SJ
@@ -161,7 +161,7 @@ public class CurveBoundaryImpl extends PrimitiveBoundaryImpl implements
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#isSimple()
+	 * @see org.opengis.geometry.coordinate.root.Geometry#isSimple()
 	 */
 	public boolean isSimple() {
 		// A curveBoundary (start and end point) is always simple

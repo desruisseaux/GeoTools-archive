@@ -94,8 +94,8 @@ import org.geotools.geometry.iso.topograph2D.PlanarGraph;
 import org.geotools.geometry.iso.topograph2D.util.CoordinateArrays;
 import org.geotools.geometry.iso.util.Assert;
 import org.geotools.geometry.iso.util.algorithm2D.CGAlgorithms;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.primitive.Surface;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.primitive.Surface;
 
 /**
  * Forms {@link Surface}s out of a graph of {@link DirectedEdge}s. The edges

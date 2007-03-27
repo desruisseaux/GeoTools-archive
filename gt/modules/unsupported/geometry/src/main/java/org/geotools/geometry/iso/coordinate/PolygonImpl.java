@@ -41,9 +41,9 @@ import java.util.List;
 
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.geometry.Polygon;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.coordinate.Polygon;
 
 /**
  * @author Jackson Roehrig & Sanjay Jena
@@ -206,7 +206,7 @@ public class PolygonImpl extends SurfacePatchImpl implements Polygon {
 
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.geometry.Polygon#getSpanningSurface()
+	 * @see org.opengis.geometry.coordinate.Polygon#getSpanningSurface()
 	 */
 	public List getSpanningSurface() {
 		// TODO semantic JR, SJ
@@ -217,7 +217,7 @@ public class PolygonImpl extends SurfacePatchImpl implements Polygon {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.geometry.GenericSurface#getUpNormal(org.opengis.spatialschema.geometry.DirectPosition)
+	 * @see org.opengis.geometry.coordinate.GenericSurface#getUpNormal(org.opengis.geometry.coordinate.DirectPosition)
 	 */
 	public double[] getUpNormal(DirectPosition point) {
 		// TODO semantic JR, SJ
@@ -228,7 +228,7 @@ public class PolygonImpl extends SurfacePatchImpl implements Polygon {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.geometry.GenericSurface#getPerimeter()
+	 * @see org.opengis.geometry.coordinate.GenericSurface#getPerimeter()
 	 */
 	public double getPerimeter() {
 		// TODO semantic JR, SJ
@@ -239,7 +239,7 @@ public class PolygonImpl extends SurfacePatchImpl implements Polygon {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.geometry.GenericSurface#getArea()
+	 * @see org.opengis.geometry.coordinate.GenericSurface#getArea()
 	 */
 	public double getArea() {
 		// TODO semantic JR, SJ

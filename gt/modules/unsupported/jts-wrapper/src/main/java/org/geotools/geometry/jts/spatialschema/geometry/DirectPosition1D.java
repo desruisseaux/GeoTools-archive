@@ -10,8 +10,8 @@ import java.io.Serializable;
 
 // OpenGIS dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.MismatchedDimensionException;
 
 
 //geotools JTS wrappers dependency
@@ -65,7 +65,7 @@ public class DirectPosition1D implements DirectPosition, Serializable, Cloneable
 
     /**
      * Returns always {@code this}, the direct position for this
-     * {@linkplain org.opengis.spatialschema.geometry.geometry.Position position}.
+     * {@linkplain org.opengis.geometry.coordinate.Position position}.
      */
     public DirectPosition getPosition() {
         return this;

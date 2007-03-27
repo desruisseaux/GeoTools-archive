@@ -8,11 +8,11 @@ import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.DoublePointArray;
 import org.geotools.geometry.iso.coordinate.PointArrayImpl;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-import org.opengis.spatialschema.geometry.PositionFactory;
-import org.opengis.spatialschema.geometry.Precision;
-import org.opengis.spatialschema.geometry.geometry.Position;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.geometry.PositionFactory;
+import org.opengis.geometry.Precision;
+import org.opengis.geometry.coordinate.Position;
 
 /**
  * Default implementation of PositionFactory..

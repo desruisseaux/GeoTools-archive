@@ -91,7 +91,7 @@ import org.geotools.geometry.iso.topograph2D.GeometryGraph;
 import org.geotools.geometry.iso.topograph2D.index.SegmentIntersector;
 import org.geotools.geometry.iso.util.algorithm2D.LineIntersector;
 import org.geotools.geometry.iso.util.algorithm2D.RobustLineIntersector;
-import org.opengis.spatialschema.geometry.Geometry;
+import org.opengis.geometry.Geometry;
 
 /**
  * Tests whether a <code>Geometry</code> is simple. In general, the SFS

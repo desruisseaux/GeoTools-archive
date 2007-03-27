@@ -32,8 +32,8 @@ import org.opengis.filter.spatial.Intersects;
 import org.opengis.filter.spatial.Overlaps;
 import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
-import org.opengis.spatialschema.geometry.Geometry;
-import org.opengis.spatialschema.geometry.primitive.PrimitiveFactory;
+import org.opengis.geometry.Geometry;
+import org.opengis.geometry.primitive.PrimitiveFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;

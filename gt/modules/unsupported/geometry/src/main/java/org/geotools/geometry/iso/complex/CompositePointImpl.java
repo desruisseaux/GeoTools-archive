@@ -47,11 +47,11 @@ import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.geometry.iso.io.GeometryToString;
 import org.geotools.geometry.iso.primitive.BoundaryImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
-import org.opengis.spatialschema.geometry.Boundary;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.complex.Complex;
-import org.opengis.spatialschema.geometry.complex.CompositePoint;
+import org.opengis.geometry.Boundary;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.complex.CompositePoint;
 
 /**
  * A separate class for composite point, CompositePoint (Figure 27) is included
@@ -105,7 +105,7 @@ public class CompositePointImpl extends CompositeImpl<PointImpl> implements Comp
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#isSimple()
+	 * @see org.opengis.geometry.coordinate.root.Geometry#isSimple()
 	 */
 	public boolean isSimple() {
 		// a point is always simple
@@ -113,7 +113,7 @@ public class CompositePointImpl extends CompositeImpl<PointImpl> implements Comp
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#isCycle()
+	 * @see org.opengis.geometry.coordinate.root.Geometry#isCycle()
 	 */
 	public boolean isCycle() {
 		// A point is always a cicle
@@ -121,7 +121,7 @@ public class CompositePointImpl extends CompositeImpl<PointImpl> implements Comp
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.complex.Composite#getGenerators()
+	 * @see org.opengis.geometry.complex.Composite#getGenerators()
 	 */
 	public List getGenerators() {
 		return this.elements;
@@ -137,7 +137,7 @@ public class CompositePointImpl extends CompositeImpl<PointImpl> implements Comp
 
 
 	/* (non-Javadoc)
-	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getDimension(org.opengis.spatialschema.geometry.DirectPosition)
+	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getDimension(org.opengis.geometry.coordinate.DirectPosition)
 	 */
 	@Override
 	public int getDimension(DirectPosition point) {

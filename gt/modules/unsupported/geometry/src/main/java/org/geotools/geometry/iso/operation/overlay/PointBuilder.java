@@ -88,7 +88,7 @@ import org.geotools.geometry.iso.topograph2D.Coordinate;
 import org.geotools.geometry.iso.topograph2D.Label;
 import org.geotools.geometry.iso.topograph2D.Node;
 import org.geotools.geometry.iso.util.algorithm2D.PointLocator;
-import org.opengis.spatialschema.geometry.geometry.GeometryFactory;
+import org.opengis.geometry.coordinate.GeometryFactory;
 
 // import java.util.*;
 // import com.vividsolutions.jts.geom.*;

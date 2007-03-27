@@ -10,7 +10,7 @@
 package org.geotools.geometry.jts.spatialschema.geometry.geometry;
 
 // OpenGIS direct dependencies
-import org.opengis.spatialschema.geometry.geometry.GenericCurve;
+import org.opengis.geometry.coordinate.GenericCurve;
 
 import org.geotools.geometry.jts.JTSGeometry;
 

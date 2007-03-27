@@ -40,9 +40,9 @@ package org.geotools.geometry.iso.primitive;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.LineStringImpl;
 import org.geotools.geometry.iso.coordinate.PositionImpl;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.complex.CompositeCurve;
-import org.opengis.spatialschema.geometry.primitive.OrientableCurve;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.complex.CompositeCurve;
+import org.opengis.geometry.primitive.OrientableCurve;
 
 /**
  * @author roehrig

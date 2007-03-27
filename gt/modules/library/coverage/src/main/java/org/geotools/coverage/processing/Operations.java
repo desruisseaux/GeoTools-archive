@@ -33,7 +33,7 @@ import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.geometry.Envelope;
 
 // Geotools dependencies
 import org.geotools.resources.i18n.Errors;

@@ -17,7 +17,7 @@ package org.geotools.gml3.bindings;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.geometry.DirectPosition;
 import org.geotools.geometry.DirectPosition1D;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.gml3.GML3TestSupport;

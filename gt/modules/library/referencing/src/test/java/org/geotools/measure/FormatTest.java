@@ -30,7 +30,7 @@ import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
 // OpenGIS dependencies
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.geometry.GeneralDirectPosition;

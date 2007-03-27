@@ -48,34 +48,34 @@ import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.geometry.iso.util.Assert;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
-import org.opengis.spatialschema.geometry.aggregate.MultiPrimitive;
-import org.opengis.spatialschema.geometry.geometry.Arc;
-import org.opengis.spatialschema.geometry.geometry.ArcByBulge;
-import org.opengis.spatialschema.geometry.geometry.ArcString;
-import org.opengis.spatialschema.geometry.geometry.ArcStringByBulge;
-import org.opengis.spatialschema.geometry.geometry.BSplineCurve;
-import org.opengis.spatialschema.geometry.geometry.BSplineSurface;
-import org.opengis.spatialschema.geometry.geometry.Geodesic;
-import org.opengis.spatialschema.geometry.geometry.GeodesicString;
-import org.opengis.spatialschema.geometry.geometry.GeometryFactory;
-import org.opengis.spatialschema.geometry.geometry.Knot;
-import org.opengis.spatialschema.geometry.geometry.KnotType;
-import org.opengis.spatialschema.geometry.geometry.LineSegment;
-import org.opengis.spatialschema.geometry.geometry.LineString;
-import org.opengis.spatialschema.geometry.geometry.PointArray;
-import org.opengis.spatialschema.geometry.geometry.Polygon;
-import org.opengis.spatialschema.geometry.geometry.PolyhedralSurface;
-import org.opengis.spatialschema.geometry.geometry.Position;
-import org.opengis.spatialschema.geometry.geometry.Tin;
-import org.opengis.spatialschema.geometry.geometry.Triangle;
-import org.opengis.spatialschema.geometry.geometry.TriangulatedSurface;
-import org.opengis.spatialschema.geometry.primitive.Ring;
-import org.opengis.spatialschema.geometry.primitive.Surface;
-import org.opengis.spatialschema.geometry.primitive.SurfaceBoundary;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.geometry.MismatchedReferenceSystemException;
+import org.opengis.geometry.aggregate.MultiPrimitive;
+import org.opengis.geometry.coordinate.Arc;
+import org.opengis.geometry.coordinate.ArcByBulge;
+import org.opengis.geometry.coordinate.ArcString;
+import org.opengis.geometry.coordinate.ArcStringByBulge;
+import org.opengis.geometry.coordinate.BSplineCurve;
+import org.opengis.geometry.coordinate.BSplineSurface;
+import org.opengis.geometry.coordinate.Geodesic;
+import org.opengis.geometry.coordinate.GeodesicString;
+import org.opengis.geometry.coordinate.GeometryFactory;
+import org.opengis.geometry.coordinate.Knot;
+import org.opengis.geometry.coordinate.KnotType;
+import org.opengis.geometry.coordinate.LineSegment;
+import org.opengis.geometry.coordinate.LineString;
+import org.opengis.geometry.coordinate.PointArray;
+import org.opengis.geometry.coordinate.Polygon;
+import org.opengis.geometry.coordinate.PolyhedralSurface;
+import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.coordinate.Tin;
+import org.opengis.geometry.coordinate.Triangle;
+import org.opengis.geometry.coordinate.TriangulatedSurface;
+import org.opengis.geometry.primitive.Ring;
+import org.opengis.geometry.primitive.Surface;
+import org.opengis.geometry.primitive.SurfaceBoundary;
 
 /**
  * convenience methods to create objects of the coordinate geometry package
@@ -102,7 +102,7 @@ public class CoordinateFactoryImpl implements GeometryFactory {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#getCoordinateReferenceSystem()
+	 * @see org.opengis.geometry.coordinate.Factory#getCoordinateReferenceSystem()
 	 */
 	public CoordinateReferenceSystem getCoordinateReferenceSystem() {
 		return this.geometryFactory.getCoordinateReferenceSystem();
@@ -127,7 +127,7 @@ public class CoordinateFactoryImpl implements GeometryFactory {
 	// **************************************************************************
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createDirectPosition()
+	 * @see org.opengis.geometry.coordinate.Factory#createDirectPosition()
 	 */
 	public DirectPositionImpl createDirectPosition() {
 		// Test ok
@@ -135,7 +135,7 @@ public class CoordinateFactoryImpl implements GeometryFactory {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createDirectPosition(double[])
+	 * @see org.opengis.geometry.coordinate.Factory#createDirectPosition(double[])
 	 */
 	public DirectPositionImpl createDirectPosition(double[] coord) {
 		// Test ok
@@ -148,7 +148,7 @@ public class CoordinateFactoryImpl implements GeometryFactory {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createEnvelope(org.opengis.spatialschema.geometry.DirectPosition, org.opengis.spatialschema.geometry.DirectPosition)
+	 * @see org.opengis.geometry.coordinate.Factory#createEnvelope(org.opengis.geometry.coordinate.DirectPosition, org.opengis.geometry.coordinate.DirectPosition)
 	 */
 	public Envelope createEnvelope(
 			DirectPosition lowerCorner,
@@ -159,7 +159,7 @@ public class CoordinateFactoryImpl implements GeometryFactory {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createLineSegment(org.opengis.spatialschema.geometry.geometry.Position, org.opengis.spatialschema.geometry.geometry.Position)
+	 * @see org.opengis.geometry.coordinate.Factory#createLineSegment(org.opengis.geometry.coordinate.Position, org.opengis.geometry.coordinate.Position)
 	 */
 	public LineSegment createLineSegment(Position startPoint, Position endPoint)
 			throws MismatchedReferenceSystemException,
@@ -176,7 +176,7 @@ public class CoordinateFactoryImpl implements GeometryFactory {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createPolygon(org.opengis.spatialschema.geometry.primitive.SurfaceBoundary)
+	 * @see org.opengis.geometry.coordinate.Factory#createPolygon(org.opengis.geometry.primitive.SurfaceBoundary)
 	 */
 	public Polygon createPolygon(SurfaceBoundary boundary)
 			throws MismatchedReferenceSystemException,
@@ -189,8 +189,8 @@ public class CoordinateFactoryImpl implements GeometryFactory {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createPolygon(org.opengis.spatialschema.geometry.primitive.SurfaceBoundary,
-	 *      org.opengis.spatialschema.geometry.primitive.Surface)
+	 * @see org.opengis.geometry.coordinate.Factory#createPolygon(org.opengis.geometry.primitive.SurfaceBoundary,
+	 *      org.opengis.geometry.primitive.Surface)
 	 */
 	public Polygon createPolygon(SurfaceBoundary boundary, Surface spanSurface)
 			throws MismatchedReferenceSystemException,
@@ -204,7 +204,7 @@ public class CoordinateFactoryImpl implements GeometryFactory {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createSurfaceBoundary(org.opengis.spatialschema.geometry.primitive.Ring,
+	 * @see org.opengis.geometry.coordinate.Factory#createSurfaceBoundary(org.opengis.geometry.primitive.Ring,
 	 *      java.util.List)
 	 */
 	// public SurfaceBoundary createSurfaceBoundary(Ring exterior, List
@@ -215,7 +215,7 @@ public class CoordinateFactoryImpl implements GeometryFactory {
 
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createMultiPrimitive()
+	 * @see org.opengis.geometry.coordinate.Factory#createMultiPrimitive()
 	 */
 	public MultiPrimitive createMultiPrimitive() {
 		// ok - this method will disappear from GeoAPI soon
@@ -273,7 +273,7 @@ public class CoordinateFactoryImpl implements GeometryFactory {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createPosition(org.opengis.spatialschema.geometry.DirectPosition)
+	 * @see org.opengis.geometry.coordinate.Factory#createPosition(org.opengis.geometry.coordinate.DirectPosition)
 	 */
 	public Position createPosition(DirectPosition dp) {
 		// Test ok
@@ -426,7 +426,7 @@ public class CoordinateFactoryImpl implements GeometryFactory {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createLineString(java.util.List)
+	 * @see org.opengis.geometry.coordinate.Factory#createLineString(java.util.List)
 	 */
 	public LineStringImpl createLineString(List<Position> positions)
 			throws MismatchedReferenceSystemException,

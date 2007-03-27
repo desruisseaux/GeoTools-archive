@@ -21,6 +21,7 @@ package org.geotools.metadata.iso.constraint;
 
 // J2SE direct dependencies
 import java.util.Collection;
+import java.util.Collections;
 
 // OpenGIS dependencies
 import org.opengis.metadata.constraint.Restriction;
@@ -111,8 +112,8 @@ public class LegalConstraintsImpl extends ConstraintsImpl implements LegalConstr
      * access constraints} or {@linkplain #getUseConstraints use constraints} declares
      * {@linkplain Restriction#OTHER_RESTRICTIONS other restrictions}.
      */
-    public InternationalString getOtherConstraints() {
-        return otherConstraints;
+    public Collection getOtherConstraints() {
+        return Collections.singleton( otherConstraints );
     }
 
     /**

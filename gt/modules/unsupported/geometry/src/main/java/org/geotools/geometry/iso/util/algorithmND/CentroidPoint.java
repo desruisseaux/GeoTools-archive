@@ -82,7 +82,7 @@ import org.geotools.geometry.iso.complex.CompositePointImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
-import org.opengis.spatialschema.geometry.primitive.Point;
+import org.opengis.geometry.primitive.Point;
 
 /**
  * Computes the centroid of a point geometry.

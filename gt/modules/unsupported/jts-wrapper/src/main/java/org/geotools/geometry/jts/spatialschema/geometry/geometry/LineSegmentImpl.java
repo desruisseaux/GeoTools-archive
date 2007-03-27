@@ -9,14 +9,14 @@
  *************************************************************************************************/
 package org.geotools.geometry.jts.spatialschema.geometry.geometry;
 
-import org.opengis.spatialschema.geometry.geometry.LineSegment;
+import org.opengis.geometry.coordinate.LineSegment;
 
 
 /**
- * Two distinct {@linkplain org.opengis.spatialschema.geometry.DirectPosition direct positions}
+ * Two distinct {@linkplain org.opengis.geometry.coordinate.DirectPosition direct positions}
  * (the {@linkplain #getStartPoint start point} and {@linkplain #getEndPoint end point}) joined
  * by a straight line. Thus its interpolation attribute shall be
- * {@link org.opengis.spatialschema.geometry.primitive.CurveInterpolation#LINEAR LINEAR}.
+ * {@link org.opengis.geometry.primitive.CurveInterpolation#LINEAR LINEAR}.
  * The default parameterization is:
  *
  * <blockquote><pre>

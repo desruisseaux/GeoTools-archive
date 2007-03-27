@@ -20,7 +20,7 @@ package org.geotools.coverage;
 import java.util.Date;
 
 // OpenGIS dependencies
-import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.geometry.Envelope;
 import org.opengis.coverage.PointOutsideCoverageException;
 
 // Geotools dependencies

@@ -50,18 +50,18 @@ import org.geotools.geometry.iso.io.GeometryToString;
 import org.geotools.geometry.iso.operation.IsSimpleOp;
 import org.geotools.geometry.iso.operation.Merger;
 import org.geotools.geometry.iso.util.DoubleOperation;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.complex.CompositeCurve;
-import org.opengis.spatialschema.geometry.geometry.LineSegment;
-import org.opengis.spatialschema.geometry.geometry.LineString;
-import org.opengis.spatialschema.geometry.geometry.ParamForPoint;
-import org.opengis.spatialschema.geometry.geometry.Position;
-import org.opengis.spatialschema.geometry.primitive.Curve;
-import org.opengis.spatialschema.geometry.primitive.CurveBoundary;
-import org.opengis.spatialschema.geometry.primitive.CurveSegment;
-import org.opengis.spatialschema.geometry.primitive.OrientablePrimitive;
-import org.opengis.spatialschema.geometry.primitive.Point;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.complex.CompositeCurve;
+import org.opengis.geometry.coordinate.LineSegment;
+import org.opengis.geometry.coordinate.LineString;
+import org.opengis.geometry.coordinate.ParamForPoint;
+import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.primitive.Curve;
+import org.opengis.geometry.primitive.CurveBoundary;
+import org.opengis.geometry.primitive.CurveSegment;
+import org.opengis.geometry.primitive.OrientablePrimitive;
+import org.opengis.geometry.primitive.Point;
 
 /**
  * Curve (Figure 11 of the ISO 19107 v5) is a descendent subtype of Primitive
@@ -384,7 +384,7 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#getEndPoint()
+	 * @see org.opengis.geometry.coordinate.GenericCurve#getEndPoint()
 	 */
 	public DirectPosition getEndPoint() {
 		/* Return End Point of last CurveSegment */
@@ -414,7 +414,7 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#getParamForPoint(org.opengis.spatialschema.geometry.DirectPosition)
+	 * @see org.opengis.geometry.coordinate.GenericCurve#getParamForPoint(org.opengis.geometry.coordinate.DirectPosition)
 	 */
 	public ParamForPoint getParamForPoint(DirectPosition p) {
 		// TODO semantic SJ, JR
@@ -456,7 +456,7 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#forParam(double)
+	 * @see org.opengis.geometry.coordinate.GenericCurve#forParam(double)
 	 */
 	public DirectPosition forParam(double distance) {
 		// Test ok - valid for n dimensional space
@@ -495,7 +495,7 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#length(double, double)
+	 * @see org.opengis.geometry.coordinate.GenericCurve#length(double, double)
 	 */
 	public double length(double par1, double par2) {
 		if (par1 < 0 || par2 > this.length())
@@ -561,7 +561,7 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#asLineString(double,
+	 * @see org.opengis.geometry.coordinate.GenericCurve#asLineString(double,
 	 *      double)
 	 */
 	public LineStringImpl asLineString(double spacing, double offset) {
@@ -615,7 +615,7 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getDimension(org.opengis.spatialschema.geometry.DirectPosition)
+	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getDimension(org.opengis.geometry.coordinate.DirectPosition)
 	 */
 	public int getDimension(DirectPosition point) {
 		// TODO semantic SJ, JR
@@ -674,7 +674,7 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#isSimple()
+	 * @see org.opengis.geometry.coordinate.root.Geometry#isSimple()
 	 */
 	public boolean isSimple() {
 		// Test ok
@@ -686,7 +686,7 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.primitive.Curve#getSegments()
+	 * @see org.opengis.geometry.primitive.Curve#getSegments()
 	 */
 	public List<CurveSegment> getSegments() {
 		// ok
@@ -697,7 +697,7 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.primitive.OrientableCurve#getComposite()
+	 * @see org.opengis.geometry.primitive.OrientableCurve#getComposite()
 	 */
 	public CompositeCurve getComposite() {
 		// TODO semantic SJ, JR
@@ -710,7 +710,7 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#getTangent(double)
+	 * @see org.opengis.geometry.coordinate.GenericCurve#getTangent(double)
 	 */
 	public double[] getTangent(double distance) {
 		// Test OK - valid for n dimensional space
@@ -732,7 +732,7 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#getStartParam()
+	 * @see org.opengis.geometry.coordinate.GenericCurve#getStartParam()
 	 */
 	public double getStartParam() {
 		// Test ok
@@ -743,7 +743,7 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#getEndParam()
+	 * @see org.opengis.geometry.coordinate.GenericCurve#getEndParam()
 	 */
 	public double getEndParam() {
 		// Test ok
@@ -755,7 +755,7 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#getStartConstructiveParam()
+	 * @see org.opengis.geometry.coordinate.GenericCurve#getStartConstructiveParam()
 	 */
 	public double getStartConstructiveParam() {
 		// Test ok
@@ -766,7 +766,7 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#getEndConstructiveParam()
+	 * @see org.opengis.geometry.coordinate.GenericCurve#getEndConstructiveParam()
 	 */
 	public double getEndConstructiveParam() {
 		// Test ok
@@ -777,7 +777,7 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#forConstructiveParam(double)
+	 * @see org.opengis.geometry.coordinate.GenericCurve#forConstructiveParam(double)
 	 */
 	public DirectPosition forConstructiveParam(double cp) {
 		// Test ok - valid for n dimensional space
@@ -790,8 +790,8 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#length(org.opengis.spatialschema.geometry.geometry.Position,
-	 *      org.opengis.spatialschema.geometry.geometry.Position)
+	 * @see org.opengis.geometry.coordinate.GenericCurve#length(org.opengis.geometry.coordinate.Position,
+	 *      org.opengis.geometry.coordinate.Position)
 	 */
 	public double length(Position point1, Position point2) {
 		// TODO semantic SJ, JR

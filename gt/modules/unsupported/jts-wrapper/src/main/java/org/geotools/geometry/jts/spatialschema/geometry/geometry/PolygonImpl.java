@@ -2,10 +2,10 @@ package org.geotools.geometry.jts.spatialschema.geometry.geometry;
 
 import java.util.List;
 
-import org.opengis.spatialschema.geometry.geometry.Polygon;
-import org.opengis.spatialschema.geometry.primitive.Ring;
-import org.opengis.spatialschema.geometry.primitive.SurfaceBoundary;
-import org.opengis.spatialschema.geometry.primitive.SurfaceInterpolation;
+import org.opengis.geometry.coordinate.Polygon;
+import org.opengis.geometry.primitive.Ring;
+import org.opengis.geometry.primitive.SurfaceBoundary;
+import org.opengis.geometry.primitive.SurfaceInterpolation;
 
 import org.geotools.geometry.jts.spatialschema.geometry.primitive.SurfacePatchImpl;
 import org.geotools.geometry.jts.JTSGeometry;
@@ -68,7 +68,7 @@ public class PolygonImpl extends SurfacePatchImpl implements Polygon {
 
     /**
      * @return
-     * @see org.opengis.spatialschema.geometry.geometry.Polygon#getSpanningSurface()
+     * @see org.opengis.geometry.coordinate.Polygon#getSpanningSurface()
      */
     public List getSpanningSurface() {
         // Why the hell is this a list???

@@ -12,8 +12,8 @@ import org.geotools.geometry.iso.io.wkt.WKTReader;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
-import org.opengis.spatialschema.geometry.geometry.Position;
-import org.opengis.spatialschema.geometry.primitive.CurveSegment;
+import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.primitive.CurveSegment;
 
 public class IsSimpleOperationTest extends TestCase {
 

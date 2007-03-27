@@ -109,7 +109,7 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
      * {@linkplain #getCode code} uses versions. When appropriate, the edition is
      * identified by the effective date, coded using ISO 8601 date format.
      */
-   // private final String version;
+   private final String version;
 
     /**
      * Comments on or information about this identifier, or {@code null} if none.
@@ -256,6 +256,7 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
          */
         String key   = null;
         Object value = null;
+        String version = null;
         for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) {
             final Map.Entry entry = (Map.Entry) it.next();
             key   = ((String) entry.getKey()).trim().toLowerCase();
@@ -279,13 +280,13 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
                     }
                     break;
                 }
-//                case 351608024: {
-//                    if (key.equals(VERSION_KEY)) {
-//                        version = value;
-//                        continue;
-//                    }
-//                    break;
-//                }
+                case 351608024: {
+                    if (key.equals(VERSION_KEY)) {
+                        version = (String) value;
+                        continue;
+                    }
+                    break;
+                }
                 case 1475610435: {
                     if (key.equals(AUTHORITY_KEY)) {
                         if (value instanceof String) {
@@ -340,7 +341,7 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
          */
         try {
             key=      CODE_KEY; this.code      = (String)              (value=code);
-            //key=   VERSION_KEY; this.version   = (String)              (value=version);
+            key=   VERSION_KEY; this.version   = (String)              (value=version);
             key= AUTHORITY_KEY; this.authority = (Citation)            (value=authority);
             key=   REMARKS_KEY; this.remarks   = (InternationalString) (value=remarks);
         } catch (ClassCastException exception) {
@@ -398,9 +399,9 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
      *
      * @return The version, or {@code null} if not available.
      */
-//    public String getVersion() {
-//        return version;
-//    }
+    public String getVersion() {
+        return version;
+    }
 
     /**
      * Comments on or information about this identifier, or {@code null} if none.
@@ -596,9 +597,9 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
         if (code != null) {
             hash ^= code.hashCode();
         }
-//        if (version != null) {
-//            hash = hash*37 + version.hashCode();
-//        }
+        if (version != null) {
+            hash = hash*37 + version.hashCode();
+        }
         return hash;
     }
 }

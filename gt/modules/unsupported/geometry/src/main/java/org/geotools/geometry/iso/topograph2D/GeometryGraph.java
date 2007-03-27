@@ -102,8 +102,8 @@ import org.geotools.geometry.iso.topograph2D.index.SimpleMonotoneChainSweepLineI
 import org.geotools.geometry.iso.topograph2D.util.CoordinateArrays;
 import org.geotools.geometry.iso.util.Assert;
 import org.geotools.geometry.iso.util.algorithm2D.LineIntersector;
-import org.opengis.spatialschema.geometry.primitive.Primitive;
-import org.opengis.spatialschema.geometry.primitive.Ring;
+import org.opengis.geometry.primitive.Primitive;
+import org.opengis.geometry.primitive.Ring;
 
 /**
  * A GeometryGraph is a graph that models a given Geometry

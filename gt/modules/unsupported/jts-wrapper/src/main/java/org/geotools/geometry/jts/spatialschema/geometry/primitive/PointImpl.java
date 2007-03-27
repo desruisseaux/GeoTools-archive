@@ -22,12 +22,12 @@ import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationNotFoundException;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.UnmodifiableGeometryException;
-import org.opengis.spatialschema.geometry.geometry.Position;
-import org.opengis.spatialschema.geometry.primitive.Bearing;
-import org.opengis.spatialschema.geometry.primitive.OrientablePrimitive;
-import org.opengis.spatialschema.geometry.primitive.Point;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.UnmodifiableGeometryException;
+import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.primitive.Bearing;
+import org.opengis.geometry.primitive.OrientablePrimitive;
+import org.opengis.geometry.primitive.Point;
 
 //geotools dependencies
 import org.geotools.factory.BasicFactories;

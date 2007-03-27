@@ -39,15 +39,15 @@ package org.geotools.geometry.iso.primitive;
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.io.GeometryToString;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.TransfiniteSet;
-import org.opengis.spatialschema.geometry.complex.Complex;
-import org.opengis.spatialschema.geometry.geometry.Position;
-import org.opengis.spatialschema.geometry.primitive.Bearing;
-import org.opengis.spatialschema.geometry.primitive.OrientablePrimitive;
-import org.opengis.spatialschema.geometry.primitive.Point;
-import org.opengis.spatialschema.geometry.primitive.PrimitiveBoundary;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.TransfiniteSet;
+import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.primitive.Bearing;
+import org.opengis.geometry.primitive.OrientablePrimitive;
+import org.opengis.geometry.primitive.Point;
+import org.opengis.geometry.primitive.PrimitiveBoundary;
 
 /**
  * 
@@ -105,7 +105,7 @@ public class PointImpl extends PrimitiveImpl implements Point {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.primitive.Point#getPosition()
+	 * @see org.opengis.geometry.primitive.Point#getPosition()
 	 */
 	public DirectPositionImpl getPosition() {
 		return this.position;
@@ -119,7 +119,7 @@ public class PointImpl extends PrimitiveImpl implements Point {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.primitive.Point#setPosition(org.opengis.spatialschema.geometry.DirectPosition)
+	 * @see org.opengis.geometry.primitive.Point#setPosition(org.opengis.geometry.coordinate.DirectPosition)
 	 */
 	public void setPosition(DirectPosition p) {
 		this.position = this.getGeometryFactory().getCoordinateFactory()
@@ -156,7 +156,7 @@ public class PointImpl extends PrimitiveImpl implements Point {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.primitive.Point#getBearing(org.opengis.spatialschema.geometry.geometry.Position)
+	 * @see org.opengis.geometry.primitive.Point#getBearing(org.opengis.geometry.coordinate.Position)
 	 */
 	public Bearing getBearing(Position toPoint) {
 		// TODO Auto-generated method stub
@@ -183,7 +183,7 @@ public class PointImpl extends PrimitiveImpl implements Point {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getDimension(org.opengis.spatialschema.geometry.DirectPosition)
+	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getDimension(org.opengis.geometry.coordinate.DirectPosition)
 	 */
 	public int getDimension(DirectPosition point) {
 		return 0;
@@ -243,7 +243,7 @@ public class PointImpl extends PrimitiveImpl implements Point {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#isSimple()
+	 * @see org.opengis.geometry.coordinate.root.Geometry#isSimple()
 	 */
 	public boolean isSimple() {
 		// A Point is always simple
@@ -253,7 +253,7 @@ public class PointImpl extends PrimitiveImpl implements Point {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#isCycle()
+	 * @see org.opengis.geometry.coordinate.root.Geometry#isCycle()
 	 */
 	public boolean isCycle() {
 		// A Point is always a cicle, because its boundary is always NULL
@@ -273,7 +273,7 @@ public class PointImpl extends PrimitiveImpl implements Point {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.primitive.Primitive#getProxy()
+	 * @see org.opengis.geometry.primitive.Primitive#getProxy()
 	 */
 	public OrientablePrimitive[] getProxy() {
 		// TODO ok?!
@@ -282,7 +282,7 @@ public class PointImpl extends PrimitiveImpl implements Point {
 	
 
 	/* (non-Javadoc)
-	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#equals(org.opengis.spatialschema.geometry.TransfiniteSet)
+	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#equals(org.opengis.geometry.coordinate.TransfiniteSet)
 	 */
 	public boolean equals(TransfiniteSet pointSet) {
 		// Overwrite the equals method for performance reason

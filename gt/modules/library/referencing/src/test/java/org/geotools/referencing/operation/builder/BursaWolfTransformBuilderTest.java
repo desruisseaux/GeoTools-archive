@@ -23,7 +23,7 @@ import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.referencing.operation.transform.GeocentricTranslation;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.geometry.DirectPosition;
 
 // J2SE and extensions
 import java.util.ArrayList;

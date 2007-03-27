@@ -44,7 +44,7 @@ import org.geotools.resources.TestData;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.geometry.MismatchedDimensionException;
 
 /**
  * Testing {@link ImagePyramidReader}.

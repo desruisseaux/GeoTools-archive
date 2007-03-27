@@ -28,9 +28,9 @@ import java.util.List;
 
 // GeoAPI dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.geometry.PointArray;
-import org.opengis.spatialschema.geometry.geometry.Position;
-import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.geometry.coordinate.PointArray;
+import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.DirectPosition;
 
 // Geotools dependencies
 import org.geotools.referencing.CRS;

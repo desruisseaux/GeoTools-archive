@@ -14,9 +14,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.complex.Complex;
-import org.opengis.spatialschema.geometry.primitive.CurveBoundary;
-import org.opengis.spatialschema.geometry.primitive.Point;
+import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.primitive.CurveBoundary;
+import org.opengis.geometry.primitive.Point;
 
 /**
  * This is Chris's implementation of a CurveBoundary.  I started it and
@@ -72,7 +72,7 @@ public class CurveBoundaryImpl extends PrimitiveBoundaryImpl implements CurveBou
 
     /**
      * @inheritDoc
-     * @see org.opengis.spatialschema.geometry.primitive.CurveBoundary#getStartPoint()
+     * @see org.opengis.geometry.primitive.CurveBoundary#getStartPoint()
      */
     public Point getStartPoint() {
         return startPoint;
@@ -80,7 +80,7 @@ public class CurveBoundaryImpl extends PrimitiveBoundaryImpl implements CurveBou
 
     /**
      * @inheritDoc
-     * @see org.opengis.spatialschema.geometry.primitive.CurveBoundary#getEndPoint()
+     * @see org.opengis.geometry.primitive.CurveBoundary#getEndPoint()
      */
     public Point getEndPoint() {
         return endPoint;

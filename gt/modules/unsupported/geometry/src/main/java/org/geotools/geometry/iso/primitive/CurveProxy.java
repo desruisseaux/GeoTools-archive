@@ -42,11 +42,11 @@ import java.util.List;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.LineStringImpl;
 import org.geotools.geometry.iso.coordinate.PositionImpl;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.geometry.ParamForPoint;
-import org.opengis.spatialschema.geometry.geometry.Position;
-import org.opengis.spatialschema.geometry.primitive.Curve;
-import org.opengis.spatialschema.geometry.primitive.CurveSegment;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.coordinate.ParamForPoint;
+import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.primitive.Curve;
+import org.opengis.geometry.primitive.CurveSegment;
 
 /**
  * @author roehrig

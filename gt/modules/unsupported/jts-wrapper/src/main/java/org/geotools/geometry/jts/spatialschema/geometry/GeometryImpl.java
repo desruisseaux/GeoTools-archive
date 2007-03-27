@@ -20,15 +20,15 @@ import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationNotFoundException;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.Boundary;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.Geometry;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-import org.opengis.spatialschema.geometry.Precision;
-import org.opengis.spatialschema.geometry.TransfiniteSet;
-import org.opengis.spatialschema.geometry.complex.Complex;
-import org.opengis.spatialschema.geometry.primitive.Ring;
+import org.opengis.geometry.Boundary;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.Geometry;
+import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.geometry.Precision;
+import org.opengis.geometry.TransfiniteSet;
+import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.primitive.Ring;
 import org.opengis.util.Cloneable;
 
 import org.geotools.geometry.jts.spatialschema.geometry.primitive.CurveBoundaryImpl;
@@ -418,7 +418,7 @@ public abstract class GeometryImpl
 
     /**
      * @inheritDoc
-     * @see org.opengis.spatialschema.geometry.Geometry#getEnvelope()
+     * @see org.opengis.geometry.coordinate.#getEnvelope()
      */
     public final Envelope getEnvelope() {
         com.vividsolutions.jts.geom.Geometry jtsGeom = getJTSGeometry();

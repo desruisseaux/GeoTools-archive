@@ -16,6 +16,12 @@
   </parent>
 
 
+<properties>
+    <allow.test.skip>true</allow.test.skip>
+    <allow.test.failure.ignore>true</allow.test.failure.ignore>
+    <maven.test.skip>true</maven.test.skip>
+</properties>
+
   <!-- ==================================================== -->
   <!--     Module description                               -->
   <!-- ==================================================== -->

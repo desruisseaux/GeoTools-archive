@@ -27,7 +27,7 @@ import junit.framework.TestSuite;
 
 // OpenGIS dependencies
 import org.opengis.coverage.grid.GridRange;
-import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.geometry.Envelope;
 
 // Geotools dependencies
 import org.geotools.coverage.grid.Interpolator2D;

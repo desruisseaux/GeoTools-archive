@@ -39,9 +39,9 @@ package org.geotools.geometry.iso.coordinate;
 
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.primitive.SurfaceInterpolation;
-import org.opengis.spatialschema.geometry.primitive.SurfacePatch;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.primitive.SurfaceInterpolation;
+import org.opengis.geometry.primitive.SurfacePatch;
 
 /**
  * @author Jackson Roehrig & Sanjay Jena
@@ -126,7 +126,7 @@ public abstract class SurfacePatchImpl implements SurfacePatch {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.primitive.SurfacePatch#getInterpolation()
+	 * @see org.opengis.geometry.primitive.SurfacePatch#getInterpolation()
 	 */
 	public SurfaceInterpolation getInterpolation() {
 		// ok
@@ -134,7 +134,7 @@ public abstract class SurfacePatchImpl implements SurfacePatch {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.primitive.SurfacePatch#getBoundary()
+	 * @see org.opengis.geometry.primitive.SurfacePatch#getBoundary()
 	 */
 	public SurfaceBoundaryImpl getBoundary() {
 		// ok
@@ -142,7 +142,7 @@ public abstract class SurfacePatchImpl implements SurfacePatch {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.primitive.SurfacePatch#getSurface()
+	 * @see org.opengis.geometry.primitive.SurfacePatch#getSurface()
 	 */
 	public SurfaceImpl getSurface() {
 		// ok
@@ -150,7 +150,7 @@ public abstract class SurfacePatchImpl implements SurfacePatch {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.primitive.SurfacePatch#getNumDerivativesOnBoundary()
+	 * @see org.opengis.geometry.primitive.SurfacePatch#getNumDerivativesOnBoundary()
 	 */
 	public int getNumDerivativesOnBoundary() {
 		return this.numDerivativesOnBoundary;

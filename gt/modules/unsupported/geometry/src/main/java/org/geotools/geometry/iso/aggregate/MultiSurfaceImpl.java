@@ -39,9 +39,9 @@ package org.geotools.geometry.iso.aggregate;
 import java.util.Set;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.opengis.spatialschema.geometry.Boundary;
-import org.opengis.spatialschema.geometry.aggregate.MultiSurface;
-import org.opengis.spatialschema.geometry.primitive.OrientableSurface;
+import org.opengis.geometry.Boundary;
+import org.opengis.geometry.aggregate.MultiSurface;
+import org.opengis.geometry.primitive.OrientableSurface;
 
 public class MultiSurfaceImpl extends MultiPrimitiveImpl implements MultiSurface {
 
@@ -56,7 +56,7 @@ public class MultiSurfaceImpl extends MultiPrimitiveImpl implements MultiSurface
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.aggregate.MultiSurface#getArea()
+	 * @see org.opengis.geometry.coordinate.aggregate.MultiSurface#getArea()
 	 */
 	public double getArea() {
 		// TODO Auto-generated method stub

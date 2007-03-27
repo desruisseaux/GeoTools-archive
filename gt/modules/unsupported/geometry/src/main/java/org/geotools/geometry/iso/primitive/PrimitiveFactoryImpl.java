@@ -49,20 +49,20 @@ import org.geotools.geometry.iso.coordinate.LineStringImpl;
 import org.geotools.geometry.iso.coordinate.PositionImpl;
 import org.geotools.geometry.iso.coordinate.SurfacePatchImpl;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
-import org.opengis.spatialschema.geometry.geometry.Position;
-import org.opengis.spatialschema.geometry.primitive.Curve;
-import org.opengis.spatialschema.geometry.primitive.CurveSegment;
-import org.opengis.spatialschema.geometry.primitive.OrientableCurve;
-import org.opengis.spatialschema.geometry.primitive.Point;
-import org.opengis.spatialschema.geometry.primitive.PrimitiveFactory;
-import org.opengis.spatialschema.geometry.primitive.Ring;
-import org.opengis.spatialschema.geometry.primitive.SolidBoundary;
-import org.opengis.spatialschema.geometry.primitive.SurfaceBoundary;
-import org.opengis.spatialschema.geometry.primitive.SurfacePatch;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.geometry.MismatchedReferenceSystemException;
+import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.primitive.Curve;
+import org.opengis.geometry.primitive.CurveSegment;
+import org.opengis.geometry.primitive.OrientableCurve;
+import org.opengis.geometry.primitive.Point;
+import org.opengis.geometry.primitive.PrimitiveFactory;
+import org.opengis.geometry.primitive.Ring;
+import org.opengis.geometry.primitive.SolidBoundary;
+import org.opengis.geometry.primitive.SurfaceBoundary;
+import org.opengis.geometry.primitive.SurfacePatch;
 
 /**
  * @author Jackson Roehrig & Sanjay Jena
@@ -82,7 +82,7 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.primitive.PrimitiveFactory#getCoordinateReferenceSystem()
+	 * @see org.opengis.geometry.primitive.PrimitiveFactory#getCoordinateReferenceSystem()
 	 */
 	public CoordinateReferenceSystem getCoordinateReferenceSystem() {
 		// TODO test
@@ -104,7 +104,7 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.primitive.PrimitiveFactory#createPoint(double[])
+	 * @see org.opengis.geometry.primitive.PrimitiveFactory#createPoint(double[])
 	 */
 	public PointImpl createPoint(double[] coord) {
 		// Test ok
@@ -139,7 +139,7 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.primitive.PrimitiveFactory#createPoint(org.opengis.spatialschema.geometry.geometry.Position)
+	 * @see org.opengis.geometry.primitive.PrimitiveFactory#createPoint(org.opengis.geometry.coordinate.Position)
 	 */
 	public PointImpl createPoint(Position position)
 			throws MismatchedReferenceSystemException,
@@ -190,7 +190,7 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.primitive.PrimitiveFactory#createCurve(java.util.List)
+	 * @see org.opengis.geometry.primitive.PrimitiveFactory#createCurve(java.util.List)
 	 */
 	public CurveImpl createCurve(List<CurveSegment> segments) {
 		// test OK
@@ -206,7 +206,7 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.primitive.PrimitiveFactory#createRing(java.util.List)
+	 * @see org.opengis.geometry.primitive.PrimitiveFactory#createRing(java.util.List)
 	 */
 	public RingImpl createRing(List<OrientableCurve> orientableCurves)
 			throws MismatchedReferenceSystemException,
@@ -239,7 +239,7 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.primitive.PrimitiveFactory#createSurfaceBoundary(org.opengis.spatialschema.geometry.primitive.Ring,
+	 * @see org.opengis.geometry.primitive.PrimitiveFactory#createSurfaceBoundary(org.opengis.geometry.primitive.Ring,
 	 *      java.util.List)
 	 */
 	public SurfaceBoundaryImpl createSurfaceBoundary(Ring exterior,
@@ -278,7 +278,7 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.primitive.PrimitiveFactory#createSurface(java.util.List)
+	 * @see org.opengis.geometry.primitive.PrimitiveFactory#createSurface(java.util.List)
 	 */
 	public SurfaceImpl createSurface(List<SurfacePatch> surfacePatches)
 			throws MismatchedReferenceSystemException,
@@ -303,7 +303,7 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.primitive.PrimitiveFactory#createSurface(org.opengis.spatialschema.geometry.primitive.SurfaceBoundary)
+	 * @see org.opengis.geometry.primitive.PrimitiveFactory#createSurface(org.opengis.geometry.primitive.SurfaceBoundary)
 	 */
 	public SurfaceImpl createSurface(SurfaceBoundary boundary)
 			throws MismatchedReferenceSystemException,
@@ -316,7 +316,7 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.primitive.PrimitiveFactory#createSolid(org.opengis.spatialschema.geometry.primitive.SolidBoundary)
+	 * @see org.opengis.geometry.primitive.PrimitiveFactory#createSolid(org.opengis.geometry.primitive.SolidBoundary)
 	 */
 	public SolidImpl createSolid(SolidBoundary boundary)
 			throws MismatchedReferenceSystemException,
@@ -331,7 +331,7 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.primitive.PrimitiveFactory#createPrimitive(org.opengis.spatialschema.geometry.Envelope)
+	 * @see org.opengis.geometry.primitive.PrimitiveFactory#createPrimitive(org.opengis.geometry.coordinate.Envelope)
 	 */
 	public PrimitiveImpl createPrimitive(Envelope envelope)
 			throws MismatchedReferenceSystemException,

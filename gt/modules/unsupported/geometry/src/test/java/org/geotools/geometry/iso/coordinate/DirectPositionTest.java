@@ -3,8 +3,8 @@ package org.geotools.geometry.iso.coordinate;
 import junit.framework.TestCase;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.geometry.GeometryFactory;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.coordinate.GeometryFactory;
 
 /**
  * @author Sanjay Jena

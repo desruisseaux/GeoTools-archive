@@ -37,7 +37,7 @@
 package org.geotools.geometry.iso.io;
 
 import org.geotools.geometry.iso.io.wkt.GeometryToWKTString;
-import org.opengis.spatialschema.geometry.Geometry;
+import org.opengis.geometry.Geometry;
 
 /**
  * This class manages the toString() outputs for geometry objects

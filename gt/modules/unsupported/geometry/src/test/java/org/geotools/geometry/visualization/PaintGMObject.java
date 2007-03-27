@@ -17,9 +17,9 @@ import org.geotools.geometry.iso.primitive.PointImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.primitive.Ring;
-import org.opengis.spatialschema.geometry.primitive.SurfaceBoundary;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.primitive.Ring;
+import org.opengis.geometry.primitive.SurfaceBoundary;
 
 /**
  * @author Sanjay Jena

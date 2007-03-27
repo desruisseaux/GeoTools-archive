@@ -85,7 +85,7 @@ import org.geotools.geometry.iso.primitive.RingImpl;
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
-import org.opengis.spatialschema.geometry.primitive.OrientableSurface;
+import org.opengis.geometry.primitive.OrientableSurface;
 
 
 

@@ -10,8 +10,8 @@
 package org.geotools.geometry.jts.spatialschema.geometry.geometry;
 
 // OpenGIS direct dependencies
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.geometry.Position;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.coordinate.Position;
 
 
 /**
@@ -49,7 +49,7 @@ public class PositionImpl implements Position {
     
     /**
      * @inheritDoc
-     * @see org.opengis.spatialschema.geometry.geometry.Position#getPosition()
+     * @see org.opengis.geometry.coordinate.Position#getPosition()
      */
     public DirectPosition getPosition() {
         return position;

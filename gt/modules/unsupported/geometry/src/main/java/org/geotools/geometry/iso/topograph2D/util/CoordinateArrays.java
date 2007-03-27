@@ -87,7 +87,7 @@ import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.PositionImpl;
 import org.geotools.geometry.iso.topograph2D.Coordinate;
 import org.geotools.geometry.iso.topograph2D.CoordinateList;
-import org.opengis.spatialschema.geometry.geometry.Position;
+import org.opengis.geometry.coordinate.Position;
 
 /**
  * Useful utility functions for handling Coordinate arrays

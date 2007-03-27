@@ -45,15 +45,15 @@ import java.util.Set;
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.geometry.iso.primitive.OrientableSurfaceImpl;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.complex.Complex;
-import org.opengis.spatialschema.geometry.complex.CompositeSurface;
-import org.opengis.spatialschema.geometry.primitive.OrientablePrimitive;
-import org.opengis.spatialschema.geometry.primitive.OrientableSurface;
-import org.opengis.spatialschema.geometry.primitive.Primitive;
-import org.opengis.spatialschema.geometry.primitive.Surface;
-import org.opengis.spatialschema.geometry.primitive.SurfaceBoundary;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.complex.CompositeSurface;
+import org.opengis.geometry.primitive.OrientablePrimitive;
+import org.opengis.geometry.primitive.OrientableSurface;
+import org.opengis.geometry.primitive.Primitive;
+import org.opengis.geometry.primitive.Surface;
+import org.opengis.geometry.primitive.SurfaceBoundary;
 
 /**
  * A composite surface, CompositeSurface (Figure 29) shall be a Complex with all
@@ -154,7 +154,7 @@ public class CompositeSurfaceImpl extends CompositeImpl<OrientableSurfaceImpl>
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.complex.Composite#getGenerators()
+	 * @see org.opengis.geometry.complex.Composite#getGenerators()
 	 */
 	public List<OrientableSurface> getGenerators() {
 		// TODO Auto-generated method stub
@@ -162,7 +162,7 @@ public class CompositeSurfaceImpl extends CompositeImpl<OrientableSurfaceImpl>
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#isSimple()
+	 * @see org.opengis.geometry.coordinate.root.Geometry#isSimple()
 	 */
 	public boolean isSimple() {
 		// TODO Auto-generated method stub
@@ -170,7 +170,7 @@ public class CompositeSurfaceImpl extends CompositeImpl<OrientableSurfaceImpl>
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.primitive.OrientableSurface#getComposite()
+	 * @see org.opengis.geometry.primitive.OrientableSurface#getComposite()
 	 */
 	public CompositeSurface getComposite() {
 		// TODO Auto-generated method stub
@@ -178,7 +178,7 @@ public class CompositeSurfaceImpl extends CompositeImpl<OrientableSurfaceImpl>
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.primitive.OrientablePrimitive#getOrientation()
+	 * @see org.opengis.geometry.primitive.OrientablePrimitive#getOrientation()
 	 */
 	public int getOrientation() {
 		// TODO Auto-generated method stub
@@ -186,7 +186,7 @@ public class CompositeSurfaceImpl extends CompositeImpl<OrientableSurfaceImpl>
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.primitive.OrientablePrimitive#getPrimitive()
+	 * @see org.opengis.geometry.primitive.OrientablePrimitive#getPrimitive()
 	 */
 	public Primitive getPrimitive() {
 		// TODO Auto-generated method stub
@@ -194,7 +194,7 @@ public class CompositeSurfaceImpl extends CompositeImpl<OrientableSurfaceImpl>
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.primitive.Primitive#getContainedPrimitives()
+	 * @see org.opengis.geometry.primitive.Primitive#getContainedPrimitives()
 	 */
 	public Set getContainedPrimitives() {
 		// TODO Auto-generated method stub
@@ -202,7 +202,7 @@ public class CompositeSurfaceImpl extends CompositeImpl<OrientableSurfaceImpl>
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.primitive.Primitive#getContainingPrimitives()
+	 * @see org.opengis.geometry.primitive.Primitive#getContainingPrimitives()
 	 */
 	public Set getContainingPrimitives() {
 		// TODO Auto-generated method stub
@@ -210,7 +210,7 @@ public class CompositeSurfaceImpl extends CompositeImpl<OrientableSurfaceImpl>
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.primitive.Primitive#getComplexes()
+	 * @see org.opengis.geometry.primitive.Primitive#getComplexes()
 	 */
 	public Set getComplexes() {
 		// TODO Auto-generated method stub
@@ -218,7 +218,7 @@ public class CompositeSurfaceImpl extends CompositeImpl<OrientableSurfaceImpl>
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.primitive.Primitive#getProxy()
+	 * @see org.opengis.geometry.primitive.Primitive#getProxy()
 	 */
 	public OrientablePrimitive[] getProxy() {
 		// TODO Auto-generated method stub
@@ -227,7 +227,7 @@ public class CompositeSurfaceImpl extends CompositeImpl<OrientableSurfaceImpl>
 
 
 	/* (non-Javadoc)
-	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getDimension(org.opengis.spatialschema.geometry.DirectPosition)
+	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getDimension(org.opengis.geometry.coordinate.DirectPosition)
 	 */
 	public int getDimension(DirectPosition point) {
 		// TODO Auto-generated method stub

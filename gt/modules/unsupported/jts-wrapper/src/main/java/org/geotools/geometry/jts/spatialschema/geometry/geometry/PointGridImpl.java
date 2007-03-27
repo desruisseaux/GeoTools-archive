@@ -13,9 +13,9 @@ package org.geotools.geometry.jts.spatialschema.geometry.geometry;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.geometry.PointArray;
-import org.opengis.spatialschema.geometry.geometry.PointGrid;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.coordinate.PointArray;
+import org.opengis.geometry.coordinate.PointGrid;
 
 
 /**

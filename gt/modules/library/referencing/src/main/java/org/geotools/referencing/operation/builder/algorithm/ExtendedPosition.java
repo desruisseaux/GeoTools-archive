@@ -16,7 +16,7 @@
 package org.geotools.referencing.operation.builder.algorithm;
 
 import org.geotools.geometry.DirectPosition2D;
-import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.geometry.DirectPosition;
 
 
 /**

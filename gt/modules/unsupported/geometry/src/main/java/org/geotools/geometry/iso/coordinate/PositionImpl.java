@@ -37,8 +37,8 @@
 package org.geotools.geometry.iso.coordinate;
 
 import org.geotools.geometry.iso.primitive.PointImpl;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.geometry.Position;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.coordinate.Position;
 
 /**
  * @author Jackson Roehrig & Sanjay Jena
@@ -84,7 +84,7 @@ public class PositionImpl implements Position {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.geometry.Position#getPosition()
+	 * @see org.opengis.geometry.coordinate.Position#getPosition()
 	 */
 	public DirectPositionImpl getPosition() {
 		// ok

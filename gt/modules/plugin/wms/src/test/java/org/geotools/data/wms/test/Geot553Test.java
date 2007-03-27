@@ -27,8 +27,8 @@ import org.geotools.referencing.CRS;
 import org.geotools.test.TestData;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
 
 
 /**

@@ -9,10 +9,10 @@ import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.complex.ComplexFactoryImpl;
 import org.geotools.geometry.iso.coordinate.CoordinateFactoryImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.complex.CompositeSurface;
-import org.opengis.spatialschema.geometry.primitive.OrientableSurface;
-import org.opengis.spatialschema.geometry.primitive.Surface;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.complex.CompositeSurface;
+import org.opengis.geometry.primitive.OrientableSurface;
+import org.opengis.geometry.primitive.Surface;
 
 public class CompositeSurfaceTest extends TestCase {
 

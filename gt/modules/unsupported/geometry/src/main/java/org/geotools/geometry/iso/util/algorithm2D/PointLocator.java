@@ -84,7 +84,7 @@ import org.geotools.geometry.iso.topograph2D.Coordinate;
 import org.geotools.geometry.iso.topograph2D.GeometryGraph;
 import org.geotools.geometry.iso.topograph2D.Location;
 import org.geotools.geometry.iso.topograph2D.util.CoordinateArrays;
-import org.opengis.spatialschema.geometry.Geometry;
+import org.opengis.geometry.Geometry;
 
 /**
  * Computes the topological relationship ({@link Location}) of a single point

@@ -43,13 +43,13 @@ import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.geometry.iso.io.GeometryToString;
 import org.geotools.geometry.iso.root.GeometryImpl;
-import org.opengis.spatialschema.geometry.Boundary;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.aggregate.MultiPrimitive;
-import org.opengis.spatialschema.geometry.complex.Complex;
-import org.opengis.spatialschema.geometry.primitive.Primitive;
-import org.opengis.spatialschema.geometry.Geometry;
+import org.opengis.geometry.Boundary;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.aggregate.MultiPrimitive;
+import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.primitive.Primitive;
+import org.opengis.geometry.Geometry;
 
 
 public class MultiPrimitiveImpl extends AggregateImpl implements MultiPrimitive {
@@ -80,7 +80,7 @@ public class MultiPrimitiveImpl extends AggregateImpl implements MultiPrimitive 
 	}
 
 	/* (non-Javadoc)
-	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getDimension(org.opengis.spatialschema.geometry.DirectPosition)
+	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getDimension(org.opengis.geometry.coordinate.DirectPosition)
 	 */
 	public int getDimension(DirectPosition point) {
 		// TODO Auto-generated method stub
@@ -100,14 +100,14 @@ public class MultiPrimitiveImpl extends AggregateImpl implements MultiPrimitive 
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.aggregate.Aggregate#getElements()
+	 * @see org.opengis.geometry.coordinate.aggregate.Aggregate#getElements()
 	 */
 	public Set getElements() {
 		return super.elements;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#isSimple()
+	 * @see org.opengis.geometry.coordinate.root.Geometry#isSimple()
 	 */
 	public boolean isSimple() {
 		// TODO Auto-generated method stub
@@ -115,7 +115,7 @@ public class MultiPrimitiveImpl extends AggregateImpl implements MultiPrimitive 
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#getMaximalComplex()
+	 * @see org.opengis.geometry.coordinate.root.Geometry#getMaximalComplex()
 	 */
 	public Set<Complex> getMaximalComplex() {
 		// TODO Auto-generated method stub

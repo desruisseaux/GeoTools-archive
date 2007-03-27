@@ -26,7 +26,7 @@ import org.geotools.io.TableWriter;
 import org.geotools.referencing.Console;
 import org.geotools.referencing.ScriptTest;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.geometry.MismatchedDimensionException;
 
 
 /**

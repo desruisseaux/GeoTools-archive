@@ -14,24 +14,24 @@ import org.geotools.geometry.jts.spatialschema.geometry.geometry.GeometryFactory
 import java.util.List;
 
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
-import org.opengis.spatialschema.geometry.geometry.GeometryFactory;
-import org.opengis.spatialschema.geometry.geometry.Polygon;
-import org.opengis.spatialschema.geometry.geometry.PolyhedralSurface;
-import org.opengis.spatialschema.geometry.geometry.Position;
-import org.opengis.spatialschema.geometry.primitive.Curve;
-import org.opengis.spatialschema.geometry.primitive.Point;
-import org.opengis.spatialschema.geometry.primitive.Primitive;
-import org.opengis.spatialschema.geometry.primitive.PrimitiveFactory;
-import org.opengis.spatialschema.geometry.primitive.Ring;
-import org.opengis.spatialschema.geometry.primitive.Solid;
-import org.opengis.spatialschema.geometry.primitive.SolidBoundary;
-import org.opengis.spatialschema.geometry.primitive.Surface;
-import org.opengis.spatialschema.geometry.primitive.SurfaceBoundary;
-import org.opengis.spatialschema.geometry.primitive.SurfacePatch;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.geometry.MismatchedReferenceSystemException;
+import org.opengis.geometry.coordinate.GeometryFactory;
+import org.opengis.geometry.coordinate.Polygon;
+import org.opengis.geometry.coordinate.PolyhedralSurface;
+import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.primitive.Curve;
+import org.opengis.geometry.primitive.Point;
+import org.opengis.geometry.primitive.Primitive;
+import org.opengis.geometry.primitive.PrimitiveFactory;
+import org.opengis.geometry.primitive.Ring;
+import org.opengis.geometry.primitive.Solid;
+import org.opengis.geometry.primitive.SolidBoundary;
+import org.opengis.geometry.primitive.Surface;
+import org.opengis.geometry.primitive.SurfaceBoundary;
+import org.opengis.geometry.primitive.SurfacePatch;
 
 /**
  * Factory that knows how to create instances of the 19107 primitives as
@@ -147,7 +147,7 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
 
     /**
      * @inheritDoc
-     * @see org.opengis.spatialschema.geometry.primitive.PrimitiveFactory#createSurface(org.opengis.spatialschema.geometry.primitive.SurfaceBoundary)
+     * @see org.opengis.geometry.primitive.PrimitiveFactory#createSurface(org.opengis.geometry.primitive.SurfaceBoundary)
      */
     public Surface createSurface(final SurfaceBoundary boundary) {
         // For now, our implementation has to assume that the boundary is a
@@ -166,7 +166,7 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
     
     /**
      * @inheritDoc
-     * @see org.opengis.spatialschema.geometry.primitive.PrimitiveFactory#createSurfaceBoundary(org.opengis.spatialschema.geometry.primitive.Ring, java.util.List)
+     * @see org.opengis.geometry.primitive.PrimitiveFactory#createSurfaceBoundary(org.opengis.geometry.primitive.Ring, java.util.List)
      */
     public SurfaceBoundary createSurfaceBoundary(Ring exterior, List interiors)
             throws MismatchedReferenceSystemException, MismatchedDimensionException {
@@ -195,7 +195,7 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
 
     /**
      * @inheritDoc
-     * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createPolyhedralSurface(java.util.List)
+     * @see org.opengis.geometry.coordinate.Factory#createPolyhedralSurface(java.util.List)
      */
     public PolyhedralSurface createPolyhedralSurface(List patches)
             throws MismatchedReferenceSystemException, MismatchedDimensionException {

@@ -24,7 +24,7 @@ import java.util.Collection;
 
 // OpenGIS dependencies
 import org.opengis.metadata.extent.BoundingPolygon;
-import org.opengis.spatialschema.geometry.Geometry;
+import org.opengis.geometry.Geometry;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;

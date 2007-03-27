@@ -119,4 +119,16 @@ public class ScopeDescriptionImpl extends MetadataEntity implements ScopeDescrip
         // TODO once method in ScopeDescription will be defined.
         return "";
     }
+
+    public Set getAttributeInstances() {
+        return Collections.EMPTY_SET;
+    }
+
+    public String getDataset() {
+        return null;
+    }
+
+    public String getOther() {
+        return null;
+    }
 }

@@ -38,7 +38,7 @@ package org.geotools.geometry.iso.primitive;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.complex.ComplexImpl;
-import org.opengis.spatialschema.geometry.Boundary;
+import org.opengis.geometry.Boundary;
 
 /**
  * 
@@ -62,7 +62,7 @@ public abstract class BoundaryImpl extends ComplexImpl implements Boundary {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#isCycle()
+	 * @see org.opengis.geometry.coordinate.root.Geometry#isCycle()
 	 */
 	public boolean isCycle() {
 		// implementation ok

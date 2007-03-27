@@ -4,10 +4,10 @@ import junit.framework.TestCase;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.coordinate.CoordinateFactoryImpl;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.geometry.LineSegment;
-import org.opengis.spatialschema.geometry.geometry.Position;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.coordinate.LineSegment;
+import org.opengis.geometry.coordinate.Position;
 
 public class CoordinateFactoryTest extends TestCase {
 	

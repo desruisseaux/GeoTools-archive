@@ -98,10 +98,10 @@ import org.geotools.geometry.iso.topograph2D.PlanarGraph;
 import org.geotools.geometry.iso.topograph2D.Position;
 import org.geotools.geometry.iso.util.Assert;
 import org.geotools.geometry.iso.util.algorithm2D.PointLocator;
-import org.opengis.spatialschema.geometry.primitive.OrientableCurve;
-import org.opengis.spatialschema.geometry.primitive.OrientableSurface;
-import org.opengis.spatialschema.geometry.primitive.Point;
-import org.opengis.spatialschema.geometry.Geometry;
+import org.opengis.geometry.primitive.OrientableCurve;
+import org.opengis.geometry.primitive.OrientableSurface;
+import org.opengis.geometry.primitive.Point;
+import org.opengis.geometry.Geometry;
 
 /**
  * Computes the overlay of two {@link Geometry}s. The overlay can be used to

@@ -40,8 +40,8 @@ import java.util.Set;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
-import org.opengis.spatialschema.geometry.aggregate.Aggregate;
-import org.opengis.spatialschema.geometry.Geometry;
+import org.opengis.geometry.aggregate.Aggregate;
+import org.opengis.geometry.Geometry;
 
 /**
  * @author roehrig

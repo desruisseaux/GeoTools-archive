@@ -41,10 +41,10 @@ import org.geotools.geometry.iso.PositionFactoryImpl;
 import org.geotools.geometry.iso.UnsupportedDimensionException;
 import org.geotools.geometry.iso.util.algorithmND.AlgoRectangleND;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.PositionFactory;
-import org.opengis.spatialschema.geometry.geometry.Position;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.PositionFactory;
+import org.opengis.geometry.coordinate.Position;
 
 /**
  * An envlope represents the bounding box of a geometric object.
@@ -100,7 +100,7 @@ public class EnvelopeImpl implements Envelope {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.Envelope#getDimension()
+	 * @see org.opengis.geometry.coordinate.Envelope#getDimension()
 	 */
 	public int getDimension() {
 		// TODO semantic JR
@@ -112,7 +112,7 @@ public class EnvelopeImpl implements Envelope {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.Envelope#getCoordinateReferenceSystem()
+	 * @see org.opengis.geometry.coordinate.Envelope#getCoordinateReferenceSystem()
 	 */
 	public CoordinateReferenceSystem getCoordinateReferenceSystem() {
 		return pMin.getCoordinateReferenceSystem();
@@ -121,7 +121,7 @@ public class EnvelopeImpl implements Envelope {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.Envelope#getMinimum(int)
+	 * @see org.opengis.geometry.coordinate.Envelope#getMinimum(int)
 	 */
 	public double getMinimum(int dimension) {
 		// TODO semantic JR, SJ Was soll diese Methode bewirken? Ich verstehe die JavaDoc nicht ganz.
@@ -135,7 +135,7 @@ public class EnvelopeImpl implements Envelope {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.Envelope#getMaximum(int)
+	 * @see org.opengis.geometry.coordinate.Envelope#getMaximum(int)
 	 */
 	public double getMaximum(int dimension) {
 		// TODO semantic JR, SJ Was soll diese Methode bewirken? Ich verstehe die JavaDoc nicht ganz.
@@ -150,7 +150,7 @@ public class EnvelopeImpl implements Envelope {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.Envelope#getCenter(int)
+	 * @see org.opengis.geometry.coordinate.Envelope#getCenter(int)
 	 */
 	public double getCenter(int dimension) {
 		// TODO semantic JR, SJ
@@ -163,7 +163,7 @@ public class EnvelopeImpl implements Envelope {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.Envelope#getLength(int)
+	 * @see org.opengis.geometry.coordinate.Envelope#getLength(int)
 	 */
 	public double getLength(int dimension) {
 		// TODO semantic JR, SJ
@@ -176,7 +176,7 @@ public class EnvelopeImpl implements Envelope {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.Envelope#getUpperCorner()
+	 * @see org.opengis.geometry.coordinate.Envelope#getUpperCorner()
 	 */
 	public DirectPosition getUpperCorner() {
 		// Return the upper corner of the envelope
@@ -186,7 +186,7 @@ public class EnvelopeImpl implements Envelope {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.Envelope#getLowerCorner()
+	 * @see org.opengis.geometry.coordinate.Envelope#getLowerCorner()
 	 */
 	public DirectPosition getLowerCorner() {
 		// Return the lower corner of the envelope

@@ -16,15 +16,15 @@ import java.util.List;
 import java.util.Set;
 
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.complex.CompositeCurve;
-import org.opengis.spatialschema.geometry.geometry.LineString;
-import org.opengis.spatialschema.geometry.geometry.ParamForPoint;
-import org.opengis.spatialschema.geometry.geometry.Position;
-import org.opengis.spatialschema.geometry.primitive.Curve;
-import org.opengis.spatialschema.geometry.primitive.CurveSegment;
-import org.opengis.spatialschema.geometry.primitive.OrientablePrimitive;
-import org.opengis.spatialschema.geometry.primitive.Primitive;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.complex.CompositeCurve;
+import org.opengis.geometry.coordinate.LineString;
+import org.opengis.geometry.coordinate.ParamForPoint;
+import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.primitive.Curve;
+import org.opengis.geometry.primitive.CurveSegment;
+import org.opengis.geometry.primitive.OrientablePrimitive;
+import org.opengis.geometry.primitive.Primitive;
 
 import org.geotools.geometry.jts.spatialschema.geometry.NotifyingArrayList;
 import org.geotools.geometry.jts.spatialschema.geometry.GeometryImpl;
@@ -70,7 +70,7 @@ public class CurveImpl extends GeometryImpl implements Curve {
 
     /**
      * @inheritDoc
-     * @see org.opengis.spatialschema.geometry.primitive.Curve#getSegments()
+     * @see org.opengis.geometry.primitive.Curve#getSegments()
      */
     public final List getSegments() {
         return curveSegments;
@@ -78,7 +78,7 @@ public class CurveImpl extends GeometryImpl implements Curve {
 
     /**
      * @inheritDoc
-     * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#getStartPoint()
+     * @see org.opengis.geometry.coordinate.GenericCurve#getStartPoint()
      */
     public final DirectPosition getStartPoint() {
         return ((CurveSegment) curveSegments.get(0)).getStartPoint();
@@ -86,7 +86,7 @@ public class CurveImpl extends GeometryImpl implements Curve {
 
     /**
      * @inheritDoc
-     * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#getEndPoint()
+     * @see org.opengis.geometry.coordinate.GenericCurve#getEndPoint()
      */
     public final DirectPosition getEndPoint() {
         return ((CurveSegment) curveSegments.get(curveSegments.size()-1)).getEndPoint();
@@ -94,7 +94,7 @@ public class CurveImpl extends GeometryImpl implements Curve {
 
     /**
      * @inheritDoc
-     * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#getTangent(double)
+     * @see org.opengis.geometry.coordinate.GenericCurve#getTangent(double)
      */
     public double [] getTangent(double s) {
         // PENDING(CSD): Implement me!

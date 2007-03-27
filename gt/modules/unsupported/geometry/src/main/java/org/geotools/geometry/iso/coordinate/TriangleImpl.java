@@ -41,9 +41,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
-import org.opengis.spatialschema.geometry.geometry.Position;
-import org.opengis.spatialschema.geometry.geometry.Triangle;
-import org.opengis.spatialschema.geometry.geometry.TriangulatedSurface;
+import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.coordinate.Triangle;
+import org.opengis.geometry.coordinate.TriangulatedSurface;
 
 /**
  * 

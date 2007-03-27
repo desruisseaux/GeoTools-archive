@@ -49,15 +49,15 @@ import org.geotools.geometry.iso.coordinate.LineSegmentImpl;
 import org.geotools.geometry.iso.coordinate.LineStringImpl;
 import org.geotools.geometry.iso.io.GeometryToString;
 import org.geotools.geometry.iso.operation.IsSimpleOp;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.complex.Complex;
-import org.opengis.spatialschema.geometry.geometry.LineSegment;
-import org.opengis.spatialschema.geometry.primitive.Curve;
-import org.opengis.spatialschema.geometry.primitive.CurveBoundary;
-import org.opengis.spatialschema.geometry.primitive.CurveSegment;
-import org.opengis.spatialschema.geometry.primitive.OrientableCurve;
-import org.opengis.spatialschema.geometry.primitive.Primitive;
-import org.opengis.spatialschema.geometry.primitive.Ring;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.coordinate.LineSegment;
+import org.opengis.geometry.primitive.Curve;
+import org.opengis.geometry.primitive.CurveBoundary;
+import org.opengis.geometry.primitive.CurveSegment;
+import org.opengis.geometry.primitive.OrientableCurve;
+import org.opengis.geometry.primitive.Primitive;
+import org.opengis.geometry.primitive.Ring;
 
 /**
  * 
@@ -235,7 +235,7 @@ public class RingImpl extends CompositeCurveImpl implements Ring {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.Geometry#getRepresentativePoint()
+	 * @see org.opengis.geometry.coordinate.#getRepresentativePoint()
 	 */
 	public DirectPosition getRepresentativePoint() {
 		// Return the start point of this ring, since it is part of the object

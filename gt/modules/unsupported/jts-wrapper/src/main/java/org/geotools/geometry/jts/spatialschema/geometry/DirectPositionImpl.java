@@ -15,15 +15,15 @@ import java.io.Serializable;
 
 //openGIS dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.geometry.Position;
-import org.opengis.spatialschema.geometry.primitive.Point;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.primitive.Point;
 import org.opengis.util.Cloneable;
 
 /**
  * Holds the coordinates for a position within some coordinate reference system. Since
  * {@code DirectPosition}s, as data types, will often be included in larger objects
- * (such as {@linkplain org.opengis.spatialschema.geometry.Geometry geometries}) that have
+ * (such as {@linkplain org.opengis.geometry.coordinate. geometries}) that have
  * references to {@link CoordinateReferenceSystem}, the {@link #getCoordinateReferenceSystem}
  * method may returns {@code null} if this particular {@code DirectPosition} is
  * included in a larger object with such a reference to a {@linkplain CoordinateReferenceSystem
@@ -165,7 +165,7 @@ public class DirectPositionImpl implements Cloneable, DirectPosition, Position, 
     
     /**
      * @inheritDoc
-     * @see org.opengis.spatialschema.geometry.DirectPosition#getDimension()
+     * @see org.opengis.geometry.coordinate.DirectPosition#getDimension()
      */
     public int getDimension() {
         return ordinates.length;
@@ -173,7 +173,7 @@ public class DirectPositionImpl implements Cloneable, DirectPosition, Position, 
 
     /**
      * @inheritDoc
-     * @see org.opengis.spatialschema.geometry.DirectPosition#getCoordinates()
+     * @see org.opengis.geometry.coordinate.DirectPosition#getCoordinates()
      */
     public double[] getCoordinates() {
         return ordinates;
@@ -181,7 +181,7 @@ public class DirectPositionImpl implements Cloneable, DirectPosition, Position, 
 
     /**
      * @inheritDoc
-     * @see org.opengis.spatialschema.geometry.DirectPosition#getOrdinate(int)
+     * @see org.opengis.geometry.coordinate.DirectPosition#getOrdinate(int)
      */
     public double getOrdinate(final int dimension) throws IndexOutOfBoundsException {
         return ordinates[dimension];
@@ -189,7 +189,7 @@ public class DirectPositionImpl implements Cloneable, DirectPosition, Position, 
 
     /**
      * @inheritDoc
-     * @see org.opengis.spatialschema.geometry.DirectPosition#setOrdinate(int, double)
+     * @see org.opengis.geometry.coordinate.DirectPosition#setOrdinate(int, double)
      */
     public void setOrdinate(final int dimension, final double value) throws IndexOutOfBoundsException {
         ordinates[dimension] = value;
@@ -197,7 +197,7 @@ public class DirectPositionImpl implements Cloneable, DirectPosition, Position, 
 
     /**
      * @inheritDoc
-     * @see org.opengis.spatialschema.geometry.DirectPosition#getCoordinateReferenceSystem()
+     * @see org.opengis.geometry.coordinate.DirectPosition#getCoordinateReferenceSystem()
      */
     public CoordinateReferenceSystem getCoordinateReferenceSystem() {
         return crs;
@@ -216,7 +216,7 @@ public class DirectPositionImpl implements Cloneable, DirectPosition, Position, 
     
     /**
      * @inheritDoc
-     * @see org.opengis.spatialschema.geometry.geometry.Position#getPosition()
+     * @see org.opengis.geometry.coordinate.Position#getPosition()
      */
     public DirectPosition getPosition() {
         return this;

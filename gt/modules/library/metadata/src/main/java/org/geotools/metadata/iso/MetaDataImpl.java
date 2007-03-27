@@ -34,6 +34,7 @@ import org.opengis.metadata.PortrayalCatalogueReference;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.constraint.Constraints;
 import org.opengis.metadata.distribution.Distribution;
+import org.opengis.metadata.identification.CharacterSet;
 import org.opengis.metadata.identification.Identification;
 import org.opengis.metadata.maintenance.MaintenanceInformation;
 import org.opengis.metadata.maintenance.ScopeCode;
@@ -80,7 +81,7 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
     /**
      * Full name of the character coding standard used for the metadata set.
      */
-    private Charset characterSet;
+    private CharacterSet characterSet;
 
     /**
      * File identifier of the metadata to which this metadata is a subset (child).
@@ -235,7 +236,7 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
     /**
      * Returns the full name of the character coding standard used for the metadata set.
      */
-    public Charset getCharacterSet()  {
+    public CharacterSet getCharacterSet()  {
         return characterSet;
     }
 
@@ -580,7 +581,7 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
         super.freeze();
         language                  = (Locale)                 unmodifiable(language);
         locales                   = (Collection)             unmodifiable(locales);
-        characterSet              = (Charset)                unmodifiable(characterSet);
+        characterSet              = (CharacterSet)           unmodifiable(characterSet);
         hierarchyLevels           = (Collection)             unmodifiable(hierarchyLevels);
         hierarchyLevelNames       = (Collection)             unmodifiable(hierarchyLevelNames);
         contacts                  = (Collection)             unmodifiable(contacts);

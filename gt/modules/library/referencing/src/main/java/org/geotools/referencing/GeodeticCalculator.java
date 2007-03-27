@@ -41,8 +41,8 @@ import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.crs.CompoundCRS;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.geometry.Position;
-import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.DirectPosition;
 
 // Geotools dependencies
 import org.geotools.measure.Angle;

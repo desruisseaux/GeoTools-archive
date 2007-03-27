@@ -16,7 +16,7 @@ import org.opengis.feature.type.FeatureCollectionType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.geometry.GeometryFactory;
+import org.opengis.geometry.coordinate.GeometryFactory;
 
 /**
  * Factory for creating instances of the Attribute family of classes.

@@ -40,9 +40,9 @@ package org.geotools.geometry.iso.primitive;
 import java.util.Set;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.opengis.spatialschema.geometry.complex.Complex;
-import org.opengis.spatialschema.geometry.primitive.OrientablePrimitive;
-import org.opengis.spatialschema.geometry.primitive.Primitive;
+import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.primitive.OrientablePrimitive;
+import org.opengis.geometry.primitive.Primitive;
 
 /**
  * 
@@ -164,14 +164,14 @@ public abstract class OrientablePrimitiveImpl extends PrimitiveImpl implements
 	 * @return 1 if positive and -1 if negative
 	 */
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.primitive.OrientablePrimitive#getOrientation()
+	 * @see org.opengis.geometry.primitive.OrientablePrimitive#getOrientation()
 	 */
 	public int getOrientation() {
 		return 1;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.primitive.OrientablePrimitive#getPrimitive()
+	 * @see org.opengis.geometry.primitive.OrientablePrimitive#getPrimitive()
 	 */
 	public PrimitiveImpl getPrimitive() {
 		return this;

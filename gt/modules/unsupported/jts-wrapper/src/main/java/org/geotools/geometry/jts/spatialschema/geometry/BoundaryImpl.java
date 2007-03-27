@@ -13,7 +13,7 @@ package org.geotools.geometry.jts.spatialschema.geometry;
 import org.geotools.geometry.jts.spatialschema.geometry.complex.ComplexImpl;
 
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.Boundary;
+import org.opengis.geometry.Boundary;
 
 
 /**

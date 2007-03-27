@@ -41,13 +41,13 @@ import java.util.List;
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.primitive.OrientableSurfaceImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
-import org.opengis.spatialschema.geometry.complex.ComplexFactory;
-import org.opengis.spatialschema.geometry.complex.CompositeCurve;
-import org.opengis.spatialschema.geometry.complex.CompositePoint;
-import org.opengis.spatialschema.geometry.complex.CompositeSurface;
-import org.opengis.spatialschema.geometry.primitive.OrientableCurve;
-import org.opengis.spatialschema.geometry.primitive.OrientableSurface;
-import org.opengis.spatialschema.geometry.primitive.Point;
+import org.opengis.geometry.complex.ComplexFactory;
+import org.opengis.geometry.complex.CompositeCurve;
+import org.opengis.geometry.complex.CompositePoint;
+import org.opengis.geometry.complex.CompositeSurface;
+import org.opengis.geometry.primitive.OrientableCurve;
+import org.opengis.geometry.primitive.OrientableSurface;
+import org.opengis.geometry.primitive.Point;
 
 public class ComplexFactoryImpl implements ComplexFactory {
 

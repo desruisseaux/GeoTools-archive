@@ -49,16 +49,16 @@ import org.geotools.geometry.iso.coordinate.SurfacePatchImpl;
 import org.geotools.geometry.iso.io.GeometryToString;
 import org.geotools.geometry.iso.operation.IsSimpleOp;
 import org.geotools.geometry.iso.root.GeometryImpl;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.TransfiniteSet;
-import org.opengis.spatialschema.geometry.aggregate.MultiSurface;
-import org.opengis.spatialschema.geometry.complex.Complex;
-import org.opengis.spatialschema.geometry.complex.CompositeSurface;
-import org.opengis.spatialschema.geometry.primitive.OrientableSurface;
-import org.opengis.spatialschema.geometry.primitive.Surface;
-import org.opengis.spatialschema.geometry.primitive.SurfaceBoundary;
-import org.opengis.spatialschema.geometry.primitive.SurfacePatch;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.TransfiniteSet;
+import org.opengis.geometry.aggregate.MultiSurface;
+import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.complex.CompositeSurface;
+import org.opengis.geometry.primitive.OrientableSurface;
+import org.opengis.geometry.primitive.Surface;
+import org.opengis.geometry.primitive.SurfaceBoundary;
+import org.opengis.geometry.primitive.SurfacePatch;
 
 /**
  * 
@@ -275,7 +275,7 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.primitive.Surface#getPatches()
+	 * @see org.opengis.geometry.primitive.Surface#getPatches()
 	 */
 	public List<? extends SurfacePatch> getPatches() {
 		return this.patch;
@@ -327,7 +327,7 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.primitive.OrientableSurface#getComposite()
+	 * @see org.opengis.geometry.primitive.OrientableSurface#getComposite()
 	 */
 	public CompositeSurface getComposite() {
 		// TODO semantic SJ, JR
@@ -340,7 +340,7 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#isSimple()
+	 * @see org.opengis.geometry.coordinate.root.Geometry#isSimple()
 	 */
 	public boolean isSimple() {
 		// Test OK
@@ -354,7 +354,7 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.geometry.GenericSurface#getUpNormal(org.opengis.spatialschema.geometry.DirectPosition)
+	 * @see org.opengis.geometry.coordinate.GenericSurface#getUpNormal(org.opengis.geometry.coordinate.DirectPosition)
 	 */
 	public double[] getUpNormal(DirectPosition point) {
 		// TODO semantic SJ, JR
@@ -367,7 +367,7 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.geometry.GenericSurface#getPerimeter()
+	 * @see org.opengis.geometry.coordinate.GenericSurface#getPerimeter()
 	 */
 	public double getPerimeter() {
 		// TODO semantic SJ, JR
@@ -380,7 +380,7 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.geometry.GenericSurface#getArea()
+	 * @see org.opengis.geometry.coordinate.GenericSurface#getArea()
 	 */
 	public double getArea() {
 		// TODO semantic SJ, JR
@@ -394,7 +394,7 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getDimension(org.opengis.spatialschema.geometry.DirectPosition)
+	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getDimension(org.opengis.geometry.coordinate.DirectPosition)
 	 */
 	public int getDimension(DirectPosition point) {
 		// TODO semantic SJ, JR

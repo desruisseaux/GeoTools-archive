@@ -16,9 +16,9 @@
 package org.geotools.referencing.operation.builder;
 
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.geometry.MismatchedReferenceSystemException;
 
 // J2SE and extensions
 import java.util.List;

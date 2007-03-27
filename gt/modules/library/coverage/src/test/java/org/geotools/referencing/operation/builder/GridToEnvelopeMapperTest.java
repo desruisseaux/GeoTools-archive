@@ -28,7 +28,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 // OpenGIS dependencies
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.coverage.grid.GeneralGridRange;

@@ -9,7 +9,7 @@
  *************************************************************************************************/
 package org.geotools.geometry.jts.spatialschema.geometry.primitive;
 
-import org.opengis.spatialschema.geometry.primitive.Bearing;
+import org.opengis.geometry.primitive.Bearing;
 
 
 /**

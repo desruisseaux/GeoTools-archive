@@ -34,15 +34,15 @@ import org.opengis.filter.spatial.Equals;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.Boundary;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Geometry;
-import org.opengis.spatialschema.geometry.Precision;
-import org.opengis.spatialschema.geometry.TransfiniteSet;
-import org.opengis.spatialschema.geometry.complex.Complex;
-import org.opengis.spatialschema.geometry.geometry.Position;
-import org.opengis.spatialschema.geometry.primitive.Bearing;
-import org.opengis.spatialschema.geometry.primitive.Point;
+import org.opengis.geometry.Boundary;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Geometry;
+import org.opengis.geometry.Precision;
+import org.opengis.geometry.TransfiniteSet;
+import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.primitive.Bearing;
+import org.opengis.geometry.primitive.Point;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.function.FilterFunction_geometryType;
@@ -206,7 +206,7 @@ public class AbstractPostPreProcessFilterSplittingVisitorTests extends TestCase 
             // TODO Auto-generated method stub
             return 0;
         }
-        public org.opengis.spatialschema.geometry.Envelope getEnvelope() {
+        public org.opengis.geometry.Envelope getEnvelope() {
             // TODO Auto-generated method stub
             return null;
         }

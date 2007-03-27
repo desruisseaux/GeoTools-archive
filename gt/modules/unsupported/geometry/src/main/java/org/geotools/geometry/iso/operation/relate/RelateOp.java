@@ -79,7 +79,7 @@ import org.geotools.geometry.iso.UnsupportedDimensionException;
 import org.geotools.geometry.iso.operation.GeometryGraphOperation;
 import org.geotools.geometry.iso.root.GeometryImpl;
 import org.geotools.geometry.iso.topograph2D.IntersectionMatrix;
-import org.opengis.spatialschema.geometry.Geometry;
+import org.opengis.geometry.Geometry;
 
 /**
  * Implements the relate() operation on {@link Geometry}s.

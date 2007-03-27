@@ -10,7 +10,7 @@
 package org.geotools.geometry.jts.spatialschema.geometry.aggregate;
 
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.aggregate.MultiPoint;
+import org.opengis.geometry.aggregate.MultiPoint;
 
 /**
  */

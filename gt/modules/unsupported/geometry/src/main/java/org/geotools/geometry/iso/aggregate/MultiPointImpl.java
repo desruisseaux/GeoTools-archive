@@ -39,9 +39,9 @@ package org.geotools.geometry.iso.aggregate;
 import java.util.Set;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.opengis.spatialschema.geometry.Boundary;
-import org.opengis.spatialschema.geometry.aggregate.MultiPoint;
-import org.opengis.spatialschema.geometry.primitive.Point;
+import org.opengis.geometry.Boundary;
+import org.opengis.geometry.aggregate.MultiPoint;
+import org.opengis.geometry.primitive.Point;
 
 /**
  * @author roehrig

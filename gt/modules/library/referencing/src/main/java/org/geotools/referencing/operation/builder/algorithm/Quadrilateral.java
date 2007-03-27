@@ -15,7 +15,7 @@
  */
 package org.geotools.referencing.operation.builder.algorithm;
 
-import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.geometry.DirectPosition;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;

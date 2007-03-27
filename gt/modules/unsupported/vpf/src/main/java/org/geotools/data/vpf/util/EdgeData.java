@@ -19,7 +19,7 @@ import java.util.HashMap;
 
 import org.geotools.data.vpf.io.RowField;
 import org.geotools.data.vpf.io.TripletId;
-import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.geometry.DirectPosition;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;

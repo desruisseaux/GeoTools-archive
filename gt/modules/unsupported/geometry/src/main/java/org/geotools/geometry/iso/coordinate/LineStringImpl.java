@@ -41,13 +41,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.geotools.geometry.iso.util.DoubleOperation;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.geometry.LineSegment;
-import org.opengis.spatialschema.geometry.geometry.LineString;
-import org.opengis.spatialschema.geometry.geometry.ParamForPoint;
-import org.opengis.spatialschema.geometry.geometry.PointArray;
-import org.opengis.spatialschema.geometry.geometry.Position;
-import org.opengis.spatialschema.geometry.primitive.CurveInterpolation;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.coordinate.LineSegment;
+import org.opengis.geometry.coordinate.LineString;
+import org.opengis.geometry.coordinate.ParamForPoint;
+import org.opengis.geometry.coordinate.PointArray;
+import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.primitive.CurveInterpolation;
 
 /**
  * A LineString consists of sequence of line segments, each having a parameterization like the one
@@ -153,7 +153,7 @@ public class LineStringImpl extends CurveSegmentImpl implements LineString {
     /*
      * (non-Javadoc)
      * 
-     * @see org.opengis.spatialschema.geometry.geometry.LineString#getControlPoints()
+     * @see org.opengis.geometry.coordinate.LineString#getControlPoints()
      */
     public PointArray getControlPoints() {
         // ok
@@ -163,7 +163,7 @@ public class LineStringImpl extends CurveSegmentImpl implements LineString {
     /*
      * (non-Javadoc)
      * 
-     * @see org.opengis.spatialschema.geometry.geometry.LineString#asLineSegments()
+     * @see org.opengis.geometry.coordinate.LineString#asLineSegments()
      * @version Not verified whether getLineSegments() in PointArray is correctly implemented
      */
     // TODO: This code depends on a specific implementation of PointArray, PointArrayImpl has very
@@ -178,7 +178,7 @@ public class LineStringImpl extends CurveSegmentImpl implements LineString {
     /*
      * (non-Javadoc)
      * 
-     * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#getStartPoint()
+     * @see org.opengis.geometry.coordinate.GenericCurve#getStartPoint()
      */
     public DirectPosition getStartPoint() {
         // ok
@@ -189,7 +189,7 @@ public class LineStringImpl extends CurveSegmentImpl implements LineString {
     /*
      * (non-Javadoc)
      * 
-     * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#getEndPoint()
+     * @see org.opengis.geometry.coordinate.GenericCurve#getEndPoint()
      * @version Implementation OK
      */
     public DirectPosition getEndPoint() {
@@ -236,7 +236,7 @@ public class LineStringImpl extends CurveSegmentImpl implements LineString {
     /*
      * (non-Javadoc)
      * 
-     * @see org.opengis.spatialschema.geometry.primitive.CurveSegment#getNumDerivativesAtStart()
+     * @see org.opengis.geometry.primitive.CurveSegment#getNumDerivativesAtStart()
      */
     public int getNumDerivativesAtStart() {
         // Return 0, because linestrings can not support continuity above C^0
@@ -246,7 +246,7 @@ public class LineStringImpl extends CurveSegmentImpl implements LineString {
     /*
      * (non-Javadoc)
      * 
-     * @see org.opengis.spatialschema.geometry.primitive.CurveSegment#getNumDerivativesInterior()
+     * @see org.opengis.geometry.primitive.CurveSegment#getNumDerivativesInterior()
      */
     public int getNumDerivativesInterior() {
         // Return 0, because linestrings can not support continuity above C^0
@@ -256,7 +256,7 @@ public class LineStringImpl extends CurveSegmentImpl implements LineString {
     /*
      * (non-Javadoc)
      * 
-     * @see org.opengis.spatialschema.geometry.primitive.CurveSegment#getNumDerivativesAtEnd()
+     * @see org.opengis.geometry.primitive.CurveSegment#getNumDerivativesAtEnd()
      */
     public int getNumDerivativesAtEnd() {
         // Return 0, because linestrings can not support continuity above C^0
@@ -266,7 +266,7 @@ public class LineStringImpl extends CurveSegmentImpl implements LineString {
     /*
      * (non-Javadoc)
      * 
-     * @see org.opengis.spatialschema.geometry.primitive.CurveSegment#getSamplePoints()
+     * @see org.opengis.geometry.primitive.CurveSegment#getSamplePoints()
      * @version Implementation OK
      */
     public PointArray getSamplePoints() {
@@ -278,7 +278,7 @@ public class LineStringImpl extends CurveSegmentImpl implements LineString {
     /*
      * (non-Javadoc)
      * 
-     * @see org.opengis.spatialschema.geometry.primitive.CurveSegment#reverse()
+     * @see org.opengis.geometry.primitive.CurveSegment#reverse()
      */
     public CurveSegmentImpl reverse() {
         // Test OK
@@ -292,7 +292,7 @@ public class LineStringImpl extends CurveSegmentImpl implements LineString {
     /*
      * (non-Javadoc)
      * 
-     * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#getTangent(double)
+     * @see org.opengis.geometry.coordinate.GenericCurve#getTangent(double)
      */
     public double[] getTangent( double distance ) {
         // Test OK - Valid for n dimensional space
@@ -313,7 +313,7 @@ public class LineStringImpl extends CurveSegmentImpl implements LineString {
     /*
      * (non-Javadoc)
      * 
-     * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#forConstructiveParam(double)
+     * @see org.opengis.geometry.coordinate.GenericCurve#forConstructiveParam(double)
      */
     public DirectPosition forConstructiveParam( double cp ) {
         // Test ok - valid for n dimensional space
@@ -338,7 +338,7 @@ public class LineStringImpl extends CurveSegmentImpl implements LineString {
     /*
      * (non-Javadoc)
      * 
-     * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#forParam(double)
+     * @see org.opengis.geometry.coordinate.GenericCurve#forParam(double)
      */
     public DirectPosition forParam( double distance ) {
         // Test OK - Valid for n dimensional space
@@ -360,7 +360,7 @@ public class LineStringImpl extends CurveSegmentImpl implements LineString {
     /*
      * (non-Javadoc)
      * 
-     * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#getParamForPoint(org.opengis.spatialschema.geometry.DirectPosition)
+     * @see org.opengis.geometry.coordinate.GenericCurve#getParamForPoint(org.opengis.geometry.coordinate.DirectPosition)
      */
     public ParamForPoint getParamForPoint( DirectPosition p ) {
         // TODO semantic SJ, JR
@@ -426,7 +426,7 @@ public class LineStringImpl extends CurveSegmentImpl implements LineString {
     /*
      * (non-Javadoc)
      * 
-     * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#asLineString(double, double)
+     * @see org.opengis.geometry.coordinate.GenericCurve#asLineString(double, double)
      */
     public LineStringImpl asLineString( double maxSpacing, double maxOffset ) {
         // TODO semantic SJ, JR

@@ -17,7 +17,7 @@ package org.geotools.referencing.operation.builder.algorithm;
 
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.operation.builder.MappedPosition;
-import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.geometry.DirectPosition;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;

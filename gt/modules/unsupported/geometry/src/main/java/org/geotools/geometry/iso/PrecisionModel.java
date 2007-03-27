@@ -77,10 +77,10 @@ package org.geotools.geometry.iso;
 import java.io.Serializable;
 
 import org.geotools.geometry.iso.topograph2D.Coordinate;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Geometry;
-import org.opengis.spatialschema.geometry.Precision;
-import org.opengis.spatialschema.geometry.PrecisionType;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Geometry;
+import org.opengis.geometry.Precision;
+import org.opengis.geometry.PrecisionType;
 
 /**
  * Specifies the precision model of the {@link Coordinate}s in a

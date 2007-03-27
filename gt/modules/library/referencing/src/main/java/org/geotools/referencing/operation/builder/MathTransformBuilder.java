@@ -40,9 +40,9 @@ import org.opengis.referencing.datum.DatumFactory;
 import org.opengis.metadata.extent.GeographicExtent;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.metadata.quality.EvaluationMethodType;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.geometry.MismatchedReferenceSystemException;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
@@ -738,7 +738,7 @@ public abstract class MathTransformBuilder {
                         Vocabulary.formatInternational(VocabularyKeys.ROOT_MEAN_SQUARED_ERROR);
                 final QuantitativeResultImpl result = new QuantitativeResultImpl();
                 result.setValues(new double[] {error});
-                result.setValueType(Double.TYPE);
+                //result.setValueType(Double.TYPE);
                 result.setValueUnit(CRSUtilities.getUnit(targetCRS.getCoordinateSystem()));
                 result.setErrorStatistic(description);
                 final PositionalAccuracyImpl accuracy = new PositionalAccuracyImpl(result);

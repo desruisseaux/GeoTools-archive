@@ -51,15 +51,15 @@ import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.OrientableCurveImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.util.DoubleOperation;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.complex.Complex;
-import org.opengis.spatialschema.geometry.complex.CompositeCurve;
-import org.opengis.spatialschema.geometry.primitive.Curve;
-import org.opengis.spatialschema.geometry.primitive.CurveBoundary;
-import org.opengis.spatialschema.geometry.primitive.OrientableCurve;
-import org.opengis.spatialschema.geometry.primitive.OrientablePrimitive;
-import org.opengis.spatialschema.geometry.primitive.Primitive;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.complex.CompositeCurve;
+import org.opengis.geometry.primitive.Curve;
+import org.opengis.geometry.primitive.CurveBoundary;
+import org.opengis.geometry.primitive.OrientableCurve;
+import org.opengis.geometry.primitive.OrientablePrimitive;
+import org.opengis.geometry.primitive.Primitive;
 
 /**
  * 
@@ -349,7 +349,7 @@ public class CompositeCurveImpl extends CompositeImpl<OrientableCurveImpl>
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#isSimple()
+	 * @see org.opengis.geometry.coordinate.root.Geometry#isSimple()
 	 */
 	public boolean isSimple() {
 		// TODO semantic SJ, JR
@@ -361,7 +361,7 @@ public class CompositeCurveImpl extends CompositeImpl<OrientableCurveImpl>
 
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.primitive.OrientableCurve#getComposite()
+	 * @see org.opengis.geometry.primitive.OrientableCurve#getComposite()
 	 */
 	public CompositeCurve getComposite() {
 		// TODO semantic SJ, JR
@@ -372,7 +372,7 @@ public class CompositeCurveImpl extends CompositeImpl<OrientableCurveImpl>
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.primitive.OrientablePrimitive#getOrientation()
+	 * @see org.opengis.geometry.primitive.OrientablePrimitive#getOrientation()
 	 */
 	public int getOrientation() {
 		// TODO semantic SJ, JR
@@ -383,7 +383,7 @@ public class CompositeCurveImpl extends CompositeImpl<OrientableCurveImpl>
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.primitive.OrientablePrimitive#getPrimitive()
+	 * @see org.opengis.geometry.primitive.OrientablePrimitive#getPrimitive()
 	 */
 	public Primitive getPrimitive() {
 		// TODO semantic SJ, JR
@@ -394,7 +394,7 @@ public class CompositeCurveImpl extends CompositeImpl<OrientableCurveImpl>
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.primitive.Primitive#getContainedPrimitives()
+	 * @see org.opengis.geometry.primitive.Primitive#getContainedPrimitives()
 	 */
 	public Set getContainedPrimitives() {
 		// TODO semantic SJ, JR
@@ -405,7 +405,7 @@ public class CompositeCurveImpl extends CompositeImpl<OrientableCurveImpl>
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.primitive.Primitive#getContainingPrimitives()
+	 * @see org.opengis.geometry.primitive.Primitive#getContainingPrimitives()
 	 */
 	public Set getContainingPrimitives() {
 		// TODO semantic SJ, JR
@@ -416,7 +416,7 @@ public class CompositeCurveImpl extends CompositeImpl<OrientableCurveImpl>
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.primitive.Primitive#getComplexes()
+	 * @see org.opengis.geometry.primitive.Primitive#getComplexes()
 	 */
 	public Set getComplexes() {
 		// TODO semantic SJ, JR
@@ -427,7 +427,7 @@ public class CompositeCurveImpl extends CompositeImpl<OrientableCurveImpl>
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.primitive.Primitive#getProxy()
+	 * @see org.opengis.geometry.primitive.Primitive#getProxy()
 	 */
 	public OrientablePrimitive[] getProxy() {
 		// TODO semantic SJ, JR
@@ -438,7 +438,7 @@ public class CompositeCurveImpl extends CompositeImpl<OrientableCurveImpl>
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.complex.Composite#getGenerators()
+	 * @see org.opengis.geometry.complex.Composite#getGenerators()
 	 */
 	public List<OrientableCurve> getGenerators() {
 		// ok
@@ -447,7 +447,7 @@ public class CompositeCurveImpl extends CompositeImpl<OrientableCurveImpl>
 	}
 
 	/* (non-Javadoc)
-	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getDimension(org.opengis.spatialschema.geometry.DirectPosition)
+	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getDimension(org.opengis.geometry.coordinate.DirectPosition)
 	 */
 	public int getDimension(DirectPosition point) {
 		// TODO semantic SJ, JR
