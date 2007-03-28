@@ -26,7 +26,7 @@ import org.geotools.factory.FactoryFinder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureCollection;
-import org.opengis.spatialschema.geometry.BoundingBox;
+import org.opengis.geometry.BoundingBox;
 
 /**
  * A utility class for working with FeatureCollections. Provides a mechanism for

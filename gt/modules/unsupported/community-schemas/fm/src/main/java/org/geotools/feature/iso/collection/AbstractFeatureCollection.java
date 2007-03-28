@@ -15,8 +15,8 @@ import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.FeatureCollectionType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
+import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.BoundingBox;
 import org.opengis.util.ProgressListener;
 
 /**

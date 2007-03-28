@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.geotools.data.collection.ResourceCollection;
-import org.geotools.feature.CollectionEvent;
 import org.geotools.feature.CollectionListener;
 import org.geotools.feature.iso.FeatureImpl;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -18,8 +17,8 @@ import org.opengis.feature.FeatureCollection;
 import org.opengis.feature.simple.BoundingBoxAttribute;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.FeatureType;
+import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.BoundingBox;
 
 /**
  * This is *not* a Feature - it is a Delegate used by FeatureCollection

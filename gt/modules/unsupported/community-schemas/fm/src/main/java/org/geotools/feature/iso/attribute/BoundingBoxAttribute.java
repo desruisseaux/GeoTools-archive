@@ -2,7 +2,7 @@ package org.geotools.feature.iso.attribute;
 
 import org.geotools.feature.iso.AttributeImpl;
 import org.opengis.feature.type.AttributeType;
-import org.opengis.spatialschema.geometry.BoundingBox;
+import org.opengis.geometry.BoundingBox;
 
 public class BoundingBoxAttribute extends AttributeImpl implements
 		org.opengis.feature.simple.BoundingBoxAttribute {

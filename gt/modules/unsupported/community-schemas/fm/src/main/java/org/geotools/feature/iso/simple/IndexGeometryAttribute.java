@@ -5,8 +5,8 @@ package org.geotools.feature.iso.simple;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.GeometryAttribute;
+import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.BoundingBox;
 
 import com.vividsolutions.jts.geom.Geometry;
 

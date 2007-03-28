@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.geotools.feature.visitor.BoundsVisitor;
 import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureCollection;
 import org.opengis.feature.FeatureList;
@@ -20,8 +19,8 @@ import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
+import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.BoundingBox;
 import org.opengis.util.ProgressListener;
 
 /**

@@ -304,10 +304,14 @@ public class Types {
             }
         }
 
-        AttributeType superType = type.getSuper();
-        if(superType instanceof ComplexType){
-            List superDescriptors = descriptors((ComplexType)superType, name);
-            match.addAll(superDescriptors);
+        //only look up in the super type if the descriptor is not found
+        //as a direct child definition
+        if(match.size() == 0){
+            AttributeType superType = type.getSuper();
+            if(superType instanceof ComplexType){
+                List superDescriptors = descriptors((ComplexType)superType, name);
+                match.addAll(superDescriptors);
+            }
         }
         return match;
     }
@@ -337,10 +341,14 @@ public class Types {
             }
         }
         
-        AttributeType superType = type.getSuper();
-        if(superType instanceof ComplexType){
-            List superDescriptors = descriptors((ComplexType)superType, name);
-            match.addAll(superDescriptors);
+        //only look up in the super type if the descriptor is not found
+        //as a direct child definition
+        if(match.size() == 0){
+            AttributeType superType = type.getSuper();
+            if (superType instanceof ComplexType) {
+                List superDescriptors = descriptors((ComplexType) superType, name);
+                match.addAll(superDescriptors);
+            }
         }
         return match;
     }

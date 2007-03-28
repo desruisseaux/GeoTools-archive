@@ -45,10 +45,10 @@ import org.opengis.feature.type.TypeFactory;
 import org.opengis.feature.type.TypeName;
 import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
 import org.opengis.filter.PropertyIsLessThan;
+import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.picocontainer.defaults.DefaultPicoContainer;
 
 import com.vividsolutions.jts.geom.Geometry;
