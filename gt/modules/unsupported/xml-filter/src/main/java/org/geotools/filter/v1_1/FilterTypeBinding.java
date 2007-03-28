@@ -106,7 +106,10 @@ public class FilterTypeBinding extends AbstractComplexBinding {
         }
 
         //&lt;xsd:element ref="ogc:comparisonOps"/&gt;
-        if (OGC.comparisonOps.equals(name) && filter instanceof BinaryComparisonOperator) {
+        if (OGC.comparisonOps.equals(name) && filter instanceof BinaryComparisonOperator
+                //JD: extra check here because many of our spatial implementations
+            // extend both	
+                && !(filter instanceof BinarySpatialOperator)) {
             return filter;
         }
 
