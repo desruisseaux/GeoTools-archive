@@ -10,7 +10,6 @@ import java.util.List;
 import org.apache.commons.jxpath.JXPathIntrospector;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.iso.AttributeFactoryImpl;
 import org.geotools.feature.iso.AttributeImpl;
 import org.geotools.feature.iso.Types;
 import org.geotools.feature.iso.simple.SimpleFeatureFactoryImpl;
@@ -26,8 +25,8 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
+import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.BoundingBox;
 
 import com.vividsolutions.jts.geom.Geometry;
 

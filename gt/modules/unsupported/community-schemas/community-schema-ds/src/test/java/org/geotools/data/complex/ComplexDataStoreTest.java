@@ -43,7 +43,7 @@ import org.opengis.filter.FilterFactory;
 import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
-import org.opengis.spatialschema.geometry.BoundingBox;
+import org.opengis.geometry.BoundingBox;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Point;
