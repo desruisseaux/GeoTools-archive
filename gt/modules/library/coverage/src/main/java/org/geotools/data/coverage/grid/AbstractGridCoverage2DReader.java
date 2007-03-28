@@ -47,7 +47,6 @@ import org.geotools.data.DataSourceException;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.operation.BufferedCoordinateOperationFactory;
-import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.util.NumberRange;
@@ -60,7 +59,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import sun.text.Normalizer.Mode;
 
 /**
  * This class is a first attempt for providing a way to get more informations
