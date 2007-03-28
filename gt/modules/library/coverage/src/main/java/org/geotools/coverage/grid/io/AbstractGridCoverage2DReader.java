@@ -377,11 +377,31 @@ public abstract class AbstractGridCoverage2DReader implements
 	 * Creates a {@link GridCoverage} for the provided {@link PlanarImage} using
 	 * the {@link #originalEnvelope} that was provided for this coverage.
 	 * 
-	 * @param image
-	 * @return a {@link GridCoverage}.
+	 * @param image contains the data for the coverage to create.
+	 * @return a {@link GridCoverage}
 	 * @throws IOException
 	 */
 	protected final GridCoverage createImageCoverage(PlanarImage image)
+			throws IOException {
+		return createImageCoverage(image, null);
+
+	}
+	
+	/**
+	 * Creates a {@link GridCoverage} for the provided {@link PlanarImage} using
+	 * the {@link #raster2Model} that was provided for this coverage.
+	 * 
+	 * <p>
+	 * This method is vital when working with coverages that have a raster to model transformation
+	 * that is not a simple scale and translate.
+	 * 
+	 * @param image contains the data for the coverage to create.
+	 * @param raster2Model is the {@link MathTransform} that maps from the 
+	 * 		  raster space to the model space.
+	 * @return a {@link GridCoverage}
+	 * @throws IOException
+	 */
+	protected final GridCoverage createImageCoverage(PlanarImage image, MathTransform raster2Model)
 			throws IOException {
 
 		// deciding the number range
@@ -494,14 +514,10 @@ public abstract class AbstractGridCoverage2DReader implements
 		}
 
 		// creating coverage
-		// if (raster2Model != null)
-		// return FactoryFinder.getGridCoverageFactory(null).create(
-		// coverageName, image, crs, raster2Model, bands, null, null);
 		return coverageFactory.create(coverageName, image, new GeneralEnvelope(
 				originalEnvelope), bands, null, null);
 
 	}
-
 	/**
 	 * Creates a {@link GridCoverage} for a coverage that is not a simple image
 	 * but that contains complex dadta from measurements.

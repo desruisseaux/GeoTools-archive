@@ -53,6 +53,8 @@ import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.operation.matrix.AffineTransform2D;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
@@ -437,13 +439,24 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 		// /////////////////////////////////////////////////////////////////////
 		// get the raster -> model transformation and
 		// create the coverage
-		return createImageCoverage((PlanarImage) JAI.create("ImageRead",pbjRead,
-				(RenderingHints) newHints));
+		if (imageChoice.intValue() == 0 && !metaFile) {
+			final AffineTransform tempRaster2Model = new AffineTransform(
+					(AffineTransform) raster2Model);
+			tempRaster2Model.concatenate(new AffineTransform(readP
+					.getSourceXSubsampling(), 0, 0, readP
+					.getSourceYSubsampling(), 0, 0));
+			return createImageCoverage(JAI.create("ImageRead", pbjRead,
+					(RenderingHints) newHints), ProjectiveTransform
+					.create((AffineTransform) tempRaster2Model));
+
+		}
+		return createImageCoverage(JAI.create("ImageRead", pbjRead,
+				 (RenderingHints) newHints));
 
 	}
 
 	/**
-	 * This method is sued to check if we are connecting directly to a WMS with
+	 * This method is used to check if we are connecting directly to a WMS with
 	 * a getmap request. In such a case we skip reading all the parameters we
 	 * can read from this http string.
 	 * 
@@ -553,11 +566,11 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 			final File prjFile = new File(base.toString());
 			if (prjFile.exists()) {
 				// it exists then we have top read it
-
+				PrjFileReader projReader=null;
 				try {
-					final FileChannel channel = new FileInputStream(prjFile)
+					FileChannel channel = new FileInputStream(prjFile)
 							.getChannel();
-					final PrjFileReader projReader = new PrjFileReader(channel);
+					projReader = new PrjFileReader(channel);
 					crs = projReader.getCoodinateSystem();
                     projReader.close();
 				} catch (FileNotFoundException e) {
@@ -572,6 +585,17 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 					// warn about the error but proceed, it is not fatal
 					// we have at least the default crs to use
 					LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+				}
+				finally{
+					if(projReader!=null)
+						try{
+							projReader.close();
+						}
+					catch (IOException e) {
+						// warn about the error but proceed, it is not fatal
+						// we have at least the default crs to use
+						LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+					}
 				}
 
 			}

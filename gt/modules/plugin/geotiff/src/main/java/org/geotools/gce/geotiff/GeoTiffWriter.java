@@ -102,14 +102,14 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 			final URL dest = (URL) destination;
 			if (dest.getProtocol().equalsIgnoreCase("file")) {
 				final File destFile = new File(URLDecoder.decode(
-						dest.getFile(), "UTF8"));
+						dest.getFile(), "UTF-8"));
 				this.outStream = ImageIO.createImageOutputStream(destFile);
 			}
 
 		} else if (destination instanceof OutputStream) {
 
-			this.outStream = new FileCacheImageOutputStream(
-					(OutputStream) destination, null);
+			this.outStream = ImageIO.createImageOutputStream(
+					(OutputStream) destination);
 
 		} else if (destination instanceof ImageOutputStream)
 			this.outStream = (ImageOutputStream) destination;
@@ -195,8 +195,7 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 			// setting georeferencing
 			final GridGeometry gg = gc.getGridGeometry();
 			final GridRange range = gg.getGridRange();
-			final AffineTransform tr = (AffineTransform) gg
-					.getGridToCoordinateSystem();
+			final AffineTransform tr = (AffineTransform) gg.getGridToCRS();
 			setGeoReference(crs, metadata, tr, range);
 
 			// writing ALWAYS the geophysics vew of the data

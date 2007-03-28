@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -646,46 +647,64 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 	private void getCoordinateReferenceSystem() throws FileNotFoundException,
 			IOException {
 
-		if (source instanceof File) {
-			crs = null;
-			final String prjPath = new StringBuffer(this.parentPath).append(
-					File.separatorChar).append(this.coverageName)
-					.append(".prj").toString();
-			// read the prj info from the file
-			// if does not exist go for the default value
+//		 check to see if there is a projection file
+		if (source instanceof File
+				|| (source instanceof URL && (((URL) source).getProtocol() == "file"))) {
+			// getting name for the prj file
+			final String sourceAsString;
 
-			try {
-				final File prj = new File(prjPath);
-				if (prj.exists()) {
-					final PrjFileReader prjReader = new PrjFileReader(
-							new FileInputStream(prj).getChannel());
-					crs = prjReader.getCoodinateSystem();
+			if (source instanceof File) {
+				sourceAsString = ((File) source).getAbsolutePath();
+			} else {
+				sourceAsString = ((URL) source).getFile();
+			}
+
+			final int index = sourceAsString.lastIndexOf(".");
+			final StringBuffer base = new StringBuffer(sourceAsString
+					.substring(0, index)).append(".prj");
+
+			// does it exist?
+			final File prjFile = new File(base.toString());
+			if (prjFile.exists()) {
+				// it exists then we have top read it
+				PrjFileReader projReader=null;
+				try {
+					FileChannel channel = new FileInputStream(prjFile)
+							.getChannel();
+					projReader = new PrjFileReader(channel);
+					crs = projReader.getCoodinateSystem();
+				} catch (FileNotFoundException e) {
+					// warn about the error but proceed, it is not fatal
+					// we have at least the default crs to use
+					LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+				} catch (IOException e) {
+					// warn about the error but proceed, it is not fatal
+					// we have at least the default crs to use
+					LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+				} catch (FactoryException e) {
+					// warn about the error but proceed, it is not fatal
+					// we have at least the default crs to use
+					LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+				}
+				finally{
+					if(projReader!=null)
+						try{
+							projReader.close();
+						}
+					catch (IOException e) {
+						// warn about the error but proceed, it is not fatal
+						// we have at least the default crs to use
+						LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+					}
 				}
 
-			} catch (FileNotFoundException e) {
-				LOGGER.info("PRJ file not found proceeding with EPSG:4326");
-				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-				// In this case there is not a prj file or it
-				// does not contain a valid CRS
-				crs = null;
-			} catch (IOException e) {
-				LOGGER.info("PRJ file not found proceeding with EPSG:4326");
-				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-				// In this case there is not a prj file or it
-				// does not contain a valid CRS
-				crs = null;
-			} catch (FactoryException e) {
-				LOGGER.info("PRJ file not found proceeding with EPSG:4326");
-				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-				// In this case there is not a prj file or it
-				// does not contain a valid CRS
-				crs = null;
 			}
 		}
-
 		if (crs == null) {
-			LOGGER.info("crs not found proceeding with EPSG:4326");
-			crs = ArcGridFormat.getDefaultCRS();
+			crs = AbstractGridFormat.getDefaultCRS();
+			LOGGER.info(new StringBuffer(
+					"Unable to find crs, continuing with default WGS4 CRS")
+					.append("\n").append(crs.toWKT()).toString());
 		}
 
 	}

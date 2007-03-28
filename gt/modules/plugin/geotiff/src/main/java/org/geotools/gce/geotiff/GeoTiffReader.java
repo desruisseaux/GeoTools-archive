@@ -412,8 +412,20 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		// /////////////////////////////////////////////////////////////////////
 		// get the raster -> model transformation and
 		//		 create the coverage
-		 return createImageCoverage(JAI.create("ImageRead", pbjRead,
-		 (RenderingHints) newHints));
+		if (imageChoice.intValue() == 0) {
+
+			final AffineTransform tempRaster2Model = new AffineTransform(
+					(AffineTransform) raster2Model);
+			tempRaster2Model.concatenate(new AffineTransform(readP
+					.getSourceXSubsampling(), 0, 0, readP
+					.getSourceYSubsampling(), 0, 0));
+			return createImageCoverage(JAI.create("ImageRead", pbjRead,
+					(RenderingHints) newHints), ProjectiveTransform
+					.create((AffineTransform) tempRaster2Model));
+
+		}
+		return createImageCoverage(JAI.create("ImageRead", pbjRead,
+				 (RenderingHints) newHints));
 
 
 	}
