@@ -19,6 +19,7 @@ import junit.framework.TestCase;
 import org.w3c.dom.Document;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
@@ -67,7 +68,12 @@ public class GMLApplicationSchemaParsingTest extends TestCase {
         }
 
         assertNull(parser.parse());
-        in.close();
+
+        try {
+            in.close();
+        } catch (IOException e) {
+            // nothing to do, but this throws an exception under java 6
+        }
     }
 
     public void testStreamPointWithIncorrectSchemaLocation()
@@ -107,7 +113,12 @@ public class GMLApplicationSchemaParsingTest extends TestCase {
         }
 
         assertNull(parser.parse());
-        in.close();
+
+        try {
+            in.close();
+        } catch (IOException e) {
+            // nothing to do, but this throws an exception under java 6
+        }
     }
 
     public void testWithCorrectSchemaLocation() throws Exception {
@@ -145,6 +156,11 @@ public class GMLApplicationSchemaParsingTest extends TestCase {
         }
 
         assertNull(parser.parse());
-        in.close();
+
+        try {
+            in.close();
+        } catch (IOException e) {
+            // nothing to do, but this throws an exception under java 6
+        }
     }
 }
