@@ -20,6 +20,25 @@ import java.sql.Date;
 import java.util.logging.Logger;
 
 import org.geotools.filter.FilterType;
+import org.opengis.filter.ExcludeFilter;
+import org.opengis.filter.Id;
+import org.opengis.filter.IncludeFilter;
+import org.opengis.filter.PropertyIsBetween;
+import org.opengis.filter.PropertyIsLike;
+import org.opengis.filter.PropertyIsNull;
+import org.opengis.filter.expression.Add;
+import org.opengis.filter.expression.Divide;
+import org.opengis.filter.expression.Multiply;
+import org.opengis.filter.expression.Subtract;
+import org.opengis.filter.spatial.BBOX;
+import org.opengis.filter.spatial.Contains;
+import org.opengis.filter.spatial.Crosses;
+import org.opengis.filter.spatial.Disjoint;
+import org.opengis.filter.spatial.Equals;
+import org.opengis.filter.spatial.Intersects;
+import org.opengis.filter.spatial.Overlaps;
+import org.opengis.filter.spatial.Touches;
+import org.opengis.filter.spatial.Within;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -92,25 +111,46 @@ public class SQLEncoderPostgis extends SQLEncoder implements
         FilterCapabilities capabilities = new FilterCapabilities();
 
         capabilities.addType(FilterCapabilities.NONE);
+        capabilities.addType(IncludeFilter.class);
         capabilities.addType(FilterCapabilities.ALL);
+        capabilities.addType(ExcludeFilter.class);
         capabilities.addType(FilterCapabilities.FID);
+        capabilities.addType(Id.class);
         capabilities.addType(FilterCapabilities.NULL_CHECK);
+        capabilities.addType(PropertyIsNull.class);
         capabilities.addType(FilterCapabilities.BETWEEN);
+        capabilities.addType(PropertyIsBetween.class);
         capabilities.addType(FilterCapabilities.LOGICAL);
+        capabilities.addAll(FilterCapabilities.LOGICAL_OPENGIS);
         capabilities.addType(FilterCapabilities.SIMPLE_ARITHMETIC);
+        capabilities.addType(Add.class);
+        capabilities.addType(Multiply.class);
+        capabilities.addType(Subtract.class);
+        capabilities.addType(Divide.class);
         capabilities.addType(FilterCapabilities.SIMPLE_COMPARISONS);
+        capabilities.addAll(FilterCapabilities.SIMPLE_COMPARISONS_OPENGIS);
         capabilities.addType(FilterCapabilities.SPATIAL_BBOX);
+        capabilities.addType(BBOX.class);
         capabilities.addType(FilterCapabilities.LIKE);
+        capabilities.addType(PropertyIsLike.class);
 
         if (supportsGEOS) {
             capabilities.addType(FilterCapabilities.SPATIAL_CONTAINS);
+            capabilities.addType(Contains.class);
             capabilities.addType(FilterCapabilities.SPATIAL_CROSSES);
+            capabilities.addType(Crosses.class);
             capabilities.addType(FilterCapabilities.SPATIAL_DISJOINT);
+            capabilities.addType(Disjoint.class);
             capabilities.addType(FilterCapabilities.SPATIAL_EQUALS);
+            capabilities.addType(Equals.class);
             capabilities.addType(FilterCapabilities.SPATIAL_INTERSECT);
+            capabilities.addType(Intersects.class);
             capabilities.addType(FilterCapabilities.SPATIAL_OVERLAPS);
+            capabilities.addType(Overlaps.class);
             capabilities.addType(FilterCapabilities.SPATIAL_TOUCHES);
+            capabilities.addType(Touches.class);
             capabilities.addType(FilterCapabilities.SPATIAL_WITHIN);
+            capabilities.addType(Within.class);
         }
         
         // TODO: add SPATIAL_BEYOND, DWITHIN to capabilities and support in
