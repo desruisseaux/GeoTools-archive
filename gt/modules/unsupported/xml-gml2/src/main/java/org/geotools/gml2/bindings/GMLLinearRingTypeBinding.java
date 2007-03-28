@@ -20,6 +20,7 @@ import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
@@ -128,5 +129,16 @@ public class GMLLinearRingTypeBinding extends AbstractComplexBinding {
         }
 
         throw new RuntimeException("Could not find coordinates to build linestring");
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        LinearRing linearRing = (LinearRing) object;
+
+        if (GML.coordinates.equals(name)) {
+            return linearRing.getCoordinateSequence();
+        }
+
+        return null;
     }
 }

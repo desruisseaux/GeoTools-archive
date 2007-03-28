@@ -18,6 +18,7 @@ package org.geotools.gml2.bindings;
 import java.util.List;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 import org.geotools.xml.AbstractComplexBinding;
@@ -100,5 +101,30 @@ public class GMLPolygonTypeBinding extends AbstractComplexBinding {
         }
 
         return gFactory.createPolygon(shell, holes);
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        Polygon polygon = (Polygon) object;
+
+        if (GML.outerBoundaryIs.equals(name)) {
+            return polygon.getExteriorRing();
+        }
+
+        if (GML.innerBoundaryIs.equals(name)) {
+            int n = polygon.getNumInteriorRing();
+
+            if (n > 0) {
+                LineString[] interior = new LineString[n];
+
+                for (int i = 0; i < n; i++) {
+                    interior[i] = polygon.getInteriorRingN(i);
+                }
+
+                return interior;
+            }
+        }
+
+        return null;
     }
 }
