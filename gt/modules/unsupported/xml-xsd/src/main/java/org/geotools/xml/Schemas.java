@@ -657,6 +657,10 @@ public class Schemas {
      * Returns a list of all attribute declarations declared in the type (or
      * any base type) of the specified element.
      *
+     * <p>
+     * This method is just a shortcut for {@link #getAttributeDeclarations(XSDTypeDefinition) getAttributeDeclarations(element.getType()}
+     * </p>
+     * 
      * @param element The element.
      *
      * @return A list of @link XSDAttributeDeclaration objects, one for each
@@ -664,6 +668,20 @@ public class Schemas {
      */
     public static final List getAttributeDeclarations(
         XSDElementDeclaration element) {
+        return getAttributeDeclarations(element.getType());
+    }
+    
+    
+    /**
+     * Returns a list of all attribute declarations declared in the type (or
+     * any base type) of the specified element.
+     *
+     * @param element The element.
+     *
+     * @return A list of @link XSDAttributeDeclaration objects, one for each
+     * attribute of the element.
+     */
+    public static final List getAttributeDeclarations(XSDTypeDefinition type) {
         final ArrayList attributes = new ArrayList();
 
         //walk up the type hierarchy of the element to generate a list of atts
@@ -711,7 +729,7 @@ public class Schemas {
             }
         };
 
-        new TypeWalker().walk( element.getType(), visitor );
+        new TypeWalker().walk( type, visitor );
         
         return attributes;
     }
