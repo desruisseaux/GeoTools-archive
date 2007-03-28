@@ -79,8 +79,8 @@ public class DataAccessFinder {
                 // apply as many properties as will fit
             }
             try {
-                if (fac.canAccess(bean)) {
-                    return fac.createAccess(bean);
+                if (fac.canAccess(properties)) {
+                    return fac.createAccess(properties);
                 }
             } catch (Throwable t) {
                 LOGGER.log( Level.WARNING, "Could not acquire "+fac.getName()+":"+t, t );                
