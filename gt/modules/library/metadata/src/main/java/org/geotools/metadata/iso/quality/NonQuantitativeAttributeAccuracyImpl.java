@@ -20,22 +20,20 @@
 package org.geotools.metadata.iso.quality;
 
 // OpenGIS dependencies
-import org.opengis.metadata.quality.NonQuantitativeAttributeCorrectness;
+import org.opengis.metadata.quality.NonQuantitativeAttributeAccuracy;
 
 
 /**
- * Correctness of non-quantitative attributes.
+ * Accuracy of non-quantitative attributes.
  *
- * @source $URL$
- * @version $Id$
- * @author Martin Desruisseaux
- * @author Touraïvane
+ * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/metadata/src/main/java/org/geotools/metadata/iso/quality/NonQuantitativeAttributeAccuracyImpl.java $
+ * @version $Id: NonQuantitativeAttributeAccuracyImpl.java 20874 2006-08-07 10:00:01Z jgarnett $
+ * @author Cory Horner
  *
- * @since 2.1
- * @deprecated use {@link NonQuantitativeAttributeAccuracyImpl}
+ * @since 2.4
  */
-public class NonQuantitativeAttributeCorrectnessImpl extends ThematicAccuracyImpl
-        implements NonQuantitativeAttributeCorrectness
+public class NonQuantitativeAttributeAccuracyImpl extends ThematicAccuracyImpl
+        implements NonQuantitativeAttributeAccuracy
 {
     /**
      * Serial number for interoperability with different versions.
@@ -45,6 +43,6 @@ public class NonQuantitativeAttributeCorrectnessImpl extends ThematicAccuracyImp
     /**
      * Constructs an initially empty non quantitative attribute correctness.
      */
-    public NonQuantitativeAttributeCorrectnessImpl() {
+    public NonQuantitativeAttributeAccuracyImpl() {
     }
 }
