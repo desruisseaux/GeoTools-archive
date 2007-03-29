@@ -224,8 +224,11 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
 
             }
         }
-        if (readEnvelope == null || requestedDim == null) {
+        if (requestedDim == null) {
             throw new IllegalArgumentException("You must call ArcSDERasterReader.read() with a GPV[] including a Parameter for READ_GRIDGEOMETRY2D.");
+        }
+        if (readEnvelope == null) {
+            readEnvelope = new GeneralEnvelope(pyramidInfo.getPyramidLevel(pyramidInfo.getNumLevels() - 1).getEnvelope());
         }
         if (LOGGER.isLoggable(Level.FINE))
             LOGGER.fine("ArcSDE raster image requested: [" + readEnvelope + ", " + requestedDim + "]");
