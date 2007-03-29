@@ -13,13 +13,12 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */ 
-package org.geotools.geometry.text;
+package org.geotools.geometry.jts.spatialschema.geometry;
 
 
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Geometry;
 import org.opengis.geometry.PositionFactory;
-import org.opengis.geometry.aggregate.AggregateFactory;
 import org.opengis.geometry.aggregate.MultiPrimitive;
 import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.geometry.coordinate.LineString;
@@ -43,54 +42,32 @@ import java.util.List;
 /**
  * This class is used to parse well known text (WKT) which describes an
  * ISO 19107 Geometry. The grammar described omes from the ISO 19125-1
- * spec which describes feature geometry. It doesn't seem to exactly mesh up
- * with the geometry as described in 19107 so not all of the grammar is supported.
+ * spec which describes feature geometry. It does not match up exactly with
+ * with the geometry as described in 19107 so not all of the grammar issupported.
  * <p/>
  *
  * The types in the WKT format, and their mappings:
- * <ul>
- * <li>
+ *
  * POINT            org.opengis.geometry.primitive.Point
- * </li>
- * <li>
  * LINESTRING       org.opengis.geometry.primitive.Curve
- * </li>
- * <li>
  * POLYGON          org.opengis.geometry.primitive.Surface
- * </li>
- * <li>
  * MULTIPOINT       org.opengis.geometry.coordinate.aggregate.MultiPoint
- *                  Note that there is no factory method for MultiPoint.
- *                  <br>
- *                  For now, to keep implementation-independance I'm returning it as a List
- * </li>
- * <li>
+ *                  Note that there is no factory method for MultiPoint. For now, to keep
+ *                  implementation-independance I'm returning it as a List
  * MULTILINESTRING  no matching type in the GeoAPI interfaces
- *                  Could also be returned as list.
- *                  <br>
- *                  Not handled for now
- * </li>
- * <li>
+ *                  Could also be returned as list. Not handled for now
  * MULTIPOLYGON     no matching type in the GeoAPI interfaces
- *                  Could also be returned as list.
- *                  <br>
- *                  Not handled for now
- * </li>
- * </ul>>
- * Please note that this parser is not thread safe; you can however reuse the parser.
- * 
+ *                  Could also be returned as list. Not handled for now
+ *
  * @author Jody Garnett
  * @author Joel Skelton
- * @since 2.4
- * @version 2.4
  */
-public class WKTParser {
+public class GeometryWKTFactory {
 
     private static final String EMPTY = "EMPTY";
     private static final String COMMA = ",";
     private static final String L_PAREN = "(";
     private static final String R_PAREN = ")";
-    
     private GeometryFactory geometryFactory;
     private PrimitiveFactory primitiveFactory;
     private PositionFactory positionFactory;
@@ -102,54 +79,37 @@ public class WKTParser {
      * in the <code>CoordinateReferenceSystem</code>
      *
      * @param geometryFactory A <code>GeometryFactory</code> created with a <code>CoordinateReferenceSystem</code> and <code>PrecisionModel</code>
-     * @param primitiveFactory A <code>PrimitiveFactory</code> created with the same crs and precision as above
-     * @param positionFactory A <code>PositionFactory</code> created with the same crs and precision as above
-     * @param aggregateFactory A <Code>AggregateFactory</code> created with the same crs and precision as above
+     * @param primitiveFactory A <code>PrimitiveFactory</code> created with a <code>CoordinateReferenceSystem</code>
+     * @param positionFactory A <code>PositionFactory</code> created with a <code>CoordianteReferenceSystem</code>
      */
-    public WKTParser(GeometryFactory geometryFactory, PrimitiveFactory primitiveFactory, PositionFactory positionFactory, AggregateFactory aggregateFactory) {
+    public GeometryWKTFactory(GeometryFactory geometryFactory, PrimitiveFactory primitiveFactory, PositionFactory positionFactory) {
         this.geometryFactory = geometryFactory;
         this.primitiveFactory = primitiveFactory;
         this.positionFactory = positionFactory;
     }
-    /**
-     * Provide a GeometryFactory for the parser.
-     * <p>
-     * Should be called prior to use.
-     * @param factory
-     */
-    public void setFactory( GeometryFactory factory){
-        this.geometryFactory = factory;
-    }
 
-    /**
-     * Provide a PrimitiveFactory for the parser.
-     * <p>
-     * Should be called prior to use.
-     * @param factory
-     */
-    public void setFactory( PrimitiveFactory factory){
-        this.primitiveFactory = factory;
-    }
-    /**
-     * Provide a PositionFactory for the parser.
-     * <p>
-     * Should be called prior to use.
-     * @param factory
-     */
-    public void setFactory( PositionFactory factory){
-        this.positionFactory = factory;
-    }
-    
     /**
      * Takes a string containing well known text geometry description and
      * wraps it in a Reader which is then passed on to parseWKT for handling.
      *
-     * @param text A string containing the well known text to be parsed.
-     * @return Geometry indicated by text (as created with current factories)
+     * @param string A string containing the well known text to be parsed.
+     * @return
      */
-    public Geometry parse(String text) throws ParseException {
-        return read(new StringReader(text));
+    Geometry parseWKTString(String string) throws ParseException {
+        return parseWKT(new StringReader(string));
     }
+
+    /**
+     * Inteprets a character stream passed through a <code>Reader</code> as a
+     * collection of well known text describing geometry.
+     *
+     * @param reader
+     * @return
+     */
+    Geometry parseWKT(Reader reader) throws ParseException {
+        return read(reader);
+    }
+
 
     /**
      * Reads a Well-Known Text representation of a geometry
