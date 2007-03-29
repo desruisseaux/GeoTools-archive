@@ -15,7 +15,7 @@ public class WKTParserTest extends TestCase {
         super.setUp();
         
         MockGeometryFactory mockFactory = new MockGeometryFactory();
-        parser = new WKTParser( mockFactory, mockFactory, null );
+        parser = new WKTParser( mockFactory, mockFactory, null, null );
     }
     
     public void testPoint1() throws Exception {
