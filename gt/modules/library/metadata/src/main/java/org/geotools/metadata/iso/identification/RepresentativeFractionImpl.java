@@ -76,7 +76,10 @@ public class RepresentativeFractionImpl extends Number implements Representative
                     "scale", new Double(scale)));
         }
     }
-
+    
+    public double toScale(){
+        return doubleValue();
+    }
     /**
      * Returns the scale in a form usable for computation.
      *
@@ -128,9 +131,9 @@ public class RepresentativeFractionImpl extends Number implements Representative
          * - a.equals(b) == b.equals(a)   (reflexivity)
          * - a.equals(b) implies (a.hashCode() == b.hashCode())
          */
-        if (object!=null && object.getClass().equals(getClass())) {
-            final RepresentativeFractionImpl that = (RepresentativeFractionImpl) object;
-            return denominator == that.denominator;
+        if (object!=null && object instanceof RepresentativeFraction ){
+            final RepresentativeFraction that = (RepresentativeFraction) object;
+            return denominator == that.getDenominator();
         }
         return false;
     }
