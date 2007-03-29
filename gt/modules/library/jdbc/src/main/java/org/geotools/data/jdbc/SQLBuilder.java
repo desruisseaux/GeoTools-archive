@@ -49,6 +49,7 @@ public interface SQLBuilder {
      * @return a String representing an SQL statement
      *
      * @throws SQLEncoderException If an error occurs encoding the SQL
+     * FIXME: This should change to a FilterToSQLException after SQLEncoder is dropped
      */
     public String buildSQLQuery(String typeName, FIDMapper mapper, 
             AttributeType[] attrTypes, Filter filter) throws SQLEncoderException;
@@ -102,6 +103,7 @@ public interface SQLBuilder {
      * <p>
      * sql: <code>WHERE filter encoding</code>
      * </p>
+     * FIXME: This should change to a FilterToSQLException after SQLEncoder is dropped
      */
     public void sqlWhere( StringBuffer sql, Filter preFilter ) throws SQLEncoderException;
 
@@ -110,6 +112,7 @@ public interface SQLBuilder {
      * <p>
      * sql: <code>ORDER BY &lt;property1&gt; [ASC|DESC], ....</code>
      * </p>
+     * FIXME: This should change to a FilterToSQLException after SQLEncoder is dropped
      */
     public void sqlOrderBy( StringBuffer sql, SortBy[] sortBy ) throws SQLEncoderException;
     

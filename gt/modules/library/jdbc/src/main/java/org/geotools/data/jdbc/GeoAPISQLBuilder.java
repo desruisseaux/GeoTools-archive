@@ -19,13 +19,11 @@ import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
-import org.opengis.filter.Filter;
 import org.geotools.filter.FilterCapabilities;
-import org.geotools.filter.Filters;
-import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.visitor.ClientTransactionAccessor;
 import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor;
+import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
 
@@ -50,12 +48,11 @@ import org.opengis.filter.sort.SortOrder;
  * </p>
  *
  * @author Sean Geoghegan, Defence Science and Technology Organisation.
- * @source $URL$
- * @deprecated Use GeoAPISQLBuilder instead
+ * @source $URL: http://gtsvn.refractions.net/geotools/trunk/gt/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/DefaultSQLBuilder.java $
  */
-public class DefaultSQLBuilder implements SQLBuilder {
+public class GeoAPISQLBuilder implements SQLBuilder {
     // The instance of the encoder to be used to generate the WHERE clause
-    protected SQLEncoder encoder;
+    protected FilterToSQL encoder;
 
     protected FeatureType ft;
     
@@ -68,24 +65,9 @@ public class DefaultSQLBuilder implements SQLBuilder {
 	/**
 	 * Constructs an instance of this class with a default SQLEncoder
 	 */
-	 public DefaultSQLBuilder() {
-	     this(new SQLEncoder());
+	 public GeoAPISQLBuilder() {
+	     this(new FilterToSQL(), null, null);
 	 }
-
-   /**
-     * Constructs an instance of this class using the encoder class specified.
-     * This will typically be from the getSqlBuilder method of a JDBCDataStore
-     * subclass.
-     * <p>
-     * This constructor should not be used to obtain Pre/Post filters, as these
-     * methods require a FeatureType to function properly.
-     *
-     * @deprecated
-     * @param encoder the specific encoder to be used.
-     */
-    public DefaultSQLBuilder(SQLEncoder encoder) {
-    	this(encoder, null, null);
-    }
 
     /**
      * Constructs an instance of this class using the encoder class specified.
@@ -96,7 +78,7 @@ public class DefaultSQLBuilder implements SQLBuilder {
      * @param featureType
      * @param accessor client-side transaction handler; may be null.
      */
-    public DefaultSQLBuilder(SQLEncoder encoder, FeatureType featureType, ClientTransactionAccessor accessor) {
+    public GeoAPISQLBuilder(FilterToSQL encoder, FeatureType featureType, ClientTransactionAccessor accessor) {
     	this.encoder = encoder;
     	this.ft = featureType;
     	this.accessor = accessor;
@@ -119,13 +101,6 @@ public class DefaultSQLBuilder implements SQLBuilder {
     		splitFilter(filter);
     	}
     	return lastPostFilter;
-    	
-//        SQLUnpacker unpacker = new SQLUnpacker(cap);
-//
-//        //figure out which of the filter we can use.
-//        unpacker.unPackAND(filter);
-//
-//        return unpacker.getUnSupported();
     }
 
     /**
@@ -141,12 +116,6 @@ public class DefaultSQLBuilder implements SQLBuilder {
     		splitFilter(filter);
     	}
     	return lastPreFilter;
-//        SQLUnpacker unpacker = new SQLUnpacker(encoder.getCapabilities());
-//
-//        //figure out which of the filter we can use.
-//        unpacker.unPackAND(filter);
-//
-//        return unpacker.getSupported();
     }
 
     protected void splitFilter(Filter filter) {
@@ -192,9 +161,13 @@ public class DefaultSQLBuilder implements SQLBuilder {
     public void sqlWhere(StringBuffer sql, Filter preFilter)
         throws SQLEncoderException {
         if ((preFilter != null) && (preFilter != Filter.INCLUDE)) {
-            String where = encoder.encode((org.geotools.filter.Filter)preFilter);
-            sql.append(" ");
-            sql.append(where);
+            try {
+                String where = encoder.encodeToString(preFilter);
+                sql.append(" ");
+                sql.append(where);
+            } catch (FilterToSQLException fse) {
+                throw new SQLEncoderException("", fse);
+            }
         }
     }
 
