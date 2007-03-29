@@ -1981,7 +1981,7 @@ public final class StreamingRenderer implements GTRenderer {
 				final AbstractGridCoverage2DReader reader = (AbstractGridCoverage2DReader) grid;
 				// then I try to get read parameters associated with this
 				// coverage if there are any.
-				final Object params =gridPropertyName.evaluate( drawMe);
+				final Object params =gridPropertyName.evaluate("params");
 				final GridCoverage2D coverage;
 				if (params != null) {
 					// //
