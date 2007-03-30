@@ -89,7 +89,6 @@
 
   <modules>
     <module>arcsde</module>
-    <module>cql</module>
     <module>db2</module>
     <module>directory</module>
     <module>epsg-extension</module>

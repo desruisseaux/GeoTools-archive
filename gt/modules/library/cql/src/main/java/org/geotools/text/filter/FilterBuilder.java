@@ -24,7 +24,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -102,8 +101,7 @@ public class FilterBuilder {
      * the different filters in a list (for example:
      * <code>att > 1| att2 < 3</code>
      */
-    public static final String DELIMITER = "|";
-
+    
     /**
      * Parses the input string in OGC CQL format into a Filter, using the
      * provided FilterFactory.
@@ -780,10 +778,7 @@ public class FilterBuilder {
 
             org.opengis.filter.expression.Expression property = resultStack.popExpression();
 
-            FilterFactory2 ff = (FilterFactory2) filterFactory;// TODO
-            // expecting
-            // implementation
-            // of new geoapi
+            FilterFactory2 ff = (FilterFactory2) filterFactory;// TODO expecting implementation of new geoapi
             BinarySpatialOperator filter = null;
 
             switch (nodeType) {
@@ -876,10 +871,7 @@ public class FilterBuilder {
 
             org.opengis.filter.expression.Expression property = resultStack.popExpression();
 
-            FilterFactory2 ff = (FilterFactory2) filterFactory;// TODO
-            // expecting
-            // implementation
-            // of new geoapi
+            FilterFactory2 ff = (FilterFactory2) filterFactory;// TODO expecting implementation of new geoapi
 
             DistanceBufferOperator filter = null;
 
@@ -890,8 +882,8 @@ public class FilterBuilder {
                 break;
 
             case JJTROUTINEINVOCATION_RELOP_BEYOND_NODE:
-                // filter = ff.beyond(property, geom, tolerance, unit); FIXME
-                // problem with Geometry param (Expresion is Needed)
+                // filter = ff.beyond(property, geom, tolerance, unit); 
+                // FIXME problem with Geometry param (Expresion is Needed)
                 break;
 
             default:
