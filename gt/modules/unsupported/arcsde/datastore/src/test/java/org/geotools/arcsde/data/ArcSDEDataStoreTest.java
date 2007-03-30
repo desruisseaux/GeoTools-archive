@@ -621,10 +621,11 @@ public class ArcSDEDataStoreTest extends TestCase {
         if (reader.hasNext()) {
             fids.add(ff.featureId(reader.next().getID()));
         }
-        String idTemplate = ((FeatureId)fids.get(0)).getID();
-        idTemplate = idTemplate.substring(0, idTemplate.length() - 1);
 
         reader.close();
+        
+        String idTemplate = ((FeatureId)fids.get(0)).getID();
+        idTemplate = idTemplate.substring(0, idTemplate.length() - 1);
         
         for (int x = 100; x < 2000; x++) {
             fids.add(ff.featureId(idTemplate + x));
