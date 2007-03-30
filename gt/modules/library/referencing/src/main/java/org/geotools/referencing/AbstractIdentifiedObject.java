@@ -44,6 +44,7 @@ import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.ObjectFactory;
+import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 import org.opengis.util.LocalName;
@@ -155,7 +156,7 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
     /**
      * The name for this object or code. Should never be {@code null}.
      */
-    private final Identifier name;
+    private final ReferenceIdentifier name;
 
     /**
      * An alternative name by which this object is identified.
@@ -305,6 +306,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                 case  1126917133: if (key.equalsIgnoreCase("positionalAccuracy")) key="positionalAccuracy"; break;
                 case  1127093059: if (key.equalsIgnoreCase("realizationEpoch"))   key="realizationEpoch";   break;
                 case -1109785975: if (key.equalsIgnoreCase("validArea"))          key="validArea";          break;
+                
                 // ----------------------------
                 // "name": String or Identifier
                 // ----------------------------
@@ -312,8 +314,12 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                     if (key.equals(NAME_KEY)) {
                         if (value instanceof String) {
                             name = new NamedIdentifier(properties, false);
-                            assert value.equals(((Identifier) name).getCode()) : name;
-                        } else {
+                            assert value.equals( ((Identifier) name).getCode() ) : name;
+                        } else if (value instanceof ReferenceIdentifier ){
+                            name = value;
+                        }
+                        else {
+                            // WARNING!
                             name = value;
                         }
                         continue NEXT_KEY;
@@ -449,7 +455,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
          */
         String key=null; Object value=null;
         try {
-            key=        NAME_KEY; this.name        =          (Identifier) (value=name);
+            key=        NAME_KEY; this.name        = (ReferenceIdentifier) (value=name);
             key=       ALIAS_KEY; this.alias       = asSet((GenericName[]) (value=alias));
             key= IDENTIFIERS_KEY; this.identifiers = asSet( (Identifier[]) (value=identifiers));
             key=     REMARKS_KEY; this.remarks     = (InternationalString) (value=remarks);
@@ -468,7 +474,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      *
      * @see #getName(Citation)
      */
-    public Identifier getName() {
+    public ReferenceIdentifier getName() {
         return name;
     }
 

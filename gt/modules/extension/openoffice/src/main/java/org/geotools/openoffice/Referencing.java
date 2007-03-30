@@ -666,10 +666,10 @@ public final class Referencing extends Formulas implements XReferencing {
             return getFailure(4,4);
         }
         return new double[][] {
-            new double[] {box.getNorthBoundLatitude(),
-                          box.getWestBoundLongitude()},
-            new double[] {box.getSouthBoundLatitude(),
-                          box.getEastBoundLongitude()}};
+            new double[] {box.getNorthBoundLatitude().doubleValue(),
+                          box.getWestBoundLongitude().doubleValue()},
+            new double[] {box.getSouthBoundLatitude().doubleValue(),
+                          box.getEastBoundLongitude().doubleValue()}};
     }
 
     /**

@@ -35,8 +35,8 @@ import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 
 // Geotools dependencies
-import org.geotools.metadata.iso.IdentifierImpl;
 import org.geotools.referencing.AbstractIdentifiedObject;
+import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.ClassChanger;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
@@ -341,7 +341,7 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
                                       final Unit       unit,
                                       final boolean    required)
     {
-        this(Collections.singletonMap(NAME_KEY, new IdentifierImpl(authority, name)),
+        this(Collections.singletonMap(NAME_KEY, new NamedIdentifier(authority, name)),
              valueClass, validValues, defaultValue, minimum, maximum, unit, required);
     }
 

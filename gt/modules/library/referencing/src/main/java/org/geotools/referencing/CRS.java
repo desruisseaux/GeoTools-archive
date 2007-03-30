@@ -422,15 +422,15 @@ public final class CRS {
                     final GeneralEnvelope candidate;
                     if (geo instanceof GeographicBoundingBox) {
                         final GeographicBoundingBox bounds = (GeographicBoundingBox) geo;
-                        if (!bounds.getInclusion()) {
+                        if (!bounds.getInclusion().booleanValue()) {
                             // TODO: we could uses Envelope.substract if such
                             //       a method is defined in a future version.
                             continue;
                         }
-                        candidate = new GeneralEnvelope(new double[] {bounds.getWestBoundLongitude(),
-                                                                      bounds.getSouthBoundLatitude()},
-                                                        new double[] {bounds.getEastBoundLongitude(),
-                                                                      bounds.getNorthBoundLatitude()});
+                        candidate = new GeneralEnvelope(new double[] {bounds.getWestBoundLongitude().doubleValue(),
+                                                                      bounds.getSouthBoundLatitude().doubleValue()},
+                                                        new double[] {bounds.getEastBoundLongitude().doubleValue(),
+                                                                      bounds.getNorthBoundLatitude().doubleValue()});
                         candidate.setCoordinateReferenceSystem(DefaultGeographicCRS.WGS84);
                     } else if (geo instanceof BoundingPolygon) {
                         // TODO: iterates through all polygons and invoke Polygon.getEnvelope();

@@ -28,6 +28,7 @@ import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.spatial.CellGeometry;
 import org.opengis.metadata.spatial.Georeferenceable;
 import org.opengis.util.InternationalString;
+import org.opengis.util.Record;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
@@ -69,7 +70,7 @@ public class GeoreferenceableImpl extends GridSpatialRepresentationImpl implemen
     /**
      * Terms which support grid data georeferencing.
      */
-    private Object parameters;
+    private Record parameters;
 
     /**
      * Reference providing description of the parameters.
@@ -144,15 +145,35 @@ public class GeoreferenceableImpl extends GridSpatialRepresentationImpl implemen
 
     /**
      * Terms which support grid data georeferencing.
+     * 
+     * @deprecated please use getGeoreferencedParameters
      */
     public Object getParameters() {
-        return parameters;
+        return getGeoreferencedParameters();
+    }
+
+    /**
+     * Terms which support grid data georeferencing.
+     */
+    public Record getGeoreferencedParameters() {
+        // TODO Auto-generated method stub
+        return null;
+    }            
+
+    /**
+     * Set terms which support grid data georeferencing.
+     * 
+     * @deprecated please use setGeoreferencedParameters
+     */
+    public synchronized void setParameters(final Object newValue) {
+        checkWritePermission();
+        parameters = (Record) newValue;
     }
 
     /**
      * Set terms which support grid data georeferencing.
      */
-    public synchronized void setParameters(final Object newValue) {
+    public synchronized void setGeoreferencedParameters(final Record newValue) {
         checkWritePermission();
         parameters = newValue;
     }
@@ -177,7 +198,7 @@ public class GeoreferenceableImpl extends GridSpatialRepresentationImpl implemen
     protected void freeze() {
         super.freeze();
         orientationParameterDescription = (InternationalString) unmodifiable(orientationParameterDescription);
-        parameters                      = (Object)              unmodifiable(parameters);
+        parameters                      = (Record)              unmodifiable(parameters);
         parameterCitation               = (Collection)          unmodifiable(parameterCitation);
     }
 
@@ -219,5 +240,5 @@ public class GeoreferenceableImpl extends GridSpatialRepresentationImpl implemen
      */
     public String toString() {
         return String.valueOf(parameterCitation);
-    }            
+    }
 }

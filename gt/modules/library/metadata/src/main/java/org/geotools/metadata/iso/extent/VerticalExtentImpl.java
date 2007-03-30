@@ -51,12 +51,12 @@ public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent
     /**
      * The lowest vertical extent contained in the dataset.
      */
-    private double minimumValue;
+    private Double minimumValue;
 
     /**
      * The highest vertical extent contained in the dataset.
      */
-    private double maximumValue;
+    private Double maximumValue;
 
     /**
      * The vertical units used for vertical extent information.
@@ -79,8 +79,8 @@ public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent
     /**
      * Creates a vertical extent initialized to the specified values.
      */
-    public VerticalExtentImpl(final double minimumValue,
-                          final double maximumValue,
+    public VerticalExtentImpl(final Double minimumValue,
+                          final Double maximumValue,
                           final Unit   unit,
                           final VerticalDatum verticalDatum)
     {
@@ -91,16 +91,30 @@ public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent
     }
 
     /**
+     * Creates a vertical extent initialized to the specified values.
+     */
+    public VerticalExtentImpl(final double minimumValue,
+                          final double maximumValue,
+                          final Unit   unit,
+                          final VerticalDatum verticalDatum)
+    {
+        setMinimumValue (new Double(minimumValue));
+        setMaximumValue (new Double(maximumValue));
+        setUnit         (unit);
+        setVerticalDatum(verticalDatum);
+    }
+
+    /**
      * Returns the lowest vertical extent contained in the dataset.
      */
-    public double getMinimumValue() {
+    public Double getMinimumValue() {
         return minimumValue;
     }
     
     /**
      * Set the lowest vertical extent contained in the dataset.
      */
-    public synchronized void setMinimumValue(final double newValue) {
+    public synchronized void setMinimumValue(final Double newValue) {
         checkWritePermission();
         minimumValue = newValue;
     }
@@ -108,14 +122,14 @@ public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent
     /**
      * Returns the highest vertical extent contained in the dataset.
      */
-    public double getMaximumValue() {
+    public Double getMaximumValue() {
         return maximumValue;
     }
 
     /**
      * Set the highest vertical extent contained in the dataset.
      */
-    public synchronized void setMaximumValue(final double newValue) {
+    public synchronized void setMaximumValue(final Double newValue) {
         checkWritePermission();
         maximumValue = newValue;
     }
@@ -174,10 +188,10 @@ public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent
             final VerticalExtentImpl that = (VerticalExtentImpl) object;
             return Utilities.equals(this.unit,           that.unit          ) &&
                    Utilities.equals(this.verticalDatum,  that.verticalDatum ) &&
-                   Double.doubleToLongBits(this.minimumValue) ==
-                   Double.doubleToLongBits(that.minimumValue) &&
-                   Double.doubleToLongBits(this.maximumValue) ==
-                   Double.doubleToLongBits(that.maximumValue);
+                   Double.doubleToLongBits(this.minimumValue.doubleValue()) ==
+                   Double.doubleToLongBits(that.minimumValue.doubleValue()) &&
+                   Double.doubleToLongBits(this.maximumValue.doubleValue()) ==
+                   Double.doubleToLongBits(that.maximumValue.doubleValue());
         }
         return false;
     }

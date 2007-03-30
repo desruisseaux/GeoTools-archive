@@ -23,15 +23,14 @@ import java.util.List;
 import java.util.Set;
 
 // OpenGIS dependencies
-import org.opengis.metadata.Identifier;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValue;
+import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.operation.Matrix;
-import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
@@ -102,7 +101,7 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
      * Forward the call to the {@linkplain MatrixParameterDescriptors matrix parameter descriptors}
      * specified at construction time.
      */
-    public Identifier getName() {
+    public ReferenceIdentifier getName() {
         return descriptor.getName();
     }
 

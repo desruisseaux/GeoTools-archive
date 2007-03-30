@@ -53,7 +53,7 @@ public class GridSpatialRepresentationImpl extends SpatialRepresentationImpl
     /**
      * Number of independent spatial-temporal axes.
      */
-    private int numberOfDimensions;
+    private Integer numberOfDimensions;
 
     /**
      * Information about spatial-temporal axis properties.
@@ -84,23 +84,37 @@ public class GridSpatialRepresentationImpl extends SpatialRepresentationImpl
                                      final CellGeometry cellGeometry,
                                      final boolean transformationParameterAvailable)
     {
+        this(new Integer(numberOfDimensions),
+             axisDimensionsProperties,
+             cellGeometry,
+             transformationParameterAvailable);
+    }
+
+    /**
+     * Creates a grid spatial representation initialized to the given values.
+     */
+    public GridSpatialRepresentationImpl(final Integer numberOfDimensions,
+                                     final List axisDimensionsProperties,
+                                     final CellGeometry cellGeometry,
+                                     final boolean transformationParameterAvailable)
+    {
         setNumberOfDimensions               (numberOfDimensions);
         setAxisDimensionsProperties         (axisDimensionsProperties);
         setCellGeometry                     (cellGeometry);
         setTransformationParameterAvailable (transformationParameterAvailable);
     }
-
+    
     /**
      * Number of independent spatial-temporal axes.
      */
-    public int getNumberOfDimensions() {
+    public Integer getNumberOfDimensions() {
         return numberOfDimensions;
     }
 
     /**
      * Set the number of independent spatial-temporal axes.
      */
-    public synchronized void setNumberOfDimensions(final int newValue) {
+    public synchronized void setNumberOfDimensions(final Integer newValue) {
         checkWritePermission();
         numberOfDimensions = newValue;
     }

@@ -41,8 +41,8 @@ import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
-import org.geotools.metadata.iso.IdentifierImpl;
 import org.geotools.referencing.AbstractIdentifiedObject;
+import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.UnmodifiableArrayList;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
@@ -124,7 +124,7 @@ public class DefaultParameterDescriptorGroup extends AbstractParameterDescriptor
     public DefaultParameterDescriptorGroup(final Citation authority, final String name,
                                            final GeneralParameterDescriptor[] parameters)
     {
-        this(Collections.singletonMap(NAME_KEY, new IdentifierImpl(authority, name)), parameters);
+        this(Collections.singletonMap(NAME_KEY, new NamedIdentifier(authority, name)), parameters);
     }
 
     /**

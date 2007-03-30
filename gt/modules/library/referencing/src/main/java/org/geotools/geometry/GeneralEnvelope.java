@@ -193,10 +193,10 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     public GeneralEnvelope(final GeographicBoundingBox box) {
         ensureNonNull("box", box);
         ordinates = new double[] {
-            box.getWestBoundLongitude(),
-            box.getSouthBoundLatitude(),
-            box.getEastBoundLongitude(),
-            box.getNorthBoundLatitude()
+            box.getWestBoundLongitude().doubleValue(),
+            box.getSouthBoundLatitude().doubleValue(),
+            box.getEastBoundLongitude().doubleValue(),
+            box.getNorthBoundLatitude().doubleValue()
         };
         crs = DefaultGeographicCRS.WGS84;
     }

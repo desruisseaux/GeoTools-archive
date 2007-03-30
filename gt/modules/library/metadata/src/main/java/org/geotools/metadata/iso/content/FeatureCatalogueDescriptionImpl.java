@@ -53,7 +53,7 @@ public class FeatureCatalogueDescriptionImpl extends ContentInformationImpl
     /**
      * Indication of whether or not the cited feature catalogue complies with ISO 19110.
      */
-    private boolean compliant;
+    private Boolean compliant;
 
     /**
      * Language(s) used within the catalogue
@@ -84,14 +84,14 @@ public class FeatureCatalogueDescriptionImpl extends ContentInformationImpl
     /**
      * Returns whether or not the cited feature catalogue complies with ISO 19110.
      */
-    public boolean isCompliant() {
+    public Boolean isCompliant() {
         return compliant;
     }
     
     /**
      * Set whether or not the cited feature catalogue complies with ISO 19110.
      */
-    public synchronized void setCompliant(final boolean newValue) {
+    public synchronized void setCompliant(final Boolean newValue) {
         checkWritePermission();
         compliant = newValue;
     }

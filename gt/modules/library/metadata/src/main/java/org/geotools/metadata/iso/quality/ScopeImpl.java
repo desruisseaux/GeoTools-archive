@@ -20,6 +20,8 @@
 package org.geotools.metadata.iso.quality;
 
 // OpenGIS dependencies
+import java.util.Collection;
+
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.quality.Scope;
 import org.opengis.metadata.maintenance.ScopeCode;
@@ -85,6 +87,14 @@ public class ScopeImpl extends MetadataEntity implements Scope {
     }
 
     /**
+     * Returns detailed descriptions about the level of the data specified by the scope.
+     */
+    public Collection getLevelDescription() {
+        // TODO Auto-generated method stub
+        return null;
+    }        
+
+    /**
      * Information about the spatial, vertical and temporal extent of the data specified by the
      * scope.
      */
@@ -142,5 +152,6 @@ public class ScopeImpl extends MetadataEntity implements Scope {
      */
     public String toString() {
         return String.valueOf(level);
-    }        
+    }
+
 }

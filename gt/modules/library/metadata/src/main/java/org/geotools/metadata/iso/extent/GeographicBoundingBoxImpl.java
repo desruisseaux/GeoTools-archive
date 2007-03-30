@@ -82,25 +82,25 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      * The western-most coordinate of the limit of the dataset extent.
      * The value is expressed in longitude in decimal degrees (positive east).
      */
-    private double westBoundLongitude;
+    private Double westBoundLongitude;
 
     /**
      * The eastern-most coordinate of the limit of the dataset extent.
      * The value is expressed in longitude in decimal degrees (positive east).
      */
-    private double eastBoundLongitude;
+    private Double eastBoundLongitude;
 
     /**
      * The southern-most coordinate of the limit of the dataset extent.
      * The value is expressed in latitude in decimal degrees (positive north).
      */
-    private double southBoundLatitude;
+    private Double southBoundLatitude;
 
     /**
      * The northern-most, coordinate of the limit of the dataset extent.
      * The value is expressed in latitude in decimal degrees (positive north).
      */
-    private double northBoundLatitude;
+    private Double northBoundLatitude;
 
     /**
      * Constructs an initially empty geographic bounding box.
@@ -158,7 +158,10 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      * The rectangle is assumed in {@linkplain DefaultGeographicCRS#WGS84 WGS 84} CRS.
      */
     public GeographicBoundingBoxImpl(final Rectangle2D bounds) {
-        this(bounds.getMinX(), bounds.getMaxX(), bounds.getMinY(), bounds.getMaxY());
+        this(new Double(bounds.getMinX()),
+             new Double(bounds.getMaxX()),
+             new Double(bounds.getMinY()), 
+             new Double(bounds.getMaxY()));
     }
 
     /**
@@ -169,13 +172,27 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
                                      final double southBoundLatitude,
                                      final double northBoundLatitude)
     {
-        super(true);
-        setWestBoundLongitude( westBoundLongitude);
-        setEastBoundLongitude( eastBoundLongitude);
-        setSouthBoundLatitude(southBoundLatitude );
-        setNorthBoundLatitude(northBoundLatitude );
+        this(new Double(westBoundLongitude),
+             new Double(eastBoundLongitude),
+             new Double(southBoundLatitude),
+             new Double(northBoundLatitude));
     }
 
+    /**
+     * Creates a geographic bounding box initialized to the specified values.
+     */
+    public GeographicBoundingBoxImpl(final Double westBoundLongitude,
+                                     final Double eastBoundLongitude,
+                                     final Double southBoundLatitude,
+                                     final Double northBoundLatitude)
+    {
+        super(true);
+        setWestBoundLongitude(westBoundLongitude);
+        setEastBoundLongitude(eastBoundLongitude);
+        setSouthBoundLatitude(southBoundLatitude);
+        setNorthBoundLatitude(northBoundLatitude);
+    }
+    
     /**
      * Returns the western-most coordinate of the limit of the
      * dataset extent. The value is expressed in longitude in
@@ -183,7 +200,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      *
      * @return The western-most longitude between -180 and +180°.
      */
-    public double getWestBoundLongitude() {
+    public Double getWestBoundLongitude() {
         return westBoundLongitude;
     }
     
@@ -192,7 +209,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      * dataset extent. The value is expressed in longitude in
      * decimal degrees (positive east).
      */
-    public synchronized void setWestBoundLongitude(final double newValue) {
+    public synchronized void setWestBoundLongitude(final Double newValue) {
         checkWritePermission();
         westBoundLongitude = newValue;
     }
@@ -204,7 +221,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      *
      * @return The eastern-most longitude between -180 and +180°.
      */
-    public double getEastBoundLongitude() {
+    public Double getEastBoundLongitude() {
         return eastBoundLongitude;
     }
 
@@ -213,7 +230,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      * dataset extent. The value is expressed in longitude in
      * decimal degrees (positive east).
      */
-    public synchronized void setEastBoundLongitude(final double newValue) {
+    public synchronized void setEastBoundLongitude(final Double newValue) {
         checkWritePermission();
         eastBoundLongitude = newValue;
     }
@@ -225,7 +242,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      *
      * @return The southern-most latitude between -90 and +90°.
      */
-    public double getSouthBoundLatitude()  {
+    public Double getSouthBoundLatitude()  {
         return southBoundLatitude;
     }
 
@@ -234,7 +251,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      * dataset extent. The value is expressed in latitude in
      * decimal degrees (positive north).
      */
-    public synchronized void setSouthBoundLatitude(final double newValue) {
+    public synchronized void setSouthBoundLatitude(final Double newValue) {
         checkWritePermission();
         southBoundLatitude = newValue;
     }
@@ -246,7 +263,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      *
      * @return The northern-most latitude between -90 and +90°.
      */
-    public double getNorthBoundLatitude()   {
+    public Double getNorthBoundLatitude()   {
         return northBoundLatitude;
     }
 
@@ -255,7 +272,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      * dataset extent. The value is expressed in latitude in
      * decimal degrees (positive north).
      */
-    public synchronized void setNorthBoundLatitude(final double newValue) {
+    public synchronized void setNorthBoundLatitude(final Double newValue) {
         checkWritePermission();
         northBoundLatitude = newValue;
     }
@@ -272,23 +289,23 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      */
     public synchronized void add(final GeographicBoundingBox box) {
         checkWritePermission();
-        final double xmin = box.getWestBoundLongitude();
-        final double xmax = box.getEastBoundLongitude();
-        final double ymin = box.getSouthBoundLatitude();
-        final double ymax = box.getNorthBoundLatitude();
+        final double xmin = box.getWestBoundLongitude().doubleValue();
+        final double xmax = box.getEastBoundLongitude().doubleValue();
+        final double ymin = box.getSouthBoundLatitude().doubleValue();
+        final double ymax = box.getNorthBoundLatitude().doubleValue();
         if (getInclusion() == box.getInclusion()) {
-            if (xmin < westBoundLongitude) westBoundLongitude = xmin;
-            if (xmax > eastBoundLongitude) eastBoundLongitude = xmax;
-            if (ymin < southBoundLatitude) southBoundLatitude = ymin;
-            if (ymax > northBoundLatitude) northBoundLatitude = ymax;
+            if (xmin < westBoundLongitude.doubleValue()) westBoundLongitude = new Double(xmin);
+            if (xmax > eastBoundLongitude.doubleValue()) eastBoundLongitude = new Double(xmax);
+            if (ymin < southBoundLatitude.doubleValue()) southBoundLatitude = new Double(ymin);
+            if (ymax > northBoundLatitude.doubleValue()) northBoundLatitude = new Double(ymax);
         } else {
-            if (ymin <= southBoundLatitude && ymax >= northBoundLatitude) {
-                if (xmin > westBoundLongitude) westBoundLongitude = xmin;
-                if (xmax < eastBoundLongitude) eastBoundLongitude = xmax;
+            if (ymin <= southBoundLatitude.doubleValue() && ymax >= northBoundLatitude.doubleValue()) {
+                if (xmin > westBoundLongitude.doubleValue()) westBoundLongitude = new Double(xmin);
+                if (xmax < eastBoundLongitude.doubleValue()) eastBoundLongitude = new Double(xmax);
             }
-            if (xmin <= westBoundLongitude && xmax >= eastBoundLongitude) {
-                if (ymin > southBoundLatitude) southBoundLatitude = ymin;
-                if (ymax < northBoundLatitude) northBoundLatitude = ymax;
+            if (xmin <= westBoundLongitude.doubleValue() && xmax >= eastBoundLongitude.doubleValue()) {
+                if (ymin > southBoundLatitude.doubleValue()) southBoundLatitude = new Double(ymin);
+                if (ymax < northBoundLatitude.doubleValue()) northBoundLatitude = new Double(ymax);
             }
         }
     }
@@ -309,14 +326,14 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
         }
         if (object!=null && object.getClass().equals(getClass())) {
             final GeographicBoundingBoxImpl that = (GeographicBoundingBoxImpl) object;
-            return Double.doubleToLongBits(this.southBoundLatitude) ==
-                   Double.doubleToLongBits(that.southBoundLatitude) &&
-                   Double.doubleToLongBits(this.northBoundLatitude) ==
-                   Double.doubleToLongBits(that.northBoundLatitude) &&
-                   Double.doubleToLongBits(this.eastBoundLongitude) ==
-                   Double.doubleToLongBits(that.eastBoundLongitude) &&
-                   Double.doubleToLongBits(this.westBoundLongitude) ==
-                   Double.doubleToLongBits(that.westBoundLongitude);
+            return Double.doubleToLongBits(this.southBoundLatitude.doubleValue()) ==
+                   Double.doubleToLongBits(that.southBoundLatitude.doubleValue()) &&
+                   Double.doubleToLongBits(this.northBoundLatitude.doubleValue()) ==
+                   Double.doubleToLongBits(that.northBoundLatitude.doubleValue()) &&
+                   Double.doubleToLongBits(this.eastBoundLongitude.doubleValue()) ==
+                   Double.doubleToLongBits(that.eastBoundLongitude.doubleValue()) &&
+                   Double.doubleToLongBits(this.westBoundLongitude.doubleValue()) ==
+                   Double.doubleToLongBits(that.westBoundLongitude.doubleValue());
         }
         return false;
     }
@@ -326,10 +343,10 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      */
     public synchronized int hashCode() {
         long code = serialVersionUID;
-        code ^=           Double.doubleToLongBits(southBoundLatitude);
-        code  = 37*code + Double.doubleToLongBits(northBoundLatitude);
-        code  = 37*code + Double.doubleToLongBits(eastBoundLongitude);
-        code  = 37*code + Double.doubleToLongBits(westBoundLongitude);
+        code ^=           Double.doubleToLongBits(southBoundLatitude.doubleValue());
+        code  = 37*code + Double.doubleToLongBits(northBoundLatitude.doubleValue());
+        code  = 37*code + Double.doubleToLongBits(eastBoundLongitude.doubleValue());
+        code  = 37*code + Double.doubleToLongBits(westBoundLongitude.doubleValue());
         return (int)code ^ (int)(code >>> 32);
     }
 

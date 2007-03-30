@@ -242,16 +242,23 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
     }
 
 
-public Collection getContacts() {
-    // TODO Auto-generated method stub
-    return null;
-}
-
-public Collection getUpdateScopeDescriptions() {
-    // TODO Auto-generated method stub
-    return Collections.EMPTY_LIST;
-}
-
-public Collection getUpdateScopes() {
-    return Collections.EMPTY_LIST;}
+    public Collection getContacts() {
+        // TODO IMPLEMENT!
+        return Collections.EMPTY_LIST;
+    }
+    
+    public Collection getUpdateScopeDescriptions() {
+        // TODO IMPLEMENT!
+        return Collections.EMPTY_LIST;
+    }
+    
+    public Collection getUpdateScopes() {
+        // TODO IMPLEMENT!
+        return Collections.EMPTY_LIST;
+    }
+    
+    public Collection getMaintenanceNotes() {
+        // TODO IMPLEMENT!
+        return Collections.EMPTY_LIST;
+    }
 }

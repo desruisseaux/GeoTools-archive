@@ -92,10 +92,10 @@ public final class BoundingBoxes {
                 }
                 envelope = CRS.transform(operation.getMathTransform(), envelope);
             }
-            box.setWestBoundLongitude(envelope.getMinimum(0));
-            box.setEastBoundLongitude(envelope.getMaximum(0));
-            box.setSouthBoundLatitude(envelope.getMinimum(1));
-            box.setNorthBoundLatitude(envelope.getMaximum(1));
+            box.setWestBoundLongitude(new Double(envelope.getMinimum(0)));
+            box.setEastBoundLongitude(new Double(envelope.getMaximum(0)));
+            box.setSouthBoundLatitude(new Double(envelope.getMinimum(1)));
+            box.setNorthBoundLatitude(new Double(envelope.getMaximum(1)));
         }
     }
 
@@ -124,13 +124,13 @@ public final class BoundingBoxes {
         final StringBuffer buffer = new StringBuffer();
         final AngleFormat  format;
         format = (locale!=null) ? new AngleFormat(pattern, locale) : new AngleFormat(pattern);
-        buffer.append(format.format(new  Latitude(box.getNorthBoundLatitude())));
+        buffer.append(format.format(new  Latitude(box.getNorthBoundLatitude().doubleValue())));
         buffer.append(", ");
-        buffer.append(format.format(new Longitude(box.getWestBoundLongitude())));
+        buffer.append(format.format(new Longitude(box.getWestBoundLongitude().doubleValue())));
         buffer.append(" - ");
-        buffer.append(format.format(new  Latitude(box.getSouthBoundLatitude())));
+        buffer.append(format.format(new  Latitude(box.getSouthBoundLatitude().doubleValue())));
         buffer.append(", ");
-        buffer.append(format.format(new Longitude(box.getEastBoundLongitude())));
+        buffer.append(format.format(new Longitude(box.getEastBoundLongitude().doubleValue())));
         return buffer.toString();
     }    
 }

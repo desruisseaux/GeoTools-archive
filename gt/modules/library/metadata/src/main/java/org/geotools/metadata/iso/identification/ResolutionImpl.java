@@ -56,7 +56,7 @@ public class ResolutionImpl extends MetadataEntity implements Resolution {
      * Only one of {@linkplain #getEquivalentScale equivalent scale} and
      * {@linkplain #getDistance ground sample distance} may be provided.
      */
-    private double distance;
+    private Double distance;
 
     /**
      * Constructs an initially empty Resolution.
@@ -87,14 +87,14 @@ public class ResolutionImpl extends MetadataEntity implements Resolution {
      * Only one of {@linkplain #getEquivalentScale equivalent scale} and
      * {@linkplain #getDistance ground sample distance} may be provided.
      */
-    public double getDistance() {
+    public Double getDistance() {
         return distance;
     }    
 
     /**
      * Set the ground sample distance.
      */
-    public synchronized void setDistance(final double newValue) {
+    public synchronized void setDistance(final Double newValue) {
         checkWritePermission();
         distance = newValue;
     }
@@ -126,8 +126,12 @@ public class ResolutionImpl extends MetadataEntity implements Resolution {
      */
     public synchronized int hashCode() {
         int code = (int)serialVersionUID;
-        code ^= (int)equivalentScale.hashCode();
-        code ^= (int)distance;
+        if (equivalentScale != null) {
+            code ^= (int) equivalentScale.hashCode();
+        }
+        if (distance != null) {
+            code ^= distance.intValue();
+        }
         return code;
     }
 

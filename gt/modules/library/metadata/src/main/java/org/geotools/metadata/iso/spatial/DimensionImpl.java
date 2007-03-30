@@ -52,12 +52,12 @@ public class DimensionImpl extends MetadataEntity implements Dimension {
     /**
      * Number of elements along the axis.
      */
-    private int dimensionSize;
+    private Integer dimensionSize;
 
     /**
      * Degree of detail in the grid dataset.
      */
-    private double resolution;
+    private Double resolution;
 
     /**
      * Constructs an initially empty dimension.
@@ -68,7 +68,7 @@ public class DimensionImpl extends MetadataEntity implements Dimension {
     /*
      * Creates a dimension initialized to the given type.
      */
-    public DimensionImpl(final DimensionNameType dimensionName, final int dimensionSize) {
+    public DimensionImpl(final DimensionNameType dimensionName, final Integer dimensionSize) {
         setDimensionName(dimensionName);
         setDimensionSize(dimensionSize);
     }
@@ -91,14 +91,14 @@ public class DimensionImpl extends MetadataEntity implements Dimension {
     /**
      * Number of elements along the axis.
      */
-    public int getDimensionSize() {
+    public Integer getDimensionSize() {
         return dimensionSize;
     }
 
     /**
      * Set the number of elements along the axis.
      */
-    public synchronized void setDimensionSize(final int newValue) {
+    public synchronized void setDimensionSize(final Integer newValue) {
         checkWritePermission();
         dimensionSize = newValue;
     }
@@ -106,14 +106,14 @@ public class DimensionImpl extends MetadataEntity implements Dimension {
     /**
      * Degree of detail in the grid dataset.
      */
-    public double getResolution() {
+    public Double getResolution() {
         return resolution;
     }
 
     /**
      * Set the degree of detail in the grid dataset.
      */
-    public synchronized void setResolution(final double newValue) {
+    public synchronized void setResolution(final Double newValue) {
         checkWritePermission();
         resolution = newValue;
     }

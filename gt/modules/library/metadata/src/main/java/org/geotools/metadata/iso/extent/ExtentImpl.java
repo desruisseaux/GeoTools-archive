@@ -182,7 +182,7 @@ public class ExtentImpl extends MetadataEntity implements Extent {
                  * ones (if any). All exclusion boxes before the first inclusion box are ignored.
                  */
                 if (candidate == null) {
-                    if (bounds.getInclusion()) {
+                    if (bounds.getInclusion().booleanValue()) {
                         candidate = bounds;
                     }
                 } else {

@@ -59,7 +59,7 @@ public class DigitalTransferOptionsImpl extends MetadataEntity implements Digita
      * The transfer size is &gt; 0.0.
      * Returns {@code null} if the transfer size is unknown.
      */
-    private Number transferSize;
+    private Double transferSize;
 
     /**
      * Information about online sources from which the resource can be obtained.
@@ -97,7 +97,7 @@ public class DigitalTransferOptionsImpl extends MetadataEntity implements Digita
      * The transfer size is &gt; 0.0.
      * Returns {@code null} if the transfer size is unknown.
      */
-    public Number getTransferSize() {
+    public Double getTransferSize() {
         return transferSize;
     }
 
@@ -105,7 +105,7 @@ public class DigitalTransferOptionsImpl extends MetadataEntity implements Digita
      * Set an estimated size of a unit in the specified transfer format, expressed in megabytes.
      * The transfer size is &gt; 0.0.
      */
-    public synchronized void setTransferSize(final Number newValue) {
+    public synchronized void setTransferSize(final Double newValue) {
         checkWritePermission();
         transferSize = newValue;
     }
@@ -145,7 +145,7 @@ public class DigitalTransferOptionsImpl extends MetadataEntity implements Digita
     protected void freeze() {
         super.freeze();
         unitsOfDistribution = (InternationalString) unmodifiable(unitsOfDistribution);
-        transferSize        = (Number)              unmodifiable(transferSize);
+        transferSize        = (Double)              unmodifiable(transferSize);
         onLines             = (Collection)          unmodifiable(onLines);
         offLines            = (Medium)              unmodifiable(offLines);
     }

@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.InvalidParameterValueException;
+import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 import org.opengis.util.LocalName;
@@ -74,7 +75,7 @@ import org.geotools.util.WeakValueHashMap;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class NamedIdentifier implements Identifier, GenericName, Serializable {
+public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -97,6 +98,11 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
      */
     private final String code;
 
+    /**
+     * Name or identifier of the person or organization responsible for namespace.
+     */
+    private final String codespace;
+    
     /**
      * Organization or party responsible for definition and maintenance of the
      * code space or code.
@@ -123,7 +129,7 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
      * value.
      */
     private GenericName name;
-
+    
     /**
      * Constructs an identifier from a set of properties. Keys are strings from the table below.
      * Key are case-insensitive, and leading and trailing spaces are ignored. The map given in
@@ -221,7 +227,7 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
         final Map properties = new HashMap(4);
         if (authority != null) properties.put(AUTHORITY_KEY, authority);
         if (code      != null) properties.put(     CODE_KEY, code     );
-        //if (version   != null) properties.put(  VERSION_KEY, version  );
+        if (version   != null) properties.put(  VERSION_KEY, version  );
         return properties;
     }
 
@@ -241,7 +247,8 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
     NamedIdentifier(final Map properties, final boolean standalone) throws IllegalArgumentException {
         ensureNonNull("properties", properties);
         Object code      = null;
-        //Object version   = null;
+        Object codespace = null;
+        Object version   = null;
         Object authority = null;
         Object remarks   = null;
         GrowableInternationalString growable = null;
@@ -256,7 +263,6 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
          */
         String key   = null;
         Object value = null;
-        String version = null;
         for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) {
             final Map.Entry entry = (Map.Entry) it.next();
             key   = ((String) entry.getKey()).trim().toLowerCase();
@@ -342,6 +348,7 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
         try {
             key=      CODE_KEY; this.code      = (String)              (value=code);
             key=   VERSION_KEY; this.version   = (String)              (value=version);
+            key= CODESPACE_KEY; this.codespace = (String)              (value=codespace);
             key= AUTHORITY_KEY; this.authority = (Citation)            (value=authority);
             key=   REMARKS_KEY; this.remarks   = (InternationalString) (value=remarks);
         } catch (ClassCastException exception) {
@@ -379,6 +386,15 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
      */
     public String getCode() {
         return code;
+    }
+
+    /**
+     * Name or identifier of the person or organization responsible for namespace.
+     * 
+     * @return The codespace, or {@code null} if not available.
+     */
+    public String getCodeSpace() {
+        return codespace;
     }
 
     /**

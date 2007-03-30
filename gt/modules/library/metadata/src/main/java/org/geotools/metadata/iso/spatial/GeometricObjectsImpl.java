@@ -52,7 +52,7 @@ public class GeometricObjectsImpl extends MetadataEntity implements GeometricObj
     /**
      * Total number of the point or vector object type occurring in the dataset.
      */
-    private int geometricObjectCount;
+    private Integer geometricObjectCount;
 
     /**
      * Constructs an initially empty geometric objects.
@@ -85,14 +85,14 @@ public class GeometricObjectsImpl extends MetadataEntity implements GeometricObj
     /**
      * Total number of the point or vector object type occurring in the dataset.
      */
-    public int getGeometricObjectCount() {
+    public Integer getGeometricObjectCount() {
         return geometricObjectCount;
     }
     
     /**
      * Set the total number of the point or vector object type occurring in the dataset.
      */
-    public synchronized void setGeometricObjectCount(final int newValue) {
+    public synchronized void setGeometricObjectCount(final Integer newValue) {
         checkWritePermission();
         geometricObjectCount = newValue;
     }

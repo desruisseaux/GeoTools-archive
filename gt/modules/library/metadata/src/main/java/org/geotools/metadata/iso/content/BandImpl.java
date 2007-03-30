@@ -48,12 +48,12 @@ public class BandImpl extends RangeDimensionImpl implements Band {
     /**
      * Longest wavelength that the sensor is capable of collecting within a designated band.
      */
-    private Number maxValue;
+    private Double maxValue;
 
     /**
      * Shortest wavelength that the sensor is capable of collecting within a designated band.
      */
-    private Number minValue;
+    private Double minValue;
 
     /**
      * Units in which sensor wavelengths are expressed. Should be non-null if
@@ -66,7 +66,7 @@ public class BandImpl extends RangeDimensionImpl implements Band {
      * Wavelength at which the response is the highest.
      * {@code null} if unspecified.
      */
-    private Number peakResponse;
+    private Double peakResponse;
 
     /**
      * Maximum number of significant bits in the uncompressed representation for the value
@@ -85,13 +85,13 @@ public class BandImpl extends RangeDimensionImpl implements Band {
      * Scale factor which has been applied to the cell value.
      * {@code null} if unspecified.
      */
-    private Number scaleFactor;
+    private Double scaleFactor;
 
     /**
      * The physical value corresponding to a cell value of zero.
      * {@code null} if unspecified.
      */
-    private Number offset;
+    private Double offset;
 
     /**
      * Constructs an initially empty band.
@@ -103,7 +103,7 @@ public class BandImpl extends RangeDimensionImpl implements Band {
      * Returns the longest wavelength that the sensor is capable of collecting within
      * a designated band. Returns {@code null} if unspecified.
      */
-    public Number getMaxValue() {
+    public Double getMaxValue() {
         return maxValue;
     }
 
@@ -111,7 +111,7 @@ public class BandImpl extends RangeDimensionImpl implements Band {
      * Set the longest wavelength that the sensor is capable of collecting within a
      * designated band. Returns {@code null} if unspecified.
      */
-    public synchronized void setMaxValue(final Number newValue) {
+    public synchronized void setMaxValue(final Double newValue) {
         checkWritePermission();
         maxValue = newValue;
     }
@@ -120,7 +120,7 @@ public class BandImpl extends RangeDimensionImpl implements Band {
      * Returns the shortest wavelength that the sensor is capable of collecting
      * within a designated band.
      */
-    public Number getMinValue() {
+    public Double getMinValue() {
         return minValue;
     }
 
@@ -128,7 +128,7 @@ public class BandImpl extends RangeDimensionImpl implements Band {
      * Set the shortest wavelength that the sensor is capable of collecting within
      * a designated band.
      */
-    public synchronized void setMinValue(final Number newValue) {
+    public synchronized void setMinValue(final Double newValue) {
         checkWritePermission();
         minValue = newValue;
     }
@@ -156,14 +156,14 @@ public class BandImpl extends RangeDimensionImpl implements Band {
      * Returns the wavelength at which the response is the highest.
      * Returns {@code null} if unspecified.
      */
-    public Number getPeakResponse() {
+    public Double getPeakResponse() {
         return peakResponse;
     }
 
     /**
      * Set the wavelength at which the response is the highest.
      */
-    public synchronized void setPeakResponse(final Number newValue) {
+    public synchronized void setPeakResponse(final Double newValue) {
         checkWritePermission();
         peakResponse = newValue;
     }
@@ -206,14 +206,14 @@ public class BandImpl extends RangeDimensionImpl implements Band {
      * Returns the scale factor which has been applied to the cell value.
      * Returns {@code null} if unspecified.
      */
-    public Number getScaleFactor() {
+    public Double getScaleFactor() {
         return scaleFactor;
     }
 
     /**
      * Set the scale factor which has been applied to the cell value.
      */
-    public synchronized void setScaleFactor(final Number newValue) {
+    public synchronized void setScaleFactor(final Double newValue) {
         checkWritePermission();
         scaleFactor = newValue;
     }
@@ -222,14 +222,14 @@ public class BandImpl extends RangeDimensionImpl implements Band {
      * Returns the physical value corresponding to a cell value of zero.
      * Returns {@code null} if unspecified.
      */
-    public Number getOffset() {
+    public Double getOffset() {
         return offset;
     }
 
     /**
      * Set the physical value corresponding to a cell value of zero.
 :     */
-    public synchronized void setOffset(final Number newValue) {
+    public synchronized void setOffset(final Double newValue) {
         checkWritePermission();
         offset = newValue;
     }
@@ -239,12 +239,12 @@ public class BandImpl extends RangeDimensionImpl implements Band {
      */
     protected void freeze() {
         super.freeze();
-        maxValue     = (Number) unmodifiable(maxValue);
-        minValue     = (Number) unmodifiable(minValue);
+        maxValue     = (Double) unmodifiable(maxValue);
+        minValue     = (Double) unmodifiable(minValue);
         units        = (Unit)   unmodifiable(units);
-        peakResponse = (Number) unmodifiable(peakResponse);
-        scaleFactor  = (Number) unmodifiable(scaleFactor);
-        offset       = (Number) unmodifiable(offset);
+        peakResponse = (Double) unmodifiable(peakResponse);
+        scaleFactor  = (Double) unmodifiable(scaleFactor);
+        offset       = (Double) unmodifiable(offset);
     }
 
     /**

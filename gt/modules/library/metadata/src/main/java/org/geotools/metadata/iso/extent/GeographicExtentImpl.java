@@ -46,7 +46,7 @@ public class GeographicExtentImpl extends MetadataEntity implements GeographicEx
      * Indication of whether the bounding polygon encompasses an area covered by the data
      * (<cite>inclusion</cite>) or an area where data is not present (<cite>exclusion</cite>).
      */
-    private boolean inclusion;
+    private Boolean inclusion;
 
     /**
      * Constructs an initially empty geographic extent.
@@ -67,7 +67,7 @@ public class GeographicExtentImpl extends MetadataEntity implements GeographicEx
      * Constructs a geographic extent initialized with the specified inclusion value.
      */
     public GeographicExtentImpl(final boolean inclusion) {
-        setInclusion(inclusion);
+        setInclusion(new Boolean(inclusion));
     }
 
     /**
@@ -76,7 +76,7 @@ public class GeographicExtentImpl extends MetadataEntity implements GeographicEx
      *
      * @return {@code true} for inclusion, or {@code false} for exclusion.
      */    
-    public boolean getInclusion() {
+    public Boolean getInclusion() {
         return inclusion;
     }
 
@@ -84,7 +84,7 @@ public class GeographicExtentImpl extends MetadataEntity implements GeographicEx
      * Set whether the bounding polygon encompasses an area covered by the data
      * (<cite>inclusion</cite>) or an area where data is not present (<cite>exclusion</cite>).
      */
-    public synchronized void setInclusion(final boolean newValue) {
+    public synchronized void setInclusion(final Boolean newValue) {
         checkWritePermission();
         inclusion = newValue;
     }
@@ -115,7 +115,7 @@ public class GeographicExtentImpl extends MetadataEntity implements GeographicEx
      */
     public synchronized int hashCode() {
         int code = (int)serialVersionUID;
-        if (inclusion) code = ~code;
+        if (inclusion.booleanValue()) code = ~code;
         return code;
     }
 

@@ -49,13 +49,13 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
      * intersection of the optical line of sight with the Earth’s surface. For images from a
      * scanning device, refer to the centre pixel of the image.
      */
-    private Number illuminationElevationAngle;
+    private Double illuminationElevationAngle;
     
     /**
      * Illumination azimuth measured in degrees clockwise from true north at the time the
      * image is taken. For images from a scanning device, refer to the centre pixel of the image.
      */
-    private Number illuminationAzimuthAngle;
+    private Double illuminationAzimuthAngle;
     
     /**
      * Conditions affected the image.
@@ -70,7 +70,7 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
     /**
      * Area of the dataset obscured by clouds, expressed as a percentage of the spatial extent.
      */
-    private Number cloudCoverPercentage;
+    private Double cloudCoverPercentage;
     
     /**
      * Image distributor’s code that identifies the level of radiometric and geometric
@@ -94,23 +94,23 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
      * Indication of whether or not the radiometric calibration information for generating the
      * radiometrically calibrated standard data product is available.
      */
-    private boolean radiometricCalibrationDataAvailable;
+    private Boolean radiometricCalibrationDataAvailable;
     
     /**
      * Indication of whether or not constants are available which allow for camera calibration
      * corrections.
      */
-    private boolean cameraCalibrationInformationAvailable;
+    private Boolean cameraCalibrationInformationAvailable;
     
     /**
      * Indication of whether or not Calibration Reseau information is available.
      */
-    private boolean filmDistortionInformationAvailable;
+    private Boolean filmDistortionInformationAvailable;
     
     /**
      * Indication of whether or not lens aberration correction information is available.
      */
-    private boolean lensDistortionInformationAvailable;
+    private Boolean lensDistortionInformationAvailable;
 
     /**
      * Constructs an initially empty image description.
@@ -123,7 +123,7 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
      * intersection of the optical line of sight with the Earth’s surface. For images from a
      * scanning device, refer to the centre pixel of the image.
      */
-    public Number getIlluminationElevationAngle() {
+    public Double getIlluminationElevationAngle() {
         return illuminationElevationAngle;
     }
 
@@ -132,7 +132,7 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
      * intersection of the optical line of sight with the Earth’s surface. For images from a
      * scanning device, refer to the centre pixel of the image.
      */
-    public synchronized void setIlluminationElevationAngle(final Number newValue) {
+    public synchronized void setIlluminationElevationAngle(final Double newValue) {
         checkWritePermission();
         illuminationElevationAngle = newValue;
     }
@@ -142,7 +142,7 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
      * the image is taken. For images from a scanning device, refer to the centre pixel of the
      * image.
      */
-    public Number getIlluminationAzimuthAngle() {
+    public Double getIlluminationAzimuthAngle() {
         return illuminationAzimuthAngle;
     }
 
@@ -150,7 +150,7 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
      * Set the illumination azimuth measured in degrees clockwise from true north at the time the
      * image is taken. For images from a scanning device, refer to the centre pixel of the image.
      */
-    public synchronized void setIlluminationAzimuthAngle(final Number newValue) {
+    public synchronized void setIlluminationAzimuthAngle(final Double newValue) {
         checkWritePermission();
         illuminationAzimuthAngle = newValue;
     }
@@ -189,7 +189,7 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
      * Returns the area of the dataset obscured by clouds, expressed as a percentage of the spatial
      * extent.
      */
-    public Number getCloudCoverPercentage() {
+    public Double getCloudCoverPercentage() {
         return cloudCoverPercentage;
     }
 
@@ -197,7 +197,7 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
      * Set the area of the dataset obscured by clouds, expressed as a percentage of the spatial
      * extent.
      */
-    public synchronized void setCloudCoverPercentage(final Number newValue) {
+    public synchronized void setCloudCoverPercentage(final Double newValue) {
         checkWritePermission();
         cloudCoverPercentage = newValue;
     }
@@ -255,7 +255,7 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
      * Returns theiIndication of whether or not the radiometric calibration information for
      * generating the radiometrically calibrated standard data product is available.
      */
-    public boolean isRadiometricCalibrationDataAvailable() {
+    public Boolean isRadiometricCalibrationDataAvailable() {
         return radiometricCalibrationDataAvailable;
     }
 
@@ -263,7 +263,7 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
      * Set the indication of whether or not the radiometric calibration information for generating
      * the radiometrically calibrated standard data product is available.
      */
-    public synchronized void setRadiometricCalibrationDataAvailable(final boolean newValue) {
+    public synchronized void setRadiometricCalibrationDataAvailable(final Boolean newValue) {
         checkWritePermission();
         radiometricCalibrationDataAvailable = newValue;
     }
@@ -272,7 +272,7 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
      * Returns the indication of whether or not constants are available which allow for camera
      * calibration corrections.
      */
-    public boolean isCameraCalibrationInformationAvailable() {
+    public Boolean isCameraCalibrationInformationAvailable() {
         return cameraCalibrationInformationAvailable;
     }
 
@@ -280,7 +280,7 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
      * Set the indication of whether or not constants are available which allow for camera
      * calibration corrections.
      */
-    public synchronized void setCameraCalibrationInformationAvailable(final boolean newValue) {
+    public synchronized void setCameraCalibrationInformationAvailable(final Boolean newValue) {
         checkWritePermission();
         cameraCalibrationInformationAvailable = newValue;
     }
@@ -288,14 +288,14 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
     /**
      * Returns the indication of whether or not Calibration Reseau information is available.
      */
-    public boolean isFilmDistortionInformationAvailable() {
+    public Boolean isFilmDistortionInformationAvailable() {
         return filmDistortionInformationAvailable;
     }
 
     /**
      * Set the indication of whether or not Calibration Reseau information is available.
      */
-    public synchronized void setFilmDistortionInformationAvailable(final boolean newValue) {
+    public synchronized void setFilmDistortionInformationAvailable(final Boolean newValue) {
         checkWritePermission();
         filmDistortionInformationAvailable = newValue;
     }
@@ -303,14 +303,14 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
     /**
      * Returns the indication of whether or not lens aberration correction information is available.
      */
-    public boolean isLensDistortionInformationAvailable() {
+    public Boolean isLensDistortionInformationAvailable() {
         return lensDistortionInformationAvailable;
     }
 
     /**
      * Set the indication of whether or not lens aberration correction information is available.
      */
-    public synchronized void setLensDistortionInformationAvailable(final boolean newValue) {
+    public synchronized void setLensDistortionInformationAvailable(final Boolean newValue) {
         checkWritePermission();
         lensDistortionInformationAvailable = newValue;
     }
@@ -320,10 +320,10 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
      */
     protected void freeze() {
         super.freeze();
-        illuminationElevationAngle = (Number)     unmodifiable(illuminationElevationAngle);
-        illuminationAzimuthAngle   = (Number)     unmodifiable(illuminationAzimuthAngle);
+        illuminationElevationAngle = (Double)     unmodifiable(illuminationElevationAngle);
+        illuminationAzimuthAngle   = (Double)     unmodifiable(illuminationAzimuthAngle);
         imageQualityCode           = (Identifier) unmodifiable(imageQualityCode);
-        cloudCoverPercentage       = (Number)     unmodifiable(cloudCoverPercentage);
+        cloudCoverPercentage       = (Double)     unmodifiable(cloudCoverPercentage);
         processingLevelCode        = (Identifier) unmodifiable(processingLevelCode);
     }
 
