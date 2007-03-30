@@ -280,6 +280,8 @@ public abstract class DataFeatureCollection implements FeatureCollection {
         try {
             return getCount();
         } catch (IOException e) {
+            if (LOGGER.isLoggable(Level.FINE))
+                LOGGER.log(Level.FINE, "IOException while calculating size() of FeatureCollection", e);
             return 0;
         }
     }
