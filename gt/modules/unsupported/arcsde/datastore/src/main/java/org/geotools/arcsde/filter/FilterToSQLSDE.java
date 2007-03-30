@@ -168,7 +168,7 @@ public class FilterToSQLSDE extends FilterToSQL
 
         try {
             StringBuffer sb = new StringBuffer();
-            sb.append(fidField + " IN(");
+            sb.append("(" + fidField + " IN(");
 
             for (int i = 0; i < nFids; i++) {
                 sb.append(fids[i]);
@@ -176,9 +176,14 @@ public class FilterToSQLSDE extends FilterToSQL
                 if (i < (nFids - 1)) {
                     sb.append(", ");
                 }
+                if (i == 999) {
+                    sb.deleteCharAt(sb.length()-1); // delete the trailing space
+                    sb.deleteCharAt(sb.length()-1); // delete the trailing comma
+                    sb.append(")) OR (" + fidField + " IN(");
+                }
             }
 
-            sb.append(')');
+            sb.append("))");
 
             if (LOGGER.isLoggable(Level.FINER)) {
                 LOGGER.finer("added fid filter: " + sb.toString());

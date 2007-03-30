@@ -185,8 +185,7 @@ public class ArcSDEDataStore extends AbstractDataStore {
                 conn = getConnectionPool().getConnection();
                 LOGGER.warning(
                     "A non qualified type name was given, qualifying it...");
-                typeName = conn.getDatabaseName() + "." + conn.getUser() + "."
-                    + typeName;
+                typeName = conn.getDatabaseName().length() > 0 ? conn.getDatabaseName() + "." + conn.getUser() + "." + typeName : conn.getUser() + "." + typeName;
                 LOGGER.info("full qualified name is " + typeName);
             } catch (DataSourceException e) {
                 throw e;

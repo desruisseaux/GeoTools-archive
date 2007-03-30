@@ -53,6 +53,7 @@ import org.opengis.filter.And;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Id;
+import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.spatial.BBOX;
 import org.xml.sax.helpers.ParserAdapter;
 
@@ -598,6 +599,44 @@ public class ArcSDEDataStoreTest extends TestCase {
         FeatureCollection results = source.getFeatures(query);
 
         assertEquals(fids.size(), results.size());
+        FeatureIterator iterator = results.features();
+
+        while (iterator.hasNext()) {
+            String fid = iterator.next().getID();
+            assertTrue("a fid not included in query was returned: " + fid,
+                fids.contains(ff.featureId(fid)));
+        }
+        results.close( iterator );
+    }
+    
+    public void testMoreThan1000FidFilters() throws Exception {
+        final DataStore ds = this.testData.getDataStore();
+        final String typeName = this.testData.getPoint_table();
+
+        //grab some fids
+        FeatureReader reader = ds.getFeatureReader(new DefaultQuery(typeName),
+                Transaction.AUTO_COMMIT);
+        List fids = new ArrayList();
+
+        if (reader.hasNext()) {
+            fids.add(ff.featureId(reader.next().getID()));
+        }
+        String idTemplate = ((FeatureId)fids.get(0)).getID();
+        idTemplate = idTemplate.substring(0, idTemplate.length() - 1);
+
+        reader.close();
+        
+        for (int x = 100; x < 2000; x++) {
+            fids.add(ff.featureId(idTemplate + x));
+        }
+        
+        Id filter = ff.id(new HashSet(fids));
+
+        FeatureSource source = ds.getFeatureSource(typeName);
+        Query query = new DefaultQuery(typeName, filter);
+        FeatureCollection results = source.getFeatures(query);
+
+        assertEquals(1, results.size());
         FeatureIterator iterator = results.features();
 
         while (iterator.hasNext()) {

@@ -347,7 +347,7 @@ class ArcSDEQuery {
             LOGGER.fine("constructing new sql query with connection: "
                 + connection + ", propnames: "
                 + java.util.Arrays.asList(propertyNames) + " sqlConstruct where clause: '"
-                + this.filters.getSeSqlConstruct().getWhere());
+                + this.filters.getSeSqlConstruct().getWhere() + "'");
         }
 
         SeQuery query = new SeQuery(connection, propertyNames,
@@ -514,6 +514,7 @@ class ArcSDEQuery {
 
                 this.resultCount = tableStats.getCount();
             } catch (SeException e) {
+                LOGGER.severe("Error calculating result cout with SQL where clause: " + this.filters.getSeSqlConstruct().getWhere());
                 throw new DataSourceException("Calculating result count: "
                     + e.getSeError().getErrDesc(), e);
             } finally {
