@@ -39,30 +39,21 @@
   <!--     Developers and Contributors                             -->
   <!-- =========================================================== -->
   <developers>
-    <developer>
-      <name>Gabriel Roldan</name>
-      <id>groldan</id>
-      <email>groldan@axios.es</email>
-      <organization>Axios Engineering</organization>
+     <developer>
+      <name>Saul Farber</name>
+      <id>saul.farber</id>
+      <email>Saul.Farber@state.ma.us</email>
+      <organization></organization>
       <roles>
         <role>Module Maintainer</role>
         <role>Java Developer</role>
       </roles>
     </developer>
     <developer>
-      <name>Chris Dillard</name>
-      <id>csdillard</id>
-      <email>cdillard@polexis.com</email>
-      <organization>Polexis</organization>
-      <roles>
-        <role>Java Developer</role>
-      </roles>
-    </developer>
-    <developer>
-      <name>Jake Fear</name>
-      <id>jfear</id>
-      <email>jfear@polexis.com</email>
-      <organization>Polexis</organization>
+      <name>Gabriel Roldan</name>
+      <id>groldan</id>
+      <email>groldan@axios.es</email>
+      <organization>Axios Engineering</organization>
       <roles>
         <role>Java Developer</role>
       </roles>

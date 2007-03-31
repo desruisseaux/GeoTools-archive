@@ -54,12 +54,21 @@
   <!-- =========================================================== -->
   <developers>
     <developer>
+      <name>Saul Farber</name>
+      <id>saul.farber</id>
+      <email>Saul.Farber@state.ma.us</email>
+      <organization></organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
       <name>Gabriel Roldan</name>
       <id>groldan</id>
       <email>groldan@axios.es</email>
       <organization>Axios Engineering</organization>
       <roles>
-        <role>Module Maintainer</role>
         <role>Java Developer</role>
       </roles>
     </developer>
