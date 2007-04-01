@@ -147,24 +147,21 @@ class FeatureMapper {
 			if (attributes[i] == null) {
 				result.UnsetField(j);
 			} else {
-				if (!java.util.Date.class.isAssignableFrom(at.getClass())) {
+                final FieldDefn ogrField = ogrSchema.GetFieldDefn(j);
+                final int ogrType = ogrField.GetFieldType();
+                ogrField.delete();
+                if(ogrType == ogr.OFTInteger)
+                    result.SetField(j, ((Number) attributes[i]).intValue());
+                else if(ogrType == ogr.OFTReal)
+                    result.SetField(j, ((Number) attributes[i]).doubleValue());
+                else if (ogrType == ogr.OFTDateTime)
+					result.SetField(j, dateTimeFormat.format((java.util.Date) attributes[i]));
+				else if (ogrType == ogr.OFTDate)
+					result.SetField(j, dateFormat.format((java.util.Date) attributes[i]));
+				else if (ogrType == ogr.OFTTime)
+					result.SetField(j, timeFormat.format((java.util.Date) attributes[i]));
+				else
 					result.SetField(j, attributes[i].toString());
-				} else {
-					final FieldDefn ogrField = ogrSchema.GetFieldDefn(j);
-					final int ogrType = ogrField.GetFieldType();
-					ogrField.delete();
-
-					final java.util.Date date = (java.util.Date) attributes[i];
-					if (ogrType == ogr.OFTDateTime)
-						result.SetField(j, dateTimeFormat.format(date));
-					else if (ogrType == ogr.OFTDate)
-						result.SetField(j, dateFormat.format(date));
-					else if (ogrType == ogr.OFTTime)
-						result.SetField(j, timeFormat.format(date));
-					else
-						throw new IOException("Date attribute, but field type is not compatible: "
-								+ ogrType);
-				} 
 			} 
 			j++;
 		}
