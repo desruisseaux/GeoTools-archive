@@ -135,12 +135,9 @@ class FeatureMapper {
 		for (int i = 0, j = 0; i < attributes.length; i++) {
 			AttributeType at = schema.getAttributeType(i);
 			if (at instanceof GeometricAttributeType) {
-				// here we are forced to use SetGeometry. SetGeometryDirectly
-				// would
-				// be more efficient, but the SWIG wrapper deallocates the
-				// geometry
-				// on finalize, making the VM crash as a result
-				result.SetGeometry(parseGTGeometry((Geometry) attributes[i]));
+                // using setGeoemtryDirectly the feature becomes the owner of the generated
+                // OGR geometry and we don't have to .delete() it (it's faster, too) 
+				result.SetGeometryDirectly(parseGTGeometry((Geometry) attributes[i]));
 				continue;
 			}
 
