@@ -64,7 +64,6 @@ public class OGRDataStoreTest extends TestCaseSupport {
 		FeatureType schema = s.getSchema(s.getTypeNames()[0]);
 		AttributeType[] types = schema.getAttributeTypes();
 		assertEquals("Number of Attributes", 253, types.length);
-		System.out.println(schema.getDefaultGeometry().getCoordinateSystem());
 		assertTrue(CRS.equalsIgnoreMetadata(CRS.decode("EPSG:4269", true), schema
 				.getDefaultGeometry().getCoordinateSystem()));
 	}
@@ -261,8 +260,7 @@ public class OGRDataStoreTest extends TestCaseSupport {
 
 		GeometryFactory gf = new GeometryFactory();
 		// creating 20 geometries because with only a couple a finalization
-		// related error
-		// that did blew up the VM would not appear
+		// related error that did blew up the VM would not appear
 		Feature[] features = new Feature[20];
 		for (int i = 0; i < features.length; i++) {
 			features[i] = schema.create(new Object[] { gf.createPoint(new Coordinate(i, i)),
