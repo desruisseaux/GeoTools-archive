@@ -307,35 +307,6 @@ public class OGRDataStoreTest extends TestCaseSupport {
 		writeFeatures(s, features);
 	}
 	
-	public void testWriteReadBigNumbers() throws Exception {
-    	// create feature type
-		FeatureTypeFactory factory = FeatureTypeFactory.newInstance("junk");
-		factory.addType(AttributeTypeFactory.newAttributeType("a", Point.class));
-		factory.addType(AttributeTypeFactory.newAttributeType("b", BigDecimal.class));
-		factory.addType(AttributeTypeFactory.newAttributeType("c", BigInteger.class));
-		FeatureType type = factory.getFeatureType();
-		FeatureCollection features = FeatureCollections.newCollection();
-		BigInteger bi = new BigInteger("1234567890123456789");
-		BigDecimal bd = new BigDecimal(bi, 2);
-		features.add(type.create(new Object[] {
-				new GeometryFactory().createPoint(new Coordinate(1, -1)),
-				bd, bi }));
-		
-		// store features
-		File tmpFile = getTempFile();
-		tmpFile.delete();
-		OGRDataStore s = new OGRDataStore(tmpFile.getAbsolutePath(), "ESRI shapefile", null);
-		writeFeatures(s, features);
-
-		// read them back
-		FeatureReader fr = s.getFeatureReader(s.getTypeNames()[0]);
-		Feature f = fr.next();
-		
-		// check attribute values (type won't be preserved)
-		assertEquals(bd.doubleValue(), ((Number) f.getAttribute("b")).doubleValue(), 0.000001);
-		assertEquals(bi.longValue(), ((Number) f.getAttribute("c")).longValue());
-	}
-
 	
 
 	// ---------------------------------------------------------------------------------------
