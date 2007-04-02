@@ -95,6 +95,7 @@
       <groupId>org.geotools</groupId>
       <artifactId>gt2-directory</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
@@ -105,11 +106,13 @@
       <groupId>org.geotools</groupId>
       <artifactId>gt2-postgis</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-shapefile</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
