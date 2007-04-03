@@ -37,7 +37,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.geotools.factory.FactoryFinder;
+import org.geotools.factory.FactoryRegistry;
+import org.geotools.referencing.FactoryFinder;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
 import org.geotools.xml.schema.ComplexType;

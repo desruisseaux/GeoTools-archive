@@ -118,7 +118,8 @@ public class ApplicationSchemaConfiguration extends Configuration {
                             locationUri = locationFile.toURI().toString();
                         }
                     }
-                    if(locationUri == null && location != null && location.startsWith("http:")){
+
+                    if ((locationUri == null) && (location != null) && location.startsWith("http:")) {
                         locationUri = location;
                     }
 

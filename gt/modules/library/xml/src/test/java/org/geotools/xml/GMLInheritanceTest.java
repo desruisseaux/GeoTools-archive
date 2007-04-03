@@ -37,69 +37,57 @@ import junit.framework.TestCase;
 public class GMLInheritanceTest extends TestCase {
 
     
-    public void testNestedFeature(){
-        try {
-            SAXParserFactory spf = SAXParserFactory.newInstance();
-            spf.setNamespaceAware(true);
-            spf.setValidating(false);
+    public void testNestedFeature() throws Throwable {
+        SAXParserFactory spf = SAXParserFactory.newInstance();
+        spf.setNamespaceAware(true);
+        spf.setValidating(false);
 
-            SAXParser parser = spf.newSAXParser();
+        SAXParser parser = spf.newSAXParser();
 
-            String path = "xml/sample/nestedFeatures.xml";
-            File f = TestData.copy(this,path);
-            TestData.copy(this,"xml/sample/nestedFeatures.xsd");
-            URI u = f.toURI();
+        String path = "xml/sample/nestedFeatures.xml";
+        File f = TestData.copy(this,path);
+        TestData.copy(this,"xml/sample/nestedFeatures.xsd");
+        URI u = f.toURI();
 
-            XMLSAXHandler xmlContentHandler = new XMLSAXHandler(u,null);
-            XMLSAXHandler.setLogLevel(Level.FINEST);
-            XSISAXHandler.setLogLevel(Level.FINEST);
-            XMLElementHandler.setLogLevel(Level.FINEST);
-            XSIElementHandler.setLogLevel(Level.FINEST);
+        XMLSAXHandler xmlContentHandler = new XMLSAXHandler(u,null);
+        XMLSAXHandler.setLogLevel(Level.FINEST);
+        XSISAXHandler.setLogLevel(Level.FINEST);
+        XMLElementHandler.setLogLevel(Level.FINEST);
+        XSIElementHandler.setLogLevel(Level.FINEST);
 
-            parser.parse(f, xmlContentHandler);
+        parser.parse(f, xmlContentHandler);
 
-            Object doc = xmlContentHandler.getDocument();
-            assertNotNull("Document missing", doc);
+        Object doc = xmlContentHandler.getDocument();
+        assertNotNull("Document missing", doc);
 //            System.out.println(doc);
-            
-            checkFeatureCollection((FeatureCollection)doc);
-            
-        } catch (Throwable e) {
-            e.printStackTrace();
-            fail(e.toString());
-        }
+        
+        checkFeatureCollection((FeatureCollection)doc);
     }
-    public void testMultiInheritance(){
-        try {
-            SAXParserFactory spf = SAXParserFactory.newInstance();
-            spf.setNamespaceAware(true);
-            spf.setValidating(false);
+    public void testMultiInheritance() throws Throwable {
+        SAXParserFactory spf = SAXParserFactory.newInstance();
+        spf.setNamespaceAware(true);
+        spf.setValidating(false);
 
-            SAXParser parser = spf.newSAXParser();
+        SAXParser parser = spf.newSAXParser();
 
-            String path = "xml/sample/multiInheritance.xml";
-            File f = TestData.copy(this,path);
-            TestData.copy(this,"xml/sample/multiInheritance.xsd");
-            URI u = f.toURI();
+        String path = "xml/sample/multiInheritance.xml";
+        File f = TestData.copy(this,path);
+        TestData.copy(this,"xml/sample/multiInheritance.xsd");
+        URI u = f.toURI();
 
-            XMLSAXHandler xmlContentHandler = new XMLSAXHandler(u,null);
-            XMLSAXHandler.setLogLevel(Level.FINEST);
-            XSISAXHandler.setLogLevel(Level.FINEST);
-            XMLElementHandler.setLogLevel(Level.FINEST);
-            XSIElementHandler.setLogLevel(Level.FINEST);
+        XMLSAXHandler xmlContentHandler = new XMLSAXHandler(u,null);
+        XMLSAXHandler.setLogLevel(Level.FINEST);
+        XSISAXHandler.setLogLevel(Level.FINEST);
+        XMLElementHandler.setLogLevel(Level.FINEST);
+        XSIElementHandler.setLogLevel(Level.FINEST);
 
-            parser.parse(f, xmlContentHandler);
+        parser.parse(f, xmlContentHandler);
 
-            Object doc = xmlContentHandler.getDocument();
-            assertNotNull("Document missing", doc);
+        Object doc = xmlContentHandler.getDocument();
+        assertNotNull("Document missing", doc);
 //            System.out.println(doc);
-            
-            checkFeatureCollection((FeatureCollection)doc);
-            
-        } catch (Throwable e) {
-            e.printStackTrace();
-            fail(e.toString());
-        }
+        
+        checkFeatureCollection((FeatureCollection)doc);
     }
     
     private void checkFeatureCollection(FeatureCollection doc){

@@ -15,8 +15,8 @@
  */
 package org.geotools.styling;
 
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.FactoryConfigurationError;
-import org.geotools.factory.FactoryFinder;
 
 
 /**
@@ -39,10 +39,8 @@ public class StyleFactoryFinder {
     public static StyleFactory createStyleFactory()
         throws FactoryConfigurationError {
         if (factory == null) {
-            factory = (StyleFactory) FactoryFinder.findFactory("org.geotools.styling.StyleFactory",
-                    "org.geotools.styling.StyleFactoryImpl");
+            factory = CommonFactoryFinder.getStyleFactory( null );
         }
-
         return factory;
     }
 }

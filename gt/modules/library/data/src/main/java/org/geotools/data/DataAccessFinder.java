@@ -16,6 +16,7 @@
 package org.geotools.data;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -23,11 +24,49 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.factory.FactoryFinder;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.FactoryCreator;
+import org.geotools.factory.FactoryRegistry;
+import org.geotools.factory.Hints;
+import org.geotools.filter.FunctionExpression;
+import org.geotools.filter.FunctionImpl;
+import org.geotools.resources.LazySet;
+import org.geotools.styling.StyleFactory;
+import org.opengis.filter.FilterFactory;
 
 public class DataAccessFinder {
     protected static final Logger LOGGER = Logger.getLogger("org.geotools.data");
 
+    /**
+     * The service registry for this manager.
+     * Will be initialized only when first needed.
+     */
+    private static FactoryRegistry registry;
+    
+    /**
+     * Returns the service registry. The registry will be created the first
+     * time this method is invoked.
+     */
+    private static FactoryRegistry getServiceRegistry() {
+        assert Thread.holdsLock(CommonFactoryFinder.class);
+        if (registry == null) {
+            registry = new FactoryCreator(Arrays.asList(new Class[] {
+                    DataAccessFactory.class}));
+        }
+        return registry;
+    }
+    
+    /**
+     * Returns a set of all available implementations for the {@link DataAccessFactory} interface.
+     *
+     * @param  hints An optional map of hints, or {@code null} if none.
+     * @return Set<DataAccessFactory> of available factory implementations.
+     */
+    public static synchronized Set getDataAccessFactories(final Hints hints) {
+        return new LazySet(getServiceRegistry().getServiceProviders(
+                DataAccessFactory.class, null, hints));
+    }
+    
     /**
      * Finds all implemtaions of DataStoreFactory which have registered using
      * the services mechanism, and that have the appropriate libraries on the
@@ -38,7 +77,8 @@ public class DataAccessFinder {
      */
     public static Iterator getAvailableDataStores() {
         Set availableDS = new HashSet();
-        Iterator it = FactoryFinder.factories(DataAccessFactory.class);
+        
+        Iterator it = getDataAccessFactories( null ).iterator();
 
         while (it.hasNext()) {
             DataAccessFactory dsFactory = (DataAccessFactory) it.next();

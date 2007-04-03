@@ -21,10 +21,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryConfigurationError;
-import org.geotools.factory.FactoryFinder;
-
+import org.geotools.factory.Hints;
 
 /**
  * A schema builder, because FeatureTypes are meant to be immutable, this
@@ -135,14 +135,13 @@ public abstract class FeatureTypeBuilder extends FeatureTypes implements Factory
      *
      * @throws FactoryConfigurationError If there exists a configuration error.
      */
-    public static FeatureTypeFactory newInstance(String name)
+    public static FeatureTypeFactory newInstance(String typeName)
         throws FactoryConfigurationError {
-        FeatureTypeFactory factory = (FeatureTypeFactory) FactoryFinder
-            .findFactory("org.geotools.feature.FeatureTypeFactory",
-                "org.geotools.feature.DefaultFeatureTypeFactory");
-        factory.setName(name);
-
-        return factory;
+        
+        // warning not sure if CommonFactoryFinder is going to cache the instance or not?
+        //
+        Hints hints = new Hints( Hints.FEATURE_TYPE_FACTORY_NAME, typeName );
+        return CommonFactoryFinder.getFeatureTypeFactory( hints );
     }
     
     /**

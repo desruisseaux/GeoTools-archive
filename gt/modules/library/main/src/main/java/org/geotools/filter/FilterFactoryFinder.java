@@ -18,12 +18,11 @@ package org.geotools.filter;
 import java.util.Map;
 import java.util.Collections;
 
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryConfigurationError;
-import org.geotools.factory.FactoryFinder;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -49,8 +48,6 @@ import com.vividsolutions.jts.geom.Envelope;
  * @deprecated Replaced by {@link org.geotools.factory.CommonFactoryFinder#getFilterFactory}.
  */
 public abstract class FilterFactoryFinder {
-    /** A cached factory to create filters. */
-    private static FilterFactory factory = null;
 
     /**
      * Creates an instance of a Filter factory.
@@ -61,12 +58,7 @@ public abstract class FilterFactoryFinder {
      */
     public static FilterFactory createFilterFactory()
         throws FactoryConfigurationError {
-        if (factory == null) {
-            factory = (FilterFactory) FactoryFinder.findFactory("org.geotools.filter.FilterFactory",
-                    "org.geotools.filter.FilterFactoryImpl");
-        }
-
-        return factory;
+        return (FilterFactory) CommonFactoryFinder.getFilterFactory( null );
     }
 
 }

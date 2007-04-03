@@ -20,12 +20,10 @@ import org.geotools.catalog.Catalog;
 import org.geotools.catalog.Service;
 import org.geotools.catalog.ServiceFactory;
 import org.geotools.catalog.ServiceFinder;
-import org.geotools.factory.FactoryFinder;
 import org.geotools.factory.FactoryRegistry;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;

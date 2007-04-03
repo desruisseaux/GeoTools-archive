@@ -33,7 +33,7 @@ import java.util.List;
  */
 public class DefaultFeatureTypeFactory extends FeatureTypeFactory {
     private List attributeTypes = new ArrayList();
-
+    
     protected void add(AttributeType type) throws IllegalArgumentException {
         attributeTypes.add(type);
     }

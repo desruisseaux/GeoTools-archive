@@ -21,7 +21,17 @@ import java.util.Set;
 
 // Geotools dependencies
 import org.geotools.styling.StyleFactory;
+import org.geotools.catalog.ServiceFactory;
+import org.geotools.data.FeatureLock;
+import org.geotools.data.FeatureLockFactory;
+import org.geotools.data.FileDataStoreFactorySpi;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.DefaultFeatureTypeFactory;
+import org.geotools.feature.FeatureCollections;
+import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.filter.FunctionExpression;
+import org.geotools.filter.FunctionImpl;
 import org.geotools.resources.LazySet;
 
 // OpenGIS dependencies
@@ -67,7 +77,14 @@ public final class CommonFactoryFinder {
         if (registry == null) {
             registry = new FactoryCreator(Arrays.asList(new Class[] {
                     StyleFactory.class,
-                    FilterFactory.class}));
+                    FilterFactory.class,
+                    FeatureLockFactory.class,
+                    FileDataStoreFactorySpi.class,
+                    FunctionImpl.class,
+                    FunctionExpression.class,
+                    AttributeTypeFactory.class,
+                    FeatureCollections.class,
+                    FeatureTypeFactory.class}));
         }
         return registry;
     }
@@ -102,6 +119,131 @@ public final class CommonFactoryFinder {
                 StyleFactory.class, null, hints));
     }
 
+    /**
+     * Returns a set of all available implementations for the {@link FunctionExpression} interface.
+     *
+     * @param  hints An optional map of hints, or {@code null} if none.
+     * @return Set of available style factory implementations.
+     * @deprecated Use FunctionExpression is now @deprecated
+     */
+    public static synchronized Set getFunctionExpressions(final Hints hints) {
+        return new LazySet(getServiceRegistry().getServiceProviders(
+                FunctionExpression.class, null, hints));
+    }
+
+
+    /**
+     * Returns a set of all available implementations for the {@link FunctionExpression} interface.
+     * 
+     * @param  hints An optional map of hints, or {@code null} if none.
+     * @return Set<FunctonImpl> of available style factory implementations.
+     */
+    public static synchronized Set getFunctions(final Hints hints) {
+        return new LazySet(getServiceRegistry().getServiceProviders(
+                FunctionImpl.class, null, hints));
+    }    
+    
+    /**
+     * Returns a set of all available implementations for the {@link FeatureLockFactory} interface.
+     * 
+     * @param  hints An optional map of hints, or {@code null} if none.
+     * @return Set<FeatureLockFactory> of available style factory implementations.
+     */
+    public static synchronized Set getFeatureLockFactories(final Hints hints) {
+        return new LazySet(getServiceRegistry().getServiceProviders(
+                FeatureLockFactory.class, null, hints));
+    }
+    
+    public static synchronized FeatureLockFactory getFeatureLockFactory(final Hints hints) {
+        return (FeatureLockFactory) getServiceRegistry().getServiceProvider(
+                FeatureLockFactory.class, null, hints, Hints.FEATURE_LOCK_FACTORY);
+    }
+    
+    /**
+     * Returns a set of all available implementations for the {@link FileDataStoreFactorySpi} interface.
+     * 
+     * @param  hints An optional map of hints, or {@code null} if none.
+     * @return Set<FileDataStoreFactorySpi> of available style factory implementations.
+     */
+    public static synchronized Set getFileDataStoreFactories(final Hints hints) {
+        return new LazySet(getServiceRegistry().getServiceProviders(
+                FileDataStoreFactorySpi.class, null, hints));
+    }
+
+    /**
+     * Returns a set of all available implementations for the {@link AttributeTypeFactory} interface.
+     *
+     * @param  hints An optional map of hints, or {@code null} if none.
+     * @return Set<AttributeTypeFactory> of available factory implementations.
+     */
+    public static synchronized Set getAttributeTypeFactories(final Hints hints) {
+        return new LazySet(getServiceRegistry().getServiceProviders(
+                AttributeTypeFactory.class, null, hints));
+    }
+    /**
+     * The default AttributeTypeFactory.
+     * <p>
+     * Initially set to DefaultAttributeTypeFactory.
+     */
+    public static synchronized AttributeTypeFactory getAttributeTypeFactory(final Hints hints) {
+        return (AttributeTypeFactory) getServiceRegistry().getServiceProvider(
+                AttributeTypeFactory.class, null, hints, Hints.ATTRIBUTE_TYPE_FACTORY );
+    }
+    
+    /**
+     * Returns a set of all available implementations for the {@link AttributeTypeFactory} interface.
+     *
+     * @param  hints An optional map of hints, or {@code null} if none.
+     * @return Set<AttributeTypeFactory> of available factory implementations.
+     */
+    public static synchronized Set getAttributeFeatureFactories(final Hints hints) {
+        return new LazySet(getServiceRegistry().getServiceProviders(
+                FeatureTypeFactory.class, null, hints));
+    }
+    /**
+     * The default AttributeTypeFactory.
+     * <p>
+     * You can use the following Hints:
+     * <ul>
+     * <li>FEATURE_TYPE_FACTORY - to control or reuse an implementation
+     * <li>FEATURE_TYPE_FACTORY_NAME - to supply a name for the returned factory
+     * </ul>
+     * GeoTools ships with a DefaultAttributeTypeFactory, although you can hook up
+     * your own implementation as needed.
+     * @return FeatureTypeFactory using Hints.FEATURE_TYPE_FACTORY_NAME
+     */
+    public static synchronized FeatureTypeFactory getFeatureTypeFactory(final Hints hints) {
+        FeatureTypeFactory factory = new DefaultFeatureTypeFactory();        
+        factory.setName( (String) hints.get( Hints.FEATURE_TYPE_FACTORY_NAME));
+        return factory;
+        
+        //return (FeatureTypeFactory) getServiceRegistry().getServiceProvider(
+        //        FeatureTypeFactory.class, null, hints, Hints.FEATURE_TYPE_FACTORY );
+    }
+    
+    /**
+     * Returns a set of all available implementations for the {@link FeatureCollections} interface.
+     *
+     * @param  hints An optional map of hints, or {@code null} if none.
+     * @return Set<FeatureCollections> of available implementations.
+     */
+    public static synchronized Set getFeatureCollectionsSet(final Hints hints) {
+        return new LazySet(getServiceRegistry().getServiceProviders(
+                FeatureCollections.class, null, hints));
+    }    
+    /**
+     * The default FeatureCollections instance.
+     * <p>
+     * Access to a utility class to let you work with FeatureCollections.
+     * </p>
+     * @param hints
+     * @return FeatureCollections utility class
+     */
+    public static synchronized FeatureCollections getFeatureCollections(final Hints hints) {
+        return (FeatureCollections) getServiceRegistry().getServiceProvider(
+                FeatureCollections.class, null, hints, Hints.FEATURE_COLLECTIONS );
+    }
+    
     /**
      * Returns the first implementation of {@link FilterFactory} matching the specified hints.
      * If no implementation matches, a new one is created if possible or an exception is thrown

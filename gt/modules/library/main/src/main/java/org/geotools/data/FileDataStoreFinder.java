@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.factory.FactoryFinder;
+import org.geotools.factory.CommonFactoryFinder;
 
 
 /**
@@ -100,9 +100,10 @@ public class FileDataStoreFinder {
      */
     public static Iterator getAvailableDataStores() {
         Set availableDS = new HashSet();
-        Iterator it = FactoryFinder.factories(FileDataStoreFactorySpi.class);
-
-        while (it.hasNext()) {
+        
+        Set all = CommonFactoryFinder.getFileDataStoreFactories( null );
+        
+        for (Iterator it = all.iterator(); it.hasNext();) {
             FileDataStoreFactorySpi dsFactory = (FileDataStoreFactorySpi) it
                 .next();
 

@@ -61,6 +61,7 @@ import org.geotools.util.Logging;
  * @author Martin Desruisseaux
  */
 public final class Hints extends RenderingHints {
+    
     ////////////////////////////////////////////////////////////////////////
     ////////                                                        ////////
     ////////                        Factories                       ////////
@@ -172,6 +173,41 @@ public final class Hints extends RenderingHints {
             "org.opengis.referencing.operation.MathTransformFactory");
 
     /**
+     * The {@link org.opengis.data.FeatureLockFactory} instance to use.
+     * 
+     * @see org.geotools.factory.CommonFactoryFinder#getFeatureLockFactory
+     *
+     * @since 2.4
+     */
+    public static final Key FEATURE_LOCK_FACTORY = new Key(
+            "org.geotools.data.FeatureLockFactory");
+
+    /**
+     * The {@link org.opengis.data.FeatureLockFactory} instance to use.
+     * 
+     * @see org.geotools.factory.CommonFactoryFinder#getFeatureCollections
+     *
+     * @since 2.4
+     */
+    public static final Key FEATURE_COLLECTIONS = new Key(
+            "org.geotools.feature.FeatureCollections");
+    
+    /**
+     * The {@link org.geotools.feature.FeatureTypeFactory} instance to use.
+     * 
+     * @see org.geotools.factory.CommonFactoryFinder#getFeatureTypeFactory
+     *
+     * @since 2.4
+     */
+    public static final Key FEATURE_TYPE_FACTORY = new Key(
+            "org.geotools.feature.FeatureTypeFactory");
+    
+    /**
+     * This key is used to provide the TypeName for the returned FeatureTypeFactory.
+     */
+    public static final Key FEATURE_TYPE_FACTORY_NAME = new Key("org.geotools.feature.FeatureTypeFactory-name");
+    
+    /**
      * The {@link org.geotools.styling.StyleFactory} instance to use.
      * 
      * @see org.geotools.factory.CommonFactoryFinder#getStyleFactory
@@ -180,9 +216,19 @@ public final class Hints extends RenderingHints {
      */
     public static final Key STYLE_FACTORY = new Key(
             "org.geotools.styling.StyleFactory");
-
+    
     /**
-     * The {@link org.opengis.filter.FilterFactory} instance to use.
+     * The {@link org.opengis.data.FeatureLockFactory} instance to use.
+     * 
+     * @see org.geotools.factory.CommonFactoryFinder#getFeatureLockFactory
+     *
+     * @since 2.4
+     */
+    public static final Key ATTRIBUTE_TYPE_FACTORY = new Key(
+            "org.geotools.feature.AttributeTypeFactory");
+    
+    /**
+     * The {@link org.opengis..FilterFactory} instance to use.
      * 
      * @see org.geotools.factory.CommonFactoryFinder#getFilterFactory
      *
@@ -190,8 +236,6 @@ public final class Hints extends RenderingHints {
      */
     public static final Key FILTER_FACTORY = new Key(
             "org.opengis.filter.FilterFactory");
-
-
 
     ////////////////////////////////////////////////////////////////////////
     ////////                                                        ////////

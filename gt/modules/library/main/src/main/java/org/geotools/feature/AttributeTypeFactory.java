@@ -18,8 +18,8 @@ package org.geotools.feature;
 import java.util.Collections;
 import java.util.Map;
 
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Factory;
-import org.geotools.factory.FactoryFinder;
 import org.opengis.filter.Filter;
 
 
@@ -55,12 +55,13 @@ public abstract class AttributeTypeFactory implements Factory {
      * If no implementations are found then DefaultAttributeTypeFactory is returned.
      * </p>
      * @return A new instance of an AttributeTypeFactory.
+     * @deprecated Please use CommonFactoryFinder
      */
     public static AttributeTypeFactory newInstance() {
-        String attFactory = "org.geotools.feature.AttributeTypeFactory";
-
-        return (AttributeTypeFactory) FactoryFinder.findFactory(attFactory,
-            "org.geotools.feature.DefaultAttributeTypeFactory");
+        if( instance == null ){
+            instance = CommonFactoryFinder.getAttributeTypeFactory( null );
+        }
+        return instance;
     }
     
     /**

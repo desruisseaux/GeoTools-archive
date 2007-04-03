@@ -18,9 +18,9 @@ package org.geotools.data;
 import java.util.Map;
 import java.util.Collections;
 
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryConfigurationError;
-import org.geotools.factory.FactoryFinder;
 
 /**
  * This specifies the interface to create FeatureLocks.
@@ -49,10 +49,8 @@ public abstract class FeatureLockFactory implements Factory {
     public static FeatureLockFactory getInstance()
         throws FactoryConfigurationError {
         if (factory == null) {
-        factory = (FeatureLockFactory) FactoryFinder
-            .findFactory("org.geotools.data.FeatureLockFactory",
-                "org.geotools.data.DefaultFeatureLockFactory");
-	}
+            factory = CommonFactoryFinder.getFeatureLockFactory( null );
+        }
         return factory;
     }
 

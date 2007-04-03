@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.geotools.factory.FactoryFinder;
+import org.geotools.factory.CommonFactoryFinder;
 
 /**
  * A utility class for {@link FilterCapabilities} that assists in mapping between a filter or expression or
@@ -132,7 +132,7 @@ class FilterNameTypeMapping {
 //		functionNameMap.put("geomfromtwkt", new FilterCapabilities(FilterFunction_buffer.class));
 //		functionNameMap.put("geomlength", new FilterCapabilities(FilterFunction_buffer.class));
 		
-		Iterator expressions = FactoryFinder.factories(org.geotools.filter.FunctionExpression.class);
+		Iterator expressions = CommonFactoryFinder.getFunctionExpressions( null ).iterator();
 		while ( expressions.hasNext() ){
 			FunctionExpression exp=(FunctionExpression) expressions.next();
 			functionNameMap.put(exp.getName().toLowerCase(), new FilterCapabilities(exp.getClass()));

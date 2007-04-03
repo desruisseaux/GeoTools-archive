@@ -18,8 +18,8 @@ package org.geotools.feature;
 import java.util.Collections;
 import java.util.Map;
 
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Factory;
-import org.geotools.factory.FactoryFinder;
 
 /**
  * A utility class for working with FeatureCollections.
@@ -37,10 +37,7 @@ public abstract class FeatureCollections implements Factory {
   
   private static FeatureCollections instance() {
     if (instance == null) {
-      instance = (FeatureCollections) FactoryFinder.findFactory(
-        "org.geotools.feature.FeatureCollections",
-        "org.geotools.feature.DefaultFeatureCollections"
-      );
+      instance = CommonFactoryFinder.getFeatureCollections( null );
     }
     return instance;
   }

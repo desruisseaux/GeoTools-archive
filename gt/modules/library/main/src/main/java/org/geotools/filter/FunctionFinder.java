@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Hints;
 import org.opengis.filter.expression.Function;
 
@@ -42,13 +44,15 @@ public class FunctionFinder {
                 functionExpressionCache = new HashMap();
                 functionImplCache = new HashMap();
 
-                for (Iterator it = org.geotools.factory.FactoryFinder
-                        .factories(FunctionExpression.class); it.hasNext();) {
+                
+                Set functions = CommonFactoryFinder.getFunctionExpressions( null );                
+                for (Iterator it = functions.iterator(); it.hasNext();) {
                     FunctionExpression function = (FunctionExpression) it.next();
                     functionExpressionCache.put(function.getName().toLowerCase(), function.getClass());
                 }
-                for (Iterator i = org.geotools.factory.FactoryFinder.factories(FunctionImpl.class); 
-                        i.hasNext();) {
+
+                functions = CommonFactoryFinder.getFunctions( null );                                
+                for (Iterator i = functions.iterator(); i.hasNext();) {
                     FunctionImpl function = (FunctionImpl) i.next();
                     functionImplCache.put(function.getName().toLowerCase(), function.getClass());
                 }
