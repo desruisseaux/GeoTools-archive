@@ -24,6 +24,7 @@ import java.util.Set;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 
 /**
@@ -140,7 +141,8 @@ public abstract class FeatureTypeBuilder extends FeatureTypes implements Factory
         
         // warning not sure if CommonFactoryFinder is going to cache the instance or not?
         //
-        Hints hints = new Hints( Hints.FEATURE_TYPE_FACTORY_NAME, typeName );
+        Hints hints = GeoTools.getDefaultHints();
+        hints.put( Hints.FEATURE_TYPE_FACTORY_NAME, typeName );
         return CommonFactoryFinder.getFeatureTypeFactory( hints );
     }
     

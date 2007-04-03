@@ -90,7 +90,7 @@ public class MysqlGeomColumn {
 
     /** factory for attribute types. */
     private static AttributeTypeFactory attFactory = AttributeTypeFactory
-        .newInstance();
+        .defaultInstance();
 
     static {
         sqlTypeMap.put("TINY", Byte.class);

@@ -21,6 +21,7 @@ import java.util.Collections;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.factory.GeoTools;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 
@@ -58,7 +59,7 @@ public abstract class FilterFactoryFinder {
      */
     public static FilterFactory createFilterFactory()
         throws FactoryConfigurationError {
-        return (FilterFactory) CommonFactoryFinder.getFilterFactory( null );
+        return (FilterFactory) CommonFactoryFinder.getFilterFactory( GeoTools.getDefaultHints() );
     }
 
 }

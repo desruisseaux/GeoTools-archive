@@ -108,6 +108,40 @@ public final class Hints extends RenderingHints {
             "org.opengis.referencing.crs.CRSAuthorityFactory");
 
     /**
+     * Used to direct WKT CRS Authority to a directory containing extra definitions.
+     * <p>
+     * To set on the command lin:<pre>
+     * -Dorg.geotools.referencing.crs-directory=PATH
+     * </pre>
+     */
+    public static final Key CRS_AUTHORITY_EXTRA_DIRECTORY = new Key( "org.geotools.referencing.crs-directory" );
+
+    /**
+     * Used to direct WKT CRS Authority to a the file containing extra definitions.
+     * <p>
+     * To set on the command lin:<pre>
+     * -Dorg.geotools.referencing.crs-file=FILE
+     * </pre>
+     */
+    public static final Key CRS_AUTHORITY_EXTRA_FILE = new Key( "org.geotools.referencing.crs-file" );
+    
+    /**
+     * Provide a DataSource to the JDBC EPSG Authority implementations.
+     * <p>
+     * To set on the command lin:<pre>
+     * -Dorg.geotools.referencing.crs-datasource=JNDIREFERENCE
+     * </pre> 
+     * <p>
+     * Possible values:
+     * <ul>
+     * <li>String - used with JNDI to locate datasource
+     * <li>DataSource - used as is
+     * <li>missing - assume connection information provided
+     * </ul>
+     */
+    public static final Key CRS_AUTHORITY_DATASOURCE = new Key( "org.geotools.referencing.crs-datasource" );
+    
+    /**
      * The {@link org.opengis.referencing.cs.CSAuthorityFactory} instance to use.
      * 
      * @see org.geotools.referencing.FactoryFinder#getCSAuthorityFactory

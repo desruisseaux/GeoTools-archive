@@ -139,7 +139,8 @@ public class FactoryRegistry extends ServiceRegistry {
      *
      * @since 2.3
      */
-    public Iterator getServiceProviders(final Class category, final Filter filter, final Hints hints) {
+    public Iterator getServiceProviders(final Class category, final Filter filter, final Hints myHints) {
+        final Hints hints = myHints != null ? myHints : GeoTools.getDefaultHints();
         /*
          * The implementation of this method is very similar to the 'getUnfilteredProviders'
          * one except for filter handling. See the comments in 'getUnfilteredProviders' for
@@ -236,6 +237,9 @@ public class FactoryRegistry extends ServiceRegistry {
                                      Hints hints, final Hints.Key key)
             throws FactoryRegistryException
     {
+        if( hints == null ) {
+            hints = GeoTools.getDefaultHints();
+        }
         synchronizeIteratorProviders();
         Class implementation = null;
         if (key != null) {
@@ -323,8 +327,10 @@ public class FactoryRegistry extends ServiceRegistry {
      * @return A factory for the specified category and hints, or {@code null} if none.
      */
     private Object getServiceImplementation(final Class category, final Class implementation,
-                                            final Filter filter,  final Hints hints)
+                                            final Filter filter,  final Hints myHints)
     {
+        final Hints hints = myHints != null ? myHints : GeoTools.getDefaultHints();
+        
         for (final Iterator/*<Object>*/ it=getUnfilteredProviders(category); it.hasNext();) {
             final Object candidate = it.next();
             // Implementation class must be tested before 'isAcceptable'
@@ -386,9 +392,11 @@ public class FactoryRegistry extends ServiceRegistry {
      */
     final boolean isAcceptable(final Object candidate,
                                final Class  category,
-                               final Hints  hints,
+                               final Hints  myHints,
                                final Filter filter)
     {
+        final Hints hints = myHints != null ? myHints : GeoTools.getDefaultHints();
+        
         if (filter!=null && !filter.filter(candidate)) {
             return false;
         }
@@ -429,9 +437,10 @@ public class FactoryRegistry extends ServiceRegistry {
      */
     private boolean usesAcceptableHints(final Factory factory,
                                         final Class   category,
-                                        final Hints   hints,
+                                        final Hints   myHints,
                                         Set/*<Factory>*/ alreadyDone)
     {
+        final Hints hints = myHints != null ? myHints : GeoTools.getDefaultHints();
         Hints remaining = null;
         final Map implementationHints = factory.getImplementationHints();
         for (final Iterator it=implementationHints.entrySet().iterator(); it.hasNext();) {

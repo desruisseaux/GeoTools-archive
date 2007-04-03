@@ -47,6 +47,7 @@ import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
+import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryNotFoundException;
@@ -59,7 +60,6 @@ import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.Utilities;
 import org.geotools.util.Version;
 import org.geotools.util.Logging;
 import org.geotools.util.UnsupportedImplementationException;
@@ -87,11 +87,6 @@ import org.geotools.util.UnsupportedImplementationException;
  * @tutorial http://docs.codehaus.org/display/GEOTOOLS/Coordinate+Transformation+Services+for+Geotools+2.1
  */
 public final class CRS {
-    /**
-     * A set of hints used in order to fetch lenient coordinate operation factory.
-     */
-    private static final Hints LENIENT = new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
-
     /**
      * A factory for CRS creation with (<var>latitude</var>, <var>longitude</var>) axis order
      * (unless otherwise specified in system property). Will be created only when first needed.
@@ -789,8 +784,11 @@ public final class CRS {
                                                   boolean lenient)
             throws FactoryException
     {
-        final CoordinateOperationFactory factory =
-                FactoryFinder.getCoordinateOperationFactory(lenient ? LENIENT : null);
+        Hints hints = GeoTools.getDefaultHints();
+        if( lenient = true ){
+            hints.put(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
+        }
+        final CoordinateOperationFactory factory = FactoryFinder.getCoordinateOperationFactory( hints );
         return factory.createOperation(sourceCRS, targetCRS).getMathTransform();
     }
 

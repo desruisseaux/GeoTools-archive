@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Factory;
+import org.geotools.factory.GeoTools;
 import org.opengis.filter.Filter;
 
 
@@ -32,9 +33,7 @@ import org.opengis.filter.Filter;
  * @version $Id$
  */
 public abstract class AttributeTypeFactory implements Factory {
-    /** The instance to be returned by {@link #defaultInstance()} */
-    private static AttributeTypeFactory instance = null;
-
+    
     /**
      * Returns the default attribute factory for the system - constucting a new
      * one if this is first time the method has been called.
@@ -42,11 +41,9 @@ public abstract class AttributeTypeFactory implements Factory {
      * @return the default instance of AttributeTypeFactory.
      */
     public static AttributeTypeFactory defaultInstance() {
-        if (instance == null) {
-            instance = newInstance();
-        }
-
-        return instance;
+        // depend on CommonFactoryFinder to keep singleton cached
+        //
+        return CommonFactoryFinder.getAttributeTypeFactory( GeoTools.getDefaultHints() );
     }
 
     /**
@@ -58,10 +55,7 @@ public abstract class AttributeTypeFactory implements Factory {
      * @deprecated Please use CommonFactoryFinder
      */
     public static AttributeTypeFactory newInstance() {
-        if( instance == null ){
-            instance = CommonFactoryFinder.getAttributeTypeFactory( null );
-        }
-        return instance;
+        return new DefaultAttributeTypeFactory(); // only need new instance if factory stateful?
     }
     
     /**

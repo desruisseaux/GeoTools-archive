@@ -58,7 +58,7 @@ public class MathTest extends TestCase {
     }
 
     public Feature[] sampleFeatures() throws Exception {
-        AttributeTypeFactory attFactory = AttributeTypeFactory.newInstance();
+        AttributeTypeFactory attFactory = AttributeTypeFactory.defaultInstance();
 
         AttributeType a1 = attFactory.newAttributeType("value", Integer.class);
         AttributeType a2 = attFactory.newAttributeType("geometry",

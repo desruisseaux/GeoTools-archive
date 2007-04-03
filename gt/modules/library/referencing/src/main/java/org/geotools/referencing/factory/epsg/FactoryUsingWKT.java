@@ -38,6 +38,7 @@ import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
+import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.factory.FactoryGroup;
@@ -85,7 +86,7 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
     /**
      * The {@linkplain System#getProperty(String) system property} key for setting the directory
      * where to search for the {@value #FILENAME} file.
-     *
+     * @depreacted Please use Hints.CRS_AUTHORITY_DATASOURCE
      * @since 2.4
      */
     public static final String CRS_DIRECTORY_KEY = "org.geotools.referencing.crs-directory";
@@ -123,10 +124,15 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
     protected static final int DEFAULT_PRIORITY = DefaultFactory.PRIORITY - 10;
 
     /**
+     * Directed scanned for extra definitions.
+     */
+    protected File directory;
+    
+    /**
      * Constructs an authority factory using the default set of factories.
      */
     public FactoryUsingWKT() {
-        this(null);
+        this( GeoTools.getDefaultHints() );
     }
 
     /**
@@ -136,7 +142,24 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
      * {@code FACTORY} hints.
      */
     public FactoryUsingWKT(final Hints hints) {
-        this(hints, DEFAULT_PRIORITY);
+        this(hints, DEFAULT_PRIORITY );
+        
+        if (hints != null) {
+            Object hint = hints.get(Hints.CRS_AUTHORITY_EXTRA_DIRECTORY);
+            if( hint instanceof File){
+                directory = (File) hint;
+            }
+            else if( hint instanceof String ){
+                directory = new File( (String) hint );
+            }
+        }
+        if (directory == null) {
+            String systemDefault = System.getProperty(CRS_DIRECTORY_KEY);
+            if( systemDefault != null ){
+                directory = new File( systemDefault );
+            }
+        }        
+        super.hints.put( Hints.CRS_AUTHORITY_EXTRA_DIRECTORY, directory );
     }
 
     /**
@@ -185,7 +208,6 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
      */
     protected URL getDefinitionsURL() {
         try {
-            final String directory = System.getProperty(CRS_DIRECTORY_KEY);
             if (directory != null) {
                 final File file = new File(directory, FILENAME);
                 if (file.isFile()) {

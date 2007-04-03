@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Factory;
+import org.geotools.factory.GeoTools;
 
 /**
  * A utility class for working with FeatureCollections.
@@ -28,18 +29,10 @@ import org.geotools.factory.Factory;
  * @source $URL$
  */
 public abstract class FeatureCollections implements Factory {
-
-  /**
-   * Holds a reference to a FeatureCollections implementation once
-   * one has been requested for the first time using instance().
-   */
-  private static FeatureCollections instance = null;
   
   private static FeatureCollections instance() {
-    if (instance == null) {
-      instance = CommonFactoryFinder.getFeatureCollections( null );
-    }
-    return instance;
+      // depend on CommonFactoryFinder's FactoryRegistry to hold singleton
+      return CommonFactoryFinder.getFeatureCollections( GeoTools.getDefaultHints() );
   }
   
   /**

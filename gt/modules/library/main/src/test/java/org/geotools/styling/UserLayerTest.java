@@ -28,6 +28,7 @@ import org.geotools.data.DataStore;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.data.memory.MemoryFeatureCollection;
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
@@ -135,8 +136,7 @@ public class UserLayerTest extends TestCase {
         final DataStore ds = new MemoryDataStore(fc);
 
         // create and populate the layer --------------------------------------
-        final Hints sldHints = new Hints(new HashMap());
-        final StyleFactory sf = CommonFactoryFinder.getStyleFactory(sldHints);
+        final StyleFactory sf = CommonFactoryFinder.getStyleFactory(GeoTools.getDefaultHints());
 
         final UserLayer layer = sf.createUserLayer();
         layer.setName(LAYER_NAME);

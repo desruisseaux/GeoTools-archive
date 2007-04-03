@@ -61,7 +61,7 @@ public class MysqlTestSuite extends TestCase {
     /** Well Known Text writer (from JTS). */
     private static WKTWriter geometryWriter = new WKTWriter();
 
-    private static AttributeTypeFactory attFactory = AttributeTypeFactory.newInstance();
+    private static AttributeTypeFactory attFactory = AttributeTypeFactory.defaultInstance();
 
         private AttributeType[] lampAttr= { attFactory.newAttributeType("NUM_BULBS", Integer.class),
     				attFactory.newAttributeType("LOCATION", Geometry.class)

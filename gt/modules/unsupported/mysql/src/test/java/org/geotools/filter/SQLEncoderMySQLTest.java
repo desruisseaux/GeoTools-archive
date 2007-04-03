@@ -49,7 +49,7 @@ public class SQLEncoderMySQLTest extends TestCase {
     protected static final Logger LOGGER = Logger.getLogger(
             "org.geotools.filter");
     protected static AttributeTypeFactory attFactory = AttributeTypeFactory
-        .newInstance();
+        .defaultInstance();
 
     /** Schema on which to preform tests */
     protected static FeatureType testSchema = null;

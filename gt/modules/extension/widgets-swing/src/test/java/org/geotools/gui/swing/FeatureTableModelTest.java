@@ -63,7 +63,7 @@ public class FeatureTableModelTest extends TestBase {
     /**
      * The attribute factory instance.
      */
-    protected static final AttributeTypeFactory attFactory = AttributeTypeFactory.newInstance();
+    protected static final AttributeTypeFactory attFactory = AttributeTypeFactory.defaultInstance();
     
     /**
      * Feature on which to perform tests.

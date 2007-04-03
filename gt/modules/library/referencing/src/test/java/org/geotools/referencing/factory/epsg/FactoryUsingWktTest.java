@@ -84,6 +84,12 @@ public class FactoryUsingWktTest extends TestCase {
                 new Hints(Hints.CRS_AUTHORITY_FACTORY, FactoryUsingWKT.class));
     }
 
+    public void testSystemProperty() throws Exception {
+        Hints hints = new Hints(Hints.CRS_AUTHORITY_FACTORY, FactoryUsingWKT.class);
+        hints.put( Hints.CRS_AUTHORITY_EXTRA_DIRECTORY, "invalid" );
+        factory = (FactoryUsingWKT) FactoryFinder.getCRSAuthorityFactory("EPSG",
+                hints );
+    }
     /**
      * Tests the authority code.
      */

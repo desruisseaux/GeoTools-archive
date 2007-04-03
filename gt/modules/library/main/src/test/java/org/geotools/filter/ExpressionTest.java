@@ -61,7 +61,7 @@ public class ExpressionTest extends TestCase {
 	private static FeatureType testSchema = null;
 
 	private static AttributeTypeFactory attFactory = AttributeTypeFactory
-			.newInstance();
+			.defaultInstance();
 
 	static FilterFactory filterFactory = FilterFactoryFinder
 			.createFilterFactory();

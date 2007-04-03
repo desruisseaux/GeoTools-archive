@@ -65,7 +65,7 @@ public class FilterTest extends TestCase {
     
     FilterFactory fac;
 
-      private static AttributeTypeFactory attFactory = AttributeTypeFactory.newInstance();
+      private static AttributeTypeFactory attFactory = AttributeTypeFactory.defaultInstance();
 
     /** Test suite for this test case */
     TestSuite suite = null;

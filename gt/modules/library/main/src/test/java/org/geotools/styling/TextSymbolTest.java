@@ -48,7 +48,7 @@ public class TextSymbolTest extends TestCase {
 
     /** factory for attributes */
     private static AttributeTypeFactory attFactory = AttributeTypeFactory
-        .newInstance();
+        .defaultInstance();
     String dataFolder;
 
     public TextSymbolTest(java.lang.String testName) {

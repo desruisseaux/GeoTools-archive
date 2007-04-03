@@ -50,7 +50,7 @@ public class FilterAttributeExtractorTest extends TestCase {
 
     /** Schema on which to preform tests */
     private static FeatureType testSchema = null;
-    private static AttributeTypeFactory attFactory = AttributeTypeFactory.newInstance();
+    private static AttributeTypeFactory attFactory = AttributeTypeFactory.defaultInstance();
     boolean set = false;
     FilterAttributeExtractor fae;
     FilterFactory fac;

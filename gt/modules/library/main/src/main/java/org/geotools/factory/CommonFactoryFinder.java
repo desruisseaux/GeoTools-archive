@@ -122,7 +122,7 @@ public final class CommonFactoryFinder {
     /**
      * Returns a set of all available implementations for the {@link FunctionExpression} interface.
      *
-     * @param  hints An optional map of hints, or {@code null} if none.
+     * @param  hints An optional map of hints, or {@code null} to assume GeoTools.getDefaultHints()
      * @return Set of available style factory implementations.
      * @deprecated Use FunctionExpression is now @deprecated
      */

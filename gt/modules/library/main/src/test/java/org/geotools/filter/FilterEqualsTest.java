@@ -65,7 +65,7 @@ public class FilterEqualsTest extends TestCase {
     boolean set = false;
     
     /** factory for attribute types */
-    private static AttributeTypeFactory attFactory = AttributeTypeFactory.newInstance();
+    private static AttributeTypeFactory attFactory = AttributeTypeFactory.defaultInstance();
 
     FeatureTypeFactory feaTypeFactory = FeatureTypeFactory.newInstance("test");
 

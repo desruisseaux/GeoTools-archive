@@ -42,7 +42,7 @@ public abstract class SQLFilterTestSupport extends TestCase {
     /** Standard logging instance */
     protected static final Logger LOGGER = Logger.getLogger(
             "org.geotools.filter");
-    protected static AttributeTypeFactory attFactory = AttributeTypeFactory.newInstance();
+    protected static AttributeTypeFactory attFactory = AttributeTypeFactory.defaultInstance();
 
     /** Schema on which to preform tests */
     protected static FeatureType testSchema = null;

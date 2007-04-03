@@ -7,7 +7,7 @@ import junit.framework.TestCase;
 public class CommonFactoryFinderTest extends TestCase {
 
     public void testGetStyleFactory() {
-        assertNotNull( CommonFactoryFinder.getStyleFactories( null ));
+        assertNotNull( CommonFactoryFinder.getStyleFactories( GeoTools.getDefaultHints() ));
     }
 
     public void testGetFilterFactory() {
