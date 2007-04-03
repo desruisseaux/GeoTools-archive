@@ -110,7 +110,7 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
      * specified directory. If {@code directory} is {@code null}, then callers are responsible
      * to invoke {@link #setDatabase} explicitly.
      *
-     * @param directory The directory for the {@value #DATABASE_NAME} HSQL database,
+     * @param directory The directory for the DATABASE_NAME HSQL database,
      *        or {@code null} if none.
      *
      * @since 2.3
