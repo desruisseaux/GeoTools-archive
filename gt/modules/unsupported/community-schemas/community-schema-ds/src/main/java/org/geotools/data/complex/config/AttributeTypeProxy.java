@@ -10,61 +10,65 @@ import org.opengis.util.InternationalString;
 
 public class AttributeTypeProxy implements AttributeType {
 
-	private TypeName typeName;
+    private TypeName typeName;
 
-	private Map registry;
+    private Map registry;
 
-	public AttributeTypeProxy(TypeName typeName, Map registry) {
-		this.typeName = typeName;
-		this.registry = registry;
-	}
+    private AttributeType subject;
 
-	public AttributeType getSubject() {
-		AttributeType subject = (AttributeType) registry.get(typeName);
-		if (subject == null) {
-			throw new IllegalStateException("Subject type not loaded yet");
-		}
-		return subject;
-	}
+    public AttributeTypeProxy(TypeName typeName, Map registry) {
+        this.typeName = typeName;
+        this.registry = registry;
+    }
 
-	public Class getBinding() {
-		return getSubject().getBinding();
-	}
+    public AttributeType getSubject() {
+        if (subject == null) {
+            subject = (AttributeType) registry.get(typeName);
+            if (subject == null) {
+                throw new IllegalStateException("Subject type not loaded yet");
+            }
+        }
+        return subject;
+    }
 
-	public Collection getOperations() {
-		return null;
-	}
+    public Class getBinding() {
+        return getSubject().getBinding();
+    }
 
-	public Set getRestrictions() {
-		return getSubject().getRestrictions();
-	}
+    public Collection getOperations() {
+        return null;
+    }
 
-	public AttributeType getSuper() {
-		return getSubject().getSuper();
-	}
+    public Set getRestrictions() {
+        return getSubject().getRestrictions();
+    }
 
-	public boolean isAbstract() {
-		return getSubject().isAbstract();
-	}
+    public AttributeType getSuper() {
+        return getSubject().getSuper();
+    }
 
-	public boolean isIdentified() {
-		return getSubject().isIdentified();
-	}
+    public boolean isAbstract() {
+        return getSubject().isAbstract();
+    }
 
-	public InternationalString getDescription() {
-		return getSubject().getDescription();
-	}
+    public boolean isIdentified() {
+        return getSubject().isIdentified();
+    }
 
-	public TypeName getName() {
-		return typeName;
-	}
+    public InternationalString getDescription() {
+        return getSubject().getDescription();
+    }
 
-	public Object getUserData(Object key) {
-		return getSubject().getUserData(key);
-	}
+    public TypeName getName() {
+        return typeName;
+    }
 
-	public void putUserData(Object key, Object value) {
-		getSubject().putUserData(key, value);
-	}
+    public Object getUserData(Object key) {
+        return getSubject().getUserData(key);
+    }
+
+    public void putUserData(Object key, Object value) {
+        getSubject().putUserData(key, value);
+    }
 
 }
