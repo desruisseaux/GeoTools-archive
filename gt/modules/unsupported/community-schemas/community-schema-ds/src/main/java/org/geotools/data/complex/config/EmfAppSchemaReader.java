@@ -1,8 +1,10 @@
 package org.geotools.data.complex.config;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,17 +23,24 @@ import org.eclipse.xsd.XSDAttributeUseCategory;
 import org.eclipse.xsd.XSDComplexTypeDefinition;
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDSchema;
+import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.eclipse.xsd.XSDTypeDefinition;
 import org.geotools.data.feature.adapter.ISOAttributeTypeAdapter;
 import org.geotools.data.feature.adapter.ISOFeatureTypeAdapter;
 import org.geotools.feature.iso.Types;
 import org.geotools.feature.iso.simple.SimpleTypeFactoryImpl;
 import org.geotools.feature.iso.type.TypeFactoryImpl;
+import org.geotools.gml3.ApplicationSchemaConfiguration;
 import org.geotools.gml3.GMLConfiguration;
 import org.geotools.gml3.GMLSchema;
 import org.geotools.gml3.bindings.GML;
+import org.geotools.gml3.bindings.smil.SMIL20;
+import org.geotools.gml3.bindings.smil.SMIL20LANG;
 import org.geotools.gml3.smil.SMIL20LANGSchema;
 import org.geotools.gml3.smil.SMIL20Schema;
+import org.geotools.xlink.bindings.XLINK;
+import org.geotools.xml.Binding;
+import org.geotools.xml.Configuration;
 import org.geotools.xml.SchemaIndex;
 import org.geotools.xml.Schemas;
 import org.geotools.xs.XSSchema;
@@ -47,16 +56,13 @@ import org.opengis.feature.type.TypeFactory;
 import org.opengis.feature.type.TypeName;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
 
 public class EmfAppSchemaReader {
     private static final Logger LOGGER = Logger.getLogger(EmfAppSchemaReader.class.getPackage()
             .getName());
-
-    /**
-     * Keyword used to store the EMF model of AttributeDescriptors and
-     * AttributeTypes as userData properties on each instance
-     */
-    public static final String EMF_USERDATA_KEY = "EMF_MODEL";
 
     /**
      * Caches the GML 3.1.1 types and its dependencies
@@ -71,8 +77,9 @@ public class EmfAppSchemaReader {
 
     private TypeFactory typeFactory;
 
+    private SchemaIndex appSchemaIndex;
+
     private EmfAppSchemaReader() {
-        registry = new HashMap();
         typeFactory = new TypeFactoryImpl();
     }
 
@@ -84,18 +91,103 @@ public class EmfAppSchemaReader {
         return new HashMap(this.registry);
     }
 
-    public void parse(URL location) throws IOException {
+    /**
+     * 
+     * @param configuration
+     *            configuration object used to access the XSDSchema to parse.
+     *            This configuration object might contain {@link Binding}s
+     * @throws IOException
+     */
+    public void parse(Configuration configuration) throws IOException {
+        //find out the schemas involved in the app schema configuration
+        appSchemaIndex = Schemas.findSchemas(configuration);
+
+        //set up the type registry
+        registry = new HashMap();
+        
+        //register the "fundation" gml types already bound to geotools AttributeTypes
         if (EmfAppSchemaReader.FOUNDATION_TYPES.isEmpty()) {
             createFoundationTypes();
-        }
+        } 
         registry.putAll(EmfAppSchemaReader.FOUNDATION_TYPES);
 
-        String appSchemaUri = location.toExternalForm();
-        EmfAppSchemaReader.LOGGER.info("Parsing application schema to emf:" + appSchemaUri);
-        XSDSchema xsdSchema = Schemas.parse(appSchemaUri);
+        //with the application schemas...
+        XSDSchema[] appSchemas = appSchemaIndex.getSchemas();
+        Map schemas = new HashMap();
+        for (Iterator it = Arrays.asList(appSchemas).iterator(); it.hasNext();) {
+            XSDSchema schema = (XSDSchema) it.next();
+            schemas.put(schema.getTargetNamespace(), schema);
+        }
+       
+        //establish a preferred parsing order so there are the less proxies possible
+        String []preferredOrder = {XS.NAMESPACE, XLINK.NAMESPACE, SMIL20.NAMESPACE, SMIL20LANG.NAMESPACE, GML.NAMESPACE};
+        List schemaList = new ArrayList(appSchemas.length);
+        for(int i  = 0; i < preferredOrder.length; i++){
+            String targetNamespace = preferredOrder[i];
+            XSDSchema schema = (XSDSchema) schemas.get(targetNamespace);
+            if(schema != null){
+                schemaList.add(schema);
+                schemas.remove(targetNamespace);
+            }
+        }
+        schemaList.addAll(schemas.values());
 
-        EmfAppSchemaReader.LOGGER.info("Importing application schema " + appSchemaUri);
-        importSchema(xsdSchema);
+        //and import them all
+        for (Iterator it = schemaList.iterator(); it.hasNext();) {
+            XSDSchema schema = (XSDSchema) it.next();
+            importSchema(schema);
+        }
+    }
+
+    public void parse(final URL location) throws IOException {
+
+        String nameSpace = findSchemaNamespace(location);
+
+        String schemaLocation = location.toExternalForm();
+        Configuration configuration = new ApplicationSchemaConfiguration(nameSpace, schemaLocation);
+
+        parse(configuration);
+    }
+
+    private String findSchemaNamespace(URL location) throws IOException {
+        String targetNamespace = null;
+        // parse some of the instance document to find out the
+        // schema location
+        InputStream input = location.openStream();
+
+        // create stream parser
+        XmlPullParser parser = null;
+
+        try {
+            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+            factory.setNamespaceAware(true);
+            factory.setValidating(false);
+
+            // parse root element
+            parser = factory.newPullParser();
+            parser.setInput(input, "UTF-8");
+            parser.nextTag();
+
+            // look for schema location
+            for (int i = 0; i < parser.getAttributeCount(); i++) {
+                if ("targetNamespace".equals(parser.getAttributeName(i))) {
+                    targetNamespace = parser.getAttributeValue(i);
+                    break;
+                }
+            }
+            // reset input stream
+            parser.setInput(null);
+        } catch (XmlPullParserException e) {
+            String msg = "Cannot find target namespace for schema document " + location;
+            throw (RuntimeException) new RuntimeException(msg).initCause(e);
+        } finally {
+            input.close();
+        }
+        if (targetNamespace == null) {
+            throw new IllegalArgumentException(
+                    "Input document does not specifies a targetNamespace");
+        }
+        return targetNamespace;
     }
 
     private void createFoundationTypes() {
@@ -116,16 +208,20 @@ public class EmfAppSchemaReader {
             schema = new GMLSchema();
             importSchema(schema);
 
-            EmfAppSchemaReader.LOGGER
-                    .info("Creating GMLConfiguration to get the prebuilt gml schemas from");
+            LOGGER.info("Creating GMLConfiguration to get the prebuilt gml schemas from");
             GMLConfiguration configuration = new GMLConfiguration();
-            EmfAppSchemaReader.LOGGER.info("Aquiring prebuilt gml schema an its dependencies");
+            LOGGER.info("Aquiring prebuilt gml schema and its dependencies");
             SchemaIndex index = Schemas.findSchemas(configuration);
             XSDSchema[] schemas = index.getSchemas();
 
-            EmfAppSchemaReader.LOGGER.info("Importing GML schema and dependencies");
+            LOGGER.info("Importing GML schema and dependencies");
             for (int i = 0; i < schemas.length; i++) {
                 XSDSchema xsdSchema = schemas[i];
+                String targetNamespace = xsdSchema.getTargetNamespace();
+                if (XS.NAMESPACE.equals(targetNamespace)) {
+                    LOGGER.finest("Ignoring XS schema parsing");
+                    continue;
+                }
                 importSchema(xsdSchema);
             }
 
@@ -136,14 +232,14 @@ public class EmfAppSchemaReader {
 
     private void importSchema(XSDSchema xsdSchema) {
         String targetNamespace = xsdSchema.getTargetNamespace();
-        EmfAppSchemaReader.LOGGER.fine("Importing schema " + targetNamespace);
+        LOGGER.fine("Importing schema " + targetNamespace);
 
         List typeDefinitions = xsdSchema.getTypeDefinitions();
-        EmfAppSchemaReader.LOGGER.finer("Importing " + targetNamespace + " type definitions");
+        LOGGER.finer("Importing " + targetNamespace + " type definitions");
         importXsdTypeDefinitions(typeDefinitions);
 
         List elementDeclarations = xsdSchema.getElementDeclarations();
-        EmfAppSchemaReader.LOGGER.finer("Importing " + targetNamespace + " element definitions");
+        LOGGER.finer("Importing " + targetNamespace + " element definitions");
         importElementDeclarations(elementDeclarations);
     }
 
@@ -151,8 +247,7 @@ public class EmfAppSchemaReader {
         XSDElementDeclaration elemDecl;
         for (Iterator it = elementDeclarations.iterator(); it.hasNext();) {
             elemDecl = (XSDElementDeclaration) it.next();
-            EmfAppSchemaReader.LOGGER.finest("Creating attribute descriptor for "
-                    + elemDecl.getQName());
+            LOGGER.finest("Creating attribute descriptor for " + elemDecl.getQName());
             AttributeDescriptor descriptor;
             try {
                 descriptor = createAttributeDescriptor(null, elemDecl);
@@ -173,12 +268,12 @@ public class EmfAppSchemaReader {
         TypeName name = type.getName();
         Object old = registry.put(name, type);
         if (old != null) {
-            System.err.println(type.getName() + " replaced by new value.");
+            LOGGER.fine(type.getName() + " replaced by new value.");
         }
     }
 
-    private AttributeDescriptor createAttributeDescriptor(XSDComplexTypeDefinition container,
-            XSDElementDeclaration elemDecl) {
+    private AttributeDescriptor createAttributeDescriptor(final XSDComplexTypeDefinition container,
+            final XSDElementDeclaration elemDecl) {
         String targetNamespace = elemDecl.getTargetNamespace();
         String name = elemDecl.getName();
         Name elemName = new org.geotools.feature.Name(targetNamespace, name);
@@ -206,7 +301,7 @@ public class EmfAppSchemaReader {
         AttributeDescriptor descriptor = typeFactory.createAttributeDescriptor(type, elemName,
                 minOccurs, maxOccurs, nillable);
 
-        descriptor.putUserData(EmfAppSchemaReader.EMF_USERDATA_KEY, elemDecl);
+        descriptor.putUserData(XSDElementDeclaration.class, elemDecl);
 
         return descriptor;
     }
@@ -215,42 +310,11 @@ public class EmfAppSchemaReader {
      * If the type of elemDecl is annonymous creates a new type with the same
      * name than the atrribute and returns it. If it is not anonymous, looks it
      * up on the registry and in case the type does not exists in the registry
-     * creates it and adds it to the registry.
+     * uses a proxy.
      * 
      * @param elemDecl
      * @return
      */
-    private AttributeType getTypeOf2(XSDElementDeclaration elemDecl) {
-        boolean registerIfNotExists = false;
-        XSDTypeDefinition typeDefinition;
-
-        // TODO REVISIT, I'm not sure this is the way to find out if the
-        // element's type is defined in line (an thus no need to register it
-        // as a global type)
-        typeDefinition = elemDecl.getAnonymousTypeDefinition();
-        if (typeDefinition == null) {
-            registerIfNotExists = true;
-            typeDefinition = elemDecl.getTypeDefinition();
-        }
-
-        AttributeType type;
-        if (registerIfNotExists) {
-            String targetNamespace = typeDefinition.getTargetNamespace();
-            String name = typeDefinition.getName();
-            type = getType(targetNamespace, name);
-            if (type == null) {
-                type = createType(typeDefinition);
-                register(type);
-            }
-        } else {
-            String name = elemDecl.getName();
-            String targetNamespace = elemDecl.getTargetNamespace();
-            TypeName overrideName = Types.typeName(targetNamespace, name);
-            type = createType(overrideName, typeDefinition);
-        }
-        return type;
-    }
-
     private AttributeType getTypeOf(XSDElementDeclaration elemDecl) {
         boolean hasToBeRegistered = false;
         XSDTypeDefinition typeDefinition;
@@ -258,6 +322,9 @@ public class EmfAppSchemaReader {
         // TODO REVISIT, I'm not sure this is the way to find out if the
         // element's type is defined in line (an thus no need to register it
         // as a global type)
+        if(elemDecl.isElementDeclarationReference()){
+            elemDecl = elemDecl.getResolvedElementDeclaration();
+        }
         typeDefinition = elemDecl.getAnonymousTypeDefinition();
         if (typeDefinition == null) {
             hasToBeRegistered = true;
@@ -269,7 +336,7 @@ public class EmfAppSchemaReader {
                     + elemDecl.getTargetNamespace() + "#" + elemDecl.getName()
                     + " has a null type definition, can't continue, fix it on the schema");
         }
-        
+
         AttributeType type;
         if (hasToBeRegistered) {
             String targetNamespace = typeDefinition.getTargetNamespace();
@@ -277,7 +344,8 @@ public class EmfAppSchemaReader {
             TypeName typeName = Types.typeName(targetNamespace, name);
             type = getType(typeName);
             if (type == null) {
-                if (typeDefinition instanceof XSDComplexTypeDefinition) {
+                if (null == typeDefinition.getSimpleType()
+                        && typeDefinition instanceof XSDComplexTypeDefinition) {
                     type = new ComplexTypeProxy(typeName, this.registry);
                 } else {
                     type = new AttributeTypeProxy(typeName, this.registry);
@@ -303,27 +371,55 @@ public class EmfAppSchemaReader {
         return createType(typeName, typeDefinition);
     }
 
+    /**
+     * Creates an {@link AttributeType} that matches the xsd type definition as
+     * much as possible.
+     * <p>
+     * The original type definition given by the {@link XSDTypeDefinition} is
+     * kept as AttributeType's metadata stored as a "user data" property using
+     * <code>XSDTypeDefinition.class</code> as key.
+     * </p>
+     * <p>
+     * If it is a complex attribute, it will contain all the properties declared
+     * in the <code>typeDefinition</code>, as well as all the properties
+     * declared in its super types.
+     * </p>
+     * TODO: handle the case where the extension mechanism is restriction.
+     * 
+     * @param assignedName
+     * @param typeDefinition
+     * @return
+     */
     private AttributeType createType(final TypeName assignedName,
             final XSDTypeDefinition typeDefinition) {
 
         AttributeType attType;
-        
+
         final XSDTypeDefinition baseType = typeDefinition.getBaseType();
+
         AttributeType superType = null;
         if (baseType != null) {
             String targetNamespace = baseType.getTargetNamespace();
             String name = baseType.getName();
             superType = getType(targetNamespace, name);
-            if(superType == null){
+            if (superType == null) {
                 superType = createType(baseType);
                 register(superType);
             }
         }
 
-        if (typeDefinition instanceof XSDComplexTypeDefinition) {
+        // if typeDefinition.getSimpleType() != null it means it is a complex
+        // xsd type
+        // with a simple content model, and has some xml attributes declared,
+        // hence the
+        // xsd complex type definition, as simple xsd types can't have
+        // attributes
+        XSDSimpleTypeDefinition simpleType = typeDefinition.getSimpleType();
+
+        if (simpleType == null && typeDefinition instanceof XSDComplexTypeDefinition) {
             XSDComplexTypeDefinition complexTypeDef;
             complexTypeDef = (XSDComplexTypeDefinition) typeDefinition;
-            boolean includeParents = false;
+            boolean includeParents = true;
             List children;
             children = Schemas.getChildElementDeclarations(typeDefinition, includeParents);
 
@@ -353,7 +449,7 @@ public class EmfAppSchemaReader {
                     isAbstract, restrictions, superType, description);
         }
 
-        attType.putUserData(EmfAppSchemaReader.EMF_USERDATA_KEY, typeDefinition);
+        attType.putUserData(XSDTypeDefinition.class, typeDefinition);
         return attType;
     }
 
@@ -427,6 +523,9 @@ public class EmfAppSchemaReader {
     /**
      * Returns true if all the AttributeDescriptors contained in
      * <code>schema</code> are of a simple type and no one has maxOccurs > 1.
+     * <p>
+     * Note this method ignores the attributes from the GML namespace
+     * </p>
      * 
      * @param schema
      * @return
@@ -435,6 +534,9 @@ public class EmfAppSchemaReader {
         AttributeDescriptor descriptor;
         for (Iterator it = schema.iterator(); it.hasNext();) {
             descriptor = (AttributeDescriptor) it.next();
+            if(GML.NAMESPACE.equals(descriptor.getName().getNamespaceURI())){
+                continue;
+            }
             if (descriptor.getMaxOccurs() > 1) {
                 return false;
             }
@@ -495,16 +597,17 @@ public class EmfAppSchemaReader {
 
             attType = getType(targetNamespace, name);
             if (attType == null) {
-                EmfAppSchemaReader.LOGGER.finest("Creating attribute type " + typeDef.getQName());
+                LOGGER.finest("Creating attribute type " + typeDef.getQName());
                 attType = createType(typeDef);
-                EmfAppSchemaReader.LOGGER.finest("Registering attribute type " + attType.getName());
+                LOGGER.finest("Registering attribute type " + attType.getName());
                 register(attType);
             } else {
-//                EmfAppSchemaReader.LOGGER.finer("Ignoring type " + typeDef.getQName()
-//                        + " as it already exists in the registry");
+                // LOGGER.finer("Ignoring type " +
+                // typeDef.getQName()
+                // + " as it already exists in the registry");
             }
         }
-        EmfAppSchemaReader.LOGGER.finer("--- type definitions imported successfully ---");
+        LOGGER.finer("--- type definitions imported successfully ---");
     }
 
     private void importSchema(Schema schema) {
@@ -513,11 +616,10 @@ public class EmfAppSchemaReader {
             Name key = (Name) entry.getKey();
             Object value = entry.getValue();
             if (registry.containsKey(key)) {
-                EmfAppSchemaReader.LOGGER.finer("Ignoring " + key + " as it already exists. type "
+                LOGGER.finer("Ignoring " + key + " as it already exists. type "
                         + value.getClass().getName());
             } else {
-                EmfAppSchemaReader.LOGGER.finer("Importing " + key + " of type "
-                        + value.getClass().getName());
+                LOGGER.finer("Importing " + key + " of type " + value.getClass().getName());
                 if (value instanceof AttributeType) {
                     AttributeType type = (AttributeType) value;
                     register(type);
@@ -538,8 +640,7 @@ public class EmfAppSchemaReader {
                 }
             }
         }
-        EmfAppSchemaReader.LOGGER.fine("Schema " + schema.namespace().getURI()
-                + " imported successfully");
+        LOGGER.fine("Schema " + schema.namespace().getURI() + " imported successfully");
     }
 
     public static EmfAppSchemaReader newInstance() {
