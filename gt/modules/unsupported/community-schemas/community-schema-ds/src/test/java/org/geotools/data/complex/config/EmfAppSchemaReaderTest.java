@@ -8,6 +8,7 @@ import junit.framework.TestCase;
 
 import org.eclipse.xsd.XSDComplexTypeDefinition;
 import org.eclipse.xsd.XSDElementDeclaration;
+import org.eclipse.xsd.XSDTypeDefinition;
 import org.geotools.feature.Name;
 import org.geotools.feature.iso.Types;
 import org.geotools.feature.type.TypeName;
@@ -56,7 +57,7 @@ public class EmfAppSchemaReaderTest extends TestCase {
         AttributeType type = (AttributeType) parsedTypes.get(typeName);
         assertNotNull(type);
         assertTrue(type.getClass().getName(), type instanceof SimpleFeatureType);
-        assertTrue(type.getUserData(EmfAppSchemaReader.EMF_USERDATA_KEY) instanceof XSDComplexTypeDefinition);
+        assertTrue(type.getUserData(XSDTypeDefinition.class) instanceof XSDComplexTypeDefinition);
 
         SimpleFeatureType ft = (SimpleFeatureType) type;
         String local = ft.getName().getLocalPart();
@@ -65,23 +66,23 @@ public class EmfAppSchemaReaderTest extends TestCase {
         assertEquals(NS_URI, uri);
 
         List/* <AttributeType> */attributes = (List) ft.getProperties();
-        assertEquals(3, attributes.size());
+        assertEquals(8, attributes.size());
         AttributeDescriptor descriptor;
 
-        descriptor = (AttributeDescriptor) attributes.get(0);
+        descriptor = (AttributeDescriptor) attributes.get(5);
         Name name = new Name(NS_URI, "the_geom");
         typeName = new TypeName(GML.NAMESPACE, "GeometryPropertyType");
         assertTrue(descriptor.getType() instanceof GeometryType);
 
         assertSimpleAttribute(descriptor, name, typeName, Geometry.class, 1, 1);
 
-        descriptor = (AttributeDescriptor) attributes.get(1);
+        descriptor = (AttributeDescriptor) attributes.get(6);
         name = new Name(NS_URI, "stringAtt");
         typeName = new TypeName(XS.NAMESPACE, XS.STRING.getLocalPart());
 
         assertSimpleAttribute(descriptor, name, typeName, String.class, 1, 1);
 
-        descriptor = (AttributeDescriptor) attributes.get(2);
+        descriptor = (AttributeDescriptor) attributes.get(7);
         name = new Name(NS_URI, "intAtt");
         typeName = new TypeName(XS.NAMESPACE, XS.INT.getLocalPart());
         assertSimpleAttribute(descriptor, name, typeName, Integer.class, 1, 1);
@@ -94,7 +95,7 @@ public class EmfAppSchemaReaderTest extends TestCase {
         assertEquals(name, descriptor.getName());
         assertEquals(minOccurs, descriptor.getMinOccurs());
         assertEquals(maxOccurs, descriptor.getMaxOccurs());
-        assertTrue(descriptor.getUserData(EmfAppSchemaReader.EMF_USERDATA_KEY) instanceof XSDElementDeclaration);
+        assertTrue(descriptor.getUserData(XSDElementDeclaration.class) instanceof XSDElementDeclaration);
 
         type = descriptor.getType();
         assertNotNull(type);
@@ -119,7 +120,7 @@ public class EmfAppSchemaReaderTest extends TestCase {
         assertTrue(type instanceof FeatureType);
         assertFalse(type instanceof SimpleFeatureType);
         assertEquals(typeName, type.getName());
-        assertTrue(type.getUserData(EmfAppSchemaReader.EMF_USERDATA_KEY) instanceof XSDComplexTypeDefinition);
+        assertTrue(type.getUserData(XSDTypeDefinition.class) instanceof XSDComplexTypeDefinition);
 
         FeatureType wq_plus_Type = (FeatureType) type;
 
@@ -128,20 +129,20 @@ public class EmfAppSchemaReaderTest extends TestCase {
         typeName = new TypeName(GML.NAMESPACE, GML.AbstractFeatureType.getLocalPart());
         assertEquals(typeName, wq_plus_Type.getSuper().getName());
         assertNotNull(wq_plus_Type.getProperties());
-        assertEquals(3, wq_plus_Type.getProperties().size());
+        assertEquals(8, wq_plus_Type.getProperties().size());
 
         Name name = new Name(NS_URI, "wq_plus");
         AttributeDescriptor wqPlusDescriptor = (AttributeDescriptor) registry.get(name);
         assertNotNull(wqPlusDescriptor);
         assertEquals(name, wqPlusDescriptor.getName());
         assertSame(wq_plus_Type, wqPlusDescriptor.getType());
-        assertTrue(wqPlusDescriptor.getUserData(EmfAppSchemaReader.EMF_USERDATA_KEY) instanceof XSDElementDeclaration);
+        assertTrue(wqPlusDescriptor.getUserData(XSDElementDeclaration.class) instanceof XSDElementDeclaration);
 
         typeName = new TypeName(NS_URI, "measurementType");
         type = (AttributeType) registry.get(typeName);
         assertTrue(type instanceof ComplexType);
         assertFalse(type instanceof FeatureType);
-        assertTrue(type.getUserData(EmfAppSchemaReader.EMF_USERDATA_KEY) instanceof XSDComplexTypeDefinition);
+        assertTrue(type.getUserData(XSDTypeDefinition.class) instanceof XSDComplexTypeDefinition);
 
         ComplexType measurementType = (ComplexType) type;
         assertEquals(typeName, measurementType.getName());
@@ -158,7 +159,7 @@ public class EmfAppSchemaReaderTest extends TestCase {
         assertSame(measurementType, descriptor.getType());
         assertEquals(0, descriptor.getMinOccurs());
         assertEquals(Integer.MAX_VALUE, descriptor.getMaxOccurs());
-        assertTrue(descriptor.getUserData(EmfAppSchemaReader.EMF_USERDATA_KEY) instanceof XSDElementDeclaration);
+        assertTrue(descriptor.getUserData(XSDElementDeclaration.class) instanceof XSDElementDeclaration);
 
         name = new Name(NS_URI, "result");
         descriptor = (AttributeDescriptor) Types.descriptor(measurementType, name);
@@ -182,4 +183,24 @@ public class EmfAppSchemaReaderTest extends TestCase {
 
     }
 
+    public void testSimpleAttributeFromComplexDeclaration() throws Exception {
+        String res = "complexFeature.xsd";
+        URL resource = TestData.getResource(this, res);
+        schemaLoader.parse(resource);
+
+        Map registry = schemaLoader.getTypeRegistry();
+
+        org.opengis.feature.type.TypeName tcl = Types.typeName(NS_URI, "TypedCategoryListType");
+        AttributeType typedCategoryListType = (AttributeType) registry.get(tcl);
+        assertNotNull(typedCategoryListType);
+        assertFalse(typedCategoryListType instanceof ComplexType);
+        
+        AttributeType superType = typedCategoryListType.getSuper();
+        assertNotNull(superType);
+        org.opengis.feature.type.TypeName superName = superType.getName();
+        assertEquals(XS.STRING.getNamespaceURI(), superName.getNamespaceURI());
+        assertEquals(XS.STRING.getLocalPart(), superName.getLocalPart());
+        
+        assertNotNull(typedCategoryListType.getUserData(XSDTypeDefinition.class));
+    }
 }
