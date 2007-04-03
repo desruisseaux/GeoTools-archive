@@ -183,15 +183,6 @@
   <!-- =========================================================== -->
   <ciManagement>
     <system>continuum</system>
-    <notifiers>
-      <notifier>
-        <type>mail</type>
-        <configuration>
-           <address>geotools-devel@lists.sourceforge.net</address>
-           <sendOnFailure>true</sendOnFailure>
-        </configuration>
-      </notifier>
-    </notifiers>
   </ciManagement>
 
   <mailingLists>
