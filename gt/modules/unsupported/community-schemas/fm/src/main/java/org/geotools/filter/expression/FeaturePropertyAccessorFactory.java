@@ -12,9 +12,11 @@ import org.geotools.feature.iso.type.FeatureTypeImpl;
 import org.geotools.feature.iso.xpath.AttributeDescriptorPropertyHandler;
 import org.geotools.feature.iso.xpath.AttributePropertyHandler;
 import org.opengis.feature.Attribute;
+import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.Feature;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.FeatureType;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -51,7 +53,7 @@ public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
         if (xpath == null)
             return null;
 
-        if (!Feature.class.isAssignableFrom(type) && !FeatureType.class.isAssignableFrom(type)
+        if (!ComplexAttribute.class.isAssignableFrom(type) && !ComplexType.class.isAssignableFrom(type)
                 && !AttributeDescriptor.class.isAssignableFrom(type))
             return null; // we only work with simple feature
 
@@ -62,7 +64,7 @@ public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
         if (xpath.matches("@(\\w+:)?id"))
             return FID_ACCESS;
 
-        // check for simple property acess
+        // check for simple property access
         // if (xpath.matches("(\\w+:)?(\\w+)")) {
         return ATTRIBUTE_ACCESS;
         // }
@@ -179,7 +181,7 @@ public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
         public boolean canHandle(Object object, String xpath, Class target) {
             // xpath = stripPrefix(xpath);
 
-            return object instanceof Feature || object instanceof FeatureType
+            return object instanceof ComplexAttribute || object instanceof ComplexType
                     || object instanceof AttributeDescriptor;
 
         }
