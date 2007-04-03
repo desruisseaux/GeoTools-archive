@@ -129,8 +129,8 @@ import org.opengis.filter.expression.Expression;
  * @author Gabriel Roldan, Axios Engineering
  */
 class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
-    private static final Logger LOGGER = Logger
-            .getLogger(GroupingFeatureIterator.class.getPackage().getName());
+    private static final Logger LOGGER = Logger.getLogger(GroupingFeatureIterator.class
+            .getPackage().getName());
 
     /**
      * 
@@ -171,8 +171,8 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
      *            list of attribute identifies for grouping the source feature
      * @throws IOException
      */
-    public GroupingFeatureIterator(ComplexDataStore store,
-            FeatureTypeMapping mappings, Query query) throws IOException {
+    public GroupingFeatureIterator(ComplexDataStore store, FeatureTypeMapping mappings, Query query)
+            throws IOException {
         super(store, mappings, query);
         if (mappings.getGroupByAttNames().size() == 0) {
             throw new IllegalArgumentException("no grouping attributes defined");
@@ -249,8 +249,7 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
      */
     public final Object /* Feature */next() {
         if (!hasNext()) {
-            throw new IllegalStateException(
-                    "there are no more features in this iterator");
+            throw new IllegalStateException("there are no more features in this iterator");
         }
         Feature next = computeNext();
         ++featureCounter;
@@ -280,7 +279,8 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
 
         // create the target feature and iterate in the source for set its
         // values.
-        final Feature targetFeature = GroupingFeatureIterator.attf.createFeature(null, targetNode, fid);
+        final Feature targetFeature = GroupingFeatureIterator.attf.createFeature(null, targetNode,
+                fid);
 
         final Feature featureForGroupingAtts = this.curSrcFeature;
 
@@ -296,8 +296,8 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
             if (mapping.isMultiValued()) {
                 setMultivaluedAttribute(targetFeature, mapping, currentGroup);
             } else {
-                setSingleValuedAttribute(targetFeature, featureForGroupingAtts,
-                        mapping, currentGroup);
+                setSingleValuedAttribute(targetFeature, featureForGroupingAtts, mapping,
+                        currentGroup);
             }
         }
 
@@ -328,8 +328,16 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
         }
 
         return currentGroup;
-        //[[Attribute[station_no:station_no:@:station_no.2]], [Attribute[sitename:sitename:@:sitename2]], [Attribute[anzlic_no:anzlic_no:@:anzlic_no2]], [Attribute[project_no:project_no:@:project_no2]], [Attribute[location:location:@:POINT (2 2)]]]
-        //[[Attribute[station_no:station_no:@:station_no.2]], [Attribute[sitename:sitename:@:sitename2]], [Attribute[anzlic_no:anzlic_no:@:anzlic_no2]], [Attribute[project_no:project_no:@:project_no2]], [Attribute[location:location:@:POINT (2 2)]]]
+        // [[Attribute[station_no:station_no:@:station_no.2]],
+        // [Attribute[sitename:sitename:@:sitename2]],
+        // [Attribute[anzlic_no:anzlic_no:@:anzlic_no2]],
+        // [Attribute[project_no:project_no:@:project_no2]],
+        // [Attribute[location:location:@:POINT (2 2)]]]
+        // [[Attribute[station_no:station_no:@:station_no.2]],
+        // [Attribute[sitename:sitename:@:sitename2]],
+        // [Attribute[anzlic_no:anzlic_no:@:anzlic_no2]],
+        // [Attribute[project_no:project_no:@:project_no2]],
+        // [Attribute[location:location:@:POINT (2 2)]]]
     }
 
     /**
@@ -402,6 +410,11 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
                 // HACK: what we actually need to resolve is dealing
                 // with queries that restricts the attributes returned
                 // by the source featurestore
+                if(e instanceof RuntimeException){
+                    throw (RuntimeException)e;
+                }else{
+                    throw (RuntimeException)new RuntimeException().initCause(e);
+                }
             }
         }
 
@@ -418,8 +431,8 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
      * 
      * @return Feature target feature sets with complex attributes
      */
-    private void setMultivaluedAttribute(Feature target,
-            AttributeMapping attMapping, List/* <Feature> */group) {
+    private void setMultivaluedAttribute(Feature target, AttributeMapping attMapping,
+            List/* <Feature> */group) {
 
         Expression sourceExpression = attMapping.getSourceExpression();
         final AttributeType targetNodeType = attMapping.getTargetNodeInstance();
@@ -445,30 +458,26 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
             // xpath.
             String targetXpathAttr = null;
 
-            boolean isComplexType = xpathAttributeBuilder.isComplexType(
-                    targetXpath, target.getDescriptor());
+            boolean isComplexType = xpathAttributeBuilder.isComplexType(targetXpath, target
+                    .getDescriptor());
             if (isComplexType) {
-                targetXpathAttr = insertIndexInXpathOfComplex(target,
-                        targetXpath, index);
+                targetXpathAttr = insertIndexInXpathOfComplex(target, targetXpath, index);
 
-            } else if (isLeafOfNestedComplexType(targetXpath, target
-                    .getDescriptor())) {
-                targetXpathAttr = insertIndexInXpathOfLeafAttr(target,
-                        targetXpath, index);
+            } else if (isLeafOfNestedComplexType(targetXpath, target.getDescriptor())) {
+                targetXpathAttr = insertIndexInXpathOfLeafAttr(target, targetXpath, index);
             } else {
                 throw new IllegalArgumentException(
                         "Attribute must be complex type or belong to the grouping attributes");
             }
 
-            Attribute instance = xpathAttributeBuilder.set(target,
-                    targetXpathAttr, value, id, targetNodeType);
+            Attribute instance = xpathAttributeBuilder.set(target, targetXpathAttr, value, id,
+                    targetNodeType);
             Map clientPropsMappings = attMapping.getClientProperties();
             setClientProperties(instance, sourceFeature, clientPropsMappings);
         }
     }
 
-    private void setClientProperties(Attribute target, Feature source,
-            Map clientProperties) {
+    private void setClientProperties(Attribute target, Feature source, Map clientProperties) {
         if (clientProperties.size() == 0) {
             return;
         }
@@ -478,8 +487,7 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
 
         for (Iterator it = clientProperties.entrySet().iterator(); it.hasNext();) {
             Map.Entry entry = (Map.Entry) it.next();
-            org.opengis.feature.type.Name propName = (org.opengis.feature.type.Name) entry
-                    .getKey();
+            org.opengis.feature.type.Name propName = (org.opengis.feature.type.Name) entry.getKey();
             Expression propExpr = (Expression) entry.getValue();
 
             Object propValue = propExpr.evaluate(source);
@@ -540,14 +548,11 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
             }
 
             String targetXPath = attMapping.getTargetXPath();
-            List targetSteps = XPath.steps(
-                    mapping.getTargetFeature().getName(), targetXPath);
+            List targetSteps = XPath.steps(mapping.getTargetFeature().getName(), targetXPath);
 
-            for (Iterator mvalues = multivaluedAttributes.iterator(); mvalues
-                    .hasNext();) {
+            for (Iterator mvalues = multivaluedAttributes.iterator(); mvalues.hasNext();) {
                 String multivalued = (String) mvalues.next();
-                List parentSteps = XPath.steps(mapping.getTargetFeature()
-                        .getName(), multivalued);
+                List parentSteps = XPath.steps(mapping.getTargetFeature().getName(), multivalued);
 
                 if (targetSteps.size() <= parentSteps.size()) {
                     // shortcut. Couldn't be a parent path since it has
@@ -567,8 +572,7 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
                 int parentStepCount = parentSteps.size();
                 if (equalCount == parentStepCount) {
                     GroupingFeatureIterator.LOGGER.fine("scheduling " + targetXPath
-                            + " as property of multivalued attribute "
-                            + multivalued);
+                            + " as property of multivalued attribute " + multivalued);
                     multivaluedAttributePaths.put(targetXPath, parentSteps);
                 }
             }
@@ -584,18 +588,15 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
      * 
      * @return true if it is a Leaf of Complex Type, false in other case
      */
-    private final boolean isLeafOfNestedComplexType(
-            final String xpathAttrDefinition,
+    private final boolean isLeafOfNestedComplexType(final String xpathAttrDefinition,
             final AttributeDescriptor targetFeatureNode) {
 
-        if (xpathAttributeBuilder.isComplexType(xpathAttrDefinition,
-                targetFeatureNode)) {
+        if (xpathAttributeBuilder.isComplexType(xpathAttrDefinition, targetFeatureNode)) {
             return false;
         }
 
         // if leaf then check if its parent attribute is complex
-        List stepList = XPath.steps(targetFeatureNode.getName(),
-                xpathAttrDefinition);
+        List stepList = XPath.steps(targetFeatureNode.getName(), xpathAttrDefinition);
         /*
          * If there are more than 2 steps and node is leaf, it is guaranteed
          * that the node is a child of a nested complex attribute
@@ -611,8 +612,7 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
 
         int insertPosition = stepList.size();
 
-        String indexXpath = insertIndexInXpath(root, xpathAttrDefinition,
-                index, insertPosition);
+        String indexXpath = insertIndexInXpath(root, xpathAttrDefinition, index, insertPosition);
 
         return indexXpath;
     }
@@ -626,16 +626,15 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
      * 
      * @return String xPath with index
      */
-    private final String insertIndexInXpathOfLeafAttr(final Attribute root,
-            final String attrXpath, final int index) {
+    private final String insertIndexInXpathOfLeafAttr(final Attribute root, final String attrXpath,
+            final int index) {
 
         org.opengis.feature.type.Name name = root.getDescriptor().getName();
         List/* <XPath.Step> */stepList = XPath.steps(name, attrXpath);
 
         int insertPosition = stepList.size() - 1;
 
-        String indexXpath = insertIndexInXpath(root, attrXpath, index,
-                insertPosition);
+        String indexXpath = insertIndexInXpath(root, attrXpath, index, insertPosition);
 
         return indexXpath;
     }
@@ -656,8 +655,7 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
      *            and arrays.
      * @return
      */
-    private final List/* <XPath.Step> */setIndexAtStep(String xpath,
-            int newIndex, int stepIndex) {
+    private final List/* <XPath.Step> */setIndexAtStep(String xpath, int newIndex, int stepIndex) {
         AttributeDescriptor targetFeature = mapping.getTargetFeature();
         org.opengis.feature.type.Name name = targetFeature.getName();
         List steps = XPath.steps(name, xpath);
@@ -678,8 +676,8 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
      * 
      * @return String
      */
-    private final String insertIndexInXpath(final Attribute root,
-            final String attrXpath, final int index, final int insertPositon) {
+    private final String insertIndexInXpath(final Attribute root, final String attrXpath,
+            final int index, final int insertPositon) {
         AttributeDescriptor descriptor = root.getDescriptor();
         org.opengis.feature.type.Name name = descriptor.getName();
         // Constructs an Xpath adding index in the step corresponding to complex
@@ -712,13 +710,11 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
      * @return List<List<Attribute>> the the contened list has the attributes
      *         required
      */
-    private final List/* <List<Attribute>> */extractGroupingAttributes(
-            ComplexAttribute srcFeature) {
+    private final List/* <List<Attribute>> */extractGroupingAttributes(ComplexAttribute srcFeature) {
 
         List/* <List<Attribute>> */attrGroup = new LinkedList/* <List<Attribute>> */();
 
-        for (Iterator itr = this.groupByAttributeNames.iterator(); itr
-                .hasNext();) {
+        for (Iterator itr = this.groupByAttributeNames.iterator(); itr.hasNext();) {
             String attrName = (String) itr.next();
             Name name = new Name(attrName);
             List/* <Attribute> */listAttrForName = srcFeature.get(name);
