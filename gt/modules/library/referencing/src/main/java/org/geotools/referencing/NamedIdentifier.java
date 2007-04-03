@@ -598,7 +598,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serial
         if (object!=null && object.getClass().equals(getClass())) {
             final NamedIdentifier that = (NamedIdentifier) object;
             return Utilities.equals(this.code,      that.code     ) &&
-                   //Utilities.equals(this.version,   that.version  ) &&
+                   Utilities.equals(this.version,   that.version  ) &&
                    Utilities.equals(this.authority, that.authority) &&
                    Utilities.equals(this.remarks,   that.remarks  );
         }

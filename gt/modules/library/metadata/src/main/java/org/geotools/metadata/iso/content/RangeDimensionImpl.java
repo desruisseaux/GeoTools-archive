@@ -97,7 +97,7 @@ public class RangeDimensionImpl extends MetadataEntity implements RangeDimension
      */
     protected void freeze() {
         super.freeze();
-        sequenceIdentifier = (MemberName)           unmodifiable(sequenceIdentifier);
+        sequenceIdentifier = (MemberName)          unmodifiable(sequenceIdentifier);
         descriptor         = (InternationalString) unmodifiable(descriptor);
     }
 

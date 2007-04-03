@@ -65,8 +65,14 @@ public class CoverageDescriptionImpl extends ContentInformationImpl implements C
 
     /**
      * Information on the dimensions of the cell measurement value.
+     * @deprecated
      */
     private RangeDimension dimension;
+
+    /**
+     * Information on the dimensions of the cell measurement value.
+     */
+    private Collection dimensions;
 
     /**
      * Constructs an empty coverage description.
@@ -84,10 +90,11 @@ public class CoverageDescriptionImpl extends ContentInformationImpl implements C
     /**
      * Set the description of the attribute described by the measurement value.
      */
-    public synchronized void setAttributeDescription(final Class newValue) {
+    public synchronized void setAttributeDescription(final RecordType newValue) {
         checkWritePermission();
-        attributeDescription = null;
+        attributeDescription = newValue;
     }
+
     /**
      * Returns the type of information represented by the cell value.
      */
@@ -105,6 +112,8 @@ public class CoverageDescriptionImpl extends ContentInformationImpl implements C
 
     /**
      * Returns the information on the dimensions of the cell measurement value.
+     * 
+     * @deprecated use getDimensions
      */
     public RangeDimension getDimension() {
         return dimension;
@@ -112,6 +121,8 @@ public class CoverageDescriptionImpl extends ContentInformationImpl implements C
 
     /**
      * Set the information on the dimensions of the cell measurement value.
+     * 
+     * @deprecated use setDimensions
      */
     public synchronized void setDimension( final RangeDimension newValue ) {
         checkWritePermission();
@@ -119,12 +130,37 @@ public class CoverageDescriptionImpl extends ContentInformationImpl implements C
     }
 
     /**
+     * Returns the information on the dimensions of the cell measurement value.
+     * 
+     * @since 2.4
+     */
+    public Collection getDimensions() {
+        if (dimensions == null) {
+            return Collections.singleton(dimension);
+        }
+        return dimensions;
+    }
+
+    /**
+     * Set the information on the dimensions of the cell measurement value.
+     * 
+     * since 2.4
+     */
+    public synchronized void setDimensions(final Collection newValue) {
+        checkWritePermission();
+        dimensions = newValue;
+    }
+    
+    /**
      * Declare this metadata and all its attributes as unmodifiable.
      */
     protected void freeze() {
         super.freeze();
         attributeDescription = (RecordType) unmodifiable(attributeDescription);
-        dimension = (RangeDimension) unmodifiable(dimension);
+        dimensions = (Collection) unmodifiable(dimensions);
+        if (dimension != null) {
+            dimension = (RangeDimension) unmodifiable(dimension);
+        }
     }
 
     /**
@@ -138,14 +174,14 @@ public class CoverageDescriptionImpl extends ContentInformationImpl implements C
             final CoverageDescriptionImpl that = (CoverageDescriptionImpl) object;
             return Utilities.equals(this.attributeDescription, that.attributeDescription)
                     && Utilities.equals(this.contentType, that.contentType)
-                    && Utilities.equals(this.dimension, that.dimension);
+                    && Utilities.equals(this.dimensions, that.dimensions);
         }
         return false;
     }
 
     /**
-     * Returns a hash code value for this coverage description. For performance reason, this method
-     * do not uses all attributes for computing the hash code. Instead, it uses the attributes that
+     * Returns a hash code value for this coverage description. For performance reasons, this method
+     * does not uses all attributes for computing the hash code. Instead, it uses the attributes that
      * are the most likely to be unique.
      */
     public synchronized int hashCode() {
@@ -162,9 +198,5 @@ public class CoverageDescriptionImpl extends ContentInformationImpl implements C
      */
     public String toString() {
         return String.valueOf(attributeDescription);
-    }
-
-    public Collection getDimensions(){
-        return Collections.singleton( dimension);
     }
 }

@@ -97,6 +97,8 @@ public class CitationImpl extends MetadataEntity implements Citation {
     /**
      * Reference form of the unique identifier (ID). Example: Universal Product Code (UPC),
      * National Stock Number (NSN).
+     * 
+     * @deprecated
      */
     private Collection identifierTypes;
 
@@ -159,7 +161,6 @@ public class CitationImpl extends MetadataEntity implements Citation {
             setEdition                (source.getEdition());
             setEditionDate            (source.getEditionDate());
             setIdentifiers            (source.getIdentifiers());
-            //setIdentifierTypes        (source.getIdentifierTypes());
             setCitedResponsibleParties(source.getCitedResponsibleParties());
             setPresentationForm       (source.getPresentationForm());
             setSeries                 (source.getSeries());
@@ -317,6 +318,8 @@ public class CitationImpl extends MetadataEntity implements Citation {
     /**
      * Returns the reference form of the unique identifier (ID).
      * Example: Universal Product Code (UPC), National Stock Number (NSN).
+     * 
+     * @deprecated IdentifierType removed from ISO 19115
      */
     public synchronized Collection getIdentifierTypes() {
         return identifierTypes = nonNullCollection(identifierTypes, String.class);
@@ -325,6 +328,8 @@ public class CitationImpl extends MetadataEntity implements Citation {
     /**
      * Set the reference form of the unique identifier (ID).
      * Example: Universal Product Code (UPC), National Stock Number (NSN).
+     * 
+     * @deprecated IdentifierType removed from ISO 19115
      */
     public synchronized void setIdentifierTypes(final Collection newValues) {
         identifierTypes = copyCollection(newValues, identifierTypes, String.class);
@@ -477,7 +482,6 @@ public class CitationImpl extends MetadataEntity implements Citation {
                    Utilities.equals(this.edition,                 that.edition                ) &&
                                    (this.editionDate         ==   that.editionDate            ) &&
                    Utilities.equals(this.identifiers,             that.identifiers            ) &&
-                   Utilities.equals(this.identifierTypes,         that.identifierTypes        ) &&
                    Utilities.equals(this.citedResponsibleParties, that.citedResponsibleParties) &&
                    Utilities.equals(this.presentationForm,        that.presentationForm       ) &&
                    Utilities.equals(this.otherCitationDetails,    that.otherCitationDetails   ) &&

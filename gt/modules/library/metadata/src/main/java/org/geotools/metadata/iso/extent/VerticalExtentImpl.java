@@ -67,6 +67,7 @@ public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent
     /**
      * Provides information about the origin from which the
      * maximum and minimum elevation values are measured.
+     * @deprecated
      */
     private VerticalDatum verticalDatum;
     
@@ -154,6 +155,8 @@ public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent
     /**
      * Provides information about the origin from which the
      * maximum and minimum elevation values are measured.
+     * 
+     * @deprecated use getVerticalCRS
      */
     public VerticalDatum getVerticalDatum()  {
         return verticalDatum;
@@ -162,6 +165,8 @@ public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent
     /**
      * Set information about the origin from which the
      * maximum and minimum elevation values are measured.
+     * 
+     * @deprecated use setVerticalCRS
      */
     public synchronized void setVerticalDatum(final VerticalDatum newValue ) {
         checkWritePermission();

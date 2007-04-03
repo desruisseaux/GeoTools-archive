@@ -127,6 +127,14 @@ public class SourceImpl extends MetadataEntity implements Source {
     }
 
     /**
+     * Set the denominator of the representative fraction on a source map.
+     */
+    public synchronized void setScaleDenominator(final RepresentativeFraction newValue)  {
+        checkWritePermission();
+        scaleDenominator = newValue;
+    }
+
+    /**
      * Returns the spatial reference system used by the source data.
      */
     public ReferenceSystem getSourceReferenceSystem()  {

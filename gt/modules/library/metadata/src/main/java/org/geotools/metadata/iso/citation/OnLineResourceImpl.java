@@ -181,25 +181,25 @@ public class OnLineResourceImpl extends MetadataEntity implements OnLineResource
     /**
      * Creates an initially empty on line resource.
      */
-     public OnLineResourceImpl() {
-     }
+    public OnLineResourceImpl() {
+    }
 
-     /**
-      * Creates an on line resource initialized to the given URI.
-      * This method is private for now since, if this constructor was public, some
-      * users may expect a string argument to be for the description text instead.
-      * Furthermore, a public method should not catch the {@link URISyntaxException}
-      * and should not set a function.
-      */
-     private OnLineResourceImpl(final String linkage) {
-         try {
+    /**
+     * Creates an on line resource initialized to the given URI.
+     * This method is private for now since, if this constructor was public, some
+     * users may expect a string argument to be for the description text instead.
+     * Furthermore, a public method should not catch the {@link URISyntaxException}
+     * and should not set a function.
+     */
+    private OnLineResourceImpl(final String linkage) {
+        try {
             setLinkage(new URI(linkage));
         } catch (URISyntaxException exception) {
             // Should never happen. TODO: chain the exception in J2SE 1.5.
             throw new IllegalArgumentException(/*exception*/);
         }
         setFunction(OnLineFunction.INFORMATION);
-     }
+    }
 
     /**
      * Creates an on line resource initialized to the given URI.
@@ -226,11 +226,23 @@ public class OnLineResourceImpl extends MetadataEntity implements OnLineResource
 
     /**
      * Name of the online resource. Returns {@code null} if none.
+     * 
+     * @since 2.4
      */
     public String getName() {
         return name;
     }
-    
+
+    /**
+     * Set the name of the online resource. Returns {@code null} if none.
+     * 
+     * @since 2.4
+     */
+    public synchronized void setName(final String newValue) {
+        checkWritePermission();
+        name = newValue;
+    }
+
     /**
      * Returns the detailed text description of what the online resource is/does.
      * Returns {@code null} if none.
@@ -307,6 +319,7 @@ public class OnLineResourceImpl extends MetadataEntity implements OnLineResource
         if (object!=null && object.getClass().equals(getClass())) {
             final OnLineResourceImpl that = (OnLineResourceImpl) object;
             return Utilities.equals(this.applicationProfile, that.applicationProfile) &&
+                   Utilities.equals(this.name,               that.name              ) &&
                    Utilities.equals(this.description,        that.description       ) &&
                    Utilities.equals(this.function,           that.function          ) &&
                    Utilities.equals(this.linkage,            that.linkage           );

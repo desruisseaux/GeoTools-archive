@@ -319,16 +319,16 @@ public class IdentificationImpl extends MetadataEntity implements Identification
      *
      * @since 2.4
      */
-    public synchronized Collection getAggregateInfo() {
+    public synchronized Collection getAggregationInfo() {
         return aggregationInfo = nonNullCollection(aggregationInfo, AggregateInformation.class);
     }
 
     /**
-     * Provides aggregate dataset information.
+     * Sets aggregate dataset information.
      *
      * @since 2.4
      */
-    public synchronized void setAggregateInfo(final Collection newValues) {
+    public synchronized void setAggregationInfo(final Collection newValues) {
         aggregationInfo = copyCollection(newValues, aggregationInfo, AggregateInformation.class);
     }
 
@@ -400,10 +400,5 @@ public class IdentificationImpl extends MetadataEntity implements Identification
      */
     public String toString() {
         return String.valueOf(resourceMaintenance);
-    }
-
-    /** @return Collection<AggregateInformation> */
-    public Collection getAggregationInfo() {
-        return Collections.EMPTY_LIST; // TODO: store provided information
     }
 }

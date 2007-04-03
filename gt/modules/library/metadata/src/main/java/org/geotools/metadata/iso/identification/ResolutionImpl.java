@@ -76,10 +76,20 @@ public class ResolutionImpl extends MetadataEntity implements Resolution {
 
     /**
      * Set the level of detail expressed as the scale of a comparable hardcopy map or chart.
+     * 
+     * Values greater than 1 will be stored as (1 / newValue), values less than one will be stored as is.
      */
     public synchronized void setEquivalentScale(final double newValue) {
         checkWritePermission();
         equivalentScale = RepresentativeFractionImpl.fromDouble(newValue);
+    }
+
+    /**
+     * Set the level of detail expressed as the scale of a comparable hardcopy map or chart.
+     */
+    public synchronized void setEquivalentScale(final RepresentativeFraction newValue) {
+        checkWritePermission();
+        equivalentScale = newValue;
     }
 
     /**
