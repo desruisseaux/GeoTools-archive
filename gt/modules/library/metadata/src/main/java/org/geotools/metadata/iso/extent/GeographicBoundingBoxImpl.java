@@ -82,25 +82,25 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      * The western-most coordinate of the limit of the dataset extent.
      * The value is expressed in longitude in decimal degrees (positive east).
      */
-    private Double westBoundLongitude;
+    private double westBoundLongitude;
 
     /**
      * The eastern-most coordinate of the limit of the dataset extent.
      * The value is expressed in longitude in decimal degrees (positive east).
      */
-    private Double eastBoundLongitude;
+    private double eastBoundLongitude;
 
     /**
      * The southern-most coordinate of the limit of the dataset extent.
      * The value is expressed in latitude in decimal degrees (positive north).
      */
-    private Double southBoundLatitude;
+    private double southBoundLatitude;
 
     /**
      * The northern-most, coordinate of the limit of the dataset extent.
      * The value is expressed in latitude in decimal degrees (positive north).
      */
-    private Double northBoundLatitude;
+    private double northBoundLatitude;
 
     /**
      * Constructs an initially empty geographic bounding box.
@@ -158,10 +158,8 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      * The rectangle is assumed in {@linkplain DefaultGeographicCRS#WGS84 WGS 84} CRS.
      */
     public GeographicBoundingBoxImpl(final Rectangle2D bounds) {
-        this(new Double(bounds.getMinX()),
-             new Double(bounds.getMaxX()),
-             new Double(bounds.getMinY()), 
-             new Double(bounds.getMaxY()));
+        this(bounds.getMinX(), bounds.getMaxX(),
+             bounds.getMinY(), bounds.getMaxY());
     }
 
     /**
@@ -171,20 +169,6 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
                                      final double eastBoundLongitude,
                                      final double southBoundLatitude,
                                      final double northBoundLatitude)
-    {
-        this(new Double(westBoundLongitude),
-             new Double(eastBoundLongitude),
-             new Double(southBoundLatitude),
-             new Double(northBoundLatitude));
-    }
-
-    /**
-     * Creates a geographic bounding box initialized to the specified values.
-     */
-    public GeographicBoundingBoxImpl(final Double westBoundLongitude,
-                                     final Double eastBoundLongitude,
-                                     final Double southBoundLatitude,
-                                     final Double northBoundLatitude)
     {
         super(true);
         setWestBoundLongitude(westBoundLongitude);
@@ -200,7 +184,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      *
      * @return The western-most longitude between -180 and +180°.
      */
-    public Double getWestBoundLongitude() {
+    public double getWestBoundLongitude() {
         return westBoundLongitude;
     }
     
@@ -209,7 +193,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      * dataset extent. The value is expressed in longitude in
      * decimal degrees (positive east).
      */
-    public synchronized void setWestBoundLongitude(final Double newValue) {
+    public synchronized void setWestBoundLongitude(final double newValue) {
         checkWritePermission();
         westBoundLongitude = newValue;
     }
@@ -221,7 +205,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      *
      * @return The eastern-most longitude between -180 and +180°.
      */
-    public Double getEastBoundLongitude() {
+    public double getEastBoundLongitude() {
         return eastBoundLongitude;
     }
 
@@ -230,7 +214,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      * dataset extent. The value is expressed in longitude in
      * decimal degrees (positive east).
      */
-    public synchronized void setEastBoundLongitude(final Double newValue) {
+    public synchronized void setEastBoundLongitude(final double newValue) {
         checkWritePermission();
         eastBoundLongitude = newValue;
     }
@@ -242,7 +226,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      *
      * @return The southern-most latitude between -90 and +90°.
      */
-    public Double getSouthBoundLatitude()  {
+    public double getSouthBoundLatitude()  {
         return southBoundLatitude;
     }
 
@@ -251,7 +235,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      * dataset extent. The value is expressed in latitude in
      * decimal degrees (positive north).
      */
-    public synchronized void setSouthBoundLatitude(final Double newValue) {
+    public synchronized void setSouthBoundLatitude(final double newValue) {
         checkWritePermission();
         southBoundLatitude = newValue;
     }
@@ -263,7 +247,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      *
      * @return The northern-most latitude between -90 and +90°.
      */
-    public Double getNorthBoundLatitude()   {
+    public double getNorthBoundLatitude()   {
         return northBoundLatitude;
     }
 
@@ -272,7 +256,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      * dataset extent. The value is expressed in latitude in
      * decimal degrees (positive north).
      */
-    public synchronized void setNorthBoundLatitude(final Double newValue) {
+    public synchronized void setNorthBoundLatitude(final double newValue) {
         checkWritePermission();
         northBoundLatitude = newValue;
     }
@@ -289,23 +273,23 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      */
     public synchronized void add(final GeographicBoundingBox box) {
         checkWritePermission();
-        final double xmin = box.getWestBoundLongitude().doubleValue();
-        final double xmax = box.getEastBoundLongitude().doubleValue();
-        final double ymin = box.getSouthBoundLatitude().doubleValue();
-        final double ymax = box.getNorthBoundLatitude().doubleValue();
+        final double xmin = box.getWestBoundLongitude();
+        final double xmax = box.getEastBoundLongitude();
+        final double ymin = box.getSouthBoundLatitude();
+        final double ymax = box.getNorthBoundLatitude();
         if (getInclusion() == box.getInclusion()) {
-            if (xmin < westBoundLongitude.doubleValue()) westBoundLongitude = new Double(xmin);
-            if (xmax > eastBoundLongitude.doubleValue()) eastBoundLongitude = new Double(xmax);
-            if (ymin < southBoundLatitude.doubleValue()) southBoundLatitude = new Double(ymin);
-            if (ymax > northBoundLatitude.doubleValue()) northBoundLatitude = new Double(ymax);
+            if (xmin < westBoundLongitude) westBoundLongitude = xmin;
+            if (xmax > eastBoundLongitude) eastBoundLongitude = xmax;
+            if (ymin < southBoundLatitude) southBoundLatitude = ymin;
+            if (ymax > northBoundLatitude) northBoundLatitude = ymax;
         } else {
-            if (ymin <= southBoundLatitude.doubleValue() && ymax >= northBoundLatitude.doubleValue()) {
-                if (xmin > westBoundLongitude.doubleValue()) westBoundLongitude = new Double(xmin);
-                if (xmax < eastBoundLongitude.doubleValue()) eastBoundLongitude = new Double(xmax);
+            if (ymin <= southBoundLatitude && ymax >= northBoundLatitude) {
+                if (xmin > westBoundLongitude) westBoundLongitude = xmin;
+                if (xmax < eastBoundLongitude) eastBoundLongitude = xmax;
             }
-            if (xmin <= westBoundLongitude.doubleValue() && xmax >= eastBoundLongitude.doubleValue()) {
-                if (ymin > southBoundLatitude.doubleValue()) southBoundLatitude = new Double(ymin);
-                if (ymax < northBoundLatitude.doubleValue()) northBoundLatitude = new Double(ymax);
+            if (xmin <= westBoundLongitude && xmax >= eastBoundLongitude) {
+                if (ymin > southBoundLatitude) southBoundLatitude = ymin;
+                if (ymax < northBoundLatitude) northBoundLatitude = ymax;
             }
         }
     }
@@ -326,14 +310,14 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
         }
         if (object!=null && object.getClass().equals(getClass())) {
             final GeographicBoundingBoxImpl that = (GeographicBoundingBoxImpl) object;
-            return Double.doubleToLongBits(this.southBoundLatitude.doubleValue()) ==
-                   Double.doubleToLongBits(that.southBoundLatitude.doubleValue()) &&
-                   Double.doubleToLongBits(this.northBoundLatitude.doubleValue()) ==
-                   Double.doubleToLongBits(that.northBoundLatitude.doubleValue()) &&
-                   Double.doubleToLongBits(this.eastBoundLongitude.doubleValue()) ==
-                   Double.doubleToLongBits(that.eastBoundLongitude.doubleValue()) &&
-                   Double.doubleToLongBits(this.westBoundLongitude.doubleValue()) ==
-                   Double.doubleToLongBits(that.westBoundLongitude.doubleValue());
+            return Double.doubleToLongBits(this.southBoundLatitude) ==
+                   Double.doubleToLongBits(that.southBoundLatitude) &&
+                   Double.doubleToLongBits(this.northBoundLatitude) ==
+                   Double.doubleToLongBits(that.northBoundLatitude) &&
+                   Double.doubleToLongBits(this.eastBoundLongitude) ==
+                   Double.doubleToLongBits(that.eastBoundLongitude) &&
+                   Double.doubleToLongBits(this.westBoundLongitude) ==
+                   Double.doubleToLongBits(that.westBoundLongitude);
         }
         return false;
     }
@@ -343,10 +327,10 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      */
     public synchronized int hashCode() {
         long code = serialVersionUID;
-        code ^=           Double.doubleToLongBits(southBoundLatitude.doubleValue());
-        code  = 37*code + Double.doubleToLongBits(northBoundLatitude.doubleValue());
-        code  = 37*code + Double.doubleToLongBits(eastBoundLongitude.doubleValue());
-        code  = 37*code + Double.doubleToLongBits(westBoundLongitude.doubleValue());
+        code ^=           Double.doubleToLongBits(southBoundLatitude);
+        code  = 37*code + Double.doubleToLongBits(northBoundLatitude);
+        code  = 37*code + Double.doubleToLongBits(eastBoundLongitude);
+        code  = 37*code + Double.doubleToLongBits(westBoundLongitude);
         return (int)code ^ (int)(code >>> 32);
     }
 

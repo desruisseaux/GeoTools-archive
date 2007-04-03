@@ -481,10 +481,10 @@ public class DefaultFactoryTest extends TestCase {
         final GeographicBoundingBox bbox = CRS.getGeographicBoundingBox(crs);
         assertNotNull("No bounding box. Maybe an older EPSG database is running? " +
                       "Try to clear the tmp/Geotools directory.", bbox);
-        assertEquals(42.25, bbox.getSouthBoundLatitude().doubleValue(), EPS);
-        assertEquals(51.10, bbox.getNorthBoundLatitude().doubleValue(), EPS);
-        assertEquals(-5.20, bbox.getWestBoundLongitude().doubleValue(), EPS);
-        assertEquals( 8.23, bbox.getEastBoundLongitude().doubleValue(), EPS);
+        assertEquals(42.25, bbox.getSouthBoundLatitude(), EPS);
+        assertEquals(51.10, bbox.getNorthBoundLatitude(), EPS);
+        assertEquals(-5.20, bbox.getWestBoundLongitude(), EPS);
+        assertEquals( 8.23, bbox.getEastBoundLongitude(), EPS);
         final Envelope envelope = CRS.getEnvelope(crs);
         assertEquals(46.948, envelope.getMinimum(0), 1E-3);
         assertEquals(56.781, envelope.getMaximum(0), 1E-3);
@@ -492,10 +492,10 @@ public class DefaultFactoryTest extends TestCase {
         assertEquals( 6.548, envelope.getMaximum(1), 1E-3);
         assertNull(CRS.getEnvelope(null));
         final GeographicBoundingBox rep = new GeographicBoundingBoxImpl(envelope);
-        assertEquals(42.25, rep.getSouthBoundLatitude().doubleValue(), 1E-3);
-        assertEquals(51.10, rep.getNorthBoundLatitude().doubleValue(), 1E-3);
-        assertEquals(-5.20, rep.getWestBoundLongitude().doubleValue(), 1E-3);
-        assertEquals( 8.23, rep.getEastBoundLongitude().doubleValue(), 1E-3);
+        assertEquals(42.25, rep.getSouthBoundLatitude(), 1E-3);
+        assertEquals(51.10, rep.getNorthBoundLatitude(), 1E-3);
+        assertEquals(-5.20, rep.getWestBoundLongitude(), 1E-3);
+        assertEquals( 8.23, rep.getEastBoundLongitude(), 1E-3);
     }
 
     /**

@@ -427,10 +427,10 @@ public final class CRS {
                             //       a method is defined in a future version.
                             continue;
                         }
-                        candidate = new GeneralEnvelope(new double[] {bounds.getWestBoundLongitude().doubleValue(),
-                                                                      bounds.getSouthBoundLatitude().doubleValue()},
-                                                        new double[] {bounds.getEastBoundLongitude().doubleValue(),
-                                                                      bounds.getNorthBoundLatitude().doubleValue()});
+                        candidate = new GeneralEnvelope(new double[] {bounds.getWestBoundLongitude(),
+                                                                      bounds.getSouthBoundLatitude()},
+                                                        new double[] {bounds.getEastBoundLongitude(),
+                                                                      bounds.getNorthBoundLatitude()});
                         candidate.setCoordinateReferenceSystem(DefaultGeographicCRS.WGS84);
                     } else if (geo instanceof BoundingPolygon) {
                         // TODO: iterates through all polygons and invoke Polygon.getEnvelope();
