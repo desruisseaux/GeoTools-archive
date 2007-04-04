@@ -208,7 +208,7 @@ public class BufferedCoordinateOperationFactory extends AbstractCoordinateOperat
     private final CoordinateOperationFactory getBackingFactory() {
         assert Thread.holdsLock(hints); // Same lock than the one used by getImplementationHints().
         if (factory == null) {
-            factory = getBackingFactory(null);
+            factory = getBackingFactory( null );
         }
         return factory;
     }

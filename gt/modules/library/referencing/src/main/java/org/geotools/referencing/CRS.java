@@ -141,7 +141,7 @@ public final class CRS {
         }
         CRSAuthorityFactory factory = (longitudeFirst) ? xyFactory : defaultFactory;
         if (factory == null) try {
-            Hints hints = GeoTools.getDefaultHints();
+            Hints hints = new Hints( null ); //GeoTools.getDefaultHints();
             if( longitudeFirst ){
                 hints.put( Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
             }
@@ -793,7 +793,12 @@ public final class CRS {
     {
         Hints hints = GeoTools.getDefaultHints();
         if( lenient = true ){
-            hints.put(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
+            if( hints == null ) {
+                hints = new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
+            }
+            else {
+                hints.put(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
+            }
         }
         final CoordinateOperationFactory factory = FactoryFinder.getCoordinateOperationFactory( hints );
         return factory.createOperation(sourceCRS, targetCRS).getMathTransform();

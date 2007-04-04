@@ -16,6 +16,7 @@
 package org.geotools.referencing.factory.epsg;
 
 // Java dependencies
+import java.io.File;
 import java.util.Collection;
 
 // JUnit dependencies
@@ -84,11 +85,20 @@ public class FactoryUsingWktTest extends TestCase {
                 new Hints(Hints.CRS_AUTHORITY_FACTORY, FactoryUsingWKT.class));
     }
 
-    public void testSystemProperty() throws Exception {
+    public void testCrsAuthorityExtraDirectoryHint() throws Exception {
         Hints hints = new Hints(Hints.CRS_AUTHORITY_FACTORY, FactoryUsingWKT.class);
-        hints.put( Hints.CRS_AUTHORITY_EXTRA_DIRECTORY, "invalid" );
-        factory = (FactoryUsingWKT) FactoryFinder.getCRSAuthorityFactory("EPSG",
-                hints );
+        try {
+           hints.put( Hints.CRS_AUTHORITY_EXTRA_DIRECTORY, "invalid" );
+           fail("Should of been tossed out as an invalid hint");
+        }
+        catch( IllegalArgumentException expected){            
+        }
+        
+        String directory = new File(".").getAbsolutePath();
+        hints = new Hints(Hints.CRS_AUTHORITY_FACTORY, FactoryUsingWKT.class);
+        hints.put( Hints.CRS_AUTHORITY_EXTRA_DIRECTORY, directory );
+        
+        System.setProperty( "org.geotools.referencing.crs-directory", directory );        
     }
     /**
      * Tests the authority code.

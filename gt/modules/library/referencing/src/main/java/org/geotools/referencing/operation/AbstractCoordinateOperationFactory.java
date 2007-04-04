@@ -241,7 +241,7 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
      */
     void initializeHints() {
         assert Thread.holdsLock(hints);
-        hints.putAll(getFactoryGroup().getImplementationHints());
+        hints.putAll( getFactoryGroup().getImplementationHints() );
     }
 
     /**

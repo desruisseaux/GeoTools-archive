@@ -441,6 +441,7 @@ public class FactoryRegistry extends ServiceRegistry {
                                         Set/*<Factory>*/ alreadyDone)
     {
         final Hints hints = myHints != null ? myHints : GeoTools.getDefaultHints();
+        
         Hints remaining = null;
         final Map implementationHints = factory.getImplementationHints();
         for (final Iterator it=implementationHints.entrySet().iterator(); it.hasNext();) {

@@ -19,6 +19,7 @@ package org.geotools.factory;
 import java.util.Map;
 import java.util.HashMap;
 import java.awt.RenderingHints;
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
@@ -114,7 +115,7 @@ public final class Hints extends RenderingHints {
      * -Dorg.geotools.referencing.crs-directory=PATH
      * </pre>
      */
-    public static final Key CRS_AUTHORITY_EXTRA_DIRECTORY = new Key( "org.geotools.referencing.crs-directory" );
+    public static final FileKey CRS_AUTHORITY_EXTRA_DIRECTORY = new FileKey( "org.geotools.referencing.crs-directory" );
 
     /**
      * Used to direct WKT CRS Authority to a the file containing extra definitions.
@@ -123,7 +124,7 @@ public final class Hints extends RenderingHints {
      * -Dorg.geotools.referencing.crs-file=FILE
      * </pre>
      */
-    public static final Key CRS_AUTHORITY_EXTRA_FILE = new Key( "org.geotools.referencing.crs-file" );
+    public static final FileKey CRS_AUTHORITY_EXTRA_FILE = new FileKey( "org.geotools.referencing.crs-file" );
     
     /**
      * Provide a DataSource to the JDBC EPSG Authority implementations.
@@ -526,6 +527,41 @@ public final class Hints extends RenderingHints {
         super(key, value);
     }
 
+    public static final class FileKey extends RenderingHints.Key {
+        /**
+         * The number of key created up to date.
+         */
+        private static volatile int count;
+        private String id;
+        
+        public FileKey( String id ){
+            super( count++ );
+            this.id = id;
+        }
+        public boolean isCompatibleValue( Object val ) {
+            File file;
+            if( val instanceof File){
+                file = (File) val;
+            }
+            else if( val instanceof String ){
+                file = new File( (String) val );
+            }         
+            else {
+                return false;
+            }
+            return file.exists() || (!file.exists() && file.canWrite());
+        }
+        /**
+         * Property for System.getProperty( id ), may be unspecified by user.
+         * @return system property, may be null
+         */
+        public String getSystemProperty(){
+            return System.getProperty( id );
+        }
+        public String toString() {
+            return id;
+        }
+    }
     /**
      * The type for keys used to control various aspects of the factory
      * creation. Factory creation impacts rendering (which is why extending
@@ -542,7 +578,7 @@ public final class Hints extends RenderingHints {
          * The number of key created up to date.
          */
         private static volatile int count;
-
+        
         /**
          * The class name for {@link #valueClass}.
          */
@@ -596,6 +632,13 @@ public final class Hints extends RenderingHints {
             return valueClass;
         }
 
+        /**
+         * Property for System.getProperty( className ), may be unspecified by user.
+         * @return system property, may be null
+         */
+        public String getSystemProperty(){
+            return System.getProperty( className );
+        }
         /**
          * Returns {@code true} if the specified object is a valid value for
          * this key. This method checks if the specified value is non-null and

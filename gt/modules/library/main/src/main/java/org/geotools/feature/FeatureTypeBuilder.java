@@ -142,6 +142,12 @@ public abstract class FeatureTypeBuilder extends FeatureTypes implements Factory
         // warning not sure if CommonFactoryFinder is going to cache the instance or not?
         //
         Hints hints = GeoTools.getDefaultHints();
+        if( hints == null ){
+            hints = new Hints( Hints.FEATURE_TYPE_FACTORY_NAME, typeName );
+        }
+        else {
+            hints.put( Hints.FEATURE_TYPE_FACTORY_NAME, typeName );
+        }
         hints.put( Hints.FEATURE_TYPE_FACTORY_NAME, typeName );
         return CommonFactoryFinder.getFeatureTypeFactory( hints );
     }
