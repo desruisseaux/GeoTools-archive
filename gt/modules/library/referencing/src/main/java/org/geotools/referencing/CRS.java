@@ -141,7 +141,14 @@ public final class CRS {
         }
         CRSAuthorityFactory factory = (longitudeFirst) ? xyFactory : defaultFactory;
         if (factory == null) try {
-            factory = new DefaultAuthorityFactory(longitudeFirst);
+            Hints hints = GeoTools.getDefaultHints();
+            if( longitudeFirst ){
+                hints.put( Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
+            }
+            else {
+                hints.put( Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE);
+            }
+            factory = new DefaultAuthorityFactory( hints );
             if (longitudeFirst) {
                 xyFactory = factory;
             } else {
@@ -166,7 +173,7 @@ public final class CRS {
      * @since 2.4
      */
     public static Version getVersion(final String authority) throws FactoryRegistryException {
-        Object factory = FactoryFinder.getCRSAuthorityFactory(authority, null);
+        Object factory = FactoryFinder.getCRSAuthorityFactory(authority, GeoTools.getDefaultHints());
         final Set guard = new HashSet(); // Safety against never-ending recursivity.
         while (factory instanceof Factory && guard.add(factory)) {
             final Map hints = ((Factory) factory).getImplementationHints();

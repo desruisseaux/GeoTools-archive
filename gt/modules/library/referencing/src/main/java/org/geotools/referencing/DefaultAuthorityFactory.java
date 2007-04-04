@@ -28,6 +28,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
 import org.geotools.util.Logging;
+import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.factory.AllAuthoritiesFactory;
@@ -36,7 +37,13 @@ import org.geotools.referencing.factory.BufferedAuthorityFactory;
 
 /**
  * The default authority factory to be used by {@link CRS#decode}.
- *
+ * <p>
+ * This class gathers together a lot of logic in order to capture the following ideas:
+ * <ul>
+ * <li>Uses Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER to swap ordinate order if needed
+ * <li>Uses AllAuthoritiesFactory to access CRSAuthorities in the environment
+ * </ul>
+ * 
  * @since 2.3
  * @source $URL$
  * @version $Id$
@@ -56,7 +63,7 @@ final class DefaultAuthorityFactory extends BufferedAuthorityFactory implements 
      * Work around for RFE #4093999 in Sun's bug database
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
-    private DefaultAuthorityFactory(final Hints hints) {
+    DefaultAuthorityFactory(final Hints hints) {
         super(new AllAuthoritiesFactory(hints, FactoryFinder.getCRSAuthorityFactories(hints)));
     }
 
@@ -67,7 +74,7 @@ final class DefaultAuthorityFactory extends BufferedAuthorityFactory implements 
     static Set/*<String>*/ getSupportedCodes(final String authority) {
     	Set result = Collections.EMPTY_SET;
         boolean isSetCopied = false;
-    	for (final Iterator i=FactoryFinder.getCRSAuthorityFactories(null).iterator(); i.hasNext();) {
+    	for (final Iterator i=FactoryFinder.getCRSAuthorityFactories( GeoTools.getDefaultHints() ).iterator(); i.hasNext();) {
             final CRSAuthorityFactory factory = (CRSAuthorityFactory) i.next();
             if (Citations.identifierMatches(factory.getAuthority(), authority)) {
                 final Set codes;

@@ -25,8 +25,9 @@ public class GeoToolsTest extends TestCase {
         
         Hints hints = new Hints( defaults );
         
-        GeoTools.init( hints );        
-        assertSame( hints, GeoTools.getDefaultHints() );
+        GeoTools.init( hints );
+        assertEquals( "same same", hints, GeoTools.getDefaultHints() );
+        assertNotSame( "but different", hints, GeoTools.getDefaultHints() );        
     }
     
 }
