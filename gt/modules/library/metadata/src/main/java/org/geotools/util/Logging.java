@@ -60,7 +60,7 @@ public final class Logging {
     /**
      * Creates an instance for the specified root package.
      */
-    private Logging(final String root) {
+    public Logging(final String root) {
         this.root = root;
     }
 

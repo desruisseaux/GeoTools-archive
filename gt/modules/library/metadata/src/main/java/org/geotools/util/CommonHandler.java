@@ -18,6 +18,7 @@ package org.geotools.util;
 // J2SE dependencies
 import java.util.Map;
 import java.util.HashMap;
+import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.Handler;
@@ -49,7 +50,10 @@ final class CommonHandler extends Handler {
      * The Apache's log created up to date.
      */
     private final Map/*<String,Log>*/ loggers = new HashMap();
-
+    /**
+     * The logger the handler is forwarding for. 
+     */
+    private final Log logger;
     /**
      * Creates a new handler.
      *
@@ -63,6 +67,7 @@ final class CommonHandler extends Handler {
          * than the setting performed by the 'getLog' method for child loggers.
          */
         loggers.put(name, logger);
+        this.logger = logger;
     }
 
     /**
@@ -131,19 +136,21 @@ final class CommonHandler extends Handler {
                 assert !(log instanceof Jdk14Logger);
                 loggers.put(name, log);
                 final Level level;
-                if (log.isErrorEnabled()) {
-                    level = Level.SEVERE;
-                } else if (log.isWarnEnabled()) {
-                    level = Level.WARNING;
-                } else if (log.isInfoEnabled()) {
-                    level = Level.INFO;
-                } else if (log.isDebugEnabled()) {
-                    level = Level.FINE;
-                } else if (log.isTraceEnabled()) {
-                    level = Level.FINER;
-                } else {
+                if (log.isTraceEnabled()) {
                     level = Level.FINEST;
-                }
+                } else if (log.isDebugEnabled()) {
+                    level = Level.FINER;
+                } else if (log.isInfoEnabled()) {
+            		level = Level.CONFIG;
+            	} else if (log.isWarnEnabled()) {
+                    level = Level.WARNING;
+                } else if (log.isErrorEnabled()) {
+            		level = Level.SEVERE;
+            	} else if (log.isFatalEnabled()) {
+            		level = Level.SEVERE;
+            	} else {
+            		level = Level.OFF;
+            	}
                 final Logger logger = Logger.getLogger(name);
                 removeAllHandlers(logger);
                 logger.setUseParentHandlers(true);
@@ -157,11 +164,15 @@ final class CommonHandler extends Handler {
      * Send the specified record to Apache's commons-logging framework.
      */
     public void publish(final LogRecord record) {
-        final Log       log       = getLog(record.getLoggerName());
+        final Log       log       = record.getLoggerName() != null ? 
+        	getLog(record.getLoggerName()) : logger;
         final int       level     = record.getLevel().intValue();
-        final String    message   = record.getMessage();
+        final String    message   = formatMessage( record );
         final Throwable throwable = record.getThrown();
-        if (level >= Level.SEVERE.intValue()) {
+        
+        if (level == Level.OFF.intValue() ) {
+        	return;
+        } else if (level >= Level.SEVERE.intValue()) {
             if (throwable != null) {
                 log.error(message, throwable);
             } else {
@@ -173,13 +184,13 @@ final class CommonHandler extends Handler {
             } else {
                 log.warn(message);
             }
-        } else if (level >= Level.INFO.intValue()) {
+        } else if (level >= Level.CONFIG.intValue() ) {
             if (throwable != null) {
                 log.info(message, throwable);
             } else {
                 log.info(message);
             }
-        } else if (level >= Level.FINE.intValue()) {
+        } else if (level >= Level.FINER.intValue() ) {
             if (throwable != null) {
                 log.debug(message, throwable);
             } else {
@@ -194,6 +205,40 @@ final class CommonHandler extends Handler {
         }
     }
 
+    /**
+     * Copied from {@link Formatter#formatMessage(LogRecord)} to support i18n.
+     */
+    public synchronized String formatMessage(LogRecord record) {
+    	String format = record.getMessage();
+    	java.util.ResourceBundle catalog = record.getResourceBundle();
+		if (catalog != null) {
+		        try {
+		            format = catalog.getString(record.getMessage());
+		        } catch (java.util.MissingResourceException ex) {
+			    // Drop through.  Use record message as format
+			    format = record.getMessage();
+			}
+	
+		}
+	  	// Do the formatting.
+		try {
+		    Object parameters[] = record.getParameters();
+	 	    if (parameters == null || parameters.length == 0) {
+			// No parameters.  Just return format string.
+			return format;
+		    }
+		    // Is is a java.text style format?
+		    if (format.indexOf("{0") >= 0) {
+		        return java.text.MessageFormat.format(format, parameters);
+		    }
+		    return format;
+	
+		} catch (Exception ex) {
+		    // Formatting failed: use localized format string.
+		    return format;
+		}
+    }
+    
     /**
      * Flush this handler. The default implementation does nothing.
      */
