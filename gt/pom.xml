@@ -19,6 +19,9 @@
   <!--       modify the build process in certain conditions.       -->
   <!--                                                             -->
   <!--   Available profiles are:                                   -->
+  <!--     nojai              Works with JAI stricktly using the   -->
+  <!--                        jar dependencies (rather then as a   -->
+  <!--                        JDK & JRE extension)                 -->
   <!--                                                             -->
   <!--     extensive.tests    Performs more extensive tests than   -->
   <!--                        the default. Only a few modules      -->

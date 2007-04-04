@@ -87,6 +87,8 @@ import org.geotools.util.UnsupportedImplementationException;
  * @tutorial http://docs.codehaus.org/display/GEOTOOLS/Coordinate+Transformation+Services+for+Geotools+2.1
  */
 public final class CRS {
+    /** Set to true to use GeoTools.getDefaultHints() */
+    public static final boolean USE_DEFAULTS = false;
     /**
      * A factory for CRS creation with (<var>latitude</var>, <var>longitude</var>) axis order
      * (unless otherwise specified in system property). Will be created only when first needed.
@@ -141,7 +143,7 @@ public final class CRS {
         }
         CRSAuthorityFactory factory = (longitudeFirst) ? xyFactory : defaultFactory;
         if (factory == null) try {
-            Hints hints = GeoTools.getDefaultHints();
+            Hints hints = USE_DEFAULTS ? GeoTools.getDefaultHints() : new Hints( null );
             if( longitudeFirst ){
                 hints.put( Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
             }
@@ -172,8 +174,8 @@ public final class CRS {
      *
      * @since 2.4
      */
-    public static Version getVersion(final String authority) throws FactoryRegistryException {
-        Object factory = FactoryFinder.getCRSAuthorityFactory(authority, GeoTools.getDefaultHints());
+    public static Version getVersion(final String authority) throws FactoryRegistryException {        
+        Object factory = FactoryFinder.getCRSAuthorityFactory(authority, USE_DEFAULTS ? GeoTools.getDefaultHints() : null );
         final Set guard = new HashSet(); // Safety against never-ending recursivity.
         while (factory instanceof Factory && guard.add(factory)) {
             final Map hints = ((Factory) factory).getImplementationHints();
@@ -791,7 +793,7 @@ public final class CRS {
                                                   boolean lenient)
             throws FactoryException
     {
-        Hints hints = GeoTools.getDefaultHints();
+        Hints hints = USE_DEFAULTS ? GeoTools.getDefaultHints() : new Hints( null );
         if( lenient = true ){
             if( hints == null ) {
                 hints = new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);

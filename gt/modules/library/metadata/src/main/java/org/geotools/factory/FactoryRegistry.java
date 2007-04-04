@@ -72,6 +72,12 @@ import org.geotools.resources.i18n.LoggingKeys;
  */
 public class FactoryRegistry extends ServiceRegistry {
     /**
+     * Change DEFAULTS to true to try it out GeoTools.getDefaultHints().
+     * <p>
+     * We are having trouble when using non null hints, give this a go.
+     */
+    public final boolean DEFAULTS = true;
+    /**
      * The logger for all events related to factory registry.
      */
     protected static final Logger LOGGER = Logger.getLogger("org.geotools.factory");
@@ -236,23 +242,33 @@ public class FactoryRegistry extends ServiceRegistry {
                                      Hints hints, final Hints.Key key)
             throws FactoryRegistryException
     {
+        final Level BEFORE = LOGGER.getLevel();
+        
+        try {
+            //LOGGER.setLevel( Level.FINEST );
         synchronizeIteratorProviders();
+        String target = category.getName();
+        target = target.substring( target.lastIndexOf('.'));
+        LOGGER.finest("GetServiceProvider: "+target+" --->" );
         Class implementation = null;
         if (key != null) {
             /*
              * Sanity check: make sure that the key class is appropriate for the category.
              */
             if (!category.isAssignableFrom(key.getValueClass())) {
+                LOGGER.finest("GetServiceProvider: "+target+" <--- did not match! FAILURE" );                
                 throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_KEY_$1, key));
             }
             if (hints!=null && !hints.isEmpty()) {
                 final Object hint = hints.get(key);
                 if (hint != null) {
+                    LOGGER.finest("GetServiceProvider: "+target+"    HINT: "+key+"="+hint );                                    
                     if (category.isInstance(hint)) {
                         /*
                          * The factory implementation was given explicitly by the user.
                          * Nothing to do; we are done.
                          */
+                        LOGGER.finest("GetServiceProvider: "+target+" <---- ("+key+") return hint as provided SUCCESS");                                        
                         return hint;
                     }
                     /*
@@ -287,9 +303,10 @@ public class FactoryRegistry extends ServiceRegistry {
                         final Class[] types = (Class[]) hint;
                         final int length = types.length;
                         for (int i=0; i<length-1; i++) {
-                            final Object candidate =
-                                    getServiceImplementation(category, types[i], filter, hints);
+                            LOGGER.finest("GetServiceProvider: "+target+"("+key+") consider hint["+i+"] "+types[i] );                            
+                            final Object candidate = getServiceImplementation(category, types[i], filter, hints);
                             if (candidate != null) {
+                                LOGGER.finest("GetServiceProvider: "+target+" <---- return found implementat"+candidate+" SUCCESS");                                
                                 return candidate;
                             }
                         }
@@ -302,13 +319,21 @@ public class FactoryRegistry extends ServiceRegistry {
                 }
             }
         }
+        if( implementation != null ){
+            LOGGER.finest("GetServiceProvider: "+target+"       with hint provided implementation "+implementation );
+        }
         final Object candidate = getServiceImplementation(category, implementation, filter, hints);
         if (candidate != null) {
+            LOGGER.finest("GetServiceProvider: "+target+" <---- found service implementation."+candidate.getClass()+" SUCCESS" );            
             return candidate;
         }
+        LOGGER.finest("GetServiceProvider: "+target+" <----- could not find implementation. FAILURE" );        
         throw new FactoryNotFoundException(Errors.format(ErrorKeys.FACTORY_NOT_FOUND_$1,
                   Utilities.getShortName(implementation!=null ? implementation : category)));
+    } finally {
+        LOGGER.setLevel( BEFORE );
     }
+}
 
     /**
      * Search the first implementation in the registery matching the specified conditions.
@@ -433,8 +458,11 @@ public class FactoryRegistry extends ServiceRegistry {
                                         Set/*<Factory>*/ alreadyDone)
     {
         Hints remaining = null;
-        final Map implementationHints = factory.getImplementationHints();
-        if( implementationHints == null ) return true;
+        Map implementationHints = factory.getImplementationHints();
+        if( implementationHints == null ) {
+            // factory was bad and did not meet contract - assume it used no Hints
+            implementationHints = Collections.EMPTY_MAP;
+        }
         for (final Iterator it=implementationHints.entrySet().iterator(); it.hasNext();) {
             final Map.Entry entry = (Map.Entry) it.next();
             final Object    key   = entry.getKey();
