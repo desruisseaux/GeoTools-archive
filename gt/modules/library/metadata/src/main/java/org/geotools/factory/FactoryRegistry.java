@@ -458,7 +458,7 @@ public class FactoryRegistry extends ServiceRegistry {
                                         Set/*<Factory>*/ alreadyDone)
     {
         Hints remaining = null;
-        Map implementationHints = factory.getImplementationHints();
+        Map implementationHints = Hints.stripNonKeys( factory.getImplementationHints() );
         if( implementationHints == null ) {
             // factory was bad and did not meet contract - assume it used no Hints
             implementationHints = Collections.EMPTY_MAP;

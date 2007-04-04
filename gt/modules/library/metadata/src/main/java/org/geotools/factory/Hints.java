@@ -16,6 +16,8 @@
 package org.geotools.factory;
 
 // J2SE dependencies
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
 import java.awt.RenderingHints;
@@ -514,7 +516,23 @@ public final class Hints extends RenderingHints {
      *              {@code null} if the object should be empty.
      */
     public Hints(final Map hints) {
-        super(hints);
+        super( stripNonKeys(hints));
+    }
+    public static Map stripNonKeys( Map hints ){
+        if( hints == null ) return Collections.EMPTY_MAP;
+        
+        Map good = new HashMap();
+        for( Iterator i=hints.entrySet().iterator(); i.hasNext(); ){
+            Map.Entry entry = (Map.Entry) i.next();
+            
+            if( entry.getKey() != null && entry.getKey() instanceof RenderingHints.Key ){
+                good.put( entry.getKey(), entry.getValue() );
+            }
+            else {
+                // stranger danger! Non Key used as a hint? I don't think so ...
+            }
+        }
+        return good;        
     }
 
     /**
