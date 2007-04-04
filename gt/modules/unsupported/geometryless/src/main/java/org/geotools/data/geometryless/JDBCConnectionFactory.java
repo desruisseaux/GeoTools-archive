@@ -1,6 +1,21 @@
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
 package org.geotools.data.geometryless;
 
-//import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -129,20 +144,9 @@ public class JDBCConnectionFactory {
 
         ConnectionPoolFacade poolDataSource =
             (ConnectionPoolFacade) _dataSources.get(poolKey);
-/*
-        MysqlConnectionPoolDataSource poolDataSource =
-            (MysqlConnectionPoolDataSource) _dataSources.get(poolKey);
-*/
         if (poolDataSource == null) {
 
               poolDataSource = new  ConnectionPoolFacade( poolKey , _driver );
-  /*            
-                poolDataSource = new  MysqlConnectionPoolDataSource( );
-             use a wrapper because we want to know it implements setURL set User and getPooledConnection()  methods..
-    
-         ConnectionPoolDataSource poolDataSource = 
-                    (ConnectionPoolDataSource)            ( Class.forName(_driver).getConstructor( new Class [] { String.class } ).newInstance( new Object [] {poolKey }));
-*/
     
 
             poolDataSource.setURL(_dbURL);

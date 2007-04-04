@@ -27,7 +27,7 @@ import org.geotools.filter.LiteralExpression;
 
 
 /**
- * Encodes a filter into a SQL WHERE statement for MySQL.  This class adds
+ * Encodes a filter into a SQL WHERE statement for generic SQL.  This class adds
  * the ability to turn geometry filters into sql statements if they are
  * bboxes.
  *

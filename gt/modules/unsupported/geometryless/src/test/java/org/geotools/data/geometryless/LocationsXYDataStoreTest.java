@@ -33,10 +33,8 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
-import org.geotools.data.Query;
 import org.geotools.data.SchemaNotFoundException;
 import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.ConnectionPool;
@@ -44,11 +42,8 @@ import org.geotools.data.jdbc.ConnectionPoolManager;
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
 import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.AbstractFilter;
 //import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.PropertyIsEqualTo;
 
@@ -66,7 +61,7 @@ import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.PrecisionModel;
+//import com.vividsolutions.jts.geom.PrecisionModel;
 
 /**
  * Test for Geometryless generic JDBC Data store.  Must use a locally available instance of JDBC database.
@@ -80,19 +75,19 @@ public class LocationsXYDataStoreTest extends TestCase {
     private static final Logger LOGGER = Logger.getLogger("org.geotools.data.geometryless");
     private static String FEATURE_TABLE = "testset";
     private static String TEST_NS = "http://www.geotools.org/data/postgis";
-    private static GeometryFactory geomFac = new GeometryFactory();
+    // private static GeometryFactory geomFac = new GeometryFactory();
     private static String GEOM_NAME = "location";
     private FilterFactory filterFac = CommonFactoryFinder.getFilterFactory(null);
   
-    private FeatureCollection collection = FeatureCollections.newCollection();
+    //private FeatureCollection collection = FeatureCollections.newCollection();
     private FeatureType schema;
-    private int srid = -1;
+    //private int srid = -1;
     private JDBCConnectionFactory connFactory;
     private LocationsXYDataStore dstore;
     private ConnectionPool connPool;
 //    private  tFilter;
     private int addId = 32;
-    private org.geotools.filter.GeometryFilter geomFilter;
+   // private org.geotools.filter.GeometryFilter geomFilter;
 
     public LocationsXYDataStoreTest(String testName) {
         super(testName);

@@ -33,21 +33,16 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
-import org.geotools.data.Query;
 import org.geotools.data.SchemaNotFoundException;
 import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.ConnectionPoolManager;
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.AbstractFilter;
 //import org.geotools.filter.CompareFilter;
 import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.Expression;
@@ -74,18 +69,18 @@ public class JDBCDataStoreTest extends TestCase {
     private static final Logger LOGGER = Logger.getLogger("org.geotools.data.geometryless");
     private static String FEATURE_TABLE = "testset";
     private static String TEST_NS = "http://www.geotools.org/data/postgis";
-    private static GeometryFactory geomFac = new GeometryFactory();
+    //private static GeometryFactory geomFac = new GeometryFactory();
     private FilterFactory filterFac = CommonFactoryFinder.getFilterFactory(null);
   
-    private FeatureCollection collection = FeatureCollections.newCollection();
+    //private FeatureCollection collection = FeatureCollections.newCollection();
     private FeatureType schema;
-    private int srid = -1;
+    //private int srid = -1;
     private JDBCConnectionFactory connFactory;
     private JDBCDataStore dstore;
     private ConnectionPool connPool;
-    private PropertyIsEqualTo tFilter;
+    //private PropertyIsEqualTo tFilter;
     private int addId = 32;
-    private org.geotools.filter.GeometryFilter geomFilter;
+    // private org.geotools.filter.GeometryFilter geomFilter;
 
     public JDBCDataStoreTest(String testName) {
         super(testName);

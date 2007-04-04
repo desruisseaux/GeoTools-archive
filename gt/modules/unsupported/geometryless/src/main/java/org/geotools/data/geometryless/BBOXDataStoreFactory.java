@@ -248,11 +248,11 @@ public class BBOXDataStoreFactory extends AbstractFactory
             throw new IOException("The parameteres map isn't correct!!");
         }
 
-        String host = (String) HOST.lookUp(params);
+//        String host = (String) HOST.lookUp(params);
         String user = (String) USER.lookUp(params);
         String passwd = (String) PASSWD.lookUp(params);
-        String port = (String) PORT.lookUp(params);
-        String database = (String) DATABASE.lookUp(params);
+//        String port = (String) PORT.lookUp(params);
+ //       String database = (String) DATABASE.lookUp(params);
         String schema = (String) SCHEMA.lookUp(params);
                 Charset charSet = (Charset) CHARSET.lookUp(params);
         String namespace = (String) NAMESPACE.lookUp(params);
@@ -329,11 +329,11 @@ public class BBOXDataStoreFactory extends AbstractFactory
      *         list of available datasources.
      */
     public String getDescription() {
-        return "Generic JDBC database";
+        return "GeometrylessJDBC - constructs geometry from Bounding Box ";
     }
    
     public String getDisplayName() {
-        return "GeometrylessJDBC";
+        return "GeometrylessJDBC - Bounding Box";
     }
     
 //    	public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {

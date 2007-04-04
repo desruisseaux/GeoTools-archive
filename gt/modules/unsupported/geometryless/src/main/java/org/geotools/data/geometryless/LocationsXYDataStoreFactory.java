@@ -313,11 +313,11 @@ public class LocationsXYDataStoreFactory extends AbstractFactory
      *         list of available datasources.
      */
     public String getDescription() {
-        return "Generic JDBC database";
+        return "Generic JDBC database with X,Y columns holding point coordinates";
     }
    
     public String getDisplayName() {
-        return "GeometrylessJDBC";
+        return "GeometrylessJDBC - locations from X,Y columns";
     }
     
 //    	public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {

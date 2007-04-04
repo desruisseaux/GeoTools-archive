@@ -1,7 +1,3 @@
-/* Copyright (c) 2001, 2003 TOPP - www.openplans.org.  All rights reserved.
- * This code is licensed under the GPL 2.0 license, availible at the root
- * application directory.
- */
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
@@ -215,11 +211,11 @@ public class JDBCDataStoreFactory extends AbstractFactory
             throw new IOException("The parameteres map isn't correct!!");
         }
 
-        String host = (String) HOST.lookUp(params);
+ //       String host = (String) HOST.lookUp(params);
         String user = (String) USER.lookUp(params);
         String passwd = (String) PASSWD.lookUp(params);
-        String port = (String) PORT.lookUp(params);
-        String database = (String) DATABASE.lookUp(params);
+ //       String port = (String) PORT.lookUp(params);
+ //       String database = (String) DATABASE.lookUp(params);
         Charset charSet = (Charset) CHARSET.lookUp(params);
         String schema = (String) SCHEMA.lookUp( params ); 
 
@@ -292,7 +288,7 @@ public class JDBCDataStoreFactory extends AbstractFactory
     }
    
     public String getDisplayName() {
-        return "GeometrylessJDBC";
+        return "GeometrylessJDBC - no geometry per feature";
     }
     
 //    	public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
