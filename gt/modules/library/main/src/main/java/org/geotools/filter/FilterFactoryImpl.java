@@ -20,6 +20,7 @@ package org.geotools.filter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -903,8 +904,7 @@ public class FilterFactoryImpl implements FilterFactory {
     }
 
 	public Map getImplementationHints() {
-		// TODO Auto-generated method stub
-		return null;
+		return Collections.EMPTY_MAP;
 	}
 	
 	public SortBy sort(String propertyName, SortOrder order) {

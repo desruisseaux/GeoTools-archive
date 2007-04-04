@@ -46,7 +46,6 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * @source $URL$
  */                                
 public class AreaFunctionTest extends TestCase {
-    
 
       /** Standard logging instance */
     protected static final Logger LOGGER = Logger.getLogger(
@@ -175,6 +174,7 @@ public class AreaFunctionTest extends TestCase {
     }
 
     static FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
+    
      /** 
      * Tests the min function expression.
      */

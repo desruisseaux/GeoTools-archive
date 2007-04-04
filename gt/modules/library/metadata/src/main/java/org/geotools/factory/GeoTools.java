@@ -29,11 +29,11 @@ public class GeoTools {
      * @return Instance returned is a copy, you can add to it if you wish;
      */
     public static Hints getDefaultHints(){
-        return null;
-//        if( hints == null ){
-//            throw new IllegalStateException( "Please call GeoTools.init( Hints )" );
-//        }
-//        return new Hints( hints );
+        //return null;
+        if( hints == null ){
+            throw new IllegalStateException( "Please call GeoTools.init( Hints )" );
+        }
+        return hints;
     }
     
     /** Initialize GeoTools for use */

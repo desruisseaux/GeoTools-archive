@@ -101,9 +101,10 @@ public final class CommonFactoryFinder {
      *
      * @see Hints#STYLE_FACTORY
      */
-    public static synchronized StyleFactory getStyleFactory(final Hints hints)
+    public static synchronized StyleFactory getStyleFactory(Hints hints)
             throws FactoryRegistryException
     {
+        if( hints == null ) hints = GeoTools.getDefaultHints();
         return (StyleFactory) getServiceRegistry().getServiceProvider(
                 StyleFactory.class, null, hints, Hints.STYLE_FACTORY);
     }
@@ -114,7 +115,8 @@ public final class CommonFactoryFinder {
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available style factory implementations.
      */
-    public static synchronized Set getStyleFactories(final Hints hints) {
+    public static synchronized Set getStyleFactories(Hints hints) {
+        if( hints == null ) hints = GeoTools.getDefaultHints();
         return new LazySet(getServiceRegistry().getServiceProviders(
                 StyleFactory.class, null, hints));
     }
@@ -126,7 +128,8 @@ public final class CommonFactoryFinder {
      * @return Set of available style factory implementations.
      * @deprecated Use FunctionExpression is now @deprecated
      */
-    public static synchronized Set getFunctionExpressions(final Hints hints) {
+    public static synchronized Set getFunctionExpressions(Hints hints) {
+        if( hints == null ) hints = GeoTools.getDefaultHints();
         return new LazySet(getServiceRegistry().getServiceProviders(
                 FunctionExpression.class, null, hints));
     }
@@ -138,7 +141,8 @@ public final class CommonFactoryFinder {
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set<FunctonImpl> of available style factory implementations.
      */
-    public static synchronized Set getFunctions(final Hints hints) {
+    public static synchronized Set getFunctions(Hints hints) {
+        if( hints == null ) hints = GeoTools.getDefaultHints();
         return new LazySet(getServiceRegistry().getServiceProviders(
                 FunctionImpl.class, null, hints));
     }    
@@ -149,12 +153,14 @@ public final class CommonFactoryFinder {
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set<FeatureLockFactory> of available style factory implementations.
      */
-    public static synchronized Set getFeatureLockFactories(final Hints hints) {
+    public static synchronized Set getFeatureLockFactories(Hints hints) {
+        if( hints == null ) hints = GeoTools.getDefaultHints();
         return new LazySet(getServiceRegistry().getServiceProviders(
                 FeatureLockFactory.class, null, hints));
     }
     
-    public static synchronized FeatureLockFactory getFeatureLockFactory(final Hints hints) {
+    public static synchronized FeatureLockFactory getFeatureLockFactory(Hints hints) {
+        if( hints == null ) hints = GeoTools.getDefaultHints();
         return (FeatureLockFactory) getServiceRegistry().getServiceProvider(
                 FeatureLockFactory.class, null, hints, Hints.FEATURE_LOCK_FACTORY);
     }
@@ -165,7 +171,8 @@ public final class CommonFactoryFinder {
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set<FileDataStoreFactorySpi> of available style factory implementations.
      */
-    public static synchronized Set getFileDataStoreFactories(final Hints hints) {
+    public static synchronized Set getFileDataStoreFactories(Hints hints) {
+        if( hints == null ) hints = GeoTools.getDefaultHints();
         return new LazySet(getServiceRegistry().getServiceProviders(
                 FileDataStoreFactorySpi.class, null, hints));
     }
@@ -176,7 +183,8 @@ public final class CommonFactoryFinder {
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set<AttributeTypeFactory> of available factory implementations.
      */
-    public static synchronized Set getAttributeTypeFactories(final Hints hints) {
+    public static synchronized Set getAttributeTypeFactories(Hints hints) {
+        if( hints == null ) hints = GeoTools.getDefaultHints();
         return new LazySet(getServiceRegistry().getServiceProviders(
                 AttributeTypeFactory.class, null, hints));
     }
@@ -185,7 +193,8 @@ public final class CommonFactoryFinder {
      * <p>
      * Initially set to DefaultAttributeTypeFactory.
      */
-    public static synchronized AttributeTypeFactory getAttributeTypeFactory(final Hints hints) {
+    public static synchronized AttributeTypeFactory getAttributeTypeFactory(Hints hints) {
+        if( hints == null ) hints = GeoTools.getDefaultHints();
         return (AttributeTypeFactory) getServiceRegistry().getServiceProvider(
                 AttributeTypeFactory.class, null, hints, Hints.ATTRIBUTE_TYPE_FACTORY );
     }
@@ -196,7 +205,8 @@ public final class CommonFactoryFinder {
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set<AttributeTypeFactory> of available factory implementations.
      */
-    public static synchronized Set getAttributeFeatureFactories(final Hints hints) {
+    public static synchronized Set getAttributeFeatureFactories(Hints hints) {
+        if( hints == null ) hints = GeoTools.getDefaultHints();
         return new LazySet(getServiceRegistry().getServiceProviders(
                 FeatureTypeFactory.class, null, hints));
     }
@@ -212,7 +222,8 @@ public final class CommonFactoryFinder {
      * your own implementation as needed.
      * @return FeatureTypeFactory using Hints.FEATURE_TYPE_FACTORY_NAME
      */
-    public static synchronized FeatureTypeFactory getFeatureTypeFactory(final Hints hints) {
+    public static synchronized FeatureTypeFactory getFeatureTypeFactory(Hints hints) {
+        if( hints == null ) hints = GeoTools.getDefaultHints();
         FeatureTypeFactory factory = new DefaultFeatureTypeFactory();        
         factory.setName( (String) hints.get( Hints.FEATURE_TYPE_FACTORY_NAME));
         return factory;
@@ -227,7 +238,8 @@ public final class CommonFactoryFinder {
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set<FeatureCollections> of available implementations.
      */
-    public static synchronized Set getFeatureCollectionsSet(final Hints hints) {
+    public static synchronized Set getFeatureCollectionsSet(Hints hints) {
+        if( hints == null ) hints = GeoTools.getDefaultHints();        
         return new LazySet(getServiceRegistry().getServiceProviders(
                 FeatureCollections.class, null, hints));
     }    
@@ -239,7 +251,8 @@ public final class CommonFactoryFinder {
      * @param hints
      * @return FeatureCollections utility class
      */
-    public static synchronized FeatureCollections getFeatureCollections(final Hints hints) {
+    public static synchronized FeatureCollections getFeatureCollections(Hints hints) {
+        if( hints == null ) hints = GeoTools.getDefaultHints();
         return (FeatureCollections) getServiceRegistry().getServiceProvider(
                 FeatureCollections.class, null, hints, Hints.FEATURE_COLLECTIONS );
     }
@@ -256,9 +269,10 @@ public final class CommonFactoryFinder {
      *
      * @see Hints#FILTER_FACTORY
      */
-    public static synchronized FilterFactory getFilterFactory(final Hints hints)
+    public static synchronized FilterFactory getFilterFactory(Hints hints)
             throws FactoryRegistryException
     {
+        if( hints == null ) hints = GeoTools.getDefaultHints();
         return (FilterFactory) getServiceRegistry().getServiceProvider(
                 FilterFactory.class, null, hints, Hints.FILTER_FACTORY);
     }

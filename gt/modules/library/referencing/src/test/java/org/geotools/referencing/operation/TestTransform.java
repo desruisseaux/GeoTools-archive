@@ -34,6 +34,7 @@ import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
+import org.geotools.factory.Hints;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.GeneralDirectPosition;
 
@@ -55,22 +56,22 @@ public abstract class TestTransform extends TestCase {
     /**
      * The default datum factory.
      */
-    protected static final DatumFactory datumFactory = FactoryFinder.getDatumFactory(null);
+    protected static DatumFactory datumFactory;
 
     /**
      * The default coordinate reference system factory.
      */
-    protected static final CRSFactory crsFactory = FactoryFinder.getCRSFactory(null);
+    protected static CRSFactory crsFactory;
 
     /**
      * The default math transform factory.
      */
-    protected static final MathTransformFactory mtFactory = FactoryFinder.getMathTransformFactory(null);
+    protected static MathTransformFactory mtFactory;
 
     /**
      * The default transformations factory.
      */
-    protected static final CoordinateOperationFactory opFactory = FactoryFinder.getCoordinateOperationFactory(null);
+    protected static CoordinateOperationFactory opFactory;
     
     /**
      * Random numbers generator.
@@ -84,6 +85,25 @@ public abstract class TestTransform extends TestCase {
         super(name);
     }
     
+
+    protected void setUp() throws Exception {
+        super.setUp();
+        
+        Hints hints = getHintsForTesting();
+        
+        datumFactory = FactoryFinder.getDatumFactory( hints );
+        crsFactory = FactoryFinder.getCRSFactory( hints );
+        mtFactory = FactoryFinder.getMathTransformFactory( hints );
+        opFactory = FactoryFinder.getCoordinateOperationFactory( hints );        
+    }
+    
+    /**
+     * Subclass can overrride
+     * @return null
+     */
+    protected Hints getHintsForTesting(){
+        return null;
+    }
     /**
      * Convenience method for checking if a boolean value is false.
      */

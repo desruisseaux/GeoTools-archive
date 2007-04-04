@@ -141,7 +141,7 @@ public final class CRS {
         }
         CRSAuthorityFactory factory = (longitudeFirst) ? xyFactory : defaultFactory;
         if (factory == null) try {
-            Hints hints = new Hints( null ); //GeoTools.getDefaultHints();
+            Hints hints = GeoTools.getDefaultHints();
             if( longitudeFirst ){
                 hints.put( Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
             }

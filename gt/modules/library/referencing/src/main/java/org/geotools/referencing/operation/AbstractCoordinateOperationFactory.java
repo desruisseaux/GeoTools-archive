@@ -231,6 +231,10 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
                 initializeHints();
                 hintsInitialized = true; // Set only after success.
             }
+            else {
+                // is this not recursive?
+                //System.out.println("!");
+            }
         }
         return super.getImplementationHints();
     }
@@ -241,7 +245,9 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
      */
     void initializeHints() {
         assert Thread.holdsLock(hints);
-        hints.putAll( getFactoryGroup().getImplementationHints() );
+        FactoryGroup factoryGroup = getFactoryGroup();
+        Map factoryGroupHints = factoryGroup.getImplementationHints();
+        hints.putAll( factoryGroupHints );
     }
 
     /**
