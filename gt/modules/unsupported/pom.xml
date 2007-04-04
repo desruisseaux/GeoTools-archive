@@ -47,7 +47,7 @@
 
   <profiles>
      <!-- ================================================== -->
-     <!--     Modules included for Java 6 build              -->
+     <!--     Modules included for Java 5 build              -->
      <!-- ================================================== -->
      <profile>
        <id>java5</id>
