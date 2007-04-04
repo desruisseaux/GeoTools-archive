@@ -563,6 +563,8 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
      */
     public ModifiedFeatureIds getModifiedFeatureFIDs(String typeName, String version1,
             String version2, Filter filter, Transaction transaction) throws IOException {
+        if(filter == null)
+            filter = Filter.INCLUDE;
         RevisionInfo r1 = new RevisionInfo(version1);
         RevisionInfo r2 = new RevisionInfo(version2);
 

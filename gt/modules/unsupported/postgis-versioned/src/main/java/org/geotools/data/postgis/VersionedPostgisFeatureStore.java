@@ -17,9 +17,11 @@
 package org.geotools.data.postgis;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -447,21 +449,21 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         // build all the filters to gather created, deleted and modified features at the appropriate
         // revisions, depending also on wheter creation/deletion should be swapped or not
         FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+        VersionedFIDMapper mapper = (VersionedFIDMapper) store.getFIDMapper(schema.getTypeName());
 
         // TODO: extract only pk attributes for the delete reader, no need for the others
         FeatureReader createdReader;
         FeatureReader deletedReader;
         if (swap) {
-            createdReader = readerFromIdsRevision(ff, mfids.deleted, r2);
-            deletedReader = readerFromIdsRevision(ff, mfids.created, r1);
+            createdReader = readerFromIdsRevision(ff, null, mfids.deleted, r2);
+            deletedReader = readerFromIdsRevision(ff, null, mfids.created, r1);
         } else {
-            createdReader = readerFromIdsRevision(ff, mfids.created, r2);
-            deletedReader = readerFromIdsRevision(ff, mfids.deleted, r1);
+            createdReader = readerFromIdsRevision(ff, null, mfids.created, r2);
+            deletedReader = readerFromIdsRevision(ff, null, mfids.deleted, r1);
         }
-        FeatureReader fvReader = readerFromIdsRevision(ff, mfids.modified, r1);
-        FeatureReader tvReader = readerFromIdsRevision(ff, mfids.modified, r2);
+        FeatureReader fvReader = readerFromIdsRevision(ff, mapper, mfids.modified, r1);
+        FeatureReader tvReader = readerFromIdsRevision(ff, mapper, mfids.modified, r2);
 
-        VersionedFIDMapper mapper = (VersionedFIDMapper) store.getFIDMapper(schema.getTypeName());
         return new FeatureDiffReader(fromVersion, toVersion, schema, mapper, createdReader,
                 deletedReader, fvReader, tvReader);
     }
@@ -480,13 +482,23 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
      * @return
      * @throws IOException
      */
-    FeatureReader readerFromIdsRevision(FilterFactory ff, Set fids, RevisionInfo ri)
+    FeatureReader readerFromIdsRevision(FilterFactory ff, VersionedFIDMapper mapper, Set fids, RevisionInfo ri)
             throws IOException {
         if (fids != null && !fids.isEmpty()) {
             Filter fidFilter = store.buildFidFilter(ff, fids);
             Filter versionFilter = store.buildVersionedFilter(schema.getTypeName(), fidFilter, ri);
-            return store.wrapped.getFeatureReader(new DefaultQuery(schema.getTypeName(),
-                    versionFilter), getTransaction());
+            DefaultQuery query = new DefaultQuery(schema.getTypeName(),
+                                versionFilter);
+            if(mapper != null) {
+                List sort = new ArrayList(mapper.getColumnCount() - 1);
+                for(int i = 0; i < mapper.getColumnCount(); i++) {
+                    String colName = mapper.getColumnName(i);
+                    if(!"revision".equals(colName))
+                        sort.add(ff.sort(colName, SortOrder.DESCENDING));
+                }
+                query.setSortBy((SortBy[]) sort.toArray(new SortBy[sort.size()]));
+            }
+            return store.wrapped.getFeatureReader(query, getTransaction());
         } else {
             return null;
         }
