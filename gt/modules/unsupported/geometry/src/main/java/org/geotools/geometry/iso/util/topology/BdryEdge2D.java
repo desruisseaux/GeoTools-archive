@@ -125,7 +125,7 @@ public class BdryEdge2D extends BRepEdge2D {
 	}
 	
 	/**
-	 * @param maxLength
+	 * @param maxSpacing
 	 */
 	public ArrayList split(double maxSpacing) {
 		BdryEdge2D line = this;

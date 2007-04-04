@@ -89,7 +89,7 @@ import org.geotools.geometry.iso.util.algorithm2D.CGAlgorithms;
 
 
 /**
- * A ring of {@link edges} which may contain nodes of degree > 2. A
+ * A ring of {@link org.geotools.geometry.iso.topograph2D.Edge}s which may contain nodes of degree > 2. A
  * MaximalEdgeRing may represent two different spatial entities:
  * <ul>
  * <li>a single polygon possibly containing inversions (if the ring is oriented
@@ -101,7 +101,7 @@ import org.geotools.geometry.iso.util.algorithm2D.CGAlgorithms;
  * strongly connected.
  * <p>
  * These are the form of rings used to define polygons under some spatial data
- * models. However, under the OGC SFS model, {@link MinimalEdgeRings} are
+ * models. However, under the OGC SFS model, {@link MinimalEdgeRing} are
  * required. A MaximalEdgeRing can be converted to a list of MinimalEdgeRings
  * using the {@link #buildMinimalRings() } method.
  * 

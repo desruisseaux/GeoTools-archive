@@ -556,13 +556,13 @@ public class Envelope implements Serializable {
 	}
 
 	/**
-	 * Computes the intersection of two {@link Envelopes}
+	 * Computes the intersection of two {@link Envelope}s
 	 * 
 	 * @param env
 	 *            the envelope to intersect with
 	 * @return a new Envelope representing the intersection of the envelopes
 	 *         (this will be the null envelope if either argument is null, or
-	 *         they do not intersect
+	 *         they do not intersect)
 	 */
 	public Envelope intersection(Envelope env) {
 		if (isNull() || env.isNull() || !intersects(env))

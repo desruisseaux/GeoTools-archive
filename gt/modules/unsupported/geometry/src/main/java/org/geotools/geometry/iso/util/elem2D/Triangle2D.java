@@ -136,7 +136,6 @@ public class Triangle2D extends Simplex2D {
 	}
 
 	/**
-	 * @param tri
 	 * @return
 	 */
 	public boolean containsPoint(Point2D p) {

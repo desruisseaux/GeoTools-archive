@@ -58,7 +58,7 @@ public class AlgoArea {
 
 	/**
 	 * returns a list of boundaries, whereas each boundary is a list of
-	 * connected Line2D segments (ArrayList<ArrayList<Line2D>>)
+	 * connected Line2D segments (ArrayList&lt;ArrayList&lt;Line2D&gt;&gt;)
 	 * 
 	 * @param area
 	 * @return
@@ -188,7 +188,7 @@ public class AlgoArea {
 		return createGeneralPathFromNodes(nodes);
 	}
 	/**
-	 * @param ring
+	 * @param points
 	 * @return
 	 */
 	public static GeneralPath createGeneralPathFromNodes(Collection<Point2D> points) {

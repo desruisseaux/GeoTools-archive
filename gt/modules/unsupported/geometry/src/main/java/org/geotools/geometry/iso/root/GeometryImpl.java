@@ -89,7 +89,7 @@ import org.opengis.geometry.Geometry;
  * GeometryImpl instances are sets of direct positions in a particular
  * coordinate reference system. A GeometryImpl can be regarded as an infinite
  * set of points that satisfies the set operation interfaces for a set of direct
- * positions, TransfiniteSet<DirectPosition>. Since an infinite collection
+ * positions, TransfiniteSet&lt;DirectPosition&gt;. Since an infinite collection
  * class cannot be implemented directly, a boolean test for inclusion is
  * provided by this class.
  * 

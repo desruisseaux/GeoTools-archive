@@ -335,12 +335,12 @@ public class PrecisionModel implements Serializable, Precision {
 	 * Compares this {@link PrecisionModel} object with the specified object for
 	 * order. A PrecisionModel is greater than another if it provides greater
 	 * precision. The comparison is based on the value returned by the
-	 * {@link getMaximumSignificantDigits) method. This comparison is not
+	 * {@link getMaximumSignificantDigits} method. This comparison is not
 	 * strictly accurate when comparing floating precision models to fixed
 	 * models; however, it is correct when both models are either floating or
 	 * fixed.
 	 * 
-	 * @param o
+	 * @param other
 	 *            the <code>PrecisionModel</code> with which this
 	 *            <code>PrecisionModel</code> is being compared
 	 * @return a negative integer, zero, or a positive integer as this

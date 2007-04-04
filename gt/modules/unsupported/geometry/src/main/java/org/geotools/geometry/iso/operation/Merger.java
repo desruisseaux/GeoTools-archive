@@ -63,7 +63,7 @@ public class Merger {
 	 * In order two neighboured curves are merged, their end and startpoint must be equal.
 	 * 
 	 * @param curves
-	 * @return
+	 * @return null or tosses IllegalArgumentException
 	 */
 	public CurveImpl merge(List<CurveImpl> curves) {
 
@@ -82,7 +82,7 @@ public class Merger {
 	 * This method trys all combinations of curve´s start and end points.
 	 * 
 	 * @param curves
-	 * @return
+	 * @return null
 	 */
 	public CurveImpl merge(Set<CurveImpl> curves) {
 		return null;

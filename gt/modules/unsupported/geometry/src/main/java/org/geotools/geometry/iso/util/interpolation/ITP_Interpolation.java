@@ -1,6 +1,7 @@
 package org.geotools.geometry.iso.util.interpolation;
 
 import java.awt.geom.Point2D;
+import java.lang.Enum;
 import java.util.ArrayList;
 
 import org.geotools.geometry.iso.util.algorithm2D.AlgoPoint2D;

@@ -79,7 +79,7 @@ import org.geotools.geometry.iso.topograph2D.Envelope;
 import org.geotools.geometry.iso.util.Assert;
 
 /**
- * A robust version of {@LineIntersector}.
+ * A robust version of {@link LineIntersector}.
  * 
  * @see RobustDeterminant
  */

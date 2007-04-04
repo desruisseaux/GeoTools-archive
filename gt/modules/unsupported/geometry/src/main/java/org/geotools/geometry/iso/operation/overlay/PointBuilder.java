@@ -96,7 +96,7 @@ import org.opengis.geometry.coordinate.GeometryFactory;
 // import com.vividsolutions.jts.geomgraph.*;
 
 /**
- * Constructs {@link Point}s from the nodes of an overlay graph.
+ * Constructs {@link org.opengis.geometry.primitive.Point}s from the nodes of an overlay graph.
  * 
  * @version 1.7.2
  */
