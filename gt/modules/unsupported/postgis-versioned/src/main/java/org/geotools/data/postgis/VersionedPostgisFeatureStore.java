@@ -35,7 +35,6 @@ import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureLocking;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
@@ -243,13 +242,13 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
     // VERSIONING EXTENSIONS
     // ---------------------------------------------------------------------------------------------
 
-    public void rollback(String toVersion, Filter filter) throws IOException {
+    public void rollback(String toVersion, Filter filter, String[] userIds) throws IOException {
         // TODO: build an optimized version of this that can do the same work with a couple
         // of queries assuming the filter is fully encodable
 
         // Gather feature modified after toVersion
         ModifiedFeatureIds mfids = store.getModifiedFeatureFIDs(schema.getTypeName(), toVersion,
-                null, filter, null, getTransaction());
+                null, filter, userIds, getTransaction());
         FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
 
         // remove all features that have been created and not deleted

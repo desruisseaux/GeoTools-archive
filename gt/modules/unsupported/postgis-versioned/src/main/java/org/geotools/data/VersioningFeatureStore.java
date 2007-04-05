@@ -26,8 +26,7 @@ import org.opengis.filter.Filter;
  * 
  * @author Andrea Aime, TOPP
  */
-public interface VersioningFeatureStore extends VersioningFeatureSource,
-        FeatureStore {
+public interface VersioningFeatureStore extends VersioningFeatureSource, FeatureStore {
     /**
      * Rolls back features matching the filter to the state they had on the
      * specified version.
@@ -37,9 +36,16 @@ public interface VersioningFeatureStore extends VersioningFeatureSource,
      * filter.
      * 
      * @param toVersion
+     *            target of the rollback
      * @param filter
+     *            limits the feature whose history will be rolled back by an OGC
+     *            filter
+     * @param users
+     *            limits the feaeature whose history will be rolled back, by
+     *            catching only those that have been modified by at least one of
+     *            the specified users. May be null to avoi user filtering.
      * @throws IOException
      */
-    public void rollback(String toVersion, Filter filter) throws IOException;
+    public void rollback(String toVersion, Filter filter, String[] users) throws IOException;
 
 }

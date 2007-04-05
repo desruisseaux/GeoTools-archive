@@ -753,7 +753,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         VersionedPostgisFeatureStore fs = (VersionedPostgisFeatureStore) ds
                 .getFeatureSource("river");
         fs.setTransaction(t);
-        fs.rollback("4", Filter.INCLUDE);
+        fs.rollback("4", Filter.INCLUDE, null);
         t.commit();
 
         // now check rv2 is again there
@@ -775,7 +775,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         VersionedPostgisFeatureStore fs = (VersionedPostgisFeatureStore) ds
                 .getFeatureSource("river");
         fs.setTransaction(t);
-        fs.rollback("3", Filter.INCLUDE);
+        fs.rollback("3", Filter.INCLUDE, null);
         t.commit();
 
         // now check rv2 is again there
@@ -804,7 +804,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         VersionedPostgisFeatureStore fs = (VersionedPostgisFeatureStore) ds
                 .getFeatureSource("river");
         fs.setTransaction(t);
-        fs.rollback("1", Filter.INCLUDE);
+        fs.rollback("1", Filter.INCLUDE, null);
         t.commit();
 
         // now check river features are just like at the beginning
@@ -813,6 +813,39 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         for (int i = 0; i < riverFeatures.length; i++) {
             assertTrue(fc.contains(riverFeatures[i]));
         }
+        t.close();
+    }
+    
+    public void testRollbackUserChanges() throws IOException, IllegalAttributeException {
+        VersionedPostgisDataStore ds = getDataStore();
+        buildRiverHistory();
+
+        // try to rollback to revision 3, that is, rollback last deletion and
+        // creation
+        Transaction t = createTransaction("Lamb", "Trout, what did you do? "
+                + "Now I have to rollback your changes!");
+        VersionedPostgisFeatureStore fs = (VersionedPostgisFeatureStore) ds
+                .getFeatureSource("river");
+        fs.setTransaction(t);
+        fs.rollback("1", Filter.INCLUDE, new String[]{"trout"});
+        t.commit();
+
+        // now check that rv2 is again there an equal to the original, rv3 has not rolled back
+        // and rv1 is still modified
+        FeatureCollection fc = fs.getFeatures();
+        assertEquals(riverFeatures.length + 1, fc.size());
+        assertTrue(fc.contains(riverFeatures[1]));
+        FeatureIterator fi = fc.features();
+        while(fi.hasNext()) {
+            Feature f = fi.next();
+            if(f.getID().equals("river.rv1"))
+                assertFalse(f.equals(riverFeatures[1]));
+            else if(f.getID().equals("river.rv2"))
+                assertEquals(riverFeatures[1], f);
+            else
+                assertEquals(new Integer(3), f.getAttribute("id"));
+        }
+        fi.close();
         t.close();
     }
 
