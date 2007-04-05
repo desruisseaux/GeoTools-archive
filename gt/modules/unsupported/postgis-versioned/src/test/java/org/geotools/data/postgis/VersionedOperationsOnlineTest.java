@@ -606,7 +606,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         t.close();
     }
 
-    public void testModifiedIds() throws IOException, IllegalAttributeException {
+    public void testPlainModifiedIds() throws IOException, IllegalAttributeException {
         VersionedPostgisDataStore ds = getDataStore();
         String newId = buildRiverHistory();
 
@@ -688,6 +688,42 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         assertEquals(0, mfids.getCreated().size());
         assertEquals(0, mfids.getDeleted().size());
         assertEquals(0, mfids.getModified().size());
+    }
+    
+    public void testUserModifiedIds() throws IOException, IllegalAttributeException {
+        VersionedPostgisDataStore ds = getDataStore();
+        String newId = buildRiverHistory();
+
+        // check modified feature types are the proper ones
+        // full history
+        String[] modifiedTypes = ds.getModifiedFeatureTypes("1", null);
+        assertEquals(1, modifiedTypes.length);
+        assertEquals("river", modifiedTypes[0]);
+
+        // get features modified in first revisions, without filters
+        Transaction ac = Transaction.AUTO_COMMIT;
+        // ... all history, all users
+        ModifiedFeatureIds mfids = ds.getModifiedFeatureFIDs("river", "1", "5", Filter.INCLUDE,
+                new String[] {"lamb", "trout"}, ac);
+        assertEquals(1, mfids.getCreated().size());
+        assertEquals(1, mfids.getDeleted().size());
+        assertEquals(1, mfids.getModified().size());
+        // ... just first modification, but with the wrong user
+        mfids = ds.getModifiedFeatureFIDs("river", "1", "2", Filter.INCLUDE, new String[] {"trout"}, ac);
+        assertEquals(0, mfids.getCreated().size());
+        assertEquals(0, mfids.getDeleted().size());
+        assertEquals(0, mfids.getModified().size());
+        // ... again the first modification, right user this time
+        mfids = ds.getModifiedFeatureFIDs("river", "1", "2", Filter.INCLUDE, new String[] {"lamb"}, ac);
+        assertEquals(0, mfids.getCreated().size());
+        assertEquals(0, mfids.getDeleted().size());
+        assertEquals(2, mfids.getModified().size());
+        // ... let's see what trout did between 1 and 4
+        mfids = ds.getModifiedFeatureFIDs("river", "1", "4", Filter.INCLUDE, new String[] {"trout"}, ac);
+        assertEquals(0, mfids.getCreated().size());
+        assertEquals(0, mfids.getDeleted().size());
+        assertEquals(1, mfids.getModified().size());
+        assertTrue(mfids.getModified().contains("river.rv2"));
     }
 
     public void testModifiedIdsUnversioned() throws IOException, IllegalAttributeException {
@@ -810,7 +846,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         FeatureIterator it = fc.features();
         Feature f = it.next();
         assertEquals("changesets.4", f.getID());
-        assertEquals("gimbo", f.getAttribute("author"));
+        assertEquals("lamb", f.getAttribute("author"));
         assertEquals("third change", f.getAttribute("message"));
         it.close();
 
@@ -821,15 +857,15 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         it = fc.features();
         f = it.next();
         assertEquals(new Long(5), f.getAttribute("revision"));
-        assertEquals("gimbo", f.getAttribute("author"));
+        assertEquals("trout", f.getAttribute("author"));
         assertEquals("fourth change", f.getAttribute("message"));
         f = it.next();
         assertEquals(new Long(3), f.getAttribute("revision"));
-        assertEquals("gimbo", f.getAttribute("author"));
+        assertEquals("trout", f.getAttribute("author"));
         assertEquals("second change", f.getAttribute("message"));
         f = it.next();
         assertEquals(new Long(2), f.getAttribute("revision"));
-        assertEquals("gimbo", f.getAttribute("author"));
+        assertEquals("lamb", f.getAttribute("author"));
         assertEquals("first change", f.getAttribute("message"));
         it.close();
 
@@ -840,7 +876,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         it = fc.features();
         f = it.next();
         assertEquals("changesets.2", f.getID());
-        assertEquals("gimbo", f.getAttribute("author"));
+        assertEquals("lamb", f.getAttribute("author"));
         assertEquals("first change", f.getAttribute("message"));
         it.close();
     }
@@ -925,8 +961,8 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         VersionedPostgisDataStore ds = getDataStore();
         ds.setVersioned("river", true, "mambo", "version enabling stuff");
 
-        // revision 2), modify two elements
-        Transaction t = createTransaction("gimbo", "first change");
+        // revision 2), modify two elements, rv1 and rv2
+        Transaction t = createTransaction("lamb", "first change");
         FeatureWriter fw = ds.getFeatureWriter("river", Filter.INCLUDE, t);
         while (fw.hasNext()) {
             Feature f = fw.next();
@@ -943,8 +979,8 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         t.commit();
         t.close();
 
-        // revision 3) modify just one
-        t = createTransaction("gimbo", "second change");
+        // revision 3) modify just one, rv2
+        t = createTransaction("trout", "second change");
         fw = ds.getFeatureWriter("river", Filter.INCLUDE, t);
         while (fw.hasNext()) {
             Feature f = fw.next();
@@ -958,8 +994,8 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         t.commit();
         t.close();
 
-        // revision 4) create a new feature
-        t = createTransaction("gimbo", "third change");
+        // revision 4) create a new feature, rv3
+        t = createTransaction("lamb", "third change");
         fw = ds.getFeatureWriterAppend("river", t);
         Feature f = fw.next();
         f.setAttribute("id", new Integer(3));
@@ -973,7 +1009,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         t.close();
 
         // revision 5), delete river rv2
-        t = createTransaction("gimbo", "fourth change");
+        t = createTransaction("trout", "fourth change");
         fw = ds.getFeatureWriter("river", Filter.INCLUDE, t);
         while (fw.hasNext()) {
             f = fw.next();

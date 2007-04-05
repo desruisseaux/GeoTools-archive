@@ -70,6 +70,7 @@ import org.geotools.filter.FilterVisitorFilterWrapper;
 import org.geotools.geometry.jts.JTS;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.PropertyName;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
@@ -581,13 +582,13 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
             r1 = r2;
             r2 = tmp;
         }
-
+        
         // gather revisions where the specified users were involved... that would be
         // a job for joins, but I don't want to make this code datastore dependent, so
         // far this one is relatively easy to port over to other dbms, I would like it
         // to stay so
-        Set userRevisions = getRevisionsCreatedBy(typeName, r1, r2, users);
-
+        Set userRevisions = getRevisionsCreatedBy(typeName, r1, r2, users, transaction);
+        
         // We have to perform the following query:
         // ------------------------------------------------------------
         // select rowId, revisionCreated, [columnsForSecondaryFilter]
@@ -598,6 +599,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         // (revision > r1 and revision <= r2)
         // )
         // and [encodableFilterComponent]
+        // and revision in [user created revisions]
         // order by rowId, revisionCreated
         // ------------------------------------------------------------
         // and then run the post filter against the results.
@@ -637,15 +639,31 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         Filter revLeR2 = ff.lessOrEqual(ff.property("revision"), ff.literal(r2.revision));
         Filter versionFilter = ff.or(ff.and(revLeR1, ff.and(expGeR1, expLeR2)), ff.and(revGtR1,
                 revLeR2));
+        // ... merge in the prefilter
         Filter newFilter = null;
         if (Filter.EXCLUDE.equals(preFilter)) {
             return new ModifiedFeatureIds(r1, r2);
         } else if (Filter.INCLUDE.equals(preFilter)) {
             newFilter = versionFilter;
         } else {
-            Filter clone = transformFidFilter(typeName, filter);
+            Filter clone = transformFidFilter(typeName, preFilter);
             newFilter = ff.and(versionFilter, clone);
         }
+        // ... and the user revision checks
+        if(userRevisions != null) {
+            // if no revisions touched by those users, no changes
+            if(userRevisions.isEmpty())
+                return new ModifiedFeatureIds(r1, r2);
+            
+            List urFilters = new ArrayList(userRevisions.size());
+            PropertyName revisionProperty = ff.property("revision");
+            for (Iterator it = userRevisions.iterator(); it.hasNext();) {
+                Long revision = (Long) it.next();
+                urFilters.add(ff.equals(revisionProperty, ff.literal(revision)));
+            }
+            newFilter = ff.and(newFilter, ff.or(urFilters));
+        }
+        
 
         // query the underlying datastore
         FeatureReader fr = null;
@@ -722,7 +740,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
             Set modified = new HashSet(matched);
             modified.removeAll(created);
             modified.removeAll(deleted);
-
+            
             // oh, finally we have all we need to return :-)
             return new ModifiedFeatureIds(r1, r2, created, deleted, modified);
         } catch (Exception e) {
@@ -740,19 +758,35 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
      * @param users an array of user 
      * @return
      */
-    Set getRevisionsCreatedBy(String typeName, RevisionInfo r1, RevisionInfo r2, String[] users) {
+    Set getRevisionsCreatedBy(String typeName, RevisionInfo r1, RevisionInfo r2, String[] users, Transaction transaction) throws IOException {
         if(users == null || users.length == 0)
             return null;
         
-        final FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
-        final List filters = new ArrayList(users.length);
+        FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+        List filters = new ArrayList(users.length);
         for (int i = 0; i < users.length; i++) {
             filters.add(ff.equals(ff.property("author"), ff.literal(users[i])));
         }
-        final Filter userFilter = ff.or(filters);
+        Filter revisionFilter = ff.between(ff.property("revision"), ff.literal(r1.revision), ff.literal(r2.revision));
+        Filter userFilter = ff.and(ff.or(filters), revisionFilter);
         
-        final Query query = new DefaultQuery(typeName, userFilter, new String[] {"revision"});
-        return null;
+        // again, here we could filter with a join on the feature type we're investigating, but...
+        Query query = new DefaultQuery(VersionedPostgisDataStore.TBL_CHANGESETS, userFilter, new String[] {"revision"});
+        Set revisions = new HashSet();
+        FeatureReader fr = null;
+        try  {
+            fr = wrapped.getFeatureReader(query, transaction);
+            while(fr.hasNext()) {
+                Feature f = fr.next();
+                revisions.add(f.getAttribute("revision"));
+            }
+        } catch(IllegalAttributeException e) {
+            throw new DataSourceException("Error reading revisions modified by users " + Arrays.asList(users), e);
+        } finally {
+            if(fr != null)
+                fr.close();
+        }
+        return revisions;
     }
 
     /**
