@@ -17,6 +17,7 @@ package org.geotools.data.postgis.fidmapper;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Types;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -24,6 +25,8 @@ import java.util.Set;
 import org.geotools.data.jdbc.fidmapper.DefaultFIDMapperFactory;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
+import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
+import org.geotools.data.postgis.VersionedPostgisDataStore;
 
 /**
  * A fid mapper factory that makes sure the revision attribute does not become part of the key
@@ -66,6 +69,12 @@ public class VersionedFIDMapperFactory extends DefaultFIDMapperFactory {
      */
     public FIDMapper getMapper(String catalog, String schema, String tableName,
             Connection connection) throws IOException {
+        // handle changesets as a special one
+        if(VersionedPostgisDataStore.TBL_CHANGESETS.equals(tableName)) {
+            PostGISAutoIncrementFIDMapper mapper = new PostGISAutoIncrementFIDMapper(VersionedPostgisDataStore.TBL_CHANGESETS, "revision", Types.NUMERIC, true);
+            return new TypedFIDMapper(mapper, VersionedPostgisDataStore.TBL_CHANGESETS);
+        }
+        
         // for non versioned types we're good with the standard mappers, but we
         // must remember that versioned data store uses typed fids externally
         // (only internal ones are non typed)
