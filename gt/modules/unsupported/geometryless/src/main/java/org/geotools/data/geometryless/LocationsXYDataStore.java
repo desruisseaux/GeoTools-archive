@@ -34,8 +34,9 @@ import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
  import org.opengis.filter.Filter;
-import org.geotools.filter.SQLEncoder;
-import org.geotools.filter.SQLEncoderLocationsXY;
+//import  org.geotools.data.jdbc.FilterToSQL;
+// import org.geotools.filter.SQLEncoder;
+import org.geotools.data.geometryless.filter.SQLEncoderLocationsXY;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -67,12 +68,13 @@ public class LocationsXYDataStore extends org.geotools.data.geometryless.JDBCDat
 
     /**
      * Constructor for LocationsXYDataStore where the database schema name is provided.
-     * @param connectionPool a MySQL {@link org.geotools.data.jdbc.ConnectionPool ConnectionPool}
+     * @param connectionPool a  {@link org.geotools.data.jdbc.ConnectionPool ConnectionPool}
      * @param databaseSchemaName the database schema.  Can be null.  See the comments for the parameter schemaPattern in {@link java.sql.DatabaseMetaData#getTables(String, String, String, String[]) DatabaseMetaData.getTables}, because databaseSchemaName behaves in the same way.
      * @throws IOException if the database cannot be properly accessed
      */
     public LocationsXYDataStore(ConnectionPool connectionPool, String databaseSchemaName, String namespace, String x, String y, String geomName)    
         throws IOException {
+    	// databaseSchemaName can be null
         super(connectionPool, databaseSchemaName,namespace);
        this.XCoordColumnName = x;
        this.YCoordColumnName = y;
@@ -109,12 +111,7 @@ public class LocationsXYDataStore extends org.geotools.data.geometryless.JDBCDat
      * Attribute Type.
      * 
      * <p>
-     * In addition to standard SQL types, this method identifies MySQL 4.1's geometric
-     * datatypes and creates attribute types accordingly.  This happens when the
-     * datatype, identified by column 5 of the ResultSet parameter, is equal to
-     * java.sql.Types.OTHER.  If a Types.OTHER ends up not being geometric, this
-     * method simply calls the parent class's buildAttributeType method to do something
-     * with it.
+     * This simply returns the constructed geometry when the column is the first (X) 
      * </p>
      * 
      * <p>
@@ -182,7 +179,7 @@ public class LocationsXYDataStore extends org.geotools.data.geometryless.JDBCDat
     public SQLBuilder getSqlBuilder(String typeName) throws IOException {
     	
     
-        SQLEncoder encoder = new SQLEncoderLocationsXY(XCoordColumnName,YCoordColumnName);
+    	SQLEncoderLocationsXY encoder = new SQLEncoderLocationsXY(XCoordColumnName,YCoordColumnName);
         encoder.setFIDMapper(getFIDMapper(typeName));
         return new LocationsXYSQLBuilder(encoder, XCoordColumnName, 
                                          YCoordColumnName);

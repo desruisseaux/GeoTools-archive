@@ -14,7 +14,9 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.filter;
+package org.geotools.data.geometryless.filter;
+
+import org.geotools.data.geometryless.filter.SQLEncoderLocationsXY;
 
 import java.util.logging.Logger;
 
@@ -27,21 +29,24 @@ import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
+//import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
 
 /**
- * Unit test for SQLEncoderPostgis.  This is a complimentary  test suite with
+ * Unit test for SQLEncoderLocationsXY.  This is a complementary  test suite with
  * the filter test suite.
  *
  * @author Chris Holmes, TOPP
- * @source $URL$
+ * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/geometryless/src/test/java/org/geotools/filter/SQLEncoderLocationsXYTest.java $
  */
 public class SQLEncoderLocationsXYTest extends TestCase {
     /** Standard logging instance */
@@ -50,8 +55,9 @@ public class SQLEncoderLocationsXYTest extends TestCase {
     protected static AttributeTypeFactory attFactory = AttributeTypeFactory
         .newInstance();
 
-   private FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
- 
+ //  private FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
+   private FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory(null);
+   
  
     /** Schema on which to preform tests */
     protected static FeatureType testSchema = null;
@@ -177,22 +183,25 @@ public class SQLEncoderLocationsXYTest extends TestCase {
     }
 
     public void test1() throws Exception {
-        GeometryFilter gf = filterFactory.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
+ //       GeometryFilter gf = filterFactory.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
 
+        Filter gf = filterFactory.bbox("testGeometry",0,
+                300, 0, 300, "EPSG:2356");
+        
 //         GeometryFilterImpl gf = new GeometryFilterImpl(AbstractFilter.GEOMETRY_BBOX);
-        LiteralExpressionImpl right = new BBoxExpressionImpl(new Envelope(0,
+ /*       LiteralExpressionImpl right = new BBoxExpressionImpl(new Envelope(0,
                     300, 0, 300));
         gf.addRightGeometry(right);
 
         AttributeExpressionImpl left = new AttributeExpressionImpl(testSchema,
                 "testGeometry");
         gf.addLeftGeometry(left);
-
+*/
         SQLEncoderLocationsXY encoder = new SQLEncoderLocationsXY("long","lat");
         encoder.setSRID(2356);
 
-        String out = encoder.encode( gf);
-        System.out.println("Resulting SQL filter is \n" + out);
+        String out = encoder.encodeToString( gf);
+        LOGGER.info("Resulting SQL filter is \n" + out);
 
         //assertEquals("WHERE \"testGeometry\" && GeometryFromText('POLYGON"
         //    + " ((0 0, 0 300, 300 300, 300 0, 0 0))'" + ", 2356)", out);
@@ -200,15 +209,19 @@ public class SQLEncoderLocationsXYTest extends TestCase {
 
     public void test2() throws Exception {
 //        GeometryFilterImpl gf = new GeometryFilterImpl(AbstractFilter.GEOMETRY_BBOX);
-        GeometryFilter gf = filterFactory.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
+        Filter gf = filterFactory.bbox("testGeometry",0,
+                300, 0, 300, "EPSG:2356");
+        
+/*    	GeometryFilter gf = filterFactory.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
         LiteralExpressionImpl left = new BBoxExpressionImpl(new Envelope(10,
                     300, 10, 300));
         gf.addLeftGeometry(left);
-
+*/
+        
         SQLEncoderLocationsXY encoder = new SQLEncoderLocationsXY("long","lat");
         encoder.setDefaultGeometry("testGeometry");
 
-        String out = encoder.encode( gf);
+        String out = encoder.encodeToString( gf);
         System.out.println("Resulting SQL filter is \n" + out);
 
         //assertEquals(out,
@@ -220,7 +233,11 @@ public class SQLEncoderLocationsXYTest extends TestCase {
 
     public void testException() throws Exception {
 //        GeometryFilterImpl gf = new GeometryFilterImpl(AbstractFilter.GEOMETRY_BEYOND);
-        GeometryFilter gf = filterFactory.createGeometryFilter(AbstractFilter.GEOMETRY_BEYOND);
+
+        Filter gf = filterFactory.bbox("testGeometry",0,
+                300, 0, 300, "EPSG:2356");
+        
+/*    	GeometryFilter gf = filterFactory.createGeometryFilter(AbstractFilter.GEOMETRY_BEYOND);
 
         LiteralExpressionImpl right = new BBoxExpressionImpl(new Envelope(10,
                     10, 300, 300));
@@ -229,12 +246,12 @@ public class SQLEncoderLocationsXYTest extends TestCase {
         AttributeExpressionImpl left = new AttributeExpressionImpl(testSchema,
                 "testGeometry");
         gf.addLeftGeometry(left);
-
+*/
         try {
             SQLEncoderLocationsXY encoder = new SQLEncoderLocationsXY("long","lat");
-            String out = encoder.encode( gf);
+            String out = encoder.encodeToString( gf);
             System.out.println("out is " + out);
-        } catch (SQLEncoderException e) {
+        } catch (Exception e) {
             System.out.println(e.getMessage());
 
             //  assertEquals("Filter type not supported", e.getMessage());

@@ -267,6 +267,7 @@ public class LocationsXYDataStoreTest extends TestCase {
             dstore.getFeatureReader(schema, Filter.INCLUDE, Transaction.AUTO_COMMIT);
         int numFeatures = count(reader);
         assertEquals("Number of features off:", 6, numFeatures);
+        // reader.close(); //done in  count()
     }
 
     public void testFilter() throws Exception {
@@ -288,6 +289,7 @@ public class LocationsXYDataStoreTest extends TestCase {
  //       Query query = new DefaultQuery(FEATURE_TABLE, test1);
         FeatureReader reader = dstore.getFeatureReader(schema, test1, Transaction.AUTO_COMMIT);
         assertEquals("Number of filtered features off:", 2, count(reader));
+       //  reader.close(); done in count()
     }
 
     public void testGeometry() throws Exception {
@@ -297,6 +299,8 @@ public class LocationsXYDataStoreTest extends TestCase {
         FeatureReader reader =
             dstore.getFeatureReader(schema, Filter.INCLUDE, Transaction.AUTO_COMMIT);
 	Feature feature = reader.next();
+    reader.close();
+    
 	LOGGER.info("feature is: " + feature);
 	Geometry geom = feature.getDefaultGeometry();
 	LOGGER.info("geometry is " + geom);

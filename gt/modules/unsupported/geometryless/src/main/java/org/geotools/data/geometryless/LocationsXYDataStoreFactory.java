@@ -61,11 +61,11 @@ public class LocationsXYDataStoreFactory extends AbstractFactory
 
     /** Specified JDBC driver class. */
     static final Param  DRIVER = new Param("driver", String.class,
-            "Java Class name of installed driver", true, "");
+            "Java Class name of installed ConectionPool JDBC driver", true, "org.geotools.data.geometryless.wrapper.PGConnectionPool");
             
                /** Specified JDBC driver class calling URL */
    static final Param  URLPREFIX  = new Param("urlprefix", String.class,
-            "complete jdbc URL for the database connection", true, "");
+            "complete jdbc URL for the database connection", true, "jdbc:postgresql://localhost:5432/postgres");
 
     /** Param, package visibiity for JUnit tests */
     static final Param DBTYPE = new Param("dbtype", String.class,
@@ -80,19 +80,20 @@ public class LocationsXYDataStoreFactory extends AbstractFactory
             "name of JDBC results column containing northing (y, latitude etc)", true, "latitude");
 
     static final Param GEOMNAME = new Param("geom_name", String.class, "the " +
-      "name of the geometry attribute from the x,y column", false, GEOM_NAME_DEFAULT);
+      "name of the geometry attribute generated from the x,y columns", true, GEOM_NAME_DEFAULT);
 
     /** Param, package visibiity for JUnit tests */
-    static final Param HOST = new Param("host", String.class,
+/*    static final Param HOST = new Param("host", String.class,
             "db host machine", false, "localhost");
-
+*/
     /** Param, package visibiity for JUnit tests */
-    static final Param PORT = new Param("port", String.class,
+/*    static final Param PORT = new Param("port", String.class,
             "db connection port", false, "3306");
-
+*/
     /** Param, package visibiity for JUnit tests */
-    static final Param DATABASE = new Param("database", String.class,
+/*    static final Param DATABASE = new Param("database", String.class,
             "jdbc database", false, "" );
+*/
 
     /** Param, package visibiity for JUnit tests */
     static final Param USER = new Param("user", String.class,
@@ -136,7 +137,7 @@ public class LocationsXYDataStoreFactory extends AbstractFactory
 
     /** Array with all of the params */
     static final Param[] arrayParameters = {
-        DBTYPE, HOST, PORT, DATABASE, SCHEMA, USER, PASSWD, CHARSET, NAMESPACE,DRIVER,URLPREFIX,XCOLUMN,YCOLUMN, GEOMNAME
+        DBTYPE, SCHEMA, USER, PASSWD, CHARSET, NAMESPACE,DRIVER,URLPREFIX,XCOLUMN,YCOLUMN, GEOMNAME
     };
 
    /**
@@ -234,11 +235,11 @@ public class LocationsXYDataStoreFactory extends AbstractFactory
             throw new IOException("The parameteres map isn't correct!!");
         }
 
-        String host = (String) HOST.lookUp(params);
+ //       String host = (String) HOST.lookUp(params);
         String user = (String) USER.lookUp(params);
         String passwd = (String) PASSWD.lookUp(params);
-        String port = (String) PORT.lookUp(params);
-        String database = (String) DATABASE.lookUp(params);
+ //       String port = (String) PORT.lookUp(params);
+ //       String database = (String) DATABASE.lookUp(params);
         Charset charSet = (Charset) CHARSET.lookUp(params);
         String namespace = (String) NAMESPACE.lookUp(params);
         String schema = (String) SCHEMA.lookUp(params);
@@ -284,12 +285,11 @@ public class LocationsXYDataStoreFactory extends AbstractFactory
 	if (geom_name == null) {
 	    geom_name = GEOM_NAME_DEFAULT;
 	}
-        if (schema != null) {
-            return new LocationsXYDataStore(pool, schema, namespace, xcolumn,
+  
+       return new LocationsXYDataStore(pool, schema, namespace, xcolumn,
                                             ycolumn, geom_name);
-        } else {
-            return new LocationsXYDataStore(pool);
-        }
+ 
+       
     }
 
     /**
@@ -354,7 +354,7 @@ public class LocationsXYDataStoreFactory extends AbstractFactory
      */
     public Param[] getParametersInfo() {
         return new Param[] {
-            DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, CHARSET, NAMESPACE, DRIVER, URLPREFIX, XCOLUMN, YCOLUMN
+            DBTYPE, SCHEMA, USER, PASSWD, CHARSET, NAMESPACE, DRIVER, URLPREFIX, XCOLUMN, YCOLUMN, GEOMNAME
         };
     }
 }

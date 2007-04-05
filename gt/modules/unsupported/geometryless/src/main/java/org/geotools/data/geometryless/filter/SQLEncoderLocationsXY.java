@@ -14,39 +14,47 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.filter;
+package org.geotools.data.geometryless.filter;
 
 import java.io.IOException;
 import java.util.logging.Logger;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import org.geotools.filter.AttributeExpression;
-import org.geotools.filter.Expression;
-import org.geotools.filter.LiteralExpression;
 
+import org.geotools.data.DataSourceException;
+import org.geotools.data.jdbc.FilterToSQL;
+import org.opengis.filter.ExcludeFilter;
+import org.opengis.filter.FilterVisitor;
+import org.opengis.filter.Id;
+import org.opengis.filter.IncludeFilter;
+import org.opengis.filter.PropertyIsBetween;
+import org.opengis.filter.PropertyIsLike;
+import org.opengis.filter.PropertyIsNull;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
+// import org.geotools.filter.LiteralExpression;
+import org.opengis.filter.spatial.BBOX;
+import org.opengis.filter.spatial.BinarySpatialOperator;
+
+import org.geotools.filter.FilterCapabilities;
 
 /**
  * Encodes a filter into a SQL WHERE statement for generic SQL.  This class adds
  * the ability to turn geometry filters into sql statements if they are
- * bboxes.
+ * based on x,y (longitude/latitude) column pairs..
  *
  * @author Rob Atkinson , SCO
  * @author Debasish Sahu, debasish.sahu@rmsi.com
  * 
- * @source $URL$
+ * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/geometryless/src/main/java/org/geotools/filter/SQLEncoderLocationsXY.java $
  */
-public class SQLEncoderBBOX extends SQLEncoder
-    implements org.geotools.filter.FilterVisitor {
+public class SQLEncoderLocationsXY extends FilterToSQL {
     /** Standard java logger */
     private static Logger LOGGER = Logger.getLogger("org.geotools.filter");
 
-    /**
-     * The filters that this encoder can processed. (Note this value shadows
-     * private capabilities in superclass)
-     */
-    private FilterCapabilities capabilities = new FilterCapabilities();
-
+ 
     /**
      * The srid of the schema, so the bbox conforms.  Could be better to have
      * it in the bbox filter itself, but this works for now.
@@ -54,12 +62,8 @@ public class SQLEncoderBBOX extends SQLEncoder
     private int srid;
 
   // names of sql addressable columns containing numerical coordinates
-   private String XMinColumnName = null;
-    private String YMinColumnName = null;
-    private String XMaxColumnName = null;
-    private String YMaxColumnName = null;
-
- 
+   private String xcolumn = null;
+   private String ycolumn = null;
    
     /** The geometry attribute to use if none is specified. */
     private String defaultGeom;
@@ -69,18 +73,15 @@ public class SQLEncoderBBOX extends SQLEncoder
      * SRID, must make client set it somehow.  Maybe detect when encode is
      * called?
      */
-    public SQLEncoderBBOX(String minx, String miny, String maxx, String maxy) {
+    public SQLEncoderLocationsXY(String xcolumn, String ycolumn) {
         capabilities = createFilterCapabilities();
-        this.XMinColumnName = minx;
-        this.YMinColumnName = miny;
-        this.XMaxColumnName = maxx;
-        this.YMaxColumnName = maxy;
- 
+        this.xcolumn = xcolumn;
+        this.ycolumn = ycolumn;
 
-        setColnameEscape("");
+        setSqlNameEscape("");
     }
 
-    public SQLEncoderBBOX(int srid) {
+    public SQLEncoderLocationsXY(int srid) {
         this.srid = srid;
     }
 
@@ -90,21 +91,18 @@ public class SQLEncoderBBOX extends SQLEncoder
     protected FilterCapabilities createFilterCapabilities() {
         FilterCapabilities capabilities = new FilterCapabilities();
 
-        capabilities.addType(AbstractFilter.LOGIC_OR);
-        capabilities.addType(AbstractFilter.LOGIC_AND);
-        capabilities.addType(AbstractFilter.LOGIC_NOT);
-        capabilities.addType(AbstractFilter.COMPARE_EQUALS);
-        capabilities.addType(AbstractFilter.COMPARE_NOT_EQUALS);
-        capabilities.addType(AbstractFilter.COMPARE_LESS_THAN);
-        capabilities.addType(AbstractFilter.COMPARE_GREATER_THAN);
-        capabilities.addType(AbstractFilter.COMPARE_LESS_THAN_EQUAL);
-        capabilities.addType(AbstractFilter.COMPARE_GREATER_THAN_EQUAL);
-        capabilities.addType(AbstractFilter.NULL);
-        capabilities.addType(AbstractFilter.BETWEEN);
-        capabilities.addType((short) 12345);
-        capabilities.addType((short) -12345);
-        capabilities.addType(AbstractFilter.GEOMETRY_BBOX);
-        capabilities.addType(AbstractFilter.FID);
+
+        capabilities.addAll(FilterCapabilities.LOGICAL_OPENGIS);
+        capabilities.addAll(FilterCapabilities.SIMPLE_COMPARISONS_OPENGIS);
+        capabilities.addType(PropertyIsNull.class);
+        capabilities.addType(PropertyIsBetween.class);
+        capabilities.addType(Id.class);
+        capabilities.addType(IncludeFilter.class);
+        capabilities.addType(ExcludeFilter.class);
+        capabilities.addType(PropertyIsLike.class);
+
+        capabilities.addType(BBOX.class);
+        
 
         return capabilities;
     }
@@ -144,27 +142,33 @@ public class SQLEncoderBBOX extends SQLEncoder
      *
      * @throws RuntimeException for IO exception (need a better error)
      */
-    public void visit(GeometryFilter filter) throws RuntimeException {
-        LOGGER.finer("exporting GeometryFilter");
-		System.out.println("exporting GeometryFilter");
-
-        if (filter.getFilterType() == AbstractFilter.GEOMETRY_BBOX) {
-            DefaultExpression left = (DefaultExpression) filter.getLeftGeometry();
-            DefaultExpression right = (DefaultExpression) filter
-                .getRightGeometry();
-
+    public Object visitBinarySpatialOperator(BinarySpatialOperator filter, Object extraData) throws RuntimeException {
+ 
+        if (filter instanceof BBOX) {
+            Expression left = (Expression) filter.getExpression1();
+            Expression right = (Expression) filter.getExpression2();
+            
+            PropertyName propertyExpr;
+            Literal geomLiteralExpr;
+            
             // left and right have to be valid expressions
             try {
-                /*   if (left == null) {
-                   out.write(defaultGeom);
-                   } else {
-                       left.accept(this);
-                   }*/
-                if (right == null) {
-                    out.write(defaultGeom);
-                } else {
-                    right.accept(this);
-                }
+                if (left instanceof PropertyName &&
+                        right instanceof Literal) {
+                        propertyExpr = (PropertyName)left;
+                        geomLiteralExpr = (Literal)right;
+                    } else if (right instanceof PropertyName &&
+                               left instanceof Literal) {
+                        propertyExpr = (PropertyName) right;
+                        geomLiteralExpr = (Literal) left;
+                    } else {
+                        String err = "LocationsXY currently supports one geometry and one " +
+                            "attribute expr.  You gave: " + left + ", " + right;
+                        throw new DataSourceException(err);
+                    }
+ 
+                visitLiteralGeometry(geomLiteralExpr);
+                
             } catch (java.io.IOException ioe) {
                 LOGGER.warning("Unable to export filter" + ioe);
             }
@@ -172,6 +176,8 @@ public class SQLEncoderBBOX extends SQLEncoder
             LOGGER.warning("exporting unknown filter type, only bbox supported");
             throw new RuntimeException("Only BBox is currently supported");
         }
+        
+        return extraData;
     }
 
     /**
@@ -182,14 +188,14 @@ public class SQLEncoderBBOX extends SQLEncoder
      *
      * @throws IOException for IO exception (need a better error)
      */
-    public void visitLiteralGeometry(LiteralExpression expression)
+    public void visitLiteralGeometry(Literal expression)
         throws IOException {
-        Geometry bbox = (Geometry) expression.getLiteral();
+        Geometry bbox = (Geometry) expression.getValue();
         Envelope e = bbox.getEnvelopeInternal();
         double x1 = e.getMinX();
        double x2 = e.getMaxX();
         double y1 = e.getMinY();
         double y2 = e.getMaxY();
-       out.write( "( " +  XMinColumnName  + " <= " + x2 + " and " + XMaxColumnName + " >= " + x1 + " and " +  YMinColumnName  + " <= " + y2 + " and " + YMaxColumnName + " >= " + y1 + " )"        );
+       out.write( "( " +  xcolumn  + " < " + x2 + " and " + xcolumn + " > " + x1 + " and " +  ycolumn  + " < " + y2 + " and " + ycolumn + " > " + y1 + " )"        );
     }
 }

@@ -34,8 +34,8 @@ import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
  import org.opengis.filter.Filter;
-import org.geotools.filter.SQLEncoder;
-import org.geotools.filter.SQLEncoderBBOX;
+//import org.geotools.filter.SQLEncoder;
+import org.geotools.data.geometryless.filter.SQLEncoderBBOX;
 
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -202,7 +202,7 @@ public class BBOXDataStore extends org.geotools.data.geometryless.JDBCDataStore 
     public SQLBuilder getSqlBuilder(String typeName) throws IOException {
     	
     
-        SQLEncoder encoder = new SQLEncoderBBOX(XMinColumnName,YMinColumnName,XMaxColumnName,YMaxColumnName);
+    	SQLEncoderBBOX encoder = new SQLEncoderBBOX(XMinColumnName,YMinColumnName,XMaxColumnName,YMaxColumnName);
         encoder.setFIDMapper(getFIDMapper(typeName));
         return new BBOXSQLBuilder(encoder, XMinColumnName,YMinColumnName,
                                          XMaxColumnName,YMaxColumnName);

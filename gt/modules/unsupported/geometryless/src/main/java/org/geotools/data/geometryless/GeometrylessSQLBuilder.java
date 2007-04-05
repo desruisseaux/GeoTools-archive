@@ -18,36 +18,32 @@ package org.geotools.data.geometryless;
 
 import java.util.logging.Logger;
 
-import org.geotools.data.jdbc.DefaultSQLBuilder;
+// import org.geotools.data.jdbc.DefaultSQLBuilder;
+import org.geotools.data.jdbc.GeoAPISQLBuilder;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.GeometryAttributeType;
-import org.geotools.filter.SQLEncoder;
+// import org.geotools.filter.SQLEncoder;
+import org.geotools.data.jdbc.FilterToSQL;
+
 /**
  * A Geometryless-specific instance of DefaultSQLBuilder, which supports geometries created form standard data types
  * @author Rob Atkinson rob@socialchange.net.au
  * @source $URL$
  */
-public class GeometrylessSQLBuilder extends DefaultSQLBuilder {
+public class GeometrylessSQLBuilder extends GeoAPISQLBuilder {
     
        /** The logger for the mysql module. */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.data.geometryless");
 
-   private String XCoordColumnName = null;
-   private String YCoordColumnName = null;
+ 
    
-    public GeometrylessSQLBuilder(SQLEncoder encoder) {
-        super(encoder);
+    public GeometrylessSQLBuilder(FilterToSQL encoder) {
+        super(encoder, null,null);
 
 
     }
     
-
-    public GeometrylessSQLBuilder(SQLEncoder encoder, String x, String y) {
-        super(encoder);
-     this.XCoordColumnName = x;
-       this.YCoordColumnName = y;
-   }
 
     /**
      * Produces the select information required.

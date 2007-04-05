@@ -18,11 +18,13 @@ package org.geotools.data.geometryless;
 
 import java.util.logging.Logger;
 
-import org.geotools.data.jdbc.DefaultSQLBuilder;
+import org.geotools.data.geometryless.filter.SQLEncoderLocationsXY;
+//import org.geotools.data.jdbc.DefaultSQLBuilder;
+import org.geotools.data.jdbc.GeoAPISQLBuilder;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.GeometryAttributeType;
-import org.geotools.filter.SQLEncoder;
+//import org.geotools.filter.SQLEncoder;
 
 /**
  * A an extension of DefaultSQLBuilder, which supports point geometries  that
@@ -32,15 +34,15 @@ import org.geotools.filter.SQLEncoder;
  * @source $URL$
  * @version $Id$
  */
-public class LocationsXYSQLBuilder extends DefaultSQLBuilder {
+public class LocationsXYSQLBuilder extends GeoAPISQLBuilder {
     /** The logger for the mysql module. */
     private static final Logger LOGGER = Logger.getLogger(
             "org.geotools.data.geometryless");
     private String xCoordColumnName = null;
     private String yCoordColumnName = null;
 
-    public LocationsXYSQLBuilder(SQLEncoder encoder, String x, String y) {
-        super(encoder);
+    public LocationsXYSQLBuilder(SQLEncoderLocationsXY encoder, String x, String y) {
+        super(encoder, null , null);
         this.xCoordColumnName = x;
         this.yCoordColumnName = y;
     }

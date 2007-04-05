@@ -35,7 +35,9 @@ import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.jdbc.attributeio.WKTAttributeIO;
 import org.geotools.feature.AttributeType;
  import org.opengis.filter.Filter;
-import org.geotools.filter.SQLEncoder;
+// import org.geotools.filter.SQLEncoder;
+// import org.geotools.data.geometryless.filter.GeometrylessSQLEncoder;
+ import org.geotools.data.jdbc.FilterToSQL;
 
 /**
  * An implementation of the GeoTools Data Store API for a generic non-spatial database platform.
@@ -204,8 +206,8 @@ public class JDBCDataStore extends org.geotools.data.jdbc.JDBCDataStore {
    
             if (dataType == Types.OTHER) {
                 //this is MySQL-specific; handle it
-                String typeName = rs.getString(TYPE_NAME);
-                String typeNameLower = typeName.toLowerCase();
+  //              String typeName = rs.getString(TYPE_NAME);
+  //              String typeNameLower = typeName.toLowerCase();
 	return super.buildAttributeType(rs);
             } else {
                 return super.buildAttributeType(rs);
@@ -218,7 +220,7 @@ public class JDBCDataStore extends org.geotools.data.jdbc.JDBCDataStore {
     public SQLBuilder getSqlBuilder(String typeName) throws IOException {
     	
     
-        SQLEncoder encoder = new SQLEncoder();
+    	FilterToSQL encoder = new FilterToSQL();
         encoder.setFIDMapper(getFIDMapper(typeName));
         return new GeometrylessSQLBuilder(encoder);
     }

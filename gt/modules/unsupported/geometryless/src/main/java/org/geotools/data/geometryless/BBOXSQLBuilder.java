@@ -18,11 +18,13 @@ package org.geotools.data.geometryless;
 
 import java.util.logging.Logger;
 
-import org.geotools.data.jdbc.DefaultSQLBuilder;
+//import org.geotools.data.jdbc.DefaultSQLBuilder;
+import org.geotools.data.jdbc.GeoAPISQLBuilder;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.GeometryAttributeType;
-import org.geotools.filter.SQLEncoder;
+// import org.geotools.filter.SQLEncoder;
+import org.geotools.data.geometryless.filter.SQLEncoderBBOX;
 
 
 /**
@@ -33,7 +35,7 @@ import org.geotools.filter.SQLEncoder;
  * @source $URL$
  * @version $Id$
  */
-public class BBOXSQLBuilder extends DefaultSQLBuilder {
+public class BBOXSQLBuilder extends GeoAPISQLBuilder {
     /** The logger for the mysql module. */
     private static final Logger LOGGER = Logger.getLogger(
             "org.geotools.data.geometryless");
@@ -42,8 +44,8 @@ public class BBOXSQLBuilder extends DefaultSQLBuilder {
     private String XMaxColumnName = null;
     private String YMaxColumnName = null;
 
-    public BBOXSQLBuilder(SQLEncoder encoder, String minx, String miny, String maxx, String maxy) {
-        super(encoder);
+    public BBOXSQLBuilder(SQLEncoderBBOX encoder, String minx, String miny, String maxx, String maxy) {
+        super(encoder, null,null);
         this.XMinColumnName = minx;
         this.YMinColumnName = miny;
         this.XMaxColumnName = maxx;

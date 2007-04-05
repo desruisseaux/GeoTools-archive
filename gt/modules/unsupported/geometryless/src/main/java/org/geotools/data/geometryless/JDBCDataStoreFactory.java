@@ -46,27 +46,17 @@ public class JDBCDataStoreFactory extends AbstractFactory
 
     /** Specified JDBC driver class. */
     static final Param  DRIVER = new Param("driver", String.class,
-            "Java Class name of installed driver", true, "");
+            "Java Class name of installed ConnectionPool driver", true, "org.geotools.data.geometryless.wrapper.PGConnectionPool");
             
                /** Specified JDBC driver class calling URL */
    static final Param  URLPREFIX  = new Param("urlprefix", String.class,
-            "eg jdbc:mysql://", true, "");
+            "eg jdbc:mysql://", true, "jdbc:postgresql://localhost:5432/postgres");
 
     /** Param, package visibiity for JUnit tests */
     static final Param DBTYPE = new Param("dbtype", String.class,
             "must be 'jdbc'", true, "jdbc");
 
-    /** Param, package visibiity for JUnit tests */
-    static final Param HOST = new Param("host", String.class,
-            "db host machine", false, "localhost");
 
-    /** Param, package visibiity for JUnit tests */
-    static final Param PORT = new Param("port", String.class,
-            "db connection port", false, "3306");
-
-    /** Param, package visibiity for JUnit tests */
-    static final Param DATABASE = new Param("database", String.class,
-            "jdbc database", false, "" );
 
     /** Param, package visibiity for JUnit tests */
     static final Param USER = new Param("user", String.class,
@@ -111,7 +101,7 @@ public class JDBCDataStoreFactory extends AbstractFactory
 
     /** Array with all of the params */
     static final Param[] arrayParameters = {
-        DBTYPE, HOST, PORT, DATABASE, SCHEMA, USER, PASSWD, CHARSET, NAMESPACE,DRIVER,URLPREFIX
+        DBTYPE, SCHEMA, USER, PASSWD, CHARSET, NAMESPACE,DRIVER,URLPREFIX
     };
 
    /**
@@ -325,7 +315,7 @@ public class JDBCDataStoreFactory extends AbstractFactory
      */
     public Param[] getParametersInfo() {
         return new Param[] {
-            DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, CHARSET, NAMESPACE, DRIVER, URLPREFIX
+            DBTYPE,  USER, PASSWD, CHARSET, NAMESPACE, DRIVER, URLPREFIX
         };
     }
 }

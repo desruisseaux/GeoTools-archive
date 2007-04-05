@@ -61,11 +61,11 @@ public class BBOXDataStoreFactory extends AbstractFactory
     
     /** Specified JDBC driver class. */
     static final Param  DRIVER = new Param("driver", String.class,
-            "Java Class name of installed driver", true, "");
+            "Java Class name of installed driver", true, "org.geotools.data.geometryless.wrapper.PGConnectionPool");
             
                /** Specified JDBC driver class calling URL */
    static final Param  URLPREFIX  = new Param("urlprefix", String.class,
-            "complete jdbc URL for the database connection", true, "");
+            "complete jdbc URL for the database connection", true, "jdbc:postgresql://localhost:5432/postgres");
 
     /** Param, package visibiity for JUnit tests */
     static final Param DBTYPE = new Param("dbtype", String.class,
@@ -90,17 +90,7 @@ public class BBOXDataStoreFactory extends AbstractFactory
     static final Param GEOMNAME = new Param("geom_name", String.class, "the " +
       "name of the geometry attribute to generate from the bbox columns", false, GEOM_NAME_DEFAULT);
 
-    /** Param, package visibiity for JUnit tests */
-    static final Param HOST = new Param("host", String.class,
-            "db host machine", false, "localhost");
-
-    /** Param, package visibiity for JUnit tests */
-    static final Param PORT = new Param("port", String.class,
-            "db connection port", false, "3306");
-
-    /** Param, package visibiity for JUnit tests */
-    static final Param DATABASE = new Param("database", String.class,
-            "jdbc database", false, "" );
+ 
 
     /** Param, package visibiity for JUnit tests */
     static final Param USER = new Param("user", String.class,
@@ -145,7 +135,7 @@ public class BBOXDataStoreFactory extends AbstractFactory
 
     /** Array with all of the params */
     static final Param[] arrayParameters = {
-        DBTYPE, HOST, PORT, DATABASE, SCHEMA, USER, PASSWD, CHARSET, NAMESPACE,DRIVER,URLPREFIX,MINXCOLUMN,MINYCOLUMN,MAXXCOLUMN,MAXYCOLUMN, GEOMNAME
+        DBTYPE, SCHEMA, USER, PASSWD, CHARSET, NAMESPACE,DRIVER,URLPREFIX,MINXCOLUMN,MINYCOLUMN,MAXXCOLUMN,MAXYCOLUMN, GEOMNAME
     };
 
 
@@ -370,8 +360,8 @@ public class BBOXDataStoreFactory extends AbstractFactory
      */
     public Param[] getParametersInfo() {
         return new Param[] {
-            DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, CHARSET, NAMESPACE, DRIVER, URLPREFIX, MINXCOLUMN, MINYCOLUMN
-,MAXXCOLUMN, MAXYCOLUMN        };
+            DBTYPE, USER, PASSWD, CHARSET, NAMESPACE, DRIVER, URLPREFIX, MINXCOLUMN, MINYCOLUMN
+,MAXXCOLUMN, MAXYCOLUMN , GEOMNAME      };
     }
 
 	/* (non-Javadoc)
