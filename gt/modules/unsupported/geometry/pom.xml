@@ -13,13 +13,11 @@
                                http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-<!-- This module is not yet included in Maven build, because it uses Java 5 features.
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>gt2-unsupported</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
--->
   
 
   <!-- =========================================================== -->
