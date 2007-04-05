@@ -438,7 +438,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         // check locks!
         // (won't do anything if we use our own
         // database locking)
-        LOGGER.info("asserting filter " + filter);
+        LOGGER.finer("asserting filter " + filter);
         assertFilter(filter);
 
         //boolean previousAutoCommit = getAutoCommit();
