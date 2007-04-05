@@ -360,6 +360,7 @@ public class DefaultTransaction implements Transaction {
             LOGGER.severe("There's code leaving transaction unclosed. "
                     + "Call Transaction.close() after using them to ensure they do not hold state "
                     + "such as JDCB connections or file handles");
+            LOGGER.severe("Unclosed transaction handle is '" + handle + "'");
             close();
         }
         super.finalize();
