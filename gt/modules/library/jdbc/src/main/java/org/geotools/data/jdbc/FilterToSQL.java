@@ -96,7 +96,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @task REVISIT: need to figure out exceptions, we're currently eating io
  *       errors, which is bad. Probably need a generic visitor exception.
- * @source $URL$
+ * 
  */
 /*
  * TODO: Use the new FilterCapabilities.  This may fall out of using the new
@@ -735,16 +735,18 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
         Class target = (Class)context;
         
         try {
+			Object literal = null;
+			
 			if ( target == Geometry.class && expression.getValue() instanceof Geometry ) {
 				//call this method for backwards compatability with subclasses
 				visitLiteralGeometry( expression );
 				return context;
 			}
-			else {
+			else if ( target != null ){
 				//convert the literal to the required type
 				//JD except for numerics, let the database do the converstion
-				Object literal = null;
-				if ( Number.class.isAssignableFrom( target ) ) {
+
+				if (   Number.class.isAssignableFrom( target ) ) {
 					//dont convert
 				}
 				else {
@@ -770,7 +772,8 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
 				else if ( String.class.isAssignableFrom( target ) ) {
 					out.write( "'" + literal.toString() + "'" );
 				}
-				else {
+			}
+			else {
 					//convert back to a string
 					String encoding = (String)Converters.convert( literal, String.class , null );
 					if ( encoding == null ) {
@@ -780,7 +783,7 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
 					
 					out.write( "'" + encoding + "'");
 				}
-			}
+			
 		} catch (IOException e) {
 			 throw new RuntimeException("IO problems writing literal", e);
 		}
