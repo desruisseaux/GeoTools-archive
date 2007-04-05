@@ -150,7 +150,7 @@
       </reporting>
     </profile>
     <profile>
-      <id>site-fr</id>
+      <id>site.fr</id>
       <distributionManagement>
         <site>
           <id>site-geotools-fr</id>
@@ -160,7 +160,7 @@
       </distributionManagement>
     </profile>
     <profile>
-      <id>site-rr</id>
+      <id>site.rr</id>
       <distributionManagement>
         <site>
           <id>site-refractions</id>
