@@ -23,6 +23,7 @@ import java.sql.Statement;
 import org.geotools.data.jdbc.fidmapper.AutoIncrementFIDMapper;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.Feature;
+import org.geotools.feature.IllegalAttributeException;
 
 /**
  * Generate FID based on an auto increment function, the most stable approach for
@@ -54,6 +55,19 @@ public class PostGISAutoIncrementFIDMapper extends AutoIncrementFIDMapper
             super(tableName, colName, dataType);
             this.returnFIDColumnsAsAttributes = returnFIDColumnsAsAttributes; 
         }
+        
+        public String createID( Connection conn, Feature feature, Statement statement ) throws IOException {
+            String id = retriveId(conn, feature, statement);
+            if(id != null && returnFIDColumnsAsAttributes) {
+                // we have to udpate the attribute in the feature too
+                try {
+                    feature.setAttribute(colNames[0], id);
+                } catch(IllegalAttributeException e) {
+                    throw new IOException("Could not set generated key " + id + " into attribute " + colNames[0]);
+                }
+            }
+            return id;
+        }
 
         /**
          * Attempts to determine the FID after it was inserted, using three techniques:
@@ -61,7 +75,7 @@ public class PostGISAutoIncrementFIDMapper extends AutoIncrementFIDMapper
          * 2. SELECT currval(sequence name) <-- using other methods to get name
          * 3. SELECT fid ... ORDER BY fid DESC LIMIT 1
          */
-        public String createID( Connection conn, Feature feature, Statement statement )
+        public String retriveId( Connection conn, Feature feature, Statement statement )
             throws IOException {
             ResultSet rs = null;
             if (can_usepg_get_serial_sequence) {
