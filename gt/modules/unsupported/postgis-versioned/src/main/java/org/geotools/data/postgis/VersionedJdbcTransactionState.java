@@ -311,7 +311,7 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
                 writer.close();
         }
 
-        return Long.parseLong(f.getID());
+        return ((Long) f.getAttribute("revision")).longValue();
     }
 
     /**

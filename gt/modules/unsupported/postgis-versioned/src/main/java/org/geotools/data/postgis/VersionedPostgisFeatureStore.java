@@ -34,6 +34,7 @@ import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureLocking;
 import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
@@ -248,7 +249,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
 
         // Gather feature modified after toVersion
         ModifiedFeatureIds mfids = store.getModifiedFeatureFIDs(schema.getTypeName(), toVersion,
-                null, filter, getTransaction());
+                null, filter, null, getTransaction());
         FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
 
         // remove all features that have been created and not deleted
@@ -360,7 +361,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         // sql lentgh limitations. Yet, if would be a lot better if we could encode this
         // as a single sql query with subqueries... (but not all filters are encodable...)
         ModifiedFeatureIds mfids = store.getModifiedFeatureFIDs(schema.getTypeName(), fromVersion,
-                toVersion, filter, getTransaction());
+                toVersion, filter, null, getTransaction());
         Set ids = new HashSet(mfids.getCreated());
         ids.addAll(mfids.getDeleted());
         ids.addAll(mfids.getModified());
@@ -420,9 +421,8 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         // time simply allow not include fid attributes in the insert queries (or provide a
         // "default"
         // value for them).
-        FeatureStore changesets = (FeatureStore) store
+        FeatureSource changesets = (FeatureSource) store
                 .getFeatureSource(VersionedPostgisDataStore.TBL_CHANGESETS);
-        changesets.setTransaction(getTransaction());
         DefaultQuery sq = new DefaultQuery();
         sq.setFilter(revisionFilter);
         sq.setSortBy(new SortBy[] { ff.sort("revision", SortOrder.DESCENDING) });
@@ -444,7 +444,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
 
         // gather modified ids
         ModifiedFeatureIds mfids = store.getModifiedFeatureFIDs(schema.getTypeName(), fromVersion,
-                toVersion, filter, getTransaction());
+                toVersion, filter, null, getTransaction());
 
         // build all the filters to gather created, deleted and modified features at the appropriate
         // revisions, depending also on wheter creation/deletion should be swapped or not

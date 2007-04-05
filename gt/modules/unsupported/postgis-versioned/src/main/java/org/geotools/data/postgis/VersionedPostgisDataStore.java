@@ -21,7 +21,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -97,11 +96,11 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
     /** The logger for the postgis module. */
     protected static final Logger LOGGER = Logger.getLogger("org.geotools.data.postgis");
 
-    static final String TBL_VERSIONEDTABLES = "versioned_tables";
+    public static final String TBL_VERSIONEDTABLES = "versioned_tables";
 
-    static final String TBL_TABLESCHANGED = "tables_changed";
+    public static final String TBL_TABLESCHANGED = "tables_changed";
 
-    static final String TBL_CHANGESETS = "changesets";
+    public static final String TBL_CHANGESETS = "changesets";
 
     static final String REVISION = "revision";
 
@@ -174,21 +173,16 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
 
     public FeatureType getSchema(String typeName) throws IOException {
         FeatureType ft = wrapped.getSchema(typeName);
+        
+        if(!isVersioned(typeName)) {
+            return ft;
+        }
 
         // if the feature type is versioned, we have to map the internal feature
         // type to an outside vision where versioned and pk columns are not
         // included
+        
         Set names = new HashSet(Arrays.asList(filterPropertyNames(new DefaultQuery(typeName))));
-        // List filtered = new ArrayList();
-        // Set extraColumns = new HashSet();
-        // if(!isVersioned(typeName)) {
-        // extraColumns.add("revision");
-        // extraColumns.add("expired");
-        // }
-        // FIDMapper mapper = getFIDMapper(typeName);
-        // for (int i = 0; i < mapper.getColumnCount(); i++) {
-        // extraColumns.add(mapper.getColumnName(i).toLowerCase());
-        // }
         List filtered = new ArrayList();
         for (int i = 0; i < ft.getAttributeCount(); i++) {
             AttributeType cat = ft.getAttributeType(i);
@@ -245,6 +239,9 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
 
     public FeatureWriter getFeatureWriter(String typeName, Filter filter, Transaction transaction)
             throws IOException {
+        if(TBL_CHANGESETS.equals(typeName))
+            throw new DataSourceException("Changesets feature type is read only");
+        
         if (!isVersioned(typeName))
             return wrapped.getFeatureWriter(typeName, filter, transaction);
 
@@ -308,6 +305,12 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
             return new VersionedPostgisFeatureStore(getSchema(typeName), this);
 
         FeatureSource source = wrapped.getFeatureSource(typeName);
+        
+        // changesets should be read only for the outside world
+        if(TBL_CHANGESETS.equals(typeName))
+            return new WrappingPostgisFeatureSource(source, this);
+        
+        // for the others, wrap so that we don't report the wrong owning datastore
         if(source instanceof FeatureLocking)
             return new WrappingPostgisFeatureLocking((FeatureLocking) source, this);
         else if(source instanceof FeatureStore)
@@ -555,14 +558,16 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
      *            the first revision
      * @param version2 -
      *            the second revision, or null if you want the diff between version1 and current
-     * @param filter
+     * @param filter a filter to limit the features that must be taken into consideration
+     * @param users an eventual list of user ids that can be used to further filter the features,
+     * only features touched by any of these users will be  
      * @param transaction
      * @throws IOException
      * @throws IllegalAttributeException
      * @throws NoSuchElementException
      */
     public ModifiedFeatureIds getModifiedFeatureFIDs(String typeName, String version1,
-            String version2, Filter filter, Transaction transaction) throws IOException {
+            String version2, Filter filter, String[] users, Transaction transaction) throws IOException {
         if(filter == null)
             filter = Filter.INCLUDE;
         RevisionInfo r1 = new RevisionInfo(version1);
@@ -576,6 +581,12 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
             r1 = r2;
             r2 = tmp;
         }
+
+        // gather revisions where the specified users were involved... that would be
+        // a job for joins, but I don't want to make this code datastore dependent, so
+        // far this one is relatively easy to port over to other dbms, I would like it
+        // to stay so
+        Set userRevisions = getRevisionsCreatedBy(typeName, r1, r2, users);
 
         // We have to perform the following query:
         // ------------------------------------------------------------
@@ -723,6 +734,28 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
     }
 
     /**
+     * Gathers the revisions created by a certain group of users between two specified revisions
+     * @param r1 the first revision
+     * @param r2 the second revision
+     * @param users an array of user 
+     * @return
+     */
+    Set getRevisionsCreatedBy(String typeName, RevisionInfo r1, RevisionInfo r2, String[] users) {
+        if(users == null || users.length == 0)
+            return null;
+        
+        final FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+        final List filters = new ArrayList(users.length);
+        for (int i = 0; i < users.length; i++) {
+            filters.add(ff.equals(ff.property("author"), ff.literal(users[i])));
+        }
+        final Filter userFilter = ff.or(filters);
+        
+        final Query query = new DefaultQuery(typeName, userFilter, new String[] {"revision"});
+        return null;
+    }
+
+    /**
      * Builds a filter from a set of feature ids, since there is no convenient way to build it using
      * the factory
      * 
@@ -853,8 +886,8 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
 
         // ensure this does not get a typed fid mapper for changesets
         // we want easy extraction of the generated revision
-        wrapped.setFIDMapper(TBL_CHANGESETS, new PostGISAutoIncrementFIDMapper(TBL_CHANGESETS, "revision",
-                Types.BIGINT, true));
+//        wrapped.setFIDMapper(TBL_CHANGESETS, new PostGISAutoIncrementFIDMapper(TBL_CHANGESETS, "revision",
+//                Types.BIGINT, true));
     }
 
     private String[] getVersionedTypeNames() throws IOException {
