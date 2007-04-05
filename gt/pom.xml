@@ -1309,11 +1309,12 @@
       </plugin>
       
       <!-- Report on various tags found in the code -->
+<!-- out of the build until library/render works with this plugin (NPE)
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>taglist-maven-plugin</artifactId>
       </plugin>
-      
+-->      
       
       <!-- SVN activities during the last 30 days -->
       <!-- Disabled for now, because this plugin crash with a 
