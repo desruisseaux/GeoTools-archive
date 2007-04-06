@@ -48,7 +48,7 @@ public class DataAccessFinder {
      * time this method is invoked.
      */
     private static FactoryRegistry getServiceRegistry() {
-        assert Thread.holdsLock(CommonFactoryFinder.class);
+        assert Thread.holdsLock(DataAccessFinder.class);
         if (registry == null) {
             registry = new FactoryCreator(Arrays.asList(new Class[] {
                     DataAccessFactory.class}));
