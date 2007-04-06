@@ -33,7 +33,7 @@ import org.opengis.metadata.citation.Citation;
 import org.geotools.factory.Hints;
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryRegistryException;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.util.GenericName;
@@ -54,10 +54,10 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * This class parses the authority name and delegates the work the corresponding factory. For
  * example if any {@code createFoo(...)} method in this class is invoked with a code starting
  * by {@code "EPSG:"}, then this class delegates the object creation to the authority factory
- * provided by <code>FactoryFinder.{@linkplain FactoryFinder#getCRSAuthorityFactory
+ * provided by <code>FactoryFinder.{@linkplain ReferencingFactoryFinder#getCRSAuthorityFactory
  * getCRSAuthorityFactory}("EPSG", hints)</code>.
  * <p>
- * This class is not registered in {@link FactoryFinder}, because it is not a real authority
+ * This class is not registered in {@link ReferencingFactoryFinder}, because it is not a real authority
  * factory. There is not a single authority name associated to this factory, but rather a set
  * of names determined from all available authority factories. If this "authority" factory is
  * wanted, then users need to refer explicitly to the {@link #DEFAULT} constant or to create
@@ -107,7 +107,7 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
     };
 
     /**
-     * A set of user-specified factories to try before to delegate to {@link FactoryFinder},
+     * A set of user-specified factories to try before to delegate to {@link ReferencingFactoryFinder},
      * or {@code null} if none.
      */
     private final Collection/*<AuthorityFactory>*/ factories;
@@ -145,7 +145,7 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
      * first scan the supplied factories in their iteration order. The first factory implementing
      * the appropriate interface and having the expected {@linkplain AuthorityFactory#getAuthority
      * authority name} will be used. Only if no suitable factory is found, then this class delegates
-     * to {@link FactoryFinder}.
+     * to {@link ReferencingFactoryFinder}.
      * <p>
      * If the {@code factories} collection contains more than one factory for the same authority
      * and interface, then all additional factories will be {@linkplain FallbackAuthorityFactory
@@ -154,7 +154,7 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
      *
      * @param hints An optional set of hints, or {@code null} if none.
      * @param factories A set of user-specified factories to try before to delegate
-     *        to {@link FactoryFinder}, or {@code null} if none.
+     *        to {@link ReferencingFactoryFinder}, or {@code null} if none.
      */
     public AllAuthoritiesFactory(final Hints hints,
                                  final Collection/*<? extends AuthorityFactory>*/ factories)
@@ -169,7 +169,7 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
      *
      * @param hints An optional set of hints, or {@code null} if none.
      * @param factories A set of user-specified factories to try before to delegate
-     *        to {@link FactoryFinder}, or {@code null} if none.
+     *        to {@link ReferencingFactoryFinder}, or {@code null} if none.
      * @param separator The separator between the authority name and the code.
      *
      * @deprecated Override the {@link #getSeparator} method instead.
@@ -408,7 +408,7 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
     /**
      * Searchs for a factory of the given type. This method first search in user-supplied
      * factories. If no user factory is found, then this method request for a factory using
-     * {@link FactoryFinder}. The authority name is inferred from the specified code.
+     * {@link ReferencingFactoryFinder}. The authority name is inferred from the specified code.
      *
      * @param  type The interface to be implemented.
      * @param  code The code of the object to create.
@@ -454,13 +454,13 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
             final AuthorityFactory factory;
             try {
                 if (CRSAuthorityFactory.class.equals(type)) {
-                    factory = FactoryFinder.getCRSAuthorityFactory(authority, userHints);
+                    factory = ReferencingFactoryFinder.getCRSAuthorityFactory(authority, userHints);
                 } else if (CSAuthorityFactory.class.equals(type)) {
-                    factory = FactoryFinder.getCSAuthorityFactory(authority, userHints);
+                    factory = ReferencingFactoryFinder.getCSAuthorityFactory(authority, userHints);
                 } else if (DatumAuthorityFactory.class.equals(type)) {
-                    factory = FactoryFinder.getDatumAuthorityFactory(authority, userHints);
+                    factory = ReferencingFactoryFinder.getDatumAuthorityFactory(authority, userHints);
                 } else if (CoordinateOperationAuthorityFactory.class.equals(type)) {
-                    factory = FactoryFinder.getCoordinateOperationAuthorityFactory(authority, userHints);
+                    factory = ReferencingFactoryFinder.getCoordinateOperationAuthorityFactory(authority, userHints);
                 } else {
                     continue;
                 }
@@ -607,7 +607,7 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
         done.add(this); // Safety for avoiding recursive calls.
         inProgress.set(Boolean.TRUE);
         try {
-            for (final Iterator it=FactoryFinder.getAuthorityNames().iterator(); it.hasNext();) {
+            for (final Iterator it=ReferencingFactoryFinder.getAuthorityNames().iterator(); it.hasNext();) {
                 final String authority = ((String) it.next()).trim();
                 final char separator = getSeparator(authority);
                 /*

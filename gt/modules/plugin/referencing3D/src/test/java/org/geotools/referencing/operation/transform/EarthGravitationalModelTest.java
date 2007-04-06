@@ -27,7 +27,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.DirectPosition;
 
 // Geotools dependencies
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.geometry.GeneralDirectPosition;
 
 
@@ -67,7 +67,7 @@ public class EarthGravitationalModelTest extends TestCase {
      * Tests the creation of the math transform from the factory.
      */
     public void testMathTransform() throws FactoryException, TransformException {
-        final MathTransformFactory mtFactory = FactoryFinder.getMathTransformFactory(null);
+        final MathTransformFactory mtFactory = ReferencingFactoryFinder.getMathTransformFactory(null);
         final ParameterValueGroup p = mtFactory.getDefaultParameters("Earth gravitational model");
         final MathTransform mt = mtFactory.createParameterizedTransform(p);
         DirectPosition pos = new GeneralDirectPosition(new double[] {45, 45, 1000});

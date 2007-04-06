@@ -39,7 +39,7 @@ import org.geotools.factory.Hints;
 import org.geotools.factory.OptionalFactory;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.referencing.AbstractIdentifiedObject;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.factory.BackingStoreException;
 import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
@@ -123,7 +123,7 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
         hints.keySet().removeAll(this.hints.keySet());
         if (!hints.isEmpty()) {
             noForce(hints);
-            authorityFactory = FactoryFinder.getCoordinateOperationAuthorityFactory(
+            authorityFactory = ReferencingFactoryFinder.getCoordinateOperationAuthorityFactory(
                     DEFAULT_AUTHORITY, hints);
         }
     }
@@ -164,7 +164,7 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
              */
             final Hints hints = new Hints(null);
             noForce(hints);
-            authorityFactory = FactoryFinder
+            authorityFactory = ReferencingFactoryFinder
                     .getCoordinateOperationAuthorityFactory(DEFAULT_AUTHORITY, hints);
         }
         return authorityFactory;

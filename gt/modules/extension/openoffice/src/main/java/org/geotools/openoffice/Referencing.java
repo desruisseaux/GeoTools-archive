@@ -65,7 +65,7 @@ import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
 import org.geotools.measure.AngleFormat;
 import org.geotools.parameter.ParameterGroup;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.wkt.Formattable;
 import org.geotools.referencing.GeodeticCalculator;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
@@ -359,7 +359,7 @@ public final class Referencing extends Formulas implements XReferencing {
      */
     private CRSAuthorityFactory crsFactory() {
         if (crsFactory == null) {
-            crsFactory = FactoryFinder.getCRSAuthorityFactory(AUTHORITY, null);
+            crsFactory = ReferencingFactoryFinder.getCRSAuthorityFactory(AUTHORITY, null);
         }
         return crsFactory;
     }
@@ -389,7 +389,7 @@ public final class Referencing extends Formulas implements XReferencing {
         sourceCRS = crsFactory.createCoordinateReferenceSystem(source);
         targetCRS = crsFactory.createCoordinateReferenceSystem(target);
         if (opFactory == null) {
-            opFactory = FactoryFinder.getCoordinateOperationFactory(
+            opFactory = ReferencingFactoryFinder.getCoordinateOperationFactory(
                     new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE));
         }
         operation = opFactory.createOperation(sourceCRS, targetCRS);
@@ -624,7 +624,7 @@ public final class Referencing extends Formulas implements XReferencing {
             validArea = crsFactory().createCoordinateReferenceSystem(authorityCode).getValidArea();
         } catch (Exception exception) {
             try {
-                validArea = FactoryFinder.getCoordinateOperationAuthorityFactory(AUTHORITY, null)
+                validArea = ReferencingFactoryFinder.getCoordinateOperationAuthorityFactory(AUTHORITY, null)
                                          .createCoordinateOperation(authorityCode).getValidArea();
             } catch (Exception ignore) {
                 return getLocalizedMessage(exception);
@@ -654,7 +654,7 @@ public final class Referencing extends Formulas implements XReferencing {
             validArea = crsFactory().createCoordinateReferenceSystem(authorityCode).getValidArea();
         } catch (Exception exception) {
             try {
-                validArea = FactoryFinder.getCoordinateOperationAuthorityFactory(AUTHORITY, null)
+                validArea = ReferencingFactoryFinder.getCoordinateOperationAuthorityFactory(AUTHORITY, null)
                                          .createCoordinateOperation(authorityCode).getValidArea();
             } catch (Exception ignore) {
                 reportException("getBoundingBox", exception);
@@ -700,7 +700,7 @@ public final class Referencing extends Formulas implements XReferencing {
             cs = crsFactory().createCoordinateReferenceSystem(authorityCode).getCoordinateSystem();
         } catch (Exception exception) {
             try {
-                cs = FactoryFinder.getCSAuthorityFactory(AUTHORITY, null)
+                cs = ReferencingFactoryFinder.getCSAuthorityFactory(AUTHORITY, null)
                                   .createCoordinateSystem(authorityCode);
             } catch (Exception ignore) {
                 // Ignore - we will report the previous exception instead.

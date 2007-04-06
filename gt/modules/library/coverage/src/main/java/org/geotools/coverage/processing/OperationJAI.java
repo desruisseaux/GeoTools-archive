@@ -61,7 +61,7 @@ import org.geotools.factory.Hints;
 import org.geotools.parameter.ImagingParameters;
 import org.geotools.parameter.ImagingParameterDescriptors;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.operation.transform.DimensionFilter;
 import org.geotools.image.jai.Registry;
 import org.geotools.resources.XArray;
@@ -487,7 +487,7 @@ public class OperationJAI extends Operation2D {
                 if (count == 1) {
                     targetCRS = components[0];
                 } else try {
-                    targetCRS = FactoryFinder.getCRSFactory(hints).createCompoundCRS(
+                    targetCRS = ReferencingFactoryFinder.getCRSFactory(hints).createCompoundCRS(
                                 Collections.singletonMap(IdentifiedObject.NAME_KEY,
                                 crs2D.getName().getCode()), components);
                 } catch (FactoryException exception) {
@@ -517,7 +517,7 @@ public class OperationJAI extends Operation2D {
                     // TODO: localize
                     throw new InvalidGridGeometryException("Unsupported math transform.");
                 }
-                final MathTransformFactory factory = FactoryFinder.getMathTransformFactory(hints);
+                final MathTransformFactory factory = ReferencingFactoryFinder.getMathTransformFactory(hints);
                 final DimensionFilter       filter = new DimensionFilter(factory);
                 toTarget = gridToCrs2D;
                 try {

@@ -53,7 +53,7 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.crs.DefaultTemporalCRS;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
@@ -261,7 +261,7 @@ control:    for (int p=0; p<=1; p++) {
             if (!CRS.equalsIgnoreMetadata(targetCRS, sourceCRS)) {
                 final CoordinateOperation      transform;
                 final CoordinateOperationFactory factory;
-                factory = FactoryFinder.getCoordinateOperationFactory(HINTS);
+                factory = ReferencingFactoryFinder.getCoordinateOperationFactory(HINTS);
                 try {
                     transform = factory.createOperation(sourceCRS, targetCRS);
                 } catch (FactoryException exception) {

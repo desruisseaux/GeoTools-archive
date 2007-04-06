@@ -31,7 +31,7 @@ import org.opengis.referencing.crs.CRSAuthorityFactory;
 
 // Geotools dependencies
 import org.geotools.resources.Arguments;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 
 
 /**
@@ -82,15 +82,15 @@ public final class AUTOTest extends TestCase {
     }
 
     /**
-     * Tests the registration in {@link FactoryFinder}.
+     * Tests the registration in {@link ReferencingFactoryFinder}.
      */
     public void testFactoryFinder() {
-        final Collection authorities = FactoryFinder.getAuthorityNames();
+        final Collection authorities = ReferencingFactoryFinder.getAuthorityNames();
         assertTrue(authorities.contains("AUTO"));
         assertTrue(authorities.contains("AUTO2"));
-        factory = FactoryFinder.getCRSAuthorityFactory("AUTO", null);
+        factory = ReferencingFactoryFinder.getCRSAuthorityFactory("AUTO", null);
         assertTrue(factory instanceof AutoCRSFactory);
-        assertSame(factory, FactoryFinder.getCRSAuthorityFactory("AUTO2", null));
+        assertSame(factory, ReferencingFactoryFinder.getCRSAuthorityFactory("AUTO2", null));
     }
 
     /**

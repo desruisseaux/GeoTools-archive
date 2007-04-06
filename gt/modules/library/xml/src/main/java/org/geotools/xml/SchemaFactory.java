@@ -38,7 +38,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.geotools.factory.FactoryRegistry;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
 import org.geotools.xml.schema.ComplexType;
@@ -157,7 +157,7 @@ public class SchemaFactory {
             // do nothing
         }
 
-        ClassLoader systemLoader = FactoryFinder.class.getClassLoader();
+        ClassLoader systemLoader = ReferencingFactoryFinder.class.getClassLoader();
 
         ClassLoader[] classLoaders;
 

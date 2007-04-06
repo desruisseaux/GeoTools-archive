@@ -29,7 +29,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 
 // Geotools dependencies
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.metadata.iso.citation.Citations;
 
@@ -82,7 +82,7 @@ public class FactoryEsriTest extends TestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        factory = (FactoryESRI) FactoryFinder.getCRSAuthorityFactory("ESRI", null);
+        factory = (FactoryESRI) ReferencingFactoryFinder.getCRSAuthorityFactory("ESRI", null);
     }
 
     /**

@@ -31,7 +31,7 @@ import org.opengis.referencing.operation.OperationNotFoundException;
 import org.geotools.factory.Hints;
 import org.geotools.resources.Utilities;
 import org.geotools.util.SoftValueHashMap;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 
 
 /**
@@ -42,7 +42,7 @@ import org.geotools.referencing.FactoryFinder;
  * <p>
  * In most cases, users should not need to create an instance of this class explicitly. An instance
  * of {@code BufferedCoordinateOperationFactory} should be automatically registered and returned
- * by {@link FactoryFinder} in default Geotools configuration.
+ * by {@link ReferencingFactoryFinder} in default Geotools configuration.
  * 
  * @since 2.3
  * @version $Id$
@@ -112,9 +112,9 @@ public class BufferedCoordinateOperationFactory extends AbstractCoordinateOperat
 
     /**
      * The wrapped factory. If {@code null}, will be fetched when first needed.
-     * We should not initialize this field using {@link FactoryFinder} from the
+     * We should not initialize this field using {@link ReferencingFactoryFinder} from the
      * no-argument constructor, since this constructor is typically invoked while
-     * {@link FactoryFinder} is still iterating over the registered implementations.
+     * {@link ReferencingFactoryFinder} is still iterating over the registered implementations.
      */
     private CoordinateOperationFactory factory;
 
@@ -190,7 +190,7 @@ public class BufferedCoordinateOperationFactory extends AbstractCoordinateOperat
      * Returns a backing factory from the specified hints.
      */
     private static CoordinateOperationFactory getBackingFactory(final Hints hints) {
-        for (final Iterator it=FactoryFinder.getCoordinateOperationFactories(hints).iterator(); it.hasNext();) {
+        for (final Iterator it=ReferencingFactoryFinder.getCoordinateOperationFactories(hints).iterator(); it.hasNext();) {
             final CoordinateOperationFactory candidate = (CoordinateOperationFactory) it.next();
             if (!(candidate instanceof BufferedCoordinateOperationFactory)) {
                 return candidate;
@@ -198,7 +198,7 @@ public class BufferedCoordinateOperationFactory extends AbstractCoordinateOperat
         }
         // The following is likely to thrown a FactoryNotFoundException,
         // which is the intended behavior.
-        return FactoryFinder.getCoordinateOperationFactory(hints);
+        return ReferencingFactoryFinder.getCoordinateOperationFactory(hints);
     }
 
     /**

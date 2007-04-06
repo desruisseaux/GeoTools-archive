@@ -30,7 +30,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.metadata.iso.citation.Citations;
 
@@ -84,7 +84,7 @@ public class FactoryExtensionTest extends TestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        factory = (FactoryExtension) FactoryFinder.getCRSAuthorityFactory("EPSG",
+        factory = (FactoryExtension) ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG",
                 new Hints(Hints.CRS_AUTHORITY_FACTORY, FactoryExtension.class));
     }
 

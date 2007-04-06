@@ -559,7 +559,7 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 					// should check them again
 
 					final CartesianCS cartCS = org.geotools.referencing.cs.DefaultCartesianCS.PROJECTED;
-					final MathTransformFactory mtFactory = org.geotools.referencing.FactoryFinder
+					final MathTransformFactory mtFactory = org.geotools.referencing.ReferencingFactoryFinder
 							.getMathTransformFactory(null);
 					final ParameterValueGroup parameters = mtFactory
 							.getDefaultParameters("Polar_Stereographic");

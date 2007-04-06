@@ -22,7 +22,7 @@ import java.sql.SQLException;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.factory.AbstractFactory;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 
 
@@ -39,7 +39,7 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * EPSG data sources.
  * <p>
  * <h3>How EPSG factory are found</h3>
- * By default, only one {@link DefaultFactory} is registered and returned by {@link FactoryFinder}.
+ * By default, only one {@link DefaultFactory} is registered and returned by {@link ReferencingFactoryFinder}.
  * We don't need to register any other implementation for an EPSG factory backed by a SQL database.
  * However, {@code DefaultFactory} alone is not suffisient for querying the database. It needs one
  * more "plugable" information: the <cite>connection</cite> to the EPSG database. This

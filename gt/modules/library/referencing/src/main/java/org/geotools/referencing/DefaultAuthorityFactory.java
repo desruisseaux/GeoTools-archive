@@ -64,7 +64,7 @@ final class DefaultAuthorityFactory extends BufferedAuthorityFactory implements 
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
     DefaultAuthorityFactory(final Hints hints) {
-        super(new AllAuthoritiesFactory(hints, FactoryFinder.getCRSAuthorityFactories(hints)));
+        super(new AllAuthoritiesFactory(hints, ReferencingFactoryFinder.getCRSAuthorityFactories(hints)));
     }
 
     /**
@@ -74,7 +74,7 @@ final class DefaultAuthorityFactory extends BufferedAuthorityFactory implements 
     static Set/*<String>*/ getSupportedCodes(final String authority) {
     	Set result = Collections.EMPTY_SET;
         boolean isSetCopied = false;
-    	for (final Iterator i=FactoryFinder.getCRSAuthorityFactories( GeoTools.getDefaultHints() ).iterator(); i.hasNext();) {
+    	for (final Iterator i=ReferencingFactoryFinder.getCRSAuthorityFactories( GeoTools.getDefaultHints() ).iterator(); i.hasNext();) {
             final CRSAuthorityFactory factory = (CRSAuthorityFactory) i.next();
             if (Citations.identifierMatches(factory.getAuthority(), authority)) {
                 final Set codes;
@@ -112,7 +112,7 @@ final class DefaultAuthorityFactory extends BufferedAuthorityFactory implements 
      * amount of class loading when using {@link CRS} for other purpose than CRS decoding.
      */
     static Set/*<String>*/ getSupportedAuthorities(final boolean returnAliases) {
-        final Set authorityFactories = FactoryFinder.getCRSAuthorityFactories(null);
+        final Set authorityFactories = ReferencingFactoryFinder.getCRSAuthorityFactories(null);
         final Set result = new LinkedHashSet();
         for (final Iterator i = authorityFactories.iterator(); i.hasNext();) {
             final CRSAuthorityFactory factory = (CRSAuthorityFactory) i.next();

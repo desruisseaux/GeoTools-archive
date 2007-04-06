@@ -37,7 +37,7 @@ import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.factory.FactoryGroup;
 
 
@@ -89,11 +89,11 @@ public final class Transform3DTest extends TestCase {
         // Gets factories to be used for all object creations
         // ----------------------------------------------------------
         final Hints                          hints = new Hints(null);
-        final CSFactory                  csFactory = FactoryFinder.getCSFactory                 (hints);
-        final CRSFactory                crsFactory = FactoryFinder.getCRSFactory                (hints);
-        final DatumFactory            datumFactory = FactoryFinder.getDatumFactory              (hints);
-        final MathTransformFactory       mtFactory = FactoryFinder.getMathTransformFactory      (hints);
-        final CoordinateOperationFactory opFactory = FactoryFinder.getCoordinateOperationFactory(hints);
+        final CSFactory                  csFactory = ReferencingFactoryFinder.getCSFactory                 (hints);
+        final CRSFactory                crsFactory = ReferencingFactoryFinder.getCRSFactory                (hints);
+        final DatumFactory            datumFactory = ReferencingFactoryFinder.getDatumFactory              (hints);
+        final MathTransformFactory       mtFactory = ReferencingFactoryFinder.getMathTransformFactory      (hints);
+        final CoordinateOperationFactory opFactory = ReferencingFactoryFinder.getCoordinateOperationFactory(hints);
         final FactoryGroup helper = new FactoryGroup(datumFactory, csFactory, crsFactory, mtFactory);
 
         // ----------------------------------------------------------

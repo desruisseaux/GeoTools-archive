@@ -29,7 +29,7 @@ import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.matrix.AffineTransform2D;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
@@ -62,7 +62,7 @@ public class JTSPolygonHandlerTest extends TestCase {
 		ReferencedEnvelope env=(ReferencedEnvelope) ds.getFeatureSource().getBounds();
 		
                 AffineTransform transform = RendererUtilities.worldToScreenTransform(env, new Rectangle(500,500));
-                MathTransform mt = FactoryFinder.getMathTransformFactory(null).createAffineTransform(new GeneralMatrix(transform));
+                MathTransform mt = ReferencingFactoryFinder.getMathTransformFactory(null).createAffineTransform(new GeneralMatrix(transform));
                 
 		
 		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
@@ -96,8 +96,8 @@ public class JTSPolygonHandlerTest extends TestCase {
 		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
 		MathTransform mt= CRS.findMathTransform(crs, DefaultGeographicCRS.WGS84);
 		AffineTransform at=RendererUtilities.worldToScreenTransform(env,new Rectangle(300,300));
-		mt = FactoryFinder.getMathTransformFactory(null)
-		.createConcatenatedTransform(mt, FactoryFinder.getMathTransformFactory(null)
+		mt = ReferencingFactoryFinder.getMathTransformFactory(null)
+		.createConcatenatedTransform(mt, ReferencingFactoryFinder.getMathTransformFactory(null)
 				.createAffineTransform(new GeneralMatrix(at)));
 
 		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());

@@ -32,7 +32,7 @@ import org.opengis.referencing.ObjectFactory;
 // Geotools dependencies
 import org.geotools.factory.AbstractFactory;
 import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.referencing.FactoryFinder;  // For javadoc
+import org.geotools.referencing.ReferencingFactoryFinder;  // For javadoc
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 

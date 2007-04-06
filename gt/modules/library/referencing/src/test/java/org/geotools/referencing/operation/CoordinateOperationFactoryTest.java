@@ -40,7 +40,7 @@ import org.opengis.referencing.operation.Transformation;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.geotools.metadata.iso.quality.PositionalAccuracyImpl;
@@ -315,10 +315,10 @@ public final class CoordinateOperationFactoryTest extends TestTransform {
          */
         CoordinateOperationFactory lenientFactory;
         Hints hints = new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.FALSE);
-        lenientFactory = FactoryFinder.getCoordinateOperationFactory(hints);
+        lenientFactory = ReferencingFactoryFinder.getCoordinateOperationFactory(hints);
         assertSame(opFactory, lenientFactory);
         hints.put(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
-        lenientFactory = FactoryFinder.getCoordinateOperationFactory(hints);
+        lenientFactory = ReferencingFactoryFinder.getCoordinateOperationFactory(hints);
         assertNotSame(opFactory, lenientFactory);
         final CoordinateOperation lenient = lenientFactory.createOperation(amputedCRS, targetCRS);
         assertSame(amputedCRS, lenient.getSourceCRS());
@@ -382,7 +382,7 @@ public final class CoordinateOperationFactoryTest extends TestTransform {
          */
         final Hints hints = new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
         final CoordinateOperationFactory lenientFactory =
-                FactoryFinder.getCoordinateOperationFactory(hints);
+                ReferencingFactoryFinder.getCoordinateOperationFactory(hints);
         assertNotSame(opFactory, lenientFactory);
         operation = lenientFactory.createOperation(sourceCRS, targetCRS);
         if (!(opFactory instanceof AuthorityBackedFactory)) { // See comment in class javadoc

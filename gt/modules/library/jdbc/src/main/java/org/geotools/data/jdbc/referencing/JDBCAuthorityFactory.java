@@ -24,7 +24,7 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.JDBCTransactionState;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
@@ -57,7 +57,7 @@ public class JDBCAuthorityFactory implements CRSAuthorityFactory {
      *
      */
     public JDBCAuthorityFactory(ConnectionPool pool) {
-        factory=FactoryFinder.getCRSFactory(null);
+        factory=ReferencingFactoryFinder.getCRSFactory(null);
         this.connectionPool=pool;
     }
     

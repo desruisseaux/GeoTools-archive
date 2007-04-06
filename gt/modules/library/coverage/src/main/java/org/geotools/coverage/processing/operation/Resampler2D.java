@@ -42,7 +42,7 @@ import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.image.ImageWorker;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.referencing.operation.transform.DimensionFilter;
 import org.geotools.referencing.operation.transform.IdentityTransform;
@@ -226,9 +226,9 @@ final class Resampler2D extends GridCoverage2D {
 				processor = JAI.getDefaultInstance();
 			}
 		}
-		final CoordinateOperationFactory factory = FactoryFinder
+		final CoordinateOperationFactory factory = ReferencingFactoryFinder
 				.getCoordinateOperationFactory(hints);
-		final MathTransformFactory mtFactory = FactoryFinder
+		final MathTransformFactory mtFactory = ReferencingFactoryFinder
 				.getMathTransformFactory(hints);
         /*
          * Computes the INVERSE of the math transform from [Source Grid] to [Target Grid].

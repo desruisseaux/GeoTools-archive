@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.geotools.geometry.jts.spatialschema.geometry.geometry.GeometryFactoryImpl;
 import org.geotools.geometry.jts.spatialschema.geometry.primitive.PrimitiveFactoryImpl;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -64,7 +64,7 @@ public abstract class AbstractGeometryTest extends TestCase {
      * @throws FactoryException
      */
     public void setUp() throws FactoryException {
-        CRSFactory crsFact = FactoryFinder.getCRSFactory(null);        
+        CRSFactory crsFact = ReferencingFactoryFinder.getCRSFactory(null);        
         crs = crsFact.createFromWKT(WGS84_WKT);
         gFact = new GeometryFactoryImpl(crs);
         pFact = new PrimitiveFactoryImpl(crs);

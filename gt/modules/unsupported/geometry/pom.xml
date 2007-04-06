@@ -135,7 +135,7 @@
     
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-referencing</artifactId>
+      <artifactId>gt2-main</artifactId>
       <version>${project.version}</version>
 	  <exclusions>      
 		  <exclusion>

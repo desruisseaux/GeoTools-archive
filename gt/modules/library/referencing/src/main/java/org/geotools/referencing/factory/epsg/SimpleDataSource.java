@@ -47,7 +47,7 @@ import org.geotools.resources.JDBC;
  * located. The properties file location must be supplied at construction time. Because this
  * base class dosn't have a no-argument constructor, it can't be registered in the
  * {@code META-INF/services/} directory. If such a registration is wanted (for automatic detection
- * by {@link org.geotools.referencing.FactoryFinder}, then users must provide a subclass with a
+ * by {@link org.geotools.referencing.ReferencingFactoryFinder}, then users must provide a subclass with a
  * no-argument constructor.
  * <p>
  * The properties file to be supplied at construction time shall contains the following:

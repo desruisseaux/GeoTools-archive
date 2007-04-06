@@ -27,7 +27,7 @@ import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
 import org.geotools.factory.Hints;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.factory.FactoryNotFoundException;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
 import org.geotools.referencing.factory.OrderedAxisAuthorityFactory;
@@ -44,7 +44,7 @@ import org.geotools.metadata.iso.citation.Citations;
  *
  * <blockquote><pre>
  * Hints hints = new Hints({@linkplain Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER}, Boolean.TRUE);
- * CRSAuthorityFactory factory = {@linkplain FactoryFinder}.getCRSAuthorityFactory("EPSG", hints);
+ * CRSAuthorityFactory factory = {@linkplain ReferencingFactoryFinder}.getCRSAuthorityFactory("EPSG", hints);
  * </pre></blockquote>
  * 
  * This factory will have a {@linkplain #priority priority} lower than the
@@ -167,7 +167,7 @@ public class LongitudeFirstFactory extends DeferredAuthorityFactory implements C
     protected AbstractAuthorityFactory createBackingStore() throws FactoryException {
         final DefaultFactory factory;
         try {
-            factory = (DefaultFactory) FactoryFinder.getCRSAuthorityFactory("EPSG",
+            factory = (DefaultFactory) ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG",
                         new Hints(Hints.CRS_AUTHORITY_FACTORY, DefaultFactory.class));
         } catch (FactoryNotFoundException exception) {
             throw new org.geotools.referencing.factory.FactoryNotFoundException(exception);

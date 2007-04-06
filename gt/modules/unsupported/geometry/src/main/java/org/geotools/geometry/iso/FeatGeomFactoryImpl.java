@@ -48,6 +48,7 @@ import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.OrientableSurface;
 import org.opengis.geometry.primitive.Point;
@@ -267,6 +268,9 @@ public class FeatGeomFactoryImpl {
 		return this.coordinateFactory;
 	}
 
+    public GeometryFactory getGeometryFactory() {
+        return this.coordinateFactory;
+    }
 	/**
 	 * @return Returns the primitiveFactory.
 	 */

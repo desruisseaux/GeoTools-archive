@@ -30,7 +30,7 @@ import org.opengis.referencing.crs.CRSAuthorityFactory;
 
 // Geotools dependencies
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 
 
@@ -68,24 +68,24 @@ public final class URN_AuthorityFactoryTest extends TestCase {
      */
     public void testRegistration() {
         String authority = "URN:OGC:DEF";
-        final AuthorityFactory factory = FactoryFinder.getCRSAuthorityFactory(authority, null);
-        assertSame(factory, FactoryFinder.getCRSAuthorityFactory  (authority, null));
-        assertSame(factory, FactoryFinder.getCSAuthorityFactory   (authority, null));
-        assertSame(factory, FactoryFinder.getDatumAuthorityFactory(authority, null));
+        final AuthorityFactory factory = ReferencingFactoryFinder.getCRSAuthorityFactory(authority, null);
+        assertSame(factory, ReferencingFactoryFinder.getCRSAuthorityFactory  (authority, null));
+        assertSame(factory, ReferencingFactoryFinder.getCSAuthorityFactory   (authority, null));
+        assertSame(factory, ReferencingFactoryFinder.getDatumAuthorityFactory(authority, null));
         /*
          * Tests the X-OGC namespace, which should be synonymous.
          */
         authority = "URN:X-OGC:DEF";
-        assertSame(factory, FactoryFinder.getCRSAuthorityFactory  (authority, null));
-        assertSame(factory, FactoryFinder.getCSAuthorityFactory   (authority, null));
-        assertSame(factory, FactoryFinder.getDatumAuthorityFactory(authority, null));
+        assertSame(factory, ReferencingFactoryFinder.getCRSAuthorityFactory  (authority, null));
+        assertSame(factory, ReferencingFactoryFinder.getCSAuthorityFactory   (authority, null));
+        assertSame(factory, ReferencingFactoryFinder.getDatumAuthorityFactory(authority, null));
     }
 
     /**
      * Tests the CRS factory.
      */
     public void testCRS() throws FactoryException {
-        CRSAuthorityFactory factory = FactoryFinder.getCRSAuthorityFactory("URN:OGC:DEF", null);
+        CRSAuthorityFactory factory = ReferencingFactoryFinder.getCRSAuthorityFactory("URN:OGC:DEF", null);
         GeographicCRS crs;
         try {
             crs = factory.createGeographicCRS("CRS:84");

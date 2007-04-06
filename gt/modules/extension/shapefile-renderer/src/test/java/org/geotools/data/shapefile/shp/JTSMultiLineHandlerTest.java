@@ -30,7 +30,7 @@ import org.geotools.data.shapefile.ShapefileRendererUtil;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.transform.IdentityTransform;
@@ -65,12 +65,12 @@ public class JTSMultiLineHandlerTest extends TestCase {
 		Envelope env=ds.getFeatureSource().getBounds();
 		MathTransform mt=null;
 		AffineTransform transform = RendererUtilities.worldToScreenTransform(env, new Rectangle(512,512));
-		MathTransform at = FactoryFinder.getMathTransformFactory(null)
+		MathTransform at = ReferencingFactoryFinder.getMathTransformFactory(null)
 				.createAffineTransform(new GeneralMatrix(transform));
 		if (mt == null) {
 			mt = at;
 		} else {
-			mt = FactoryFinder.getMathTransformFactory(null)
+			mt = ReferencingFactoryFinder.getMathTransformFactory(null)
 					.createConcatenatedTransform(mt, at);
 		}
 
@@ -107,9 +107,9 @@ public class JTSMultiLineHandlerTest extends TestCase {
 		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
 		MathTransform mt=CRS.findMathTransform(crs, DefaultGeographicCRS.WGS84);
 		AffineTransform at=RendererUtilities.worldToScreenTransform(env,new Rectangle(300,300));
-		MathTransform worldToScreen=FactoryFinder.getMathTransformFactory(null)
+		MathTransform worldToScreen=ReferencingFactoryFinder.getMathTransformFactory(null)
 		.createAffineTransform(new GeneralMatrix(at));
-		mt = FactoryFinder.getMathTransformFactory(null)
+		mt = ReferencingFactoryFinder.getMathTransformFactory(null)
 		.createConcatenatedTransform(mt,worldToScreen);
 		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
 		reader.setHandler(new org.geotools.renderer.shape.shapehandler.jts.MultiLineHandler(reader.getHeader().getShapeType(), env, mt, false,new Rectangle(300,300)));

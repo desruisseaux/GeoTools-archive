@@ -30,7 +30,7 @@ import org.opengis.geometry.MismatchedDimensionException;
 import org.geotools.factory.Hints;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
@@ -166,7 +166,7 @@ public class TransformedDirectPosition extends GeneralDirectPosition {
         super(targetCRS);
         ensureNonNull("targetCRS", targetCRS);
         defaultCRS = CRS.equalsIgnoreMetadata(sourceCRS, targetCRS) ? null : sourceCRS;
-        factory = FactoryFinder.getCoordinateOperationFactory(hints);
+        factory = ReferencingFactoryFinder.getCoordinateOperationFactory(hints);
     }
 
     /**

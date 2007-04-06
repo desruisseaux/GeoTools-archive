@@ -38,7 +38,7 @@ import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.type.GeometricAttributeType;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.opengis.filter.Filter;
 import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.identity.Identifier;
@@ -418,7 +418,7 @@ public class ArcSDEAdapter {
 					+ " does not provides a Coordinate Reference System");
 		} else {
 			try {
-				CRSFactory crsFactory = FactoryFinder.getCRSFactory(null);
+				CRSFactory crsFactory = ReferencingFactoryFinder.getCRSFactory(null);
 				crs = crsFactory.createFromWKT(WKT);
 				LOGGER.fine("ArcSDE CRS correctly parsed from layer "
 						+ sdeLayer.getName());

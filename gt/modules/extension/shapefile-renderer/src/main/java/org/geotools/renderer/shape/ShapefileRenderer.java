@@ -74,7 +74,7 @@ import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeocentricCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
@@ -1292,13 +1292,13 @@ public class ShapefileRenderer implements GTRenderer {
                     mt = null;
                 }
 
-                MathTransform at = FactoryFinder.getMathTransformFactory(null)
+                MathTransform at = ReferencingFactoryFinder.getMathTransformFactory(null)
                         .createAffineTransform(new GeneralMatrix(transform));
 
                 if (mt == null) {
                     mt = at;
                 } else {
-                    mt = FactoryFinder.getMathTransformFactory(null).createConcatenatedTransform(
+                    mt = ReferencingFactoryFinder.getMathTransformFactory(null).createConcatenatedTransform(
                             mt, at);
                 }
 

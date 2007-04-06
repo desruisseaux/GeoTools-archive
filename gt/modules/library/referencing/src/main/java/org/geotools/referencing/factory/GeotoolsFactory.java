@@ -77,7 +77,7 @@ import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.wkt.Parser;
 import org.geotools.referencing.wkt.Symbols;
 import org.geotools.referencing.crs.DefaultCompoundCRS;
@@ -146,9 +146,9 @@ public class GeotoolsFactory extends ReferencingFactory
      * not instantiate this factory directly, but use one of the following lines instead:
      *
      * <blockquote><pre>
-     * {@linkplain DatumFactory} factory = FactoryFinder.{@linkplain FactoryFinder#getDatumFactory getDatumFactory()};
-     * {@linkplain CSFactory}    factory = FactoryFinder.{@linkplain FactoryFinder#getCSFactory    getCSFactory()};
-     * {@linkplain CRSFactory}   factory = FactoryFinder.{@linkplain FactoryFinder#getCRSFactory   getCRSFactory()};
+     * {@linkplain DatumFactory} factory = FactoryFinder.{@linkplain ReferencingFactoryFinder#getDatumFactory getDatumFactory()};
+     * {@linkplain CSFactory}    factory = FactoryFinder.{@linkplain ReferencingFactoryFinder#getCSFactory    getCSFactory()};
+     * {@linkplain CRSFactory}   factory = FactoryFinder.{@linkplain ReferencingFactoryFinder#getCRSFactory   getCRSFactory()};
      * </pre></blockquote>
      */
     public GeotoolsFactory() {
@@ -968,8 +968,8 @@ public class GeotoolsFactory extends ReferencingFactory
         //       synchronize.
         if (parser == null) {
             final Hints hints = new Hints(getImplementationHints());
-            parser = new Parser(Symbols.DEFAULT, FactoryFinder.getDatumFactory(hints), this, this,
-                                                 FactoryFinder.getMathTransformFactory(hints));
+            parser = new Parser(Symbols.DEFAULT, ReferencingFactoryFinder.getDatumFactory(hints), this, this,
+                                                 ReferencingFactoryFinder.getMathTransformFactory(hints));
         }
         try {
             return parser.parseCoordinateReferenceSystem(wkt);

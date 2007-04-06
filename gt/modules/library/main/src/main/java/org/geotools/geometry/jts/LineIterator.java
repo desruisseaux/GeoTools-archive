@@ -18,7 +18,7 @@ package org.geotools.geometry.jts;
 import java.awt.geom.AffineTransform;
 import java.util.NoSuchElementException;
 
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.NoninvertibleTransformException;

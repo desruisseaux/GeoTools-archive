@@ -29,7 +29,7 @@ import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.renderer.lite.RendererUtilities;
@@ -63,9 +63,9 @@ public class SimpleMultiPointHandlerTest extends TestCase {
         AffineTransform transform = RendererUtilities.worldToScreenTransform(
                 env, rectangle);
         GeneralMatrix matrix = new GeneralMatrix(transform);
-        MathTransform at = FactoryFinder.getMathTransformFactory(null)
+        MathTransform at = ReferencingFactoryFinder.getMathTransformFactory(null)
                 .createAffineTransform(matrix);
-        mt = FactoryFinder.getMathTransformFactory(null)
+        mt = ReferencingFactoryFinder.getMathTransformFactory(null)
                 .createConcatenatedTransform(mt, at);
 
         ShapefileReader reader = new ShapefileReader(ShapefileRendererUtil

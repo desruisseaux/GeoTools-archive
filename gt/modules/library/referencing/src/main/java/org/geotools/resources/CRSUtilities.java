@@ -55,7 +55,7 @@ import org.geotools.measure.AngleFormat;
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
@@ -435,7 +435,7 @@ public final class CRSUtilities {
         try {
             crs = getCRS2D(crs);
             if (!CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, crs)) {
-                final CoordinateOperation op = FactoryFinder.getCoordinateOperationFactory(null)
+                final CoordinateOperation op = ReferencingFactoryFinder.getCoordinateOperationFactory(null)
                         .createOperation(crs, DefaultGeographicCRS.WGS84);
                 bounds = CRS.transform((MathTransform2D) op.getMathTransform(), bounds, null);
             }

@@ -32,7 +32,7 @@ import org.opengis.referencing.FactoryException;
 // Geotools dependencies
 import org.geotools.referencing.crs.*;
 import org.geotools.referencing.datum.*;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 
 
 /**
@@ -81,7 +81,7 @@ public final class AuthorityFactoryProxyTest extends TestCase {
      * Tests {@link AuthorityFactoryProxy#create}. We uses the CRS factory for testing purpose.
      */
     public void testCreate() throws FactoryException {
-        final CRSAuthorityFactory factory = FactoryFinder.getCRSAuthorityFactory("CRS", null);
+        final CRSAuthorityFactory factory = ReferencingFactoryFinder.getCRSAuthorityFactory("CRS", null);
         final CoordinateReferenceSystem expected = factory.createCoordinateReferenceSystem("83");
         AuthorityFactoryProxy proxy;
         /*
@@ -146,7 +146,7 @@ public final class AuthorityFactoryProxyTest extends TestCase {
      * Tests {@link AuthorityFactoryProxy#create}. We uses the CRS factory for testing purpose.
      */
     public void testCreateEquivalent() throws FactoryException {
-        final CRSAuthorityFactory factory = FactoryFinder.getCRSAuthorityFactory("CRS", null);
+        final CRSAuthorityFactory factory = ReferencingFactoryFinder.getCRSAuthorityFactory("CRS", null);
         final AuthorityFactoryProxy proxy = AuthorityFactoryProxy.getInstance(GeographicCRS.class, factory);
         CoordinateReferenceSystem expected = factory.createCoordinateReferenceSystem("84");
         assertSame   (expected, proxy.create("84"));

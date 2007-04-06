@@ -67,7 +67,7 @@ import org.opengis.referencing.operation.OperationMethod;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
@@ -153,10 +153,10 @@ public class Parser extends MathTransformParser {
      */
     public Parser(final Symbols symbols) {
         this(symbols,
-             FactoryFinder.getDatumFactory        (null),
-             FactoryFinder.getCSFactory           (null),
-             FactoryFinder.getCRSFactory          (null),
-             FactoryFinder.getMathTransformFactory(null));
+             ReferencingFactoryFinder.getDatumFactory        (null),
+             ReferencingFactoryFinder.getCSFactory           (null),
+             ReferencingFactoryFinder.getCRSFactory          (null),
+             ReferencingFactoryFinder.getMathTransformFactory(null));
     }
     
     /**

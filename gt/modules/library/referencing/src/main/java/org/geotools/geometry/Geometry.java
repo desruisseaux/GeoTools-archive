@@ -27,7 +27,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.Cloneable;
 
 // Geotools dependencies
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.operation.TransformPathNotFoundException;
 
 
@@ -111,7 +111,7 @@ public abstract class Geometry implements org.opengis.geometry.Geometry, Seriali
             // No need to synchronize: this is not a problem if this method is invoked
             // twice in two different threads.
             try {
-                coordinateOperationFactory = FactoryFinder.getCoordinateOperationFactory(null);
+                coordinateOperationFactory = ReferencingFactoryFinder.getCoordinateOperationFactory(null);
             } catch (NoSuchElementException exception) {
                 // TODO: localize the message
                 throw new TransformException("Can't transform the geometry", exception);

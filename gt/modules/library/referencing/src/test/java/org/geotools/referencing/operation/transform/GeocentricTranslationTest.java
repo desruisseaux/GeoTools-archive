@@ -30,7 +30,7 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
 
 // Geotools dependencies
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.operation.TestTransform;
 import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.geometry.GeneralDirectPosition;
@@ -71,7 +71,7 @@ public final class GeocentricTranslationTest extends TestCase {
      */
     public void testTranslation() throws FactoryException, TransformException {
         final String        classification = "Geocentric translations";
-        final MathTransformFactory factory = FactoryFinder.getMathTransformFactory(null);
+        final MathTransformFactory factory = ReferencingFactoryFinder.getMathTransformFactory(null);
         final ParameterValueGroup    param = factory.getDefaultParameters(classification);
 
         param.parameter("dx").setValue( 84.87);
@@ -95,7 +95,7 @@ public final class GeocentricTranslationTest extends TestCase {
      */
     public void testSevenParam() throws FactoryException, TransformException {
         final String        classification = "Position Vector 7-param. transformation";
-        final MathTransformFactory factory = FactoryFinder.getMathTransformFactory(null);
+        final MathTransformFactory factory = ReferencingFactoryFinder.getMathTransformFactory(null);
         final ParameterValueGroup    param = factory.getDefaultParameters(classification);
 
         param.parameter("dx") .setValue(0.000);
@@ -123,7 +123,7 @@ public final class GeocentricTranslationTest extends TestCase {
      */
     public void testFrameRotation() throws FactoryException, TransformException {
         final String        classification = "Coordinate Frame rotation";
-        final MathTransformFactory factory = FactoryFinder.getMathTransformFactory(null);
+        final MathTransformFactory factory = ReferencingFactoryFinder.getMathTransformFactory(null);
         final ParameterValueGroup    param = factory.getDefaultParameters(classification);
 
         param.parameter("dx") .setValue( 0.000);
@@ -152,7 +152,7 @@ public final class GeocentricTranslationTest extends TestCase {
      */
     public void testGeotoolsExtensions() throws FactoryException, TransformException {
         final String        classification = "Coordinate Frame rotation";
-        final MathTransformFactory factory = FactoryFinder.getMathTransformFactory(null);
+        final MathTransformFactory factory = ReferencingFactoryFinder.getMathTransformFactory(null);
         final ParameterValueGroup    param = factory.getDefaultParameters(classification);
         final Ellipsoid    sourceEllipsoid = DefaultEllipsoid.INTERNATIONAL_1924;
         final Ellipsoid    targetEllipsoid = DefaultEllipsoid.WGS84;

@@ -40,7 +40,7 @@ import org.opengis.geometry.DirectPosition;
 // Geotools dependencies
 import org.geotools.geometry.DirectPosition1D;
 import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
@@ -108,7 +108,7 @@ public final class MathTransformTest extends TestCase {
      * Tests a transformation on a {@link DirectPosition} object.
      */
     public void testDirectPositionTransform() throws FactoryException, TransformException {
-        CoordinateReferenceSystem crs = FactoryFinder.getCRSFactory(null).createFromWKT(
+        CoordinateReferenceSystem crs = ReferencingFactoryFinder.getCRSFactory(null).createFromWKT(
                 "PROJCS[\"NAD_1983_UTM_Zone_10N\",\n"                      +
                 "  GEOGCS[\"GCS_North_American_1983\",\n"                  +
                 "    DATUM[\"D_North_American_1983\",\n"                   +
@@ -124,7 +124,7 @@ public final class MathTransformTest extends TestCase {
                 "  PARAMETER[\"Latitude_Of_Origin\",0],\n"                 +
                 "  UNIT[\"Meter\",1]]");
         
-        MathTransform t = FactoryFinder.getCoordinateOperationFactory(null).createOperation(
+        MathTransform t = ReferencingFactoryFinder.getCoordinateOperationFactory(null).createOperation(
                                         DefaultGeographicCRS.WGS84, crs).getMathTransform();
         DirectPosition position = new GeneralDirectPosition(-123, 55);
         position = t.          transform(position, position);

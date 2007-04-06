@@ -45,7 +45,7 @@ import org.geotools.factory.JNDI;
 import org.geotools.factory.Hints;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
@@ -59,14 +59,14 @@ import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
- * Base class for EPSG factories to be registered in {@link FactoryFinder}. Various subclasses
+ * Base class for EPSG factories to be registered in {@link ReferencingFactoryFinder}. Various subclasses
  * are defined for different database backend (Access, PostgreSQL, HSQL, <cite>etc.</cite>).
  * The main purpose of this class is to {@linkplain #createDataSource create a data source}
  * connecting to the EPSG database, and an appropriate {@link FactoryUsingSQL} instance capable
  * to speak that database syntax.
  * <p>
  * Users should not creates instance of this class directly. They should invoke one of
- * <code>{@linkplain FactoryFinder}.getFooAuthorityFactory("EPSG")</code> methods instead.
+ * <code>{@linkplain ReferencingFactoryFinder}.getFooAuthorityFactory("EPSG")</code> methods instead.
  * <p>
  * Subclasses should override the following methods:
  * <ul>
@@ -220,7 +220,7 @@ public class DefaultFactory extends DeferredAuthorityFactory
     /**
      * Set the data source for the EPSG database. If an other EPSG database was already in use,
      * it will be disconnected. Users should not invoke this method on the factory returned by
-     * {@link FactoryFinder}, since it could have a system-wide effect.
+     * {@link ReferencingFactoryFinder}, since it could have a system-wide effect.
      *
      * @param  datasource The new datasource.
      * @throws SQLException if an error occured.

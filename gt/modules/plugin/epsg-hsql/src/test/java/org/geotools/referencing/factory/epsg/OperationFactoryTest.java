@@ -41,7 +41,7 @@ import org.opengis.referencing.operation.ConcatenatedOperation;
 import org.geotools.referencing.operation.BufferedCoordinateOperationFactory;
 import org.geotools.referencing.operation.AbstractCoordinateOperation;
 import org.geotools.referencing.operation.AuthorityBackedFactory;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.factory.Hints;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
@@ -103,8 +103,8 @@ public class OperationFactoryTest extends TestCase {
               CoordinateReferenceSystem  targetCRS;
               CoordinateOperation        operation;
 
-        crsFactory = FactoryFinder.getCRSAuthorityFactory("EPSG", null);
-        opFactory  = FactoryFinder.getCoordinateOperationFactory(null);
+        crsFactory = ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG", null);
+        opFactory  = ReferencingFactoryFinder.getCoordinateOperationFactory(null);
         sourceCRS  = crsFactory.createCoordinateReferenceSystem("4230");
         targetCRS  = crsFactory.createCoordinateReferenceSystem("4326");
         operation  = opFactory.createOperation(sourceCRS, targetCRS);

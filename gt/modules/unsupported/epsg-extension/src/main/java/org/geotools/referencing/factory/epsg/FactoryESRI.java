@@ -106,7 +106,7 @@ public class FactoryESRI extends FactoryUsingWKT {
 
     /**
      * Prints a list of codes that duplicate the ones provided in the {@link DefaultFactory}.
-     * The factory tested is the one registered in {@link FactoryFinder}.  By default, this
+     * The factory tested is the one registered in {@link ReferencingFactoryFinder}.  By default, this
      * is this {@code FactoryESRI} class backed by the {@value #FILENAME} property file.
      * This method can be invoked from the command line in order to check the content of the
      * property file. Valid arguments are:

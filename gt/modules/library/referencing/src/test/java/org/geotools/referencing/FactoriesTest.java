@@ -116,10 +116,10 @@ public final class FactoriesTest extends TestCase {
         out.println("---------------------");
         out.println();
         out.println("create Coodinate Reference System....1: ");
-        final         DatumFactory datumFactory = FactoryFinder.getDatumFactory        (null);
-        final            CSFactory    csFactory = FactoryFinder.getCSFactory           (null);
-        final           CRSFactory   crsFactory = FactoryFinder.getCRSFactory          (null);
-        final MathTransformFactory    mtFactory = FactoryFinder.getMathTransformFactory(null);
+        final         DatumFactory datumFactory = ReferencingFactoryFinder.getDatumFactory        (null);
+        final            CSFactory    csFactory = ReferencingFactoryFinder.getCSFactory           (null);
+        final           CRSFactory   crsFactory = ReferencingFactoryFinder.getCRSFactory          (null);
+        final MathTransformFactory    mtFactory = ReferencingFactoryFinder.getMathTransformFactory(null);
 
         final Ellipsoid airy1830;
         final Unit meters = SI.METER;
@@ -196,7 +196,7 @@ public final class FactoriesTest extends TestCase {
         out.println();
         out.println("Testing classification names");
         out.println("----------------------------");
-        final MathTransformFactory mtFactory = FactoryFinder.getMathTransformFactory(null);
+        final MathTransformFactory mtFactory = ReferencingFactoryFinder.getMathTransformFactory(null);
         final Collection methods = mtFactory.getAvailableMethods(Projection.class);
         for (final Iterator it=methods.iterator(); it.hasNext();) {
             final OperationMethod    method = (OperationMethod) it.next();
@@ -259,7 +259,7 @@ public final class FactoriesTest extends TestCase {
         for (int i=0; i<3; i++) {
             switch (i) {
                 case  0: factory = new DatumAliases(factory);           break;
-                case  1: factory = FactoryFinder.getDatumFactory(null); break;
+                case  1: factory = ReferencingFactoryFinder.getDatumFactory(null); break;
                 case  2: ((DatumAliases) factory).freeUnused();         break;
                 default: throw new AssertionError(); // Should not occurs.
             }

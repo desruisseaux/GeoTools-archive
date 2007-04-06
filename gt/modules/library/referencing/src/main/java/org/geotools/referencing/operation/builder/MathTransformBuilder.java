@@ -50,7 +50,7 @@ import org.geotools.io.TableWriter;
 import org.geotools.math.Statistics;
 import org.geotools.resources.XMath;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.operation.DefaultOperationMethod;
 import org.geotools.referencing.operation.DefaultTransformation;
@@ -161,9 +161,9 @@ public abstract class MathTransformBuilder {
      * Creates a builder from the specified hints.
      */
     public MathTransformBuilder(final Hints hints) {
-        mtFactory    = FactoryFinder.getMathTransformFactory(hints);
-        crsFactory   = FactoryFinder.getCRSFactory          (hints);
-        datumFactory = FactoryFinder.getDatumFactory        (hints);
+        mtFactory    = ReferencingFactoryFinder.getMathTransformFactory(hints);
+        crsFactory   = ReferencingFactoryFinder.getCRSFactory          (hints);
+        datumFactory = ReferencingFactoryFinder.getDatumFactory        (hints);
     }
 
     /**

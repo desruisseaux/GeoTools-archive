@@ -46,7 +46,7 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.SwingUtilities;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.gui.swing.IconFactory;
 
@@ -119,7 +119,7 @@ public class AuthorityCodesComboBox extends JComponent {
      * @throws FactoryException if the factory can't provide CRS codes.
      */
     public AuthorityCodesComboBox() throws FactoryRegistryException, FactoryException {
-        this(FactoryFinder.getCRSAuthorityFactory("EPSG", null));
+        this(ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG", null));
     }
 
     /**

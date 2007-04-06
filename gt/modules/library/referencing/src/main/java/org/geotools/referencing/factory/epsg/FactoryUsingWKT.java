@@ -40,7 +40,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 // Geotools dependencies
 import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
@@ -254,7 +254,7 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
             final Class/*<T extends AbstractAuthorityFactory>*/ type)
     {
         // TODO: use type.cast(...) when we will be allowed to compile for J2SE 1.5.
-        return (AbstractAuthorityFactory) FactoryFinder.getCRSAuthorityFactory("EPSG",
+        return (AbstractAuthorityFactory) ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG",
                 new Hints(Hints.CRS_AUTHORITY_FACTORY, type));
     }
 
@@ -358,7 +358,7 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
 
     /**
      * Prints a list of codes that duplicate the ones provided in the {@link DefaultFactory}.
-     * The factory tested is the one registered in {@link FactoryFinder}.  By default, this
+     * The factory tested is the one registered in {@link ReferencingFactoryFinder}.  By default, this
      * is this {@code FactoryUsingWKT} class backed by the {@value #FILENAME} property file.
      * This method can be invoked from the command line in order to check the content of the
      * property file. Valid arguments are:

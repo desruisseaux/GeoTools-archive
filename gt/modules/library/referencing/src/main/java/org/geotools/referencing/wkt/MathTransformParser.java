@@ -35,7 +35,7 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.OperationMethod;
 
 // Geotools dependencies
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -89,7 +89,7 @@ public class MathTransformParser extends AbstractParser {
      * @todo Pass hints in argument.
      */
     public MathTransformParser(final Symbols symbols) {
-        this(symbols, FactoryFinder.getMathTransformFactory(null));
+        this(symbols, ReferencingFactoryFinder.getMathTransformFactory(null));
     }
     
     /**

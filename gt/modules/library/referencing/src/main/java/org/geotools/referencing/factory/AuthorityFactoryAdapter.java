@@ -42,7 +42,7 @@ import org.geotools.factory.Hints;
 import org.geotools.factory.Factory;
 import org.geotools.factory.AbstractFactory;
 import org.geotools.factory.OptionalFactory;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -908,7 +908,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
                 return (CoordinateOperationFactory) candidate;
             }
         }
-        return FactoryFinder.getCoordinateOperationFactory(hints());
+        return ReferencingFactoryFinder.getCoordinateOperationFactory(hints());
     }
 
     /**

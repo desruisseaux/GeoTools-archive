@@ -38,7 +38,7 @@ import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryCreator;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.parameter.Parameters;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.DefiningConversion;
 import org.geotools.referencing.operation.MathTransformProvider;
@@ -109,7 +109,7 @@ public final class FactoryGroup extends ReferencingFactory {
 
     /**
      * Constructs an instance using the specified factories. If any factory is null,
-     * a default instance will be created by {@link FactoryFinder} when first needed.
+     * a default instance will be created by {@link ReferencingFactoryFinder} when first needed.
      *
      * @param datumFactory The {@linkplain Datum datum} factory.
      * @param    csFactory The {@linkplain CoordinateSystem coordinate system} factory.
@@ -198,7 +198,7 @@ public final class FactoryGroup extends ReferencingFactory {
          * queries FactoryFinder, and some implementations managed by FactoryFinder may ask
          * for a FactoryGroup in turn.
          */
-        synchronized (FactoryFinder.class) {
+        synchronized (ReferencingFactoryFinder.class) {
             if (cache == null) {
                 cache = new FactoryCreator(Arrays.asList(new Class[] {FactoryGroup.class}));
                 cache.registerServiceProvider(new FactoryGroup(null), FactoryGroup.class);
@@ -263,7 +263,7 @@ public final class FactoryGroup extends ReferencingFactory {
     public DatumFactory getDatumFactory() {
         if (datumFactory == null) {
             synchronized (hints) {
-                datumFactory = FactoryFinder.getDatumFactory(hints());
+                datumFactory = ReferencingFactoryFinder.getDatumFactory(hints());
             }
         }
         return datumFactory;
@@ -275,7 +275,7 @@ public final class FactoryGroup extends ReferencingFactory {
     public CSFactory getCSFactory() {
         if (csFactory == null) {
             synchronized (hints) {
-                csFactory = FactoryFinder.getCSFactory(hints());
+                csFactory = ReferencingFactoryFinder.getCSFactory(hints());
             }
         }
         return csFactory;
@@ -287,7 +287,7 @@ public final class FactoryGroup extends ReferencingFactory {
     public CRSFactory getCRSFactory() {
         if (crsFactory == null) {
             synchronized (hints) {
-                crsFactory = FactoryFinder.getCRSFactory(hints());
+                crsFactory = ReferencingFactoryFinder.getCRSFactory(hints());
             }
         }
         return crsFactory;
@@ -299,7 +299,7 @@ public final class FactoryGroup extends ReferencingFactory {
     public MathTransformFactory getMathTransformFactory() {
         if (mtFactory == null) {
             synchronized (hints) {
-                mtFactory = FactoryFinder.getMathTransformFactory(hints());
+                mtFactory = ReferencingFactoryFinder.getMathTransformFactory(hints());
             }
         }
         return mtFactory;

@@ -33,7 +33,7 @@ import org.opengis.referencing.operation.TransformException;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 
@@ -92,7 +92,7 @@ public class TransformedCoverage extends AbstractCoverage {
               (coverage instanceof PropertySource) ? ((PropertySource) coverage) : null, null);
         this.coverage = coverage;
         position = new GeneralDirectPosition(crs.getCoordinateSystem().getDimension());
-        toWrapped = FactoryFinder.getCoordinateOperationFactory(HINTS)
+        toWrapped = ReferencingFactoryFinder.getCoordinateOperationFactory(HINTS)
                                  .createOperation(crs, coverage.getCoordinateReferenceSystem())
                                  .getMathTransform();
     }

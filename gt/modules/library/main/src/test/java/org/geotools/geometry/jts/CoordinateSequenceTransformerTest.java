@@ -32,7 +32,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 
 // JUnit dependencies
@@ -76,8 +76,8 @@ public class CoordinateSequenceTransformerTest extends TestCase {
     public void testTransform() throws FactoryException, TransformException {
         final MathTransform2D t;
         final CoordinateReferenceSystem crs;
-        crs = FactoryFinder.getCRSFactory(null).createFromWKT(JTSTest.UTM_ZONE_10N);
-        t = (MathTransform2D) FactoryFinder.getCoordinateOperationFactory(null).createOperation(
+        crs = ReferencingFactoryFinder.getCRSFactory(null).createFromWKT(JTSTest.UTM_ZONE_10N);
+        t = (MathTransform2D) ReferencingFactoryFinder.getCoordinateOperationFactory(null).createOperation(
                                             DefaultGeographicCRS.WGS84, crs).getMathTransform();
         final Random random = new Random(546757437746704345L);
 

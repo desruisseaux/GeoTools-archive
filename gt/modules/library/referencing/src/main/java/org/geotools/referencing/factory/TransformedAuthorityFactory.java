@@ -41,7 +41,7 @@ import org.geotools.util.WeakHashSet;
 import org.geotools.factory.Hints;
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryRegistryException;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.DefiningConversion;
 import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
@@ -124,11 +124,11 @@ public class TransformedAuthorityFactory extends AuthorityFactoryAdapter {
 
     /**
      * Creates a wrappers around the default factories for the specified
-     * authority. The factories are fetched using {@link FactoryFinder}.
+     * authority. The factories are fetched using {@link ReferencingFactoryFinder}.
      * <p>
      * <strong>WARNING:</strong> Do not invoke this constructor from a subclass
      * to be registered in a {@code META-INF/services/} file for use by
-     * {@link FactoryFinder}. It may lead to recursive calls until a
+     * {@link ReferencingFactoryFinder}. It may lead to recursive calls until a
      * {@link StackOverflowError} is thrown.
      * 
      * @param authority The authority to wraps (example: {@code "EPSG"}). If {@code null},
@@ -140,15 +140,15 @@ public class TransformedAuthorityFactory extends AuthorityFactoryAdapter {
     TransformedAuthorityFactory(final String authority, final Hints hints)
             throws FactoryRegistryException
     {
-        super(FactoryFinder.getCRSAuthorityFactory                (authority, hints),
-              FactoryFinder.getCSAuthorityFactory                 (authority, hints),
-              FactoryFinder.getDatumAuthorityFactory              (authority, hints),
-              FactoryFinder.getCoordinateOperationAuthorityFactory(authority, hints));
+        super(ReferencingFactoryFinder.getCRSAuthorityFactory                (authority, hints),
+              ReferencingFactoryFinder.getCSAuthorityFactory                 (authority, hints),
+              ReferencingFactoryFinder.getDatumAuthorityFactory              (authority, hints),
+              ReferencingFactoryFinder.getCoordinateOperationAuthorityFactory(authority, hints));
     }
 
     /**
      * Returns the priority for this factory. Priorities are used by
-     * {@link FactoryFinder} for selecting a preferred factory when many are
+     * {@link ReferencingFactoryFinder} for selecting a preferred factory when many are
      * found for the same service. The default implementation returns
      * <code>{@linkplain #priority priority} + 1</code>, which implies that
      * this adapter has precedence over the wrapped factories. Subclasses should

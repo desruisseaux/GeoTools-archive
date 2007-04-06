@@ -43,7 +43,7 @@ import org.geotools.metadata.iso.citation.Citations;
  * name space. An exemple of complete URN is {@code "urn:ogc:def:crs:EPSG:6.8:4326"}.
  * <p>
  * Users don't need to create an instance of this class, since one is automatically
- * registered for use in {@link org.opengis.referencing.FactoryFinder}.
+ * registered for use in {@link org.opengis.referencing.ReferencingFactoryFinder}.
  *
  * @since 2.4
  * @source $URL$

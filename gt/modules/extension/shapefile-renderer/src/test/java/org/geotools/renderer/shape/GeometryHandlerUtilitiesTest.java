@@ -20,7 +20,7 @@ import java.awt.geom.AffineTransform;
 import junit.framework.TestCase;
 
 import org.geotools.data.shapefile.shp.ShapeType;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.Matrix;
@@ -230,7 +230,7 @@ public class GeometryHandlerUtilitiesTest extends TestCase {
         double[] src = new double[] { 1, 1, 2, 2, 3, 3, 4, 4, 5, 5 };
         double[] dest = new double[8];
 
-        MathTransform mt = FactoryFinder.getMathTransformFactory(null)
+        MathTransform mt = ReferencingFactoryFinder.getMathTransformFactory(null)
                                         .createAffineTransform(new GeneralMatrix(
                     at));
         GeometryHandlerUtilities.transform(ShapeType.ARC, mt, src, dest);

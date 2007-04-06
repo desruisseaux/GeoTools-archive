@@ -30,7 +30,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
 import org.geotools.referencing.wkt.Parser;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultProjectedCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
@@ -116,15 +116,15 @@ public class JTSTest extends TestCase {
     public void testTransformCoordinate() throws FactoryException, TransformException {
         Coordinate   coord = new Coordinate(10, 10);
         AffineTransform at = AffineTransform.getScaleInstance(0.5, 1);
-        MathTransform2D  t = (MathTransform2D) FactoryFinder.getMathTransformFactory(null)
+        MathTransform2D  t = (MathTransform2D) ReferencingFactoryFinder.getMathTransformFactory(null)
                                             .createAffineTransform(new GeneralMatrix(at));
         coord = JTS.transform(coord, coord, t);
         assertEquals(new Coordinate(5, 10), coord);
         coord = JTS.transform(coord, coord, t.inverse());
         assertEquals(new Coordinate(10, 10), coord);
         
-        CoordinateReferenceSystem crs = FactoryFinder.getCRSFactory(null).createFromWKT(UTM_ZONE_10N);
-        t = (MathTransform2D) FactoryFinder.getCoordinateOperationFactory(null).createOperation(
+        CoordinateReferenceSystem crs = ReferencingFactoryFinder.getCRSFactory(null).createFromWKT(UTM_ZONE_10N);
+        t = (MathTransform2D) ReferencingFactoryFinder.getCoordinateOperationFactory(null).createOperation(
                                             DefaultGeographicCRS.WGS84, crs).getMathTransform();
         coord = new Coordinate(-123, 55);
         coord = JTS.transform(coord, coord, t);
@@ -139,7 +139,7 @@ public class JTSTest extends TestCase {
     public void testTransformEnvelopeMathTransform() throws FactoryException, TransformException {
         Envelope envelope  = new Envelope(0, 10, 0, 10);
         AffineTransform at = AffineTransform.getScaleInstance(0.5, 1);
-        MathTransform2D t  = (MathTransform2D) FactoryFinder.getMathTransformFactory(null)
+        MathTransform2D t  = (MathTransform2D) ReferencingFactoryFinder.getMathTransformFactory(null)
                                             .createAffineTransform(new GeneralMatrix(at));
         envelope = JTS.transform(envelope, t);
         assertEquals(new Envelope(0, 5, 0, 10), envelope);
@@ -151,8 +151,8 @@ public class JTSTest extends TestCase {
         envelope = JTS.transform(envelope, null, t.inverse(), 10);
         assertEquals(new Envelope(0, 10, 0, 10), envelope);
         
-        CoordinateReferenceSystem crs = FactoryFinder.getCRSFactory(null).createFromWKT(UTM_ZONE_10N);
-        t = (MathTransform2D) FactoryFinder.getCoordinateOperationFactory(null).createOperation(
+        CoordinateReferenceSystem crs = ReferencingFactoryFinder.getCRSFactory(null).createFromWKT(UTM_ZONE_10N);
+        t = (MathTransform2D) ReferencingFactoryFinder.getCoordinateOperationFactory(null).createOperation(
                                             DefaultGeographicCRS.WGS84, crs).getMathTransform();
         envelope = new Envelope(-123, -133, 55, 60);
         envelope = JTS.transform(envelope, t);

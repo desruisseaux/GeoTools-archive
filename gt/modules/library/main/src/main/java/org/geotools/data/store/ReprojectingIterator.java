@@ -8,7 +8,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.geometry.jts.GeometryCoordinateSequenceTransformer;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -61,7 +61,7 @@ public class ReprojectingIterator implements Iterator {
         this.schema = schema;
         tx = transformer;
 
-        MathTransform transform = FactoryFinder.getCoordinateOperationFactory(
+        MathTransform transform = ReferencingFactoryFinder.getCoordinateOperationFactory(
                 null).createOperation(source, target).getMathTransform();
         tx.setMathTransform((MathTransform2D) transform);
     }

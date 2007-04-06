@@ -27,7 +27,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 
 import org.geotools.data.shapefile.StreamLogging;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.resources.NIOUtilities;
 import org.opengis.referencing.FactoryException;
 
@@ -66,7 +66,7 @@ public class PrjFileReader {
         
         String wkt = charBuffer.toString();
      
-        cs = FactoryFinder.getCRSFactory(null).createFromWKT(wkt);
+        cs = ReferencingFactoryFinder.getCRSFactory(null).createFromWKT(wkt);
     }
     
     public org.opengis.referencing.crs.CoordinateReferenceSystem getCoodinateSystem(){

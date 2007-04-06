@@ -83,7 +83,7 @@ final class Command {
      */
     private Command(final String authority) {
         factory = (authority == null) ? CRS.getAuthorityFactory(false) :
-                FactoryFinder.getCRSAuthorityFactory(authority, HINTS);
+                ReferencingFactoryFinder.getCRSAuthorityFactory(authority, HINTS);
         formatter = new Parser();
     }
 
@@ -187,7 +187,7 @@ final class Command {
         table.nextColumn();
         table.write(Vocabulary.format(VocabularyKeys.NOTE));
         table.writeHorizontalSeparator();
-        for (final Iterator it=FactoryFinder.getCRSAuthorityFactories(null).iterator(); it.hasNext();) {
+        for (final Iterator it=ReferencingFactoryFinder.getCRSAuthorityFactories(null).iterator(); it.hasNext();) {
             AuthorityFactory factory = (AuthorityFactory) it.next();
             final Citation authority = factory.getAuthority();
             final Iterator identifiers = authority.getIdentifiers().iterator();
@@ -328,7 +328,7 @@ final class Command {
         }
         final CRSAuthorityFactory factory = (CRSAuthorityFactory) this.factory;
         final CoordinateOperationFactory opFactory =
-                FactoryFinder.getCoordinateOperationFactory(HINTS);
+                ReferencingFactoryFinder.getCoordinateOperationFactory(HINTS);
         char[] separator = null;
         for (int i=0; i<args.length; i++) {
             final CoordinateReferenceSystem crs1 = factory.createCoordinateReferenceSystem(args[i]);

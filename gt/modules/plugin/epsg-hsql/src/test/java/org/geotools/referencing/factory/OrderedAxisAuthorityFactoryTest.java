@@ -42,7 +42,7 @@ import org.opengis.referencing.operation.Matrix;
 import org.geotools.factory.Hints;
 import org.geotools.resources.Arguments;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
@@ -115,7 +115,7 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
      */
     private static OrderedAxisAuthorityFactory getFactory(final Hints hints) {
         CRSAuthorityFactory factory;
-        factory = FactoryFinder.getCRSAuthorityFactory(EPSG, hints);
+        factory = ReferencingFactoryFinder.getCRSAuthorityFactory(EPSG, hints);
         assertTrue(factory.getClass().toString(), factory instanceof LongitudeFirstFactory);
         factory = (CRSAuthorityFactory) ((LongitudeFirstFactory) factory).getImplementationHints()
                    .get(Hints.CRS_AUTHORITY_FACTORY);
@@ -175,13 +175,13 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
          */
         final AbstractAuthorityFactory factory0, factory1;
         final Hints hints = new Hints(Hints.CRS_AUTHORITY_FACTORY, AbstractAuthorityFactory.class);
-        factory0 = (AbstractAuthorityFactory) FactoryFinder.getCRSAuthorityFactory(EPSG, hints);
+        factory0 = (AbstractAuthorityFactory) ReferencingFactoryFinder.getCRSAuthorityFactory(EPSG, hints);
         assertFalse(factory0 instanceof OrderedAxisAuthorityFactory);
         assertFalse(factory0 instanceof LongitudeFirstFactory);
         hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
         hints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS,   Boolean.TRUE);
         hints.put(Hints.FORCE_STANDARD_AXIS_UNITS,        Boolean.TRUE);
-        factory1 = (AbstractAuthorityFactory) FactoryFinder.getCRSAuthorityFactory(EPSG, hints);
+        factory1 = (AbstractAuthorityFactory) ReferencingFactoryFinder.getCRSAuthorityFactory(EPSG, hints);
         assertTrue(factory1 instanceof LongitudeFirstFactory);
         /*
          * The local variables to be used for all remaining tests
@@ -189,7 +189,7 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
          */
         String code;
         CoordinateReferenceSystem crs0, crs1;
-        CoordinateOperationFactory opFactory = FactoryFinder.getCoordinateOperationFactory(null);
+        CoordinateOperationFactory opFactory = ReferencingFactoryFinder.getCoordinateOperationFactory(null);
         MathTransform mt;
         Matrix matrix;
         /*
@@ -339,7 +339,7 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
         Citation authority;
 
         // Tests the official factory.
-        factory   = FactoryFinder.getCRSAuthorityFactory(EPSG, null);
+        factory   = ReferencingFactoryFinder.getCRSAuthorityFactory(EPSG, null);
         authority = factory.getAuthority();
         assertNotNull(authority);
         assertEquals("European Petroleum Survey Group", authority.getTitle().toString(Locale.US));

@@ -21,7 +21,7 @@ import java.util.Random;
 import junit.framework.TestCase;
 
 // Geotools dependencies
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 
 // OpenGIS dependencis
 import org.opengis.referencing.crs.CRSFactory;
@@ -91,10 +91,10 @@ public abstract class TestTransform extends TestCase {
         
         Hints hints = getHintsForTesting();
         
-        datumFactory = FactoryFinder.getDatumFactory( hints );
-        crsFactory = FactoryFinder.getCRSFactory( hints );
-        mtFactory = FactoryFinder.getMathTransformFactory( hints );
-        opFactory = FactoryFinder.getCoordinateOperationFactory( hints );        
+        datumFactory = ReferencingFactoryFinder.getDatumFactory( hints );
+        crsFactory = ReferencingFactoryFinder.getCRSFactory( hints );
+        mtFactory = ReferencingFactoryFinder.getMathTransformFactory( hints );
+        opFactory = ReferencingFactoryFinder.getCoordinateOperationFactory( hints );        
     }
     
     /**

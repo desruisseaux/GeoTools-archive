@@ -57,7 +57,7 @@ import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.codes.GeoTiffGCSCodes;
 import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.codes.GeoTiffPCSCodes;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.crs.DefaultProjectedCRS;
 import org.geotools.referencing.cs.DefaultCartesianCS;
@@ -198,9 +198,9 @@ public final class GeoTiffMetadata2CRSAdapter {
 		allAuthoritiesFactory = new AllAuthoritiesFactory(this.hints);
 
 		// factory = new DefaultFactory(hints);
-		datumObjFactory = FactoryFinder.getDatumFactory(this.hints);
-		crsFactory = FactoryFinder.getCRSFactory(this.hints);
-		csFactory = FactoryFinder.getCSFactory(this.hints);
+		datumObjFactory = ReferencingFactoryFinder.getDatumFactory(this.hints);
+		crsFactory = ReferencingFactoryFinder.getCRSFactory(this.hints);
+		csFactory = ReferencingFactoryFinder.getCSFactory(this.hints);
 		tempHints.put(Hints.DATUM_AUTHORITY_FACTORY, allAuthoritiesFactory);
 		tempHints.put(Hints.CS_FACTORY, csFactory);
 		tempHints.put(Hints.CRS_FACTORY, crsFactory);

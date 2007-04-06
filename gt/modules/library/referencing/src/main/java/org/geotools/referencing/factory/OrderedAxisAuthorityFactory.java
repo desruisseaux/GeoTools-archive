@@ -33,7 +33,7 @@ import org.opengis.referencing.FactoryException;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.factory.FactoryRegistryException;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -83,7 +83,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * <p>
  * For some authority factories, an instance of this class can be obtained by passing a
  * {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER FORCE_LONGITUDE_FIRST_AXIS_ORDER} hint
- * to the <code>{@linkplain FactoryFinder#getCRSAuthorityFactory
+ * to the <code>{@linkplain ReferencingFactoryFinder#getCRSAuthorityFactory
  * FactoryFinder.getCRSAuthorityFactory}(...)</code> method. Whatever this hint is supported
  * or not is authority dependent. Example:
  *
@@ -160,13 +160,13 @@ public class OrderedAxisAuthorityFactory extends TransformedAuthorityFactory
 
     /**
      * Creates a factory which will reorder the axis of all objects created by the default
-     * authority factories. The factories are fetched using {@link FactoryFinder}. This
+     * authority factories. The factories are fetched using {@link ReferencingFactoryFinder}. This
      * constructor accepts the following hints:
      * <p>
      * <ul>
      *   <li>{@link Hints#FORCE_STANDARD_AXIS_UNITS}</li>
      *   <li>{@link Hints#FORCE_STANDARD_AXIS_DIRECTIONS}</li>
-     *   <li>All hints understood by {@link FactoryFinder}</li>
+     *   <li>All hints understood by {@link ReferencingFactoryFinder}</li>
      * </ul>
      *
      * @param  authority The authority to wraps (example: {@code "EPSG"}). If {@code null},

@@ -33,7 +33,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 // Geotools dependencies
 import org.geotools.referencing.CRS;
 import org.geotools.resources.Arguments;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 
@@ -85,12 +85,12 @@ public final class CRSTest extends TestCase {
     }
 
     /**
-     * Tests the registration in {@link FactoryFinder}.
+     * Tests the registration in {@link ReferencingFactoryFinder}.
      */
     public void testFactoryFinder() {
-        final Collection authorities = FactoryFinder.getAuthorityNames();
+        final Collection authorities = ReferencingFactoryFinder.getAuthorityNames();
         assertTrue(authorities.contains("CRS"));
-        factory = FactoryFinder.getCRSAuthorityFactory("CRS", null);
+        factory = ReferencingFactoryFinder.getCRSAuthorityFactory("CRS", null);
         assertTrue(factory instanceof WebCRSFactory);
     }
 

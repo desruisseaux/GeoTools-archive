@@ -35,7 +35,7 @@ import org.geotools.measure.Longitude;
 import org.geotools.measure.AngleFormat;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.TransformPathNotFoundException;
 import org.geotools.resources.i18n.Errors;
@@ -83,7 +83,7 @@ public final class BoundingBoxes {
             {
                 final CoordinateOperation operation;
                 final CoordinateOperationFactory factory;
-                factory = FactoryFinder.getCoordinateOperationFactory(LENIENT);
+                factory = ReferencingFactoryFinder.getCoordinateOperationFactory(LENIENT);
                 try {
                     operation = factory.createOperation(crs, DefaultGeographicCRS.WGS84);
                 } catch (FactoryException exception) {

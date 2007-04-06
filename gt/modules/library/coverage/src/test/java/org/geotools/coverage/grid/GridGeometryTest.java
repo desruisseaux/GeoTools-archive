@@ -32,7 +32,7 @@ import org.opengis.geometry.Envelope;
 
 // Geotools dependencies
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.operation.matrix.MatrixFactory;
 
 
@@ -69,7 +69,7 @@ public class GridGeometryTest extends TestCase {
      * Tests the construction with an identity transform.
      */
     public void testIdentity() throws FactoryException {
-        final MathTransformFactory factory = FactoryFinder.getMathTransformFactory(null);
+        final MathTransformFactory factory = ReferencingFactoryFinder.getMathTransformFactory(null);
         final int[] lower = new int[] {0,     0, 2};
         final int[] upper = new int[] {100, 200, 4};
         final MathTransform identity = factory.createAffineTransform(MatrixFactory.create(4));

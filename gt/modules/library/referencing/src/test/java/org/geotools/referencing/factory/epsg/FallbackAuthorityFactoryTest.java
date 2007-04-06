@@ -33,7 +33,7 @@ import org.opengis.referencing.crs.ProjectedCRS;
 
 // Geotools dependencies
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 
 
 /**
@@ -85,8 +85,8 @@ public class FallbackAuthorityFactoryTest extends TestCase {
     public void setUp() {
         assertNull(extra);
         extra = new FactoryEPSGExtra();
-        FactoryFinder.addAuthorityFactory(extra);
-        FactoryFinder.scanForPlugins();
+        ReferencingFactoryFinder.addAuthorityFactory(extra);
+        ReferencingFactoryFinder.scanForPlugins();
     }
 
     /**
@@ -99,7 +99,7 @@ public class FallbackAuthorityFactoryTest extends TestCase {
             return;
         }
         assertNotNull(extra);
-        FactoryFinder.removeAuthorityFactory(extra);
+        ReferencingFactoryFinder.removeAuthorityFactory(extra);
         extra = null;
     }
 
@@ -113,7 +113,7 @@ public class FallbackAuthorityFactoryTest extends TestCase {
             // TODO: Remove when we will be target J2SE 1.4 or 1.5.
             return;
         }
-        Set factories =  FactoryFinder.getCRSAuthorityFactories(null);
+        Set factories =  ReferencingFactoryFinder.getCRSAuthorityFactories(null);
         boolean foundWkt = false;
         boolean foundExtra = false;
         for (Iterator it = factories.iterator(); it.hasNext();) {

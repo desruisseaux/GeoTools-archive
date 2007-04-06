@@ -27,7 +27,7 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
 
 // Geotools dependencies
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.matrix.XMatrix;
 import org.geotools.referencing.operation.matrix.MatrixFactory;
@@ -92,11 +92,11 @@ public class DimensionFilter {
     private final MathTransformFactory factory;
 
     /**
-     * Constructs a dimension filter with the {@linkplain FactoryFinder#getMathTransformFactory
+     * Constructs a dimension filter with the {@linkplain ReferencingFactoryFinder#getMathTransformFactory
      * default math transform factory}.
      */
     public DimensionFilter() {
-        this(FactoryFinder.getMathTransformFactory(null));
+        this(ReferencingFactoryFinder.getMathTransformFactory(null));
     }
 
     /**

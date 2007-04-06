@@ -56,7 +56,7 @@ import org.geotools.metadata.iso.quality.PositionalAccuracyImpl;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.NamedIdentifier;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.factory.ReferencingFactory;
 import org.geotools.referencing.cs.AbstractCS;

@@ -87,7 +87,7 @@ import org.geotools.resources.LazySet;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class FactoryFinder {
+public final class ReferencingFactoryFinder {
     /**
      * The service registry for this manager.
      * Will be initialized only when first needed.
@@ -108,7 +108,7 @@ public final class FactoryFinder {
     /**
      * Do not allows any instantiation of this class.
      */
-    private FactoryFinder() {
+    private ReferencingFactoryFinder() {
         // singleton
     }
 
@@ -117,7 +117,7 @@ public final class FactoryFinder {
      * time this method is invoked.
      */
     private static FactoryRegistry getServiceRegistry() {
-        assert Thread.holdsLock(FactoryFinder.class);
+        assert Thread.holdsLock(ReferencingFactoryFinder.class);
         if (registry == null) {
             registry = new FactoryCreator(Arrays.asList(new Class[] {
                     DatumFactory.class,

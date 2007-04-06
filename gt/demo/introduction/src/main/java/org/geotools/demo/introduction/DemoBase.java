@@ -51,7 +51,7 @@ import org.geotools.feature.SchemaException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapLayer;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
@@ -695,7 +695,7 @@ public class DemoBase {
         
         /* Coordinate System */
         Map map = new HashMap();
-        CSFactory csFactory = FactoryFinder.getCSFactory(null);
+        CSFactory csFactory = ReferencingFactoryFinder.getCSFactory(null);
         CoordinateSystemAxis xAxis = null;
         CoordinateSystemAxis yAxis = null;
         CartesianCS worldCS = null;

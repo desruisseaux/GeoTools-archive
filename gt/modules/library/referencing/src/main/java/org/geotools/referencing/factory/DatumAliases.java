@@ -57,7 +57,7 @@ import org.opengis.util.GenericName;
 import org.opengis.util.ScopedName;
 
 // Geotools dependencies
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.datum.AbstractDatum;        // For javadoc
 import org.geotools.referencing.datum.BursaWolfParameters;  // For javadoc
@@ -143,7 +143,7 @@ public class DatumAliases extends ReferencingFactory implements DatumFactory {
 
     /**
      * The underlying datum factory. If {@code null}, a default factory will be fetch
-     * from {@link FactoryFinder} when first needed. A default value can't be set at
+     * from {@link ReferencingFactoryFinder} when first needed. A default value can't be set at
      * construction time, since all factories may not be registered at this time.
      */
     private DatumFactory factory;
@@ -207,7 +207,7 @@ public class DatumAliases extends ReferencingFactory implements DatumFactory {
         assert Thread.holdsLock(this);
         if (factory == null) {
             DatumFactory candidate;
-            final Iterator it = FactoryFinder.getDatumFactories(null).iterator();
+            final Iterator it = ReferencingFactoryFinder.getDatumFactories(null).iterator();
             do candidate = (DatumFactory) it.next();
             while (candidate == this);
             factory = candidate;

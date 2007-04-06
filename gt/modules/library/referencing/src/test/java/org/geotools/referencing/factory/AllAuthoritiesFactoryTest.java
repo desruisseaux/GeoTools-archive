@@ -33,7 +33,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
 import org.geotools.resources.Arguments;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 
 
 /**
@@ -84,8 +84,8 @@ public final class AllAuthoritiesFactoryTest extends TestCase {
      * Tests the {@link AllAuthoritiesFactory#createCoordinateReferenceSystem} method.
      */
     public void testCreateCRS() throws FactoryException {
-        final CRSAuthorityFactory auto = FactoryFinder.getCRSAuthorityFactory("AUTO", null);
-        final CRSAuthorityFactory crs  = FactoryFinder.getCRSAuthorityFactory("CRS",  null);
+        final CRSAuthorityFactory auto = ReferencingFactoryFinder.getCRSAuthorityFactory("AUTO", null);
+        final CRSAuthorityFactory crs  = ReferencingFactoryFinder.getCRSAuthorityFactory("CRS",  null);
         final CRSAuthorityFactory all  = AllAuthoritiesFactory.DEFAULT;
         CoordinateReferenceSystem actual, expected;
 
@@ -127,7 +127,7 @@ public final class AllAuthoritiesFactoryTest extends TestCase {
      * usual {@code ':'}.
      */
     public void testHttp() throws FactoryException {
-        final CRSAuthorityFactory crs = FactoryFinder.getCRSAuthorityFactory("CRS",  null);
+        final CRSAuthorityFactory crs = ReferencingFactoryFinder.getCRSAuthorityFactory("CRS",  null);
         final CRSAuthorityFactory all = AllAuthoritiesFactory.DEFAULT;
         CoordinateReferenceSystem actual, expected;
 

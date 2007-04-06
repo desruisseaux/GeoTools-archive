@@ -70,7 +70,7 @@ import org.geotools.util.UnsupportedImplementationException;
  * coordinate reference system} and associated {@linkplain org.opengis.referencing.Factory}
  * implementations. This utility class is made up of static final functions. This class is
  * not a factory or a builder. It makes use of the GeoAPI factory interfaces provided by
- * {@link FactoryFinder}.
+ * {@link ReferencingFactoryFinder}.
  * <p>
  * The following methods may be added in a future version:
  * <ul>
@@ -120,12 +120,12 @@ public final class CRS {
      * {@linkplain org.geotools.referencing.factory.BufferedAuthorityFactory buffered}, scans over
      * {@linkplain org.geotools.referencing.factory.AllAuthoritiesFactory all factories} and uses
      * additional factories as {@linkplain org.geotools.referencing.factory.FallbackAuthorityFactory
-     * fallbacks} if there is more than one {@linkplain FactoryFinder#getCRSAuthorityFactories
+     * fallbacks} if there is more than one {@linkplain ReferencingFactoryFinder#getCRSAuthorityFactories
      * registered factory} for the same authority.
      * <p>
      * This factory can be used as a kind of <cite>system-wide</cite> factory for all authorities.
      * However for more determinist behavior, consider using a more specific factory (as returned
-     * by {@link FactoryFinder#getCRSAuthorityFactory} when the authority in known.
+     * by {@link ReferencingFactoryFinder#getCRSAuthorityFactory} when the authority in known.
      *
      * @param  longitudeFirst {@code true} if axis order should be forced to
      *         (<var>longitude</var>,<var>latitude</var>).
@@ -137,8 +137,8 @@ public final class CRS {
     public static synchronized CRSAuthorityFactory getAuthorityFactory(final boolean longitudeFirst)
             throws FactoryRegistryException
     {
-        if (FactoryFinder.updated) {
-            FactoryFinder.updated = false;
+        if (ReferencingFactoryFinder.updated) {
+            ReferencingFactoryFinder.updated = false;
             defaultFactory = xyFactory = null;
         }
         CRSAuthorityFactory factory = (longitudeFirst) ? xyFactory : defaultFactory;
@@ -175,7 +175,7 @@ public final class CRS {
      * @since 2.4
      */
     public static Version getVersion(final String authority) throws FactoryRegistryException {        
-        Object factory = FactoryFinder.getCRSAuthorityFactory(authority, USE_DEFAULTS ? GeoTools.getDefaultHints() : null );
+        Object factory = ReferencingFactoryFinder.getCRSAuthorityFactory(authority, USE_DEFAULTS ? GeoTools.getDefaultHints() : null );
         final Set guard = new HashSet(); // Safety against never-ending recursivity.
         while (factory instanceof Factory && guard.add(factory)) {
             final Map hints = ((Factory) factory).getImplementationHints();
@@ -222,7 +222,7 @@ public final class CRS {
      *
      * <blockquote><code>
      * {@linkplain CRSAuthorityFactory} factory = FactoryFinder.{@linkplain
-     * FactoryFinder#getCRSAuthorityFactory getCRSAuthorityFactory}(authority, null);<br>
+     * ReferencingFactoryFinder#getCRSAuthorityFactory getCRSAuthorityFactory}(authority, null);<br>
      * Set&lt;String&gt; codes = factory.{@linkplain CRSAuthorityFactory#getAuthorityCodes
      * getAuthorityCodes}(CoordinateReferenceSystem.class);<br>
      * String code = <cite>...choose a code here...</cite><br>
@@ -354,12 +354,12 @@ public final class CRS {
      * shorthand for the following:
      *
      * <blockquote><code>
-     * FactoryFinder.{@linkplain FactoryFinder#getCRSFactory getCRSFactory}(null).{@linkplain
+     * FactoryFinder.{@linkplain ReferencingFactoryFinder#getCRSFactory getCRSFactory}(null).{@linkplain
      * org.opengis.referencing.crs.CRSFactory#createFromWKT createFromWKT}(wkt);
      * </code></blockquote>
      */
     public static CoordinateReferenceSystem parseWKT(final String wkt) throws FactoryException {
-    	return FactoryFinder.getCRSFactory(null).createFromWKT(wkt);
+    	return ReferencingFactoryFinder.getCRSFactory(null).createFromWKT(wkt);
     }
 
     /**
@@ -740,7 +740,7 @@ public final class CRS {
      * Grab a transform between two Coordinate Reference Systems. This convenience method is a
      * shorthand for the following:
      *
-     * <blockquote><code>FactoryFinder.{@linkplain FactoryFinder#getCoordinateOperationFactory
+     * <blockquote><code>FactoryFinder.{@linkplain ReferencingFactoryFinder#getCoordinateOperationFactory
      * getCoordinateOperationFactory}(null).{@linkplain CoordinateOperationFactory#createOperation
      * createOperation}(sourceCRS, targetCRS).{@linkplain CoordinateOperation#getMathTransform
      * getMathTransform}();</code></blockquote>
@@ -802,7 +802,7 @@ public final class CRS {
                 hints.put(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
             }
         }
-        final CoordinateOperationFactory factory = FactoryFinder.getCoordinateOperationFactory( hints );
+        final CoordinateOperationFactory factory = ReferencingFactoryFinder.getCoordinateOperationFactory( hints );
         return factory.createOperation(sourceCRS, targetCRS).getMathTransform();
     }
 

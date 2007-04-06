@@ -22,7 +22,7 @@ import junit.framework.TestCase;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperation;
@@ -72,7 +72,7 @@ public class CRSTest extends TestCase {
         CoordinateReferenceSystem NAD83_UTM10 = (CoordinateReferenceSystem) CRS.decode("EPSG:26910");
         CoordinateReferenceSystem BC_ALBERS = (CoordinateReferenceSystem) CRS.decode("EPSG:42102");
                 
-        CoordinateOperation op = FactoryFinder.getCoordinateOperationFactory(null).createOperation( WGS84, WGS84 );
+        CoordinateOperation op = ReferencingFactoryFinder.getCoordinateOperationFactory(null).createOperation( WGS84, WGS84 );
         MathTransform math = op.getMathTransform();
                 
         DirectPosition pt1 = new GeneralDirectPosition(0.0,0.0);        

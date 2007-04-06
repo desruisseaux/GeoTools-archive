@@ -43,7 +43,7 @@ import org.opengis.geometry.Envelope;
 import org.geotools.TestData;
 import org.geotools.factory.Hints;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
@@ -94,25 +94,16 @@ public class DefaultFactoryTest extends TestCase {
      *   <li>{@code -log}: set the logger lever to {@link Level#CONFIG}.
      *       This is usefull for tracking down which data source is actually used.</li>
      *   <li>{@code -verbose}: Prints some messages to the standard output stream.</li>
-     *   <li>{@code -gui}: Run the graphical test runner instead of the text one.</li>
      * </ul>
      */
     public static void main(final String[] args) {
         final Arguments arguments = new Arguments(args);
-        final boolean gui = arguments.getFlag("-gui");
         final boolean log = arguments.getFlag("-log");
         verbose = arguments.getFlag("-verbose");
         extensive = true;
         arguments.getRemainingArguments(0);
         org.geotools.util.Logging.GEOTOOLS.forceMonolineConsoleOutput(log ? Level.CONFIG : null);
-        if (gui) {
-            junit.swingui.TestRunner.main(new String[] {
-                "-noloading",
-                DefaultFactoryTest.class.getName()
-            });
-        } else {
-            junit.textui.TestRunner.run(suite());
-        }
+        junit.textui.TestRunner.run(suite());        
     }
 
     /**
@@ -134,7 +125,7 @@ public class DefaultFactoryTest extends TestCase {
      */
     protected void setUp() throws SQLException {
         if (factory == null) {
-            factory = (DefaultFactory) FactoryFinder.getCRSAuthorityFactory("EPSG",
+            factory = (DefaultFactory) ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG",
                         new Hints(Hints.CRS_AUTHORITY_FACTORY, DefaultFactory.class));
             extensive |= TestData.isExtensiveTest();
             if (verbose) {
@@ -150,7 +141,7 @@ public class DefaultFactoryTest extends TestCase {
      * is a singleton. It may not be the case when there is a bug in {@code FactoryRegistry}.
      */
     public void testRegistry() {
-        final Object candidate = FactoryFinder.getCRSAuthorityFactory("EPSG", null);
+        final Object candidate = ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG", null);
         if (candidate instanceof DefaultFactory) {
             assertSame(factory, candidate);
         }
@@ -167,7 +158,7 @@ public class DefaultFactoryTest extends TestCase {
      * Tests creations of CRS objects.
      */
     public void testCreation() throws FactoryException {
-        final CoordinateOperationFactory opf = FactoryFinder.getCoordinateOperationFactory(null);
+        final CoordinateOperationFactory opf = ReferencingFactoryFinder.getCoordinateOperationFactory(null);
         CoordinateReferenceSystem sourceCRS, targetCRS;
         CoordinateOperation operation;
         ParameterValueGroup parameters;
@@ -504,7 +495,7 @@ public class DefaultFactoryTest extends TestCase {
     public void testSerialization() throws FactoryException, IOException, ClassNotFoundException {
         CoordinateReferenceSystem crs1 = factory.createCoordinateReferenceSystem("4326");
         CoordinateReferenceSystem crs2 = factory.createCoordinateReferenceSystem("4322");
-        CoordinateOperationFactory opf = FactoryFinder.getCoordinateOperationFactory(null);
+        CoordinateOperationFactory opf = ReferencingFactoryFinder.getCoordinateOperationFactory(null);
         CoordinateOperation cop = opf.createOperation(crs1, crs2);
         serialize(cop);
 

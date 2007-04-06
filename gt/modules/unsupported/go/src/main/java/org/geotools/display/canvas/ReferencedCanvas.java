@@ -67,7 +67,7 @@ import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.TransformedDirectPosition;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.AbstractIdentifiedObject;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
@@ -1425,7 +1425,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
         if (opFactory == null) {
             final Hints tmp = new Hints(hints);
             tmp.putAll(getFactoryGroup().getImplementationHints());
-            opFactory = FactoryFinder.getCoordinateOperationFactory(tmp);
+            opFactory = ReferencingFactoryFinder.getCoordinateOperationFactory(tmp);
         }
         return opFactory;
     }

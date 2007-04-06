@@ -44,12 +44,12 @@ import org.opengis.util.NameFactory;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.Utilities;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 
 
 /**
  * Defines a common abstraction for getting the different factories. This default implementation
- * provides support for only the most basic factories ({@linkplain FactoryFinder referencing},
+ * provides support for only the most basic factories ({@linkplain ReferencingFactoryFinder referencing},
  * <cite>etc.</cite>). Many methods thrown an {@link FactoryNotFoundException} in all cases, for
  * example all methods related to GO-1 canvas objects. Those methods will be implemented later
  * in a subclass.
@@ -205,7 +205,7 @@ public class BasicFactories implements CommonFactory {
      * @throws FactoryRegistryException if the factory can't be obtained for an other reason.
      */
     public CRSAuthorityFactory getCRSAuthorityFactory() throws FactoryRegistryException {
-        return FactoryFinder.getCRSAuthorityFactory(DEFAULT_AUTHORITY, hints);
+        return ReferencingFactoryFinder.getCRSAuthorityFactory(DEFAULT_AUTHORITY, hints);
     }
 
     /**
@@ -215,7 +215,7 @@ public class BasicFactories implements CommonFactory {
      * @throws FactoryRegistryException if the factory can't be obtained for an other reason.
      */
     public CRSFactory getCRSFactory() throws FactoryRegistryException {
-        return FactoryFinder.getCRSFactory(hints);
+        return ReferencingFactoryFinder.getCRSFactory(hints);
     }
 
     /**
@@ -225,7 +225,7 @@ public class BasicFactories implements CommonFactory {
      * @throws FactoryRegistryException if the factory can't be obtained for an other reason.
      */
     public CSAuthorityFactory getCSAuthorityFactory() throws FactoryRegistryException {
-        return FactoryFinder.getCSAuthorityFactory(DEFAULT_AUTHORITY, hints);
+        return ReferencingFactoryFinder.getCSAuthorityFactory(DEFAULT_AUTHORITY, hints);
     }
 
     /**
@@ -235,7 +235,7 @@ public class BasicFactories implements CommonFactory {
      * @throws FactoryRegistryException if the factory can't be obtained for an other reason.
      */
     public CSFactory getCSFactory() throws FactoryRegistryException {
-        return FactoryFinder.getCSFactory(hints);
+        return ReferencingFactoryFinder.getCSFactory(hints);
     }
 
     /**
@@ -245,7 +245,7 @@ public class BasicFactories implements CommonFactory {
      * @throws FactoryRegistryException if the factory can't be obtained for an other reason.
      */
     public DatumAuthorityFactory getDatumAuthorityFactory() throws FactoryRegistryException {
-        return FactoryFinder.getDatumAuthorityFactory(DEFAULT_AUTHORITY, hints);
+        return ReferencingFactoryFinder.getDatumAuthorityFactory(DEFAULT_AUTHORITY, hints);
     }
 
     /**
@@ -255,7 +255,7 @@ public class BasicFactories implements CommonFactory {
      * @throws FactoryRegistryException if the factory can't be obtained for an other reason.
      */
     public DatumFactory getDatumFactory() throws FactoryRegistryException {
-        return FactoryFinder.getDatumFactory(hints);
+        return ReferencingFactoryFinder.getDatumFactory(hints);
     }
 
     /**
@@ -268,7 +268,7 @@ public class BasicFactories implements CommonFactory {
     public CoordinateOperationAuthorityFactory getCoordinateOperationAuthorityFactory()
             throws FactoryRegistryException
     {
-        return FactoryFinder.getCoordinateOperationAuthorityFactory(DEFAULT_AUTHORITY, hints);
+        return ReferencingFactoryFinder.getCoordinateOperationAuthorityFactory(DEFAULT_AUTHORITY, hints);
     }
 
     /**
@@ -280,7 +280,7 @@ public class BasicFactories implements CommonFactory {
     public CoordinateOperationFactory getCoordinateOperationFactory()
             throws FactoryRegistryException
     {
-        return FactoryFinder.getCoordinateOperationFactory(hints);
+        return ReferencingFactoryFinder.getCoordinateOperationFactory(hints);
     }
 
     /**

@@ -41,7 +41,7 @@ import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 
 /**
  * Default implementation for a coordinate reference system authority factory backed
@@ -88,7 +88,7 @@ public class EPSGCRSAuthorityFactory implements CRSAuthorityFactory {
      * exported from postgis and cubeworks.
      */
     public EPSGCRSAuthorityFactory() {
-        this(FactoryFinder.getCRSFactory(null));
+        this(ReferencingFactoryFinder.getCRSFactory(null));
     }
     
     /**

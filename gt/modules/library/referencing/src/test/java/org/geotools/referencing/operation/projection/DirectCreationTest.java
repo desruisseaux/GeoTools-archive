@@ -34,7 +34,7 @@ import org.opengis.geometry.DirectPosition;
 // Geotools dependencies
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.parameter.ParameterWriter;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.resources.Arguments;
 
@@ -96,7 +96,7 @@ public final class DirectCreationTest extends TestCase {
      * Set up common objects used by all tests.
      */
     protected void setUp() {
-        mtFactory = FactoryFinder.getMathTransformFactory(null);
+        mtFactory = ReferencingFactoryFinder.getMathTransformFactory(null);
     }
     
     /**

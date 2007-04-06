@@ -17,7 +17,7 @@
 package org.geotools.data.db2;
 
 import org.geotools.factory.FactoryRegistryException;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.sql.Connection;
@@ -121,7 +121,7 @@ public class DB2CoordinateSystem {
     CoordinateReferenceSystem getCRS()
         throws FactoryRegistryException, FactoryException {
         if (this.crs == null) {
-            this.crs = FactoryFinder.getCRSFactory(null).createFromWKT(this.definition);
+            this.crs = ReferencingFactoryFinder.getCRSFactory(null).createFromWKT(this.definition);
         }
 
         return this.crs;

@@ -38,7 +38,7 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.display.event.ReferencedEvent;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
@@ -206,7 +206,7 @@ public abstract class ReferencedGraphic extends AbstractGraphic {
                 return ((ReferencedCanvas) owner).getMathTransform(sourceCRS, targetCRS,
                        ReferencedGraphic.class.getName(), sourceMethodName);
             } else {
-                return FactoryFinder.getCoordinateOperationFactory(null)
+                return ReferencingFactoryFinder.getCoordinateOperationFactory(null)
                        .createOperation(sourceCRS, targetCRS).getMathTransform();
             }
         } catch (FactoryException exception) {
