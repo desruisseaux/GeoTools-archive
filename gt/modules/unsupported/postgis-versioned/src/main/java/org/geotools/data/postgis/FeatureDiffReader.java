@@ -192,7 +192,7 @@ public class FeatureDiffReader {
                     }
                     if (!changes.isEmpty()) {
                         String id = mapper.getUnversionedFid(from.getID());
-                        lastDiff = new FeatureDiff(id, changes);
+                        lastDiff = new FeatureDiff(id, from, to, changes);
                         return true;
                     }
                 }

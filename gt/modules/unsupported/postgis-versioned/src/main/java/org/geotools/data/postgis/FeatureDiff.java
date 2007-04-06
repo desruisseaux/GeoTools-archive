@@ -49,17 +49,15 @@ public class FeatureDiff {
     int state;
 
     Map changes;
-    
+
     Feature feature;
+
+    Feature oldFeature;
 
     /**
      * Creates a new feature difference for a deleted feature
      * 
      * @param ID
-     * @param fromVersion
-     * @param toVersion
-     * @param state
-     * @param changes
      */
     FeatureDiff(String ID) {
         super();
@@ -67,31 +65,27 @@ public class FeatureDiff {
         this.state = DELETED;
         this.changes = Collections.EMPTY_MAP;
     }
-    
+
     /**
      * Creates a new feature difference for a modified feature
      * 
      * @param ID
-     * @param fromVersion
-     * @param toVersion
-     * @param state
+     * @param oldFeature
+     * @param newFeature
      * @param changes
      */
-    FeatureDiff(String ID, Map changes) {
+    FeatureDiff(String ID, Feature oldFeature, Feature newFeature, Map changes) {
         super();
         this.ID = ID;
         this.state = UPDATED;
         this.changes = Collections.unmodifiableMap(changes);
+        this.feature = newFeature;
+        this.oldFeature = oldFeature;
     }
-    
+
     /**
-     * Creates a new feature difference
-     * 
-     * @param ID
-     * @param fromVersion
-     * @param toVersion
-     * @param state
-     * @param changes
+     * Creates a new feature difference for an inserted feature
+     * @param feature
      */
     FeatureDiff(Feature feature) {
         super();
@@ -133,13 +127,23 @@ public class FeatureDiff {
     public int getState() {
         return state;
     }
-    
+
     /**
-     * Returns the inserted feature, if the state is {@link #INSERTED}, null otherwise
+     * Returns the inserted feature, if the state is {@link #INSERTED}, the new
+     * feature, if the state is {@link #UPDATED}, null otherwise
+     * 
      * @return
      */
     public Feature getFeature() {
         return feature;
+    }
+    
+    /**
+     * Returns the old feature, if the state is {@link #UPDATED}, null otherwise
+     * @return
+     */
+    public Feature getOldFeature() {
+        return oldFeature;
     }
 
 }
