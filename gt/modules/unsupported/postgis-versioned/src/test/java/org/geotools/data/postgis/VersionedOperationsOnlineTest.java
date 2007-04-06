@@ -946,27 +946,31 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         assertFalse(fdr.hasNext());
         fdr.close();
 
-        // forward diff, two modifications on changeset 1-2
+        // forward diff, two modifications on changeset 1-2, and check reader reset while
+        // you're at it
         fdr = fs.getDifferences("1", "2", Filter.INCLUDE);
-        assertEquals(fs.getSchema(), fdr.getSchema());
-        Set ids = new HashSet(Arrays.asList(new String[] { "river.rv1", "river.rv2" }));
-        assertTrue(fdr.hasNext());
-        while (fdr.hasNext()) {
-            diff = fdr.next();
-            assertTrue("Unexpected id: " + diff.getID(), ids.remove(diff.getID()));
-            assertEquals("1", fdr.getFromVersion());
-            assertEquals("2", fdr.getToVersion());
-            assertEquals(FeatureDiff.UPDATED, diff.state);
-            if (diff.getID().equals("river.rv1")) {
-                assertEquals(2, diff.getChanges().size());
-                assertEquals("rv1 v2", diff.getChanges().get("river"));
-                assertEquals(new Double(9.6), diff.getChanges().get("flow"));
-            } else {
-                assertEquals(2, diff.getChanges().size());
-                assertEquals("rv2 v2", diff.getChanges().get("river"));
-                assertTrue(DataUtilities.attributesEqual(
-                        lines(new int[][] { { 100, 100, 120, 120 } }), diff.getChanges()
-                                .get("geom")));
+        for (int i = 0; i < 2; i++) {
+            fdr.reset();
+            assertEquals(fs.getSchema(), fdr.getSchema());
+            Set ids = new HashSet(Arrays.asList(new String[] { "river.rv1", "river.rv2" }));
+            assertTrue(fdr.hasNext());
+            while (fdr.hasNext()) {
+                diff = fdr.next();
+                assertTrue("Unexpected id: " + diff.getID(), ids.remove(diff.getID()));
+                assertEquals("1", fdr.getFromVersion());
+                assertEquals("2", fdr.getToVersion());
+                assertEquals(FeatureDiff.UPDATED, diff.state);
+                if (diff.getID().equals("river.rv1")) {
+                    assertEquals(2, diff.getChanges().size());
+                    assertEquals("rv1 v2", diff.getChanges().get("river"));
+                    assertEquals(new Double(9.6), diff.getChanges().get("flow"));
+                } else {
+                    assertEquals(2, diff.getChanges().size());
+                    assertEquals("rv2 v2", diff.getChanges().get("river"));
+                    assertTrue(DataUtilities.attributesEqual(
+                            lines(new int[][] { { 100, 100, 120, 120 } }), diff.getChanges()
+                                    .get("geom")));
+                }
             }
         }
         fdr.close();

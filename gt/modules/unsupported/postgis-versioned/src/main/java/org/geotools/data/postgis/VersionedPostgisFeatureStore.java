@@ -436,11 +436,6 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         RevisionInfo r1 = new RevisionInfo(fromVersion);
         RevisionInfo r2 = new RevisionInfo(toVersion);
 
-        boolean swap = false;
-        if (r1.revision > r2.revision) {
-            swap = true;
-        }
-
         // gather modified ids
         ModifiedFeatureIds mfids = store.getModifiedFeatureFIDs(schema.getTypeName(), fromVersion,
                 toVersion, filter, null, getTransaction());
@@ -450,59 +445,14 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
         VersionedFIDMapper mapper = (VersionedFIDMapper) store.getFIDMapper(schema.getTypeName());
 
-        // TODO: extract only pk attributes for the delete reader, no need for the others
-        FeatureReader createdReader;
-        FeatureReader deletedReader;
-        if (swap) {
-            createdReader = readerFromIdsRevision(ff, null, mfids.deleted, r2);
-            deletedReader = readerFromIdsRevision(ff, null, mfids.created, r1);
-        } else {
-            createdReader = readerFromIdsRevision(ff, null, mfids.created, r2);
-            deletedReader = readerFromIdsRevision(ff, null, mfids.deleted, r1);
-        }
-        FeatureReader fvReader = readerFromIdsRevision(ff, mapper, mfids.modified, r1);
-        FeatureReader tvReader = readerFromIdsRevision(ff, mapper, mfids.modified, r2);
-
-        return new FeatureDiffReader(fromVersion, toVersion, schema, mapper, createdReader,
-                deletedReader, fvReader, tvReader);
+        return new FeatureDiffReader(store, getTransaction(), schema, r1, r2, mapper, mfids);
     }
     
     // ----------------------------------------------------------------------------------------------
     // INTERNAL SUPPORT METHODS
     // ----------------------------------------------------------------------------------------------
     
-
-    /**
-     * Returns a feature reader for the specified fids and revision, or null if the fid set is empty
-     * 
-     * @param ff
-     * @param fids
-     * @param ri
-     * @return
-     * @throws IOException
-     */
-    FeatureReader readerFromIdsRevision(FilterFactory ff, VersionedFIDMapper mapper, Set fids, RevisionInfo ri)
-            throws IOException {
-        if (fids != null && !fids.isEmpty()) {
-            Filter fidFilter = store.buildFidFilter(ff, fids);
-            Filter versionFilter = store.buildVersionedFilter(schema.getTypeName(), fidFilter, ri);
-            DefaultQuery query = new DefaultQuery(schema.getTypeName(),
-                                versionFilter);
-            if(mapper != null) {
-                List sort = new ArrayList(mapper.getColumnCount() - 1);
-                for(int i = 0; i < mapper.getColumnCount(); i++) {
-                    String colName = mapper.getColumnName(i);
-                    if(!"revision".equals(colName))
-                        sort.add(ff.sort(colName, SortOrder.DESCENDING));
-                }
-                query.setSortBy((SortBy[]) sort.toArray(new SortBy[sort.size()]));
-            }
-            return store.wrapped.getFeatureReader(query, getTransaction());
-        } else {
-            return null;
-        }
-    }
-    
+   
     /**
      * Clones the query and sets the proper type name into it
      * 
