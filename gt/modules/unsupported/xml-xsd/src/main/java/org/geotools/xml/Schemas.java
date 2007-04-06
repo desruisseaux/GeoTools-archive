@@ -68,6 +68,7 @@ import org.eclipse.xsd.util.XSDUtil;
 import org.geotools.resources.Utilities;
 import org.geotools.xml.impl.SchemaIndexImpl;
 import org.geotools.xml.impl.TypeWalker;
+import org.geotools.xml.impl.TypeWalker.Visitor;
 import org.picocontainer.ComponentAdapter;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.Parameter;
@@ -128,7 +129,9 @@ public class Schemas {
             }
             LOGGER.fine("schema location: " + schemaLocation);
             XSDSchema schema = locator.locateSchema(null, namespaceURI, schemaLocation, null);
-            resolvedSchemas.add(schema);
+            if(schema != null){
+                resolvedSchemas.add(schema);
+            }
         }
         
         XSDSchema []schemas = (XSDSchema[]) resolvedSchemas.toArray(new XSDSchema[resolvedSchemas.size()]);
@@ -177,7 +180,7 @@ public class Schemas {
      *
      * @param location A uri pointing to the location of the schema.
      * @param locators An array of schema locator objects to be used when
-     * parsing input/includes of the main schema.
+     * parsing imports/includes of the main schema.
      * @param resolvers An array of schema location resolvers used to override
      * schema locations encountered in an instance document or an imported
      * schema.
@@ -452,7 +455,7 @@ public class Schemas {
                 }
             };
 
-        visitElements(type, visitor);
+        visitElements(type, visitor, true);
 
         if (minOccurs.isEmpty()) {
             throw new IllegalArgumentException("Element: " + element
@@ -493,8 +496,8 @@ public class Schemas {
                     }
                 }
             };
-
-        visitElements(type, visitor);
+            
+        visitElements(type, visitor, true);
 
         if (maxOccurs.isEmpty()) {
             throw new IllegalArgumentException("Element: " + element
@@ -504,6 +507,28 @@ public class Schemas {
         return ((Integer) maxOccurs.get(0)).intValue();
     }
 
+
+    private static void visitElements(XSDComplexTypeDefinition cType,
+            ElementVisitor visitor, boolean includeParents) {
+        if(includeParents){
+
+            LinkedList baseTypes = new LinkedList();
+            XSDTypeDefinition baseType = cType.getBaseType();
+            while(baseType != null && baseType != baseType.getBaseType()){
+                if(baseType instanceof XSDComplexTypeDefinition){
+                    baseTypes.addLast(baseType);
+                }
+                baseType = baseType.getBaseType();
+            }
+            
+            for(Iterator it = baseTypes.iterator(); it.hasNext();){
+                baseType = (XSDTypeDefinition) it.next();
+                visitElements((XSDComplexTypeDefinition) baseType, visitor);
+            }
+        }
+        visitElements(cType, visitor);
+    }
+
     private static void visitElements(XSDComplexTypeDefinition cType,
         ElementVisitor visitor) {
         //simple content cant define children
@@ -511,7 +536,7 @@ public class Schemas {
                 || (cType.getContent() instanceof XSDSimpleTypeDefinition)) {
             return;
         }
-
+        
         //use a queue to simulate the recursion
         LinkedList queue = new LinkedList();
         queue.addLast(cType.getContent());
