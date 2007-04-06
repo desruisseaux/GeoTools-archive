@@ -82,11 +82,11 @@ public class ModifiedFeatureIds {
     }
 
     public String getToVersion() {
-        return toRevision.toVersion();
+        return toRevision.getVersion();
     }
 
     public String getFromVersion() {
-        return fromRevision.toVersion();
+        return fromRevision.getVersion();
     }
 
     public String toString() {

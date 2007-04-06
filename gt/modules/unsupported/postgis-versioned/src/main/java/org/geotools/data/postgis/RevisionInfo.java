@@ -20,8 +20,8 @@ import java.io.IOException;
 import org.geotools.data.DataSourceException;
 
 /**
- * Simple struct used to specify with revision must be extracted, and eventually from which branch
- * (even if at the moment we don't have branches around).
+ * Simple struct used to specify with revision must be extracted, and eventually
+ * from which branch (even if at the moment we don't have branches around).
  * 
  * @author aaime
  * @since 2.4
@@ -29,6 +29,8 @@ import org.geotools.data.DataSourceException;
  */
 class RevisionInfo {
     long revision;
+
+    String version;
 
     /**
      * RevisionInfo for the last revision in "trunk"
@@ -48,6 +50,7 @@ class RevisionInfo {
      * @throws IOException
      */
     public RevisionInfo(String version) throws IOException {
+        this.version = version;
         if (version == null || version.trim().equals("")) {
             revision = Long.MAX_VALUE;
         } else {
@@ -63,13 +66,28 @@ class RevisionInfo {
         return revision == Long.MAX_VALUE;
     }
 
-    public String toVersion() {
+    /**
+     * Returns the version in canonical form, that is, revision or "" if it's
+     * the last revision
+     * 
+     * @return
+     */
+    public String getCanonicalVersion() {
         if (isLast())
             return "";
         else
             return String.valueOf(revision);
     }
-    
+
+    /**
+     * Returns the original version used to create this revision info
+     * 
+     * @return
+     */
+    public String getVersion() {
+        return version;
+    }
+
     public String toString() {
         if (isLast())
             return "LATEST";
