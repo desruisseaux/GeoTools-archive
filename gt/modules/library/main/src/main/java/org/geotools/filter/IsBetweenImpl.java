@@ -118,5 +118,9 @@ public class IsBetweenImpl extends CompareFilterImpl implements BetweenFilter {
 	public void addMiddleValue(org.geotools.filter.Expression middleValue) {
 		setExpression( middleValue );
 	}
+    
+    public String toString() {
+        return "[ " + expression + " BETWEEN " + expression1 + " AND " + expression2 + " ]";
+    }
 	
 }
