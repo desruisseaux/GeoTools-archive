@@ -53,7 +53,7 @@ public class FilterBuilder {
      * <li>not
      * </ul>
      */
-    Filter filter;
+    List filter = new ArrayList(2);
         
     /**
      * List of Expression(s) used in creating Filters, or Functions.
@@ -101,6 +101,14 @@ public class FilterBuilder {
         }
         return (Expression) expression.remove( expression.size()-1);
     }
+    private FilterBuilder build( Expression expression ){
+         this.expression.add( expression  );
+         return this;
+    }
+    private FilterBuilder build( Filter filter ){
+    	this.filter.add( filter );
+        return this;
+    }
     /**
      * Create a FilterBuilder with the "default" FilterFactory.
      * <p>
@@ -132,16 +140,24 @@ public class FilterBuilder {
     public void setFilterFactory( FilterFactory factory ){
         ff = factory;
     }
-    public void init( Filter filter ){
-        
+    public void init(){
+    	this.expression.clear();
+    	this.filter.clear();
     }
+    public void init( Filter filter ){
+    	 init();
+         this.filter.add( filter );
+    }
+    public void init( Expression expr ){
+    	init();
+    	this.expression.add( expr );   
+   }
     /** Create a Filter based on builder state. */
     public Filter filter(){
-        return filter;
-    }
-    public FilterBuilder and( Filter filter ){
-        this.filter = ff.and( this.filter, filter );
-        return this;
+        if( filter.isEmpty() ){
+            return Filter.EXCLUDE;
+        }
+        return (Filter) filter.remove( filter.size()-1);
     }
 
     public FilterBuilder left( Expression left ){
@@ -151,13 +167,34 @@ public class FilterBuilder {
     public void setLeft(Expression left) {
         setExpression( 0, left );
     }
+    /**
+     * Set the right expression (usually in refernece to an infix operator such as ADD.
+     * <p>
+     * Example:<code>build.left( expr1 ).right( expr2 ).add();
+     * </p>
+     * @param right
+     * @return Builder for use in chaining
+     */
     public FilterBuilder right( Expression right ){
         setRight(right);
         return this;
     }
+    /**
+     * Set the right expression (in reference to an infix operator such as ADD).
+     * @param right
+     */
     public void setRight(Expression right) {
         setExpression( 2, right );
     }
+    
+    /**
+     * Used to insert provided expressions into the list (for later use).
+     * <p>
+     * Example 1:
+     * <code>build.expression( expr1 ).expression( expr2 ).expression( expr3 ).function("sum");
+     * @param expr Expression to add to builder
+     * @return builder with provided expr added
+     */
     public FilterBuilder expression( Expression expr){
         this.expression.add( expr );
         return this;
@@ -176,7 +213,8 @@ public class FilterBuilder {
     /** Name (currently just used for function calls).
      * <p>
      * Example:
-     * expr.name("sin").expression( 45 ).function();
+     * <code>expr.name("sin").literal( 45 ).function();</code>
+     * @return builder (for use in chaning)
      */
     FilterBuilder name( String name ){
         this.name = name;
@@ -184,8 +222,11 @@ public class FilterBuilder {
     }
     /**
      * Create a Function based on name and expression list.
-     * 
-     * @return Function
+     * <p>
+     * Example:<pre><code>
+     * build.name("sine").property("angle").function();
+     * </code></pre>
+     * @return Function based on name and previous expressions
      */
     Function function(){
         Function function = ff.function( name, (Expression[]) expression.toArray( new Expression[ expression.size()]));
@@ -193,18 +234,164 @@ public class FilterBuilder {
         expression.add( function );
         return function;
     }
-    
-    public Expression add( FilterBuilder build ) {
-        return add( build.expr() );
-    }
-    public Expression add( Expression left ) {
-        Expression right = expr();
-        return ff.add( right, left );
+    Function function( String functionName ){
+    	this.name( functionName );
+    	return function();
     }
     public Expression add() {
-        Expression right = expr();
-        Expression left = expr();
-        return ff.add( left, right );
-    }
+		return add(this).expr();
+	}
+
+	public FilterBuilder add(Object number) {
+		return add(ff.literal(number));
+	}
+
+	public FilterBuilder add(long number) {
+		return add(ff.literal(number));
+	}
+
+	public FilterBuilder add(double number) {
+		return add(ff.literal(number));
+	}
+
+	public FilterBuilder add(FilterBuilder build) {
+		return add(build.expr());
+	}
+
+	public FilterBuilder add(Expression right) {
+		Expression left = expr();
+		return build(ff.add(left, right));
+	}
     
+	public Expression subtract() {
+		return subtract(this).expr();
+	}
+
+	public FilterBuilder subtract(Object number) {
+		return subtract(ff.literal(number));
+	}
+
+	public FilterBuilder subtract(long number) {
+		return subtract(ff.literal(number));
+	}
+
+	public FilterBuilder subtract(double number) {
+		return subtract(ff.literal(number));
+	}
+
+	public FilterBuilder subtract(FilterBuilder build) {
+		return subtract(build.expr());
+	}
+
+	public FilterBuilder subtract(Expression right) {
+		Expression left = expr();
+		return build(ff.subtract(left, right));
+	}
+	
+	public Expression multiply() {
+		return multiply(this).expr();
+	}
+	public FilterBuilder multiply(Object number) {
+		return multiply(ff.literal(number));
+	}
+
+	public FilterBuilder multiply(long number) {
+		return multiply(ff.literal(number));
+	}
+
+	public FilterBuilder multiply(double number) {
+		return multiply(ff.literal(number));
+	}
+
+	public FilterBuilder multiply(FilterBuilder build) {
+		return multiply(build.expr());
+	}
+
+	public FilterBuilder multiply(Expression right) {
+		Expression left = expr();
+		return build(ff.multiply(left, right));
+	}
+	/**
+	 * Example: build.literal(1.0).literal("2").divide();
+	 * 
+	 * @return division of the last two expressions
+	 */
+	public Expression divide(){
+	    return divide( this ).expr();
+	}
+	public FilterBuilder divide( long number ){
+		return divide( ff.literal( number ));
+	}
+	public FilterBuilder divide( double number){
+		return divide( ff.literal( number ));
+	}
+	public FilterBuilder divide( FilterBuilder build ){
+    	return divide( build.expr() );    	
+    }
+	public FilterBuilder divide(Expression right) {
+		Expression left = expr();		
+		return build( ff.divide( left, right ) );
+	}
+	/**
+	 * Collapse all built filters into a single AND filter.
+	 * <p>
+	 * Example:<pre>
+	 * build.property("age").less( build.literal( 23 );
+	 * build.property("sex").equal( build.literal("male") );
+	 * build.and();
+	 * </pre>
+	 * Returns all filters as an *And* filter.
+	 * 
+	 */
+	public Filter and(){
+		if( filter.isEmpty()){
+			return Filter.EXCLUDE;
+		}
+		else if (filter.size() == 1 ){
+			return filter();
+		}
+		Filter and = ff.and( this.filter );
+		
+		this.filter = new ArrayList(2);		
+		return and;
+	}
+	
+	/** A.and( B ) */
+    public FilterBuilder and( FilterBuilder build ){
+    	return and( build.filter() );    	
+    }
+	/** A.and( B ) */
+	public FilterBuilder and(Filter right) {
+		Filter left = filter();		
+		return build( ff.and( left, right ) );
+	}
+
+	/** Take all built filters and return a single OR statement.
+	 * 
+	 * @return OR filter based on all previous content.
+	 */
+	public Filter or(){
+		if( filter.isEmpty()){
+			return Filter.INCLUDE;
+		}
+		else if (filter.size() == 1 ){
+			return filter();
+		}
+		Filter or = ff.or( this.filter );
+		
+		this.filter = new ArrayList(2);		
+		return or;
+	}
+	
+	/** A.and( B ) */
+    public FilterBuilder or( FilterBuilder build ){
+    	return or( build.filter() );    	
+    }
+	/** A.and( B ) */
+	public FilterBuilder or(Filter right) {
+		Filter left = filter();		
+		return build( ff.or( left, right ) );
+	}
+	
 }
+
