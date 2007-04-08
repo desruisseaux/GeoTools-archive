@@ -167,7 +167,32 @@ public class H2SQLBuilder implements FilterVisitor, ExpressionVisitor {
 			}
 		}
 		
-		sql.append(" );" );
+		sql.append(" )" );
+		return sql.toString();
+	}
+	
+	
+	/**
+	 * Encodes an entire sql SELECT statement of the form 
+	 * 	"SELECT count(*) FROM ...".
+	 * 
+	 * @param filter The filter describing the where class of the select statement.
+	 * 
+	 */
+	public String count( Filter filter ) {
+		init();
+		
+		//select
+		sql.append( "SELECT count(*) " );
+		
+		//from
+		from();
+		
+		//where
+		if ( filter != null && filter != Filter.INCLUDE ) {
+			where( filter );
+		}
+		
 		return sql.toString();
 	}
 	
@@ -187,7 +212,7 @@ public class H2SQLBuilder implements FilterVisitor, ExpressionVisitor {
 		from();
 		
 		//where
-		if ( query.getFilter() != null ) {
+		if ( query.getFilter() != null && query.getFilter() != Filter.INCLUDE ) {
 			where( query.getFilter() );	
 		}
 		
@@ -783,11 +808,11 @@ public class H2SQLBuilder implements FilterVisitor, ExpressionVisitor {
 		
 		//was the type passed in as a hint?
 		if ( data instanceof Class ) {
-			//special case for numerics, we want to avoid truncation, so we 
-			// convert to largest possible value space, and let the database
-			// do the conversions it needs to
+			//special case for numerics, let the database do the conversions
+			// it needs to
 			if ( Number.class.isAssignableFrom( (Class) data ) ) {
-				value = literal.evaluate( null, BigDecimal.class );
+				//value = literal.evaluate( null, BigDecimal.class );
+				value = literal.evaluate( null, Number.class );
 			}
 			else {
 				//non numeric, just convert

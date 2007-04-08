@@ -26,23 +26,22 @@ public class H2DataStore extends ContentDataStore {
 		super(content);
 	}
 
-	
-	H2Content getContent() {
-		return (H2Content) content;
+	H2Content content() {
+		return (H2Content) getContent();
 	}
 	
 	/**
 	 * Returns the connection pool data source used by the datastore.
 	 */
 	ConnectionPoolDataSource getConnectionPoolDataSource() {
-		return getContent().getConnectionPoolDataSource();
+		return content().getConnectionPoolDataSource();
 	}
 	
 	/**
 	 * The Database schema the data store corresponds to.
 	 */
 	String getDatabaseSchema() {
-		return getContent().getDatabaseSchema();
+		return content().getDatabaseSchema();
 	}
 	
 	/**
@@ -53,7 +52,7 @@ public class H2DataStore extends ContentDataStore {
 	 * 
 	 */
 	Connection connection() throws SQLException {
-		return getContent().connection();
+		return content().connection();
 	}
 	
 	//
@@ -75,7 +74,7 @@ public class H2DataStore extends ContentDataStore {
 		state.put( getTypeFactory().getClass() , featureType );
 		
 		//create the sql statement to create the table
-		H2SQLBuilder sqlBuilder = sqlBuilder( state );
+		H2SQLBuilder sqlBuilder = createSQLBuilder( state );
 		String sql = sqlBuilder.create();
 		
 		//execute the sql
@@ -103,7 +102,7 @@ public class H2DataStore extends ContentDataStore {
 		}
 	}
 	
-	protected H2SQLBuilder sqlBuilder( H2ContentState state ) {
+	public H2SQLBuilder createSQLBuilder( H2ContentState state ) {
 		return new H2SQLBuilder( state, filterFactory );
 	}
 	

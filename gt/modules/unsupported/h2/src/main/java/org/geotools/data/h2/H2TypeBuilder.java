@@ -1,11 +1,16 @@
 package org.geotools.data.h2;
 
 import java.math.BigDecimal;
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.HashMap;
 
 import org.geotools.feature.simple.SimpleTypeBuilder;
 import org.opengis.feature.simple.SimpleTypeFactory;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Type Builder with which one can specify types as contants of {@link Types}.
@@ -40,10 +45,11 @@ public class H2TypeBuilder extends SimpleTypeBuilder {
 		MAPPINGS.put(new Integer(Types.DECIMAL), BigDecimal.class);
 		MAPPINGS.put(new Integer(Types.NUMERIC), BigDecimal.class);
 
-		MAPPINGS.put(new Integer(Types.DATE), java.sql.Date.class);
-		MAPPINGS.put(new Integer(Types.TIME), java.sql.Time.class);
-		MAPPINGS.put(new Integer(Types.TIMESTAMP),
-				java.sql.Timestamp.class);
+		MAPPINGS.put(new Integer(Types.DATE), Date.class);
+		MAPPINGS.put(new Integer(Types.TIME), Time.class);
+		MAPPINGS.put(new Integer(Types.TIMESTAMP), Timestamp.class);
+		
+		MAPPINGS.put(new Integer(Types.OTHER), Geometry.class );
 	}
 	
 	/**
@@ -65,9 +71,11 @@ public class H2TypeBuilder extends SimpleTypeBuilder {
 
 		RMAPPINGS.put(BigDecimal.class,new Integer(Types.NUMERIC));
 
-		RMAPPINGS.put(java.sql.Date.class,new Integer(Types.DATE));
-		RMAPPINGS.put(java.sql.Time.class,new Integer(Types.TIME));
-		RMAPPINGS.put(java.sql.Timestamp.class,new Integer(Types.TIMESTAMP));
+		RMAPPINGS.put(Date.class,new Integer(Types.DATE));
+		RMAPPINGS.put(Time.class,new Integer(Types.TIME));
+		RMAPPINGS.put(Timestamp.class,new Integer(Types.TIMESTAMP));
+		
+		RMAPPINGS.put(Geometry.class, new Integer(Types.OTHER) );
 	}
 	
 	/**

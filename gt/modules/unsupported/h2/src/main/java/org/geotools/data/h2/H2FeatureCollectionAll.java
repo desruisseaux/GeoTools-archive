@@ -2,20 +2,23 @@ package org.geotools.data.h2;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.geotools.feature.CollectionListener;
+import org.geotools.data.DefaultQuery;
+import org.geotools.data.Query;
+import org.geotools.data.store.DataFeatureCollection;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureList;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.visitor.FeatureVisitor;
-import org.geotools.util.ProgressListener;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.filter.Filter;
-import org.opengis.filter.sort.SortBy;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -26,7 +29,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  *
  */
-public class H2FeatureCollectionAll implements FeatureCollection {
+public class H2FeatureCollectionAll extends DataFeatureCollection {
 
 	/**
 	 * state about table / feature type
@@ -37,215 +40,264 @@ public class H2FeatureCollectionAll implements FeatureCollection {
 		this.state = state;
 	}
 	
-	public void accepts(FeatureVisitor visitor, ProgressListener progress)
-			throws IOException {
-		// TODO Auto-generated method stub
+	public boolean add(Object object) {
+		Feature feature = (Feature) object;
+		
+		//build up the names, values to insert
+		String[] names = new String[ feature.getNumberOfAttributes() ];
+		Object[] values = new Object[ names.length ];
+		
+		for ( int i = 0; i < names.length; i++ ) {
+			names[ i ] = feature.getFeatureType().getAttributeType( i ).getName();
+			values[ i ] = feature.getAttribute( i );
+		}
 
-	}
-
-	public void addListener(CollectionListener listener)
-			throws NullPointerException {
-		// TODO Auto-generated method stub
-
+		//build statement "INSERT INTO <featureType> ...' 
+		H2SQLBuilder sqlBuilder = 
+			state.getDataStore().createSQLBuilder( state );  
+		String sql = sqlBuilder.insert(names, values);
+		
+		try {
+			Connection conn = state.getDataStore().connection();
+			try {
+				Statement st = conn.createStatement();
+				st.execute( sql );
+				
+				st.close();
+				return true;
+			}
+			finally {
+				conn.close();
+			}
+		} 
+		catch (SQLException e) {
+			throw new RuntimeException( e );
+		}
 	}
 	
-	public void removeListener(CollectionListener listener)
-		throws NullPointerException {
-		// TODO Auto-generated method stub
-	
-	}
-
-	public FeatureIterator features() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public void close(FeatureIterator close) {
-		// TODO Auto-generated method stub
-
-	}
-
-	
-	public Iterator iterator() {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean addAll(Collection collection) {
+		//TODO: optimize this with a batch statement!!
+		
+		for ( Iterator i = collection.iterator(); i.hasNext(); ) {
+			add( i.next() );
+		}
+		
+		return true;
 	}
 	
-	public void close(Iterator close) {
-		// TODO Auto-generated method stub
+	public Envelope getBounds() {
+		//first check the state cache
+		if ( state.get( "bounds" ) == null ) {
+			//calculate it
+			synchronized ( state ) {
+				if ( state.get( "bounds" ) == null ) {
+					
+					try {
 
+						FeatureType featureType = state.featureType();
+						if ( featureType.getDefaultGeometry() == null ) {
+							//no geometry, return null boundsw
+							ReferencedEnvelope bounds = 
+								new ReferencedEnvelope( (CoordinateReferenceSystem) null );
+							bounds.setToNull();
+							return bounds;
+						}
+						
+						//get the crs
+						CoordinateReferenceSystem crs = null;
+						if ( featureType.getDefaultGeometry() != null ) {
+							crs = featureType.getDefaultGeometry().getCoordinateSystem();
+						}
+						
+						ReferencedEnvelope bounds = new ReferencedEnvelope( crs );
+						
+						//build statement "SELECT <geometry> FROM <featureType>' 
+						H2SQLBuilder sqlBuilder = 
+							state.getDataStore().createSQLBuilder( state );  
+						sqlBuilder.select( 
+							new String[]{ featureType.getDefaultGeometry().getName() } 
+						);
+						sqlBuilder.from();
+						String sql = sqlBuilder.getSQL().toString();
+						
+						Connection conn = state.getDataStore().connection();
+						try {
+							Statement st = conn.createStatement();
+							ResultSet rs = st.executeQuery( sql );
+							
+							if ( rs.next() ) {
+								Geometry geometry = (Geometry) rs.getObject( 1 );
+								bounds.init( geometry.getEnvelopeInternal() );
+								
+								while( rs.next() ) {
+									geometry = (Geometry) rs.getObject( 1 );
+									bounds.expandToInclude( geometry.getEnvelopeInternal() );
+								}
+							}
+							else {
+								bounds.setToNull();
+							}
+							
+							rs.close();
+							st.close();
+						}
+						finally {
+							conn.close();
+						}
+						
+						//throw result in cache
+						state.put( "bounds", bounds );
+					} 
+					
+					catch (Exception e) {
+						throw new RuntimeException( e );
+					}
+				}
+			}
+		}
+		
+		return (Envelope) state.get( "bounds" );
 	}
 
-	
-	public FeatureType getFeatureType() {
-		// TODO Auto-generated method stub
-		return null;
+
+	public int getCount() throws IOException {
+		//is this cached
+    	if ( state.get( "count" ) == null ) {
+    		//calculate it
+    		synchronized ( state ) {
+    		
+    			if ( state.get( "count" ) == null ) {
+    			
+    				try {
+						//get all the data from the table
+						H2SQLBuilder sqlBuilder = 
+							state.getDataStore().createSQLBuilder( state );
+						String sql = sqlBuilder.count( Filter.INCLUDE );
+						
+						Connection conn = state.getDataStore().connection();
+						try {
+							Statement st = conn.createStatement();
+							ResultSet rs = st.executeQuery( sql );
+							
+							rs.next();
+							int count = rs.getInt( 1 );
+							
+							state.put( "count", new Integer( count ) );
+							
+							st.close();
+							rs.close();
+						}
+						finally {
+							conn.close();
+						}
+					} 
+    				catch (SQLException e) {
+    					throw (IOException) new IOException().initCause( e );
+					}
+        		
+    			}
+    		}
+    	}
+    	
+    	return ((Integer) state.get( "count" )).intValue();
 	}
+
 
 	public FeatureType getSchema() {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			return state.featureType();
+		} 
+		catch (IOException e) {
+			throw new RuntimeException( e );
+		}
 	}
-
 	
-
-	public FeatureList sort(SortBy order) {
-		// TODO Auto-generated method stub
-		return null;
+	protected Iterator openIterator() throws IOException {
+		try {
+			return new IteratorAll();
+		} 
+		catch (SQLException e) {
+			throw (IOException) new IOException().initCause( e );
+		}
 	}
-
-	public FeatureCollection subCollection(Filter filter) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	
-
-	public void purge() {
-		// TODO Auto-generated method stub
-
+	protected void closeIterator(Iterator close) throws IOException {
+		try {
+			((IteratorAll) close).close();
+		} 
+		catch (SQLException e) {
+			throw (IOException) new IOException().initCause( e );
+		}
+		
+		super.closeIterator( close );
 	}
-
-	public boolean add(Object arg0) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public boolean addAll(Collection arg0) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public void clear() {
-		// TODO Auto-generated method stub
-
-	}
-
-	public boolean contains(Object arg0) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public boolean containsAll(Collection arg0) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public boolean isEmpty() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public boolean remove(Object arg0) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public boolean removeAll(Collection arg0) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public boolean retainAll(Collection arg0) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public int size() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public Object[] toArray() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Object[] toArray(Object[] arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Object getAttribute(String xPath) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Object getAttribute(int index) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Object[] getAttributes(Object[] attributes) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Envelope getBounds() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Geometry getDefaultGeometry() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public String getID() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public int getNumberOfAttributes() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public void setAttribute(int position, Object val)
-			throws IllegalAttributeException, ArrayIndexOutOfBoundsException {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void setAttribute(String xPath, Object attribute)
-			throws IllegalAttributeException {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void setDefaultGeometry(Geometry geometry)
-			throws IllegalAttributeException {
-		// TODO Auto-generated method stub
-
-	}
-
+	
 	class IteratorAll implements java.util.Iterator {
 
 		Connection connection;
+		Statement st;
+		ResultSet rs;
 		
 		IteratorAll() throws SQLException {
 			//grab a connection
 			connection = state.getDataStore().getConnectionPoolDataSource()
 				.getPooledConnection().getConnection();
+			
+			//get all the data from the table
+			H2SQLBuilder sqlBuilder = 
+				state.getDataStore().createSQLBuilder( state );
+			String sql = sqlBuilder.select( Query.ALL );
+			
+			//get the result set
+			st = connection.createStatement();
+			rs = st.executeQuery( sql );
 		}
 		
 		public boolean hasNext() {
-			// TODO Auto-generated method stub
-			return false;
+			try {
+				return rs.next();
+			} 
+			catch (SQLException e) {
+				throw new RuntimeException( e );
+			}
 		}
 
 		public Object next() {
-			// TODO Auto-generated method stub
-			return null;
+			try {
+				FeatureType featureType = state.featureType();
+				
+				SimpleFeatureBuilder builder = 
+					new SimpleFeatureBuilder( state.getDataStore().getFeatureFactory() );
+				builder.setType( featureType );
+				
+				//build up teh attributes
+				for ( int i = 0; i < featureType.getAttributeCount(); i++) {
+					AttributeType attributeType = 
+						featureType.getAttributeType( i );
+					
+					builder.add( rs.getObject( attributeType.getName() ) );
+				}
+				
+				//get the feature id
+				String fid = state.primaryKey().encode( rs );
+				return builder.build( fid );
+			} 
+			
+			catch (Exception e) {
+				throw new RuntimeException( e );
+			}
 		}
 
 		public void remove() {
-			// TODO Auto-generated method stub
+			throw new UnsupportedOperationException();
 		}
 		
 		public void close() throws SQLException {
+			rs.close();
+			st.close();
 			connection.close();
 		}
 		
 	}
+
 }

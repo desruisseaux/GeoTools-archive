@@ -1,14 +1,25 @@
 package org.geotools.data.h2;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 import junit.framework.TestCase;
 
+import org.geotools.feature.simple.SimpleFeatureFactoryImpl;
 import org.geotools.feature.simple.SimpleTypeFactoryImpl;
+import org.geotools.feature.type.TypeName;
+import org.geotools.filter.FilterFactoryImpl;
 import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.Server;
+
+import com.vividsolutions.jts.geom.GeometryFactory;
+
+import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
 
 /**
  * Test support class for tests which run of a live h2 instance.
@@ -19,9 +30,79 @@ import org.h2.tools.Server;
 public class H2TestSupport extends TestCase {
 
 	/**
-	 * Embedded server instance
+	 * Embedded server instance, created statically to live over the life 
+	 * of many test cases, with a shutdown hook to cleanup
 	 */
-	Server server;
+	static Server server;
+	static {
+		Runtime.getRuntime().addShutdownHook( 
+			new Thread( 
+				new Runnable() {
+
+					public void run() {
+						if ( server != null ) {
+							//stop the server
+							server.stop();
+							
+							//kill the files
+							String dir = System.getProperty( "user.dir" );
+							try {
+								DeleteDbFiles.execute( dir , "geotools", true );
+							} 
+							catch (SQLException e) {}
+						}
+					}
+				}
+			)	
+		);
+	}
+	
+	/**
+	 * Runs an sql script against the database.
+	 */
+	static void run( String script ) throws Exception {
+		//load the script
+		BufferedReader reader = new BufferedReader( 
+			new InputStreamReader( H2TestSupport.class.getResourceAsStream( script ) )	
+		);
+		
+		H2ConnectionPoolDataSource cpDataSource 
+			= new H2ConnectionPoolDataSource("jdbc:h2:geotools");
+	
+		//connect
+		Connection conn = 
+			cpDataSource.getPooledConnection().getConnection();
+		
+		try {
+			Statement st = conn.createStatement();
+			
+			String line = null;
+			while( ( line = reader.readLine() ) != null ) {
+				st.execute( line );
+			}
+			
+			reader.close();
+			
+			st.close();
+		}
+		finally {
+			conn.close();	
+		}
+		
+	}
+	
+	
+	
+	/**
+	 * types created for tests
+	 */
+	//two run of the mill feature types
+	static TypeName ft1 = new TypeName( "featureType1" );
+	static TypeName ft2 = new TypeName( "featureType2" );
+	
+	//a feature type with no geometry
+	static TypeName nogeom = new TypeName( "noGeometry" );
+	
 	/**
 	 * The datastore
 	 */
@@ -30,111 +111,35 @@ public class H2TestSupport extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		//create the server instance
-		server = Server.createTcpServer( new String[]{} );
-		server.start();
+		if ( server == null ) {
+			//create the server instance
+			server = Server.createTcpServer( new String[]{} );
+			server.start();	
+			
+			//spatialy enable it
+			run( "h2.sql" );
+		}
+		
+		//set up the data
+		run( "featureTypes.sql" );
 		
 		H2ConnectionPoolDataSource cpDataSource 
 			= new H2ConnectionPoolDataSource("jdbc:h2:geotools");
-		
-		//connect
-		Connection conn = 
-			cpDataSource.getPooledConnection().getConnection();
-	   
-		try {
-			//create a schema
-			Statement st = conn.createStatement();
-			try {
-				st.execute( "CREATE SCHEMA \"geotools\";" );	
-			}
-			catch( Exception ignore ) {}
-			finally {
-				st.close();	
-			}
-			
-			//create a table
-			st = conn.createStatement();
-			try { 
-				st.execute( 
-		    		"CREATE TABLE \"geotools\".\"featureType1\" (" + 
-		    		 " \"id\" int primary key, \"intProperty\" int," +
-		    		 " \"doubleProperty\" double, \"stringProperty\" varchar" +
-					");"
-				);
-			}
-			catch( Exception ignore ) {
-				ignore.printStackTrace();
-			}
-			finally {
-				st.close();
-			}
-		    
-			//clear the table
-			st = conn.createStatement();
-			st.execute( "DELETE FROM \"geotools\".\"featureType1\";" );
-			st.close();
-			
-		    //insert some data
-		    PreparedStatement pst = conn.prepareStatement( 
-	    		"INSERT INTO \"geotools\".\"featureType1\" VALUES ( ?, ?, ?, ? );"
-    		);
-		    pst.setInt( 1 , 1  );
-		    pst.setInt( 2 , 1  );
-		    pst.setDouble( 3, 1.1 );
-		    pst.setString( 4, "one" );
-		    pst.execute();
-		    
-		    pst.setInt( 1 , 2  );
-		    pst.setInt( 2 , 2  );
-		    pst.setDouble( 3, 2.2 );
-		    pst.setString( 4, "two" );
-		    pst.execute();
-		    
-		    pst.setInt( 1 , 3  );
-		    pst.setInt( 2 , 3  );
-		    pst.setDouble( 3, 3.3 );
-		    pst.setString( 4, "three" );
-		    pst.execute();
-		    
-		    pst.close();
-		    
-		    //create the datastore
-		    H2Content content = new H2Content( cpDataSource );
-		    content.setDatabaseSchema( "geotools" );
-		    
-		    dataStore = new H2DataStore( content );
-		    dataStore.setNamespaceURI( "http://www.geotools.org/test" );
-		    dataStore.setTypeFactory( new SimpleTypeFactoryImpl() );
-		    
-		}
-		finally {
-			conn.close();	
-		}
 
+	    //create the datastore
+	    H2Content content = new H2Content( cpDataSource );
+	    content.setDatabaseSchema( "geotools" );
+	    
+	    dataStore = new H2DataStore( content );
+	    dataStore.setNamespaceURI( "http://www.geotools.org/test" );
+	    dataStore.setTypeFactory( new SimpleTypeFactoryImpl() );
+	    dataStore.setFeatureFactory( new SimpleFeatureFactoryImpl() );
+	    dataStore.setFilterFactory( new FilterFactoryImpl() );
+	    dataStore.setGeometryFactory( new GeometryFactory() );
+	    
 	}
 	
 	protected void tearDown() throws Exception {
-		
-		Connection conn = dataStore.getConnectionPoolDataSource()
-			.getPooledConnection().getConnection();
-		
-		try {
-			//drop the table
-		    Statement st = conn.createStatement();
-		    st.addBatch( "DROP TABLE \"geotools\".\"featureType1\";" );
-		    st.addBatch( "DROP SCHEMA \"geotools\";" );
-		    st.executeBatch();
-		}
-		finally {
-			conn.close();
-		}
-		
-		//stop the server
-		server.stop();
-		Thread.sleep( 100 );
-		
-		//kill the files
-		String dir = System.getProperty( "user.dir" );
-		DeleteDbFiles.execute( dir , "geotools", true );
+		run( "featureTypes-cleanup.sql" );
 	}
 }

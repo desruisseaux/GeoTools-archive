@@ -1,11 +1,18 @@
 package org.geotools.data.h2;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
+import org.geotools.data.Query;
 import org.geotools.data.store.ContentEntry;
 import org.geotools.data.store.ContentState;
 import org.geotools.feature.FeatureType;
 import org.opengis.feature.simple.SimpleTypeFactory;
+import org.opengis.filter.Filter;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 public class H2ContentState extends ContentState {
 
@@ -13,14 +20,14 @@ public class H2ContentState extends ContentState {
 		super(entry);
 	}
 
-	H2DataStore getDataStore() {
+	public H2DataStore getDataStore() {
 		return (H2DataStore) entry.getDataStore();
 	}
 	
 	/**
      * Builds the primary key for the entry.
      */
-    PrimaryKey primaryKey() throws Exception {
+    public PrimaryKey primaryKey() throws Exception {
     	return H2Utils.primaryKey( this );
     }
     
@@ -36,4 +43,5 @@ public class H2ContentState extends ContentState {
 		}
     }
 	
+    
 }

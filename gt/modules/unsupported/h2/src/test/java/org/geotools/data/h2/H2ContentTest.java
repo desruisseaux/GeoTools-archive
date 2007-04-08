@@ -11,7 +11,7 @@ public class H2ContentTest extends H2TestSupport {
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		content = dataStore.getContent();
+		content = (H2Content) dataStore.getContent();
 	}
 	
 	public void testGetTypeNames() throws Exception {

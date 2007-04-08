@@ -1,10 +1,19 @@
 package org.geotools.data.h2;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+
+import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.store.ContentEntry;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.type.TypeName;
+import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Point;
 
 public class H2SQLBuilderTest extends H2TestSupport {
 
@@ -36,8 +45,36 @@ public class H2SQLBuilderTest extends H2TestSupport {
 		String sql = encoder.create();
 		assertEquals( 
 			"CREATE TABLE \"geotools\".\"featureType1\" (" + 
-				" \"intProperty\" INTEGER, \"doubleProperty\" DOUBLE, \"stringProperty\" VARCHAR_IGNORECASE " +
-			");",  sql );
+				" \"geometry\" OTHER, \"intProperty\" INTEGER, \"doubleProperty\" DOUBLE, \"stringProperty\" VARCHAR_IGNORECASE " +
+			")",  sql );
+	}
+	
+	public void testSelectAll() throws Exception {
+		String sql = encoder.select( Query.ALL );
+		assertEquals( "SELECT * FROM \"geotools\".\"featureType1\"", sql );
+	}
+	
+	public void testSelectCountAll() throws Exception {
+		String sql = encoder.count( Filter.INCLUDE );
+		assertEquals( "SELECT count(*)  FROM \"geotools\".\"featureType1\"", sql );
+	}
+	
+	public void testInsert() throws Exception {
+		
+		String[] names = new String[]{
+			"geometry", "intProperty", "doubleProperty", "stringProperty"
+		};
+		Object[] values = new Object[]{
+			dataStore.getGeometryFactory().createPoint( new Coordinate( 4, 4 )), 
+			new Integer( 4 ), new Double( 4.4 ), "four"
+		};
+		String sql = encoder.insert( names, values );
+		assertEquals( 
+			"INSERT INTO \"geotools\".\"featureType1\" ( " +
+			"\"geometry\", \"intProperty\", \"doubleProperty\", \"stringProperty\" " +
+			") VALUES ( GeometryFromText( 'POINT (4 4)', 0 ), 4, 4.4, 'four' )",
+			sql
+		);
 	}
 	
 //	public void testEncodePropertyNameSimple() throws Exception {
