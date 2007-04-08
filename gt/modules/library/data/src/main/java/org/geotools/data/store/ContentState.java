@@ -18,14 +18,21 @@ package org.geotools.data.store;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.geotools.data.FeatureListener;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.simple.SimpleTypeBuilder;
 import org.geotools.feature.simple.SimpleTypeFactoryImpl;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleTypeFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Everything you need to implement your FeatureCollections (captures content
@@ -160,6 +167,28 @@ public abstract class ContentState {
     }
     
     /**
+     * Accessor for the bounds of the content entry for its given state with 
+     * no filter applied ( ie, all the data ).
+     * <p>
+     * This method is a convenience for content.all( this ).getBounds()
+     * </p>
+  	 */
+    final public Envelope bounds() throws IOException {
+		return entry.getDataStore().getContent().all( this ).getBounds();
+	}
+    
+    /**
+     * Accessor for the number of features for the content entry in this state
+     * with no filter applied ( ie, all the data ).
+     * <p>
+     * This method is a convenience for content.all( this ).size()
+     * </p>
+  	 */
+    final public int count() throws IOException {
+    	return entry.getDataStore().getContent().all( this ).size();
+    }
+    
+    /**
      * Creates a feature type for the entry.
      * <p>
      * An implementation of this method should create a new instance of 
@@ -169,4 +198,6 @@ public abstract class ContentState {
      */
     abstract protected FeatureType buildFeatureType( SimpleTypeFactory factory )
     	throws IOException;
+
+	
 }
