@@ -49,7 +49,7 @@ import org.geotools.referencing.CRS;
  * Test non functionality of PropertyDataStore.
  * 
  * @author Jody Garnett, Refractions Research Inc.
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/demo/property/src/test/java/org/geotools/data/property/PropertyDataStoreTest.java $
+ * @source $URL$
  */
 public class PropertyDataStore2Test extends TestCase {
     PropertyDataStore store;

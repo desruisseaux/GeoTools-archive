@@ -20,7 +20,7 @@ import org.geotools.geometry.jts.GeometryUtils;
 /**
  * Holds the coordinates for a one-dimensional position within some coordinate reference system.
  * 
- * @version $Id: DirectPosition1D.java,v 1.2 2005/11/02 05:39:33 crossley Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class DirectPosition1D implements DirectPosition, Serializable, Cloneable {

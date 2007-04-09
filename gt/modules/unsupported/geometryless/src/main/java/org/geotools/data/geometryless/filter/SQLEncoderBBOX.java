@@ -47,7 +47,7 @@ import org.geotools.filter.FilterCapabilities;
  *
  * @author Rob Atkinson , SCO
  * 
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/geometryless/src/main/java/org/geotools/filter/SQLEncoderBBOX.java $
+ * @source $URL$
  */
 public class SQLEncoderBBOX extends FilterToSQL {
     /** Standard java logger */

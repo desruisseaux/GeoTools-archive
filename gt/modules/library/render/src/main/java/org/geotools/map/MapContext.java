@@ -41,7 +41,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * OGC Web Map Context Specification.
  * 
  * @author Cameron Shorter
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/main/src/main/java/org/geotools/map/MapContext.java $
+ * @source $URL$
  * @version $Id$
  */
 public interface MapContext {

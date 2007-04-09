@@ -42,7 +42,7 @@ import org.opengis.referencing.operation.TransformException;
  * Default implementation of the MapLayer implementation
  * 
  * @author wolf
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/main/src/main/java/org/geotools/map/DefaultMapLayer.java $
+ * @source $URL$
  */
 public class DefaultMapLayer implements MapLayer {
     /** Holds value of property Source? */

@@ -26,7 +26,7 @@ import java.util.EventObject;
  * @author Andrea Aime
  * @author Ian Turton
  * @author Martin Desruisseaux
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/main/src/main/java/org/geotools/map/event/MapLayerEvent.java $
+ * @source $URL$
  * @version $Id$
  *
  * @see Layer

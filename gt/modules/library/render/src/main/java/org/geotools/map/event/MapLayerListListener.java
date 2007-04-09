@@ -24,7 +24,7 @@ import java.util.EventListener;
  * DOCUMENT ME!
  *
  * @author wolf
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/main/src/main/java/org/geotools/map/event/MapLayerListListener.java $
+ * @source $URL$
  */
 public interface MapLayerListListener extends EventListener {
     /**

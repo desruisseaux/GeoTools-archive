@@ -36,7 +36,7 @@ import org.opengis.feature.FeatureCollection;
  * are kept in memory.
  * </p>
  * @author Jody Garnett, Refractions Research Inc.
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/api/src/main/java/org/geotools/feature/collection/RandomFeatureAccess.java $
+ * @source $URL$
  */
 public interface RandomFeatureAccess extends FeatureCollection {
     /**

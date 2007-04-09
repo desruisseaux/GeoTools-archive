@@ -36,8 +36,8 @@ import org.geotools.data.FileDataStoreFactorySpi;
  * Implementation of the DataStore service provider interface for OGR.
  *
  * @author Andrea Aime, TOPP
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/ShapefileDataStoreFactory.java $
- * @version $Id: ShapefileDataStoreFactory.java 22266 2006-10-19 11:30:55Z acuster $
+ * @source $URL$
+ * @version $Id$
  */
 public class OGRDataStoreFactory
     implements DataStoreFactorySpi {

@@ -1,6 +1,6 @@
 /*$************************************************************************************************
  **
- ** $Id: PositionImpl.java,v 1.3 2004/12/02 01:10:40 crossley Exp $
+ ** $Id$
  **
  ** $Source: /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/geometry/PositionImpl.java,v $
  **

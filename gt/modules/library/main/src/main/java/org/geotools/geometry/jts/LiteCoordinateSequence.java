@@ -24,7 +24,7 @@ import com.vividsolutions.jts.geom.impl.PackedCoordinateSequence;
  * 
  * @author jeichar
  * @since 2.1.x
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/main/src/main/java/org/geotools/util/LiteCoordinateSequence.java $
+ * @source $URL$
  */
 public class LiteCoordinateSequence extends PackedCoordinateSequence{
 

@@ -30,7 +30,7 @@ import junit.framework.TestSuite;
  *
  * @task REVISIT: Is there still need for this with maven?  It runs everything
  *       that ends with Test.
- * @source $URL: http://gtsvn.refractions.net/geotools/trunk/gt/modules/library/jdbc/src/test/java/org/geotools/filter/SQLFilterSuite.java $
+ * @source $URL$
  */
 public class SQLFilterSuite extends TestCase {
     public SQLFilterSuite(java.lang.String testName) {

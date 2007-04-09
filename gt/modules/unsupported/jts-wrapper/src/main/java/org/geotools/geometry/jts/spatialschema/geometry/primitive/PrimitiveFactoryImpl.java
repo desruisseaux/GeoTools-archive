@@ -1,5 +1,5 @@
 /*******************************************************************************
- * $ * * $Id: PrimitiveFactoryImpl.java,v 1.14 2005/11/02 05:39:33 crossley Exp $ * *
+ * $ * * $Id$ * *
  * $Source:
  * /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/primitive/PrimitiveFactoryImpl.java,v $ * *
  * Copyright (C) 2003 Open GIS Consortium, Inc. All Rights Reserved.

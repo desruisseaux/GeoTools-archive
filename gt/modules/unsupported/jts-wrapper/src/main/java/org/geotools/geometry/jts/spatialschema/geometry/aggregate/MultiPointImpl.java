@@ -1,6 +1,6 @@
 /*$************************************************************************************************
  **
- ** $Id: MultiPointImpl.java,v 1.2 2005/04/01 23:22:46 cdillard Exp $
+ ** $Id$
  **
  ** $Source: /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/aggregate/MultiPointImpl.java,v $
  **

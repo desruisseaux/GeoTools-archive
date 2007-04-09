@@ -20,7 +20,7 @@ package org.geotools.data.jdbc;
  * the SQLEncoder being used, or that there were io problems.
  *
  * @author Chris Holmes, TOPP
- * @source $URL: http://gtsvn.refractions.net/geotools/trunk/gt/modules/library/jdbc/src/main/java/org/geotools/filter/SQLEncoderException.java $
+ * @source $URL$
  */
 public class FilterToSQLException extends Exception {
     private static final long serialVersionUID = -2394509611777950167L;

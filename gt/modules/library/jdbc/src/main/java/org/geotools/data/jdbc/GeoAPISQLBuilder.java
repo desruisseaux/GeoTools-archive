@@ -50,7 +50,7 @@ import org.opengis.filter.sort.SortOrder;
  * </p>
  *
  * @author Sean Geoghegan, Defence Science and Technology Organisation.
- * @source $URL: http://gtsvn.refractions.net/geotools/trunk/gt/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/DefaultSQLBuilder.java $
+ * @source $URL$
  */
 public class GeoAPISQLBuilder implements SQLBuilder {
     // The instance of the encoder to be used to generate the WHERE clause

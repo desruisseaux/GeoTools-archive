@@ -24,7 +24,7 @@ import java.util.EventListener;
  * The listener that's notified when a bounding box changes its area of interest.
  *
  * @author Andrea Aime
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/main/src/main/java/org/geotools/map/event/MapBoundsListener.java $
+ * @source $URL$
  * @version $Id$
  *
  * @see AreaOfInterestEvent

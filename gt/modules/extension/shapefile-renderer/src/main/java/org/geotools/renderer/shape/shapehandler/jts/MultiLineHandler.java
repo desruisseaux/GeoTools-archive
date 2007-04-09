@@ -34,7 +34,7 @@ import com.vividsolutions.jts.geom.impl.PackedCoordinateSequenceFactory;
  * @author jeichar
  *
  * @since 2.1.x
- * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/ext/shaperenderer/src/org/geotools/renderer/shape/MultiLineHandler.java $
+ * @source $URL$
  */
 public class MultiLineHandler extends org.geotools.renderer.shape.shapehandler.simple.MultiLineHandler {
     static final GeometryFactory factory=new GeometryFactory();

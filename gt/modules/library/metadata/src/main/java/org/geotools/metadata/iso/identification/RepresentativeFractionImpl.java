@@ -30,8 +30,8 @@ import org.geotools.resources.i18n.Errors;
  * A scale where {@linkplain #getDenominator denominator} = {@code 1 / scale}.
  * This implementation is set up as a {@linkplain Number number} - because it is.
  * 
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/metadata/src/main/java/org/geotools/metadata/iso/identification/ResolutionImpl.java $
- * @version $Id: ResolutionImpl.java 24868 2007-03-22 07:58:09Z jgarnett $
+ * @source $URL$
+ * @version $Id$
  * @author Jody Garnett
  *
  * @since 2.4

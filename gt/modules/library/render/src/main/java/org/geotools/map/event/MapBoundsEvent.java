@@ -29,7 +29,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * Event object for MapContext area of interest and coordinate system changes.
  *
  * @author wolf
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/main/src/main/java/org/geotools/map/event/MapBoundsEvent.java $
+ * @source $URL$
  */
 public class MapBoundsEvent extends EventObject {
     /** Area of interest changed */

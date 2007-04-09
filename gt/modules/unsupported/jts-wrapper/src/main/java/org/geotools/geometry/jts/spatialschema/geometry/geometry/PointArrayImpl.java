@@ -1,6 +1,6 @@
 /*$************************************************************************************************
  **
- ** $Id: PointArrayImpl.java,v 1.8 2005/11/02 05:39:33 crossley Exp $
+ ** $Id$
  **
  ** $Source: /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/geometry/PointArrayImpl.java,v $
  **

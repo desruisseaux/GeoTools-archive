@@ -36,7 +36,7 @@ import com.vividsolutions.jts.geom.LineString;
  * Common filter testing code factored up here.
  *
  * @author Chris Holmes
- * @source $URL: http://gtsvn.refractions.net/geotools/trunk/gt/modules/library/jdbc/src/test/java/org/geotools/filter/SQLFilterTestSupport.java $
+ * @source $URL$
  */
 public abstract class SQLFilterTestSupport extends TestCase {
     /** Standard logging instance */

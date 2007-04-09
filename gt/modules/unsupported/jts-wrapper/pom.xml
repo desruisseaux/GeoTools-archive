@@ -3,7 +3,7 @@
          Project configuration file for the Geotools 2 project
          http://www.geotools.org/
 
-         Version: $Id: pom.xml 19288 2006-04-25 22:30:06Z desruisseaux $
+         Version: $Id$
      =========================================================================== -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

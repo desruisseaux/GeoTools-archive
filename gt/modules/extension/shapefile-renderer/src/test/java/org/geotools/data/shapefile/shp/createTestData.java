@@ -41,7 +41,7 @@ import com.vividsolutions.jts.geom.LineString;
 
 /**
  *
- * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/ext/shaperenderer/test/org/geotools/data/shapefile/shp/createTestData.java $
+ * @source $URL$
  */
 public class createTestData {
     public static URL createLineData(final Dimension d)

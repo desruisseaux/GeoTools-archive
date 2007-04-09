@@ -34,7 +34,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  * @author jeichar
  * @since 2.1.x
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/render/src/main/java/org/geotools/renderer/lite/Decimator.java $
+ * @source $URL$
  */
 public final class Decimator {
 

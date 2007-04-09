@@ -1,6 +1,6 @@
 /*$************************************************************************************************
  **
- ** $Id: AggregateImpl.java,v 1.6 2005/04/15 16:32:37 crossley Exp $
+ ** $Id$
  **
  ** $Source: /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/aggregate/AggregateImpl.java,v $
  **

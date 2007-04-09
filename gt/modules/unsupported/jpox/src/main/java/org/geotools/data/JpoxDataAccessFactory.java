@@ -29,8 +29,8 @@ import org.opengis.util.InternationalString;
  * @author Thomas Marti
  * @author Stefan Schmid
  * 
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/module/render/src/org/geotools/renderer/lite/StreamingRenderer.java $
- * @version $Id: StreamingRenderer.java 23200 2006-12-04 21:25:42Z jgarnett $
+ * @source $URL$
+ * @version $Id$
  */
 
 public class JpoxDataAccessFactory implements DataAccessFactory {

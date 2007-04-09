@@ -1,6 +1,6 @@
 /*$************************************************************************************************
  **
- ** $Id: SurfacePatchImpl.java,v 1.5 2005/11/02 05:39:33 crossley Exp $
+ ** $Id$
  **
  ** $Source: /cvs/ctree/LiteGO1/src/jar/com/polexis/lite/spatialschema/geometry/primitive/SurfacePatchImpl.java,v $
  **

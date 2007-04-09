@@ -33,7 +33,7 @@ import com.vividsolutions.jts.geom.Polygon;
  *
  * @author Andrea Aime
  * @author simone giannecchini
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/render/src/main/java/org/geotools/renderer/lite/PolygonIterator.java $
+ * @source $URL$
  * @version $Id$
  */
 public final  class PolygonIterator extends AbstractLiteIterator {

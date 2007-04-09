@@ -28,7 +28,7 @@ import javax.sql.PooledConnection;
  *
  * To change the template for this generated type comment go to
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/jdbc/src/test/java/org/geotools/data/jdbc/MockPooledConnection.java $
+ * @source $URL$
  */
 public class MockPooledConnection implements PooledConnection {
     private Connection conn;

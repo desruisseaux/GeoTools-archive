@@ -68,7 +68,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * rigorous; must of them should be seen as temporary implementations.
  *
  * @since 2.2
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/coverage/src/main/java/org/geotools/resources/image/CoverageUtilities.java $
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Simone Giannecchini

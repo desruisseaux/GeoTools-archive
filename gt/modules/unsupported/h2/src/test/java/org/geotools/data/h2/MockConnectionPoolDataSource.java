@@ -28,7 +28,7 @@ import javax.sql.PooledConnection;
 /** A Mock ConnectionPoolDataSource for testing the JDBCDataStore.
  * 
  * @author Sean Geoghegan, Defence Science and Technology Organisation.
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/jdbc/src/test/java/org/geotools/data/jdbc/MockConnectionPoolDataSource.java $
+ * @source $URL$
  */
 public class MockConnectionPoolDataSource implements ConnectionPoolDataSource {
     private Connection conn;

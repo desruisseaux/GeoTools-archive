@@ -29,8 +29,8 @@ import com.vividsolutions.jts.io.WKTReader;
  * <p>
  * Note: a nearly identical copy of this file exists in the {@code ext/shape} module.
  *
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/data/shapefile/TestCaseSupport.java $
- * @version $Id: TestCaseSupport.java 22666 2006-11-09 03:50:28Z jgarnett $
+ * @source $URL$
+ * @version $Id$
  * @author  Ian Schneider
  * @author  Martin Desruisseaux
  */

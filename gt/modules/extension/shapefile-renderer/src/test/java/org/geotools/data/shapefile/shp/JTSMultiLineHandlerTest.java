@@ -52,7 +52,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author jeichar
  * @since 2.1.x
- * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/ext/shaperenderer/test/org/geotools/data/shapefile/shp/MultiLineHandlerTest.java $
+ * @source $URL$
  */
 public class JTSMultiLineHandlerTest extends TestCase {
 

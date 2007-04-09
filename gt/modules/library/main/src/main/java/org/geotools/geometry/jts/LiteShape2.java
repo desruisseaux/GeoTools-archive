@@ -42,7 +42,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * geometry can be used by java2d without coordinate cloning
  * 
  * @author Andrea Aime
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/render/src/main/java/org/geotools/renderer/lite/LiteShape2.java $
+ * @source $URL$
  * @version $Id$
  */
 public final class LiteShape2 implements Shape, Cloneable {

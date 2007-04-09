@@ -55,7 +55,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * interface
  * 
  * @author Andrea Aime
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/main/src/main/java/org/geotools/map/DefaultMapContext.java $
+ * @source $URL$
  */
 public class DefaultMapContext implements MapContext {
 	/** The logger for the map module. */

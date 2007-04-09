@@ -28,7 +28,7 @@ import org.geotools.styling.Style;
  *
  * @author Cameron Shorter
  * @author Martin Desruisseaux
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/main/src/main/java/org/geotools/map/MapLayer.java $
+ * @source $URL$
  * @version $Id$
  */
 public interface MapLayer {

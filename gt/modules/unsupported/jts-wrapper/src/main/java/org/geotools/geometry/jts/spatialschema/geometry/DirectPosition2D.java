@@ -29,7 +29,7 @@ import org.geotools.geometry.jts.GeometryUtils;
  * anyway such a restriction is hard to generalize (what to do with
  * {@linkplain AxisDirection#NORTH_EAST North-East} direction?).
  * 
- * @version $Id: DirectPosition2D.java,v 1.2 2005/11/02 05:39:33 crossley Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class DirectPosition2D extends Point2D.Double implements DirectPosition, Serializable {

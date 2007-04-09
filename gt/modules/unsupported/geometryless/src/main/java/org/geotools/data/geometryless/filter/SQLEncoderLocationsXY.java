@@ -48,7 +48,7 @@ import org.geotools.filter.FilterCapabilities;
  * @author Rob Atkinson , SCO
  * @author Debasish Sahu, debasish.sahu@rmsi.com
  * 
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/geometryless/src/main/java/org/geotools/filter/SQLEncoderLocationsXY.java $
+ * @source $URL$
  */
 public class SQLEncoderLocationsXY extends FilterToSQL {
     /** Standard java logger */

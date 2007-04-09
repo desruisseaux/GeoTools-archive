@@ -34,7 +34,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  * @author jeichar
  * @since 2.1.x
- * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/ext/shaperenderer/src/org/geotools/renderer/shape/PolygonHandler.java $
+ * @source $URL$
  */
 public class PolygonHandler extends org.geotools.renderer.shape.shapehandler.simple.PolygonHandler{
     private static final LinearRing[] HOLES=new LinearRing[0];

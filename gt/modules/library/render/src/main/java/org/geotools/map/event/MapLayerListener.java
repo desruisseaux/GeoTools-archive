@@ -29,7 +29,7 @@ import org.geotools.map.MapLayer;
  *
  * @see MapLayer
  * @see MapLayerEvent
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/main/src/main/java/org/geotools/map/event/MapLayerListener.java $
+ * @source $URL$
  */
 public interface MapLayerListener extends EventListener {
     /**
