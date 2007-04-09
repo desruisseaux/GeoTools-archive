@@ -6,6 +6,8 @@ package org.geotools.feature.iso.xpath;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.jxpath.DynamicPropertyHandler;
 import org.geotools.feature.iso.Types;
@@ -14,6 +16,7 @@ import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.Name;
+import org.opengis.feature.type.TypeName;
 
 /**
  * JXPath property handler that works on Attribute.
@@ -82,8 +85,31 @@ public class AttributePropertyHandler implements DynamicPropertyHandler {
             // PropertyHandler returning attribute, hence can't, for example,
             // compare
             // an Attribute with a Literal
+            /*
             if (value instanceof Attribute && !(value instanceof ComplexAttribute)) {
                 value = ((Attribute) value).get();
+            }
+            */
+        }
+        
+         if (value == null && descriptor != null) {
+            if ("id".equals(propName)) {
+                value = att.getID();
+            } else {
+                String[] scopedAttName = propName.split(":");
+                attName = scopedAttName[scopedAttName.length - 1];
+
+                Map attributes = (Map) descriptor.getUserData("attributes");
+                if (attributes != null) {
+                    for (Iterator it = attributes.entrySet().iterator(); it.hasNext();) {
+                        Map.Entry entry = (Entry) it.next();
+                        TypeName key = (TypeName) entry.getKey();
+                        if (attName.equals(key.getLocalPart())) {
+                            value = entry.getValue();
+                            break;
+                        }
+                    }
+                }
             }
         }
         return value;

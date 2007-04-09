@@ -21,9 +21,10 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Factory;
-import org.geotools.factory.FactoryFinder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureCollection;
 import org.opengis.geometry.BoundingBox;
@@ -46,9 +47,11 @@ public abstract class FeatureCollections implements Factory {
 
     private static FeatureCollections instance() {
         if (instance == null) {
+/*
             instance = (FeatureCollections) FactoryFinder.findFactory(
                     "org.geotools.feature.FeatureCollections",
                     "org.geotools.feature.DefaultFeatureCollections");
+*/
         }
         return instance;
     }

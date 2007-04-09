@@ -4,8 +4,14 @@ import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathIntrospector;
 import org.geotools.factory.Hints;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.iso.AttributeImpl;
 import org.geotools.feature.iso.ComplexAttributeImpl;
 import org.geotools.feature.iso.FeatureImpl;
+import org.geotools.feature.iso.attribute.BooleanAttribute;
+import org.geotools.feature.iso.attribute.GeometricAttribute;
+import org.geotools.feature.iso.attribute.NumericAttribute;
+import org.geotools.feature.iso.attribute.TemporalAttribute;
+import org.geotools.feature.iso.attribute.TextualAttribute;
 import org.geotools.feature.iso.simple.SimpleFeatureImpl;
 import org.geotools.feature.iso.type.AttributeDescriptorImpl;
 import org.geotools.feature.iso.type.FeatureTypeImpl;
@@ -16,6 +22,7 @@ import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.Feature;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.FeatureType;
 
@@ -171,6 +178,20 @@ public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
                     AttributePropertyHandler.class);
             JXPathIntrospector.registerDynamicClass(ComplexAttributeImpl.class,
                     AttributePropertyHandler.class);
+            JXPathIntrospector.registerDynamicClass(AttributeImpl.class,
+                    AttributePropertyHandler.class);
+            JXPathIntrospector.registerDynamicClass(GeometricAttribute.class,
+                    AttributePropertyHandler.class);
+            JXPathIntrospector.registerDynamicClass(BooleanAttribute.class,
+                    AttributePropertyHandler.class);
+            JXPathIntrospector.registerDynamicClass(NumericAttribute.class,
+                    AttributePropertyHandler.class);
+            JXPathIntrospector.registerDynamicClass(TemporalAttribute.class,
+                    AttributePropertyHandler.class);
+            JXPathIntrospector.registerDynamicClass(TextualAttribute.class,
+                    AttributePropertyHandler.class);
+
+
 
             JXPathIntrospector.registerDynamicClass(AttributeDescriptorImpl.class,
                     AttributeDescriptorPropertyHandler.class);
@@ -181,7 +202,7 @@ public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
         public boolean canHandle(Object object, String xpath, Class target) {
             // xpath = stripPrefix(xpath);
 
-            return object instanceof ComplexAttribute || object instanceof ComplexType
+            return object instanceof Attribute || object instanceof AttributeType
                     || object instanceof AttributeDescriptor;
 
         }
