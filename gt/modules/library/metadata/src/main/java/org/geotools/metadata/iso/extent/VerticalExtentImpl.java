@@ -25,6 +25,7 @@ import javax.units.Unit;
 // OpenGIS dependencies
 import org.opengis.metadata.extent.VerticalExtent;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.VerticalCRS;
 import org.opengis.referencing.datum.VerticalDatum;
 
 // Geotools dependencies
@@ -46,7 +47,7 @@ public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -6288728580430359681L;
+    private static final long serialVersionUID = -3214554246909844079L;
 
     /**
      * The lowest vertical extent contained in the dataset.
@@ -59,18 +60,12 @@ public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent
     private Double maximumValue;
 
     /**
-     * The vertical units used for vertical extent information.
-     * Examples: metres, feet, millimetres, hectopascals.
+     * Provides information about the vertical coordinate reference system to
+     * which the maximum and minimum elevation values are measured. The CRS
+     * identification includes unit of measure.
      */
-    private Unit unit;
+    private VerticalCRS verticalCRS;
 
-    /**
-     * Provides information about the origin from which the
-     * maximum and minimum elevation values are measured.
-     * @deprecated
-     */
-    private VerticalDatum verticalDatum;
-    
     /**
      * Constructs an initially empty vertical extent.
      */
@@ -79,25 +74,27 @@ public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent
 
     /**
      * Creates a vertical extent initialized to the specified values.
+     *
+     * @since 2.4
      */
     public VerticalExtentImpl(final Double minimumValue,
-                          final Double maximumValue,
-                          final Unit   unit,
-                          final VerticalDatum verticalDatum)
+                              final Double maximumValue,
+                              final VerticalCRS verticalCRS)
     {
-        setMinimumValue (minimumValue );
-        setMaximumValue (maximumValue );
-        setUnit         (unit         );
-        setVerticalDatum(verticalDatum);
+        setMinimumValue(minimumValue);
+        setMaximumValue(maximumValue);
+        setVerticalCRS (verticalCRS );
     }
 
     /**
      * Creates a vertical extent initialized to the specified values.
+     *
+     * @deprecated Use {@link #VerticalExtentImpl(Double,Double,VerticalCRS)} instead.
      */
     public VerticalExtentImpl(final double minimumValue,
-                          final double maximumValue,
-                          final Unit   unit,
-                          final VerticalDatum verticalDatum)
+                              final double maximumValue,
+                              final Unit   unit,
+                              final VerticalDatum verticalDatum)
     {
         setMinimumValue (new Double(minimumValue));
         setMaximumValue (new Double(maximumValue));
@@ -111,7 +108,7 @@ public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent
     public Double getMinimumValue() {
         return minimumValue;
     }
-    
+
     /**
      * Set the lowest vertical extent contained in the dataset.
      */
@@ -136,50 +133,76 @@ public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent
     }
 
     /**
+     * Provides information about the vertical coordinate reference system to
+     * which the maximum and minimum elevation values are measured. The CRS
+     * identification includes unit of measure.
+     *
+     * @since 2.4
+     */
+    public CoordinateReferenceSystem getVerticalCRS() {
+        return verticalCRS;
+    }
+
+    /**
+     * Set the information about the vertical coordinate reference system to
+     * which the maximum and minimum elevation values are measured.
+     *
+     * @since 2.4
+     */
+    public synchronized void setVerticalCRS(final VerticalCRS newValue) {
+        checkWritePermission();
+        verticalCRS = newValue;
+    }
+
+    /**
      * Returns the vertical units used for vertical extent information.
      * Examples: metres, feet, millimetres, hectopascals.
+     * <p>
+     * This convenience method get the unit from the {@linkplain #getVerticalCRS vertical CRS},
+     * if any.
      */
     public Unit getUnit()  {
-        return unit;
+        return (verticalCRS != null) ? verticalCRS.getCoordinateSystem().getAxis(0).getUnit() : null;
     }
 
     /**
      * Set the vertical units used for vertical extent information.
      * Examples: metres, feet, millimetres, hectopascals.
+     *
+     * @deprecated Use {@link #setVerticalCRS} instead.
      */
     public synchronized void setUnit(final Unit newValue) {
         checkWritePermission();
-        unit = newValue;
+        throw new UnsupportedOperationException("Use setVerticalCRS instead.");
     }
 
     /**
      * Provides information about the origin from which the
      * maximum and minimum elevation values are measured.
-     * 
-     * @deprecated use getVerticalCRS
+     * <p>
+     * @deprecated Use {@link #getVerticalCRS} instead.
      */
     public VerticalDatum getVerticalDatum()  {
-        return verticalDatum;
+        return (verticalCRS != null) ? (VerticalDatum) verticalCRS.getDatum() : null;
     }
-    
+
     /**
      * Set information about the origin from which the
      * maximum and minimum elevation values are measured.
-     * 
-     * @deprecated use setVerticalCRS
+     *
+     * @deprecated Use {@link #setVerticalCRS} instead.
      */
-    public synchronized void setVerticalDatum(final VerticalDatum newValue ) {
+    public synchronized void setVerticalDatum(final VerticalDatum newValue) {
         checkWritePermission();
-        verticalDatum = newValue;
+        throw new UnsupportedOperationException("Use setVerticalCRS instead.");
     }
-    
+
     /**
      * Declare this metadata and all its attributes as unmodifiable.
      */
     protected void freeze() {
         super.freeze();
-        unit          = (Unit)          unmodifiable(unit);
-        verticalDatum = (VerticalDatum) unmodifiable(verticalDatum);
+        verticalCRS = (VerticalCRS) unmodifiable(verticalCRS);
     }
 
     /**
@@ -191,12 +214,9 @@ public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent
         }
         if (object!=null && object.getClass().equals(getClass())) {
             final VerticalExtentImpl that = (VerticalExtentImpl) object;
-            return Utilities.equals(this.unit,           that.unit          ) &&
-                   Utilities.equals(this.verticalDatum,  that.verticalDatum ) &&
-                   Double.doubleToLongBits(this.minimumValue.doubleValue()) ==
-                   Double.doubleToLongBits(that.minimumValue.doubleValue()) &&
-                   Double.doubleToLongBits(this.maximumValue.doubleValue()) ==
-                   Double.doubleToLongBits(that.maximumValue.doubleValue());
+            return Utilities.equals(this.verticalCRS,  that.verticalCRS ) &&
+                   Utilities.equals(this.minimumValue, that.minimumValue) &&
+                   Utilities.equals(this.maximumValue, that.maximumValue);
         }
         return false;
     }
@@ -206,8 +226,9 @@ public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent
      */
     public synchronized int hashCode() {
         int code = (int)serialVersionUID;
-        if (unit          != null) code ^= unit         .hashCode();
-        if (verticalDatum != null) code ^= verticalDatum.hashCode();
+        if (verticalCRS  != null) code ^= verticalCRS .hashCode();
+        if (minimumValue != null) code  = minimumValue.hashCode() + 37*code;
+        if (maximumValue != null) code  = maximumValue.hashCode() + 37*code;
         return code;
     }
 
@@ -215,11 +236,6 @@ public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent
      * Returns a string representation of this extent.
      */
     public String toString() {
-        return String.valueOf(verticalDatum);
-    }
-
-    // TODO: provide CRS
-    public CoordinateReferenceSystem getVerticalCRS() {
-        return null; // can probably create from verticalData, min/max unit info
+        return String.valueOf(verticalCRS);
     }
 }

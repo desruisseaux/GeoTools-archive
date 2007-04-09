@@ -264,7 +264,7 @@ public class GeorectifiedImpl extends GridSpatialRepresentationImpl implements G
         if (object == this) {
             return true;
         }
-        if (object!=null && object.getClass().equals(getClass())) {
+        if (super.equals(object)) {
             final GeorectifiedImpl that = (GeorectifiedImpl) object; 
             return Utilities.equals(this.checkPointDescription,              that.checkPointDescription             ) &&
                    Utilities.equals(this.cornerPoints,                       that.cornerPoints                      ) &&

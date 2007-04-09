@@ -95,7 +95,7 @@ public class BoundingPolygonImpl extends GeographicExtentImpl implements Boundin
         if (object == this) {
             return true;
         }
-        if (object!=null && object.getClass().equals(getClass())) {
+        if (super.equals(object)) {
             final BoundingPolygonImpl that = (BoundingPolygonImpl) object;
             return Utilities.equals(this.polygons, that.polygons);
         }

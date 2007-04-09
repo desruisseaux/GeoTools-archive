@@ -25,11 +25,10 @@ import java.util.Date;
 // OpenGIS dependencies
 import org.opengis.metadata.extent.TemporalExtent;
 import org.opengis.temporal.TemporalPrimitive;
-import org.opengis.geometry.primitive.Primitive;
-import org.opengis.geometry.primitive.PrimitiveBoundary;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -63,8 +62,13 @@ public class TemporalExtentImpl extends MetadataEntity implements TemporalExtent
      * of {@link Long#MIN_VALUE} means that this attribute is not set.
      */
     private long endTime = Long.MIN_VALUE;
-    
-   /**
+
+    /**
+     * The date and time for the content of the dataset.
+     */
+    private TemporalPrimitive extent;
+
+    /**
      * Constructs an initially empty temporal extent.
      */
     public TemporalExtentImpl() {
@@ -99,7 +103,7 @@ public class TemporalExtentImpl extends MetadataEntity implements TemporalExtent
     public synchronized Date getEndTime() {
         return (endTime!=Long.MIN_VALUE) ? new Date(endTime) : null;
     }
-    
+
     /**
      * Set the end date and time for the content of the dataset.
      */
@@ -109,7 +113,26 @@ public class TemporalExtentImpl extends MetadataEntity implements TemporalExtent
     }
 
     /**
-     * Compare this TemporalExtent with the specified object for equality.
+     * Returns the date and time for the content of the dataset.
+     *
+     * @since 2.4
+     */
+    public TemporalPrimitive getExtent() {
+        return extent;
+    }
+
+    /**
+     * Set the date and time for the content of the dataset.
+     *
+     * @since 2.4
+     */
+    public synchronized void setExtent(final TemporalPrimitive newValue) {
+        checkWritePermission();
+        extent = newValue;
+    }
+
+    /**
+     * Compare this temporal extent with the specified object for equality.
      */
     public synchronized boolean equals(final Object object) {
         if (object == this) {
@@ -118,7 +141,8 @@ public class TemporalExtentImpl extends MetadataEntity implements TemporalExtent
         if (object!=null && object.getClass().equals(getClass())) {
             final TemporalExtentImpl that = (TemporalExtentImpl) object;
             return this.startTime == that.startTime &&
-                   this.endTime   == that.endTime;
+                   this.endTime   == that.endTime   &&
+                   Utilities.equals(this.extent, that.extent);
         }
         return false;
     }
@@ -139,12 +163,4 @@ public class TemporalExtentImpl extends MetadataEntity implements TemporalExtent
     public String toString() {
         return String.valueOf(startTime);
     }
-
-    /**
-     * TODO What is needed here?
-     */
-    public TemporalPrimitive getExtent() {
-        return null;
-    }
-    
 }

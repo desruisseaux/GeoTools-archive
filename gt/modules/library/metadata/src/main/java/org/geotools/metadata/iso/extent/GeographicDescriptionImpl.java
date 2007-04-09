@@ -93,7 +93,7 @@ public class GeographicDescriptionImpl extends GeographicExtentImpl
         if (object == this) {
             return true;
         }
-        if (object!=null && object.getClass().equals(getClass())) {
+        if (super.equals(object)) {
             final GeographicDescriptionImpl that = (GeographicDescriptionImpl) object;
             return Utilities.equals(this.geographicIdentifier, that.geographicIdentifier);
         }

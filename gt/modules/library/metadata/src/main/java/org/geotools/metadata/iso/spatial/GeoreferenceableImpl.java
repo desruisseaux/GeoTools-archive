@@ -209,7 +209,7 @@ public class GeoreferenceableImpl extends GridSpatialRepresentationImpl implemen
         if (object == this) {
             return true;
         }
-        if (object!=null && object.getClass().equals(getClass())) {
+        if (super.equals(object)) {
             final GeoreferenceableImpl that = (GeoreferenceableImpl) object; 
             return Utilities.equals(this.parameters,
                                     that.parameters) &&

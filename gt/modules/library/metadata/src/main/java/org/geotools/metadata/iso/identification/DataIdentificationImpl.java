@@ -314,7 +314,7 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
         if (object == this) {
             return true;
         }
-        if (object!=null && object.getClass().equals(getClass())) {
+        if (super.equals(object)) {
             final DataIdentificationImpl that = (DataIdentificationImpl) object;
             return Utilities.equals(this.spatialRepresentationTypes, that.spatialRepresentationTypes   ) &&
                    Utilities.equals(this.spatialResolutions,         that.spatialResolutions           ) &&

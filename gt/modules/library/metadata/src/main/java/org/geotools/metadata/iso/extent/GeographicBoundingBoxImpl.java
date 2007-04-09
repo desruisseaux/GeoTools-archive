@@ -138,9 +138,9 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
     public GeographicBoundingBoxImpl(final Envelope envelope) throws TransformException {
         super(true);
         if (constructor == null) {
-            // No need to synchronize.
-            constructor = getMethod("copy",  new Class[] {
-                            Envelope.class, GeographicBoundingBoxImpl.class});
+            // No need to synchronize; not a big deal if we set this field twice.
+            constructor = getMethod("copy",
+                    new Class[] {Envelope.class, GeographicBoundingBoxImpl.class});
         }
         try {
             invoke(constructor, new Object[] {envelope, this});
@@ -277,7 +277,12 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
         final double xmax = box.getEastBoundLongitude();
         final double ymin = box.getSouthBoundLatitude();
         final double ymax = box.getNorthBoundLatitude();
-        if (getInclusion() == box.getInclusion()) {
+        /*
+         * Reminder: 'inclusion' is a mandatory attribute, so it should never be null for a
+         * valid metadata object.  If the metadata object is invalid, it is better to get a
+         * NullPointerException than having a code doing silently some inappropriate work.
+         */
+        if (getInclusion().booleanValue() == box.getInclusion().booleanValue()) {
             if (xmin < westBoundLongitude) westBoundLongitude = xmin;
             if (xmax > eastBoundLongitude) eastBoundLongitude = xmax;
             if (ymin < southBoundLatitude) southBoundLatitude = ymin;
@@ -308,7 +313,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
         if (object == this) {
             return true;
         }
-        if (object!=null && object.getClass().equals(getClass())) {
+        if (super.equals(object)) {
             final GeographicBoundingBoxImpl that = (GeographicBoundingBoxImpl) object;
             return Double.doubleToLongBits(this.southBoundLatitude) ==
                    Double.doubleToLongBits(that.southBoundLatitude) &&

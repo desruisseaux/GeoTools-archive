@@ -116,6 +116,9 @@ public class RepresentativeFractionImpl extends Number implements Representative
      * Returns the number below the line in a vulgar fraction.
      */
     public int getDenominator() {
+        if (denominator < Integer.MIN_VALUE || denominator > Integer.MAX_VALUE) {
+            throw new IllegalStateException(); // API change required.
+        }
         return (int) denominator;
     }
 
@@ -124,14 +127,13 @@ public class RepresentativeFractionImpl extends Number implements Representative
      */
     public boolean equals(final Object object) {
         /*
-         * We require the exact same implementation because the 'equals(Object)' and 'hashCode()'
-         * contracts are not defined in the interface. Without such contract, we can not ensure
-         * the following requirements for arbitrary implementations:
+         * Note: 'equals(Object)' and 'hashCode()' implementations are defined in the interface,
+         * in order to ensure that the following requirements hold:
          *
          * - a.equals(b) == b.equals(a)   (reflexivity)
          * - a.equals(b) implies (a.hashCode() == b.hashCode())
          */
-        if (object!=null && object instanceof RepresentativeFraction ){
+        if (object instanceof RepresentativeFraction) {
             final RepresentativeFraction that = (RepresentativeFraction) object;
             return denominator == that.getDenominator();
         }
@@ -142,6 +144,6 @@ public class RepresentativeFractionImpl extends Number implements Representative
      * Returns a hash value for this representative fraction.
      */
     public int hashCode() {
-        return (int)serialVersionUID ^ (int)denominator;
+        return (int) denominator;
     }
 }

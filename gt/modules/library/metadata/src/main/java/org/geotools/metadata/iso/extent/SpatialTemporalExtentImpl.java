@@ -105,7 +105,7 @@ public class SpatialTemporalExtentImpl extends TemporalExtentImpl implements Spa
         if (object == this) {
             return true;
         }
-        if (object!=null && object.getClass().equals(getClass())) {
+        if (super.equals(object)) {
             final SpatialTemporalExtentImpl that = (SpatialTemporalExtentImpl) object;
             return Utilities.equals(this.spatialExtent, that.spatialExtent);
         }

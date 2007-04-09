@@ -182,6 +182,12 @@ public class ExtentImpl extends MetadataEntity implements Extent {
                  * ones (if any). All exclusion boxes before the first inclusion box are ignored.
                  */
                 if (candidate == null) {
+                    /*
+                     * Reminder: 'inclusion' is a mandatory attribute, so it should never be
+                     * null for a valid metadata object.  If the metadata object is invalid,
+                     * it is better to get a NullPointerException than having a code doing
+                     * silently some probably inappropriate work.
+                     */
                     if (bounds.getInclusion().booleanValue()) {
                         candidate = bounds;
                     }
@@ -223,7 +229,7 @@ public class ExtentImpl extends MetadataEntity implements Extent {
             return Utilities.equals(this.description,        that.description       ) &&
                    Utilities.equals(this.geographicElements, that.geographicElements) &&
                    Utilities.equals(this.temporalElements,   that.temporalElements  ) &&
-                   Utilities.equals(this.verticalElements,   that.verticalElements  )  ;
+                   Utilities.equals(this.verticalElements,   that.verticalElements  );
         }
         return false;
     }

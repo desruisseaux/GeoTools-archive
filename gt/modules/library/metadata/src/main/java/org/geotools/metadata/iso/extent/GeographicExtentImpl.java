@@ -24,6 +24,7 @@ import org.opengis.metadata.extent.GeographicExtent;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -40,7 +41,7 @@ public class GeographicExtentImpl extends MetadataEntity implements GeographicEx
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -1871146315280869971L;
+    private static final long serialVersionUID = -8844015895495563161L;
 
     /**
      * Indication of whether the bounding polygon encompasses an area covered by the data
@@ -67,7 +68,7 @@ public class GeographicExtentImpl extends MetadataEntity implements GeographicEx
      * Constructs a geographic extent initialized with the specified inclusion value.
      */
     public GeographicExtentImpl(final boolean inclusion) {
-        setInclusion(new Boolean(inclusion));
+        setInclusion(Boolean.valueOf(inclusion));
     }
 
     /**
@@ -105,7 +106,7 @@ public class GeographicExtentImpl extends MetadataEntity implements GeographicEx
         }
         if (object!=null && object.getClass().equals(getClass())) {
             final GeographicExtentImpl that = (GeographicExtentImpl) object;
-            return (this.inclusion == that.inclusion);
+            return Utilities.equals(this.inclusion, that.inclusion);
         }
         return false;
     }
@@ -115,7 +116,9 @@ public class GeographicExtentImpl extends MetadataEntity implements GeographicEx
      */
     public synchronized int hashCode() {
         int code = (int)serialVersionUID;
-        if (inclusion.booleanValue()) code = ~code;
+        if (inclusion != null) {
+            code ^= inclusion.hashCode();
+        }
         return code;
     }
 
