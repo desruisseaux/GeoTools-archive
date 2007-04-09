@@ -29,7 +29,9 @@ import org.geotools.data.Source;
 import org.geotools.data.feature.FeatureSource2;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.iso.AttributeFactoryImpl;
+import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
+import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureFactory;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
@@ -192,4 +194,12 @@ abstract class AbstractMappingFeatureIterator implements Iterator/* <Feature> */
         return fid;
     }
 
+    protected Object getValue(Expression expression, ComplexAttribute sourceFeature) {
+        Object value;
+        value = expression.evaluate(sourceFeature);
+        if(value instanceof Attribute){
+            value = ((Attribute)value).get();
+        }
+        return value;
+    }
 }

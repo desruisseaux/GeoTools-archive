@@ -372,7 +372,7 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
                 index++;
                 Feature sourceFeature = (Feature) it.next();
                 try {
-                    value = expression.evaluate(sourceFeature);
+                    value = getValue(expression, sourceFeature);
                 } catch (Exception e) {
                     // HACK: what we actually need to resolve is dealing
                     // with queries that restricts the attributes returned
@@ -395,7 +395,7 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
         } else {
 
             try {
-                value = expression.evaluate(source);
+                value = getValue(expression, source);
 
                 // if target has id construct the id value from source
                 String id = extractIdForAttribute(attMapping,
@@ -443,7 +443,7 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
         for (Iterator itr = group.iterator(); itr.hasNext();) {
             Feature sourceFeature = (Feature) itr.next();
             try {
-                value = sourceExpression.evaluate(sourceFeature);
+                value = getValue(sourceExpression, sourceFeature);
             } catch (Exception e) {
                 // HACK: what we actually need to resolve is dealing
                 // with queries that restricts the attributes returned
@@ -490,7 +490,7 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
             org.opengis.feature.type.Name propName = (org.opengis.feature.type.Name) entry.getKey();
             Expression propExpr = (Expression) entry.getValue();
 
-            Object propValue = propExpr.evaluate(source);
+            Object propValue = getValue(propExpr, source);
 
             nodeAttributes.put(propName, propValue);
         }

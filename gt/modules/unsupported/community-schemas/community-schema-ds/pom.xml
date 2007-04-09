@@ -115,6 +115,10 @@
 			<version>2.4-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>xpp3</groupId>
+			<artifactId>xpp3</artifactId>
+		</dependency>
 	</dependencies>
 
 

@@ -24,6 +24,7 @@ import java.util.List;
 import org.geotools.data.Query;
 import org.geotools.data.complex.filter.XPath;
 import org.geotools.feature.iso.AttributeBuilder;
+import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -93,7 +94,7 @@ class DefaultMappingFeatureIterator extends AbstractMappingFeatureIterator {
                     targetNodeName, targetXpathProperty));
             AttributeType targetNodeType = attMapping.getTargetNodeInstance();
 
-            Object value = sourceExp.evaluate(sourceInstance);
+            Object value = super.getValue(sourceExp, sourceInstance);
             id = extractIdForAttribute(attMapping, sourceInstance);
 
             xpathAttributeBuilder.set(mapped, targetXpathProperty, value, id,
