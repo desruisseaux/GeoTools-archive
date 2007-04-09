@@ -17,12 +17,12 @@ package org.geotools.data.store;
 
 import java.io.IOException;
 import java.util.List;
-
+import org.opengis.feature.type.TypeName;
+import org.opengis.filter.Filter;
 import org.geotools.catalog.GeoResourceInfo;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureList;
-import org.opengis.feature.type.TypeName;
-import org.opengis.filter.Filter;
+
 
 /**
  * Class is used to provide data access for ContentDataStore.
@@ -30,37 +30,36 @@ import org.opengis.filter.Filter;
  * @author Jody Garnett, Refractions Research Inc.
  */
 public abstract class Content {
-    
     /**
      * List of TypeNames indicating available content.
      * @return List<TypeName>
      */
     public abstract List getTypeNames() throws IOException;
-    
+
     /**
      * Summary information, providing access to such metadata as is available.
      * <p>
      * Metadata is usually available in file headers, table information
      * or data descriptors.
      */
-    public abstract GeoResourceInfo info( ContentState state );
-    
+    public abstract GeoResourceInfo info(ContentState state);
+
     /**
      * Produce an entry representing the provided typeName.
      * @param dataStore
      * @param typeName
      * @return entry representing the provided typeName
      */
-    public abstract ContentEntry entry( ContentDataStore dataStore, TypeName typeName );
-    
+    public abstract ContentEntry entry(ContentDataStore dataStore, TypeName typeName);
+
     /**
      * Track per transaction state.
-     * 
+     *
      * @param entry
      * @return per transaction state.
      */
-    public abstract ContentState state( ContentEntry entry );
-    
+    public abstract ContentState state(ContentEntry entry);
+
     /**
      * FeatureCollection representing the entire contents.
      * <p>
@@ -69,12 +68,12 @@ public abstract class Content {
      * <li>getFeatures()
      * <li>getFeatures( Filter.INCLUDES )
      * </ul>
-     * 
+     *
      * @param state
      * @return all content
      */
-    public abstract FeatureCollection all( ContentState state );
-    
+    public abstract FeatureCollection all(ContentState state);
+
     /**
      * FeatureCollection representing a subset of available content.
      * <p>
@@ -87,8 +86,8 @@ public abstract class Content {
      * @param filter
      * @return subset of content
      */
-    public abstract FeatureCollection filter( ContentState state, Filter filter );
-    
+    public abstract FeatureCollection filter(ContentState state, Filter filter);
+
     /**
      * FeatureList representing sorted content.
      * <p>
@@ -103,8 +102,8 @@ public abstract class Content {
      * @param order List<SortBy> used to determine sort order
      * @return subset of content
      */
-    public abstract FeatureList sorted( ContentState state, Filter filter, List order );
-    
+    public abstract FeatureList sorted(ContentState state, Filter filter, List order);
+
     /**
      * FeatureCollection optimized for read-only access.
      * <p>
@@ -120,6 +119,6 @@ public abstract class Content {
      * @param state
      * @param filter
      * @return readonly access
-     */    
-    public abstract FeatureCollection readonly( ContentState state, Filter filter );
+     */
+    public abstract FeatureCollection readonly(ContentState state, Filter filter);
 }

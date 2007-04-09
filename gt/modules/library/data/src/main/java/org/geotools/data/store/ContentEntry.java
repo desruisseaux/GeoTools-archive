@@ -17,75 +17,82 @@ package org.geotools.data.store;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.geotools.data.Transaction;
 import org.opengis.feature.type.TypeName;
+import org.geotools.data.Transaction;
+
 
 /**
- * Captures all content information that does not change.
+ * An entry for a type provided by a datastore.
+ * <p>
+ * A content entry maintains the "state" of an entry for a particular
+ * transaction.
+ * </p>
  *
  * @author Jody Garnett, Refractions Research Inc.
+ * @author Justin Deoliveira, The Open Planning Project
  */
-public abstract class ContentEntry {
+public final class ContentEntry {
     /**
-     * TypeName (storngly typed) for this content.
+     * Qualified name of the entry.
      */
-    private final TypeName typeName;
-    
+    TypeName typeName;
+
     /**
      * Map<Transaction,ContentState> state according to Transaction.
      */
-    private final Map state;
-    
-    /** Backpointer to parent */
-    protected ContentDataStore dataStore;
-    
+    Map state;
+
     /**
-     * Subclass must provide typeName.
-     * 
-     * @param typeName
+     * Backpointer to datastore
      */
-    protected ContentEntry( ContentDataStore dataStore, TypeName typeName ){
+    ContentDataStore dataStore;
+
+    protected ContentEntry(ContentDataStore dataStore, TypeName typeName) {
         this.typeName = typeName;
-        this.state = new HashMap();
-        
         this.dataStore = dataStore;
-        ContentState autoState = dataStore.content.state( this );
-        this.state.put( Transaction.AUTO_COMMIT, autoState );
-    }
-    
-    public final TypeName getName() {
-        return typeName;
-    }
-    
-    public final String getTypeName(){
-        return typeName.getLocalPart();
-    }
-    
-    /**
-     * @return Back pointer to the datastore.
-     */
-    public ContentDataStore getDataStore() {
-		return dataStore;
-	}
-    
-    public String toString() {
-        return getTypeName() + " ContentEntry";
+
+        this.state = new HashMap();
+
+        //create a state for the auto commit transaction
+        ContentState autoState = new ContentState(this);
+        this.state.put(Transaction.AUTO_COMMIT, autoState);
     }
 
-    /** Grab the per transaction state */
-    public final ContentState getState( Transaction transaction ){
-        if( state.containsKey( transaction )){
-            return (ContentState) state.get( transaction );
-        }
-        else {
-            ContentState auto = (ContentState) state.get( Transaction.AUTO_COMMIT );            
+    public TypeName getName() {
+        return typeName;
+    }
+
+    public String getTypeName() {
+        return typeName.getLocalPart();
+    }
+
+    public ContentDataStore getDataStore() {
+        return dataStore;
+    }
+
+    /**
+     * Returns state for the entry for a particular transaction.
+     * <p>
+     * In the event that no state exists for the supplied transaction one will
+     * be created by copying the state of {@link Transaction#AUTO_COMMIT}.
+     * </p>
+     * @param transaction A transaction.
+     *
+     * @return The state for the transaction.
+     */
+    public ContentState getState(Transaction transaction) {
+        if (state.containsKey(transaction)) {
+            return (ContentState) state.get(transaction);
+        } else {
+            ContentState auto = (ContentState) state.get(Transaction.AUTO_COMMIT);
             ContentState copy = (ContentState) auto.copy();
-            state.put( transaction, copy );
-            
+            state.put(transaction, copy);
+
             return copy;
         }
-    }    
-    
-    
+    }
+
+    public String toString() {
+        return getTypeName();
+    }
 }
