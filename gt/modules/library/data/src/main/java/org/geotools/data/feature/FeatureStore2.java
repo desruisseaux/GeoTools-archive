@@ -18,6 +18,7 @@ package org.geotools.data.feature;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Store;
 
+
 /**
  * Provides access to features.
  * <p>
@@ -29,5 +30,4 @@ import org.geotools.data.Store;
  * @author Jody Garnett, Refractions Research Inc.
  */
 public interface FeatureStore2 extends FeatureStore, Store {
-
 }

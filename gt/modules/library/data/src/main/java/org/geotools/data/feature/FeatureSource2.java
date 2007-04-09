@@ -18,6 +18,7 @@ package org.geotools.data.feature;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Source;
 
+
 /**
  * Provides access to features.
  * <p>
@@ -29,5 +30,4 @@ import org.geotools.data.Source;
  * @author Jody Garnett, Refractions Research Inc.
  */
 public interface FeatureSource2 extends FeatureSource, Source {
-
 }

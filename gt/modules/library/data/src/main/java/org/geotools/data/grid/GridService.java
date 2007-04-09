@@ -17,9 +17,9 @@ package org.geotools.data.grid;
 
 import java.io.IOException;
 import java.util.List;
-
 import org.geotools.catalog.Service;
 import org.geotools.util.ProgressListener;
+
 
 /**
  * Service handle describing a source of raster data.
@@ -33,15 +33,15 @@ import org.geotools.util.ProgressListener;
  * @author Jody Garnett, Refractions Research Inc.
  */
 public interface GridService extends Service {
-
     /**
      * Describes the connection status of the "preferred" resource,
      * ie the same one described by the Service.getMessage().
-     * 
-     * TODO steal description of this concept from uDig javadocs 
+     *
+     * TODO steal description of this concept from uDig javadocs
      */
-    List/**ConnectionStatus*/ getConnectionStatus(); // TODO: Consider this as an extention to Serice that let's us hack at warnings in a user friendly fashion
-    
+    List 
+    /**ConnectionStatus*/ getConnectionStatus(); // TODO: Consider this as an extention to Serice that let's us hack at warnings in a user friendly fashion
+
     /**
      * Provide access to our preferred resourc (ie GridAccess)
      * <p>
@@ -50,9 +50,9 @@ public interface GridService extends Service {
      * @return GridAccess
      */
     GridAccess access();
-    
+
     /**
      * @return List<GridGeoResource>
      */
-    List members( ProgressListener monitor ) throws IOException;
+    List members(ProgressListener monitor) throws IOException;
 }

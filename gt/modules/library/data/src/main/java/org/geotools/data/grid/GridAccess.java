@@ -16,11 +16,11 @@
 package org.geotools.data.grid;
 
 import java.util.List;
-
+import org.opengis.feature.type.TypeName;
 import org.geotools.catalog.ServiceInfo;
 import org.geotools.data.DataAccess;
 import org.geotools.data.Source;
-import org.opengis.feature.type.TypeName;
+
 
 /**
  * This is an example of using DataAccess proposal to access raster content.
@@ -28,31 +28,30 @@ import org.opengis.feature.type.TypeName;
  * @deprecated This is a Proposal, we need your feedback!
  * @author Jody Garnett, Refractions Research Inc.
  */
-public interface GridAccess extends DataAccess/*<GridCoverage,GridCoverageDescription>*/  {
-    
-    /** Names of avaiable content. */    
-    List/*<TypeName*/ getTypeNames();
-    
+public interface GridAccess extends DataAccess /*<GridCoverage,GridCoverageDescription>*/ {
+    /** Names of avaiable content. */
+    List /*<TypeName*/ getTypeNames();
+
     /**
      * Metadata about this access point
-     * 
+     *
      * @return GridServiceInfo ?
      */
     ServiceInfo getInfo();
-    
+
     /**
      * Description of GridCoverageDescription.
-     * 
+     *
      * @return GridCoverageDescription
      */
-    public Object /*GridCoverageDescription*/ describe( TypeName typeName );
-       
+    public Object /*GridCoverageDescription*/ describe(TypeName typeName);
+
     /**
-     * 
+     *
      *@return GridSource
      */
-    public Source access( TypeName typeName );
-    
+    public Source access(TypeName typeName);
+
     /**
      * This will free any cached info object or header information.
      * <p>

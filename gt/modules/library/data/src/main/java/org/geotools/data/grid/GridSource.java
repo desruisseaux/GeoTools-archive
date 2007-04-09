@@ -16,35 +16,34 @@
 package org.geotools.data.grid;
 
 import java.util.Collection;
-
-import org.geotools.catalog.GeoResourceInfo;
-import org.geotools.data.Source;
-import org.geotools.data.Transaction;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.capability.FilterCapabilities;
+import org.geotools.catalog.GeoResourceInfo;
+import org.geotools.data.Source;
+import org.geotools.data.Transaction;
+
 
 /**
  * Allows readonly access to a single GridCoverage.
- * 
+ *
  * @since 2.4
  * @deprecated This is a Proposal, we need your feedback!
  * @author Jody Garnett, Refractions Research Inc.
  */
 public interface GridSource extends Source {
-
     public Name getName();
 
     /**
      * Human readible description of content (title, icon, etc...).
-     * 
+     *
      * @return Information about content
      */
     GeoResourceInfo getInfo();
-    
+
     /**
      * Direct description about content, often from content header.
-     * 
+     *
      * @see GridAccess#describe(org.opengis.feature.type.TypeName)
      * @return GridCoverageDescription
      */
@@ -55,7 +54,7 @@ public interface GridSource extends Source {
      * selecting content.
      */
     public FilterCapabilities getFilterCapabilities();
-    
+
     /**
      * Provides independence between sessions.
      * <p>
@@ -64,18 +63,19 @@ public interface GridSource extends Source {
      * change (an example would be providing a visualization of a grid coverage
      * as it is convolved).
      */
-    public void setTransaction( Transaction t );
-    
+    public void setTransaction(Transaction t);
+
     /**
      * Retrive all content, read-only.
      * <p>
      * Collection of (one or more in the case of tiles) GridCoverage. If we are cool the collection
      * can be spatial indexed as per FeatureCollection.subCollection( filter ) example.
      * </p>
-     * 
+     *
      * @return Collection<GridCoverage> read-only
      */
-    public Collection/** <GridCoverage> */
+    public Collection 
+    /** <GridCoverage> */
     content();
 
     /**
@@ -84,19 +84,18 @@ public interface GridSource extends Source {
      * If we are cool the collection can be spatial indexed as per FeatureCollection.subCollection(
      * filter ) example.
      * </p>
-     * 
+     *
      * @return Collection<GridCoverage> read-only
      */
-    public Collection content( Filter filter );
+    public Collection content(Filter filter);
 
     /**
      * Retrive indicated content, read-only.
      */
-    public Collection content( String query, String queryLanguage );
+    public Collection content(String query, String queryLanguage);
 
     /**
      * Clean up any cached content, or if only user file channel.
      */
     public void dispose();
-    
 }
