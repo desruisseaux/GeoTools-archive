@@ -17,6 +17,9 @@
  */
 package org.geotools.renderer.lite;
 
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
@@ -25,13 +28,18 @@ import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
+import org.geotools.data.DataUtilities;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
@@ -41,6 +49,7 @@ import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.renderer.RenderListener;
 import org.geotools.test.TestData;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
@@ -51,6 +60,7 @@ import org.geotools.styling.Rule;
 import org.geotools.styling.SLDParser;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
+import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.StyledLayerDescriptor;
@@ -60,11 +70,14 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.TopologyException;
@@ -1102,4 +1115,93 @@ public class Rendering2DTest extends TestCase {
 		LOGGER.info(Double.toString(s));
 		// assertTrue(Math.abs(102355 - s) < 10); // 102355.1639202933
 	}
+    
+    public void testRenderEmptyLine() throws SchemaException, IllegalAttributeException {
+        GeometryFactory gf = new GeometryFactory();
+        StyleBuilder sb = new StyleBuilder();
+        FeatureType pointType = DataUtilities.createType("emptyLines", "geom:LineString,name:String");
+        Feature f = pointType.create(new Object[] {gf.createLineString((Coordinate[]) null), "name" });
+        Style style = sb.createStyle(sb.createLineSymbolizer());
+        
+        renderEmptyGeometry(f, style);
+    }
+    
+    public void testRenderEmptyCollection() throws SchemaException, IllegalAttributeException {
+        GeometryFactory gf = new GeometryFactory();
+        StyleBuilder sb = new StyleBuilder();
+        FeatureType pointType = DataUtilities.createType("emptyPolygon", "geom:MultiPolygon,name:String");
+        Feature f = pointType.create(new Object[] {gf.createMultiPolygon((Polygon[]) null), "name" });
+        Style style = sb.createStyle(sb.createPolygonSymbolizer());
+        
+        renderEmptyGeometry(f, style);
+    }
+    
+    public void testRenderCollectionWithEmptyItems() throws SchemaException, IllegalAttributeException {
+        GeometryFactory gf = new GeometryFactory();
+        StyleBuilder sb = new StyleBuilder();
+        FeatureType pointType = DataUtilities.createType("emptyPolygon", "geom:MultiPolygon,name:String");
+        Polygon p1 = gf.createPolygon(gf.createLinearRing((Coordinate[]) null), null);
+        Polygon p2 = gf.createPolygon(gf.createLinearRing(new Coordinate[] {new Coordinate(0,0), 
+                new Coordinate(1, 1), new Coordinate(1, 0), new Coordinate(0,0)}), null);
+        MultiPolygon mp = gf.createMultiPolygon(new Polygon[] {p1, p2});
+        Feature f = pointType.create(new Object[] {mp, "name" });
+        Style style = sb.createStyle(sb.createPolygonSymbolizer());
+        
+        renderEmptyGeometry(f, style);
+    }
+    
+    public void testRenderPolygonEmptyRings() throws SchemaException, IllegalAttributeException {
+        GeometryFactory gf = new GeometryFactory();
+        StyleBuilder sb = new StyleBuilder();
+        FeatureType pointType = DataUtilities.createType("emptyRings", "geom:MultiPolygon,name:String");
+        LinearRing emptyRing = gf.createLinearRing((Coordinate[]) null);
+        LinearRing realRing = gf.createLinearRing(new Coordinate[] {new Coordinate(0,0), 
+                        new Coordinate(1, 1), new Coordinate(1, 0), new Coordinate(0,0)});
+        Polygon p1 = gf.createPolygon(realRing, new LinearRing[] {emptyRing});
+        Polygon p2 = gf.createPolygon(emptyRing, new LinearRing[] {emptyRing});
+        MultiPolygon mp = gf.createMultiPolygon(new Polygon[] {p1, p2});
+        Feature f = pointType.create(new Object[] {mp, "name" });
+        Style style = sb.createStyle(sb.createPolygonSymbolizer());
+        
+        renderEmptyGeometry(f, style);
+    }
+    
+    public void testMixedEmptyMultiLine() throws SchemaException, IllegalAttributeException {
+        GeometryFactory gf = new GeometryFactory();
+        StyleBuilder sb = new StyleBuilder();
+        FeatureType pointType = DataUtilities.createType("emptyRings", "geom:MultiLineString,name:String");
+        LineString emptyLine = gf.createLineString((Coordinate[]) null);
+        LineString realLine = gf.createLineString(new Coordinate[] {new Coordinate(0,0), 
+                        new Coordinate(1, 1)});
+        MultiLineString mls = gf.createMultiLineString(new LineString[] {emptyLine, realLine});
+        Feature f = pointType.create(new Object[] {mls, "name" });
+        Style style = sb.createStyle(sb.createPolygonSymbolizer());
+        
+        renderEmptyGeometry(f, style);
+    }
+    
+    
+
+    private void renderEmptyGeometry(Feature f, Style style) {
+        FeatureCollection fc = DataUtilities.collection(f);
+        MapContext mc = new DefaultMapContext();
+        mc.addLayer(fc, style);
+        StreamingRenderer sr = new StreamingRenderer();
+        sr.setContext(mc);
+        BufferedImage bi = new BufferedImage(640, 480, BufferedImage.TYPE_4BYTE_ABGR);
+        sr.addRenderListener(new RenderListener() {
+        
+            public void featureRenderer(Feature feature) {
+            }
+        
+            public void errorOccurred(Exception e) {
+                e.printStackTrace();
+                fail("Got an exception during rendering, this should not happen, " +
+                        "not even with emtpy geometries");
+            }
+        
+        });
+        sr.paint((Graphics2D) bi.getGraphics(), new Rectangle(640, 480), 
+                new ReferencedEnvelope(new Envelope(0, 10, 0, 10), DefaultGeographicCRS.WGS84));
+    }
 }
