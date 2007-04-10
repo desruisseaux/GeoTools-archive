@@ -36,6 +36,8 @@ import org.opengis.util.InternationalString;
 // Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -96,7 +98,7 @@ public class ElementImpl extends MetadataEntity implements Element {
      * come of evaluating the obtained value (or set of values) against a specified
      * acceptable conformance quality level.
      */
-    private Result result;
+    private Collection/*<Result>*/ results;
 
     /**
      * Constructs an initially empty element.
@@ -204,14 +206,14 @@ public class ElementImpl extends MetadataEntity implements Element {
     /**
      * Returns the date or range of dates on which a data quality measure was applied.
      * The array length is 1 for a single date, or 2 for a range. Returns
-     * {@code null} if this information is not available.
+     * an empty list if this information is not available.
      */
     public synchronized Collection getDate() {
         if (date1 == Long.MIN_VALUE) {
-            return null;
+            return Collections.EMPTY_LIST;
         }
         if (date2 == Long.MIN_VALUE) {
-            return Collections.singleton( new Date(date1) );
+            return Collections.singleton(new Date(date1));
         }
         return Arrays.asList(
             new Date[] {new Date(date1), new Date(date2)}
@@ -220,14 +222,25 @@ public class ElementImpl extends MetadataEntity implements Element {
 
     /**
      * Set the date or range of dates on which a data quality measure was applied.
+     * The collection size is 1 for a single date, or 2 for a range.
+     */
+    public void setDate(final Collection/*<Date>*/ newValues) {
+        setDate((Date[]) newValues.toArray(new Date[newValues.size()]));
+    }
+
+    /**
+     * Set the date or range of dates on which a data quality measure was applied.
      * The array length is 1 for a single date, or 2 for a range.
+     *
+     * @deprecated Use {@link #setDate(Collection)} instead.
      */
     public synchronized void setDate(final Date[] newValue) {
         checkWritePermission();
         date1 = date2 = Long.MIN_VALUE;
         if (newValue != null) {
             switch (newValue.length) {
-                default: throw new IllegalArgumentException(); // TODO: provide a localized message
+                default: throw new IllegalArgumentException(
+                        Errors.format(ErrorKeys.MISMATCHED_ARRAY_LENGTH));
                 case  2: date2 = newValue[1].getTime(); // Fall through
                 case  1: date1 = newValue[0].getTime(); // Fall through
                 case  0: break;
@@ -235,23 +248,53 @@ public class ElementImpl extends MetadataEntity implements Element {
         }
     }
 
-    /**
-     * Returns the value (or set of values) obtained from applying a data quality measure or
-     * the out come of evaluating the obtained value (or set of values) against a specified
-     * acceptable conformance quality level.
-     */
+//    /**
+//     * Returns the value (or set of values) obtained from applying a data quality measure or
+//     * the out come of evaluating the obtained value (or set of values) against a specified
+//     * acceptable conformance quality level.
+//     *
+//     * @deprecated Use {@link #getResults} instead.
+//     */
+//    public Result getResult() {
+//        final Collection results = getResults();
+//        return results.isEmpty() ? null : (Result) results.iterator().next();
+//    }
+    // Remove this method and uncomment the code above if 'getResult' is renamed 'getResults'.
     public Collection getResult() {
-        return Collections.singleton( result );
+        return getResults();
     }
 
     /**
      * Set the value (or set of values) obtained from applying a data quality measure or
      * the out come of evaluating the obtained value (or set of values) against a specified
      * acceptable conformance quality level.
+     *
+     * @deprecated Use {@link #setResults} instead.
      */
-    public synchronized void setResult(final Result newValue) {
-        checkWritePermission();
-        result = newValue;
+    public void setResult(final Result newValue) {
+        setResults(Collections.singleton(newValue));
+    }
+
+    /**
+     * Returns the value (or set of values) obtained from applying a data quality measure or
+     * the out come of evaluating the obtained value (or set of values) against a specified
+     * acceptable conformance quality level.
+     *
+     * @since 2.4
+     */
+    public synchronized Collection getResults() {
+        return results = nonNullCollection(results, Result.class);
+    }
+
+    /**
+     * Set the value (or set of values) obtained from applying a data quality measure or
+     * the out come of evaluating the obtained value (or set of values) against a specified
+     * acceptable conformance quality level.
+     *
+     * @since 2.4
+     */
+    public synchronized void setResults(final Collection/*<Result>*/ newValues) {
+        results = copyCollection(newValues, results, Result.class);
     }
     
     /**
@@ -264,7 +307,7 @@ public class ElementImpl extends MetadataEntity implements Element {
         measureDescription          = (InternationalString) unmodifiable(measureDescription);
         evaluationMethodDescription = (InternationalString) unmodifiable(evaluationMethodDescription);
         evaluationProcedure         = (Citation)            unmodifiable(evaluationProcedure);
-        result                      = (Result)              unmodifiable(result);
+        results                     = (Collection)          unmodifiable(results);
     }
 
     /**
@@ -282,7 +325,7 @@ public class ElementImpl extends MetadataEntity implements Element {
                    Utilities.equals(this.evaluationMethodType,        that.evaluationMethodType        ) &&
                    Utilities.equals(this.evaluationMethodDescription, that.evaluationMethodDescription ) &&
                    Utilities.equals(this.evaluationProcedure,         that.evaluationProcedure         ) &&
-                   Utilities.equals(this.result,                      that.result                      ) &&
+                   Utilities.equals(this.results,                     that.results                     ) &&
                                     this.date1                     == that.date1                         &&
                                     this.date2                     == that.date2;
         }
@@ -304,9 +347,9 @@ public class ElementImpl extends MetadataEntity implements Element {
     /**
      * Returns a string representation of this citation.
      *
-     * @todo localize
+     * @todo localize and improve output.
      */
-    public String toString() {
+    public synchronized String toString() {
         final String lineSeparator = System.getProperty("line.separator", "\n");
         final StringBuffer buffer = new StringBuffer();
         if (measureDescription != null) {
@@ -314,7 +357,7 @@ public class ElementImpl extends MetadataEntity implements Element {
             buffer.append(measureDescription);
             buffer.append(lineSeparator);
         }
-        buffer.append(result);
+        buffer.append(results);
         return buffer.toString();
     }
 }

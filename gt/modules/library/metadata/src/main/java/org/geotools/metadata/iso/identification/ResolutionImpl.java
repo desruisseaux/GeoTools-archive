@@ -25,6 +25,7 @@ import org.opengis.metadata.identification.Resolution;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -41,7 +42,7 @@ public class ResolutionImpl extends MetadataEntity implements Resolution {
     /**
      * Serial number for compatibility with different versions.
      */
-    private static final long serialVersionUID = 4418980634370167689L;
+    private static final long serialVersionUID = -4644465057871958482L;
 
     /**
      * Level of detail expressed as the scale of a comparable hardcopy map or chart.
@@ -66,7 +67,6 @@ public class ResolutionImpl extends MetadataEntity implements Resolution {
 
     /**
      * Level of detail expressed as the scale of a comparable hardcopy map or chart.
-     * This value should be between 0 and 1.
      * Only one of {@linkplain #getEquivalentScale equivalent scale} and
      * {@linkplain #getDistance ground sample distance} may be provided.
      */
@@ -76,16 +76,19 @@ public class ResolutionImpl extends MetadataEntity implements Resolution {
 
     /**
      * Set the level of detail expressed as the scale of a comparable hardcopy map or chart.
-     * 
+     *
      * Values greater than 1 will be stored as (1 / newValue), values less than one will be stored as is.
+     *
+     * @deprecated Replaced by {@link #setEquivalentScale(RepresentativeFraction)}.
      */
-    public synchronized void setEquivalentScale(final double newValue) {
-        checkWritePermission();
-        equivalentScale = RepresentativeFractionImpl.fromDouble(newValue);
+    public void setEquivalentScale(final double newValue) {
+        setEquivalentScale(RepresentativeFractionImpl.fromScale(newValue));
     }
 
     /**
      * Set the level of detail expressed as the scale of a comparable hardcopy map or chart.
+     *
+     * @since 2.4
      */
     public synchronized void setEquivalentScale(final RepresentativeFraction newValue) {
         checkWritePermission();
@@ -125,8 +128,8 @@ public class ResolutionImpl extends MetadataEntity implements Resolution {
         }
         if (object!=null && object.getClass().equals(getClass())) {
             final ResolutionImpl that = (ResolutionImpl) object;
-            return (this.equivalentScale == that.equivalentScale) &&
-                   (this.distance        == that.distance       );
+            return Utilities.equals(this.equivalentScale, that.equivalentScale) &&
+                   Utilities.equals(this.distance       , that.distance       );
         }
         return false;
     }

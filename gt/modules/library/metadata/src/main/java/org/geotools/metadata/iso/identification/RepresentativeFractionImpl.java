@@ -58,13 +58,11 @@ public class RepresentativeFractionImpl extends Number implements Representative
      * Creates a representative fraction from a scale as a {@code double} value.
      * The {@linkplain #getDenominator denominator} will be set to {@code 1/scale}.
      *
-     * @param scale The scale.
+     * @param scale The scale as a number between 0 and 1.
      *
      * @throws IllegalArgumentException if the condition {@code abs(scale) <= 1} is not meet.
-     *
-     * @todo Should we rename this method as {@code fromScale}?
      */
-    public static RepresentativeFraction fromDouble(final double scale)
+    public static RepresentativeFraction fromScale(final double scale)
             throws IllegalArgumentException
     {
         if (Math.abs(scale) <= 1 || scale == Double.POSITIVE_INFINITY) {
@@ -76,10 +74,14 @@ public class RepresentativeFractionImpl extends Number implements Representative
                     "scale", new Double(scale)));
         }
     }
-    
+
+    /**
+     * Returns the scale. This is equivalent to {@link #doubleValue}.
+     */
     public double toScale(){
         return doubleValue();
     }
+
     /**
      * Returns the scale in a form usable for computation.
      *

@@ -49,7 +49,7 @@ public class FeatureCatalogueDescriptionImpl extends ContentInformationImpl
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -2566307080447896276L;
+    private static final long serialVersionUID = -5361236546997056467L;
     
     /**
      * Indication of whether or not the cited feature catalogue complies with ISO 19110.
@@ -64,7 +64,7 @@ public class FeatureCatalogueDescriptionImpl extends ContentInformationImpl
     /**
      * Indication of whether or not the feature catalogue is included with the dataset.
      */
-    private boolean includeWithDataset;
+    private Boolean includeWithDataset;
 
     /**
      * Subset of feature types from cited feature catalogue occurring in dataset.
@@ -112,15 +112,17 @@ public class FeatureCatalogueDescriptionImpl extends ContentInformationImpl
     
     /**
      * Returns whether or not the feature catalogue is included with the dataset.
+     *
+     * @todo Return type should be {@link Boolean}.
      */
     public boolean isIncludedWithDataset() {
-        return includeWithDataset;
+        return includeWithDataset.booleanValue();
     }
     
     /**
      * Set whether or not the feature catalogue is included with the dataset.
      */
-    public synchronized void setIncludedWithDataset(final boolean newValue) {
+    public synchronized void setIncludedWithDataset(final Boolean newValue) {
         checkWritePermission();
         includeWithDataset = newValue;
     }
@@ -172,8 +174,8 @@ public class FeatureCatalogueDescriptionImpl extends ContentInformationImpl
         }
         if (super.equals(this)) {
             final FeatureCatalogueDescriptionImpl that = (FeatureCatalogueDescriptionImpl) object;
-            return                 (compliant               == that.compliant                ) &&
-                                   (includeWithDataset      == that.includeWithDataset       ) &&
+            return Utilities.equals(compliant,                 that.compliant                ) &&
+                   Utilities.equals(includeWithDataset,        that.includeWithDataset       ) &&
                    Utilities.equals(featureTypes,              that.featureTypes             ) &&
                    Utilities.equals(featureCatalogueCitations, that.featureCatalogueCitations) &&
                    Utilities.equals(language,                  that.language                 );
@@ -187,7 +189,7 @@ public class FeatureCatalogueDescriptionImpl extends ContentInformationImpl
      * that are the most likely to be unique.
      */
     public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
+        int code = (int) serialVersionUID;
         if (featureCatalogueCitations != null) code ^= featureCatalogueCitations.hashCode();
         if (language                  != null) code ^= language                 .hashCode();
         return code;

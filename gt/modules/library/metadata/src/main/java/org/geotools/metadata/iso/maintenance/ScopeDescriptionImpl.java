@@ -28,6 +28,7 @@ import org.opengis.metadata.maintenance.ScopeDescription;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -45,6 +46,17 @@ public class ScopeDescriptionImpl extends MetadataEntity implements ScopeDescrip
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -5671299759930976286L;
+
+    /**
+     * Dataset to which the information applies.
+     */
+    private String dataset;
+
+    /**
+     * Class of information that does not fall into the other categories to
+     * which the information applies.
+     */
+    private String other;
 
     /**
      * Creates an initially empty scope description.
@@ -78,6 +90,57 @@ public class ScopeDescriptionImpl extends MetadataEntity implements ScopeDescrip
     public Set getFeatureInstances() {
         return Collections.EMPTY_SET;
     }
+
+    /**
+     * Returns the attribute instances to which the information applies.
+     *
+     * @since 2.4
+     *
+     * @todo Not yet implemented.
+     */
+    public Set getAttributeInstances() {
+        return Collections.EMPTY_SET;
+    }
+
+    /**
+     * Returns the dataset to which the information applies.
+     *
+     * @since 2.4
+     */
+    public String getDataset() {
+        return dataset;
+    }
+
+    /**
+     * Set the dataset to which the information applies.
+     *
+     * @since 2.4
+     */
+    public synchronized void setDataset(final String newValue) {
+        checkWritePermission();
+        dataset = newValue;
+    }
+
+    /**
+     * Returns the class of information that does not fall into the other categories to
+     * which the information applies.
+     *
+     * @since 2.4
+     */
+    public String getOther() {
+        return other;
+    }
+
+    /**
+     * Set the class of information that does not fall into the other categories to
+     * which the information applies.
+     *
+     * @since 2.4
+     */
+    public synchronized void setOther(final String newValue) {
+        checkWritePermission();
+        other = newValue;
+    }
     
     /**
      * Declare this metadata and all its attributes as unmodifiable.
@@ -95,8 +158,8 @@ public class ScopeDescriptionImpl extends MetadataEntity implements ScopeDescrip
         }
         if (object!=null && object.getClass().equals(getClass())) {
             final ScopeDescriptionImpl that = (ScopeDescriptionImpl) object;
-            // TODO once method in ScopeDescription will be defined.
-            return true;
+            return Utilities.equals(this.dataset, that.dataset) &&
+                   Utilities.equals(this.other,   that.other);
         }
         return false;
     }
@@ -106,7 +169,8 @@ public class ScopeDescriptionImpl extends MetadataEntity implements ScopeDescrip
      */
     public synchronized int hashCode() {
         int code = (int)serialVersionUID;
-        // TODO once method in ScopeDescription will be defined.
+        if (dataset != null) code ^= dataset.hashCode();
+        if (other   != null) code ^= other  .hashCode();
         return code;
     }
 
@@ -118,17 +182,5 @@ public class ScopeDescriptionImpl extends MetadataEntity implements ScopeDescrip
     public synchronized String toString() {
         // TODO once method in ScopeDescription will be defined.
         return "";
-    }
-
-    public Set getAttributeInstances() {
-        return Collections.EMPTY_SET;
-    }
-
-    public String getDataset() {
-        return null;
-    }
-
-    public String getOther() {
-        return null;
     }
 }

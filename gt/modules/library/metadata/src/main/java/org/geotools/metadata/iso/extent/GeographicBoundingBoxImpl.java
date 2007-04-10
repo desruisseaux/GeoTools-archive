@@ -280,9 +280,11 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
         /*
          * Reminder: 'inclusion' is a mandatory attribute, so it should never be null for a
          * valid metadata object.  If the metadata object is invalid, it is better to get a
-         * NullPointerException than having a code doing silently some inappropriate work.
+         * an exception than having a code doing silently some inappropriate work.
          */
-        if (getInclusion().booleanValue() == box.getInclusion().booleanValue()) {
+        final Boolean inc1 =     getInclusion(); ensureNonNull("inclusion", inc1);
+        final Boolean inc2 = box.getInclusion(); ensureNonNull("inclusion", inc2);
+        if (inc1.booleanValue() == inc2.booleanValue()) {
             if (xmin < westBoundLongitude) westBoundLongitude = xmin;
             if (xmax > eastBoundLongitude) eastBoundLongitude = xmax;
             if (ymin < southBoundLatitude) southBoundLatitude = ymin;

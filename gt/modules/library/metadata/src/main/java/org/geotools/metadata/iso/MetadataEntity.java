@@ -32,7 +32,9 @@ import org.opengis.util.Cloneable;
 // Geotools dependencies
 import org.geotools.util.CheckedArrayList;
 import org.geotools.util.CheckedHashSet;
-
+import org.geotools.util.Logging;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -108,8 +110,7 @@ public class MetadataEntity implements java.lang.Cloneable, Serializable {
                  * (for example it may be backed by some external database).
                  * Assumes that the metadata is unmodifiable.
                  */
-                // TODO: localize the warning.
-                LOGGER.warning("Cant't clone the medata. Assumes it is immutable.");
+                Logging.unexpectedException(LOGGER, exception);
                 return this;
             }
             unmodifiable.freeze();
@@ -231,13 +232,12 @@ public class MetadataEntity implements java.lang.Cloneable, Serializable {
      * Check if changes in the metadata are allowed. All {@code setFoo(...)} methods in
      * sub-classes should invoke this method before to apply any change.
      *
-     * @throws UnsupportedOperationException if this metadata is unmodifiable.
+     * @throws UnmodifiableMetadataException if this metadata is unmodifiable.
      */
-    protected void checkWritePermission() throws UnsupportedOperationException {
+    protected void checkWritePermission() throws UnmodifiableMetadataException {
         assert Thread.holdsLock(this);
         if (unmodifiable == this) {
-            // TODO: Localize the error message.
-            throw new UnsupportedOperationException("Unmodifiable metadata");
+            throw new UnmodifiableMetadataException(Errors.format(ErrorKeys.UNMODIFIABLE_METADATA));
         }
         unmodifiable = null;
     }
@@ -262,10 +262,14 @@ public class MetadataEntity implements java.lang.Cloneable, Serializable {
             }
         } else {
             final boolean isList = (source instanceof List);
-            if (target==null || (target instanceof List)!=isList) {
-                // TODO: remove the cast once we are allowed to compile for J2SE 1.5.
-                target = isList ? (Collection) new CheckedArrayList(elementType)
-                                : (Collection) new CheckedHashSet  (elementType);
+            if (target == null || (target instanceof List) != isList) {
+                int capacity = source.size();
+                if (isList) {
+                    target = new CheckedArrayList(elementType, capacity);
+                } else {
+                    capacity = Math.round(capacity / 0.75f) + 1;
+                    target = new CheckedHashSet(elementType, capacity);
+                }
             } else {
                 target.clear();
             }
@@ -295,6 +299,24 @@ public class MetadataEntity implements java.lang.Cloneable, Serializable {
     }
 
     /**
+     * Makes sure that an argument is non-null. This is used for checking if
+     * a mandatory attribute is presents.
+     *
+     * @param  name   Argument name.
+     * @param  object User argument.
+     * @throws InvalidMetadataException if {@code object} is null.
+     *
+     * @since 2.4
+     */
+    protected static void ensureNonNull(final String name, final Object object)
+            throws InvalidMetadataException
+    {
+        if (object == null) {
+            throw new InvalidMetadataException(Errors.format(ErrorKeys.NULL_ATTRIBUTE_$1, name));
+        }
+    }
+
+    /**
      * Add a line separator to the given buffer, except if the buffer is empty.
      * This convenience method is used for {@link #toString} implementations.
      */
@@ -303,30 +325,34 @@ public class MetadataEntity implements java.lang.Cloneable, Serializable {
             buffer.append(System.getProperty("line.separator", "\n"));
         }
     }
-    
+
     /**
      * Add the contents of a collection to the provided buffer.
      * This convenience method is used for {@link #toString) implementations.
-     * Output will be: "label: [1,2,3]"
+     * Output will be: {@code "label: [1,2,3]"}.
      *  
-     * @param buffer     string buffer to add the collection contents to
-     * @param label      label for easy identification 
-     * @param collection source object
+     * @param buffer     String buffer to add the collection contents to.
+     * @param label      Label for easy identification.
+     * @param collection Source object.
+     *
+     * @todo We should probably consider creating some formatter class (like
+     *       {@code org.geotools.referencing.wkt.Formatter}) for more elaborated
+     *       formatting with indentation, syntax coloring and stuff like that.
+     *       Formatting method like {@code appendCollection} and {@code appendLineSeparator}
+     *       would then be removed from that class.
      */
-    protected static void appendCollection(final StringBuffer buffer, String label, Collection collection) {
+    static void appendCollection(final StringBuffer buffer, String label, Collection collection) {
         buffer.append(label);
         buffer.append(": [");
-        if (collection != null && !collection.isEmpty()) {
-            Iterator it = collection.iterator();
+        if (collection != null) {
+            final Iterator it = collection.iterator();
             while (it.hasNext()) {
                 buffer.append(it.next().toString());
                 if (it.hasNext()) {
-                    buffer.append(",");
+                    buffer.append(',');
                 }
             }
-            it.remove();
-            it = null;
         }
-        buffer.append("]");
+        buffer.append(']');
     }
 }

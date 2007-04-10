@@ -60,7 +60,7 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = 4280620497868178687L;
+    private static final long serialVersionUID = -5600409558876701144L;
 
     /**
      * Unique identifier for this metadata file, or {@code null} if none.
@@ -99,7 +99,7 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
     private Collection hierarchyLevelNames;
 
     /**
-     * Party responsible for the metadata information.
+     * Parties responsible for the metadata information.
      */
     private Collection contacts;
 
@@ -293,22 +293,24 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
 
     /**
      * Returns the party responsible for the metadata information.
+     *
      * @deprecated use {@link #getContacts}.
      */
     public ResponsibleParty getContact() {
-        Collection contacts = getContacts();
-        return (contacts.isEmpty()) ? null : (ResponsibleParty) contacts.toArray()[0];
+        final Collection contacts = getContacts();
+        return contacts.isEmpty() ? null : (ResponsibleParty) contacts.iterator().next();
     }
 
     /**
-     * Returns the party responsible for the metadata information.
+     * Returns the parties responsible for the metadata information.
      */
     public Collection getContacts() {
-        return nonNullCollection(contacts, ResponsibleParty.class);
+        return contacts = nonNullCollection(contacts, ResponsibleParty.class);
     }
 
     /**
      * Set the party responsible for the metadata information.
+     *
      * @deprecated use {@link #setContacts}.
      */
     public synchronized void setContact(final ResponsibleParty newValue) {
@@ -537,17 +539,17 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
 
     /**
      * Provides information about an alternatively used localized character
-     * string for a linguistic extension
+     * string for a linguistic extension.
      *
      * @since 2.4
      */
     public synchronized Collection getLocales() {
-        return nonNullCollection(locales, Locale.class);
+        return locales = nonNullCollection(locales, Locale.class);
     }
 
     /**
      * Set information about an alternatively used localized character
-     * string for a linguistic extension
+     * string for a linguistic extension.
      *
      * @since 2.4
      */
@@ -640,7 +642,7 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
      * that are the most likely to be unique.
      */
     public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
+        int code = (int) serialVersionUID;
         if (fileIdentifier     != null) code ^= fileIdentifier    .hashCode();
         if (identificationInfo != null) code ^= identificationInfo.hashCode();
         return code;

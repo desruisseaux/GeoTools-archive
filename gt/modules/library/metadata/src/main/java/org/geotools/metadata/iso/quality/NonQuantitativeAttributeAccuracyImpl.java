@@ -1,8 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2004, Institut de Recherche pour le Développement
+ *    (C) 2007, GeoTools Project Managment Committee (PMC)
  *   
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -38,7 +37,7 @@ public class NonQuantitativeAttributeAccuracyImpl extends ThematicAccuracyImpl
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -4976754662775709253L;
+    private static final long serialVersionUID = 2659617465862554345L;
 
     /**
      * Constructs an initially empty non quantitative attribute correctness.

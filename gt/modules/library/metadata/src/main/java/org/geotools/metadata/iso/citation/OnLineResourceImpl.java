@@ -176,6 +176,9 @@ public class OnLineResourceImpl extends MetadataEntity implements OnLineResource
      */
     private URI linkage;
 
+    /**
+     * Name of the online resources.
+     */
     private String name;
 
     /**
@@ -234,7 +237,7 @@ public class OnLineResourceImpl extends MetadataEntity implements OnLineResource
     }
 
     /**
-     * Set the name of the online resource. Returns {@code null} if none.
+     * Set the name of the online resource.
      * 
      * @since 2.4
      */

@@ -51,8 +51,8 @@ public class SourceImpl extends MetadataEntity implements Source {
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = 1754233428736991423L;
-    
+    private static final long serialVersionUID = 2660914446466438044L;
+
     /**
      * Detailed description of the level of the source data.
      */
@@ -82,13 +82,13 @@ public class SourceImpl extends MetadataEntity implements Source {
      * Information about an event in the creation process for the source data.
      */
     private Collection sourceSteps;
-    
+
     /**
      * Creates an initially empty source.
      */
     public SourceImpl() {
     }
-    
+
     /**
      * Creates a source initialized with the given description.
      */
@@ -120,14 +120,17 @@ public class SourceImpl extends MetadataEntity implements Source {
 
     /**
      * Set the denominator of the representative fraction on a source map.
+     *
+     * @deprecated Use {@link #setScaleDenominator(RepresentativeFraction)}.
      */
-    public synchronized void setScaleDenominator(final int newValue)  {
-        checkWritePermission();
-        scaleDenominator = new RepresentativeFractionImpl( newValue );
+    public void setScaleDenominator(final long newValue)  {
+        setScaleDenominator(new RepresentativeFractionImpl(newValue));
     }
 
     /**
      * Set the denominator of the representative fraction on a source map.
+     *
+     * @since 2.4
      */
     public synchronized void setScaleDenominator(final RepresentativeFraction newValue)  {
         checkWritePermission();
@@ -192,7 +195,7 @@ public class SourceImpl extends MetadataEntity implements Source {
     public synchronized void setSourceSteps(final Collection newValues) {
         sourceSteps = copyCollection(newValues, sourceSteps, ProcessStep.class);
     }
-    
+
     /**
      * Declare this metadata and all its attributes as unmodifiable.
      */
@@ -215,11 +218,11 @@ public class SourceImpl extends MetadataEntity implements Source {
         if (object!=null && object.getClass().equals(getClass())) {
             final SourceImpl that = (SourceImpl) object;
             return Utilities.equals(this.description,           that.description           ) &&
+                   Utilities.equals(this.scaleDenominator,      that.scaleDenominator      ) &&
                    Utilities.equals(this.sourceReferenceSystem, that.sourceReferenceSystem ) &&
                    Utilities.equals(this.sourceCitation,        that.sourceCitation        ) &&
                    Utilities.equals(this.sourceExtents,         that.sourceExtents         ) &&
-                   Utilities.equals(this.sourceSteps,           that.sourceSteps           ) &&
-                                   (this.scaleDenominator    == that.scaleDenominator      );
+                   Utilities.equals(this.sourceSteps,           that.sourceSteps           );
         }
         return false;
     }
@@ -228,7 +231,7 @@ public class SourceImpl extends MetadataEntity implements Source {
      * Returns a hash code value for this source.
      */
     public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
+        int code = (int) serialVersionUID;
         if (description           != null) code ^= description          .hashCode();
         if (sourceReferenceSystem != null) code ^= sourceReferenceSystem.hashCode();
         if (sourceCitation        != null) code ^= sourceCitation       .hashCode();
@@ -244,5 +247,5 @@ public class SourceImpl extends MetadataEntity implements Source {
      */
     public String toString() {
         return String.valueOf(description);
-    }        
+    }
 }

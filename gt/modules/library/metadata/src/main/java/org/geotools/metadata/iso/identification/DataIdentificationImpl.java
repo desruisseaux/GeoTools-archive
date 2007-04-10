@@ -75,7 +75,7 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
     /**
      * Full name of the character coding standard used for the dataset.
      */
-    private CharacterSet characterSet;
+    private Collection/*<CharacterSet>*/ characterSets;
 
     /**
      * Main theme(s) of the datset.
@@ -86,6 +86,8 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
      * Minimum bounding rectangle within which data is available.
      * Only one of {@code getGeographicBox()} and {@link #getGeographicDescription()}
      * should be provided.
+     *
+     * @deprecated not in ISO 19115:2003
      */
     private Collection geographicBox;
 
@@ -93,6 +95,8 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
      * Description of the geographic area within which data is available.
      * Only one of {@link #getGeographicBox()} and {@code getGeographicDescription()}
      * should be provided.
+     *
+     * @deprecated not in ISO 19115:2003
      */
     private Collection geographicDescription;
 
@@ -123,9 +127,9 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
      * Creates a data identification initialized to the specified values.
      */
     public DataIdentificationImpl(final Citation citation, 
-                              final InternationalString abstracts, 
-                              final Collection language, 
-                              final Collection topicCategories)
+                                  final InternationalString abstracts, 
+                                  final Collection language, 
+                                  final Collection topicCategories)
     {
         super(citation, abstracts);
         setLanguage       (language       );
@@ -180,20 +184,35 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
 
     /**
      * Full name of the character coding standard used for the dataset.
+     *
+     * @deprecated Use {@link #getCharacterSets} instead.
      */
     public Charset getCharacterSet() {
-        return characterSet.toCharset();
+        final Collection characterSet = getCharacterSets();
+        return characterSet.isEmpty() ? null : ((CharacterSet) characterSet.iterator().next()).toCharset();
     }
-    public Collection getCharacterSets() {
-        return Collections.singleton( characterSet );
+
+    /**
+     * Full name of the character coding standard used for the dataset.
+     */
+    public synchronized Collection getCharacterSets() {
+        return characterSets = nonNullCollection(characterSets, CharacterSet.class);
+    }
+
+    /**
+     * Set the full name of the character coding standard used for the dataset.
+     *
+     * @deprecated Use {@link #setCharacterSets} instead.
+     */
+    public synchronized void setCharacterSet(final CharacterSet newValue) {
+        setCharacterSets(Collections.singleton(newValue));
     }
 
     /**
      * Set the full name of the character coding standard used for the dataset.
      */
-    public synchronized void setCharacterSet(final CharacterSet newValue)  {
-        checkWritePermission();
-        characterSet = newValue;
+    public synchronized void setCharacterSets(final Collection/*<CharacterSet>*/ newValues) {
+        characterSets = copyCollection(newValues, characterSets, CharacterSet.class);
     }
     
     /**
@@ -214,6 +233,8 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
      * Minimum bounding rectangle within which data is available.
      * Only one of {@code getGeographicBox()} and {@link #getGeographicDescription()}
      * should be provided.
+     *
+     * @deprecated not in ISO 19115:2003
      */
     public synchronized Collection getGeographicBox() {
         return geographicBox = nonNullCollection(geographicBox, GeographicBoundingBox.class);
@@ -221,6 +242,8 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
 
     /**
      * Set the minimum bounding rectangle within which data is available.
+     *
+     * @deprecated not in ISO 19115:2003
      */
     public synchronized void setGeographicBox(final Collection newValues)  {
         geographicBox = copyCollection(newValues, geographicBox, GeographicBoundingBox.class);
@@ -230,6 +253,8 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
      * Description of the geographic area within which data is available.
      * Only one of {@link #getGeographicBox()} and {@code getGeographicDescription()}
      * should be provided.
+     *
+     * @deprecated not in ISO 19115:2003
      */
     public synchronized Collection getGeographicDescription() {
         return geographicDescription = nonNullCollection(geographicDescription,
@@ -238,6 +263,8 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
 
     /**
      * Set the description of the geographic area within which data is available.
+     *
+     * @deprecated not in ISO 19115:2003
      */
     public synchronized void setGeographicDescription(final Collection newValues)  {
         geographicDescription = copyCollection(newValues, geographicDescription,
@@ -298,7 +325,7 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
         spatialRepresentationTypes = (Collection)          unmodifiable(spatialRepresentationTypes);
         spatialResolutions         = (Collection)          unmodifiable(spatialResolutions);
         language                   = (Collection)          unmodifiable(language);
-        characterSet               = (CharacterSet)        unmodifiable(characterSet);
+        characterSets              = (Collection)          unmodifiable(characterSets);
         topicCategories            = (Collection)          unmodifiable(topicCategories);
         geographicBox              = (Collection)          unmodifiable(geographicBox);
         geographicDescription      = (Collection)          unmodifiable(geographicDescription);
@@ -319,7 +346,7 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
             return Utilities.equals(this.spatialRepresentationTypes, that.spatialRepresentationTypes   ) &&
                    Utilities.equals(this.spatialResolutions,         that.spatialResolutions           ) &&
                    Utilities.equals(this.language,                   that.language                     ) &&
-                   Utilities.equals(this.characterSet,               that.characterSet                 ) &&
+                   Utilities.equals(this.characterSets,              that.characterSets                ) &&
                    Utilities.equals(this.topicCategories,            that.topicCategories              ) &&
                    Utilities.equals(this.geographicBox,              that.geographicBox                ) &&
                    Utilities.equals(this.geographicDescription,      that.geographicDescription        ) &&
@@ -338,7 +365,7 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
         if (spatialRepresentationTypes != null) code ^= spatialRepresentationTypes.hashCode();
         if (spatialResolutions         != null) code ^= spatialResolutions        .hashCode();
         if (language                   != null) code ^= language                  .hashCode();
-        if (characterSet               != null) code ^= characterSet              .hashCode();
+        if (characterSets              != null) code ^= characterSets             .hashCode();
         if (topicCategories            != null) code ^= topicCategories           .hashCode();
         if (geographicBox              != null) code ^= geographicBox             .hashCode();
         if (geographicDescription      != null) code ^= geographicDescription     .hashCode();

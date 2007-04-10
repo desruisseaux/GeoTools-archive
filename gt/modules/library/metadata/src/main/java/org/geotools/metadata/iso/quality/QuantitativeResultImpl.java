@@ -20,11 +20,9 @@
 package org.geotools.metadata.iso.quality;
 
 // J2SE dependencies and extension
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
 import javax.units.Unit;
 
 // OpenGIS dependencies
@@ -34,6 +32,7 @@ import org.opengis.util.RecordType;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
+import org.geotools.util.CheckedArrayList;
 
 
 /**
@@ -50,12 +49,12 @@ public class QuantitativeResultImpl extends ResultImpl implements QuantitativeRe
     /**
      * Serial number for compatibility with different versions.
      */
-    private static final long serialVersionUID = -3430567391539903195L;
+    private static final long serialVersionUID = 1230713599561236060L;
     
     /**
      * Quantitative value or values, content determined by the evaluation procedure used.
      */    
-    private List/*<Double>*/ values;
+    private Collection/*<Double>*/ values;
 
     /**
      * Value type for reporting a data quality result, or {@code null} if none.
@@ -89,11 +88,14 @@ public class QuantitativeResultImpl extends ResultImpl implements QuantitativeRe
      * Quantitative value or values, content determined by the evaluation procedure used.
      */
     public synchronized Collection getValues() {
-        if (isModifiable()) {
-            return values;
-        } else {
-            return Collections.unmodifiableList( values );            
+        if (values == null) {
+            if (isModifiable()) {
+                values = new CheckedArrayList(Double.class);
+            } else {
+                values = Collections.EMPTY_LIST;
+            }
         }
+        return values;
     }
 
     /**
@@ -101,14 +103,23 @@ public class QuantitativeResultImpl extends ResultImpl implements QuantitativeRe
      */
     public synchronized void setValues(final double[] newValues) {
         checkWritePermission();
-        values = new ArrayList();
-        for( int i=0; i<newValues.length;i++){
-            values.add( new Double( newValues[i]));            
+        if (newValues == null) {
+            values = null;
+        } else {
+            values = new CheckedArrayList(Double.class, newValues.length);
+            for (int i=0; i<newValues.length; i++) {
+                values.add(new Double(newValues[i]));
+            }
         }
     }
 
-    public synchronized void setValues( List newValues ){
-        values = newValues;
+    /**
+     * Set the quantitative value or values, content determined by the evaluation procedure used.
+     *
+     * @since 2.4
+     */
+    public synchronized void setValues(final Collection/*<Double>*/ newValues) {
+        values = copyCollection(newValues, values, Double.class);
     }
     
     /**
@@ -120,8 +131,6 @@ public class QuantitativeResultImpl extends ResultImpl implements QuantitativeRe
 
     /**
      * Set the value type for reporting a data quality result, or {@code null} if none.
-     *
-     * @todo Verify if the value is of the requested type.
      */
     public synchronized void setValueType(final RecordType newValue) {
         checkWritePermission();
@@ -163,7 +172,7 @@ public class QuantitativeResultImpl extends ResultImpl implements QuantitativeRe
      */
     protected void freeze() {
         super.freeze();
-        values         = (List)            unmodifiable(values);
+        values         = (Collection)          unmodifiable(values);
         valueType      = (RecordType)          unmodifiable(valueType);
         valueUnit      = (Unit)                unmodifiable(valueUnit);
         errorStatistic = (InternationalString) unmodifiable(errorStatistic);
@@ -181,7 +190,7 @@ public class QuantitativeResultImpl extends ResultImpl implements QuantitativeRe
             return Utilities.equals(this.values,         that.values         ) &&
                    Utilities.equals(this.valueType,      that.valueType      ) &&
                    Utilities.equals(this.valueUnit,      that.valueUnit      ) &&
-                   Utilities.equals(this.errorStatistic, that.errorStatistic ) ;
+                   Utilities.equals(this.errorStatistic, that.errorStatistic );
         }
         return false;
     }
@@ -192,9 +201,8 @@ public class QuantitativeResultImpl extends ResultImpl implements QuantitativeRe
      * that are the most likely to be unique.
      */
     public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-//TODO: Uses Arrays.hashCode when we will be allowed to uses J2SE 1.5.
-//      if (values    != null) code ^= values   .hashCode();
+        int code = (int) serialVersionUID;
+        if (values    != null) code ^= values   .hashCode();
         if (valueType != null) code ^= valueType.hashCode();
         return code;
     }

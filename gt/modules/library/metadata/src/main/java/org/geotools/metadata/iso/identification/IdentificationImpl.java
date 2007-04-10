@@ -371,7 +371,7 @@ public class IdentificationImpl extends MetadataEntity implements Identification
                    Utilities.equals(this.descriptiveKeywords,    that.descriptiveKeywords    ) &&
                    Utilities.equals(this.resourceSpecificUsages, that.resourceSpecificUsages ) &&
                    Utilities.equals(this.resourceConstraints,    that.resourceConstraints    ) &&
-                   Utilities.equals(this.aggregationInfo,        that.aggregationInfo        )  ;
+                   Utilities.equals(this.aggregationInfo,        that.aggregationInfo        );
         }
         return false;
     }

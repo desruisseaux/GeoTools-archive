@@ -752,6 +752,11 @@ public final class ErrorKeys {
     public static final int NULL_ARGUMENT_$1 = 105;
 
     /**
+     * Attribute "{0}" should not be null.
+     */
+    public static final int NULL_ATTRIBUTE_$1 = 61;
+
+    /**
      * Format #{0} (on {1}) is not defined.
      */
     public static final int NULL_FORMAT_$2 = 106;
@@ -969,6 +974,11 @@ public final class ErrorKeys {
      * Unmodifiable geometry.
      */
     public static final int UNMODIFIABLE_GEOMETRY = 137;
+
+    /**
+     * Unmodifiable metadata.
+     */
+    public static final int UNMODIFIABLE_METADATA = 200;
 
     /**
      * Can't convert "{0}" to a number.

@@ -19,17 +19,15 @@
  */
 package org.geotools.metadata.iso.content;
 
-// Geotools dependencies
+// J2SE dependencies
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import org.opengis.metadata.content.CoverageDescription;
-
 // OpenGIS dependencies
-import org.geotools.resources.Utilities;
 import org.opengis.metadata.content.CoverageContentType;
+import org.opengis.metadata.content.CoverageDescription;
 import org.opengis.metadata.content.RangeDimension;
 import org.opengis.util.MemberName;
 import org.opengis.util.Record;
@@ -37,21 +35,24 @@ import org.opengis.util.RecordSchema;
 import org.opengis.util.RecordType;
 import org.opengis.util.TypeName;
 
+// Geotools dependencies
+import org.geotools.resources.Utilities;
+
+
 /**
  * Information about the content of a grid data cell.
  * 
- * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/library/metadata/src/main/java/org/geotools/metadata/iso/content/CoverageDescriptionImpl.java $
+ * @since 2.1
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
- * @since 2.1
  */
 public class CoverageDescriptionImpl extends ContentInformationImpl implements CoverageDescription {
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -2303929749109678792L;
+    private static final long serialVersionUID = -326050615789333559L;;
 
     /**
      * Description of the attribute described by the measurement value.
@@ -62,12 +63,6 @@ public class CoverageDescriptionImpl extends ContentInformationImpl implements C
      * Type of information represented by the cell value.
      */
     private CoverageContentType contentType;
-
-    /**
-     * Information on the dimensions of the cell measurement value.
-     * @deprecated
-     */
-    private RangeDimension dimension;
 
     /**
      * Information on the dimensions of the cell measurement value.
@@ -105,7 +100,7 @@ public class CoverageDescriptionImpl extends ContentInformationImpl implements C
     /**
      * Set the type of information represented by the cell value.
      */
-    public synchronized void setContentType( final CoverageContentType newValue ) {
+    public synchronized void setContentType(final CoverageContentType newValue) {
         checkWritePermission();
         contentType = newValue;
     }
@@ -113,20 +108,20 @@ public class CoverageDescriptionImpl extends ContentInformationImpl implements C
     /**
      * Returns the information on the dimensions of the cell measurement value.
      * 
-     * @deprecated use getDimensions
+     * @deprecated use {@link #getDimensions}
      */
     public RangeDimension getDimension() {
-        return dimension;
+        final Collection dimensions = getDimensions();
+        return dimensions.isEmpty() ? null : (RangeDimension) dimensions.iterator().next();
     }
 
     /**
      * Set the information on the dimensions of the cell measurement value.
      * 
-     * @deprecated use setDimensions
+     * @deprecated use {@link #setDimensions}
      */
-    public synchronized void setDimension( final RangeDimension newValue ) {
-        checkWritePermission();
-        dimension = newValue;
+    public synchronized void setDimension(final RangeDimension newValue) {
+        setDimensions(java.util.Collections.singleton(newValue));
     }
 
     /**
@@ -135,10 +130,7 @@ public class CoverageDescriptionImpl extends ContentInformationImpl implements C
      * @since 2.4
      */
     public Collection getDimensions() {
-        if (dimensions == null) {
-            return Collections.singleton(dimension);
-        }
-        return dimensions;
+        return dimensions = nonNullCollection(dimensions, RangeDimension.class);
     }
 
     /**
@@ -146,9 +138,8 @@ public class CoverageDescriptionImpl extends ContentInformationImpl implements C
      * 
      * since 2.4
      */
-    public synchronized void setDimensions(final Collection newValue) {
-        checkWritePermission();
-        dimensions = newValue;
+    public synchronized void setDimensions(final Collection newValues) {
+        dimensions = copyCollection(newValues, dimensions, RangeDimension.class);
     }
     
     /**
@@ -157,10 +148,7 @@ public class CoverageDescriptionImpl extends ContentInformationImpl implements C
     protected void freeze() {
         super.freeze();
         attributeDescription = (RecordType) unmodifiable(attributeDescription);
-        dimensions = (Collection) unmodifiable(dimensions);
-        if (dimension != null) {
-            dimension = (RangeDimension) unmodifiable(dimension);
-        }
+        dimensions           = (Collection) unmodifiable(dimensions);
     }
 
     /**
@@ -172,9 +160,9 @@ public class CoverageDescriptionImpl extends ContentInformationImpl implements C
         }
         if (super.equals(object)) {
             final CoverageDescriptionImpl that = (CoverageDescriptionImpl) object;
-            return Utilities.equals(this.attributeDescription, that.attributeDescription)
-                    && Utilities.equals(this.contentType, that.contentType)
-                    && Utilities.equals(this.dimensions, that.dimensions);
+            return Utilities.equals(this.attributeDescription, that.attributeDescription) &&
+                   Utilities.equals(this.contentType,          that.contentType)          &&
+                   Utilities.equals(this.dimensions,           that.dimensions);
         }
         return false;
     }
@@ -186,10 +174,12 @@ public class CoverageDescriptionImpl extends ContentInformationImpl implements C
      */
     public synchronized int hashCode() {
         int code = (int) serialVersionUID;
-        if (attributeDescription != null)
+        if (attributeDescription != null) {
             code ^= attributeDescription.hashCode();
-        if (contentType != null)
+        }
+        if (contentType != null) {
             code ^= contentType.hashCode();
+        }
         return code;
     }
 

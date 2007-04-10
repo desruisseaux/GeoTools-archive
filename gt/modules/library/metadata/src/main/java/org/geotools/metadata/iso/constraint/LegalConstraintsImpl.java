@@ -46,8 +46,8 @@ public class LegalConstraintsImpl extends ConstraintsImpl implements LegalConstr
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = 6197608101092130586L;
-    
+    private static final long serialVersionUID = -2891061818279024901L;
+
     /**
      * Access constraints applied to assure the protection of privacy or intellectual property,
      * and any special restrictions or limitations on obtaining the resource.
@@ -62,14 +62,14 @@ public class LegalConstraintsImpl extends ConstraintsImpl implements LegalConstr
 
     /**
      * Other restrictions and legal prerequisites for accessing and using the resource.
-     * This method should returns a non-null value only if {@linkplain #getAccessConstraints
+     * This method should returns a non-empty value only if {@linkplain #getAccessConstraints
      * access constraints} or {@linkplain #getUseConstraints use constraints} declares
      * {@linkplain Restriction#OTHER_RESTRICTIONS other restrictions}.
      */
-    private InternationalString otherConstraints;
+    private Collection/*<InternationalString>*/ otherConstraints;
 
     /**
-     * Construct an initially empty constraints.
+     * Constructs an initially empty constraints.
      */
     public LegalConstraintsImpl() {
     }
@@ -108,23 +108,19 @@ public class LegalConstraintsImpl extends ConstraintsImpl implements LegalConstr
 
     /**
      * Returns the other restrictions and legal prerequisites for accessing and using the resource.
-     * This method should returns a non-null value only if {@linkplain #getAccessConstraints
+     * This method should returns a non-empty value only if {@linkplain #getAccessConstraints
      * access constraints} or {@linkplain #getUseConstraints use constraints} declares
      * {@linkplain Restriction#OTHER_RESTRICTIONS other restrictions}.
      */
-    public Collection getOtherConstraints() {
-        return Collections.singleton( otherConstraints );
+    public synchronized Collection getOtherConstraints() {
+        return otherConstraints = nonNullCollection(otherConstraints, InternationalString.class);
     }
 
     /**
      * Set the other restrictions and legal prerequisites for accessing and using the resource.
-     * This method should returns a non-null value only if {@linkplain #getAccessConstraints
-     * access constraints} or {@linkplain #getUseConstraints use constraints} declares
-     * {@linkplain Restriction#OTHER_RESTRICTIONS other restrictions}.
      */
-    public synchronized void setOtherConstraints(final InternationalString newValue) {
-        checkWritePermission();
-        otherConstraints = newValue;
+    public synchronized void setOtherConstraints(final Collection/*<InternationalString>*/ newValues) {
+        otherConstraints = copyCollection(newValues, otherConstraints, InternationalString.class);
     }   
 
     /**
@@ -132,9 +128,9 @@ public class LegalConstraintsImpl extends ConstraintsImpl implements LegalConstr
      */
     protected void freeze() {
         super.freeze();
-        accessConstraints = (Collection)          unmodifiable(accessConstraints);
-        useConstraints    = (Collection)          unmodifiable(useConstraints);
-        otherConstraints  = (InternationalString) unmodifiable(otherConstraints);
+        accessConstraints = (Collection) unmodifiable(accessConstraints);
+        useConstraints    = (Collection) unmodifiable(useConstraints);
+        otherConstraints  = (Collection) unmodifiable(otherConstraints);
     } 
 
     /**
@@ -157,7 +153,7 @@ public class LegalConstraintsImpl extends ConstraintsImpl implements LegalConstr
      * Returns a hash code value for this constraints.
      */
     public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
+        int code = (int) serialVersionUID;
         if (accessConstraints != null) code ^= accessConstraints.hashCode();
         if (useConstraints    != null) code ^= useConstraints   .hashCode();
         if (otherConstraints  != null) code ^= otherConstraints .hashCode();

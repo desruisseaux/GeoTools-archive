@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Date;
 
 // OpenGIS dependencies
+import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.maintenance.MaintenanceInformation;
 import org.opengis.metadata.maintenance.MaintenanceFrequency;
 import org.opengis.metadata.maintenance.ScopeCode;
@@ -51,7 +52,7 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -8268338804608896671L;
+    private static final long serialVersionUID = 8523463344581266776L;
 
     /**
      * Frequency with which changes and additions are made to the resource after the
@@ -74,31 +75,37 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
     /**
      * Scope of data to which maintenance is applied.
      */
-    private ScopeCode updateScope;
+    private Collection/*<ScopeCode>*/ updateScopes;
 
     /**
      * Additional information about the range or extent of the resource.
      */
-    private ScopeDescription updateScopeDescription;
+    private Collection/*<ScopeDescription>*/ updateScopeDescriptions;
 
     /**
      * Information regarding specific requirements for maintaining the resource.
      */
-    private InternationalString maintenanceNote;
-    
+    private Collection/*<InternationalString>*/ maintenanceNotes;
+
+    /**
+     * Identification of, and means of communicating with,
+     * person(s) and organization(s) with responsibility for maintaining the metadata
+     */
+    private Collection/*<ResponsibleParty>*/ contacts;
+
     /**
      * Creates a an initially empty maintenance information.
      */
     public MaintenanceInformationImpl() {
     }
-    
+
     /**
      * Creates a maintenance information.
      */
     public MaintenanceInformationImpl(final MaintenanceFrequency maintenanceAndUpdateFrequency) {
         setMaintenanceAndUpdateFrequency(maintenanceAndUpdateFrequency);
     }
-    
+
     /**
      * Returns the frequency with which changes and additions are made to the resource
      * after the initial resource is completed.
@@ -106,7 +113,7 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
     public MaintenanceFrequency getMaintenanceAndUpdateFrequency() {
         return maintenanceAndUpdateFrequency;
     }
-    
+
     /**
      * Set the frequency with which changes and additions are made to the resource
      * after the initial resource is completed.
@@ -132,7 +139,7 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
     }
 
     /**
-     * Maintenance period other than those defined.
+     * Returns the maintenance period other than those defined.
      *
      * @return The period, in milliseconds.
      */
@@ -141,7 +148,7 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
     }
 
     /**
-     * Maintenance period other than those defined.
+     * Set the maintenance period other than those defined.
      */
     public synchronized void setUserDefinedMaintenanceFrequency(final PeriodDuration newValue) {
         checkWritePermission();
@@ -150,56 +157,146 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
 
     /**
      * Scope of data to which maintenance is applied.
+     *
+     * @deprecated Replaced by {@link #getUpdateScopes}.
      */
     public ScopeCode getUpdateScope() {
-        return updateScope;
+        final Collection updateScopes = getUpdateScopes();
+        return updateScopes.isEmpty() ? null : (ScopeCode) updateScopes.iterator().next();
     }
 
     /**
      * Scope of data to which maintenance is applied.
+     *
+     * @deprecated Replaced by {@link #setUpdateScopes}.
      */
-    public synchronized void setUpdateScope(final ScopeCode newValue) {
-        checkWritePermission();
-        updateScope = newValue;
+    public void setUpdateScope(final ScopeCode newValue) {
+        setUpdateScopes(Collections.singleton(newValue));
+    }
+
+    /**
+     * Returns the scope of data to which maintenance is applied.
+     *
+     * @since 2.4
+     */
+    public synchronized Collection getUpdateScopes() {
+        return updateScopes = nonNullCollection(updateScopes, ScopeCode.class);
+    }
+
+    /**
+     * Set the scope of data to which maintenance is applied.
+     *
+     * @since 2.4
+     */
+    public synchronized void setUpdateScopes(final Collection newValues) {
+        updateScopes = copyCollection(newValues, updateScopes, ScopeCode.class);
     }
 
     /**
      * Additional information about the range or extent of the resource.
+     *
+     * @deprecated Replaced by {@link #getUpdateScopeDescriptions}.
      */
     public ScopeDescription getUpdateScopeDescription() {
-        return updateScopeDescription;
+        final Collection updateScopeDescriptions = getUpdateScopeDescriptions();
+        return updateScopeDescriptions.isEmpty() ? null :
+            (ScopeDescription) updateScopeDescriptions.iterator().next();
     }
 
     /**
      * Additional information about the range or extent of the resource.
+     *
+     * @deprecated Replaced by {@link #setUpdateScopeDescriptions}.
      */
-    public synchronized void setUpdateScopeDescription(final ScopeDescription newValue) {
-        checkWritePermission();
-        updateScopeDescription = newValue;
+    public void setUpdateScopeDescription(final ScopeDescription newValue) {
+        setUpdateScopeDescriptions(Collections.singleton(newValue));
+    }
+
+    /**
+     * Returns additional information about the range or extent of the resource.
+     *
+     * @since 2.4
+     */
+    public synchronized Collection getUpdateScopeDescriptions() {
+        return updateScopeDescriptions = nonNullCollection(updateScopeDescriptions, ScopeDescription.class);
+    }
+
+    /**
+     * Set additional information about the range or extent of the resource.
+     *
+     * @since 2.4
+     */
+    public synchronized void setUpdateScopeDescriptions(final Collection newValues) {
+        updateScopeDescriptions = copyCollection(newValues, updateScopeDescriptions, ScopeDescription.class);
     }
 
     /**
      * Information regarding specific requirements for maintaining the resource.
+     *
+     * @deprecated Replaced by {@link #getMaintenanceNotes}.
      */
     public InternationalString getMaintenanceNote() {
-        return maintenanceNote;
+        final Collection maintenanceNotes = getMaintenanceNotes();
+        return maintenanceNotes.isEmpty() ? null :
+            (InternationalString) maintenanceNotes.iterator().next();
     }
 
     /**
      * Information regarding specific requirements for maintaining the resource.
+     *
+     * @deprecated Replaced by {@link #setMaintenanceNotes}.
      */
-    public synchronized void setMaintenanceNote(final InternationalString newValue) {
-        checkWritePermission();
-        maintenanceNote = newValue;
+    public void setMaintenanceNote(final InternationalString newValue) {
+        setMaintenanceNotes(Collections.singleton(newValue));
     }
-    
+
+    /**
+     * Returns information regarding specific requirements for maintaining the resource.
+     *
+     * @since 2.4
+     */
+    public synchronized Collection getMaintenanceNotes() {
+        return maintenanceNotes = nonNullCollection(maintenanceNotes, InternationalString.class);
+    }
+
+    /**
+     * Set information regarding specific requirements for maintaining the resource.
+     *
+     * @since 2.4
+     */
+    public synchronized void setMaintenanceNotes(final Collection newValues) {
+        maintenanceNotes = copyCollection(newValues, maintenanceNotes, InternationalString.class);
+    }
+
+    /**
+     * Returns identification of, and means of communicating with,
+     * person(s) and organization(s) with responsibility for maintaining the metadata.
+     *
+     * @since 2.4
+     */
+    public synchronized Collection getContacts() {
+        return contacts = nonNullCollection(contacts, ResponsibleParty.class);
+    }
+
+    /**
+     * Set identification of, and means of communicating with,
+     * person(s) and organization(s) with responsibility for maintaining the metadata.
+     *
+     * @since 2.4
+     */
+    public synchronized void setContacts(final Collection newValues) {
+        contacts = copyCollection(newValues, contacts, ResponsibleParty.class);
+    }
+
     /**
      * Declare this metadata and all its attributes as unmodifiable.
      */
     protected void freeze() {
         super.freeze();
-        updateScopeDescription = (ScopeDescription)    unmodifiable(updateScopeDescription);
-        maintenanceNote        = (InternationalString) unmodifiable(maintenanceNote);
+        updateScopes            = (Collection) unmodifiable(updateScopes);
+        updateScopeDescriptions = (Collection) unmodifiable(updateScopeDescriptions);
+        maintenanceNotes        = (Collection) unmodifiable(maintenanceNotes);
+        contacts                = (Collection) unmodifiable(contacts);
     }
 
     /**
@@ -212,9 +309,10 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
         if (object!=null && object.getClass().equals(getClass())) {
             final MaintenanceInformationImpl that = (MaintenanceInformationImpl) object;
             return Utilities.equals(this.maintenanceAndUpdateFrequency, that.maintenanceAndUpdateFrequency  ) &&
-                   Utilities.equals(this.updateScope,                   that.updateScope                    ) &&
-                   Utilities.equals(this.updateScopeDescription,        that.updateScopeDescription         ) &&
-                   Utilities.equals(this.maintenanceNote,               that.maintenanceNote                ) &&
+                   Utilities.equals(this.updateScopes,                  that.updateScopes                   ) &&
+                   Utilities.equals(this.updateScopeDescriptions,       that.updateScopeDescriptions        ) &&
+                   Utilities.equals(this.maintenanceNotes,              that.maintenanceNotes               ) &&
+                   Utilities.equals(this.contacts,                      that.contacts                       ) &&
                    (this.userDefinedMaintenanceFrequency             == that.userDefinedMaintenanceFrequency) &&
                    (this.dateOfNextUpdate                            == that.dateOfNextUpdate               );
         }
@@ -225,9 +323,9 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
      * Returns a hash code value for this maintenance information.
      */
     public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
+        int code = (int) serialVersionUID;
         if (maintenanceAndUpdateFrequency != null) code ^= maintenanceAndUpdateFrequency.hashCode();
-        if (updateScope                   != null) code ^= updateScope                  .hashCode();
+        if (updateScopes                  != null) code ^= updateScopes                 .hashCode();
         return code;
     }
 
@@ -239,26 +337,5 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
             return maintenanceAndUpdateFrequency.name().toLowerCase().replace('_', ' ');
         }
         return "";
-    }
-
-
-    public Collection getContacts() {
-        // TODO IMPLEMENT!
-        return Collections.EMPTY_LIST;
-    }
-    
-    public Collection getUpdateScopeDescriptions() {
-        // TODO IMPLEMENT!
-        return Collections.EMPTY_LIST;
-    }
-    
-    public Collection getUpdateScopes() {
-        // TODO IMPLEMENT!
-        return Collections.EMPTY_LIST;
-    }
-    
-    public Collection getMaintenanceNotes() {
-        // TODO IMPLEMENT!
-        return Collections.EMPTY_LIST;
     }
 }

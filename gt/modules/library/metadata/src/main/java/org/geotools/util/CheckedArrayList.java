@@ -59,9 +59,31 @@ public class CheckedArrayList extends ArrayList implements Cloneable {
      * @param type The element type (should not be null).
      */
     public CheckedArrayList(final Class type) {
+        super();
         this.type = type;
+        ensureNonNull();
+    }
+
+    /**
+     * Constructs a list of the specified type and initial capacity.
+     *
+     * @param type The element type (should not be null).
+     * @param capacity The initial capacity.
+     *
+     * @since 2.4
+     */
+    public CheckedArrayList(final Class type, final int capacity) {
+        super(capacity);
+        this.type = type;
+        ensureNonNull();
+    }
+
+    /**
+     * Make sure that {@link #type} is non-null.
+     */
+    private void ensureNonNull() {
         if (type == null) {
-            throw new NullPointerException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, "type"));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, "type"));
         }
     }
 

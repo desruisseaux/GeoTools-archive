@@ -20,11 +20,13 @@
 package org.geotools.metadata.iso.content;
 
 // OpenGIS dependencies
-import org.geotools.metadata.iso.MetadataEntity;
-import org.geotools.resources.Utilities;
 import org.opengis.metadata.content.RangeDimension;
 import org.opengis.util.InternationalString;
 import org.opengis.util.MemberName;
+
+// Geotools dependencies
+import org.geotools.metadata.iso.MetadataEntity;
+import org.geotools.resources.Utilities;
 
 
 /**

@@ -522,9 +522,8 @@ public final class Citations {
 
     /**
      * Returns {@code true} if at least one {@linkplain Citation#getIdentifiers identifier} in
-     * {@code c1} is equals to an identifier of the same {@linkplain Citation#getIdentifierTypes
-     * type} in {@code c2}. The comparaison is case-insensitive and ignores leading and trailing
-     * spaces. The identifier ordering is not significant.
+     * {@code c1} is equals to an identifier in {@code c2}. The comparaison is case-insensitive
+     * and ignores leading and trailing spaces. The identifier ordering is not significant.
      * <p>
      * If (and <em>only</em> if) the citations do not contains any identifier, then this method
      * fallback on titles comparaison using the {@link #titleMatches(Citation,Citation)
@@ -533,68 +532,29 @@ public final class Citations {
      *
      * @param  c1 The first citation to compare.
      * @param  c2 the second citation to compare.
-     * @return {@code true} if at least one title or alternate title matches.
+     * @return {@code true} if at least one identifier, title or alternate title matches.
      */
-    public static boolean identifierMatches(final Citation c1, final Citation c2) {
+    public static boolean identifierMatches(Citation c1, Citation c2) {
         /*
          * If there is no identifier in both citations, fallback on title comparaisons. If there is
-         * identifiers in only one citation, make sure that this citation is the first one (c1), in
-         * order to allow the calls to 'identifierMatches(c2, String)' to fallback on title
-         * comparaisons for c2.
+         * identifiers in only one citation, make sure that this citation is the second one (c2) in
+         * order to allow at least one call to 'identifierMatches(c1, String)'.
          */
-        final Collection identifiers2 = c2.getIdentifiers();
-        final Iterator   ids1_iter    = c1.getIdentifiers().iterator();
-        if (!ids1_iter.hasNext()) {
-            if (identifiers2.isEmpty()) {
+        Iterator iterator = c2.getIdentifiers().iterator();
+        if (!iterator.hasNext()) {
+            iterator = c1.getIdentifiers().iterator();
+            if (!iterator.hasNext()) {
                 return titleMatches(c1, c2);
-            } else {
-                return identifierMatches(c2, c1);
             }
+            c1 = c2;
+            c2 = null; // Just for make sure that we don't use it by accident.
         }
-        
-        
-        //final Collection types2      = c2.getIdentifierTypes();
-        //final Iterator   types1_iter = c1.getIdentifierTypes().iterator();
         do {
-            
-            // If there is no more identifier types to compare, delegates to the
-            // identifierMatches(Citation, String) method (which doesn't take in
-            // account any identifier type, but may inspect titles if c2 doesn't
-            // have any identifier).
-                          
-            final String identifier1 = ((String) ids1_iter.next()).trim();
-            /*
-            if (!types1_iter.hasNext() || types2.isEmpty()) {
-                if (identifierMatches(c2, identifier1)) {
-                    return true;
-                } else {
-                    continue;
-                }
+            final String id = ((String) iterator.next()).trim();
+            if (identifierMatches(c1, id)) {
+                return true;
             }
-            */
-            //  Iterates through all identifiers in order to performs the comparaisons.  It would
-            //  have been more efficient to use Collection.contains (especially if the collection
-            //  is actually a HashSet), but we want the comparaisons to be case-insensitive. We
-            //  also want to compare the identifiers only if their types match (except if there
-            //  is no type information).
-             
-            //final String   type1       = ((String) types1_iter.next()).trim();
-            //final Iterator types2_iter = types2.iterator();
-            final Iterator ids2_iter   = identifiers2.iterator();
-            while (ids2_iter.hasNext()) {
-                final String identifier2 = ((String) ids2_iter.next()).trim();
-//                if (types2_iter.hasNext()) {
-//                    final String type2 = ((String) types2_iter.next()).trim();
-//                    if (!type1.equalsIgnoreCase(type2)) {
-//                        continue;
-//                    }
-//                }
-                if (identifier1.equalsIgnoreCase(identifier2)) {
-                    return true;
-                }
-            }
-        } while (ids1_iter.hasNext());
-        
+        } while (iterator.hasNext());
         return false;
     }
 

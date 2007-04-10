@@ -185,10 +185,12 @@ public class ExtentImpl extends MetadataEntity implements Extent {
                     /*
                      * Reminder: 'inclusion' is a mandatory attribute, so it should never be
                      * null for a valid metadata object.  If the metadata object is invalid,
-                     * it is better to get a NullPointerException than having a code doing
-                     * silently some probably inappropriate work.
+                     * it is better to get an exception than having a code doing silently
+                     * some probably inappropriate work.
                      */
-                    if (bounds.getInclusion().booleanValue()) {
+                    final Boolean inclusion = bounds.getInclusion();
+                    ensureNonNull("inclusion", inclusion);
+                    if (inclusion.booleanValue()) {
                         candidate = bounds;
                     }
                 } else {
