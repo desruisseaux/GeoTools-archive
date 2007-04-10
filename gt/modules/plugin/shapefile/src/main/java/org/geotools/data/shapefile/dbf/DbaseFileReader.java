@@ -475,10 +475,15 @@ public class DbaseFileReader {
 			case 'n':
 			case 'N':
 				try {
-					if (header.getFieldDecimalCount(fieldNum) == 0) {
-						object = new Integer(extractNumberString(charBuffer, fieldOffset, fieldLen));
+                    final Class clazz = header.getFieldClass(fieldNum);
+                    final String number = extractNumberString(charBuffer, fieldOffset, fieldLen);
+                    if(clazz == Integer.class) {
+						object = new Integer(number);
 						break;
-					}
+					} else if(clazz == Long.class) {
+                        object = new Long(number);
+                        break;
+                    }
 					// else will fall through to the floating point number
 				} catch (NumberFormatException e) {
 
