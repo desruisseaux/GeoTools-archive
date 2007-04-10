@@ -73,9 +73,8 @@ public abstract class ContentFeatureSource implements FeatureSource {
     }
 
     public final FeatureType getSchema() {
-        SimpleTypeFactory typeFactory = entry.getDataStore().getTypeFactory();
         ContentState state = entry.getState(transaction);
-        FeatureType featureType = (FeatureType) state.getMemberType( typeFactory );
+        FeatureType featureType = state.getMemberType();
 
         if (featureType == null) {
             //build and cache it
@@ -86,7 +85,7 @@ public abstract class ContentFeatureSource implements FeatureSource {
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                    state.setMemberType( typeFactory, featureType);
+                    state.setMemberType( featureType);
                 }
             }
         }

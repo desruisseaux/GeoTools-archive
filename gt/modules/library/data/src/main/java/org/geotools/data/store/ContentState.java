@@ -16,9 +16,8 @@
 package org.geotools.data.store;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 import org.geotools.data.FeatureListener;
 import org.geotools.feature.FeatureType;
 import org.opengis.feature.simple.SimpleTypeFactory;
@@ -44,12 +43,9 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author Justin Deoliveira, The Open Planning Project
  */
 public class ContentState {
+	protected FeatureType schema;
 
-	/** Map<SimpleTypeFactory,FeatureType> */
-	protected Map schema;
-
-	/** Map<SimpleTypeFactory,FeatureType> */
-	protected Map type;
+	protected FeatureType type;
 
     /**
      * observers
@@ -77,24 +73,24 @@ public class ContentState {
     
     public ContentState(ContentState state) {
 		this( state.getEntry() );
-        schema = new HashMap(state.schema);
-        type = new HashMap(state.type);
+        schema = state.schema;
+        type = state.type;
         count = state.count;
         bounds = state.bounds == null ? null : new Envelope( state.bounds );
 	}
 
-	public FeatureType getMemberType( SimpleTypeFactory factory ){
-    	return (FeatureType) schema.get( factory );
+	public FeatureType getMemberType(){
+    	return schema;
     }
     
-    public void setMemberType( SimpleTypeFactory factory, FeatureType memberType ){
-    	schema.put( factory, memberType);    	
+    public void setMemberType( FeatureType memberType ){
+    	schema = memberType;    	
     }
-    public FeatureType getType( SimpleTypeFactory factory ){
-    	return (FeatureType) type.get( factory );
+    public FeatureType getType(){
+    	return type; 
     }    
-    public void setType( SimpleTypeFactory factory, FeatureType featureType ){
-    	type.put( factory, type);    	
+    public void setType( FeatureType featureType ){
+    	type = featureType;    	
     }
     public int getCount(){
     	return count;
@@ -112,8 +108,8 @@ public class ContentState {
      * Flushes the cache.
      */
     public void flush() {
-        schema.clear();
-        type.clear();
+        schema = null;
+        type = null;
         count = -1;
         bounds = null;
     }
@@ -129,12 +125,12 @@ public class ContentState {
      * Cleans up the state object by clearing cache and listeners.
      */
     public void close() {
-    	if( schema == null ){
-           schema.clear();
-           schema = null;
+    	schema = null;
+    	type = null;
+    	if( listeners != null ){
+    		listeners.clear();
+    		listeners = null;
     	}
-        listeners.clear();
-        listeners = null;
     }
 
     /**
