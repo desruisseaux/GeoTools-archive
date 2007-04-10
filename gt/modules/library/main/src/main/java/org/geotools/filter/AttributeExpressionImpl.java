@@ -158,27 +158,35 @@ public class AttributeExpressionImpl extends DefaultExpression
      * @param obj Object from which we need to extract a property value.
      */
    public Object evaluate(Object obj) {
-        PropertyAccessor accessor =
-                PropertyAccessors.findPropertyAccessor( obj, attPath, null, null );
-
-        if ( accessor == null ) {
-                return null; //JD:not throwing exception to remain backwards compatabile, just returnign null                
-        }        
-        return accessor.get( obj, attPath, null );
+        return evaluate(obj, null);
    }
    
+   
    public Object evaluate(Object obj, Class target) {
-       PropertyAccessor accessor =
-               PropertyAccessors.findPropertyAccessor( obj, attPath, target, null );
+       PropertyAccessor accessor = getPropertyAccessor(obj, target);
 
        if ( accessor == null ) {
                return null; //JD:not throwing exception to remain backwards compatabile, just returnign null                
        }        
        Object propertyValue = accessor.get( obj, attPath, target );
+       if(target == null)
+           return propertyValue;
+
        Value value = new Value( propertyValue );
        return value.value( target ); // pull into the requested shape
        
   } 
+   
+   private PropertyAccessor lastAccessor;
+   private PropertyAccessor getPropertyAccessor(Object obj, Class target) {
+       if(lastAccessor == null)
+           lastAccessor = PropertyAccessors.findPropertyAccessor( obj, attPath, target, null );
+       else if(!lastAccessor.canHandle(obj, attPath, target))
+           lastAccessor = PropertyAccessors.findPropertyAccessor( obj, attPath, target, null );
+       
+       return lastAccessor;
+   }
+   
      /**
      * Return this expression as a string.
      *
