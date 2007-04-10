@@ -192,25 +192,12 @@ public abstract class ContentDataStore implements DataStore {
      */
     public final FeatureSource getFeatureSource(TypeName typeName, Transaction tx)
         throws IOException {
+    	
         ContentEntry entry = ensureEntry(typeName);
-        ContentState state = entry.getState(tx);
 
-        ContentFeatureSource featureSource = 
-        	(ContentFeatureSource) state.get(FeatureSource.class);
-
-        if (featureSource == null) {
-            synchronized (this) {
-                if (featureSource == null) {
-                    //create the feature source
-                    featureSource = createFeatureSource(entry);
-                    featureSource.setTransaction(tx);
-
-                    //cache it
-                    state.put(FeatureSource.class, featureSource);
-                }
-            }
-        }
-
+        ContentFeatureSource featureSource = createFeatureSource(entry);
+        featureSource.setTransaction(tx);
+        
         return featureSource;
     }
 

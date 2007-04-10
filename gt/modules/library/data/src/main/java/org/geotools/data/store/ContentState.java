@@ -20,6 +20,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.geotools.data.FeatureListener;
+import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleTypeFactory;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -29,7 +33,8 @@ import org.geotools.data.FeatureListener;
  * subject to the state of a dataset modified in a transaction. Examples of 
  * content to cache:
  * <ul>
- * <li>key: instance of FeatureTypeFactory; value: instance of FeatureType 
+ * <li>Schmea FeatureType (per FeatureTypeFactory )
+ * <li>Type FeatureType (per FeatureTypeFactory )
  * <li>key: "bounds"; value: Envelope of dataset
  * <li>key: "count"; value: Number of features in dataset
  * </ul>
@@ -38,21 +43,27 @@ import org.geotools.data.FeatureListener;
  * @author Jody Garnett, Refractions Research Inc.
  * @author Justin Deoliveira, The Open Planning Project
  */
-public final class ContentState {
-    /**
-     * cache / state
-     */
-    Map cache = new HashMap();
+public class ContentState {
+
+	/** Map<SimpleTypeFactory,FeatureType> */
+	protected Map schema;
+
+	/** Map<SimpleTypeFactory,FeatureType> */
+	protected Map type;
 
     /**
      * observers
      */
-    List listeners = new ArrayList(2);
+    private List listeners = new ArrayList(2);
 
     /**
      * entry maintaining the state
      */
-    ContentEntry entry;
+    private ContentEntry entry;
+
+	private int count = -1;
+
+	private Envelope bounds;
 
     /**
      * Creates a new state.
@@ -61,34 +72,50 @@ public final class ContentState {
      */
     public ContentState(ContentEntry entry) {
         this.entry = entry;
+        this.listeners = new ArrayList(2);
     }
+    
+    public ContentState(ContentState state) {
+		this( state.getEntry() );
+        schema = new HashMap(state.schema);
+        type = new HashMap(state.type);
+        count = state.count;
+        bounds = state.bounds == null ? null : new Envelope( state.bounds );
+	}
 
-    /**
-     * Adds a new item to the cache.
-     *
-     * @param key The key for the item.
-     * @param value The item.
-     */
-    public void put(Object key, Object value) {
-        cache.put(key, value);
+	public FeatureType getMemberType( SimpleTypeFactory factory ){
+    	return (FeatureType) schema.get( factory );
     }
-
-    /**
-     * Retreives an item from the cache.
-     *
-     * @param key The key for the item.
-     *
-     * @return The item, of <code>null</code> if no such item exists for key.
-     */
-    public Object get(Object key) {
-        return cache.get(key);
+    
+    public void setMemberType( SimpleTypeFactory factory, FeatureType memberType ){
+    	schema.put( factory, memberType);    	
     }
-
+    public FeatureType getType( SimpleTypeFactory factory ){
+    	return (FeatureType) type.get( factory );
+    }    
+    public void setType( SimpleTypeFactory factory, FeatureType featureType ){
+    	type.put( factory, type);    	
+    }
+    public int getCount(){
+    	return count;
+    }
+    public void setCount(int count){
+    	this.count = count;
+    }
+    public Envelope getBounds(){
+    	return bounds;
+    }
+    public void setBounds( Envelope bounds ){
+    	this.bounds = bounds;
+    }
     /**
      * Flushes the cache.
      */
-    final public void flush() {
-        cache.clear();
+    public void flush() {
+        schema.clear();
+        type.clear();
+        count = -1;
+        bounds = null;
     }
 
     /**
@@ -102,8 +129,10 @@ public final class ContentState {
      * Cleans up the state object by clearing cache and listeners.
      */
     public void close() {
-        cache.clear();
-        cache = null;
+    	if( schema == null ){
+           schema.clear();
+           schema = null;
+    	}
         listeners.clear();
         listeners = null;
     }
@@ -124,21 +153,6 @@ public final class ContentState {
      */
     public void removeListener(FeatureListener listener) {
         listeners.remove(listener);
-    }
-
-    /**
-     * Clones the state copying the cache.
-     * <p>
-     * Listeners are not copied.
-     * </p>
-     */
-    protected Object clone() throws CloneNotSupportedException {
-        ContentState clone = new ContentState(entry);
-
-        clone.cache = new HashMap(cache);
-        clone.listeners = new ArrayList(2);
-
-        return clone;
     }
 
     /**
