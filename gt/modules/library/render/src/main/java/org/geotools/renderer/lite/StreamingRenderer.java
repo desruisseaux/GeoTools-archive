@@ -179,6 +179,8 @@ public final class StreamingRenderer implements GTRenderer {
 	private final static PropertyName gridPropertyName= filterFactory.property("grid");
 	
 	private final static PropertyName paramsPropertyName= filterFactory.property("params");
+    
+    private final static PropertyName defaultGeometryPropertyName= filterFactory.property("");
 	
 
 	private final static CoordinateOperationFactory operationFactory = new BufferedCoordinateOperationFactory(
@@ -1837,7 +1839,7 @@ public final class StreamingRenderer implements GTRenderer {
 						// DJB: this should never be necessary since we've
 						// already taken care to make sure the reader is
 						// producing the correct coordinate system
-						if (CRS.equalsIgnoreMetadata(sa.crs,
+						if (sa.crs == null || CRS.equalsIgnoreMetadata(sa.crs,
 								destinationCrs))
 							transform = null;
 						else
@@ -2237,7 +2239,7 @@ public final class StreamingRenderer implements GTRenderer {
         }
                 
         if( geomName == null ){
-            geomName = ""; // indicate default geometry!
+            return defaultGeometryPropertyName;
         }
 		return filterFactory.property(geomName);
 	}
