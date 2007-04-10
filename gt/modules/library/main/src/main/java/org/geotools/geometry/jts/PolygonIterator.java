@@ -166,14 +166,16 @@ public final  class PolygonIterator extends AbstractLiteIterator {
      * @see #SEG_CLOSE
      */
     public int currentSegment(double[] coords) {
-        if (currentCoord == 0) {
+        // first make sure we're not at the last element, this prevents us from exceptions
+        // in the case where coords.size() == 0
+        if (currentCoord == this.coords.size()) {
+            return SEG_CLOSE;
+        } else if (currentCoord == 0) {
             coords[0] = this.coords.getX(0);
             coords[1] = this.coords.getY(0);
             transform(coords, 0, coords, 0, 1);
 
             return SEG_MOVETO;
-        } else if (currentCoord == this.coords.size()) {
-            return SEG_CLOSE;
         } else {
             coords[0] = this.coords.getX(currentCoord);
             coords[1] = this.coords.getY(currentCoord);

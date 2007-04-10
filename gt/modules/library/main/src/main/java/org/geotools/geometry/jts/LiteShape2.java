@@ -58,6 +58,8 @@ public final class LiteShape2 implements Shape, Cloneable {
 	private LineIterator2 lineIterator = new LineIterator2();
 
 	private GeomCollectionIterator collIterator = new GeomCollectionIterator();
+    
+    private EmptyIterator emptyiterator = new EmptyIterator();
 
 	private static GeometryFactory geomFac;
 
@@ -560,6 +562,9 @@ public final class LiteShape2 implements Shape, Cloneable {
 	 */
 	public PathIterator getPathIterator(AffineTransform at) {
 		PathIterator pi = null;
+        
+        if(this.geometry.isEmpty())
+            return emptyiterator;
 
 		// return iterator according to the kind of geometry we include
 		if (this.geometry instanceof Point) {

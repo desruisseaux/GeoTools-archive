@@ -62,6 +62,8 @@ public final class GeomCollectionIterator extends AbstractLiteIterator {
     private double maxDistance = 1.0;
     
     private LineIterator lineIterator = new LineIterator();
+    
+    private EmptyIterator emptyIterator = new EmptyIterator();
 
     public GeomCollectionIterator()
     {
@@ -79,7 +81,7 @@ public final class GeomCollectionIterator extends AbstractLiteIterator {
         this.maxDistance = maxDistance;
         currentGeom = 0;
         done = false;
-        currentIterator = getIterator(gc.getGeometryN(0));
+        currentIterator = gc.isEmpty() ? emptyIterator : getIterator(gc.getGeometryN(0));
 	}
 
     /**
@@ -127,6 +129,8 @@ public final class GeomCollectionIterator extends AbstractLiteIterator {
     private AbstractLiteIterator getIterator(Geometry g) {
         AbstractLiteIterator pi = null;
 
+        if (g.isEmpty())
+            return emptyIterator;
         if (g instanceof Polygon) {
             Polygon p = (Polygon) g;
             pi = new PolygonIterator(p, at, generalize, maxDistance);
