@@ -194,7 +194,7 @@ public class SubFeatureCollection extends AbstractResourceCollection implements 
 	public boolean isEmpty() {
 		Iterator iterator = iterator();
 		try {
-			return iterator.hasNext();
+			return !iterator.hasNext();
 		}
 		finally {
 			close( iterator );
