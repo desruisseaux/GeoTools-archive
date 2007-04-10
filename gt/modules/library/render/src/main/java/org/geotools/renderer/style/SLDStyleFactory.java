@@ -85,6 +85,7 @@ import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextMark;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.styling.TextSymbolizer2;
+import org.geotools.util.SoftValueHashMap;
 import org.w3c.dom.Document;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -217,13 +218,13 @@ public class SLDStyleFactory {
     }
 
     /** Parsed SVG glyphs */
-    WeakHashMap svgGlyphs = new WeakHashMap();
+    Map svgGlyphs = new SoftValueHashMap();
 
     /** Symbolizers that depend on attributes */
-    WeakHashMap dynamicSymbolizers = new WeakHashMap();
+    Map dynamicSymbolizers = new SoftValueHashMap();
 
     /** Symbolizers that do not depend on attributes */
-    WeakHashMap staticSymbolizers = new WeakHashMap(); 
+    Map staticSymbolizers = new SoftValueHashMap(); 
 
     private static Set getSupportedGraphicFormats() {
         if (supportedGraphicFormats == null) {
@@ -306,7 +307,7 @@ public class SLDStyleFactory {
                 if ((nameSet == null) || (nameSet.size() == 0)) {
                     staticSymbolizers.put(key, style);
                 } else {
-                    dynamicSymbolizers.put(key, null);
+                    dynamicSymbolizers.put(key, Boolean.TRUE);
                 }
             }
         }
@@ -1441,6 +1442,9 @@ public class SLDStyleFactory {
         if(exp == null){
             return fallback;
         }
+        Object o = exp.evaluate(f);
+        if(o instanceof Number)
+            return ((Number) o).floatValue();
         Float fo = (Float) exp.evaluate( f, Float.class );
         if( fo != null ){
             return fo.floatValue();
@@ -1453,6 +1457,9 @@ public class SLDStyleFactory {
         if(exp == null){
             return fallback;
         }
+        Object o = exp.evaluate(f);
+        if(o instanceof Number)
+            return ((Number) o).doubleValue();
         Double d = (Double) exp.evaluate( f, Double.class );
         if( d != null ){
             return d.doubleValue();
