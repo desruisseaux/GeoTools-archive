@@ -12,7 +12,7 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *    
+ *
  *    Created on 20/10/2003
  */
 package org.geotools.data.h2;
@@ -20,13 +20,12 @@ package org.geotools.data.h2;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
-
 import javax.sql.ConnectionPoolDataSource;
 import javax.sql.PooledConnection;
 
 
 /** A Mock ConnectionPoolDataSource for testing the JDBCDataStore.
- * 
+ *
  * @author Sean Geoghegan, Defence Science and Technology Organisation.
  * @source $URL$
  */
@@ -34,7 +33,7 @@ public class MockConnectionPoolDataSource implements ConnectionPoolDataSource {
     private Connection conn;
 
     /**
-     * 
+     *
      */
     public MockConnectionPoolDataSource(Connection conn) {
         this.conn = conn;
@@ -50,7 +49,8 @@ public class MockConnectionPoolDataSource implements ConnectionPoolDataSource {
     /* (non-Javadoc)
      * @see javax.sql.ConnectionPoolDataSource#getPooledConnection(java.lang.String, java.lang.String)
      */
-    public PooledConnection getPooledConnection(String user, String password) throws SQLException {
+    public PooledConnection getPooledConnection(String user, String password)
+        throws SQLException {
         throw new UnsupportedOperationException();
     }
 
@@ -64,21 +64,19 @@ public class MockConnectionPoolDataSource implements ConnectionPoolDataSource {
     /* (non-Javadoc)
      * @see javax.sql.ConnectionPoolDataSource#setLogWriter(java.io.PrintWriter)
      */
-    public void setLogWriter(PrintWriter out) throws SQLException {        
-
+    public void setLogWriter(PrintWriter out) throws SQLException {
     }
 
     /* (non-Javadoc)
      * @see javax.sql.ConnectionPoolDataSource#setLoginTimeout(int)
      */
     public void setLoginTimeout(int seconds) throws SQLException {
-       
     }
 
     /* (non-Javadoc)
      * @see javax.sql.ConnectionPoolDataSource#getLoginTimeout()
      */
-    public int getLoginTimeout() throws SQLException {       
+    public int getLoginTimeout() throws SQLException {
         return 0;
     }
 }

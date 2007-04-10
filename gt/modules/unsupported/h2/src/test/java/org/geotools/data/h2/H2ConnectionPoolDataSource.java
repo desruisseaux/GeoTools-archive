@@ -1,3 +1,18 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.data.h2;
 
 import java.io.PrintWriter;
@@ -12,106 +27,104 @@ import java.sql.Savepoint;
 import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.Map;
-
 import javax.sql.ConnectionEventListener;
 import javax.sql.ConnectionPoolDataSource;
 import javax.sql.PooledConnection;
 
+
 /**
- * A very lame connection pool datasource which actually doesn't pool 
+ * A very lame connection pool datasource which actually doesn't pool
  * connections!!.
- * 
+ *
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  *
  */
 public class H2ConnectionPoolDataSource implements ConnectionPoolDataSource {
+    /**
+     * connection url
+     */
+    String connectionURL;
 
-	/**
-	 * connection url
-	 */
-	String connectionURL;
-	/**
-	 * log writer
-	 */
-	PrintWriter logWriter;
-	/**
-	 * login timeout
-	 */
-	int loginTimeout;
-	
-	/**
-	 * Creates the connection pool datasource.
-	 * 
-	 * @param connectionURL The url describing how to connect to the db.
-	 */
-	H2ConnectionPoolDataSource( String connectionURL ) {
-		this.connectionURL = connectionURL;
-	}
-	
-	public PrintWriter getLogWriter() throws SQLException {
-		return logWriter;
-	}
+    /**
+     * log writer
+     */
+    PrintWriter logWriter;
 
-	public void setLogWriter(PrintWriter out) throws SQLException {
-		this.logWriter = out;
-	}
+    /**
+     * login timeout
+     */
+    int loginTimeout;
 
-	public int getLoginTimeout() throws SQLException {
-		return loginTimeout;
-	}
+    /**
+     * Creates the connection pool datasource.
+     *
+     * @param connectionURL The url describing how to connect to the db.
+     */
+    H2ConnectionPoolDataSource(String connectionURL) {
+        this.connectionURL = connectionURL;
+    }
 
-	public void setLoginTimeout(int seconds) throws SQLException {
-		this.loginTimeout = seconds;
-	}
-	
-	public PooledConnection getPooledConnection() throws SQLException {
-		return new H2PooledConnection();
-	}
+    public PrintWriter getLogWriter() throws SQLException {
+        return logWriter;
+    }
 
-	public PooledConnection getPooledConnection(String user, String password)
-			throws SQLException {
-		
-		return getPooledConnection();
-	}
+    public void setLogWriter(PrintWriter out) throws SQLException {
+        this.logWriter = out;
+    }
 
-	class H2PooledConnection implements PooledConnection {
+    public int getLoginTimeout() throws SQLException {
+        return loginTimeout;
+    }
 
-		/**
-		 * The actual connection resource
-		 */
-		Connection connection;
-		
-		public void addConnectionEventListener(ConnectionEventListener listener) {
-			throw new UnsupportedOperationException();
-		}
+    public void setLoginTimeout(int seconds) throws SQLException {
+        this.loginTimeout = seconds;
+    }
 
-		public void removeConnectionEventListener(ConnectionEventListener listener) {
-			throw new UnsupportedOperationException();
-		}
-		
-		public void close() throws SQLException {
-			if ( !connection.isClosed() ) {
-				connection.close();
-			}
-		}
+    public PooledConnection getPooledConnection() throws SQLException {
+        return new H2PooledConnection();
+    }
 
-		public Connection getConnection() throws SQLException {
-			if ( connection == null ) {
-				synchronized ( this ) {
-					if ( connection == null ) {
-						try {
-							Class.forName("org.h2.Driver");
-						} 
-						catch (ClassNotFoundException e) {
-							throw new RuntimeException( e );
-						}
-						connection = DriverManager.getConnection( connectionURL );
-					}
-				}
-			}
-			
-			return connection;
-		
-		}
-	}
+    public PooledConnection getPooledConnection(String user, String password)
+        throws SQLException {
+        return getPooledConnection();
+    }
+
+    class H2PooledConnection implements PooledConnection {
+        /**
+         * The actual connection resource
+         */
+        Connection connection;
+
+        public void addConnectionEventListener(ConnectionEventListener listener) {
+            throw new UnsupportedOperationException();
+        }
+
+        public void removeConnectionEventListener(ConnectionEventListener listener) {
+            throw new UnsupportedOperationException();
+        }
+
+        public void close() throws SQLException {
+            if (!connection.isClosed()) {
+                connection.close();
+            }
+        }
+
+        public Connection getConnection() throws SQLException {
+            if (connection == null) {
+                synchronized (this) {
+                    if (connection == null) {
+                        try {
+                            Class.forName("org.h2.Driver");
+                        } catch (ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                        connection = DriverManager.getConnection(connectionURL);
+                    }
+                }
+            }
+
+            return connection;
+        }
+    }
 }
