@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
+
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.opengis.feature.simple.SimpleFeatureFactory;
 import org.opengis.feature.simple.SimpleTypeFactory;
@@ -52,7 +54,12 @@ import org.geotools.feature.SchemaException;
  * @author Justin Deoliveira, The Open Planning Project
  */
 public abstract class ContentDataStore implements DataStore {
-    /**
+	/**
+	 * logging instance
+	 */
+	static final Logger LOGGER = Logger.getLogger( "org.geotools.data" );
+	
+	/**
      * Map<TypeName,ContentEntry> one for each kind of content served up.
      */
     final Map entries;
@@ -188,7 +195,8 @@ public abstract class ContentDataStore implements DataStore {
         ContentEntry entry = ensureEntry(typeName);
         ContentState state = entry.getState(tx);
 
-        ContentFeatureSource featureSource = (ContentFeatureSource) state.get(FeatureSource.class);
+        ContentFeatureSource featureSource = 
+        	(ContentFeatureSource) state.get(FeatureSource.class);
 
         if (featureSource == null) {
             synchronized (this) {
@@ -226,7 +234,7 @@ public abstract class ContentDataStore implements DataStore {
      *
      * @see DataStore#createSchema(FeatureType)
      */
-    public final void createSchema(FeatureType featureType)
+    public void createSchema(FeatureType featureType)
         throws IOException {
         throw new UnsupportedOperationException();
     }
@@ -285,10 +293,25 @@ public abstract class ContentDataStore implements DataStore {
      * </p>
      * @param entry The entry.
      *
-     * @return An instance of {@link ContentFeatureSource} for the entry.
+     * @return An new instance of {@link ContentFeatureSource} for the entry.
      */
     protected abstract ContentFeatureSource createFeatureSource(ContentEntry entry);
 
+    /**
+     * Instantiates a new conent state for the entry.
+     * <p>
+     * Subclasses may override this method to return a specific subclass of 
+     * {@link ContentState}.
+     * </p>
+     * @param entry The entry.
+     * 
+     * @return A new instance of {@link ContentState} for the entry.
+     *
+     */
+    protected ContentState createContentState(ContentEntry entry) {
+    	return new ContentState( entry );
+    }
+    
     /**
      * Helper method to wrap a non-qualified name.
      */
