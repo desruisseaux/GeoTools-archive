@@ -15,9 +15,11 @@
  */
 package org.geotools.data.postgis;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Map;
+import java.util.List;
 
+import org.geotools.data.DataUtilities;
 import org.geotools.feature.Feature;
 
 /**
@@ -27,20 +29,20 @@ import org.geotools.feature.Feature;
  * @since 2.4
  */
 public class FeatureDiff {
+    
+    /**
+     * Feature does not exists in fromVersion, has been created in the meantime (change map contains
+     * all attributes in this case)
+     */
+    public static final int INSERTED = 0;
+    
     /**
      * Feature exists in both versions, but has been modified
      */
-    public static final int UPDATED = 0;
+    public static final int UPDATED = 1;
 
     /**
-     * Feature does not exists in fromVersion, has been created in the meantime
-     * (change map contains all attributes in this case)
-     */
-    public static final int INSERTED = 1;
-
-    /**
-     * Feature existed in fromVersion, but has been deleted (change map is
-     * empty)
+     * Feature existed in fromVersion, but has been deleted (change map is empty)
      */
     public static final int DELETED = 2;
 
@@ -48,23 +50,11 @@ public class FeatureDiff {
 
     int state;
 
-    Map changes;
+    List changedAttributes;
 
     Feature feature;
 
     Feature oldFeature;
-
-    /**
-     * Creates a new feature difference for a deleted feature
-     * 
-     * @param ID
-     */
-    FeatureDiff(String ID) {
-        super();
-        this.ID = ID;
-        this.state = DELETED;
-        this.changes = Collections.EMPTY_MAP;
-    }
 
     /**
      * Creates a new feature difference for a modified feature
@@ -74,35 +64,42 @@ public class FeatureDiff {
      * @param newFeature
      * @param changes
      */
-    FeatureDiff(String ID, Feature oldFeature, Feature newFeature, Map changes) {
+    FeatureDiff(Feature oldFeature, Feature newFeature) {
         super();
-        this.ID = ID;
-        this.state = UPDATED;
-        this.changes = Collections.unmodifiableMap(changes);
+        if(oldFeature == null && newFeature == null)
+            throw new IllegalArgumentException("Both features are null, that's not a diff!");
+        
+        this.ID = oldFeature != null ? oldFeature.getID() : newFeature.getID();
         this.feature = newFeature;
         this.oldFeature = oldFeature;
+        this.changedAttributes = Collections.EMPTY_LIST;
+        if(oldFeature == null) {
+            this.state = INSERTED;
+        } else if(newFeature == null) {
+            this.state = DELETED;
+        } else {
+            this.state = UPDATED;
+            List changedAttributes = new ArrayList();
+            for (int i = 0; i < oldFeature.getNumberOfAttributes(); i++) {
+                String attName = oldFeature.getFeatureType().getAttributeType(i).getName();
+                Object toAttribute = newFeature.getAttribute(attName);
+                Object fromAttribute = oldFeature.getAttribute(attName);
+                if (!DataUtilities.attributesEqual(fromAttribute, toAttribute)) {
+                    changedAttributes.add(attName);
+                }
+            }
+            this.changedAttributes = Collections.unmodifiableList(changedAttributes);
+        }
     }
 
     /**
-     * Creates a new feature difference for an inserted feature
-     * @param feature
-     */
-    FeatureDiff(Feature feature) {
-        super();
-        this.ID = feature.getID();
-        this.state = INSERTED;
-        this.feature = feature;
-        this.changes = Collections.EMPTY_MAP;
-    }
-
-    /**
-     * Returns a map of changes, from attribute name to the value at toVersion,
-     * if state is {@link #UPDATED}, an empty map otherwise
+     * Returns a read only list of modified attribute names if state is {@link #UPDATED}, an empty
+     * list otherwise
      * 
      * @return
      */
-    public Map getChanges() {
-        return changes;
+    public List getChangedAttributes() {
+        return changedAttributes;
     }
 
     /**
@@ -129,17 +126,18 @@ public class FeatureDiff {
     }
 
     /**
-     * Returns the inserted feature, if the state is {@link #INSERTED}, the new
-     * feature, if the state is {@link #UPDATED}, null otherwise
+     * Returns the inserted feature, if the state is {@link #INSERTED}, the new feature, if the
+     * state is {@link #UPDATED}, null otherwise
      * 
      * @return
      */
     public Feature getFeature() {
         return feature;
     }
-    
+
     /**
      * Returns the old feature, if the state is {@link #UPDATED}, null otherwise
+     * 
      * @return
      */
     public Feature getOldFeature() {

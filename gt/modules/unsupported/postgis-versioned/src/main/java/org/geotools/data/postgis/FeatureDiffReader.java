@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
@@ -54,11 +55,11 @@ public class FeatureDiffReader {
     private RevisionInfo fromVersion;
 
     private RevisionInfo toVersion;
-    
+
     private VersionedFIDMapper mapper;
-    
+
     private Transaction transaction;
-    
+
     private VersionedPostgisDataStore store;
 
     private FeatureReader deletedReader;
@@ -71,9 +72,8 @@ public class FeatureDiffReader {
 
     private ModifiedFeatureIds modifiedIds;
 
-    public FeatureDiffReader(VersionedPostgisDataStore store, Transaction transaction, 
-            FeatureType externalFeatureType, 
-            RevisionInfo fromVersion, RevisionInfo toVersion, 
+    public FeatureDiffReader(VersionedPostgisDataStore store, Transaction transaction,
+            FeatureType externalFeatureType, RevisionInfo fromVersion, RevisionInfo toVersion,
             VersionedFIDMapper mapper, ModifiedFeatureIds modifiedIds) throws IOException {
         this.store = store;
         this.transaction = transaction;
@@ -84,10 +84,28 @@ public class FeatureDiffReader {
         this.modifiedIds = modifiedIds;
         initReaders();
     }
-    
+
+    /**
+     * Allows to clone a diff reader, this makes it possible to scroll over the same diffs with
+     * multiple readers at the same time (reset allows only for multiple isolated scans)
+     * 
+     * @param other
+     * @throws IOException
+     */
+    public FeatureDiffReader(FeatureDiffReader other) throws IOException {
+        this.store = other.store;
+        this.transaction = other.transaction;
+        this.fromVersion = other.fromVersion;
+        this.toVersion = other.toVersion;
+        this.externalFeatureType = other.externalFeatureType;
+        this.mapper = other.mapper;
+        this.modifiedIds = other.modifiedIds;
+        initReaders();
+    }
+
     void initReaders() throws IOException {
         FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
-        
+
         // TODO: extract only pk attributes for the delete reader, no need for the others
         if (fromVersion.revision > toVersion.revision) {
             createdReader = readerFromIdsRevision(ff, null, modifiedIds.deleted, toVersion);
@@ -99,7 +117,7 @@ public class FeatureDiffReader {
         fvReader = readerFromIdsRevision(ff, mapper, modifiedIds.modified, fromVersion);
         tvReader = readerFromIdsRevision(ff, mapper, modifiedIds.modified, toVersion);
     }
-    
+
     /**
      * Returns a feature reader for the specified fids and revision, or null if the fid set is empty
      * 
@@ -109,18 +127,18 @@ public class FeatureDiffReader {
      * @return
      * @throws IOException
      */
-    FeatureReader readerFromIdsRevision(FilterFactory ff, VersionedFIDMapper mapper, Set fids, RevisionInfo ri)
-            throws IOException {
+    FeatureReader readerFromIdsRevision(FilterFactory ff, VersionedFIDMapper mapper, Set fids,
+            RevisionInfo ri) throws IOException {
         if (fids != null && !fids.isEmpty()) {
             Filter fidFilter = store.buildFidFilter(ff, fids);
-            Filter versionFilter = store.buildVersionedFilter(externalFeatureType.getTypeName(), fidFilter, ri);
-            DefaultQuery query = new DefaultQuery(externalFeatureType.getTypeName(),
-                                versionFilter);
-            if(mapper != null) {
+            Filter versionFilter = store.buildVersionedFilter(externalFeatureType.getTypeName(),
+                    fidFilter, ri);
+            DefaultQuery query = new DefaultQuery(externalFeatureType.getTypeName(), versionFilter);
+            if (mapper != null) {
                 List sort = new ArrayList(mapper.getColumnCount() - 1);
-                for(int i = 0; i < mapper.getColumnCount(); i++) {
+                for (int i = 0; i < mapper.getColumnCount(); i++) {
                     String colName = mapper.getColumnName(i);
-                    if(!"revision".equals(colName))
+                    if (!"revision".equals(colName))
                         sort.add(ff.sort(colName, SortOrder.DESCENDING));
                 }
                 query.setSortBy((SortBy[]) sort.toArray(new SortBy[sort.size()]));
@@ -148,9 +166,10 @@ public class FeatureDiffReader {
     public String getToVersion() {
         return toVersion.getVersion();
     }
-    
+
     /**
      * Returns the feature type whose features are diffed with this reader
+     * 
      * @return
      */
     public FeatureType getSchema() {
@@ -170,29 +189,37 @@ public class FeatureDiffReader {
     public FeatureDiff next() throws IOException, NoSuchElementException {
         // check we have something, and force reader mantainance as well, so that
         // we make sure finished ones are nullified
-        try {
-            if (!hasNext())
-                throw new NoSuchElementException("No more diffs in this reader");
+        if (!hasNext())
+            throw new NoSuchElementException("No more diffs in this reader");
+        if (createdReader != null) {
+            return new FeatureDiff(null, gatherNextUnversionedFeature(createdReader));
+        } else if (deletedReader != null) {
+            return new FeatureDiff(gatherNextUnversionedFeature(deletedReader), null);
+        } else {
+            FeatureDiff diff = lastDiff;
+            lastDiff = null;
+            return diff;
+        }
 
-            if (createdReader != null) {
-                // all attributes in the external type become changes
-                final Feature f = createdReader.next();
-                final Object[] attributes = new Object[externalFeatureType.getAttributeCount()];
-                for (int i = 0; i < externalFeatureType.getAttributeCount(); i++) {
-                    attributes[i] = f.getAttribute(externalFeatureType.getAttributeType(i).getName());
-                }
-                String id = mapper.getUnversionedFid(f.getID());
-                return new FeatureDiff(externalFeatureType.create(attributes, id));
-            } else if (deletedReader != null) {
-                // no changes, we just need the id
-                final Feature f = deletedReader.next();
-                final String id = mapper.getUnversionedFid(f.getID());
-                return new FeatureDiff(id);
-            } else {
-                FeatureDiff diff = lastDiff;
-                lastDiff = null;
-                return diff;
+    }
+
+    /**
+     * Turns a versioned feature into the extenal equivalent, with modified fid and without the
+     * versioning columns
+     * 
+     * @param f
+     * @return
+     * @throws IllegalAttributeException
+     */
+    private Feature gatherNextUnversionedFeature(final FeatureReader fr) throws IOException {
+        try {
+            final Feature f = fr.next();
+            final Object[] attributes = new Object[externalFeatureType.getAttributeCount()];
+            for (int i = 0; i < externalFeatureType.getAttributeCount(); i++) {
+                attributes[i] = f.getAttribute(externalFeatureType.getAttributeType(i).getName());
             }
+            String id = mapper.getUnversionedFid(f.getID());
+            return externalFeatureType.create(attributes, id);
         } catch (IllegalAttributeException e) {
             throw new DataSourceException("Could not properly load the fetures to diff: " + e);
         }
@@ -227,48 +254,36 @@ public class FeatureDiffReader {
                 deletedReader = null;
             }
         }
-        try {
-            // this is harder... we may have features that have changed between fromVersion and
-            // toVersion, but which are equal in those two (typical case, rollback). So we really
-            // need to compute the diff and move forward if there's no difference at all
-            if (lastDiff != null)
-                return true;
-            if (fvReader != null && tvReader != null) {
-                while (true) {
-                    if (!fvReader.hasNext()) {
-                        lastDiff = null;
-                        fvReader.close();
-                        tvReader.close();
-                        return false;
-                    }
-                    // compute field by field difference
-                    Feature from = fvReader.next();
-                    Feature to = tvReader.next();
-                    Map changes = new HashMap();
-                    for (int i = 0; i < externalFeatureType.getAttributeCount(); i++) {
-                        String attName = externalFeatureType.getAttributeType(i).getName();
-                        Object toAttribute = to.getAttribute(attName);
-                        Object fromAttribute = from.getAttribute(attName);
-                        if (!DataUtilities.attributesEqual(fromAttribute, toAttribute)) {
-                            changes.put(attName, toAttribute);
-                        }
-                    }
-                    if (!changes.isEmpty()) {
-                        String id = mapper.getUnversionedFid(from.getID());
-                        lastDiff = new FeatureDiff(id, from, to, changes);
-                        return true;
-                    }
+        // this is harder... we may have features that have changed between fromVersion and
+        // toVersion, but which are equal in those two (typical case, rollback). So we really
+        // need to compute the diff and move forward if there's no difference at all
+        if (lastDiff != null)
+            return true;
+        if (fvReader != null && tvReader != null) {
+            while (true) {
+                if (!fvReader.hasNext()) {
+                    lastDiff = null;
+                    fvReader.close();
+                    tvReader.close();
+                    return false;
                 }
-            } else {
-                return false; // closed;
+                // compute field by field difference
+                Feature from = gatherNextUnversionedFeature(fvReader);
+                Feature to = gatherNextUnversionedFeature(tvReader);
+                FeatureDiff diff = new FeatureDiff(from, to);
+                if (diff.getChangedAttributes().size() != 0) {
+                    lastDiff = diff;
+                    return true;
+                }
             }
-        } catch (IllegalAttributeException e) {
-            throw new DataSourceException("Could not properly load the fetures to diff: " + e);
+        } else {
+            return false; // closed;
         }
     }
-    
+
     /**
      * Resets the reader to the initial position
+     * 
      * @throws IOException
      */
     public void reset() throws IOException {
@@ -300,10 +315,9 @@ public class FeatureDiffReader {
             tvReader = null;
         }
     }
-    
+
     protected void finalize() throws Throwable {
         close();
-    }   
-    
-    
+    }
+
 }

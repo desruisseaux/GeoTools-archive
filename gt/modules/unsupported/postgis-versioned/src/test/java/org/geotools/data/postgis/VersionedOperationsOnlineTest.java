@@ -70,9 +70,9 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         assertFalse(typeNames.contains(VersionedPostgisDataStore.TBL_TABLESCHANGED));
     }
 
-    /** 
-     * Changesets is special, it's an internal table exposed for log access purposes,
-     * and it's not writable
+    /**
+     * Changesets is special, it's an internal table exposed for log access purposes, and it's not
+     * writable
      */
     public void testChangesetFeatureType() throws IOException {
         VersionedPostgisDataStore ds = getDataStore();
@@ -392,15 +392,15 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         assertEquals(2, types.size());
         assertTrue(types.contains("river"));
         assertTrue(types.contains("road"));
-        
+
         // remember to close down the transaction
         t.close();
     }
 
     /**
-     * The datastore used to choke on single point changes because the change
-     * bbox would be an invalid polygon. Plus the feature collection seems to
-     * ignore the version set in the query used to gather it
+     * The datastore used to choke on single point changes because the change bbox would be an
+     * invalid polygon. Plus the feature collection seems to ignore the version set in the query
+     * used to gather it
      * 
      * @throws Exception
      */
@@ -421,9 +421,9 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
     }
 
     /**
-     * The datastore used to choke on single point changes because the change
-     * bbox would be an invalid polygon. Plus the feature collection seems to
-     * ignore the version set in the query used to gather it
+     * The datastore used to choke on single point changes because the change bbox would be an
+     * invalid polygon. Plus the feature collection seems to ignore the version set in the query
+     * used to gather it
      * 
      * @throws Exception
      */
@@ -478,9 +478,9 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
     }
 
     /**
-     * Versioned datastore broke if the same feature got updated twice in the
-     * same transaction (since it tried to create a new record at revions x,
-     * then expired it, and created another again at revision x).
+     * Versioned datastore broke if the same feature got updated twice in the same transaction
+     * (since it tried to create a new record at revions x, then expired it, and created another
+     * again at revision x).
      * 
      * @throws Exception
      * 
@@ -689,7 +689,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         assertEquals(0, mfids.getDeleted().size());
         assertEquals(0, mfids.getModified().size());
     }
-    
+
     public void testUserModifiedIds() throws IOException, IllegalAttributeException {
         VersionedPostgisDataStore ds = getDataStore();
         String newId = buildRiverHistory();
@@ -704,22 +704,25 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         Transaction ac = Transaction.AUTO_COMMIT;
         // ... all history, all users
         ModifiedFeatureIds mfids = ds.getModifiedFeatureFIDs("river", "1", "5", Filter.INCLUDE,
-                new String[] {"lamb", "trout"}, ac);
+                new String[] { "lamb", "trout" }, ac);
         assertEquals(1, mfids.getCreated().size());
         assertEquals(1, mfids.getDeleted().size());
         assertEquals(1, mfids.getModified().size());
         // ... just first modification, but with the wrong user
-        mfids = ds.getModifiedFeatureFIDs("river", "1", "2", Filter.INCLUDE, new String[] {"trout"}, ac);
+        mfids = ds.getModifiedFeatureFIDs("river", "1", "2", Filter.INCLUDE,
+                new String[] { "trout" }, ac);
         assertEquals(0, mfids.getCreated().size());
         assertEquals(0, mfids.getDeleted().size());
         assertEquals(0, mfids.getModified().size());
         // ... again the first modification, right user this time
-        mfids = ds.getModifiedFeatureFIDs("river", "1", "2", Filter.INCLUDE, new String[] {"lamb"}, ac);
+        mfids = ds.getModifiedFeatureFIDs("river", "1", "2", Filter.INCLUDE,
+                new String[] { "lamb" }, ac);
         assertEquals(0, mfids.getCreated().size());
         assertEquals(0, mfids.getDeleted().size());
         assertEquals(2, mfids.getModified().size());
         // ... let's see what trout did between 1 and 4
-        mfids = ds.getModifiedFeatureFIDs("river", "1", "4", Filter.INCLUDE, new String[] {"trout"}, ac);
+        mfids = ds.getModifiedFeatureFIDs("river", "1", "4", Filter.INCLUDE,
+                new String[] { "trout" }, ac);
         assertEquals(0, mfids.getCreated().size());
         assertEquals(0, mfids.getDeleted().size());
         assertEquals(1, mfids.getModified().size());
@@ -789,7 +792,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         assertFalse(fr.hasNext());
         fr.close();
         assertEquals(2, fs.getFeatures(Filter.INCLUDE).size());
-        
+
         t.close();
     }
 
@@ -815,7 +818,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         }
         t.close();
     }
-    
+
     public void testRollbackUserChanges() throws IOException, IllegalAttributeException {
         VersionedPostgisDataStore ds = getDataStore();
         buildRiverHistory();
@@ -827,7 +830,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         VersionedPostgisFeatureStore fs = (VersionedPostgisFeatureStore) ds
                 .getFeatureSource("river");
         fs.setTransaction(t);
-        fs.rollback("1", Filter.INCLUDE, new String[]{"trout"});
+        fs.rollback("1", Filter.INCLUDE, new String[] { "trout" });
         t.commit();
 
         // now check that rv2 is again there an equal to the original, rv3 has not rolled back
@@ -836,11 +839,11 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         assertEquals(riverFeatures.length + 1, fc.size());
         assertTrue(fc.contains(riverFeatures[1]));
         FeatureIterator fi = fc.features();
-        while(fi.hasNext()) {
+        while (fi.hasNext()) {
             Feature f = fi.next();
-            if(f.getID().equals("river.rv1"))
+            if (f.getID().equals("river.rv1"))
                 assertFalse(f.equals(riverFeatures[1]));
-            else if(f.getID().equals("river.rv2"))
+            else if (f.getID().equals("river.rv2"))
                 assertEquals(riverFeatures[1], f);
             else
                 assertEquals(new Integer(3), f.getAttribute("id"));
@@ -961,15 +964,16 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
                 assertEquals("2", fdr.getToVersion());
                 assertEquals(FeatureDiff.UPDATED, diff.state);
                 if (diff.getID().equals("river.rv1")) {
-                    assertEquals(2, diff.getChanges().size());
-                    assertEquals("rv1 v2", diff.getChanges().get("river"));
-                    assertEquals(new Double(9.6), diff.getChanges().get("flow"));
+                    assertEquals(2, diff.getChangedAttributes().size());
+                    assertTrue(diff.getChangedAttributes().contains("river"));
+                    assertTrue(diff.getChangedAttributes().contains("flow"));
+                    assertEquals("rv1 v2", diff.getFeature().getAttribute("river"));
+                    assertEquals(new Double(9.6), diff.getFeature().getAttribute("flow"));
                 } else {
-                    assertEquals(2, diff.getChanges().size());
-                    assertEquals("rv2 v2", diff.getChanges().get("river"));
-                    assertTrue(DataUtilities.attributesEqual(
-                            lines(new int[][] { { 100, 100, 120, 120 } }), diff.getChanges()
-                                    .get("geom")));
+                    assertEquals(2, diff.getChangedAttributes().size());
+                    assertEquals("rv2 v2", diff.getFeature().getAttribute("river"));
+                    assertTrue(DataUtilities.attributesEqual(lines(new int[][] { { 100, 100, 120,
+                            120 } }), diff.getFeature().getAttribute("geom")));
                 }
             }
         }
@@ -984,6 +988,30 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         assertEquals(fs.getSchema(), diff.getFeature().getFeatureType());
         assertFalse(fdr.hasNext());
         fdr.close();
+    }
+    
+    /**
+     * Create history, rollback it, diff used to report changes anyways
+     * @throws IOException 
+     * @throws IllegalAttributeException 
+     */
+    public void testRollbackDiff() throws IOException, IllegalAttributeException {
+        VersionedPostgisDataStore ds = getDataStore();
+        buildRiverHistory();
+
+        // try to rollback to revision 1, that is, rollback everything
+        Transaction t = createTransaction("Mambo", "Restarting the world");
+        VersionedPostgisFeatureStore fs = (VersionedPostgisFeatureStore) ds
+                .getFeatureSource("river");
+        fs.setTransaction(t);
+        fs.rollback("1", Filter.INCLUDE, null);
+        t.commit();
+
+        // now extract a diff between current revision and the last one
+        FeatureDiffReader reader = fs.getDifferences("1",null, null);
+        assertFalse(reader.hasNext());
+        reader.close();
+        t.close();
     }
 
     /**
@@ -1068,24 +1096,26 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         t.putProperty(VersionedPostgisDataStore.MESSAGE, message);
         return t;
     }
-    
+
     public static void main(String[] args) {
         junit.textui.TestRunner runner = new junit.textui.TestRunner();
-        runner.setPrinter(new ResultPrinter(System.out){
-            
+        runner.setPrinter(new ResultPrinter(System.out) {
+
             public void startTest(Test test) {
                 getWriter().println("About to run " + test);
                 super.startTest(test);
             }
-            
+
             public void endTest(Test test) {
                 super.endTest(test);
-                System.gc(); System.gc(); System.gc();
+                System.gc();
+                System.gc();
+                System.gc();
                 Runtime.getRuntime().runFinalization();
                 getWriter().println("Test ended: " + test);
                 getWriter().println();
             }
-        
+
         });
         runner.doRun(new TestSuite(VersionedOperationsOnlineTest.class));
     }
