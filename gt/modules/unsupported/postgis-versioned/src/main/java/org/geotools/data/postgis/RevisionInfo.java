@@ -51,8 +51,9 @@ class RevisionInfo {
      */
     public RevisionInfo(String version) throws IOException {
         this.version = version;
-        if (version == null || version.trim().equals("")) {
+        if (version == null || version.trim().equals("") || version.trim().equals("CURRENT")) {
             revision = Long.MAX_VALUE;
+            this.version = "CURRENT";
         } else {
             try {
                 revision = Long.parseLong(version);
@@ -74,7 +75,7 @@ class RevisionInfo {
      */
     public String getCanonicalVersion() {
         if (isLast())
-            return "";
+            return "CURRENT";
         else
             return String.valueOf(revision);
     }
