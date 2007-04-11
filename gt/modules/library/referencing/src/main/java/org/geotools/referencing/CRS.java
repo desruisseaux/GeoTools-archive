@@ -56,6 +56,7 @@ import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.factory.epsg.LongitudeFirstFactory;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
@@ -277,10 +278,10 @@ public final class CRS {
      * @see #getSupportedCodes
      * @see org.geotools.referencing.factory.AllAuthoritiesFactory#createCoordinateReferenceSystem
      */ 
-    public static CoordinateReferenceSystem decode(final String code)
+    public static CoordinateReferenceSystem decode(final String code)    
             throws NoSuchAuthorityCodeException, FactoryException
     {
-        return decode(code, false);
+        return decode(code, Boolean.getBoolean(LongitudeFirstFactory.SYSTEM_DEFAULT_KEY));
     }
 
     /**
