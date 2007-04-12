@@ -53,7 +53,7 @@ public class GeorectifiedImpl extends GridSpatialRepresentationImpl implements G
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 5875851898471237138L;
- 
+
     /**
      * Indication of whether or not geographic position points are available to test the
      * accuracy of the georeferenced grid data.
@@ -95,7 +95,7 @@ public class GeorectifiedImpl extends GridSpatialRepresentationImpl implements G
      * Information about which grid dimensions are the spatial dimensions.
      */
     private Collection transformationDimensionMapping;
-    
+
     /**
      * Constructs an initially empty georectified object.
      */
@@ -106,12 +106,12 @@ public class GeorectifiedImpl extends GridSpatialRepresentationImpl implements G
      * Creates a georectified object initialized to the specified values.
      */
     public GeorectifiedImpl(final int              numberOfDimensions,
-                        final List             axisDimensionsProperties,
-                        final CellGeometry     cellGeometry,
-                        final boolean          transformationParameterAvailable,
-                        final boolean          checkPointAvailable, 
-                        final List             cornerPoints, 
-                        final PixelOrientation pointInPixel)
+                            final List             axisDimensionsProperties,
+                            final CellGeometry     cellGeometry,
+                            final boolean          transformationParameterAvailable,
+                            final boolean          checkPointAvailable,
+                            final List             cornerPoints,
+                            final PixelOrientation pointInPixel)
     {
         super(numberOfDimensions,
               axisDimensionsProperties,
@@ -244,7 +244,7 @@ public class GeorectifiedImpl extends GridSpatialRepresentationImpl implements G
         transformationDimensionMapping = copyCollection(newValues, transformationDimensionMapping,
                                                         InternationalString.class);
     }
-        
+
     /**
      * Declare this metadata and all its attributes as unmodifiable.
      */
@@ -284,8 +284,8 @@ public class GeorectifiedImpl extends GridSpatialRepresentationImpl implements G
      */
     public synchronized int hashCode() {
         int code = (int)serialVersionUID;
-        if (checkPointDescription              != null)        code ^= checkPointDescription             .hashCode();
-        if (transformationDimensionDescription != null)        code ^= transformationDimensionDescription.hashCode();
+        if (checkPointDescription              != null) code ^= checkPointDescription             .hashCode();
+        if (transformationDimensionDescription != null) code ^= transformationDimensionDescription.hashCode();
         return code;
     }
 
@@ -294,5 +294,5 @@ public class GeorectifiedImpl extends GridSpatialRepresentationImpl implements G
      */
     public String toString() {
         return String.valueOf(checkPointDescription);
-    }            
+    }
 }

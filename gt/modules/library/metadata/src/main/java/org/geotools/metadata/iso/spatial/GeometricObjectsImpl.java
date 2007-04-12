@@ -113,8 +113,8 @@ public class GeometricObjectsImpl extends MetadataEntity implements GeometricObj
         }
         if (object!=null && object.getClass().equals(getClass())) {
             final GeometricObjectsImpl that = (GeometricObjectsImpl) object; 
-            return  Utilities.equals(this.geometricObjectType,    that.geometricObjectType ) &&
-                                    (this.geometricObjectCount == that.geometricObjectCount);
+            return Utilities.equals(this.geometricObjectType,  that.geometricObjectType ) &&
+                   Utilities.equals(this.geometricObjectCount, that.geometricObjectCount);
         }
         return false;
     }
@@ -126,7 +126,7 @@ public class GeometricObjectsImpl extends MetadataEntity implements GeometricObj
      */
     public synchronized int hashCode() {
         int code = (int)serialVersionUID;
-        if (geometricObjectType != null)        code ^= geometricObjectType.hashCode();
+        if (geometricObjectType != null) code ^= geometricObjectType.hashCode();
         return code;
     }
 

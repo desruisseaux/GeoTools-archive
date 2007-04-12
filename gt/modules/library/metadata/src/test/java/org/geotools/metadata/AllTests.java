@@ -65,6 +65,8 @@ public final class AllTests {
         suite.addTest(org.geotools.factory  .AbstractFactoryTest        .suite());
         suite.addTest(org.geotools.factory  .FactoryRegistryTest        .suite());
         suite.addTest(org.geotools.factory  .FactoryIteratorProviderTest.suite());
+        suite.addTest(org.geotools.metadata .PropertyAccessorTest       .suite());
+        suite.addTest(org.geotools.metadata .MetadataStandardTest       .suite());
         return suite;
     }
 }

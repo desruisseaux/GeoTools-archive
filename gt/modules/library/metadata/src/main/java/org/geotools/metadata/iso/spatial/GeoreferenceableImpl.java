@@ -70,7 +70,7 @@ public class GeoreferenceableImpl extends GridSpatialRepresentationImpl implemen
     /**
      * Terms which support grid data georeferencing.
      */
-    private Record parameters;
+    private Record georeferencedParameters;
 
     /**
      * Reference providing description of the parameters.
@@ -146,7 +146,7 @@ public class GeoreferenceableImpl extends GridSpatialRepresentationImpl implemen
     /**
      * Terms which support grid data georeferencing.
      * 
-     * @deprecated please use getGeoreferencedParameters
+     * @deprecated please use {@link #getGeoreferencedParameters}.
      */
     public Object getParameters() {
         return getGeoreferencedParameters();
@@ -154,28 +154,30 @@ public class GeoreferenceableImpl extends GridSpatialRepresentationImpl implemen
 
     /**
      * Terms which support grid data georeferencing.
+     *
+     * @since 2.4
      */
     public Record getGeoreferencedParameters() {
-        // TODO Auto-generated method stub
-        return null;
+        return georeferencedParameters;
     }            
 
     /**
      * Set terms which support grid data georeferencing.
      * 
-     * @deprecated please use setGeoreferencedParameters
+     * @deprecated please use {@link #setGeoreferencedParameters}.
      */
-    public synchronized void setParameters(final Object newValue) {
-        checkWritePermission();
-        parameters = (Record) newValue;
+    public void setParameters(final Object newValue) {
+        setGeoreferencedParameters((Record) newValue);
     }
 
     /**
      * Set terms which support grid data georeferencing.
+     *
+     * @since 2.4
      */
     public synchronized void setGeoreferencedParameters(final Record newValue) {
         checkWritePermission();
-        parameters = newValue;
+        georeferencedParameters = newValue;
     }
 
     /**
@@ -198,7 +200,7 @@ public class GeoreferenceableImpl extends GridSpatialRepresentationImpl implemen
     protected void freeze() {
         super.freeze();
         orientationParameterDescription = (InternationalString) unmodifiable(orientationParameterDescription);
-        parameters                      = (Record)              unmodifiable(parameters);
+        georeferencedParameters         = (Record)              unmodifiable(georeferencedParameters);
         parameterCitation               = (Collection)          unmodifiable(parameterCitation);
     }
 
@@ -211,8 +213,8 @@ public class GeoreferenceableImpl extends GridSpatialRepresentationImpl implemen
         }
         if (super.equals(object)) {
             final GeoreferenceableImpl that = (GeoreferenceableImpl) object; 
-            return Utilities.equals(this.parameters,
-                                    that.parameters) &&
+            return Utilities.equals(this.georeferencedParameters,
+                                    that.georeferencedParameters) &&
                    Utilities.equals(this.parameterCitation,
                                     that.parameterCitation) &&
                    Utilities.equals(this.orientationParameterDescription,
@@ -229,9 +231,9 @@ public class GeoreferenceableImpl extends GridSpatialRepresentationImpl implemen
      * that are the most likely to be unique.
      */
     public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (parameters != null)        code ^= parameters.hashCode();
-        if (parameterCitation != null) code ^= parameterCitation.hashCode();
+        int code = (int) serialVersionUID;
+        if (georeferencedParameters != null) code ^= georeferencedParameters.hashCode();
+        if (parameterCitation       != null) code ^= parameterCitation.hashCode();
         return code;
     }
 

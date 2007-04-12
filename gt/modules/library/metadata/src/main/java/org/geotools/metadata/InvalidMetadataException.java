@@ -13,12 +13,12 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.metadata.iso;
+package org.geotools.metadata;
 
 
 /**
- * Throws when a {@linkplain MetadataEntity metadata entity} is in a invalid state,
- * usually because a mandatory attribute is missing.
+ * Throws when a {@linkplain org.geotools.metadata.iso.MetadataEntity metadata entity}
+ * is in a invalid state, usually because a mandatory attribute is missing.
  *
  * @since 2.4
  * @source $URL$

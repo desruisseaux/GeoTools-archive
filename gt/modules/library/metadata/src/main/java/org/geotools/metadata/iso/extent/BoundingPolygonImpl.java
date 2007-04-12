@@ -106,7 +106,7 @@ public class BoundingPolygonImpl extends GeographicExtentImpl implements Boundin
      * Returns a hash code value for this bounding polygon.
      */
     public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
+        int code = (int) serialVersionUID;
         if (polygons != null) code ^= polygons.hashCode();
         return code;
     }

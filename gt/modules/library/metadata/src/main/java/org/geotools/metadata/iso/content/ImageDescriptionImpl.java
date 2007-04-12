@@ -350,9 +350,9 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
      * that are the most likely to be unique.
      */
     public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (illuminationElevationAngle != null)  code ^= illuminationElevationAngle.hashCode();
-        if (illuminationAzimuthAngle   != null)  code ^= illuminationAzimuthAngle  .hashCode();
+        int code = (int) serialVersionUID;
+        if (illuminationElevationAngle != null) code ^= illuminationElevationAngle.hashCode();
+        if (illuminationAzimuthAngle   != null) code ^= illuminationAzimuthAngle  .hashCode();
         return code;
     }
 }

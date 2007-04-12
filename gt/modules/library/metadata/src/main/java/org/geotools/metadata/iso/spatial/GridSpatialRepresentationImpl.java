@@ -20,6 +20,7 @@
 package org.geotools.metadata.iso.spatial;
 
 // J2SE direct dependencies
+import java.util.Collections;
 import java.util.List;
 
 // OpenGIS dependencies
@@ -78,32 +79,21 @@ public class GridSpatialRepresentationImpl extends SpatialRepresentationImpl
 
     /**
      * Creates a grid spatial representation initialized to the given values.
+     * <p>
+     * <b>Note:</b> this is a convenience constructor. The argument types don't need to
+     * match exactly the types expected by getters and setters.
      */
     public GridSpatialRepresentationImpl(final int numberOfDimensions,
-                                     final List axisDimensionsProperties,
-                                     final CellGeometry cellGeometry,
-                                     final boolean transformationParameterAvailable)
+                                         final List axisDimensionsProperties,
+                                         final CellGeometry cellGeometry,
+                                         final boolean transformationParameterAvailable)
     {
-        this(new Integer(numberOfDimensions),
-             axisDimensionsProperties,
-             cellGeometry,
-             transformationParameterAvailable);
-    }
-
-    /**
-     * Creates a grid spatial representation initialized to the given values.
-     */
-    public GridSpatialRepresentationImpl(final Integer numberOfDimensions,
-                                     final List axisDimensionsProperties,
-                                     final CellGeometry cellGeometry,
-                                     final boolean transformationParameterAvailable)
-    {
-        setNumberOfDimensions               (numberOfDimensions);
+        setNumberOfDimensions               (new Integer(numberOfDimensions));
         setAxisDimensionsProperties         (axisDimensionsProperties);
         setCellGeometry                     (cellGeometry);
         setTransformationParameterAvailable (transformationParameterAvailable);
     }
-    
+
     /**
      * Number of independent spatial-temporal axes.
      */
@@ -118,13 +108,17 @@ public class GridSpatialRepresentationImpl extends SpatialRepresentationImpl
         checkWritePermission();
         numberOfDimensions = newValue;
     }
-    
+
     /**
      * Information about spatial-temporal axis properties.
      */
     public synchronized List getAxisDimensionsProperties() {
         if (axisDimensionsProperties == null) {
-            axisDimensionsProperties = new CheckedArrayList(Dimension.class);
+            if (isModifiable()) {
+                axisDimensionsProperties = new CheckedArrayList(Dimension.class);
+            } else {
+                axisDimensionsProperties = Collections.EMPTY_LIST;
+            }
         }
         return axisDimensionsProperties;
     }
@@ -134,12 +128,8 @@ public class GridSpatialRepresentationImpl extends SpatialRepresentationImpl
      */
     public synchronized void setAxisDimensionsProperties(final List newValues) {
         checkWritePermission();
-        if (axisDimensionsProperties == null) {
-            axisDimensionsProperties = new CheckedArrayList(Dimension.class);
-        } else {
-            axisDimensionsProperties.clear();
-        }
-        axisDimensionsProperties.addAll(newValues);
+        axisDimensionsProperties = (List)
+                copyCollection(newValues, axisDimensionsProperties, Dimension.class);
     }
 
     /**
@@ -189,10 +179,10 @@ public class GridSpatialRepresentationImpl extends SpatialRepresentationImpl
         }
         if (object!=null && object.getClass().equals(getClass())) {
             final GridSpatialRepresentationImpl that = (GridSpatialRepresentationImpl) object; 
-            return  Utilities.equals(this.axisDimensionsProperties, that.axisDimensionsProperties  ) &&
-                    Utilities.equals(this.cellGeometry,             that.cellGeometry  ) &&
-                    (this.numberOfDimensions                     == that.numberOfDimensions ) &&
-                    (this.transformationParameterAvailable       == that.transformationParameterAvailable ) ;
+            return  Utilities.equals(this.axisDimensionsProperties, that.axisDimensionsProperties) &&
+                    Utilities.equals(this.cellGeometry,             that.cellGeometry) &&
+                    Utilities.equals(this.numberOfDimensions,       that.numberOfDimensions) &&
+                    (this.transformationParameterAvailable       == that.transformationParameterAvailable) ;
         }
         return false;
     }
@@ -203,7 +193,7 @@ public class GridSpatialRepresentationImpl extends SpatialRepresentationImpl
      * that are the most likely to be unique.
      */
     public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
+        int code = (int) serialVersionUID;
         if (axisDimensionsProperties != null)  code ^= axisDimensionsProperties.hashCode();
         if (cellGeometry != null)              code ^= cellGeometry.hashCode();
         return code;
@@ -214,5 +204,5 @@ public class GridSpatialRepresentationImpl extends SpatialRepresentationImpl
      */
     public String toString() {
         return String.valueOf(axisDimensionsProperties);
-    }            
+    }
 }

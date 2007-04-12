@@ -30,6 +30,8 @@ import java.io.Serializable;
 import org.opengis.util.Cloneable;
 
 // Geotools dependencies
+import org.geotools.metadata.InvalidMetadataException;
+import org.geotools.metadata.UnmodifiableMetadataException;
 import org.geotools.util.CheckedArrayList;
 import org.geotools.util.CheckedHashSet;
 import org.geotools.util.Logging;

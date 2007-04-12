@@ -13,12 +13,12 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.metadata.iso;
+package org.geotools.metadata;
 
 
 /**
- * Throws when a setter method is invoked on a {@linkplain MetadataEntity metadata entity},
- * but this entity was declared unmodifiable.
+ * Throws when a setter method is invoked on a {@linkplain org.geotools.metadata.iso.MetadataEntity
+ * metadata entity}, but this entity was declared unmodifiable.
  *
  * @since 2.4
  * @source $URL$

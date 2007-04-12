@@ -172,7 +172,7 @@ public class FeatureCatalogueDescriptionImpl extends ContentInformationImpl
         }
         if (super.equals(this)) {
             final FeatureCatalogueDescriptionImpl that = (FeatureCatalogueDescriptionImpl) object;
-            return                 (this.compliant               == that.compliant                ) &&
+            return Utilities.equals(this.compliant,                 that.compliant                ) &&
                                    (this.includeWithDataset      == that.includeWithDataset       ) &&
                    Utilities.equals(this.featureTypes,              that.featureTypes             ) &&
                    Utilities.equals(this.featureCatalogueCitations, that.featureCatalogueCitations) &&

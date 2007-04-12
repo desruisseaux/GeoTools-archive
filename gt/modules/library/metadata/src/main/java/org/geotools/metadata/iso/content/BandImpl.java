@@ -274,9 +274,9 @@ public class BandImpl extends RangeDimensionImpl implements Band {
      * that are the most likely to be unique.
      */
     public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (maxValue != null)  code ^= maxValue.hashCode();
-        if (minValue != null)  code ^= minValue.hashCode();
+        int code = (int) serialVersionUID;
+        if (maxValue != null) code ^= maxValue.hashCode();
+        if (minValue != null) code ^= minValue.hashCode();
         return code;
     }
 }

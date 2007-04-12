@@ -25,6 +25,7 @@ import java.util.Collection;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.quality.Scope;
 import org.opengis.metadata.maintenance.ScopeCode;
+import org.opengis.metadata.maintenance.ScopeDescription;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
@@ -59,6 +60,11 @@ public class ScopeImpl extends MetadataEntity implements Scope {
     private Extent extent;
 
     /**
+     * Detailed description about the level of the data specified by the scope.
+     */
+    private Collection/*<ScopeDescription>*/ levelDescription;
+
+    /**
      * Constructs an initially empty scope.
      */
     public ScopeImpl() {
@@ -88,10 +94,22 @@ public class ScopeImpl extends MetadataEntity implements Scope {
 
     /**
      * Returns detailed descriptions about the level of the data specified by the scope.
+     * Should be defined only if the {@linkplain #getLevel level} is not equal
+     * to {@link ScopeCode#DATASET DATASET} or {@link ScopeCode#SERIES SERIES}.
+     *
+     * @since 2.4
      */
-    public Collection getLevelDescription() {
-        // TODO Auto-generated method stub
-        return null;
+    public synchronized Collection getLevelDescription() {
+        return levelDescription = nonNullCollection(levelDescription, ScopeDescription.class);
+    }
+
+    /**
+     * Set detailed descriptions about the level of the data specified by the scope.
+     *
+     * @since 2.4
+     */
+    public synchronized void setLevelDescription(final Collection newValues) {
+        levelDescription = copyCollection(newValues, levelDescription, ScopeDescription.class);
     }        
 
     /**
@@ -128,16 +146,15 @@ public class ScopeImpl extends MetadataEntity implements Scope {
         }
         if (object!=null && object.getClass().equals(getClass())) {
             final ScopeImpl that = (ScopeImpl) object; 
-            return Utilities.equals(this.level,   that.level ) &&
-                   Utilities.equals(this.extent,  that.extent);
+            return Utilities.equals(this.level,            that.level           ) &&
+                   Utilities.equals(this.levelDescription, that.levelDescription) &&
+                   Utilities.equals(this.extent,           that.extent          );
         }
         return false;
     }
 
     /**
-     * Returns a hash code value for this address. For performance reason, this method do
-     * not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
+     * Returns a hash code value for this scope.
      */
     public synchronized int hashCode() {
         int code = (int)serialVersionUID;
@@ -147,11 +164,9 @@ public class ScopeImpl extends MetadataEntity implements Scope {
     }
 
     /**
-     * Returns a string representation of this citation. The default implementation
-     * returns the title in the default locale.
+     * Returns a string representation of this scope.
      */
     public String toString() {
         return String.valueOf(level);
     }
-
 }

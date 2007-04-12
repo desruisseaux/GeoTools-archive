@@ -42,8 +42,8 @@ public class DimensionImpl extends MetadataEntity implements Dimension {
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -1945030788532182129L;
-    
+    private static final long serialVersionUID = -2572515000574007266L;
+
     /**
      * Name of the axis.
      */
@@ -68,9 +68,9 @@ public class DimensionImpl extends MetadataEntity implements Dimension {
     /*
      * Creates a dimension initialized to the given type.
      */
-    public DimensionImpl(final DimensionNameType dimensionName, final Integer dimensionSize) {
+    public DimensionImpl(final DimensionNameType dimensionName, final int dimensionSize) {
         setDimensionName(dimensionName);
-        setDimensionSize(dimensionSize);
+        setDimensionSize(new Integer(dimensionSize));
     }
 
     /**
@@ -117,7 +117,7 @@ public class DimensionImpl extends MetadataEntity implements Dimension {
         checkWritePermission();
         resolution = newValue;
     }
-    
+
     /**
      * Declares this metadata and all its attributes as unmodifiable.
      */
@@ -135,8 +135,8 @@ public class DimensionImpl extends MetadataEntity implements Dimension {
         if (object!=null && object.getClass().equals(getClass())) {
             final DimensionImpl that = (DimensionImpl) object; 
             return Utilities.equals(this.dimensionName,   that.dimensionName) &&
-                                   (this.dimensionSize == that.dimensionSize) &&
-                                   (this.resolution    == that.resolution   );
+                   Utilities.equals(this.dimensionSize,   that.dimensionSize) &&
+                   Utilities.equals(this.resolution,      that.resolution);
         }
         return false;
     }
@@ -147,7 +147,7 @@ public class DimensionImpl extends MetadataEntity implements Dimension {
      * that are the most likely to be unique.
      */
     public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
+        int code = (int) serialVersionUID;
         if (dimensionName != null) code ^= dimensionName.hashCode();
         return code;
     }
@@ -157,5 +157,5 @@ public class DimensionImpl extends MetadataEntity implements Dimension {
      */
     public String toString() {
         return String.valueOf(dimensionName);
-    }            
+    }
 }
