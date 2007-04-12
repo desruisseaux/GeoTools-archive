@@ -1210,6 +1210,7 @@ public abstract class MapProjection extends AbstractMathTransform
                     new NamedIdentifier(Citations.OGC,     "central_meridian"),
                     new NamedIdentifier(Citations.EPSG,    "Longitude of natural origin"),
                     new NamedIdentifier(Citations.EPSG,    "Longitude of false origin"),
+                    new NamedIdentifier(Citations.EPSG,    "Longitude of origin"),
                     new NamedIdentifier(Citations.ESRI,    "Longitude_Of_Origin"),
                     new NamedIdentifier(Citations.ESRI,    "Longitude_Of_Center"),
                     new NamedIdentifier(Citations.GEOTIFF, "NatOriginLong")
