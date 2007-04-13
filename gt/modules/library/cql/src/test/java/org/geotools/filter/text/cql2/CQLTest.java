@@ -66,24 +66,6 @@ public class CQLTest extends TestCase {
     }
 
     /**
-     * Verify the parser uses the provided FilterFactory implementation
-     * @throws ParseException
-     */
-    public void testUsesProvidedFilterFactory() throws Exception {
-        final boolean[] called = { false };
-        FilterFactory ff = new FilterFactoryImpl() {
-                public PropertyName property(String propName) {
-                    called[0] = true;
-
-                    return super.property(propName);
-                }
-            };
-
-        CQL.toFilter( "attName > 20", ff);
-        assertTrue("Provided FilterFactory was not called", called[0]);
-    }
-
-    /**
      * Test Comparation Predicate
      * <p>
      *

@@ -117,7 +117,7 @@ public class CQL {
      *            a string containing a query predicate in OGC CQL format.
      * @param filterFactory
      *            the {@link FilterFactory} to use for the creation of the
-     *            Filter.
+     *            Filter. If it is null the method finds the default implementation.
      * @return a {@link Filter} equivalent to the constraint specified in
      *         <code>Predicate</code>.
      */
@@ -168,7 +168,7 @@ public class CQL {
      *
      * @param filterFactory
      *            the {@link FilterFactory} to use for the creation of the
-     *            Expression.
+     *            Expression. If it is null the method finds the default implementation.    
      * @return a {@link Filter} equivalent to the constraint specified in
      *         <code>cqlExpression</code>.
      */
@@ -222,7 +222,7 @@ public class CQL {
      *
      * @param filterFactory
      *            the {@link FilterFactory} to use for the creation of the
-     *            Expression.
+     *            Expression. If it is null the method finds the default implementation.
      * @return a List of {@link Filter}, one for each input CQL statement
      */
     public static List toFilterList(final String cqlSourceFilterList, final FilterFactory filterFactory)

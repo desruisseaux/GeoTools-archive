@@ -17,8 +17,11 @@ package org.geotools.filter.text.cql2;
 
 import junit.framework.TestCase;
 import java.util.List;
+
+import org.geotools.filter.FilterFactoryImpl;
 import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
 import org.opengis.filter.IncludeFilter;
 import org.opengis.filter.PropertyIsBetween;
 import org.opengis.filter.PropertyIsEqualTo;
@@ -172,4 +175,34 @@ public class CQLExtensionTest extends TestCase {
         assertTrue(filters.get(1) instanceof IncludeFilter);
         assertTrue(filters.get(2) instanceof PropertyIsEqualTo);
     }
+    
+    /**
+     * Verify the parser uses the provided FilterFactory implementation
+     * @throws ParseException
+     */
+    public void testUsesProvidedFilterFactory() throws Exception {
+        final boolean[] called = { false };
+        FilterFactory ff = new FilterFactoryImpl() {
+                public PropertyName property(String propName) {
+                    called[0] = true;
+
+                    return super.property(propName);
+                }
+            };
+
+        CQL.toFilter("attName > 20", ff);
+        assertTrue("Provided FilterFactory was not called", called[0]);
+    }
+    /**
+     * Tests null factory as parameter.
+     * 
+     * @throws Exception
+     */
+    public void testNullFilterFactory() throws Exception {
+        
+        CQL.toFilter( "attName > 20", null );
+        
+        CQL.toExpression( "2+2", null);
+    }
+    
 }

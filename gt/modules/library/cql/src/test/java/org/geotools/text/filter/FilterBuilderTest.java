@@ -90,6 +90,17 @@ public class FilterBuilderTest extends TestCase {
         FilterBuilder.parse(ff, "attName > 20");
         assertTrue("Provided FilterFactory was not called", called[0]);
     }
+    /**
+     * Tests null factory as parameter.
+     * 
+     * @throws Exception
+     */
+    public void testNullFilterFactory() throws Exception {
+        
+        FilterBuilder.parse(null, "attName > 20" );
+        
+        FilterBuilder.parseExpression(null, "2+2");
+    }
 
     /**
      * An INCLUDE token is parsed as {@link Filter#INCLUDE}
@@ -1485,4 +1496,5 @@ public class FilterBuilderTest extends TestCase {
         assertNotNull("expects filter not null", actual);
         assertEquals("this is not the filter expected", expected, actual);
     }
+    
 }

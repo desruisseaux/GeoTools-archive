@@ -74,7 +74,7 @@ public class FilterBuilder {
      *
      * @param filterFactory
      *            the {@link FilterFactory} to use for the creation of the
-     *            Filter.
+     *            Filter. If it is null the method finds the default implementation.
      * @param input
      *            a string containing a query predicate in OGC CQL format.
      * @return a {@link Filter} equivalent to the constraint specified in
@@ -85,6 +85,19 @@ public class FilterBuilder {
         return CQL.toFilter(input, filterFactory);
     }
 
+        
+    /**
+     * Parses the input string in OGC CQL format into a Filter.
+     * 
+     * @param filterFactory
+     *            the {@link FilterFactory} to use for the creation of the
+     *            Expression. If it is null the method finds the default implementation.
+     * @param input
+     *            a string containing a query predicate in OGC CQL format.
+     *            If it is null the method finds the default implementation.
+     * @return
+     * @throws ParseException
+     */
     public static List parseFilterList(FilterFactory2 filterFactory, String input)
         throws ParseException {
         return CQL.toFilterList(input, filterFactory);
@@ -110,7 +123,7 @@ public class FilterBuilder {
      *
      * @param filterFactory
      *            the {@link FilterFactory} to use for the creation of the
-     *            Expression.
+     *            Expression. If it is null the method finds the default implementation.
      * @param input
      *            a string containing a OGC CQL expression.
      * @return a {@link Filter} equivalent to the constraint specified in
