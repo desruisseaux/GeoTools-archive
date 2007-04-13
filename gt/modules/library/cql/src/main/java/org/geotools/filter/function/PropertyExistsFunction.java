@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006, GeoTools Project Managment Committee (PMC)
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -15,31 +15,32 @@
  */
 package org.geotools.filter.function;
 
+import org.apache.commons.beanutils.PropertyUtils;
+
 /**
  * Function expression that returns a Boolean indicating if a given property
  * exists in the structure of the object being evaluated.
- * 
+ *
  * @since 2.4
  * @author Gabriel Roldan, Axios Engineering
  * @author Mauricio Pazos, Axios Engineering
  * @version $Id$
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/library/cql/src/main/java/org/geotools/filter/function/PropertyExistsFunction.java $
  */
 import java.lang.reflect.InvocationTargetException;
-
-import org.apache.commons.beanutils.PropertyUtils;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Function;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.FunctionExpressionImpl;
 import org.geotools.resources.Utilities;
-import org.opengis.filter.expression.Expression;
-import org.opengis.filter.expression.Function;
-import org.opengis.filter.expression.Literal;
-import org.opengis.filter.expression.PropertyName;
+
 
 public class PropertyExistsFunction extends FunctionExpressionImpl {
-
     public PropertyExistsFunction() {
         super("PropertyExists");
     }
@@ -50,18 +51,19 @@ public class PropertyExistsFunction extends FunctionExpressionImpl {
 
     private String getPropertyName() {
         Expression expr = (Expression) getParameters().get(0);
+
         return getPropertyName(expr);
     }
 
     private String getPropertyName(Expression expr) {
         String propertyName;
+
         if (expr instanceof Literal) {
             propertyName = String.valueOf(((Literal) expr).getValue());
         } else if (expr instanceof PropertyName) {
             propertyName = ((PropertyName) expr).getPropertyName();
         } else {
-            throw new IllegalStateException("Not a property name expression: "
-                    + expr);
+            throw new IllegalStateException("Not a property name expression: " + expr);
         }
 
         return propertyName;
@@ -75,8 +77,8 @@ public class PropertyExistsFunction extends FunctionExpressionImpl {
      */
     public Object evaluate(Feature feature) {
         String propName = getPropertyName();
-        AttributeType attributeType = feature.getFeatureType()
-                .getAttributeType(propName);
+        AttributeType attributeType = feature.getFeatureType().getAttributeType(propName);
+
         return Boolean.valueOf(attributeType != null);
     }
 
@@ -112,7 +114,9 @@ public class PropertyExistsFunction extends FunctionExpressionImpl {
         StringBuffer sb = new StringBuffer("PropertyExists('");
         sb.append(getPropertyName());
         sb.append("')");
+
         String stringVal = sb.toString();
+
         return stringVal;
     }
 
@@ -120,6 +124,7 @@ public class PropertyExistsFunction extends FunctionExpressionImpl {
         if (!(obj instanceof Function)) {
             return false;
         }
+
         Function other = (Function) obj;
 
         if (!Utilities.equals(getName(), other.getName())) {

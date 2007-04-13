@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006, GeoTools Project Managment Committee (PMC)
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -13,40 +13,39 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.text.filter;
+package org.geotools.filter.text.cql2;
 
-import org.geotools.text.filter.Token;
+import org.geotools.filter.text.cql2.Token;
+
 
 /**
- * Maintains the result of building process. 
- * 
+ * Maintains the result of building process.
+ *
  * @since 2.4
  * @author Mauricio Pazos - Axios Engineering
  * @author Gabriel Roldan - Axios Engineering
  * @version $Id$
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/library/cql/src/main/java/org/geotools/text/filter/Result.java $
  */
 final class Result {
-
     private int nodeType = 0;
-
     private Object built = null;
-
     private Token token = null;
 
     Result(Object built, Token token, int nodeType) {
-
         this.built = built;
         this.token = token;
         this.nodeType = nodeType;
     }
 
-    public String toString(){
+    public String toString() {
         assert this.token != null;
-        
-        return "Result [TOKEN("+ this.token.toString()+");"+ "BUILT("+ built +"); NODE_TYPE("+ new Integer(nodeType)+") ]"; 
-        
+
+        return "Result [TOKEN(" + this.token.toString() + ");" + "BUILT(" + built + "); NODE_TYPE("
+        + new Integer(nodeType) + ") ]";
     }
+
     public final Object getBuilt() {
         return this.built;
     }

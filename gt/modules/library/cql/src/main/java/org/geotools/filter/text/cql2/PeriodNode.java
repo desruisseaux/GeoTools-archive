@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006, GeoTools Project Managment Committee (PMC)
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -13,62 +13,58 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.text.filter;
+package org.geotools.filter.text.cql2;
 
 import java.security.InvalidParameterException;
 import java.util.Date;
-
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Literal;
+
 
 /**
  * Period is consturcted in the parseing process. this has convenient method to
  * deliver begin and end date of period. a period can be created from
  * date-time/date-time or date-time/duration or duration/date-time
- * 
+ *
  * @since 2.4
  * @author Mauricio Pazos - Axios Engineering
  * @author Gabriel Roldan - Axios Engineering
  * @version $Id$
- * @source $URL$
- * 
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/library/cql/src/main/java/org/geotools/text/filter/PeriodNode.java $
+ *
  */
 class PeriodNode {
-
     private Literal begin = null;
-
     private Literal end = null;
 
     /**
      * @see create
-     * 
+     *
      * @param begin
      * @param end
      */
     private PeriodNode(final Literal begin, final Literal end) {
+        if (!(begin.getValue() instanceof Date)) {
+            throw new InvalidParameterException("begin parameter must be Literal with Date");
+        }
 
-        if (!(begin.getValue() instanceof Date))
-            throw new InvalidParameterException(
-                    "begin parameter must be Literal with Date");
-        if (!(begin.getValue() instanceof Date))
-            throw new InvalidParameterException(
-                    "end paremeter must be Literal with Date");
+        if (!(begin.getValue() instanceof Date)) {
+            throw new InvalidParameterException("end paremeter must be Literal with Date");
+        }
 
         this.begin = begin;
         this.end = end;
     }
 
-    public static PeriodNode createPeriodDateAndDate(final Literal beginDate,
-            final Literal endDate) {
-
+    public static PeriodNode createPeriodDateAndDate(final Literal beginDate, final Literal endDate) {
         PeriodNode period = new PeriodNode(beginDate, endDate);
 
         return period;
     }
 
     public static PeriodNode createPeriodDateAndDuration(final Literal date,
-            final Literal duration, FilterFactory filterFactory) {
-
+        final Literal duration, FilterFactory filterFactory) {
         // compute last date from duration
         // Y M D and H M S
         Date firstDate = (Date) date.getValue();
@@ -83,10 +79,8 @@ class PeriodNode {
         return period;
     }
 
-    public static PeriodNode createPeriodDurationAndDate(
-            final Literal duration, final Literal date,
-            FilterFactory filterFactory) {
-
+    public static PeriodNode createPeriodDurationAndDate(final Literal duration,
+        final Literal date, FilterFactory filterFactory) {
         // compute first date from duration Y M D and H M S
         Date lastDate = (Date) date.getValue();
         String strDuration = (String) duration.getValue();
@@ -113,5 +107,4 @@ class PeriodNode {
     public Literal getEnding() {
         return this.end;
     }
-
 }

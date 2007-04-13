@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -15,49 +15,32 @@
  *
  *    Created on October 15, 2003, 1:57 PM
  */
-
 package org.geotools.text.filter;
 
-import org.geotools.text.filter.ParseException;
-import org.geotools.text.filter.Token;
+import org.geotools.filter.text.cql2.CQLException;
+import org.geotools.filter.text.cql2.Token;
 
 
 /**
- *
  * @author  Ian Schneider
- * @source $URL$
+ * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/cql/src/main/java/org/geotools/text/filter/FilterBuilderException.java $
+ * @deprecated use the {@link CQLException} class instead, this one is going to be set to package visibility
  */
-public class FilterBuilderException extends ParseException {
-    
+public class FilterBuilderException extends CQLException {
     /**
-     * generated serial version uid 
+     * generated serial version uid
      */
     private static final long serialVersionUID = -8027243686579409436L;
-    
-    Throwable cause;
-    
+
     public FilterBuilderException(String message) {
-        this(message,null,null);
+        super(message);
     }
 
-    public FilterBuilderException(String message,Token token) {
-        this(message,token,null);
+    public FilterBuilderException(String message, Token token) {
+        super(message, token);
     }
-    
-    public FilterBuilderException(String message,Token token,Throwable cause) {
-        super(message);
-        
-        this.currentToken = token;
-        this.cause = cause;
-    }
-    
-    public Throwable getCause() {
-        return cause;
-    }
-    
-    public String getMessage() {
-        if (currentToken == null) return super.getMessage();
-        
-        return super.getMessage() + ", Current Token : " + currentToken.image;
+
+    public FilterBuilderException(String message, Token token, Throwable cause) {
+        super(message, token, cause);
     }
 }

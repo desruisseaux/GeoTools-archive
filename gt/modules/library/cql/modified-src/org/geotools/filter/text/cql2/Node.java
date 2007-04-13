@@ -15,14 +15,14 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.text.filter;
+package org.geotools.filter.text.cql2;
 
 /* All AST nodes must implement this interface.  It provides basic
    machinery for constructing the parent and child relationships
  * @source $URL$
    between nodes. */
 
-public interface Node {
+interface Node {
     
   public void dispose();
   

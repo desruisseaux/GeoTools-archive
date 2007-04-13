@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006, GeoTools Project Managment Committee (PMC)
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -13,10 +13,11 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.text.filter;
+package org.geotools.filter.text.cql2;
 
 import java.util.Calendar;
 import java.util.Date;
+
 
 /**
  * Utility class for filter builder
@@ -25,25 +26,19 @@ import java.util.Date;
  * @author Mauricio Pazos - Axios Engineering
  * @author Gabriel Roldan - Axios Engineering
  * @version $Id$
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/library/cql/src/main/java/org/geotools/text/filter/Util.java $
  */
 final class Util {
-
     private static final Calendar CALENDAR = Calendar.getInstance();
-
     private static final int YEARS = 0;
-
     private static final int MONTHS = 1;
-
     private static final int DAYS = 2;
 
     /** Y,M,D */
     private static int[] DURATION_DATE = new int[3];
-
     private static final int HOURS = 0;
-
     private static final int MINUTES = 1;
-
     private static final int SECONDS = 2;
 
     /** H,M,S */
@@ -55,19 +50,20 @@ final class Util {
 
     /**
      * Extract from duration string the values of years, month and days
-     * 
+     *
      * @param duration
      * @return int[3] with years,months,days, if some value are not present -1
      *         will be returned.
      */
     private static int[] extractDurationDate(final String duration) {
-
         // initializa duration date container
         for (int i = 0; i < DURATION_DATE.length; i++) {
             DURATION_DATE[i] = -1;
         }
+
         // if has not duration date return array with -1 values
         int cursor = duration.indexOf("P");
+
         if (cursor == -1) {
             return DURATION_DATE;
         }
@@ -77,6 +73,7 @@ final class Util {
 
         // years
         int endYears = duration.indexOf("Y", cursor);
+
         if (endYears >= 0) {
             String strYears = duration.substring(cursor, endYears);
             int years = Integer.parseInt(strYears);
@@ -87,6 +84,7 @@ final class Util {
 
         // months
         int endMonths = duration.indexOf("M", cursor);
+
         if (endMonths >= 0) {
             String strMonths = duration.substring(cursor, endMonths);
             int months = Integer.parseInt(strMonths);
@@ -97,6 +95,7 @@ final class Util {
 
         // days
         int endDays = duration.indexOf("D", cursor);
+
         if (endDays >= 0) {
             String strDays = duration.substring(cursor, endDays);
             int days = Integer.parseInt(strDays);
@@ -104,29 +103,31 @@ final class Util {
         }
 
         return DURATION_DATE;
-
     }
 
     /**
      * Extract from duration string the values of hours, minutes and seconds
-     * 
+     *
      * @param duration
      * @return int[3] with hours, minutes and seconds if some value are not
      *         present -1 will be returned.
      */
     private static int[] extractDurationTime(final String duration) {
-
         for (int i = 0; i < DURATION_TIME.length; i++) {
             DURATION_TIME[i] = -1;
         }
+
         int cursor = duration.indexOf("T");
+
         if (cursor == -1) {
             return DURATION_TIME;
         }
+
         cursor++;
 
         // hours
         int endHours = duration.indexOf("H", cursor);
+
         if (endHours >= 0) {
             String strHours = duration.substring(cursor, endHours);
             int hours = Integer.parseInt(strHours);
@@ -137,6 +138,7 @@ final class Util {
 
         // minute
         int endMinutes = duration.indexOf("M", cursor);
+
         if (endMinutes >= 0) {
             String strMinutes = duration.substring(cursor, endMinutes);
             int minutes = Integer.parseInt(strMinutes);
@@ -147,6 +149,7 @@ final class Util {
 
         // seconds
         int endSeconds = duration.indexOf("S", cursor);
+
         if (endSeconds >= 0) {
             String strSeconds = duration.substring(cursor, endSeconds);
             int seconds = Integer.parseInt(strSeconds);
@@ -154,50 +157,46 @@ final class Util {
         }
 
         return DURATION_TIME;
-
     }
 
     /**
      * Add duration to date
-     * 
+     *
      * @param date
      *            a Date
      * @param duration
      *            a String formated like "P##Y##M##D"
-     * 
+     *
      * @return a Date
-     * 
+     *
      */
     public static Date addDurationToDate(final Date date, final String duration)
-            throws NumberFormatException {
-
+        throws NumberFormatException {
         final int positive = 1;
 
         Date computedDate = null;
 
         computedDate = computeDateFromDurationDate(date, duration, positive);
 
-        computedDate = computeDateFromDurationTime(computedDate, duration,
-                positive);
+        computedDate = computeDateFromDurationTime(computedDate, duration, positive);
 
         return computedDate;
     }
 
     /**
      * Adds years, month and days (duration) to initial date.
-     * 
+     *
      * @param date
      *            initial date
      * @param duration
      *            a String with format: PddYddMddD
      * @return Date a computed date. if duration have not got duration "P"
      *         return date value.
-     * 
+     *
      */
-    private static Date computeDateFromDurationDate(final Date date,
-            final String duration, int sign) {
-
+    private static Date computeDateFromDurationDate(final Date date, final String duration, int sign) {
         DURATION_DATE = extractDurationDate(duration);
+
         if (isNull(DURATION_DATE)) {
             return date;
         }
@@ -206,7 +205,6 @@ final class Util {
 
         // years
         if (DURATION_DATE[YEARS] >= 0) {
-
             CALENDAR.add(Calendar.YEAR, sign * DURATION_DATE[YEARS]);
         }
 
@@ -223,28 +221,27 @@ final class Util {
         Date lastDate = CALENDAR.getTime();
 
         return lastDate;
-
     }
 
     /**
      * durDate is null if all his values are -1
-     * 
+     *
      * @param durDate
      * @return true if has some greater than or equal 0
      */
     private static boolean isNull(int[] durDate) {
-
         for (int i = 0; i < durDate.length; i++) {
             if (durDate[i] >= 0) {
                 return false;
             }
         }
+
         return true;
     }
 
     /**
      * Add or subtract time duration to initial date.
-     * 
+     *
      * @param date
      *            initial date
      * @param duration
@@ -254,10 +251,10 @@ final class Util {
      * @return Date a computed date. if duration have not got duration "T"
      *         return date value.
      */
-    private static Date computeDateFromDurationTime(final Date date,
-            final String duration, final int sign) {
-
+    private static Date computeDateFromDurationTime(final Date date, final String duration,
+        final int sign) {
         DURATION_TIME = extractDurationTime(duration);
+
         if (isNull(DURATION_TIME)) {
             return date;
         }
@@ -286,26 +283,23 @@ final class Util {
 
     /**
      * Subtracts duration to date
-     * 
+     *
      * @param date
      *            a Date
      * @param duration
      *            a String formated like "P##Y##M##D"
-     * 
+     *
      * @return a Date
      */
     public static Date subtractDurationToDate(Date date, String duration) {
-
         final int negative = -1;
 
         Date computedDate = null;
 
         computedDate = computeDateFromDurationDate(date, duration, negative);
 
-        computedDate = computeDateFromDurationTime(computedDate, duration,
-                negative);
+        computedDate = computeDateFromDurationTime(computedDate, duration, negative);
 
         return computedDate;
     }
-
 }

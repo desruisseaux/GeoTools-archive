@@ -15,9 +15,10 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.text.filter;
+package org.geotools.filter.text.cql2;
 
-public class SimpleNode implements Node {
+
+class SimpleNode implements Node {
   protected Node parent;
   protected Node[] children;
   protected int id;
