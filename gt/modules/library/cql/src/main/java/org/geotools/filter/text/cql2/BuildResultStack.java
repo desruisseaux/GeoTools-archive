@@ -17,41 +17,36 @@ package org.geotools.filter.text.cql2;
 
 import java.util.EmptyStackException;
 import java.util.Stack;
+
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
-import org.geotools.filter.text.cql2.Token;
-import org.geotools.text.filter.FilterBuilderException;
 
 
 /**
  * Holds the results of the building process in a stack
  *
- * @since 2.4
  * @author Mauricio Pazos - Axios Engineering
  * @author Gabriel Roldan - Axios Engineering
  * @version $Id$
- * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/library/cql/src/main/java/org/geotools/text/filter/BuildResultStack.java $
+ * @since 2.4
  */
 final class BuildResultStack {
+
     private Stack stack = new Stack();
 
-    private BuildResultStack() {
-        // no-op
+    private String cqlSource = null;
+
+    private BuildResultStack(final String cqlSource) {
+        this.cqlSource  = cqlSource;
     }
 
     /**
-     * @return BuildResultStack this single instance
+     * factory method create a new instance of stak
+     * 
+     * @return BuildResultStack a new instance
      */
-    public static BuildResultStack getInstance() {
-        return new BuildResultStack();
-    }
-
-    /**
-     * Clear all result elements
-     */
-    public void clear() {
-        stack.clear();
+    public static BuildResultStack getInstance(final String cqlSource) {
+        return new BuildResultStack(cqlSource);
     }
 
     public Result peek() {
@@ -68,10 +63,10 @@ final class BuildResultStack {
         try {
             return (Result) stack.pop();
         } catch (ClassCastException cce) {
-            throw new FilterBuilderException("Expecting Expression, but found Filter",
-                item.getToken());
+            throw new CQLException("Expecting Expression, but found Filter",
+                item.getToken(),cce, this.cqlSource );
         } catch (EmptyStackException ese) {
-            throw new FilterBuilderException("No items on stack");
+            throw new CQLException("No items on stack");
         }
     }
 
@@ -84,10 +79,10 @@ final class BuildResultStack {
 
             return (org.opengis.filter.expression.Expression) item.getBuilt();
         } catch (ClassCastException cce) {
-            throw new FilterBuilderException("Expecting Expression, but found Filter",
-                item.getToken());
+            throw new CQLException("Expecting Expression, but found Filter",
+                item.getToken(), cce, this.cqlSource);
         } catch (EmptyStackException ese) {
-            throw new FilterBuilderException("No items on stack");
+            throw new CQLException("No items on stack");
         }
     }
 
@@ -99,10 +94,10 @@ final class BuildResultStack {
 
             return (Literal) item.getBuilt();
         } catch (ClassCastException cce) {
-            throw new FilterBuilderException("Expecting Expression, but found Filter",
-                item.getToken());
+            throw new CQLException("Expecting Expression, but found Filter",
+                item.getToken(), cce, this.cqlSource);
         } catch (EmptyStackException ese) {
-            throw new FilterBuilderException("No items on stack");
+            throw new CQLException("No items on stack");
         }
     }
 
@@ -114,10 +109,10 @@ final class BuildResultStack {
 
             return (PropertyName) item.getBuilt();
         } catch (ClassCastException cce) {
-            throw new FilterBuilderException("Expecting Expression, but found Filter",
-                item.getToken());
+            throw new CQLException("Expecting Expression, but found Filter",
+                item.getToken(), cce, this.cqlSource);
         } catch (EmptyStackException ese) {
-            throw new FilterBuilderException("No items on stack");
+            throw new CQLException("No items on stack");
         }
     }
 
@@ -129,10 +124,10 @@ final class BuildResultStack {
 
             return (org.opengis.filter.Filter) item.getBuilt();
         } catch (ClassCastException cce) {
-            throw new FilterBuilderException("Expecting Filter, but found Expression",
-                item.getToken());
+            throw new CQLException("Expecting Filter, but found Expression",
+                item.getToken(), cce, this.cqlSource);
         } catch (EmptyStackException ese) {
-            throw new FilterBuilderException("No items on stack");
+            throw new CQLException("No items on stack");
         }
     }
 
@@ -144,10 +139,10 @@ final class BuildResultStack {
 
             return (PeriodNode) item.getBuilt();
         } catch (ClassCastException cce) {
-            throw new FilterBuilderException("Expecting Filter, but found Expression",
-                item.getToken());
+            throw new CQLException("Expecting Filter, but found Expression",
+                item.getToken(), cce, this.cqlSource);
         } catch (EmptyStackException ese) {
-            throw new FilterBuilderException("No items on stack");
+            throw new CQLException("No items on stack");
         }
     }
 
@@ -158,7 +153,7 @@ final class BuildResultStack {
 
             return number.doubleValue();
         } catch (ClassCastException cce) {
-            throw new FilterBuilderException("Expected double");
+            throw new CQLException("Expected double");
         }
     }
 
@@ -169,7 +164,7 @@ final class BuildResultStack {
 
             return number.intValue();
         } catch (ClassCastException cce) {
-            throw new FilterBuilderException("Expected double");
+            throw new CQLException("Expected double");
         }
     }
 
@@ -186,7 +181,7 @@ final class BuildResultStack {
 
             return token.image;
         } catch (ClassCastException e) {
-            throw new FilterBuilderException("identifier part is expected");
+            throw new CQLException("identifier part is expected");
         }
     }
 
@@ -197,7 +192,7 @@ final class BuildResultStack {
 
             return identifier;
         } catch (ClassCastException e) {
-            throw new FilterBuilderException("fail in identifier parsing");
+            throw new CQLException("fail in identifier parsing");
         }
     }
 

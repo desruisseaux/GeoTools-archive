@@ -21,48 +21,57 @@ import org.geotools.filter.text.cql2.Token;
 
 
 /**
- * This exception is produced when the cql input string has sintax errors
+ * This exception is produced when the cql input string has sintax errors.
  *
- * @since 2.4
  * @author Mauricio Pazos - Axios Engineering
  * 
  * @version $Id$
- *
+ * @since 2.4
  */
 public class CQLException extends ParseException {
     /** for interoperability */
     private static final long serialVersionUID = 8873756073711225699L;
-    protected Throwable cause;
+
+    protected Throwable cause = null;
+    private String cqlSource = null;
 
     /**
      * New instance of CQLException
      *
-     * @param message
-     * @param token
-     * @param cause
+     * @param message   exception description
+     * @param token     current token
+     * @param cause     the cause
+     * @param cqlSource string analized
      */
-    public CQLException(String message, Token token, Throwable cause) {
-        this.currentToken = token;
+    public CQLException(String message, Token token, Throwable cause, String cqlSource) {
+        super(message);
+        
+        assert message != null;
+
+        super.currentToken = token;
+
         this.cause = cause;
+        this.cqlSource = cqlSource;
+    }
+
+    /**
+     * New instance of CQLException
+     * 
+     * @param message   exception description
+     * @param token     current token
+     * @param cqlSource analized string
+     */
+    public CQLException(final String message, final Token token, final String cqlSource) {
+        this(message, token, null, cqlSource);
     }
 
     /**
      * New instance of CQLException
      *
-     * @param message
+     * @param message   exception description
      */
     public CQLException(String message) {
-        this(message, null, null);
-    }
-
-    /**
-     * New instance of CQLException
-     *
-     * @param message
-     * @param token
-     */
-    public CQLException(String message, Token token) {
-        this(message, token, null);
+        this(message, null, null, null);
     }
 
     /**
@@ -85,5 +94,39 @@ public class CQLException extends ParseException {
         }
 
         return super.getMessage() + ", Current Token : " + currentToken.image;
+    }
+
+    /**
+     * Returns the syntax error presents in the last sequence of characters analyzed.
+     * 
+     * @return the syntax error
+     */
+    public String getSyntaxError() {
+
+        // builds two lines the first has the source string, the second has
+        // the pointer to syntax error.
+        
+        // First Line
+        StringBuffer msg = new StringBuffer(this.cqlSource);
+        msg.append('\n');
+
+        // Second Line
+        // searchs the last token recognized 
+        Token curToken = this.currentToken;
+
+        while (curToken.next != null)
+            curToken = curToken.next;
+
+        // add the pointer to error
+        int column = curToken.beginColumn - 1;
+
+        for (int i = 0; i < column; i++) {
+            msg.append(' ');
+        }
+
+        msg.append('^').append('\n');
+        msg.append(this.getMessage());
+
+        return msg.toString();
     }
 }

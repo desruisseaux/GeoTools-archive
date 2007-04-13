@@ -19,16 +19,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
-
 import javax.xml.transform.TransformerException;
-
-import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.factory.Hints;
-import org.geotools.filter.FilterTransformer;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.Hints;
+import org.geotools.filter.FilterTransformer;
 
 
 /**
@@ -55,12 +53,6 @@ import org.opengis.filter.expression.Expression;
  *
  * <pre>
  * <code>
- * Expression expr1 = CQL.toExpression(&quot;attName&quot;);
- *
- * Expression expr2 = CQL.toExpression(&quot;attName * 2&quot;);
- *
- * Expression expr3 = CQL.toExpression(&quot;strConcat(attName, 'suffix')&quot;);
- *
  * Filter f1 = CQL.toFilter(&quot;ATTR1 &lt; 10 AND ATTR2 &lt; 2 OR ATTR3 &gt; 10&quot;);
  *
  * Filter f2 = CQL.toFilter(&quot;ATTR1 IS NULL&quot;);
@@ -75,6 +67,12 @@ import org.opengis.filter.expression.Expression;
  *
  * Filter f7 = CQL.toFilter(&quot;BBOX(ATTR1, 10,20,30,40)&quot;);
  *
+ * Expression expr1 = CQL.toExpression(&quot;attName&quot;);
+ *
+ * Expression expr2 = CQL.toExpression(&quot;attName * 2&quot;);
+ *
+ * Expression expr3 = CQL.toExpression(&quot;strConcat(attName, 'suffix')&quot;);
+ *
  * List filters = CQL
  *                 .toFilterList(&quot;ATTR1 IS NULL|BBOX(ATTR1, 10,20,30,40)|INCLUDE&quot;);
  * </code>
@@ -87,7 +85,7 @@ import org.opengis.filter.expression.Expression;
  * @author Gabriel Roldan - Axios Engineering
  * @version $Id$
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/library/cql/src/main/java/org/geotools/text/filter/CQL.java $
+ *        http://svn.geotools.org/geotools/trunk/gt/modules/library/cql/src/main/java/org/geotools/filter/text/cql2/CQL.java $
  */
 public class CQL {
     private CQL() {
@@ -123,28 +121,28 @@ public class CQL {
      * @return a {@link Filter} equivalent to the constraint specified in
      *         <code>Predicate</code>.
      */
-    public static Filter toFilter(String cqlPredicate, FilterFactory filterFactory)
+    public static Filter toFilter(final String cqlPredicate, final FilterFactory filterFactory)
         throws CQLException {
-        if (filterFactory == null) {
-            filterFactory = CommonFactoryFinder.getFilterFactory((Hints) null);
+        
+        FilterFactory ff = filterFactory;
+        
+        if (ff == null) {
+            ff = CommonFactoryFinder.getFilterFactory((Hints) null);
         }
 
-        CQLCompiler compiler = new CQLCompiler(cqlPredicate, filterFactory);
+        CQLCompiler compiler = new CQLCompiler(cqlPredicate, ff);
 
         try {
             compiler.CompilationUnit();
+            Object result = compiler.getResult();
+            Filter builtFilter = (Filter) result;
+
+            return builtFilter;
+
         } catch (ParseException e) {
-            throw new CQLException(e.getMessage(), compiler.getToken(0));
+            throw new CQLException(e.getMessage(), compiler.getToken(0),e, cqlPredicate);
         }
 
-        if (compiler.getException() != null) {
-            throw compiler.getException();
-        }
-
-        Object result = compiler.getResult();
-        Filter builtFilter = (Filter) result;
-
-        return builtFilter;
     }
 
     /**
@@ -186,17 +184,15 @@ public class CQL {
 
         try {
             c.ExpressionCompilationUnit();
+        
+            Expression builtFilter = (Expression) c.getResult();
+
+            return builtFilter;
+
         } catch (ParseException e) {
-            throw new CQLException(e.getMessage(), c.getToken(0));
+            throw new CQLException(e.getMessage(), c.getToken(0),e, cqlExpression);
         }
 
-        if (c.getException() != null) {
-            throw c.getException();
-        }
-
-        Expression builtFilter = (Expression) c.getResult();
-
-        return builtFilter;
     }
 
     /**
@@ -221,7 +217,7 @@ public class CQL {
      * separated by <code>|</code> into a <code>List</code> of
      * <code>Filter</code>s, using the provided FilterFactory.
      *
-     * @param cqlFilterList
+     * @param cqlSourceFilterList
      *            a list of OGC CQL predicates separated by <code>|</code>
      *
      * @param filterFactory
@@ -229,57 +225,33 @@ public class CQL {
      *            Expression.
      * @return a List of {@link Filter}, one for each input CQL statement
      */
-    public static List toFilterList(final String cqlFilterList, final FilterFactory filterFactory)
+    public static List toFilterList(final String cqlSourceFilterList, final FilterFactory filterFactory)
         throws CQLException {
+        
         FilterFactory factory = filterFactory;
 
         if (factory == null) {
             factory = CommonFactoryFinder.getFilterFactory((Hints) null);
         }
 
-        CQLCompiler compiler = new CQLCompiler(cqlFilterList, factory);
+        CQLCompiler compiler = new CQLCompiler(cqlSourceFilterList, factory);
 
         try {
             compiler.MultipleCompilationUnit();
+            List results = compiler.getResults();
+
+            return results;
+
         } catch (ParseException e) {
-            throw new CQLException(e.getMessage() + ": " + cqlFilterList,
-                    compiler.getToken(0));
+            throw new CQLException(e.getMessage() + ": " + cqlSourceFilterList, compiler.getToken(0), e, cqlSourceFilterList);
         }
-
-        if (compiler.getException() != null) {
-            throw compiler.getException();
-        }
-
-        List results = compiler.getResults();
-
-        return results;
     }
 
-    public static String getFormattedErrorMessage(CQLException pe, String input) {
-        StringBuffer sb = new StringBuffer(input);
-        sb.append('\n');
-
-        Token t = pe.currentToken;
-
-        while (t.next != null)
-            t = t.next;
-
-        int column = t.beginColumn - 1;
-
-        for (int i = 0; i < column; i++) {
-            sb.append(' ');
-        }
-
-        sb.append('^').append('\n');
-        sb.append(pe.getMessage());
-
-        return sb.toString();
-    }
 
     public static final void main(String[] args) {
-        System.out.println("Expression Tester");
+        System.out.println("Expression Tester (\"quit\" to finish)");
 
-        BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         FilterTransformer filterTransformer = new FilterTransformer();
         filterTransformer.setIndentation(4);
 
@@ -287,18 +259,22 @@ public class CQL {
             System.out.print(">");
 
             String line = null;
+
             try {
-                line = r.readLine();
+                line = reader.readLine();
+
                 if (line.equals("quit")) {
+                    System.out.println("Bye!");
                     break;
                 }
-                Object b = CQL.toFilter(line);
-                filterTransformer.transform(b, System.out);
+
+                Object newFilter = CQL.toFilter(line);
+                filterTransformer.transform(newFilter, System.out);
                 System.out.println();
             } catch (IOException e1) {
                 e1.printStackTrace();
-            } catch (CQLException pe) {
-                System.out.println(CQL.getFormattedErrorMessage(pe, line));
+            } catch (CQLException cqlex) {
+                System.out.println(cqlex.getSyntaxError());
             } catch (TransformerException e) {
                 e.printStackTrace();
             }

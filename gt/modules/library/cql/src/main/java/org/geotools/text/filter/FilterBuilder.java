@@ -143,7 +143,7 @@ public class FilterBuilder {
      *
      */
     public static String getFormattedErrorMessage(ParseException pe, String input) {
-        String formattedErrorMessage = CQL.getFormattedErrorMessage((CQLException)pe, input);
+        String formattedErrorMessage = ((CQLException)pe).getSyntaxError();
 
         return formattedErrorMessage;
     }

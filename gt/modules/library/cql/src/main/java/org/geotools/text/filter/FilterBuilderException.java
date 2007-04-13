@@ -37,10 +37,10 @@ public class FilterBuilderException extends CQLException {
     }
 
     public FilterBuilderException(String message, Token token) {
-        super(message, token);
+        super(message, token,null);
     }
 
     public FilterBuilderException(String message, Token token, Throwable cause) {
-        super(message, token, cause);
+        super(message, token, cause, null);
     }
 }

@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2006, GeoTools Project Managment Committee (PMC)
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -13,17 +13,15 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.text.filter;
+package org.geotools.filter.text.cql2;
 
 import junit.framework.TestCase;
-import java.util.List;
-import org.opengis.filter.ExcludeFilter;
+
+import org.geotools.filter.FilterFactoryImpl;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
-import org.opengis.filter.IncludeFilter;
 import org.opengis.filter.PropertyIsBetween;
 import org.opengis.filter.PropertyIsEqualTo;
-import org.opengis.filter.PropertyIsGreaterThan;
 import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.expression.Add;
@@ -42,33 +40,27 @@ import org.opengis.filter.spatial.Intersects;
 import org.opengis.filter.spatial.Overlaps;
 import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
-import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.filter.FilterFactoryImpl;
-import org.geotools.filter.text.cql2.ParseException;
 
 
 /**
- * <b>FilterBuilderTest</b>
+ *
+ * CQL Test
+ * 
  * <p>
- * Unit test for cql.
- * </p>
- * <p>
- * This test was extended to cover all cql rules.
+ * Test Common CQL language
  * </p>
  *
- * @author Created by: James
- * @author Extended by: Mauricio Pazos - Axios Engineering
- * @deprecated was replaced by {@link org.geotools.filter.CQLTest} and {@link org.geotools.filter.CQLExtensionTest}
+ * @author Mauricio Pazos - www.axios.es
+ * @version 2.4
  */
-public class FilterBuilderTest extends TestCase {
-    private static final String DELIMITER = "|";
+public class CQLTest extends TestCase {
 
-    public FilterBuilderTest(String testName) {
+    public CQLTest(String testName) {
         super(testName);
     }
 
     public static junit.framework.Test suite() {
-        junit.framework.TestSuite suite = new junit.framework.TestSuite(FilterBuilderTest.class);
+        junit.framework.TestSuite suite = new junit.framework.TestSuite(CQLTest.class);
 
         return suite;
     }
@@ -87,46 +79,8 @@ public class FilterBuilderTest extends TestCase {
                 }
             };
 
-        FilterBuilder.parse(ff, "attName > 20");
+        CQL.toFilter( "attName > 20", ff);
         assertTrue("Provided FilterFactory was not called", called[0]);
-    }
-
-    /**
-     * An INCLUDE token is parsed as {@link Filter#INCLUDE}
-     *
-     * @throws Exception
-     */
-    public void testIncludeFilter() throws Exception {
-        Filter filter = FilterBuilder.parse("INCLUDE");
-        assertNotNull(filter);
-        assertTrue(Filter.INCLUDE.equals(filter));
-
-        filter = FilterBuilder.parse("INCLUDE and a < 1");
-        assertNotNull(filter);
-        assertTrue(filter instanceof PropertyIsLessThan);
-
-        filter = FilterBuilder.parse("INCLUDE or a < 1");
-        assertNotNull(filter);
-        assertTrue(Filter.INCLUDE.equals(filter));
-    }
-
-    /**
-     * An EXCLUDE token is parsed as {@link Filter#EXCLUDE}
-     *
-     * @throws Exception
-     */
-    public void testExcludeFilter() throws Exception {
-        Filter filter = FilterBuilder.parse("EXCLUDE");
-        assertNotNull(filter);
-        assertTrue(Filter.EXCLUDE.equals(filter));
-
-        filter = FilterBuilder.parse("EXCLUDE and a < 1");
-        assertNotNull(filter);
-        assertTrue(Filter.EXCLUDE.equals(filter));
-
-        filter = FilterBuilder.parse("EXCLUDE or a < 1");
-        assertNotNull(filter);
-        assertTrue(filter instanceof PropertyIsLessThan);
     }
 
     /**
@@ -146,7 +100,7 @@ public class FilterBuilderTest extends TestCase {
         // attr1 < 5
         expected = FilterSample.getSample(FilterSample.LESS_FILTER_SAMPLE);
 
-        actual = FilterBuilder.parse(FilterSample.LESS_FILTER_SAMPLE);
+        actual = CQL.toFilter(FilterSample.LESS_FILTER_SAMPLE);
 
         assertNotNull("expects filter not null", actual);
 
@@ -155,7 +109,7 @@ public class FilterBuilderTest extends TestCase {
         // attr1 <= 5
         expected = FilterSample.getSample(FilterSample.LESS_EQ_FILTER_SAMPLE);
 
-        actual = FilterBuilder.parse(FilterSample.LESS_EQ_FILTER_SAMPLE);
+        actual = CQL.toFilter(FilterSample.LESS_EQ_FILTER_SAMPLE);
 
         assertNotNull("expects filter not null", actual);
 
@@ -164,7 +118,7 @@ public class FilterBuilderTest extends TestCase {
         // attr <> 5
         expected = FilterSample.getSample(FilterSample.NOT_EQ_FILTER);
 
-        actual = FilterBuilder.parse(FilterSample.NOT_EQ_FILTER);
+        actual = CQL.toFilter(FilterSample.NOT_EQ_FILTER);
 
         assertNotNull("expects filter not null", actual);
 
@@ -173,7 +127,7 @@ public class FilterBuilderTest extends TestCase {
         // "gmd:aa:bb.gmd:cc.gmd:dd"
         final String prop = "gmd:aa:bb.gmd:cc.gmd:dd";
         final String propExpected = "gmd:aa:bb/gmd:cc/gmd:dd";
-        actual = FilterBuilder.parse(prop + " < 100");
+        actual = CQL.toFilter(prop + " < 100");
 
         assertTrue("PropertyIsLessThan filter was expected", actual instanceof PropertyIsLessThan);
 
@@ -200,30 +154,13 @@ public class FilterBuilderTest extends TestCase {
         Filter actual;
 
         expected = FilterSample.getSample(FilterSample.FILTER_SIMPLE_EXPR);
-        actual = FilterBuilder.parse(FilterSample.FILTER_SIMPLE_EXPR);
+        actual = CQL.toFilter(FilterSample.FILTER_SIMPLE_EXPR);
 
         assertNotNull("expects filter not null", actual);
 
         assertEquals("not equal compare filter error", expected, actual);
     }
 
-    /**
-     * Test of getFormattedErrorMessage method, of class
-     * org.geotools.filter.ExpressionBuilder.
-     */
-    public void testGetFormattedErrorMessage() {
-        final String exp = "12 / ] + 4";
-
-        try {
-            FilterBuilder.parse(exp);
-            fail("expected Exception");
-        } catch (ParseException pe) {
-            String error = FilterBuilder.getFormattedErrorMessage(pe, exp);
-            assertFalse("".equals(error));
-
-            // LOGGER.info(error);
-        }
-    }
 
     /**
      * Test Existnce Predicate.
@@ -250,7 +187,7 @@ public class FilterBuilderTest extends TestCase {
         // -------------------------------------------------------------
         // <attribute_name> DOES-NOT-EXIST
         // -------------------------------------------------------------
-        resultFilter = FilterBuilder.parse(FilterSample.ATTRIBUTE_NAME_DOES_NOT_EXIST);
+        resultFilter = CQL.toFilter(FilterSample.ATTRIBUTE_NAME_DOES_NOT_EXIST);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -261,7 +198,7 @@ public class FilterBuilderTest extends TestCase {
         // -------------------------------------------------------------
         // <attribute_name> EXISTS
         // -------------------------------------------------------------
-        resultFilter = FilterBuilder.parse(FilterSample.ATTRIBUTE_NAME_EXISTS);
+        resultFilter = CQL.toFilter(FilterSample.ATTRIBUTE_NAME_EXISTS);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -295,7 +232,7 @@ public class FilterBuilderTest extends TestCase {
         // ATTR1 IS NULL
         // -------------------------------------------------------------
         expected = FilterSample.getSample(FilterSample.PROPERTY_IS_NULL);
-        resultFilter = FilterBuilder.parse(FilterSample.PROPERTY_IS_NULL);
+        resultFilter = CQL.toFilter(FilterSample.PROPERTY_IS_NULL);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -305,7 +242,7 @@ public class FilterBuilderTest extends TestCase {
         // ATTR1 IS NOT NULL
         // -------------------------------------------------------------
         expected = FilterSample.getSample(FilterSample.PROPERTY_IS_NOT_NULL);
-        resultFilter = FilterBuilder.parse(FilterSample.PROPERTY_IS_NOT_NULL);
+        resultFilter = CQL.toFilter(FilterSample.PROPERTY_IS_NOT_NULL);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -357,7 +294,7 @@ public class FilterBuilderTest extends TestCase {
         // <attribute_name> BEFORE <date-time expression>
         // -------------------------------------------------------------
         // ATTR1 BEFORE 2006-12-31T01:30:00Z
-        resultFilter = FilterBuilder.parse(FilterSample.FILTER_BEFORE_DATE);
+        resultFilter = CQL.toFilter(FilterSample.FILTER_BEFORE_DATE);
 
         assertNotNull("not null expected", resultFilter);
 
@@ -365,7 +302,7 @@ public class FilterBuilderTest extends TestCase {
         assertEquals("less filter ", expected, resultFilter);
 
         // ATTR1 BEFORE 2006-11-31T01:30:00Z/2006-12-31T01:30:00Z
-        resultFilter = FilterBuilder.parse(FilterSample.FILTER_BEFORE_PERIOD_BETWEEN_DATES);
+        resultFilter = CQL.toFilter(FilterSample.FILTER_BEFORE_PERIOD_BETWEEN_DATES);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -374,7 +311,7 @@ public class FilterBuilderTest extends TestCase {
         assertEquals("less than first date of period ", expected, resultFilter);
 
         // ATTR1 BEFORE 2006-11-31T01:30:00Z/P30D
-        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_BEFORE_PERIOD_DATE_AND_DAYS);
+        resultFilter = CQL.toFilter(FilterSample.FILTER_BEFORE_PERIOD_DATE_AND_DAYS);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -383,7 +320,7 @@ public class FilterBuilderTest extends TestCase {
         assertEquals("less than first date of period ", expected, resultFilter);
 
         // "ATTR1 BEFORE 2006-11-31T01:30:00Z/P1Y"
-        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_BEFORE_PERIOD_DATE_AND_YEARS);
+        resultFilter = CQL.toFilter(FilterSample.FILTER_BEFORE_PERIOD_DATE_AND_YEARS);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -392,7 +329,7 @@ public class FilterBuilderTest extends TestCase {
         assertEquals("less than first date of period ", expected, resultFilter);
 
         // "ATTR1 BEFORE 2006-11-31T01:30:00Z/P12M"
-        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_BEFORE_PERIOD_DATE_AND_MONTHS);
+        resultFilter = CQL.toFilter(FilterSample.FILTER_BEFORE_PERIOD_DATE_AND_MONTHS);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -401,7 +338,7 @@ public class FilterBuilderTest extends TestCase {
         assertEquals("less than first date of period ", expected, resultFilter);
 
         // ATTR1 BEFORE P10Y10M10DT5H5M5S/2006-11-30T01:30:00Z
-        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_BEFORE_PERIOD_YMD_HMS_DATE);
+        resultFilter = CQL.toFilter(FilterSample.FILTER_BEFORE_PERIOD_YMD_HMS_DATE);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -412,7 +349,7 @@ public class FilterBuilderTest extends TestCase {
         // test compound attribute gmd:aa:bb.gmd:cc.gmd:dd
         final String prop = "gmd:aa:bb.gmd:cc.gmd:dd";
         final String propExpected = "gmd:aa:bb/gmd:cc/gmd:dd";
-        resultFilter = FilterBuilder.parse(prop + " BEFORE P10Y10M10DT5H5M5S/2006-11-30T01:30:00Z ");
+        resultFilter = CQL.toFilter(prop + " BEFORE P10Y10M10DT5H5M5S/2006-11-30T01:30:00Z ");
 
         assertTrue("PropertyIsLessThan filter was expected",
             resultFilter instanceof PropertyIsLessThan);
@@ -450,7 +387,7 @@ public class FilterBuilderTest extends TestCase {
         // <attribute_name> BEFORE OR DURING <period>
         // -------------------------------------------------------------
         // ATTR1 BEFORE OR DURING 2006-11-31T01:30:00Z/2006-12-31T01:30:00Z
-        resultFilter = FilterBuilder.parse(FilterSample.FILTER_BEFORE_OR_DURING_PERIOD_BETWEEN_DATES);
+        resultFilter = CQL.toFilter(FilterSample.FILTER_BEFORE_OR_DURING_PERIOD_BETWEEN_DATES);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -459,7 +396,7 @@ public class FilterBuilderTest extends TestCase {
         assertEquals("less than or equal the last date of period ", expected, resultFilter);
 
         // ATTR1 BEFORE OR DURING P10Y10M10DT5H5M5S/2006-11-30T01:30:00Z
-        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_BEFORE_OR_DURING_PERIOD_YMD_HMS_DATE);
+        resultFilter = CQL.toFilter(FilterSample.FILTER_BEFORE_OR_DURING_PERIOD_YMD_HMS_DATE);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -468,7 +405,7 @@ public class FilterBuilderTest extends TestCase {
         assertEquals(" filter", expected, resultFilter);
 
         // ATTR1 BEFORE OR DURING 2006-11-30T01:30:00Z/P10Y10M10DT5H5M5S
-        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_BEFORE_OR_DURING_PERIOD_DATE_YMD_HMS);
+        resultFilter = CQL.toFilter(FilterSample.FILTER_BEFORE_OR_DURING_PERIOD_DATE_YMD_HMS);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -504,7 +441,7 @@ public class FilterBuilderTest extends TestCase {
         // <attribute_name> BEFORE OR DURING <period>
         // -------------------------------------------------------------
         // ATTR1 DURING OF AFTER 2006-11-31T01:30:00Z/2006-12-31T01:30:00Z
-        resultFilter = FilterBuilder.parse(FilterSample.FILTER_DURING_OR_AFTER_PERIOD_BETWEEN_DATES);
+        resultFilter = CQL.toFilter(FilterSample.FILTER_DURING_OR_AFTER_PERIOD_BETWEEN_DATES);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -513,7 +450,7 @@ public class FilterBuilderTest extends TestCase {
         assertEquals("greater than or equal the first date of period ", expected, resultFilter);
 
         // ATTR1 DURING OR AFTER P10Y10M10DT5H5M5S/2006-11-30T01:30:00Z
-        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_DURING_OR_AFTER_PERIOD_YMD_HMS_DATE);
+        resultFilter = CQL.toFilter(FilterSample.FILTER_DURING_OR_AFTER_PERIOD_YMD_HMS_DATE);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -523,7 +460,7 @@ public class FilterBuilderTest extends TestCase {
             expected, resultFilter);
 
         // ATTR1 DURING OR AFTER 2006-11-30T01:30:00Z/P10Y10M10DT5H5M5S
-        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_DURING_OR_AFTER_PERIOD_DATE_YMD_HMS);
+        resultFilter = CQL.toFilter(FilterSample.FILTER_DURING_OR_AFTER_PERIOD_DATE_YMD_HMS);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -557,7 +494,7 @@ public class FilterBuilderTest extends TestCase {
         Filter expected;
 
         // ATTR1 DURING 2006-11-30T01:30:00Z/2006-12-31T01:30:00Z
-        resultFilter = FilterBuilder.parse(FilterSample.FILTER_DURING_PERIOD_BETWEEN_DATES);
+        resultFilter = CQL.toFilter(FilterSample.FILTER_DURING_PERIOD_BETWEEN_DATES);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -566,7 +503,7 @@ public class FilterBuilderTest extends TestCase {
         assertEquals("greater filter ", expected, resultFilter);
 
         // ATTR1 DURING 2006-11-30T01:30:00Z/P10Y10M10DT5H5M5S
-        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_DURING_PERIOD_DATE_YMD_HMS);
+        resultFilter = CQL.toFilter(FilterSample.FILTER_DURING_PERIOD_DATE_YMD_HMS);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -575,7 +512,7 @@ public class FilterBuilderTest extends TestCase {
         assertEquals("greater filter", expected, resultFilter);
 
         // ATTR1 DURING P10Y10M10DT5H5M5S/2006-11-30T01:30:00Z
-        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_DURING_PERIOD_YMD_HMS_DATE);
+        resultFilter = CQL.toFilter(FilterSample.FILTER_DURING_PERIOD_YMD_HMS_DATE);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -612,7 +549,7 @@ public class FilterBuilderTest extends TestCase {
         // <attribute_name> AFTER <date-time expression>
         // -------------------------------------------------------------
         //
-        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_AFTER_DATE);
+        resultFilter = CQL.toFilter(FilterSample.FILTER_AFTER_DATE);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -624,7 +561,7 @@ public class FilterBuilderTest extends TestCase {
         // <attribute_name> AFTER <period>
         // -------------------------------------------------------------
         // ATTR1 BEFORE 2006-11-31T01:30:00Z/2006-12-31T01:30:00Z
-        resultFilter = FilterBuilder.parse(FilterSample.FILTER_AFTER_PERIOD_BETWEEN_DATES);
+        resultFilter = CQL.toFilter(FilterSample.FILTER_AFTER_PERIOD_BETWEEN_DATES);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -633,7 +570,7 @@ public class FilterBuilderTest extends TestCase {
         assertEquals("greater filter ", expected, resultFilter);
 
         // ATTR1 AFTER 2006-11-30T01:30:00Z/P10D
-        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_AFTER_PERIOD_DATE_DAYS);
+        resultFilter = CQL.toFilter(FilterSample.FILTER_AFTER_PERIOD_DATE_DAYS);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -642,7 +579,7 @@ public class FilterBuilderTest extends TestCase {
         assertEquals("greater filter", expected, resultFilter);
 
         // ATTR1 AFTER 2006-11-30T01:30:00Z/P10M
-        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_AFTER_PERIOD_DATE_MONTH);
+        resultFilter = CQL.toFilter(FilterSample.FILTER_AFTER_PERIOD_DATE_MONTH);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -651,7 +588,7 @@ public class FilterBuilderTest extends TestCase {
         assertEquals("greater filter", expected, resultFilter);
 
         // ATTR1 AFTER 2006-11-30T01:30:00Z/P10Y
-        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_AFTER_PERIOD_DATE_YEARS);
+        resultFilter = CQL.toFilter(FilterSample.FILTER_AFTER_PERIOD_DATE_YEARS);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -660,7 +597,7 @@ public class FilterBuilderTest extends TestCase {
         assertEquals("greater filter", expected, resultFilter);
 
         // ATTR1 AFTER 2006-11-30T01:30:00Z/P10Y10M
-        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_AFTER_PERIOD_DATE_YEARS_MONTH);
+        resultFilter = CQL.toFilter(FilterSample.FILTER_AFTER_PERIOD_DATE_YEARS_MONTH);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -669,7 +606,7 @@ public class FilterBuilderTest extends TestCase {
         assertEquals("greater filter", expected, resultFilter);
 
         // ATTR1 AFTER 2006-11-30T01:30:00Z/T5H
-        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_AFTER_PERIOD_DATE_HOURS);
+        resultFilter = CQL.toFilter(FilterSample.FILTER_AFTER_PERIOD_DATE_HOURS);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -678,7 +615,7 @@ public class FilterBuilderTest extends TestCase {
         assertEquals("greater filter", expected, resultFilter);
 
         // ATTR1 AFTER 2006-11-30T01:30:00Z/T5M
-        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_AFTER_PERIOD_DATE_MINUTES);
+        resultFilter = CQL.toFilter(FilterSample.FILTER_AFTER_PERIOD_DATE_MINUTES);
 
         assertNotNull("FilSter expected", resultFilter);
 
@@ -687,7 +624,7 @@ public class FilterBuilderTest extends TestCase {
         assertEquals("greater filter", expected, resultFilter);
 
         // ATTR1 AFTER 2006-11-30T01:30:00Z/T5S
-        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_AFTER_PERIOD_DATE_SECONDS);
+        resultFilter = CQL.toFilter(FilterSample.FILTER_AFTER_PERIOD_DATE_SECONDS);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -696,7 +633,7 @@ public class FilterBuilderTest extends TestCase {
         assertEquals("greater filter", expected, resultFilter);
 
         // ATTR1 AFTER 2006-11-30T01:30:00Z/P10Y10M10DT5H5M5S
-        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_AFTER_PERIOD_DATE_YMD_HMS);
+        resultFilter = CQL.toFilter(FilterSample.FILTER_AFTER_PERIOD_DATE_YMD_HMS);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -729,7 +666,7 @@ public class FilterBuilderTest extends TestCase {
         Filter expected;
 
         // Like
-        resultFilter = FilterBuilder.parse(FilterSample.LIKE_FILTER);
+        resultFilter = CQL.toFilter(FilterSample.LIKE_FILTER);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -738,7 +675,7 @@ public class FilterBuilderTest extends TestCase {
         assertEquals("like filter was expected", expected, resultFilter);
 
         // not Like
-        resultFilter = FilterBuilder.parse(FilterSample.NOT_LIKE_FILTER);
+        resultFilter = CQL.toFilter(FilterSample.NOT_LIKE_FILTER);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -764,7 +701,7 @@ public class FilterBuilderTest extends TestCase {
         Filter expected;
 
         // between
-        resultFilter = FilterBuilder.parse(FilterSample.BETWEEN_FILTER);
+        resultFilter = CQL.toFilter(FilterSample.BETWEEN_FILTER);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -773,7 +710,7 @@ public class FilterBuilderTest extends TestCase {
         assertEquals("Between filter was expected", expected, resultFilter);
 
         // not between
-        resultFilter = FilterBuilder.parse(FilterSample.NOT_BETWEEN_FILTER);
+        resultFilter = CQL.toFilter(FilterSample.NOT_BETWEEN_FILTER);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -784,7 +721,7 @@ public class FilterBuilderTest extends TestCase {
         // test compound attribute gmd:aa:bb.gmd:cc.gmd:dd
         final String prop = "gmd:aa:bb.gmd:cc.gmd:dd";
         final String propExpected = "gmd:aa:bb/gmd:cc/gmd:dd";
-        resultFilter = FilterBuilder.parse(prop + " BETWEEN 100 AND 200 ");
+        resultFilter = CQL.toFilter(prop + " BETWEEN 100 AND 200 ");
 
         assertTrue("PropertyIsBetween filter was expected",
             resultFilter instanceof PropertyIsBetween);
@@ -832,7 +769,7 @@ public class FilterBuilderTest extends TestCase {
         try {
             String expected = attSample.replace('.', '/');
 
-            result = (PropertyIsLike) FilterBuilder.parse(attSample + " LIKE 'abc%'");
+            result = (PropertyIsLike) CQL.toFilter(attSample + " LIKE 'abc%'");
 
             attResult = (PropertyName) result.getExpression();
 
@@ -862,7 +799,7 @@ public class FilterBuilderTest extends TestCase {
         Filter expected;
 
         // ATTR1 < 10 AND ATTR2 < 2
-        result = FilterBuilder.parse(FilterSample.FILTER_AND);
+        result = CQL.toFilter(FilterSample.FILTER_AND);
 
         assertNotNull("filter expected", result);
 
@@ -871,7 +808,7 @@ public class FilterBuilderTest extends TestCase {
         assertEquals("ATTR1 < 10 AND ATTR2 < 2 was expected", expected, result);
 
         // "ATTR1 > 10 OR ATTR2 < 2"
-        result = FilterBuilder.parse(FilterSample.FILTER_OR);
+        result = CQL.toFilter(FilterSample.FILTER_OR);
 
         assertNotNull("filter expected", result);
 
@@ -880,7 +817,7 @@ public class FilterBuilderTest extends TestCase {
         assertEquals("ATTR1 > 10 OR ATTR2 < 2 was expected", expected, result);
 
         // ATTR1 < 10 AND ATTR2 < 2 OR ATTR3 > 10
-        result = FilterBuilder.parse(FilterSample.FILTER_OR_AND);
+        result = CQL.toFilter(FilterSample.FILTER_OR_AND);
 
         assertNotNull("filter expected", result);
 
@@ -889,7 +826,7 @@ public class FilterBuilderTest extends TestCase {
         assertEquals("(ATTR1 < 10 AND ATTR2 < 2 OR ATTR3 > 10) was expected", expected, result);
 
         // ATTR3 < 4 AND (ATT1 > 10 OR ATT2 < 2)
-        result = FilterBuilder.parse(FilterSample.FILTER_OR_AND_PARENTHESIS);
+        result = CQL.toFilter(FilterSample.FILTER_OR_AND_PARENTHESIS);
 
         assertNotNull("filter expected", result);
 
@@ -898,7 +835,7 @@ public class FilterBuilderTest extends TestCase {
         assertEquals("ATTR3 < 4 AND (ATT1 > 10 OR ATT2 < 2) was expected", expected, result);
 
         // ATTR3 < 4 AND (NOT( ATTR1 < 10 AND ATTR2 < 2))
-        result = FilterBuilder.parse(FilterSample.FILTER_AND_NOT_AND);
+        result = CQL.toFilter(FilterSample.FILTER_AND_NOT_AND);
 
         assertNotNull("filter expected", result);
 
@@ -907,7 +844,7 @@ public class FilterBuilderTest extends TestCase {
         assertEquals("ATTR3 < 4 AND (NOT( ATTR1 < 10 AND ATTR2 < 2)) was expected", expected, result);
 
         // "ATTR1 < 1 AND (NOT (ATTR2 < 2)) AND ATTR3 < 3"
-        result = FilterBuilder.parse(FilterSample.FILTER_AND_NOT_COMPARASION);
+        result = CQL.toFilter(FilterSample.FILTER_AND_NOT_COMPARASION);
 
         assertNotNull("filter expected", result);
 
@@ -936,7 +873,7 @@ public class FilterBuilderTest extends TestCase {
         Filter result;
         Filter expected;
 
-        result = FilterBuilder.parse(FilterSample.FILTER_WITH_FUNCTION_ABS);
+        result = CQL.toFilter(FilterSample.FILTER_WITH_FUNCTION_ABS);
 
         assertNotNull("filter expected", result);
 
@@ -947,7 +884,7 @@ public class FilterBuilderTest extends TestCase {
         // Functions", expected,result);
 
         // Key: GEOT-1167 type: BUG
-        result = FilterBuilder.parse(FilterSample.FILTER__WITH_FUNCTION_STR_CONCAT);
+        result = CQL.toFilter(FilterSample.FILTER__WITH_FUNCTION_STR_CONCAT);
 
         assertNotNull("filter expected", result);
 
@@ -959,7 +896,7 @@ public class FilterBuilderTest extends TestCase {
 
         // test for improvement Key: GEOT-1168
         String cqlExpression = "A = strConcat(B, 'testParam')";
-        Filter filter = FilterBuilder.parse(cqlExpression);
+        Filter filter = CQL.toFilter(cqlExpression);
 
         assertTrue(filter instanceof PropertyIsEqualTo);
 
@@ -1008,45 +945,45 @@ public class FilterBuilderTest extends TestCase {
     public void testRoutineInvocationGeoOp() throws Exception {
         Filter resultFilter;
 
-        resultFilter = FilterBuilder.parse("DISJOINT(ATTR1, POINT(1 2))");
+        resultFilter = CQL.toFilter("DISJOINT(ATTR1, POINT(1 2))");
 
         assertTrue("Disjoint was expected", resultFilter instanceof Disjoint);
 
-        resultFilter = FilterBuilder.parse("INTERSECT(ATTR1, POINT(1 2))");
+        resultFilter = CQL.toFilter("INTERSECT(ATTR1, POINT(1 2))");
 
         assertTrue("Intersects was expected", resultFilter instanceof Intersects);
 
-        resultFilter = FilterBuilder.parse("TOUCH(ATTR1, POINT(1 2))");
+        resultFilter = CQL.toFilter("TOUCH(ATTR1, POINT(1 2))");
 
         assertTrue("Touches was expected", resultFilter instanceof Touches);
 
-        resultFilter = FilterBuilder.parse("CROSS(ATTR1, POINT(1 2))");
+        resultFilter = CQL.toFilter("CROSS(ATTR1, POINT(1 2))");
 
         assertTrue("Crosses was expected", resultFilter instanceof Crosses);
 
-        resultFilter = FilterBuilder.parse("CONTAINS(ATTR1, POINT(1 2))");
+        resultFilter = CQL.toFilter("CONTAINS(ATTR1, POINT(1 2))");
 
         assertTrue("Contains was expected", resultFilter instanceof Contains);
 
-        resultFilter = FilterBuilder.parse("OVERLAP(ATTR1, POINT(1 2))");
+        resultFilter = CQL.toFilter("OVERLAP(ATTR1, POINT(1 2))");
 
         assertTrue("Overlaps was expected", resultFilter instanceof Overlaps);
 
         // BBOX
-        resultFilter = FilterBuilder.parse("BBOX(ATTR1, 10,20,30,40)");
+        resultFilter = CQL.toFilter("BBOX(ATTR1, 10,20,30,40)");
 
         assertTrue("BBox was expected", resultFilter instanceof BBOX);
 
-        resultFilter = FilterBuilder.parse("BBOX(ATTR1, 10,20,30,40, 'EPSG:4326')");
+        resultFilter = CQL.toFilter("BBOX(ATTR1, 10,20,30,40, 'EPSG:4326')");
 
         assertTrue("BBox was expected", resultFilter instanceof BBOX);
 
         // EQUALS
-        resultFilter = FilterBuilder.parse("EQUAL(ATTR1, POINT(1 2))");
+        resultFilter = CQL.toFilter("EQUAL(ATTR1, POINT(1 2))");
 
         assertTrue("not an instance of Equals", resultFilter instanceof Equals);
 
-        resultFilter = FilterBuilder.parse("WITHIN(ATTR1, POINT(1 2))");
+        resultFilter = CQL.toFilter("WITHIN(ATTR1, POINT(1 2))");
 
         assertTrue("Within was expected", resultFilter instanceof Within);
     }
@@ -1069,14 +1006,14 @@ public class FilterBuilderTest extends TestCase {
     public void testRoutineInvocationRelGeoOp() throws Exception {
         Filter resultFilter;
 
-        resultFilter = FilterBuilder.parse("DWITHIN(ATTR1, POINT(1 2), 10, kilometers)");
+        resultFilter = CQL.toFilter("DWITHIN(ATTR1, POINT(1 2), 10, kilometers)");
 
         assertTrue(resultFilter instanceof DistanceBufferOperator);
 
         // test compound attribute gmd:aa:bb.gmd:cc.gmd:dd
         final String prop = "gmd:aa:bb.gmd:cc.gmd:dd";
         final String propExpected = "gmd:aa:bb/gmd:cc/gmd:dd";
-        resultFilter = FilterBuilder.parse("DWITHIN(" + prop + ", POINT(1 2), 10, kilometers) ");
+        resultFilter = CQL.toFilter("DWITHIN(" + prop + ", POINT(1 2), 10, kilometers) ");
 
         assertTrue("DistanceBufferOperator filter was expected",
             resultFilter instanceof DistanceBufferOperator);
@@ -1133,7 +1070,7 @@ public class FilterBuilderTest extends TestCase {
         final String cqlExpression = "strConcat(A, B)";
 
         // simple attribute as argument
-        resultExpr = FilterBuilder.parseExpression(cqlExpression);
+        resultExpr = CQL.toExpression(cqlExpression);
 
         assertNotNull(resultExpr);
         assertTrue(resultExpr instanceof Function);
@@ -1155,7 +1092,7 @@ public class FilterBuilderTest extends TestCase {
 
         final String cqlExpression2 = "strConcat(" + arg1Name + ", " + arg2Name + ")";
 
-        resultExpr = FilterBuilder.parseExpression(cqlExpression2);
+        resultExpr = CQL.toExpression(cqlExpression2);
 
         assertNotNull(resultExpr);
         assertTrue(resultExpr instanceof Function);
@@ -1199,11 +1136,11 @@ public class FilterBuilderTest extends TestCase {
         throws Exception {
         // Test 1
         String cqlExpression = "strConcat(A, abs(B))";
-        Expression expression = FilterBuilder.parseExpression(cqlExpression);
+        Expression expression = CQL.toExpression(cqlExpression);
 
         // Test 2
         cqlExpression = "strConcat(A, strConcat(B, strConcat(C, \".\")))";
-        expression = FilterBuilder.parseExpression(cqlExpression);
+        expression = CQL.toExpression(cqlExpression);
         assertNotNull(expression);
         assertTrue(expression instanceof Function);
 
@@ -1258,7 +1195,7 @@ public class FilterBuilderTest extends TestCase {
         Literal geom;
 
         // Point
-        result = (BinarySpatialOperator) FilterBuilder.parse("CROSS(ATTR1, POINT(1 2))");
+        result = (BinarySpatialOperator) CQL.toFilter("CROSS(ATTR1, POINT(1 2))");
 
         geom = (Literal) result.getExpression2();
 
@@ -1266,7 +1203,7 @@ public class FilterBuilderTest extends TestCase {
         assertTrue(geom.getValue() instanceof com.vividsolutions.jts.geom.Point);
 
         // LineString
-        result = (BinarySpatialOperator) FilterBuilder.parse("CROSS(ATTR1, LINESTRING(1 2, 10 15))");
+        result = (BinarySpatialOperator) CQL.toFilter("CROSS(ATTR1, LINESTRING(1 2, 10 15))");
 
         geom = (Literal) result.getExpression2();
 
@@ -1274,7 +1211,7 @@ public class FilterBuilderTest extends TestCase {
         assertTrue(geom.getValue() instanceof com.vividsolutions.jts.geom.LineString);
 
         // Poligon
-        result = (BinarySpatialOperator) FilterBuilder.parse(
+        result = (BinarySpatialOperator) CQL.toFilter(
                 "CROSS(ATTR1, POLYGON((1 2, 15 2, 15 20, 15 21, 1 2)))");
 
         geom = (Literal) result.getExpression2();
@@ -1283,7 +1220,7 @@ public class FilterBuilderTest extends TestCase {
         assertTrue(geom.getValue() instanceof com.vividsolutions.jts.geom.Polygon);
 
         // MultiPoint
-        result = (BinarySpatialOperator) FilterBuilder.parse(
+        result = (BinarySpatialOperator) CQL.toFilter(
                 "CROSS(ATTR1, MULTIPOINT( (1 2), (15 2), (15 20), (15 21), (1 2) ))");
 
         geom = (Literal) result.getExpression2();
@@ -1292,7 +1229,7 @@ public class FilterBuilderTest extends TestCase {
         assertTrue(geom.getValue() instanceof com.vividsolutions.jts.geom.MultiPoint);
 
         // MultiLineString
-        result = (BinarySpatialOperator) FilterBuilder.parse(
+        result = (BinarySpatialOperator) CQL.toFilter(
                 "CROSS(ATTR1, MULTILINESTRING((10 10, 20 20),(15 15,30 15)) )");
 
         geom = (Literal) result.getExpression2();
@@ -1301,7 +1238,7 @@ public class FilterBuilderTest extends TestCase {
         assertTrue(geom.getValue() instanceof com.vividsolutions.jts.geom.MultiLineString);
 
         // MultiPolygon
-        result = (BinarySpatialOperator) FilterBuilder.parse(
+        result = (BinarySpatialOperator) CQL.toFilter(
                 "CROSS(ATTR1, MULTIPOLYGON( ((10 10, 10 20, 20 20, 20 15, 10 10)),((60 60, 70 70, 80 60, 60 60 )) ) )");
 
         geom = (Literal) result.getExpression2();
@@ -1310,7 +1247,7 @@ public class FilterBuilderTest extends TestCase {
         assertTrue(geom.getValue() instanceof com.vividsolutions.jts.geom.MultiPolygon);
 
         // GEOMETRYCOLLECTION
-        result = (BinarySpatialOperator) FilterBuilder.parse(
+        result = (BinarySpatialOperator) CQL.toFilter(
                 "CROSS(ATTR1, GEOMETRYCOLLECTION (POINT (10 10),POINT (30 30),LINESTRING (15 15, 20 20)) )");
 
         geom = (Literal) result.getExpression2();
@@ -1319,7 +1256,7 @@ public class FilterBuilderTest extends TestCase {
         assertTrue(geom.getValue() instanceof com.vividsolutions.jts.geom.GeometryCollection);
 
         // ENVELOPE
-        result = (BinarySpatialOperator) FilterBuilder.parse(
+        result = (BinarySpatialOperator) CQL.toFilter(
                 "CROSS(ATTR1, ENVELOPE( 10, 20, 30, 40) )");
 
         geom = (Literal) result.getExpression2();
@@ -1336,11 +1273,11 @@ public class FilterBuilderTest extends TestCase {
         final String filterError = "WITHIN(ATTR1, POLYGON((1 2, 10 15), (10 15, 1 2)))";
 
         try {
-            FilterBuilder.parse(filterError);
+            CQL.toFilter(filterError);
 
             fail("polygon error was expected");
-        } catch (ParseException e) {
-            String message = FilterBuilder.getFormattedErrorMessage(e, filterError);
+        } catch (CQLException e) {
+            String message = e.getSyntaxError();
             assertFalse("error message is expected", "".equals(message));
         }
     }
@@ -1351,13 +1288,12 @@ public class FilterBuilderTest extends TestCase {
      * @throws Exception
      */
     public void testParseExpression() throws Exception {
-        FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
-        Expression expression = FilterBuilder.parseExpression("attName");
+        Expression expression = CQL.toExpression("attName");
         assertNotNull(expression);
         assertTrue(expression instanceof PropertyName);
         assertEquals("attName", ((PropertyName) expression).getPropertyName());
 
-        expression = FilterBuilder.parseExpression("a + b + x.y.z");
+        expression = CQL.toExpression("a + b + x.y.z");
         assertNotNull(expression);
         assertTrue(expression instanceof Add);
 
@@ -1370,105 +1306,14 @@ public class FilterBuilderTest extends TestCase {
         assertEquals("x/y/z", ((PropertyName) e2).getPropertyName());
     }
 
-    /**
-     * Simple test for expressions with delimiter
-     *
-     * @throws Exception
-     */
-    public void testParseFilterListSingleFilter() throws Exception {
-        String valueWithDelimiter = "text" + DELIMITER + "with" + DELIMITER + "delimiter";
-        final String singleFilterStr = "attr3 = '" + valueWithDelimiter + "'";
-        List filters = FilterBuilder.parseFilterList(null, singleFilterStr);
-
-        assertNotNull(filters);
-        assertEquals(1, filters.size());
-        assertTrue(filters.get(0) instanceof PropertyIsEqualTo);
-
-        PropertyIsEqualTo filter = (PropertyIsEqualTo) filters.get(0);
-        assertEquals("attr3", ((PropertyName) filter.getExpression1()).getPropertyName());
-        assertEquals(valueWithDelimiter, ((Literal) filter.getExpression2()).getValue());
-    }
-
     public void testBoolean() throws Exception {
-        Filter filter = FilterBuilder.parse("attr = true");
+        Filter filter = CQL.toFilter("attr = true");
         assertNotNull(filter);
         assertTrue(filter instanceof PropertyIsEqualTo);
 
         PropertyIsEqualTo f = (PropertyIsEqualTo) filter;
         assertEquals("attr", ((PropertyName) f.getExpression1()).getPropertyName());
         assertEquals(Boolean.TRUE, ((Literal) f.getExpression2()).getValue());
-    }
-
-    /**
-     * Tests expressions with delimiter
-     *
-     *
-     * Sample: attr1 > 5|attr2 between 1 and 7|attr3 = 'text|with|delimiter'
-     *
-     * @throws Exception
-     */
-    public void testParseFilterListWithDelimiter() throws Exception {
-        String valueWithDelimiter = "text" + DELIMITER + "with" + DELIMITER + "delimiter";
-
-        // if delimiter is '|':
-        // "attr1 > 5|attr2 between 1 and 7|attr3 = 'text|with|delimiter'"
-        final String filterListStr = "attr1 > 5" + DELIMITER + "attr2 between 1 and 7" + DELIMITER
-            + "attr3 = '" + valueWithDelimiter + "'";
-        List filters = FilterBuilder.parseFilterList(null, filterListStr);
-        assertNotNull(filters);
-        assertEquals(3, filters.size());
-        assertTrue(filters.get(0) instanceof PropertyIsGreaterThan);
-        assertTrue(filters.get(1) instanceof PropertyIsBetween);
-        assertTrue(filters.get(2) instanceof PropertyIsEqualTo);
-
-        PropertyIsGreaterThan gt = (PropertyIsGreaterThan) filters.get(0);
-        assertEquals("attr1", ((PropertyName) gt.getExpression1()).getPropertyName());
-        assertEquals(new Integer(5), ((Literal) gt.getExpression2()).getValue());
-
-        PropertyIsBetween btw = (PropertyIsBetween) filters.get(1);
-        assertEquals("attr2", ((PropertyName) btw.getExpression()).getPropertyName());
-        assertEquals(new Integer(1), ((Literal) btw.getLowerBoundary()).getValue());
-        assertEquals(new Integer(7), ((Literal) btw.getUpperBoundary()).getValue());
-
-        PropertyIsEqualTo equals = (PropertyIsEqualTo) filters.get(2);
-        assertEquals("attr3", ((PropertyName) equals.getExpression1()).getPropertyName());
-        assertEquals(valueWithDelimiter, ((Literal) equals.getExpression2()).getValue());
-    }
-
-    /**
-     * An empty filter int the constraints list shall be parsed as
-     * {@link Filter#INCLUDE}
-     *
-     * @throws Exception
-     */
-    public void testParseFilterListWithEmptyFilter() throws Exception {
-        String valueWithDelimiter = "text" + DELIMITER + "with" + DELIMITER + "delimiter";
-
-        // if delimiter is |, "attr1 > 5|INCLUDE|attr3 = 'text|with|delimiter'"
-        String filterListStr = "attr1 > 5" + DELIMITER + "INCLUDE" + DELIMITER + " attr3 = '"
-            + valueWithDelimiter + "'";
-        List filters = FilterBuilder.parseFilterList(null, filterListStr);
-        assertNotNull(filters);
-        assertEquals(3, filters.size());
-        assertTrue(filters.get(0) instanceof PropertyIsGreaterThan);
-        assertTrue(filters.get(1) instanceof IncludeFilter);
-        assertTrue(filters.get(2) instanceof PropertyIsEqualTo);
-
-        PropertyIsGreaterThan gt = (PropertyIsGreaterThan) filters.get(0);
-        assertEquals("attr1", ((PropertyName) gt.getExpression1()).getPropertyName());
-        assertEquals(new Integer(5), ((Literal) gt.getExpression2()).getValue());
-
-        PropertyIsEqualTo equals = (PropertyIsEqualTo) filters.get(2);
-        assertEquals("attr3", ((PropertyName) equals.getExpression1()).getPropertyName());
-        assertEquals(valueWithDelimiter, ((Literal) equals.getExpression2()).getValue());
-
-        filterListStr = "EXCLUDE" + DELIMITER + "INCLUDE" + DELIMITER + "attr3 = '"
-            + valueWithDelimiter + "'";
-
-        filters = FilterBuilder.parseFilterList(null, filterListStr);
-        assertTrue(filters.get(0) instanceof ExcludeFilter);
-        assertTrue(filters.get(1) instanceof IncludeFilter);
-        assertTrue(filters.get(2) instanceof PropertyIsEqualTo);
     }
 
     /**
@@ -1480,9 +1325,32 @@ public class FilterBuilderTest extends TestCase {
     private void testEqualsExpressions(final String cqlSample)
         throws Exception {
         Filter expected = FilterSample.getSample(cqlSample);
-        Filter actual = FilterBuilder.parse(cqlSample);
+        Filter actual = CQL.toFilter(cqlSample);
 
         assertNotNull("expects filter not null", actual);
         assertEquals("this is not the filter expected", expected, actual);
+    }
+   
+    public final void testGetSyntaxError() {
+
+        try {
+            final String malformedExp = "12 / ] + 4";
+            CQL.toFilter(malformedExp);
+            fail("expected Exception");
+        } catch (CQLException pe) {
+            String error = pe.getSyntaxError();
+            assertFalse("".equals(error));
+        }
+
+        try {
+            String malformedGeometry = "WITHIN(ATTR1, POLYGON((1 2, 10 15), (10 15, 1 2)))";
+            CQL.toFilter(malformedGeometry);
+
+            fail("polygon error was expected");
+        } catch (CQLException e) {
+            String message = e.getSyntaxError();
+            assertFalse("error message is expected", "".equals(message));
+        }
+        
     }
 }
