@@ -68,6 +68,7 @@
     <interactive.tests>false</interactive.tests>
     <online.skip.pattern>**/*OnlineTest.java</online.skip.pattern>
     <stress.skip.pattern>**/*StressTest.java</stress.skip.pattern>
+    <test.maxHeapSize>512M</test.maxHeapSize>
   </properties>
 
   <!-- Profiles set on the command-line overwrite default properties. -->
@@ -997,7 +998,7 @@
             <exclude>${stress.skip.pattern}</exclude>
           </excludes>
           <forkMode>once</forkMode>
-          <argLine>-Xmx512M -enableassertions -Dorg.geotools.test.extensive=${extensive.tests} -Dorg.geotools.test.interactive=${interactive.tests} -Djava.awt.headless=${java.awt.headless}</argLine>
+          <argLine>-Xmx${test.maxHeapSize} -enableassertions -Dorg.geotools.test.extensive=${extensive.tests} -Dorg.geotools.test.interactive=${interactive.tests} -Djava.awt.headless=${java.awt.headless}</argLine>
           <!-- Ignores test failure only if we are generating a       -->
           <!-- report for publication on the web site. See the        -->
           <!-- profiles section at the begining of this pom.xml file. -->
