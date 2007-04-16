@@ -16,18 +16,21 @@
 package org.geotools.data;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.data.crs.ReprojectFeatureReader;
 import org.geotools.data.store.DataFeatureCollection;
+import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.geotools.geometry.jts.GeometryCoordinateSequenceTransformer;
+import org.geotools.feature.type.GeometricAttributeType;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -197,6 +200,32 @@ public class DefaultFeatureResults extends DataFeatureCollection {
         return reader;
     }   
 
+    
+    /**
+     * Retrieve a FeatureReader for the geometry attributes only, designed for bounds computation
+     */
+    protected FeatureReader boundsReader() throws IOException {
+        List attributes = new ArrayList();
+        FeatureType schema = featureSource.getSchema();
+        for (int i = 0; i < schema.getAttributeCount(); i++) {
+            AttributeType at = schema.getAttributeType(i);
+            if(at instanceof GeometricAttributeType)
+                attributes.add(at.getName());
+        }
+        
+        DefaultQuery q = new DefaultQuery(query);
+        q.setPropertyNames(attributes);
+        FeatureReader reader = featureSource.getDataStore().getFeatureReader(q,
+                getTransaction());
+        int maxFeatures = query.getMaxFeatures();
+
+        if (maxFeatures == Integer.MAX_VALUE) {
+            return reader;
+        } else {
+            return new MaxFeatureReader(reader, maxFeatures);
+        }
+    }
+
     /**
      * Returns the bounding box of this FeatureResults
      *
@@ -229,7 +258,7 @@ public class DefaultFeatureResults extends DataFeatureCollection {
             Feature feature;
             bounds = new Envelope();
 
-            FeatureReader reader = reader();
+            FeatureReader reader = boundsReader();
 
             while (reader.hasNext()) {
                 feature = reader.next();
