@@ -277,8 +277,8 @@ public final class CoordinateOperationFactoryTest extends TestTransform {
 
         final CoordinateOperation operation = opFactory.createOperation(sourceCRS, targetCRS);
         if (!(opFactory instanceof AuthorityBackedFactory)) { // See comment in class javadoc
-            assertSame(sourceCRS, operation.getSourceCRS());
-            assertSame(targetCRS, operation.getTargetCRS());
+            assertSame (sourceCRS, operation.getSourceCRS());
+            assertSame (targetCRS, operation.getTargetCRS());
             assertTrue (operation.getPositionalAccuracy().contains(PositionalAccuracyImpl.DATUM_SHIFT_APPLIED));
             assertFalse(operation.getPositionalAccuracy().contains(PositionalAccuracyImpl.DATUM_SHIFT_OMITTED));
         }

@@ -45,4 +45,13 @@ public class ServiceIdentificationImpl extends IdentificationImpl implements Ser
      */
     public ServiceIdentificationImpl() {
     }
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public ServiceIdentificationImpl(final ServiceIdentification source) {
+        super(source);
+    }
 }

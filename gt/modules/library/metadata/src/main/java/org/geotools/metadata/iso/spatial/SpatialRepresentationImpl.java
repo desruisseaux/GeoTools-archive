@@ -47,4 +47,13 @@ public class SpatialRepresentationImpl extends MetadataEntity implements Spatial
      */
     public SpatialRepresentationImpl() {
     }
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public SpatialRepresentationImpl(final SpatialRepresentation source) {
+        super(source);
+    }
 }

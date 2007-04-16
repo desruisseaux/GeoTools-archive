@@ -65,6 +65,15 @@ public class DimensionImpl extends MetadataEntity implements Dimension {
     public DimensionImpl() {
     }
 
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public DimensionImpl(final Dimension source) {
+        super(source);
+    }
+
     /*
      * Creates a dimension initialized to the given type.
      */
@@ -116,46 +125,5 @@ public class DimensionImpl extends MetadataEntity implements Dimension {
     public synchronized void setResolution(final Double newValue) {
         checkWritePermission();
         resolution = newValue;
-    }
-
-    /**
-     * Declares this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-    }
-
-    /**
-     * Compares this dimension with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final DimensionImpl that = (DimensionImpl) object; 
-            return Utilities.equals(this.dimensionName,   that.dimensionName) &&
-                   Utilities.equals(this.dimensionSize,   that.dimensionSize) &&
-                   Utilities.equals(this.resolution,      that.resolution);
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this dimension. For performance reason, this method do
-     * not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int) serialVersionUID;
-        if (dimensionName != null) code ^= dimensionName.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this dimension.
-     */
-    public String toString() {
-        return String.valueOf(dimensionName);
     }
 }

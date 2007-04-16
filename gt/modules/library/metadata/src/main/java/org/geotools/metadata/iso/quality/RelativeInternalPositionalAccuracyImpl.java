@@ -47,5 +47,13 @@ public class RelativeInternalPositionalAccuracyImpl extends PositionalAccuracyIm
      */
     public RelativeInternalPositionalAccuracyImpl() {
     }
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public RelativeInternalPositionalAccuracyImpl(final RelativeInternalPositionalAccuracy source) {
+        super(source);
+    }
 }
- 

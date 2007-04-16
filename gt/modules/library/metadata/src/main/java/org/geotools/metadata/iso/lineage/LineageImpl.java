@@ -79,6 +79,15 @@ public class LineageImpl extends MetadataEntity implements Lineage {
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public LineageImpl(final Lineage source) {
+        super(source);
+    }
+
+    /**
      * Returns the general explanation of the data producer’s knowledge about the lineage
      * of a dataset. Should be provided only if {@linkplain ScopeImpl#getLevel scope level}
      * is {@linkplain ScopeCode#DATASET dataset} or {@linkplain ScopeCode#SERIES series}.
@@ -125,50 +134,4 @@ public class LineageImpl extends MetadataEntity implements Lineage {
     public synchronized void setSources(final Collection newValues) {
         sources = copyCollection(newValues, sources, Source.class);
     }
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        statement    = (InternationalString) unmodifiable(statement);
-        processSteps = (Collection)          unmodifiable(processSteps);
-        sources      = (Collection)          unmodifiable(sources);
-    }
-
-    /**
-     * Compare this Lineage with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final LineageImpl that = (LineageImpl) object;
-            return Utilities.equals(this.statement,    that.statement    ) &&
-                   Utilities.equals(this.processSteps, that.processSteps ) &&
-                   Utilities.equals(this.sources,      that.sources      );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this series.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (statement    != null) code ^= statement   .hashCode();
-        if (processSteps != null) code ^= processSteps.hashCode();
-        if (sources      != null) code ^= sources     .hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this lineage.
-     *
-     * @todo Provides a more elaborated implementation.
-     */
-    public String toString() {
-        return String.valueOf(statement);
-    }        
 }

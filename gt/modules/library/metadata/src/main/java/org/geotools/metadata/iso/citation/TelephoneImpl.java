@@ -58,6 +58,15 @@ public class TelephoneImpl extends MetadataEntity implements Telephone {
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public TelephoneImpl(final Telephone source) {
+        super(source);
+    }
+
+    /**
      * Returns the telephone number by which individuals can speak to the responsible
      * organization or individual.
      */
@@ -89,54 +98,5 @@ public class TelephoneImpl extends MetadataEntity implements Telephone {
     public synchronized void setFacsimile(final String newValue) {
         checkWritePermission();
         facsimile = newValue;
-    }
-
-    /**
-     * Declares this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-    }
-
-    /**
-     * Compares this telephone with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final TelephoneImpl that = (TelephoneImpl) object;
-            return Utilities.equals(this.voice,     that.voice    ) &&
-                   Utilities.equals(this.facsimile, that.facsimile);
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this telephone.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (voice     != null) code ^= voice    .hashCode();
-        if (facsimile != null) code ^= facsimile.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this telephone.
-     */
-    public synchronized String toString() {
-        final StringBuffer buffer = new StringBuffer();
-        if (voice != null) {
-            buffer.append("Tel: ");
-            buffer.append(voice);
-        }
-        if (facsimile != null) {
-            appendLineSeparator(buffer);
-            buffer.append("Fax: ");
-            buffer.append(facsimile);
-        }
-        return buffer.toString();
     }
 }

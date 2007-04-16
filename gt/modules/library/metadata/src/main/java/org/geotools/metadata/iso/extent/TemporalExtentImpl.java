@@ -75,6 +75,15 @@ public class TemporalExtentImpl extends MetadataEntity implements TemporalExtent
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public TemporalExtentImpl(final TemporalExtent source) {
+        super(source);
+    }
+
+    /**
      * Creates a temporal extent initialized to the specified values.
      */
     public TemporalExtentImpl(final Date startTime, final Date endTime) {
@@ -129,38 +138,5 @@ public class TemporalExtentImpl extends MetadataEntity implements TemporalExtent
     public synchronized void setExtent(final TemporalPrimitive newValue) {
         checkWritePermission();
         extent = newValue;
-    }
-
-    /**
-     * Compare this temporal extent with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final TemporalExtentImpl that = (TemporalExtentImpl) object;
-            return this.startTime == that.startTime &&
-                   this.endTime   == that.endTime   &&
-                   Utilities.equals(this.extent, that.extent);
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this series.
-     */
-    public synchronized int hashCode() {
-        final long code = (startTime + 37*endTime);
-        return (int)code ^ (int)(code >>> 32) ^ (int)serialVersionUID;
-    }
-
-    /**
-     * Returns a string representation of this series.
-     *
-     * @todo Provides a more elaborated implementation.
-     */
-    public String toString() {
-        return String.valueOf(startTime);
     }
 }

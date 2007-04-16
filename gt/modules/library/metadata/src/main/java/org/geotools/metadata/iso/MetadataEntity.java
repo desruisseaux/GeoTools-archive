@@ -23,13 +23,14 @@ import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.logging.Logger;
 import java.io.Serializable;
 
 // OpenGIS dependencies
 import org.opengis.util.Cloneable;
 
 // Geotools dependencies
+import org.geotools.metadata.MetadataStandard;
+import org.geotools.metadata.ModifiableMetadata;
 import org.geotools.metadata.InvalidMetadataException;
 import org.geotools.metadata.UnmodifiableMetadataException;
 import org.geotools.util.CheckedArrayList;
@@ -40,17 +41,9 @@ import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
- * A superclass for implementing ISO 19115 metadata interfaces. Subclasses must implement
- * at least one of the ISO MetaData interface provided by
+ * A superclass for implementing ISO 19115 metadata interfaces. Subclasses
+ * must implement at least one of the ISO MetaData interface provided by
  * <A HREF="http://geoapi.sourceforge.net">GeoAPI</A>.
- *
- * <H3>Contract of the {@link #clone() clone()} method</H3>
- * <P>While {@linkplain java.lang.Cloneable cloneable}, this class do not provides the
- * {@link #clone() clone()} operation as part of the public API. The clone operation is
- * required for the internal working of the {@link #unmodifiable()} method, which expect
- * from {@link #clone() clone()} a <strong>shalow</strong> copy of this metadata entity.
- * The default implementation of {@link #clone() clone()} is suffisient for must uses.
- * However, subclasses are required to overrides the {@link #freeze} method.</P>
  *
  * @since 2.1
  * @source $URL$
@@ -58,66 +51,41 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @author Jody Garnett
  * @author Martin Desruisseaux
  */
-public class MetadataEntity implements java.lang.Cloneable, Serializable {
+public class MetadataEntity extends ModifiableMetadata implements Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 5730550742604669102L;
 
     /**
-     * The logger for metadata implementation.
-     */
-    protected static final Logger LOGGER = Logger.getLogger("org.geotools.metadata");
-
-    /**
-     * An unmodifiable copy of this metadata. Will be created only when first needed.
-     * If {@code null}, then no unmodifiable entity is available.
-     * If {@code this}, then this entity is itself unmodifiable.
-     */
-    private transient MetadataEntity unmodifiable;
-
-    /**
-     * Construct a default metadata entity.
+     * Constructs an initially empty metadata entity.
      */
     protected MetadataEntity() {
+        super();
     }
 
     /**
-     * Returns {@code true} if this metadata entity is modifiable.
-     * This method returns {@code false} if {@link #unmodifiable()}
-     * has been invoked on this object.
-     */
-    public boolean isModifiable() {
-        return unmodifiable != this;
-    }
-
-    /**
-     * Returns an unmodifiable copy of this metadata. Any attempt to modify an attribute of the
-     * returned object will throw an {@link UnsupportedOperationException}. If this metadata is
-     * already unmodifiable, then this method returns {@code this}.
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     * The {@code source} metadata must implements the same metadata interface than this class.
      *
-     * @return An unmodifiable copy of this metadata.
+     * @param  source The metadata to copy values from.
+     * @throws ClassCastException if the specified metadata don't implements the expected
+     *         metadata interface.
+     *
+     * @since 2.4
      */
-    public synchronized MetadataEntity unmodifiable() {
-        if (unmodifiable == null) {
-            try {
-                /*
-                 * Need a SHALOW copy of this metadata, because some attributes
-                 * may already be unmodifiable and we don't want to clone them.
-                 */
-                unmodifiable = (MetadataEntity) clone();
-            } catch (CloneNotSupportedException exception) {
-                /*
-                 * The metadata is not cloneable for some reason left to the user
-                 * (for example it may be backed by some external database).
-                 * Assumes that the metadata is unmodifiable.
-                 */
-                Logging.unexpectedException(LOGGER, exception);
-                return this;
-            }
-            unmodifiable.freeze();
-        }
-        return unmodifiable;
+    protected MetadataEntity(final Object source) throws ClassCastException {
+        super(source);
+    }
+
+    /**
+     * Returns the metadata standard implemented by subclasses,
+     * which is {@linkplain MetadataStandard#ISO_19115 ISO 19115}.
+     *
+     * @since 2.4
+     */
+    public MetadataStandard getStandard() {
+        return MetadataStandard.ISO_19115;
     }
 
     /**
@@ -137,6 +105,9 @@ public class MetadataEntity implements java.lang.Cloneable, Serializable {
      *
      * @param  object The object to convert in an immutable one.
      * @return A presumed immutable view of the specified object.
+     *
+     * @deprecated No longuer needed, since {@link #freeze} is now implemented
+     *             in the general case using Java reflections.
      */
     protected static Object unmodifiable(final Object object) {
         /*
@@ -222,85 +193,6 @@ public class MetadataEntity implements java.lang.Cloneable, Serializable {
     }
 
     /**
-     * Declare this metadata and all its attributes as unmodifiable. This method is invoked
-     * automatically by the {@link #unmodifiable()} method. Subclasses should overrides
-     * this method and invokes {@link #unmodifiable(Object)} for all attributes.
-     */
-    protected void freeze() {
-        unmodifiable = this;
-    }
-
-    /**
-     * Check if changes in the metadata are allowed. All {@code setFoo(...)} methods in
-     * sub-classes should invoke this method before to apply any change.
-     *
-     * @throws UnmodifiableMetadataException if this metadata is unmodifiable.
-     */
-    protected void checkWritePermission() throws UnmodifiableMetadataException {
-        assert Thread.holdsLock(this);
-        if (unmodifiable == this) {
-            throw new UnmodifiableMetadataException(Errors.format(ErrorKeys.UNMODIFIABLE_METADATA));
-        }
-        unmodifiable = null;
-    }
-
-    /**
-     * Copy the content of one collection ({@code source}) into an other ({@code target}).
-     * If the target collection is {@code null}, or if its type ({@link List} vs {@link Set})
-     * doesn't matches the type of the source collection, a new target collection is expected.
-     *
-     * @param  source      The source collection.
-     * @param  target      The target collection, or {@code null} if not yet created.
-     * @param  elementType The base type of elements to put in the collection.
-     * @return {@code target}, or a newly created collection.
-     */
-    protected final Collection copyCollection(final Collection source, Collection target,
-                                              final Class elementType)
-    {
-        checkWritePermission();
-        if (source == null) {
-            if (target != null) {
-                target.clear();
-            }
-        } else {
-            final boolean isList = (source instanceof List);
-            if (target == null || (target instanceof List) != isList) {
-                int capacity = source.size();
-                if (isList) {
-                    target = new CheckedArrayList(elementType, capacity);
-                } else {
-                    capacity = Math.round(capacity / 0.75f) + 1;
-                    target = new CheckedHashSet(elementType, capacity);
-                }
-            } else {
-                target.clear();
-            }
-            target.addAll(source);
-        }
-        return target;
-    }
-
-    /**
-     * Returns the specified collection, or a new one if {@code c} is null.
-     * This is a convenience method for implementation of {@code getFoo()}
-     * methods.
-     *
-     * @param  c The collection to checks.
-     * @param  elementType The element type (used only if {@code c} is null).
-     * @return {@code c}, or a new collection if {@code c} is null.
-     */
-    protected final Collection nonNullCollection(final Collection c, final Class elementType) {
-        assert Thread.holdsLock(this);
-        if (c != null) {
-            return c;
-        }
-        if (isModifiable()) {
-            return new CheckedHashSet(elementType);
-        }
-        return Collections.EMPTY_SET;
-    }
-
-    /**
      * Makes sure that an argument is non-null. This is used for checking if
      * a mandatory attribute is presents.
      *
@@ -321,40 +213,13 @@ public class MetadataEntity implements java.lang.Cloneable, Serializable {
     /**
      * Add a line separator to the given buffer, except if the buffer is empty.
      * This convenience method is used for {@link #toString} implementations.
+     *
+     * @deprecated Not needed anymore since we now inherit a default {@link #toString}
+     *             method for all metadata.
      */
     protected static void appendLineSeparator(final StringBuffer buffer) {
         if (buffer.length() != 0) {
             buffer.append(System.getProperty("line.separator", "\n"));
         }
-    }
-
-    /**
-     * Add the contents of a collection to the provided buffer.
-     * This convenience method is used for {@link #toString) implementations.
-     * Output will be: {@code "label: [1,2,3]"}.
-     *  
-     * @param buffer     String buffer to add the collection contents to.
-     * @param label      Label for easy identification.
-     * @param collection Source object.
-     *
-     * @todo We should probably consider creating some formatter class (like
-     *       {@code org.geotools.referencing.wkt.Formatter}) for more elaborated
-     *       formatting with indentation, syntax coloring and stuff like that.
-     *       Formatting method like {@code appendCollection} and {@code appendLineSeparator}
-     *       would then be removed from that class.
-     */
-    static void appendCollection(final StringBuffer buffer, String label, Collection collection) {
-        buffer.append(label);
-        buffer.append(": [");
-        if (collection != null) {
-            final Iterator it = collection.iterator();
-            while (it.hasNext()) {
-                buffer.append(it.next().toString());
-                if (it.hasNext()) {
-                    buffer.append(',');
-                }
-            }
-        }
-        buffer.append(']');
     }
 }

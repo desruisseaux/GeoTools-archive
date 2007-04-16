@@ -54,4 +54,13 @@ public class AbsoluteExternalPositionalAccuracyImpl extends PositionalAccuracyIm
     public AbsoluteExternalPositionalAccuracyImpl(final Result result) {
         super(result);
     }
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public AbsoluteExternalPositionalAccuracyImpl(final AbsoluteExternalPositionalAccuracy source) {
+        super(source);
+    }
 }

@@ -72,6 +72,15 @@ public class DistributionImpl extends MetadataEntity implements Distribution {
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public DistributionImpl(final Distribution source) {
+        super(source);
+    }
+
+    /**
      * Provides a description of the format of the data to be distributed.
      */
     public synchronized Collection getDistributionFormats() {
@@ -113,51 +122,5 @@ public class DistributionImpl extends MetadataEntity implements Distribution {
      */
     public synchronized void setTransferOptions(final Collection newValues) {
         transferOptions = copyCollection(newValues, transferOptions, DigitalTransferOptions.class);
-    }
-    
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        distributionFormats = (Collection) unmodifiable(distributionFormats);
-        distributors        = (Collection) unmodifiable(distributors);
-        transferOptions     = (Collection) unmodifiable(transferOptions);
-    }
-
-    /**
-     * Compare this Distribution with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final DistributionImpl that = (DistributionImpl) object;
-            return Utilities.equals(this.distributionFormats,  that.distributionFormats) &&
-                   Utilities.equals(this.distributors,         that.distributors       ) &&
-                   Utilities.equals(this.transferOptions,      that.transferOptions    ) ;
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this series.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (distributionFormats != null) code ^= distributionFormats.hashCode();
-        if (distributors        != null) code ^= distributors.hashCode();
-        if (transferOptions     != null) code ^= transferOptions.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this series.
-     *
-     * @todo Provides a more elaborated implementation.
-     */
-    public String toString() {
-        return String.valueOf(distributionFormats);
     }
 }

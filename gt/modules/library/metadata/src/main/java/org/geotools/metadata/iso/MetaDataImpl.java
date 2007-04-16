@@ -187,6 +187,15 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public MetaDataImpl(final MetaData source) {
+        super(source);
+    }
+
+    /**
      * Creates a meta data initialised to the specified values.
      *
      * @param contact   Party responsible for the metadata information.
@@ -574,93 +583,5 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
     public void setDataSetUri(final String newValue) {
         checkWritePermission();
         dataSetUri = newValue;
-    }
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        language                  = (Locale)                 unmodifiable(language);
-        locales                   = (Collection)             unmodifiable(locales);
-        characterSet              = (CharacterSet)           unmodifiable(characterSet);
-        hierarchyLevels           = (Collection)             unmodifiable(hierarchyLevels);
-        hierarchyLevelNames       = (Collection)             unmodifiable(hierarchyLevelNames);
-        contacts                  = (Collection)             unmodifiable(contacts);
-        spatialRepresentationInfo = (Collection)             unmodifiable(spatialRepresentationInfo);
-        referenceSystemInfo       = (Collection)             unmodifiable(referenceSystemInfo);
-        metadataExtensionInfo     = (Collection)             unmodifiable(metadataExtensionInfo);
-        identificationInfo        = (Collection)             unmodifiable(identificationInfo);
-        contentInfo               = (Collection)             unmodifiable(contentInfo);
-        distributionInfo          = (Distribution)           unmodifiable(distributionInfo);
-        dataQualityInfo           = (Collection)             unmodifiable(dataQualityInfo);
-        portrayalCatalogueInfo    = (Collection)             unmodifiable(portrayalCatalogueInfo);
-        metadataConstraints       = (Collection)             unmodifiable(metadataConstraints);
-        applicationSchemaInfo     = (Collection)             unmodifiable(applicationSchemaInfo);
-        metadataMaintenance       = (MaintenanceInformation) unmodifiable(metadataMaintenance);
-    }
-
-    /**
-     * Compare this MetaData with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final MetaDataImpl that = (MetaDataImpl) object;
-            return               this.dateStamp             ==   that.dateStamp                  &&
-                Utilities.equals(this.fileIdentifier,            that.fileIdentifier           ) &&
-                Utilities.equals(this.language,                  that.language                 ) &&
-                Utilities.equals(this.locales,                   that.locales                  ) &&
-                Utilities.equals(this.dataSetUri,                that.dataSetUri               ) &&
-                Utilities.equals(this.characterSet,              that.characterSet             ) &&
-                Utilities.equals(this.parentIdentifier,          that.parentIdentifier         ) &&
-                Utilities.equals(this.hierarchyLevels,           that.hierarchyLevels          ) &&
-                Utilities.equals(this.hierarchyLevelNames,       that.hierarchyLevelNames      ) &&
-                Utilities.equals(this.contacts,                  that.contacts                 ) &&
-                Utilities.equals(this.metadataStandardName,      that.metadataStandardName     ) &&
-                Utilities.equals(this.metadataStandardVersion,   that.metadataStandardVersion  ) &&
-                Utilities.equals(this.spatialRepresentationInfo, that.spatialRepresentationInfo) &&
-                Utilities.equals(this.referenceSystemInfo,       that.referenceSystemInfo      ) &&
-                Utilities.equals(this.metadataExtensionInfo,     that.metadataExtensionInfo    ) &&
-                Utilities.equals(this.identificationInfo,        that.identificationInfo       ) &&
-                Utilities.equals(this.contentInfo,               that.contentInfo              ) &&
-                Utilities.equals(this.distributionInfo,          that.distributionInfo         ) &&
-                Utilities.equals(this.dataQualityInfo,           that.dataQualityInfo          ) &&
-                Utilities.equals(this.portrayalCatalogueInfo,    that.portrayalCatalogueInfo   ) &&
-                Utilities.equals(this.metadataConstraints,       that.metadataConstraints      ) &&
-                Utilities.equals(this.applicationSchemaInfo,     that.applicationSchemaInfo    ) &&
-                Utilities.equals(this.metadataMaintenance,       that.metadataMaintenance      );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this address. For performance reason, this method do
-     * not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int) serialVersionUID;
-        if (fileIdentifier     != null) code ^= fileIdentifier    .hashCode();
-        if (identificationInfo != null) code ^= identificationInfo.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this metadata. The content of this string is
-     * implementation dependent and used mostly for debugging purpose.
-     *
-     * @todo Provides a more elaborated implementation.
-     */
-    public String toString() {
-        StringBuffer str = new StringBuffer();
-        if (fileIdentifier != null) {
-            str.append(fileIdentifier);
-        }
-        appendCollection(str, "ContentInfo", getContentInfo());
-        appendCollection(str, "Contacts", getContacts());
-        return str.toString();
     }
 }

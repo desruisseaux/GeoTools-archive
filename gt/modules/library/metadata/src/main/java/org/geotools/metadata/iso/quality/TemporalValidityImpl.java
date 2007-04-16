@@ -44,4 +44,13 @@ public class TemporalValidityImpl extends TemporalAccuracyImpl implements Tempor
      */
     public TemporalValidityImpl() {
     }
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public TemporalValidityImpl(final TemporalValidity source) {
+        super(source);
+    }
 }

@@ -132,6 +132,15 @@ public class IdentificationImpl extends MetadataEntity implements Identification
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public IdentificationImpl(final Identification source) {
+        super(source);
+    }
+
+    /**
      * Creates an identification initialized to the specified values.
      */
     public IdentificationImpl(final Citation citation, final InternationalString abstracts) {
@@ -330,75 +339,5 @@ public class IdentificationImpl extends MetadataEntity implements Identification
      */
     public synchronized void setAggregationInfo(final Collection newValues) {
         aggregationInfo = copyCollection(newValues, aggregationInfo, AggregateInformation.class);
-    }
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        citation               = (Citation)            unmodifiable(citation);
-        abstracts              = (InternationalString) unmodifiable(abstracts);
-        purpose                = (InternationalString) unmodifiable(purpose);
-        credits                = (Collection)          unmodifiable(credits);
-        status                 = (Collection)          unmodifiable(status);
-        pointOfContacts        = (Collection)          unmodifiable(pointOfContacts);
-        resourceMaintenance    = (Collection)          unmodifiable(resourceMaintenance);
-        resourceFormat         = (Collection)          unmodifiable(resourceFormat);
-        descriptiveKeywords    = (Collection)          unmodifiable(descriptiveKeywords);
-        resourceSpecificUsages = (Collection)          unmodifiable(resourceSpecificUsages);
-        resourceConstraints    = (Collection)          unmodifiable(resourceConstraints);
-        aggregationInfo        = (Collection)          unmodifiable(aggregationInfo);
-    }
-
-    /**
-     * Compare this identification with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final IdentificationImpl that = (IdentificationImpl) object;
-            return Utilities.equals(this.citation,               that.citation               ) &&
-                   Utilities.equals(this.abstracts,              that.abstracts              ) &&
-                   Utilities.equals(this.purpose,                that.purpose                ) &&
-                   Utilities.equals(this.credits,                that.credits                ) &&
-                   Utilities.equals(this.status,                 that.status                 ) &&
-                   Utilities.equals(this.pointOfContacts,        that.pointOfContacts        ) &&
-                   Utilities.equals(this.resourceMaintenance,    that.resourceMaintenance    ) &&
-                   Utilities.equals(this.resourceFormat,         that.resourceFormat         ) &&
-                   Utilities.equals(this.descriptiveKeywords,    that.descriptiveKeywords    ) &&
-                   Utilities.equals(this.resourceSpecificUsages, that.resourceSpecificUsages ) &&
-                   Utilities.equals(this.resourceConstraints,    that.resourceConstraints    ) &&
-                   Utilities.equals(this.aggregationInfo,        that.aggregationInfo        );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this identification.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (citation                != null) code ^= citation              .hashCode();
-        if (abstracts               != null) code ^= abstracts             .hashCode();
-        if (purpose                 != null) code ^= purpose               .hashCode();
-        if (credits                 != null) code ^= credits               .hashCode();
-        if (status                  != null) code ^= status                .hashCode();
-        if (pointOfContacts         != null) code ^= pointOfContacts       .hashCode();
-        if (resourceMaintenance     != null) code ^= resourceMaintenance   .hashCode();
-        if (resourceFormat          != null) code ^= resourceFormat        .hashCode();
-        if (descriptiveKeywords     != null) code ^= descriptiveKeywords   .hashCode();
-        if (resourceSpecificUsages  != null) code ^= resourceSpecificUsages.hashCode();
-        if (resourceConstraints     != null) code ^= resourceConstraints   .hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this identification.
-     */
-    public String toString() {
-        return String.valueOf(resourceMaintenance);
     }
 }

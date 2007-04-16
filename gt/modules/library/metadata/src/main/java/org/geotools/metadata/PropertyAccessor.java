@@ -16,6 +16,7 @@
 package org.geotools.metadata;
 
 // J2SE dependencies
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
@@ -63,7 +64,7 @@ final class PropertyAccessor {
     /**
      * The implemented metadata interface.
      */
-    private final Class type;
+    final Class type;
 
     /**
      * The implementation class. The following condition must hold:
@@ -90,15 +91,12 @@ final class PropertyAccessor {
      * Creates a new property reader for the specified metadata implementation.
      *
      * @param  metadata The metadata implementation to wrap.
-     * @param  interfacePackage The root package for metadata interfaces.
-     * @throws ClassCastException if the specified implementation class
-     *         do not implements a metadata interface of the expected package.
+     * @param  type The interface implemented by the metadata.
+     *         Should be the value returned by {@link #getType}.
      */
-    PropertyAccessor(final Class implementation, final String interfacePackage)
-            throws ClassCastException
-    {
+    PropertyAccessor(final Class implementation, final Class type) {
         this.implementation = implementation;
-        type = getType(implementation, interfacePackage);
+        this.type           = type;
         assert type.isAssignableFrom(implementation) : implementation;
         getters = getGetters(type);
         Method[] setters = null;
@@ -108,7 +106,16 @@ final class PropertyAccessor {
             final Method setter; // To be determined later
             arguments[0] = getter.getReturnType();
             String name  = getter.getName();
-            name = SET + name.substring(prefix(name).length());
+            final int base = prefix(name).length();
+            if (name.length() > base) {
+                final char lo = name.charAt(base);
+                final char up = Character.toUpperCase(lo);
+                if (lo != up) {
+                    name = SET + up + name.substring(base + 1);
+                } else {
+                    name = SET + name.substring(base);
+                }
+            }
             try {
                 setter = implementation.getMethod(name, arguments);
             } catch (NoSuchMethodException e) {
@@ -128,12 +135,9 @@ final class PropertyAccessor {
      *
      * @param  metadata The metadata implementation to wraps.
      * @param  interfacePackage The root package for metadata interfaces.
-     * @throws ClassCastException if the specified implementation class
-     *         do not implements a metadata interface of the expected package.
+     * @return The single interface, or {@code null} if none where found.
      */
-    private static Class getType(final Class implementation, final String interfacePackage)
-            throws ClassCastException
-    {
+    static Class getType(final Class implementation, final String interfacePackage) {
         if (!implementation.isInterface()) {
             final Class[] interfaces = implementation.getInterfaces();
             int count = 0;
@@ -147,8 +151,7 @@ final class PropertyAccessor {
                 return interfaces[0];
             }
         }
-        throw new ClassCastException(Errors.format(ErrorKeys.UNKNOW_TYPE_$1,
-                                     implementation.getName()));        
+        return null;
     }
 
     /**
@@ -165,9 +168,15 @@ final class PropertyAccessor {
                 int count = 0;
                 for (int i=0; i<getters.length; i++) {
                     final Method candidate = getters[i];
-                    final String name = candidate.getName();
-                    if (name.startsWith(GET) || name.startsWith(IS)) {
-                        getters[count++] = candidate;
+                    if (!candidate.getReturnType().equals(Void.TYPE) &&
+                         candidate.getParameterTypes().length == 0)
+                    {
+                        // We do not require a name starting with "get" or "is" because
+                        // some properties do not begin with such prefix (e.g. "pass()").
+                        final String name = candidate.getName();
+                        if (!name.startsWith(SET)) {
+                            getters[count++] = candidate;
+                        }
                     }
                 }
                 getters = (Method[]) XArray.resize(getters, count);
@@ -178,8 +187,9 @@ final class PropertyAccessor {
     }
 
     /**
-     * Returns the prefix of the specified method name.
-     * We test the most common prefix first.
+     * Returns the prefix of the specified method name. If the method name don't starts with
+     * a prefix (for example {@link org.opengis.metadata.quality.ConformanceResult#pass()}),
+     * then this method returns an empty string.
      */
     private static String prefix(final String name) {
         if (name.startsWith(GET)) {
@@ -191,8 +201,7 @@ final class PropertyAccessor {
         if (name.startsWith(SET)) {
             return SET;
         }
-        // Should never happen since 'getGetters' filtered the methods.
-        throw new AssertionError(name);
+        return "";
     }
 
     /**
@@ -251,7 +260,13 @@ final class PropertyAccessor {
                 if (isAcronym(name, base)) {
                     name = name.substring(base);
                 } else {
-                    name = Character.toLowerCase(name.charAt(base)) + name.substring(base + 1);
+                    final char up = name.charAt(base);
+                    final char lo = Character.toLowerCase(up);
+                    if (up != lo) {
+                        name = lo + name.substring(base + 1);
+                    } else {
+                        name = name.substring(base);
+                    }
                 }
             }
             return name;
@@ -274,7 +289,7 @@ final class PropertyAccessor {
      * @param metadata The metadata object to query.
      */
     private static Object get(final Method method, final Object metadata) {
-        assert method.getReturnType() != null;
+        assert !method.getReturnType().equals(Void.TYPE) : method;
         try {
             return method.invoke(metadata, (Object[]) null);
         } catch (IllegalAccessException e) {
@@ -355,11 +370,16 @@ final class PropertyAccessor {
         assert type.isInstance(metadata1);
         assert type.isInstance(metadata2);
         for (int i=0; i<getters.length; i++) {
-            final Method method = getters[i];
-            final Object value1 = get(method, metadata1);
-            final Object value2 = get(method, metadata2);
+            final Method  method = getters[i];
+            final Object  value1 = get(method, metadata1);
+            final Object  value2 = get(method, metadata2);
+            final boolean empty1 = isEmpty(value1);
+            final boolean empty2 = isEmpty(value2);
+            if (empty1 && empty2) {
+                continue;
+            }
             if (!Utilities.equals(value1, value2)) {
-                if (!skipNulls || (!isEmpty(value1) && !isEmpty(value2))) {
+                if (!skipNulls || (!empty1 && !empty2)) {
                     return false;
                 }
             }
@@ -404,6 +424,64 @@ final class PropertyAccessor {
     }
 
     /**
+     * Replaces every properties in the specified metadata by their
+     * {@linkplain ModifiableMetadata#unmodifiable unmodifiable variant.
+     */
+    final void freeze(final Object metadata) {
+        assert implementation.isInstance(metadata);
+        if (setters != null) {
+            final Object[] arguments = new Object[1];
+            for (int i=0; i<getters.length; i++) {
+                final Method setter = setters[i];
+                if (setter != null) {
+                    final Object source = get(getters[i], metadata);
+                    final Object target = ModifiableMetadata.unmodifiable(source);
+                    if (source != target) {
+                        arguments[0] = target;
+                        set(setter, metadata, arguments);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns {@code true} if the metadata is modifiable. This method is not public because it
+     * uses heuristic rules. In case of doubt, this method conservatively returns {@code true}.
+     */
+    final boolean isModifiable() {
+        if (setters != null) {
+            return true;
+        }
+        for (int i=0; i<getters.length; i++) {
+            // Immutable objects usually don't need to be cloned. So if
+            // an object is cloneable, it is probably not immutable.
+            if (Cloneable.class.isAssignableFrom(getters[i].getReturnType())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns a hash code for the specified metadata. The hash code is defined as the
+     * sum of hash code values of all non-null properties. This is the same contract than
+     * {@link java.util.Set#hashCode} and ensure that the hash code value is insensitive
+     * to the ordering of properties.
+     */
+    public int hashCode(final Object metadata) {
+        assert type.isInstance(metadata);
+        int code = 0;
+        for (int i=0; i<getters.length; i++) {
+            final Object value = get(getters[i], metadata);
+            if (!isEmpty(value)) {
+                code += value.hashCode();
+            }
+        }
+        return code;
+    }
+
+    /**
      * Counts the number of non-null properties.
      */
     public int count(final Object metadata, final int max) {
@@ -420,34 +498,13 @@ final class PropertyAccessor {
     }
 
     /**
-     * Returns {@code true} if the specified object is null or an empty collection.
+     * Returns {@code true} if the specified object is null or an empty collection,
+     * array or string.
      */
     static boolean isEmpty(final Object value) {
-        return value == null || ((value instanceof Collection) && ((Collection) value).isEmpty());
-    }
-
-    /**
-     * Returns {@code true} if the specified object implements the expected interface.
-     *
-     * @throws ClassCastException if the specified implementation class do
-     *         not implements a metadata interface of the expected package.
-     */
-    final boolean sameInterface(final Class implementation, final String interfacePackage)
-            throws ClassCastException
-    {
-        return type.equals(getType(implementation, interfacePackage));
-    }
-
-    /**
-     * Makes sure that the specified metadata is of the expected type.
-     */
-    final void ensureValidType(final Object metadata) throws ClassCastException {
-        if (!type.isInstance(metadata)) {
-            if (metadata == null) {
-                throw new ClassCastException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, "metadata"));
-            }
-            throw new ClassCastException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
-                    metadata.getClass().getName(), type.getName()));
-        }
+        return value == null ||
+                ((value instanceof Collection) && ((Collection) value).isEmpty()) ||
+                ((value instanceof CharSequence) && value.toString().trim().length() == 0) ||
+                (value.getClass().isArray() && Array.getLength(value) == 0);
     }
 }

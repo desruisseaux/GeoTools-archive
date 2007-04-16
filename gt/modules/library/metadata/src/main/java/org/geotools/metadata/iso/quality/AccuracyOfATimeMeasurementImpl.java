@@ -46,4 +46,13 @@ public class AccuracyOfATimeMeasurementImpl extends TemporalAccuracyImpl
      */
     public AccuracyOfATimeMeasurementImpl() {
     }
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public AccuracyOfATimeMeasurementImpl(final AccuracyOfATimeMeasurement source) {
+        super(source);
+    }
 }

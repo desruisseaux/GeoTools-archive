@@ -68,6 +68,15 @@ public class MetadataExtensionInformationImpl extends MetadataEntity
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public MetadataExtensionInformationImpl(final MetadataExtensionInformation source) {
+        super(source);
+    }
+
+    /**
      * Information about on-line sources containing the community profile name and
      * the extended metadata elements. Information for all new metadata elements.
      */
@@ -99,46 +108,4 @@ public class MetadataExtensionInformationImpl extends MetadataEntity
         extendedElementInformation = copyCollection(newValues, extendedElementInformation,
                                                     ExtendedElementInformation.class);
     }
-    
-   /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        extensionOnLineResource    = (OnLineResource) unmodifiable(extensionOnLineResource);
-        extendedElementInformation = (Collection)     unmodifiable(extendedElementInformation);
-    }
-
-    /**
-     * Compare this metadata extension information with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final MetadataExtensionInformationImpl that = (MetadataExtensionInformationImpl) object;
-            return Utilities.equals(extensionOnLineResource,    that.extensionOnLineResource   ) &&
-                   Utilities.equals(extendedElementInformation, that.extendedElementInformation);
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this object. For performance reason, this method do
-     * not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (extensionOnLineResource != null) code ^= extensionOnLineResource.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this object.
-     */
-    public String toString() {
-        return String.valueOf(extensionOnLineResource);
-    }        
 }

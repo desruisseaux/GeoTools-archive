@@ -63,6 +63,15 @@ public class RangeDimensionImpl extends MetadataEntity implements RangeDimension
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public RangeDimensionImpl(final RangeDimension source) {
+        super(source);
+    }
+
+    /**
      * Returns the number that uniquely identifies instances of bands of wavelengths
      * on which a sensor operates.
      */
@@ -93,49 +102,4 @@ public class RangeDimensionImpl extends MetadataEntity implements RangeDimension
         checkWritePermission();
         descriptor = newValue;
     }
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        sequenceIdentifier = (MemberName)          unmodifiable(sequenceIdentifier);
-        descriptor         = (InternationalString) unmodifiable(descriptor);
-    }
-
-    /**
-     * Compare this range dimension with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final RangeDimensionImpl that = (RangeDimensionImpl) object;
-            return Utilities.equals(this.sequenceIdentifier, that.sequenceIdentifier) &&
-                   Utilities.equals(this.descriptor,         that.descriptor);
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this range dimension. For performance reason, this method do
-     * not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (sequenceIdentifier != null) code ^= sequenceIdentifier.hashCode();
-        if (descriptor         != null) code ^= descriptor        .hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this range dimension
-     *
-     * @todo Provides a more elaborated implementation.
-     */
-    public String toString() {
-        return String.valueOf(descriptor);
-    }             
 }

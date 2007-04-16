@@ -96,11 +96,20 @@ public class ApplicationSchemaInformationImpl extends MetadataEntity
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public ApplicationSchemaInformationImpl(final ApplicationSchemaInformation source) {
+        super(source);
+    }
+
+    /**
      * Creates a application schema information initialized to the specified values.
      */
     public ApplicationSchemaInformationImpl(final Citation name,
-                                        final String schemaLanguage,
-                                        final String constraintLanguage)
+                                            final String schemaLanguage,
+                                            final String constraintLanguage)
     {
         setName              (name              );
         setSchemaLanguage    (schemaLanguage    );
@@ -226,53 +235,4 @@ public class ApplicationSchemaInformationImpl extends MetadataEntity
         checkWritePermission();
         featureCatalogueSupplement = newValue;
     }
-    
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        name                       = (Citation)                   unmodifiable(name);
-        featureCatalogueSupplement = (SpatialAttributeSupplement) unmodifiable(featureCatalogueSupplement);
-    }
-
-    /**
-     * Compare this application schema information with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final ApplicationSchemaInformationImpl that = (ApplicationSchemaInformationImpl) object;
-            return Utilities.equals(this.name,                          that.name                         ) &&
-                   Utilities.equals(this.schemaLanguage,                that.schemaLanguage               ) &&
-                   Utilities.equals(this.constraintLanguage,            that.constraintLanguage           ) &&
-                   Utilities.equals(this.schemaAscii,                   that.schemaAscii                  ) &&
-                   Utilities.equals(this.graphicsFile,                  that.graphicsFile                 ) &&
-                   Utilities.equals(this.softwareDevelopmentFile,       that.softwareDevelopmentFile      ) &&
-                   Utilities.equals(this.softwareDevelopmentFileFormat, that.softwareDevelopmentFileFormat) &&
-                   Utilities.equals(this.featureCatalogueSupplement,    that.featureCatalogueSupplement   );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this object. For performance reason, this method do
-     * not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (name           != null) code ^= name          .hashCode();
-        if (schemaLanguage != null) code ^= schemaLanguage.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this object.
-     */
-    public String toString() {
-        return String.valueOf(name);
-    }        
 }

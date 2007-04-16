@@ -90,6 +90,15 @@ public class SourceImpl extends MetadataEntity implements Source {
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public SourceImpl(final Source source) {
+        super(source);
+    }
+
+    /**
      * Creates a source initialized with the given description.
      */
     public SourceImpl(final InternationalString description) {
@@ -194,58 +203,5 @@ public class SourceImpl extends MetadataEntity implements Source {
      */
     public synchronized void setSourceSteps(final Collection newValues) {
         sourceSteps = copyCollection(newValues, sourceSteps, ProcessStep.class);
-    }
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        description           = (InternationalString) unmodifiable(description);
-        sourceReferenceSystem = (ReferenceSystem)     unmodifiable(sourceReferenceSystem);
-        sourceCitation        = (Citation)            unmodifiable(sourceCitation);
-        sourceExtents         = (Collection)          unmodifiable(sourceExtents);
-        sourceSteps           = (Collection)          unmodifiable(sourceSteps);
-    }
-
-    /**
-     * Compare this source with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final SourceImpl that = (SourceImpl) object;
-            return Utilities.equals(this.description,           that.description           ) &&
-                   Utilities.equals(this.scaleDenominator,      that.scaleDenominator      ) &&
-                   Utilities.equals(this.sourceReferenceSystem, that.sourceReferenceSystem ) &&
-                   Utilities.equals(this.sourceCitation,        that.sourceCitation        ) &&
-                   Utilities.equals(this.sourceExtents,         that.sourceExtents         ) &&
-                   Utilities.equals(this.sourceSteps,           that.sourceSteps           );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this source.
-     */
-    public synchronized int hashCode() {
-        int code = (int) serialVersionUID;
-        if (description           != null) code ^= description          .hashCode();
-        if (sourceReferenceSystem != null) code ^= sourceReferenceSystem.hashCode();
-        if (sourceCitation        != null) code ^= sourceCitation       .hashCode();
-        if (sourceExtents         != null) code ^= sourceExtents        .hashCode();
-        if (sourceSteps           != null) code ^= sourceSteps          .hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this source.
-     *
-     * @todo Provides a more elaborated implementation.
-     */
-    public String toString() {
-        return String.valueOf(description);
     }
 }

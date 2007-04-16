@@ -62,11 +62,20 @@ public class SpatialTemporalExtentImpl extends TemporalExtentImpl implements Spa
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public SpatialTemporalExtentImpl(final SpatialTemporalExtent source) {
+        super(source);
+    }
+
+    /**
      * Creates a spatial-temporal extent initialized to the specified values.
      */
     public SpatialTemporalExtentImpl(final Date       startTime,
-                                 final Date       endTime,
-                                 final Collection spatialExtent)
+                                     final Date       endTime,
+                                     final Collection spatialExtent)
     {
         super(startTime, endTime);
         setSpatialExtent(spatialExtent);
@@ -89,44 +98,4 @@ public class SpatialTemporalExtentImpl extends TemporalExtentImpl implements Spa
     public synchronized void setSpatialExtent(final Collection newValues) {
         spatialExtent = copyCollection(newValues, spatialExtent, GeographicExtent.class);
     }
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        spatialExtent = (Collection) unmodifiable(spatialExtent);
-    }
-
-    /**
-     * Compare this spatial-temporal extent with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (super.equals(object)) {
-            final SpatialTemporalExtentImpl that = (SpatialTemporalExtentImpl) object;
-            return Utilities.equals(this.spatialExtent, that.spatialExtent);
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this extent.
-     */
-    public synchronized int hashCode() {
-        int code = super.hashCode() ^ (int)serialVersionUID;
-        if (spatialExtent != null) code ^= spatialExtent.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this extent.
-     *
-     * @todo Provides a more elaborated implementation.
-     */
-    public String toString() {
-        return String.valueOf(spatialExtent);
-    }    
 }

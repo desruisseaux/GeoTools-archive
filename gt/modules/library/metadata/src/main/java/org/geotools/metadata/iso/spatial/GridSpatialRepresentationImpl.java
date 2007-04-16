@@ -78,6 +78,15 @@ public class GridSpatialRepresentationImpl extends SpatialRepresentationImpl
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public GridSpatialRepresentationImpl(final GridSpatialRepresentation source) {
+        super(source);
+    }
+
+    /**
      * Creates a grid spatial representation initialized to the given values.
      * <p>
      * <b>Note:</b> this is a convenience constructor. The argument types don't need to
@@ -113,14 +122,7 @@ public class GridSpatialRepresentationImpl extends SpatialRepresentationImpl
      * Information about spatial-temporal axis properties.
      */
     public synchronized List getAxisDimensionsProperties() {
-        if (axisDimensionsProperties == null) {
-            if (isModifiable()) {
-                axisDimensionsProperties = new CheckedArrayList(Dimension.class);
-            } else {
-                axisDimensionsProperties = Collections.EMPTY_LIST;
-            }
-        }
-        return axisDimensionsProperties;
+        return axisDimensionsProperties = nonNullList(axisDimensionsProperties, Dimension.class);
     }
 
     /**
@@ -160,49 +162,5 @@ public class GridSpatialRepresentationImpl extends SpatialRepresentationImpl
     public synchronized void setTransformationParameterAvailable(final boolean newValue) {
         checkWritePermission();
         transformationParameterAvailable = newValue;
-    }
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        axisDimensionsProperties = (List) unmodifiable(axisDimensionsProperties);
-    }
-
-    /**
-     * Compare this grid spatial representation with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final GridSpatialRepresentationImpl that = (GridSpatialRepresentationImpl) object; 
-            return  Utilities.equals(this.axisDimensionsProperties, that.axisDimensionsProperties) &&
-                    Utilities.equals(this.cellGeometry,             that.cellGeometry) &&
-                    Utilities.equals(this.numberOfDimensions,       that.numberOfDimensions) &&
-                    (this.transformationParameterAvailable       == that.transformationParameterAvailable) ;
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this representation. For performance reason, this method do
-     * not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int) serialVersionUID;
-        if (axisDimensionsProperties != null)  code ^= axisDimensionsProperties.hashCode();
-        if (cellGeometry != null)              code ^= cellGeometry.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this representation.
-     */
-    public String toString() {
-        return String.valueOf(axisDimensionsProperties);
     }
 }

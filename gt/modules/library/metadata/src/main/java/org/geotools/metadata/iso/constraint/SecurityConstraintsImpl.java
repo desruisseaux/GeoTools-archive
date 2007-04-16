@@ -70,6 +70,15 @@ public class SecurityConstraintsImpl extends ConstraintsImpl implements Security
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public SecurityConstraintsImpl(final SecurityConstraints source) {
+        super(source);
+    }
+
+    /**
      * Creates a security constraints initialized with the specified classification.
      */
     public SecurityConstraintsImpl(final Classification classification) {
@@ -118,10 +127,10 @@ public class SecurityConstraintsImpl extends ConstraintsImpl implements Security
     /**
      * Set the name of the classification system.
      */
-     public synchronized void setClassificatonSystem(final InternationalString newValue) {
-         checkWritePermission();
-         classificationSystem = newValue;
-     }
+    public synchronized void setClassificatonSystem(final InternationalString newValue) {
+        checkWritePermission();
+        classificationSystem = newValue;
+    }
 
     /**
      * Returns the additional information about the restrictions on handling the resource.
@@ -136,60 +145,5 @@ public class SecurityConstraintsImpl extends ConstraintsImpl implements Security
     public synchronized void setHandlingDescription(final InternationalString newValue) {
         checkWritePermission();
         handlingDescription = newValue;
-    }
-    
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        userNote             = (InternationalString) unmodifiable(userNote);
-        classificationSystem = (InternationalString) unmodifiable(classificationSystem);
-        handlingDescription  = (InternationalString) unmodifiable(handlingDescription);
-    }
-
-    /**
-     * Compare this security constraints with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (super.equals(object)) {
-            final SecurityConstraintsImpl that = (SecurityConstraintsImpl) object;
-            return Utilities.equals(this.classification,       that.classification      ) &&
-                   Utilities.equals(this.userNote,             that.userNote            ) &&
-                   Utilities.equals(this.classificationSystem, that.classificationSystem) &&
-                   Utilities.equals(this.handlingDescription,  that.handlingDescription );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this constraints.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (classification       != null)  code ^= classification      .hashCode();
-        if (userNote             != null)  code ^= userNote            .hashCode();
-        if (classificationSystem != null)  code ^= classificationSystem.hashCode();
-        if (handlingDescription  != null)  code ^= handlingDescription .hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this constraints.
-     */
-    public synchronized String toString() {
-        final StringBuffer buffer = new StringBuffer();
-        if (classification != null) {
-            buffer.append(classification.name().replace('_', ' '));
-        }
-        final String useLimitation = super.toString();
-        if (useLimitation!=null && useLimitation.length()!=0) {
-            appendLineSeparator(buffer);
-            buffer.append(useLimitation);
-        }
-        return buffer.toString();
     }
 }

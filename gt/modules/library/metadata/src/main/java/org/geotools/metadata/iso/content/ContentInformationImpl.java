@@ -49,20 +49,11 @@ public class ContentInformationImpl extends MetadataEntity implements ContentInf
     }
 
     /**
-     * Compare this content information with the specified object for equality.
+     * Constructs a metadata entity initialized with the value from the specified metadata.
+     *
+     * @since 2.4
      */
-    public boolean equals(final Object object) {
-        if (object!=null && object.getClass().equals(getClass())) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this content information.
-     */
-    public int hashCode() {
-        int code = (int)serialVersionUID;
-        return code;
+    public ContentInformationImpl(final ContentInformation source) {
+        super(source);
     }
 }

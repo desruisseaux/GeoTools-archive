@@ -100,6 +100,15 @@ public class BandImpl extends RangeDimensionImpl implements Band {
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public BandImpl(final Band source) {
+        super(source);
+    }
+
+    /**
      * Returns the longest wavelength that the sensor is capable of collecting within
      * a designated band. Returns {@code null} if unspecified.
      */
@@ -228,55 +237,9 @@ public class BandImpl extends RangeDimensionImpl implements Band {
 
     /**
      * Set the physical value corresponding to a cell value of zero.
-:     */
+     */
     public synchronized void setOffset(final Double newValue) {
         checkWritePermission();
         offset = newValue;
-    }
-    
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        maxValue     = (Double) unmodifiable(maxValue);
-        minValue     = (Double) unmodifiable(minValue);
-        units        = (Unit)   unmodifiable(units);
-        peakResponse = (Double) unmodifiable(peakResponse);
-        scaleFactor  = (Double) unmodifiable(scaleFactor);
-        offset       = (Double) unmodifiable(offset);
-    }
-
-    /**
-     * Compare this Band with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (super.equals(object)) {
-            final BandImpl that = (BandImpl) object;
-            return Utilities.equals(this.maxValue,      that.maxValue      ) &&
-                   Utilities.equals(this.minValue,      that.minValue      ) &&
-                   Utilities.equals(this.units,         that.units         ) &&
-                   Utilities.equals(this.peakResponse,  that.peakResponse  ) &&
-                   Utilities.equals(this.bitsPerValue,  that.bitsPerValue  ) &&
-                   Utilities.equals(this.toneGradation, that.toneGradation ) &&
-                   Utilities.equals(this.scaleFactor,   that.scaleFactor   ) &&
-                   Utilities.equals(this.offset,        that.offset        )  ;
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this band. For performance reason, this method do
-     * not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int) serialVersionUID;
-        if (maxValue != null) code ^= maxValue.hashCode();
-        if (minValue != null) code ^= minValue.hashCode();
-        return code;
     }
 }

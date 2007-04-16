@@ -44,4 +44,13 @@ public class NonQuantitativeAttributeAccuracyImpl extends ThematicAccuracyImpl
      */
     public NonQuantitativeAttributeAccuracyImpl() {
     }
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public NonQuantitativeAttributeAccuracyImpl(final NonQuantitativeAttributeAccuracy source) {
+        super(source);
+    }
 }

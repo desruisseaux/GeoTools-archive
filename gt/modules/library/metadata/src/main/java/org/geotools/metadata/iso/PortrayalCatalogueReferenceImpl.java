@@ -58,7 +58,16 @@ public class PortrayalCatalogueReferenceImpl extends MetadataEntity
      */
     public PortrayalCatalogueReferenceImpl() {
     }
-    
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public PortrayalCatalogueReferenceImpl(final PortrayalCatalogueReference source) {
+        super(source);
+    }
+
     /**
      * Creates a portrayal catalogue reference initialized to the given values.
      */
@@ -79,44 +88,4 @@ public class PortrayalCatalogueReferenceImpl extends MetadataEntity
     public synchronized void setPortrayalCatalogueCitations(Collection newValues) {
         portrayalCatalogueCitations = copyCollection(newValues, portrayalCatalogueCitations, Citation.class);
     }
-
-   /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        portrayalCatalogueCitations = (Collection) unmodifiable(portrayalCatalogueCitations);
-    }
-
-    /**
-     * Compare this portrayal catalogue reference with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final PortrayalCatalogueReferenceImpl that = (PortrayalCatalogueReferenceImpl) object;
-            return Utilities.equals(this.portrayalCatalogueCitations, that.portrayalCatalogueCitations ) ;
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this object. For performance reason, this method do
-     * not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (portrayalCatalogueCitations != null) code ^= portrayalCatalogueCitations.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this object.
-     */
-    public String toString() {
-        return String.valueOf(portrayalCatalogueCitations);
-    }        
 }

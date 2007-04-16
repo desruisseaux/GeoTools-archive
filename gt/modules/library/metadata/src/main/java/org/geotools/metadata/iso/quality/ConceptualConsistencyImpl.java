@@ -46,4 +46,13 @@ public class ConceptualConsistencyImpl extends LogicalConsistencyImpl
      */
     public ConceptualConsistencyImpl() {
     }
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public ConceptualConsistencyImpl(final ConceptualConsistency source) {
+        super(source);
+    }
 }

@@ -46,4 +46,13 @@ public class QuantitativeAttributeAccuracyImpl extends ThematicAccuracyImpl
      */
     public QuantitativeAttributeAccuracyImpl() {
     }
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public QuantitativeAttributeAccuracyImpl(final QuantitativeAttributeAccuracy source) {
+        super(source);
+    }
 }

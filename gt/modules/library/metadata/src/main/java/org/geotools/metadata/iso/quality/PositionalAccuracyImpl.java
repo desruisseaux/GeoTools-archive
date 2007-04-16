@@ -99,6 +99,15 @@ public class PositionalAccuracyImpl extends ElementImpl implements PositionalAcc
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public PositionalAccuracyImpl(final PositionalAccuracy source) {
+        super(source);
+    }
+
+    /**
      * Creates an positional accuracy initialized to the given result.
      */
     public PositionalAccuracyImpl(final Result result) {

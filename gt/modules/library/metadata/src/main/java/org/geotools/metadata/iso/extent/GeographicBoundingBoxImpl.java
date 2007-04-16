@@ -32,6 +32,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.Envelope;
 
 // Geotools dependencies
+import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -114,7 +115,15 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      * @since 2.2
      */
     public GeographicBoundingBoxImpl(final GeographicBoundingBox box) {
-        super(box);
+        /*
+         * We could invokes super(box), but we will perform the assignations explicitly here
+         * for performance reason. Warning: it may be a problem if the user creates a subclass
+         * and relies on the default MetadataEntity(Object) behavior. Rather than bothering
+         * the user with a javadoc warning, I would prefer to find some trick to avoid this
+         * issue (todo).
+         */
+        super();
+        setInclusion         (box.getInclusion());
         setWestBoundLongitude(box.getWestBoundLongitude());
         setEastBoundLongitude(box.getEastBoundLongitude());
         setSouthBoundLatitude(box.getSouthBoundLatitude());
@@ -302,22 +311,17 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
     }
 
     /**
-     * Declares this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-    }
-
-    /**
      * Compares this geographic bounding box with the specified object for equality.
      */
     public synchronized boolean equals(final Object object) {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
+        // Above code really requires GeographicBoundingBoxImpl.class, not getClass().
+        if (object!=null && object.getClass().equals(GeographicBoundingBoxImpl.class)) {
             final GeographicBoundingBoxImpl that = (GeographicBoundingBoxImpl) object;
-            return Double.doubleToLongBits(this.southBoundLatitude) ==
+            return Utilities.equals(this.getInclusion(), that.getInclusion()) &&
+                   Double.doubleToLongBits(this.southBoundLatitude) ==
                    Double.doubleToLongBits(that.southBoundLatitude) &&
                    Double.doubleToLongBits(this.northBoundLatitude) ==
                    Double.doubleToLongBits(that.northBoundLatitude) &&
@@ -326,18 +330,32 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
                    Double.doubleToLongBits(this.westBoundLongitude) ==
                    Double.doubleToLongBits(that.westBoundLongitude);
         }
-        return false;
+        return super.equals(object);
     }
 
     /**
      * Returns a hash code value for this extent.
+     *
+     * @todo Consider relying on the default implementation, since it cache the hash code.
      */
     public synchronized int hashCode() {
-        long code = serialVersionUID;
-        code ^=           Double.doubleToLongBits(southBoundLatitude);
-        code  = 37*code + Double.doubleToLongBits(northBoundLatitude);
-        code  = 37*code + Double.doubleToLongBits(eastBoundLongitude);
-        code  = 37*code + Double.doubleToLongBits(westBoundLongitude);
+        if (!getClass().equals(GeographicBoundingBoxImpl.class)) {
+            return super.hashCode();
+        }
+        final Boolean inclusion = getInclusion();
+        int code = (inclusion != null) ? inclusion.hashCode() : 0;
+        code += hashCode(southBoundLatitude);
+        code += hashCode(northBoundLatitude);
+        code += hashCode(eastBoundLongitude);
+        code += hashCode(westBoundLongitude);
+        return code;
+    }
+
+    /**
+     * Returns a hash code value for the specified {@code double}.
+     */
+    private static int hashCode(final double value) {
+        final long code = Double.doubleToLongBits(value);
         return (int)code ^ (int)(code >>> 32);
     }
 

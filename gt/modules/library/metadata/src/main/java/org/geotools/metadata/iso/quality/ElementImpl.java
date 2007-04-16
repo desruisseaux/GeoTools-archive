@@ -91,7 +91,7 @@ public class ElementImpl extends MetadataEntity implements Element {
      * The array length is 1 for a single date, or 2 for a range. Returns
      * {@code null} if this information is not available.
      */
-    private long date1, date2;
+    private long date1 = Long.MIN_VALUE, date2 = Long.MIN_VALUE;
 
     /**
      * Value (or set of values) obtained from applying a data quality measure or the out
@@ -104,6 +104,15 @@ public class ElementImpl extends MetadataEntity implements Element {
      * Constructs an initially empty element.
      */
     public ElementImpl() {
+    }
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public ElementImpl(final Element source) {
+        super(source);
     }
 
     /**
@@ -295,69 +304,5 @@ public class ElementImpl extends MetadataEntity implements Element {
      */
     public synchronized void setResults(final Collection/*<Result>*/ newValues) {
         results = copyCollection(newValues, results, Result.class);
-    }
-    
-    /**
-     * Declares this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        namesOfMeasure              = (Collection)          unmodifiable(namesOfMeasure);
-        measureIdentification       = (Identifier)          unmodifiable(measureIdentification);
-        measureDescription          = (InternationalString) unmodifiable(measureDescription);
-        evaluationMethodDescription = (InternationalString) unmodifiable(evaluationMethodDescription);
-        evaluationProcedure         = (Citation)            unmodifiable(evaluationProcedure);
-        results                     = (Collection)          unmodifiable(results);
-    }
-
-    /**
-     * Compare this element with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final ElementImpl that = (ElementImpl) object;
-            return Utilities.equals(this.namesOfMeasure,              that.namesOfMeasure              ) &&
-                   Utilities.equals(this.measureIdentification,       that.measureIdentification       ) &&
-                   Utilities.equals(this.measureDescription,          that.measureDescription          ) &&
-                   Utilities.equals(this.evaluationMethodType,        that.evaluationMethodType        ) &&
-                   Utilities.equals(this.evaluationMethodDescription, that.evaluationMethodDescription ) &&
-                   Utilities.equals(this.evaluationProcedure,         that.evaluationProcedure         ) &&
-                   Utilities.equals(this.results,                     that.results                     ) &&
-                                    this.date1                     == that.date1                         &&
-                                    this.date2                     == that.date2;
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this address. For performance reason, this method do
-     * not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (namesOfMeasure != null)        code ^= namesOfMeasure       .hashCode();
-        if (measureIdentification != null) code ^= measureIdentification.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this citation.
-     *
-     * @todo localize and improve output.
-     */
-    public synchronized String toString() {
-        final String lineSeparator = System.getProperty("line.separator", "\n");
-        final StringBuffer buffer = new StringBuffer();
-        if (measureDescription != null) {
-            buffer.append("Measure: ");
-            buffer.append(measureDescription);
-            buffer.append(lineSeparator);
-        }
-        buffer.append(results);
-        return buffer.toString();
     }
 }

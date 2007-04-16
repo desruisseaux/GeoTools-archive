@@ -85,6 +85,15 @@ public class AddressImpl extends MetadataEntity implements Address {
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public AddressImpl(final Address source) {
+        super(source);
+    }
+
+    /**
      * Return the state, province of the location.
      * Returns {@code null} if unspecified.
      */
@@ -174,74 +183,4 @@ public class AddressImpl extends MetadataEntity implements Address {
         checkWritePermission();
         postalCode = newValue;
     }
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        administrativeArea      = (InternationalString) unmodifiable(administrativeArea);
-        city                    = (InternationalString) unmodifiable(city);
-        country                 = (InternationalString) unmodifiable(country);
-        deliveryPoints          = (Collection)          unmodifiable(deliveryPoints);
-        electronicMailAddresses = (Collection)          unmodifiable(electronicMailAddresses);
-    }
-
-    /**
-     * Compare this address with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final AddressImpl that = (AddressImpl) object;
-            return Utilities.equals(this.administrativeArea,      that.administrativeArea ) &&
-                   Utilities.equals(this.city,                    that.city               ) &&
-                   Utilities.equals(this.country,                 that.country            ) &&
-                   Utilities.equals(this.postalCode,              that.postalCode         ) &&
-                   Utilities.equals(this.deliveryPoints,          that.deliveryPoints     ) &&
-                   Utilities.equals(this.electronicMailAddresses, that.electronicMailAddresses);
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this address. For performance reason, this method do
-     * not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (postalCode              != null) code ^= postalCode             .hashCode();
-        if (electronicMailAddresses != null) code ^= electronicMailAddresses.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this address.
-     */
-    public synchronized String toString() {
-        final StringBuffer buffer = new StringBuffer();
-        if (deliveryPoints != null) {
-            for (final Iterator it=deliveryPoints.iterator(); it.hasNext();) {
-                appendLineSeparator(buffer);
-                buffer.append(it.next());
-            }
-        }
-        if (city != null) {
-            appendLineSeparator(buffer);
-            buffer.append(city);
-            if (administrativeArea != null) {
-                buffer.append(" (");
-                buffer.append(administrativeArea);
-                buffer.append(')');
-            }
-        }
-        if (country != null) {
-            appendLineSeparator(buffer);
-            buffer.append(country);
-        }
-        return buffer.toString();
-    }        
 }

@@ -16,12 +16,16 @@
 package org.geotools.metadata;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import org.geotools.util.SimpleInternationalString;
 import org.opengis.metadata.citation.Citation;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.metadata.iso.citation.Citations;
+import org.opengis.util.InternationalString;
 
 
 /**
@@ -54,18 +58,24 @@ public class PropertyAccessorTest extends TestCase {
     }
 
     /**
+     * Creates a property accessor for the given citation.
+     */
+    private static PropertyAccessor createPropertyAccessor(final Citation citation) {
+        final Class implementation = citation.getClass();
+        final Class type = PropertyAccessor.getType(implementation, "org.opengis.metadata");
+        assertNotNull(type);
+        return new PropertyAccessor(implementation, type);
+    }
+
+    /**
      * Tests the constructor.
      */
     public void testConstructor() {
         final Citation citation = Citations.EPSG;
         PropertyAccessor accessor;
-        try {
-            accessor = new PropertyAccessor(citation.getClass(), "org.opengis.dummy");
-            fail("No dummy interface expected.");
-        } catch (ClassCastException e) {
-            // This is the expected exception.
-        }
-        accessor = new PropertyAccessor(citation.getClass(), "org.opengis.metadata");
+        assertNull("No dummy interface expected.",
+                PropertyAccessor.getType(citation.getClass(), "org.opengis.dummy"));
+        accessor = createPropertyAccessor(citation);
         assertEquals("Count of 'get' methods.", 14,  accessor.count());
     }
 
@@ -74,8 +84,7 @@ public class PropertyAccessorTest extends TestCase {
      */
     public void testName() {
         final Citation citation = Citations.EPSG;
-        final PropertyAccessor accessor =
-                new PropertyAccessor(citation.getClass(), "org.opengis.metadata");
+        final PropertyAccessor accessor = createPropertyAccessor(citation);
         assertEquals("Non-existent property",   -1,  accessor.indexOf("dummy"));
         assertEquals("getTitle() property", "title", accessor.name(accessor.indexOf("title")));
         assertEquals("getTitle() property", "title", accessor.name(accessor.indexOf("getTitle")));
@@ -89,8 +98,7 @@ public class PropertyAccessorTest extends TestCase {
      */
     public void testGet() {
         Citation citation = Citations.EPSG;
-        final PropertyAccessor accessor =
-                new PropertyAccessor(citation.getClass(), "org.opengis.metadata");
+        final PropertyAccessor accessor = createPropertyAccessor(citation);
         final int index = accessor.indexOf("identifiers");
         assertTrue(String.valueOf(index), index >= 0);
         final Object identifiers = accessor.get(index, citation);
@@ -104,9 +112,7 @@ public class PropertyAccessorTest extends TestCase {
      */
     public void testEquals() {
         Citation citation = Citations.EPSG;
-        final PropertyAccessor accessor =
-                new PropertyAccessor(citation.getClass(), "org.opengis.metadata");
-
+        final PropertyAccessor accessor = createPropertyAccessor(citation);
         assertFalse(accessor.shallowEquals(citation, Citations.GEOTIFF, true ));
         assertFalse(accessor.shallowEquals(citation, Citations.GEOTIFF, false));
         assertTrue (accessor.shallowEquals(citation, Citations.EPSG,    false));
@@ -137,5 +143,38 @@ public class PropertyAccessorTest extends TestCase {
         } catch (UnmodifiableMetadataException e) {
             // This is the expected exception.
         }
+    }
+
+    /**
+     * Tests the hash code computation.
+     */
+    public void testHashCode() {
+        final CitationImpl citation = new CitationImpl();
+        final PropertyAccessor accessor = createPropertyAccessor(citation);
+        int hashCode = accessor.hashCode(citation);
+        assertEquals("Empty metadata.", 0, hashCode);
+
+        final String ISBN = "Dummy ISBN";
+        citation.setISBN(ISBN);
+        hashCode = accessor.hashCode(citation);
+        assertEquals("Metadata with a single String value.", ISBN.hashCode(), hashCode);
+
+        final Set set = new HashSet();
+        assertEquals("By Set.hashCode() contract.", 0, set.hashCode());
+        assertTrue(set.add(ISBN));
+        assertEquals("Expected Metadata.hashCode() == Set.hashCode().", set.hashCode(), hashCode);
+
+        final InternationalString title = new SimpleInternationalString("Dummy title");
+        citation.setTitle(title);
+        hashCode = accessor.hashCode(citation);
+        assertEquals("Metadata with two values.", ISBN.hashCode() + title.hashCode(), hashCode);
+        assertTrue(set.add(title));
+        assertEquals("Expected Metadata.hashCode() == Set.hashCode().", set.hashCode(), hashCode);
+        assertEquals("CitationsImpl.hashCode() should delegate.", hashCode, citation.hashCode());
+
+        final Collection values = citation.asMap().values();
+        assertEquals(hashCode, new HashSet(values).hashCode());
+        assertTrue(values.containsAll(set));
+        assertTrue(set.containsAll(values));
     }
 }

@@ -74,6 +74,15 @@ public class DataQualityImpl extends MetadataEntity implements DataQuality {
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public DataQualityImpl(final DataQuality source) {
+        super(source);
+    }
+
+    /**
      * Creates a data quality initialized to the given scope.
      */
     public DataQualityImpl(Scope scope) {
@@ -131,49 +140,4 @@ public class DataQualityImpl extends MetadataEntity implements DataQuality {
         checkWritePermission();
         lineage = newValue;
     }
-    
-    /**
-     * Declares this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        scope   = (Scope)      unmodifiable(scope);
-        reports = (Collection) unmodifiable(reports);
-        lineage = (Lineage)    unmodifiable(lineage);
-    }
-
-    /**
-     * Compares this data quality with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final DataQualityImpl that = (DataQualityImpl) object; 
-            return Utilities.equals(this.scope,    that.scope   ) &&
-                   Utilities.equals(this.reports,  that.reports ) &&
-                   Utilities.equals(this.lineage,  that.lineage )  ;
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this address. For performance reason, this method do
-     * not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = 0; // (int)serialVersionUID;
-        if (scope != null)   code ^= scope  .hashCode();
-        if (lineage != null) code ^= lineage.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this data quality.
-     */
-    public String toString() {
-        return String.valueOf(scope);
-    }        
 }

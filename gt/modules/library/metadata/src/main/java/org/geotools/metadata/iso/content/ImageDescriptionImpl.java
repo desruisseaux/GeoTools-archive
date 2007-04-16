@@ -119,6 +119,15 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public ImageDescriptionImpl(final ImageDescription source) {
+        super(source);
+    }
+
+    /**
      * Returns the illumination elevation measured in degrees clockwise from the target plane at
      * intersection of the optical line of sight with the Earth’s surface. For images from a
      * scanning device, refer to the centre pixel of the image.
@@ -313,46 +322,5 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
     public synchronized void setLensDistortionInformationAvailable(final Boolean newValue) {
         checkWritePermission();
         lensDistortionInformationAvailable = newValue;
-    }
-    
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        illuminationElevationAngle = (Double)     unmodifiable(illuminationElevationAngle);
-        illuminationAzimuthAngle   = (Double)     unmodifiable(illuminationAzimuthAngle);
-        imageQualityCode           = (Identifier) unmodifiable(imageQualityCode);
-        cloudCoverPercentage       = (Double)     unmodifiable(cloudCoverPercentage);
-        processingLevelCode        = (Identifier) unmodifiable(processingLevelCode);
-    }
-
-    /**
-     * Compare this image description with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (super.equals(object)) {
-            final ImageDescriptionImpl that = (ImageDescriptionImpl) object;
-            return Utilities.equals(this.illuminationElevationAngle, that.illuminationElevationAngle) &&
-                   Utilities.equals(this.illuminationAzimuthAngle,   that.illuminationAzimuthAngle  ) &&
-                   Utilities.equals(this.imagingCondition,           that.imagingCondition          ) &&
-                   Utilities.equals(this.imageQualityCode,           that.imageQualityCode          );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this image description. For performance reason, this method
-     * do not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int) serialVersionUID;
-        if (illuminationElevationAngle != null) code ^= illuminationElevationAngle.hashCode();
-        if (illuminationAzimuthAngle   != null) code ^= illuminationAzimuthAngle  .hashCode();
-        return code;
     }
 }

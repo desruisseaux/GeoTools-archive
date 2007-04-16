@@ -90,6 +90,15 @@ public class MediumImpl extends MetadataEntity implements Medium {
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public MediumImpl(final Medium source) {
+        super(source);
+    }
+
+    /**
      * Returns the name of the medium on which the resource can be received.
      */
     public MediumName getName() {
@@ -179,58 +188,5 @@ public class MediumImpl extends MetadataEntity implements Medium {
      */
     public synchronized void setDensities(final Collection newValues) {
         densities = copyCollection(newValues, densities, Number.class);
-    }
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        densities     = (Collection)          unmodifiable(densities);
-        densityUnits  = (Unit)                unmodifiable(densityUnits);
-        mediumFormats = (Collection)          unmodifiable(mediumFormats);
-        mediumNote    = (InternationalString) unmodifiable(mediumNote);
-    }
-
-    /**
-     * Compare this Medium with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final MediumImpl that = (MediumImpl) object;
-            return Utilities.equals(this.name,          that.name         ) &&
-                   Utilities.equals(this.densities,     that.densities    ) &&
-                   Utilities.equals(this.densityUnits,  that.densityUnits ) &&
-                   Utilities.equals(this.volumes,       that.volumes      ) &&
-                   Utilities.equals(this.mediumFormats, that.mediumFormats) &&
-                   Utilities.equals(this.mediumNote,    that.mediumNote   );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this series.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (name          != null) code ^= name         .hashCode();
-        if (densities     != null) code ^= densities    .hashCode();
-        if (densityUnits  != null) code ^= densityUnits .hashCode();
-        if (volumes       != null) code ^= volumes      .hashCode();
-        if (mediumFormats != null) code ^= mediumFormats.hashCode();
-        if (mediumNote    != null) code ^= mediumNote   .hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this series.
-     *
-     * @todo Provides a more elaborated implementation.
-     */
-    public String toString() {
-        return String.valueOf(name);
     }
 }

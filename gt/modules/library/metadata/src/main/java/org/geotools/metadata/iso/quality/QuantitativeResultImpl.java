@@ -78,6 +78,15 @@ public class QuantitativeResultImpl extends ResultImpl implements QuantitativeRe
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public QuantitativeResultImpl(final QuantitativeResult source) {
+        super(source);
+    }
+
+    /**
      * Constructs a quantitative result initialized to the specified value.
      */
     public QuantitativeResultImpl(final double[] values) {
@@ -166,53 +175,4 @@ public class QuantitativeResultImpl extends ResultImpl implements QuantitativeRe
         checkWritePermission();
         errorStatistic = newValue;
     } 
-
-    /**
-     * Declares this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        values         = (Collection)          unmodifiable(values);
-        valueType      = (RecordType)          unmodifiable(valueType);
-        valueUnit      = (Unit)                unmodifiable(valueUnit);
-        errorStatistic = (InternationalString) unmodifiable(errorStatistic);
-    }
-
-    /**
-     * Compare this quantitative result with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final QuantitativeResultImpl that = (QuantitativeResultImpl) object; 
-            return Utilities.equals(this.values,         that.values         ) &&
-                   Utilities.equals(this.valueType,      that.valueType      ) &&
-                   Utilities.equals(this.valueUnit,      that.valueUnit      ) &&
-                   Utilities.equals(this.errorStatistic, that.errorStatistic );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this address. For performance reason, this method do
-     * not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int) serialVersionUID;
-        if (values    != null) code ^= values   .hashCode();
-        if (valueType != null) code ^= valueType.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this result.
-     *
-     * @todo Provides a more elaborated implementation.
-     */
-    public String toString() {
-        return String.valueOf(valueType);
-    }        
 }

@@ -78,6 +78,15 @@ public class DigitalTransferOptionsImpl extends MetadataEntity implements Digita
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public DigitalTransferOptionsImpl(final DigitalTransferOptions source) {
+        super(source);
+    }
+
+    /**
      * Returne tiles, layers, geographic areas, etc., in which data is available.
      */
     public InternationalString getUnitsOfDistribution() {
@@ -137,54 +146,5 @@ public class DigitalTransferOptionsImpl extends MetadataEntity implements Digita
     public synchronized void setOffLine(final Medium newValue) {
         checkWritePermission();
         offLines = newValue;
-    }
-    
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        unitsOfDistribution = (InternationalString) unmodifiable(unitsOfDistribution);
-        transferSize        = (Double)              unmodifiable(transferSize);
-        onLines             = (Collection)          unmodifiable(onLines);
-        offLines            = (Medium)              unmodifiable(offLines);
-    }
-
-    /**
-     * Compare this digital transfer options with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final DigitalTransferOptionsImpl that = (DigitalTransferOptionsImpl) object;
-            return Utilities.equals(this.unitsOfDistribution,  that.unitsOfDistribution) &&
-                   Utilities.equals(this.transferSize,         that.transferSize       ) &&
-                   Utilities.equals(this.onLines,              that.onLines            ) &&
-                   Utilities.equals(this.offLines,             that.offLines           );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this digital transfer options.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (unitsOfDistribution != null) code ^= unitsOfDistribution.hashCode();
-        if (transferSize        != null) code ^= transferSize.hashCode();
-        if (onLines             != null) code ^= onLines.hashCode();
-        if (offLines            != null) code ^= offLines.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this digital transfer options.
-     *
-     * @todo Provides a more elaborated implementation.
-     */
-    public String toString() {
-        return String.valueOf(unitsOfDistribution);
     }
 }

@@ -17,7 +17,7 @@ package org.geotools.metadata;
 
 
 /**
- * Throws when a {@linkplain org.geotools.metadata.iso.MetadataEntity metadata entity}
+ * Thrown when a {@linkplain org.geotools.metadata.iso.MetadataEntity metadata entity}
  * is in a invalid state, usually because a mandatory attribute is missing.
  *
  * @since 2.4

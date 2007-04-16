@@ -61,6 +61,15 @@ public class GeometricObjectsImpl extends MetadataEntity implements GeometricObj
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public GeometricObjectsImpl(final GeometricObjects source) {
+        super(source);
+    }
+
+    /**
      * Creates a geometric object initialized to the given type.
      */
     public GeometricObjectsImpl(final GeometricObjectType geometricObjectType) {
@@ -96,44 +105,4 @@ public class GeometricObjectsImpl extends MetadataEntity implements GeometricObj
         checkWritePermission();
         geometricObjectCount = newValue;
     }
-
-    /**
-     * Declares this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-    }
-
-    /**
-     * Compares this geometric objects with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final GeometricObjectsImpl that = (GeometricObjectsImpl) object; 
-            return Utilities.equals(this.geometricObjectType,  that.geometricObjectType ) &&
-                   Utilities.equals(this.geometricObjectCount, that.geometricObjectCount);
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this object. For performance reason, this method do
-     * not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (geometricObjectType != null) code ^= geometricObjectType.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this object.
-     */
-    public String toString() {
-        return String.valueOf(geometricObjectType);
-    }            
 }

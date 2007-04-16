@@ -64,6 +64,15 @@ public class ConstraintsImpl extends MetadataEntity implements Constraints {
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public ConstraintsImpl(final Constraints source) {
+        super(source);
+    }
+
+    /**
      * Returns the limitation affecting the fitness for use of the resource. Example, "not to be used for
      * navigation".
      */
@@ -77,50 +86,5 @@ public class ConstraintsImpl extends MetadataEntity implements Constraints {
      */
     public synchronized void setUseLimitation(final Collection newValues) {
         useLimitation = copyCollection(newValues, useLimitation, InternationalString.class);
-    }
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        useLimitation = (Collection) unmodifiable(useLimitation);
-    }
-
-    /**
-     * Compare this constraints with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final ConstraintsImpl that = (ConstraintsImpl) object;
-            return Utilities.equals(this.useLimitation, that.useLimitation);
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this constraints.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (useLimitation != null) code ^= useLimitation.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this constraints.
-     */
-    public synchronized String toString() {
-        final StringBuffer buffer = new StringBuffer();
-        if (useLimitation != null) {
-            for (final Iterator it=useLimitation.iterator(); it.hasNext();) {
-                appendLineSeparator(buffer);
-                buffer.append(it.next());
-            }
-        }
-        return buffer.toString();
     }
 }

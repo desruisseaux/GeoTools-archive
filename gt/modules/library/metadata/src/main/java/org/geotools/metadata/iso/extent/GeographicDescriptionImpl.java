@@ -57,6 +57,15 @@ public class GeographicDescriptionImpl extends GeographicExtentImpl
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public GeographicDescriptionImpl(final GeographicDescription source) {
+        super(source);
+    }
+
+    /**
      * Creates a geographic description initialized to the specified value.
      */
      public GeographicDescriptionImpl(final Identifier geographicIdentifier) {
@@ -77,44 +86,4 @@ public class GeographicDescriptionImpl extends GeographicExtentImpl
         checkWritePermission();
         geographicIdentifier = newValue;
     }
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        geographicIdentifier = (Identifier) unmodifiable(geographicIdentifier);
-    }
-
-    /**
-     * Compare this GeographicDescription with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (super.equals(object)) {
-            final GeographicDescriptionImpl that = (GeographicDescriptionImpl) object;
-            return Utilities.equals(this.geographicIdentifier, that.geographicIdentifier);
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this geographic description.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (geographicIdentifier != null) code ^= geographicIdentifier.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this geographic description.
-     *
-     * @todo Provides a more elaborated implementation.
-     */
-    public String toString() {
-        return String.valueOf(geographicIdentifier);
-    }    
 }

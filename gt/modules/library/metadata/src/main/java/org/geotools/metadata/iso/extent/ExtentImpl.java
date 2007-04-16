@@ -99,6 +99,15 @@ public class ExtentImpl extends MetadataEntity implements Extent {
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public ExtentImpl(final Extent source) {
+        super(source);
+    }
+
+    /**
      * Returns the spatial and temporal extent for the referring object.
      */
     public InternationalString getDescription() {
@@ -206,63 +215,5 @@ public class ExtentImpl extends MetadataEntity implements Extent {
             }
         }
         return candidate;
-    }
-
-    /**
-     * Declares this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        description        = (InternationalString) unmodifiable(description);
-        geographicElements = (Collection)          unmodifiable(geographicElements);
-        temporalElements   = (Collection)          unmodifiable(temporalElements);
-        verticalElements   = (Collection)          unmodifiable(verticalElements);
-    }
-
-    /**
-     * Compare this extent with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final ExtentImpl that = (ExtentImpl) object;
-            return Utilities.equals(this.description,        that.description       ) &&
-                   Utilities.equals(this.geographicElements, that.geographicElements) &&
-                   Utilities.equals(this.temporalElements,   that.temporalElements  ) &&
-                   Utilities.equals(this.verticalElements,   that.verticalElements  );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this extent.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (description        != null) code ^= description       .hashCode();
-        if (geographicElements != null) code ^= geographicElements.hashCode();
-        if (temporalElements   != null) code ^= temporalElements  .hashCode();
-        if (verticalElements   != null) code ^= verticalElements  .hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this extent.
-     */
-    public String toString() {
-        final StringBuffer buffer = new StringBuffer();
-        if (description != null) {
-            buffer.append(description);
-        }
-        final GeographicBoundingBox box = getGeographicBoundingBox(this);
-        if (box != null) {
-            if (buffer.length() != 0) {
-                buffer.append(System.getProperty("line.separator"));
-            }
-            buffer.append(GeographicBoundingBoxImpl.toString(box, "DD°MM'SS.s\"", null));
-        }
-        return buffer.toString();
     }
 }

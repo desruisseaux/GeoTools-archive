@@ -182,6 +182,15 @@ public class ContactImpl extends MetadataEntity implements Contact {
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public ContactImpl(final Contact source) {
+        super(source);
+    }
+
+    /**
      * Constructs a contact initialized to the specified online resource.
      */
     public ContactImpl(final OnLineResource resource) {
@@ -269,69 +278,4 @@ public class ContactImpl extends MetadataEntity implements Contact {
         checkWritePermission();
         hoursOfService = newValue;
     }
-    
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        contactInstructions = (InternationalString) unmodifiable(contactInstructions);
-        hoursOfService      = (InternationalString) unmodifiable(hoursOfService);
-        onLineResource      = (OnLineResource)      unmodifiable(onLineResource);
-        address             = (Address)             unmodifiable(address);
-        phone               = (Telephone)           unmodifiable(phone);
-    }
-
-    /**
-     * Compare this contact with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final ContactImpl that = (ContactImpl) object;
-            return Utilities.equals(this.contactInstructions, that.contactInstructions) &&
-                   Utilities.equals(this.hoursOfService,      that.hoursOfService     ) &&
-                   Utilities.equals(this.onLineResource,      that.onLineResource     ) &&
-                   Utilities.equals(this.address,             that.address            ) &&
-                   Utilities.equals(this.phone,               that.phone              );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this contact. For performance reason, this method do
-     * not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (contactInstructions != null) code ^= contactInstructions.hashCode();
-        if (address             != null) code ^= address            .hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this contact.
-     */
-    public synchronized String toString() {
-        final StringBuffer buffer = new StringBuffer();
-        if (contactInstructions != null) {
-            buffer.append(contactInstructions);
-        }
-        if (address != null) {
-            appendLineSeparator(buffer);
-            buffer.append(address);
-        }
-        if (phone != null) {
-            appendLineSeparator(buffer);
-            buffer.append(phone);
-        }
-        if (onLineResource != null) {
-            appendLineSeparator(buffer);
-            buffer.append(onLineResource);
-        }
-        return buffer.toString();
-    }    
 }

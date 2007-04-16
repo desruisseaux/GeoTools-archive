@@ -87,6 +87,15 @@ public class FormatImpl extends MetadataEntity implements Format {
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public FormatImpl(final Format source) {
+        super(source);
+    }
+
+    /**
      * Creates a format initialized to the given name.
      */
     public FormatImpl(final InternationalString name, final InternationalString version) {
@@ -183,60 +192,5 @@ public class FormatImpl extends MetadataEntity implements Format {
      */
     public synchronized void setFormatDistributors(final Collection newValues) {
         formatDistributors = copyCollection(newValues, formatDistributors, Distributor.class);
-    }
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        name                       = (InternationalString) unmodifiable(name);
-        version                    = (InternationalString) unmodifiable(version);
-        amendmentNumber            = (InternationalString) unmodifiable(amendmentNumber);
-        specification              = (InternationalString) unmodifiable(specification);
-        fileDecompressionTechnique = (InternationalString) unmodifiable(fileDecompressionTechnique);
-        formatDistributors         = (Collection)          unmodifiable(formatDistributors);
-    }
-
-    /**
-     * Compare this Format with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final FormatImpl that = (FormatImpl) object;
-            return Utilities.equals(this.name,                       that.name                      ) &&
-                   Utilities.equals(this.version,                    that.version                   ) &&
-                   Utilities.equals(this.amendmentNumber,            that.amendmentNumber           ) &&
-                   Utilities.equals(this.specification,              that.specification             ) &&
-                   Utilities.equals(this.fileDecompressionTechnique, that.fileDecompressionTechnique) &&
-                   Utilities.equals(this.formatDistributors,         that.formatDistributors        );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this series.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (name                       != null) code ^= name                      .hashCode();
-        if (version                    != null) code ^= version                   .hashCode();
-        if (amendmentNumber            != null) code ^= amendmentNumber           .hashCode();
-        if (specification              != null) code ^= specification             .hashCode();
-        if (fileDecompressionTechnique != null) code ^= fileDecompressionTechnique.hashCode();
-        if (formatDistributors         != null) code ^= formatDistributors        .hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this series.
-     *
-     * @todo Provides a more elaborated implementation.
-     */
-    public String toString() {
-        return String.valueOf(name);
     }
 }

@@ -45,4 +45,13 @@ public class ThematicAccuracyImpl extends ElementImpl implements ThematicAccurac
      */
     public ThematicAccuracyImpl() {
     }
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public ThematicAccuracyImpl(final ThematicAccuracy source) {
+        super(source);
+    }
 }

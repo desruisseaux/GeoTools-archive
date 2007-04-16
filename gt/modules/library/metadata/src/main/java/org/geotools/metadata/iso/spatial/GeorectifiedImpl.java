@@ -103,6 +103,15 @@ public class GeorectifiedImpl extends GridSpatialRepresentationImpl implements G
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public GeorectifiedImpl(final Georectified source) {
+        super(source);
+    }
+
+    /**
      * Creates a georectified object initialized to the specified values.
      */
     public GeorectifiedImpl(final int              numberOfDimensions,
@@ -163,10 +172,7 @@ public class GeorectifiedImpl extends GridSpatialRepresentationImpl implements G
      * georectified grid; at least two corner points along one diagonal are required.
      */
     public synchronized List getCornerPoints() {
-        if (cornerPoints == null) {
-            cornerPoints = new CheckedArrayList(Point.class);
-        }
-        return cornerPoints;
+        return cornerPoints = nonNullList(cornerPoints, Point.class);
     }
 
     /**
@@ -243,56 +249,5 @@ public class GeorectifiedImpl extends GridSpatialRepresentationImpl implements G
     public synchronized void setTransformationDimensionMapping(final Collection newValues) {
         transformationDimensionMapping = copyCollection(newValues, transformationDimensionMapping,
                                                         InternationalString.class);
-    }
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        checkPointDescription              = (InternationalString) unmodifiable(checkPointDescription);
-        cornerPoints                       = (List)                unmodifiable(cornerPoints);
-        centerPoint                        = (Point)               unmodifiable(centerPoint);
-        transformationDimensionDescription = (InternationalString) unmodifiable(transformationDimensionDescription);
-        transformationDimensionMapping     = (Collection)          unmodifiable(transformationDimensionMapping);
-    }
-
-    /**
-     * Compare this georectified object with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (super.equals(object)) {
-            final GeorectifiedImpl that = (GeorectifiedImpl) object; 
-            return Utilities.equals(this.checkPointDescription,              that.checkPointDescription             ) &&
-                   Utilities.equals(this.cornerPoints,                       that.cornerPoints                      ) &&
-                   Utilities.equals(this.centerPoint,                        that.centerPoint                       ) &&
-                   Utilities.equals(this.pointInPixel,                       that.pointInPixel                      ) &&
-                   Utilities.equals(this.transformationDimensionDescription, that.transformationDimensionDescription) &&
-                   Utilities.equals(this.transformationDimensionMapping,     that.transformationDimensionMapping    ) &&
-                                   (this.checkPointAvailable              == that.checkPointAvailable               );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this object. For performance reason, this method do
-     * not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (checkPointDescription              != null) code ^= checkPointDescription             .hashCode();
-        if (transformationDimensionDescription != null) code ^= transformationDimensionDescription.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this object.
-     */
-    public String toString() {
-        return String.valueOf(checkPointDescription);
     }
 }

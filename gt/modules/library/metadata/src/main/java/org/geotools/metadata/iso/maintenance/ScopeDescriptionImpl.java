@@ -65,6 +65,15 @@ public class ScopeDescriptionImpl extends MetadataEntity implements ScopeDescrip
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public ScopeDescriptionImpl(final ScopeDescription source) {
+        super(source);
+    }
+
+    /**
      * Returns the attributes to which the information applies.
      *
      * @todo Not yet implemented.
@@ -140,47 +149,5 @@ public class ScopeDescriptionImpl extends MetadataEntity implements ScopeDescrip
     public synchronized void setOther(final String newValue) {
         checkWritePermission();
         other = newValue;
-    }
-    
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-    }
-
-    /**
-     * Compare this scope description with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final ScopeDescriptionImpl that = (ScopeDescriptionImpl) object;
-            return Utilities.equals(this.dataset, that.dataset) &&
-                   Utilities.equals(this.other,   that.other);
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this maintenance information.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (dataset != null) code ^= dataset.hashCode();
-        if (other   != null) code ^= other  .hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this maintenance information.
-     *
-     * @todo Provides a more elaborated implementation.
-     */
-    public synchronized String toString() {
-        // TODO once method in ScopeDescription will be defined.
-        return "";
     }
 }

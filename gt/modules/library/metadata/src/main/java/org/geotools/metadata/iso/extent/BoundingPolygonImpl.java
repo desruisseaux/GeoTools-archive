@@ -60,6 +60,15 @@ public class BoundingPolygonImpl extends GeographicExtentImpl implements Boundin
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public BoundingPolygonImpl(final BoundingPolygon source) {
+        super(source);
+    }
+
+    /**
      * Creates a bounding polygon initialized to the specified value.
      */
     public BoundingPolygonImpl(final Collection/*<Geometry>*/ polygons) {
@@ -79,44 +88,4 @@ public class BoundingPolygonImpl extends GeographicExtentImpl implements Boundin
     public synchronized void setPolygons(final Collection/*<Geometry>*/ newValues) {
         polygons = copyCollection(newValues, polygons, Geometry.class);
     }
-    
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        polygons = (Collection) unmodifiable(polygons);
-    }
-
-    /**
-     * Compare this bounding polygon with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (super.equals(object)) {
-            final BoundingPolygonImpl that = (BoundingPolygonImpl) object;
-            return Utilities.equals(this.polygons, that.polygons);
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this bounding polygon.
-     */
-    public synchronized int hashCode() {
-        int code = (int) serialVersionUID;
-        if (polygons != null) code ^= polygons.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this bounding polygon.
-     *
-     * @todo Provides a more elaborated implementation.
-     */
-    public String toString() {
-        return String.valueOf(polygons);
-    }    
 }

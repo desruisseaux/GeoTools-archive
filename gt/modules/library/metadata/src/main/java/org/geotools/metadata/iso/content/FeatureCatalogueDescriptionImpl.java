@@ -80,7 +80,16 @@ public class FeatureCatalogueDescriptionImpl extends ContentInformationImpl
      */
     public FeatureCatalogueDescriptionImpl() {
     }
-    
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public FeatureCatalogueDescriptionImpl(final FeatureCatalogueDescription source) {
+        super(source);
+    }
+
     /**
      * Returns whether or not the cited feature catalogue complies with ISO 19110.
      */
@@ -151,45 +160,5 @@ public class FeatureCatalogueDescriptionImpl extends ContentInformationImpl
      */
     public synchronized void setFeatureCatalogueCitations(final Collection newValues) {
         featureCatalogueCitations = copyCollection(newValues, featureCatalogueCitations, Citation.class);
-    }
-    
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        language                  = (Collection) unmodifiable(language);
-        featureTypes              = (Collection) unmodifiable(featureTypes);
-        featureCatalogueCitations = (Collection) unmodifiable(featureCatalogueCitations);
-    }
-
-    /**
-     * Compare this feature catalogue description with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (super.equals(this)) {
-            final FeatureCatalogueDescriptionImpl that = (FeatureCatalogueDescriptionImpl) object;
-            return Utilities.equals(this.compliant,                 that.compliant                ) &&
-                                   (this.includeWithDataset      == that.includeWithDataset       ) &&
-                   Utilities.equals(this.featureTypes,              that.featureTypes             ) &&
-                   Utilities.equals(this.featureCatalogueCitations, that.featureCatalogueCitations) &&
-                   Utilities.equals(this.language,                  that.language                 );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this catalogue. For performance reason, this method do
-     * not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (featureCatalogueCitations != null)  code ^= featureCatalogueCitations.hashCode();
-        if (language != null)                   code ^= language                 .hashCode();
-        return code;
     }
 }

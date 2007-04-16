@@ -124,6 +124,15 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public DataIdentificationImpl(final DataIdentification source) {
+        super(source);
+    }
+
+    /**
      * Creates a data identification initialized to the specified values.
      */
     public DataIdentificationImpl(final Citation citation, 
@@ -316,69 +325,4 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
         checkWritePermission();
         supplementalInformation = newValue;
     }
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        spatialRepresentationTypes = (Collection)          unmodifiable(spatialRepresentationTypes);
-        spatialResolutions         = (Collection)          unmodifiable(spatialResolutions);
-        language                   = (Collection)          unmodifiable(language);
-        characterSets              = (Collection)          unmodifiable(characterSets);
-        topicCategories            = (Collection)          unmodifiable(topicCategories);
-        geographicBox              = (Collection)          unmodifiable(geographicBox);
-        geographicDescription      = (Collection)          unmodifiable(geographicDescription);
-        environmentDescription     = (InternationalString) unmodifiable(environmentDescription);
-        extent                     = (Collection)          unmodifiable(extent);
-        supplementalInformation    = (InternationalString) unmodifiable(supplementalInformation);
-    }
-
-    /**
-     * Compare this data identification with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (super.equals(object)) {
-            final DataIdentificationImpl that = (DataIdentificationImpl) object;
-            return Utilities.equals(this.spatialRepresentationTypes, that.spatialRepresentationTypes   ) &&
-                   Utilities.equals(this.spatialResolutions,         that.spatialResolutions           ) &&
-                   Utilities.equals(this.language,                   that.language                     ) &&
-                   Utilities.equals(this.characterSets,              that.characterSets                ) &&
-                   Utilities.equals(this.topicCategories,            that.topicCategories              ) &&
-                   Utilities.equals(this.geographicBox,              that.geographicBox                ) &&
-                   Utilities.equals(this.geographicDescription,      that.geographicDescription        ) &&
-                   Utilities.equals(this.environmentDescription,     that.environmentDescription       ) &&
-                   Utilities.equals(this.extent,                     that.extent                       ) &&
-                   Utilities.equals(this.supplementalInformation,    that.supplementalInformation      )  ;
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this identification.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (spatialRepresentationTypes != null) code ^= spatialRepresentationTypes.hashCode();
-        if (spatialResolutions         != null) code ^= spatialResolutions        .hashCode();
-        if (language                   != null) code ^= language                  .hashCode();
-        if (characterSets              != null) code ^= characterSets             .hashCode();
-        if (topicCategories            != null) code ^= topicCategories           .hashCode();
-        if (geographicBox              != null) code ^= geographicBox             .hashCode();
-        if (geographicDescription      != null) code ^= geographicDescription     .hashCode();
-        if (environmentDescription     != null) code ^= environmentDescription    .hashCode();
-        if (extent                     != null) code ^= extent                    .hashCode();
-        if (supplementalInformation    != null) code ^= supplementalInformation   .hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this identification.
-     */
-    public String toString() {
-        return String.valueOf(spatialRepresentationTypes);
-    }    
 }

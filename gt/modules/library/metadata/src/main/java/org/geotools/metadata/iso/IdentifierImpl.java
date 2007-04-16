@@ -68,6 +68,15 @@ public class IdentifierImpl extends MetadataEntity implements Identifier {
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public IdentifierImpl(final Identifier source) {
+        super(source);
+    }
+
+    /**
      * Creates an identifier initialized to the given code.
      */
     public IdentifierImpl(final String code) {
@@ -139,41 +148,5 @@ public class IdentifierImpl extends MetadataEntity implements Identifier {
     public synchronized void setAuthority(final Citation newValue) {
         checkWritePermission();
         authority = newValue;
-    }
-    
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        authority = (Citation) unmodifiable(authority);
-    }
-
-    /**
-     * Compare this Identifier with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final IdentifierImpl that = (IdentifierImpl) object;
-            return Utilities.equals(this.code,      that.code      ) &&
-                   Utilities.equals(this.version,   that.version   ) &&
-                   Utilities.equals(this.authority, that.authority );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this address. For performance reason, this method do
-     * not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (this.code != null) code ^= this.code.hashCode();
-        if (authority != null) code ^= authority.hashCode();
-        return code;
     }
 }

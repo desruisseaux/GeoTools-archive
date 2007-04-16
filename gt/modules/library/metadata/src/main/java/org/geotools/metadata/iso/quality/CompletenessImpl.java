@@ -43,4 +43,13 @@ public class CompletenessImpl extends ElementImpl implements Completeness {
      */
     public CompletenessImpl() {
     }
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public CompletenessImpl(final Completeness source) {
+        super(source);
+    }
 }

@@ -64,6 +64,15 @@ public class CitationDateImpl extends MetadataEntity implements CitationDate {
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public CitationDateImpl(final CitationDate source) {
+        super(source);
+    }
+
+    /**
      * Constructs a citation date initialized to the given date.
      */
     public CitationDateImpl(final Date date, final DateType dateType) {
@@ -99,47 +108,5 @@ public class CitationDateImpl extends MetadataEntity implements CitationDate {
     public synchronized void setDateType(final DateType newValue) {
         checkWritePermission();
         dateType = newValue;
-    }
-
-    /**
-     * Declares this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-    }
-
-    /**
-     * Compares this citation with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final CitationDateImpl that = (CitationDateImpl) object;
-            return this.date == that.date && Utilities.equals(this.dateType, that.dateType);
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this citation. For performance reason, this method do
-     * not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        code ^= (int)date ^ (int) (date >>> 32);
-        if (dateType != null) code ^= dateType.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this citation.
-     *
-     * @todo Provides a more elaborated implementation.
-     */
-    public String toString() {
-        return String.valueOf(getDate());
     }
 }

@@ -73,6 +73,15 @@ public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public VerticalExtentImpl(final VerticalExtent source) {
+        super(source);
+    }
+
+    /**
      * Creates a vertical extent initialized to the specified values.
      *
      * @since 2.4
@@ -171,8 +180,7 @@ public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent
      *
      * @deprecated Use {@link #setVerticalCRS} instead.
      */
-    public synchronized void setUnit(final Unit newValue) {
-        checkWritePermission();
+    public void setUnit(final Unit newValue) {
         throw new UnsupportedOperationException("Use setVerticalCRS instead.");
     }
 
@@ -192,50 +200,7 @@ public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent
      *
      * @deprecated Use {@link #setVerticalCRS} instead.
      */
-    public synchronized void setVerticalDatum(final VerticalDatum newValue) {
-        checkWritePermission();
+    public void setVerticalDatum(final VerticalDatum newValue) {
         throw new UnsupportedOperationException("Use setVerticalCRS instead.");
-    }
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        verticalCRS = (VerticalCRS) unmodifiable(verticalCRS);
-    }
-
-    /**
-     * Compare this vertical extent with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final VerticalExtentImpl that = (VerticalExtentImpl) object;
-            return Utilities.equals(this.verticalCRS,  that.verticalCRS ) &&
-                   Utilities.equals(this.minimumValue, that.minimumValue) &&
-                   Utilities.equals(this.maximumValue, that.maximumValue);
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this extent.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (verticalCRS  != null) code ^= verticalCRS .hashCode();
-        if (minimumValue != null) code  = minimumValue.hashCode() + 37*code;
-        if (maximumValue != null) code  = maximumValue.hashCode() + 37*code;
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this extent.
-     */
-    public String toString() {
-        return String.valueOf(verticalCRS);
     }
 }

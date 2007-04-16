@@ -100,6 +100,15 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public MaintenanceInformationImpl(final MaintenanceInformation source) {
+        super(source);
+    }
+
+    /**
      * Creates a maintenance information.
      */
     public MaintenanceInformationImpl(final MaintenanceFrequency maintenanceAndUpdateFrequency) {
@@ -286,56 +295,5 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
      */
     public synchronized void setContacts(final Collection newValues) {
         contacts = copyCollection(newValues, contacts, ResponsibleParty.class);
-    }
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        updateScopes            = (Collection) unmodifiable(updateScopes);
-        updateScopeDescriptions = (Collection) unmodifiable(updateScopeDescriptions);
-        maintenanceNotes        = (Collection) unmodifiable(maintenanceNotes);
-        contacts                = (Collection) unmodifiable(contacts);
-    }
-
-    /**
-     * Compare this maintenance information with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final MaintenanceInformationImpl that = (MaintenanceInformationImpl) object;
-            return Utilities.equals(this.maintenanceAndUpdateFrequency, that.maintenanceAndUpdateFrequency  ) &&
-                   Utilities.equals(this.updateScopes,                  that.updateScopes                   ) &&
-                   Utilities.equals(this.updateScopeDescriptions,       that.updateScopeDescriptions        ) &&
-                   Utilities.equals(this.maintenanceNotes,              that.maintenanceNotes               ) &&
-                   Utilities.equals(this.contacts,                      that.contacts                       ) &&
-                   (this.userDefinedMaintenanceFrequency             == that.userDefinedMaintenanceFrequency) &&
-                   (this.dateOfNextUpdate                            == that.dateOfNextUpdate               );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this maintenance information.
-     */
-    public synchronized int hashCode() {
-        int code = (int) serialVersionUID;
-        if (maintenanceAndUpdateFrequency != null) code ^= maintenanceAndUpdateFrequency.hashCode();
-        if (updateScopes                  != null) code ^= updateScopes                 .hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this maintenance information.
-     */
-    public synchronized String toString() {
-        if (maintenanceAndUpdateFrequency != null) {
-            return maintenanceAndUpdateFrequency.name().toLowerCase().replace('_', ' ');
-        }
-        return "";
     }
 }

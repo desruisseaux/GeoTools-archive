@@ -71,7 +71,16 @@ public class KeywordsImpl extends MetadataEntity implements Keywords {
         super();
     }
 
-    /* 
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public KeywordsImpl(final Keywords source) {
+        super(source);
+    }
+
+    /**
      * Creates keywords initialized to the given list.
      */    
     public KeywordsImpl(final Collection keywords) {
@@ -122,47 +131,4 @@ public class KeywordsImpl extends MetadataEntity implements Keywords {
         checkWritePermission();
         thesaurusName = newValue;
     }
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        keywords      = (Collection) unmodifiable(keywords);
-        thesaurusName = (Citation)   unmodifiable(thesaurusName);
-    }
-
-    /**
-     * Compare this keywords with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final KeywordsImpl that = (KeywordsImpl) object;
-            return Utilities.equals(this.keywords,      that.keywords      ) &&
-                   Utilities.equals(this.type,          that.type          ) &&
-                   Utilities.equals(this.thesaurusName, that.thesaurusName )  ;
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this object.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (keywords      != null) code ^= keywords     .hashCode();
-        if (type          != null) code ^= type         .hashCode();
-        if (thesaurusName != null) code ^= thesaurusName.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this object.
-     */
-    public String toString() {
-        return String.valueOf(keywords);
-    }    
 }

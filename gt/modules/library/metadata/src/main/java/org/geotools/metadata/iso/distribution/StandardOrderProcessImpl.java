@@ -77,6 +77,15 @@ public class StandardOrderProcessImpl extends MetadataEntity implements Standard
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public StandardOrderProcessImpl(final StandardOrderProcess source) {
+        super(source);
+    }
+
+    /**
      * Returns fees and terms for retrieving the resource.
      * Include monetary units (as specified in ISO 4217).
      */
@@ -137,52 +146,5 @@ public class StandardOrderProcessImpl extends MetadataEntity implements Standard
     public synchronized void setTurnaround(final InternationalString newValue) {
         checkWritePermission();
         turnaround = newValue;
-    }
-    
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        fees                 = (InternationalString) unmodifiable(fees);
-        orderingInstructions = (InternationalString) unmodifiable(orderingInstructions);
-        turnaround           = (InternationalString) unmodifiable(turnaround);
-    }
-
-    /**
-     * Compare this StandardOrderProcess with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final StandardOrderProcessImpl that = (StandardOrderProcessImpl) object;
-            return Utilities.equals(fees,                       that.fees                    ) &&
-                                   (plannedAvailableDateTime == that.plannedAvailableDateTime) &&
-                   Utilities.equals(orderingInstructions,       that.orderingInstructions    ) &&
-                   Utilities.equals(turnaround,                 that.turnaround              ) ;
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this series.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (fees                      != null) code ^= fees                    .hashCode();
-        if (orderingInstructions      != null) code ^= orderingInstructions    .hashCode();
-        if (turnaround                != null) code ^= turnaround              .hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this series.
-     *
-     * @todo Provides a more elaborated implementation.
-     */
-    public String toString() {
-        return String.valueOf(orderingInstructions);
     }
 }

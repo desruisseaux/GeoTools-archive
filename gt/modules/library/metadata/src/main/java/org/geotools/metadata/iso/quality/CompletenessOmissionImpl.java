@@ -44,4 +44,13 @@ public class CompletenessOmissionImpl extends CompletenessImpl implements Comple
      */
     public CompletenessOmissionImpl() {
     }
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public CompletenessOmissionImpl(final CompletenessOmission source) {
+        super(source);
+    }
 }

@@ -84,14 +84,23 @@ public class GeoreferenceableImpl extends GridSpatialRepresentationImpl implemen
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public GeoreferenceableImpl(final Georeferenceable source) {
+        super(source);
+    }
+
+    /**
      * Creates a georeferencable initialized to the given parameters.
      */
     public GeoreferenceableImpl(final int          numberOfDimensions,
-                            final List         axisDimensionsProperties,
-                            final CellGeometry cellGeometry,
-                            final boolean      transformationParameterAvailable,
-                            final boolean      controlPointAvailable, 
-                            final boolean      orientationParameterAvailable)
+                                final List         axisDimensionsProperties,
+                                final CellGeometry cellGeometry,
+                                final boolean      transformationParameterAvailable,
+                                final boolean      controlPointAvailable, 
+                                final boolean      orientationParameterAvailable)
     {
         super(numberOfDimensions, axisDimensionsProperties, cellGeometry, transformationParameterAvailable);
         setControlPointAvailable        (controlPointAvailable        );
@@ -192,55 +201,5 @@ public class GeoreferenceableImpl extends GridSpatialRepresentationImpl implemen
      */
     public synchronized void setParameterCitation(final Collection newValues) {
         parameterCitation = copyCollection(newValues, parameterCitation, Citation.class);
-    }
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        orientationParameterDescription = (InternationalString) unmodifiable(orientationParameterDescription);
-        georeferencedParameters         = (Record)              unmodifiable(georeferencedParameters);
-        parameterCitation               = (Collection)          unmodifiable(parameterCitation);
-    }
-
-    /**
-     * Compare this georeferenceable object with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (super.equals(object)) {
-            final GeoreferenceableImpl that = (GeoreferenceableImpl) object; 
-            return Utilities.equals(this.georeferencedParameters,
-                                    that.georeferencedParameters) &&
-                   Utilities.equals(this.parameterCitation,
-                                    that.parameterCitation) &&
-                   Utilities.equals(this.orientationParameterDescription,
-                                    that.orientationParameterDescription) &&
-                   (this.controlPointAvailable         == that.controlPointAvailable) &&
-                   (this.orientationParameterAvailable == that.orientationParameterAvailable);
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this object. For performance reason, this method do
-     * not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int) serialVersionUID;
-        if (georeferencedParameters != null) code ^= georeferencedParameters.hashCode();
-        if (parameterCitation       != null) code ^= parameterCitation.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this object.
-     */
-    public String toString() {
-        return String.valueOf(parameterCitation);
     }
 }

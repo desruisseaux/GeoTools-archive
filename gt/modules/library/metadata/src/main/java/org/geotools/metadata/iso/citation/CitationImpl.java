@@ -154,21 +154,7 @@ public class CitationImpl extends MetadataEntity implements Citation {
      * without copying them).
      */
     public CitationImpl(final Citation source) {
-        if (source != null) {
-            setTitle                  (source.getTitle());
-            setAlternateTitles        (source.getAlternateTitles());
-            setDates                  (source.getDates());
-            setEdition                (source.getEdition());
-            setEditionDate            (source.getEditionDate());
-            setIdentifiers            (source.getIdentifiers());
-            setCitedResponsibleParties(source.getCitedResponsibleParties());
-            setPresentationForm       (source.getPresentationForm());
-            setSeries                 (source.getSeries());
-            setOtherCitationDetails   (source.getOtherCitationDetails());
-            setCollectiveTitle        (source.getCollectiveTitle());
-            setISBN                   (source.getISBN());
-            setISSN                   (source.getISSN());
-        }
+        super(source);
     }
 
     /**
@@ -448,70 +434,5 @@ public class CitationImpl extends MetadataEntity implements Citation {
     public synchronized void setISSN(final String newValue) {
         checkWritePermission();
         ISSN = newValue;
-    }
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        title                   = (InternationalString) unmodifiable(title);
-        alternateTitles         = (Collection)          unmodifiable(alternateTitles);
-        dates                   = (Collection)          unmodifiable(dates);
-        edition                 = (InternationalString) unmodifiable(edition);
-        identifiers             = (Collection)          unmodifiable(identifiers);
-        identifierTypes         = (Collection)          unmodifiable(identifierTypes);
-        citedResponsibleParties = (Collection)          unmodifiable(citedResponsibleParties);
-        presentationForm        = (Collection)          unmodifiable(presentationForm);
-        otherCitationDetails    = (InternationalString) unmodifiable(otherCitationDetails);
-        collectiveTitle         = (InternationalString) unmodifiable(collectiveTitle);
-    }
-
-    /**
-     * Compare this citation with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final CitationImpl that = (CitationImpl) object;
-            return Utilities.equals(this.title,                   that.title                  ) &&
-                   Utilities.equals(this.alternateTitles,         that.alternateTitles        ) &&
-                   Utilities.equals(this.dates,                   that.dates                  ) &&
-                   Utilities.equals(this.edition,                 that.edition                ) &&
-                                   (this.editionDate         ==   that.editionDate            ) &&
-                   Utilities.equals(this.identifiers,             that.identifiers            ) &&
-                   Utilities.equals(this.citedResponsibleParties, that.citedResponsibleParties) &&
-                   Utilities.equals(this.presentationForm,        that.presentationForm       ) &&
-                   Utilities.equals(this.otherCitationDetails,    that.otherCitationDetails   ) &&
-                   Utilities.equals(this.collectiveTitle,         that.collectiveTitle        ) &&
-                   Utilities.equals(this.ISBN,                    that.ISBN                   ) &&
-                   Utilities.equals(this.ISSN,                    that.ISSN                   );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this citation. For performance reason, this method do
-     * not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (title       != null) code ^= title      .hashCode();
-        if (identifiers != null) code ^= identifiers.hashCode();
-        if (ISBN        != null) code ^= ISBN       .hashCode();
-        if (ISSN        != null) code ^= ISSN       .hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this citation.
-     *
-     * @todo Provides a more elaborated implementation.
-     */
-    public String toString() {
-        return String.valueOf(title);
     }
 }

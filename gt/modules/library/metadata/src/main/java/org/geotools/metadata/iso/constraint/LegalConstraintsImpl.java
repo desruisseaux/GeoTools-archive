@@ -75,6 +75,15 @@ public class LegalConstraintsImpl extends ConstraintsImpl implements LegalConstr
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public LegalConstraintsImpl(final LegalConstraints source) {
+        super(source);
+    }
+
+    /**
      * Returns the access constraints applied to assure the protection of privacy or intellectual property,
      * and any special restrictions or limitations on obtaining the resource.
      */
@@ -122,41 +131,4 @@ public class LegalConstraintsImpl extends ConstraintsImpl implements LegalConstr
     public synchronized void setOtherConstraints(final Collection/*<InternationalString>*/ newValues) {
         otherConstraints = copyCollection(newValues, otherConstraints, InternationalString.class);
     }   
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        accessConstraints = (Collection) unmodifiable(accessConstraints);
-        useConstraints    = (Collection) unmodifiable(useConstraints);
-        otherConstraints  = (Collection) unmodifiable(otherConstraints);
-    } 
-
-    /**
-     * Compare this constraints with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (super.equals(object)) {
-            final LegalConstraintsImpl that = (LegalConstraintsImpl) object;
-            return Utilities.equals(this.accessConstraints, that.accessConstraints) &&
-                   Utilities.equals(this.useConstraints,    that.useConstraints   ) &&
-                   Utilities.equals(this.otherConstraints,  that.otherConstraints );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this constraints.
-     */
-    public synchronized int hashCode() {
-        int code = (int) serialVersionUID;
-        if (accessConstraints != null) code ^= accessConstraints.hashCode();
-        if (useConstraints    != null) code ^= useConstraints   .hashCode();
-        if (otherConstraints  != null) code ^= otherConstraints .hashCode();
-        return code;
-    }
 }

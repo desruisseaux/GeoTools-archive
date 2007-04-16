@@ -188,6 +188,15 @@ public class OnLineResourceImpl extends MetadataEntity implements OnLineResource
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public OnLineResourceImpl(final OnLineResource source) {
+        super(source);
+    }
+
+    /**
      * Creates an on line resource initialized to the given URI.
      * This method is private for now since, if this constructor was public, some
      * users may expect a string argument to be for the description text instead.
@@ -302,49 +311,5 @@ public class OnLineResourceImpl extends MetadataEntity implements OnLineResource
     public String getProtocol() {
         final URI linkage = this.linkage;
         return (linkage!=null) ? linkage.getScheme() : null;
-    }
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        description = (InternationalString) unmodifiable(description);
-    }
-
-    /**
-     * Compare this on line resource with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final OnLineResourceImpl that = (OnLineResourceImpl) object;
-            return Utilities.equals(this.applicationProfile, that.applicationProfile) &&
-                   Utilities.equals(this.name,               that.name              ) &&
-                   Utilities.equals(this.description,        that.description       ) &&
-                   Utilities.equals(this.function,           that.function          ) &&
-                   Utilities.equals(this.linkage,            that.linkage           );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this on line resource. For performance reason, this method
-     * do not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (linkage != null) code ^= linkage.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this on line resource.
-     */
-    public String toString() {
-        return linkage.toString();
     }
 }

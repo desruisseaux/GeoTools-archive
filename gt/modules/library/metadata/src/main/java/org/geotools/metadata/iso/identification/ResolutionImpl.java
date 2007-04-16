@@ -66,6 +66,15 @@ public class ResolutionImpl extends MetadataEntity implements Resolution {
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public ResolutionImpl(final Resolution source) {
+        super(source);
+    }
+
+    /**
      * Level of detail expressed as the scale of a comparable hardcopy map or chart.
      * Only one of {@linkplain #getEquivalentScale equivalent scale} and
      * {@linkplain #getDistance ground sample distance} may be provided.
@@ -110,48 +119,5 @@ public class ResolutionImpl extends MetadataEntity implements Resolution {
     public synchronized void setDistance(final Double newValue) {
         checkWritePermission();
         distance = newValue;
-    }
-
-    /**
-     * Declares this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-    }
-
-    /**
-     * Compares this Resolution with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final ResolutionImpl that = (ResolutionImpl) object;
-            return Utilities.equals(this.equivalentScale, that.equivalentScale) &&
-                   Utilities.equals(this.distance       , that.distance       );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this resolution.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (equivalentScale != null) {
-            code ^= (int) equivalentScale.hashCode();
-        }
-        if (distance != null) {
-            code ^= distance.intValue();
-        }
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this resolution.
-     */
-    public String toString() {
-        return String.valueOf(distance);
     }
 }

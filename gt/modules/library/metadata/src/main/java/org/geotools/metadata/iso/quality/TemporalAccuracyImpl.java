@@ -44,4 +44,13 @@ public class TemporalAccuracyImpl extends ElementImpl implements TemporalAccurac
      */
     public TemporalAccuracyImpl() {
     }
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public TemporalAccuracyImpl(final TemporalAccuracy source) {
+        super(source);
+    }
 }

@@ -65,6 +65,15 @@ public class SeriesImpl extends MetadataEntity implements Series {
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public SeriesImpl(final Series source) {
+        super(source);
+    }
+
+    /**
      * Constructs a series with the specified name.
      */
     public SeriesImpl(final CharSequence name) {
@@ -120,48 +129,5 @@ public class SeriesImpl extends MetadataEntity implements Series {
     public synchronized void setPage(final String newValue) {
         checkWritePermission();
         page = newValue;
-    }
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        name = (InternationalString) unmodifiable(name);
-    }
-
-    /**
-     * Compare this series with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final SeriesImpl that = (SeriesImpl) object;
-            return Utilities.equals(this.name,                that.name               ) &&
-                   Utilities.equals(this.issueIdentification, that.issueIdentification) &&
-                   Utilities.equals(this.page,                that.page               );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this series.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (name != null) code ^= name.hashCode();
-        if (page != null) code ^= page.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this series.
-     *
-     * @todo Provides a more elaborated implementation.
-     */
-    public String toString() {
-        return String.valueOf(name);
     }
 }

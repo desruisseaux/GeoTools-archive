@@ -47,4 +47,13 @@ public class TopologicalConsistencyImpl extends LogicalConsistencyImpl
      */
     public TopologicalConsistencyImpl() {
     }
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public TopologicalConsistencyImpl(final TopologicalConsistency source) {
+        super(source);
+    }
 }

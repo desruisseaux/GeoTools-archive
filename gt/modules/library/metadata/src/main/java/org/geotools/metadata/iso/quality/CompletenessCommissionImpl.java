@@ -43,4 +43,13 @@ public class CompletenessCommissionImpl extends CompletenessImpl implements Comp
      */
     public CompletenessCommissionImpl() {
     }
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public CompletenessCommissionImpl(final CompletenessCommission source) {
+        super(source);
+    }
 }

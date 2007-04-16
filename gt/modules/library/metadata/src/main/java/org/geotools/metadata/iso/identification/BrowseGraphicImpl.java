@@ -75,6 +75,15 @@ public class BrowseGraphicImpl extends MetadataEntity implements BrowseGraphic {
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public BrowseGraphicImpl(final BrowseGraphic source) {
+        super(source);
+    }
+
+    /**
      * Creates a browse graphics initialized to the specified URI.
      */
     public BrowseGraphicImpl(final URI fileName) {
@@ -143,46 +152,4 @@ public class BrowseGraphicImpl extends MetadataEntity implements BrowseGraphic {
         checkWritePermission();
         fileType = newValue;
     }
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        fileDescription = (InternationalString) unmodifiable(fileDescription);
-    }
-
-    /**
-     * Compare this browse graphic with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final BrowseGraphicImpl that = (BrowseGraphicImpl) object;
-            return Utilities.equals(this.fileName,        that.fileName        ) &&
-                   Utilities.equals(this.fileDescription, that.fileDescription ) &&
-                   Utilities.equals(this.fileType,        that.fileType        )  ;
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this browse graphics.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (fileName         != null) code ^= fileName       .hashCode();
-        if (fileDescription  != null) code ^= fileDescription.hashCode();
-        if (fileType         != null) code ^= fileType       .hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this browse graphics.
-     */
-    public String toString() {
-        return String.valueOf(fileName);
-    }        
 }

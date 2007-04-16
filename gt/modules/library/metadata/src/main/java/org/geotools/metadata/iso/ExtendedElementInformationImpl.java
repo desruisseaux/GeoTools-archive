@@ -136,15 +136,24 @@ public class ExtendedElementInformationImpl extends MetadataEntity
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public ExtendedElementInformationImpl(final ExtendedElementInformation source) {
+        super(source);
+    }
+
+    /**
      * Create an extended element information initialized to the given values.
      */
     public ExtendedElementInformationImpl(final String              name, 
-                                      final InternationalString definition, 
-                                      final InternationalString condition, 
-                                      final Datatype            datatype, 
-                                      final Collection          parentEntity, 
-                                      final InternationalString rule,
-                                      final Collection          sources)
+                                          final InternationalString definition, 
+                                          final InternationalString condition, 
+                                          final Datatype            datatype, 
+                                          final Collection          parentEntity, 
+                                          final InternationalString rule,
+                                          final Collection          sources)
     {
         setName        (name);
         setDefinition  (definition);
@@ -362,63 +371,4 @@ public class ExtendedElementInformationImpl extends MetadataEntity
     public synchronized void setSources(final Collection newValues) {
         sources = copyCollection(newValues, sources, ResponsibleParty.class);
     }
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        definition   = (InternationalString) unmodifiable(definition);
-        condition    = (InternationalString) unmodifiable(condition);
-        domainValue  = (InternationalString) unmodifiable(domainValue);
-        parentEntity = (Collection)          unmodifiable(parentEntity);
-        rule         = (InternationalString) unmodifiable(rule);
-        rationales   = (Collection)          unmodifiable(rationales);
-        sources      = (Collection)          unmodifiable(sources);
-    }
-
-    /**
-     * Compare this ExtendedElementInformation with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final ExtendedElementInformationImpl that = (ExtendedElementInformationImpl) object;
-            return Utilities.equals(this.name,              that.name             ) &&
-                   Utilities.equals(this.shortName,         that.shortName        ) &&
-                   Utilities.equals(this.domainCode,        that.domainCode       ) &&
-                   Utilities.equals(this.definition,        that.definition       ) &&
-                   Utilities.equals(this.obligation,        that.obligation       ) &&
-                   Utilities.equals(this.condition,         that.condition        ) &&
-                   Utilities.equals(this.dataType,          that.dataType         ) &&
-                   Utilities.equals(this.maximumOccurrence, that.maximumOccurrence) &&
-                   Utilities.equals(this.domainValue,       that.domainValue      ) &&
-                   Utilities.equals(this.parentEntity,      that.parentEntity     ) &&
-                   Utilities.equals(this.rule,              that.rule             ) &&
-                   Utilities.equals(this.rationales,        that.rationales       ) &&
-                   Utilities.equals(this.sources,           that.sources          );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this object. For performance reason, this method do
-     * not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (name      != null) code ^= name     .hashCode();
-        if (shortName != null) code ^= shortName.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this object.
-     */
-    public String toString() {
-        return String.valueOf(name);
-    }        
 }

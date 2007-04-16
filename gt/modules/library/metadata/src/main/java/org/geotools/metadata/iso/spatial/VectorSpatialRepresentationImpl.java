@@ -64,7 +64,16 @@ public class VectorSpatialRepresentationImpl extends SpatialRepresentationImpl
      */
     public VectorSpatialRepresentationImpl() {
     }
-    
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public VectorSpatialRepresentationImpl(final VectorSpatialRepresentation source) {
+        super(source);
+    }
+
     /**
      * Code which identifies the degree of complexity of the spatial relationships.
     */
@@ -93,46 +102,4 @@ public class VectorSpatialRepresentationImpl extends SpatialRepresentationImpl
     public synchronized void setGeometricObjects(final Collection newValues) {
         geometricObjects = copyCollection(newValues, geometricObjects, GeometricObjects.class);
     }
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        geometricObjects = (Collection) unmodifiable(geometricObjects);
-    }
-
-    /**
-     * Compare this vector spatial representation with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final VectorSpatialRepresentationImpl that = (VectorSpatialRepresentationImpl) object; 
-            return Utilities.equals(this.topologyLevel,    that.topologyLevel) &&
-                   Utilities.equals(this.geometricObjects, that.geometricObjects);
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this representation. For performance reason, this method do
-     * not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (topologyLevel != null)        code ^= topologyLevel.hashCode();
-        if (geometricObjects != null)     code ^= geometricObjects.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this representation.
-     */
-    public String toString() {
-        return String.valueOf(geometricObjects);
-    }                
 }

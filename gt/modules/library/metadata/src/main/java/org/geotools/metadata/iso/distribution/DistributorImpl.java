@@ -78,6 +78,15 @@ public class DistributorImpl extends MetadataEntity implements Distributor {
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public DistributorImpl(final Distributor source) {
+        super(source);
+    }
+
+    /**
      * Creates a distributor with the specified contact.
      */
     public DistributorImpl(final ResponsibleParty distributorContact) {
@@ -145,54 +154,5 @@ public class DistributorImpl extends MetadataEntity implements Distributor {
     public synchronized void setDistributorTransferOptions(final Collection newValues) {
         distributorTransferOptions = copyCollection(newValues, distributorTransferOptions,
                                                     DigitalTransferOptions.class);
-    }
-    
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        distributorContact         = (ResponsibleParty) unmodifiable(distributorContact);
-        distributionOrderProcesses = (Collection)       unmodifiable(distributionOrderProcesses);
-        distributorFormats         = (Collection)       unmodifiable(distributorFormats);
-        distributorTransferOptions = (Collection)       unmodifiable(distributorTransferOptions);
-    }
-
-    /**
-     * Compare this Distributor with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final DistributorImpl that = (DistributorImpl) object;
-            return Utilities.equals(this.distributorContact,         that.distributorContact        ) &&
-                   Utilities.equals(this.distributionOrderProcesses, that.distributionOrderProcesses) &&
-                   Utilities.equals(this.distributorFormats,         that.distributorFormats        ) &&
-                   Utilities.equals(this.distributorTransferOptions, that.distributorTransferOptions);
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this series.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (distributorContact != null)         code ^= distributorContact        .hashCode();
-        if (distributionOrderProcesses != null) code ^= distributionOrderProcesses.hashCode();
-        if (distributorFormats != null)         code ^= distributorFormats        .hashCode();
-        if (distributorTransferOptions != null) code ^= distributorTransferOptions.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this series.
-     *
-     * @todo Provides a more elaborated implementation.
-     */
-    public String toString() {
-        return String.valueOf(distributorContact);
     }
 }

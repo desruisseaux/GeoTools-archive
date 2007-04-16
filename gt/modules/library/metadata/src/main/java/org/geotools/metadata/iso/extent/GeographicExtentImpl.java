@@ -61,7 +61,7 @@ public class GeographicExtentImpl extends MetadataEntity implements GeographicEx
      * @since 2.2
      */
     public GeographicExtentImpl(final GeographicExtent extent) {
-        setInclusion(extent.getInclusion());
+        super(extent);
     }
 
     /**
@@ -88,46 +88,5 @@ public class GeographicExtentImpl extends MetadataEntity implements GeographicEx
     public synchronized void setInclusion(final Boolean newValue) {
         checkWritePermission();
         inclusion = newValue;
-    }
-
-    /**
-     * Declares this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-    }
-
-    /**
-     * Compares this GeographicExtent with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final GeographicExtentImpl that = (GeographicExtentImpl) object;
-            return Utilities.equals(this.inclusion, that.inclusion);
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this extent.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (inclusion != null) {
-            code ^= inclusion.hashCode();
-        }
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this extent.
-     *
-     * @todo Provides a more elaborated implementation.
-     */
-    public String toString() {
-        return String.valueOf(inclusion);
     }
 }

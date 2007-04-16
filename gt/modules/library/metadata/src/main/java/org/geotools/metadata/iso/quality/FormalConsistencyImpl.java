@@ -45,4 +45,13 @@ public class FormalConsistencyImpl extends LogicalConsistencyImpl implements For
      */
     public FormalConsistencyImpl() {
     }
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public FormalConsistencyImpl(final FormalConsistency source) {
+        super(source);
+    }
 }

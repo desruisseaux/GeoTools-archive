@@ -46,4 +46,13 @@ public class GriddedDataPositionalAccuracyImpl extends PositionalAccuracyImpl
      */
     public GriddedDataPositionalAccuracyImpl() {
     }
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public GriddedDataPositionalAccuracyImpl(final GriddedDataPositionalAccuracy source) {
+        super(source);
+    }
 }

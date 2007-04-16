@@ -44,4 +44,13 @@ public class DomainConsistencyImpl extends LogicalConsistencyImpl implements Dom
      */
     public DomainConsistencyImpl() {
     }
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public DomainConsistencyImpl(final DomainConsistency source) {
+        super(source);
+    }
 }

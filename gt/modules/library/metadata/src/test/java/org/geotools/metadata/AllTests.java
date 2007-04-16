@@ -67,6 +67,7 @@ public final class AllTests {
         suite.addTest(org.geotools.factory  .FactoryIteratorProviderTest.suite());
         suite.addTest(org.geotools.metadata .PropertyAccessorTest       .suite());
         suite.addTest(org.geotools.metadata .MetadataStandardTest       .suite());
+        suite.addTest(org.geotools.metadata .CitationsTest              .suite());
         return suite;
     }
 }

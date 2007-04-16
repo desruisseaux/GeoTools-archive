@@ -46,4 +46,13 @@ public class ThematicClassificationCorrectnessImpl extends ThematicAccuracyImpl
      */
     public ThematicClassificationCorrectnessImpl() {
     }
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public ThematicClassificationCorrectnessImpl(final ThematicClassificationCorrectness source) {
+        super(source);
+    }
 }

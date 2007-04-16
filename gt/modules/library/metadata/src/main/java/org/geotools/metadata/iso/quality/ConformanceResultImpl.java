@@ -68,11 +68,20 @@ public class ConformanceResultImpl extends ResultImpl implements ConformanceResu
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public ConformanceResultImpl(final ConformanceResult source) {
+        super(source);
+    }
+
+    /**
      * Creates a conformance result initialized to the given values.
      */
     public ConformanceResultImpl(final Citation            specification,
-                             final InternationalString explanation,
-                             final boolean             pass)
+                                 final InternationalString explanation,
+                                 final boolean             pass)
     {
         setSpecification(specification);
         setExplanation  (explanation);
@@ -123,56 +132,5 @@ public class ConformanceResultImpl extends ResultImpl implements ConformanceResu
     public synchronized void setPass(final boolean newValue) {
         checkWritePermission();
         pass = newValue;
-    }
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        specification = (Citation)            unmodifiable(specification);
-        explanation   = (InternationalString) unmodifiable(explanation  );
-    }
-
-    /**
-     * Compare this conformance result with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final ConformanceResultImpl that = (ConformanceResultImpl) object;
-            return Utilities.equals(this.specification, that.specification ) &&
-                   Utilities.equals(this.explanation,   that.explanation   ) &&
-                                   (this.pass        == that.pass          );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this series.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (specification != null) code ^= specification.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this result.
-     *
-     * @todo localize
-     */
-    public String toString() {
-        final String lineSeparator = System.getProperty("line.separator", "\n");
-        final StringBuffer buffer = new StringBuffer();
-        buffer.append("Explanation: ");
-        buffer.append(explanation);
-        buffer.append(lineSeparator);
-        buffer.append("Result: ");
-        buffer.append(pass);
-        buffer.append(lineSeparator);
-        return buffer.toString();
     }
 }

@@ -44,4 +44,13 @@ public class TemporalConsistencyImpl extends TemporalAccuracyImpl implements Tem
      */
     public TemporalConsistencyImpl() {
     }
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public TemporalConsistencyImpl(final TemporalConsistency source) {
+        super(source);
+    }
 }

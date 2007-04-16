@@ -71,6 +71,15 @@ public class ScopeImpl extends MetadataEntity implements Scope {
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public ScopeImpl(final Scope source) {
+        super(source);
+    }
+
+    /**
      * Creates a scope initialized to the given level.
      */
     public ScopeImpl(final ScopeCode level) {
@@ -127,46 +136,5 @@ public class ScopeImpl extends MetadataEntity implements Scope {
     public synchronized void setExtent(final Extent newValue) {
         checkWritePermission();
         extent = newValue;
-    }
-
-    /**
-     * Declares this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        extent = (Extent) unmodifiable(extent);
-    }
-
-    /**
-     * Compares this Scope with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final ScopeImpl that = (ScopeImpl) object; 
-            return Utilities.equals(this.level,            that.level           ) &&
-                   Utilities.equals(this.levelDescription, that.levelDescription) &&
-                   Utilities.equals(this.extent,           that.extent          );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this scope.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (level  != null) code ^= level .hashCode();
-        if (extent != null) code ^= extent.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this scope.
-     */
-    public String toString() {
-        return String.valueOf(level);
     }
 }

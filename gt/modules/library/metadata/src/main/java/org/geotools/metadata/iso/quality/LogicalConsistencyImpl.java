@@ -45,4 +45,13 @@ public class LogicalConsistencyImpl extends ElementImpl implements LogicalConsis
      */
     public LogicalConsistencyImpl() {
     }
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public LogicalConsistencyImpl(final LogicalConsistency source) {
+        super(source);
+    }
 }

@@ -76,6 +76,15 @@ public class CoverageDescriptionImpl extends ContentInformationImpl implements C
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public CoverageDescriptionImpl(final CoverageDescription source) {
+        super(source);
+    }
+
+    /**
      * Returns the description of the attribute described by the measurement value.
      */
     public RecordType getAttributeDescription() {
@@ -140,53 +149,5 @@ public class CoverageDescriptionImpl extends ContentInformationImpl implements C
      */
     public synchronized void setDimensions(final Collection newValues) {
         dimensions = copyCollection(newValues, dimensions, RangeDimension.class);
-    }
-    
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        attributeDescription = (RecordType) unmodifiable(attributeDescription);
-        dimensions           = (Collection) unmodifiable(dimensions);
-    }
-
-    /**
-     * Compare this coverage description with the specified object for equality.
-     */
-    public synchronized boolean equals( final Object object ) {
-        if (object == this) {
-            return true;
-        }
-        if (super.equals(object)) {
-            final CoverageDescriptionImpl that = (CoverageDescriptionImpl) object;
-            return Utilities.equals(this.attributeDescription, that.attributeDescription) &&
-                   Utilities.equals(this.contentType,          that.contentType)          &&
-                   Utilities.equals(this.dimensions,           that.dimensions);
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this coverage description. For performance reasons, this method
-     * does not uses all attributes for computing the hash code. Instead, it uses the attributes that
-     * are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int) serialVersionUID;
-        if (attributeDescription != null) {
-            code ^= attributeDescription.hashCode();
-        }
-        if (contentType != null) {
-            code ^= contentType.hashCode();
-        }
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this coverage description.
-     */
-    public String toString() {
-        return String.valueOf(attributeDescription);
     }
 }

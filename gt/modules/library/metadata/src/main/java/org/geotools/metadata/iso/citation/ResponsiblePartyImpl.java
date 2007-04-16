@@ -285,13 +285,7 @@ public class ResponsiblePartyImpl extends MetadataEntity implements ResponsibleP
      * @since 2.2
      */
     public ResponsiblePartyImpl(final ResponsibleParty source) {
-        if (source != null) {
-            setIndividualName  (source.getIndividualName());
-            setOrganisationName(source.getOrganisationName());
-            setPositionName    (source.getPositionName());
-            setContactInfo     (source.getContactInfo());
-            setRole            (source.getRole());
-        }
+        super(source);
     }
 
     /**
@@ -388,69 +382,5 @@ public class ResponsiblePartyImpl extends MetadataEntity implements ResponsibleP
     public synchronized void setRole(final Role newValue) {
         checkWritePermission();
         role = newValue;
-    }
-
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        organisationName = (InternationalString) unmodifiable(organisationName);
-        positionName     = (InternationalString) unmodifiable(positionName);
-        contactInfo      = (Contact)             unmodifiable(contactInfo);
-    }
-
-    /**
-     * Compare this responsible party with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final ResponsiblePartyImpl that = (ResponsiblePartyImpl) object;
-            return Utilities.equals(this.individualName,   that.individualName  ) &&
-                   Utilities.equals(this.organisationName, that.organisationName) &&
-                   Utilities.equals(this.positionName,     that.positionName    ) &&
-                   Utilities.equals(this.contactInfo,      that.contactInfo     ) &&
-                   Utilities.equals(this.role,             that.role            );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this responsible party. For performance reason, this method
-     * do not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (individualName != null) code ^= individualName.hashCode();
-        if (contactInfo    != null) code ^= contactInfo   .hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this responsible party.
-     */
-    public synchronized String toString() {
-        final StringBuffer buffer = new StringBuffer();
-        if (individualName != null) {
-            buffer.append(individualName);
-            if (role != null) {
-                buffer.append(" (");
-                buffer.append(role.name().toLowerCase().replace('_', ' '));
-                buffer.append(')');
-            }
-        }
-        if (organisationName != null) {
-            appendLineSeparator(buffer);
-            buffer.append(organisationName);
-        }
-        if (contactInfo != null) {
-            appendLineSeparator(buffer);
-            buffer.append(contactInfo);
-        }
-        return buffer.toString();
     }
 }

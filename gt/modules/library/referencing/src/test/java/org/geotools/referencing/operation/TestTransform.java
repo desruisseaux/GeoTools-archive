@@ -104,12 +104,6 @@ public abstract class TestTransform extends TestCase {
     protected Hints getHintsForTesting(){
         return null;
     }
-    /**
-     * Convenience method for checking if a boolean value is false.
-     */
-    public static void assertFalse(final boolean value) {
-        assertTrue(!value);
-    }
 
     /**
      * Returns <code>true</code> if the specified number is real

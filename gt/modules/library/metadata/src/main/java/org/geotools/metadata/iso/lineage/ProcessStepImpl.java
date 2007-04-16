@@ -85,6 +85,15 @@ public class ProcessStepImpl extends MetadataEntity implements ProcessStep {
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public ProcessStepImpl(final ProcessStep source) {
+        super(source);
+    }
+
+    /**
      * Creates a process step initialized to the given description.
      */
     public ProcessStepImpl(final InternationalString description) {
@@ -168,55 +177,4 @@ public class ProcessStepImpl extends MetadataEntity implements ProcessStep {
     public synchronized void setSources(final Collection newValues) {
         sources = copyCollection(newValues, sources, Source.class);
     }
- 
-    
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        description = (InternationalString)  unmodifiable(description);
-        rationale    = (InternationalString) unmodifiable(rationale);
-        processors   = (Collection)          unmodifiable(processors);
-        sources      = (Collection)          unmodifiable(sources);
-    }
-
-    /**
-     * Compare this process step with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final ProcessStepImpl that = (ProcessStepImpl) object;
-            return Utilities.equals(this.description,  that.description ) &&
-                   Utilities.equals(this.rationale,    that.rationale   ) &&
-                                   (this.date       == that.date        ) &&
-                   Utilities.equals(this.processors,   that.processors  ) &&
-                   Utilities.equals(this.sources,      that.sources     )  ;
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this process step.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (description != null) code ^= description.hashCode();
-        if (rationale   != null) code ^= rationale  .hashCode();
-        if (processors  != null) code ^= processors .hashCode();
-        if (sources     != null) code ^= sources    .hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this process step.
-     *
-     * @todo Provides a more elaborated implementation.
-     */
-    public String toString() {
-        return String.valueOf(description);
-    }        
 }

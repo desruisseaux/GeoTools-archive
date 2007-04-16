@@ -58,7 +58,16 @@ public class SpatialAttributeSupplementImpl extends MetadataEntity
      */
     public SpatialAttributeSupplementImpl() {
     }
-    
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public SpatialAttributeSupplementImpl(final SpatialAttributeSupplement source) {
+        super(source);
+    }
+
     /** 
      * Creates a spatial attribute supplement initialized to the given values.
      */
@@ -79,42 +88,4 @@ public class SpatialAttributeSupplementImpl extends MetadataEntity
     public synchronized void setFeatureTypeList(final Collection newValues) {
         featureTypeList = copyCollection(newValues, featureTypeList, FeatureTypeList.class);
     }
-
-   /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        featureTypeList = (Collection) unmodifiable(featureTypeList);
-    }
-
-    /**
-     * Compare this spatial attribute supplement with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final SpatialAttributeSupplementImpl that = (SpatialAttributeSupplementImpl) object;
-            return Utilities.equals(this.featureTypeList, that.featureTypeList ) ;
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this object.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (featureTypeList != null) code ^= featureTypeList.hashCode();
-        return code;
-    }
-
-    /**
-     * Returns a string representation of this object.
-     */
-    public String toString() {
-        return String.valueOf(featureTypeList);
-    }        
 }

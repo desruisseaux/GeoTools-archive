@@ -50,7 +50,7 @@ public class FeatureCatalogueDescriptionImpl extends ContentInformationImpl
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -5361236546997056467L;
-    
+
     /**
      * Indication of whether or not the cited feature catalogue complies with ISO 19110.
      */
@@ -81,7 +81,16 @@ public class FeatureCatalogueDescriptionImpl extends ContentInformationImpl
      */
     public FeatureCatalogueDescriptionImpl() {
     }
-    
+
+    /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public FeatureCatalogueDescriptionImpl(final FeatureCatalogueDescription source) {
+        super(source);
+    }
+
     /**
      * Returns whether or not the cited feature catalogue complies with ISO 19110.
      */
@@ -95,21 +104,21 @@ public class FeatureCatalogueDescriptionImpl extends ContentInformationImpl
         checkWritePermission();
         compliant = newValue;
     }
-    
+
     /**
      * Returns the language(s) used within the catalogue
      */
     public synchronized Collection getLanguages() {
         return language = nonNullCollection(language, Locale.class);
     }
-    
+
     /**
      * Returns the language(s) used within the catalogue
      */
     public synchronized void setLanguages(final Collection newValues) {
         language = copyCollection(newValues, language, Locale.class);
     }
-    
+
     /**
      * Returns whether or not the feature catalogue is included with the dataset.
      *
@@ -118,7 +127,7 @@ public class FeatureCatalogueDescriptionImpl extends ContentInformationImpl
     public boolean isIncludedWithDataset() {
         return includeWithDataset.booleanValue();
     }
-    
+
     /**
      * Set whether or not the feature catalogue is included with the dataset.
      */
@@ -133,7 +142,7 @@ public class FeatureCatalogueDescriptionImpl extends ContentInformationImpl
     public synchronized Collection getFeatureTypes() {
         return featureTypes = nonNullCollection(featureTypes, GenericName.class);
     }
-    
+
     /**
      * Returns the Complete bibliographic reference to one or more external feature catalogues.
      */
@@ -147,51 +156,11 @@ public class FeatureCatalogueDescriptionImpl extends ContentInformationImpl
     public synchronized Collection getFeatureCatalogueCitations() {
         return featureCatalogueCitations = nonNullCollection(featureCatalogueCitations, Citation.class);
     }
-    
+
     /**
      * Returns the Complete bibliographic reference to one or more external feature catalogues.
      */
     public synchronized void setFeatureCatalogueCitations(final Collection newValues) {
         featureCatalogueCitations = copyCollection(newValues, featureCatalogueCitations, Citation.class);
-    }
-    
-    /**
-     * Declare this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-        language                  = (Collection) unmodifiable(language);
-        featureTypes              = (Collection) unmodifiable(featureTypes);
-        featureCatalogueCitations = (Collection) unmodifiable(featureCatalogueCitations);
-    }
-
-    /**
-     * Compare this feature catalogue description with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (super.equals(this)) {
-            final FeatureCatalogueDescriptionImpl that = (FeatureCatalogueDescriptionImpl) object;
-            return Utilities.equals(compliant,                 that.compliant                ) &&
-                   Utilities.equals(includeWithDataset,        that.includeWithDataset       ) &&
-                   Utilities.equals(featureTypes,              that.featureTypes             ) &&
-                   Utilities.equals(featureCatalogueCitations, that.featureCatalogueCitations) &&
-                   Utilities.equals(language,                  that.language                 );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this catalogue. For performance reason, this method do
-     * not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int) serialVersionUID;
-        if (featureCatalogueCitations != null) code ^= featureCatalogueCitations.hashCode();
-        if (language                  != null) code ^= language                 .hashCode();
-        return code;
     }
 }

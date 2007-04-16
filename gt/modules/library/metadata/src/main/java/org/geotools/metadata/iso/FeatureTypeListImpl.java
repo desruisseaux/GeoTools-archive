@@ -59,10 +59,19 @@ public class FeatureTypeListImpl extends MetadataEntity implements FeatureTypeLi
     }
 
     /**
+     * Constructs a metadata entity initialized with the values from the specified metadata.
+     *
+     * @since 2.4
+     */
+    public FeatureTypeListImpl(final FeatureTypeList source) {
+        super(source);
+    }
+
+    /**
      * Creates a feature type list initialized to the given values.
      */
     public FeatureTypeListImpl(final String spatialObject,
-                           final String spatialSchemaName)
+                               final String spatialSchemaName)
     {
         setSpatialObject    (spatialObject    );
         setSpatialSchemaName(spatialSchemaName);
@@ -96,39 +105,5 @@ public class FeatureTypeListImpl extends MetadataEntity implements FeatureTypeLi
     public synchronized void setSpatialSchemaName(final String newValue) {
         checkWritePermission();
         spatialSchemaName = newValue;
-    }
-
-    /**
-     * Declares this metadata and all its attributes as unmodifiable.
-     */
-    protected void freeze() {
-        super.freeze();
-    }
-
-    /**
-     * Compares this FeatureTypeList with the specified object for equality.
-     */
-    public synchronized boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object!=null && object.getClass().equals(getClass())) {
-            final FeatureTypeListImpl that = (FeatureTypeListImpl) object;
-            return Utilities.equals(this.spatialSchemaName, that.spatialSchemaName) &&
-                   Utilities.equals(this.spatialObject,     that.spatialObject    );
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this address. For performance reason, this method do
-     * not uses all attributes for computing the hash code. Instead, it uses the attributes
-     * that are the most likely to be unique.
-     */
-    public synchronized int hashCode() {
-        int code = (int)serialVersionUID;
-        if (spatialObject      != null) code ^= spatialObject    .hashCode();
-        if (spatialSchemaName  != null) code ^= spatialSchemaName.hashCode();
-        return code;
     }
 }
