@@ -21,11 +21,11 @@ import org.opengis.util.ProgressListener;
  * <li>http://labs.metacarta.com/wms-c/tilecache.py/
  * <li>http://worldwind25.arc.nasa.gov/tile/tile.aspx
  * </ul>
- * The protocol used to accesss these services is varried (from the tile conventions
- * used for nasa world wind, to the squeeky new wms-tile specification.
+ * The protocol used to accesss these services is varied (from the tile conventions
+ * used for nasa world wind, to the squeeky new wms-tile specification).
  * <p>
  * At this time no standardization has occured, each of these servers can
- * be accessed by a TileStratagy object, negotiating which one to use
+ * be accessed by a TileStrategy object, negotiating which one to use
  * is probably not automatic (yet).
  * </p>
  * @author jgarnett
