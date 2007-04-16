@@ -37,9 +37,8 @@ import org.geotools.data.complex.AttributeMapping;
 import org.geotools.data.complex.FeatureTypeMapping;
 import org.geotools.data.feature.FeatureAccess;
 import org.geotools.data.feature.FeatureSource2;
-import org.geotools.filter.FilterBuilder;
-import org.geotools.text.filter.CQL;
-import org.geotools.text.filter.ParseException;
+import org.geotools.filter.text.cql2.CQL;
+import org.geotools.filter.text.cql2.ParseException;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.TypeName;
@@ -231,8 +230,7 @@ public class ComplexDataStoreConfigurator {
             try {
                 expression = CQL.toExpression(sourceExpr);
             } catch (ParseException e) {
-                String formattedErrorMessage;
-                formattedErrorMessage = CQL.getFormattedErrorMessage(e, sourceExpr);
+                String formattedErrorMessage = e.getMessage();
                 ComplexDataStoreConfigurator.LOGGER.log(Level.SEVERE, formattedErrorMessage, e);
                 throw new DataSourceException("Error parsing expression:\n" + formattedErrorMessage);
             } catch (Exception e) {
