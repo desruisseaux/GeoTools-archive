@@ -82,7 +82,6 @@
        <modules>
          <module>hsql</module>
          <module>h2</module>
-         <module>oracle</module>         
        </modules>
      </profile>
   </profiles>

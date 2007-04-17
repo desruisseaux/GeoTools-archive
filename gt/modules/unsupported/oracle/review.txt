@@ -1,9 +1,0 @@
-PLUGIN ORACLE SPATIAL
-=====================
-Module Maintainer: Jody Garnett
-IP Review:
-- Jody Garnett, July 6th, 2006
-
-IP:
-- this module has been forked from the oracle, jdbc, and main modules all of which have
-  completed their IP check.
