@@ -28,9 +28,6 @@ import org.opengis.metadata.constraint.Restriction;
 import org.opengis.metadata.constraint.LegalConstraints;
 import org.opengis.util.InternationalString;
 
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-
 
 /**
  * Restrictions and legal prerequisites for accessing and using the resource.

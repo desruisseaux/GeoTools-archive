@@ -25,7 +25,6 @@ import org.opengis.metadata.spatial.DimensionNameType;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
-import org.geotools.resources.Utilities;
 
 
 /**

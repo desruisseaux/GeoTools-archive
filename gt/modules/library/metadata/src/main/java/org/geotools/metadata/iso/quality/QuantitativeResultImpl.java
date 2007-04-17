@@ -31,7 +31,6 @@ import org.opengis.util.InternationalString;
 import org.opengis.util.RecordType;
 
 // Geotools dependencies
-import org.geotools.resources.Utilities;
 import org.geotools.util.CheckedArrayList;
 
 

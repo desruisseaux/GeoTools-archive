@@ -28,9 +28,6 @@ import org.opengis.metadata.content.FeatureCatalogueDescription;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.util.GenericName;
 
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-
  
 /**
  * Information identifying the feature catalogue.

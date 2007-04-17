@@ -20,11 +20,8 @@
 package org.geotools.metadata.iso.content;
 
 // OpenGIS dependencies
-import org.opengis.metadata.content.ImageDescription;
-
-// J2SE extensions
-import org.geotools.resources.Utilities;
 import org.opengis.metadata.Identifier;
+import org.opengis.metadata.content.ImageDescription;
 import org.opengis.metadata.content.ImagingCondition;
 
 

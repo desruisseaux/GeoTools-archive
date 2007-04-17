@@ -29,9 +29,6 @@ import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.ExtendedElementInformation;
 import org.opengis.util.InternationalString;
 
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-
 
 /**
  * New metadata element, not found in ISO 19115, which is required to describe geographic data.

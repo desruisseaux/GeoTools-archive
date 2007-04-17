@@ -30,7 +30,6 @@ import org.opengis.metadata.distribution.Format;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
-import org.geotools.resources.Utilities;
 
 
 /**

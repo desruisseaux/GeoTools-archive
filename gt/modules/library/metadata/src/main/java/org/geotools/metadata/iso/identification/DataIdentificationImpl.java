@@ -36,9 +36,6 @@ import org.opengis.metadata.identification.TopicCategory;
 import org.opengis.metadata.spatial.SpatialRepresentationType;
 import org.opengis.util.InternationalString;
 
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-
 
 /**
  * Information required to identify a dataset.

@@ -31,7 +31,6 @@ import org.opengis.geometry.primitive.Point;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
-import org.geotools.resources.Utilities;
 import org.geotools.util.CheckedArrayList;
 
 

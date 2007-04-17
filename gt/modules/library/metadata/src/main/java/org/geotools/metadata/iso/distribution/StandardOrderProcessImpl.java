@@ -28,7 +28,6 @@ import org.opengis.metadata.distribution.StandardOrderProcess;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
-import org.geotools.resources.Utilities;
 
 
 /**

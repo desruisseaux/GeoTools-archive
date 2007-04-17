@@ -23,7 +23,6 @@ import org.opengis.metadata.citation.Telephone;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
-import org.geotools.resources.Utilities;
 
 
 /**

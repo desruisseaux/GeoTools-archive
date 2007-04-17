@@ -30,7 +30,6 @@ import org.opengis.util.GenericName;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.content.ContentInformationImpl;
-import org.geotools.resources.Utilities;
 
 
 /**

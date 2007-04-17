@@ -22,7 +22,6 @@ package org.geotools.metadata.iso;
 // OpenGIS direct dependencies
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
-import org.geotools.resources.Utilities;
 
 
 /**

@@ -30,7 +30,6 @@ import org.opengis.referencing.datum.VerticalDatum;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
-import org.geotools.resources.Utilities;
 
 
 /**

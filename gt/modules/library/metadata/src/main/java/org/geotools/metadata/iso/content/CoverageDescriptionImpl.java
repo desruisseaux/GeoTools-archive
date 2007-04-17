@@ -35,9 +35,6 @@ import org.opengis.util.RecordSchema;
 import org.opengis.util.RecordType;
 import org.opengis.util.TypeName;
 
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-
 
 /**
  * Information about the content of a grid data cell.

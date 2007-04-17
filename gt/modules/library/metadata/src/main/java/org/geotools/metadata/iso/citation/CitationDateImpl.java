@@ -28,7 +28,6 @@ import org.opengis.metadata.citation.DateType;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
-import org.geotools.resources.Utilities;
 
 
 /**

@@ -27,9 +27,6 @@ import org.opengis.metadata.ApplicationSchemaInformation;
 import org.opengis.metadata.SpatialAttributeSupplement;
 import org.opengis.metadata.citation.Citation;
 
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-
 
 /**
  * Information about the application schema used to build the dataset.

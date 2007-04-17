@@ -27,9 +27,6 @@ import org.opengis.metadata.spatial.GeometricObjects;
 import org.opengis.metadata.spatial.TopologyLevel;
 import org.opengis.metadata.spatial.VectorSpatialRepresentation;
 
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-
 
 /**
  * Information about the vector spatial objects in the dataset.

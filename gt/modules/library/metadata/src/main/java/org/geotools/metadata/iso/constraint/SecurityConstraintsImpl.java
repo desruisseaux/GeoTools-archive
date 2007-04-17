@@ -20,7 +20,6 @@
 package org.geotools.metadata.iso.constraint;
 
 // OpenGIS direct dependencies
-import org.geotools.resources.Utilities;
 import org.opengis.metadata.constraint.Classification;
 import org.opengis.metadata.constraint.SecurityConstraints;
 import org.opengis.util.InternationalString;

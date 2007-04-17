@@ -32,7 +32,6 @@ import org.opengis.util.InternationalString;
 // Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 import org.geotools.metadata.iso.quality.ScopeImpl;
-import org.geotools.resources.Utilities;
 
 
 /**

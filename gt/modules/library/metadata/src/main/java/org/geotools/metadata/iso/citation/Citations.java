@@ -42,7 +42,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem; // For javadoc
 
 // Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
-import org.geotools.resources.Utilities;
 import org.geotools.util.SimpleInternationalString;
 
 

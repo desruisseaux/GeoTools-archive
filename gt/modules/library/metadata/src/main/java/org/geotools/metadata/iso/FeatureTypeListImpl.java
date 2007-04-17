@@ -22,9 +22,6 @@ package org.geotools.metadata.iso;
 // OpenGIS dependencies
 import org.opengis.metadata.FeatureTypeList;
 
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-
 
 /**
  * List of names of feature types with the same spatial representation (same as spatial attributes).

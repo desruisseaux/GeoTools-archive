@@ -24,7 +24,6 @@ import org.opengis.metadata.extent.GeographicExtent;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
-import org.geotools.resources.Utilities;
 
 
 /**

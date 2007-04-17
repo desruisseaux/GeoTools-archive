@@ -26,7 +26,6 @@ import org.opengis.util.MemberName;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
-import org.geotools.resources.Utilities;
 
 
 /**

@@ -27,9 +27,6 @@ import org.opengis.metadata.citation.OnLineResource;
 import org.opengis.metadata.ExtendedElementInformation;
 import org.opengis.metadata.MetadataExtensionInformation;
 
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-
 
 /**
  * Information describing metadata extensions.

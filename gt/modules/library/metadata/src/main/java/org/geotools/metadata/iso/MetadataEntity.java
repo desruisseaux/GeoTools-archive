@@ -32,10 +32,6 @@ import org.opengis.util.Cloneable;
 import org.geotools.metadata.MetadataStandard;
 import org.geotools.metadata.ModifiableMetadata;
 import org.geotools.metadata.InvalidMetadataException;
-import org.geotools.metadata.UnmodifiableMetadataException;
-import org.geotools.util.CheckedArrayList;
-import org.geotools.util.CheckedHashSet;
-import org.geotools.util.Logging;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 

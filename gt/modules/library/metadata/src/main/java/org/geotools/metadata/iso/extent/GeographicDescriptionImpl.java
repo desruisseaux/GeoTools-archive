@@ -23,9 +23,6 @@ package org.geotools.metadata.iso.extent;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.extent.GeographicDescription;
 
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-
 
 /**
  * Description of the geographic area using identifiers.

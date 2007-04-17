@@ -26,9 +26,6 @@ import java.util.Collection;
 import org.opengis.metadata.extent.BoundingPolygon;
 import org.opengis.geometry.Geometry;
 
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-
 
 /**
  * Boundary enclosing the dataset, expressed as the closed set of

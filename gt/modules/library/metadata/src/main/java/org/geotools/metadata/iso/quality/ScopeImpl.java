@@ -29,7 +29,6 @@ import org.opengis.metadata.maintenance.ScopeDescription;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
-import org.geotools.resources.Utilities;
 
 
 /**

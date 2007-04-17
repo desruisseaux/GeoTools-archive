@@ -24,9 +24,6 @@ import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.quality.ConformanceResult;
 import org.opengis.util.InternationalString;
 
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-
 
 /**
  * Information about the outcome of evaluating the obtained value (or set of values) against

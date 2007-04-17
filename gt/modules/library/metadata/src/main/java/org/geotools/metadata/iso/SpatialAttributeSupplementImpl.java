@@ -26,9 +26,6 @@ import java.util.Collection;
 import org.opengis.metadata.FeatureTypeList;
 import org.opengis.metadata.SpatialAttributeSupplement;
 
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-
 
 /**
  * Spatial attributes in the application schema for the feature types.

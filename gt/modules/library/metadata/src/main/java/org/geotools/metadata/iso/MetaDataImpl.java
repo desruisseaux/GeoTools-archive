@@ -42,9 +42,6 @@ import org.opengis.metadata.quality.DataQuality;
 import org.opengis.metadata.spatial.SpatialRepresentation;
 import org.opengis.referencing.ReferenceSystem;
 
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-
 
 /**
  * Root entity which defines metadata about a resource or resources.

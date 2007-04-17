@@ -25,9 +25,6 @@ import javax.units.Unit;
 // OpenGIS dependencies
 import org.opengis.metadata.content.Band;
 
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-
 
 /**
  * Range of wavelengths in the electromagnetic spectrum.

@@ -26,9 +26,6 @@ import java.util.Collection;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.PortrayalCatalogueReference;
 
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-
 
 /**
  * Information identifying the portrayal catalogue used.

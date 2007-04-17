@@ -27,9 +27,6 @@ import java.util.Date;
 import org.opengis.metadata.extent.GeographicExtent;
 import org.opengis.metadata.extent.SpatialTemporalExtent;
 
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-
 
 /**
  * Boundary enclosing the dataset, expressed as the closed set of

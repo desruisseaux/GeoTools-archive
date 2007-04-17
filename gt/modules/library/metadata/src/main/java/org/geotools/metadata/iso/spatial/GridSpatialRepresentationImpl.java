@@ -28,10 +28,6 @@ import org.opengis.metadata.spatial.Dimension;
 import org.opengis.metadata.spatial.CellGeometry;
 import org.opengis.metadata.spatial.GridSpatialRepresentation;
 
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedArrayList;
-
 
 /**
  * Basic information required to uniquely identify a resource or resources.

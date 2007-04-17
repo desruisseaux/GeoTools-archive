@@ -30,9 +30,6 @@ import org.opengis.metadata.spatial.Georeferenceable;
 import org.opengis.util.InternationalString;
 import org.opengis.util.Record;
 
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-
 
 /**
  * Grid with cells irregularly spaced in any given geographic/map projection coordinate
