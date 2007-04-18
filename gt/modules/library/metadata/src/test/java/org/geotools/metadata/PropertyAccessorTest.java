@@ -87,7 +87,6 @@ public class PropertyAccessorTest extends TestCase {
         final PropertyAccessor accessor = createPropertyAccessor(citation);
         assertEquals("Non-existent property",   -1,  accessor.indexOf("dummy"));
         assertEquals("getTitle() property", "title", accessor.name(accessor.indexOf("title")));
-        assertEquals("getTitle() property", "title", accessor.name(accessor.indexOf("getTitle")));
         assertEquals("getTitle() property", "title", accessor.name(accessor.indexOf("TITLE")));
         assertEquals("getISBN() property",  "ISBN",  accessor.name(accessor.indexOf("ISBN")));
         assertNull(accessor.name(-1));

@@ -16,12 +16,12 @@
 package org.geotools.factory;
 
 // J2SE dependencies
+import java.io.File;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
 import java.awt.RenderingHints;
-import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
@@ -62,12 +62,19 @@ import org.geotools.util.Logging;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Jody Garnett
  */
 public final class Hints extends RenderingHints {
-    
+
     ////////////////////////////////////////////////////////////////////////
     ////////                                                        ////////
     ////////                        Factories                       ////////
+    ////////                                                        ////////
+    ////////  The following keys are mainly about getting instances ////////
+    ////////  of the right factory.  Keys for factory configuration ////////
+    ////////  other than JTS are defined in their own categories    ////////
+    ////////  after this one.  JTS factories are treated especially ////////
+    ////////  because they are implemented outside Geotools.        ////////
     ////////                                                        ////////
     ////////////////////////////////////////////////////////////////////////
 
@@ -110,40 +117,6 @@ public final class Hints extends RenderingHints {
     public static final Key CRS_AUTHORITY_FACTORY = new Key(
             "org.opengis.referencing.crs.CRSAuthorityFactory");
 
-    /**
-     * Used to direct WKT CRS Authority to a directory containing extra definitions.
-     * <p>
-     * To set on the command lin:<pre>
-     * -Dorg.geotools.referencing.crs-directory=PATH
-     * </pre>
-     */
-    public static final FileKey CRS_AUTHORITY_EXTRA_DIRECTORY = new FileKey( "org.geotools.referencing.crs-directory" );
-
-    /**
-     * Used to direct WKT CRS Authority to a the file containing extra definitions.
-     * <p>
-     * To set on the command lin:<pre>
-     * -Dorg.geotools.referencing.crs-file=FILE
-     * </pre>
-     */
-    public static final FileKey CRS_AUTHORITY_EXTRA_FILE = new FileKey( "org.geotools.referencing.crs-file" );
-    
-    /**
-     * Provide a DataSource to the JDBC EPSG Authority implementations.
-     * <p>
-     * To set on the command lin:<pre>
-     * -Dorg.geotools.referencing.crs-datasource=JNDIREFERENCE
-     * </pre> 
-     * <p>
-     * Possible values:
-     * <ul>
-     * <li>String - used with JNDI to locate datasource
-     * <li>DataSource - used as is
-     * <li>missing - assume connection information provided
-     * </ul>
-     */
-    public static final Key CRS_AUTHORITY_DATASOURCE = new Key( "org.geotools.referencing.crs-datasource" );
-    
     /**
      * The {@link org.opengis.referencing.cs.CSAuthorityFactory} instance to use.
      * 
@@ -210,9 +183,9 @@ public final class Hints extends RenderingHints {
             "org.opengis.referencing.operation.MathTransformFactory");
 
     /**
-     * The {@link org.opengis.data.FeatureLockFactory} instance to use.
+     * The {@link org.geotools.data.FeatureLockFactory} instance to use.
      * 
-     * @see org.geotools.factory.CommonFactoryFinder#getFeatureLockFactory
+     * @see CommonFactoryFinder#getFeatureLockFactory
      *
      * @since 2.4
      */
@@ -220,59 +193,65 @@ public final class Hints extends RenderingHints {
             "org.geotools.data.FeatureLockFactory");
 
     /**
-     * The {@link org.opengis.data.FeatureLockFactory} instance to use.
+     * The {@link org.geotools.feature.FeatureCollections} instance to use.
      * 
-     * @see org.geotools.factory.CommonFactoryFinder#getFeatureCollections
+     * @see CommonFactoryFinder#getFeatureCollections
      *
      * @since 2.4
      */
     public static final Key FEATURE_COLLECTIONS = new Key(
             "org.geotools.feature.FeatureCollections");
-    
+
     /**
      * The {@link org.geotools.feature.FeatureTypeFactory} instance to use.
      * 
-     * @see org.geotools.factory.CommonFactoryFinder#getFeatureTypeFactory
+     * @see CommonFactoryFinder#getFeatureTypeFactory
      *
      * @since 2.4
      */
     public static final Key FEATURE_TYPE_FACTORY = new Key(
             "org.geotools.feature.FeatureTypeFactory");
-    
+
     /**
-     * This key is used to provide the TypeName for the returned FeatureTypeFactory.
+     * Used to provide the <cite>type name</cite> for the returned
+     * {@link org.geotools.feature.FeatureTypeFactory}. Values should
+     * be instances of {@link String}.
+     *
+     * @since 2.4
      */
-    public static final Key FEATURE_TYPE_FACTORY_NAME = new Key("org.geotools.feature.FeatureTypeFactory-name");
-    
+    public static final Key FEATURE_TYPE_FACTORY_NAME = new Key(String.class);
+
     /**
      * The {@link org.geotools.styling.StyleFactory} instance to use.
      * 
-     * @see org.geotools.factory.CommonFactoryFinder#getStyleFactory
+     * @see CommonFactoryFinder#getStyleFactory
      *
      * @since 2.4
      */
     public static final Key STYLE_FACTORY = new Key(
             "org.geotools.styling.StyleFactory");
-    
+
     /**
-     * The {@link org.opengis.data.FeatureLockFactory} instance to use.
+     * The {@link org.geotools.feature.AttributeTypeFactory} instance to use.
      * 
-     * @see org.geotools.factory.CommonFactoryFinder#getFeatureLockFactory
+     * @see CommonFactoryFinder#getAttributeTypeFactory
      *
      * @since 2.4
      */
     public static final Key ATTRIBUTE_TYPE_FACTORY = new Key(
             "org.geotools.feature.AttributeTypeFactory");
-    
+
     /**
-     * The {@link org.opengis..FilterFactory} instance to use.
+     * The {@link org.opengis.filter.FilterFactory} instance to use.
      * 
-     * @see org.geotools.factory.CommonFactoryFinder#getFilterFactory
+     * @see CommonFactoryFinder#getFilterFactory
      *
      * @since 2.4
      */
     public static final Key FILTER_FACTORY = new Key(
             "org.opengis.filter.FilterFactory");
+
+
 
     ////////////////////////////////////////////////////////////////////////
     ////////                                                        ////////
@@ -289,6 +268,60 @@ public final class Hints extends RenderingHints {
      */
     public static final Key DEFAULT_COORDINATE_REFERENCE_SYSTEM = new Key(
             "org.opengis.referencing.crs.CoordinateReferenceSystem");
+
+    /**
+     * Used to direct WKT CRS Authority to a directory containing extra definitions.
+     * The value should be an instance of {@link File} or {@link String} refering to
+     * an existing directory.
+     * <p>
+     * To set on the command line:
+     *
+     * <blockquote><pre>
+     * -Dorg.geotools.referencing.crs-directory=<var>PATH</var>
+     * </pre></blockquote>
+     *
+     * @since 2.4
+     */
+    public static final Key CRS_AUTHORITY_EXTRA_DIRECTORY = new FileKey(
+            "org.geotools.referencing.crs-directory");
+
+    /**
+     * Used to direct WKT CRS Authority to a the file containing extra definitions.
+     * The value should be an instance of {@link File} or {@link String} refering to
+     * an existing file.
+     * <p>
+     * To set on the command line:
+     *
+     * <blockquote><pre>
+     * -Dorg.geotools.referencing.crs-file=<var>FILE</var>
+     * </pre></blockquote>
+     *
+     * @since 2.4
+     * @deprecated Seems not used.
+     */
+    public static final Key CRS_AUTHORITY_EXTRA_FILE = new FileKey(
+            "org.geotools.referencing.crs-file");
+
+    /**
+     * Provides a DataSource to the JDBC EPSG Authority implementations.
+     * <p>
+     * To set on the command line:
+     * <blockquote><pre>
+     * -Dorg.geotools.referencing.crs-datasource=<var>JNDI_REFERENCE</var>
+     * </pre></blockquote>
+     * <p>
+     * Possible values:
+     * <ul>
+     *   <li>String - used with JNDI to locate datasource</li>
+     *   <li>DataSource - used as is</li>
+     *   <li>missing - assume connection information provided</li>
+     * </ul>
+     *
+     * @since 2.4
+     * @deprecated Seems not yet used. Current proposal is {@link #EPSG_DATA_SOURCE},
+     *             but it may not be generic enough.
+     */
+    public static final Key CRS_AUTHORITY_DATASOURCE = new Key(Object.class);
 
     /**
      * The {@linkplain javax.sql.DataSource data source} name to lookup from JNDI when
@@ -516,23 +549,30 @@ public final class Hints extends RenderingHints {
      *              {@code null} if the object should be empty.
      */
     public Hints(final Map hints) {
-        super( stripNonKeys(hints));
+        super(stripNonKeys(hints));
     }
-    public static Map stripNonKeys( Map hints ){
-        if( hints == null ) return Collections.EMPTY_MAP;
-        
-        Map good = new HashMap();
-        for( Iterator i=hints.entrySet().iterator(); i.hasNext(); ){
-            Map.Entry entry = (Map.Entry) i.next();
-            
-            if( entry.getKey() != null && entry.getKey() instanceof RenderingHints.Key ){
-                good.put( entry.getKey(), entry.getValue() );
-            }
-            else {
-                // stranger danger! Non Key used as a hint? I don't think so ...
+
+    /**
+     * Returns a map with the same hints than the specified one, minus every (key,value)
+     * pairs where the key is not an instance of {@link RenderingHints.Key}. If the given
+     * map contains only valid keys, then it is returned unchanged.
+     */
+    static Map stripNonKeys(final Map hints) {
+        if (hints == null) {
+            return null;
+        }
+        Map filtered = hints;
+        for (final Iterator it=hints.keySet().iterator(); it.hasNext();) {
+            final Object key = it.next();
+            if (!(key instanceof RenderingHints.Key)) {
+                if (filtered == hints) {
+                    // Copy the map only if needed.
+                    filtered = new HashMap(hints);
+                }
+                filtered.remove(key);
             }
         }
-        return good;        
+        return filtered;
     }
 
     /**
@@ -545,41 +585,6 @@ public final class Hints extends RenderingHints {
         super(key, value);
     }
 
-    public static final class FileKey extends RenderingHints.Key {
-        /**
-         * The number of key created up to date.
-         */
-        private static volatile int count;
-        private String id;
-        
-        public FileKey( String id ){
-            super( count++ );
-            this.id = id;
-        }
-        public boolean isCompatibleValue( Object val ) {
-            File file;
-            if( val instanceof File){
-                file = (File) val;
-            }
-            else if( val instanceof String ){
-                file = new File( (String) val );
-            }         
-            else {
-                return false;
-            }
-            return file.exists() || (!file.exists() && file.canWrite());
-        }
-        /**
-         * Property for System.getProperty( id ), may be unspecified by user.
-         * @return system property, may be null
-         */
-        public String getSystemProperty(){
-            return System.getProperty( id );
-        }
-        public String toString() {
-            return id;
-        }
-    }
     /**
      * The type for keys used to control various aspects of the factory
      * creation. Factory creation impacts rendering (which is why extending
@@ -591,12 +596,12 @@ public final class Hints extends RenderingHints {
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    public static final class Key extends RenderingHints.Key {
+    public static class Key extends RenderingHints.Key {
         /**
          * The number of key created up to date.
          */
         private static volatile int count;
-        
+
         /**
          * The class name for {@link #valueClass}.
          */
@@ -643,7 +648,7 @@ public final class Hints extends RenderingHints {
                     valueClass = Class.forName(className);
                 } catch (ClassNotFoundException exception) {
                     Logging.unexpectedException("org.geotools.factory",
-                            Key.class, "isCompatibleValue", exception);
+                            Key.class, "getValueClass", exception);
                     valueClass = Object.class;
                 }
             }
@@ -652,11 +657,13 @@ public final class Hints extends RenderingHints {
 
         /**
          * Property for System.getProperty( className ), may be unspecified by user.
+         *
          * @return system property, may be null
          */
-        public String getSystemProperty(){
-            return System.getProperty( className );
+        String getSystemProperty() {
+            return System.getProperty(className);
         }
+
         /**
          * Returns {@code true} if the specified object is a valid value for
          * this key. This method checks if the specified value is non-null and
@@ -706,9 +713,9 @@ public final class Hints extends RenderingHints {
             while (true) {
                 final Class type;
                 switch (t++) {
-                case 0:  type = Hints.class;      break;
-                case 1:  type = getValueClass();  break;
-                default: return super.toString();
+                    case 0:  type = Hints.class;      break;
+                    case 1:  type = getValueClass();  break;
+                    default: return super.toString();
                 }
                 final Field[] fields = type.getFields();
                 for (int i=0; i<fields.length; i++) {
@@ -726,6 +733,45 @@ public final class Hints extends RenderingHints {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * 
+     */
+    static final class FileKey extends Key {
+        /**
+         */
+        private final String id;
+
+        /**
+         */
+        public FileKey(final String id) {
+            super(File.class);
+            this.id = id;
+        }
+
+        /**
+         */
+        public boolean isCompatibleValue(final Object value) {
+            final File file;
+            if (value instanceof File) {
+                file = (File) value;
+            } else if (value instanceof String) {
+                file = new File((String) value);
+            } else {
+                return false;
+            }
+            return file.exists() || file.canWrite();
+        }
+
+        /**
+         * Property for System.getProperty( id ), may be unspecified by user.
+         * @return system property, may be null
+         */
+        //@Override
+        String getSystemProperty() {
+            return System.getProperty(id);
         }
     }
 }

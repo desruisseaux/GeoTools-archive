@@ -126,7 +126,7 @@ public class SecurityConstraintsImpl extends ConstraintsImpl implements Security
     /**
      * Set the name of the classification system.
      */
-    public synchronized void setClassificatonSystem(final InternationalString newValue) {
+    public synchronized void setClassificationSystem(final InternationalString newValue) {
         checkWritePermission();
         classificationSystem = newValue;
     }

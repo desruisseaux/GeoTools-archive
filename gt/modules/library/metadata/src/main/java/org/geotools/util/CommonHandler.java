@@ -18,11 +18,12 @@ package org.geotools.util;
 // J2SE dependencies
 import java.util.Map;
 import java.util.HashMap;
-import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
+import java.util.logging.Formatter;
+import java.util.logging.SimpleFormatter;
 
 // Apache dependencies
 import org.apache.commons.logging.Log;
@@ -42,6 +43,7 @@ import org.geotools.resources.i18n.LoggingKeys;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Saul Farber
  *
  * @see Logging
  */
@@ -50,10 +52,12 @@ final class CommonHandler extends Handler {
      * The Apache's log created up to date.
      */
     private final Map/*<String,Log>*/ loggers = new HashMap();
+
     /**
      * The logger the handler is forwarding for. 
      */
     private final Log logger;
+
     /**
      * Creates a new handler.
      *
@@ -68,6 +72,7 @@ final class CommonHandler extends Handler {
          */
         loggers.put(name, logger);
         this.logger = logger;
+        setFormatter(new SimpleFormatter());
     }
 
     /**
@@ -141,16 +146,16 @@ final class CommonHandler extends Handler {
                 } else if (log.isDebugEnabled()) {
                     level = Level.FINER;
                 } else if (log.isInfoEnabled()) {
-            		level = Level.CONFIG;
-            	} else if (log.isWarnEnabled()) {
+                    level = Level.CONFIG;
+                } else if (log.isWarnEnabled()) {
                     level = Level.WARNING;
                 } else if (log.isErrorEnabled()) {
-            		level = Level.SEVERE;
-            	} else if (log.isFatalEnabled()) {
-            		level = Level.SEVERE;
-            	} else {
-            		level = Level.OFF;
-            	}
+                    level = Level.SEVERE;
+                } else if (log.isFatalEnabled()) {
+                    level = Level.SEVERE;
+                } else {
+                    level = Level.OFF;
+                }
                 final Logger logger = Logger.getLogger(name);
                 removeAllHandlers(logger);
                 logger.setUseParentHandlers(true);
@@ -164,14 +169,14 @@ final class CommonHandler extends Handler {
      * Send the specified record to Apache's commons-logging framework.
      */
     public void publish(final LogRecord record) {
-        final Log       log       = record.getLoggerName() != null ? 
-        	getLog(record.getLoggerName()) : logger;
+        final String    name      = record.getLoggerName();
+        final Log       log       = (name != null) ? getLog(name) : logger;
         final int       level     = record.getLevel().intValue();
-        final String    message   = formatMessage( record );
+        final String    message   = getFormatter().formatMessage(record);
         final Throwable throwable = record.getThrown();
-        
+
         if (level == Level.OFF.intValue() ) {
-        	return;
+            return;
         } else if (level >= Level.SEVERE.intValue()) {
             if (throwable != null) {
                 log.error(message, throwable);
@@ -205,40 +210,6 @@ final class CommonHandler extends Handler {
         }
     }
 
-    /**
-     * Copied from {@link Formatter#formatMessage(LogRecord)} to support i18n.
-     */
-    public synchronized String formatMessage(LogRecord record) {
-    	String format = record.getMessage();
-    	java.util.ResourceBundle catalog = record.getResourceBundle();
-		if (catalog != null) {
-		        try {
-		            format = catalog.getString(record.getMessage());
-		        } catch (java.util.MissingResourceException ex) {
-			    // Drop through.  Use record message as format
-			    format = record.getMessage();
-			}
-	
-		}
-	  	// Do the formatting.
-		try {
-		    Object parameters[] = record.getParameters();
-	 	    if (parameters == null || parameters.length == 0) {
-			// No parameters.  Just return format string.
-			return format;
-		    }
-		    // Is is a java.text style format?
-		    if (format.indexOf("{0") >= 0) {
-		        return java.text.MessageFormat.format(format, parameters);
-		    }
-		    return format;
-	
-		} catch (Exception ex) {
-		    // Formatting failed: use localized format string.
-		    return format;
-		}
-    }
-    
     /**
      * Flush this handler. The default implementation does nothing.
      */

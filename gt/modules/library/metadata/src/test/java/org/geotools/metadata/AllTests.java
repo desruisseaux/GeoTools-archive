@@ -68,6 +68,7 @@ public final class AllTests {
         suite.addTest(org.geotools.metadata .PropertyAccessorTest       .suite());
         suite.addTest(org.geotools.metadata .MetadataStandardTest       .suite());
         suite.addTest(org.geotools.metadata .CitationsTest              .suite());
+        suite.addTest(org.geotools.metadata .ISOTest                    .suite());
         return suite;
     }
 }

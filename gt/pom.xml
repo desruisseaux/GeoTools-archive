@@ -136,7 +136,7 @@
     <profile>
       <id>java5</id>
       <activation>
-          <jdk>1.5</jdk>
+        <jdk>1.5</jdk>
       </activation>
       <reporting>
         <plugins>
@@ -753,14 +753,14 @@
       <!-- ORACLE -->
       <!-- Download and install into your own repo -->
       <dependency>
-          <artifactId>ojdbc14</artifactId>
-          <groupId>com.oracle</groupId>
-          <version>10.2.0</version>
+        <artifactId>ojdbc14</artifactId>
+        <groupId>com.oracle</groupId>
+        <version>10.2.0</version>
       </dependency>
       <dependency>
-          <artifactId>sdoapi</artifactId>
-          <groupId>com.oracle</groupId>
-          <version>10.2.0</version>
+        <artifactId>sdoapi</artifactId>
+        <groupId>com.oracle</groupId>
+        <version>10.2.0</version>
       </dependency>
 
       <!-- Tests or legacy -->
@@ -850,7 +850,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>2.0.1</version>
+          <version>2.0.2</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -865,17 +865,17 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>2.1</version>
+          <version>2.2</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-plugin-plugin</artifactId>
-          <version>2.1</version>
+          <version>2.3</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-pmd-plugin</artifactId>
-          <version>2.1</version>
+          <version>2.2</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -896,11 +896,14 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.2</version>
+          <!-- Current version is 2.3, but it seems to be rough with
+               class loaders; JAI is not found anymore, and we have
+               some additional test failures. -->
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-report-plugin</artifactId>
-          <version>2.0</version>
+          <version>2.3</version>
         </plugin>
 
         <!-- http://www.ibiblio.org/maven2/org/codehaus/mojo/ -->
@@ -997,7 +1000,9 @@
             <exclude>${online.skip.pattern}</exclude>
             <exclude>${stress.skip.pattern}</exclude>
           </excludes>
+          <!-- todo: remove forkMode when we will use Surefire 2.3, since "once" is the default. -->
           <forkMode>once</forkMode>
+          <!-- todo: remove -enableassertions when we will use Surefire 2.3, since it is enabled by default. -->
           <argLine>-Xmx${test.maxHeapSize} -enableassertions -Dorg.geotools.test.extensive=${extensive.tests} -Dorg.geotools.test.interactive=${interactive.tests} -Djava.awt.headless=${java.awt.headless}</argLine>
           <!-- Ignores test failure only if we are generating a       -->
           <!-- report for publication on the web site. See the        -->
@@ -1005,6 +1010,8 @@
           <testFailureIgnore>
             ${allow.test.failure.ignore}
           </testFailureIgnore>
+          <!-- Redirect the unit test standard output to a file -->
+          <redirectTestOutputToFile>true</redirectTestOutputToFile>
         </configuration>
       </plugin>
 

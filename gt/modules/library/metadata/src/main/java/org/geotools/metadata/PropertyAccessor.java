@@ -56,6 +56,17 @@ final class PropertyAccessor {
     private static final String SET = "set";
 
     /**
+     * Methods to exclude from {@link #getGetters}. They are method inherited from
+     * {@link java.lang.Object}. Some of them, especially {@link Object#hashCode()}
+     * {@link Object#toString()} and {@link Object#clone()}, may be declared explicitly
+     * in some interface with a formal contract. Note: only no-argument methods need to
+     * be declared in this list.
+     */
+    private static final String[] EXCLUDES = {
+        "clone", "finalize", "getClass", "hashCode", "notify", "notifyAll", "toString", "wait"
+    };
+
+    /**
      * Getters shared between many instances of this class. Two different implementations
      * may share the same getters but different setters.
      */
@@ -73,7 +84,7 @@ final class PropertyAccessor {
      * type.{@linkplain Class#isAssignableFrom isAssignableFrom}(implementation);
      * </pre></blockquote>
      */
-    private final Class implementation;
+    final Class implementation;
 
     /**
      * The getter methods. This array should not contain any null element.
@@ -171,10 +182,15 @@ final class PropertyAccessor {
                     if (!candidate.getReturnType().equals(Void.TYPE) &&
                          candidate.getParameterTypes().length == 0)
                     {
-                        // We do not require a name starting with "get" or "is" because
-                        // some properties do not begin with such prefix (e.g. "pass()").
+                        /*
+                         * We do not require a name starting with "get" or "is" prefix because some
+                         * methods do not begin with such prefix, as in "ConformanceResult.pass()".
+                         * Consequently we must provide special cases for no-arg methods inherited
+                         * from java.lang.Object because some interfaces declare explicitly the
+                         * contract for those methods.
+                         */
                         final String name = candidate.getName();
-                        if (!name.startsWith(SET)) {
+                        if (!name.startsWith(SET) && !isExcluded(name)) {
                             getters[count++] = candidate;
                         }
                     }
@@ -184,6 +200,18 @@ final class PropertyAccessor {
             }
             return getters;
         }
+    }
+
+    /**
+     * Returns {@code true} if the specified method is on the exclusion list.
+     */
+    private static boolean isExcluded(final String name) {
+        for (int i=0; i<EXCLUDES.length; i++) {
+            if (name.equals(EXCLUDES[i])) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -219,9 +247,9 @@ final class PropertyAccessor {
         key = key.trim();
         for (int i=0; i<getters.length; i++) {
             final String name = getters[i].getName();
-            if (name.equalsIgnoreCase(key) ||
-                name.regionMatches(true, prefix(name).length(), key, 0, key.length()))
-            {
+            final int base    = prefix(name).length();
+            final int length  = key.length();
+            if (name.length() == base + length && name.regionMatches(true, base, key, 0, length)) {
                 return i;
             }
         }
@@ -272,6 +300,23 @@ final class PropertyAccessor {
             return name;
         }
         return null;
+    }
+
+    /**
+     * Returns the type of the property at the given index.
+     */
+    final Class type(final int index) {
+        if (index >= 0 && index < getters.length) {
+            return getters[index].getReturnType();
+        }
+        return null;
+    }
+
+    /**
+     * Returns {@code true} if the property at the given index is writable.
+     */
+    final boolean isWritable(final int index) {
+        return (index >= 0) && (index < getters.length) && (setters != null) && (setters[index] != null);
     }
 
     /**

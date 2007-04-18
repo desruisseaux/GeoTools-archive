@@ -33,6 +33,8 @@ import java.util.regex.Pattern;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @see org.geotools.factory.GeoTools#getVersion
  */
 public class Version implements CharSequence, Comparable, Serializable {
     /**

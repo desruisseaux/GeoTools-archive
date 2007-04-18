@@ -154,7 +154,7 @@ public class MediumImpl extends MetadataEntity implements Medium {
     /**
      * Set the method used to write to the medium.
      */
-    public synchronized void setMediumFormat(final Collection/*<MediumFormat>*/ newValues) {
+    public synchronized void setMediumFormats(final Collection/*<MediumFormat>*/ newValues) {
         mediumFormats = copyCollection(newValues, mediumFormats, MediumFormat.class);
     }
 

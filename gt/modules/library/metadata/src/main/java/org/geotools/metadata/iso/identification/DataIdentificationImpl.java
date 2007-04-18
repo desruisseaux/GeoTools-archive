@@ -210,8 +210,8 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
      *
      * @deprecated Use {@link #setCharacterSets} instead.
      */
-    public synchronized void setCharacterSet(final CharacterSet newValue) {
-        setCharacterSets(Collections.singleton(newValue));
+    public synchronized void setCharacterSet(final Charset newValue) {
+        throw new UnsupportedOperationException();
     }
 
     /**

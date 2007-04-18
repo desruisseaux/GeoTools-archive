@@ -118,7 +118,7 @@ public class ElementImpl extends MetadataEntity implements Element {
      * Creates an element initialized to the given result.
      */
     public ElementImpl(final Result result) {
-        setResult(result);
+        setResults(Collections.singleton(result));
     }
     
     /**
@@ -279,8 +279,12 @@ public class ElementImpl extends MetadataEntity implements Element {
      *
      * @deprecated Use {@link #setResults} instead.
      */
-    public void setResult(final Result newValue) {
-        setResults(Collections.singleton(newValue));
+//    public void setResult(final Result newValue) {
+//        setResults(Collections.singleton(newValue));
+//    }
+    // Remove this method and uncomment the code above if 'getResult' is renamed 'getResults'.
+    public void setResult(final Collection newValues) {
+        setResults(newValues);
     }
 
     /**

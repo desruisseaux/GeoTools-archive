@@ -53,6 +53,7 @@ import org.opengis.filter.FilterFactory;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Jody Garnett
  */
 public final class CommonFactoryFinder {
     /**

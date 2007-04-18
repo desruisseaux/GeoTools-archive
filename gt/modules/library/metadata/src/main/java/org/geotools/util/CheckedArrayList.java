@@ -42,14 +42,14 @@ import org.geotools.resources.i18n.ErrorKeys;
  *       The lock would be the metadata that owns this collection. Be carefull to update the lock
  *       after a clone (this work may be done in {@code MetadataEntity.unmodifiable(Object)}).
  */
-public class CheckedArrayList extends ArrayList implements Cloneable {
+public class CheckedArrayList extends ArrayList implements CheckedCollection, Cloneable {
     /**
      * Serial version UID for compatibility with different versions.
      */
     private static final long serialVersionUID = -587331971085094268L;
     
     /**
-     * The class type.
+     * The element type.
      */
     private final Class type;
 
@@ -76,6 +76,15 @@ public class CheckedArrayList extends ArrayList implements Cloneable {
         super(capacity);
         this.type = type;
         ensureNonNull();
+    }
+
+    /**
+     * Returns the element type given at construction time.
+     *
+     * @since 2.4
+     */
+    public Class getElementType() {
+        return type;
     }
 
     /**

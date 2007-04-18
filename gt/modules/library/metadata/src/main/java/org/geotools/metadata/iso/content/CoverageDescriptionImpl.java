@@ -135,7 +135,7 @@ public class CoverageDescriptionImpl extends ContentInformationImpl implements C
      * 
      * @since 2.4
      */
-    public Collection getDimensions() {
+    public synchronized Collection getDimensions() {
         return dimensions = nonNullCollection(dimensions, RangeDimension.class);
     }
 

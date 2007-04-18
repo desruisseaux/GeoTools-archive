@@ -20,32 +20,29 @@
 package org.geotools.metadata.iso.quality;
 
 // OpenGIS dependencies
-import org.opengis.metadata.quality.FormalConsistency;
+import org.opengis.metadata.quality.FormatConsistency;
 
 
 /**
  * Degree to which data is stored in accordance with the physical structure of
  * the dataset, as described by the scope.
  *
+ * @since 2.4
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
- *
- * @since 2.1
- *
- * @deprecated Renamed as {@link FormatConsistencyImpl}.
  */
-public class FormalConsistencyImpl extends LogicalConsistencyImpl implements FormalConsistency {
+public class FormatConsistencyImpl extends LogicalConsistencyImpl implements FormatConsistency {
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -6474410938957783954L;
+    private static final long serialVersionUID = -1204766930140154729L;
 
     /**
      * Constructs an initially empty formal consistency.
      */
-    public FormalConsistencyImpl() {
+    public FormatConsistencyImpl() {
     }
 
     /**
@@ -53,7 +50,7 @@ public class FormalConsistencyImpl extends LogicalConsistencyImpl implements For
      *
      * @since 2.4
      */
-    public FormalConsistencyImpl(final FormalConsistency source) {
+    public FormatConsistencyImpl(final FormatConsistency source) {
         super(source);
     }
 }

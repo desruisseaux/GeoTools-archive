@@ -249,9 +249,9 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
     /**
      * Set the full name of the character coding standard used for the metadata set.
      */
-    public synchronized void setCharacterSet(final String newValue) {
+    public synchronized void setCharacterSet(final CharacterSet newValue) {
         checkWritePermission();
-        fileIdentifier = newValue;
+        characterSet = newValue;
     }
 
     /**
@@ -310,7 +310,7 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
     /**
      * Returns the parties responsible for the metadata information.
      */
-    public Collection getContacts() {
+    public synchronized Collection getContacts() {
         return contacts = nonNullCollection(contacts, ResponsibleParty.class);
     }
 

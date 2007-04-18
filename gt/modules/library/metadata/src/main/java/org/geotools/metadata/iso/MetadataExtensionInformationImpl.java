@@ -84,7 +84,7 @@ public class MetadataExtensionInformationImpl extends MetadataEntity
    /**
      * Set information about on-line sources.
      */
-    public synchronized void setextensionOnLineResource(final OnLineResource newValue) {
+    public synchronized void setExtensionOnLineResource(final OnLineResource newValue) {
         checkWritePermission();
         this.extensionOnLineResource = newValue; 
     }
@@ -101,7 +101,7 @@ public class MetadataExtensionInformationImpl extends MetadataEntity
     /**
      * Set information about a new metadata element.
      */
-    public synchronized void setextendedElementInformation(final Collection newValues) {
+    public synchronized void setExtendedElementInformation(final Collection newValues) {
         extendedElementInformation = copyCollection(newValues, extendedElementInformation,
                                                     ExtendedElementInformation.class);
     }

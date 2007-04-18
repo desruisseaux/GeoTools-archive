@@ -6,10 +6,13 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 public class GeoToolsTest extends TestCase {
-
-    public void testNothing(){
-        
+    /**
+     * Make sures that J2SE 1.4 assertions are enabled.
+     */
+    public void testAssertionEnabled() {
+        assertTrue("Assertions not enabled.", GeoToolsTest.class.desiredAssertionStatus());
     }
+
     /** DefaultInitialization should occure during class load */
     public void XtestInitializationRequired(){
         Hints hints = GeoTools.getDefaultHints();
