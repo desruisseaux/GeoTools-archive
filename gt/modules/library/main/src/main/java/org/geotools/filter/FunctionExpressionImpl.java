@@ -24,6 +24,7 @@ import java.util.Collections;
 
 import org.geotools.filter.Expression;
 import org.opengis.filter.expression.ExpressionVisitor;
+import org.opengis.filter.expression.Function;
 
 /**
  * Abstract class for a function expression implementation
@@ -175,5 +176,20 @@ public abstract class FunctionExpressionImpl
         org.opengis.filter.expression.Expression exp;
         exp = (org.opengis.filter.expression.Expression) getParameters().get(index);
         return exp;
+    }
+    
+    public boolean equals(Object obj) {
+    	if( obj == null || !(obj instanceof Function)){
+    		return false;
+    	}
+    	Function other = (Function) obj;
+    	if( ( getName() == null && other.getName() != null ) ||
+    	    (getName() != null && !getName().equalsIgnoreCase( other.getName() ))){
+    		return false;
+    	}
+    	if( getParameters() == null && other.getClass() != null ){
+    		return false;
+    	}
+    	return getParameters() != null && getParameters().equals( other.getParameters() );
     }
 }

@@ -5,8 +5,10 @@ import java.util.List;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Hints;
+import org.opengis.filter.And;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Filter;
+import org.opengis.filter.Or;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Function;
 
@@ -360,10 +362,19 @@ public class FilterBuilder {
     public FilterBuilder and( FilterBuilder build ){
     	return and( build.filter() );    	
     }
-	/** A.and( B ) */
+    /** A.and( B ) */
 	public FilterBuilder and(Filter right) {
-		Filter left = filter();		
-		return build( ff.and( left, right ) );
+		Filter left = filter();
+		if( left instanceof And){
+			// logic to collapse multiple AND filters
+			// occurs in a builder (rather then factory)
+			//
+			And and = (And) left;
+			List children = new ArrayList( and.getChildren() );
+			children.add( right );
+			return build( ff.and( children) );
+		}
+		return build(ff.and(left, right));
 	}
 
 	/** Take all built filters and return a single OR statement.
@@ -383,14 +394,23 @@ public class FilterBuilder {
 		return or;
 	}
 	
-	/** A.and( B ) */
+	/** A.or( B ) */
     public FilterBuilder or( FilterBuilder build ){
     	return or( build.filter() );    	
     }
-	/** A.and( B ) */
+    /** A.or( B ) */
 	public FilterBuilder or(Filter right) {
-		Filter left = filter();		
-		return build( ff.or( left, right ) );
+		Filter left = filter();
+		if( left instanceof Or){
+			// logic to collapse multiple OR filters
+			// occurs in a builder (rather then factory)
+			//
+			Or or = (Or) left;
+			List children = new ArrayList( or.getChildren() );
+			children.add( right );
+			return build( ff.or( children) );
+		}
+		return build(ff.or(left, right));
 	}
 	
 }

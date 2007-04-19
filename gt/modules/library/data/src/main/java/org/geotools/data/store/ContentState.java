@@ -20,7 +20,6 @@ import java.util.List;
 
 import org.geotools.data.FeatureListener;
 import org.geotools.feature.FeatureType;
-import org.opengis.feature.simple.SimpleTypeFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -43,9 +42,10 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author Justin Deoliveira, The Open Planning Project
  */
 public class ContentState {
-	protected FeatureType schema;
-
-	protected FeatureType type;
+	
+	protected FeatureType memberType;
+	
+	protected FeatureType collectionType;
 
     /**
      * observers
@@ -73,24 +73,24 @@ public class ContentState {
     
     public ContentState(ContentState state) {
 		this( state.getEntry() );
-        schema = state.schema;
-        type = state.type;
+        memberType = state.memberType;
+        collectionType = state.collectionType;
         count = state.count;
         bounds = state.bounds == null ? null : new Envelope( state.bounds );
 	}
 
 	public FeatureType getMemberType(){
-    	return schema;
+    	return memberType;
     }
     
     public void setMemberType( FeatureType memberType ){
-    	schema = memberType;    	
+    	memberType = memberType;    	
     }
-    public FeatureType getType(){
-    	return type; 
+    public FeatureType getCollectionType(){
+    	return collectionType; 
     }    
-    public void setType( FeatureType featureType ){
-    	type = featureType;    	
+    public void setCollectionType( FeatureType featureType ){
+    	collectionType = featureType;    	
     }
     public int getCount(){
     	return count;
@@ -108,8 +108,8 @@ public class ContentState {
      * Flushes the cache.
      */
     public void flush() {
-        schema = null;
-        type = null;
+        memberType = null;
+        collectionType = null;
         count = -1;
         bounds = null;
     }
@@ -125,8 +125,8 @@ public class ContentState {
      * Cleans up the state object by clearing cache and listeners.
      */
     public void close() {
-    	schema = null;
-    	type = null;
+    	memberType = null;
+    	collectionType = null;
     	if( listeners != null ){
     		listeners.clear();
     		listeners = null;

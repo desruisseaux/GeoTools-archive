@@ -16,6 +16,7 @@
 package org.geotools.feature;
 
 import java.util.EventObject;
+import org.geotools.data.FeatureEvent;
 
 
 /**
@@ -48,6 +49,32 @@ public class CollectionEvent extends EventObject {
 
     /** Holds value of property features. */
     private Feature[] features;
+
+    public CollectionEvent(FeatureCollection collection, FeatureEvent event) {
+        super(collection);
+
+        switch (event.getEventType()) {
+        case FeatureEvent.FEATURES_ADDED:
+            this.type = CollectionEvent.FEATURES_ADDED;
+
+            break;
+
+        case FeatureEvent.FEATURES_CHANGED:
+            this.type = CollectionEvent.FEATURES_CHANGED;
+
+            break;
+
+        case FeatureEvent.FEATURES_REMOVED:
+            this.type = CollectionEvent.FEATURES_REMOVED;
+
+            break;
+
+        default:
+            this.type = CollectionEvent.FEATURES_REMOVED;
+        }
+
+        this.features = null;
+    }
 
     /**
      * Constructs a new CollectionEvent.

@@ -46,8 +46,7 @@ public class FilterBuilderTest extends TestCase {
     }
     
     public void testGeometry(){
-    	build.literal( gf.createPoint( new Coordinate( 1, 1 )));
-    	
+    	build.literal( gf.createPoint( new Coordinate( 1, 1 )));    	
     }
     
 }
