@@ -35,7 +35,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  * @author Ian Schneider
  * @source $URL$
  */
-class CoordinateWriter {
+public class CoordinateWriter {
     
     /**
      * Internal representation of coordinate delimeter (',' for GML is default)
@@ -59,6 +59,16 @@ class CoordinateWriter {
     private final boolean useDummyZ;
     
     private final double dummyZ;
+    
+    /**
+     * Flag controlling wether namespaces should be ignored.
+     */
+    private boolean namespaceAware = true;
+    /**
+     * Namepsace prefix + uri, default to gml
+     */
+    private String prefix = "gml";
+    private String namespaceUri = GMLUtils.GML_URL;
     
     public CoordinateWriter() {
         this(4);
@@ -89,6 +99,18 @@ class CoordinateWriter {
         return useDummyZ;
     }
     
+    public void setNamespaceAware(boolean namespaceAware) {
+        this.namespaceAware = namespaceAware;
+    }
+    
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+    
+    public void setNamespaceUri(String namespaceUri) {
+        this.namespaceUri = namespaceUri;
+    }
+    
     public CoordinateWriter(int numDecimals, String tupleDelim, String coordDelim, boolean useDummyZ, double zValue) {
         
         if (tupleDelim == null || tupleDelim.length() == 0)
@@ -104,10 +126,15 @@ class CoordinateWriter {
         coordFormatter.setMaximumFractionDigits(numDecimals);
         coordFormatter.setGroupingUsed(false);
         
-        atts.addAttribute(GMLUtils.GML_URL, "decimal", "decimal", "decimal", ".");
-        atts.addAttribute(GMLUtils.GML_URL, "cs", "cs", "cs",
+        String uri = namespaceUri;
+        if ( !namespaceAware ) {
+            uri = null;
+        }
+        
+        atts.addAttribute(uri, "decimal", "decimal", "decimal", ".");
+        atts.addAttribute(uri, "cs", "cs", "cs",
                 coordinateDelimiter);
-        atts.addAttribute(GMLUtils.GML_URL, "ts", "ts", "ts", tupleDelimiter);
+        atts.addAttribute(uri, "ts", "ts", "ts", tupleDelimiter);
         
         this.useDummyZ = useDummyZ;
         this.dummyZ = zValue;
@@ -116,9 +143,17 @@ class CoordinateWriter {
     public void writeCoordinates(Coordinate[] c, ContentHandler output)
     throws SAXException {
         
-        output.startElement(GMLUtils.GML_URL, "coordinates", "gml:coordinates",
-                atts);
+        String prefix = this.prefix + ":";
+        String namespaceUri = this.namespaceUri;
         
+        if ( !namespaceAware ) {
+            prefix = "";
+            namespaceUri = null;
+        }
+        
+        output.startElement(namespaceUri, "coordinates", prefix + "coordinates",
+                    atts);    
+                
         for (int i = 0, n = c.length; i < n; i++) {
             // clear the buffer
             coordBuff.delete(0, coordBuff.length());
@@ -147,6 +182,6 @@ class CoordinateWriter {
             output.characters(buff, 0, coordBuff.length());
         }
         
-        output.endElement(GMLUtils.GML_URL,"coordinates", "gml:coordinates");
+        output.endElement(namespaceUri,"coordinates", prefix + "coordinates");
     }
 }

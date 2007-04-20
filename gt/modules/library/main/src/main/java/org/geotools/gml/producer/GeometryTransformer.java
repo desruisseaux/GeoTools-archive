@@ -62,20 +62,38 @@ public class GeometryTransformer extends TransformerBase {
     }
     
     public static class GeometryTranslator extends TranslatorSupport {
-        CoordinateWriter coordWriter = new CoordinateWriter();
+        protected CoordinateWriter coordWriter = new CoordinateWriter();
         
-        public GeometryTranslator(ContentHandler handler) {
-            super(handler, "gml", GMLUtils.GML_URL);
+        public GeometryTranslator(ContentHandler handler) {            
+            this(handler,"gml",GMLUtils.GML_URL);
         }
        
+        public GeometryTranslator(ContentHandler handler, String prefix, String nsUri ) {
+            super(handler,prefix,nsUri);
+            coordWriter.setPrefix( prefix );
+            coordWriter.setNamespaceUri( nsUri );
+        }
+        
         public GeometryTranslator(ContentHandler handler, int numDecimals) {
-            this(handler);
+            this(handler,"gml",GMLUtils.GML_URL,numDecimals);
+        }
+
+        public GeometryTranslator(ContentHandler handler, String prefix, String nsUri, int numDecimals) {
+            this(handler,prefix,nsUri);
             coordWriter = new CoordinateWriter(numDecimals, false);
+            coordWriter.setPrefix( prefix );
+            coordWriter.setNamespaceUri( nsUri );
         }
         
         public GeometryTranslator(ContentHandler handler, int numDecimals, boolean isDummyZEnabled) {
-            this(handler);
+            this(handler,"gml",GMLUtils.GML_URL,numDecimals,isDummyZEnabled);
+        }
+        
+        public GeometryTranslator(ContentHandler handler, String prefix, String nsUri, int numDecimals, boolean isDummyZEnabled) {
+            this(handler,prefix,nsUri);
             coordWriter = new CoordinateWriter(numDecimals, isDummyZEnabled);
+            coordWriter.setPrefix( prefix );
+            coordWriter.setNamespaceUri( nsUri );
         }
         
         public boolean isDummyZEnabled(){
