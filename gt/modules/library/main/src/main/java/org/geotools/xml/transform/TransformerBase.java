@@ -34,6 +34,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.NamespaceSupport;
 import org.xml.sax.helpers.XMLFilterImpl;
@@ -472,6 +473,20 @@ public abstract class TransformerBase {
             }
         }
 
+        protected void cdata( String cdata ) {
+            if ( contentHandler instanceof LexicalHandler ) {
+                LexicalHandler lexicalHandler = (LexicalHandler) contentHandler;
+                try {
+                    lexicalHandler.startCDATA();
+                    chars(cdata);
+                    lexicalHandler.endCDATA();    
+                }
+                catch( SAXException e ) {
+                    throw new RuntimeException( e );
+                }
+            }
+        }
+        
         public String getDefaultNamespace() {
             return namespace;
         }
