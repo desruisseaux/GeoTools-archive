@@ -39,5 +39,7 @@ public class CRSTest extends  TestCase {
         
         CoordinateSystemAxis axis1  = crs.getCoordinateSystem().getAxis(1);
         assertEquals( "forceXY did not work", "Lat", axis1.getAbbreviation() );
+        
+        System.setProperty("org.geotools.referencing.forceXY", "false");        
     }    
 }
