@@ -15,8 +15,13 @@
  */
 package org.geotools.text.filter;
 
-import junit.framework.TestCase;
 import java.util.List;
+
+import junit.framework.TestCase;
+
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.filter.FilterFactoryImpl;
+import org.geotools.filter.text.cql2.ParseException;
 import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
@@ -42,9 +47,6 @@ import org.opengis.filter.spatial.Intersects;
 import org.opengis.filter.spatial.Overlaps;
 import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
-import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.filter.FilterFactoryImpl;
-import org.geotools.filter.text.cql2.ParseException;
 
 
 /**
@@ -61,7 +63,7 @@ import org.geotools.filter.text.cql2.ParseException;
  * @deprecated was replaced by {@link org.geotools.filter.CQLTest} and {@link org.geotools.filter.CQLExtensionTest}
  */
 public class FilterBuilderTest extends TestCase {
-    private static final String DELIMITER = "|";
+    private static final String DELIMITER = ";";
 
     public FilterBuilderTest(String testName) {
         super(testName);

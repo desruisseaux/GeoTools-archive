@@ -34,20 +34,14 @@ final class BuildResultStack {
 
     private Stack stack = new Stack();
 
-    private String cqlSource = null;
+    private String cqlSource;
 
-    private BuildResultStack(final String cqlSource) {
+    public BuildResultStack(final String cqlSource) {
+        assert cqlSource != null;
+        
         this.cqlSource  = cqlSource;
     }
 
-    /**
-     * factory method create a new instance of stak
-     * 
-     * @return BuildResultStack a new instance
-     */
-    public static BuildResultStack getInstance(final String cqlSource) {
-        return new BuildResultStack(cqlSource);
-    }
 
     public Result peek() {
         return (Result) stack.peek();

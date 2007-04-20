@@ -89,7 +89,7 @@ final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
 
         this.filterFactory = filterFactory;
         
-        this.resultStack = BuildResultStack.getInstance(this.cqlSource);
+        this.resultStack = new BuildResultStack(this.cqlSource);
     }
 
 

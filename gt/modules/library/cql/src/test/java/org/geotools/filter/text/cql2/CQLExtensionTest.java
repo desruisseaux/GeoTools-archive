@@ -45,7 +45,7 @@ import org.opengis.filter.expression.PropertyName;
  * @version Revision: 1.9
  */
 public class CQLExtensionTest extends TestCase {
-    private static final String DELIMITER = "|";
+    private static final String DELIMITER = ";";
 
     /**
      * An INCLUDE token is parsed as {@link Filter#INCLUDE}
@@ -86,11 +86,19 @@ public class CQLExtensionTest extends TestCase {
     }
 
     /**
-     * Simple test for expressions with delimiter
+     * Simple test for sequence of search conditions with only one filter [*]
+     * <p>
+     * <pre>
+     * &lt;SequenceOfSearchConditions &gt; ::= 
+     *          &lt;search condition&gt; [*]
+     *     |    &lt;SequenceOfSearchConditions&gt; ; &lt;search condition&gt;
      *
+     * </pre>
+     * <p> 
+     * 
      * @throws Exception
      */
-    public void testParseFilterListSingleFilter() throws Exception {
+    public void testSequenceOfSearchConditionsWithOneFilter() throws Exception {
         String valueWithDelimiter = "text" + DELIMITER + "with" + DELIMITER + "delimiter";
         final String singleFilterStr = "attr3 = '" + valueWithDelimiter + "'";
         List filters = CQL.toFilterList(singleFilterStr);
@@ -105,20 +113,28 @@ public class CQLExtensionTest extends TestCase {
     }
 
     /**
-     * Tests expressions with delimiter
+     * Simple test for sequence of search conditions with only one filter [*]
+     * <p>
+     * <pre>
+     * &lt;SequenceOfSearchConditions &gt; ::= 
+     *          &lt;search condition&gt; 
+     *     |    &lt;SequenceOfSearchConditions&gt; ; &lt;search condition&gt; [*]
      *
-     *
-     * Sample: attr1 > 5|attr2 between 1 and 7|attr3 = 'text|with|delimiter'
+     * </pre>
+     * <p> 
+     * Sample: attr1 > 5;attr2 between 1 and 7;attr3
      *
      * @throws Exception
      */
-    public void testParseFilterListWithDelimiter() throws Exception {
+    public void testSequenceOfSearchConditionsWithManyFilters() throws Exception {
         String valueWithDelimiter = "text" + DELIMITER + "with" + DELIMITER + "delimiter";
 
-        // if delimiter is '|':
-        // "attr1 > 5|attr2 between 1 and 7|attr3 = 'text|with|delimiter'"
-        final String filterListStr = "attr1 > 5" + DELIMITER + "attr2 between 1 and 7" + DELIMITER
-            + "attr3 = '" + valueWithDelimiter + "'";
+        // "attr1 > 5; attr2 between 1 and 7; attr3 = 'text;with;delimiter
+        final String filterListStr = 
+                "attr1 > 5" + DELIMITER + 
+                "attr2 between 1 and 7" + DELIMITER +   
+                "attr3 = '" + valueWithDelimiter + "'";
+        
         List filters = CQL.toFilterList(filterListStr);
         assertNotNull(filters);
         assertEquals(3, filters.size());
@@ -149,7 +165,7 @@ public class CQLExtensionTest extends TestCase {
     public void testParseFilterListWithEmptyFilter() throws Exception {
         String valueWithDelimiter = "text" + DELIMITER + "with" + DELIMITER + "delimiter";
 
-        // if delimiter is |, "attr1 > 5|INCLUDE|attr3 = 'text|with|delimiter'"
+        // "attr1 > 5;INCLUDE;attr3 = 'text;with;delimiter'"
         String filterListStr = "attr1 > 5" + DELIMITER + "INCLUDE" + DELIMITER + " attr3 = '"
             + valueWithDelimiter + "'";
         List filters = CQL.toFilterList(filterListStr);

@@ -20,26 +20,32 @@
     <P ALIGN="justify">
     Extensions in original BNF
     <pre>
-    <b>&#60;between predicate&#62; ::= 
-    		&#60;attribute name&#62; [ NOT ] BETWEEN &#60;literal&#62; AND &#60; literal &#62; 
+	<b>
+    &lt;SequenceOfSearchConditions &gt; ::= 
+              &lt;search condition&gt; 
+         |    &lt;SequenceOfSearchConditions&gt; ";" &lt;search condition&gt; 
+     </b>
+    
+    <b>&lt;between predicate&gt; ::= 
+    		&lt;attribute name&gt; [ NOT ] BETWEEN &lt;literal&gt; AND &lt; literal &gt; 
 	</b>
-    &#60;routine invocation&#62; ::= 
-             &#60;geoop name&#62;&#60;georoutine argument list&#62;
-           | &#60;relgeoop name&#62;&#60;relgeoop argument list&#62;
-           | &#60;routine name&#62;&#60;argument list&#62;
-           <b>| &#60;BBOX&#62; &#60;bbox argument list&#62;	</b>
+    &lt;routine invocation&gt; ::= 
+             &lt;geoop name&gt;&lt;georoutine argument list&gt;
+           | &lt;relgeoop name&gt;&lt;relgeoop argument list&gt;
+           | &lt;routine name&gt;&lt;argument list&gt;
+           <b>| &lt;BBOX&gt; &lt;bbox argument list&gt;	</b>
            
-    &#60;geoop name&#62; ::= 
+    &lt;geoop name&gt; ::= 
            EQUAL | DISJOINT | INTERSECT | TOUCH | CROSS | 
            WITHIN | CONTAINS |OVERLAP | RELATE <b>[1]</b>
     <b>  
-    &#60;bbox argument list&#62;::= 
-       "(" &#60;attribute&#62; ","&#60;min X&#62; ","&#60;min Y&#62; ","&#60;max X&#62; ","&#60;max Y&#62;["," &#60;crs&#62;] ")"
-    &#60;min X&#62; ::= &#60;signed numerical literal&#62; 
-    &#60;min Y&#62; ::= &#60;signed numerical literal&#62; 
-    &#60;max X&#62; ::= &#60;signed numerical literal&#62; 
-    &#60;max Y&#62; ::= &#60;signed numerical literal&#62;
-    &#60;crs&#62; ::= [2]  
+    &lt;bbox argument list&gt;::= 
+       "(" &lt;attribute&gt; ","&lt;min X&gt; ","&lt;min Y&gt; ","&lt;max X&gt; ","&lt;max Y&gt;["," &lt;crs&gt;] ")"
+    &lt;min X&gt; ::= &lt;signed numerical literal&gt; 
+    &lt;min Y&gt; ::= &lt;signed numerical literal&gt; 
+    &lt;max X&gt; ::= &lt;signed numerical literal&gt; 
+    &lt;max Y&gt; ::= &lt;signed numerical literal&gt;
+    &lt;crs&gt; ::= [2]  
     </b>  
       
     [1] RELATE is not supported (implementation in GeoTools is required)
