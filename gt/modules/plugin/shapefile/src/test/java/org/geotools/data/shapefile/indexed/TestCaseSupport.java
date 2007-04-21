@@ -104,14 +104,14 @@ public abstract class TestCaseSupport extends TestCase {
     /**
      * Helper method for {@link #tearDown}.
      */
-    private static File sibling(final File f, final String ext) {
+    protected static File sibling(final File f, final String ext) {
     	return new File(f.getParent(), sibling(f.getName(), ext));
     }
 
     /**
      * Helper method for {@link #copyShapefiles}.
      */
-    private static String sibling(String name, final String ext) {
+    protected static String sibling(String name, final String ext) {
         final int s = name.lastIndexOf('.');
         if (s >= 0) {
             name = name.substring(0, s);
@@ -165,8 +165,15 @@ public abstract class TestCaseSupport extends TestCase {
      * sibling ({@code .dbf}, {@code .shp}, {@code .shx} and {@code .prj} files).
      */
     protected File copyShapefiles(final String name) throws IOException {
-        assertTrue(TestData.copy(this, sibling(name, "dbf")).canRead());
-        assertTrue(TestData.copy(this, sibling(name, "shp")).canRead());
+    	if( this.getClass().getResourceAsStream("test-data")==null ){
+    		String root=getClass().getResource(".").getFile();
+    		File file = new File(root+"/"+"test-data");
+    		if (file.mkdirs() ){
+    			file.deleteOnExit();
+    		}
+    	}
+		assertTrue(TestData.copy(this, sibling(name, "dbf")).canRead());
+		assertTrue(TestData.copy(this, sibling(name, "shp")).canRead());
         try {
             assertTrue(TestData.copy(this, sibling(name, "shx")).canRead());
         } catch (FileNotFoundException e) {
@@ -174,6 +181,21 @@ public abstract class TestCaseSupport extends TestCase {
         }
         try {
             assertTrue(TestData.copy(this, sibling(name, "prj")).canRead());
+        } catch (FileNotFoundException e) {
+            // Ignore: this file is optional.
+        }
+        try {
+            assertTrue(TestData.copy(this, sibling(name, "grx")).canRead());
+        } catch (FileNotFoundException e) {
+            // Ignore: this file is optional.
+        }
+        try {
+            assertTrue(TestData.copy(this, sibling(name, "fix")).canRead());
+        } catch (FileNotFoundException e) {
+            // Ignore: this file is optional.
+        }
+        try {
+            assertTrue(TestData.copy(this, sibling(name, "qix")).canRead());
         } catch (FileNotFoundException e) {
             // Ignore: this file is optional.
         }

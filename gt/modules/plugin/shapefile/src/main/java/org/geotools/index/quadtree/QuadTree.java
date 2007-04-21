@@ -80,11 +80,12 @@ public class QuadTree {
         if( maxBounds!=null )
         	this.root = new Node(new Envelope(maxBounds), 0, null);
         
-        if( maxDepth==0 ){
+        if( maxDepth<1 ){
             /* No max depth was defined, try to select a reasonable one
              * that implies approximately 8 shapes per node.
              */
             int numNodes = 1;
+            this.maxDepth=0;
               
             while(numNodes * 4 < numShapes) {
                 this.maxDepth += 1;

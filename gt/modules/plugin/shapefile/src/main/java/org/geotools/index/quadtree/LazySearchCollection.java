@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.logging.Logger;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -57,13 +58,22 @@ public class LazySearchCollection extends AbstractCollection implements
 		return object;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.util.AbstractCollection#size()
-	 */
 	public int size() {
-		return -1;
+		Iterator iter = iterator();
+		try{
+			int count=0;
+			while(iter.hasNext()){
+				iter.next();
+				count++;
+			}
+			return count;
+		}finally{
+			try {
+				tree.close(iter);
+			} catch (StoreException e) {
+				Logger.getLogger("org.geotools.index.quadtree").severe("Couldn't close iterator");
+			}
+		}
 	}
 
 }

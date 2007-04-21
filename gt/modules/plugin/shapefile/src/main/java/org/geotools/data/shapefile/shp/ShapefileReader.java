@@ -464,7 +464,7 @@ public class ShapefileReader {
 			record.maxY = buffer.getDouble();
 		} else if (recordType != ShapeType.NULL) {
 			record.minX = record.maxX = buffer.getDouble();
-			record.minY = record.minY = buffer.getDouble();
+			record.minY = record.maxY = buffer.getDouble();
 		}
 		buffer.reset();
 

@@ -131,6 +131,8 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
         
 	private RTree rtree;
 
+	int maxDepth;
+
 	/**
 	 * Creates a new instance of ShapefileDataStore.
 	 *
@@ -780,7 +782,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
     			if (!treeFile.exists() || (treeFile.length() == 0)) {
     				if (this.createIndex) {
     					try {
-    						this.buildQuadTree();
+    						this.buildQuadTree(maxDepth);
     					} catch (Throwable e) {
     						createIndex=false;
                             treeType=TREE_NONE;
@@ -1123,18 +1125,19 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	}
 
 	/**
-	 * Builds the QuadTree index
+	 * Builds the QuadTree index.  Usually not necessary since reading features will index when required
 	 *
+	 * @param maxDepth depth of the tree.  if < 0 then a best guess is made.
 	 * @throws TreeException
-	 *             DOCUMENT ME!
 	 */
-	private void buildQuadTree() throws TreeException {
+	public void buildQuadTree(int maxDepth) throws TreeException {
 		if (isLocal()) {
 			LOGGER.fine("Creating spatial index for " + shpURL.getPath());
 
 			ShapeFileIndexer indexer = new ShapeFileIndexer();
 			indexer.setIdxType(ShapeFileIndexer.QUADTREE);
 			indexer.setShapeFileName(shpURL.getPath());
+			indexer.setMax(maxDepth);
 
 			try {
 				indexer.index(false, readWriteLock);
@@ -1630,7 +1633,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 								toDelete.delete();
 							}
 						} else if (treeType == TREE_QIX) {
-							buildQuadTree();
+							buildQuadTree(maxDepth);
 							filename = shpURL.getFile().substring(0,
 									shpURL.getFile().length() - 4);
 

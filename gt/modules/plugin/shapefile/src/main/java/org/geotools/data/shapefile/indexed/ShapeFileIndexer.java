@@ -420,7 +420,7 @@ public class ShapeFileIndexer {
         Envelope bounds = new Envelope(header.minX(), header.maxX(),
                 header.minY(), header.maxY());
 
-        tree = new QuadTree(numRecs, bounds, shpIndex);
+        tree = new QuadTree(numRecs, max, bounds, shpIndex);
 
         Record rec = null;
 
@@ -434,9 +434,9 @@ public class ShapeFileIndexer {
             }
         }
         }finally{
-        channelIdx.close();
-        fisIdx.close();
-        shpIndex.close();
+	        channelIdx.close();
+	        fisIdx.close();
+	        shpIndex.close();
         }
         FileSystemIndexStore store = new FileSystemIndexStore(file, order);
         store.store(tree);
@@ -446,6 +446,8 @@ public class ShapeFileIndexer {
 
     /**
      * DOCUMENT ME!
+     * 
+     * For quad tree this is the max depth.  I don't know what it is for RTree
      *
      * @param i
      */
