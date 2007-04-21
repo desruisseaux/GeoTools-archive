@@ -84,7 +84,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-postgis-sqlview</artifactId>
+      <artifactId>gt2-sql-datastore</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
