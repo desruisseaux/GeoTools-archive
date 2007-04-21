@@ -141,7 +141,7 @@ public class JDBCDataStoreTest extends TestCase {
         try {
             LOGGER.fine("getting connection pool");
             connPool = connFactory.getConnectionPool();
-           // setupTestTable(connPool.getConnection());
+            setupTestTable(connPool.getConnection());
             dstore = new JDBCDataStore(connPool, dbschema, TEST_NS);
 
             dstore.setFIDMapper(
@@ -187,8 +187,8 @@ public class JDBCDataStoreTest extends TestCase {
 
              st = conn.createStatement();  
                    st.execute(
-            "CREATE TABLE testset ( gid integer, area double, perimeter double, testb_ integer, "
-                + " testb_id integer, name varchar(255), pcedflag integer, dbdflag integer, x double, y double)");
+            "CREATE TABLE testset ( gid integer, area float, perimeter float, testb_ integer, "
+                + " testb_id integer, name varchar(255), pcedflag integer, dbdflag integer, x float, y float)");
         st.close();
         PreparedStatement ps =
             conn.prepareStatement(

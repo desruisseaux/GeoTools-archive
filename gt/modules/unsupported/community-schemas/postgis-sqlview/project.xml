@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <pomVersion>3</pomVersion>
+  <extend>${basedir}/../../project.xml</extend>
+  <name>geotools-sql-view-support</name>
+  <id>sqlds</id>
+  <currentVersion>2.2.x-complex_branch</currentVersion>
+  <package>org.geotools</package>
+  <shortDescription>DataStore wrapper over SQLDataStores that adds configuration assistance</shortDescription>
+  <gumpRepositoryId>geotools</gumpRepositoryId>
+  <description>
+    DataStore wrapper over SQLDataStores that adds configuration assistance, allowing to declare a set
+    of SQL SELECT statements as the source of a DataStore's FeatureType.
+  </description>
+  <developers>
+    <developer>
+      <name>Gabriel Roldan</name>
+      <id></id>
+      <email>groldan@axios.es</email>
+      <organization>Axios Engineering</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+  <dependencies>
+    <dependency>
+      <artifactId>main</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.2.x-complex_branch</version>
+    </dependency>
+    <dependency>
+      <artifactId>referencing</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.2.x-complex_branch</version>
+    </dependency>
+    <!--dependency>
+      <id>geoapi</id>
+      <version>2.0-without-feature</version>
+      </dependency-->
+    <dependency>
+      <id>jsqlparser</id>
+      <version>0.3.14</version>
+      <url>http://jsqlparser.sourceforge.net/</url>
+    </dependency>
+    <dependency>
+      <id>JTS</id>
+      <version>1.6</version>
+      <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
+    </dependency>
+    <dependency>
+      <id>opengis+legacy</id>
+      <version>0.2</version>
+      <url>http://www.opengis.org</url>
+    </dependency>
+    <dependency>
+      <id>vecmath</id>
+      <version>1.3</version>
+      <url>http://java.sun.com/products/java-media/3D/</url>
+    </dependency>
+    <dependency>
+      <id>junit</id>
+      <version>3.8.1</version>
+      <type>test</type>
+      <url>http://junit.org/</url>
+    </dependency>
+    <dependency>
+      <id>mockrunner</id>
+      <version>0.2</version>
+      <type>test</type>
+      <url>http://mockrunner.sourceforge.net/</url>
+    </dependency>
+  </dependencies>
+  <build>
+    <unitTest>
+      <!-- This section excludes the tests -->
+      <!--
+        <excludes>
+        <exclude>**/*.java</exclude>
+        <exclude>**/L*.java</exclude>
+        <exclude>**/JDBCTestSuite.java</exclude>
+        <exclude>**/JDBCDataStoreAPITest.java</exclude>
+        <exclude>**/ServiceTest.java</exclude>
+        
+        </excludes>
+      -->
+      <!-- End exclude tests -->
+      <resources>
+        <resource>
+          <directory>${basedir}/test</directory>
+          <includes>
+            <include>**/*.properties</include>
+            <include>**/*.txt</include>
+          </includes>
+        </resource>
+      </resources>
+    </unitTest>
+  </build>
+</project>

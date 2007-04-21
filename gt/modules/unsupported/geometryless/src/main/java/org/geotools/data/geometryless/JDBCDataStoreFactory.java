@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.jdbc.ConnectionPool;
+import org.geotools.data.sql.ViewRegisteringFactoryHelper;
 import org.geotools.factory.AbstractFactory;
 
 /**
@@ -246,11 +247,16 @@ public class JDBCDataStoreFactory extends AbstractFactory
             throw new DataSourceException("Could not create connection", e);
         }
 
+        JDBCDataStore dataStore;
         if (namespace != null) {
-            return new JDBCDataStore(pool, schema, namespace);
+            dataStore = new JDBCDataStore(pool, schema, namespace);
         } else {
-            return new JDBCDataStore(pool);
+            dataStore = new JDBCDataStore(pool);
         }
+        
+        ViewRegisteringFactoryHelper.registerSqlViews(dataStore, params);
+        
+        return dataStore;
     }
 
     /**
