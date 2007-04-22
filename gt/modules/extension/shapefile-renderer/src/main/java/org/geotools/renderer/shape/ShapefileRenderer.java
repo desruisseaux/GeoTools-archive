@@ -207,7 +207,15 @@ public class ShapefileRenderer implements GTRenderer {
     /** The painter class we use to depict shapes onto the screen */
     private StyledShapePainter painter = new StyledShapePainter(labelCache);
     private Map decimators = new HashMap();
-
+    
+	public static final String LABEL_CACHE_KEY = "labelCache";
+	public static final String FORCE_CRS_KEY = "forceCRS";
+	public static final String DPI_KEY = "dpi";
+	public static final String DECLARED_SCALE_DENOM_KEY = "declaredScaleDenominator";
+	public static final String MEMORY_PRE_LOADING_KEY = "memoryPreloadingEnabled";
+	public static final String OPTIMIZED_DATA_LOADING_KEY = "optimizedDataLoadingEnabled";
+	public static final String SCALE_COMPUTATION_METHOD_KEY = "scaleComputationMethod";
+    
     /**
      * "optimizedDataLoadingEnabled" - Boolean  yes/no (see default optimizedDataLoadingEnabledDEFAULT)
      * "memoryPreloadingEnabled"     - Boolean  yes/no (see default memoryPreloadingEnabledDEFAULT)
@@ -216,8 +224,9 @@ public class ShapefileRenderer implements GTRenderer {
      *                                          and the displayed area of the map.
      *  "dpi"                        - Integer  number of dots per inch of the display 90 DPI is the default (as declared by OGC)      
      *  "forceCRS"                   - CoordinateReferenceSystem declares to the renderer that all layers are of the CRS declared in this hint                               
+     *  "labelCache"                 - Declares the label cache that will be used by the renderer.                               
      */
-    private Map rendererHints;
+    private Map rendererHints = null;
 
     public ShapefileRenderer( MapContext context ) {
         setContext(context);
@@ -1149,10 +1158,18 @@ public class ShapefileRenderer implements GTRenderer {
         return hints;
     }
 
-    public void setRendererHints( Map hints ) {
+    public void setRendererHints(Map hints) {
+    	if( hints!=null && hints.containsKey(LABEL_CACHE_KEY) ){
+    		LabelCache cache=(LabelCache) hints.get(LABEL_CACHE_KEY);
+    		if( cache==null )
+    			throw new NullPointerException("Label_Cache_Hint has a null value for the labelcache");
+    		
+    		this.labelCache=cache;
+    		this.painter=new StyledShapePainter(cache);
+    	}
         rendererHints = hints;
     }
-
+    
     public Map getRendererHints() {
         return rendererHints;
     }
@@ -1353,17 +1370,15 @@ public class ShapefileRenderer implements GTRenderer {
      * <p>
      * Returns scale computation algorithm to be used. 
      * </p>
-     * 
      */
     private String getScaleComputationMethod() {
         if (rendererHints == null)
             return scaleComputationMethodDEFAULT;
-        String result = (String) rendererHints.get("scaleComputationMethod");
+        String result = (String) rendererHints.get(SCALE_COMPUTATION_METHOD_KEY);
         if (result == null)
             return scaleComputationMethodDEFAULT;
         return result;
     }
-    
     
     private double computeScale(ReferencedEnvelope envelope, CoordinateReferenceSystem crs, Rectangle paintArea, Map hints) {
         if(getScaleComputationMethod().equals(SCALE_ACCURATE)) {

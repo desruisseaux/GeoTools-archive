@@ -178,8 +178,6 @@ public final class StreamingRenderer implements GTRenderer {
 	
 	private final static PropertyName gridPropertyName= filterFactory.property("grid");
 	
-	private final static PropertyName paramsPropertyName= filterFactory.property("params");
-    
     private final static PropertyName defaultGeometryPropertyName= filterFactory.property("");
 	
 
@@ -250,6 +248,15 @@ public final class StreamingRenderer implements GTRenderer {
     
     private String scaleComputationMethodDEFAULT = SCALE_OGC;
 
+	public static final String LABEL_CACHE_KEY = "labelCache";
+	public static final String FORCE_CRS_KEY = "forceCRS";
+	public static final String DPI_KEY = "dpi";
+	public static final String DECLARED_SCALE_DENOM_KEY = "declaredScaleDenominator";
+	public static final String MEMORY_PRE_LOADING_KEY = "memoryPreloadingEnabled";
+	public static final String OPTIMIZED_DATA_LOADING_KEY = "optimizedDataLoadingEnabled";
+	public static final String SCALE_COMPUTATION_METHOD_KEY = "scaleComputationMethod";
+    
+    
     /**
      * "optimizedDataLoadingEnabled" - Boolean  yes/no (see default optimizedDataLoadingEnabledDEFAULT)
      * "memoryPreloadingEnabled"     - Boolean  yes/no (see default memoryPreloadingEnabledDEFAULT)
@@ -258,9 +265,10 @@ public final class StreamingRenderer implements GTRenderer {
      *                                          and the displayed area of the map.
      *  "dpi"                        - Integer  number of dots per inch of the display 90 DPI is the default (as declared by OGC)      
      *  "forceCRS"                   - CoordinateReferenceSystem declares to the renderer that all layers are of the CRS declared in this hint                               
+     *  "labelCache"                 - Declares the label cache that will be used by the renderer.                               
      */
-	private Map rendererHints = null;
-
+    private Map rendererHints = null;
+    
 	private AffineTransform worldToScreenTransform = null;
 
 	private CoordinateReferenceSystem destinationCrs;
@@ -1022,19 +1030,6 @@ public final class StreamingRenderer implements GTRenderer {
 		 * carry on, but report to // user } }
 		 */
 		return results;
-	}
-
-	/**
-	 * get the query's filter and looks for a FIDFilter in it. if it finds one
-	 * --> false if no fid filter --> true
-	 * 
-	 * @param query
-	 */
-	private boolean doesntHaveFIDFilter(Query query) {
-		FIDFilterFinder finder = new FIDFilterFinder();
-		finder.visit( (org.geotools.filter.Filter)query.getFilter());
-
-		return !finder.hasFIDFilter; // note: not
 	}
 
 	/**
@@ -2368,15 +2363,18 @@ public final class StreamingRenderer implements GTRenderer {
 		return java2dHints;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.geotools.renderer.GTRenderer#setRendererHints(java.util.Map)
-	 */
-	public void setRendererHints(Map hints) {
-		rendererHints = hints;
-	}
-
+    public void setRendererHints(Map hints) {
+    	if( hints!=null && hints.containsKey(LABEL_CACHE_KEY) ){
+    		LabelCache cache=(LabelCache) hints.get(LABEL_CACHE_KEY);
+    		if( cache==null )
+    			throw new NullPointerException("Label_Cache_Hint has a null value for the labelcache");
+    		
+    		this.labelCache=cache;
+    		this.painter=new StyledShapePainter(cache);
+    	}
+        rendererHints = hints;
+    }
+    
 	/*
 	 * (non-Javadoc)
 	 * 
