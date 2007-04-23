@@ -30,6 +30,7 @@ import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.DataStoreFactorySpi.Param;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.GeometryAttributeType;
 
 /**
  * Test Params used by JDBCDataStoreFactory.
@@ -136,27 +137,28 @@ public class JDBCDataStoreFactoryTest extends TestCase {
         testRegisterViews(factory);
     }
 
-//    public void testRegisterViewsLocationXY() throws Exception {
-//        Map params = new HashMap(this.local);
-//
-//        DataStoreFactorySpi factory = new LocationsXYDataStoreFactory();
-//        params.put(LocationsXYDataStoreFactory.DBTYPE.key, "locationsxy");
-//        params.put(LocationsXYDataStoreFactory.XCOLUMN.key, "xcord");
-//        params.put(LocationsXYDataStoreFactory.YCOLUMN.key, "ycord");
-//        params.put(LocationsXYDataStoreFactory.GEOMNAME.key, "location");
-//
-//        assertTrue(factory.canProcess(params));
-//
-//        this.local = params;
-//        DataStore ds = testRegisterViews(factory);
-//        assertTrue(ds instanceof LocationsXYDataStore);
-//        FeatureSource fs = ds.getFeatureSource("ViewType1");
-//        assertNotNull(fs);
-//        FeatureType schema = fs.getSchema();
-//        assertNotNull(schema);
-//        assertNotNull(schema.toString(), schema.getDefaultGeometry());
-//        assertEquals("location", schema.getDefaultGeometry().getName());
-//    }
+    public void testRegisterViewsLocationXY() throws Exception {
+        Map params = new HashMap(this.local);
+
+        DataStoreFactorySpi factory = new LocationsXYDataStoreFactory();
+        params.put(LocationsXYDataStoreFactory.DBTYPE.key, "locationsxy");
+        params.put(LocationsXYDataStoreFactory.XCOLUMN.key, "x");
+        params.put(LocationsXYDataStoreFactory.YCOLUMN.key, "y");
+        params.put(LocationsXYDataStoreFactory.GEOMNAME.key, "location");
+
+        assertTrue(factory.canProcess(params));
+
+        this.local = params;
+        DataStore ds = testRegisterViews(factory);
+        assertTrue(ds instanceof LocationsXYDataStore);
+        FeatureSource fs = ds.getFeatureSource("ViewType1");
+        assertNotNull(fs);
+        FeatureType schema = fs.getSchema();
+        assertNotNull(schema);
+        GeometryAttributeType defaultGeometry = schema.getDefaultGeometry();
+        assertNotNull("No default geometry: " + schema.toString(), defaultGeometry);
+        assertEquals("location", defaultGeometry.getName());
+    }
 
     /*
      * public void testRegisterViewsLocationXYWaterQ()throws Exception{ Map

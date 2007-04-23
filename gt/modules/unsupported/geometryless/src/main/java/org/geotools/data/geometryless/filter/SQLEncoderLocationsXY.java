@@ -39,38 +39,40 @@ import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.BinarySpatialOperator;
 
 import org.geotools.filter.FilterCapabilities;
+import org.geotools.filter.UnaliasSQLEncoder;
 
 /**
- * Encodes a filter into a SQL WHERE statement for generic SQL.  This class adds
- * the ability to turn geometry filters into sql statements if they are
- * based on x,y (longitude/latitude) column pairs..
- *
+ * Encodes a filter into a SQL WHERE statement for generic SQL. This class adds
+ * the ability to turn geometry filters into sql statements if they are based on
+ * x,y (longitude/latitude) column pairs..
+ * 
  * @author Rob Atkinson , SCO
  * @author Debasish Sahu, debasish.sahu@rmsi.com
  * 
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/geometryless/src/main/java/org/geotools/data/geometryless/filter/SQLEncoderLocationsXY.java $
  */
-public class SQLEncoderLocationsXY extends FilterToSQL {
+public class SQLEncoderLocationsXY extends UnaliasSQLEncoder {
     /** Standard java logger */
     private static Logger LOGGER = Logger.getLogger("org.geotools.filter");
 
- 
     /**
-     * The srid of the schema, so the bbox conforms.  Could be better to have
-     * it in the bbox filter itself, but this works for now.
+     * The srid of the schema, so the bbox conforms. Could be better to have it
+     * in the bbox filter itself, but this works for now.
      */
     private int srid;
 
-  // names of sql addressable columns containing numerical coordinates
-   private String xcolumn = null;
-   private String ycolumn = null;
-   
+    // names of sql addressable columns containing numerical coordinates
+    private String xcolumn = null;
+
+    private String ycolumn = null;
+
     /** The geometry attribute to use if none is specified. */
     private String defaultGeom;
 
     /**
      * Empty constructor TODO: rethink empty constructor, as BBOXes _need_ an
-     * SRID, must make client set it somehow.  Maybe detect when encode is
+     * SRID, must make client set it somehow. Maybe detect when encode is
      * called?
      */
     public SQLEncoderLocationsXY(String xcolumn, String ycolumn) {
@@ -91,7 +93,6 @@ public class SQLEncoderLocationsXY extends FilterToSQL {
     protected FilterCapabilities createFilterCapabilities() {
         FilterCapabilities capabilities = new FilterCapabilities();
 
-
         capabilities.addAll(FilterCapabilities.LOGICAL_OPENGIS);
         capabilities.addAll(FilterCapabilities.SIMPLE_COMPARISONS_OPENGIS);
         capabilities.addType(PropertyIsNull.class);
@@ -102,17 +103,17 @@ public class SQLEncoderLocationsXY extends FilterToSQL {
         capabilities.addType(PropertyIsLike.class);
 
         capabilities.addType(BBOX.class);
-        
 
         return capabilities;
     }
 
     /**
      * Sets a spatial reference system ESPG number, so that the geometry can be
-     * properly encoded for postgis.  If geotools starts actually creating
+     * properly encoded for postgis. If geotools starts actually creating
      * geometries with valid srids then this method will no longer be needed.
-     *
-     * @param srid the integer code for the EPSG spatial reference system.
+     * 
+     * @param srid
+     *            the integer code for the EPSG spatial reference system.
      */
     public void setSRID(int srid) {
         this.srid = srid;
@@ -121,54 +122,56 @@ public class SQLEncoderLocationsXY extends FilterToSQL {
     /**
      * Sets the default geometry, so that filters with null for one of their
      * expressions can assume that the default geometry is intended.
-     *
-     * @param name the name of the default geometry Attribute.
-     *
+     * 
+     * @param name
+     *            the name of the default geometry Attribute.
+     * 
      * @task REVISIT: pass in a featureType so that geometries can figure out
      *       their own default geometry?
      */
     public void setDefaultGeometry(String name) {
-        //Do we really want clients to be using malformed filters?  
-        //I mean, this is a useful method for unit tests, but shouldn't 
-        //fully formed filters usually be used?  Though I guess adding 
-        //the option wouldn't hurt. -ch
+        // Do we really want clients to be using malformed filters?
+        // I mean, this is a useful method for unit tests, but shouldn't
+        // fully formed filters usually be used? Though I guess adding
+        // the option wouldn't hurt. -ch
         this.defaultGeom = name;
     }
 
     /**
      * Turns a geometry filter into the postgis sql bbox statement.
-     *
-     * @param filter the geometry filter to be encoded.
-     *
-     * @throws RuntimeException for IO exception (need a better error)
+     * 
+     * @param filter
+     *            the geometry filter to be encoded.
+     * 
+     * @throws RuntimeException
+     *             for IO exception (need a better error)
      */
-    public Object visitBinarySpatialOperator(BinarySpatialOperator filter, Object extraData) throws RuntimeException {
- 
+    public Object visitBinarySpatialOperator(BinarySpatialOperator filter, Object extraData)
+            throws RuntimeException {
+
         if (filter instanceof BBOX) {
             Expression left = (Expression) filter.getExpression1();
             Expression right = (Expression) filter.getExpression2();
-            
+
             PropertyName propertyExpr;
             Literal geomLiteralExpr;
-            
+
             // left and right have to be valid expressions
             try {
-                if (left instanceof PropertyName &&
-                        right instanceof Literal) {
-                        propertyExpr = (PropertyName)left;
-                        geomLiteralExpr = (Literal)right;
-                    } else if (right instanceof PropertyName &&
-                               left instanceof Literal) {
-                        propertyExpr = (PropertyName) right;
-                        geomLiteralExpr = (Literal) left;
-                    } else {
-                        String err = "LocationsXY currently supports one geometry and one " +
-                            "attribute expr.  You gave: " + left + ", " + right;
-                        throw new DataSourceException(err);
-                    }
- 
+                if (left instanceof PropertyName && right instanceof Literal) {
+                    propertyExpr = (PropertyName) left;
+                    geomLiteralExpr = (Literal) right;
+                } else if (right instanceof PropertyName && left instanceof Literal) {
+                    propertyExpr = (PropertyName) right;
+                    geomLiteralExpr = (Literal) left;
+                } else {
+                    String err = "LocationsXY currently supports one geometry and one "
+                            + "attribute expr.  You gave: " + left + ", " + right;
+                    throw new DataSourceException(err);
+                }
+
                 visitLiteralGeometry(geomLiteralExpr);
-                
+
             } catch (java.io.IOException ioe) {
                 LOGGER.warning("Unable to export filter" + ioe);
             }
@@ -176,26 +179,28 @@ public class SQLEncoderLocationsXY extends FilterToSQL {
             LOGGER.warning("exporting unknown filter type, only bbox supported");
             throw new RuntimeException("Only BBox is currently supported");
         }
-        
+
         return extraData;
     }
 
     /**
-     * Checks to see if the literal is a geometry, and encodes it if it  is, if
+     * Checks to see if the literal is a geometry, and encodes it if it is, if
      * not just sends to the parent class.
-     *
-     * @param expression the expression to visit and encode.
-     *
-     * @throws IOException for IO exception (need a better error)
+     * 
+     * @param expression
+     *            the expression to visit and encode.
+     * 
+     * @throws IOException
+     *             for IO exception (need a better error)
      */
-    public void visitLiteralGeometry(Literal expression)
-        throws IOException {
+    public void visitLiteralGeometry(Literal expression) throws IOException {
         Geometry bbox = (Geometry) expression.getValue();
         Envelope e = bbox.getEnvelopeInternal();
         double x1 = e.getMinX();
-       double x2 = e.getMaxX();
+        double x2 = e.getMaxX();
         double y1 = e.getMinY();
         double y2 = e.getMaxY();
-       out.write( "( " +  xcolumn  + " < " + x2 + " and " + xcolumn + " > " + x1 + " and " +  ycolumn  + " < " + y2 + " and " + ycolumn + " > " + y1 + " )"        );
+        out.write("( " + xcolumn + " < " + x2 + " and " + xcolumn + " > " + x1 + " and " + ycolumn
+                + " < " + y2 + " and " + ycolumn + " > " + y1 + " )");
     }
 }

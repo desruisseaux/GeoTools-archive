@@ -448,7 +448,7 @@ public class JDBCDataStore extends org.geotools.data.jdbc.JDBCDataStore implemen
 
                     // AttributeDescriptor attribute =
                     // buildAttributeDescriptor(tableInfo);
-                    AttributeType attribute = super.buildAttributeType(tableInfo);
+                    AttributeType attribute = buildAttributeType(tableInfo);
 
                     if (attribute != null) {
                         attributeDescriptors.add(attribute);
