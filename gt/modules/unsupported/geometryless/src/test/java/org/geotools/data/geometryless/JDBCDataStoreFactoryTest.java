@@ -29,8 +29,13 @@ import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.DataStoreFactorySpi.Param;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
+
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * Test Params used by JDBCDataStoreFactory.
@@ -158,6 +163,18 @@ public class JDBCDataStoreFactoryTest extends TestCase {
         GeometryAttributeType defaultGeometry = schema.getDefaultGeometry();
         assertNotNull("No default geometry: " + schema.toString(), defaultGeometry);
         assertEquals("location", defaultGeometry.getName());
+        
+        FeatureCollection features = fs.getFeatures();
+        assertNotNull(features);
+        FeatureIterator iterator = features.features();
+        while(iterator.hasNext()){
+            Feature next = iterator.next();
+            assertNotNull(next);
+            Object location = next.getAttribute("location");
+            assertNotNull(location);
+            assertTrue(location instanceof Point);
+        }
+        features.close(iterator);
     }
 
     /*
