@@ -46,12 +46,12 @@ public interface DummyFactory extends InternalFactory {
     /**
      * A hint key for a {@code DummyFactory} instance.
      */
-    Hints.Key DUMMY_FACTORY = new Hints.Key(DummyFactory.class.getName());
+    Hints.Key DUMMY_FACTORY = new Hints.ClassKey(DummyFactory.class.getName());
 
     /**
      * A hint key for a {@code DummyFactory2} instance.
      */
-    Hints.Key INTERNAL_FACTORY = new Hints.Key(InternalFactory.class.getName());
+    Hints.Key INTERNAL_FACTORY = new Hints.ClassKey(InternalFactory.class.getName());
 
     /**
      * Dummy factory implementation #1.

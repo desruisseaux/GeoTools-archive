@@ -24,39 +24,31 @@ import java.util.HashMap;
 import java.awt.RenderingHints;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import javax.sql.DataSource;
 
 // Geotools Dependencies
 import org.geotools.util.Logging;
 
 
 /**
- * A set of hints providing control on factories to be used.
+ * A set of hints providing control on factories to be used. Those hints are typically used by
+ * renderers or {@linkplain org.opengis.coverage.processing.GridCoverageProcessor grid coverage
+ * processors} for example. They provides a way to control low-level details. Example:
  * <p>
- * Those hints are typically used by renderers or
- * {@linkplain org.opengis.coverage.processing.GridCoverageProcessor grid coverage processors}
- * for example. They provides a way to control low-level details. Example:
+ * <blockquote><pre>
+ * CoordinateOperationFactory myFactory = &amp;hellip
+ * Hints hints = new Hints(Hints.{@linkplain #COORDINATE_OPERATION_FACTORY}, myFactory);
+ * AbstractProcessor processor = new DefaultProcessor(hints);
+ * </pre></blockquote>
  * <p>
- * <blockquote>
- * 
- * <pre>
- *   CoordinateOperationFactory myFactory = &amp;hellip
- *   RenderingHints hints = new RenderingHints(Hints.{@link #COORDINATE_OPERATION_FACTORY}, myFactory);
- *   AbstractProcessor processor = new DefaultProcessor(hints);
- * </pre>
- * 
- * </blockquote>
+ * Any hint mentioned by this class is considered to be API, failure to make
+ * use of a hint by a GeoTools factory implementation is considered a bug (as
+ * it will prevent the use of this library for application specific tasks).
  * <p>
- * Any hint mentioned by this interface is considered to be API, failure to make
- * use of a hint by a geotools factory implementation is considered a bug (as it
- * will prevent the use of this library for application specific tasks).
- * <p>
- * When hints are used in conjuction with the Factory service discovery
- * mechanism we have the complete geotools plugin system. By using hints to
+ * When hints are used in conjuction with the {@linkplain FactoryRegistry factory service
+ * discovery mechanism} we have the complete geotools plugin system. By using hints to
  * allow application code to effect service discovery we allow client code to
  * retarget the geotools library for their needs.
- * <p>
- * While this works in practice for services which we control (like Feature
- * creation), we also make use of other services.
  * 
  * @since 2.1
  * @source $URL$
@@ -65,6 +57,15 @@ import org.geotools.util.Logging;
  * @author Jody Garnett
  */
 public final class Hints extends RenderingHints {
+    /**
+     * A set of system-wide hints to use by default.
+     */
+    private static final Hints GLOBAL = new Hints(null);
+
+    /**
+     * {@code true} if {@link #scanSystemProperties} needs to be invoked.
+     */
+    private static boolean needScan = true;
 
     ////////////////////////////////////////////////////////////////////////
     ////////                                                        ////////
@@ -83,7 +84,7 @@ public final class Hints extends RenderingHints {
      * 
      * @see org.geotools.geometry.jts.FactoryFinder#getGeometryFactory
      */
-    public static final Key JTS_GEOMETRY_FACTORY = new Key(
+    public static final Key JTS_GEOMETRY_FACTORY = new ClassKey(
             "com.vividsolutions.jts.geom.GeometryFactory");
 
     /**
@@ -91,7 +92,7 @@ public final class Hints extends RenderingHints {
      * 
      * @see org.geotools.geometry.jts.FactoryFinder#getCoordinateSequenceFactory
      */
-    public static final Key JTS_COORDINATE_SEQUENCE_FACTORY = new Key(
+    public static final Key JTS_COORDINATE_SEQUENCE_FACTORY = new ClassKey(
             "com.vividsolutions.jts.geom.CoordinateSequenceFactory");
 
     /**
@@ -99,7 +100,7 @@ public final class Hints extends RenderingHints {
      * 
      * @see org.geotools.geometry.jts.FactoryFinder#getPrecisionModel
      */
-    public static final Key JTS_PRECISION_MODEL = new Key(
+    public static final Key JTS_PRECISION_MODEL = new ClassKey(
             "com.vividsolutions.jts.geom.PrecisionModel");
 
     /**
@@ -114,7 +115,7 @@ public final class Hints extends RenderingHints {
      * 
      * @see org.geotools.referencing.FactoryFinder#getCRSAuthorityFactory
      */
-    public static final Key CRS_AUTHORITY_FACTORY = new Key(
+    public static final Key CRS_AUTHORITY_FACTORY = new ClassKey(
             "org.opengis.referencing.crs.CRSAuthorityFactory");
 
     /**
@@ -122,7 +123,7 @@ public final class Hints extends RenderingHints {
      * 
      * @see org.geotools.referencing.FactoryFinder#getCSAuthorityFactory
      */
-    public static final Key CS_AUTHORITY_FACTORY = new Key(
+    public static final Key CS_AUTHORITY_FACTORY = new ClassKey(
             "org.opengis.referencing.cs.CSAuthorityFactory");
 
     /**
@@ -130,7 +131,7 @@ public final class Hints extends RenderingHints {
      * 
      * @see org.geotools.referencing.FactoryFinder#getDatumAuthorityFactory
      */
-    public static final Key DATUM_AUTHORITY_FACTORY = new Key(
+    public static final Key DATUM_AUTHORITY_FACTORY = new ClassKey(
             "org.opengis.referencing.datum.DatumAuthorityFactory");
 
     /**
@@ -138,7 +139,7 @@ public final class Hints extends RenderingHints {
      * 
      * @see org.geotools.referencing.FactoryFinder#getCRSFactory
      */
-    public static final Key CRS_FACTORY = new Key(
+    public static final Key CRS_FACTORY = new ClassKey(
             "org.opengis.referencing.crs.CRSFactory");
 
     /**
@@ -146,7 +147,7 @@ public final class Hints extends RenderingHints {
      * 
      * @see org.geotools.referencing.FactoryFinder#getCSFactory
      */
-    public static final Key CS_FACTORY = new Key(
+    public static final Key CS_FACTORY = new ClassKey(
             "org.opengis.referencing.cs.CSFactory");
 
     /**
@@ -154,7 +155,7 @@ public final class Hints extends RenderingHints {
      * 
      * @see org.geotools.referencing.FactoryFinder#getDatumFactory
      */
-    public static final Key DATUM_FACTORY = new Key(
+    public static final Key DATUM_FACTORY = new ClassKey(
             "org.opengis.referencing.datum.DatumFactory");
 
     /**
@@ -162,7 +163,7 @@ public final class Hints extends RenderingHints {
      * 
      * @see org.geotools.referencing.FactoryFinder#getCoordinateOperationFactory
      */
-    public static final Key COORDINATE_OPERATION_FACTORY = new Key(
+    public static final Key COORDINATE_OPERATION_FACTORY = new ClassKey(
             "org.opengis.referencing.operation.CoordinateOperationFactory");
 
     /**
@@ -171,7 +172,7 @@ public final class Hints extends RenderingHints {
      * 
      * @see org.geotools.referencing.FactoryFinder#getCoordinateOperationAuthorityFactory
      */
-    public static final Key COORDINATE_OPERATION_AUTHORITY_FACTORY = new Key(
+    public static final Key COORDINATE_OPERATION_AUTHORITY_FACTORY = new ClassKey(
             "org.opengis.referencing.operation.CoordinateOperationAuthorityFactory");
 
     /**
@@ -179,7 +180,7 @@ public final class Hints extends RenderingHints {
      * 
      * @see org.geotools.referencing.FactoryFinder#getMathTransformFactory
      */
-    public static final Key MATH_TRANSFORM_FACTORY = new Key(
+    public static final Key MATH_TRANSFORM_FACTORY = new ClassKey(
             "org.opengis.referencing.operation.MathTransformFactory");
 
     /**
@@ -189,7 +190,7 @@ public final class Hints extends RenderingHints {
      *
      * @since 2.4
      */
-    public static final Key FEATURE_LOCK_FACTORY = new Key(
+    public static final Key FEATURE_LOCK_FACTORY = new ClassKey(
             "org.geotools.data.FeatureLockFactory");
 
     /**
@@ -199,7 +200,7 @@ public final class Hints extends RenderingHints {
      *
      * @since 2.4
      */
-    public static final Key FEATURE_COLLECTIONS = new Key(
+    public static final Key FEATURE_COLLECTIONS = new ClassKey(
             "org.geotools.feature.FeatureCollections");
 
     /**
@@ -209,7 +210,7 @@ public final class Hints extends RenderingHints {
      *
      * @since 2.4
      */
-    public static final Key FEATURE_TYPE_FACTORY = new Key(
+    public static final Key FEATURE_TYPE_FACTORY = new ClassKey(
             "org.geotools.feature.FeatureTypeFactory");
 
     /**
@@ -228,7 +229,7 @@ public final class Hints extends RenderingHints {
      *
      * @since 2.4
      */
-    public static final Key STYLE_FACTORY = new Key(
+    public static final Key STYLE_FACTORY = new ClassKey(
             "org.geotools.styling.StyleFactory");
 
     /**
@@ -238,7 +239,7 @@ public final class Hints extends RenderingHints {
      *
      * @since 2.4
      */
-    public static final Key ATTRIBUTE_TYPE_FACTORY = new Key(
+    public static final Key ATTRIBUTE_TYPE_FACTORY = new ClassKey(
             "org.geotools.feature.AttributeTypeFactory");
 
     /**
@@ -248,7 +249,7 @@ public final class Hints extends RenderingHints {
      *
      * @since 2.4
      */
-    public static final Key FILTER_FACTORY = new Key(
+    public static final Key FILTER_FACTORY = new ClassKey(
             "org.opengis.filter.FilterFactory");
 
 
@@ -266,7 +267,7 @@ public final class Hints extends RenderingHints {
      * 
      * @since 2.2
      */
-    public static final Key DEFAULT_COORDINATE_REFERENCE_SYSTEM = new Key(
+    public static final Key DEFAULT_COORDINATE_REFERENCE_SYSTEM = new ClassKey(
             "org.opengis.referencing.crs.CoordinateReferenceSystem");
 
     /**
@@ -274,66 +275,42 @@ public final class Hints extends RenderingHints {
      * The value should be an instance of {@link File} or {@link String} refering to
      * an existing directory.
      * <p>
-     * To set on the command line:
+     * Filenames in the supplied directory should be of the form
+     * <code><var>authority</var>.properties</code> where <var>authority</var>
+     * is the authority name space to use. For example the
+     * {@value org.geotools.referencing.factory.epsg.FactoryUsingWKT#FILENAME}
+     * file contains extra CRS to add as new EPSG codes.
+     * <p>
+     * To set the directory on the command line:
      *
      * <blockquote><pre>
-     * -Dorg.geotools.referencing.crs-directory=<var>PATH</var>
+     * -D{@value GeoTools#CRS_AUTHORITY_EXTRA_DIRECTORY}=<var>path</var>
      * </pre></blockquote>
      *
      * @since 2.4
      */
-    public static final Key CRS_AUTHORITY_EXTRA_DIRECTORY = new FileKey(
-            "org.geotools.referencing.crs-directory");
-
-    /**
-     * Used to direct WKT CRS Authority to a the file containing extra definitions.
-     * The value should be an instance of {@link File} or {@link String} refering to
-     * an existing file.
-     * <p>
-     * To set on the command line:
-     *
-     * <blockquote><pre>
-     * -Dorg.geotools.referencing.crs-file=<var>FILE</var>
-     * </pre></blockquote>
-     *
-     * @since 2.4
-     * @deprecated Seems not used.
-     */
-    public static final Key CRS_AUTHORITY_EXTRA_FILE = new FileKey(
-            "org.geotools.referencing.crs-file");
-
-    /**
-     * Provides a DataSource to the JDBC EPSG Authority implementations.
-     * <p>
-     * To set on the command line:
-     * <blockquote><pre>
-     * -Dorg.geotools.referencing.crs-datasource=<var>JNDI_REFERENCE</var>
-     * </pre></blockquote>
-     * <p>
-     * Possible values:
-     * <ul>
-     *   <li>String - used with JNDI to locate datasource</li>
-     *   <li>DataSource - used as is</li>
-     *   <li>missing - assume connection information provided</li>
-     * </ul>
-     *
-     * @since 2.4
-     * @deprecated Seems not yet used. Current proposal is {@link #EPSG_DATA_SOURCE},
-     *             but it may not be generic enough.
-     */
-    public static final Key CRS_AUTHORITY_DATASOURCE = new Key(Object.class);
+    public static final Key CRS_AUTHORITY_EXTRA_DIRECTORY = new FileKey(false);
 
     /**
      * The {@linkplain javax.sql.DataSource data source} name to lookup from JNDI when
      * initializing the {@linkplain org.geotools.referencing.factory.epsg EPSG factory}.
-     * The value should be a {@link String}. If this hint is not provided, then the default
-     * is {@value org.geotools.referencing.factory.epsg.DefaultFactory#DATASOURCE_NAME}.
-     * This hint has no effect if there is no {@linkplain javax.naming.InitialContext
-     * JNDI initial context} setup.
+     * Possible values:
+     * <ul>
+     *   <li>{@link String} - used with JNDI to locate datasource. This hint has no effect if
+     *       there is no {@linkplain javax.naming.InitialContext JNDI initial context} setup.</li>
+     *   <li>{@linkplain javax.sql.DataSource} - used as is.</li>
+     *   <li>missing - default to
+     *       {@value org.geotools.referencing.factory.epsg.DefaultFactory#DATASOURCE_NAME}.</li>
+     * </ul>
+     * <p>
+     * To set on the command line:
+     * <blockquote><pre>
+     * -D{@value GeoTools#EPSG_DATA_SOURCE}=<var>jndiReference</var>
+     * </pre></blockquote>
      *
      * @since 2.4
      */
-    public static final Key EPSG_DATA_SOURCE = new Key(String.class);
+    public static final Key EPSG_DATA_SOURCE = new DataSourceKey();
 
     /**
      * The preferred datum shift method to use for
@@ -397,6 +374,11 @@ public final class Hints extends RenderingHints {
      * this hint has precedence. This allow axis order control on a data store
      * basis, and keep the system-wide property as the default value only for
      * cases where axis order is unspecified.
+     * <p>
+     * To set on the command line:
+     * <blockquote><pre>
+     * -D{@value GeoTools#FORCE_LONGITUDE_FIRST_AXIS_ORDER}=<var>longitudeFirst</var>
+     * </pre></blockquote>
      * 
      * @see org.geotools.referencing.FactoryFinder#getCSFactory
      * @see org.geotools.referencing.FactoryFinder#getCRSFactory
@@ -477,7 +459,7 @@ public final class Hints extends RenderingHints {
      * @deprecated The {@code GridCoverageProcessor} interface is not yet
      *             stable. Avoid dependencies if possible.
      */
-    public static final Key GRID_COVERAGE_PROCESSOR = new Key(Object.class);
+    public static final Key GRID_COVERAGE_PROCESSOR = new ClassKey(Object.class);
     // TODO new Key("org.opengis.coverage.processing.GridCoverageProcessor");
 
     /**
@@ -533,13 +515,23 @@ public final class Hints extends RenderingHints {
     /**
      * The {@link javax.media.jai.JAI} instance to use.
      */
-    public static final Key JAI_INSTANCE = new Key("javax.media.jai.JAI");
+    public static final Key JAI_INSTANCE = new ClassKey("javax.media.jai.JAI");
 
     /**
      * The {@link org.opengis.coverage.SampleDimensionType} to use.
      */
     public static final Key SAMPLE_DIMENSION_TYPE = new Key(
             "org.opengis.coverage.SampleDimensionType");
+
+    /**
+     * Constructs a new object with the specified key/value pair.
+     * 
+     * @param key   The key of the particular hint property.
+     * @param value The value of the hint property specified with {@code key}.
+     */
+    public Hints(final RenderingHints.Key key, final Object value) {
+        super(key, value);
+    }
 
     /**
      * Constructs a new object with keys and values initialized from the
@@ -576,13 +568,142 @@ public final class Hints extends RenderingHints {
     }
 
     /**
-     * Constructs a new object with the specified key/value pair.
-     * 
-     * @param key   The key of the particular hint property.
-     * @param value The value of the hint property specified with {@code key}.
+     * Scans {@linkplain System#getProperties system properties} for any property keys
+     * defined in the {@link GeoTools} class, and add their values to the {@linkplain
+     * GeoTools#getDefaultHints default hints}. For example if the
+     * {@value GeoTools#FORCE_LONGITUDE_FIRST_AXIS_ORDER} system property is defined,
+     * then the {@link #FORCE_LONGITUDE_FIRST_AXIS_ORDER} hint will be added to the set
+     * of default hints.
+     * <p>
+     * This method is invoked automatically the first time it is needed. It usually don't
+     * need to be invoked explicitly, except if the {@linkplain System#getProperties system
+     * properties} changed.
+     *
+     * @return {@code true} if at least one hint changed as a result of this scan,
+     *         or {@code false} otherwise.
+     *
+     * @since 2.4
      */
-    public Hints(final RenderingHints.Key key, final Object value) {
-        super(key, value);
+    public static boolean scanSystemProperties() {
+        synchronized (GLOBAL) {
+            return GeoTools.scanForSystemHints(GLOBAL);
+        }
+    }
+
+    /**
+     * Invokes {@link #scanSystemProperties} when first needed.
+     */
+    private static void ensureSystemDefaultLoaded() {
+        assert Thread.holdsLock(GLOBAL);
+        if (needScan) {
+            scanSystemProperties();
+            needScan = false;
+        }
+    }
+
+    /**
+     * Returns a copy of the system hints. This is for
+     * {@link GeoTools#getDefaultHints} implementation only.
+     */
+    static Hints getDefaults() {
+        synchronized (GLOBAL) {
+            ensureSystemDefaultLoaded();
+            return new Hints(GLOBAL);
+        }
+    }
+
+    /**
+     * Adds all specified hints to the system hints. This
+     * is for {@link GeoTools#init} implementation only.
+     */
+    static void putSystemDefault(final RenderingHints hints) {
+        synchronized (GLOBAL) {
+            ensureSystemDefaultLoaded();
+            GLOBAL.add(hints);
+        }
+    }
+
+    /**
+     * Returns the hint {@linkplain GeoTools#getDefaultHints default value}
+     * for the specified key.
+     *
+     * @param  key The hints key.
+     * @return The value for the specified key, or {@code null}
+     *         if the key did not have a mapping.
+     *
+     * @since 2.4
+     */
+    public static Object getSystemDefault(final RenderingHints.Key key) {
+        synchronized (GLOBAL) {
+            ensureSystemDefaultLoaded();
+            return GLOBAL.get(key);
+        }
+    }
+
+    /**
+     * Adds a hint value to the set of {@linkplain GeoTools#getDefaultHints default hints}.
+     * Default hints can be added by call to this {@code putDefaultHint} method, to the
+     * {@link GeoTools#init} method or by {@linkplain System#getProperties system properties}
+     * with keys defined by the {@link String} constants in the {@link GeoTools} class.
+     * 
+     * @param key   The hint key.
+     * @param value The hint value.
+     * @return The previous value of the specified key, or {@code null} if none.
+     * @throws IllegalArgumentException If {@link Hints.Key#isCompatibleValue()}
+     *         returns {@code false} for the specified value.
+     *
+     * @since 2.4
+     */
+    public static Object putSystemDefault(final RenderingHints.Key key, final Object value) {
+        synchronized (GLOBAL) {
+            ensureSystemDefaultLoaded();
+            return GLOBAL.put(key, value);
+        }
+    }
+
+    /**
+     * Removes the specified hints from the set of
+     * {@linkplain GeoTools#getDefaultHints default hints}.
+     *
+     * @param  key The hints key that needs to be removed.
+     * @return The value to which the key had previously been mapped,
+     *         or {@code null} if the key did not have a mapping.
+     *
+     * @since 2.4
+     */
+    public static Object removeSystemDefault(final RenderingHints.Key key) {
+        synchronized (GLOBAL) {
+            ensureSystemDefaultLoaded();
+            return GLOBAL.remove(key);
+        }
+    }
+
+    /**
+     * Returns a string representation of the hints. This method formats the set of hints
+     * as a tree. If some system-wide {@linkplain GeoTools#getDefaultHints default hints}
+     * exist, they are formatted after those hints for completness.
+     *
+     * @since 2.4
+     */
+    public String toString() {
+        final String lineSeparator = System.getProperty("line.separator", "\n");
+        final StringBuffer buffer = new StringBuffer("Hints:"); // TODO: localize
+        buffer.append(lineSeparator).append(AbstractFactory.toString(this));
+        Map extra = null;
+        synchronized (GLOBAL) {
+            ensureSystemDefaultLoaded();
+            if (!GLOBAL.isEmpty()) {
+                extra = new HashMap(GLOBAL);
+            }
+        }
+        if (extra != null) {
+            extra.keySet().removeAll(keySet());
+            if (!extra.isEmpty()) {
+                buffer.append("System defaults:")  // TODO: localize
+                      .append(lineSeparator).append(AbstractFactory.toString(extra));
+            }
+        }
+        return buffer.toString();
     }
 
     /**
@@ -596,11 +717,11 @@ public final class Hints extends RenderingHints {
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    public static class Key extends RenderingHints.Key {
+    public static class Key/*<T>*/ extends RenderingHints.Key {
         /**
          * The number of key created up to date.
          */
-        private static volatile int count;
+        private static int count;
 
         /**
          * The class name for {@link #valueClass}.
@@ -613,7 +734,7 @@ public final class Hints extends RenderingHints {
          * {@link #JAI_INSTANCE} key for example, in order to avoid JAI dependencies in applications
          * that do not need it.
          */
-        private transient Class valueClass;
+        private transient Class/*<T>*/ valueClass;
 
         /**
          * Constructs a new key for values of the given class.
@@ -621,7 +742,7 @@ public final class Hints extends RenderingHints {
          * @param classe
          *            The base class for all valid values.
          */
-        public Key(final Class classe) {
+        public Key(final Class/*<T>*/ classe) {
             this(classe.getName());
             valueClass = classe;
         }
@@ -635,14 +756,23 @@ public final class Hints extends RenderingHints {
          *            Name of base class for all valid values.
          */
         Key(final String className) {
-            super(count++);
+            super(count());
             this.className = className;
+        }
+
+        /**
+         * Workaround for RFE #4093999 ("Relax constraint on placement of this()/super()
+         * call in constructors"): {@code count++} need to be executed in a synchronized
+         * block since it is not an atomic operation.
+         */
+        private static synchronized int count() {
+            return count++;
         }
 
         /**
          * Returns the expected class for values stored under this key.
          */
-        public Class getValueClass() {
+        public Class/*<T>*/ getValueClass() {
             if (valueClass == null) {
                 try {
                     valueClass = Class.forName(className);
@@ -656,51 +786,21 @@ public final class Hints extends RenderingHints {
         }
 
         /**
-         * Property for System.getProperty( className ), may be unspecified by user.
-         *
-         * @return system property, may be null
-         */
-        String getSystemProperty() {
-            return System.getProperty(className);
-        }
-
-        /**
          * Returns {@code true} if the specified object is a valid value for
-         * this key. This method checks if the specified value is non-null and
-         * is one of the following:
+         * this key. The default implementation checks if the specified value
+         * {@linkplain Class#isInstance is an instance} of the {@linkplain
+         * #getValueClass value class}.
          * <p>
-         * <ul>
-         * <li>An instance of the
-         * {@linkplain #getValueClass expected value class}.</li>
-         * <li>A {@link Class} assignable to the expected value class.</li>
-         * <li>An array of {@code Class} objects assignable to the expected
-         * value class.</li>
-         * </ul>
+         * Note that many hint keys defined in the {@link Hints} class relax this rule and accept
+         * {@link Class} object assignable to the expected {@linkplain #getValueClass value class}
+         * as well.
          * 
          * @param value
          *            The object to test for validity.
          * @return {@code true} if the value is valid; {@code false} otherwise.
          */
         public boolean isCompatibleValue(final Object value) {
-            if (value == null) {
-                return false;
-            }
-            if (value instanceof Class[]) {
-                final Class[] types = (Class[]) value;
-                for (int i = 0; i < types.length; i++) {
-                    if (!isCompatibleValue(types[i])) {
-                        return false;
-                    }
-                }
-                return types.length != 0;
-            }
-            final Class type;
-            if (value instanceof Class) {
-                type = (Class) value;
-            } else {
-                type = value.getClass();
-            }
-            return getValueClass().isAssignableFrom(type);
+            return getValueClass().isInstance(value);
         }
 
         /**
@@ -737,22 +837,103 @@ public final class Hints extends RenderingHints {
     }
 
     /**
+     * A key for value that may be specified either as instance of {@code T}, or as
+     * {@code Class<T>}.
      * 
+     * @since 2.4
+     * @source $URL$
+     * @version $Id$
+     * @author Martin Desruisseaux
      */
-    static final class FileKey extends Key {
+    static final class ClassKey/*<T>*/ extends Key/*<T>*/ {
         /**
+         * Constructs a new key for values of the given class.
+         * 
+         * @param classe
+         *            The base class for all valid values.
          */
-        private final String id;
-
-        /**
-         */
-        public FileKey(final String id) {
-            super(File.class);
-            this.id = id;
+        public ClassKey(final Class/*<T>*/ classe) {
+            super(classe);
         }
 
         /**
+         * Constructs a new key for values of the given class. The class is
+         * specified by name instead of a {@link Class} object. This allows to
+         * defer class loading until needed.
+         * 
+         * @param className
+         *            Name of base class for all valid values.
          */
+        ClassKey(final String className) {
+            super(className);
+        }
+
+        /**
+         * Returns {@code true} if the specified object is a valid value for
+         * this key. This method checks if the specified value is non-null and
+         * is one of the following:
+         * <p>
+         * <ul>
+         *   <li>An instance of the {@linkplain #getValueClass expected value class}.</li>
+         *   <li>A {@link Class} assignable to the expected value class.</li>
+         *   <li>An array of {@code Class} objects assignable to the expected value class.</li>
+         * </ul>
+         */
+        //@Override
+        public boolean isCompatibleValue(final Object value) {
+            if (value == null) {
+                return false;
+            }
+            if (value instanceof Class[]) {
+                final Class[] types = (Class[]) value;
+                for (int i = 0; i < types.length; i++) {
+                    if (!isCompatibleValue(types[i])) {
+                        return false;
+                    }
+                }
+                return types.length != 0;
+            }
+            final Class type;
+            if (value instanceof Class) {
+                type = (Class) value;
+            } else {
+                type = value.getClass();
+            }
+            return getValueClass().isAssignableFrom(type);
+        }
+    }
+
+    /**
+     * Key for hints to be specified as a {@link File}.
+     * The file may also be specified as a {@link String} object.
+     * 
+     * @since 2.4
+     * @source $URL$
+     * @version $Id$
+     * @author Jody Garnett
+     * @author Martin Desruisseaux
+     */
+    static final class FileKey extends Key {
+        /**
+         * {@code true} if write operations need to be allowed.
+         */
+        private final boolean writable;
+
+        /**
+         * Creates a new key for {@link File} value.
+         *
+         * @param writable
+         *          {@code true} if write operations need to be allowed.
+         */
+        public FileKey(final boolean writable) {
+            super(File.class);
+            this.writable = writable;
+        }
+
+        /**
+         * Returns {@code true} if the specified object is a valid file or directory.
+         */
+        //@Override
         public boolean isCompatibleValue(final Object value) {
             final File file;
             if (value instanceof File) {
@@ -762,16 +943,37 @@ public final class Hints extends RenderingHints {
             } else {
                 return false;
             }
-            return file.exists() || file.canWrite();
+            if (file.exists()) {
+                return !writable || file.canWrite();
+            }
+            final File parent = file.getParentFile();
+            return parent!=null && parent.canWrite();
+        }
+    }
+
+    /**
+     * Key for hints to be specified as a {@link javax.sql.DataSource}.
+     * The file may also be specified as a {@link String} object.
+     * 
+     * @since 2.4
+     * @source $URL$
+     * @version $Id$
+     * @author Martin Desruisseaux
+     */
+    static final class DataSourceKey extends Key {
+        /**
+         * Creates a new key for {@link javax.sql.DataSource} value.
+         */
+        public DataSourceKey() {
+            super(DataSource.class);
         }
 
         /**
-         * Property for System.getProperty( id ), may be unspecified by user.
-         * @return system property, may be null
+         * Returns {@code true} if the specified object is a data source or data source name.
          */
         //@Override
-        String getSystemProperty() {
-            return System.getProperty(id);
-        }
+        public boolean isCompatibleValue(final Object value) {
+            return (value instanceof DataSource) || (value instanceof String);
+        }        
     }
 }

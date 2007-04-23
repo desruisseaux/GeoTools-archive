@@ -124,8 +124,8 @@ public final class MathTransformTest extends TestCase {
                 "  PARAMETER[\"Latitude_Of_Origin\",0],\n"                 +
                 "  UNIT[\"Meter\",1]]");
         
-        MathTransform t = ReferencingFactoryFinder.getCoordinateOperationFactory(null).createOperation(
-                                        DefaultGeographicCRS.WGS84, crs).getMathTransform();
+        MathTransform t = ReferencingFactoryFinder.getCoordinateOperationFactory(null).
+                createOperation(DefaultGeographicCRS.WGS84, crs).getMathTransform();
         DirectPosition position = new GeneralDirectPosition(-123, 55);
         position = t.          transform(position, position);
         position = t.inverse().transform(position, position);

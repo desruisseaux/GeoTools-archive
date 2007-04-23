@@ -171,9 +171,7 @@ public class DefaultFactory extends DeferredAuthorityFactory
      */
     public DefaultFactory(final Hints hints, final int priority) {
         super(hints, priority);
-        if (hints != null) {
-            datasourceName = (String) hints.get(Hints.EPSG_DATA_SOURCE);
-        }
+        datasourceName = (String) getHintValue(hints, Hints.EPSG_DATA_SOURCE);
         if (datasourceName == null) {
             datasourceName = DATASOURCE_NAME;
         }

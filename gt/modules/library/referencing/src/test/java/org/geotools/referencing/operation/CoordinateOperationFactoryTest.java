@@ -72,7 +72,7 @@ public final class CoordinateOperationFactoryTest extends TestTransform {
     public CoordinateOperationFactoryTest(final String name) {
         super(name);
     }
-    
+
     /**
      * Uses reflection to dynamically create a test suite containing all 
      * the <code>testXXX()</code> methods - from the JUnit FAQ.
@@ -80,7 +80,7 @@ public final class CoordinateOperationFactoryTest extends TestTransform {
     public static Test suite() {
         return new TestSuite(CoordinateOperationFactoryTest.class);
     }
-    
+
     /**
      * Runs the tests with the textual test runner.
      */

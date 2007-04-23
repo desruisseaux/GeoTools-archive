@@ -258,9 +258,9 @@ public final class FactoriesTest extends TestCase {
 
         for (int i=0; i<3; i++) {
             switch (i) {
-                case  0: factory = new DatumAliases(factory);           break;
+                case  0: factory = new DatumAliases(factory);                      break;
                 case  1: factory = ReferencingFactoryFinder.getDatumFactory(null); break;
-                case  2: ((DatumAliases) factory).freeUnused();         break;
+                case  2: ((DatumAliases) factory).freeUnused();                    break;
                 default: throw new AssertionError(); // Should not occurs.
             }
             final String pass = "Pass #"+i;

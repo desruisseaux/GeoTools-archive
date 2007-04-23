@@ -21,12 +21,12 @@ import java.util.Collection;
 import java.awt.geom.Point2D;
 
 // OpenGIS dependencies
-import org.opengis.metadata.Identifier;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.ReferenceIdentifier;
 
 // Geotools dependencies
 import org.geotools.math.Complex;
@@ -282,7 +282,8 @@ public class NewZealandMapGrid extends MapProjection {
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(
+                new ReferenceIdentifier[] {
                     new NamedIdentifier(Citations.OGC,  "New_Zealand_Map_Grid"),
                     new NamedIdentifier(Citations.EPSG, "New Zealand Map Grid"),
                     new NamedIdentifier(Citations.EPSG, "27200")

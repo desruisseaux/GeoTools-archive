@@ -92,7 +92,7 @@ public final class ImagingParametersTest extends TestCase {
         assertEquals   ("Name",  "AddConst", parameters.getName().getCode());
         assertEquals   ("Authority", author, parameters.getName().getAuthority().getTitle().toString());
         assertEquals   ("Vendor",    vendor, alias     .getScope().toString());
-        //assertNotNull  ("Version",           parameters.getName().getVersion());
+        assertNotNull  ("Version",           parameters.getName().getVersion());
         assertLocalized("Vendor",            alias     .getScope().toInternationalString());
         assertLocalized("Remarks",           parameters.getRemarks());
         assertTrue     ("Remarks",           parameters.getRemarks().toString().trim().length() > 0);

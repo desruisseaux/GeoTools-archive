@@ -72,15 +72,14 @@ import org.geotools.resources.i18n.LoggingKeys;
  */
 public class FactoryRegistry extends ServiceRegistry {
     /**
-     * Change DEFAULTS to true to try it out GeoTools.getDefaultHints().
-     * <p>
-     * We are having trouble when using non null hints, give this a go.
-     */
-    public final boolean DEFAULTS = true;
-    /**
      * The logger for all events related to factory registry.
      */
     protected static final Logger LOGGER = Logger.getLogger("org.geotools.factory");
+
+    /**
+     * The logger level for debug messages.
+     */
+    private static final Level DEBUG_LEVEL = Level.FINEST;
 
     /**
      * A copy of the global configuration set through {@link Factories} static methods. We keep
@@ -242,33 +241,48 @@ public class FactoryRegistry extends ServiceRegistry {
                                      Hints hints, final Hints.Key key)
             throws FactoryRegistryException
     {
-        final Level BEFORE = LOGGER.getLevel();
-        
-        try {
-            //LOGGER.setLevel( Level.FINEST );
         synchronizeIteratorProviders();
-        String target = category.getName();
-        target = target.substring( target.lastIndexOf('.'));
-        LOGGER.finest("GetServiceProvider: "+target+" --->" );
+        final boolean debug = LOGGER.isLoggable(DEBUG_LEVEL);
+        if (debug) {
+            /*
+             * We are not required to insert the method name ("GetServiceProvider") in the
+             * message because it is part of the informations already stored by LogRecord,
+             * and formatted by the default java.util.logging.SimpleFormatter.
+             *
+             * Conventions for the message part according java.util.logging.Logger javadoc:
+             * - "ENTRY"  at the begining of a method.
+             * - "RETURN" at the end of a method, if successful.
+             * - "THROW"  in case of failure.
+             * - "CHECK"  ... is our own addition to Sun's convention for this method ...
+             */
+            debug("ENTRY", category, key, null, null);
+        }
         Class implementation = null;
         if (key != null) {
             /*
              * Sanity check: make sure that the key class is appropriate for the category.
              */
-            if (!category.isAssignableFrom(key.getValueClass())) {
-                LOGGER.finest("GetServiceProvider: "+target+" <--- did not match! FAILURE" );                
+            final Class valueClass = key.getValueClass();
+            if (!category.isAssignableFrom(valueClass)) {
+                if (debug) {
+                    debug("THROW", category, key, "unexpected type:", valueClass);
+                }
                 throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_KEY_$1, key));
             }
             if (hints!=null && !hints.isEmpty()) {
                 final Object hint = hints.get(key);
                 if (hint != null) {
-                    LOGGER.finest("GetServiceProvider: "+target+"    HINT: "+key+"="+hint );                                    
+                    if (debug) {
+                        debug("CHECK", category, key, "user provided a", hint.getClass());
+                    }
                     if (category.isInstance(hint)) {
                         /*
                          * The factory implementation was given explicitly by the user.
                          * Nothing to do; we are done.
                          */
-                        LOGGER.finest("GetServiceProvider: "+target+" <---- ("+key+") return hint as provided SUCCESS");                                        
+                        if (debug) {
+                            debug("RETURN", category, key, "return hint as provided.", null);
+                        }
                         return hint;
                     }
                     /*
@@ -303,10 +317,15 @@ public class FactoryRegistry extends ServiceRegistry {
                         final Class[] types = (Class[]) hint;
                         final int length = types.length;
                         for (int i=0; i<length-1; i++) {
-                            LOGGER.finest("GetServiceProvider: "+target+"("+key+") consider hint["+i+"] "+types[i] );                            
-                            final Object candidate = getServiceImplementation(category, types[i], filter, hints);
+                            final Class type = types[i];
+                            if (debug) {
+                                debug("CHECK", category, key, "consider hint[" + i + ']', type);
+                            }
+                            final Object candidate = getServiceImplementation(category, type, filter, hints);
                             if (candidate != null) {
-                                LOGGER.finest("GetServiceProvider: "+target+" <---- return found implementat"+candidate+" SUCCESS");                                
+                                if (debug) {
+                                    debug("RETURN", category, key, "found implementation", candidate.getClass());
+                                }
                                 return candidate;
                             }
                         }
@@ -319,21 +338,57 @@ public class FactoryRegistry extends ServiceRegistry {
                 }
             }
         }
-        if( implementation != null ){
-            LOGGER.finest("GetServiceProvider: "+target+"       with hint provided implementation "+implementation );
+        if (debug && implementation != null) {
+            debug("CHECK", category, key, "consider hint[last]", implementation);
         }
         final Object candidate = getServiceImplementation(category, implementation, filter, hints);
         if (candidate != null) {
-            LOGGER.finest("GetServiceProvider: "+target+" <---- found service implementation."+candidate.getClass()+" SUCCESS" );            
+            if (debug) {
+                debug("RETURN", category, key, "found implementation", candidate.getClass());
+            }
             return candidate;
         }
-        LOGGER.finest("GetServiceProvider: "+target+" <----- could not find implementation. FAILURE" );        
+        if (debug) {
+            debug("THROW", category, key, "could not find implementation.", null);
+        }
         throw new FactoryNotFoundException(Errors.format(ErrorKeys.FACTORY_NOT_FOUND_$1,
                   Utilities.getShortName(implementation!=null ? implementation : category)));
-    } finally {
-        LOGGER.setLevel( BEFORE );
     }
-}
+
+    /**
+     * Log a debug message for {@link #getServiceProvider} method. Note: we are not required
+     * to insert the method name ({@code "GetServiceProvider"}) in the message because it is
+     * part of the informations already stored by {@link LogRecord}, and formatted by the
+     * default {@link java.util.logging.SimpleFormatter}.
+     *
+     * @param status   {@code "ENTRY"}, {@code "RETURN"} or {@code "THROW"},
+     *                 according {@link Logger} conventions.
+     * @param category The category given to the {@link #getServiceProvider} method.
+     * @param key      The key being examined, or {@code null}.
+     * @param message  Optional message, or {@code null} if none.
+     * @param type     Optional class to format after the message, or {@code null}.
+     */
+    private static void debug(final String status, final Class category,
+                              final Hints.Key key, final String message, final Class type)
+    {
+        final StringBuffer buffer = new StringBuffer(status);
+        buffer.append(Utilities.spaces(Math.max(1, 7-status.length())))
+              .append('(').append(Utilities.getShortName(category));
+        if (key != null) {
+            buffer.append(", ").append(key);
+        }
+        buffer.append(')');
+        if (message != null) {
+            buffer.append(": ").append(message);
+        }
+        if (type != null) {
+            buffer.append(' ').append(Utilities.getShortName(type)).append('.');
+        }
+        final LogRecord record = new LogRecord(DEBUG_LEVEL, buffer.toString());
+        record.setSourceClassName(FactoryRegistry.class.getName());
+        record.setSourceMethodName("getServiceProvider");
+        LOGGER.log(record);
+    }
 
     /**
      * Search the first implementation in the registery matching the specified conditions.
@@ -349,7 +404,7 @@ public class FactoryRegistry extends ServiceRegistry {
      */
     private Object getServiceImplementation(final Class category, final Class implementation,
                                             final Filter filter,  final Hints hints)
-    {        
+    {
         for (final Iterator/*<Object>*/ it=getUnfilteredProviders(category); it.hasNext();) {
             final Object candidate = it.next();
             // Implementation class must be tested before 'isAcceptable'
@@ -413,7 +468,7 @@ public class FactoryRegistry extends ServiceRegistry {
                                final Class  category,
                                final Hints  hints,
                                final Filter filter)
-    {        
+    {
         if (filter!=null && !filter.filter(candidate)) {
             return false;
         }
@@ -458,10 +513,10 @@ public class FactoryRegistry extends ServiceRegistry {
                                         Set/*<Factory>*/ alreadyDone)
     {
         Hints remaining = null;
-        Map implementationHints = Hints.stripNonKeys( factory.getImplementationHints() );
-        if( implementationHints == null ) {
+        final Map implementationHints = Hints.stripNonKeys(factory.getImplementationHints());
+        if (implementationHints == null) {
             // factory was bad and did not meet contract - assume it used no Hints
-            implementationHints = Collections.EMPTY_MAP;
+            return true;
         }
         for (final Iterator it=implementationHints.entrySet().iterator(); it.hasNext();) {
             final Map.Entry entry = (Map.Entry) it.next();
@@ -729,6 +784,16 @@ public class FactoryRegistry extends ServiceRegistry {
                  */
                 loadingFailure(category, error, false);
                 continue;
+            } catch (ExceptionInInitializerError error) {
+                /*
+                 * If an exception occured during class initialization, log the cause.
+                 * The ExceptionInInitializerError alone doesn't help enough.
+                 */
+                final Throwable cause = error.getCause();
+                if (cause != null) {
+                    loadingFailure(category, cause, true);
+                }
+                throw error;
             } catch (Error error) {
                 if (!Utilities.getShortClassName(error).equals("ServiceConfigurationError")) {
                     // We want to handle sun.misc.ServiceConfigurationError only. Unfortunatly, we

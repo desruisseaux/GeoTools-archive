@@ -85,21 +85,24 @@ public class FactoryUsingWktTest extends TestCase {
                 new Hints(Hints.CRS_AUTHORITY_FACTORY, FactoryUsingWKT.class));
     }
 
+    /**
+     * Tests the setting of "CRS authority extra directory" hint.
+     */
     public void testCrsAuthorityExtraDirectoryHint() throws Exception {
         Hints hints = new Hints(Hints.CRS_AUTHORITY_FACTORY, FactoryUsingWKT.class);
         try {
-           hints.put( Hints.CRS_AUTHORITY_EXTRA_DIRECTORY, "invalid" );
+           hints.put(Hints.CRS_AUTHORITY_EXTRA_DIRECTORY, "invalid");
            fail("Should of been tossed out as an invalid hint");
         }
-        catch( IllegalArgumentException expected){            
+        catch (IllegalArgumentException expected) {
+            // This is the expected exception.
         }
-        
         String directory = new File(".").getAbsolutePath();
         hints = new Hints(Hints.CRS_AUTHORITY_FACTORY, FactoryUsingWKT.class);
-        hints.put( Hints.CRS_AUTHORITY_EXTRA_DIRECTORY, directory );
-        
-        System.setProperty( "org.geotools.referencing.crs-directory", directory );        
+        hints.put(Hints.CRS_AUTHORITY_EXTRA_DIRECTORY, directory);
+        // TODO: test the factory here.
     }
+
     /**
      * Tests the authority code.
      */

@@ -90,6 +90,8 @@ public final class Logging {
      * his setting ignored.
      * 
      * @throws IllegalStateException is {@link #redirectToCommonsLogging} has been invoked.
+     *
+     * @see org.geotools.factory.GeoTools#init
      */
     public synchronized void forceMonolineConsoleOutput(final Level level)
             throws IllegalStateException
@@ -119,10 +121,13 @@ public final class Logging {
      *
      * @return {@code true} if the adapter has been installed or re-installed, or
      *         {@code false} if this method did nothing.
+     *
+     * @see org.geotools.factory.GeoTools#init
      */
     public synchronized boolean redirectToCommonsLogging() {
         try {
             if (CommonHandler.install(root)) {
+                assert isCommonsLoggingAvailable();
                 redirected = true;
                 return true;
             }
@@ -131,6 +136,22 @@ public final class Logging {
             unexpectedException("org.geotools.util", Logging.class, "redirectToCommonsLogging", error);
         }
         return false;
+    }
+
+    /**
+     * Returns {@code true} if the
+     * <A HREF="http://jakarta.apache.org/commons/logging/">commons-logging</A>
+     * framework seems to be available on the classpath.
+     *
+     * @since 2.4
+     */
+    public static boolean isCommonsLoggingAvailable() {
+        try {
+            Class.forName("org.apache.commons.logging.Log", false, Logging.class.getClassLoader());
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 
     /**

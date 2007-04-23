@@ -422,7 +422,7 @@ public final class XMath {
     public static double rool(final Class type, double value, int amount)
             throws IllegalArgumentException
     {
-        if (Double.class.isAssignableFrom(type)) {
+        if (Double.class.equals(type)) {
             if (amount<0) {
                 do {
                     value = previous(value);
@@ -434,7 +434,7 @@ public final class XMath {
             }
             return value;
         }
-        if (Float.class.isAssignableFrom(type)) {
+        if (Float.class.equals(type)) {
             float vf = (float)value;
             if (amount<0) {
                 do {
@@ -462,9 +462,9 @@ public final class XMath {
      * @return {@code true} if {@code type} is the class {@link Float} or {@link Double}.
      */
     public static boolean isReal(final Class type) {
-        return type!=null &&
-               Double.class.isAssignableFrom(type) ||
-                Float.class.isAssignableFrom(type);
+        return type != null &&
+               Double.class.equals(type) ||
+                Float.class.equals(type);
     }
 
     /**
@@ -476,11 +476,11 @@ public final class XMath {
      *         {@link Short} or {@link Byte}.
      */
     public static boolean isInteger(final Class type) {
-        return type!=null &&
-               Long.class.isAssignableFrom(type) ||
-            Integer.class.isAssignableFrom(type) ||
-              Short.class.isAssignableFrom(type) ||
-               Byte.class.isAssignableFrom(type);
+        return type != null &&
+               Long.class.equals(type) ||
+            Integer.class.equals(type) ||
+              Short.class.equals(type) ||
+               Byte.class.equals(type);
     }
 
     /**
@@ -492,14 +492,14 @@ public final class XMath {
      * @todo Use the predefined constants when we will be allowed to use J2SE 1.5.
      */
     public static int getBitCount(final Class type) {
-        if (Double   .class.isAssignableFrom(type)) return 64;
-        if (Float    .class.isAssignableFrom(type)) return 32;
-        if (Long     .class.isAssignableFrom(type)) return 64;
-        if (Integer  .class.isAssignableFrom(type)) return 32;
-        if (Short    .class.isAssignableFrom(type)) return 16;
-        if (Byte     .class.isAssignableFrom(type)) return  8;
-        if (Character.class.isAssignableFrom(type)) return 16;
-        if (Boolean  .class.isAssignableFrom(type)) return  1;
+        if (Double   .class.equals(type)) return 64;
+        if (Float    .class.equals(type)) return 32;
+        if (Long     .class.equals(type)) return 64;
+        if (Integer  .class.equals(type)) return 32;
+        if (Short    .class.equals(type)) return 16;
+        if (Byte     .class.equals(type)) return  8;
+        if (Character.class.equals(type)) return 16;
+        if (Boolean  .class.equals(type)) return  1;
         return 0;
     }
 
@@ -520,5 +520,35 @@ public final class XMath {
         if (Float    .TYPE.equals(type)) return Float    .class;
         if (Double   .TYPE.equals(type)) return Double   .class;
         return type;
+    }
+
+    /**
+     * Converts the specified string into a value object. The value object will be an instance
+     * of {@link Boolean}, {@link Integer}, {@link Double}, <cite>etc.</cite> according the
+     * specified type.
+     *
+     * @param  type The requested type.
+     * @param  value the value to parse.
+     * @return The value object, or {@code null} if {@code value} was null.
+     * @throws IllegalArgumentException if {@code type} is not a recognized type.
+     * @throws NumberFormatException if the string value is not parseable as a number
+     *         of the specified type.
+     *
+     * @since 2.4
+     */
+    public static /*T*/ Object valueOf(final Class/*<T>*/ type, final String value)
+            throws IllegalArgumentException, NumberFormatException
+    {
+        if (value == null) {
+            return null;
+        }
+        if (Double   .class.equals(type)) return Double .valueOf(value);
+        if (Float    .class.equals(type)) return Float  .valueOf(value);
+        if (Long     .class.equals(type)) return Long   .valueOf(value);
+        if (Integer  .class.equals(type)) return Integer.valueOf(value);
+        if (Short    .class.equals(type)) return Short  .valueOf(value);
+        if (Byte     .class.equals(type)) return Byte   .valueOf(value);
+        if (Boolean  .class.equals(type)) return Boolean.valueOf(value);
+        throw new IllegalArgumentException(Errors.format(ErrorKeys.UNKNOW_TYPE_$1, type));
     }
 }

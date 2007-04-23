@@ -82,12 +82,12 @@ import org.geotools.resources.LazySet;
  * {@link FactoryRegistry}. This {@code FactoryFinder} class is simply a convenience
  * wrapper around a {@code FactoryRegistry} instance.</P>
  *
- * @since 2.0
+ * @since 2.4
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class ReferencingFactoryFinder {
+public class ReferencingFactoryFinder {
     /**
      * The service registry for this manager.
      * Will be initialized only when first needed.
@@ -108,7 +108,7 @@ public final class ReferencingFactoryFinder {
     /**
      * Do not allows any instantiation of this class.
      */
-    private ReferencingFactoryFinder() {
+    ReferencingFactoryFinder() {
         // singleton
     }
 
@@ -261,8 +261,6 @@ loop:       for (int i=0; ; i++) {
      *
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available datum factory implementations.
-     *
-     * @since 2.3
      */
     public static Set getDatumFactories(final Hints hints) {
         return getFactories(DatumFactory.class, hints);
@@ -289,8 +287,6 @@ loop:       for (int i=0; ; i++) {
      *
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available coordinate system factory implementations.
-     *
-     * @since 2.3
      */
     public static Set getCSFactories(final Hints hints) {
         return getFactories(CSFactory.class, hints);
@@ -317,8 +313,6 @@ loop:       for (int i=0; ; i++) {
      *
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available coordinate reference system factory implementations.
-     *
-     * @since 2.3
      */
     public static Set getCRSFactories(final Hints hints) {
         return getFactories(CRSFactory.class, hints);
@@ -355,8 +349,6 @@ loop:       for (int i=0; ; i++) {
      *
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available coordinate operation factory implementations.
-     *
-     * @since 2.3
      */
     public static Set getCoordinateOperationFactories(final Hints hints) {
         return getFactories(CoordinateOperationFactory.class, hints);
@@ -389,8 +381,6 @@ loop:       for (int i=0; ; i++) {
      *
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available datum authority factory implementations.
-     *
-     * @since 2.3
      */
     public static Set getDatumAuthorityFactories(final Hints hints) {
         return getFactories(DatumAuthorityFactory.class, hints);
@@ -428,8 +418,6 @@ loop:       for (int i=0; ; i++) {
      *
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available coordinate system authority factory implementations.
-     *
-     * @since 2.3
      */
     public static Set getCSAuthorityFactories(final Hints hints) {
         return getFactories(CSAuthorityFactory.class, hints);
@@ -471,8 +459,6 @@ loop:       for (int i=0; ; i++) {
      *
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available coordinate reference system authority factory implementations.
-     *
-     * @since 2.3
      */
     public static Set getCRSAuthorityFactories(final Hints hints) {
         return getFactories(CRSAuthorityFactory.class, hints);
@@ -506,8 +492,6 @@ loop:       for (int i=0; ; i++) {
      *
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available coordinate operation authority factory implementations.
-     *
-     * @since 2.3
      */
     public static Set getCoordinateOperationAuthorityFactories(final Hints hints) {
         return getFactories(CoordinateOperationAuthorityFactory.class, hints);
@@ -538,8 +522,6 @@ loop:       for (int i=0; ; i++) {
      *
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available math transform factory implementations.
-     *
-     * @since 2.3
      */
     public static Set getMathTransformFactories(final Hints hints) {
         return getFactories(MathTransformFactory.class, hints);

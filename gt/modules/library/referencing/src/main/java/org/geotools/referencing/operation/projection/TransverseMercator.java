@@ -30,13 +30,13 @@ import java.awt.geom.Point2D;
 import java.util.Collection;
 
 // OpenGIS dependencies
-import org.opengis.metadata.Identifier;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.CylindricalProjection;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.ReferenceIdentifier;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.Citations;
@@ -602,7 +602,7 @@ public class TransverseMercator extends MapProjection {
         /**
          * Returns a descriptor group for the specified parameters.
          */
-        static ParameterDescriptorGroup createDescriptorGroup(final Identifier[] identifiers) {
+        static ParameterDescriptorGroup createDescriptorGroup(final ReferenceIdentifier[] identifiers) {
             return createDescriptorGroup(identifiers, new ParameterDescriptor[] {
                 SEMI_MAJOR,       SEMI_MINOR,
                 CENTRAL_MERIDIAN, LATITUDE_OF_ORIGIN,

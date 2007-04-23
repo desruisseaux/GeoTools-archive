@@ -65,7 +65,7 @@ public final class GeocentricTransformTest extends TestTransform {
     public static Test suite() {
         return new TestSuite(GeocentricTransformTest.class);
     }
-    
+
     /**
      * Constructs a test case with the given name.
      */

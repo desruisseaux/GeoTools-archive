@@ -86,10 +86,11 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
     /**
      * The {@linkplain System#getProperty(String) system property} key for setting the directory
      * where to search for the {@value #FILENAME} file.
-     * @depreacted Please use Hints.CRS_AUTHORITY_DATASOURCE
+     *
      * @since 2.4
+     * @deprecated Moved to {@link GeoTools#CRS_AUTHORITY_EXTRA_DIRECTORY}.
      */
-    public static final String CRS_DIRECTORY_KEY = "org.geotools.referencing.crs-directory";
+    public static final String CRS_DIRECTORY_KEY = GeoTools.CRS_AUTHORITY_EXTRA_DIRECTORY;
 
     /**
      * The default filename to read. The default {@code FactoryUsingWKT} implementation will
@@ -115,24 +116,26 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
      * The factories to be given to the backing store.
      */
     private final FactoryGroup factories;
-    
+
     /**
      * Default priority for this factory.
      *
      * @since 2.4
+     * @deprecated We will try to replace the priority mechanism by a better
+     *             one in a future Geotools version.
      */
     protected static final int DEFAULT_PRIORITY = DefaultFactory.PRIORITY - 10;
 
     /**
-     * Directed scanned for extra definitions.
+     * Directory scanned for extra definitions.
      */
-    protected File directory;
-    
+    private final File directory;
+
     /**
      * Constructs an authority factory using the default set of factories.
      */
     public FactoryUsingWKT() {
-        this( GeoTools.getDefaultHints() );
+        this(null);
     }
 
     /**
@@ -142,24 +145,7 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
      * {@code FACTORY} hints.
      */
     public FactoryUsingWKT(final Hints hints) {
-        this(hints, DEFAULT_PRIORITY );
-        
-        if (hints != null) {
-            Object hint = hints.get(Hints.CRS_AUTHORITY_EXTRA_DIRECTORY);
-            if( hint instanceof File){
-                directory = (File) hint;
-            }
-            else if( hint instanceof String ){
-                directory = new File( (String) hint );
-            }
-        }
-        if (directory == null) {
-            String systemDefault = System.getProperty(CRS_DIRECTORY_KEY);
-            if( systemDefault != null ){
-                directory = new File( systemDefault );
-            }
-        }        
-        super.hints.put( Hints.CRS_AUTHORITY_EXTRA_DIRECTORY, directory );
+        this(hints, DEFAULT_PRIORITY);
     }
 
     /**
@@ -168,6 +154,15 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
     protected FactoryUsingWKT(final Hints hints, final int priority) {
         super(hints, priority);
         factories = FactoryGroup.createInstance(hints);
+        final Object hint = getHintValue(hints, Hints.CRS_AUTHORITY_EXTRA_DIRECTORY);
+        if (hint instanceof File) {
+            directory = (File) hint;
+        } else if (hint instanceof String) {
+            directory = new File((String) hint);
+        } else {
+            directory = null;
+        }
+        super.hints.put(Hints.CRS_AUTHORITY_EXTRA_DIRECTORY, directory);
         // Disposes the cached property file after at least 15 minutes of inactivity.
         setTimeout(15 * 60 * 1000L);
     }
@@ -358,8 +353,8 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
 
     /**
      * Prints a list of codes that duplicate the ones provided in the {@link DefaultFactory}.
-     * The factory tested is the one registered in {@link ReferencingFactoryFinder}.  By default, this
-     * is this {@code FactoryUsingWKT} class backed by the {@value #FILENAME} property file.
+     * The factory tested is the one registered in {@link ReferencingFactoryFinder}. By default,
+     * this is this {@code FactoryUsingWKT} class backed by the {@value #FILENAME} property file.
      * This method can be invoked from the command line in order to check the content of the
      * property file. Valid arguments are:
      * <p>

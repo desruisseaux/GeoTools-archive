@@ -2478,7 +2478,9 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
                     final QuantitativeResultImpl                 accuracyResult;
                     final AbsoluteExternalPositionalAccuracyImpl accuracyElement;
                     accuracyResult = new QuantitativeResultImpl(new double[]{accuracy});
-                    //accuracyResult.setValueType(Float.class); // This is the type declared in the MS-Access database.
+                    // TODO: Need to invoke something equivalent to:
+                    // accuracyResult.setValueType(Float.class);
+                    // This is the type declared in the MS-Access database.
                     accuracyResult.setValueUnit(SI.METER); // In meters by definition in the EPSG database.
                     accuracyElement = new AbsoluteExternalPositionalAccuracyImpl(accuracyResult);
                     accuracyElement.setMeasureDescription(TRANSFORMATION_ACCURACY);

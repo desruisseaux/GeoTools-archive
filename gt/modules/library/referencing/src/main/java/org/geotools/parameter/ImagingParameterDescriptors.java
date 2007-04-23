@@ -44,6 +44,7 @@ import org.opengis.metadata.citation.OnLineFunction;
 import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.citation.ResponsibleParty;
+import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.coverage.grid.GridCoverage;
@@ -54,7 +55,6 @@ import org.opengis.util.GenericName;
 import org.geotools.util.NameFactory;
 import org.geotools.resources.Utilities;
 import org.geotools.referencing.AbstractIdentifiedObject;
-import org.geotools.metadata.iso.IdentifierImpl;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.metadata.iso.citation.ContactImpl;
 import org.geotools.metadata.iso.citation.CitationImpl;
@@ -224,7 +224,7 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
      *       {@linkplain ResponsibleParty#getContactInfo contact information}.</td></td>
      *  </tr>
      *  <tr>
-     *   <td>{@link Identifier#VERSION_KEY VERSION_KEY}</td>
+     *   <td>{@link ReferenceIdentifier#VERSION_KEY VERSION_KEY}</td>
      *   <td>{@code "Version"} {@linkplain OperationDescriptor#getResources resources}</td>
      *  </tr>
      *  <tr>
@@ -315,8 +315,7 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
             }, '.');
             properties.put(ALIAS_KEY,   alias);
             properties.put(REMARKS_KEY, description);
-            //TODO: add VERSION_KEY to ReferenceIdentifier
-            //properties.put(Identifier.VERSION_KEY, bundle.getString("Version"));
+            properties.put(ReferenceIdentifier.VERSION_KEY, bundle.getString("Version"));
             properties.put(Identifier.AUTHORITY_KEY, authority);
         }
         properties.put(NAME_KEY, name);

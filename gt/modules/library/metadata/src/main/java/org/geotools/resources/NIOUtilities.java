@@ -91,7 +91,7 @@ public class NIOUtilities {
     private static synchronized boolean isLoggable() {
         try {
             return !warned && (
-                    System.getProperty("org.geotools.io.debugBuffer", "false").equalsIgnoreCase("true") ||
+                    Boolean.getBoolean("org.geotools.io.debugBuffer") ||
                     System.getProperty("os.name").indexOf("Windows") >= 0 );
         } catch (SecurityException exception) {
             // The utilities may be running in an Applet, in which case we

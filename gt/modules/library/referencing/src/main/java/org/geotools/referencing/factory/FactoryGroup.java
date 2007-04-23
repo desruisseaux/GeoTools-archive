@@ -172,8 +172,8 @@ public final class FactoryGroup extends ReferencingFactory {
      * Returns the factory for the specified hint, or {@code null} if the hint is not a factory
      * instance. It could be for example a {@link Class}.
      */
-    private static Factory extract(final Map hints, final Hints.Key key) {
-        final Object candidate = hints.get(key);
+    private Factory extract(final Map hints, final Hints.Key key) {
+        final Object candidate = getHintValue(hints, key);
         if (candidate instanceof Factory) {
             hints.remove(key);
             return (Factory) candidate;

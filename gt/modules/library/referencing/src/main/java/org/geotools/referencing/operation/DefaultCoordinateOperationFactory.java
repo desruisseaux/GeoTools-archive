@@ -27,10 +27,10 @@ import javax.units.Unit;
 import javax.vecmath.SingularMatrixException;
 
 // OpenGIS dependencies
-import org.opengis.metadata.Identifier;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
+import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.cs.*;
 import org.opengis.referencing.crs.*;
 import org.opengis.referencing.datum.*;
@@ -38,7 +38,6 @@ import org.opengis.referencing.operation.*;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
-import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.crs.DefaultCompoundCRS;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
@@ -140,18 +139,16 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
         //
         // Fetchs the user-supplied hints
         //
-        if (hints != null) {
-            Object candidate = hints.get(Hints.DATUM_SHIFT_METHOD);
-            if (candidate instanceof String) {
-                molodenskiMethod = (String) candidate;
-                if (molodenskiMethod.trim().equalsIgnoreCase("Geocentric")) {
-                    molodenskiMethod = null;
-                }
+        Object candidate = getHintValue(hints, Hints.DATUM_SHIFT_METHOD);
+        if (candidate instanceof String) {
+            molodenskiMethod = (String) candidate;
+            if (molodenskiMethod.trim().equalsIgnoreCase("Geocentric")) {
+                molodenskiMethod = null;
             }
-            candidate = hints.get(Hints.LENIENT_DATUM_SHIFT);
-            if (candidate instanceof Boolean) {
-                lenientDatumShift = ((Boolean) candidate).booleanValue();
-            }
+        }
+        candidate = getHintValue(hints, Hints.LENIENT_DATUM_SHIFT);
+        if (candidate instanceof Boolean) {
+            lenientDatumShift = ((Boolean) candidate).booleanValue();
         }
         //
         // Stores the retained hints
@@ -792,7 +789,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
          * in a single affine transform.
          */
         if (molodenskiMethod != null) {
-            Identifier          identifier = DATUM_SHIFT;
+            ReferenceIdentifier identifier = DATUM_SHIFT;
             BursaWolfParameters bursaWolf  = null;
             if (sourceDatum instanceof DefaultGeodeticDatum) {
                 bursaWolf = ((DefaultGeodeticDatum) sourceDatum).getBursaWolfParameters(targetDatum);
@@ -1066,7 +1063,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
          */
         final CartesianCS STANDARD = DefaultCartesianCS.GEOCENTRIC;
         final XMatrix matrix;
-        Identifier identifier = DATUM_SHIFT;
+        ReferenceIdentifier identifier = DATUM_SHIFT;
         try {
             Matrix datumShift = DefaultGeodeticDatum.getAffineTransform(
                                     TemporaryDatum.unwrap(sourceDatum),

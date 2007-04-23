@@ -30,12 +30,10 @@ import junit.framework.TestSuite;
 import org.opengis.coverage.grid.GridCoverage;
 
 // Geotools dependencies
-import org.geotools.resources.Arguments;
 import org.geotools.test.TestData;
+import org.geotools.resources.Arguments;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.processing.Operations;
-
-import com.sun.media.imageioimpl.plugins.jpeg2000.MediaLibAccessor;
 
 
 /**
@@ -169,6 +167,7 @@ public final class OperationsTest extends GridCoverageTest {
         assertEquals (0, sourceRaster.getMinY());
         assertEquals ("SubtractConst", ((OperationNode) targetImage).getOperationName());
 
+        final boolean medialib = TestData.isMediaLibAvailable();
         for (int y=sourceRaster.getHeight(); --y>=0;) {
             for (int x=sourceRaster.getWidth(); --x>=0;) {
                 final float s = sourceRaster.getSampleFloat(x, y, 0);
@@ -180,8 +179,9 @@ public final class OperationsTest extends GridCoverageTest {
                      * line, then make sure that "<your_jdk_path>/jre/bin/mlib_jai.dll" (Windows)
                      * or "lib/i386/libmlib_jai.so" (Linux) is presents in your JDK installation.
                      */
-                    if(TestData.isMediaLibAvailable())
+                    if (medialib) {
                         assertTrue(Float.isNaN(t));
+                    }
                 } else {
                     assertEquals(s - constants[0], t, 1E-3f);
                 }
@@ -191,7 +191,7 @@ public final class OperationsTest extends GridCoverageTest {
             show(targetCoverage);
         }
     }
-    
+
     /**
      * Tests {@link Operations#nodataFilter}.
      */

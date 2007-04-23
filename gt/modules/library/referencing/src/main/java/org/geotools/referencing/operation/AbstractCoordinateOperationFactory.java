@@ -28,12 +28,12 @@ import java.util.Collections;
 import javax.units.ConversionException;
 
 // OpenGIS dependencies
-import org.opengis.metadata.Identifier;
 import org.opengis.metadata.quality.PositionalAccuracy;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
+import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.operation.Conversion;
@@ -56,7 +56,6 @@ import org.geotools.metadata.iso.quality.PositionalAccuracyImpl;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.NamedIdentifier;
-import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.factory.ReferencingFactory;
 import org.geotools.referencing.cs.AbstractCS;
@@ -85,7 +84,7 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
     /**
      * The identifier for an identity operation.
      */
-    protected static final Identifier IDENTITY =
+    protected static final ReferenceIdentifier IDENTITY =
             new NamedIdentifier(Citations.GEOTOOLS,
                                 Vocabulary.formatInternational(VocabularyKeys.IDENTITY));
 
@@ -93,7 +92,7 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
      * The identifier for conversion using an affine transform for axis swapping and/or
      * unit conversions.
      */
-    protected static final Identifier AXIS_CHANGES =
+    protected static final ReferenceIdentifier AXIS_CHANGES =
             new NamedIdentifier(Citations.GEOTOOLS,
                                 Vocabulary.formatInternational(VocabularyKeys.AXIS_CHANGES));
 
@@ -102,7 +101,7 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
      *
      * @see PositionalAccuracyImpl#DATUM_SHIFT_APPLIED
      */
-    protected static final Identifier DATUM_SHIFT =
+    protected static final ReferenceIdentifier DATUM_SHIFT =
             new NamedIdentifier(Citations.GEOTOOLS,
                                 Vocabulary.formatInternational(VocabularyKeys.DATUM_SHIFT));
 
@@ -116,21 +115,21 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
      *
      * @see PositionalAccuracyImpl#DATUM_SHIFT_OMITTED
      */
-    protected static final Identifier ELLIPSOID_SHIFT =
+    protected static final ReferenceIdentifier ELLIPSOID_SHIFT =
             new NamedIdentifier(Citations.GEOTOOLS,
                                 Vocabulary.formatInternational(VocabularyKeys.ELLIPSOID_SHIFT));
 
     /**
      * The identifier for a geocentric conversion.
      */
-    protected static final Identifier GEOCENTRIC_CONVERSION =
+    protected static final ReferenceIdentifier GEOCENTRIC_CONVERSION =
             new NamedIdentifier(Citations.GEOTOOLS,
                 Vocabulary.formatInternational(VocabularyKeys.GEOCENTRIC_TRANSFORM));
 
     /**
      * The identifier for an inverse operation.
      */
-    protected static final Identifier INVERSE_OPERATION =
+    protected static final ReferenceIdentifier INVERSE_OPERATION =
             new NamedIdentifier(Citations.GEOTOOLS,
                 Vocabulary.formatInternational(VocabularyKeys.INVERSE_OPERATION));
 
@@ -231,10 +230,6 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
                 initializeHints();
                 hintsInitialized = true; // Set only after success.
             }
-            else {
-                // is this not recursive?
-                //System.out.println("!");
-            }
         }
         return super.getImplementationHints();
     }
@@ -245,9 +240,9 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
      */
     void initializeHints() {
         assert Thread.holdsLock(hints);
-        FactoryGroup factoryGroup = getFactoryGroup();
-        Map factoryGroupHints = factoryGroup.getImplementationHints();
-        hints.putAll( factoryGroupHints );
+        final FactoryGroup factories = getFactoryGroup();
+        final Map factoryGroupHints = factories.getImplementationHints();
+        hints.putAll(factoryGroupHints);
     }
 
     /**
@@ -315,7 +310,7 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
      *       Consequently, the Geotools implementation relax the rule requirying an operation
      *       version and we do not try to provide this information here for now.
      */
-    private static Map getProperties(final Identifier name) {
+    private static Map getProperties(final ReferenceIdentifier name) {
         final Map properties;
         if (name==DATUM_SHIFT || name==ELLIPSOID_SHIFT) {
             properties = new HashMap(4);
@@ -345,7 +340,7 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
      * @throws FactoryException if the operation can't be created.
      */
     protected CoordinateOperation createFromAffineTransform(
-                                  final Identifier                name,
+                                  final ReferenceIdentifier       name,
                                   final CoordinateReferenceSystem sourceCRS,
                                   final CoordinateReferenceSystem targetCRS,
                                   final Matrix                    matrix)
@@ -373,7 +368,7 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
      * @throws FactoryException if the operation can't be created.
      */
     protected CoordinateOperation createFromParameters(
-                                  final Identifier                name,
+                                  final ReferenceIdentifier       name,
                                   final CoordinateReferenceSystem sourceCRS,
                                   final CoordinateReferenceSystem targetCRS,
                                   final ParameterValueGroup       parameters)
@@ -398,7 +393,7 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
      * @throws FactoryException if the operation can't be constructed.
      */
     protected CoordinateOperation createFromMathTransform(
-                                  final Identifier                name,
+                                  final ReferenceIdentifier       name,
                                   final CoordinateReferenceSystem sourceCRS,
                                   final CoordinateReferenceSystem targetCRS,
                                   final MathTransform             transform)
@@ -621,26 +616,26 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
      */
     private static final class TemporaryIdentifier extends NamedIdentifier {
         /** The parent identifier. */
-        private final Identifier parent;
+        private final ReferenceIdentifier parent;
 
         /** The temporary object count. */
         private final int count;
 
         /** Constructs an identifier derived from the specified one. */
-        public TemporaryIdentifier(final Identifier parent) {
+        public TemporaryIdentifier(final ReferenceIdentifier parent) {
             this(parent, ((parent instanceof TemporaryIdentifier) ?
                          ((TemporaryIdentifier) parent).count : 0) + 1);
         }
 
         /** Work around for RFE #4093999 in Sun's bug database */
-        private TemporaryIdentifier(final Identifier parent, final int count) {
+        private TemporaryIdentifier(final ReferenceIdentifier parent, final int count) {
             super(Citations.GEOTOOLS, unwrap(parent).getCode() + " (step " + count + ')');
             this.parent = parent;
             this.count  = count;
         }
 
         /** Returns the parent identifier for the specified identifier, if any. */
-        public static Identifier unwrap(Identifier identifier) {
+        public static ReferenceIdentifier unwrap(ReferenceIdentifier identifier) {
             while (identifier instanceof TemporaryIdentifier) {
                 identifier = ((TemporaryIdentifier) identifier).parent;
             }
@@ -664,7 +659,7 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
                 }
             }
             String name = Utilities.getShortName(type);
-            final Identifier id = object.getName();
+            final ReferenceIdentifier id = object.getName();
             if (id != null) {
                 name = name + '[' + id.getCode() + ']';
             }

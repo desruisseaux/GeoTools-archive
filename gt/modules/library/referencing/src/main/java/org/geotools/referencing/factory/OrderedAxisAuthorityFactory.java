@@ -223,14 +223,9 @@ public class OrderedAxisAuthorityFactory extends TransformedAuthorityFactory
     /**
      * Returns the boolean value for the specified hint.
      */
-    private static boolean booleanValue(final Hints hints, final Hints.Key key) {
-        if (hints != null) {
-            final Boolean value = (Boolean) hints.get(key);
-            if (value != null) {
-                return value.booleanValue();
-            }
-        }
-        return false;
+    private boolean booleanValue(final Hints hints, final Hints.Key key) {
+        final Boolean value = (Boolean) getHintValue(hints, key);
+        return (value != null) && value.booleanValue();
     }
 
     /**

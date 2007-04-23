@@ -112,8 +112,19 @@ public class TestData implements Runnable {
      * suffisient since it will preserve any overwritten files.
      */
     private static final LinkedList toDelete = new LinkedList();
-    
+
+    /**
+     * {@code true} if JAI media lib is available.
+     */
     private static final boolean mediaLibAvailable;
+    static {
+        Class mediaLibImage = null;
+        try {
+            mediaLibImage = Class.forName("com.sun.medialib.mlib.Image");
+        } catch (ClassNotFoundException e) {
+        }
+        mediaLibAvailable = (mediaLibImage != null);
+    }
 
     /**
      * Register the thread to be automatically executed at shutdown time.
@@ -121,14 +132,6 @@ public class TestData implements Runnable {
      */
     static {
         Runtime.getRuntime().addShutdownHook(new Thread(new TestData(), "Test data cleaner"));
-        
-        // check media lib is around
-        Class mediaLibImage = null;
-        try {
-            mediaLibImage = Class.forName("com.sun.medialib.mlib.Image");
-        } catch(ClassNotFoundException e) {
-        }
-        mediaLibAvailable = mediaLibImage != null;
     }
 
     /**
@@ -167,12 +170,10 @@ public class TestData implements Runnable {
      * <p>
      * This method is used to disable some checks in unit tests that fail when JAI is
      * run in pure java mode.
-     * @return
      */
     public static boolean isMediaLibAvailable() {
         return mediaLibAvailable;
     }
-    
 
     /**
      * Returns {@code true} if {@value #EXTENSIVE_TEST_KEY} system property is set to

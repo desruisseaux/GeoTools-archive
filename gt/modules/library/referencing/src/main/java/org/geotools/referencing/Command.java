@@ -187,7 +187,7 @@ final class Command {
         table.nextColumn();
         table.write(Vocabulary.format(VocabularyKeys.NOTE));
         table.writeHorizontalSeparator();
-        for (final Iterator it=ReferencingFactoryFinder.getCRSAuthorityFactories(null).iterator(); it.hasNext();) {
+        for (final Iterator it=ReferencingFactoryFinder.getCRSAuthorityFactories(HINTS).iterator(); it.hasNext();) {
             AuthorityFactory factory = (AuthorityFactory) it.next();
             final Citation authority = factory.getAuthority();
             final Iterator identifiers = authority.getIdentifiers().iterator();

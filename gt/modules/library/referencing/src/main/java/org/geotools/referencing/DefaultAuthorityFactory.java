@@ -40,8 +40,8 @@ import org.geotools.referencing.factory.BufferedAuthorityFactory;
  * <p>
  * This class gathers together a lot of logic in order to capture the following ideas:
  * <ul>
- * <li>Uses Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER to swap ordinate order if needed
- * <li>Uses AllAuthoritiesFactory to access CRSAuthorities in the environment
+ *   <li>Uses {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER} to swap ordinate order if needed.</li>
+ *   <li>Uses {@link AllAuthoritiesFactory} to access CRSAuthorities in the environment.</li>
  * </ul>
  * 
  * @since 2.3
@@ -52,16 +52,7 @@ import org.geotools.referencing.factory.BufferedAuthorityFactory;
  */
 final class DefaultAuthorityFactory extends BufferedAuthorityFactory implements CRSAuthorityFactory {
     /**
-     * Creates a new authority factory with a {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER} hint
-     * if {@code longitudeFirst} is {@code true}.
-     */
-    DefaultAuthorityFactory(final boolean longitudeFirst) {
-        this(longitudeFirst ? new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE) : null);
-    }
-
-    /**
-     * Work around for RFE #4093999 in Sun's bug database
-     * ("Relax constraint on placement of this()/super() call in constructors").
+     * Creates a new authority factory with the specified hints.
      */
     DefaultAuthorityFactory(final Hints hints) {
         super(new AllAuthoritiesFactory(hints, ReferencingFactoryFinder.getCRSAuthorityFactories(hints)));
@@ -72,9 +63,9 @@ final class DefaultAuthorityFactory extends BufferedAuthorityFactory implements 
      * amount of class loading when using {@link CRS} for other purpose than CRS decoding.
      */
     static Set/*<String>*/ getSupportedCodes(final String authority) {
-    	Set result = Collections.EMPTY_SET;
+        Set result = Collections.EMPTY_SET;
         boolean isSetCopied = false;
-    	for (final Iterator i=ReferencingFactoryFinder.getCRSAuthorityFactories( GeoTools.getDefaultHints() ).iterator(); i.hasNext();) {
+        for (final Iterator i=ReferencingFactoryFinder.getCRSAuthorityFactories(null).iterator(); i.hasNext();) {
             final CRSAuthorityFactory factory = (CRSAuthorityFactory) i.next();
             if (Citations.identifierMatches(factory.getAuthority(), authority)) {
                 final Set codes;
@@ -103,7 +94,7 @@ final class DefaultAuthorityFactory extends BufferedAuthorityFactory implements 
                     }
                 }
             }
-    	}
+        }
         return result;
     }
 

@@ -56,7 +56,6 @@ import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.referencing.factory.epsg.LongitudeFirstFactory;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
@@ -88,8 +87,11 @@ import org.geotools.util.UnsupportedImplementationException;
  * @tutorial http://docs.codehaus.org/display/GEOTOOLS/Coordinate+Transformation+Services+for+Geotools+2.1
  */
 public final class CRS {
-    /** Set to true to use GeoTools.getDefaultHints() */
-    public static final boolean USE_DEFAULTS = false;
+    /**
+     * A set of hints used in order to fetch lenient coordinate operation factory.
+     */
+    private static final Hints LENIENT = new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
+
     /**
      * A factory for CRS creation with (<var>latitude</var>, <var>longitude</var>) axis order
      * (unless otherwise specified in system property). Will be created only when first needed.
@@ -117,10 +119,9 @@ public final class CRS {
 
     /**
      * Returns the CRS authority factory used by the {@link #decode(String,boolean) decode} methods.
-     * This factory is
-     * {@linkplain org.geotools.referencing.factory.BufferedAuthorityFactory buffered}, scans over
-     * {@linkplain org.geotools.referencing.factory.AllAuthoritiesFactory all factories} and uses
-     * additional factories as {@linkplain org.geotools.referencing.factory.FallbackAuthorityFactory
+     * This factory is {@linkplain org.geotools.referencing.factory.BufferedAuthorityFactory buffered},
+     * scans over {@linkplain org.geotools.referencing.factory.AllAuthoritiesFactory all factories} and
+     * uses additional factories as {@linkplain org.geotools.referencing.factory.FallbackAuthorityFactory
      * fallbacks} if there is more than one {@linkplain ReferencingFactoryFinder#getCRSAuthorityFactories
      * registered factory} for the same authority.
      * <p>
@@ -129,7 +130,8 @@ public final class CRS {
      * by {@link ReferencingFactoryFinder#getCRSAuthorityFactory} when the authority in known.
      *
      * @param  longitudeFirst {@code true} if axis order should be forced to
-     *         (<var>longitude</var>,<var>latitude</var>).
+     *         (<var>longitude</var>,<var>latitude</var>). Note that {@code false} means
+     *         "<cite>use default</cite>", <strong>not</strong> "<cite>latitude first</cite>".
      * @return The CRS authority factory.
      * @throws FactoryRegistryException if the factory can't be created.
      *
@@ -144,14 +146,19 @@ public final class CRS {
         }
         CRSAuthorityFactory factory = (longitudeFirst) ? xyFactory : defaultFactory;
         if (factory == null) try {
-            Hints hints = USE_DEFAULTS ? GeoTools.getDefaultHints() : new Hints( null );
-            if( longitudeFirst ){
-                hints.put( Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
+            final Hints hints = GeoTools.getDefaultHints();
+            if (longitudeFirst) {
+                hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
+            } else {
+                /*
+                 * Do NOT set the hint to false. If 'longitudeFirst' is not set, this means
+                 * "use the system default", not "latitude first". The longitude may or may
+                 * not be first depending the value of "org.geotools.referencing.forcexy"
+                 * system property. This state is included in GeoTools.getDefaultHints().
+                 * If we don't behave that way, the 'decode(String)' method will fails.
+                 */
             }
-            else {
-                hints.put( Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE);
-            }
-            factory = new DefaultAuthorityFactory( hints );
+            factory = new DefaultAuthorityFactory(hints);
             if (longitudeFirst) {
                 xyFactory = factory;
             } else {
@@ -175,8 +182,8 @@ public final class CRS {
      *
      * @since 2.4
      */
-    public static Version getVersion(final String authority) throws FactoryRegistryException {        
-        Object factory = ReferencingFactoryFinder.getCRSAuthorityFactory(authority, USE_DEFAULTS ? GeoTools.getDefaultHints() : null );
+    public static Version getVersion(final String authority) throws FactoryRegistryException {
+        Object factory = ReferencingFactoryFinder.getCRSAuthorityFactory(authority, null);
         final Set guard = new HashSet(); // Safety against never-ending recursivity.
         while (factory instanceof Factory && guard.add(factory)) {
             final Map hints = ((Factory) factory).getImplementationHints();
@@ -278,10 +285,15 @@ public final class CRS {
      * @see #getSupportedCodes
      * @see org.geotools.referencing.factory.AllAuthoritiesFactory#createCoordinateReferenceSystem
      */ 
-    public static CoordinateReferenceSystem decode(final String code)    
+    public static CoordinateReferenceSystem decode(final String code)
             throws NoSuchAuthorityCodeException, FactoryException
     {
-        return decode(code, Boolean.getBoolean(LongitudeFirstFactory.SYSTEM_DEFAULT_KEY));
+        /*
+         * Do not use Boolean.getBoolean(GeoTools.FORCE_LONGITUDE_FIRST_AXIS_ORDER).
+         * The boolean argument should be 'false', which means "use system default"
+         * (not "latitude first").
+         */
+        return decode(code, false);
     }
 
     /**
@@ -330,7 +342,8 @@ public final class CRS {
      *
      * @param  code The Coordinate Reference System authority code.
      * @param  longitudeFirst {@code true} if axis order should be forced to
-     *         (<var>longitude</var>,<var>latitude</var>).
+     *         (<var>longitude</var>,<var>latitude</var>). Note that {@code false} means
+     *         "<cite>use default</cite>", <strong>not</strong> "<cite>latitude first</cite>".
      * @return The Coordinate Reference System for the provided code.
      * @throws NoSuchAuthorityCodeException If the code could not be understood.
      * @throws FactoryException if the CRS creation failed for an other reason.
@@ -427,7 +440,12 @@ public final class CRS {
                     final GeneralEnvelope candidate;
                     if (geo instanceof GeographicBoundingBox) {
                         final GeographicBoundingBox bounds = (GeographicBoundingBox) geo;
-                        if (!bounds.getInclusion().booleanValue()) {
+                        final Boolean inclusion = bounds.getInclusion();
+                        if (inclusion == null) {
+                            // Status unknow; ignore this bounding box.
+                            continue;
+                        }
+                        if (!inclusion.booleanValue()) {
                             // TODO: we could uses Envelope.substract if such
                             //       a method is defined in a future version.
                             continue;
@@ -696,10 +714,11 @@ public final class CRS {
                 String code = (String) itCodes.next();
                 try {
                     final CoordinateReferenceSystem candidate;
-                    if(code.indexOf(":") == -1)
-                        candidate = CRS.decode(authority + ":" + code);
-                    else
+                    if (code.indexOf(':') == -1) {
+                        candidate = CRS.decode(authority + ':' + code);
+                    } else {
                         candidate = CRS.decode(code);
+                    }
                     if (CRS.equalsIgnoreMetadata(candidate, crs)) {
                         return getSRSFromCRS(candidate, Collections.singleton(authority));
                     }
@@ -794,16 +813,8 @@ public final class CRS {
                                                   boolean lenient)
             throws FactoryException
     {
-        Hints hints = USE_DEFAULTS ? GeoTools.getDefaultHints() : new Hints( null );
-        if( lenient = true ){
-            if( hints == null ) {
-                hints = new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
-            }
-            else {
-                hints.put(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
-            }
-        }
-        final CoordinateOperationFactory factory = ReferencingFactoryFinder.getCoordinateOperationFactory( hints );
+        final CoordinateOperationFactory factory =
+                ReferencingFactoryFinder.getCoordinateOperationFactory(lenient ? LENIENT : null);
         return factory.createOperation(sourceCRS, targetCRS).getMathTransform();
     }
 

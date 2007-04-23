@@ -25,7 +25,6 @@ import java.util.Map;
 import javax.units.Unit;
 
 // OpenGIS dependencies
-import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
@@ -39,6 +38,7 @@ import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
+import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.Operation;
@@ -188,11 +188,8 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      * @param maximum The maximum parameter value, or {@link Double#POSITIVE_INFINITY} if none.
      * @param unit    The unit for default, minimum and maximum values.
      */
-    protected static ParameterDescriptor createDescriptor(final Identifier[] identifiers,
-                                                          final double       defaultValue,
-                                                          final double       minimum,
-                                                          final double       maximum,
-                                                          final Unit         unit)
+    protected static ParameterDescriptor createDescriptor(final ReferenceIdentifier[] identifiers,
+            final double defaultValue, final double minimum, final double maximum, final Unit unit)
     {
         return new DefaultParameterDescriptor(toMap(identifiers), defaultValue,
                                               minimum, maximum, unit, true);
@@ -207,10 +204,9 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      * @param maximum The maximum parameter value, or {@link Double#POSITIVE_INFINITY} if none.
      * @param unit    The unit for default, minimum and maximum values.
      */
-    protected static ParameterDescriptor createOptionalDescriptor(final Identifier[] identifiers,
-                                                                  final double       minimum,
-                                                                  final double       maximum,
-                                                                  final Unit         unit)
+    protected static ParameterDescriptor createOptionalDescriptor(
+            final ReferenceIdentifier[] identifiers,
+            final double minimum, final double maximum, final Unit unit)
     {
         return new DefaultParameterDescriptor(toMap(identifiers), Double.NaN,
                                               minimum, maximum, unit, false);
@@ -234,7 +230,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      * @param parameters   The set of parameters, or {@code null} or an empty array if none.
      */
     protected static ParameterDescriptorGroup createDescriptorGroup(
-                final Identifier[] identifiers, final GeneralParameterDescriptor[] parameters)
+            final ReferenceIdentifier[] identifiers, final GeneralParameterDescriptor[] parameters)
     {
         return new DefaultParameterDescriptorGroup(toMap(identifiers), parameters);
     }
@@ -243,25 +239,25 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      * Put the identifiers into a properties map suitable for {@link IdentifiedObject}
      * constructor.
      */
-    private static Map toMap(final Identifier[] identifiers) {
+    private static Map toMap(final ReferenceIdentifier[] identifiers) {
         ensureNonNull("identifiers", identifiers);
         if (identifiers.length == 0) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.EMPTY_ARRAY));
         }
         int idCount    = 0;
         int aliasCount = 0;
-        Identifier [] id    = new Identifier [identifiers.length];
-        GenericName[] alias = new GenericName[identifiers.length];
+        ReferenceIdentifier[] id = new ReferenceIdentifier[identifiers.length];
+        GenericName[]      alias = new GenericName        [identifiers.length];
         for (int i=0; i<identifiers.length; i++) {
-            final Identifier candidate = identifiers[i];
+            final ReferenceIdentifier candidate = identifiers[i];
             if (candidate instanceof GenericName) {
                 alias[aliasCount++] = (GenericName) candidate;
             } else {
                 id[idCount++] = candidate;
             }
         }
-        id    = (Identifier []) XArray.resize(id,       idCount);
-        alias = (GenericName[]) XArray.resize(alias, aliasCount);
+        id    = (ReferenceIdentifier[]) XArray.resize(id,       idCount);
+        alias = (GenericName[])         XArray.resize(alias, aliasCount);
         final Map properties = new HashMap(4, 0.8f);
         properties.put(NAME_KEY,        identifiers[0]);
         properties.put(IDENTIFIERS_KEY, id);

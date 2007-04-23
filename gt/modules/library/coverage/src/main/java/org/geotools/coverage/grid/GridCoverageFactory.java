@@ -114,23 +114,20 @@ public class GridCoverageFactory extends AbstractFactory {
      * </ul>
      */
     public GridCoverageFactory(final Hints hints) {
-        CoordinateReferenceSystem defaultCRS   = null;
-        String                    tileEncoding = null;
-        if (hints != null) {
-            // TODO: remove casts when we will be allowed to compile for J2SE 1.5.
-            defaultCRS = (CoordinateReferenceSystem) hints.get(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM);
-            if (Utilities.equals(defaultCRS, DefaultGeographicCRS.WGS84) ||
-                Utilities.equals(defaultCRS, DefaultGeographicCRS.WGS84_3D))
-            {
-                // Will be handled in a special way by getDefaultCRS(int)
-                defaultCRS = null;
-            }
-            tileEncoding = (String) hints.get(Hints.TILE_ENCODING);
-            if (tileEncoding != null) {
-                tileEncoding = tileEncoding.trim();
-                if (tileEncoding.length() == 0) {
-                    tileEncoding = null;
-                }
+        // TODO: remove casts when we will be allowed to compile for J2SE 1.5.
+        CoordinateReferenceSystem defaultCRS = (CoordinateReferenceSystem)
+                getHintValue(hints, Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM);
+        if (Utilities.equals(defaultCRS, DefaultGeographicCRS.WGS84) ||
+            Utilities.equals(defaultCRS, DefaultGeographicCRS.WGS84_3D))
+        {
+            // Will be handled in a special way by getDefaultCRS(int)
+            defaultCRS = null;
+        }
+        String tileEncoding = (String) getHintValue(hints, Hints.TILE_ENCODING);
+        if (tileEncoding != null) {
+            tileEncoding = tileEncoding.trim();
+            if (tileEncoding.length() == 0) {
+                tileEncoding = null;
             }
         }
         this.hints.put(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM, defaultCRS  );
@@ -150,6 +147,7 @@ public class GridCoverageFactory extends AbstractFactory {
      * @since 2.2
      */
     protected CoordinateReferenceSystem getDefaultCRS(final int dimension) {
+        // Really hints.get(key), not getHintValue(hints, key).
         final CoordinateReferenceSystem candidate =
                 (CoordinateReferenceSystem) hints.get(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM);
         if (candidate != null) {
@@ -581,6 +579,7 @@ public class GridCoverageFactory extends AbstractFactory {
         coverage = new GridCoverage2D(name, PlanarImage.wrapRenderedImage(image),
                                       gridGeometry, bands, sources, properties);
         coverage.tileEncoding = (String) hints.get(Hints.TILE_ENCODING);
+        // Really hints.get(key), not getHintValue(hints, key).
         return coverage;
     }
 }

@@ -128,7 +128,7 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
      * for the EPSG authority factory.
      */
     public void testRegistration() {
-        final Hints  hints = new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
+        final Hints hints = new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
         OrderedAxisAuthorityFactory factory;
         factory = getFactory(hints);
         assertTrue(factory.forceStandardDirections);
@@ -145,19 +145,19 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
         assertTrue(factory.forceStandardUnits);
 
         hints.put(Hints.FORCE_STANDARD_AXIS_UNITS, Boolean.FALSE);
-        factory = getFactory(hints);
-        assertTrue (factory.forceStandardDirections);
-        assertFalse(factory.forceStandardUnits);
+        assertNotSame(factory, factory = getFactory(hints));
+        assertTrue   (factory.forceStandardDirections);
+        assertFalse  (factory.forceStandardUnits);
 
         hints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS, Boolean.FALSE);
-        factory = getFactory(hints);
-        assertFalse(factory.forceStandardDirections);
-        assertFalse(factory.forceStandardUnits);
+        assertNotSame(factory, factory = getFactory(hints));
+        assertFalse  (factory.forceStandardDirections);
+        assertFalse  (factory.forceStandardUnits);
 
         hints.put(Hints.FORCE_STANDARD_AXIS_UNITS, Boolean.TRUE);
-        factory = getFactory(hints);
-        assertFalse(factory.forceStandardDirections);
-        assertTrue (factory.forceStandardUnits);
+        assertNotSame(factory, factory = getFactory(hints));
+        assertFalse  (factory.forceStandardDirections);
+        assertTrue   (factory.forceStandardUnits);
     }
 
     /**

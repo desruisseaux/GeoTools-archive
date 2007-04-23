@@ -137,12 +137,12 @@
       <groupId>org.geotools</groupId>
       <artifactId>gt2-main</artifactId>
       <version>${project.version}</version>
-	  <exclusions>      
-		  <exclusion>
-		       <groupId>org.opengis</groupId>
-               <artifactId>geoapi-nogenerics</artifactId>
-		  </exclusion>
-	  </exclusions>	  
+      <exclusions>      
+        <exclusion>
+          <groupId>org.opengis</groupId>
+          <artifactId>geoapi-nogenerics</artifactId>
+        </exclusion>
+      </exclusions>	  
     </dependency>
     
     <dependency>

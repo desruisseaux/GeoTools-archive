@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.io.Writer;
 import java.io.IOException;
+import java.awt.RenderingHints;
 import javax.imageio.spi.ServiceRegistry;
 import javax.imageio.spi.RegisterableService;
 
@@ -228,6 +229,38 @@ public class AbstractFactory implements Factory, RegisterableService {
     }
 
     /**
+     * Returns the hint value for the specified key, or the {@linkplain Hints#getSystemDefault
+     * system default} if the {@code hints} map is either {@code null} or has no mapping for
+     * the key.
+     * <p>
+     * This convenience method should be used <strong>in constructors only</strong>.
+     * After construction completion, stored hints should fetch using the usual
+     * <code>{@linkplain #hints}.get(key)}</code> code instead. This is because
+     * factories should be immutable and insensitive to change in
+     * {@linkplain GeoTools#getDefaultHints system default} after their construction.
+     *
+     * @since 2.4
+     */
+    protected final Object getHintValue(final Map hints, final RenderingHints.Key key) {
+        if (hints == this.hints || hints == unmodifiableHints) {
+            /*
+             * Technically this method don't care. But such argument is an indication that the
+             * caller may be using this method in a way that break the factory immutability
+             * contract, so we are better to warn him.
+             */
+            throw new IllegalArgumentException(
+                    Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$1, "hints"));
+        }
+        if (hints != null) {
+            final Object value = hints.get(key);
+            if (value != null) {
+                return value;
+            }
+        }
+        return Hints.getSystemDefault(key);
+    }
+
+    /**
      * Called when this factory is added to the given {@code category} of the given
      * {@code registry}. The factory may already be registered under another category
      * or categories.
@@ -289,7 +322,7 @@ public class AbstractFactory implements Factory, RegisterableService {
      * @since 2.3
      */
     public final int hashCode() {
-        return getClass().hashCode() ^ 37 * priority;
+        return getClass().hashCode() + (37 * priority);
     }
 
     /**
@@ -334,15 +367,16 @@ public class AbstractFactory implements Factory, RegisterableService {
         final String name = format(this);
         final Map done = new IdentityHashMap(); // We don't want to rely on Factory.equals(...)
         done.put(this, name);
-        final Writer table;
-        try {
-            table = new TableWriter(null, " ");
-            format(table, this, "  ", done);
-        } catch (IOException e) {
-            // Should never happen, since we are writing in a buffer.
-            throw new AssertionError(e);
-        }
-        return name + System.getProperty("line.separator", "\n") + table.toString();
+        final String tree = format(getImplementationHints(), done);
+        return name + System.getProperty("line.separator", "\n") + tree;
+    }
+
+    /**
+     * Returns a string representation of the specified hints. This is used by
+     * {@link Hints#toString} in order to share the code provided in this class.
+     */
+    static String toString(final Map hints) {
+        return format(hints, new IdentityHashMap());
     }
 
     /**
@@ -357,14 +391,29 @@ public class AbstractFactory implements Factory, RegisterableService {
     }
 
     /**
-     * Formats recursively the tree.
+     * Formats the specified hints. This method is just the starting
+     * point for {@link #format(Writer, Map, String, Map)} below.
+     */
+    private static String format(final Map hints, final Map done) {
+        final Writer table;
+        try {
+            table = new TableWriter(null, " ");
+            format(table, hints, "  ", done);
+        } catch (IOException e) {
+            // Should never happen, since we are writing in a buffer.
+            throw new AssertionError(e);
+        }
+        return table.toString();
+    }
+
+    /**
+     * Formats recursively the tree. This method invoke itself.
      */
     private static void format(final Writer  table,
-                               final Factory factory,
+                               final Map     hints,
                                final String  indent,
                                final Map/*<Object,String>*/ done) throws IOException
     {
-        final Map      hints  = factory.getImplementationHints();
         final String[] keys   = new String[hints.size()];
         final Object[] values = new Object[keys.length];
         for (final Iterator it=hints.entrySet().iterator(); it.hasNext();) {
@@ -391,7 +440,7 @@ public class AbstractFactory implements Factory, RegisterableService {
             table.write('\n');
             if (recursive != null) {
                 final String nextIndent = Utilities.spaces(indent.length() + 2);
-                format(table, recursive, nextIndent, done);
+                format(table, recursive.getImplementationHints(), nextIndent, done);
             }
         }
     }

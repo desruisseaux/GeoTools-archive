@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 // OpenGIS dependencies
-import org.opengis.metadata.Identifier;
+import org.opengis.metadata.Identifier;  // For javadoc
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;

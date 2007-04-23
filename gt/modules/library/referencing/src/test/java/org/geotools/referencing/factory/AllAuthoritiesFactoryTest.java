@@ -127,7 +127,7 @@ public final class AllAuthoritiesFactoryTest extends TestCase {
      * usual {@code ':'}.
      */
     public void testHttp() throws FactoryException {
-        final CRSAuthorityFactory crs = ReferencingFactoryFinder.getCRSAuthorityFactory("CRS",  null);
+        final CRSAuthorityFactory crs = ReferencingFactoryFinder.getCRSAuthorityFactory("CRS", null);
         final CRSAuthorityFactory all = AllAuthoritiesFactory.DEFAULT;
         CoordinateReferenceSystem actual, expected;
 

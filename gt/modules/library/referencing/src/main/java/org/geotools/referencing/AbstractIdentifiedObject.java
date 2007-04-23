@@ -65,11 +65,11 @@ import org.geotools.util.NameFactory;
 /**
  * A base class for metadata applicable to reference system objects.
  * When {@link AuthorityFactory} is used to create an object, the
- * {@linkplain Identifier#getAuthority authority} and {@linkplain Identifier#getCode
- * authority code} values are set to the authority name of the factory object, and the
- * authority code supplied by the client, respectively. When {@link ObjectFactory} creates an
- * object, the {@linkplain #getName() name} is set to the value supplied by the client and
- * all of the other metadata items are left empty.
+ * {@linkplain ReferenceIdentifier#getAuthority authority} and
+ * {@linkplain ReferenceIdentifier#getCode authority code} values are set to the authority
+ * name of the factory object, and the authority code supplied by the client, respectively.
+ * When {@link ObjectFactory} creates an object, the {@linkplain #getName() name} is set to
+ * the value supplied by the client and all of the other metadata items are left empty.
  * <p>
  * This class is conceptually <cite>abstract</cite>, even if it is technically possible to
  * instantiate it. Typical applications should create instances of the most specific subclass with
@@ -97,7 +97,7 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
      * {@linkplain #getIdentifiers()}.toArray(EMPTY_IDENTIFIER_ARRAY);
      * </pre></blockquote>
      */
-    public static final Identifier[] EMPTY_IDENTIFIER_ARRAY = new Identifier[0];
+    public static final ReferenceIdentifier[] EMPTY_IDENTIFIER_ARRAY = new ReferenceIdentifier[0];
 
     /**
      * An empty array of alias. This is usefull for fetching alias as an array,
@@ -128,11 +128,24 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
     public static final Comparator IDENTIFIER_COMPARATOR = new IdentifierComparator();
     private static final class IdentifierComparator implements Comparator, Serializable {
         public int compare(final Object o1, final Object o2) {
-            final Collection/*<Identifier>*/ a1 = ((IdentifiedObject)o1).getIdentifiers();
-            final Collection/*<Identifier>*/ a2 = ((IdentifiedObject)o2).getIdentifiers();
-            return doCompare((a1!=null && !a1.isEmpty()) ? ((Identifier) a1.iterator().next()).getCode() : null,
-                             (a2!=null && !a2.isEmpty()) ? ((Identifier) a2.iterator().next()).getCode() : null);
-            // TODO: remove (Identifier) cast once we will be allowed to compile for J2SE 1.5.
+            Collection/*<ReferenceIdentifier>*/ a1 = ((IdentifiedObject)o1).getIdentifiers();
+            Collection/*<ReferenceIdentifier>*/ a2 = ((IdentifiedObject)o2).getIdentifiers();
+            if (a1 == null) a1 = Collections.EMPTY_SET;
+            if (a2 == null) a2 = Collections.EMPTY_SET;
+            final Iterator i1 = a1.iterator();
+            final Iterator i2 = a2.iterator();
+            boolean n1, n2;
+            while ((n1=i1.hasNext()) & (n2=i2.hasNext())) {  // Really '&', not '&&'
+                final int c = doCompare(((ReferenceIdentifier) i1.next()).getCode(),
+                                        ((ReferenceIdentifier) i2.next()).getCode());
+                // TODO: remove (ReferenceIdentifier) cast once we will be allowed to compile for J2SE 1.5.
+                if (c != 0) {
+                    return c;
+                }
+            }
+            if (n1) return +1;
+            if (n2) return -1;
+            return 0;
         }
         protected Object readResolve() throws ObjectStreamException {
             return IDENTIFIER_COMPARATOR;
@@ -167,7 +180,7 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
      * An identifier which references elsewhere the object's defining information.
      * Alternatively an identifier by which this object can be referenced.
      */
-    private final Set/*<Identifier>*/ identifiers;
+    private final Set/*<ReferenceIdentifier>*/ identifiers;
 
     /**
      * Comments on or information about this object, or {@code null} if none.
@@ -202,7 +215,7 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
      *   </tr>
      *   <tr>
      *     <td nowrap>&nbsp;{@link #NAME_KEY "name"}&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link String} or {@link Identifier}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link String} or {@link ReferenceIdentifier}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getName()}</td>
      *   </tr>
      *   <tr>
@@ -212,18 +225,23 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
      *     <td nowrap>&nbsp;{@link #getAlias}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link Identifier#AUTHORITY_KEY "authority"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link ReferenceIdentifier#AUTHORITY_KEY "authority"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String} or {@link Citation}&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link Identifier#getAuthority} on the {@linkplain #getName() name}</td>
+     *     <td nowrap>&nbsp;{@link ReferenceIdentifier#getAuthority} on the {@linkplain #getName() name}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link Identifier#VERSION_KEY "version"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link ReferenceIdentifier#CODESPACE_KEY "version"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link Identifier#getVersion} on the {@linkplain #getName() name}</td>
+     *     <td nowrap>&nbsp;{@link ReferenceIdentifier#getCodeSpace} on the {@linkplain #getName() name}</td>
+     *   </tr>
+     *   <tr>
+     *     <td nowrap>&nbsp;{@link ReferenceIdentifier#VERSION_KEY "version"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link ReferenceIdentifier#getVersion} on the {@linkplain #getName() name}</td>
      *   </tr>
      *   <tr>
      *     <td nowrap>&nbsp;{@link #IDENTIFIERS_KEY "identifiers"}&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link Identifier} or <code>{@linkplain Identifier}[]</code>&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link ReferenceIdentifier} or <code>{@linkplain ReferenceIdentifier}[]</code>&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getIdentifiers}</td>
      *   </tr>
      *   <tr>
@@ -307,19 +325,18 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                 case  1127093059: if (key.equalsIgnoreCase("realizationEpoch"))   key="realizationEpoch";   break;
                 case -1109785975: if (key.equalsIgnoreCase("validArea"))          key="validArea";          break;
                 
-                // ----------------------------
-                // "name": String or Identifier
-                // ----------------------------
+                // -------------------------------------
+                // "name": String or ReferenceIdentifier
+                // -------------------------------------
                 case 3373707: {
                     if (key.equals(NAME_KEY)) {
                         if (value instanceof String) {
                             name = new NamedIdentifier(properties, false);
-                            assert value.equals( ((Identifier) name).getCode() ) : name;
-                        } else if (value instanceof ReferenceIdentifier ){
-                            name = value;
-                        }
-                        else {
-                            // WARNING!
+                            assert value.equals(((Identifier) name).getCode()) : name;
+                        } else {
+                            // Should be an instance of ReferenceIdentifier, but we don't check
+                            // here. The type will be checked at the end of this method, which
+                            // will thrown an exception with detailed message in case of mismatch.
                             name = value;
                         }
                         continue NEXT_KEY;
@@ -336,14 +353,16 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                     }
                     break;
                 }
-                // -----------------------------------------
-                // "identifiers": Identifier or Identifier[]
-                // -----------------------------------------
+                // -----------------------------------------------------------
+                // "identifiers": ReferenceIdentifier or ReferenceIdentifier[]
+                // -----------------------------------------------------------
                 case 1368189162: {
                     if (key.equals(IDENTIFIERS_KEY)) {
                         if (value != null) {
-                            if (value instanceof Identifier) {
-                                identifiers = new Identifier[] {(Identifier) value};
+                            if (value instanceof ReferenceIdentifier) {
+                                identifiers = new ReferenceIdentifier[] {
+                                    (ReferenceIdentifier) value
+                                };
                             } else {
                                 identifiers = value;
                             }
@@ -455,10 +474,10 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
          */
         String key=null; Object value=null;
         try {
-            key=        NAME_KEY; this.name        = (ReferenceIdentifier) (value=name);
-            key=       ALIAS_KEY; this.alias       = asSet((GenericName[]) (value=alias));
-            key= IDENTIFIERS_KEY; this.identifiers = asSet( (Identifier[]) (value=identifiers));
-            key=     REMARKS_KEY; this.remarks     = (InternationalString) (value=remarks);
+            key=        NAME_KEY; this.name        =       (ReferenceIdentifier)   (value=name);
+            key=       ALIAS_KEY; this.alias       = asSet((GenericName[])         (value=alias));
+            key= IDENTIFIERS_KEY; this.identifiers = asSet((ReferenceIdentifier[]) (value=identifiers));
+            key=     REMARKS_KEY; this.remarks     =       (InternationalString)   (value=remarks);
         } catch (ClassCastException exception) {
             InvalidParameterValueException e = new InvalidParameterValueException(Errors.format(
                                    ErrorKeys.ILLEGAL_ARGUMENT_$2, key, value), key, value);
@@ -497,7 +516,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      *
      * @see #getIdentifier(Citation)
      */
-    public Set/*<Identifier>*/ getIdentifiers() {
+    public Set/*<ReferenceIdentifier>*/ getIdentifiers() {
         return (identifiers!=null) ? identifiers : Collections.EMPTY_SET;
     }
 
@@ -551,7 +570,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
     /**
      * Returns an identifier according the given authority. This method first checks all
      * {@link #getIdentifiers identifiers} in their iteration order. It returns the first
-     * identifier with an {@linkplain Identifier#getAuthority authority} citation
+     * identifier with an {@linkplain ReferenceIdentifier#getAuthority authority} citation
      * {@linkplain Citations#identifierMatches(Citation,Citation) matching} the specified
      * authority.
      *
@@ -561,7 +580,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      *
      * @since 2.2
      */
-    public Identifier getIdentifier(final Citation authority) {
+    public ReferenceIdentifier getIdentifier(final Citation authority) {
         return getIdentifier0(this, authority);
     }
 
@@ -576,7 +595,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      *
      * @since 2.2
      */
-    public static Identifier getIdentifier(final IdentifiedObject info, final Citation authority) {
+    public static ReferenceIdentifier getIdentifier(final IdentifiedObject info, final Citation authority) {
         if (info instanceof AbstractIdentifiedObject) {
             // Gives a chances to subclasses to get their overridden method invoked.
             return ((AbstractIdentifiedObject) info).getIdentifier(authority);
@@ -587,12 +606,12 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
     /**
      * Implementation of {@link #getIdentifier(Citation)}.
      */
-    private static Identifier getIdentifier0(final IdentifiedObject info, final Citation authority) {
+    private static ReferenceIdentifier getIdentifier0(final IdentifiedObject info, final Citation authority) {
         if (info == null) {
             return null;
         }
         for (final Iterator it=info.getIdentifiers().iterator(); it.hasNext();) {
-            final Identifier identifier = (Identifier) it.next();
+            final ReferenceIdentifier identifier = (ReferenceIdentifier) it.next();
             if (authority == null) {
                 return identifier;
             }
@@ -612,11 +631,12 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * order.
      *
      * <ul>
-     *   <li><p>If the name or alias implements the {@link Identifier} interface, then this method
-     *       compares the {@linkplain Identifier#getAuthority identifier authority} against the
-     *       specified citation using the {@link Citations#identifierMatches(Citation,Citation)
-     *       identifierMatches} method. If a matching is found, then this method returns the
-     *       {@linkplain Identifier#getCode identifier code} of this object.</p></li>
+     *   <li><p>If the name or alias implements the {@link ReferenceIdentifier} interface,
+     *       then this method compares the {@linkplain ReferenceIdentifier#getAuthority
+     *       identifier authority} against the specified citation using the
+     *       {@link Citations#identifierMatches(Citation,Citation) identifierMatches}
+     *       method. If a matching is found, then this method returns the
+     *       {@linkplain ReferenceIdentifier#getCode identifier code} of this object.</p></li>
      *
      *   <li><p>Otherwise, if the alias implements the {@link GenericName} interface, then this
      *       method compares the {@linkplain GenericName#getScope name scope} against the specified
@@ -625,13 +645,14 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      *       {@linkplain GenericName#asLocalName local name} of this object.</p></li>
      * </ul>
      *
-     * Note that alias may implement both the {@link Identifier} and {@link GenericName} interfaces
-     * (for example {@link NamedIdentifier}). In such cases, the identifier view has precedence.
+     * Note that alias may implement both the {@link ReferenceIdentifier} and {@link GenericName}
+     * interfaces (for example {@link NamedIdentifier}). In such cases, the identifier view has
+     * precedence.
      *
      * @param  authority The authority for the name to return.
-     * @return The object's name (either a {@linkplain Identifier#getCode code} or a
-     *         {@linkplain GenericName#asLocalName local name}), or {@code null} if no
-     *         name matching the specified authority was found.
+     * @return The object's name (either a {@linkplain ReferenceIdentifier#getCode code}
+     *         or a {@linkplain GenericName#asLocalName local name}), or {@code null} if
+     *         no name matching the specified authority was found.
      *
      * @see #getName()
      * @see #getAlias()
@@ -648,9 +669,9 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      *
      * @param  info The object to get the name from.
      * @param  authority The authority for the name to return.
-     * @return The object's name (either a {@linkplain Identifier#getCode code} or a
-     *         {@linkplain GenericName#asLocalName local name}), or {@code null} if no
-     *         name matching the specified authority was found.
+     * @return The object's name (either a {@linkplain ReferenceIdentifier#getCode code}
+     *         or a {@linkplain GenericName#asLocalName local name}), or {@code null} if
+     *         no name matching the specified authority was found.
      *
      * @since 2.2
      */

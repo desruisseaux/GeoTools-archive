@@ -31,7 +31,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // OpenGIS dependencies
-import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.referencing.ReferenceIdentifier;
@@ -53,17 +52,18 @@ import org.geotools.util.WeakValueHashMap;
 
 
 /**
- * An identification of a CRS object. The main interface implemented by this class
- * is {@link Identifier}. However, this class also implements {@link GenericName} in
- * order to make it possible to give identifiers in the list of
+ * An identification of a CRS object. The main interface implemented by this class is
+ * {@link ReferenceIdentifier}. However, this class also implements {@link GenericName}
+ * in order to make it possible to reuse the same identifiers in the list of
  * {@linkplain AbstractIdentifiedObject#getAlias aliases}. Casting an alias's
- * {@linkplain GenericName generic name} to an {@linkplain Identifier identifier}
+ * {@linkplain GenericName generic name} to an {@linkplain ReferenceIdentifier identifier}
  * gives access to more informations, like the URL of the authority.
  * <P>
- * The {@linkplain GenericName generic name} will be infered from {@linkplain Identifier identifier}
- * attributes. More specifically, a {@linkplain ScopedName scoped name} will be constructed using
- * the shortest authority's {@linkplain Citation#getAlternateTitles alternate titles} (or
- * the {@linkplain Citation#getTitle main title} if there is no alternate titles) as the
+ * The {@linkplain GenericName generic name} will be infered from
+ * {@linkplain ReferenceIdentifier identifier} attributes. More specifically, a
+ * {@linkplain ScopedName scoped name} will be constructed using the shortest authority's
+ * {@linkplain Citation#getAlternateTitles alternate titles} (or the
+ * {@linkplain Citation#getTitle main title} if there is no alternate titles) as the
  * {@linkplain ScopedName#getScope scope}, and the {@linkplain #getCode code} as the
  * {@linkplain ScopedName#asLocalName head}. This heuristic rule seems raisonable
  * since, according ISO 19115, the {@linkplain Citation#getAlternateTitles alternate
@@ -102,7 +102,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serial
      * Name or identifier of the person or organization responsible for namespace.
      */
     private final String codespace;
-    
+
     /**
      * Organization or party responsible for definition and maintenance of the
      * code space or code.
@@ -115,7 +115,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serial
      * {@linkplain #getCode code} uses versions. When appropriate, the edition is
      * identified by the effective date, coded using ISO 8601 date format.
      */
-   private final String version;
+    private final String version;
 
     /**
      * Comments on or information about this identifier, or {@code null} if none.
@@ -129,7 +129,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serial
      * value.
      */
     private GenericName name;
-    
+
     /**
      * Constructs an identifier from a set of properties. Keys are strings from the table below.
      * Key are case-insensitive, and leading and trailing spaces are ignored. The map given in
@@ -146,6 +146,11 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serial
      *     <td nowrap>&nbsp;{@link #CODE_KEY "code"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getCode}</td>
+     *   </tr>
+     *   <tr>
+     *     <td nowrap>&nbsp;{@link #CODESPACE_KEY "code"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #getCodeSpace}</td>
      *   </tr>
      *   <tr>
      *     <td nowrap>&nbsp;{@link #AUTHORITY_KEY "authority"}&nbsp;</td>
@@ -286,9 +291,17 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serial
                     }
                     break;
                 }
+                case -1108676807: {
+                    if (key.equals(CODESPACE_KEY)) {
+                        codespace = value;
+                        continue;
+                    }
+                    break;
+                    
+                }
                 case 351608024: {
                     if (key.equals(VERSION_KEY)) {
-                        version = (String) value;
+                        version = value;
                         continue;
                     }
                     break;
@@ -341,6 +354,15 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serial
             }
         }
         /*
+         * Completes the code space if it was not explicitly set.
+         */
+        if (codespace == null && authority instanceof Citation) {
+            final String title = getShortestTitle((Citation) authority).toString(Locale.US);
+            if (isValidCodeSpace(title)) {
+                codespace = title;
+            }
+        }
+        /*
          * Stores the definitive reference to the attributes. Note that casts are performed only
          * there (not before). This is a wanted feature, since we want to catch ClassCastExceptions
          * are rethrown them as more informative exceptions.
@@ -359,7 +381,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serial
         }
         ensureNonNull(CODE_KEY, code);
     }
-    
+
     /**
      * Makes sure an argument is non-null. This is method duplicate
      * {@link AbstractIdentifiedObject#ensureNonNull(String, Object)}
@@ -425,7 +447,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serial
     public InternationalString getRemarks() {
         return remarks;
     }
-    
+
     /**
      * Returns the generic name of this identifier. The name will be constructed
      * automatically the first time it will be needed. The name's scope is infered
@@ -450,19 +472,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serial
         if (authority == null) {
             return new org.geotools.util.LocalName(code);
         }
-        InternationalString title = authority.getTitle();
-        int length = title.length();
-        final Collection alt = authority.getAlternateTitles();
-        if (alt != null) {
-            for (final Iterator it=alt.iterator(); it.hasNext();) {
-                final InternationalString candidate = (InternationalString) it.next();
-                final int candidateLength = candidate.length();
-                if (candidateLength>0 && candidateLength<length) {
-                    title = candidate;
-                    length = candidateLength;
-                }
-            }
-        }
+        final InternationalString title = getShortestTitle(authority);
         GenericName scope;
         synchronized (NamedIdentifier.class) {
             if (SCOPES == null) {
@@ -476,7 +486,41 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serial
         }
         return new org.geotools.util.ScopedName(scope, code);
     }
-    
+
+    /**
+     * Returns the shortest title inferred from the specified authority.
+     */
+    private static InternationalString getShortestTitle(final Citation authority) {
+        InternationalString title = authority.getTitle();
+        int length = title.length();
+        final Collection alt = authority.getAlternateTitles();
+        if (alt != null) {
+            for (final Iterator it=alt.iterator(); it.hasNext();) {
+                final InternationalString candidate = (InternationalString) it.next();
+                final int candidateLength = candidate.length();
+                if (candidateLength>0 && candidateLength<length) {
+                    title = candidate;
+                    length = candidateLength;
+                }
+            }
+        }
+        return title;
+    }
+
+    /**
+     * Returns {@code true} if the specified string looks like a valid code space.
+     * This method, together with {@link #getShortestTitle}, uses soemwhat heuristic
+     * rules that may change in future Geotools versions.
+     */
+    private static boolean isValidCodeSpace(final String codespace) {
+        for (int i=codespace.length(); --i>=0;) {
+            if (!Character.isJavaIdentifierPart(codespace.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * Returns the last element in the sequence of {@linkplain #getParsedNames parsed names}.
      *
@@ -485,7 +529,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serial
     public LocalName name() {
         return getName().name();
     }
-    
+
     /**
      * Returns a view of this object as a local name. The local name returned by this method
      * will have the same {@linkplain LocalName#getScope scope} than this generic name.
@@ -495,7 +539,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serial
     public LocalName asLocalName() {
         return getName().asLocalName();
     }
-    
+
     /**
      * Returns the scope (name space) in which this name is local.
      *
@@ -504,7 +548,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serial
     public NameSpace scope() {
         return getName().scope();
     }
-    
+
     /**
      * Returns the scope (name space) of this generic name. If this name has no scope
      * (e.g. is the root), then this method returns {@code null}.
@@ -514,7 +558,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serial
     public GenericName getScope() {
         return getName().getScope();
     }
-    
+
     /**
      * Returns the depth of this name within the namespace hierarchy.
      *
@@ -523,7 +567,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serial
     public int depth() {
         return getName().depth();
     }
-    
+
     /**
      * Returns the sequence of {@linkplain LocalName local names} making this generic name.
      * Each element in this list is like a directory name in a file path name.
@@ -532,7 +576,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serial
     public List getParsedNames() {
         return getName().getParsedNames();
     }
-    
+
     /**
      * Returns this name expanded with the specified scope. One may represent this operation
      * as a concatenation of the specified {@code name} with {@code this}.
@@ -542,7 +586,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serial
     public ScopedName push(final GenericName scope) {
         return getName().push(scope);
     }
-    
+
     /**
      * Returns a view of this name as a fully-qualified name.
      *
@@ -551,7 +595,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serial
     public GenericName toFullyQualifiedName() {
         return getName().toFullyQualifiedName();
     }
-    
+
     /**
      * Returns a view of this object as a scoped name,
      * or {@code null} if this name has no scope.
@@ -561,7 +605,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serial
     public ScopedName asScopedName() {
         return getName().asScopedName();
     }
-    
+
     /**
      * Returns a local-dependent string representation of this generic name. This string
      * is similar to the one returned by {@link #toString} except that each element has
@@ -598,6 +642,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serial
         if (object!=null && object.getClass().equals(getClass())) {
             final NamedIdentifier that = (NamedIdentifier) object;
             return Utilities.equals(this.code,      that.code     ) &&
+                   Utilities.equals(this.codespace, that.codespace) &&
                    Utilities.equals(this.version,   that.version  ) &&
                    Utilities.equals(this.authority, that.authority) &&
                    Utilities.equals(this.remarks,   that.remarks  );

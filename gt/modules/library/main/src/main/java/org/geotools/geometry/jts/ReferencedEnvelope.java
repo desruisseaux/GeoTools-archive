@@ -15,7 +15,6 @@
  */
 package org.geotools.geometry.jts;
 
-// OpenGIS dependencies
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralDirectPosition;
@@ -182,6 +181,17 @@ public class ReferencedEnvelope extends Envelope implements
     /**
      * Returns the coordinate reference system associated with this envelope.
      * 
+     * @deprecated Use {@link #getCoordinateReferenceSystem}.
+     *
+     * @since 2.4
+     */
+    public CoordinateReferenceSystem crs() {
+        return getCoordinateReferenceSystem();
+    }
+
+    /**
+     * Returns the coordinate reference system associated with this envelope.
+     * 
      * @deprecated Replaced by {@link #getCoordinateReferenceSystem} for
      *             consistency with other envelope implementations, and also
      *             because a future GeoAPI release may provides a
@@ -268,6 +278,129 @@ public class ReferencedEnvelope extends Envelope implements
     }
 
     /**
+     * Provides the minimium easting ordinate.
+     * This is a helper method for <code>{@linkplain #getMinimum getMinimum}(i)</code>
+     * where <var>i</var> is the ordinate used to represent easting.
+     *
+     * @todo Current implementation do not obeys the above contract, since it doesn't try
+     *       to locate which axis is the easting. We don't know yet if we will change the
+     *       implementation or the specification in a future Geotools version.
+     *
+     * @since 2.4
+     */
+    public double minX() {
+        return super.getMinX();
+    }
+
+    /**
+     * Provides the maximum easting ordinate.
+     * This is a helper method for <code>{@linkplain #getMaximum getMaximum}(i)</code>
+     * where <var>i</var> is the ordinate used to represent easting.
+     *
+     * @todo Current implementation do not obeys the above contract, since it doesn't try
+     *       to locate which axis is the easting. We don't know yet if we will change the
+     *       implementation or the specification in a future Geotools version.
+     *
+     * @since 2.4
+     */
+    public double maxX() {
+        return super.getMaxX();
+    }
+
+    /**
+     * Provides the minimium northing ordinate.
+     * This is a helper method for <code>{@linkplain #getMinimum getMinimum}(i)</code>
+     * where <var>i</var> is the ordinate used to represent northing.
+     *
+     * @todo Current implementation do not obeys the above contract, since it doesn't try
+     *       to locate which axis is the northing. We don't know yet if we will change the
+     *       implementation or the specification in a future Geotools version.
+     *
+     * @since 2.4
+     */
+    public double minY() {
+        return super.getMinY();
+    }
+
+    /**
+     * Provides the northing easting ordinate.
+     * This is a helper method for <code>{@linkplain #getMaximum getMaximum}(i)</code>
+     * where <var>i</var> is the ordinate used to represent northing.
+     *
+     * @todo Current implementation do not obeys the above contract, since it doesn't try
+     *       to locate which axis is the northing. We don't know yet if we will change the
+     *       implementation or the specification in a future Geotools version.
+     *
+     * @since 2.4
+     */
+    public double maxY() {
+        return super.getMaxY();
+    }
+
+    /**
+     * Returns {@code true} if lengths along all dimension are zero.
+     *
+     * @since 2.4
+     */
+    public boolean isEmpty() {
+        return super.isNull();
+    }
+
+    /**
+     * Returns {@code true} if the provided location is contained by this bounding box.
+     *
+     * @since 2.4
+     */
+    public boolean contains(DirectPosition pos) {
+        return super.contains(pos.getOrdinate(0),pos.getOrdinate(1));
+    }
+
+    /**
+     * Returns {@code true} if the provided bounds are contained by this bounding box.
+     *
+     * @since 2.4
+     */
+    public boolean contains(BoundingBox bbox) {
+        return super.contains(new Envelope(bbox.minX(), bbox.maxX(), bbox.minY(), bbox.maxY()));
+    }
+
+    /**
+     * Check if this bounding box intersects the provided bounds.
+     *
+     * @since 2.4
+     */
+    public boolean intersects(BoundingBox bbox) {
+        return super.intersects(new Envelope(bbox.minX(), bbox.maxX(), bbox.minY(), bbox.maxY()));
+    }
+
+    /**
+     * Include the provided bounding box, expanding as necessary.
+     *
+     * @since 2.4
+     */
+    public void include(BoundingBox bbox) {
+        super.expandToInclude(new Envelope(bbox.minX(), bbox.maxX(), bbox.minY(), bbox.maxY()));
+    }
+
+    /**
+     * Include the provided coordinates, expanding as necessary.
+     *
+     * @since 2.4
+     */
+    public void include(double x, double y) {
+        super.expandToInclude(x, y);
+    }
+
+    /**
+     * Initialize the bounding box with another bounding box.
+     *
+     * @since 2.4
+     */
+    public void init(BoundingBox bbox) {
+        super.init(new Envelope(bbox.minX(), bbox.maxX(), bbox.minY(), bbox.maxY()));
+    }
+
+    /**
      * Transforms the referenced envelope to the specified coordinate reference system.
      * 
      * @param targetCRS The target coordinate reference system.
@@ -300,25 +433,14 @@ public class ReferencedEnvelope extends Envelope implements
      *
      * @since 2.3
      */
-    public ReferencedEnvelope transform(
-            final CoordinateReferenceSystem targetCRS, final boolean lenient,
-            final int numPointsForTransformation) throws TransformException,
-            FactoryException {
-        // /////////////////////////////////////////////////////////////////////
-        //
-        // Getting the transform
-        //
-        // /////////////////////////////////////////////////////////////////////
+    public ReferencedEnvelope transform(final CoordinateReferenceSystem targetCRS,
+                                        final boolean lenient,
+                                        final int numPointsForTransformation)
+            throws TransformException, FactoryException
+    {
         MathTransform transform = CRS.findMathTransform(crs, targetCRS, lenient);
-
-        // /////////////////////////////////////////////////////////////////////
-        //
-        // Transforming
-        //
-        // /////////////////////////////////////////////////////////////////////
         final ReferencedEnvelope target = new ReferencedEnvelope(targetCRS);
         JTS.transform(this, target, transform, numPointsForTransformation);
-
         return target;
     }
 
@@ -364,54 +486,5 @@ public class ReferencedEnvelope extends Envelope implements
         buffer.append(GeneralDirectPosition.toString(getUpperCorner()));
         buffer.append(']');
         return buffer.toString();
-    }
-
-    public boolean contains(DirectPosition pos) {
-        return super.contains(pos.getOrdinate(0),pos.getOrdinate(1));
-    }
-
-    public boolean contains(BoundingBox bbox) {
-        return super.contains(new Envelope(bbox.minX(), bbox.maxX(), bbox.minY(), bbox.maxY()));
-    }
-
-    public CoordinateReferenceSystem crs() {
-        return getCoordinateReferenceSystem();
-    }
-
-    public void include(BoundingBox bbox) {
-        super.expandToInclude(new Envelope(bbox.minX(), bbox.maxX(), bbox.minY(), bbox.maxY()));
-        
-    }
-
-    public void include(double x, double y) {
-        super.expandToInclude(x, y);
-    }
-
-    public void init(BoundingBox bbox) {
-        super.init(new Envelope(bbox.minX(), bbox.maxX(), bbox.minY(), bbox.maxY()));
-    }
-
-    public boolean intersects(BoundingBox bbox) {
-        return super.intersects(new Envelope(bbox.minX(), bbox.maxX(), bbox.minY(), bbox.maxY()));
-    }
-
-    public boolean isEmpty() {
-        return super.isNull();
-    }
-
-    public double maxX() {
-        return super.getMaxX();
-    }
-
-    public double maxY() {
-        return super.getMaxY();
-    }
-
-    public double minX() {
-        return super.getMinX();
-    }
-
-    public double minY() {
-        return super.getMinY();
     }
 }

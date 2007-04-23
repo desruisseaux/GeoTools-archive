@@ -58,19 +58,19 @@ import javax.imageio.spi.ServiceRegistry; // For javadoc
  *
  * <strong>Examples:</strong>
  * <ul>
- * <li><p>An application supplied a {@linkplain org.opengis.referencing.datum.DatumFactory datum
- * factory} hint, being passed to a {@linkplain org.opengis.referencing.datum.DatumAuthorityFactory
- * datum authority factory} so that all datum created from an authority code will come from the
- * supplied datum factory.</p></li>
+ *   <li><p>An application supplied a {@linkplain Hints#DATUM_FACTORY datum factory hint}, being
+ *   passed to a {@linkplain org.opengis.referencing.datum.DatumAuthorityFactory datum authority
+ *   factory} so that all datum created from an authority code will come from the supplied datum
+ *   factory.</p></li>
  *
- * <li><p>An application supplied a {@link org.geotools.feature.FeatureFactory} (ensuring all
- * constructed features support the {@code IAdaptable} interface), being passed to a
- * {@link org.geotools.feature.FeatureTypeFactory} so that all {@code FeatureTypes}
- * constructed will produce features supporting the indicated interface.<p></li>
+ *   <li><p>An application supplied a {@link org.geotools.feature.FeatureFactory} (ensuring all
+ *   constructed features support the Eclipse's {@code IAdaptable} interface), being passed to a
+ *   {@link org.geotools.feature.FeatureTypeFactory} so that all {@code FeatureTypes}
+ *   constructed will produce features supporting the indicated interface.<p></li>
  * </ul>
  *
  * <p>As seen in those examples this concept of a hint becomes more interesting when
- * the opperation being controlled is discovery of other services used by the Factory.
+ * the operation being controlled is discovery of other services used by the Factory.
  * By supplying appropriate hints one can chain together several factories and retarget
  * them to an application specific task.</p>
  *
@@ -89,8 +89,8 @@ public interface Factory {
      * used by this factory to customize its use. This map is <strong>not</strong> guaranteed
      * to contains all the hints supplied by the user; it may be only a subset. Consequently,
      * hints provided here are usually not suitable for creating new factories, unless the
-     * implementation make some additional garantees (e.g.
-     * {@link FactoryUsingVolatileDependencies}).
+     * implementation make some additional garantees
+     * (e.g. {@link FactoryUsingVolatileDependencies}).
      * <p>
      * The primary purpose of this method is to determine if an <strong>existing</strong>
      * factory instance can be reused for a set of user-supplied hints. This method is invoked by
@@ -102,12 +102,12 @@ public interface Factory {
      * instances of some key-dependent class. The {@linkplain Map#keySet key set} must contains
      * at least all hints impacting functionality. While the key set may contains all hints
      * supplied by the user, it is recommended to limit the set to only the hints used by this
-     * particular factory instance. A minimal set will helps {@link FactoryRegistry} to compares
+     * particular factory instance. A minimal set will helps {@link FactoryRegistry} to compare
      * only hints that matter and avoid the creation of unnecessary instances of this factory.
      * <p>
      * The hint values may be different than the one supplied by the user. If a user supplied a
-     * hint as a {@link Class} object, this method shall replace it by the actual instance used, if
-     * possible.
+     * hint as a {@link Class} object, this method shall replace it by the actual instance used,
+     * if possible.
      * <p>
      * Implementations of this method are usually quite simple. For example if a
      * {@linkplain org.opengis.referencing.datum.DatumAuthorityFactory datum authority factory}

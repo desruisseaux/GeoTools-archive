@@ -904,6 +904,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
             final Factory factory   = (Factory) operationFactory;
             final Map     hints     = factory.getImplementationHints();
             final Object  candidate = hints.get(Hints.COORDINATE_OPERATION_FACTORY);
+            // Really hints.get(key), not getHintValue(hints, key).
             if (candidate instanceof CoordinateOperationFactory) {
                 return (CoordinateOperationFactory) candidate;
             }

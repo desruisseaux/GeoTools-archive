@@ -18,12 +18,13 @@ package org.geotools.referencing.operation.builder;
 // J2SE dependencies
 import java.io.Serializable;
 
-// Geotools dependencies
+// OpenGIS dependencies
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.geometry.DirectPosition;
 
-// OpenGIS dependencies
+// Geotools dependencies
 import org.geotools.io.TableWriter;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.GeneralDirectPosition;
@@ -32,7 +33,6 @@ import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.Utilities;
-import org.opengis.geometry.MismatchedDimensionException;
 
 
 /**

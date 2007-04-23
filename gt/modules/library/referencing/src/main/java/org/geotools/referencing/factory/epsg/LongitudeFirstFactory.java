@@ -25,6 +25,7 @@ import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
+import org.geotools.factory.GeoTools;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.factory.FactoryNotFoundException;
 import org.geotools.referencing.ReferencingFactoryFinder;
@@ -46,14 +47,6 @@ import org.geotools.metadata.iso.citation.Citations;
  * Hints hints = new Hints({@linkplain Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER}, Boolean.TRUE);
  * CRSAuthorityFactory factory = {@linkplain ReferencingFactoryFinder}.getCRSAuthorityFactory("EPSG", hints);
  * </pre></blockquote>
- * 
- * This factory will have a {@linkplain #priority priority} lower than the
- * {@linkplain DefaultFactory default factory} priority, <u>except</u> if the
- * <code>{@value #SYSTEM_DEFAULT_KEY}</code> {@linkplain System#getProperty(String) system
- * property} is set to {@code true}. This means that when the
- * {@code FORCE_LONGITUDE_FIRST_AXIS_ORDER} hint is not specified, the system-wide default is
- * (<var>longitude</var>, <var>latitude</var>) order if the above-cited system property is set
- * to {@code true}, and the EPSG (<var>latitude</var>, <var>longitude</var>) order otherwise.
  *
  * @since 2.3
  * @source $URL$
@@ -90,15 +83,22 @@ public class LongitudeFirstFactory extends DeferredAuthorityFactory implements C
      * since they use (<var>longitude</var>, <var>latitude</var>) axis order by design.
      *
      * @see Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER
+     *
+     * @deprecated Moved to {@link GeoTools#FORCE_LONGITUDE_FIRST_AXIS_ORDER}.
      */
-    public static final String SYSTEM_DEFAULT_KEY = "org.geotools.referencing.forceXY";
+    public static final String SYSTEM_DEFAULT_KEY = GeoTools.FORCE_LONGITUDE_FIRST_AXIS_ORDER;
 
     /**
      * Creates a default factory. The
-     * {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER FORCE_LONGITUDE_FIRST_AXIS_ORDER},
-     * {@link Hints#FORCE_STANDARD_AXIS_DIRECTIONS   FORCE_STANDARD_AXIS_DIRECTIONS} and
-     * {@link Hints#FORCE_STANDARD_AXIS_UNITS        FORCE_STANDARD_AXIS_UNITS} hints
-     * are set to {@link Boolean#TRUE TRUE}.
+     * {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER FORCE_LONGITUDE_FIRST_AXIS_ORDER}
+     * hint is always set to {@link Boolean#TRUE TRUE}. The
+     * {@link Hints#FORCE_STANDARD_AXIS_DIRECTIONS FORCE_STANDARD_AXIS_DIRECTIONS} and
+     * {@link Hints#FORCE_STANDARD_AXIS_UNITS FORCE_STANDARD_AXIS_UNITS} hints are set
+     * to {@link Boolean#FALSE FALSE} by default. A different value for those two hints
+     * can be specified using the {@linkplain LongitudeFirstFactory(Hints) constructor
+     * below}.
+     *
+     * @todo Current implementation do not yet follow the above javadoc.
      */
     public LongitudeFirstFactory() {
         this(null);
@@ -111,24 +111,18 @@ public class LongitudeFirstFactory extends DeferredAuthorityFactory implements C
      */
     public LongitudeFirstFactory(final Hints hints) {
         super(hints, DefaultFactory.PRIORITY + relativePriority());
-        put(null,  Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER);
+        super.hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
         put(hints, Hints.FORCE_STANDARD_AXIS_DIRECTIONS);
         put(hints, Hints.FORCE_STANDARD_AXIS_UNITS);
-        // Note: the above hints are also listed in FactoryFinder.UGLY_HACK
     }
 
     /**
      * Stores a value from the specified hints.
      */
     private void put(final Hints source, final Hints.Key key) {
-        Object value;
-        if (source != null) {
-            value = source.get(key);
-            if (value == null) {
-                value = Boolean.TRUE;
-            }
-        } else {
-            value = Boolean.TRUE;
+        Object value = getHintValue(source, key);
+        if (value == null) {
+            value = Boolean.TRUE; // TODO set to FALSE.
         }
         hints.put(key, value);
     }
@@ -137,6 +131,8 @@ public class LongitudeFirstFactory extends DeferredAuthorityFactory implements C
      * Returns the priority to use relative to the {@link DefaultFactory} priority. The default
      * priority should be lower, except if the <code>{@value #SYSTEM_DEFAULT_KEY}</code> system
      * property is set to {@code true}.
+     *
+     * @deprecated Not needed anymore since {@link Geotools#getDefaultHints}.
      */
     private static int relativePriority() {
         try {

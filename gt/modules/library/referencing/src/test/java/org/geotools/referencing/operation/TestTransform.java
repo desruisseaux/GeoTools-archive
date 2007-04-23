@@ -56,23 +56,23 @@ public abstract class TestTransform extends TestCase {
     /**
      * The default datum factory.
      */
-    protected static DatumFactory datumFactory;
+    protected DatumFactory datumFactory;
 
     /**
      * The default coordinate reference system factory.
      */
-    protected static CRSFactory crsFactory;
+    protected CRSFactory crsFactory;
 
     /**
      * The default math transform factory.
      */
-    protected static MathTransformFactory mtFactory;
+    protected MathTransformFactory mtFactory;
 
     /**
      * The default transformations factory.
      */
-    protected static CoordinateOperationFactory opFactory;
-    
+    protected CoordinateOperationFactory opFactory;
+
     /**
      * Random numbers generator.
      */
@@ -84,24 +84,24 @@ public abstract class TestTransform extends TestCase {
     public TestTransform(final String name) {
         super(name);
     }
-    
 
+    /**
+     * Setup the factories using the hints provided by {@link #getHintsForTesting}.
+     */
     protected void setUp() throws Exception {
         super.setUp();
-        
-        Hints hints = getHintsForTesting();
-        
-        datumFactory = ReferencingFactoryFinder.getDatumFactory( hints );
-        crsFactory = ReferencingFactoryFinder.getCRSFactory( hints );
-        mtFactory = ReferencingFactoryFinder.getMathTransformFactory( hints );
-        opFactory = ReferencingFactoryFinder.getCoordinateOperationFactory( hints );        
+        Hints hints  = getHintsForTesting();
+        datumFactory = ReferencingFactoryFinder.getDatumFactory(hints);
+        crsFactory   = ReferencingFactoryFinder.getCRSFactory(hints);
+        mtFactory    = ReferencingFactoryFinder.getMathTransformFactory(hints);
+        opFactory    = ReferencingFactoryFinder.getCoordinateOperationFactory(hints);
     }
-    
+
     /**
-     * Subclass can overrride
-     * @return null
+     * Returns the hints to be used by {@link #setUp} in order to fetch the factories.
+     * The default implementation returns {@code null}. Subclasses can override.
      */
-    protected Hints getHintsForTesting(){
+    protected Hints getHintsForTesting() {
         return null;
     }
 

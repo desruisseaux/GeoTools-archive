@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 // OpenGIS dependencies
-import org.opengis.metadata.Identifier;
+import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.datum.Ellipsoid;
 import org.opengis.referencing.datum.PrimeMeridian;
@@ -68,7 +68,7 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
      */
     public static final DefaultGeodeticDatum WGS84;
     static {
-        final Identifier[] identifiers = {
+        final ReferenceIdentifier[] identifiers = {
             new NamedIdentifier(Citations.OGC,    "WGS84"),
             new NamedIdentifier(Citations.ORACLE, "WGS 84"),
             new NamedIdentifier(null,             "WGS_84"),
