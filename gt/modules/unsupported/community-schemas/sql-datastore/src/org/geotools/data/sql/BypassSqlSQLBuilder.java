@@ -6,18 +6,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
-import org.geotools.data.jdbc.DefaultSQLBuilder;
 import org.geotools.data.jdbc.GeoAPISQLBuilder;
-import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
-import org.geotools.feature.type.GeometricAttributeType;
-import org.geotools.filter.Filter;
-import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.UnaliasSQLEncoder;
 
@@ -65,7 +59,7 @@ public class BypassSqlSQLBuilder extends GeoAPISQLBuilder {
 	 *             class
 	 */
 	public String buildSQLQuery(String typeName, FIDMapper mapper,
-			AttributeType[] attrTypes, Filter filter)
+			AttributeType[] attrTypes, org.opengis.filter.Filter filter)
 			throws SQLEncoderException {
 		String sqlStmt;
 
@@ -229,7 +223,7 @@ public class BypassSqlSQLBuilder extends GeoAPISQLBuilder {
 	}
 
 	public String getWhere(String sqlQueryDefinition, FIDMapper mapper,
-			Filter filter) throws SQLEncoderException {
+			org.opengis.filter.Filter filter) throws SQLEncoderException {
 		String search = " where ";
 		String searchIn = sqlQueryDefinition.toLowerCase();
 		int index = searchIn.lastIndexOf(search);
