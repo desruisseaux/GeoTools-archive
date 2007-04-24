@@ -69,6 +69,7 @@
     <online.skip.pattern>**/*OnlineTest.java</online.skip.pattern>
     <stress.skip.pattern>**/*StressTest.java</stress.skip.pattern>
     <test.maxHeapSize>512M</test.maxHeapSize>
+    <src.output>${basedir}/target</src.output>
   </properties>
 
   <!-- Profiles set on the command-line overwrite default properties. -->
@@ -944,6 +945,14 @@
           <artifactId>jalopy-maven-plugin</artifactId>
           <version>1.0-SNAPSHOT</version>
         </plugin>
+	<plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <configuration>
+            <outputDirectory>${src.output}</outputDirectory>
+            <attach>false</attach>
+          </configuration>
+	</plugin>
       </plugins>
     </pluginManagement>
 
