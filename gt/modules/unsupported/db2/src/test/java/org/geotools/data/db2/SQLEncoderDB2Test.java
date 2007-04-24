@@ -16,302 +16,278 @@
  */
 package org.geotools.data.db2;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.io.WKTReader;
-import org.geotools.data.db2.filter.SQLEncoderDB2;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.filter.AbstractFilter;
-import org.geotools.filter.AttributeExpression;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FidFilter;
-import org.geotools.filter.FilterCapabilities;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.GeometryDistanceFilter;
-import org.geotools.filter.GeometryFilter;
-import org.geotools.filter.IllegalFilterException;
-import org.geotools.filter.LiteralExpression;
-import org.geotools.filter.SQLEncoderException;
-import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.geotools.data.db2.filter.SQLEncoderDB2;
+import org.geotools.data.jdbc.FilterToSQLException;
+import org.geotools.factory.CommonFactoryFinder;
+
+import org.geotools.filter.FilterCapabilities;
+import org.geotools.filter.IllegalFilterException;
+import org.geotools.referencing.CRS;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.spatial.BBOX;
+import org.opengis.filter.spatial.BinarySpatialOperator;
+import org.opengis.filter.spatial.Contains;
+import org.opengis.filter.spatial.Crosses;
+import org.opengis.filter.spatial.Disjoint;
+import org.opengis.filter.spatial.Equals;
+import org.opengis.filter.spatial.Intersects;
+import org.opengis.filter.spatial.Overlaps;
+import org.opengis.filter.spatial.Touches;
+import org.opengis.filter.spatial.Within;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.io.WKTReader;
 
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author David Adler
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/db2/src/test/java/org/geotools/data/db2/SQLEncoderDB2Test.java $
  */
 public class SQLEncoderDB2Test extends DB2TestCase {
-    private static Map DB2_SPATIAL_PREDICATES = new HashMap();
-    private SQLEncoderDB2 encoder;
-    FilterFactory ff = null;
-    LiteralExpression bboxLiteral = null;
-    String sqlString = null;
-    AttributeType[] types = null;
-    FeatureType pointType = null;
-    AttributeExpression spatialColumn = null;
-    LiteralExpression doubleLiteral = null;
-    LiteralExpression geometryLiteral = null;
+	private static Map DB2_SPATIAL_PREDICATES = new HashMap();
 
-    {
-        DB2_SPATIAL_PREDICATES.put("EnvelopesIntersect",
-            new Integer(AbstractFilter.GEOMETRY_BBOX));
-        DB2_SPATIAL_PREDICATES.put("ST_Contains",
-            new Integer(AbstractFilter.GEOMETRY_CONTAINS));
-        DB2_SPATIAL_PREDICATES.put("ST_Crosses",
-            new Integer(AbstractFilter.GEOMETRY_CROSSES));
-        DB2_SPATIAL_PREDICATES.put("ST_Disjoint",
-            new Integer(AbstractFilter.GEOMETRY_DISJOINT));
-        DB2_SPATIAL_PREDICATES.put("ST_Equals",
-            new Integer(AbstractFilter.GEOMETRY_EQUALS));
-        DB2_SPATIAL_PREDICATES.put("ST_Intersects",
-            new Integer(AbstractFilter.GEOMETRY_INTERSECTS));
-        DB2_SPATIAL_PREDICATES.put("ST_Overlaps",
-            new Integer(AbstractFilter.GEOMETRY_OVERLAPS));
-        DB2_SPATIAL_PREDICATES.put("ST_Touches",
-            new Integer(AbstractFilter.GEOMETRY_TOUCHES));
-        DB2_SPATIAL_PREDICATES.put("ST_Within",
-            new Integer(AbstractFilter.GEOMETRY_WITHIN));
-    }
+	private SQLEncoderDB2 encoder;
 
-    /**
-     * Setup creates an encoder and an expression to encode
-     *
-     * @throws Exception DOCUMENT ME!
-     */
-    public void setUp() throws Exception {
-        super.setUp();
-        encoder = new SQLEncoderDB2();
-        encoder.setSqlNameEscape("\"");
-        ff = FilterFactoryFinder.createFilterFactory();
-        bboxLiteral = null;
-        types = new AttributeType[1];
-        types[0] = AttributeTypeFactory.newAttributeType("Geom", Point.class);
-        pointType = FeatureTypeFactory.newFeatureType(types, "testfeature");
-        bboxLiteral = ff.createBBoxExpression(new Envelope(-76.0, -74.0, 41.0,
-                    42.0));
-        spatialColumn = ff.createAttributeExpression(pointType, "Geom");
-        doubleLiteral = ff.createLiteralExpression(1);
+	FilterFactory2 ff = null;
 
-        WKTReader reader = new WKTReader();
-        LineString line = (LineString) reader.read("LINESTRING (0 0, 300 300)");
-        geometryLiteral = ff.createLiteralExpression(line);
-    }
+	Literal bboxLiteral = null;
 
-    /**
-     * Creates a geometry filter that uses the left and right geometries
-     * created by the setup method.
-     *
-     * @param filterType a value defined by AbstractFilter
-     *
-     * @return a GeometryFilter
-     *
-     * @throws IllegalFilterException
-     */
-    private GeometryFilter createGeometryFilter(short filterType)
-        throws IllegalFilterException {
-        return createGeometryFilter(filterType, spatialColumn, bboxLiteral);
-    }
+	String sqlString = null;
 
-    /**
-     * Creates a geometry filter with the specified filter type, left and right
-     * expressions.
-     *
-     * @param filterType
-     * @param left
-     * @param right
-     *
-     * @return
-     *
-     * @throws IllegalFilterException
-     */
-    private GeometryFilter createGeometryFilter(short filterType,
-        Expression left, Expression right) throws IllegalFilterException {
-        GeometryFilter gf = null;
-        gf = ff.createGeometryFilter(filterType);
-        gf.addLeftGeometry(left);
-        gf.addRightGeometry(right);
+	PropertyName spatialColumn = null;
 
-        return gf;
-    }
+	Literal doubleLiteral = null;
 
-    /**
-     * Creates a distance filter with the specified filter type, left and right
-     * expressions and distance.
-     *
-     * @param filterType
-     * @param left
-     * @param right
-     * @param distance
-     *
-     * @return
-     *
-     * @throws IllegalFilterException
-     */
-    private GeometryDistanceFilter createDistanceFilter(short filterType,
-        Expression left, Expression right, double distance)
-        throws IllegalFilterException {
-        GeometryDistanceFilter gf = null;
-        gf = (GeometryDistanceFilter) ff.createGeometryDistanceFilter(filterType);
-        gf.addLeftGeometry(left);
-        gf.addRightGeometry(right);
-        gf.setDistance(distance);
+	Literal geometryLiteral = null;
 
-        return gf;
-    }
- 
-    public void testDistance()
-        throws IllegalFilterException, SQLEncoderException {
-        StringWriter output;
-        GeometryDistanceFilter gf = null;
+	Literal polygonLiteral = null;
+	Envelope bboxEnv = null;
 
-        encoder.setSelectivityClause(null);
-        gf = createDistanceFilter(AbstractFilter.GEOMETRY_BEYOND,
-                spatialColumn, geometryLiteral, 10.0);
-        encoder.setSelectivityClause(null);
-        output = new StringWriter();
-        this.encoder.encode(output, gf);
-        sqlString = output.toString();
-        assertEquals("DWITHIN",
-            "WHERE db2gse.ST_Distance(\"Geom\", db2gse.ST_LINESTRING('LINESTRING (0 0, 300 300)', 1)) > 10.0",
-            sqlString);
-        gf = createDistanceFilter(AbstractFilter.GEOMETRY_DWITHIN,
-                spatialColumn, geometryLiteral, 10.0);
-        encoder.setSelectivityClause(null);
-        output = new StringWriter();
-        this.encoder.encode(output, gf);
-        sqlString = output.toString();
-        assertEquals("DWITHIN",
-            "WHERE db2gse.ST_Distance(\"Geom\", db2gse.ST_LINESTRING('LINESTRING (0 0, 300 300)', 1)) < 10.0",
-            sqlString);
-    }
+	/**
+	 * Setup creates an encoder and an expression to encode
+	 * 
+	 * @throws Exception
+	 *             DOCUMENT ME!
+	 */
+	public void setUp() throws Exception {
+		super.setUp();
+		encoder = new SQLEncoderDB2();
+		encoder.setSqlNameEscape("\"");
+		ff = (FilterFactory2) CommonFactoryFinder.getFilterFactory(null);
+		bboxLiteral = null;
 
-    public void testDWITHIN() throws IllegalFilterException {
-        StringWriter output;
-        GeometryDistanceFilter gf = null;
+		spatialColumn = ff.property("Geom");
+		doubleLiteral = ff.literal(1);
 
-        encoder.setSelectivityClause(null);
+		WKTReader reader = new WKTReader();
+		LineString line = (LineString) reader.read("LINESTRING (0 0, 300 300)");
+		bboxEnv = line.getEnvelopeInternal();
+		geometryLiteral = ff.literal(line);
+		polygonLiteral = ff.literal((Polygon) reader
+				.read("POLYGON ((-76 41, -76 42, -74 42, -74 41, -76 41))"));
+		
+		// stuff below not currently used - was testing opengis geometries
+		CoordinateReferenceSystem crs = null;
+		crs = CRS.decode("EPSG:4269");
+		try {
+			//       Geometry geom = JTSUtils.jtsToGo1(line,crs); // causes
+			// FactoryNotFoundException
+			Object obj = ff.contains(spatialColumn, geometryLiteral);
+			//        Object obj2 = ff.contains("Geom", geom);
+			System.out.println(obj);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+	}
 
-        gf = createDistanceFilter(AbstractFilter.GEOMETRY_DWITHIN,
-                spatialColumn, geometryLiteral, 10.0);
+	/**
+	 * Creates a geometry filter that uses the left and right geometries created
+	 * by the setup method.
+	 * 
+	 * @param opClass Class of the filter (Contains, Intersects, etc)
+	 * 
+	 * @return a BinarySpatialOperator
+	 * 
+	 * @throws IllegalFilterException
+	 */
+	private BinarySpatialOperator createGeometryFilter(Class opClass)
+			throws IllegalFilterException {
+		BinarySpatialOperator gf = null;
+		gf = createGeometryFilter(opClass, spatialColumn, polygonLiteral);
+		return gf;
+	}
 
-        encoder.setSelectivityClause(null);
-        output = new StringWriter();
+	/**
+	 * Creates a geometry filter with the specified filter type, left and right
+	 * expressions.
+	 * 
+	 * @param opClass Class of the filter (Contains, Intersects, etc)
+	 * @param left
+	 * @param right
+	 * 
+	 * @return a BinarySpatialOperato
+	 * 
+	 * @throws IllegalFilterException
+	 */
+	private BinarySpatialOperator createGeometryFilter(Class opClass,
+			PropertyName left, Literal right) throws IllegalFilterException {
+		BinarySpatialOperator gf = null;
 
-        try {
-            this.encoder.encode(output, gf);
-            sqlString = output.toString();
-            assertEquals("DWITHIN",
-                "WHERE db2gse.ST_Distance(\"Geom\", db2gse.ST_LINESTRING('LINESTRING (0 0, 300 300)', 1)) < 10.0",
-                sqlString);
-        } catch (SQLEncoderException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-    }
+		if (opClass == Contains.class) {
+			gf = ff.contains(left, right);
+		} else if (opClass == Crosses.class) {
+			gf = ff.crosses(left, right);
+		} else if (opClass == Disjoint.class) {
+			gf = ff.disjoint(left, right);
+		} else if (opClass == Equals.class) {
+			gf = ff.equal(left, right);
+		} else if (opClass == Intersects.class) {
+			gf = ff.intersects(left, right);
+		} else if (opClass == Overlaps.class) {
+			gf = ff.overlaps(left, right);
+		} else if (opClass == Touches.class) {
+			gf = ff.touches(left, right);
+		} else if (opClass == Within.class) {
+			gf = ff.within(left, right);
+		} else {
+			// This shouldn't happen since we will have pulled out
+			// the unsupported parts before invoking this method
+			String msg = "unsupported filter type" + opClass.toString();
+			System.out.println(msg);
+		}
+		return gf;
+	}
 
-    public void testVisit() throws SQLEncoderException, IllegalFilterException {
-        // The visit method is tested by invoking "encode" in the 
-        // super-class which will subsequent invoke visit in the
-        // SQLEncoderDB2 object.
-        StringWriter output;
-        GeometryFilter gf;
-        gf = createGeometryFilter(AbstractFilter.GEOMETRY_BBOX, spatialColumn,
-                bboxLiteral);
-        encoder.setSelectivityClause(null);
-        output = new StringWriter();
-        encoder.encode(output, gf);
-        sqlString = output.toString();
-        assertEquals("Check without selectivity",
-            "WHERE db2gse.EnvelopesIntersect(\"Geom\", -76.0, 41.0, -74.0, 42.0, 1) = 1",
-            sqlString);
+	/**
+	 * Creates a distance filter with the specified left and right
+	 * expressions and distance.
+	 * 
+	 * @param left
+	 * @param right
+	 * @param distance
+	 * 
+	 * @return
+	 * 
+	 * @throws IllegalFilterException
+	 */
+	private BinarySpatialOperator createDistanceFilter(PropertyName left,
+			Literal right, double distance) throws IllegalFilterException {
 
-        encoder.setSelectivityClause("SELECTIVITY 0.001");
-        output = new StringWriter();
-        encoder.encode(output, gf);
-        sqlString = output.toString();
-        assertEquals("Check with selectivity",
-            "WHERE db2gse.EnvelopesIntersect(\"Geom\", -76.0, 41.0, -74.0, 42.0, 1) = 1 SELECTIVITY 0.001",
-            sqlString);
+		BinarySpatialOperator gf = ff.dwithin(left, right, distance, "");
+		return gf;
+	}
 
-        Set keys = DB2_SPATIAL_PREDICATES.keySet();
-        Iterator it = keys.iterator();
+	private BinarySpatialOperator createBeyondFilter(PropertyName left,
+			Literal right, double distance) throws IllegalFilterException {
 
-        while (it.hasNext()) {
-            String predicateName = (String) it.next();
+		BinarySpatialOperator gf = ff.beyond(left, right, distance, "");
+		return gf;
+	}
+	private BBOX createBBOXFilter(PropertyName left,
+			Envelope env) throws IllegalFilterException {
 
-            if (predicateName.equals("EnvelopesIntersect")) { // skip - already tested
+    	double xmin = env.getMinX();
+    	double ymin = env.getMinY();
+    	double xmax = env.getMaxX();
+    	double ymax = env.getMaxY();
+    	BBOX bbox = ff.bbox(left,xmin,ymin,xmax,ymax,"");
+		return bbox;
+	}
+	
+	public void testDistance() throws IllegalFilterException,
+			FilterToSQLException {
+		BinarySpatialOperator gf = null;
+		encoder.setSelectivityClause(null);
+		gf = createBeyondFilter(spatialColumn, geometryLiteral, 10.0);
+		encoder.setSelectivityClause(null);
+		sqlString = this.encoder.encodeToString(gf);
 
-                continue;
-            }
+		assertEquals(
+				"Beyond",
+				"WHERE db2gse.ST_Distance(\"Geom\", db2gse.ST_LINESTRING('LINESTRING (0 0, 300 300)', 1)) > 10.0",
+				sqlString);
+		gf = createDistanceFilter(spatialColumn, geometryLiteral, 10.0);
+		encoder.setSelectivityClause(null);
+		sqlString = this.encoder.encodeToString(gf);
+		assertEquals(
+				"DWithin",
+				"WHERE db2gse.ST_Distance(\"Geom\", db2gse.ST_LINESTRING('LINESTRING (0 0, 300 300)', 1)) < 10.0",
+				sqlString);
+		
+		encoder.setSelectivityClause("SELECTIVITY 0.01");
+		sqlString = this.encoder.encodeToString(gf);
+		assertEquals(
+				"DWithin",
+				"WHERE db2gse.ST_Distance(\"Geom\", db2gse.ST_LINESTRING('LINESTRING (0 0, 300 300)', 1)) < 10.0 SELECTIVITY 0.01",
+				sqlString);		
+	}
 
-            Integer type = (Integer) DB2_SPATIAL_PREDICATES.get(predicateName);
-            short filterType = type.shortValue();
+	public void testBBOX() throws IllegalFilterException, FilterToSQLException {
 
-            //			System.out.println("Testing predicate '" + predicateName + "' type = " + filterType);
-            gf = createGeometryFilter(filterType);
-            encoder.setSelectivityClause(null);
-            output = new StringWriter();
-            encoder.encode(output, gf);
-            sqlString = output.toString();
+		encoder.setSelectivityClause(null);
 
-            String expected = "WHERE db2gse." + predicateName
-                + "(\"Geom\", db2gse.ST_POLYGON('POLYGON ((-76 41, -76 42, -74 42, -74 41, -76 41))', 1)) = 1";
-            assertEquals("Testing predicate: " + predicateName, expected,
-                sqlString);
-        }
+        BBOX bbox = createBBOXFilter(spatialColumn, bboxEnv);
+		encoder.setSelectivityClause(null);
+		sqlString = this.encoder.encodeToString(bbox);
+		assertEquals(
+				"geometry literal",
+				"WHERE db2gse.EnvelopesIntersect(\"Geom\", 0.0, 0.0, 300.0, 300.0, 1) = 1",
+				sqlString);
 
-        gf = createGeometryFilter(AbstractFilter.GEOMETRY_BBOX, bboxLiteral,
-                spatialColumn);
+		encoder.setSelectivityClause("SELECTIVITY 0.001");
+		sqlString = this.encoder.encodeToString(bbox);
+		assertEquals(
+				"geometry literal",
+				"WHERE db2gse.EnvelopesIntersect(\"Geom\", 0.0, 0.0, 300.0, 300.0, 1) = 1 SELECTIVITY 0.001",
+				sqlString);
 
-        encoder.setSelectivityClause(null);
-        output = new StringWriter();
+	}
 
-        try {
-            encoder.encode(output, gf);
-            fail("Filter with bboxLiteral on left should not be accepted");
-        } catch (RuntimeException e) {
-            // we should always come here
-        }
+	public void testCommonPredicates() throws IllegalFilterException,
+			FilterToSQLException {
 
-        gf = createGeometryFilter(AbstractFilter.GEOMETRY_BBOX, spatialColumn,
-                geometryLiteral);
+		BinarySpatialOperator gf = null;
+		Set keys = encoder.getPredicateMap().keySet();
+		Iterator it = keys.iterator();
+		while (it.hasNext()) {
+			Class filterType = (Class) it.next();
+			String predicateName = (String) encoder.getPredicateMap()
+					.get(filterType);
 
-        encoder.setSelectivityClause(null);
-        output = new StringWriter();
+			if (predicateName.equals("EnvelopesIntersect")
+					|| predicateName.equals("ST_Distance")) { // skip - tested separately
+				continue;
+			}
 
-        encoder.encode(output, gf);
-        sqlString = output.toString();
-        assertEquals("geometry literal",
-            "WHERE db2gse.EnvelopesIntersect(\"Geom\", 0.0, 0.0, 300.0, 300.0, 1) = 1",
-            sqlString);
+			System.out.println("Testing predicate '" + predicateName
+					+ "' type = " + filterType);
+			gf = createGeometryFilter(filterType);
+			encoder.setSelectivityClause(null);
+			sqlString = this.encoder.encodeToString(gf);
+			String expected = "WHERE db2gse."
+					+ predicateName
+					+ "(\"Geom\", db2gse.ST_POLYGON('POLYGON ((-76 41, -76 42, -74 42, -74 41, -76 41))', 1)) = 1";
+			assertEquals("Testing predicate: " + predicateName, expected,
+					sqlString);
+		}
+	}
 
-        gf = createGeometryFilter(AbstractFilter.GEOMETRY_BBOX, spatialColumn,
-                doubleLiteral);
-        encoder.setSelectivityClause(null);
-        output = new StringWriter();
+	public void testGetCapabilities() throws IllegalFilterException {
+		        FilterCapabilities fc = encoder.getCapabilities();
 
-        try {
-            encoder.encode(output, gf);
-            fail(
-                "Filter with numeric literal on the right should not be accepted");
-        } catch (RuntimeException e) {
-            // we should always come here
-        }
-    }
-
-    public void testGetCapabilities() throws IllegalFilterException {
-        FilterCapabilities fc = encoder.getCapabilities();
-        assertTrue("Check if BB filter supported",
-            fc.fullySupports(createGeometryFilter(AbstractFilter.GEOMETRY_BBOX)));
-    }
+		        assertTrue("Check if filter supported",
+		 fc.fullySupports(createGeometryFilter(Contains.class)));
+	}
 }

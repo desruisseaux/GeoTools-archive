@@ -32,9 +32,11 @@ import org.geotools.data.Query;
 import org.geotools.data.ReTypeFeatureReader;
 import org.geotools.data.Transaction;
 import org.geotools.data.db2.filter.SQLEncoderDB2;
+import org.geotools.data.db2.filter.SQLEncoderDB2;
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.FeatureTypeHandler;
 import org.geotools.data.jdbc.FeatureTypeInfo;
+import org.geotools.data.jdbc.FilterToSQL;
 import org.geotools.data.jdbc.JDBCDataStore;
 import org.geotools.data.jdbc.JDBCDataStoreConfig;
 import org.geotools.data.jdbc.JDBCFeatureWriter;
@@ -49,7 +51,8 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
-import org.geotools.filter.Filter;
+
+import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.io.IOException;
 import java.sql.Connection;
@@ -311,7 +314,7 @@ public class DB2DataStore extends JDBCDataStore {
 
         // We should probably get the table schema name from the feature type
         // information - not sure that it exists there.
-        return new DB2SQLBuilder(encoder, getTableSchema(), info.getSchema());
+        return new DB2SQLBuilder((FilterToSQL) encoder, getTableSchema(), info.getSchema());
     }
 
     /**
@@ -522,7 +525,7 @@ public class DB2DataStore extends JDBCDataStore {
 			throw new IOException("Type " + typeName + " does match request");
 		}
 
-		if ((filter == Filter.ALL) || filter.equals(Filter.ALL)) {
+		if ((filter == Filter.INCLUDE) || filter.equals(Filter.INCLUDE)) {
 			return new EmptyFeatureReader(requestType);
 		}
 

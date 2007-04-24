@@ -20,16 +20,13 @@ import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.AbstractFilter;
-import org.geotools.filter.AttributeExpression;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
-import org.geotools.filter.LiteralExpression;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.spatial.BBOX;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.io.IOException;
 import java.util.Iterator;
@@ -47,6 +44,7 @@ public class DB2FeatureSourceTest extends DB2TestCase {
     private Envelope placesEnv2 = new Envelope(-74.15, -74.12, 42.0, 42.01);
     private Envelope roadsEnv1 = new Envelope(600000.0, 604000.0, 1160000.0,
             1162000.0);
+    FilterFactory2 ff = (FilterFactory2) CommonFactoryFinder.getFilterFactory(null);
 
     /**
      * Get a DB2DataStore that we will use for all the tests.
@@ -65,7 +63,7 @@ public class DB2FeatureSourceTest extends DB2TestCase {
         DefaultQuery query;
 
         //Test "Places" - all bounds
-        featureSource = dataStore.getFeatureSource("Places");
+        featureSource = new DB2FeatureSource(dataStore,dataStore.getSchema("Places"));
         env = featureSource.getBounds();
         assertEquals("all places bounds",
             "[74°09.6'W 41°59.6'N , 74°04.1'W 42°03.6'N]",
@@ -174,30 +172,30 @@ public class DB2FeatureSourceTest extends DB2TestCase {
         featureSource = dataStore.getFeatureSource("Roads");
 
         String schemaFound = featureSource.getSchema().toString();
-        String schemaCompare = "DefaultFeatureType [name=Roads , namespace=Test , abstract=false , types=(DefaultAttributeType [name=ID , type=class java.lang.Integer , nillable=true, min=1, max=1],DefaultAttributeType [name=Name , type=class java.lang.String , nillable=true, min=1, max=1],DefaultAttributeType [name=Length , type=class java.lang.Double , nillable=true, min=1, max=1],DefaultAttributeType [name=Geom , type=class com.vividsolutions.jts.geom.LineString , nillable=true, min=1, max=1],)]";
+        String schemaCompare = "DefaultFeatureType [name=Roads , namespace=Test , abstract=false , types=(DefaultAttributeType [name=ID , type=class java.lang.Integer , nillable=true, min=1, max=1],DefaultAttributeType [name=Name , type=class java.lang.String , nillable=true, min=0, max=0],DefaultAttributeType [name=Length , type=class java.lang.Double , nillable=true, min=0, max=0],DefaultAttributeType [name=Geom , type=class com.vividsolutions.jts.geom.LineString , nillable=true, min=0, max=0],)]";
         System.out.println("schema: " + schemaFound);
         assertEquals("schema mismatch", schemaCompare, schemaFound);
     }
 
-    private GeometryFilter getBBOXFilter(FeatureSource featureSource,
+    private BBOX getBBOXFilter(FeatureSource featureSource,
         Envelope env) throws IllegalFilterException {
-        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-        GeometryFilter gf = ff.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
-        LiteralExpression envelope = ff.createBBoxExpression(env);
-        FeatureType ft = featureSource.getSchema();
-        AttributeExpression spatialColumn = ff.createAttributeExpression("Geom");
-        gf.addLeftGeometry(spatialColumn);
-        gf.addRightGeometry(envelope);
+    	
+    	double xmin = env.getMinX();
+    	double ymin = env.getMinY();
+    	double xmax = env.getMaxX();
+    	double ymax = env.getMaxY();
 
-        return gf;
+    	BBOX bbox = ff.bbox("Geom",xmin,ymin,xmax,ymax,"");
+
+        return bbox;
     }
 
     private DefaultQuery getBBOXQuery(FeatureSource featureSource, Envelope env)
         throws IllegalFilterException {
-        GeometryFilter gf = getBBOXFilter(featureSource, env);
+        BBOX bbox = getBBOXFilter(featureSource, env);
         FeatureType ft = featureSource.getSchema();
 
-        return new DefaultQuery(ft.getTypeName(), gf);
+        return new DefaultQuery(ft.getTypeName(), bbox);
     }
         public String env2CoordString(Envelope env) {
     	String result = null;

@@ -25,16 +25,24 @@ import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.JDBCDataStore;
 import org.geotools.data.jdbc.JDBCFeatureSource;
 import org.geotools.data.jdbc.SQLBuilder;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.filter.AttributeExpression;
-import org.geotools.filter.Filter;
+import org.geotools.filter.DefaultExpression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.spatial.BBOX;
+import org.opengis.filter.spatial.BinarySpatialOperator;
+import org.opengis.filter.spatial.Intersects;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.io.IOException;
 import java.sql.Connection;
@@ -50,7 +58,8 @@ import java.util.logging.Logger;
  * 
  * @author David Adler - IBM Corporation
  * @source $URL:
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/db2/src/main/java/org/geotools/data/db2/DB2FeatureSource.java $
  */
 public class DB2FeatureSource extends JDBCFeatureSource {
 
@@ -108,29 +117,20 @@ public class DB2FeatureSource extends JDBCFeatureSource {
 		Envelope env = new Envelope();
 		CoordinateReferenceSystem crs = null;
 		LOGGER.fine("Query: " + query.toString());
-//		Exception e0 = new Exception();
-//		e0.printStackTrace();
-//		System.out.println("getBounds Query: " + query.toString());
+
 		if (getSchema() != null) {
 			String typeName = getSchema().getTypeName();
 			GeometryAttributeType geomType = getSchema().getDefaultGeometry();
-//			System.out.println("getBounds typeName: " + typeName);
-//			System.out.println("getBounds geomType: " + geomType);
+
 			if (geomType != null) {
-				org.opengis.filter.Filter filter = query.getFilter();
-//				System.out.println("getBounds filter: " + filter.toString());
-//				Object fclass = filter.getClass();
-//				System.out.println("getBounds filter class: " + fclass);
-//				int ftype = filter.getFilterType();
-//				System.out.println("getBounds filter type: " + ftype);
-//				if (ftype == Filter.GEOMETRY_INTERSECTS || ftype == Filter.GEOMETRY_BBOX) {
-//					filter = fixNullGeomFilter(filter);
-//				}
-//				JDBCDataStore jdbc = (JDBCDataStore) getJDBCDataStore();
-//				SQLBuilder sqlBuilder = jdbc.getSqlBuilder(typeName);
-//				filter = sqlBuilder.getPreQueryFilter(query.getFilter());
-				//           	filter = Filter.NONE;
-				if (filter != Filter.ALL) {
+				Filter filter = query.getFilter();
+				Class filterClass = filter.getClass();
+
+				if (filterClass == Intersects.class
+						|| filterClass == BBOX.class) {
+					filter = fixNullGeomFilter(filter);
+				}
+				if (filter != Filter.EXCLUDE) {
 					String sqlStmt = null;
 					try {
 						DB2SQLBuilder builder = (DB2SQLBuilder) ((DB2DataStore) this
@@ -180,29 +180,45 @@ public class DB2FeatureSource extends JDBCFeatureSource {
 
 		return env;
 	}
-/*
- * Sometimes getBounds gets a filter with no geometry column - we substitute the
- * default geometry column, if one can be found.
- */
+
+	/*
+	 * Sometimes getBounds gets a filter with no geometry column - we substitute
+	 * the default geometry column, if one can be found.
+	 */
 	private Filter fixNullGeomFilter(Filter inFilter) {
-		GeometryFilter gf = (GeometryFilter) inFilter;
-		if (gf.getExpression1() == null) {
+		BinarySpatialOperator operator = (BinarySpatialOperator) inFilter;
+		Filter filter = (Filter) inFilter;
+		Class filterClass = inFilter.getClass();
+		double xmin = 0, ymin = 0, xmax = 0, ymax = 0;
+		if (operator.getExpression1() == null) {
 			String attName = null;
 			GeometryAttributeType dg = getSchema().getDefaultGeometry();
-			if (dg != null) attName = dg.getName();
+			if (dg != null)
+				attName = dg.getName();
 			if (attName != null) {
-				
-				FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-				AttributeExpression spatialColumn = ff
-						.createAttributeExpression(attName);
-				gf.addLeftGeometry(spatialColumn);
-				if (gf.getFilterType() == Filter.GEOMETRY_INTERSECTS) {
-					gf = ff.createGeometryFilter(Filter.GEOMETRY_BBOX);
-					gf.addLeftGeometry(spatialColumn);
-					gf.addRightGeometry(((GeometryFilter)inFilter).getRightGeometry());
+				FilterFactory2 ff = (FilterFactory2) CommonFactoryFinder
+						.getFilterFactory(null);
+				if (filterClass == Intersects.class) {
+					Intersects intersects = (Intersects) inFilter;
+					Literal geomLiteral = (Literal) intersects.getExpression2();
+					Geometry geom = (Geometry) geomLiteral.getValue();
+					Envelope envelope = geom.getEnvelopeInternal();
+					xmin = envelope.getMinX();
+					ymin = envelope.getMinY();
+					xmax = envelope.getMaxX();
+					ymax = envelope.getMaxY();
+					PropertyName name = ff.property(attName);
+					filter = ff.intersects(name,geomLiteral);
+				} else if (filterClass == BBOX.class) {
+					BBOX bbox = (BBOX) inFilter;
+					xmin = bbox.getMinX();
+					ymin = bbox.getMinY();
+					xmax = bbox.getMaxX();
+					ymax = bbox.getMaxY();
 				}
+				filter = ff.bbox(attName, xmin, ymin, xmax, ymax, "");
 			}
 		}
-		return gf;
+	return filter;
 	}
 }

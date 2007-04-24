@@ -18,13 +18,12 @@ package org.geotools.data.db2;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.data.db2.filter.SQLEncoderDB2;
-import org.geotools.data.jdbc.DefaultSQLBuilder;
+import org.geotools.data.jdbc.FilterToSQL;
+import org.geotools.data.jdbc.GeoAPISQLBuilder;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.Filter;
-import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -42,36 +41,14 @@ import java.util.logging.Logger;
  * @author David Adler - IBM Corporation
  * @source $URL$
  */
-public class DB2SQLBuilder extends DefaultSQLBuilder {
+public class DB2SQLBuilder extends GeoAPISQLBuilder {
     private static final Logger LOGGER = Logger.getLogger(
             "org.geotools.data.db2");
     private String tableSchema = null;
     private String tableName = null;
     private FIDMapper mapper = null;
 
-    /**
-     * Creates a DB2SQLBuilder that will provide a table schema to qualify
-     * table names. The table schema is provided by the DB2DataStore which
-     * means that a given DataStore can only access tables within a single
-     * schema.
-     * 
-     * <p>
-     * It would be better if the table schema was managed by FeatureTypeHandler
-     * or FeatureType.
-     * </p>
-     *
-     * @deprecated please use DB2SQLBuilder(encoder, tableSchema, featureType)
-     * @param encoder an SQLEncoder
-     * @param tableSchema table schema to qualify table names
-     * @param tableName the table name to be used by this SQL builder
-     */
-    public DB2SQLBuilder(SQLEncoder encoder, FIDMapper mapper, String tableSchema,
-        String tableName) {
-        super(encoder);
-        this.mapper = mapper;
-        this.tableSchema = tableSchema;
-        this.tableName = tableName;
-    }
+
 
     /**
      * Creates a DB2SQLBuilder that will provide a table schema to qualify
@@ -86,13 +63,10 @@ public class DB2SQLBuilder extends DefaultSQLBuilder {
      *
      * @param encoder an SQLEncoder
      * @param tableSchema table schema to qualify table names
-     * @param tableName the table name to be used by this SQL builder
+     * @param featureType the feature type to be used by this SQL builder
      */
-    public DB2SQLBuilder(SQLEncoder encoder, String tableSchema, FeatureType featureType) {
- //       super(encoder, featureType, null);
-    	this.encoder = encoder;
-//    	this.ft = featureType;
-    	this.accessor = null;
+    public DB2SQLBuilder(FilterToSQL encoder, String tableSchema, FeatureType featureType) {
+        super(encoder, featureType, null);
         this.tableSchema = tableSchema;
         this.tableName = featureType.getTypeName();
     }
@@ -235,6 +209,7 @@ public class DB2SQLBuilder extends DefaultSQLBuilder {
      * it possible to insert out of order, as well as inserting less than all
      * features.
      *
+     * @param attributes the attribute columns to be inserted
      * @param feature the feature to add.
      *
      * @return an insert sql statement.
@@ -287,6 +262,7 @@ public class DB2SQLBuilder extends DefaultSQLBuilder {
 	/**
 	 * Generates the SQL UPDATE statement
 	 * 
+	 * @param attributes the attribute columns to be inserted
 	 * @param feature
 	 * 
 	 * @return DB2 UPDATE statement
