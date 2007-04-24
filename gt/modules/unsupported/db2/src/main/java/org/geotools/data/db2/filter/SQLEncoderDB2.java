@@ -152,7 +152,7 @@ public class SQLEncoderDB2 extends FilterToSQL{
 	        super();
 	    }
 
-
+	    /** HashMap<Class,String> example [BBOX.class,"EnvelopesIntersect"] */ 
 	    static private HashMap getPredicateTable() {
 	        return DB2_SPATIAL_PREDICATES;
 	    }
@@ -197,8 +197,10 @@ public class SQLEncoderDB2 extends FilterToSQL{
 	        FilterCapabilities capabilities = new FilterCapabilities();
 	        
 //	 New capbilities
-	        capabilities.addAll(FilterCapabilities.SIMPLE_COMPARISONS_OPENGIS);	        
-	      //capabilities.addAll(getPredicateTable().keySet());
+	        capabilities.addAll(FilterCapabilities.SIMPLE_COMPARISONS_OPENGIS);
+            for( Iterator i=getPredicateTable().keySet().iterator(); i.hasNext(); ){
+                capabilities.addType( (Class) i.next() );    
+            }
 	        capabilities.addType(PropertyIsLike.class);
 	        capabilities.addType(Id.class);
 	        
