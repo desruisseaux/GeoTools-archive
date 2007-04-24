@@ -197,9 +197,8 @@ public class SQLEncoderDB2 extends FilterToSQL{
 	        FilterCapabilities capabilities = new FilterCapabilities();
 	        
 //	 New capbilities
-	        capabilities.addAll(FilterCapabilities.SIMPLE_COMPARISONS_OPENGIS);
-	        
-	        capabilities.addAll(getPredicateTable().keySet());
+	        capabilities.addAll(FilterCapabilities.SIMPLE_COMPARISONS_OPENGIS);	        
+	      //capabilities.addAll(getPredicateTable().keySet());
 	        capabilities.addType(PropertyIsLike.class);
 	        capabilities.addType(Id.class);
 	        
