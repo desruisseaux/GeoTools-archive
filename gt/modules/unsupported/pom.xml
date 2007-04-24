@@ -56,7 +56,6 @@
        </activation>
        <modules>
         <module>geometry</module>
-    <!--<module>jpox</module>-->
        </modules>
      </profile>
 
@@ -70,7 +69,7 @@
        </activation>
        <modules>
         <module>geometry</module>
-   <!--<module>jpox</module>-->
+        <module>jpox</module>
        </modules>
      </profile>
      
@@ -80,10 +79,27 @@
      <profile>
        <id>pending</id>
        <modules>
+         <module>community-schemas</module>
+         <module>coveragetools</module>
          <module>hsql</module>
+         <module>geometryless</module>
          <module>h2</module>
+         <module>notifying-collections</module>
+         <module>ogr</module>
        </modules>
      </profile>
+
+     <!-- ================================================== -->
+     <!--     Modules kicked out of the build                -->
+     <!-- ================================================== -->
+     <profile>
+       <id>archive</id>
+       <modules>
+         <module>hsql</module>
+         <module>jpox</module>
+       </modules>
+     </profile>
+
   </profiles>
 
   <modules>
