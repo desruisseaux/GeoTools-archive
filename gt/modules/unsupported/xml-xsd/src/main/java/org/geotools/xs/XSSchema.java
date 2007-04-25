@@ -28,7 +28,12 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.type.SchemaImpl;
 
-
+/**
+ * Schema for xml simple types.
+ *  
+ * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
+ *
+ */
 public class XSSchema extends SchemaImpl {
     /**
      * <p>
