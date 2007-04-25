@@ -93,18 +93,6 @@
         <allow.test.failure.ignore>true</allow.test.failure.ignore>
         <extensive.tests>true</extensive.tests>
       </properties>
-      <dependencies>
-        <dependency>
-          <groupId>org.opengis</groupId>
-            <artifactId>geoapi-nogenerics</artifactId>
-            <!-- The version number is specified above. --> 
-        </dependency>
-        <dependency>
-          <groupId>javax.units</groupId>
-          <artifactId>jsr108</artifactId>
-          <!-- The version number is specified above. -->
-        </dependency>
-      </dependencies>
     </profile>
      <profile>
       <id>online</id>
@@ -801,16 +789,6 @@
   <!--     is not specified at this level.                         -->
   <!-- =========================================================== -->
   <dependencies>
-    <!-- conflict with unsupported/geometry moved to site.build profile
-    <dependency>
-      <groupId>org.opengis</groupId>
-      <artifactId>geoapi-nogenerics</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.units</groupId>
-      <artifactId>jsr108</artifactId>
-    </dependency>
-    -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

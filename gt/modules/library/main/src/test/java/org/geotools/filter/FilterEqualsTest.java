@@ -189,21 +189,26 @@ public class FilterEqualsTest extends TestCase {
         //LOGGER.finer("...flat feature created");
     }
 
-    public void testLiteralExpressionImpl(){
-	try {
-	    testExp1 = new LiteralExpressionImpl("test literal");
-	    testExp2 = new LiteralExpressionImpl("test literal");
-	    assertTrue(testExp1.equals(testExp2));
-	    testExp2 = new LiteralExpressionImpl("not test literal");
-	    assertTrue(!testExp1.equals(testExp2));
-	    testExp3 = new LiteralExpressionImpl(new Integer(34));
-	    assertTrue(!testExp1.equals(testExp3));
-	    testExp1 = new LiteralExpressionImpl(new Integer(34));
-	    assertTrue(testExp1.equals(testExp3));
-	}  catch (IllegalFilterException e) {
-	    LOGGER.warning("bad filter " + e.getMessage());
-	}
-    }   
+    public void testLiteralExpressionImplEquals(){
+    	try {
+    	    Expression testString1 = new LiteralExpressionImpl("test literal");
+            Expression testString2 = new LiteralExpressionImpl("test literal");
+    	    assertTrue(testString1.equals(testString2));
+            
+            Expression testOtherString = new LiteralExpressionImpl("not test literal");
+    	    assertFalse( testString1.equals(testOtherString) );
+            
+    	    Expression testNumber34 = new LiteralExpressionImpl(new Integer(34));
+    	    assertFalse( testString1.equals(testNumber34));
+            
+            Expression testOtherNumber34 = new LiteralExpressionImpl(new Integer(34));	    
+    	    assertTrue(testNumber34.equals(testOtherNumber34));                  
+    	}  catch (IllegalFilterException e) {
+    	    LOGGER.warning("bad filter " + e.getMessage());
+    	}
+    }
+    
+    
 
     public void testFidFilter(){
         FidFilter ff = new FidFilterImpl();
