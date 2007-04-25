@@ -256,12 +256,9 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
             return handler;
         }
 
-        //use the schema builder to get the element declaration, then see if it 
-        //group has a substiution
-        //TODO: this is kind of a hack, this logic shouldn't really be here, 
-        // clean this up
+        //could not find the element as a direct child of the parent, check 
+        // for a global element, and then check its substituation group
         element = index.getElementDeclaration(qName);
-
         if (element != null) {
             XSDElementDeclaration sub = element.getSubstitutionGroupAffiliation();
 
@@ -271,7 +268,12 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
                 Handler handler = getChildHandlerInternal(subQName);
 
                 if (handler != null) {
-                    //substituable
+                	//this means that hte element is substituatable for an 
+                	// actual child. now we have have choice, do we return 
+                	// a handler for the actual element, or the element it 
+                	// substituable for - the answer is to check the bindings
+                        //TODO: ask the binding
+
                     handler = parser.getHandlerFactory().createElementHandler( element, this, parser );
 
                     return handler;
