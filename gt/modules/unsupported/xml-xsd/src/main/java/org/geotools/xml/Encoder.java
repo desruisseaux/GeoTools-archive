@@ -22,6 +22,7 @@ import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 import org.eclipse.xsd.XSDAttributeDeclaration;
 import org.eclipse.xsd.XSDElementDeclaration;
+import org.eclipse.xsd.XSDFactory;
 import org.eclipse.xsd.XSDModelGroup;
 import org.eclipse.xsd.XSDNamedComponent;
 import org.eclipse.xsd.XSDParticle;
@@ -309,6 +310,10 @@ public class Encoder {
 			
 			namespaces.declarePrefix( pre != null ? pre : "" , ns );
 		}
+		//ensure a default namespace prefix set
+		if ( namespaces.getURI( "" ) == null ) {
+			namespaces.declarePrefix( "", schema.getTargetNamespace() );
+		}
 		
 		//create the document
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance(); 
@@ -320,7 +325,10 @@ public class Encoder {
 		}
 		//maintain a stack of (encoding,element declaration pairs)
 		Stack encoded = new Stack();
-		encoded.add(new EncodingEntry(object,index.getElementDeclaration(name)));
+		
+		//add the first entry
+		XSDElementDeclaration root = index.getElementDeclaration(name);
+		encoded.add(new EncodingEntry(object,root));
 		
 		while(!encoded.isEmpty()) {
 			EncodingEntry entry = (EncodingEntry)encoded.peek();
