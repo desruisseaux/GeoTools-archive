@@ -172,8 +172,9 @@ public class UnoPkg extends AbstractMojo implements FilenameFilter {
             for (final Iterator it=dependencies.iterator(); it.hasNext();) {
                 final Artifact artifact = (Artifact) it.next();
                 final String scope = artifact.getScope();
-                if (scope.equalsIgnoreCase(Artifact.SCOPE_COMPILE) ||
-                    scope.equalsIgnoreCase(Artifact.SCOPE_RUNTIME))
+                if (scope != null &&  // Maven 2.0.6 bug?
+                   (scope.equalsIgnoreCase(Artifact.SCOPE_COMPILE) ||
+                    scope.equalsIgnoreCase(Artifact.SCOPE_RUNTIME)))
                 {
                     final File file = artifact.getFile();
                     String name = file.getName();

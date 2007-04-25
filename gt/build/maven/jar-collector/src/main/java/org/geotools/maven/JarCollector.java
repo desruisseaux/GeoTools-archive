@@ -42,7 +42,13 @@ import org.codehaus.plexus.util.FileUtils;
  */
 public class JarCollector extends AbstractMojo {
     /**
-     * The directory where JARs are collected.
+     * The sub directory to create inside the "target" directory.
+     */
+    private static final String SUB_DIRECTORY = "binaries";
+
+    /**
+     * The directory where JARs are to be copied. It should
+     * be the "target" directory of the parent {@code pom.xml}.
      */
     private String collectDirectory;
 
@@ -85,7 +91,7 @@ public class JarCollector extends AbstractMojo {
      */
     public void execute() throws MojoExecutionException {
         /*
-         * Get the parent output directory.
+         * Gets the parent "target" directory.
          */
         MavenProject parent = project;
         while (parent.hasParent()) {
@@ -106,12 +112,18 @@ public class JarCollector extends AbstractMojo {
      * Implementation of the {@link #execute} method.
      */
     private void collect() throws MojoExecutionException, IOException {
+        /*
+         * Make sure that we are collecting the JAR file from a module which produced
+         * such file. Some modules use pom packaging, which do not produce any JAR file.
+         */
         final File jarFile = new File(outputDirectory, jarName + ".jar");
         if (!jarFile.isFile()) {
-            // Need to check for existing files, since pom packaging do not have any JAR.
             return;
         }
-        final File collect = new File(collectDirectory);
+        /*
+         * Get the "target" directory of the parent pom.xml and make sure it exists.
+         */
+        File collect = new File(collectDirectory);
         if (!collect.exists()) {
             if (!collect.mkdir()) {
                 throw new MojoExecutionException("Failed to create target directory.");
@@ -126,14 +138,24 @@ public class JarCollector extends AbstractMojo {
              */
             return;
         }
+        /*
+         * Creates a "binaries" subdirectory inside the "target" directory.
+         */
+        collect = new File(collect, SUB_DIRECTORY);
+        if (!collect.exists()) {
+            if (!collect.mkdir()) {
+                throw new MojoExecutionException("Failed to create binaries directory.");
+            }
+        }
         int count = 1;
         FileUtils.copyFileToDirectory(jarFile, collect);
         if (dependencies != null) {
             for (final Iterator it=dependencies.iterator(); it.hasNext();) {
                 final Artifact artifact = (Artifact) it.next();
                 final String scope = artifact.getScope();
-                if (scope.equalsIgnoreCase(Artifact.SCOPE_COMPILE) ||
-                    scope.equalsIgnoreCase(Artifact.SCOPE_RUNTIME))
+                if (scope != null &&  // Maven 2.0.6 bug?
+                   (scope.equalsIgnoreCase(Artifact.SCOPE_COMPILE) ||
+                    scope.equalsIgnoreCase(Artifact.SCOPE_RUNTIME)))
                 {
                     final File file = artifact.getFile();
                     final File copy = new File(collect, file.getName());
