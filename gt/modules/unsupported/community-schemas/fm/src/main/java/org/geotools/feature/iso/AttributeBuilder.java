@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.geotools.feature.iso.type.AttributeDescriptorImpl;
 import org.opengis.feature.Association;
@@ -31,6 +32,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  */
 public class AttributeBuilder {
+    private static final Logger LOGGER = Logger.getLogger(AttributeBuilder.class.getPackage()
+            .getName());
 
     /**
      * Factory used to create attributes
@@ -311,8 +314,14 @@ public class AttributeBuilder {
         if (!declaredType.equals(type)) {
             boolean argIsSubType = Types.isSuperType(type, declaredType);
             if (!argIsSubType) {
-                throw new IllegalArgumentException(type.getName() + " is not a subtype of "
-                        + declaredType.getName());
+                /*
+                 * commented out since we got community schemas where the
+                 * required instance type is not a subtype of the declared one
+                 * throw new IllegalArgumentException(type.getName() + " is not
+                 * a subtype of " + declaredType.getName());
+                 */
+                LOGGER.warning("Adding attribute " + name + " of type " + type.getName()
+                        + " which is not a subtype of " + declaredType.getName());
             }
             int minOccurs = descriptor.getMinOccurs();
             int maxOccurs = descriptor.getMaxOccurs();
