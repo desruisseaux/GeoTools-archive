@@ -96,22 +96,7 @@ public class GMLAbstractFeatureTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        //get the definition of the element
-        XSDElementDeclaration decl = instance.getElementDeclaration();
-
-        //look for a feature type in the cache
-        FeatureType fType = ftCache.get(decl.getName());
-
-        if (fType == null) {
-            fType = GML2ParsingUtils.featureType(decl, bwFactory);
-            ftCache.put(fType);
-        }
-
-        //fid
-        String fid = (String) node.getAttributeValue("fid");
-
-        //create feature
-        return GML2ParsingUtils.feature(fType, fid, node);
+        return GML2ParsingUtils.parseFeature(instance, node, value, ftCache, bwFactory);
     }
 
     public Object getProperty(Object object, QName name)

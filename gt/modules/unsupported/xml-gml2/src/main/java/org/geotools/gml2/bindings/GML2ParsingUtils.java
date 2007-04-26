@@ -33,10 +33,12 @@ import org.geotools.feature.DefaultFeatureTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
+import org.geotools.gml2.FeatureTypeCache;
 import org.geotools.referencing.CRS;
 import org.geotools.util.Converters;
 import org.geotools.xml.Binding;
 import org.geotools.xml.BindingWalkerFactory;
+import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 import org.geotools.xml.Schemas;
 import org.geotools.xml.impl.BindingWalker;
@@ -49,6 +51,57 @@ import org.geotools.xml.impl.BindingWalker;
  *
  */
 public class GML2ParsingUtils {
+    /**
+     * Utility method to implement Binding.parse for a binding which parses
+     * into A feature.
+     *
+     * @param instance The instance being parsed.
+     * @param node The parse tree.
+     * @param value The value from the last binding in the chain.
+     * @param ftCache The feature type cache.
+     * @param bwFactory Binding walker factory.
+     *
+     * @return A feature type.
+     */
+    public static Feature parseFeature(ElementInstance instance, Node node, Object value,
+        FeatureTypeCache ftCache, BindingWalkerFactory bwFactory)
+        throws Exception {
+        //get the definition of the element
+        XSDElementDeclaration decl = instance.getElementDeclaration();
+
+        //special case, if the declaration is abstract it is probably "_Feautre" 
+        // which means we are parsing an elemetn which could not be found in the 
+        // schema, so instaed of using the element declaration to build the 
+        // type, just use the node given to us
+        FeatureType fType = null;
+
+        if (!decl.isAbstract()) {
+            //first look in cache
+            fType = ftCache.get(decl.getName());
+
+            if (fType == null) {
+                //build from element declaration
+                fType = GML2ParsingUtils.featureType(decl, bwFactory);
+                ftCache.put(fType);
+            }
+        } else {
+            // first look in cache
+            fType = ftCache.get(node.getComponent().getName());
+
+            if (fType == null) {
+                //build from node
+                fType = GML2ParsingUtils.featureType(node);
+                ftCache.put(fType);
+            }
+        }
+
+        //fid
+        String fid = (String) node.getAttributeValue("fid");
+
+        //create feature
+        return GML2ParsingUtils.feature(fType, fid, node);
+    }
+
     /**
      * Turns a parse node instance into a geotools feature type.
      * <p>
