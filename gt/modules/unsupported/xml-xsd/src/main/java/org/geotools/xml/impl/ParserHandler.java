@@ -30,6 +30,7 @@ import org.eclipse.xsd.XSDFactory;
 import org.eclipse.xsd.XSDParticle;
 import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.XSDSimpleTypeDefinition;
+import org.eclipse.xsd.XSDTypeDefinition;
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.eclipse.xsd.util.XSDSchemaLocator;
 import org.eclipse.xsd.util.XSDUtil;
@@ -39,6 +40,7 @@ import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Parser;
 import org.geotools.xml.SchemaIndex;
 import org.geotools.xml.Schemas;
+import org.geotools.xs.bindings.XS;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.defaults.DefaultPicoContainer;
 import org.xml.sax.Attributes;
@@ -366,10 +368,7 @@ public class ParserHandler extends DefaultHandler {
         		decl.setTargetNamespace( qualifiedName.getNamespaceURI() );
         		
         		//set the type to be of string
-        		XSDSimpleTypeDefinition type = (XSDSimpleTypeDefinition) 
-        			XSDUtil.getSchemaForSchema( XSDUtil.SCHEMA_FOR_SCHEMA_URI_2001 )
-        			.getSimpleTypeIdMap().get( "anyType" );
-        		
+        		XSDTypeDefinition type = index.getTypeDefinition( XS.ANYTYPE );
         		decl.setTypeDefinition( type );
         		handler = new ElementHandlerImpl( decl, parent, this );
         	}
