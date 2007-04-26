@@ -28,7 +28,9 @@ public class IsNullImpl extends CompareFilterImpl implements
 	}
 
 	public boolean evaluate(Object feature) {
-		return getExpression().evaluate( feature ) == null;
+	    Expression expr = getExpression();
+        Object value = eval(expr, feature);
+		return value == null;
 	}
 
 	public Object accept(FilterVisitor visitor, Object extraData) {

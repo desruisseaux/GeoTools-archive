@@ -42,7 +42,8 @@ public class LengthFunction extends FunctionExpressionImpl {
 	 */
 	public Object evaluate(Object feature) {
 	    Expression ae = (Expression)getParameters().get(0);
-            return new Integer(ae.evaluate(feature).toString().length());
+        String value = (String) ae.evaluate(feature, String.class);
+        return new Integer(value == null? 0 : value.length());
 	}
 
 }
