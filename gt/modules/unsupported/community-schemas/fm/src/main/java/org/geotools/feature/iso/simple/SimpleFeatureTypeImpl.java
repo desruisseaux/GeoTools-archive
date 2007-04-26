@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.geotools.feature.iso.Descriptors;
+import org.geotools.feature.iso.Types;
 import org.geotools.feature.iso.type.FeatureTypeImpl;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -50,7 +51,7 @@ public class SimpleFeatureTypeImpl extends FeatureTypeImpl implements
 	}
 
 	public AttributeType get(String name) {
-		return get(new org.geotools.feature.Name(name));
+		return get(Types.attributeName(name));
 	}
 
 	public AttributeType get(int index) {

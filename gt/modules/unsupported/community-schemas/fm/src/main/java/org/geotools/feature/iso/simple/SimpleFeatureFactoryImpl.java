@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.geotools.feature.iso.AttributeFactoryImpl;
 import org.geotools.feature.iso.AttributeImpl;
+import org.geotools.feature.iso.Types;
 import org.geotools.feature.iso.attribute.GeometricAttribute;
 import org.geotools.feature.iso.attribute.TextualAttribute;
 import org.geotools.feature.iso.type.AttributeDescriptorImpl;
@@ -24,6 +25,7 @@ import org.opengis.feature.simple.TemporalAttribute;
 import org.opengis.feature.simple.TextAttribute;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.Name;
 import org.opengis.feature.type.TypeName;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -117,7 +119,9 @@ public class SimpleFeatureFactoryImpl extends AttributeFactoryImpl implements
 		List descriptors = new ArrayList( typeList.size() );
 		for( Iterator i = typeList.iterator(); i.hasNext(); ){
 			AttributeType attributeType = (AttributeType) i.next();
-			AttributeDescriptor attribute = new AttributeDescriptorImpl(attributeType, attributeType.getName(), 1,1,true );
+			TypeName typeName = attributeType.getName();
+            Name name = Types.attributeName(typeName);
+            AttributeDescriptor attribute = new AttributeDescriptorImpl(attributeType, name, 1,1,true );
 			descriptors.add( attribute );
 		}
 		return descriptors;

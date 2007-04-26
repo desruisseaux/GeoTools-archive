@@ -3,6 +3,7 @@ package org.geotools.util;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import org.geotools.feature.iso.Types;
 import org.opengis.feature.type.Name;
 
 public class Namespace extends HashSet implements
@@ -30,7 +31,7 @@ public class Namespace extends HashSet implements
      *            The uri of the namespace.
      */
     public Namespace(String uri) {
-        this.name = new org.geotools.feature.Name(uri);
+        this.name = Types.attributeName(uri);
     }
 
     public Name getName() {

@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.geotools.feature.iso.Types;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.Namespace;
@@ -23,14 +24,21 @@ public class SchemaImpl implements Schema {
 			if (lookupName == null) 
 				return null;
 			
-			Name name = new org.geotools.feature.Name(getURI(), lookupName ); 
+			Name name = Types.attributeName(getURI(), lookupName ); 
 			
 			for (Iterator itr = iterator(); itr.hasNext();) {
 				Name n = (Name) itr.next();
 				if (name.equals( n )) return n;
 			}
 			
-			return null;
+            name = Types.typeName(getURI(), lookupName ); 
+            
+            for (Iterator itr = iterator(); itr.hasNext();) {
+                Name n = (Name) itr.next();
+                if (name.equals( n )) return n;
+            }
+
+            return null;
 		}
 		public int size() {
 			return contents.size();

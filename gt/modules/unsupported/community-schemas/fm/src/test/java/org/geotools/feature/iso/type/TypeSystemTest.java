@@ -7,6 +7,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.geotools.feature.iso.Types;
 import org.geotools.util.GTContainer;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
@@ -214,11 +215,11 @@ public class TypeSystemTest extends TestCase {
     }
 
     static final Name name(String local) {
-        return new org.geotools.feature.Name(null, local);
+        return Types.attributeName(null, local);
     }
 
     static final Name name(String uri, String local) {
-        return new org.geotools.feature.Name(uri, local);
+        return Types.attributeName(uri, local);
     }
 
     static final TypeName typeName(String uri, String type) {
@@ -230,8 +231,7 @@ public class TypeSystemTest extends TestCase {
     }
 
     static final AttributeDescriptor attribute(String name, AttributeType type) {
-        Name attributeName = new org.geotools.feature.Name(
-                "irc://localhost/#bot", name);
+        Name attributeName = Types.attributeName("irc://localhost/#bot", name);
         return new AttributeDescriptorImpl(type, attributeName, 1, 1, true);
     }
 }
