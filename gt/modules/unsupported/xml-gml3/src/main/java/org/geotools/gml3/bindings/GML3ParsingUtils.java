@@ -29,9 +29,11 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
+import org.geotools.gml2.FeatureTypeCache;
 import org.geotools.gml2.bindings.GML2ParsingUtils;
 import org.geotools.referencing.CRS;
 import org.geotools.xml.BindingWalkerFactory;
+import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 
 
@@ -42,6 +44,24 @@ import org.geotools.xml.Node;
  *
  */
 public class GML3ParsingUtils {
+    /**
+     * Utility method to implement Binding.parse for a binding which parses
+     * into A feature.
+     *
+     * @param instance The instance being parsed.
+     * @param node The parse tree.
+     * @param value The value from the last binding in the chain.
+     * @param ftCache The feature type cache.
+     * @param bwFactory Binding walker factory.
+     *
+     * @return A feature.
+     */
+    public static Feature parseFeature(ElementInstance instance, Node node, Object value,
+        FeatureTypeCache ftCache, BindingWalkerFactory bwFactory)
+        throws Exception {
+        return GML2ParsingUtils.parseFeature(instance, node, value, ftCache, bwFactory);
+    }
+
     /**
      * Turns a xml type definition into a geotools feature type.
      * @param type The xml schema tupe.
