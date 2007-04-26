@@ -276,7 +276,7 @@ public class EmfAppSchemaReader {
             final XSDElementDeclaration elemDecl) {
         String targetNamespace = elemDecl.getTargetNamespace();
         String name = elemDecl.getName();
-        Name elemName = new org.geotools.feature.Name(targetNamespace, name);
+        Name elemName = Types.attributeName(targetNamespace, name);
 
         AttributeType type;
         try {

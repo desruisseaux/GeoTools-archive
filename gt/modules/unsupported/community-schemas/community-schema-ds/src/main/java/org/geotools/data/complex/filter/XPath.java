@@ -283,7 +283,7 @@ public class XPath {
                         parentType, currStepLocalName, targetNodeType);
                 if (actualDescriptor != null) {
                     String namespace = actualDescriptor.getName().getNamespaceURI();
-                    Name name = new org.geotools.feature.Name(namespace, currStepLocalName);
+                    Name name = Types.attributeName(namespace, currStepLocalName);
                     int minOccurs = actualDescriptor.getMinOccurs();
                     int maxOccurs = actualDescriptor.getMaxOccurs();
                     boolean nillable = actualDescriptor.isNillable();

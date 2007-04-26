@@ -9,7 +9,6 @@ import junit.framework.TestCase;
 import org.eclipse.xsd.XSDComplexTypeDefinition;
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDTypeDefinition;
-import org.geotools.feature.Name;
 import org.geotools.feature.iso.Types;
 import org.geotools.feature.type.TypeName;
 import org.geotools.gml3.bindings.GML;
@@ -70,20 +69,20 @@ public class EmfAppSchemaReaderTest extends TestCase {
         AttributeDescriptor descriptor;
 
         descriptor = (AttributeDescriptor) attributes.get(5);
-        Name name = new Name(NS_URI, "the_geom");
+        org.opengis.feature.type.Name name = Types.attributeName(NS_URI, "the_geom");
         typeName = new TypeName(GML.NAMESPACE, "GeometryPropertyType");
         assertTrue(descriptor.getType() instanceof GeometryType);
 
         assertSimpleAttribute(descriptor, name, typeName, Geometry.class, 1, 1);
 
         descriptor = (AttributeDescriptor) attributes.get(6);
-        name = new Name(NS_URI, "stringAtt");
+        name = Types.attributeName(NS_URI, "stringAtt");
         typeName = new TypeName(XS.NAMESPACE, XS.STRING.getLocalPart());
 
         assertSimpleAttribute(descriptor, name, typeName, String.class, 1, 1);
 
         descriptor = (AttributeDescriptor) attributes.get(7);
-        name = new Name(NS_URI, "intAtt");
+        name = Types.attributeName(NS_URI, "intAtt");
         typeName = new TypeName(XS.NAMESPACE, XS.INT.getLocalPart());
         assertSimpleAttribute(descriptor, name, typeName, Integer.class, 1, 1);
     }
@@ -131,7 +130,7 @@ public class EmfAppSchemaReaderTest extends TestCase {
         assertNotNull(wq_plus_Type.getProperties());
         assertEquals(8, wq_plus_Type.getProperties().size());
 
-        Name name = new Name(NS_URI, "wq_plus");
+        org.opengis.feature.type.Name name = Types.attributeName(NS_URI, "wq_plus");
         AttributeDescriptor wqPlusDescriptor = (AttributeDescriptor) registry.get(name);
         assertNotNull(wqPlusDescriptor);
         assertEquals(name, wqPlusDescriptor.getName());
@@ -150,7 +149,7 @@ public class EmfAppSchemaReaderTest extends TestCase {
         assertFalse(measurementType.isAbstract());
         assertEquals(2, measurementType.getProperties().size());
 
-        name = new Name(NS_URI, "measurement");
+        name = Types.attributeName(NS_URI, "measurement");
         AttributeDescriptor descriptor;
         descriptor = (AttributeDescriptor) Types.descriptor(wq_plus_Type, name);
         assertNotNull(descriptor);
@@ -161,22 +160,22 @@ public class EmfAppSchemaReaderTest extends TestCase {
         assertEquals(Integer.MAX_VALUE, descriptor.getMaxOccurs());
         assertTrue(descriptor.getUserData(XSDElementDeclaration.class) instanceof XSDElementDeclaration);
 
-        name = new Name(NS_URI, "result");
+        name = Types.attributeName(NS_URI, "result");
         descriptor = (AttributeDescriptor) Types.descriptor(measurementType, name);
         typeName = new TypeName(XS.NAMESPACE, XS.FLOAT.getLocalPart());
         assertSimpleAttribute(descriptor, name, typeName, Float.class, 1, 1);
 
-        name = new Name(NS_URI, "determinand_description");
+        name = Types.attributeName(NS_URI, "determinand_description");
         descriptor = (AttributeDescriptor) Types.descriptor(measurementType, name);
         typeName = new TypeName(XS.NAMESPACE, XS.STRING.getLocalPart());
         assertSimpleAttribute(descriptor, name, typeName, String.class, 1, 1);
 
-        name = new Name(NS_URI, "the_geom");
+        name = Types.attributeName(NS_URI, "the_geom");
         descriptor = (AttributeDescriptor) Types.descriptor(wq_plus_Type, name);
         typeName = new TypeName(GML.NAMESPACE, GML.PointPropertyType.getLocalPart());
         assertSimpleAttribute(descriptor, name, typeName, Point.class, 1, 1);
 
-        name = new Name(NS_URI, "sitename");
+        name = Types.attributeName(NS_URI, "sitename");
         descriptor = (AttributeDescriptor) Types.descriptor(wq_plus_Type, name);
         typeName = new TypeName(XS.NAMESPACE, XS.STRING.getLocalPart());
         assertSimpleAttribute(descriptor, name, typeName, String.class, 1, Integer.MAX_VALUE);

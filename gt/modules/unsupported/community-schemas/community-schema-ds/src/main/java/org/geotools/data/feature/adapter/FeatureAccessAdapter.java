@@ -18,6 +18,7 @@ import org.geotools.data.feature.FeatureAccess;
 import org.geotools.data.feature.FeatureSource2;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.iso.Types;
 import org.opengis.feature.simple.SimpleFeatureFactory;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.Name;
@@ -152,7 +153,7 @@ public class FeatureAccessAdapter implements FeatureAccess {
                 schema = getSchema(featureName);
                 URI namespace = schema.getNamespace();
                 String nsUri = namespace == null ? null : namespace.toString();
-                Name name = new org.geotools.feature.Name(nsUri, featureName);
+                Name name = Types.attributeName(nsUri, featureName);
                 names.add(name);
             }
         } catch (IOException e) {

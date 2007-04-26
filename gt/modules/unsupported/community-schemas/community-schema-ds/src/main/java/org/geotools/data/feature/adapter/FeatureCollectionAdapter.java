@@ -6,6 +6,7 @@ import java.util.Iterator;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.iso.Types;
 import org.geotools.feature.iso.type.AttributeDescriptorImpl;
 import org.opengis.feature.simple.SimpleFeatureFactory;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -30,7 +31,7 @@ public class FeatureCollectionAdapter extends AbstractCollection {
 		this.gtFeatures = features;
 		
         TypeName typeName = isoType.getName();
-        Name name = new org.geotools.feature.Name(typeName.getNamespaceURI(), typeName.getLocalPart());
+        Name name = Types.attributeName(typeName.getNamespaceURI(), typeName.getLocalPart());
         featureDescriptor = new AttributeDescriptorImpl(isoType, name, 0, Integer.MAX_VALUE, true);
     }
 

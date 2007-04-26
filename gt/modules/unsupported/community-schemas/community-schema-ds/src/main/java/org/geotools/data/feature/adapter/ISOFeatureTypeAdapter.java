@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.iso.TypeBuilder;
+import org.geotools.feature.iso.Types;
 import org.geotools.feature.iso.type.TypeFactoryImpl;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -51,8 +52,7 @@ public class ISOFeatureTypeAdapter implements FeatureType, SimpleFeatureType {
             AttributeType attType = ISOAttributeTypeAdapter.adapter(nsUri,
                     gtType);
 
-            org.geotools.feature.Name name = new org.geotools.feature.Name(
-                    nsUri, attType.getName().getLocalPart());
+            Name name = Types.attributeName(nsUri, attType.getName().getLocalPart());
             builder.addAttribute(name, attType);
         }
         builder.defaultGeometry(featureType.getDefaultGeometry().getName());

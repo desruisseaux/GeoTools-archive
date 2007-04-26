@@ -114,7 +114,7 @@ public class ComplexDataStoreTest extends TestCase {
     public void testGetBounds() throws IOException {
         final String namespaceUri = "http://online.socialchange.net.au";
         final String localName = "RoadSegment";
-        final Name typeName = new org.geotools.feature.Name(namespaceUri, localName);
+        final Name typeName = Types.attributeName(namespaceUri, localName);
 
         URL configUrl = getClass().getResource("test-data/roadsegments.xml");
 
@@ -303,7 +303,7 @@ public class ComplexDataStoreTest extends TestCase {
 
         int featureCount = 0;
         Iterator it = complexFeatures.iterator();
-        Name measurementName = new org.geotools.feature.Name("measurement");
+        Name measurementName = Types.attributeName("measurement");
         while (it.hasNext()) {
 
             Feature currFeature = (Feature) it.next();
@@ -419,17 +419,16 @@ public class ComplexDataStoreTest extends TestCase {
         FeatureType type = (FeatureType) sdesc.getType();
 
         AttributeDescriptor node;
-        node = (AttributeDescriptor) Types.descriptor(type, new org.geotools.feature.Name(nsUri,
-                "the_geom"));
+        node = (AttributeDescriptor) Types.descriptor(type, Types.attributeName(nsUri, "the_geom"));
         assertNotNull(node);
         assertEquals("LineStringPropertyType", node.getType().getName().getLocalPart());
 
         assertNotNull(type.getDefaultGeometry());
         assertEquals(node.getType(), type.getDefaultGeometry().getType());
 
-        assertNotNull(Types.descriptor(type, Types.typeName(nsUri, "name")));
+        assertNotNull(Types.descriptor(type, Types.attributeName(nsUri, "name")));
 
-        TypeName ftNodeName = Types.typeName(nsUri, "fromToNodes");
+        Name ftNodeName = Types.attributeName(nsUri, "fromToNodes");
         assertNotNull(Types.descriptor(type, ftNodeName));
 
         AttributeDescriptor descriptor = (AttributeDescriptor) Types.descriptor(type, ftNodeName);
@@ -439,12 +438,12 @@ public class ComplexDataStoreTest extends TestCase {
         assertFalse(descriptor.isNillable());
         assertTrue(fromToNodes.isIdentified());
 
-        TypeName fromNodeName = Types.typeName(nsUri, "fromNode");
+        Name fromNodeName = Types.attributeName(nsUri, "fromNode");
         AttributeDescriptor fromNode = (AttributeDescriptor) Types.descriptor(fromToNodes,
                 fromNodeName);
         assertNotNull(fromNode);
 
-        TypeName toNodeName = Types.typeName(nsUri, "toNode");
+        Name toNodeName = Types.attributeName(nsUri, "toNode");
         AttributeDescriptor toNode = (AttributeDescriptor) Types
                 .descriptor(fromToNodes, toNodeName);
         assertNotNull(fromNode);

@@ -32,14 +32,15 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.Query;
 import org.geotools.data.complex.filter.FilterAttributeExtractor;
 import org.geotools.data.complex.filter.XPath;
-import org.geotools.feature.Name;
 import org.geotools.feature.iso.AttributeFactoryImpl;
+import org.geotools.feature.iso.Types;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureFactory;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.expression.Expression;
 
 /**
@@ -716,7 +717,7 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
 
         for (Iterator itr = this.groupByAttributeNames.iterator(); itr.hasNext();) {
             String attrName = (String) itr.next();
-            Name name = new Name(attrName);
+            Name name = Types.attributeName(attrName);
             List/* <Attribute> */listAttrForName = srcFeature.get(name);
             attrGroup.add(listAttrForName);
         }

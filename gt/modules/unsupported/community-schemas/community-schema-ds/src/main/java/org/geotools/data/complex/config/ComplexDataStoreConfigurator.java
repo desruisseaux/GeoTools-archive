@@ -37,10 +37,12 @@ import org.geotools.data.complex.AttributeMapping;
 import org.geotools.data.complex.FeatureTypeMapping;
 import org.geotools.data.feature.FeatureAccess;
 import org.geotools.data.feature.FeatureSource2;
+import org.geotools.feature.iso.Types;
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.ParseException;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.Name;
 import org.opengis.feature.type.TypeName;
 import org.opengis.filter.expression.Expression;
 
@@ -54,7 +56,8 @@ import org.opengis.filter.expression.Expression;
  * @version $Id: ComplexDataStoreConfigurator.java 24255 2007-02-07 14:12:24Z
  *          groldan $
  * 
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/config/ComplexDataStoreConfigurator.java $
  * @since 2.3.x
  */
 public class ComplexDataStoreConfigurator {
@@ -166,7 +169,7 @@ public class ComplexDataStoreConfigurator {
         }
 
         String prefixedTargetName = dto.getTargetElementName();
-        TypeName targetNodeName = deglose(prefixedTargetName);
+        Name targetNodeName = degloseName(prefixedTargetName);
 
         AttributeDescriptor targetDescriptor = (AttributeDescriptor) registry.get(targetNodeName);
         return targetDescriptor;
@@ -205,7 +208,7 @@ public class ComplexDataStoreConfigurator {
 
             if (expectedInstanceTypeName != null) {
                 TypeName expectedNodeTypeName = null;
-                expectedNodeTypeName = deglose(expectedInstanceTypeName);
+                expectedNodeTypeName = degloseTypeName(expectedInstanceTypeName);
                 expectedInstanceOf = (AttributeType) registry.get(expectedNodeTypeName);
                 if (expectedInstanceOf == null) {
                     String msg = "mapping expects and instance of " + expectedNodeTypeName
@@ -242,6 +245,13 @@ public class ComplexDataStoreConfigurator {
         return expression;
     }
 
+    /**
+     * 
+     * @param dto
+     * @return Map&lt;Name, Object&gt; with the values per qualified name
+     *         (attribute name in the mapping)
+     * @throws DataSourceException
+     */
     private Map getClientProperties(org.geotools.data.complex.config.AttributeMapping dto)
             throws DataSourceException {
 
@@ -253,7 +263,7 @@ public class ComplexDataStoreConfigurator {
         for (Iterator it = dto.getClientProperties().entrySet().iterator(); it.hasNext();) {
             Map.Entry entry = (Map.Entry) it.next();
             String name = (String) entry.getKey();
-            TypeName qName = deglose(name);
+            Name qName = degloseName(name);
             String cqlExpression = (String) entry.getValue();
             Expression expression = parseOgcCqlExpression(cqlExpression);
             clientProperties.put(qName, expression);
@@ -279,7 +289,7 @@ public class ComplexDataStoreConfigurator {
 
         ComplexDataStoreConfigurator.LOGGER.fine("asking datastore " + sourceDataStore
                 + " for source type " + typeName);
-        TypeName name = deglose(typeName);
+        Name name = degloseName(typeName);
         FeatureSource2 fSource = (FeatureSource2) sourceDataStore.access(name);
         ComplexDataStoreConfigurator.LOGGER.fine("found feature source for " + typeName);
         return fSource;
@@ -388,7 +398,7 @@ public class ComplexDataStoreConfigurator {
     }
 
     /**
-     * Takes a prefixed attribute name and returns an {@link AttributeName} by
+     * Takes a prefixed attribute name and returns an {@link TypeName} by
      * looking which namespace belongs the prefix to in
      * {@link ComplexDataStoreDTO#getNamespaces()}.
      * 
@@ -397,7 +407,7 @@ public class ComplexDataStoreConfigurator {
      * @throws IllegalArgumentException
      *             if <code>prefixedName</code> has no prefix.
      */
-    private TypeName deglose(String prefixedName) throws IllegalArgumentException {
+    private TypeName degloseTypeName(String prefixedName) throws IllegalArgumentException {
         TypeName name = null;
 
         if (prefixedName == null) {
@@ -422,4 +432,28 @@ public class ComplexDataStoreConfigurator {
         return name;
     }
 
+    private Name degloseName(String prefixedName) throws IllegalArgumentException {
+        Name name = null;
+
+        if (prefixedName == null) {
+            return null;
+        }
+
+        int prefixIdx = prefixedName.indexOf(':');
+        if (prefixIdx == -1) {
+            return new org.geotools.feature.type.TypeName(prefixedName);
+            // throw new IllegalArgumentException(prefixedName + " is not
+            // prefixed");
+        }
+
+        Map namespaces = config.getNamespaces();
+
+        String nsPrefix = prefixedName.substring(0, prefixIdx);
+        String localName = prefixedName.substring(prefixIdx + 1);
+        String nsUri = (String) namespaces.get(nsPrefix);
+
+        name = Types.attributeName(nsUri, localName);
+
+        return name;
+    }
 }

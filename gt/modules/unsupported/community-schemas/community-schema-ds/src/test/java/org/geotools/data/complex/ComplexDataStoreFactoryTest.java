@@ -14,8 +14,9 @@ import org.geotools.data.DataAccessFinder;
 import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.feature.FeatureAccess;
 import org.geotools.data.feature.FeatureSource2;
-import org.geotools.feature.Name;
+import org.geotools.feature.iso.Types;
 import org.geotools.util.Logging;
+import org.opengis.feature.type.Name;
 
 public class ComplexDataStoreFactoryTest extends TestCase {
 
@@ -25,7 +26,7 @@ public class ComplexDataStoreFactoryTest extends TestCase {
 
     private static final String NSURI = "http://online.socialchange.net.au";
 
-    static final Name mappedTypeName = new Name(NSURI, "RoadSegment");
+    static final Name mappedTypeName = Types.attributeName(NSURI, "RoadSegment");
 
     protected void setUp() throws Exception {
         super.setUp();

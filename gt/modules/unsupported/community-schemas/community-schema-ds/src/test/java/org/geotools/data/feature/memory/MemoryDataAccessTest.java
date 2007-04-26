@@ -226,15 +226,15 @@ public class MemoryDataAccessTest extends TestCase {
         builder.setType(ftype);
         for (int i = 0; i < NUM_FEATURES; i++) {
 
-            builder.add("sitename_" + i, new Name(namespaceURI, "sitename"));
+            builder.add("sitename_" + i, Types.attributeName(namespaceURI, "sitename"));
 
-            builder.add("anzlic_no_" + i, new Name(namespaceURI, "anzlic_no"));
+            builder.add("anzlic_no_" + i, Types.attributeName(namespaceURI, "anzlic_no"));
 
-            builder.add(gf.createPoint(new Coordinate(i, i)), new Name(
+            builder.add(gf.createPoint(new Coordinate(i, i)), Types.attributeName(
                     namespaceURI, "location"));
 
             PropertyDescriptor measurementDescriptor = Types.descriptor(ftype,
-                    new Name(namespaceURI, "measurement"));
+                    Types.attributeName(namespaceURI, "measurement"));
 
             ComplexType mtype = (ComplexType) measurementDescriptor.type();
 
@@ -246,16 +246,16 @@ public class MemoryDataAccessTest extends TestCase {
                 mbuilder.setType(mtype);
 
                 mbuilder.add("determinand_description_" + i + "_" + mcount,
-                        new Name(namespaceURI, "determinand_description"));
+                        Types.attributeName(namespaceURI, "determinand_description"));
 
-                mbuilder.add("result_" + i + "_" + mcount, new Name(
+                mbuilder.add("result_" + i + "_" + mcount, Types.attributeName(
                         namespaceURI, "result"));
 
                 ComplexAttribute measurement = (ComplexAttribute) mbuilder
                         .build();
                 // measurements.add(measurement);
 
-                builder.add(measurement.get(), new Name(namespaceURI,
+                builder.add(measurement.get(), Types.attributeName(namespaceURI,
                         "measurement"));
             }
             /*
@@ -264,7 +264,7 @@ public class MemoryDataAccessTest extends TestCase {
              */
 
             builder.add("project_no_ " + i,
-                    new Name(namespaceURI, "project_no"));
+                    Types.attributeName(namespaceURI, "project_no"));
 
             String fid = ftype.getName().getLocalPart() + "." + i;
             Feature f = (Feature) builder.build(fid);

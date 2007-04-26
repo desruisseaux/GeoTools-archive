@@ -13,6 +13,7 @@ import org.geotools.data.Transaction;
 import org.geotools.data.feature.FeatureSource2;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.iso.Types;
 import org.geotools.feature.iso.type.TypeFactoryImpl;
 import org.opengis.feature.simple.SimpleFeatureFactory;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -132,7 +133,7 @@ public class FeatureSource2Adapter implements FeatureSource2 {
         String nsUri = namespace == null ? null : namespace.toString();
         String name = gtType.getTypeName();
 
-        Name typeName = new org.geotools.feature.Name(nsUri, name);
+        Name typeName = Types.attributeName(nsUri, name);
         return typeName;
     }
 
