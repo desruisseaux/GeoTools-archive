@@ -84,13 +84,23 @@ public abstract class FilterAbstract implements org.opengis.filter.Filter
 	
 	/**
 	 * Helper method for subclasses to reduce null checks
+     * 
 	 * @param expression
 	 * @param object
 	 * @return value or null
 	 */
 	protected Object eval(org.opengis.filter.expression.Expression expression, Object object) {
 		if( expression == null ) return null;
-		return expression.evaluate( object );
+		Object value = expression.evaluate( object );
+        //HACK as this method is used internally for filter 
+        //evaluation comparisons, etc, they work over the
+        //contents (i.e. comparing an attexpresion with a literal)
+        //so, lacking a better way of doing so, I'm putting this
+        //check here
+        if(value instanceof org.opengis.feature.Attribute){
+            value = ((org.opengis.feature.Attribute)value).get();
+        }
+        return value;
 	}
 	/**
 	 * Helper method for subclasses to reduce null checks
