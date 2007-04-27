@@ -270,7 +270,7 @@ public class FactoryRegistry extends ServiceRegistry {
                 throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_KEY_$1, key));
             }
             if (hints!=null && !hints.isEmpty()) {
-                final Object hint = hints.get(key);
+                final Object hint = getHintValue(hints, key);
                 if (hint != null) {
                     if (debug) {
                         debug("CHECK", category, key, "user provided a", hint.getClass());
@@ -353,6 +353,18 @@ public class FactoryRegistry extends ServiceRegistry {
         }
         throw new FactoryNotFoundException(Errors.format(ErrorKeys.FACTORY_NOT_FOUND_$1,
                   Utilities.getShortName(implementation!=null ? implementation : category)));
+    }
+
+    /**
+     * Returns a hint value, or a {@linkplain Hints#getSystemDefault system default}
+     * if no hint where explicitly specified in the given map for the given key.
+     */
+    private static Object getHintValue(final Hints hints, final Object key) {
+        Object hint = hints.get(key);
+        if (hint == null && key instanceof Hints.Key) {
+            hint = Hints.getSystemDefault((Hints.Key) key);
+        }
+        return hint;
     }
 
     /**
@@ -522,7 +534,7 @@ public class FactoryRegistry extends ServiceRegistry {
             final Map.Entry entry = (Map.Entry) it.next();
             final Object    key   = entry.getKey();
             final Object    value = entry.getValue();
-            final Object expected = hints.get(key);
+            final Object expected = getHintValue(hints, key);
             if (expected != null) {
                 /*
                  * We have found a hint that matter. Check if the
