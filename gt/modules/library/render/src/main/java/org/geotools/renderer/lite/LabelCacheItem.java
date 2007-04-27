@@ -16,7 +16,10 @@
 package org.geotools.renderer.lite;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.geotools.geometry.jts.LiteShape2;
 import org.geotools.renderer.style.TextStyle2D;
@@ -36,6 +39,7 @@ public final class LabelCacheItem implements Comparable {
 	double priority = 0.0;
 	int spaceAround = 0;
 	String label;
+	private Set layerIds=new HashSet();
 	
 	public String getLabel()
 	{
@@ -74,11 +78,20 @@ public final class LabelCacheItem implements Comparable {
 	/**
 	 * Construct <code>LabelCacheItem</code>.
 	 */
-	public LabelCacheItem(TextStyle2D textStyle, LiteShape2 shape, String label) 
+	public LabelCacheItem(String layerId, TextStyle2D textStyle, LiteShape2 shape, String label) 
 	{
 		this.textStyle=textStyle;
 		this.geoms.add(shape.getGeometry());
 		this.label = label;
+		this.layerIds.add(layerId);
+	}
+	
+	/**
+	 * Return a modifiable set of ids
+	 * @return
+	 */
+	public Set getLayerIds() {
+		return Collections.synchronizedSet(layerIds);
 	}
 	
 	/**

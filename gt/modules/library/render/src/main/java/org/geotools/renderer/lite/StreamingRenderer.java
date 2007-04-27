@@ -275,6 +275,8 @@ public final class StreamingRenderer implements GTRenderer {
 
 	private boolean canTransform;
 
+	private String layerId;
+
 	/**
 	 * Creates a new instance of LiteRenderer without a context. Use it only to
 	 * gain access to utility methods of this class or if you want to render
@@ -480,123 +482,8 @@ public final class StreamingRenderer implements GTRenderer {
 	 */
 	public void paint(Graphics2D graphics, Rectangle paintArea,
 			Envelope mapArea, AffineTransform worldToScreen) {
-		// Check that we have a context to paint
-		if (context == null)
-			throw new IllegalStateException("Cannot perform paint, "
-					+ "no map context has been assigned to the renderer.");
-
-		// Check for null arguments, recompute missing ones if possible
-		if (graphics == null || paintArea == null) {
-			LOGGER.info("renderer passed null arguments");
-			return;
-		} else if (mapArea == null && paintArea == null) {
-			LOGGER.info("renderer passed null arguments");
-			return;
-		} else if (mapArea == null) {
-			try {
-				mapArea = RendererUtilities.createMapEnvelope(paintArea,
-						worldToScreen);
-			} catch (NoninvertibleTransformException e) {
-				// TODO: Throw error here as in the other paint method?
-				LOGGER.info("renderer passed null arguments");
-				return;
-			}
-		} else if (worldToScreen == null) {
-			worldToScreen = RendererUtilities.worldToScreenTransform(mapArea,
-					paintArea);
-		}
-
-		error = 0;
-		if (java2dHints != null)
-			graphics.setRenderingHints(java2dHints);
-
-		// reset the abort flag
-		renderingStopRequested = false;
-		AffineTransform at = worldToScreen;
-		if (LOGGER.isLoggable(Level.FINE)) {
-			LOGGER.fine(new StringBuffer("Affine Transform is ").append(at)
-					.toString());
-		}
-		/*
-		 * If we are rendering to a component which has already set up some form
-		 * of transformation then we can concatenate our transformation to it.
-		 * An example of this is the ZoomPane component of the swinggui module.
-		 */
-		if (concatTransforms) {
-			AffineTransform atg = graphics.getTransform();
-			atg.concatenate(at);
-			at = atg;
-		}
-		// graphics.setTransform(at);
-
-		// get detstination CRS
-		final CoordinateReferenceSystem destinationCrs = context
-				.getCoordinateReferenceSystem();
-        mapExtent = new ReferencedEnvelope(mapArea, destinationCrs);
-
-		// compute the scale according to the user specified method
-        scaleDenominator = computeScale(mapExtent, paintArea, rendererHints);
-        
-		//////////////////////////////////////////////////////////////////////
-        //
-        // Consider expanding the map extent so that a few more geometries
-        // will be considered, in order to catch those outside of the rendering
-        // bounds whose stroke is so thick that it countributes rendered area
-        //
-        //////////////////////////////////////////////////////////////////////
-        int buffer = getRenderingBuffer();
-        if(buffer > 0) {
-            mapExtent = new ReferencedEnvelope(expandEnvelope(mapExtent, worldToScreen, buffer), 
-                    mapExtent.getCoordinateReferenceSystem()); 
-        }
-
-		labelCache.start();
-		final MapLayer[] layers = context.getLayers();
-		final int layersNumber = layers.length;
-		MapLayer currLayer;
-		for (int i = 0; i < layersNumber; i++) // DJB: for each layer (ie. one
-		{
-			currLayer = layers[i];
-
-			if (!currLayer.isVisible()) {
-				// Only render layer when layer is visible
-				continue;
-			}
-
-			if (renderingStopRequested) {
-				return;
-			}
-			labelCache.startLayer();
-			try {
-
-				// extract the feature type stylers from the style object
-				// and process them
-				this.screenSize = paintArea;
-				processStylers(graphics, currLayer, at, destinationCrs,
-						mapArea, paintArea);
-			} catch (Throwable t) {
-				LOGGER.log(Level.SEVERE, t.getLocalizedMessage(), t);
-				fireErrorEvent(new Exception(new StringBuffer(
-						"Exception rendering layer ").append(currLayer)
-						.toString(), t));
-			}
-
-			labelCache.endLayer(graphics, screenSize);
-		}
-
-		labelCache.end(graphics, paintArea);
-
-		if (LOGGER.isLoggable(Level.FINE))
-			LOGGER.fine(new StringBuffer("Style cache hit ratio: ").append(
-					styleFactory.getHitRatio()).append(" , hits ").append(
-					styleFactory.getHits()).append(", requests ").append(
-					styleFactory.getRequests()).toString());
-		if (error > 0) {
-			LOGGER
-					.warning(new StringBuffer(
-							"Number of Errors during paint(Graphics2D, AffineTransform) = ")
-							.append(error).toString());
-		}
+		paint( graphics, paintArea, new ReferencedEnvelope(mapArea, context.getCoordinateReferenceSystem()),
+				worldToScreen);
 	}
 
 	private double computeScale(ReferencedEnvelope envelope, Rectangle paintArea, Map hints) {
@@ -726,7 +613,7 @@ public final class StreamingRenderer implements GTRenderer {
 			if (renderingStopRequested) {
 				return;
 			}
-			labelCache.startLayer();
+			labelCache.startLayer(i+"");
 			try {
 
 				// extract the feature type stylers from the style object
@@ -740,7 +627,7 @@ public final class StreamingRenderer implements GTRenderer {
 						.toString(), t));
 			}
 
-			labelCache.endLayer(graphics, screenSize);
+			labelCache.endLayer(i+"", graphics, screenSize);
 		}
 
 		labelCache.end(graphics, paintArea);
@@ -1872,7 +1759,7 @@ public final class StreamingRenderer implements GTRenderer {
 				}
 				if (symbolizers[m] instanceof TextSymbolizer && drawMe instanceof Feature) {
                     // TODO: double back and make labelCache work with Objects
-					labelCache.put((TextSymbolizer) symbolizers[m], (Feature)drawMe,
+					labelCache.put(layerId, (TextSymbolizer) symbolizers[m], (Feature)drawMe,
 							shape, scaleRange);
 				} else {
 					Style2D style = styleFactory.createStyle(drawMe,

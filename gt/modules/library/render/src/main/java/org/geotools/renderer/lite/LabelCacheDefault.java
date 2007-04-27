@@ -32,10 +32,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.media.jai.util.Range;
 
@@ -130,13 +132,13 @@ public final class LabelCacheDefault implements LabelCache {
 	// option
 
 	public int DEFAULT_SPACEAROUND = 0;
-
-	protected SLDStyleFactory styleFactory = new SLDStyleFactory();
-
-	boolean stop = false;
-
-	LineLengthComparator lineLengthComparator = new LineLengthComparator();
-
+	
+	protected SLDStyleFactory styleFactory=new SLDStyleFactory();
+	boolean stop=false;
+	Set activeLayers=new HashSet();
+	
+	LineLengthComparator lineLengthComparator = new LineLengthComparator ();
+	
 	public void stop() {
 		stop = true;
 	}
@@ -147,11 +149,38 @@ public final class LabelCacheDefault implements LabelCache {
 	public void start() {
 		stop = false;
 	}
+	
+	public void clear() {
+        labelCache.clear();
+        labelCacheNonGrouped.clear();
+		activeLayers.clear();
+	}
 
+	public void clear(String layerId){
+		for (Iterator iter = labelCache.values().iterator(); iter.hasNext();) {
+			LabelCacheItem item = (LabelCacheItem) iter.next();
+			if( item.getLayerIds().contains(layerId) )
+				iter.remove();
+		}
+		for (Iterator iter = labelCacheNonGrouped
+				.iterator(); iter.hasNext();) {
+			LabelCacheItem item = (LabelCacheItem) iter.next();
+			if( item.getLayerIds().contains(layerId) )
+				iter.remove();
+		}
+		
+		activeLayers.remove(layerId);
+		
+	}
+	
+	public void disableLayer(String layerId) {
+		activeLayers.remove(layerId);
+	}
 	/**
 	 * @see org.geotools.renderer.lite.LabelCache#startLayer()
 	 */
-	public void startLayer() {
+	public void startLayer(String layerId) {
+		activeLayers.add(layerId);
 	}
 
 	/**
@@ -189,28 +218,25 @@ public final class LabelCacheDefault implements LabelCache {
 	 * @see org.geotools.renderer.lite.LabelCache#put(org.geotools.renderer.style.TextStyle2D,
 	 *      org.geotools.renderer.lite.LiteShape)
 	 */
-	public void put(TextSymbolizer symbolizer, Feature feature,
-			LiteShape2 shape, Range scaleRange) {
-		try {
-			// get label and geometry
-			Object labelObj = symbolizer.getLabel().getValue(feature);
-
+	public void put(String layerId, TextSymbolizer symbolizer, Feature feature, LiteShape2 shape, Range scaleRange) 
+	{
+		try{
+			//get label and geometry				
+		    Object labelObj = symbolizer.getLabel().getValue(feature);
+		    
 			if (labelObj == null)
 				return;
-			String label = labelObj.toString().trim(); // DJB: remove white
-			// space from label
-			if (label.length() == 0)
-				return; // dont label something with nothing!
-
-			double priorityValue = getPriority(symbolizer, feature);
-
-			boolean group = isGrouping(symbolizer);
-
-			if (!(group)) {
-				TextStyle2D textStyle = (TextStyle2D) styleFactory.createStyle(
-						feature, symbolizer, scaleRange);
-				LabelCacheItem item = new LabelCacheItem(textStyle, shape,
-						label);
+		    String label = labelObj.toString().trim(); //DJB: remove white space from label
+		    if (label.length() ==0)
+		    	return; // dont label something with nothing!
+		    
+		    double priorityValue = getPriority(symbolizer,feature);
+		    boolean group = isGrouping(symbolizer);
+		    if (!(group))
+		    {
+		    	TextStyle2D textStyle=(TextStyle2D) styleFactory.createStyle(feature, symbolizer, scaleRange);
+		    	
+				LabelCacheItem item = new LabelCacheItem(layerId, textStyle, shape,label);
 				item.setPriority(priorityValue);
 				item.setSpaceAround(getSpaceAround(symbolizer));
 				labelCacheNonGrouped.add(item);
@@ -228,7 +254,7 @@ public final class LabelCacheDefault implements LabelCache {
 				{
 					TextStyle2D textStyle = (TextStyle2D) styleFactory
 							.createStyle(feature, symbolizer, scaleRange);
-					LabelCacheItem item = new LabelCacheItem(textStyle, shape,
+					LabelCacheItem item = new LabelCacheItem(layerId, textStyle, shape,
 							label);
 					item.setPriority(priorityValue);
 					item.setSpaceAround(getSpaceAround(symbolizer));
@@ -296,7 +322,8 @@ public final class LabelCacheDefault implements LabelCache {
 	 * @see org.geotools.renderer.lite.LabelCache#endLayer(java.awt.Graphics2D,
 	 *      java.awt.Rectangle)
 	 */
-	public void endLayer(Graphics2D graphics, Rectangle displayArea) {
+	public void endLayer(String layerId, Graphics2D graphics, Rectangle displayArea) 
+	{
 	}
 
 	/**
@@ -307,15 +334,32 @@ public final class LabelCacheDefault implements LabelCache {
 	 */
 	public List orderedLabels() {
 		Collection c = labelCache.values();
-		ArrayList al = new ArrayList(c); // modifiable (ie. sortable)
+		ArrayList al = new ArrayList(); // modifiable (ie. sortable)
+		for (Iterator iter = c.iterator(); iter.hasNext();) {
+			LabelCacheItem item = (LabelCacheItem) iter.next();
+			if( isActive(item.getLayerIds()) )
+					al.add(item);
+		}
 
-		al.addAll(labelCacheNonGrouped);
+		for (Iterator iter = labelCacheNonGrouped.iterator(); iter.hasNext();) {
+			LabelCacheItem item = (LabelCacheItem) iter.next();
+			if( isActive(item.getLayerIds()) )
+					al.add(item);
+		}
 
 		Collections.sort(al);
 		Collections.reverse(al);
 		return al;
 	}
-
+	private boolean isActive(Set layerIds) {
+		for (Iterator iter = layerIds.iterator(); iter.hasNext();) {
+			String string = (String) iter.next();
+			if( activeLayers.contains(string) )
+				return true;
+			
+		}
+		return false;
+	}
 	/**
 	 * @see org.geotools.renderer.lite.LabelCache#end(java.awt.Graphics2D,
 	 *      java.awt.Rectangle)
@@ -535,10 +579,8 @@ public final class LabelCacheDefault implements LabelCache {
 			    // try to minimize it
                 // do nothing
 			}
-		}
-		labelCache.clear();
-		labelCacheNonGrouped.clear();
-	}
+    	}
+    }
 
 	/**
 	 * how well does the label "fit" with the geometry. 1. points ALWAYS RETURNS
@@ -1615,4 +1657,9 @@ public final class LabelCacheDefault implements LabelCache {
 			return null;
 		return r;
 	}
+
+	public void enableLayer(String layerId) {
+		activeLayers.add(layerId);
+	}
+	
 }
