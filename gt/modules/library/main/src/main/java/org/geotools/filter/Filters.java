@@ -183,7 +183,7 @@ public class Filters {
            ((org.geotools.filter.Filter) filter).accept( visitor );
        }
        else {
-           throw new ClassCastException("Update code to use org.opengis.filter.Filter");
+           throw new ClassCastException("Please update your code to a org.opengis.filter.FilterVisitor");
        }
     }
     /**
