@@ -36,7 +36,7 @@ public class FilterFunction_isLike extends FunctionExpressionImpl implements
         String arg1;
 
         try { // attempt to get value and perform conversion
-            arg0 = (getExpression(0).evaluate(feature)).toString(); // extra
+            arg0 = (String) getExpression(0).evaluate(feature, String.class); // extra
                                                                     // protection
                                                                     // for
                                                                     // strings
@@ -47,7 +47,7 @@ public class FilterFunction_isLike extends FunctionExpressionImpl implements
         }
 
         try { // attempt to get value and perform conversion
-            arg1 = (getExpression(1).evaluate(feature)).toString(); // extra
+            arg1 = (String) getExpression(1).evaluate(feature, String.class); // extra
                                                                     // protection
                                                                     // for
                                                                     // strings

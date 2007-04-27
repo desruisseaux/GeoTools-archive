@@ -35,7 +35,7 @@ public class FilterFunction_strTrim extends FunctionExpressionImpl implements
         String arg0;
 
         try { // attempt to get value and perform conversion
-            arg0 = (getExpression(0).evaluate(feature)).toString(); // extra
+            arg0 = (String) getExpression(0).evaluate(feature, String.class); // extra
                                                                     // protection
                                                                     // for
                                                                     // strings

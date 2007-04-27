@@ -20,8 +20,7 @@ package org.geotools.filter.function;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.FunctionExpressionImpl;
 
-public class FilterFunction_strConcat extends FunctionExpressionImpl implements
-        FunctionExpression {
+public class FilterFunction_strConcat extends FunctionExpressionImpl implements FunctionExpression {
 
     public FilterFunction_strConcat() {
         super("strConcat");
@@ -35,11 +34,9 @@ public class FilterFunction_strConcat extends FunctionExpressionImpl implements
         String arg0;
         String arg1;
 
-        try { // attempt to get value and perform conversion
-            arg0 = (getExpression(0).evaluate(feature)).toString(); // extra
-                                                                    // protection
-                                                                    // for
-                                                                    // strings
+        try {
+            // attempt to get value and perform conversion
+            arg0 = (String) getExpression(0).evaluate(feature, String.class);
         } catch (Exception e) // probably a type error
         {
             throw new IllegalArgumentException(
@@ -47,10 +44,7 @@ public class FilterFunction_strConcat extends FunctionExpressionImpl implements
         }
 
         try { // attempt to get value and perform conversion
-            arg1 = (getExpression(1).evaluate(feature)).toString(); // extra
-                                                                    // protection
-                                                                    // for
-                                                                    // strings
+            arg1 = (String) getExpression(1).evaluate(feature, String.class); 
         } catch (Exception e) // probably a type error
         {
             throw new IllegalArgumentException(

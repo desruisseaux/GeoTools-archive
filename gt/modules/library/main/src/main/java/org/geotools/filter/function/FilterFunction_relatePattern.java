@@ -60,7 +60,7 @@ public class FilterFunction_relatePattern extends FunctionExpressionImpl
         }
 
         try { // attempt to get value and perform conversion
-            arg2 = (getExpression(2).evaluate(feature)).toString(); // extra
+            arg2 = (String) getExpression(2).evaluate(feature, String.class); // extra
                                                                     // protection
                                                                     // for
                                                                     // strings

@@ -36,7 +36,7 @@ public class FilterFunction_strSubstringStart extends FunctionExpressionImpl
         int arg1;
 
         try { // attempt to get value and perform conversion
-            arg0 = (getExpression(0).evaluate(feature)).toString(); // extra
+            arg0 = (String) getExpression(0).evaluate(feature, String.class); // extra
                                                                     // protection
                                                                     // for
                                                                     // strings
