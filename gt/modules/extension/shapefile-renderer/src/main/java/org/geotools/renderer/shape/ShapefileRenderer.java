@@ -269,7 +269,7 @@ public class ShapefileRenderer implements GTRenderer {
 
     private void processStylers( Graphics2D graphics, ShapefileDataStore datastore,
             Query query, Envelope bbox, Rectangle screenSize, MathTransform mt, Style style, IndexInfo info,
-            Transaction transaction) throws IOException {
+            Transaction transaction, String layerId) throws IOException {
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.fine("processing " + style.getFeatureTypeStyles().length + " stylers");
         }
@@ -337,17 +337,17 @@ public class ShapefileRenderer implements GTRenderer {
                 NumberRange scaleRange = new NumberRange(scaleDenominator, scaleDenominator);
 
                 Set modifiedFIDs = processTransaction(graphics, bbox, mt, datastore, transaction,
-                        typeName, query, ruleList, elseRuleList, scaleRange);
+                        typeName, query, ruleList, elseRuleList, scaleRange, layerId);
 
                 processShapefile(graphics, datastore, bbox,screenSize, mt, info, type, query, ruleList,
-                        elseRuleList, modifiedFIDs, scaleRange);
+                        elseRuleList, modifiedFIDs, scaleRange, layerId);
             }
         }
     }
 
     private Set processTransaction( Graphics2D graphics, Envelope bbox, MathTransform transform,
             DataStore ds, Transaction transaction, String typename, Query query, List ruleList,
-            List elseRuleList, NumberRange scaleRange ) {
+            List elseRuleList, NumberRange scaleRange, String layerId ) {
         if (transaction == Transaction.AUTO_COMMIT) {
             return Collections.EMPTY_SET;
         }
@@ -421,7 +421,7 @@ public class ShapefileRenderer implements GTRenderer {
 
                             try {
                                 processSymbolizers(graphics, feature, symbolizers, scaleRange,
-                                        transform);
+                                        transform, layerId);
                             } catch (Exception e) {
                                 fireErrorEvent(e);
 
@@ -450,7 +450,7 @@ public class ShapefileRenderer implements GTRenderer {
 
                             try {
                                 processSymbolizers(graphics, feature, symbolizers, scaleRange,
-                                        transform);
+                                        transform, layerId);
                             } catch (Exception e) {
                                 fireErrorEvent(e);
 
@@ -475,7 +475,7 @@ public class ShapefileRenderer implements GTRenderer {
 
     private void processShapefile( Graphics2D graphics, ShapefileDataStore datastore,
             Envelope bbox, Rectangle screenSize, MathTransform mt, IndexInfo info, FeatureType type, Query query,
-            List ruleList, List elseRuleList, Set modifiedFIDs, NumberRange scaleRange )
+            List ruleList, List elseRuleList, Set modifiedFIDs, NumberRange scaleRange, String layerId )
             throws IOException {
         IndexedDbaseFileReader dbfreader = null;
 
@@ -588,7 +588,7 @@ public class ShapefileRenderer implements GTRenderer {
 
                             Symbolizer[] symbolizers = r.getSymbolizers();
 
-                            processSymbolizers(graphics, feature, geom, symbolizers, scaleRange, useJTS);
+                            processSymbolizers(graphics, feature, geom, symbolizers, scaleRange, useJTS, layerId);
 
                             if (LOGGER.isLoggable(Level.FINER)) {
                                 LOGGER.finer("... done!");
@@ -610,7 +610,7 @@ public class ShapefileRenderer implements GTRenderer {
                                 LOGGER.finer("processing Symobolizer ...");
                             }
 
-                            processSymbolizers(graphics, feature, geom, symbolizers, scaleRange, useJTS);
+                            processSymbolizers(graphics, feature, geom, symbolizers, scaleRange, useJTS, layerId);
 
                             if (LOGGER.isLoggable(Level.FINER)) {
                                 LOGGER.finer("... done!");
@@ -798,9 +798,10 @@ public class ShapefileRenderer implements GTRenderer {
      * @param geom
      * @param symbolizers
      * @param scaleRange
+     * @param layerId 
      */
     private void processSymbolizers( Graphics2D graphics, Feature feature, Object geom,
-            Symbolizer[] symbolizers, NumberRange scaleRange, boolean isJTS ) {
+            Symbolizer[] symbolizers, NumberRange scaleRange, boolean isJTS, String layerId ) {
         for( int m = 0; m < symbolizers.length; m++ ) {
             if (LOGGER.isLoggable(Level.FINER)) {
                 LOGGER.finer("applying symbolizer " + symbolizers[m]);
@@ -812,7 +813,7 @@ public class ShapefileRenderer implements GTRenderer {
 
             if (symbolizers[m] instanceof TextSymbolizer) {
                 try {
-                    labelCache.put((TextSymbolizer) symbolizers[m], 
+                    labelCache.put(layerId,(TextSymbolizer) symbolizers[m], 
                             feature, 
                             new LiteShape2(feature.getDefaultGeometry(), null, null, false),
                             scaleRange);
@@ -848,11 +849,12 @@ public class ShapefileRenderer implements GTRenderer {
      * @param scaleRange The scale range we are working on... provided in order to make the style
      *        factory happy
      * @param transform DOCUMENT ME!
+     * @param layerId 
      * @throws TransformException
      * @throws FactoryException
      */
     private void processSymbolizers( final Graphics2D graphics, final Feature feature,
-            final Symbolizer[] symbolizers, Range scaleRange, MathTransform transform )
+            final Symbolizer[] symbolizers, Range scaleRange, MathTransform transform, String layerId )
             throws TransformException, FactoryException {
         LiteShape2 shape;
 
@@ -865,7 +867,7 @@ public class ShapefileRenderer implements GTRenderer {
             shape = new LiteShape2(g, transform, getDecimator(transform), false);
 
             if (symbolizers[m] instanceof TextSymbolizer) {
-                labelCache.put((TextSymbolizer) symbolizers[m], feature, shape, scaleRange);
+                labelCache.put(layerId, (TextSymbolizer) symbolizers[m], feature, shape, scaleRange);
             } else {
                 Style2D style = styleFactory.createStyle(feature, symbolizers[m], scaleRange);
                 painter.paint(graphics, shape, style, scaleDenominator);
@@ -1268,7 +1270,7 @@ public class ShapefileRenderer implements GTRenderer {
         // get detstination CRS
         CoordinateReferenceSystem destinationCrs = context.getCoordinateReferenceSystem();
         labelCache.start();
-
+        labelCache.clear();
         for( int i = 0; i < layers.length; i++ ) {
             MapLayer currLayer = layers[i];
 
@@ -1285,7 +1287,7 @@ public class ShapefileRenderer implements GTRenderer {
             	renderWithStreamingRenderer(currLayer, graphics, paintArea, envelope, transform);
                 continue;
             }
-            labelCache.startLayer();
+            labelCache.startLayer(""+i);
 
             Envelope bbox = envelope;
 
@@ -1353,12 +1355,12 @@ public class ShapefileRenderer implements GTRenderer {
                 //processStylers(graphics, ds, query, extractor.getIntersection(), paintArea,
                 //        mt, currLayer.getStyle(), layerIndexInfo[i], transaction);
                 processStylers(graphics, ds, query, bbox, paintArea,
-                        mt, currLayer.getStyle(), layerIndexInfo[i], transaction);
+                        mt, currLayer.getStyle(), layerIndexInfo[i], transaction, ""+i);
             } catch (Exception exception) {
                 fireErrorEvent(new Exception("Exception rendering layer " + currLayer, exception));
             }
 
-            labelCache.endLayer(graphics, paintArea);
+            labelCache.endLayer(""+i, graphics, paintArea);
         }
 
         labelCache.end(graphics, paintArea);
