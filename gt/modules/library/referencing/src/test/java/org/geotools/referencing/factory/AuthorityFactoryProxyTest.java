@@ -85,30 +85,21 @@ public final class AuthorityFactoryProxyTest extends TestCase {
         final CoordinateReferenceSystem expected = factory.createCoordinateReferenceSystem("83");
         AuthorityFactoryProxy proxy;
         /*
-         * Try to create a proxy using an invalid type.
-         */
-        try {
-            proxy = AuthorityFactoryProxy.getInstance(DefaultGeographicCRS.class, factory);
-            fail();
-        } catch (IllegalArgumentException e) {
-            // This is the expected exception.
-        }
-        /*
          * Try the proxy using the 'createGeographicCRS', 'createCoordinateReferenceSystem'
          * and 'createObject' methods. The later uses a generic implementation, while the
          * first two should use specialized implementations.
          */
-        proxy = AuthorityFactoryProxy.getInstance(GeographicCRS.class, factory);
+        proxy = AuthorityFactoryProxy.getInstance(factory, GeographicCRS.class);
         assertTrue(proxy.getClass().getName().endsWith("Geographic"));
         assertSame(expected, proxy.create("83"));
         assertSame(expected, proxy.create("CRS:83"));
 
-        proxy = AuthorityFactoryProxy.getInstance(CoordinateReferenceSystem.class, factory);
+        proxy = AuthorityFactoryProxy.getInstance(factory, CoordinateReferenceSystem.class);
         assertTrue(proxy.getClass().getName().endsWith("CRS"));
         assertSame(expected, proxy.create("83"));
         assertSame(expected, proxy.create("CRS:83"));
 
-        proxy = AuthorityFactoryProxy.getInstance(IdentifiedObject.class, factory);
+        proxy = AuthorityFactoryProxy.getInstance(factory, IdentifiedObject.class);
         assertTrue(proxy.getClass().getName().endsWith("Default"));
         assertSame(expected, proxy.create("83"));
         assertSame(expected, proxy.create("CRS:83"));
@@ -116,7 +107,7 @@ public final class AuthorityFactoryProxyTest extends TestCase {
          * Try using the 'createProjectedCRS' method, which should not
          * be supported for the CRS factory (at least not for code "83").
          */
-        proxy = AuthorityFactoryProxy.getInstance(ProjectedCRS.class, factory);
+        proxy = AuthorityFactoryProxy.getInstance(factory, ProjectedCRS.class);
         assertTrue(proxy.getClass().getName().endsWith("Projected"));
         try {
             assertSame(expected, proxy.create("83"));
@@ -131,7 +122,7 @@ public final class AuthorityFactoryProxyTest extends TestCase {
          * In addition, this code test the generic proxy instead of the
          * specialized 'GeographicCRS' and 'ProjectedCRS' variants.
          */
-        proxy = AuthorityFactoryProxy.getInstance(TemporalCRS.class, factory);
+        proxy = AuthorityFactoryProxy.getInstance(factory, TemporalCRS.class);
         assertTrue(proxy.getClass().getName().endsWith("Default"));
         try {
             assertSame(expected, proxy.create("83"));
@@ -143,13 +134,13 @@ public final class AuthorityFactoryProxyTest extends TestCase {
     }
 
     /**
-     * Tests {@link AuthorityFactoryProxy#create}. We uses the CRS factory for testing purpose.
+     * Tests {@link IdentifiedObjectFinder#createEquivalent}.
+     * We uses the CRS factory for testing purpose.
      */
     public void testCreateEquivalent() throws FactoryException {
         final CRSAuthorityFactory factory = ReferencingFactoryFinder.getCRSAuthorityFactory("CRS", null);
-        final AuthorityFactoryProxy proxy = AuthorityFactoryProxy.getInstance(GeographicCRS.class, factory);
+        final IdentifiedObjectFinder proxy = new IdentifiedObjectFinder(factory, GeographicCRS.class);
         CoordinateReferenceSystem expected = factory.createCoordinateReferenceSystem("84");
-        assertSame   (expected, proxy.create("84"));
         assertNotSame(expected, DefaultGeographicCRS.WGS84);
         assertSame   (expected, proxy.createEquivalent     (expected));
         assertSame   (expected, proxy.createFromIdentifiers(expected));

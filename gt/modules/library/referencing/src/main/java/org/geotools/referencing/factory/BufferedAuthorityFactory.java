@@ -107,8 +107,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     /**
      * The pool of objects identified by {@link #find}.
      */
-    private final Map/*<IdentifiedObject,IdentifiedObject>*/ findPool =
-            Collections.synchronizedMap(new WeakHashMap());
+    private final Map/*<IdentifiedObject,IdentifiedObject>*/ findPool = new WeakHashMap();
 
     /**
      * Constructs an instance wrapping the specified factory with a default number
@@ -982,12 +981,21 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
          * Do not synchronize on 'this'. This method may take a while to execute and we don't
          * want to block other threads. The synchronizations in the 'create' methods and in
          * the 'findPool' map should be suffisient.
+         *
+         * TODO: avoid to search for the same object twice. For now we consider that this
+         *       is not a big deal if the same object is searched twice; it is just a
+         *       waste of CPU.
          */
-        IdentifiedObject candidate = (IdentifiedObject) findPool.get(object);
+        IdentifiedObject candidate;
+        synchronized (findPool) {
+            candidate = (IdentifiedObject) findPool.get(object);
+        }
         if (candidate == null) {
             candidate = super.find(object, fullScan);
             if (candidate != null) {
-                findPool.put(object, candidate);
+                synchronized (findPool) {
+                    findPool.put(object, candidate);
+                }
             }
         }
         return candidate;

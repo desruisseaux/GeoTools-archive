@@ -795,29 +795,7 @@ public abstract class AbstractAuthorityFactory extends ReferencingFactory
     public IdentifiedObject find(final IdentifiedObject object, final boolean fullScan)
             throws FactoryException
     {
-        final AuthorityFactoryProxy proxy = AuthorityFactoryProxy.getInstance(
-                AuthorityFactoryProxy.getType(object.getClass()), this);
-        /*
-         * First check if one of the identifiers can be used to spot directly an
-         * identified object (and check it's actually equal to one in the factory).
-         */
-        IdentifiedObject candidate = proxy.createFromIdentifiers(object);
-        if (candidate != null) {
-            return candidate;
-        }
-        /*
-         * We are unable to find the object from its identifiers. Try a quick name lookup.
-         * Some implementations like the one backed by the EPSG database are capable to find
-         * an object from its name.
-         */
-        candidate = proxy.createFromNames(object);
-        if (candidate != null) {
-            return candidate;
-        }
-        /*
-         * Here we exhausted the quick paths. Bail out if the user does not want a full scan.
-         */
-        return fullScan ? proxy.createEquivalent(object) : null;
+        return new IdentifiedObjectFinder(this, object.getClass()).find(object, fullScan);
     }
 
     /**
@@ -832,9 +810,10 @@ public abstract class AbstractAuthorityFactory extends ReferencingFactory
      * may iterates through every returned codes, instantiate the objects and compare them with
      * the specified one in order to determine which codes are really applicable.
      * <p>
-     * If this method has no code candidates to suggest, then it should return {@code null}
-     * (which is not the same than an {@linkplain Collections#EMPTY_SET empty set}).
-     * The default implementation always returns {@code null}.
+     * The default implementation returns the same set than
+     * <code>{@linkplain #getAuthorityCodes getAuthorityCodes}(type)</code> where {@code type}
+     * if the interface implemented by the specified object. Subclasses should override this
+     * method in order to return a smaller set, if they can.
      *
      * @param  object The object looked up.
      * @return A set of code candidates, or {@code null} if this method is not implemented.
@@ -842,8 +821,8 @@ public abstract class AbstractAuthorityFactory extends ReferencingFactory
      *
      * @since 2.4
      */
-    protected Set/*<String>*/ getCodeCandidates(IdentifiedObject object) throws FactoryException {
-        return null;
+    protected Set/*<String>*/ getCodeCandidates(final IdentifiedObject object) throws FactoryException {
+        return getAuthorityCodes(AuthorityFactoryProxy.getType(object.getClass()));
     }
 
     /**

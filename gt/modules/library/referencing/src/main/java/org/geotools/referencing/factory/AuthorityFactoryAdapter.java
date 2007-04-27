@@ -42,6 +42,7 @@ import org.geotools.factory.Hints;
 import org.geotools.factory.Factory;
 import org.geotools.factory.AbstractFactory;
 import org.geotools.factory.OptionalFactory;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
@@ -700,23 +701,73 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
 
     /**
      * Looks up an object from this authority factory which is
-     * {@linkplain org.geotools.referencing.CRS#equalsIgnoreMetadata equals, ignoring metadata},
-     * to the specified object. The default implementation delegates to the
+     * {@linkplain CRS#equalsIgnoreMetadata equals, ignoring metadata},
+     * to the specified object.
+     *
+     * @since 2.4
+     */
+    //@Override
+    public IdentifiedObject find(final IdentifiedObject object, final boolean fullScan)
+            throws FactoryException
+    {
+        final AuthorityFactory factory = getAuthorityFactory(null);
+        if (factory == null) {
+            return super.find(object, fullScan);
+            /*
+             * Do not invoke 'replaceObject(...)' since super.find(...)
+             * used the 'createFoo(...)' methods defined in this class,
+             * which already invoked 'replaceObject(...)'.
+             */
+        }
+        return new Finder(factory, object.getClass()).find(object, fullScan);
+    }
+
+    /**
+     * A {@link IdentifiedObjectFinder} which test {@linkplain AuthorityFactoryAdapter#replaceObject
+     * modified objects} in addition of original object.
+     */
+    private final class Finder extends IdentifiedObjectFinder {
+        /**
+         * Creates a finder with the specified backing store factory.
+         */
+        Finder(final AuthorityFactory factory, final Class/*<? extends IdentifiedObject>*/ type) {
+            super(factory, type);
+        }
+
+        /**
+         * Returns {@code candidate}, or an object derived from {@code candidate}, if it is
+         * {@linkplain CRS#equalsIgnoreMetadata equals ignoring metadata} to the specified
+         * model. Otherwise returns {@code null}.
+         */
+        //@Override
+        protected IdentifiedObject getAcceptable(final IdentifiedObject candidate,
+                                                 final IdentifiedObject model)
+                throws FactoryException
+        {
+            final IdentifiedObject modified = replaceObject(candidate);
+            if (modified != candidate) {
+                if (CRS.equalsIgnoreMetadata(modified, model)) {
+                    return modified;
+                }
+            }
+            return super.getAcceptable(candidate, model);
+        }
+    }
+
+    /**
+     * Returns a set of authority codes that <strong>may</strong> identify the same
+     * object than the specified one. The default implementation delegates to the
      * {@linkplain #getAuthorityFactory(String) generic authority factory}, if possible.
      *
      * @since 2.4
      */
     //@Override
-    public IdentifiedObject find(IdentifiedObject object, final boolean fullScan)
+    protected Set/*<String>*/ getCodeCandidates(final IdentifiedObject object)
             throws FactoryException
     {
         final AbstractAuthorityFactory factory = getGeotoolsFactory(null, null);
-        if (factory != null) {
-            object = factory.find(object, fullScan);
-        } else {
-            object = super.find(object, fullScan);
-        }
-        return replaceObject(object);
+        return (factory != null) ? factory.getCodeCandidates(object)
+                                 :   super.getCodeCandidates(object);
     }
 
     /**

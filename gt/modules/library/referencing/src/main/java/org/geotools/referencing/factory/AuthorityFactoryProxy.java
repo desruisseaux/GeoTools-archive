@@ -21,26 +21,20 @@ package org.geotools.referencing.factory;
 // J2SE dependencies
 import java.util.Set;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 
 // OpenGIS dependencies
-import org.opengis.metadata.Identifier;
-import org.opengis.metadata.citation.Citation;
-import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.referencing.*;
 import org.opengis.referencing.cs.*;
 import org.opengis.referencing.crs.*;
 import org.opengis.referencing.datum.*;
 import org.opengis.referencing.operation.*;
-import org.opengis.util.GenericName;
+import org.opengis.parameter.ParameterDescriptor;
 
 // Geotools dependencies
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.metadata.iso.citation.Citations;
-
 
 /**
  * Delegates object creations to one of the {@code create} methods in a backing
@@ -75,10 +69,10 @@ import org.geotools.metadata.iso.citation.Citations;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-abstract class AuthorityFactoryProxy/*<T extends IdentifiedObject>*/ {
+abstract class AuthorityFactoryProxy {
     /**
      * The types that factories can be create. The most
-     * specified types must appear first in this list.
+     * specific types must appear first in this list.
      */
     private static final Class/*<? extends IdentifiedObject>*/[] TYPES = {        
         CoordinateOperation      .class,
@@ -122,22 +116,17 @@ abstract class AuthorityFactoryProxy/*<T extends IdentifiedObject>*/ {
 
     /**
      * Returns a proxy instance which will create objects of the specified type using the
-     * specified factory. The type must be one of the values returned by {@link #getType(Class)}.
+     * specified factory.
      *
+     * @param  factory The factory to use for object creations.
      * @param  type    The type of objects to be created by the proxy.
-     * @param  factory The factory to use for object creation.
-     * @throws IllegalArgumentException if the {@code type} is illegal for the specified factory.
      */
-    public static /*<T extends IdentifiedObject>*/ AuthorityFactoryProxy/*<T>*/ getInstance(
-            Class/*<T>*/ type, final AuthorityFactory factory)
-            throws IllegalArgumentException
+    public static AuthorityFactoryProxy getInstance(final AuthorityFactory factory,
+                                                    Class/*<? extends IdentifiedObject>*/ type)
     {
         AbstractAuthorityFactory.ensureNonNull("type",    type);
         AbstractAuthorityFactory.ensureNonNull("factory", factory);
-        if (!type.equals(getType(type))) {
-            throw new IllegalArgumentException(
-                    Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, "type", type));
-        }
+        type = getType(type);
         /*
          * Checks for some special cases for which a fast implementation is available.
          */
@@ -183,7 +172,7 @@ abstract class AuthorityFactoryProxy/*<T extends IdentifiedObject>*/ {
     /**
      * Returns the type of the objects to be created by this proxy instance.
      */
-    public abstract Class/*<T>*/ getType();
+    public abstract Class/*<? extends IdentifiedObject>*/ getType();
 
     /**
      * Returns the authority factory used by the {@link #create create} method.
@@ -207,147 +196,8 @@ abstract class AuthorityFactoryProxy/*<T extends IdentifiedObject>*/ {
      * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      */
-    public abstract /*T*/IdentifiedObject create(String code)
+    public abstract IdentifiedObject create(String code)
             throws NoSuchAuthorityCodeException, FactoryException;
-
-    /**
-     * Creates an object {@linkplain org.geotools.referencing.CRS#equalsIgnoreMetadata
-     * equals, ignoring metadata}, to the specified object. This method scans the
-     * {@linkplain #getAuthorityCodes authority codes}, {@linkplain #create create} the
-     * objects and returns the first one which is equals to the specified object in the
-     * sense of {@link org.geotools.referencing.CRS#equalsIgnoreMetadata equalsIgnoreMetadata}.
-     * <p>
-     * This method may be used in order to get a fully {@linkplain IdentifiedObject identified
-     * object} from an object without {@linkplain IdentifiedObject#getIdentifiers identifiers}.
-     * <p>
-     * Scaning the whole set of authority codes may be slow. Users should try
-     * <code>{@linkplain #createFromIdentifiers createFromIdentifiers}(object)</code> and/or
-     * <code>{@linkplain #createFromNames createFromNames}(object)</code> before to fallback
-     * on this method.
-     *
-     * @param  object The object looked up.
-     * @return The identified object, or {@code null} if not found.
-     * @throws FactoryException if an error occured while scanning through authority codes.
-     *
-     * @see #createFromIdentifiers
-     * @see #createFromNames
-     */
-    public final /*T*/IdentifiedObject createEquivalent(final IdentifiedObject object)
-            throws FactoryException
-    {
-        Set/*<String>*/ codes = null;
-        final AuthorityFactory factory = getAuthorityFactory();
-        if (factory instanceof AbstractAuthorityFactory) {
-            codes = ((AbstractAuthorityFactory) factory).getCodeCandidates(object);
-        }
-        if (codes == null) {
-            codes = getAuthorityCodes();
-        }
-        for (final Iterator it=codes.iterator(); it.hasNext();) {
-            final String code = (String) it.next();
-            final IdentifiedObject candidate;
-            try {
-                candidate = create(code);
-            } catch (FactoryException e) {
-                // Some object cannot be created properly.
-                continue;
-            }
-            if (org.geotools.referencing.CRS.equalsIgnoreMetadata(candidate, object)) {
-                return candidate;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Creates an object {@linkplain org.geotools.referencing.CRS#equalsIgnoreMetadata
-     * equals, ignoring metadata}, to the specified object using only the {@linkplain
-     * IdentifiedObject#getIdentifiers identifiers}. If no such object is found, returns
-     * {@code null}.
-     * <p>
-     * This method may be used in order to get a fully identified object from a partially
-     * identified one.
-     *
-     * @param  object The object looked up.
-     * @return The identified object, or {@code null} if not found.
-     * @throws FactoryException if an error occured while creating an object.
-     *
-     * @see #createEquivalent
-     * @see #createFromNames
-     */
-    public final /*T*/IdentifiedObject createFromIdentifiers(final IdentifiedObject object)
-            throws FactoryException
-    {
-        final Citation authority = getAuthorityFactory().getAuthority();
-        for (final Iterator it=object.getIdentifiers().iterator(); it.hasNext();) {
-            final Identifier id = (Identifier) it.next();
-            if (!Citations.identifierMatches(authority, id.getAuthority())) {
-                // The identifier is not for this authority. Looks the other ones.
-                continue;
-            }
-            final /*T*/IdentifiedObject candidate;
-            try {
-                candidate = create(id.getCode());
-            } catch (NoSuchAuthorityCodeException e) {
-                // The identifier was not recognized. No problem, let's go on.
-                continue;
-            }
-            if (org.geotools.referencing.CRS.equalsIgnoreMetadata(candidate, object)) {
-                return candidate;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Creates an object {@linkplain org.geotools.referencing.CRS#equalsIgnoreMetadata
-     * equals, ignoring metadata}, to the specified object using only the {@linkplain
-     * IdentifiedObject#getName name} and {@linkplain IdentifiedObject#getAlias aliases}.
-     * If no such object is found, returns {@code null}.
-     * <p>
-     * This method may be used with some {@linkplain AuthorityFactory authority factory}
-     * implementations like the one backed by the EPSG database, which are capable to find
-     * an object from its name when the identifier is unknown.
-     *
-     * @param  object The object looked up.
-     * @return The identified object, or {@code null} if not found.
-     * @throws FactoryException if an error occured while creating an object.
-     *
-     * @see #createEquivalent
-     * @see #createFromIdentifiers
-     */
-    public final /*T*/IdentifiedObject createFromNames(final IdentifiedObject object)
-            throws FactoryException
-    {
-        /*T*/IdentifiedObject candidate;
-        try {
-            candidate = create(object.getName().getCode());
-            if (org.geotools.referencing.CRS.equalsIgnoreMetadata(candidate, object)) {
-                return candidate;
-            }
-        } catch (FactoryException e) {
-            /*
-             * The identifier was not recognized. No problem, let's go on.
-             * Note: we catch a more generic exception than NoSuchAuthorityCodeException
-             *       because this attempt may fail for various reasons (character string
-             *       not supported by the underlying database for primary key, duplicated
-             *       name found, etc.).
-             */
-        }
-        for (final Iterator it=object.getAlias().iterator(); it.hasNext();) {
-            final GenericName id = (GenericName) it.next();
-            try {
-                candidate = create(id.toString());
-            } catch (FactoryException e) {
-                // The name was not recognized. No problem, let's go on.
-                continue;
-            }
-            if (org.geotools.referencing.CRS.equalsIgnoreMetadata(candidate, object)) {
-                return candidate;
-            }
-        }
-        return null;
-    }
 
 
     /**
@@ -357,7 +207,7 @@ abstract class AuthorityFactoryProxy/*<T extends IdentifiedObject>*/ {
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    private static final class Default/*<T>*/ extends AuthorityFactoryProxy/*<T>*/ {
+    private static final class Default extends AuthorityFactoryProxy {
         /**
          * The argument types of {@code createFoo} methods.
          */
@@ -371,7 +221,7 @@ abstract class AuthorityFactoryProxy/*<T extends IdentifiedObject>*/ {
         /**
          * The type of the objects to be created.
          */
-        private final Class/*<T>*/ type;
+        private final Class/*<? extends IdentifiedObject>*/ type;
 
         /**
          * The {@code createFoo} method to invoke.
@@ -381,7 +231,7 @@ abstract class AuthorityFactoryProxy/*<T extends IdentifiedObject>*/ {
         /**
          * Creates a new proxy which will delegates the object creation to the specified instance.
          */
-        Default(final AuthorityFactory factory, final Class/*<T>*/ type)
+        Default(final AuthorityFactory factory, final Class/*<? extends IdentifiedObject>*/ type)
                 throws IllegalArgumentException
         {
             this.factory = factory;
@@ -402,7 +252,7 @@ abstract class AuthorityFactoryProxy/*<T extends IdentifiedObject>*/ {
         /**
          * {@inheritDoc}
          */
-        public Class/*<T>*/ getType() {
+        public Class/*<? extends IdentifiedObject>*/ getType() {
             return type;
         }
 
@@ -416,7 +266,7 @@ abstract class AuthorityFactoryProxy/*<T extends IdentifiedObject>*/ {
         /**
          * {@inheritDoc}
          */
-        public IdentifiedObject/*<T>*/ create(final String code) throws FactoryException {
+        public IdentifiedObject create(final String code) throws FactoryException {
             try {
                 return (IdentifiedObject) method.invoke(factory, new String[] {code});
             } catch (InvocationTargetException exception) {
