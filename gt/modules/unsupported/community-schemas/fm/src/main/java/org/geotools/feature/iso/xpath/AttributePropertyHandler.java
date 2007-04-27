@@ -17,6 +17,7 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.TypeName;
+import org.xml.sax.Attributes;
 
 /**
  * JXPath property handler that works on Attribute.
@@ -99,7 +100,7 @@ public class AttributePropertyHandler implements DynamicPropertyHandler {
                 String[] scopedAttName = propName.split(":");
                 attName = scopedAttName[scopedAttName.length - 1];
 
-                Map attributes = (Map) descriptor.getUserData("attributes");
+                Map attributes = (Map) descriptor.getUserData(Attributes.class);
                 if (attributes != null) {
                     for (Iterator it = attributes.entrySet().iterator(); it.hasNext();) {
                         Map.Entry entry = (Entry) it.next();

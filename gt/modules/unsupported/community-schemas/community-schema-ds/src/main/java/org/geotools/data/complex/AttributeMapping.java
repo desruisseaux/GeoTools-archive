@@ -49,7 +49,7 @@ public class AttributeMapping {
      */
     AttributeType targetNodeInstance;
 
-    private Map /* <AttributeName,Expression> */clientProperties;
+    private Map /* <Name,Expression> */clientProperties;
 
     /**
      * Creates a new AttributeMapping object.

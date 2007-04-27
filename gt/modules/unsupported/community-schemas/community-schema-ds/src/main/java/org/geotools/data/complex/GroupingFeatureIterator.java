@@ -42,6 +42,7 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.expression.Expression;
+import org.xml.sax.Attributes;
 
 /**
  * 
@@ -496,7 +497,7 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
             nodeAttributes.put(propName, propValue);
         }
 
-        node.putUserData("attributes", nodeAttributes);
+        node.putUserData(Attributes.class, nodeAttributes);
     }
 
     /**
