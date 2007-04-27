@@ -33,16 +33,13 @@ import java.io.IOException;
 import javax.swing.JPanel;
 
 import org.geotools.feature.FeatureCollection;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.gui.swing.event.HighlightChangeListener;
 import org.geotools.gui.swing.event.HighlightChangedEvent;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.styling.Graphic;
 import org.geotools.styling.LineSymbolizer;
@@ -52,12 +49,12 @@ import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
-import org.geotools.styling.StyleFactoryFinder;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.spatial.SpatialOperator;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
 /**
@@ -74,14 +71,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * @author Ian Turton
  *
  */
-/**
- * @author ijt1
- *
- */
-/**
- * @author ijt1
- *
- */
+
 public class JMapPane extends JPanel implements MouseListener,
         HighlightChangeListener, PropertyChangeListener {
     /**
@@ -142,7 +132,7 @@ public class JMapPane extends JPanel implements MouseListener,
     /** 
      * a factory for filters
      */
-    FilterFactory ff = FilterFactoryFinder.createFilterFactory();
+    FilterFactory ff;
     /** 
      * a factory for geometries
      */
@@ -202,6 +192,9 @@ public class JMapPane extends JPanel implements MouseListener,
     public JMapPane(LayoutManager layout, boolean isDoubleBuffered,
             GTRenderer render, MapContext context) {
         super(layout, isDoubleBuffered);
+        
+
+        ff = org.geotools.factory.CommonFactoryFinder.getFilterFactory(null);
         setRenderer(render);
 
         setContext(context);
@@ -432,7 +425,7 @@ public class JMapPane extends JPanel implements MouseListener,
                 selectionStyle = lineSelectionStyle;
             }
 
-            selectionContext = new DefaultMapContext();
+            selectionContext = new DefaultMapContext(DefaultGeographicCRS.WGS84);
 
             selectionContext.addLayer(selection, selectionStyle);
             renderer.setContext(selectionContext);
@@ -464,7 +457,7 @@ public class JMapPane extends JPanel implements MouseListener,
                 highlightStyle = lineHighlightStyle;
             }
 
-            MapContext highlightContext = new DefaultMapContext();
+            MapContext highlightContext = new DefaultMapContext(DefaultGeographicCRS.WGS84);
 
             highlightContext.addLayer(highlightFeature, highlightStyle);
             renderer.setContext(highlightContext);
@@ -476,12 +469,12 @@ public class JMapPane extends JPanel implements MouseListener,
     }
 
     public FeatureCollection doSelection(double x, double y, int layer) {
-        GeometryFilter f = null;
+        org.opengis.filter.spatial.BinarySpatialOperator f = null;
         FeatureCollection select = null;
-        Geometry geometry = gf.createPoint(new Coordinate(x, y));
+        //Geometry geometry = gf.createPoint(new Coordinate(x, y));
+        org.opengis.geometry.Geometry geometry = null;
         try {
-            f = ff.createGeometryFilter(GeometryFilter.GEOMETRY_CONTAINS);
-            f.addRightGeometry(ff.createLiteralExpression(geometry));
+            f = ff.contains("",geometry);
         } catch (IllegalFilterException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -509,7 +502,7 @@ public class JMapPane extends JPanel implements MouseListener,
      *            the index of the layer to search
      * @throws IndexOutOfBoundsException
      */
-    private FeatureCollection findFeature(GeometryFilter f, int i)
+    private FeatureCollection findFeature(SpatialOperator f, int i)
             throws IndexOutOfBoundsException {
         FeatureCollection fcol = null;
         if (context != null && i > context.getLayers().length) {
@@ -522,7 +515,7 @@ public class JMapPane extends JPanel implements MouseListener,
                     .getDefaultGeometry().getName();
             if (name == "")
                 name = "the_geom";
-            f.addLeftGeometry(ff.createAttributeExpression(name));
+            //f.addLeftGeometry(ff.property(name));
             // System.out.println("looking with " + f);
             FeatureCollection fc = layer.getFeatureSource().getFeatures(f);
             if (fc.size() > 0) {
@@ -639,8 +632,8 @@ public class JMapPane extends JPanel implements MouseListener,
     private static final int POINT = 2;
 
     private org.geotools.styling.Style setupStyle(int type, Color color) {
-        StyleFactory sf = StyleFactoryFinder.createStyleFactory();
-        StyleBuilder sb = new StyleBuilder(sf, ff);
+        StyleFactory sf = org.geotools.factory.CommonFactoryFinder.getStyleFactory(null);
+        StyleBuilder sb = new StyleBuilder();
 
         org.geotools.styling.Style s = sf.createStyle();
         s.setTitle("selection");
@@ -677,7 +670,7 @@ public class JMapPane extends JPanel implements MouseListener,
     public void highlightChanged(HighlightChangedEvent e) {
         // TODO Auto-generated method stub
 
-        Filter f = e.getFilter();
+        org.opengis.filter.Filter f = e.getFilter();
         try {
             highlightFeature = highlightLayer.getFeatureSource().getFeatures(f);
         } catch (IOException e1) {
