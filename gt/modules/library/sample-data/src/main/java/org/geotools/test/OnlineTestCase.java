@@ -88,10 +88,18 @@ public abstract class OnlineTestCase extends TestCase {
             } catch (Throwable t) {
                 // abort the test
                 fixture = null;
+                
+                if( once ) {
+                    // print out connection failure message once
+                    // (for people debugging a single test case)
+                    t.printStackTrace();
+                    once = false;
+                }                  
             }
         }
     }
 
+    static boolean once = true;
     /**
      * Tear down method for test, calls through to {@link #disconnect()} if the
      * test is active.
