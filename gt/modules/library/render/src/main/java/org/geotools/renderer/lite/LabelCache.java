@@ -45,14 +45,6 @@ public interface LabelCache {
 	 */
 	void startLayer(String layerId);
 	/**
-<<<<<<< .working
-	 * Puts a TextStyle and its associated shape in the cache. 
-	 * 
-	 * @param symbolizer the TextSymbolizer containing the style information 
-	 * @param feature
-	 * @param shape      the shape to be labeled
-	 * @param scaleRange
-=======
 	 * Puts a Label in the cache.
 	 * 
 	 * @param layerId  id indicating the layer the feature is part of
@@ -61,7 +53,6 @@ public interface LabelCache {
 	 * calculate the required render information. 
 	 * @param shape the shape to be labeled.  This is in screen coordinates.
 	 * @param scaleRange the scaleRange that the symbolizer is legal
->>>>>>> .merge-right.r25359
 	 */
 	void put( String layerId, TextSymbolizer symbolizer, Feature feature, LiteShape2 shape, Range scaleRange) ;
 	/**
