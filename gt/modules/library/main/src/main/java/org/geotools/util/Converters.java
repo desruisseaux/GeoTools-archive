@@ -61,9 +61,17 @@ public class Converters {
 	 * @since 2.4
 	 */
 	public static Object convert( Object source, Class target, Hints hints ) {
-		if ( source == null ) 
+		//cant convert null
+                if ( source == null ) 
 			return null;
 		
+                //handle case of source being a direct instance of target 
+                // up front
+                if ( source.getClass().equals( target ) ) {
+                    return source;
+                }
+                
+                
 		for ( Iterator i = factories().iterator(); i.hasNext(); ) {
 			ConverterFactory factory = (ConverterFactory) i.next();
 			Converter converter = factory.createConverter( source.getClass(), target, hints );
