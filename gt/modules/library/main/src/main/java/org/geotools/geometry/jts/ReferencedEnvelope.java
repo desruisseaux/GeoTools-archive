@@ -22,6 +22,7 @@ import org.geotools.referencing.CRS;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
+import org.opengis.geometry.MismatchedReferenceSystemException;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -99,39 +100,6 @@ public class ReferencedEnvelope extends Envelope implements
 
     /**
      * Creates a new envelope from an existing envelope.
-     * 
-     * @param envelope The envelope to initialize from
-     * @param crs The coordinate reference system.
-     * @throws MismatchedDimensionExceptionif the CRS dimension is not valid.
-     */
-    public ReferencedEnvelope(final Envelope envelope, final CoordinateReferenceSystem crs)
-            throws MismatchedDimensionException
-    {
-        super(envelope);
-        this.crs = crs;
-        checkCoordinateReferenceSystemDimension();
-    }
-
-    /**
-     * Creates a new envelope from an existing envelope.
-     * 
-     * @param envelope The envelope to initialize from
-     * @param crs The coordinate reference system.
-     * @throws MismatchedDimensionException if the CRS dimension is not valid.
-     *
-     * @since 2.3
-     */
-    public ReferencedEnvelope(
-            final org.opengis.geometry.Envelope envelope,
-            final CoordinateReferenceSystem crs) throws MismatchedDimensionException
-    {
-        super(getJTSEnvelope(envelope, crs));
-        this.crs = crs;
-        checkCoordinateReferenceSystemDimension();
-    }
-
-    /**
-     * Creates a new envelope from an existing envelope.
      *
      * @param envelope The envelope to initialize from
      * @throws MismatchedDimensionException if the CRS dimension is not valid.
@@ -147,7 +115,77 @@ public class ReferencedEnvelope extends Envelope implements
     }
 
     /**
-     * Get a JTS envelope out of an OGC Envelope
+     * Creates a new envelope from an existing bounding box.
+     * 
+     * @param bbox The bounding box to initialize from.
+     * @throws MismatchedDimensionException if the CRS dimension is not valid.
+     *
+     * @since 2.4
+     */
+    public ReferencedEnvelope(final BoundingBox bbox)
+            throws MismatchedDimensionException
+    {
+        this(bbox.getMinX(), bbox.getMaxX(), bbox.getMinY(), bbox.getMaxY(),
+             bbox.getCoordinateReferenceSystem());
+    }
+
+    /**
+     * Creates a new envelope from an existing OGC envelope.
+     * 
+     * @param envelope The envelope to initialize from.
+     * @throws MismatchedDimensionException if the CRS dimension is not valid.
+     *
+     * @since 2.4
+     */
+    public ReferencedEnvelope(final org.opengis.geometry.Envelope envelope)
+            throws MismatchedDimensionException
+    {
+        super(envelope.getMinimum(0), envelope.getMaximum(0),
+              envelope.getMinimum(1), envelope.getMaximum(1));
+        this.crs = envelope.getCoordinateReferenceSystem();
+        checkCoordinateReferenceSystemDimension();
+    }
+
+    /**
+     * Creates a new envelope from an existing JTS envelope.
+     * 
+     * @param envelope The envelope to initialize from.
+     * @param crs The coordinate reference system.
+     * @throws MismatchedDimensionExceptionif the CRS dimension is not valid.
+     */
+    public ReferencedEnvelope(final Envelope envelope, final CoordinateReferenceSystem crs)
+            throws MismatchedDimensionException
+    {
+        super(envelope);
+        this.crs = crs;
+        checkCoordinateReferenceSystemDimension();
+    }
+
+    /**
+     * Creates a new envelope from an existing OGC envelope.
+     * 
+     * @param envelope The envelope to initialize from.
+     * @param crs The coordinate reference system.
+     * @throws MismatchedDimensionException if the CRS dimension is not valid.
+     *
+     * @since 2.3
+     *
+     * @deprecated The {@code crs} argument duplicate the information already provided
+     *             in the OGC envelope.
+     */
+    public ReferencedEnvelope(
+            final org.opengis.geometry.Envelope envelope,
+            final CoordinateReferenceSystem crs) throws MismatchedDimensionException
+    {
+        super(getJTSEnvelope(envelope, crs));
+        this.crs = crs;
+        checkCoordinateReferenceSystemDimension();
+    }
+
+    /**
+     * Get a JTS envelope out of an OGC envelope.
+     *
+     * @deprecated To remove once the above constructor has been removed.
      */
     private static Envelope getJTSEnvelope(
             org.opengis.geometry.Envelope envelope,
@@ -159,6 +197,16 @@ public class ReferencedEnvelope extends Envelope implements
         envelope2D.setCoordinateReferenceSystem(crs);
         return new Envelope(envelope2D.getMinX(), envelope2D.getMaxX(),
                             envelope2D.getMinY(), envelope2D.getMaxY());
+    }
+
+    /**
+     * Returns the specified bounding box as a JTS envelope.
+     */
+    private static Envelope getJTSEnvelope(final BoundingBox bbox) {
+        if (bbox instanceof Envelope) {
+            return (Envelope) bbox;
+        }
+        return new ReferencedEnvelope(bbox);
     }
 
     /**
@@ -174,6 +222,26 @@ public class ReferencedEnvelope extends Envelope implements
                 throw new MismatchedDimensionException(Errors.format(
                         ErrorKeys.MISMATCHED_DIMENSION_$3, crs.getName().getCode(),
                         new Integer(dimension), new Integer(expected)));
+            }
+        }
+    }
+
+    /**
+     * Make sure that the specified bounding box uses the same CRS than this one.
+     *
+     * @param  bbox The other bounding box to test for compatibility.
+     * @throws MismatchedReferenceSystemException if the CRS are incompatibles.
+     */
+    private void ensureCompatibleReferenceSystem(final BoundingBox bbox)
+            throws MismatchedReferenceSystemException
+    {
+        if (crs != null) {
+            final CoordinateReferenceSystem other = bbox.getCoordinateReferenceSystem();
+            if (other != null) {
+                if (!CRS.equalsIgnoreMetadata(crs, other)) {
+                    throw new MismatchedReferenceSystemException(
+                            Errors.format(ErrorKeys.MISMATCHED_COORDINATE_REFERENCE_SYSTEM));
+                }
             }
         }
     }
@@ -282,7 +350,7 @@ public class ReferencedEnvelope extends Envelope implements
      * This is a helper method for <code>{@linkplain #getMinimum getMinimum}(i)</code>
      * where <var>i</var> is the ordinate used to represent easting.
      *
-     * @todo Current implementation do not obeys the above contract, since it doesn't try
+     * @deprecated This implementation do not obeys the above contract, since it doesn't try
      *       to locate which axis is the easting. We don't know yet if we will change the
      *       implementation or the specification in a future Geotools version.
      *
@@ -297,7 +365,7 @@ public class ReferencedEnvelope extends Envelope implements
      * This is a helper method for <code>{@linkplain #getMaximum getMaximum}(i)</code>
      * where <var>i</var> is the ordinate used to represent easting.
      *
-     * @todo Current implementation do not obeys the above contract, since it doesn't try
+     * @deprecated This implementation do not obeys the above contract, since it doesn't try
      *       to locate which axis is the easting. We don't know yet if we will change the
      *       implementation or the specification in a future Geotools version.
      *
@@ -312,7 +380,7 @@ public class ReferencedEnvelope extends Envelope implements
      * This is a helper method for <code>{@linkplain #getMinimum getMinimum}(i)</code>
      * where <var>i</var> is the ordinate used to represent northing.
      *
-     * @todo Current implementation do not obeys the above contract, since it doesn't try
+     * @deprecated This implementation do not obeys the above contract, since it doesn't try
      *       to locate which axis is the northing. We don't know yet if we will change the
      *       implementation or the specification in a future Geotools version.
      *
@@ -327,7 +395,7 @@ public class ReferencedEnvelope extends Envelope implements
      * This is a helper method for <code>{@linkplain #getMaximum getMaximum}(i)</code>
      * where <var>i</var> is the ordinate used to represent northing.
      *
-     * @todo Current implementation do not obeys the above contract, since it doesn't try
+     * @deprecated This implementation do not obeys the above contract, since it doesn't try
      *       to locate which axis is the northing. We don't know yet if we will change the
      *       implementation or the specification in a future Geotools version.
      *
@@ -360,8 +428,9 @@ public class ReferencedEnvelope extends Envelope implements
      *
      * @since 2.4
      */
-    public boolean contains(BoundingBox bbox) {
-        return super.contains(new Envelope(bbox.minX(), bbox.maxX(), bbox.minY(), bbox.maxY()));
+    public boolean contains(final BoundingBox bbox) {
+        ensureCompatibleReferenceSystem(bbox);
+        return super.contains(getJTSEnvelope(bbox));
     }
 
     /**
@@ -369,8 +438,9 @@ public class ReferencedEnvelope extends Envelope implements
      *
      * @since 2.4
      */
-    public boolean intersects(BoundingBox bbox) {
-        return super.intersects(new Envelope(bbox.minX(), bbox.maxX(), bbox.minY(), bbox.maxY()));
+    public boolean intersects(final BoundingBox bbox) {
+        ensureCompatibleReferenceSystem(bbox);
+        return super.intersects(getJTSEnvelope(bbox));
     }
 
     /**
@@ -378,8 +448,9 @@ public class ReferencedEnvelope extends Envelope implements
      *
      * @since 2.4
      */
-    public void include(BoundingBox bbox) {
-        super.expandToInclude(new Envelope(bbox.minX(), bbox.maxX(), bbox.minY(), bbox.maxY()));
+    public void include(final BoundingBox bbox) {
+        ensureCompatibleReferenceSystem(bbox);
+        super.expandToInclude(getJTSEnvelope(bbox));
     }
 
     /**
@@ -395,9 +466,36 @@ public class ReferencedEnvelope extends Envelope implements
      * Initialize the bounding box with another bounding box.
      *
      * @since 2.4
+     *
+     * @deprecated Renamed {@link #setBounds}.
      */
-    public void init(BoundingBox bbox) {
-        super.init(new Envelope(bbox.minX(), bbox.maxX(), bbox.minY(), bbox.maxY()));
+    public void init(final BoundingBox bbox) {
+        setBounds(bbox);
+    }
+
+    /**
+     * Initialize the bounding box with another bounding box.
+     *
+     * @since 2.4
+     */
+    public void setBounds(final BoundingBox bbox) {
+        ensureCompatibleReferenceSystem(bbox);
+        super.init(getJTSEnvelope(bbox));
+    }
+
+    /**
+     * Returns a new bounding box which contains the transformed shape of this bounding box.
+     * This is a convenience method that delegate its work to the {@link #transform transform}
+     * method.
+     *
+     * @since 2.4
+     */
+    public BoundingBox toBounds(final CoordinateReferenceSystem targetCRS) throws TransformException {
+        try {
+            return transform(targetCRS, true);
+        } catch (FactoryException e) {
+            throw new TransformException(e.getLocalizedMessage(), e);
+        }
     }
 
     /**

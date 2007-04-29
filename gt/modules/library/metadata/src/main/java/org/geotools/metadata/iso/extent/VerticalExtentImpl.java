@@ -24,7 +24,6 @@ import javax.units.Unit;
 
 // OpenGIS dependencies
 import org.opengis.metadata.extent.VerticalExtent;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.VerticalCRS;
 import org.opengis.referencing.datum.VerticalDatum;
 
@@ -147,7 +146,7 @@ public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent
      *
      * @since 2.4
      */
-    public CoordinateReferenceSystem getVerticalCRS() {
+    public VerticalCRS getVerticalCRS() {
         return verticalCRS;
     }
 
