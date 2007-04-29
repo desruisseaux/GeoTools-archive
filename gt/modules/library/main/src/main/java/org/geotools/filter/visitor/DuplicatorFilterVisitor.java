@@ -45,6 +45,7 @@ import org.opengis.filter.IncludeFilter;
  *
  * @author Jody Garnett, Refractions Research Inc.
  * @source $URL$
+ * @deprecated use {@link FilterDuplicatorVisitor}
  */
 public class DuplicatorFilterVisitor extends AbstractFilterVisitor implements FilterVisitor2 {
     protected Stack pages = new Stack(); // need a Stack as Filter structure is recursive
