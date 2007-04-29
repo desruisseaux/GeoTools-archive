@@ -322,6 +322,7 @@ public class Schemas {
      * 
      */
     public static final List getChildElementParticles( XSDTypeDefinition type, boolean includeParents ) {
+        final HashSet contents = new HashSet();
         final ArrayList particles = new ArrayList();
         TypeWalker.Visitor visitor = new TypeWalker.Visitor() {
             public boolean visit(XSDTypeDefinition type) {
@@ -334,9 +335,17 @@ public class Schemas {
 
                 ElementVisitor visitor = new ElementVisitor() {
                     public void visit(XSDParticle particle) {
-                    	//element declaration, add to list
-                    	if ( !particles.contains( particle ) )
-                    		particles.add( particle );
+                        XSDElementDeclaration element = 
+                            (XSDElementDeclaration) particle.getContent();
+                        if ( element.isElementDeclarationReference() ) {
+                            element = element.getResolvedElementDeclaration();
+                        }
+                        
+                    	//make sure unique
+                        if ( !contents.contains( element ) ) {
+                            contents.add( element );
+                            particles.add( particle );
+                        }
                     }
                 };
 
