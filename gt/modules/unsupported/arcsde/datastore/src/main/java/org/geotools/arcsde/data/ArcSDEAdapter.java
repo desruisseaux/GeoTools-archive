@@ -82,6 +82,7 @@ public class ArcSDEAdapter {
 	private static final Map java2SDETypes = new HashMap();
 
 	static {
+        sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_NSTRING), String.class);
 		sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_STRING),	String.class);
 		sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_INT16),	Short.class);
 		sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_INT32),	Integer.class);
@@ -364,6 +365,10 @@ public class ArcSDEAdapter {
 						"Raster columns are not supported yet");
 			} else {
 				typeClass = (Class) sde2JavaTypes.get(sdeType);
+                if (typeClass == null) {
+                    LOGGER.warning("ArcSDE column " + seColumns[i].getName() + " reported column type " + sdeType + ".  Couldn't figure out what Java type this maps to.");
+                    throw new DataSourceException("Unable to determine data type for column '" + seColumns[i].getName() + "'");
+                }
 				attribute = new ArcSDEAttributeType(AttributeTypeFactory.newAttributeType(seColumns[i]
 						.getName(), typeClass, isNilable, fieldLen, defValue));
 				if (attribute.getName().equalsIgnoreCase(rowIdColumnName)) {
