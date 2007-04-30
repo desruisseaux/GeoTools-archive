@@ -750,79 +750,26 @@ public abstract class AbstractAuthorityFactory extends ReferencingFactory
     }
 
     /**
-     * Looks up an object from this authority factory which is
-     * {@linkplain org.geotools.referencing.CRS#equalsIgnoreMetadata equals, ignoring metadata},
-     * to the specified object. The default implementation tries to instantiate some
-     * {@linkplain IdentifiedObject identified objects} from this factory in the
-     * following order:
-     * <p>
-     * <ul>
-     *   <li>If the specified object contains {@linkplain IdentifiedObject#getIdentifiers
-     *       identifiers} associated to the same authority than this factory, then those
-     *       identifiers are used for {@linkplain #createObject creating objects} to be
-     *       tested.</li>
-     *   <li>If this authority factory can create objects from their {@linkplain
-     *       IdentifiedObject#getName name} in addition of identifiers, then the name and
-     *       {@linkplain IdentifiedObject#getAlias aliases} are used for creating objects
-     *       to be tested.</li>
-     *   <li>If {@code fullScan} is {@code true}, then full {@linkplain #getAuthorityCodes
-     *       set of authority codes} are used for creating objects to be tested.</li>
-     * </ul>
-     * <p>
-     * The first of the above created objects which is equals to the specified object in the
-     * sense of {@link org.geotools.referencing.CRS#equalsIgnoreMetadata equalsIgnoreMetadata}
-     * is returned. The main purpose of this method is to get a fully identified object from
-     * an incomplete one, e.g. from an object without identifier or "{@code AUTHORITY[...]}"
-     * element in <cite>Well Known Text</cite> terminology.
-     * <p>
-     * The authority code can be obtained from the identified object using the following code:
+     * Returns a finder which can be used for looking up unidentified objects. The finder
+     * fetchs a fully {@linkplain IdentifiedObject identified object} from an incomplete one,
+     * for example from an object without identifier or "{@code AUTHORITY[...]}" element in
+     * <cite>Well Known Text</cite> terminology.
      *
-     * <blockquote><pre>
-     * IdentifiedObject object = factory.find(...);
-     * Identifier id = AbstractIdentifiedObject.getIdentifier(object, factory.getAuthority());
-     * String code = (id != null) ? id.getCode() : null;
-     * </pre></blockquote>
-     *
-     * @param  object The object looked up.
-     * @param  fullScan If {@code true}, an exhaustive full scan against all registered object
-     *         will be performed (may be slow). Otherwise only a fast lookup based on embedded
-     *         identifiers and names will be performed.
-     * @return The identified object, or {@code null} if not found.
-     * @throws FactoryException if an error occured while creating an object.
+     * @param  type The type of objects to look for. Should be a GeoAPI interface like
+     *         {@code GeographicCRS.class}, but this method accepts also implementation
+     *         class. If the type is unknown, use {@code IdentifiedObject.class}. A more
+     *         accurate type may help to speed up the search, since it reduces the amount
+     *         of tables to scan in some implementations like the factories backed by
+     *         EPSG database.
+     * @return A finder to use for looking up unidentified objects.
+     * @throws FactoryException if the finder can not be created.
      *
      * @since 2.4
      */
-    public IdentifiedObject find(final IdentifiedObject object, final boolean fullScan)
-            throws FactoryException
+    public IdentifiedObjectFinder getIdentifiedObjectFinder(
+            final Class/*<? extends IdentifiedObject>*/ type) throws FactoryException
     {
-        return new IdentifiedObjectFinder(this, object.getClass()).find(object, fullScan);
-    }
-
-    /**
-     * Returns a set of authority codes that <strong>may</strong> identify the same object than
-     * the specified one. The returned set must contains the code of every objects that are
-     * {@linkplain org.geotools.referencing.CRS#equalsIgnoreMetadata equals, ignoring metadata},
-     * to the specified one. However the set is not required to contains only the codes of those
-     * objects; it may conservatively contains the code for more objects if an exact search is too
-     * expensive.
-     * <p>
-     * This method is invoked by the default {@link #find find} method implementation. The caller
-     * may iterates through every returned codes, instantiate the objects and compare them with
-     * the specified one in order to determine which codes are really applicable.
-     * <p>
-     * The default implementation returns the same set than
-     * <code>{@linkplain #getAuthorityCodes getAuthorityCodes}(type)</code> where {@code type}
-     * if the interface implemented by the specified object. Subclasses should override this
-     * method in order to return a smaller set, if they can.
-     *
-     * @param  object The object looked up.
-     * @return A set of code candidates, or {@code null} if this method is not implemented.
-     * @throws FactoryException if an error occured while fetching the set of candidates.
-     *
-     * @since 2.4
-     */
-    protected Set/*<String>*/ getCodeCandidates(final IdentifiedObject object) throws FactoryException {
-        return getAuthorityCodes(AuthorityFactoryProxy.getType(object.getClass()));
+        return new IdentifiedObjectFinder(this, type);
     }
 
     /**

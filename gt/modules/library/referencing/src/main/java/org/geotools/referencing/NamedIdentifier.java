@@ -354,13 +354,11 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serial
             }
         }
         /*
-         * Completes the code space if it was not explicitly set.
+         * Completes the code space if it was not explicitly set. We take the first
+         * identifier if there is any, otherwise we take the shortest title.
          */
         if (codespace == null && authority instanceof Citation) {
-            final String title = getShortestTitle((Citation) authority).toString(Locale.US);
-            if (isValidCodeSpace(title)) {
-                codespace = title;
-            }
+            codespace = getCodeSpace((Citation) authority);
         }
         /*
          * Stores the definitive reference to the attributes. Note that casts are performed only
@@ -468,11 +466,16 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serial
     /**
      * Constructs a generic name from the specified authority and code.
      */
-    private static GenericName getName(final Citation authority, final CharSequence code) {
+    private GenericName getName(final Citation authority, final CharSequence code) {
         if (authority == null) {
             return new org.geotools.util.LocalName(code);
         }
-        final InternationalString title = getShortestTitle(authority);
+        final CharSequence title;
+        if (codespace != null) {
+            title = codespace;
+        } else {
+            title = getShortestTitle(authority);
+        }
         GenericName scope;
         synchronized (NamedIdentifier.class) {
             if (SCOPES == null) {
@@ -508,11 +511,35 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serial
     }
 
     /**
+     * Tries to get a codespace from the specified authority. This method scan first
+     * through the identifier, then through the titles if no suitable identifier were found.
+     */
+    private static String getCodeSpace(final Citation authority) {
+        final Collection identifiers = authority.getIdentifiers();
+        if (identifiers != null) {
+            for (final Iterator it=identifiers.iterator(); it.hasNext();) {
+                final String identifier = (String) it.next();
+                if (isValidCodeSpace(identifier)) {
+                    return identifier;
+                }
+            }
+        }
+        final String title = getShortestTitle(authority).toString(Locale.US);
+        if (isValidCodeSpace(title)) {
+            return title;
+        }
+        return null;
+    }
+
+    /**
      * Returns {@code true} if the specified string looks like a valid code space.
-     * This method, together with {@link #getShortestTitle}, uses soemwhat heuristic
+     * This method, together with {@link #getShortestTitle}, uses somewhat heuristic
      * rules that may change in future Geotools versions.
      */
     private static boolean isValidCodeSpace(final String codespace) {
+        if (codespace == null) {
+            return false;
+        }
         for (int i=codespace.length(); --i>=0;) {
             if (!Character.isJavaIdentifierPart(codespace.charAt(i))) {
                 return false;

@@ -17,9 +17,6 @@
 package org.geotools.referencing.factory;
 
 // J2SE dependencies
-import java.util.Set;
-import java.util.Locale;
-import java.util.Iterator;
 import java.util.logging.Level;
 
 // JUnit dependencies
@@ -28,7 +25,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 // OpenGIS dependencies
-import org.opengis.metadata.citation.Citation;
+import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.SingleCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
@@ -43,12 +40,10 @@ import org.geotools.factory.Hints;
 import org.geotools.resources.Arguments;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
-import org.geotools.referencing.NamedIdentifier;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.factory.epsg.LongitudeFirstFactory;
-import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.factory.FactoryRegistryException;
 
 
 /**
@@ -73,16 +68,6 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
     private static final boolean METADATA_ERASED = false;
 
     /**
-     * For safety.
-     */
-    private static final String EPSG = "EPSG";
-
-    /**
-     * {@code true} for tracing operations on the standard output.
-     */
-    private static boolean verbose;
-
-    /**
      * Run the suite from the command line. If {@code "-log"} flag is specified on the
      * command-line, then the logger will be set to {@link Level#CONFIG}. This is usefull
      * for tracking down which data source is actually used.
@@ -90,7 +75,6 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
     public static void main(final String[] args) {
         final Arguments arguments = new Arguments(args);
         final boolean log = arguments.getFlag("-log");
-        verbose = arguments.getFlag("-verbose");
         arguments.getRemainingArguments(0);
         org.geotools.util.Logging.GEOTOOLS.forceMonolineConsoleOutput(log ? Level.CONFIG : null);
         junit.textui.TestRunner.run(suite());
@@ -115,7 +99,7 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
      */
     private static OrderedAxisAuthorityFactory getFactory(final Hints hints) {
         CRSAuthorityFactory factory;
-        factory = ReferencingFactoryFinder.getCRSAuthorityFactory(EPSG, hints);
+        factory = ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG", hints);
         assertTrue(factory.getClass().toString(), factory instanceof LongitudeFirstFactory);
         factory = (CRSAuthorityFactory) ((LongitudeFirstFactory) factory).getImplementationHints()
                    .get(Hints.CRS_AUTHORITY_FACTORY);
@@ -175,13 +159,13 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
          */
         final AbstractAuthorityFactory factory0, factory1;
         final Hints hints = new Hints(Hints.CRS_AUTHORITY_FACTORY, AbstractAuthorityFactory.class);
-        factory0 = (AbstractAuthorityFactory) ReferencingFactoryFinder.getCRSAuthorityFactory(EPSG, hints);
+        factory0 = (AbstractAuthorityFactory) ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG", hints);
         assertFalse(factory0 instanceof OrderedAxisAuthorityFactory);
         assertFalse(factory0 instanceof LongitudeFirstFactory);
         hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
         hints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS,   Boolean.TRUE);
         hints.put(Hints.FORCE_STANDARD_AXIS_UNITS,        Boolean.TRUE);
-        factory1 = (AbstractAuthorityFactory) ReferencingFactoryFinder.getCRSAuthorityFactory(EPSG, hints);
+        factory1 = (AbstractAuthorityFactory) ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG", hints);
         assertTrue(factory1 instanceof LongitudeFirstFactory);
         /*
          * The local variables to be used for all remaining tests
@@ -327,193 +311,26 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
             { 0,  0,  1}}), new GeneralMatrix(matrix));
     }
 
-    // -------------------------------------------------------------------------
-    // The following tests are copied from the legacy plugin/epsg-wkt test suite
-    // -------------------------------------------------------------------------
-
     /**
-     * Makes sure that the authority factory has the proper name.
+     * Tests the {@link IdentifiedObjectFinder#find} method with axis order forced.
      */
-    public void testAuthority() {
-        CRSAuthorityFactory factory;
-        Citation authority;
+    public void testFind() throws FactoryException {
+        final CRSAuthorityFactory factory = ReferencingFactoryFinder.getCRSAuthorityFactory(
+                "EPSG", new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE));
+        assertTrue(factory instanceof AbstractAuthorityFactory);
+        final IdentifiedObjectFinder finder = ((AbstractAuthorityFactory) factory).
+                getIdentifiedObjectFinder(CoordinateReferenceSystem.class);
+        /*
+         * We tested in DefaultFactoryTest that WGS84 is not found when searching
+         * directly in DefaultFactory. Now we perform the same search through the
+         * ordered axis authority factory.
+         */
+        finder.setFullScanAllowed(false);
+        assertNull("Should not find the CRS without a scan.",
+                   finder.find(DefaultGeographicCRS.WGS84));
 
-        // Tests the official factory.
-        factory   = ReferencingFactoryFinder.getCRSAuthorityFactory(EPSG, null);
-        authority = factory.getAuthority();
-        assertNotNull(authority);
-        assertEquals("European Petroleum Survey Group", authority.getTitle().toString(Locale.US));
-        assertTrue(authority.getIdentifiers().contains(EPSG));
-
-        // Tests the modified factory.
-        factory   = new OrderedAxisAuthorityFactory(EPSG, null, null);
-        authority = factory.getAuthority();
-        assertNotNull(authority);
-        assertTrue(authority.getIdentifiers().contains(EPSG));
-    }
-
-    /**
-     * Tests the vendor name.
-     */
-    public void testVendor() {
-        CRSAuthorityFactory factory;
-        Citation vendor;
-
-        factory = new OrderedAxisAuthorityFactory(EPSG, null, null);
-        vendor  = factory.getVendor();
-        assertNotNull(vendor);
-        assertEquals("Geotools", vendor.getTitle().toString(Locale.US));
-        assertFalse(vendor.getIdentifiers().contains(EPSG));
-    }
-
-    /**
-     * Tests the amount of codes available.
-     */
-    public void testCodes() throws FactoryException {
-        final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory(EPSG, null, null);
-        final Set codes = factory.getAuthorityCodes( CoordinateReferenceSystem.class );
-        assertNotNull(codes);
-        assertTrue(codes.size() >= 3000);
-    }
-
-    /**
-     * A random CRS for fun.
-     */
-    public void test26910() throws FactoryException {
-        final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory(EPSG, null, null);
-        final CoordinateReferenceSystem crs = factory.createCoordinateReferenceSystem("EPSG:26910");
-        assertNotNull(crs);
-        assertSame(crs, factory.createObject("EPSG:26910"));
-    }
-
-    /**
-     * UDIG requires this to work.
-     */
-    public void test4326() throws FactoryException {
-        final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory(EPSG, null, null);
-        final CoordinateReferenceSystem crs = factory.createCoordinateReferenceSystem("EPSG:4326");
-        assertNotNull(crs);
-        assertSame(crs, factory.createObject("EPSG:4326"));
-    }
-
-    /**
-     * UDIG requires this to work.
-     */
-    public void test4269() throws FactoryException {
-        final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory(EPSG, null, null);
-        final CoordinateReferenceSystem crs = factory.createCoordinateReferenceSystem("EPSG:4269");
-        assertNotNull(crs);
-        assertSame(crs, factory.createObject("EPSG:4269"));
-    }
-
-    /**
-     * UDIG requires this to work.
-     */
-    public void test42102() throws FactoryException {
-        if (true) {
-            // TODO: not yet implemented: this CRS doesn't exists in the EPSG database.
-            return;
-        }
-        final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory(EPSG, null, null);
-        final CoordinateReferenceSystem crs = factory.createCoordinateReferenceSystem("EPSG:42102");
-        assertNotNull(crs);
-        assertNotNull(crs.getIdentifiers());
-        assertFalse(crs.getIdentifiers().isEmpty());
-        NamedIdentifier expected = new NamedIdentifier(Citations.EPSG, "42102");
-        assertTrue(crs.getIdentifiers().contains(expected));
-    }
-
-    /**
-     * Tests the number of CRS that can be created. This test will be executed only if this test
-     * suite is run with the {@code -verbose} option provided on the command line.
-     */
-    public void testSuccess() throws FactoryException {
-        if (!verbose) {
-            return;
-        }
-        final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory(EPSG, null, null);
-        Set codes = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
-        int total = codes.size();
-        int count = 0;
-        for (Iterator i=codes.iterator(); i.hasNext();) {
-            CoordinateReferenceSystem crs;
-            String code = (String) i.next();
-            try {
-                crs = factory.createCoordinateReferenceSystem(code);
-                assertNotNull(crs);
-                count++;
-            } catch (FactoryException e) {
-                System.err.println("WARNING (CRS: "+code+" ):" + e.getMessage());
-            }            
-        }
-        System.out.println("Success: " + count + "/" + total + " (" + (count*100)/total + "%)");
-    }
-
-    /**
-     * A random CRS for fun.
-     */
-    public void test26910Lower() throws FactoryException {
-        CoordinateReferenceSystem crs = CRS.decode("epsg:26910");
-        assertNotNull(crs);                
-    }
-
-    /**
-     * A random CRS for fun.
-     */
-    public void test26986Lower() throws FactoryException {
-        CoordinateReferenceSystem crs = CRS.decode("epsg:26986");
-        assertNotNull(crs);                
-    }
-
-    /**
-     * WFS requires this to work.
-     */
-    public void test4326Lower() throws FactoryException {
-        CoordinateReferenceSystem crs = CRS.decode("epsg:4326");
-        assertNotNull(crs);
-    }
-
-    /**
-     * WFS requires this to work.
-     */
-    public void test26742Lower() throws FactoryException {
-        CoordinateReferenceSystem crs = CRS.decode("epsg:26742");
-        assertNotNull(crs);
-    }
-
-    /**
-     * WFS requires this to work.
-     */
-    public void test4269Lower() throws FactoryException {
-        CoordinateReferenceSystem crs = CRS.decode("epsg:4269");
-        assertNotNull(crs);
-    }
-
-    /**
-     * WFS requires this to work.
-     */
-    public void test42304Lower() throws FactoryException {
-        if (true) {
-            // TODO: not yet implemented: this CRS doesn't exists in the EPSG database.
-            return;
-        }
-        CoordinateReferenceSystem crs = CRS.decode("epsg:42304");
-        assertNotNull(crs);
-    }
-
-    /**
-     * WFS requires this to work.
-     */
-    public void test42102Lower() throws FactoryException {
-        if (true) {
-            // TODO: not yet implemented: this CRS doesn't exists in the EPSG database.
-            return;
-        }
-        CoordinateReferenceSystem crs = CRS.decode("epsg:42102");
-        assertNotNull(crs);
-        assertNotNull(crs.getIdentifiers());
-        assertFalse(crs.getIdentifiers().isEmpty());
-        NamedIdentifier expected = new NamedIdentifier(Citations.EPSG, "42102");
-        assertTrue(crs.getIdentifiers().contains(expected));
+        finder.setFullScanAllowed(true);
+        IdentifiedObject find = finder.find(DefaultGeographicCRS.WGS84);
+//        assertNotNull("With scan allowed, should find the CRS.", find);
     }
 }

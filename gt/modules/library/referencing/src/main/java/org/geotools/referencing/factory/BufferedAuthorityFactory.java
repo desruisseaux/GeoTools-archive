@@ -966,56 +966,109 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Looks up an object from this authority factory which is
-     * {@linkplain org.geotools.referencing.CRS#equalsIgnoreMetadata equals, ignoring metadata},
-     * to the specified object. The default implementation performs the same lookup than the
-     * {@linkplain AbstractAuthorityFactory#find super-class} and caches the result.
+     * Returns a finder which can be used for looking up unidentified objects.
+     * The default implementation delegates lookup to the underlying backing
+     * store and caches the result.
      *
      * @since 2.4
      */
     //@Override
-    public IdentifiedObject find(final IdentifiedObject object, final boolean fullScan)
-            throws FactoryException
+    public synchronized IdentifiedObjectFinder getIdentifiedObjectFinder(
+            final Class/*<? extends IdentifiedObject>*/ type) throws FactoryException
     {
-        /*
-         * Do not synchronize on 'this'. This method may take a while to execute and we don't
-         * want to block other threads. The synchronizations in the 'create' methods and in
-         * the 'findPool' map should be suffisient.
-         *
-         * TODO: avoid to search for the same object twice. For now we consider that this
-         *       is not a big deal if the same object is searched twice; it is just a
-         *       waste of CPU.
-         */
-        IdentifiedObject candidate;
-        synchronized (findPool) {
-            candidate = (IdentifiedObject) findPool.get(object);
-        }
-        if (candidate == null) {
-            candidate = super.find(object, fullScan);
-            if (candidate != null) {
-                synchronized (findPool) {
-                    findPool.put(object, candidate);
-                }
-            }
-        }
-        return candidate;
+        return new Finder(getBackingStore().getIdentifiedObjectFinder(type));
     }
 
     /**
-     * Returns a set of authority codes that <strong>may</strong> identify the same object than
-     * the specified one. The default implementation delegates to the underlying authority factory.
-     *
-     * @since 2.4
+     * An implementation of {@link IdentifiedObjectFinder} which delegates
+     * the work to the underlying backing store and caches the result.
+     * <p>
+     * <b>Implementation note:</b> the scan is performed directly on the underlying backing store,
+     * not using the buffer. This is because hundred of objects may be created during a scan while
+     * only one will be typically retained. We don't want to overload the cache with every false
+     * candidates that we encounter during the scan.
      */
-    //@Override
-    protected Set/*<String>*/ getCodeCandidates(final IdentifiedObject object)
-            throws FactoryException
-    {
-        final AbstractAuthorityFactory factory;
-        synchronized (this) {
-            factory = getBackingStore();
+    private final class Finder extends IdentifiedObjectFinder {
+        /**
+         * The object to use for performing the scan.
+         */
+        private final IdentifiedObjectFinder finder;
+
+        /**
+         * Creates a finder for the underlying backing store.
+         */
+        Finder(final IdentifiedObjectFinder finder) {
+            super(finder);
+            this.finder = finder;
         }
-        return factory.getCodeCandidates(object);
+
+        /**
+         * Set whatever an exhaustive scan against all registered objects is allowed.
+         */
+        //@Override
+        public void setFullScanAllowed(final boolean fullScan) {
+            finder.setFullScanAllowed(fullScan);
+            super .setFullScanAllowed(fullScan);
+        }
+
+        /**
+         * Looks up an object from this authority factory which is equals, ignoring metadata,
+         * to the specified object. The default implementation performs the same lookup than
+         * the backing store and caches the result.
+         */
+        //@Override
+        public IdentifiedObject find(final IdentifiedObject object) throws FactoryException {
+            /*
+             * Do not synchronize on 'BufferedAuthorityFactory.this'. This method may take a
+             * while to execute and we don't want to block other threads. The synchronizations
+             * in the 'create' methods and in the 'findPool' map should be suffisient.
+             *
+             * TODO: avoid to search for the same object twice. For now we consider that this
+             *       is not a big deal if the same object is searched twice; it is "just" a
+             *       waste of CPU.
+             */
+            IdentifiedObject candidate;
+            synchronized (findPool) {
+                candidate = (IdentifiedObject) findPool.get(object);
+            }
+            if (candidate == null) {
+                candidate = super.find(object);
+                if (candidate != null) {
+                    synchronized (findPool) {
+                        findPool.put(object, candidate);
+                    }
+                }
+            }
+            return candidate;
+        }
+ 
+        /**
+         * Creates an object for the specified code by first looking in the cache. If nothing is
+         * found in the cache, creates a new object but do <strong>not</strong> cache it.
+         */
+        //@Override
+        protected IdentifiedObject create(final String code) throws FactoryException {
+            final String key = trimAuthority(code);
+            final Object cached;
+            synchronized (BufferedAuthorityFactory.this) {
+                cached = get(key);
+            }
+            if (cached instanceof IdentifiedObject) {
+                return (IdentifiedObject) cached;
+            } else {
+                return super.create(code);
+                // No call to put(...), since we don't want to cache this one.
+            }
+        }
+
+        /**
+         * Returns a set of authority codes that <strong>may</strong> identify the same object than
+         * the specified one. The default implementation delegates to the backing store.
+         */
+        //@Override
+        protected Set/*<String>*/ getCodeCandidates(final IdentifiedObject object) throws FactoryException {
+            return finder.getCodeCandidates(object);
+        }
     }
 
     /**
@@ -1037,6 +1090,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * @todo Consider logging a message here to the finer or finest level.
      */
     private Object get(final Object key) {
+        assert Thread.holdsLock(this);
         Object object = pool.get(key);
         if (object instanceof Reference) {
             object = ((Reference) object).get();
@@ -1052,6 +1106,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * one used.
      */
     private void put(final Object key, final Object object) {
+        assert Thread.holdsLock(this);
         pool.put(key, object);
         int toReplace = pool.size() - maxStrongReferences;
         if (toReplace > 0) {

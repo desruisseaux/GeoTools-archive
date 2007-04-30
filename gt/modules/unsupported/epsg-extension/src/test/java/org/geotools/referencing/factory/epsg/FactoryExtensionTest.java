@@ -25,13 +25,15 @@ import java.io.StringWriter;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.ProjectedCRS;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.NamedIdentifier;
+import org.geotools.referencing.ReferencingFactoryFinder;
+import org.geotools.referencing.factory.OrderedAxisAuthorityFactory;
 import org.geotools.metadata.iso.citation.Citations;
 
 // JUnit dependencies
@@ -141,5 +143,39 @@ public class FactoryExtensionTest extends TestCase {
         Collection ids = actual.getIdentifiers();
         assertTrue (ids.contains(new NamedIdentifier(Citations.EPSG, "41001")));
         assertFalse(ids.contains(new NamedIdentifier(Citations.ESRI, "41001")));
+    }
+
+    /**
+     * UDIG requires this to work.
+     */
+    public void test42102() throws FactoryException {
+        final Hints hints = new Hints(Hints.CRS_AUTHORITY_FACTORY, FactoryExtension.class);
+        final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory("EPSG", hints, null);
+        final CoordinateReferenceSystem crs = factory.createCoordinateReferenceSystem("EPSG:42102");
+        assertNotNull(crs);
+        assertNotNull(crs.getIdentifiers());
+        assertFalse(crs.getIdentifiers().isEmpty());
+        NamedIdentifier expected = new NamedIdentifier(Citations.EPSG, "42102");
+        assertTrue(crs.getIdentifiers().contains(expected));
+    }
+
+    /**
+     * WFS requires this to work.
+     */
+    public void test42102Lower() throws FactoryException {
+        CoordinateReferenceSystem crs = CRS.decode("epsg:42102");
+        assertNotNull(crs);
+        assertNotNull(crs.getIdentifiers());
+        assertFalse(crs.getIdentifiers().isEmpty());
+        NamedIdentifier expected = new NamedIdentifier(Citations.EPSG, "42102");
+        assertTrue(crs.getIdentifiers().contains(expected));
+    }
+
+    /**
+     * WFS requires this to work.
+     */
+    public void test42304Lower() throws FactoryException {
+        CoordinateReferenceSystem crs = CRS.decode("epsg:42304");
+        assertNotNull(crs);
     }
 }

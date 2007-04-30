@@ -35,7 +35,9 @@ import org.geotools.referencing.CRS;
 import org.geotools.resources.Arguments;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.factory.IdentifiedObjectFinder;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
+import org.geotools.referencing.factory.BufferedAuthorityFactory;
 
 
 /**
@@ -49,7 +51,7 @@ public final class CRSTest extends TestCase {
     /**
      * The factory to test.
      */
-    private CRSAuthorityFactory factory;
+    private AbstractAuthorityFactory factory;
 
     /**
      * Run the suite from the command line.
@@ -90,8 +92,8 @@ public final class CRSTest extends TestCase {
     public void testFactoryFinder() {
         final Collection authorities = ReferencingFactoryFinder.getAuthorityNames();
         assertTrue(authorities.contains("CRS"));
-        factory = ReferencingFactoryFinder.getCRSAuthorityFactory("CRS", null);
-        assertTrue(factory instanceof WebCRSFactory);
+        CRSAuthorityFactory found = ReferencingFactoryFinder.getCRSAuthorityFactory("CRS", null);
+        assertTrue(found instanceof WebCRSFactory);
     }
 
     /**
@@ -132,16 +134,40 @@ public final class CRSTest extends TestCase {
     }
 
     /**
-     * Tests the {@link AbstractAuthorityFactory#find} method.
+     * Tests the {@link IdentifiedObjectFinder#find} method.
      */
     public void testFind() throws FactoryException {
-        final AbstractAuthorityFactory factory = (AbstractAuthorityFactory) this.factory;
-        GeographicCRS crs = factory.createGeographicCRS("CRS:84");
-        assertSame   (crs, factory.find(crs, false));
-        assertSame   (crs, factory.find(crs, true ));
-        assertNotSame(crs, DefaultGeographicCRS.WGS84);
-        assertSame   (crs, factory.find(DefaultGeographicCRS.WGS84, true ));
-        assertNull   (     factory.find(DefaultGeographicCRS.WGS84, false));
+        final GeographicCRS CRS84 = factory.createGeographicCRS("CRS:84");
+        final IdentifiedObjectFinder finder = factory.getIdentifiedObjectFinder(CoordinateReferenceSystem.class);
+        assertTrue("Newly created finder should default to full scan.", finder.isFullScanAllowed());
+
+        finder.setFullScanAllowed(false);
+        assertSame("Should find without the need for scan, since we can use the CRS:84 identifier.",
+                   CRS84, finder.find(CRS84));
+
+        finder.setFullScanAllowed(true);
+        assertSame("Allowing scanning should not make any difference for this CRS84 instance.",
+                   CRS84, finder.find(CRS84));
+
+        assertNotSame("Required condition for next test.", CRS84, DefaultGeographicCRS.WGS84);
+        assertFalse  ("Required condition for next test.", CRS84.equals(DefaultGeographicCRS.WGS84));
+        assertTrue   ("Required condition for next test.", CRS.equalsIgnoreMetadata(CRS84, DefaultGeographicCRS.WGS84));
+
+        finder.setFullScanAllowed(false);
+        assertNull("Should not find WGS84 without a full scan, since it doesn't contains the CRS:84 identifier.",
+                   finder.find(DefaultGeographicCRS.WGS84));
+
+        finder.setFullScanAllowed(true);
+        assertSame("A full scan should allow us to find WGS84, since it is equals ignoring metadata to CRS:84.",
+                   CRS84, finder.find(DefaultGeographicCRS.WGS84));
+
+        finder.setFullScanAllowed(false);
+        assertNull("The scan result should not be cached.",
+                   finder.find(DefaultGeographicCRS.WGS84));
+
+        // --------------------------------------------------
+        // Same test than above, using a CRS created from WKT
+        // --------------------------------------------------
 
         String wkt = "GEOGCS[\"WGS 84\",\n" +
                      "  DATUM[\"WGS84\",\n" +
@@ -149,8 +175,53 @@ public final class CRSTest extends TestCase {
                      "  PRIMEM[\"Greenwich\", 0.0],\n" +
                      "  UNIT[\"degree\", 0.017453292519943295]]";
         CoordinateReferenceSystem search = CRS.parseWKT(wkt);
-        assertFalse(crs.equals(search));
-        assertNull (factory.find(search, false));
-        assertSame (crs, factory.find(search, true));
+        assertFalse("Required condition for next test.", CRS84.equals(search));
+        assertTrue ("Required condition for next test.", CRS.equalsIgnoreMetadata(CRS84, search));
+
+        finder.setFullScanAllowed(false);
+        assertNull("Should not find WGS84 without a full scan, since it doesn't contains the CRS:84 identifier.",
+                   finder.find(search));
+
+        finder.setFullScanAllowed(true);
+        assertSame("A full scan should allow us to find WGS84, since it is equals ignoring metadata to CRS:84.",
+                   CRS84, finder.find(search));
+
+        assertEquals("CRS:84", finder.findIdentifier(search));
+    }
+
+    /**
+     * Tests the {@link IdentifiedObjectFinder#find} method through a.
+     */
+    public void testBufferedFind() throws FactoryException {
+        final AbstractAuthorityFactory factory = new Buffered(this.factory);
+        final GeographicCRS CRS84 = factory.createGeographicCRS("CRS:84");
+        final IdentifiedObjectFinder finder = factory.getIdentifiedObjectFinder(CoordinateReferenceSystem.class);
+
+        finder.setFullScanAllowed(false);
+        assertSame("Should find without the need for scan, since we can use the CRS:84 identifier.",
+                   CRS84, finder.find(CRS84));
+
+        finder.setFullScanAllowed(false);
+        assertNull("Should not find WGS84 without a full scan, since it doesn't contains the CRS:84 identifier.",
+                   finder.find(DefaultGeographicCRS.WGS84));
+
+        finder.setFullScanAllowed(true);
+        assertSame("A full scan should allow us to find WGS84, since it is equals ignoring metadata to CRS:84.",
+                   CRS84, finder.find(DefaultGeographicCRS.WGS84));
+
+        finder.setFullScanAllowed(false);
+        assertSame("At the contrary of testFind(), the scan result should be cached.",
+                   CRS84, finder.find(DefaultGeographicCRS.WGS84));
+
+        assertEquals("CRS:84", finder.findIdentifier(DefaultGeographicCRS.WGS84));
+    }
+
+    /**
+     * For {@link #testBufferedFind}.
+     */
+    private static final class Buffered extends BufferedAuthorityFactory implements CRSAuthorityFactory {
+        Buffered(final AbstractAuthorityFactory factory) {
+            super(factory);
+        }
     }
 }

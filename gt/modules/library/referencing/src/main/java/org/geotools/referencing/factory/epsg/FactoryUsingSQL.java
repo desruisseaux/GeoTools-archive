@@ -66,6 +66,7 @@ import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.DirectAuthorityFactory;
+import org.geotools.referencing.factory.IdentifiedObjectFinder;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
@@ -2743,61 +2744,89 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
     }
 
     /**
-     * Returns a set of authority codes that <strong>may</strong> identify the same object
-     * than the specified one. This implementation tries to get a smaller set than what
-     * {@link #getAuthorityCodes} would produce.
-     * <p>
-     * <b>Implementation note:</b> Since this method may be invoked indirectly by
-     * {@link LongitudeFirstFactory}, it must be insensitive to axis order.
+     * Returns a finder which can be used for looking up unidentified objects.
+     *
+     * @param  type The type of objects to look for.
+     * @return A finder to use for looking up unidentified objects.
+     * @throws FactoryException if the finder can not be created.
      *
      * @since 2.4
      */
-    protected Set getCodeCandidates(final IdentifiedObject object) throws FactoryException {
-        String select = "COORD_REF_SYS_CODE";
-        String from   = "[Coordinate Reference System]";
-        String where, code;
-        if (object instanceof Ellipsoid) {
-            select = "ELLIPSOID_CODE";
-            from   = "[Ellipsoid]";
-            where  = "SEMI_MAJOR_AXIS";
-            code   = Double.toString(((Ellipsoid) object).getSemiMajorAxis());
-        } else {
-            IdentifiedObject dependency;
-            if (object instanceof GeneralDerivedCRS) {
-                dependency = ((GeneralDerivedCRS) object).getBaseCRS();
-                where      = "SOURCE_GEOGCRS_CODE";
-            } else if (object instanceof SingleCRS) {
-                dependency = ((SingleCRS) object).getDatum();
-                where      = "DATUM_CODE";
-            } else if (object instanceof GeodeticDatum) {
-                dependency = ((GeodeticDatum) object).getEllipsoid();
-                select     = "DATUM_CODE";
-                from       = "[Datum]";
-                where      = "ELLIPSOID_CODE";
+    //@Override
+    public IdentifiedObjectFinder getIdentifiedObjectFinder(
+            final Class/*<? extends IdentifiedObject>*/ type) throws FactoryException
+    {
+        return new Finder(buffered, type);
+    }
+
+    /**
+     * An implementation of {@link IdentifiedObjectFinder} which scans over a smaller set
+     * of authority codes.
+     * <p>
+     * <b>Implementation note:</b> Since this method may be invoked indirectly by
+     * {@link LongitudeFirstFactory}, it must be insensitive to axis order.
+     */
+    private final class Finder extends IdentifiedObjectFinder {
+        /**
+         * Creates a new finder backed by the specified <em>buffered</em> authority factory.
+         */
+        Finder(final AbstractAuthorityFactory buffered, final Class/*<? extends IdentifiedObject>*/ type) {
+            super(buffered, type);
+        }
+
+        /**
+         * Returns a set of authority codes that <strong>may</strong> identify the same object
+         * than the specified one. This implementation tries to get a smaller set than what
+         * {@link FactoryUsingSQL#getAuthorityCodes} would produce.
+         */
+        //@Override
+        protected Set getCodeCandidates(final IdentifiedObject object) throws FactoryException {
+            String select = "COORD_REF_SYS_CODE";
+            String from   = "[Coordinate Reference System]";
+            String where, code;
+            if (object instanceof Ellipsoid) {
+                select = "ELLIPSOID_CODE";
+                from   = "[Ellipsoid]";
+                where  = "SEMI_MAJOR_AXIS";
+                code   = Double.toString(((Ellipsoid) object).getSemiMajorAxis());
             } else {
-                return super.getCodeCandidates(object);
+                IdentifiedObject dependency;
+                if (object instanceof GeneralDerivedCRS) {
+                    dependency = ((GeneralDerivedCRS) object).getBaseCRS();
+                    where      = "SOURCE_GEOGCRS_CODE";
+                } else if (object instanceof SingleCRS) {
+                    dependency = ((SingleCRS) object).getDatum();
+                    where      = "DATUM_CODE";
+                } else if (object instanceof GeodeticDatum) {
+                    dependency = ((GeodeticDatum) object).getEllipsoid();
+                    select     = "DATUM_CODE";
+                    from       = "[Datum]";
+                    where      = "ELLIPSOID_CODE";
+                } else {
+                    return super.getCodeCandidates(object);
+                }
+                dependency = buffered.getIdentifiedObjectFinder(dependency.getClass()).find(dependency);
+                Identifier id = AbstractIdentifiedObject.getIdentifier(dependency, getAuthority());
+                if (id == null || (code = id.getCode()) == null) {
+                    return super.getCodeCandidates(object);
+                }
             }
-            dependency = buffered.find(dependency, true);
-            Identifier id = AbstractIdentifiedObject.getIdentifier(dependency, getAuthority());
-            if (id == null || (code = id.getCode()) == null) {
-                return super.getCodeCandidates(object);
+            String sql = "SELECT " + select + " FROM " + from + " WHERE " + where + "='" + code + '\'';
+            sql = adaptSQL(sql);
+            final Set/*<String>*/ result = new LinkedHashSet();
+            try {
+                final Statement s = connection.createStatement();
+                final ResultSet r = s.executeQuery(sql);
+                while (r.next()) {
+                    result.add(r.getString(1));
+                }
+                r.close();
+                s.close();
+            } catch (SQLException exception) {
+                throw databaseFailure(Identifier.class, code, exception);
             }
+            return result;
         }
-        String sql = "SELECT " + select + " FROM " + from + " WHERE " + where + "='" + code + '\'';
-        sql = adaptSQL(sql);
-        final Set/*<String>*/ result = new LinkedHashSet();
-        try {
-            final Statement s = connection.createStatement();
-            final ResultSet r = s.executeQuery(sql);
-            while (r.next()) {
-                result.add(r.getString(1));
-            }
-            r.close();
-            s.close();
-        } catch (SQLException exception) {
-            throw databaseFailure(Identifier.class, code, exception);
-        }
-        return result;
     }
 
     /**

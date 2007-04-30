@@ -50,6 +50,7 @@ import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.operation.AbstractCoordinateOperation;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
+import org.geotools.referencing.factory.IdentifiedObjectFinder;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.resources.Arguments;
@@ -732,7 +733,12 @@ public class DefaultFactoryTest extends TestCase {
      * Tests {@link DefaultFactory#find} method.
      */
     public void testFind() throws FactoryException {
-        assertNull(factory.find(DefaultGeographicCRS.WGS84, true));
+        final IdentifiedObjectFinder finder = factory.getIdentifiedObjectFinder(
+                CoordinateReferenceSystem.class);
+        assertTrue("Full scan should be enabled by default.", finder.isFullScanAllowed());
+        assertNull("Should not find WGS84 because the axis order is not the same.",
+                   finder.find(DefaultGeographicCRS.WGS84));
+
         String wkt;
         wkt = "GEOGCS[\"WGS 84\",\n"                                    +
               "  DATUM[\"World Geodetic System 1984\",\n"               +
@@ -742,10 +748,21 @@ public class DefaultFactoryTest extends TestCase {
               "  AXIS[\"Geodetic latitude\", NORTH],\n"                 +
               "  AXIS[\"Geodetic longitude\", EAST]]";
         CoordinateReferenceSystem crs = CRS.parseWKT(wkt);
-        assertNull(factory.find(crs, false)); // Work because there is more than one object called "WGS 84".
-        IdentifiedObject find = factory.find(crs, true);
-        assertTrue(CRS.equalsIgnoreMetadata(crs, find));
-        assertEquals("4326", AbstractIdentifiedObject.getIdentifier(find, factory.getAuthority()).getCode());
+        finder.setFullScanAllowed(false);
+        assertNull("Should not find without a full scan, because the WKT contains no identifier " +
+                   "and the CRS name is ambiguous (more than one EPSG object have this name).",
+                   finder.find(crs));
+
+        finder.setFullScanAllowed(true);
+        IdentifiedObject find = finder.find(crs);
+        assertNotNull("With full scan allowed, the CRS should be found.", find);
+        assertTrue("Should found an object equals (ignoring metadata) to the requested one.",
+                   CRS.equalsIgnoreMetadata(crs, find));
+        assertEquals("4326",
+                AbstractIdentifiedObject.getIdentifier(find, factory.getAuthority()).getCode());
+        finder.setFullScanAllowed(false);
+        assertEquals("The CRS should still in the cache.",
+                     "EPSG:4326", finder.findIdentifier(crs));
         /*
          * The PROJCS below intentionnaly uses a name different from the one found in the
          * EPSG database, in order to force a full scan (otherwise the EPSG database would
@@ -769,9 +786,16 @@ public class DefaultFactoryTest extends TestCase {
               "   AXIS[\"Northing\", NORTH],\n"                            +
               "   AXIS[\"Easting\", EAST]]";
         crs = CRS.parseWKT(wkt);
-        assertNull(factory.find(crs, false));
-        find = factory.find(crs, true);
-        assertTrue(CRS.equalsIgnoreMetadata(crs, find));
+        finder.setFullScanAllowed(false);
+        assertNull("Should not find the CRS without a full scan.", finder.find(crs));
+        finder.setFullScanAllowed(true);
+        find = finder.find(crs);
+        assertNotNull("With full scan allowed, the CRS should be found.", find);
+        assertTrue("Should found an object equals (ignoring metadata) to the requested one.",
+                   CRS.equalsIgnoreMetadata(crs, find));
         assertEquals("2442", AbstractIdentifiedObject.getIdentifier(find, factory.getAuthority()).getCode());
+        finder.setFullScanAllowed(false);
+        assertEquals("The CRS should still in the cache.",
+                     "EPSG:2442", finder.findIdentifier(crs));
     }
 }

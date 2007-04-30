@@ -42,6 +42,7 @@ import org.geotools.factory.Hints;
 import org.geotools.factory.Factory;
 import org.geotools.factory.AbstractFactory;
 import org.geotools.factory.OptionalFactory;
+import org.geotools.factory.FactoryRegistryException;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.resources.i18n.Logging;
@@ -66,6 +67,16 @@ import org.geotools.resources.Utilities;
  * @author Martin Desruisseaux
  */
 public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements OptionalFactory {
+    /**
+     * List of hint keys related to authority factories.
+     */
+    private static final Hints.Key[] TYPES = new Hints.Key[] {
+        Hints.CRS_AUTHORITY_FACTORY,
+        Hints.CS_AUTHORITY_FACTORY,
+        Hints.DATUM_AUTHORITY_FACTORY,
+        Hints.COORDINATE_OPERATION_AUTHORITY_FACTORY
+    };
+
     /**
      * The underlying {@linkplain Datum datum} authority factory,
      * or {@code null} if none.
@@ -200,9 +211,80 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     private void store(final Hints.Key key, final AuthorityFactory factory) {
         if (factory != null) {
             if (hints.put(key, factory) != null) {
+                // Should never happen since 'hints' should be initially empty.
                 throw new AssertionError(key);
             }
         }
+    }
+
+    /**
+     * Creates a wrappers around the default factories for the specified authority.
+     * The factories are fetched using {@link ReferencingFactoryFinder}.
+     * 
+     * @param authority The authority to wraps (example: {@code "EPSG"}). If {@code null},
+     *                  then all authority factories must be explicitly specified in the
+     *                  set of hints.
+     * @param hints     An optional set of hints, or {@code null} if none.
+     * @throws FactoryRegistryException if at least one factory can not be obtained.
+     *
+     * @since 2.4
+     */
+    protected AuthorityFactoryAdapter(final String authority, final Hints hints)
+            throws FactoryRegistryException
+    {
+        this(ReferencingFactoryFinder.getCRSAuthorityFactory(authority,
+                trim(hints, Hints.CRS_AUTHORITY_FACTORY)),
+             ReferencingFactoryFinder.getCSAuthorityFactory(authority,
+                trim(hints, Hints.CS_AUTHORITY_FACTORY)),
+             ReferencingFactoryFinder.getDatumAuthorityFactory(authority,
+                trim(hints, Hints.DATUM_AUTHORITY_FACTORY)),
+             ReferencingFactoryFinder.getCoordinateOperationAuthorityFactory(authority,
+                trim(hints, Hints.COORDINATE_OPERATION_AUTHORITY_FACTORY)));
+    }
+
+    /**
+     * Removes every {@code *_AUTHORITY_FACTORY} hints except the specified one. The removal,
+     * if needed, is performed in a copy of the supplied hints in order to keep user's map
+     * unmodified.
+     * <p>
+     * This removal is performed because {@code *_AUTHORITY_FACTORY} hints are typically supplied
+     * to the above constructor in order to initialize the {@link #crsFactory}, {@link #csFactory},
+     * <cite>etc.</cite> fields. But because the same map of hints is used for every call to {@code
+     * ReferencingFactoryFinder.getFooAuthorityFactory(...)}, if we don't perform this removal, then
+     * the {@code CRS_AUTHORITY_FACTORY} hint is taken in account for fetching other factories like
+     * {@link CSAuthorityFactory}. We may think that it is not a problem since CS authority factory
+     * should not care about {@code CRS_AUTHORITY_FACTORY} hint. But... our EPSG authority factory
+     * implements both {@link CRSAuthorityFactory} and {@link CSAuthorityFactory} interfaces, so
+     * our {@link CSAuthorityFactory} implementation do have CRS-related hints.
+     * <p>
+     * Conclusion: if we do not remove those hints, it typically leads to failure to find
+     * a CS authority factory using this specific CRS authority factory. We may argue that
+     * this is a Geotools design problem. Maybe... this is not a trivial issue. So we are
+     * better to not document that in public API for now.
+     *
+     * @param  hints The user hints to trim. This map will never be modified.
+     * @param  keep  The hint to <strong>not</strong> remove.
+     * @return A copy of {@code hints} without the authority hints, or {@code hints}
+     *         if no change were required.
+     */
+    private static Hints trim(final Hints hints, final Hints.Key keep) {
+        Hints reduced = hints;
+        if (hints != null) {
+            for (int i=0; i<TYPES.length; i++) {
+                final Hints.Key key = TYPES[i];
+                if (!keep.equals(key)) {
+                    if (reduced == hints) {
+                        if (!hints.containsKey(key)) {
+                            continue;
+                        }
+                        // Copies the map only if we need to modify it.
+                        reduced = new Hints(hints);
+                    }
+                    reduced.remove(key);
+                }
+            }
+        }
+        return reduced;
     }
 
     /**
@@ -214,7 +296,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
         addAll(    datumFactory, extended);
         addAll(       csFactory, extended);
         addAll(      crsFactory, extended);
-        extended.putAll(hints); // Give precedences to the hints from this class.
+        extended.putAll(hints); // Gives precedence to the hints from this class.
         return extended;
     }
 
@@ -700,26 +782,17 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     }
 
     /**
-     * Looks up an object from this authority factory which is
-     * {@linkplain CRS#equalsIgnoreMetadata equals, ignoring metadata},
-     * to the specified object.
+     * Returns a finder which can be used for looking up unidentified objects.
+     * The default implementation delegates lookup to the underlying factory.
      *
      * @since 2.4
      */
     //@Override
-    public IdentifiedObject find(final IdentifiedObject object, final boolean fullScan)
+    public IdentifiedObjectFinder getIdentifiedObjectFinder(final Class/*<? extends IdentifiedObject>*/ type)
             throws FactoryException
     {
-        final AuthorityFactory factory = getAuthorityFactory(null);
-        if (factory == null) {
-            return super.find(object, fullScan);
-            /*
-             * Do not invoke 'replaceObject(...)' since super.find(...)
-             * used the 'createFoo(...)' methods defined in this class,
-             * which already invoked 'replaceObject(...)'.
-             */
-        }
-        return new Finder(factory, object.getClass()).find(object, fullScan);
+        return new Finder(getGeotoolsFactory("getIdentifiedObjectFinder", null).
+                getIdentifiedObjectFinder(type));
     }
 
     /**
@@ -728,10 +801,34 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      */
     private final class Finder extends IdentifiedObjectFinder {
         /**
-         * Creates a finder with the specified backing store factory.
+         * The object to use for performing the scan.
          */
-        Finder(final AuthorityFactory factory, final Class/*<? extends IdentifiedObject>*/ type) {
-            super(factory, type);
+        private final IdentifiedObjectFinder finder;
+
+        /**
+         * Creates a finder for the underlying backing store.
+         */
+        Finder(final IdentifiedObjectFinder finder) {
+            super(finder);
+            this.finder = finder;
+        }
+
+        /**
+         * Set whatever an exhaustive scan against all registered objects is allowed.
+         */
+        //@Override
+        public void setFullScanAllowed(final boolean fullScan) {
+            finder.setFullScanAllowed(fullScan);
+            super .setFullScanAllowed(fullScan);
+        }
+
+        /**
+         * Returns a set of authority codes that <strong>may</strong> identify the same object than
+         * the specified one. The default implementation delegates to the backing store.
+         */
+        //@Override
+        protected Set/*<String>*/ getCodeCandidates(final IdentifiedObject object) throws FactoryException {
+            return finder.getCodeCandidates(object);
         }
 
         /**
@@ -740,8 +837,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
          * model. Otherwise returns {@code null}.
          */
         //@Override
-        protected IdentifiedObject getAcceptable(final IdentifiedObject candidate,
-                                                 final IdentifiedObject model)
+        IdentifiedObject getAcceptable(final IdentifiedObject candidate, final IdentifiedObject model)
                 throws FactoryException
         {
             final IdentifiedObject modified = replaceObject(candidate);
@@ -752,22 +848,6 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
             }
             return super.getAcceptable(candidate, model);
         }
-    }
-
-    /**
-     * Returns a set of authority codes that <strong>may</strong> identify the same
-     * object than the specified one. The default implementation delegates to the
-     * {@linkplain #getAuthorityFactory(String) generic authority factory}, if possible.
-     *
-     * @since 2.4
-     */
-    //@Override
-    protected Set/*<String>*/ getCodeCandidates(final IdentifiedObject object)
-            throws FactoryException
-    {
-        final AbstractAuthorityFactory factory = getGeotoolsFactory(null, null);
-        return (factory != null) ? factory.getCodeCandidates(object)
-                                 :   super.getCodeCandidates(object);
     }
 
     /**

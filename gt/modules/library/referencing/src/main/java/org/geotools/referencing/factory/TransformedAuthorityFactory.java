@@ -125,25 +125,19 @@ public class TransformedAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Creates a wrappers around the default factories for the specified
      * authority. The factories are fetched using {@link ReferencingFactoryFinder}.
-     * <p>
-     * <strong>WARNING:</strong> Do not invoke this constructor from a subclass
-     * to be registered in a {@code META-INF/services/} file for use by
-     * {@link ReferencingFactoryFinder}. It may lead to recursive calls until a
-     * {@link StackOverflowError} is thrown.
      * 
      * @param authority The authority to wraps (example: {@code "EPSG"}). If {@code null},
      *                  then all authority factories must be explicitly specified in the
      *                  set of hints.
      * @param hints     An optional set of hints, or {@code null} if none.
      * @throws FactoryRegistryException if at least one factory can not be obtained.
+     *
+     * @since 2.4
      */
-    TransformedAuthorityFactory(final String authority, final Hints hints)
+    protected TransformedAuthorityFactory(final String authority, final Hints hints)
             throws FactoryRegistryException
     {
-        super(ReferencingFactoryFinder.getCRSAuthorityFactory                (authority, hints),
-              ReferencingFactoryFinder.getCSAuthorityFactory                 (authority, hints),
-              ReferencingFactoryFinder.getDatumAuthorityFactory              (authority, hints),
-              ReferencingFactoryFinder.getCoordinateOperationAuthorityFactory(authority, hints));
+        super(authority, hints);
     }
 
     /**
