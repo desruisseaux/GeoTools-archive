@@ -18,6 +18,7 @@ public class SeColumnDefinition {
 	public static /* GEOT-947 final*/ int TYPE_FLOAT64 = 11;
 	public static /* GEOT-947 final*/ int TYPE_BLOB = 12;
 	public static /* GEOT-947 final*/ int TYPE_RASTER = 13;
+	public static /* GEOT-947 final*/ int TYPE_NSTRING = 14;
 	
 	
 	public String getName() { return null; }
