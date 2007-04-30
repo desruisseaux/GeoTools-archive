@@ -535,7 +535,7 @@ public class DefaultFactory extends DeferredAuthorityFactory
             synchronized (DefaultFactory.this) {
                 try {
                     dispose();
-                } catch (FactoryException exception) {
+                } catch (Throwable exception) {
                     // To late for logging, since the JVM is
                     // in process of shutting down. Ignore...
                 }
