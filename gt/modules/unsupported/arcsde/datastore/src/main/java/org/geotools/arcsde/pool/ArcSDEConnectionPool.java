@@ -236,13 +236,16 @@ public class ArcSDEConnectionPool {
         try {
             return (ArcSDEPooledConnection) this.pool.borrowObject();
         } catch (NoSuchElementException e) {
-            LOGGER.log(Level.WARNING, "Getting connection: " + e.getMessage(), e);
+            LOGGER.log(Level.WARNING, "Out of connections: " + e.getMessage(), e);
             throw new UnavailableArcSDEConnectionException(this.pool.getNumActive(),
                                                      this.config
                                                     );
+        } catch (SeException se) {
+            LOGGER.log(Level.WARNING, "ArcSDE error getting connection: " + se.getSeError().getErrDesc(), se);
+            throw new DataSourceException("ArcSDE Error Message: " + se.getSeError().getErrDesc(), se);
         } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Getting connection: " + e.getMessage(), e);
-            throw new DataSourceException(e.getMessage(), e);
+            LOGGER.log(Level.WARNING, "Unknown problem getting connection: " + e.getMessage(), e);
+            throw new DataSourceException("Unknown problem fetching connection from connection pool", e);
         }
     }
 
@@ -251,7 +254,7 @@ public class ArcSDEConnectionPool {
     	try{
     		conn = getConnection();
     	}catch(UnavailableArcSDEConnectionException e){
-    		throw new DataSourceException(e);
+    		throw new DataSourceException(e.getMessage(),e);
     	}
         try {
             SeTable table = new SeTable(conn, tableName);
@@ -384,7 +387,8 @@ public class ArcSDEConnectionPool {
                                           ex
                                          );
         } finally {
-            conn.close();
+            if (conn != null)
+                conn.close();
         }
         return layerNames;
     }
