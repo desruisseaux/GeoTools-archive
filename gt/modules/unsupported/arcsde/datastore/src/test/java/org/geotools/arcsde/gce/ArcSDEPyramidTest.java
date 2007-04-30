@@ -129,11 +129,17 @@ public class ArcSDEPyramidTest extends TestCase {
     public void testArcSDEPyramidThreeBand() throws Exception {
 
         ArcSDEPooledConnection scon = pool.getConnection();
-        SeQuery q = new SeQuery(scon, new String[] { "RASTER"}, new SeSqlConstruct(conProps.getProperty("threebandtable")));
-        q.prepareQuery();
-        q.execute();
-        SeRow r = q.fetch();
-        SeRasterAttr rAttr = r.getRaster(0);
+        SeRasterAttr rAttr;
+        try {
+            SeQuery q = new SeQuery(scon, new String[] { "RASTER"}, new SeSqlConstruct(conProps.getProperty("threebandtable")));
+            q.prepareQuery();
+            q.execute();
+            SeRow r = q.fetch();
+            rAttr = r.getRaster(0);
+        } catch (SeException se) {
+            scon.close();
+            throw new RuntimeException(se.getSeError().getErrDesc(), se);
+        }
         
         CoordinateReferenceSystem crs = CRS.decode(conProps.getProperty("tableCRS"));
         ArcSDEPyramid pyramid = new ArcSDEPyramid(rAttr, crs);
@@ -166,11 +172,17 @@ public class ArcSDEPyramidTest extends TestCase {
     public void testArcSDEPyramidFourBand() throws Exception {
 
         ArcSDEPooledConnection scon = pool.getConnection();
-        SeQuery q = new SeQuery(scon, new String[] { "RASTER"}, new SeSqlConstruct(conProps.getProperty("fourbandtable")));
-        q.prepareQuery();
-        q.execute();
-        SeRow r = q.fetch();
-        SeRasterAttr rAttr= r.getRaster(0);
+        SeRasterAttr rAttr;
+        try {
+            SeQuery q = new SeQuery(scon, new String[] { "RASTER"}, new SeSqlConstruct(conProps.getProperty("fourbandtable")));
+            q.prepareQuery();
+            q.execute();
+            SeRow r = q.fetch();
+            rAttr= r.getRaster(0);
+        } catch (SeException se) {
+            scon.close();
+            throw new RuntimeException(se.getSeError().getErrDesc(), se);
+        }
         
         CoordinateReferenceSystem crs = CRS.decode(conProps.getProperty("tableCRS"));
         ArcSDEPyramid pyramid = new ArcSDEPyramid(rAttr, crs);
