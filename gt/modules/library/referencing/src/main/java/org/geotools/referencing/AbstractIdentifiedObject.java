@@ -622,7 +622,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                 }
             }
         }
-        return (authority==null) ? info.getName() : null;
+        return (authority == null) ? info.getName() : null;
     }
 
     /**

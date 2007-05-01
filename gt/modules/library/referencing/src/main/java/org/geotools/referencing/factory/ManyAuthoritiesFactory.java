@@ -401,6 +401,27 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
     }
 
     /**
+     * Returns {@code true} if the specified factory should be excluded from the search.
+     * We exclude adapters around {@link AllAuthoritiesFactory}. This code actually aims
+     * to exclude {@link URN_AuthorityFactory} and similar adapters around all factories,
+     * since it leads to duplicated search and innacurate identifier to be returned by
+     * {@link #findIdentifier}.
+     */
+    private static boolean exclude(final AuthorityFactory factory) {
+        if (ManyAuthoritiesFactory.class.isInstance(factory)) {
+            return true;
+        }
+        if (factory instanceof AuthorityFactoryAdapter) {
+            final AuthorityFactoryAdapter adapter = (AuthorityFactoryAdapter) factory;
+            return exclude(adapter.crsFactory)   ||
+                   exclude(adapter.csFactory)    ||
+                   exclude(adapter.datumFactory) ||
+                   exclude(adapter.operationFactory);
+        }
+        return false;
+    }
+
+    /**
      * Same as {@link #fromFactoryRegistry(String, Class)}, but returns every factories
      * that fit the given type. The factories are added to the specified set.
      */
@@ -408,17 +429,16 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
                                    final Class/*<? extends AuthorityFactory>*/ type,
                                    final Set/*<AuthorityFactory>*/ addTo)
     {
-        for (int i=0; i<FACTORY_TYPES.length; i++) {
-            final Class/*<? extends AuthorityFactory>*/ candidate = FACTORY_TYPES[i];
-            if (candidate.isAssignableFrom(type)) {
+        for (int i=0; i<OBJECT_TYPES.length; i++) {
+            if (OBJECT_TYPES[i].isAssignableFrom(type)) {
                 final AuthorityFactory factory;
                 try {
-                    factory = fromFactoryRegistry(authority, type);
+                    factory = fromFactoryRegistry(authority, FACTORY_TYPES[i]);
                 } catch (FactoryRegistryException e) {
                     // No factory for the given authority. It may be normal.
                     continue;
                 }
-                if (factory != null) {
+                if (!exclude(factory)) {
                     addTo.add(factory);
                 }
             }
@@ -834,7 +854,7 @@ scanForType:    for (int i=0; i<FACTORY_TYPES.length; i++) {
         /**
          * Returns the user-supplied factories.
          */
-        private Collection getFactories() {
+        final Collection getFactories() {
             return ((ManyAuthoritiesFactory) proxy.getAuthorityFactory()).factories;
         }
 
@@ -846,6 +866,9 @@ scanForType:    for (int i=0; i<FACTORY_TYPES.length; i++) {
         {
             while (it.hasNext()) {
                 final AuthorityFactory factory = (AuthorityFactory) it.next();
+                if (exclude(factory)) {
+                    continue;
+                }
                 if (factory instanceof AbstractAuthorityFactory) {
                     final IdentifiedObjectFinder finder = ((AbstractAuthorityFactory) factory).
                             getIdentifiedObjectFinder(proxy.getType());

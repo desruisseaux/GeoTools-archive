@@ -36,6 +36,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
 import org.geotools.resources.Arguments;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.OrderedAxisAuthorityFactory;
 
 
@@ -116,6 +117,38 @@ public class CRSTest extends TestCase {
 //        }
 //    }
 
+    /**
+     * Tests {@link CRS#lookupIdentifier}.
+     */
+    public void testFind() throws FactoryException {
+        CoordinateReferenceSystem crs = getED50("ED50");
+        assertEquals("Should find without scan thanks to the name.", "EPSG:4230",
+                     CRS.lookupIdentifier(crs, false));
+
+        crs = getED50("ED50 with unknown name");
+        assertNull("Should not find the CRS without a scan.",
+                   CRS.lookupIdentifier(crs, false));
+
+        assertEquals("With scan allowed, should find the CRS.", "EPSG:4230",
+                     CRS.lookupIdentifier(crs, true));
+    }
+
+    /**
+     * Returns a ED50 CRS with the specified name.
+     */
+    private static CoordinateReferenceSystem getED50(final String name) throws FactoryException {
+        final String wkt =
+                "GEOGCS[\"" + name + "\",\n" +
+                "  DATUM[\"European Datum 1950\",\n" +
+                "  SPHEROID[\"International 1924\", 6378388.0, 297.0]],\n" +
+                "PRIMEM[\"Greenwich\", 0.0],\n" +
+                "UNIT[\"degree\", 0.017453292519943295]]";
+        return CRS.parseWKT(wkt);
+    }
+
+
+
+
     // -------------------------------------------------------------------------
     // The following tests are copied from the legacy plugin/epsg-wkt test suite
     // -------------------------------------------------------------------------
@@ -160,7 +193,7 @@ public class CRSTest extends TestCase {
      */
     public void testCodes() throws FactoryException {
         final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory("EPSG", null, null);
-        final Set codes = factory.getAuthorityCodes( CoordinateReferenceSystem.class );
+        final Set codes = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
         assertNotNull(codes);
         assertTrue(codes.size() >= 3000);
     }

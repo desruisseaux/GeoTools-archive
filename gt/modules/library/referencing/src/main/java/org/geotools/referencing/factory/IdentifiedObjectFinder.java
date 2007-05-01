@@ -171,16 +171,20 @@ public class IdentifiedObjectFinder {
      */
     public String findIdentifier(final IdentifiedObject object) throws FactoryException {
         final IdentifiedObject candidate = find(object);
-        if (candidate != null) {
-            final Citation authority = proxy.getAuthorityFactory().getAuthority();
-            ReferenceIdentifier id = AbstractIdentifiedObject.getIdentifier(candidate, authority);
-            if (id == null) {
-                id = candidate.getName();
-                // Should never be null past this point, since 'name' is a mandatory attribute.
-            }
-            return id.toString();
+        return (candidate != null) ? getIdentifier(candidate) : null;
+    }
+
+    /**
+     * Returns the identifier for the specified object.
+     */
+    final String getIdentifier(final IdentifiedObject object) {
+        final Citation authority = proxy.getAuthorityFactory().getAuthority();
+        ReferenceIdentifier id = AbstractIdentifiedObject.getIdentifier(object, authority);
+        if (id == null) {
+            id = object.getName();
+            // Should never be null past this point, since 'name' is a mandatory attribute.
         }
-        return null;
+        return id.toString();
     }
 
     /**
@@ -372,6 +376,14 @@ public class IdentifiedObjectFinder {
             throws FactoryException
     {
         return CRS.equalsIgnoreMetadata(candidate, model) ? candidate : null;
+    }
+
+    /**
+     * Returns a string representation of this finder, for debugging purpose only.
+     */
+    //@Override
+    public String toString() {
+        return proxy.toString(IdentifiedObjectFinder.class);
     }
 
 

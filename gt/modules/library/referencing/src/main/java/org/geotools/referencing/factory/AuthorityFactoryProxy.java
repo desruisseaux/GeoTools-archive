@@ -33,6 +33,7 @@ import org.opengis.referencing.operation.*;
 import org.opengis.parameter.ParameterDescriptor;
 
 // Geotools dependencies
+import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -198,6 +199,25 @@ abstract class AuthorityFactoryProxy {
      */
     public abstract IdentifiedObject create(String code)
             throws NoSuchAuthorityCodeException, FactoryException;
+
+    /**
+     * Returns a string representation of this proxy, for debugging purpose only.
+     */
+    //@Override
+    public String toString() {
+        return toString(AuthorityFactoryProxy.class);
+    }
+
+    /**
+     * Returns a string representation of the specified object, for debugging purpose only.
+     */
+    final String toString(final Class owner) {
+        final AuthorityFactory factory = getAuthorityFactory();
+        return Utilities.getShortName(owner) + '[' +
+               Utilities.getShortName(getType()) + " in " +
+               Utilities.getShortClassName(factory) + "(\"" +
+               factory.getAuthority().getTitle() + "\")]";
+    }
 
 
     /**

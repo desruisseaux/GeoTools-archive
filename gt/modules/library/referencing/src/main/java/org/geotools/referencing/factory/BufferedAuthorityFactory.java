@@ -1017,7 +1017,9 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
                 candidate = (IdentifiedObject) findPool.get(object);
             }
             if (candidate == null) {
-                candidate = super.find(object);
+                // Must delegates to 'finder' (not to 'super') in order to take
+                // advantage of the method overriden by AllAuthoritiesFactory.
+                candidate = finder.find(object);
                 if (candidate != null) {
                     synchronized (findPool) {
                         findPool.put(object, candidate);
@@ -1025,6 +1027,23 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
                 }
             }
             return candidate;
+        }
+
+        /**
+         * Returns the identifier for the specified object.
+         */
+        //@Override
+        public String findIdentifier(final IdentifiedObject object) throws FactoryException {
+            IdentifiedObject candidate;
+            synchronized (findPool) {
+                candidate = (IdentifiedObject) findPool.get(object);
+            }
+            if (candidate != null) {
+                return getIdentifier(candidate);
+            }
+            // We don't rely on super-class implementation, because we want to
+            // take advantage of the method overriden by AllAuthoritiesFactory.
+            return finder.findIdentifier(object);
         }
     }
 

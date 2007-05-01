@@ -188,6 +188,11 @@ public class AllAuthoritiesFactory extends ManyAuthoritiesFactory {
                 final String authority = (String) it.next();
                 factory.fromFactoryRegistry(authority, type, factories);
             }
+            // Removes the factories already tried by super-class.
+            final Collection done = getFactories();
+            if (done != null) {
+                factories.removeAll(done);
+            }
             return factories;
         }
 

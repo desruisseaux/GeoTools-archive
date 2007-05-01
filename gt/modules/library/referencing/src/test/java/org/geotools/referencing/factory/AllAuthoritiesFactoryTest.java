@@ -26,14 +26,17 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 // OpenGIS dependencies
+import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
-import org.geotools.resources.Arguments;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.resources.Arguments;
 
 
 /**
@@ -154,5 +157,22 @@ public final class AllAuthoritiesFactoryTest extends TestCase {
         } catch (NoSuchAuthorityCodeException e) {
             assertEquals("http://www.opengis.net/gml/srs/", e.getAuthority());
         }
+    }
+
+    /**
+     * Tests the {@link IdentifiedObjectFinder#find} method.
+     */
+    public void testFind() throws FactoryException {
+        final AbstractAuthorityFactory all = AllAuthoritiesFactory.DEFAULT;
+        final IdentifiedObjectFinder finder = all.getIdentifiedObjectFinder(CoordinateReferenceSystem.class);
+        finder.setFullScanAllowed(false);
+        assertNull("Should not find the CRS without a scan.", finder.find(DefaultGeographicCRS.WGS84));
+
+        finder.setFullScanAllowed(true);
+        final IdentifiedObject find = finder.find(DefaultGeographicCRS.WGS84);
+        assertNotNull("With scan allowed, should find the CRS.", find);
+        assertTrue(CRS.equalsIgnoreMetadata(find, DefaultGeographicCRS.WGS84));
+        assertSame(all.createCoordinateReferenceSystem("CRS:84"), find);
+        assertEquals("CRS:84", finder.findIdentifier(DefaultGeographicCRS.WGS84));
     }
 }

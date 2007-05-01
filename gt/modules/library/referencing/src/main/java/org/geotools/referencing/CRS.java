@@ -32,8 +32,7 @@ import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.extent.BoundingPolygon;
 import org.opengis.metadata.extent.GeographicExtent;
 import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.referencing.*;
 import org.opengis.referencing.crs.*;
 import org.opengis.referencing.datum.*;
 import org.opengis.referencing.operation.*;
@@ -56,6 +55,8 @@ import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.factory.AbstractAuthorityFactory;
+import org.geotools.referencing.factory.IdentifiedObjectFinder;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
@@ -645,10 +646,47 @@ public final class CRS {
         return object1!=null && object1.equals(object2);
     }
 
-    
+    /**
+     * Looks up an identifier for the specified object. This method searchs in registered factories
+     * for an object {@linkplain #equalsIgnoreMetadata equals, ignoring metadata}, to the specified
+     * object. If such object is found, then its identifier is returned. Otherwise this method
+     * returns {@code null}.
+     * <p>
+     * This convenience method delegates its work to {@link IdentifiedObjectFinder}. Consider using
+     * the later if more control are wanted, for example if the search shall be performed only on
+     * some {@linkplain AuthorityFactory authority factories} instead of all registered onez, or
+     * if the full {@linkplain IdentifiedObject identified object} is wanted instead of only its
+     * identifier.
+     * 
+     * @param  object The object (usually a {@linkplain CoordinateReferenceSystem coordinate
+     *         reference system}) looked up.
+     * @param  fullScan If {@code true}, an exhaustive full scan against all registered objects
+     *         will be performed (may be slow). Otherwise only a fast lookup based on embedded
+     *         identifiers and names will be performed.
+     * @return The identifier, or {@code null} if not found.
+     * @throws FactoryException if an unexpected failure occured during the search.
+     *
+     * @see AbstractAuthorityFactory#getIdentifiedObjectFinder
+     * @see IdentifiedObjectFinder#find
+     *
+     * @since 2.4
+     */
+    public static String lookupIdentifier(final IdentifiedObject object, final boolean fullScan)
+            throws FactoryException
+    {
+        /*
+         * We perform the search using the 'xyFactory' because our implementation of
+         * IdentifiedObjectFinder should be able to inspect both the (x,y) and (y,x)
+         * axis order using this factory.
+         */
+        final AbstractAuthorityFactory xyFactory = (AbstractAuthorityFactory) getAuthorityFactory(true);
+        final IdentifiedObjectFinder finder = xyFactory.getIdentifiedObjectFinder(object.getClass());
+        finder.setFullScanAllowed(fullScan);
+        return finder.findIdentifier(object);
+    }
+
     /**
      * Looks up an identifier for the specified coordinate reference system.
-     * 
      * 
      * @param crs the coordinate reference system looked up.
      * @param authorities the authority that we should look up the identifier into. 
@@ -659,6 +697,9 @@ public final class CRS {
      * @return The identifier, or {@code null} if not found.
      *
      * @since 2.3.1
+     *
+     * @deprecated Replaced by {@link #lookupIdentifier(IdentifiedObject, boolean)},
+     *             which should be faster since it tries to leverage database index.
      */
     public static String lookupIdentifier(final CoordinateReferenceSystem crs,
                                           Set/*<String>*/ authorities,
@@ -732,8 +773,6 @@ public final class CRS {
 
     /**
      * Scans the identifiers list looking for an EPSG id
-     * @param crs
-     * @return
      */
     private static String getSRSFromCRS(final CoordinateReferenceSystem crs, final Set authorities) {
         for (Iterator itAuth = authorities.iterator(); itAuth.hasNext();) {
