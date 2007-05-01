@@ -783,7 +783,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
 
     /**
      * Returns a finder which can be used for looking up unidentified objects.
-     * The default implementation delegates lookup to the underlying factory.
+     * The default implementation delegates the lookups to the underlying factory.
      *
      * @since 2.4
      */
@@ -791,53 +791,32 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     public IdentifiedObjectFinder getIdentifiedObjectFinder(final Class/*<? extends IdentifiedObject>*/ type)
             throws FactoryException
     {
-        return new Finder(getGeotoolsFactory("getIdentifiedObjectFinder", null).
-                getIdentifiedObjectFinder(type));
+        return new Finder(type);
     }
 
     /**
-     * A {@link IdentifiedObjectFinder} which test {@linkplain AuthorityFactoryAdapter#replaceObject
-     * modified objects} in addition of original object.
+     * A {@link IdentifiedObjectFinder} which tests
+     * {@linkplain AuthorityFactoryAdapter#replaceObject modified objects}
+     * in addition of original object.
      */
-    private final class Finder extends IdentifiedObjectFinder {
-        /**
-         * The object to use for performing the scan.
-         */
-        private final IdentifiedObjectFinder finder;
-
+    class Finder extends IdentifiedObjectFinder.Adapter {
         /**
          * Creates a finder for the underlying backing store.
          */
-        Finder(final IdentifiedObjectFinder finder) {
-            super(finder);
-            this.finder = finder;
-        }
-
-        /**
-         * Set whatever an exhaustive scan against all registered objects is allowed.
-         */
-        //@Override
-        public void setFullScanAllowed(final boolean fullScan) {
-            finder.setFullScanAllowed(fullScan);
-            super .setFullScanAllowed(fullScan);
-        }
-
-        /**
-         * Returns a set of authority codes that <strong>may</strong> identify the same object than
-         * the specified one. The default implementation delegates to the backing store.
-         */
-        //@Override
-        protected Set/*<String>*/ getCodeCandidates(final IdentifiedObject object) throws FactoryException {
-            return finder.getCodeCandidates(object);
+        protected Finder(final Class/*<? extends IdentifiedObject>*/ type) throws FactoryException {
+            super(getGeotoolsFactory("getIdentifiedObjectFinder", null).getIdentifiedObjectFinder(type));
         }
 
         /**
          * Returns {@code candidate}, or an object derived from {@code candidate}, if it is
          * {@linkplain CRS#equalsIgnoreMetadata equals ignoring metadata} to the specified
          * model. Otherwise returns {@code null}.
+         *
+         * @throws FactoryException if an error occured while creating a derived object.
          */
         //@Override
-        IdentifiedObject getAcceptable(final IdentifiedObject candidate, final IdentifiedObject model)
+        protected IdentifiedObject deriveEquivalent(final IdentifiedObject candidate,
+                                                    final IdentifiedObject model)
                 throws FactoryException
         {
             final IdentifiedObject modified = replaceObject(candidate);
@@ -846,7 +825,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
                     return modified;
                 }
             }
-            return super.getAcceptable(candidate, model);
+            return super.deriveEquivalent(candidate, model);
         }
     }
 

@@ -536,7 +536,7 @@ public class DefaultFactory extends DeferredAuthorityFactory
                 try {
                     dispose();
                 } catch (Throwable exception) {
-                    // To late for logging, since the JVM is
+                    // Too late for logging, since the JVM is
                     // in process of shutting down. Ignore...
                 }
             }

@@ -832,6 +832,76 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     }
 
     /**
+     * Returns a finder which can be used for looking up unidentified objects.
+     * The default implementation delegates the lookups to the primary factory,
+     * and fallback on the second one if the primary factory can't find a match.
+     *
+     * @since 2.4
+     */
+    //@Override
+    public IdentifiedObjectFinder getIdentifiedObjectFinder(final Class/*<? extends IdentifiedObject>*/ type)
+            throws FactoryException
+    {
+        return new Finder(type);
+    }
+
+    /**
+     * A {@link IdentifiedObjectFinder} which fallback to the second factory
+     * if the primary one can't find a match.
+     */
+    private final class Finder extends AuthorityFactoryAdapter.Finder {
+        /**
+         * The fallback. Will be created only when first needed.
+         */
+        private transient IdentifiedObjectFinder fallback;
+
+        /**
+         * Creates a finder for the underlying backing store.
+         */
+        Finder(final Class/*<? extends IdentifiedObject>*/ type) throws FactoryException {
+            super(type);
+        }
+
+        /**
+         * Makes sure that {@link #fallback} is initialized.
+         */
+        private void ensureFallback() throws FactoryException {
+            if (fallback == null) {
+                fallback = FallbackAuthorityFactory.this.getIdentifiedObjectFinder(proxy.getType());
+            }
+            fallback.setFullScanAllowed(isFullScanAllowed());
+        }
+
+        /**
+         * Lookups for the specified object.
+         */
+        //@Override
+        public IdentifiedObject find(final IdentifiedObject object) throws FactoryException {
+            IdentifiedObject candidate = finder.find(object);
+            if (candidate == null) {
+                return candidate;
+            }
+            ensureFallback();
+            candidate = fallback.find(object);
+            return candidate;
+        }
+
+        /**
+         * Returns the identifier of the specified object, or {@code null} if none.
+         */
+        //@Override
+        public String findIdentifier(final IdentifiedObject object) throws FactoryException {
+            String candidate = finder.findIdentifier(object);
+            if (candidate == null) {
+                return candidate;
+            }
+            ensureFallback();
+            candidate = fallback.findIdentifier(object);
+            return candidate;
+        }
+    }
+
+    /**
      * Invoked by <code>create</code><var>Foo</var><code>(String)</code> methods when the
      * <cite>primary</cite> factory failed to create an object. Note that it doesn't imply
      * anything about the success of <cite>fallback</cite> factory. The default implementation

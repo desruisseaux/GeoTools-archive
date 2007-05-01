@@ -31,6 +31,7 @@ import org.opengis.referencing.crs.SingleCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.Matrix;
@@ -43,6 +44,7 @@ import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
+import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotools.referencing.factory.epsg.LongitudeFirstFactory;
 
 
@@ -66,6 +68,11 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
      * @see http://jira.codehaus.org/browse/GEOT-854
      */
     private static final boolean METADATA_ERASED = false;
+
+    /**
+     * Small number for floating points comparaisons.
+     */
+    private static final double EPS = 1E-8;
 
     /**
      * Run the suite from the command line. If {@code "-log"} flag is specified on the
@@ -105,6 +112,17 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
                    .get(Hints.CRS_AUTHORITY_FACTORY);
         assertTrue(factory.getClass().toString(), factory instanceof OrderedAxisAuthorityFactory);
         return (OrderedAxisAuthorityFactory) factory;
+    }
+
+    /**
+     * Returns a positive number if the specified coordinate system is right-handed,
+     * or a negative number if it is left handed.
+     */
+    private static double getAngle(final CoordinateReferenceSystem crs) {
+        final CoordinateSystem cs = crs.getCoordinateSystem();
+        assertEquals(2, cs.getDimension());
+        return DefaultCoordinateSystemAxis.getAngle(cs.getAxis(0).getDirection(),
+                                                    cs.getAxis(1).getDirection());
     }
 
     /**
@@ -187,6 +205,8 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
         assertNotSame(crs0, crs1);
         assertNotSame(crs0.getCoordinateSystem(), crs1.getCoordinateSystem());
         assertSame(((SingleCRS) crs0).getDatum(), ((SingleCRS) crs1).getDatum());
+        assertEquals("Expected a left-handed CS.",  -90, getAngle(crs0), EPS);
+        assertEquals("Expected a right-handed CS.", +90, getAngle(crs1), EPS);
         assertFalse(crs0.getIdentifiers().isEmpty());
         if (METADATA_ERASED) {
             assertTrue(crs1.getIdentifiers().isEmpty());
@@ -302,6 +322,8 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
     public void testLongitudeFirst() throws FactoryException {
         final CoordinateReferenceSystem standard = CRS.decode("EPSG:4326", false);
         final CoordinateReferenceSystem modified = CRS.decode("EPSG:4326", true );
+        assertEquals("Expected a left-handed CS.",  -90, getAngle(standard), EPS);
+        assertEquals("Expected a right-handed CS.", +90, getAngle(modified), EPS);
         final MathTransform transform = CRS.findMathTransform(standard, modified);
         assertTrue(transform instanceof LinearTransform);
         final Matrix matrix = ((LinearTransform) transform).getMatrix();
@@ -331,6 +353,38 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
 
         finder.setFullScanAllowed(true);
         IdentifiedObject find = finder.find(DefaultGeographicCRS.WGS84);
-//        assertNotNull("With scan allowed, should find the CRS.", find);
+        assertNotNull("With scan allowed, should find the CRS.", find);
+        assertTrue(CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, find));
+        assertEquals("Expected a right-handed CS.", +90, getAngle((CoordinateReferenceSystem) find), EPS);
+        /*
+         * Search a CRS using (latitude,longitude) axis order. The IdentifiedObjectFinder
+         * should be able to find it even if it is backed by LongitudeFirstAuthorityFactory,
+         * because the later is itself backed by EPSG factory and IdentifiedObjectFinder
+         * should queries CRS from both.
+         */
+        final String wkt =
+                "GEOGCS[\"WGS 84\",\n" +
+                "  DATUM[\"WGS84\",\n" +
+                "    SPHEROID[\"WGS 84\", 6378137.0, 298.257223563]],\n" +
+                "  PRIMEM[\"Greenwich\", 0.0],\n" +
+                "  UNIT[\"degree\", 0.017453292519943295],\n" +
+                "  AXIS[\"Geodetic latitude\", NORTH],\n" + 
+                "  AXIS[\"Geodetic longitude\", EAST]]";
+        final CoordinateReferenceSystem search   = CRS.parseWKT(wkt);
+        final CoordinateReferenceSystem standard = CRS.decode("EPSG:4326", false);
+        assertTrue(CRS.equalsIgnoreMetadata(search, standard));
+        assertFalse("Identifiers should not be the same.", search.equals(standard));
+        finder.setFullScanAllowed(false);
+        assertNull("Should not find the CRS without a scan.", finder.find(search));
+
+        finder.setFullScanAllowed(true);
+        find = finder.find(search);
+        final CoordinateReferenceSystem crs = (CoordinateReferenceSystem) search;
+        assertNotNull("Should find the CRS despite the different axis order.", find);
+        assertEquals("Expected a left-handed CS.", -90, getAngle(crs), EPS);
+        assertFalse(CRS.equalsIgnoreMetadata(find, DefaultGeographicCRS.WGS84));
+        assertTrue (CRS.equalsIgnoreMetadata(find, search));
+        assertTrue (CRS.equalsIgnoreMetadata(find, standard));
+        assertSame("Expected caching to work.", standard, find);
     }
 }

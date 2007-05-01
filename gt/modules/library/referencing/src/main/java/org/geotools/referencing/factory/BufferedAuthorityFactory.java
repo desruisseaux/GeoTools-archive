@@ -983,32 +983,17 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * An implementation of {@link IdentifiedObjectFinder} which delegates
      * the work to the underlying backing store and caches the result.
      * <p>
-     * <b>Implementation note:</b> the scan is performed directly on the underlying backing store,
-     * not using the buffer. This is because hundred of objects may be created during a scan while
-     * only one will be typically retained. We don't want to overload the cache with every false
-     * candidates that we encounter during the scan.
+     * <b>Implementation note:</b> we will create objects using directly the underlying backing
+     * store, not using the cache. This is because hundred of objects may be created during a
+     * scan while only one will be typically retained. We don't want to overload the cache with
+     * every false candidates that we encounter during the scan.
      */
-    private final class Finder extends IdentifiedObjectFinder {
-        /**
-         * The object to use for performing the scan.
-         */
-        private final IdentifiedObjectFinder finder;
-
+    private final class Finder extends IdentifiedObjectFinder.Adapter {
         /**
          * Creates a finder for the underlying backing store.
          */
         Finder(final IdentifiedObjectFinder finder) {
             super(finder);
-            this.finder = finder;
-        }
-
-        /**
-         * Set whatever an exhaustive scan against all registered objects is allowed.
-         */
-        //@Override
-        public void setFullScanAllowed(final boolean fullScan) {
-            finder.setFullScanAllowed(fullScan);
-            super .setFullScanAllowed(fullScan);
         }
 
         /**
@@ -1040,34 +1025,6 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
                 }
             }
             return candidate;
-        }
- 
-        /**
-         * Creates an object for the specified code by first looking in the cache. If nothing is
-         * found in the cache, creates a new object but do <strong>not</strong> cache it.
-         */
-        //@Override
-        protected IdentifiedObject create(final String code) throws FactoryException {
-            final String key = trimAuthority(code);
-            final Object cached;
-            synchronized (BufferedAuthorityFactory.this) {
-                cached = get(key);
-            }
-            if (cached instanceof IdentifiedObject) {
-                return (IdentifiedObject) cached;
-            } else {
-                return super.create(code);
-                // No call to put(...), since we don't want to cache this one.
-            }
-        }
-
-        /**
-         * Returns a set of authority codes that <strong>may</strong> identify the same object than
-         * the specified one. The default implementation delegates to the backing store.
-         */
-        //@Override
-        protected Set/*<String>*/ getCodeCandidates(final IdentifiedObject object) throws FactoryException {
-            return finder.getCodeCandidates(object);
         }
     }
 

@@ -54,7 +54,7 @@ public class IdentifiedObjectFinder {
     /**
      * The proxy for object creation.
      */
-    private final AuthorityFactoryProxy proxy;
+    final AuthorityFactoryProxy proxy;
 
     /**
      * {@code true} for performing full scans, or {@code false} otherwise.
@@ -82,12 +82,17 @@ public class IdentifiedObjectFinder {
         proxy = AuthorityFactoryProxy.getInstance(factory, type);
     }
 
-    /**
-     * Returns the authority factory specified at construction time.
+    /*
+     * Do NOT provide the following method:
+     *
+     *     public AuthorityFactory getAuthorityFactory() {
+     *         return proxy.getAuthorityFactory();
+     *     }
+     *
+     * because the returned factory may not be the one the user would expect. Some of our
+     * AbstractAuthorityFactory implementations create proxy to the underlying backing
+     * store rather than to the factory on which 'getIdentifiedObjectFinder()' was invoked.
      */
-    public AuthorityFactory getAuthorityFactory() {
-        return proxy.getAuthorityFactory();
-    }
 
     /**
      * If {@code true}, an exhaustive full scan against all registered objects
@@ -108,8 +113,8 @@ public class IdentifiedObjectFinder {
     }
 
     /**
-     * Looks up an object from the {@linkplain #getAuthorityFactory authority factory}
-     * which is {@linkplain CRS#equalsIgnoreMetadata equals, ignoring metadata}, to the
+     * Lookups an object which is
+     * {@linkplain CRS#equalsIgnoreMetadata equals, ignoring metadata}, to the
      * specified object. The default implementation tries to instantiate some
      * {@linkplain IdentifiedObject identified objects} from the authority factory
      * specified at construction time, in the following order:
@@ -135,9 +140,7 @@ public class IdentifiedObjectFinder {
      * @return The identified object, or {@code null} if not found.
      * @throws FactoryException if an error occured while creating an object.
      */
-    public IdentifiedObject find(final IdentifiedObject object)
-            throws FactoryException
-    {
+    public IdentifiedObject find(final IdentifiedObject object) throws FactoryException {
         /*
          * First check if one of the identifiers can be used to spot directly an
          * identified object (and check it's actually equal to one in the factory).
@@ -158,7 +161,7 @@ public class IdentifiedObjectFinder {
         /*
          * Here we exhausted the quick paths. Bail out if the user does not want a full scan.
          */
-        return fullScan ? createEquivalent(object) : null;
+        return fullScan ? createFromCodes(object) : null;
     }
 
     /**
@@ -169,7 +172,7 @@ public class IdentifiedObjectFinder {
     public String findIdentifier(final IdentifiedObject object) throws FactoryException {
         final IdentifiedObject candidate = find(object);
         if (candidate != null) {
-            final Citation authority = getAuthorityFactory().getAuthority();
+            final Citation authority = proxy.getAuthorityFactory().getAuthority();
             ReferenceIdentifier id = AbstractIdentifiedObject.getIdentifier(candidate, authority);
             if (id == null) {
                 id = candidate.getName();
@@ -182,61 +185,20 @@ public class IdentifiedObjectFinder {
 
     /**
      * Creates an object {@linkplain CRS#equalsIgnoreMetadata equals, ignoring metadata}, to the
-     * specified object. This method scans the {@linkplain #getAuthorityCodes authority codes},
-     * {@linkplain #create create} the objects and returns the first one which is equals to the
-     * specified object in the sense of {@link CRS#equalsIgnoreMetadata equalsIgnoreMetadata}.
-     * <p>
-     * This method may be used in order to get a fully {@linkplain IdentifiedObject identified
-     * object} from an object without {@linkplain IdentifiedObject#getIdentifiers identifiers}.
-     * <p>
-     * Scaning the whole set of authority codes may be slow. Users should try
-     * <code>{@linkplain #createFromIdentifiers createFromIdentifiers}(object)</code> and/or
-     * <code>{@linkplain #createFromNames createFromNames}(object)</code> before to fallback
-     * on this method.
-     *
-     * @param  object The object looked up.
-     * @return The identified object, or {@code null} if not found.
-     * @throws FactoryException if an error occured while scanning through authority codes.
-     *
-     * @see #createFromIdentifiers
-     * @see #createFromNames
-     */
-    final IdentifiedObject createEquivalent(final IdentifiedObject object) throws FactoryException {
-        final Set/*<String>*/ codes = getCodeCandidates(object);
-        for (final Iterator it=codes.iterator(); it.hasNext();) {
-            final String code = (String) it.next();
-            IdentifiedObject candidate;
-            try {
-                candidate = create(code);
-            } catch (FactoryException e) {
-                // Some object cannot be created properly.
-                continue;
-            }
-            candidate = getAcceptable(candidate, object);
-            if (candidate != null) {
-                return candidate;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Creates an object {@linkplain CRS#equalsIgnoreMetadata equals, ignoring metadata}, to the
      * specified object using only the {@linkplain IdentifiedObject#getIdentifiers identifiers}.
      * If no such object is found, returns {@code null}.
      * <p>
      * This method may be used in order to get a fully identified object from a partially
      * identified one.
-     *
-     * @param  object The object looked up.
+     * 
+     * @param object The object looked up.
      * @return The identified object, or {@code null} if not found.
-     * @throws FactoryException if an error occured while creating an object.
-     *
-     * @see #createEquivalent
+     * @see #createFromCodes
      * @see #createFromNames
+     * @throws FactoryException if an error occured while creating an object.
      */
     final IdentifiedObject createFromIdentifiers(final IdentifiedObject object) throws FactoryException {
-        final Citation authority = getAuthorityFactory().getAuthority();
+        final Citation authority = proxy.getAuthorityFactory().getAuthority();
         for (final Iterator it=object.getIdentifiers().iterator(); it.hasNext();) {
             final Identifier id = (Identifier) it.next();
             if (!Citations.identifierMatches(authority, id.getAuthority())) {
@@ -245,12 +207,12 @@ public class IdentifiedObjectFinder {
             }
             IdentifiedObject candidate;
             try {
-                candidate = create(id.getCode());
+                candidate = proxy.create(id.getCode());
             } catch (NoSuchAuthorityCodeException e) {
                 // The identifier was not recognized. No problem, let's go on.
                 continue;
             }
-            candidate = getAcceptable(candidate, object);
+            candidate = deriveEquivalent(candidate, object);
             if (candidate != null) {
                 return candidate;
             }
@@ -267,19 +229,18 @@ public class IdentifiedObjectFinder {
      * This method may be used with some {@linkplain AuthorityFactory authority factory}
      * implementations like the one backed by the EPSG database, which are capable to find
      * an object from its name when the identifier is unknown.
-     *
-     * @param  object The object looked up.
+     * 
+     * @param object The object looked up.
      * @return The identified object, or {@code null} if not found.
-     * @throws FactoryException if an error occured while creating an object.
-     *
-     * @see #createEquivalent
+     * @see #createFromCodes
      * @see #createFromIdentifiers
+     * @throws FactoryException if an error occured while creating an object.
      */
     final IdentifiedObject createFromNames(final IdentifiedObject object) throws FactoryException {
         IdentifiedObject candidate;
         try {
-            candidate = create(object.getName().getCode());
-            candidate = getAcceptable(candidate, object);
+            candidate = proxy.create(object.getName().getCode());
+            candidate = deriveEquivalent(candidate, object);
             if (candidate != null) {
                 return candidate;
             }
@@ -295,12 +256,12 @@ public class IdentifiedObjectFinder {
         for (final Iterator it=object.getAlias().iterator(); it.hasNext();) {
             final GenericName id = (GenericName) it.next();
             try {
-                candidate = create(id.toString());
+                candidate = proxy.create(id.toString());
             } catch (FactoryException e) {
                 // The name was not recognized. No problem, let's go on.
                 continue;
             }
-            candidate = getAcceptable(candidate, object);
+            candidate = deriveEquivalent(candidate, object);
             if (candidate != null) {
                 return candidate;
             }
@@ -309,15 +270,43 @@ public class IdentifiedObjectFinder {
     }
 
     /**
-     * Creates an object for the specified code. This method will delegates to the most
-     * specific {@code create} method from the authority factory for the type specified
-     * at construction time.
+     * Creates an object {@linkplain CRS#equalsIgnoreMetadata equals, ignoring metadata}, to the
+     * specified object. This method scans the {@linkplain #getAuthorityCodes authority codes},
+     * create the objects and returns the first one which is equals to the specified object in
+     * the sense of {@link CRS#equalsIgnoreMetadata equalsIgnoreMetadata}.
+     * <p>
+     * This method may be used in order to get a fully {@linkplain IdentifiedObject identified
+     * object} from an object without {@linkplain IdentifiedObject#getIdentifiers identifiers}.
+     * <p>
+     * Scaning the whole set of authority codes may be slow. Users should try
+     * <code>{@linkplain #createFromIdentifiers createFromIdentifiers}(object)</code> and/or
+     * <code>{@linkplain #createFromNames createFromNames}(object)</code> before to fallback
+     * on this method.
      *
-     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
-     * @throws FactoryException if the object creation failed for some other reason.
+     * @param  object The object looked up.
+     * @return The identified object, or {@code null} if not found.
+     * @throws FactoryException if an error occured while scanning through authority codes.
+     *
+     * @see #createFromIdentifiers
+     * @see #createFromNames
      */
-    protected IdentifiedObject create(final String code) throws FactoryException {
-        return proxy.create(code);
+    final IdentifiedObject createFromCodes(final IdentifiedObject object) throws FactoryException {
+        final Set/*<String>*/ codes = getCodeCandidates(object);
+        for (final Iterator it=codes.iterator(); it.hasNext();) {
+            final String code = (String) it.next();
+            IdentifiedObject candidate;
+            try {
+                candidate = proxy.create(code);
+            } catch (FactoryException e) {
+                // Some object cannot be created properly.
+                continue;
+            }
+            candidate = deriveEquivalent(candidate, object);
+            if (candidate != null) {
+                return candidate;
+            }
+        }
+        return null;
     }
 
     /**
@@ -344,6 +333,24 @@ public class IdentifiedObjectFinder {
         return proxy.getAuthorityCodes();
     }
 
+    /*
+     * Do NOT define the following method in IdentifiedObjectFinder's API:
+     *
+     *     protected IdentifiedObject create(String code) throws FactoryException {
+     *         return proxy.create(code);
+     *     }
+     *
+     * We may be tempted to put such method in order to allow BufferedAuthorityFactory to
+     * override it with caching service,  but it conflicts with AuthorityFactoryAdapter's
+     * work. The later (or to be more accurate, OrderedAxisAuthorityFactory) expects axis
+     * in (latitude,longitude) order first, in order to test this CRS before to switch to
+     * (longitude,latitude) order and test again. If the BufferedAuthorityFactory's cache
+     * is in the way, we get directly (longitude,latitude) order and miss an opportunity
+     * to identify the user's CRS.
+     *
+     * We should invoke directly AuthorityFactoryProxy.create(String) instead.
+     */
+
     /**
      * Returns {@code candidate}, or an object derived from {@code candidate}, if it is
      * {@linkplain CRS#equalsIgnoreMetadata equals ignoring metadata} to the specified
@@ -352,11 +359,75 @@ public class IdentifiedObjectFinder {
      * This method is overriden by factories that may test many flavors of
      * {@code candidate}, for example {@link TransformedAuthorityFactory}.
      *
-     * @throws FactoryException if an error occured while creating an object.
+     * @param  candidate An object created by the factory specified at construction time.
+     * @return {@code candidate}, or an object derived from {@code candidate} (for example with axis
+     *         order forced to (<var>longitude</var>, <var>latitude</var>), or {@code null} if none
+     *         of the above is {@linkplain CRS#equalsIgnoreMetadata equals ignoring metadata} to the
+     *         specified model.
+     *
+     * @throws FactoryException if an error occured while creating a derived object.
      */
-    IdentifiedObject getAcceptable(final IdentifiedObject candidate, final IdentifiedObject model)
+    protected IdentifiedObject deriveEquivalent(final IdentifiedObject candidate,
+                                                final IdentifiedObject model)
             throws FactoryException
     {
         return CRS.equalsIgnoreMetadata(candidate, model) ? candidate : null;
+    }
+
+
+
+
+    /**
+     * A finder which delegate part of its work to an other finder. This adapter forwards
+     * some method calls to the underlying finder. This class should not be public, because
+     * not all method are overriden. The choice is tuned for {@link BufferedAuthorityFactory}
+     * and {@link AuthorityFactoryAdapter} needs and may not be appropriate in the general case.
+     *
+     * @author Martin Desruisseaux
+     */
+    static class Adapter extends IdentifiedObjectFinder {
+        /**
+         * The finder on which to delegate the work.
+         */
+        protected final IdentifiedObjectFinder finder;
+
+        /**
+         * Creates an adapter for the specified finder.
+         */
+        protected Adapter(final IdentifiedObjectFinder finder) {
+            super(finder);
+            this.finder = finder;
+        }
+
+        /**
+         * Set whatever an exhaustive scan against all registered objects is allowed.
+         */
+        //@Override
+        public void setFullScanAllowed(final boolean fullScan) {
+            finder.setFullScanAllowed(fullScan);
+            super .setFullScanAllowed(fullScan);
+        }
+
+        /**
+         * Returns a set of authority codes that <strong>may</strong> identify the same object
+         * than the specified one. The default implementation delegates to the backing finder.
+         */
+        //@Override
+        protected Set/*<String>*/ getCodeCandidates(final IdentifiedObject object) throws FactoryException {
+            return finder.getCodeCandidates(object);
+        }
+
+        /**
+         * Returns {@code candidate}, or an object derived from {@code candidate}, if it is
+         * {@linkplain CRS#equalsIgnoreMetadata equals ignoring metadata} to the specified
+         * model. The default implementation delegates to the backing finder.
+         */
+        //@Override
+        protected IdentifiedObject deriveEquivalent(final IdentifiedObject candidate,
+                                                    final IdentifiedObject model)
+                throws FactoryException
+        {
+            return finder.deriveEquivalent(candidate, model);
+        }
     }
 }

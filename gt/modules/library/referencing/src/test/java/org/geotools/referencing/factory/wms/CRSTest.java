@@ -190,7 +190,8 @@ public final class CRSTest extends TestCase {
     }
 
     /**
-     * Tests the {@link IdentifiedObjectFinder#find} method through a.
+     * Tests the {@link IdentifiedObjectFinder#find} method through a buffered authority factory.
+     * The objects found are expected to be cached.
      */
     public void testBufferedFind() throws FactoryException {
         final AbstractAuthorityFactory factory = new Buffered(this.factory);
