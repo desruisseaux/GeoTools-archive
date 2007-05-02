@@ -89,7 +89,6 @@ public class XSAnySimpleTypeBinding implements SimpleBinding {
      * @generated modifiable
      */
     public String encode(Object object, String value) {
-        //TODO: implement
-        return null;
+        return object == null? null : String.valueOf(object);
     }
 }
