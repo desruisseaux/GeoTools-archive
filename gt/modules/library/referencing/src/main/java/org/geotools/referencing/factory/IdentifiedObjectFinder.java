@@ -40,10 +40,11 @@ import org.geotools.metadata.iso.citation.Citations;
 
 /**
  * Looks up an object from an {@linkplain AuthorityFactory authority factory} which is
- * {@linkplain CRS#equalsIgnoreMetadata equals, ignoring metadata}, to the specified object.
- * The main purpose of this class is to get a fully {@linkplain IdentifiedObject identified
- * object} from an incomplete one, for example from an object without identifier or
- * "{@code AUTHORITY[...]}" element in <cite>Well Known Text</cite> terminology.
+ * {@linkplain CRS#equalsIgnoreMetadata equals, ignoring metadata}, to the specified
+ * object. The main purpose of this class is to get a fully {@linkplain IdentifiedObject
+ * identified object} from an incomplete one, for example from an object without
+ * {@linkplain IdentifiedObject#getIdentifiers identifiers} or "{@code AUTHORITY[...]}"
+ * element in <cite>Well Known Text</cite> terminology.
  *
  * @since 2.4
  * @source $URL$
@@ -178,13 +179,27 @@ public class IdentifiedObjectFinder {
      * Returns the identifier for the specified object.
      */
     final String getIdentifier(final IdentifiedObject object) {
-        final Citation authority = proxy.getAuthorityFactory().getAuthority();
-        ReferenceIdentifier id = AbstractIdentifiedObject.getIdentifier(object, authority);
-        if (id == null) {
-            id = object.getName();
+        Citation authority = proxy.getAuthorityFactory().getAuthority();
+        if (ReferencingFactory.ALL.equals(authority)) {
+            /*
+             * "All" is a pseudo-authority declared by AllAuthoritiesFactory. This is not a real
+             * authority, so we will not find any identifier if we search for this authority. We
+             * will rather pickup the first identifier, regardless its authority.
+             */
+            authority = null;
+        }
+        ReferenceIdentifier identifier = AbstractIdentifiedObject.getIdentifier(object, authority);
+        if (identifier == null) {
+            identifier = object.getName();
             // Should never be null past this point, since 'name' is a mandatory attribute.
         }
-        return id.toString();
+        final String codespace = identifier.getCodeSpace();
+        final String code = identifier.getCode();
+        if (codespace != null) {
+            return codespace + org.geotools.util.GenericName.DEFAULT_SEPARATOR + code;
+        } else {
+            return code;
+        }
     }
 
     /**
@@ -203,9 +218,10 @@ public class IdentifiedObjectFinder {
      */
     final IdentifiedObject createFromIdentifiers(final IdentifiedObject object) throws FactoryException {
         final Citation authority = proxy.getAuthorityFactory().getAuthority();
+        final boolean isAll = ReferencingFactory.ALL.equals(authority);
         for (final Iterator it=object.getIdentifiers().iterator(); it.hasNext();) {
             final Identifier id = (Identifier) it.next();
-            if (!Citations.identifierMatches(authority, id.getAuthority())) {
+            if (!isAll && !Citations.identifierMatches(authority, id.getAuthority())) {
                 // The identifier is not for this authority. Looks the other ones.
                 continue;
             }

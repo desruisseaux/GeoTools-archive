@@ -32,8 +32,11 @@ import org.opengis.referencing.ObjectFactory;
 // Geotools dependencies
 import org.geotools.factory.AbstractFactory;
 import org.geotools.metadata.iso.citation.Citations;
+import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -59,6 +62,20 @@ public class ReferencingFactory extends AbstractFactory implements Factory {
      * The logger for event related to Geotools's factories.
      */
     public static final Logger LOGGER = Logger.getLogger("org.geotools.referencing.factory");
+
+    /**
+     * A citation which contains only the title "All" in localized language. Used
+     * as a pseudoèauthority name for {@link AllAuthoritiesFactory}. Declared here
+     * because processed specially by {@link IdentifiedObjectFinder}, since it is
+     * not a valid authority name (not declared in {@link AllAuthoritiesFactory}
+     * because we want to avoid this dependency in {@link IdentifiedObjectFinder}).
+     */
+    static final Citation ALL;
+    static {
+        final CitationImpl citation = new CitationImpl(Vocabulary.format(VocabularyKeys.ALL));
+        citation.freeze();
+        ALL = citation;
+    }
 
     /**
      * Constructs a factory with the default priority.

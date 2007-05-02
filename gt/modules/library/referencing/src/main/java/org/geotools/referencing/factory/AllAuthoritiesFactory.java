@@ -17,30 +17,24 @@
 package org.geotools.referencing.factory;
 
 // J2SE dependencies
-import java.util.*;
-import javax.units.Unit;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 // OpenGIS dependencies
-import org.opengis.referencing.*;
-import org.opengis.referencing.cs.*;
-import org.opengis.referencing.crs.*;
-import org.opengis.referencing.datum.*;
-import org.opengis.referencing.operation.*;
-import org.opengis.util.InternationalString;
-import org.opengis.metadata.citation.Citation;
+import org.opengis.referencing.AuthorityFactory;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.IdentifiedObject;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
+import org.opengis.referencing.cs.CSAuthorityFactory;
+import org.opengis.referencing.datum.DatumAuthorityFactory;
+import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
-import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.referencing.ReferencingFactoryFinder;
-import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.metadata.iso.citation.CitationImpl;
-import org.geotools.util.GenericName;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.i18n.Vocabulary;
-import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**

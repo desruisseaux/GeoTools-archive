@@ -17,16 +17,17 @@ package org.geotools.referencing.factory.epsg;
 
 // JSE dependencies
 import java.util.Set;
+import java.util.Iterator;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
 // OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.crs.CRSAuthorityFactory;
 
 // Geotools dependencies
 import org.geotools.referencing.ReferencingFactoryFinder;
@@ -47,17 +48,17 @@ import junit.framework.TestSuite;
  * @author Jody Garnett
  * @author Martin Desruisseaux
  */
-public class FactoryEsriTest extends TestCase {
+public class EsriExtensionTest extends TestCase {
     /**
      * The factory to test.
      */
-    private FactoryESRI factory;
+    private EsriExtension factory;
 
     /**
      * Returns the test suite.
      */
     public static Test suite() {
-        return new TestSuite(FactoryEsriTest.class);
+        return new TestSuite(EsriExtensionTest.class);
     }
 
     /**
@@ -73,7 +74,7 @@ public class FactoryEsriTest extends TestCase {
     /**
      * Creates a test case with the specified name.
      */
-    public FactoryEsriTest(final String name) {
+    public EsriExtensionTest(final String name) {
         super(name);
     }
 
@@ -82,7 +83,7 @@ public class FactoryEsriTest extends TestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        factory = (FactoryESRI) ReferencingFactoryFinder.getCRSAuthorityFactory("ESRI", null);
+        factory = (EsriExtension) ReferencingFactoryFinder.getCRSAuthorityFactory("ESRI", null);
     }
 
     /**
@@ -92,7 +93,7 @@ public class FactoryEsriTest extends TestCase {
         Citation authority = factory.getAuthority();
         assertNotNull(authority);
         assertEquals("ESRI", authority.getTitle().toString());
-        assertTrue(factory instanceof FactoryESRI);
+        assertTrue(factory instanceof EsriExtension);
     }
 
     /**
@@ -204,5 +205,24 @@ public class FactoryEsriTest extends TestCase {
         String asString = identifiers.toString();
         assertTrue(asString, identifiers.contains(new NamedIdentifier(Citations.ESRI, "30591")));
         assertTrue(asString, identifiers.contains(new NamedIdentifier(Citations.EPSG, "30591")));
+
+        final Iterator iterator = identifiers.iterator();
+        Identifier identifier;
+
+        // Checks the first identifier.
+        assertTrue(iterator.hasNext());
+        identifier = (Identifier) iterator.next();
+        assertTrue(identifier instanceof NamedIdentifier);
+        assertEquals(Citations.ESRI, identifier.getAuthority());
+        assertEquals("30591", identifier.getCode());
+        assertEquals("ESRI:30591", identifier.toString());
+
+        // Checks the second identifier.
+        assertTrue(iterator.hasNext());
+        identifier = (Identifier) iterator.next();
+        assertTrue(identifier instanceof NamedIdentifier);
+        assertEquals(Citations.EPSG, identifier.getAuthority());
+        assertEquals("30591", identifier.getCode());
+        assertEquals("EPSG:30591", identifier.toString());
     }
 }

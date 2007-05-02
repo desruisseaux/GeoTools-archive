@@ -19,25 +19,23 @@ package org.geotools.referencing.factory.epsg;
 import java.net.URL;
 
 // OpenGIS dependencies
-import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
-import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.metadata.iso.citation.CitationImpl;
 
 
 /**
- * Extends the EPSG database with {@linkplain CoordinateReferenceSystem Coordinate Reference Systems}
- * defined by ESRI. Those CRS will be registered both in {@code "ESRI"} and {@code "EPSG"} name space.
+ * Provides common {@linkplain CoordinateReferenceSystem Coordinate Reference Systems}
+ * not found in the standard EPSG database. Those CRS will be registered in 
+ * {@code "EPSG"} name space.
  *
  * @since 2.4
  * @source $URL$
  * @version $Id$
- * @author Martin Desruisseaux
+ * @author Andrea Aime
  */
-public class FactoryESRI extends FactoryUsingWKT {
+public class UnnamedExtension extends FactoryUsingWKT {
     /**
      * The default filename to read. This file will be searched in the
      * {@code org/geotools/referencing/factory/espg} directory in the
@@ -45,24 +43,12 @@ public class FactoryESRI extends FactoryUsingWKT {
      *
      * @see #getDefinitionsURL
      */
-    public static final String FILENAME = "esri.properties";
-
-    /**
-     * The ESRI authority expanded with a "EPSG" identifier.
-     */
-    private static final Citation AUTHORITY;
-    static {
-        final CitationImpl c = new CitationImpl(Citations.ESRI);
-        c.getIdentifierTypes().add("Authority name");
-        c.getIdentifiers().add("EPSG");
-        // TODO: remove cast when we will be allowed to compile for J2SE 1.5.
-        AUTHORITY = (Citation) c.unmodifiable();
-    }
+    public static final String FILENAME = "unnamed.properties";
 
     /**
      * Constructs an authority factory using the default set of factories.
      */
-    public FactoryESRI() {
+    public UnnamedExtension() {
         this(null);
     }
 
@@ -72,26 +58,8 @@ public class FactoryESRI extends FactoryUsingWKT {
      * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}
      * {@code FACTORY} hints.
      */
-    public FactoryESRI(final Hints hints) {
-        super(hints, DEFAULT_PRIORITY - 5);
-    }
-
-    /**
-     * Returns the authority, which is {@link Citations#ESRI ESRI}.
-     */
-    public Citation getAuthority() {
-        return AUTHORITY;
-    }
-
-    /**
-     * Returns the set of authorities to give to {@link PropertyAuthorityFactory} constructor.
-     */
-    //@Override
-    Citation[] getAuthorities() {
-        return new Citation[] {
-            Citations.ESRI,
-            Citations.EPSG
-        };
+    public UnnamedExtension(final Hints hints) {
+        super(hints, DEFAULT_PRIORITY - 2);
     }
 
     /**
@@ -101,13 +69,13 @@ public class FactoryESRI extends FactoryUsingWKT {
      * @return The URL, or {@code null} if none.
      */
     protected URL getDefinitionsURL() {
-        return FactoryESRI.class.getResource(FILENAME);
+        return UnnamedExtension.class.getResource(FILENAME);
     }
 
     /**
      * Prints a list of codes that duplicate the ones provided in the {@link DefaultFactory}.
      * The factory tested is the one registered in {@link ReferencingFactoryFinder}.  By default, this
-     * is this {@code FactoryESRI} class backed by the {@value #FILENAME} property file.
+     * is this {@code UnnamedExtension} class backed by the {@value #FILENAME} property file.
      * This method can be invoked from the command line in order to check the content of the
      * property file. Valid arguments are:
      * <p>
@@ -122,6 +90,6 @@ public class FactoryESRI extends FactoryUsingWKT {
      * @throws FactoryException if an error occured.
      */
     public static void main(final String[] args) throws FactoryException {
-        main(args, FactoryESRI.class);
+        main(args, UnnamedExtension.class);
     }
 }

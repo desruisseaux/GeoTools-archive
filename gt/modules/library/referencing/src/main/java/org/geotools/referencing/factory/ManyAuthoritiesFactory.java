@@ -34,7 +34,6 @@ import org.geotools.factory.Hints;
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.util.GenericName;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
@@ -67,12 +66,6 @@ import org.geotools.resources.i18n.VocabularyKeys;
 public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements CRSAuthorityFactory,
         CSAuthorityFactory, DatumAuthorityFactory, CoordinateOperationAuthorityFactory
 {
-    /**
-     * The authority name for this factory.
-     */
-    private static final Citation AUTHORITY = (Citation)
-            new CitationImpl(Vocabulary.format(VocabularyKeys.ALL)).unmodifiable();
-
     /**
      * The types to be recognized for the {@code factories} argument in
      * constructors. Must be consistent with the types expected by the
@@ -370,10 +363,10 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
 
     /**
      * Returns the organization or party responsible for definition and maintenance of the
-     * database. The default implementation returns a citation named "All".
+     * database. The default implementation returns a citation with title "All".
      */
     public Citation getAuthority() {
-        return AUTHORITY;
+        return ALL;
     }
 
     /**

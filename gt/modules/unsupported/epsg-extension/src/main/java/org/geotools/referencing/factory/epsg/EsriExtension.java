@@ -19,23 +19,25 @@ package org.geotools.referencing.factory.epsg;
 import java.net.URL;
 
 // OpenGIS dependencies
+import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
+import org.geotools.metadata.iso.citation.Citations;
+import org.geotools.metadata.iso.citation.CitationImpl;
 
 
 /**
- * Provides common {@linkplain CoordinateReferenceSystem Coordinate Reference Systems}
- * not found in the standard EPSG database. Those CRS will be registered in 
- * {@code "EPSG"} name space.
+ * Extends the EPSG database with {@linkplain CoordinateReferenceSystem Coordinate Reference Systems}
+ * defined by ESRI. Those CRS will be registered both in {@code "ESRI"} and {@code "EPSG"} name space.
  *
  * @since 2.4
  * @source $URL$
  * @version $Id$
- * @author Andrea Aime
+ * @author Martin Desruisseaux
  */
-public class FactoryExtension extends FactoryUsingWKT {
+public class EsriExtension extends FactoryUsingWKT {
     /**
      * The default filename to read. This file will be searched in the
      * {@code org/geotools/referencing/factory/espg} directory in the
@@ -43,12 +45,24 @@ public class FactoryExtension extends FactoryUsingWKT {
      *
      * @see #getDefinitionsURL
      */
-    public static final String FILENAME = "extension.properties";
+    public static final String FILENAME = "esri.properties";
+
+    /**
+     * The ESRI authority expanded with a "EPSG" identifier.
+     */
+    private static final Citation AUTHORITY;
+    static {
+        final CitationImpl c = new CitationImpl(Citations.ESRI);
+        c.getIdentifierTypes().add("Authority name");
+        c.getIdentifiers().add("EPSG");
+        c.freeze();
+        AUTHORITY = c;
+    }
 
     /**
      * Constructs an authority factory using the default set of factories.
      */
-    public FactoryExtension() {
+    public EsriExtension() {
         this(null);
     }
 
@@ -58,8 +72,28 @@ public class FactoryExtension extends FactoryUsingWKT {
      * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}
      * {@code FACTORY} hints.
      */
-    public FactoryExtension(final Hints hints) {
-        super(hints, DEFAULT_PRIORITY - 2);
+    public EsriExtension(final Hints hints) {
+        super(hints, DEFAULT_PRIORITY - 5);
+    }
+
+    /**
+     * Returns the authority, which is derived from {@link Citations#ESRI ESRI}.
+     */
+    public Citation getAuthority() {
+        return AUTHORITY;
+    }
+
+    /**
+     * Returns the set of authorities to use as identifiers for the CRS to be created.
+     * The default implementation returns {@linkplain Citations#ESRI ESRI} and
+     * {@linkplain Citations#EPSG EPSG} authorities.
+     */
+    //@Override
+    protected Citation[] getAuthorities() {
+        return new Citation[] {
+            Citations.ESRI,
+            Citations.EPSG
+        };
     }
 
     /**
@@ -69,13 +103,13 @@ public class FactoryExtension extends FactoryUsingWKT {
      * @return The URL, or {@code null} if none.
      */
     protected URL getDefinitionsURL() {
-        return FactoryExtension.class.getResource(FILENAME);
+        return EsriExtension.class.getResource(FILENAME);
     }
 
     /**
      * Prints a list of codes that duplicate the ones provided in the {@link DefaultFactory}.
      * The factory tested is the one registered in {@link ReferencingFactoryFinder}.  By default, this
-     * is this {@code FactoryExtension} class backed by the {@value #FILENAME} property file.
+     * is this {@code EsriExtension} class backed by the {@value #FILENAME} property file.
      * This method can be invoked from the command line in order to check the content of the
      * property file. Valid arguments are:
      * <p>
@@ -90,6 +124,6 @@ public class FactoryExtension extends FactoryUsingWKT {
      * @throws FactoryException if an error occured.
      */
     public static void main(final String[] args) throws FactoryException {
-        main(args, FactoryExtension.class);
+        main(args, EsriExtension.class);
     }
 }

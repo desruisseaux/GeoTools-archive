@@ -574,7 +574,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * {@linkplain Citations#identifierMatches(Citation,Citation) matching} the specified
      * authority.
      *
-     * @param  authority The authority for the identifier to return.
+     * @param  authority The authority for the identifier to return, or {@code null} for
+     *         the first identifier regarless its authority.
      * @return The object's identifier, or {@code null} if no identifier matching the specified
      *         authority was found.
      *
@@ -589,7 +590,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * than {@link #getIdentifier(Citation)} on arbitrary implementations of GeoAPI interface.
      *
      * @param  info The object to get the identifier from.
-     * @param  authority The authority for the identifier to return.
+     * @param  authority The authority for the identifier to return, or {@code null} for
+     *         the first identifier regarless its authority.
      * @return The object's identifier, or {@code null} if no identifier matching the specified
      *         authority was found.
      *
@@ -611,14 +613,17 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
             return null;
         }
         for (final Iterator it=info.getIdentifiers().iterator(); it.hasNext();) {
-            final ReferenceIdentifier identifier = (ReferenceIdentifier) it.next();
-            if (authority == null) {
-                return identifier;
-            }
-            final Citation infoAuthority = identifier.getAuthority();
-            if (infoAuthority != null) {
-                if (Citations.identifierMatches(authority, infoAuthority)) {
+            final Identifier candidate = (Identifier) it.next();
+            if (candidate instanceof ReferenceIdentifier) {
+                final ReferenceIdentifier identifier = (ReferenceIdentifier) candidate;
+                if (authority == null) {
                     return identifier;
+                }
+                final Citation infoAuthority = identifier.getAuthority();
+                if (infoAuthority != null) {
+                    if (Citations.identifierMatches(authority, infoAuthority)) {
+                        return identifier;
+                    }
                 }
             }
         }

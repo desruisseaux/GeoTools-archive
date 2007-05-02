@@ -19,7 +19,6 @@ package org.geotools.referencing.factory.epsg;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Collection;
 import java.util.Set;
 import java.util.Map;
 import java.util.TreeSet;
@@ -97,7 +96,8 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
      * search for the first occurence of this file in the following places:
      * <p>
      * <ul>
-     *   <li>In the directory specified by the {@value #CRS_DIRECTORY_KEY} system property.</li>
+     *   <li>In the directory specified by the {@value GeoTools#CRS_DIRECTORY_KEY} system
+     *       property.</li>
      *   <li>In every {@code org/geotools/referencing/factory/espg} directories found on the
      *       classpath.</li>
      * </ul>
@@ -171,19 +171,42 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
      * Returns the authority. The default implementation returns {@link Citations#EPSG EPSG}
      * in order to register the extra CRS in the "EPSG" namespace, even if the code defined
      * in the property file may not be official EPSG codes.
+     * <p>
+     * Subclasses should return the authority that define the extension to the EPSG database.
+     * For example {@link EsriExtension} returns the {@linkplain Citations#ESRI ESRI} authority.
+     * However the CRS created by this method will typically contain more than one
+     * {@linkplain CoordinateReferenceSystem#getIdentifiers identifier}, one for each
+     * authority returned by {@link #getAuthorities}, and the {@linkplain Citations#EPSG EPSG}
+     * authority is typically in this list.
+     *
+     * @see #getAuthorities
      */
+    //@Override
     public Citation getAuthority() {
         return Citations.EPSG;
     }
 
     /**
-     * Returns the set of authorities to give to {@link PropertyAuthorityFactory} constructor.
-     * To be overriden by {@link FactoryESRI} only.
+     * Returns the set of authorities to use as {@linkplain CoordinateReferenceSystem#getIdentifiers
+     * identifiers} for the CRS to be created. This set is given to the
+     * {@linkplain PropertyAuthorityFactory#PropertyAuthorityFactory(FactoryGroup, Citation[], URL)
+     * properties-backed factory constructor}. The {@linkplain Citations#EPSG EPSG} authority should
+     * be last.
+     *
+     * @since 2.4
      */
-    Citation[] getAuthorities() {
-        return new Citation[] {
-            getAuthority()
-        };
+    protected Citation[] getAuthorities() {
+        final Citation authority = getAuthority();
+        if (Citations.EPSG.equals(authority)) {
+            return new Citation[] {
+                authority
+            };
+        } else {
+            return new Citation[] {
+                authority,
+                Citations.EPSG
+            };
+        }
     }
 
     /**
@@ -232,8 +255,8 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
                 throw new FactoryNotFoundException(Errors.format(
                         ErrorKeys.FILE_DOES_NOT_EXIST_$1, FILENAME));
             }
-            final Collection ids = getAuthority().getIdentifiers();
-            final String authority = ids.isEmpty() ? "EPSG" : (String) ids.iterator().next();
+            final Iterator ids = getAuthority().getIdentifiers().iterator();
+            final String authority = ids.hasNext() ? (String) ids.next() : "EPSG";
             LOGGER.log(Logging.format(Level.CONFIG, LoggingKeys.USING_FILE_AS_FACTORY_$2,
                                       url.getPath(), authority));
             return new PropertyAuthorityFactory(factories, getAuthorities(), url);

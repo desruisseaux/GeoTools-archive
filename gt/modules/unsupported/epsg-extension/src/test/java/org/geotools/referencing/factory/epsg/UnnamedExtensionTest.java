@@ -43,24 +43,24 @@ import junit.framework.TestSuite;
 
 
 /**
- * Tests {@link FactoryExtension}.
+ * Tests {@link UnnamedExtension}.
  * 
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Jody Garnett
  */
-public class FactoryExtensionTest extends TestCase {
+public class UnnamedExtensionTest extends TestCase {
     /**
      * The factory to test.
      */
-    private FactoryExtension factory;
+    private UnnamedExtension factory;
 
     /**
      * Returns the test suite.
      */
     public static Test suite() {
-        return new TestSuite(FactoryExtensionTest.class);
+        return new TestSuite(UnnamedExtensionTest.class);
     }
 
     /**
@@ -77,7 +77,7 @@ public class FactoryExtensionTest extends TestCase {
     /**
      * Creates a test case with the specified name.
      */
-    public FactoryExtensionTest(final String name) {
+    public UnnamedExtensionTest(final String name) {
         super(name);
     }
 
@@ -86,8 +86,8 @@ public class FactoryExtensionTest extends TestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        factory = (FactoryExtension) ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG",
-                new Hints(Hints.CRS_AUTHORITY_FACTORY, FactoryExtension.class));
+        factory = (UnnamedExtension) ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG",
+                new Hints(Hints.CRS_AUTHORITY_FACTORY, UnnamedExtension.class));
     }
 
     /**
@@ -99,7 +99,7 @@ public class FactoryExtensionTest extends TestCase {
         assertEquals("European Petroleum Survey Group", authority.getTitle().toString());
         assertTrue (authority.getIdentifiers().contains("EPSG"));
         assertFalse(authority.getIdentifiers().contains("ESRI"));
-        assertTrue(factory instanceof FactoryExtension);
+        assertTrue(factory instanceof UnnamedExtension);
     }
 
     /**
@@ -149,7 +149,7 @@ public class FactoryExtensionTest extends TestCase {
      * UDIG requires this to work.
      */
     public void test42102() throws FactoryException {
-        final Hints hints = new Hints(Hints.CRS_AUTHORITY_FACTORY, FactoryExtension.class);
+        final Hints hints = new Hints(Hints.CRS_AUTHORITY_FACTORY, UnnamedExtension.class);
         final CRSAuthorityFactory factory = new OrderedAxisAuthorityFactory("EPSG", hints, null);
         final CoordinateReferenceSystem crs = factory.createCoordinateReferenceSystem("EPSG:42102");
         assertNotNull(crs);

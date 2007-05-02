@@ -125,7 +125,7 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
      * one authority may be specified when the CRS to create should have more than one
      * {@linkplain CoordinateReferenceSystem#getIdentifiers identifier}, each with the same
      * code but different namespace. For example a
-     * {@linkplain org.geotools.referencing.factory.epsg.FactoryESRI factory for CRS defined
+     * {@linkplain org.geotools.referencing.factory.epsg.EsriExtension factory for CRS defined
      * by ESRI} uses the {@code "ESRI"} namespace, but also the {@code "EPSG"} namespace
      * because those CRS are used as extension of the EPSG database. Concequently, the same
      * CRS can be identified as {@code "ESRI:53001"} and {@code "EPSG:53001"}, where
