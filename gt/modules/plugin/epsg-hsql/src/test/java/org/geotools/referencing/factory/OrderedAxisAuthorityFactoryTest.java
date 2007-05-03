@@ -133,33 +133,33 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
         final Hints hints = new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
         OrderedAxisAuthorityFactory factory;
         factory = getFactory(hints);
-        assertTrue(factory.forceStandardDirections);
-        assertTrue(factory.forceStandardUnits);
-
-        hints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS, Boolean.TRUE);
-        assertSame(factory, getFactory(hints));
-        assertTrue(factory.forceStandardDirections);
-        assertTrue(factory.forceStandardUnits);
-
-        hints.put(Hints.FORCE_STANDARD_AXIS_UNITS, Boolean.TRUE);
-        assertSame(factory, getFactory(hints));
-        assertTrue(factory.forceStandardDirections);
-        assertTrue(factory.forceStandardUnits);
-
-        hints.put(Hints.FORCE_STANDARD_AXIS_UNITS, Boolean.FALSE);
-        assertNotSame(factory, factory = getFactory(hints));
-        assertTrue   (factory.forceStandardDirections);
-        assertFalse  (factory.forceStandardUnits);
+        assertFalse(factory.forceStandardDirections);
+        assertFalse(factory.forceStandardUnits);
 
         hints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS, Boolean.FALSE);
-        assertNotSame(factory, factory = getFactory(hints));
-        assertFalse  (factory.forceStandardDirections);
-        assertFalse  (factory.forceStandardUnits);
+        assertSame(factory, getFactory(hints));
+        assertFalse(factory.forceStandardDirections);
+        assertFalse(factory.forceStandardUnits);
+
+        hints.put(Hints.FORCE_STANDARD_AXIS_UNITS, Boolean.FALSE);
+        assertSame(factory, getFactory(hints));
+        assertFalse(factory.forceStandardDirections);
+        assertFalse(factory.forceStandardUnits);
 
         hints.put(Hints.FORCE_STANDARD_AXIS_UNITS, Boolean.TRUE);
         assertNotSame(factory, factory = getFactory(hints));
         assertFalse  (factory.forceStandardDirections);
         assertTrue   (factory.forceStandardUnits);
+
+        hints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS, Boolean.TRUE);
+        assertNotSame(factory, factory = getFactory(hints));
+        assertTrue   (factory.forceStandardDirections);
+        assertTrue   (factory.forceStandardUnits);
+
+        hints.put(Hints.FORCE_STANDARD_AXIS_UNITS, Boolean.FALSE);
+        assertNotSame(factory, factory = getFactory(hints));
+        assertTrue   (factory.forceStandardDirections);
+        assertFalse  (factory.forceStandardUnits);
     }
 
     /**

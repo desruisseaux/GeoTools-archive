@@ -97,8 +97,6 @@ public class LongitudeFirstFactory extends DeferredAuthorityFactory implements C
      * to {@link Boolean#FALSE FALSE} by default. A different value for those two hints
      * can be specified using the {@linkplain LongitudeFirstFactory(Hints) constructor
      * below}.
-     *
-     * @todo Current implementation do not yet follow the above javadoc.
      */
     public LongitudeFirstFactory() {
         this(null);
@@ -122,7 +120,7 @@ public class LongitudeFirstFactory extends DeferredAuthorityFactory implements C
     private void put(final Hints source, final Hints.Key key) {
         Object value = getHintValue(source, key);
         if (value == null) {
-            value = Boolean.TRUE; // TODO set to FALSE.
+            value = Boolean.FALSE;
         }
         hints.put(key, value);
     }
@@ -132,7 +130,7 @@ public class LongitudeFirstFactory extends DeferredAuthorityFactory implements C
      * priority should be lower, except if the <code>{@value #SYSTEM_DEFAULT_KEY}</code> system
      * property is set to {@code true}.
      *
-     * @deprecated Not needed anymore since {@link Geotools#getDefaultHints}.
+     * @deprecated Not needed anymore since {@link GeoTools#getDefaultHints}.
      */
     private static int relativePriority() {
         try {
