@@ -15,6 +15,7 @@
  */
 package org.geotools.factory;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import junit.framework.Test;
@@ -61,6 +62,23 @@ public class GeoToolsTest extends TestCase {
     }
 
     /**
+     * Tests the removal of keys from a hashmap. Required for {@link FactoryRegistry} working.
+     */
+    public void testHintsKey() {
+        final Hints hints = new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
+        assertFalse(hints.isEmpty());
+
+        Map map = new HashMap();
+        assertNull(map.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE));
+        map = Collections.unmodifiableMap(map);
+        assertFalse(map.isEmpty());
+
+        final Hints remaining = new Hints(hints);
+        assertTrue(remaining.keySet().removeAll(map.keySet()));
+        assertTrue(remaining.isEmpty());
+    }
+
+    /**
      * Tests addition of custom hints.
      */
     public void testMyHints(){
@@ -100,13 +118,12 @@ public class GeoToolsTest extends TestCase {
      * @todo Uncomment when we will be allowed to compile for J2SE 1.5.
      *       Call to {@link System#clearProperty} is mandatory for this test.
      */
-//    public void testSystemHints() {
-//        Hints hints = GeoTools.getDefaultHints();
-//        assertNotNull(hints);
-//        assertTrue(hints.isEmpty());
+    public void testSystemHints() {
+        Hints hints = GeoTools.getDefaultHints();
+        assertNotNull(hints);
+        assertTrue(hints.isEmpty());
 //        System.setProperty(GeoTools.FORCE_LONGITUDE_FIRST_AXIS_ORDER, "true");
-//        assertTrue ("Property change should have been detected.", Hints.scanSystemProperties());
-//        assertFalse("No more property should have been changed.", Hints.scanSystemProperties());
+//        Hints.scanSystemProperties();
 //        try {
 //            hints = GeoTools.getDefaultHints();
 //            assertNotNull(hints);
@@ -119,8 +136,8 @@ public class GeoToolsTest extends TestCase {
 //            System.clearProperty(GeoTools.FORCE_LONGITUDE_FIRST_AXIS_ORDER);
 //            assertNotNull(Hints.removeSystemDefault(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER));
 //        }
-//        hints = GeoTools.getDefaultHints();
-//        assertNotNull(hints);
-//        assertTrue(hints.isEmpty());
-//    }
+        hints = GeoTools.getDefaultHints();
+        assertNotNull(hints);
+        assertTrue(hints.isEmpty());
+    }
 }

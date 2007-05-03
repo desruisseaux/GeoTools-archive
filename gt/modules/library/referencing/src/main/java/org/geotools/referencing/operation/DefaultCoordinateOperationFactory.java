@@ -110,10 +110,10 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}
      * {@code FACTORY} hints.
      *
-     * @param hints The hints, or {@code null} if none.
+     * @param userHints The hints, or {@code null} if none.
      */
-    public DefaultCoordinateOperationFactory(final Hints hints) {
-        this(hints, PRIORITY);
+    public DefaultCoordinateOperationFactory(final Hints userHints) {
+        this(userHints, PRIORITY);
     }
 
     /**
@@ -122,15 +122,15 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}
      * {@code FACTORY} hints.
      *
-     * @param hints The hints, or {@code null} if none.
+     * @param userHints The hints, or {@code null} if none.
      * @param priority The priority for this factory, as a number between
      *        {@link #MINIMUM_PRIORITY MINIMUM_PRIORITY} and
      *        {@link #MAXIMUM_PRIORITY MAXIMUM_PRIORITY} inclusive.
      *
      * @since 2.2
      */
-    public DefaultCoordinateOperationFactory(final Hints hints, final int priority) {
-        super(hints, priority);
+    public DefaultCoordinateOperationFactory(final Hints userHints, final int priority) {
+        super(userHints, priority);
         //
         // Default hints values
         //
@@ -139,16 +139,18 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
         //
         // Fetchs the user-supplied hints
         //
-        Object candidate = getHintValue(hints, Hints.DATUM_SHIFT_METHOD);
-        if (candidate instanceof String) {
-            molodenskiMethod = (String) candidate;
-            if (molodenskiMethod.trim().equalsIgnoreCase("Geocentric")) {
-                molodenskiMethod = null;
+        if (userHints != null) {
+            Object candidate = userHints.get(Hints.DATUM_SHIFT_METHOD);
+            if (candidate instanceof String) {
+                molodenskiMethod = (String) candidate;
+                if (molodenskiMethod.trim().equalsIgnoreCase("Geocentric")) {
+                    molodenskiMethod = null;
+                }
             }
-        }
-        candidate = getHintValue(hints, Hints.LENIENT_DATUM_SHIFT);
-        if (candidate instanceof Boolean) {
-            lenientDatumShift = ((Boolean) candidate).booleanValue();
+            candidate = userHints.get(Hints.LENIENT_DATUM_SHIFT);
+            if (candidate instanceof Boolean) {
+                lenientDatumShift = ((Boolean) candidate).booleanValue();
+            }
         }
         //
         // Stores the retained hints

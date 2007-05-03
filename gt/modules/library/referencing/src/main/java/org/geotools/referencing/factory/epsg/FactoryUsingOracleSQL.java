@@ -48,15 +48,15 @@ public class FactoryUsingOracleSQL extends FactoryUsingAnsiSQL {
     /**
      * Constructs an authority factory using the specified connection.
      *
-     * @param hints      The underlying factories used for objects creation.
+     * @param userHints  The underlying factories used for objects creation.
      * @param connection The connection to the underlying EPSG database.
      *
      * @since 2.2
      */
-    public FactoryUsingOracleSQL(final Hints      hints,
+    public FactoryUsingOracleSQL(final Hints      userHints,
                                  final Connection connection)
     {
-        super(hints, connection);
+        super(userHints, connection);
     }
 
     /**
@@ -67,17 +67,16 @@ public class FactoryUsingOracleSQL extends FactoryUsingAnsiSQL {
      * ensure that the connecting user has permissions to select from all the tables in the
      * epsg user schema.
      *
-     * @param hints      The underlying factories used for objects creation.
+     * @param userHints  The underlying factories used for objects creation.
      * @param connection The connection to the underlying EPSG database.
      * @param epsgSchema The database schema in which the epsg tables are stored (optional).
-     *
      * @since 2.2
      */
-    public FactoryUsingOracleSQL(final Hints      hints,
+    public FactoryUsingOracleSQL(final Hints      userHints,
                                  final Connection connection,
                                  final String     epsgSchema)
     {
-        super(hints, connection);
+        super(userHints, connection);
         adaptTableNames(epsgSchema);
     }
 

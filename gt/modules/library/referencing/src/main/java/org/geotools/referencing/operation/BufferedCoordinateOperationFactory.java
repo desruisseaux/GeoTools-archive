@@ -142,22 +142,22 @@ public class BufferedCoordinateOperationFactory extends AbstractCoordinateOperat
     /**
      * Creates a buffered factory wrapping an other factory selected according the specified hints.
      *
-     * @param hints The hints to use for choosing a backing factory.
+     * @param userHints The hints to use for choosing a backing factory.
      */
-    public BufferedCoordinateOperationFactory(final Hints hints) {
-        this(hints, PRIORITY);
+    public BufferedCoordinateOperationFactory(final Hints userHints) {
+        this(userHints, PRIORITY);
     }
 
     /**
      * Creates a buffered factory wrapping an other factory selected according the specified hints.
      *
-     * @param hints The hints to use for choosing a backing factory.
+     * @param userHints The hints to use for choosing a backing factory.
      * @param priority The priority for this factory, as a number between
      *        {@link #MINIMUM_PRIORITY MINIMUM_PRIORITY} and
      *        {@link #MAXIMUM_PRIORITY MAXIMUM_PRIORITY} inclusive.
      */
-    public BufferedCoordinateOperationFactory(final Hints hints, final int priority) {
-        this(getBackingFactory(hints), hints, priority);
+    public BufferedCoordinateOperationFactory(final Hints userHints, final int priority) {
+        this(getBackingFactory(userHints), userHints, priority);
     }
 
     /**
@@ -179,9 +179,9 @@ public class BufferedCoordinateOperationFactory extends AbstractCoordinateOperat
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
     private BufferedCoordinateOperationFactory(final CoordinateOperationFactory factory,
-                                               final Hints hints, final int priority)
+                                               final Hints userHints, final int priority)
     {
-        super(factory, hints, priority);
+        super(factory, userHints, priority);
         this.factory = factory;
         ensureNonNull("factory", factory);
     }

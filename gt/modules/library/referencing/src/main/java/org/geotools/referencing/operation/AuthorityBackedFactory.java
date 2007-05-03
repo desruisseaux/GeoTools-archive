@@ -107,10 +107,10 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
      * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}
      * {@code FACTORY} hints.
      *
-     * @param hints The hints, or {@code null} if none.
+     * @param userHints The hints, or {@code null} if none.
      */
-    public AuthorityBackedFactory(Hints hints) {
-        super(hints, PRIORITY);
+    public AuthorityBackedFactory(Hints userHints) {
+        super(userHints, PRIORITY);
         /*
          * Removes the hint processed by the super-class. This include hints like
          * LENIENT_DATUM_SHIFT, which usually don't apply to authority factories.
@@ -119,12 +119,12 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
          * which in turn help to get the default CoordinateOperationAuthorityFactory
          * (instead of forcing a new instance).
          */
-        hints = new Hints(hints);
-        hints.keySet().removeAll(this.hints.keySet());
-        if (!hints.isEmpty()) {
-            noForce(hints);
+        userHints = new Hints(userHints);
+        userHints.keySet().removeAll(hints.keySet());
+        if (!userHints.isEmpty()) {
+            noForce(userHints);
             authorityFactory = ReferencingFactoryFinder.getCoordinateOperationAuthorityFactory(
-                    DEFAULT_AUTHORITY, hints);
+                    DEFAULT_AUTHORITY, userHints);
         }
     }
 
@@ -140,10 +140,10 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
      *
      * @see http://jira.codehaus.org/browse/GEOT-1161
      */
-    private static void noForce(final Hints hints) {
-        hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE);
-        hints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS,   Boolean.FALSE);
-        hints.put(Hints.FORCE_STANDARD_AXIS_UNITS,        Boolean.FALSE);
+    private static void noForce(final Hints userHints) {
+        userHints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE);
+        userHints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS,   Boolean.FALSE);
+        userHints.put(Hints.FORCE_STANDARD_AXIS_UNITS,        Boolean.FALSE);
     }
 
     /**

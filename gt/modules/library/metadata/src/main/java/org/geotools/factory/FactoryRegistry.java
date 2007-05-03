@@ -88,6 +88,8 @@ public class FactoryRegistry extends ServiceRegistry {
      * registry was used.
      *
      * @see #synchronizeIteratorProviders
+     *
+     * @deprecated Use listeners instead.
      */
     private final Factories globalConfiguration = new Factories();
 
@@ -99,10 +101,16 @@ public class FactoryRegistry extends ServiceRegistry {
     private final Set/*<Class>*/ scanningCategories = new HashSet();
 
     /**
-     * Factories under testing for availablity. This is used by {@link #isAvailable}
-     * as a guard against infinite recursivity.
+     * Factories under testing for availability. This is used by
+     * {@link #isAvailable} as a guard against infinite recursivity.
      */
-    private final Set/*<Class<? extends OptionalFactory>>*/ testingFactories = new HashSet();
+    private final Set/*<Class<? extends OptionalFactory>>*/ testingAvailability = new HashSet();
+
+    /**
+     * Factories under testing for hints compatibility. This is used by
+     * {@link #usesAcceptableHints} as a guard against infinite recursivity.
+     */
+    private final Set/*<Class<? extends Factory>>*/ testingHints = new HashSet();
 
     /**
      * Constructs a new registry for the specified categories.
@@ -269,8 +277,8 @@ public class FactoryRegistry extends ServiceRegistry {
                 }
                 throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_KEY_$1, key));
             }
-            if (hints!=null && !hints.isEmpty()) {
-                final Object hint = getHintValue(hints, key);
+            if (hints != null) {
+                final Object hint = hints.get(key);
                 if (hint != null) {
                     if (debug) {
                         debug("CHECK", category, key, "user provided a", hint.getClass());
@@ -353,18 +361,6 @@ public class FactoryRegistry extends ServiceRegistry {
         }
         throw new FactoryNotFoundException(Errors.format(ErrorKeys.FACTORY_NOT_FOUND_$1,
                   Utilities.getShortName(implementation!=null ? implementation : category)));
-    }
-
-    /**
-     * Returns a hint value, or a {@linkplain Hints#getSystemDefault system default}
-     * if no hint where explicitly specified in the given map for the given key.
-     */
-    private static Object getHintValue(final Hints hints, final Object key) {
-        Object hint = hints.get(key);
-        if (hint == null && key instanceof Hints.Key) {
-            hint = Hints.getSystemDefault((Hints.Key) key);
-        }
-        return hint;
     }
 
     /**
@@ -524,17 +520,42 @@ public class FactoryRegistry extends ServiceRegistry {
                                         final Hints   hints,
                                         Set/*<Factory>*/ alreadyDone)
     {
-        Hints remaining = null;
-        final Map implementationHints = Hints.stripNonKeys(factory.getImplementationHints());
+        /*
+         * Ask for implementation hints with special care against infinite recursivity.
+         * Some implementations use deferred algorithms fetching dependencies only when
+         * first needed. The call to getImplementationHints() is sometime a trigger for
+         * fetching dependencies (in order to return accurate hints).   For example the
+         * BufferedCoordinateOperationFactory implementation asks for an other instance
+         * of CoordinateOperationFactory, the instance to cache behind a buffer,  which
+         * should not be itself. Of course BufferedCoordinateOperation will checks that
+         * it is not caching itself, but its test happen too late for preventing a never-
+         * ending loop if we don't put a 'testingHints' guard here. It is also a safety
+         * against broken factory implementations.
+         */
+        if (!testingHints.add(factory)) {
+            return false;
+        }
+        final Map implementationHints;
+        try {
+            implementationHints = Hints.stripNonKeys(factory.getImplementationHints());
+        } finally {
+            if (!testingHints.remove(factory)) {
+                throw new AssertionError(factory); // Should never happen.
+            }
+        }
         if (implementationHints == null) {
             // factory was bad and did not meet contract - assume it used no Hints
             return true;
         }
+        /*
+         * We got the implementation hints. Now tests their compatibility.
+         */
+        Hints remaining = null;
         for (final Iterator it=implementationHints.entrySet().iterator(); it.hasNext();) {
             final Map.Entry entry = (Map.Entry) it.next();
             final Object    key   = entry.getKey();
             final Object    value = entry.getValue();
-            final Object expected = getHintValue(hints, key);
+            final Object expected = hints.get(key);
             if (expected != null) {
                 /*
                  * We have found a hint that matter. Check if the
@@ -558,7 +579,7 @@ public class FactoryRegistry extends ServiceRegistry {
                 return false;
             }
             /*
-             * Check recursively in factory dependencies, if any. Note that the dependencies
+             * Checks recursively in factory dependencies, if any. Note that the dependencies
              * will be checked against a subset of user's hints. More specifically, all hints
              * processed by the current pass will NOT be passed to the factories dependencies.
              * This is because the same hint may appears in the "parent" factory and a "child"
@@ -568,7 +589,9 @@ public class FactoryRegistry extends ServiceRegistry {
              * for the same hint.
              *
              * Additional note: The 'alreadyDone' set is a safety against cyclic dependencies,
-             * in order to protect ourself against never-ending loops.
+             * in order to protect ourself against never-ending loops. This is not the same
+             * kind of dependencies than 'testingHints'. It is a "factory A depends on factory
+             * B which depends on factory A" loop, which is legal.
              */
             if (value instanceof Factory) {
                 final Factory dependency = (Factory) value;
@@ -631,14 +654,14 @@ public class FactoryRegistry extends ServiceRegistry {
         }
         final OptionalFactory factory = (OptionalFactory) provider;
         final Class type = factory.getClass();
-        if (!testingFactories.add(type)) {
+        if (!testingAvailability.add(type)) {
             throw new RecursiveSearchException(type);
         }
         try {
             return factory.isAvailable();
         } finally {
-            if (!testingFactories.remove(type)) {
-                throw new AssertionError(type);
+            if (!testingAvailability.remove(type)) {
+                throw new AssertionError(type); // Should never happen.
             }
         }
     }

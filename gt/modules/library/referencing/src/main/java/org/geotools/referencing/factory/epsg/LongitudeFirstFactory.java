@@ -105,20 +105,23 @@ public class LongitudeFirstFactory extends DeferredAuthorityFactory implements C
     /**
      * Creates a factory from the specified set of hints.
      *
-     * @param hints An optional set of hints, or {@code null} for the default values.
+     * @param userHints An optional set of hints, or {@code null} for the default values.
      */
-    public LongitudeFirstFactory(final Hints hints) {
-        super(hints, DefaultFactory.PRIORITY + relativePriority());
-        super.hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
-        put(hints, Hints.FORCE_STANDARD_AXIS_DIRECTIONS);
-        put(hints, Hints.FORCE_STANDARD_AXIS_UNITS);
+    public LongitudeFirstFactory(final Hints userHints) {
+        super(userHints, DefaultFactory.PRIORITY + relativePriority());
+        hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
+        put(userHints, Hints.FORCE_STANDARD_AXIS_DIRECTIONS);
+        put(userHints, Hints.FORCE_STANDARD_AXIS_UNITS);
     }
 
     /**
      * Stores a value from the specified hints.
      */
-    private void put(final Hints source, final Hints.Key key) {
-        Object value = getHintValue(source, key);
+    private void put(final Hints userHints, final Hints.Key key) {
+        Object value = null;
+        if (userHints != null) {
+            value = userHints.get(key);
+        }
         if (value == null) {
             value = Boolean.FALSE;
         }

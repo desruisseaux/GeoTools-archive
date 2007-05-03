@@ -93,14 +93,6 @@ public final class CommonFactoryFinder {
     /**
      * Add {@linkplain GeoTools#getDefaultHints defaults hints} to the specified user hints.
      * User hints have precedence.
-     * <p>
-     * <b>Note:</b>
-     * Revisit if this method is necessary. Default hints should already be
-     * taken in account if the factory implementations get their hints with
-     * {@link org.geotools.factory.AbstractFactory#getHintValue}. This method
-     * is a safety for factories that are not implemented like that, but we
-     * could (in theory) remove it for Geotools factories if profiling show
-     * that this method has noticeable performance impact.
      */
     private static Hints addDefaultHints(final Hints hints) {
         final Hints completed = GeoTools.getDefaultHints();

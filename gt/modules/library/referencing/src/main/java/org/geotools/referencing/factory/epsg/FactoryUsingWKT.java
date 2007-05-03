@@ -144,17 +144,20 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
      * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}
      * {@code FACTORY} hints.
      */
-    public FactoryUsingWKT(final Hints hints) {
-        this(hints, DEFAULT_PRIORITY);
+    public FactoryUsingWKT(final Hints userHints) {
+        this(userHints, DEFAULT_PRIORITY);
     }
 
     /**
      * Constructs an authority factory using the specified hints and priority.
      */
-    protected FactoryUsingWKT(final Hints hints, final int priority) {
-        super(hints, priority);
-        factories = FactoryGroup.createInstance(hints);
-        final Object hint = getHintValue(hints, Hints.CRS_AUTHORITY_EXTRA_DIRECTORY);
+    protected FactoryUsingWKT(final Hints userHints, final int priority) {
+        super(userHints, priority);
+        factories = FactoryGroup.createInstance(userHints);
+        Object hint = null;
+        if (userHints != null) {
+            hint = userHints.get(Hints.CRS_AUTHORITY_EXTRA_DIRECTORY);
+        }
         if (hint instanceof File) {
             directory = (File) hint;
         } else if (hint instanceof String) {
@@ -162,7 +165,7 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
         } else {
             directory = null;
         }
-        super.hints.put(Hints.CRS_AUTHORITY_EXTRA_DIRECTORY, directory);
+        hints.put(Hints.CRS_AUTHORITY_EXTRA_DIRECTORY, directory);
         // Disposes the cached property file after at least 15 minutes of inactivity.
         setTimeout(15 * 60 * 1000L);
     }

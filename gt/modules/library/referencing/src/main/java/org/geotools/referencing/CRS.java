@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.NoSuchElementException;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 // OpenGIS dependencies
 import org.opengis.metadata.Identifier;
@@ -89,11 +91,6 @@ import org.geotools.util.UnsupportedImplementationException;
  */
 public final class CRS {
     /**
-     * A set of hints used in order to fetch lenient coordinate operation factory.
-     */
-    private static final Hints LENIENT = new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
-
-    /**
      * A factory for CRS creation with (<var>latitude</var>, <var>longitude</var>) axis order
      * (unless otherwise specified in system property). Will be created only when first needed.
      */
@@ -104,6 +101,30 @@ public final class CRS {
      * Will be created only when first needed.
      */
     private static CRSAuthorityFactory xyFactory;
+
+    /**
+     * A factory for default (non-lenient) operations.
+     */
+    private static CoordinateOperationFactory strictFactory;
+
+    /**
+     * A factory for default lenient operations.
+     */
+    private static CoordinateOperationFactory lenientFactory;
+
+    static {
+        GeoTools.addChangeListener(new ChangeListener() {
+            // Automatically invoked when the system-wide configuration changed.
+            public void stateChanged(ChangeEvent e) {
+                synchronized (CRS.class) {
+                    defaultFactory = null;
+                    xyFactory      = null;
+                    strictFactory  = null;
+                    lenientFactory = null;
+                }
+            }
+        });
+    }
 
     /**
      * Do not allow instantiation of this class.
@@ -141,10 +162,6 @@ public final class CRS {
     public static synchronized CRSAuthorityFactory getAuthorityFactory(final boolean longitudeFirst)
             throws FactoryRegistryException
     {
-        if (ReferencingFactoryFinder.updated) {
-            ReferencingFactoryFinder.updated = false;
-            defaultFactory = xyFactory = null;
-        }
         CRSAuthorityFactory factory = (longitudeFirst) ? xyFactory : defaultFactory;
         if (factory == null) try {
             final Hints hints = GeoTools.getDefaultHints();
@@ -168,6 +185,26 @@ public final class CRS {
         } catch (NoSuchElementException exception) {
             // No factory registered in FactoryFinder.
             throw new FactoryNotFoundException(null, exception);
+        }
+        return factory;
+    }
+
+    /**
+     * Returns the coordinate operation factory to use.
+     */
+    private static synchronized CoordinateOperationFactory getCoordinateOperationFactory(final boolean lenient) {
+        CoordinateOperationFactory factory = (lenient) ? lenientFactory : strictFactory;
+        if (factory == null) {
+            final Hints hints = GeoTools.getDefaultHints();
+            if (lenient) {
+                hints.put(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
+            }
+            factory = ReferencingFactoryFinder.getCoordinateOperationFactory(hints);
+            if (lenient) {
+                lenientFactory = factory;
+            } else {
+                strictFactory = factory;
+            }
         }
         return factory;
     }
@@ -852,9 +889,7 @@ public final class CRS {
                                                   boolean lenient)
             throws FactoryException
     {
-        final CoordinateOperationFactory factory =
-                ReferencingFactoryFinder.getCoordinateOperationFactory(lenient ? LENIENT : null);
-        return factory.createOperation(sourceCRS, targetCRS).getMathTransform();
+        return getCoordinateOperationFactory(lenient).createOperation(sourceCRS, targetCRS).getMathTransform();
     }
 
     /**

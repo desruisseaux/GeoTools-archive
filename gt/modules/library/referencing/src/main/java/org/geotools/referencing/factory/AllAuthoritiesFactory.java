@@ -62,12 +62,18 @@ public class AllAuthoritiesFactory extends ManyAuthoritiesFactory {
     public static AllAuthoritiesFactory DEFAULT = new AllAuthoritiesFactory(null);
 
     /**
+     * User-supplied hints provided at construction time.
+     * Its content may or may not be identical to {@link #hints}.
+     */
+    private final Hints userHints;
+
+    /**
      * Creates a new factory using the specified hints.
      *
-     * @param hints An optional set of hints, or {@code null} if none.
+     * @param userHints An optional set of hints, or {@code null} if none.
      */
-    public AllAuthoritiesFactory(final Hints hints) {
-        super(hints);
+    public AllAuthoritiesFactory(final Hints userHints) {
+        this(userHints, null);
     }
 
     /**
@@ -83,14 +89,14 @@ public class AllAuthoritiesFactory extends ManyAuthoritiesFactory {
      * fallbacks}, to be tried in iteration order only if the first acceptable factory failed to
      * create the requested object.
      *
-     * @param hints An optional set of hints, or {@code null} if none.
+     * @param userHints An optional set of hints, or {@code null} if none.
      * @param factories A set of user-specified factories to try before to delegate
      *        to {@link ReferencingFactoryFinder}, or {@code null} if none.
      */
-    public AllAuthoritiesFactory(final Hints hints,
+    public AllAuthoritiesFactory(final Hints userHints,
                                  final Collection/*<? extends AuthorityFactory>*/ factories)
     {
-        super(hints, factories);
+        this(userHints, factories, (char) 0);
     }
 
     /**
@@ -98,18 +104,19 @@ public class AllAuthoritiesFactory extends ManyAuthoritiesFactory {
      * separator. The optional {@code factories} collection is handled as in the
      * {@linkplain #AllAuthoritiesFactory(Hints, Collection) constructor above}.
      *
-     * @param hints An optional set of hints, or {@code null} if none.
+     * @param userHints An optional set of hints, or {@code null} if none.
      * @param factories A set of user-specified factories to try before to delegate
      *        to {@link ReferencingFactoryFinder}, or {@code null} if none.
      * @param separator The separator between the authority name and the code.
      *
      * @deprecated Override the {@link #getSeparator} method instead.
      */
-    public AllAuthoritiesFactory(final Hints hints,
+    public AllAuthoritiesFactory(final Hints userHints,
                                  final Collection/*<? extends AuthorityFactory>*/ factories,
                                  final char separator)
     {
-        super(hints, factories, separator);
+        super(userHints, factories, separator);
+        this.userHints = new Hints(userHints);
     }
 
     /**
@@ -133,16 +140,25 @@ public class AllAuthoritiesFactory extends ManyAuthoritiesFactory {
             throws FactoryRegistryException
     {
         if (CRSAuthorityFactory.class.equals(type)) {
-            return ReferencingFactoryFinder.getCRSAuthorityFactory(authority, getUserHints());
+            return ReferencingFactoryFinder.getCRSAuthorityFactory(authority, userHints);
         } else if (CSAuthorityFactory.class.equals(type)) {
-            return ReferencingFactoryFinder.getCSAuthorityFactory(authority, getUserHints());
+            return ReferencingFactoryFinder.getCSAuthorityFactory(authority, userHints);
         } else if (DatumAuthorityFactory.class.equals(type)) {
-            return ReferencingFactoryFinder.getDatumAuthorityFactory(authority, getUserHints());
+            return ReferencingFactoryFinder.getDatumAuthorityFactory(authority, userHints);
         } else if (CoordinateOperationAuthorityFactory.class.equals(type)) {
-            return ReferencingFactoryFinder.getCoordinateOperationAuthorityFactory(authority, getUserHints());
+            return ReferencingFactoryFinder.getCoordinateOperationAuthorityFactory(authority, userHints);
         } else {
             return super.fromFactoryRegistry(authority, type);
         }
+    }
+
+    /**
+     * Returns a copy of the hints specified by the user at construction time. It may or may
+     * not be the same than the {@linkplain #getImplementationHints implementation hints} for
+     * this class.
+     */
+    final Hints getUserHints() {
+        return new Hints(userHints);
     }
 
     /**

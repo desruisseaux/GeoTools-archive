@@ -81,7 +81,7 @@ public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
      * creating an appropriate backing store when the {@link #createBackingStore} method is
      * invoked.
      *
-     * @param hints An optional set of hints, or {@code null} if none.
+     * @param userHints An optional set of hints, or {@code null} if none.
      * @param priority The priority for this factory, as a number between
      *        {@link #MINIMUM_PRIORITY MINIMUM_PRIORITY} and
      *        {@link #MAXIMUM_PRIORITY MAXIMUM_PRIORITY} inclusive.
@@ -90,7 +90,7 @@ public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
      *
      * @since 2.2
      */
-    protected DeferredAuthorityFactory(final Hints hints, final int priority) {
+    protected DeferredAuthorityFactory(final Hints userHints, final int priority) {
         super(priority, DEFAULT_MAX);
     }
 
@@ -99,7 +99,7 @@ public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
      * creating an appropriate backing store when the {@link #createBackingStore} method is
      * invoked.
      *
-     * @param hints An optional set of hints, or {@code null} if none.
+     * @param userHints An optional set of hints, or {@code null} if none.
      * @param priority The priority for this factory, as a number between
      *        {@link #MINIMUM_PRIORITY MINIMUM_PRIORITY} and
      *        {@link #MAXIMUM_PRIORITY MAXIMUM_PRIORITY} inclusive.
@@ -109,7 +109,7 @@ public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
      *
      * @since 2.2
      */
-    protected DeferredAuthorityFactory(final Hints hints,
+    protected DeferredAuthorityFactory(final Hints userHints,
                                        final int priority,
                                        final int maxStrongReferences)
     {

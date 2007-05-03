@@ -28,6 +28,7 @@ import javax.sql.DataSource;
 
 // Geotools Dependencies
 import org.geotools.util.Logging;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -568,36 +569,40 @@ public final class Hints extends RenderingHints {
     }
 
     /**
-     * Scans {@linkplain System#getProperties system properties} for any property keys
-     * defined in the {@link GeoTools} class, and add their values to the {@linkplain
-     * GeoTools#getDefaultHints default hints}. For example if the
-     * {@value GeoTools#FORCE_LONGITUDE_FIRST_AXIS_ORDER} system property is defined,
-     * then the {@link #FORCE_LONGITUDE_FIRST_AXIS_ORDER} hint will be added to the set
-     * of default hints.
+     * Notifies that {@linkplain System#getProperties system properties} will need to be scanned
+     * for any property keys defined in the {@link GeoTools} class. New values found (if any) will
+     * be added to the set of {@linkplain GeoTools#getDefaultHints default hints}. For example if
+     * the {@value GeoTools#FORCE_LONGITUDE_FIRST_AXIS_ORDER} system property is defined, then the
+     * {@link #FORCE_LONGITUDE_FIRST_AXIS_ORDER} hint will be added to the set of default hints.
      * <p>
      * This method is invoked automatically the first time it is needed. It usually don't
      * need to be invoked explicitly, except if the {@linkplain System#getProperties system
-     * properties} changed.
-     *
-     * @return {@code true} if at least one hint changed as a result of this scan,
-     *         or {@code false} otherwise.
+     * properties} changed. The scan may not be performed immediately, but rather when needed
+     * at some later stage.
      *
      * @since 2.4
      */
-    public static boolean scanSystemProperties() {
+    public static void scanSystemProperties() {
         synchronized (GLOBAL) {
-            return GeoTools.scanForSystemHints(GLOBAL);
+            needScan = true;
         }
     }
 
     /**
-     * Invokes {@link #scanSystemProperties} when first needed.
+     * Invokes {@link GeoTools#scanSystemProperties} when first needed. The caller is
+     * responsible for invoking {@link GeoTools#fireConfigurationChanged} outside the
+     * synchronized block if this method returns {@code true}.
+     *
+     * @return {@code true} if at least one hint changed as a result of this scan,
+     *         or {@code false} otherwise.
      */
-    private static void ensureSystemDefaultLoaded() {
+    private static boolean ensureSystemDefaultLoaded() {
         assert Thread.holdsLock(GLOBAL);
         if (needScan) {
-            scanSystemProperties();
             needScan = false;
+            return GeoTools.scanForSystemHints(GLOBAL);
+        } else {
+            return false;
         }
     }
 
@@ -606,10 +611,16 @@ public final class Hints extends RenderingHints {
      * {@link GeoTools#getDefaultHints} implementation only.
      */
     static Hints getDefaults() {
+        final boolean changed;
+        final Hints hints;
         synchronized (GLOBAL) {
-            ensureSystemDefaultLoaded();
-            return new Hints(GLOBAL);
+            changed = ensureSystemDefaultLoaded();
+            hints = new Hints(GLOBAL);
         }
+        if (changed) {
+            GeoTools.fireConfigurationChanged();
+        }
+        return hints;
     }
 
     /**
@@ -621,6 +632,7 @@ public final class Hints extends RenderingHints {
             ensureSystemDefaultLoaded();
             GLOBAL.add(hints);
         }
+        GeoTools.fireConfigurationChanged();
     }
 
     /**
@@ -634,10 +646,16 @@ public final class Hints extends RenderingHints {
      * @since 2.4
      */
     public static Object getSystemDefault(final RenderingHints.Key key) {
+        final boolean changed;
+        final Object value;
         synchronized (GLOBAL) {
-            ensureSystemDefaultLoaded();
-            return GLOBAL.get(key);
+            changed = ensureSystemDefaultLoaded();
+            value = GLOBAL.get(key);
         }
+        if (changed) {
+            GeoTools.fireConfigurationChanged();
+        }
+        return value;
     }
 
     /**
@@ -655,10 +673,16 @@ public final class Hints extends RenderingHints {
      * @since 2.4
      */
     public static Object putSystemDefault(final RenderingHints.Key key, final Object value) {
+        final boolean changed;
+        final Object old;
         synchronized (GLOBAL) {
-            ensureSystemDefaultLoaded();
-            return GLOBAL.put(key, value);
+            changed = ensureSystemDefaultLoaded();
+            old = GLOBAL.put(key, value);
         }
+        if (changed || !Utilities.equals(value, old)) {
+            GeoTools.fireConfigurationChanged();
+        }
+        return old;
     }
 
     /**
@@ -672,10 +696,16 @@ public final class Hints extends RenderingHints {
      * @since 2.4
      */
     public static Object removeSystemDefault(final RenderingHints.Key key) {
+        final boolean changed;
+        final Object old;
         synchronized (GLOBAL) {
-            ensureSystemDefaultLoaded();
-            return GLOBAL.remove(key);
+            changed = ensureSystemDefaultLoaded();
+            old = GLOBAL.remove(key);
         }
+        if (changed || old != null) {
+            GeoTools.fireConfigurationChanged();
+        }
+        return old;
     }
 
     /**
@@ -690,11 +720,15 @@ public final class Hints extends RenderingHints {
         final StringBuffer buffer = new StringBuffer("Hints:"); // TODO: localize
         buffer.append(lineSeparator).append(AbstractFactory.toString(this));
         Map extra = null;
+        final boolean changed;
         synchronized (GLOBAL) {
-            ensureSystemDefaultLoaded();
+            changed = ensureSystemDefaultLoaded();
             if (!GLOBAL.isEmpty()) {
                 extra = new HashMap(GLOBAL);
             }
+        }
+        if (changed) {
+            GeoTools.fireConfigurationChanged();
         }
         if (extra != null) {
             extra.keySet().removeAll(keySet());

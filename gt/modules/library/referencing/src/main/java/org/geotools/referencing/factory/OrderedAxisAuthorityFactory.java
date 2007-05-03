@@ -171,7 +171,7 @@ public class OrderedAxisAuthorityFactory extends TransformedAuthorityFactory
      *
      * @param  authority The authority to wraps (example: {@code "EPSG"}). If {@code null},
      *         then all authority factories must be explicitly specified in the set of hints.
-     * @param  hints An optional set of hints, or {@code null} if none.
+     * @param  userHints An optional set of hints, or {@code null} if none.
      * @param  axisOrder An array of axis directions that determine the axis order wanted,
      *         or {@code null} for the default axis order.
      * @throws FactoryRegistryException if at least one factory can not be obtained.
@@ -180,13 +180,13 @@ public class OrderedAxisAuthorityFactory extends TransformedAuthorityFactory
      * @since 2.3
      */
     public OrderedAxisAuthorityFactory(final String          authority,
-                                       final Hints           hints,
+                                       final Hints           userHints,
                                        final AxisDirection[] axisOrder)
             throws FactoryRegistryException, IllegalArgumentException
     {
-        super(authority, hints);
-        forceStandardUnits      = booleanValue(hints, Hints.FORCE_STANDARD_AXIS_UNITS);
-        forceStandardDirections = booleanValue(hints, Hints.FORCE_STANDARD_AXIS_DIRECTIONS);
+        super(authority, userHints);
+        forceStandardUnits      = booleanValue(userHints, Hints.FORCE_STANDARD_AXIS_UNITS);
+        forceStandardDirections = booleanValue(userHints, Hints.FORCE_STANDARD_AXIS_DIRECTIONS);
         directionRanks          = computeDirectionRanks(axisOrder);
         completeHints();
     }
@@ -201,7 +201,7 @@ public class OrderedAxisAuthorityFactory extends TransformedAuthorityFactory
      * </ul>
      *
      * @param  factory   The factory that produces objects using arbitrary axis order.
-     * @param  hints     An optional set of hints, or {@code null} if none.
+     * @param  userHints An optional set of hints, or {@code null} if none.
      * @param  axisOrder An array of axis directions that determine the axis order wanted,
      *                   or {@code null} for the default axis order.
      * @throws IllegalArgumentException If at least two axis directions are colinear.
@@ -209,13 +209,13 @@ public class OrderedAxisAuthorityFactory extends TransformedAuthorityFactory
      * @since 2.3
      */
     public OrderedAxisAuthorityFactory(final AbstractAuthorityFactory factory,
-                                       final Hints                    hints,
+                                       final Hints                    userHints,
                                        final AxisDirection[]          axisOrder)
             throws IllegalArgumentException
     {
         super(factory);
-        forceStandardUnits      = booleanValue(hints, Hints.FORCE_STANDARD_AXIS_UNITS);
-        forceStandardDirections = booleanValue(hints, Hints.FORCE_STANDARD_AXIS_DIRECTIONS);
+        forceStandardUnits      = booleanValue(userHints, Hints.FORCE_STANDARD_AXIS_UNITS);
+        forceStandardDirections = booleanValue(userHints, Hints.FORCE_STANDARD_AXIS_DIRECTIONS);
         directionRanks          = computeDirectionRanks(axisOrder);
         completeHints();
     }
@@ -223,9 +223,14 @@ public class OrderedAxisAuthorityFactory extends TransformedAuthorityFactory
     /**
      * Returns the boolean value for the specified hint.
      */
-    private boolean booleanValue(final Hints hints, final Hints.Key key) {
-        final Boolean value = (Boolean) getHintValue(hints, key);
-        return (value != null) && value.booleanValue();
+    private static boolean booleanValue(final Hints userHints, final Hints.Key key) {
+        if (userHints != null) {
+            final Boolean value = (Boolean) userHints.get(key);
+            if (value != null) {
+                return value.booleanValue();
+            }
+        }
+        return false;
     }
 
     /**

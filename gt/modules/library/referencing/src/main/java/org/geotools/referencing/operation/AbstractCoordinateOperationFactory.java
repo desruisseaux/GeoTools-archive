@@ -175,10 +175,10 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
      * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}
      * {@code FACTORY} hints.
      *
-     * @param hints The hints, or {@code null} if none.
+     * @param userHints The hints, or {@code null} if none.
      */
-    public AbstractCoordinateOperationFactory(final Hints hints) {
-        this(hints, NORMAL_PRIORITY);
+    public AbstractCoordinateOperationFactory(final Hints userHints) {
+        this(userHints, NORMAL_PRIORITY);
     }
 
     /**
@@ -187,16 +187,16 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
      * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}
      * {@code FACTORY} hints.
      *
-     * @param hints The hints, or {@code null} if none.
+     * @param userHints The hints, or {@code null} if none.
      * @param priority The priority for this factory, as a number between
      *        {@link #MINIMUM_PRIORITY MINIMUM_PRIORITY} and
      *        {@link #MAXIMUM_PRIORITY MAXIMUM_PRIORITY} inclusive.
      *
      * @since 2.2
      */
-    public AbstractCoordinateOperationFactory(final Hints hints, final int priority) {
+    public AbstractCoordinateOperationFactory(final Hints userHints, final int priority) {
         super(priority);
-        factories = FactoryGroup.createInstance(hints);
+        factories = FactoryGroup.createInstance(userHints);
         mtFactory = factories.getMathTransformFactory();
     }
 

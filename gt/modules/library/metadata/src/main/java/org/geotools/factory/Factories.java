@@ -31,6 +31,9 @@ import org.geotools.resources.XArray;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Consider moving those methods to {@link GeoTools}. We should also remove
+ *             {@link FactoryRegistry#globalConfiguration} and relies on listeners instead.
  */
 public final class Factories {
     /**
@@ -119,6 +122,8 @@ public final class Factories {
      * to specify additional discovery algorithms. It may be useful in the context of some
      * frameworks that use the <cite>constructor injection</cite> pattern, like the
      * <a href="http://www.springframework.org/">Spring framework</a>.
+     *
+     * @deprecated Moved to {@link GeoTools} class.
      */
     public static void addFactoryIteratorProvider(FactoryIteratorProvider provider) {
         synchronized (GLOBAL) {
@@ -135,6 +140,8 @@ public final class Factories {
      * Removes a provider that was previously {@linkplain #addFactoryIteratorProvider added}.
      * Note that factories already obtained from the specified provider will not be
      * {@linkplain FactoryRegistry#deregisterServiceProvider deregistered} by this method.
+     *
+     * @deprecated Moved to {@link GeoTools} class.
      */
     public static void removeFactoryIteratorProvider(FactoryIteratorProvider provider) {
         synchronized (GLOBAL) {

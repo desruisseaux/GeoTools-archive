@@ -35,6 +35,8 @@ import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
+import org.geotools.factory.Hints;
+import org.geotools.factory.GeoTools;
 import org.geotools.resources.Arguments;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.OrderedAxisAuthorityFactory;
@@ -94,13 +96,41 @@ public class CRSTest extends TestCase {
     }
 
     /**
+     * Tests the (longitude, latitude) axis order for EPSG:4326.
+     */
+    public void testForcedAxisOrder() throws NoSuchAuthorityCodeException, FactoryException {
+        final CoordinateReferenceSystem crs = CRS.decode("EPSG:4326", true);
+        final CoordinateSystem cs = crs.getCoordinateSystem();
+        assertEquals(2, cs.getDimension());
+
+        CoordinateSystemAxis axis0 = cs.getAxis(0);
+        assertEquals("Long", axis0.getAbbreviation());
+
+        CoordinateSystemAxis axis1 = cs.getAxis(1);
+        assertEquals("Lat", axis1.getAbbreviation());
+
+        final CoordinateReferenceSystem standard = CRS.decode("EPSG:4326");
+        assertFalse("Should not be (long,lat) axis order.", CRS.equalsIgnoreMetadata(crs, standard));
+
+        final CoordinateReferenceSystem def;
+        try {
+            assertNull(Hints.putSystemDefault(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE));
+            def = CRS.decode("EPSG:4326");
+        } finally {
+            assertEquals(Boolean.TRUE, Hints.removeSystemDefault(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER));
+        }
+        assertEquals("Expected (long,lat) axis order.", crs, def);
+        assertSame("Should be back to (lat,long) axis order.", standard, CRS.decode("EPSG:4326"));
+    }
+
+    /**
      * Tests again EPSG:4326, but forced to (longitude, latitude) axis order.
      *
      * @todo Uncomment when we will be allowed to compile for J2SE 1.5.
      *       Call to {@link System#clearProperty} is mandatory for this test.
      */
-//    public void testSystemPropertyToForceXY() throws NoSuchAuthorityCodeException, FactoryException {
-//        assertNull(System.getProperty(GeoTools.FORCE_LONGITUDE_FIRST_AXIS_ORDER));
+    public void testSystemPropertyToForceXY() throws NoSuchAuthorityCodeException, FactoryException {
+        assertNull(System.getProperty(GeoTools.FORCE_LONGITUDE_FIRST_AXIS_ORDER));
 //        System.setProperty(GeoTools.FORCE_LONGITUDE_FIRST_AXIS_ORDER, "true");
 //        try {
 //            CoordinateReferenceSystem crs = CRS.decode("EPSG:4326");
@@ -115,7 +145,7 @@ public class CRSTest extends TestCase {
 //        } finally {
 //            System.clearProperty(GeoTools.FORCE_LONGITUDE_FIRST_AXIS_ORDER);
 //        }
-//    }
+    }
 
     /**
      * Tests {@link CRS#lookupIdentifier}.

@@ -44,6 +44,7 @@ import org.opengis.referencing.operation.MathTransformFactory;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
+import org.geotools.factory.GeoTools;
 import org.geotools.factory.FactoryCreator;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.factory.FactoryRegistryException;
@@ -100,12 +101,6 @@ public class ReferencingFactoryFinder {
     private static Set/*<String>*/ authorityNames;
 
     /**
-     * Set to {@code true} when {@link #scanForPlugins} is invoked.
-     * For internal use by {@link CRS} only.
-     */
-    static boolean updated;
-
-    /**
      * Do not allows any instantiation of this class.
      */
     ReferencingFactoryFinder() {
@@ -134,30 +129,24 @@ public class ReferencingFactoryFinder {
     }
 
     /**
-     * Programmatic management of authority factories.
-     * Needed for user managed, not plug-in managed, authority factory.
-     * Also useful for test cases.
-     *
-     * @param authority The authority factory to add.
+     * Add {@linkplain GeoTools#getDefaultHints defaults hints} to the specified user hints.
+     * User hints have precedence.
+     * <p>
+     * <b>Note:</b> In a previous version, we fetched the {@linkplain Hints#getSystemDefault
+     * default hints} on a case-by-case basis instead of fetching all default hints at once.
+     * But it leads to significant complication in {@link FactoryRegistry} (hints comming from
+     * two different sources, which introduced new bugs when "longitude first axis order" hint
+     * is set). In addition, it may leads to synchronization issue if many hints are modified
+     * one by one. It is safer to get all default hints in one synchronized snapshot and lets
+     * {@link FactoryRegistry} assumes that the hints map really contains every hints it need
+     * to care about.
      */
-    public static synchronized void addAuthorityFactory(final AuthorityFactory authority) {
-        if (registry == null) {
-            scanForPlugins();
+    private static Hints addDefaultHints(final Hints hints) {
+        final Hints completed = GeoTools.getDefaultHints();
+        if (hints != null) {
+            completed.add(hints);
         }
-        getServiceRegistry().registerServiceProvider(authority);
-        authorityNames = null;
-    }
-
-    /**
-     * Programmatic management of authority factories.
-     * Needed for user managed, not plug-in managed, authority factory.
-     * Also useful for test cases.
-     *
-     * @param authority The authority factory to remove.
-     */
-    public static synchronized void removeAuthorityFactory(final AuthorityFactory authority) {
-        getServiceRegistry().deregisterServiceProvider(authority);
-        authorityNames = null;
+        return completed;
     }
 
     /**
@@ -193,9 +182,8 @@ loop:       for (int i=0; ; i++) {
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available factory implementations.
      */
-    private static synchronized Set/*<T>*/ getFactories(final Class/*<T extends Factory>*/ type,
-            final Hints hints)
-    {
+    private static synchronized Set/*<T>*/ getFactories(final Class/*<T extends Factory>*/ type, Hints hints) {
+        hints = addDefaultHints(hints);
         return new LazySet(getServiceRegistry().getServiceProviders(type, null, hints));
     }
 
@@ -210,9 +198,10 @@ loop:       for (int i=0; ; i++) {
      *         specified interface.
      */
     private static synchronized Factory /*T*/ getFactory(final Class/*<T extends Factory>*/ type,
-            final Hints hints, final Hints.Key key)
+            Hints hints, final Hints.Key key)
             throws FactoryRegistryException
     {
+        hints = addDefaultHints(hints);
         return (Factory) getServiceRegistry().getServiceProvider(type, null, hints, key);
     }
 
@@ -233,9 +222,10 @@ loop:       for (int i=0; ; i++) {
      */
     private static synchronized AuthorityFactory /*T*/ getAuthorityFactory(
             final Class/*<T extends AuthorityFactory>*/ type, final String authority,
-            final Hints hints, final Hints.Key key)
+            Hints hints, final Hints.Key key)
             throws FactoryRegistryException
     {
+        hints = addDefaultHints(hints);
         return (AuthorityFactory) getServiceRegistry().getServiceProvider(
                 type, new AuthorityFilter(authority), hints, key);
     }
@@ -647,6 +637,33 @@ loop:       for (int i=0; ; i++) {
     }
 
     /**
+     * Programmatic management of authority factories.
+     * Needed for user managed, not plug-in managed, authority factory.
+     * Also useful for test cases.
+     *
+     * @param authority The authority factory to add.
+     */
+    public static synchronized void addAuthorityFactory(final AuthorityFactory authority) {
+        if (registry == null) {
+            scanForPlugins();
+        }
+        getServiceRegistry().registerServiceProvider(authority);
+        authorityNames = null;
+    }
+
+    /**
+     * Programmatic management of authority factories.
+     * Needed for user managed, not plug-in managed, authority factory.
+     * Also useful for test cases.
+     *
+     * @param authority The authority factory to remove.
+     */
+    public static synchronized void removeAuthorityFactory(final AuthorityFactory authority) {
+        getServiceRegistry().deregisterServiceProvider(authority);
+        authorityNames = null;
+    }
+
+    /**
      * Scans for factory plug-ins on the application class path. This method is
      * needed because the application class path can theoretically change, or
      * additional plug-ins may become available. Rather than re-scanning the
@@ -656,12 +673,14 @@ loop:       for (int i=0; ; i++) {
      * sophisticated applications which dynamically make new plug-ins
      * available at runtime.
      */
-    public static synchronized void scanForPlugins() {
-        authorityNames = null;
-        if (registry != null) {
-            registry.scanForPlugins();
+    public static void scanForPlugins() {
+        synchronized (ReferencingFactoryFinder.class) {
+            authorityNames = null;
+            if (registry != null) {
+                registry.scanForPlugins();
+            }
         }
-        updated = true;
+        GeoTools.fireConfigurationChanged();
     }
 
     /**

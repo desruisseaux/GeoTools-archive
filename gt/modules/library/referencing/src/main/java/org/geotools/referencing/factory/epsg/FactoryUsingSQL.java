@@ -413,18 +413,18 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
     /**
      * Constructs an authority factory using the specified connection.
      *
-     * @param hints The underlying factories used for objects creation.
+     * @param userHints The underlying factories used for objects creation.
      * @param connection The connection to the underlying EPSG database.
      *
      * @since 2.2
      */
-    public FactoryUsingSQL(final Hints hints, final Connection connection) {
-        super(hints, MAXIMUM_PRIORITY-20);
+    public FactoryUsingSQL(final Hints userHints, final Connection connection) {
+        super(userHints, MAXIMUM_PRIORITY-20);
         // The following hints have no effect on this class behaviour,
         // but tell to the user what this factory do about axis order.
-        this.hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE);
-        this.hints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS,   Boolean.FALSE);
-        this.hints.put(Hints.FORCE_STANDARD_AXIS_UNITS,        Boolean.FALSE);
+        hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE);
+        hints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS,   Boolean.FALSE);
+        hints.put(Hints.FORCE_STANDARD_AXIS_UNITS,        Boolean.FALSE);
         this.connection = connection;
         ensureNonNull("connection", connection);
     }

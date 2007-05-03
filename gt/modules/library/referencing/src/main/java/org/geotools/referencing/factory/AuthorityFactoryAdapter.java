@@ -220,26 +220,26 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * Creates a wrappers around the default factories for the specified authority.
      * The factories are fetched using {@link ReferencingFactoryFinder}.
-     * 
+     *
      * @param authority The authority to wraps (example: {@code "EPSG"}). If {@code null},
      *                  then all authority factories must be explicitly specified in the
      *                  set of hints.
-     * @param hints     An optional set of hints, or {@code null} if none.
+     * @param userHints An optional set of hints, or {@code null} if none.
      * @throws FactoryRegistryException if at least one factory can not be obtained.
      *
      * @since 2.4
      */
-    protected AuthorityFactoryAdapter(final String authority, final Hints hints)
+    protected AuthorityFactoryAdapter(final String authority, final Hints userHints)
             throws FactoryRegistryException
     {
         this(ReferencingFactoryFinder.getCRSAuthorityFactory(authority,
-                trim(hints, Hints.CRS_AUTHORITY_FACTORY)),
+                trim(userHints, Hints.CRS_AUTHORITY_FACTORY)),
              ReferencingFactoryFinder.getCSAuthorityFactory(authority,
-                trim(hints, Hints.CS_AUTHORITY_FACTORY)),
+                trim(userHints, Hints.CS_AUTHORITY_FACTORY)),
              ReferencingFactoryFinder.getDatumAuthorityFactory(authority,
-                trim(hints, Hints.DATUM_AUTHORITY_FACTORY)),
+                trim(userHints, Hints.DATUM_AUTHORITY_FACTORY)),
              ReferencingFactoryFinder.getCoordinateOperationAuthorityFactory(authority,
-                trim(hints, Hints.COORDINATE_OPERATION_AUTHORITY_FACTORY)));
+                trim(userHints, Hints.COORDINATE_OPERATION_AUTHORITY_FACTORY)));
     }
 
     /**
@@ -262,23 +262,23 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      * this is a Geotools design problem. Maybe... this is not a trivial issue. So we are
      * better to not document that in public API for now.
      *
-     * @param  hints The user hints to trim. This map will never be modified.
+     * @param  userHints The user hints to trim. This map will never be modified.
      * @param  keep  The hint to <strong>not</strong> remove.
-     * @return A copy of {@code hints} without the authority hints, or {@code hints}
+     * @return A copy of {@code userHints} without the authority hints, or {@code userHints}
      *         if no change were required.
      */
-    private static Hints trim(final Hints hints, final Hints.Key keep) {
-        Hints reduced = hints;
-        if (hints != null) {
+    private static Hints trim(final Hints userHints, final Hints.Key keep) {
+        Hints reduced = userHints;
+        if (userHints != null) {
             for (int i=0; i<TYPES.length; i++) {
                 final Hints.Key key = TYPES[i];
                 if (!keep.equals(key)) {
-                    if (reduced == hints) {
-                        if (!hints.containsKey(key)) {
+                    if (reduced == userHints) {
+                        if (!userHints.containsKey(key)) {
                             continue;
                         }
                         // Copies the map only if we need to modify it.
-                        reduced = new Hints(hints);
+                        reduced = new Hints(userHints);
                     }
                     reduced.remove(key);
                 }
@@ -1014,7 +1014,6 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
             final Factory factory   = (Factory) operationFactory;
             final Map     hints     = factory.getImplementationHints();
             final Object  candidate = hints.get(Hints.COORDINATE_OPERATION_FACTORY);
-            // Really hints.get(key), not getHintValue(hints, key).
             if (candidate instanceof CoordinateOperationFactory) {
                 return (CoordinateOperationFactory) candidate;
             }

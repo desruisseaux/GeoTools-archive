@@ -99,7 +99,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  *
  *     FactoryA(Hints userHints) {
  *         fb = FactoryFinder.getFactoryB(userHints);
- *         this.hints.put(Hints.FACTORY_B, fb);
+ *         hints.put(Hints.FACTORY_B, fb);
  *     }
  * }
  * </pre></blockquote></td>
@@ -226,38 +226,6 @@ public class AbstractFactory implements Factory, RegisterableService {
      */
     public Map getImplementationHints() {
         return unmodifiableHints;
-    }
-
-    /**
-     * Returns the hint value for the specified key, or the {@linkplain Hints#getSystemDefault
-     * system default} if the {@code hints} map is either {@code null} or has no mapping for
-     * the key.
-     * <p>
-     * This convenience method should be used <strong>in constructors only</strong>.
-     * After construction completion, stored hints should fetch using the usual
-     * <code>{@linkplain #hints}.get(key)}</code> code instead. This is because
-     * factories should be immutable and insensitive to change in
-     * {@linkplain GeoTools#getDefaultHints system default} after their construction.
-     *
-     * @since 2.4
-     */
-    protected final Object getHintValue(final Map hints, final RenderingHints.Key key) {
-        if (hints == this.hints || hints == unmodifiableHints) {
-            /*
-             * Technically this method don't care. But such argument is an indication that the
-             * caller may be using this method in a way that break the factory immutability
-             * contract, so we are better to warn him.
-             */
-            throw new IllegalArgumentException(
-                    Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$1, "hints"));
-        }
-        if (hints != null) {
-            final Object value = hints.get(key);
-            if (value != null) {
-                return value;
-            }
-        }
-        return Hints.getSystemDefault(key);
     }
 
     /**

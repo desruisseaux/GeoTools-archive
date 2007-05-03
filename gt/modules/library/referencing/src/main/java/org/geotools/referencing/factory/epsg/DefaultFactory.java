@@ -152,8 +152,8 @@ public class DefaultFactory extends DeferredAuthorityFactory
     /**
      * Constructs an authority factory with the default priority.
      */
-    public DefaultFactory(final Hints hints) {
-        this(hints, PRIORITY);
+    public DefaultFactory(final Hints userHints) {
+        this(userHints, PRIORITY);
     }
 
     /**
@@ -162,21 +162,23 @@ public class DefaultFactory extends DeferredAuthorityFactory
      * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}
      * {@code FACTORY} hints, in addition of {@link Hints#EPSG_DATA_SOURCE EPSG_DATA_SOURCE}.
      *
-     * @param hints An optional set of hints, or {@code null} if none.
+     * @param userHints An optional set of hints, or {@code null} if none.
      * @param priority The priority for this factory, as a number between
      *        {@link #MINIMUM_PRIORITY MINIMUM_PRIORITY} and
      *        {@link #MAXIMUM_PRIORITY MAXIMUM_PRIORITY} inclusive.
      *
      * @since 2.4
      */
-    public DefaultFactory(final Hints hints, final int priority) {
-        super(hints, priority);
-        datasourceName = (String) getHintValue(hints, Hints.EPSG_DATA_SOURCE);
+    public DefaultFactory(final Hints userHints, final int priority) {
+        super(userHints, priority);
+        if (userHints != null) {
+            datasourceName = (String) userHints.get(Hints.EPSG_DATA_SOURCE);
+        }
         if (datasourceName == null) {
             datasourceName = DATASOURCE_NAME;
         }
-        this.hints.put(Hints.EPSG_DATA_SOURCE, datasourceName);
-        factories = FactoryGroup.createInstance(hints);
+        hints.put(Hints.EPSG_DATA_SOURCE, datasourceName);
+        factories = FactoryGroup.createInstance(userHints);
         setTimeout(30*60*1000L); // Close the connection after at least 30 minutes of inactivity.
     }
 

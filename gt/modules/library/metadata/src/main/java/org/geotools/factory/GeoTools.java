@@ -17,10 +17,12 @@ package org.geotools.factory;
 
 // J2SE dependencies
 import java.awt.RenderingHints;
-import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.EventListenerList;
 
 // Geotools dependencies
 import org.geotools.resources.XMath;
@@ -48,6 +50,13 @@ public final class GeoTools {
      * The current GeoTools version. The separator character must be the dot.
      */
     private static final Version VERSION = new Version("2.4.SNAPSHOT");
+
+    /**
+     * Object to inform about system-wide configuration changes.
+     * We use the Swing utility listener list since it is lightweight and thread-safe.
+     * Note that it doesn't involve any dependency to the remaining of Swing library.
+     */
+    private static final EventListenerList LISTENERS = new EventListenerList();
 
     /**
      * The bindings between {@linkplain System#getProperties system properties} and
@@ -200,6 +209,7 @@ public final class GeoTools {
      *         or {@code false} otherwise.
      */
     static boolean scanForSystemHints(final Hints hints) {
+        assert Thread.holdsLock(hints);
         boolean changed = false;
         synchronized (BINDINGS) {
             for (final Iterator it=BINDINGS.entrySet().iterator(); it.hasNext();) {
@@ -283,6 +293,57 @@ public final class GeoTools {
      */
     public static Hints getDefaultHints() {
         return Hints.getDefaults();
+    }
+
+    /**
+     * Adds an alternative way to search for factory implementations. {@link FactoryRegistry} has
+     * a default mechanism bundled in it, which uses the content of all {@code META-INF/services}
+     * directories found on the classpath. This {@code addFactoryIteratorProvider} method allows
+     * to specify additional discovery algorithms. It may be useful in the context of some
+     * frameworks that use the <cite>constructor injection</cite> pattern, like the
+     * <a href="http://www.springframework.org/">Spring framework</a>.
+     */
+    public static void addFactoryIteratorProvider(final FactoryIteratorProvider provider) {
+        Factories.addFactoryIteratorProvider(provider);
+    }
+
+    /**
+     * Removes a provider that was previously {@linkplain #addFactoryIteratorProvider added}.
+     * Note that factories already obtained from the specified provider will not be
+     * {@linkplain FactoryRegistry#deregisterServiceProvider deregistered} by this method.
+     */
+    public static void removeFactoryIteratorProvider(final FactoryIteratorProvider provider) {
+        Factories.removeFactoryIteratorProvider(provider);
+    }
+
+    /**
+     * Adds the specified listener to the list of objects to inform when system-wide
+     * configuration changed.
+     */
+    public static void addChangeListener(final ChangeListener listener) {
+        removeChangeListener(listener); // Ensure singleton.
+        LISTENERS.add(ChangeListener.class, listener);
+    }
+
+    /**
+     * Removes the specified listener from the list of objects to inform when system-wide
+     * configuration changed.
+     */
+    public static void removeChangeListener(final ChangeListener listener) {
+        LISTENERS.remove(ChangeListener.class, listener);
+    }
+
+    /**
+     * Informs every listeners that system-wide configuration changed.
+     */
+    public static void fireConfigurationChanged() {
+        final ChangeEvent event = new ChangeEvent(GeoTools.class);
+        final Object[] listeners = LISTENERS.getListenerList();
+        for (int i=0; i<listeners.length; i+=2) {
+            if (listeners[i] == ChangeListener.class) {
+                ((ChangeListener) listeners[i+1]).stateChanged(event);
+            }
+        }
     }
 
     /**

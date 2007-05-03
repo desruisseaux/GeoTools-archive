@@ -87,10 +87,10 @@ public class URN_AuthorityFactory extends AuthorityFactoryAdapter implements CRS
      * {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER FORCE_LONGITUDE_FIRST_AXIS_ORDER} hint
      * with value {@link Boolean#FALSE FALSE}.
      *
-     * @param hints The hints to be given to backing factories.
+     * @param userHints The hints to be given to backing factories.
      */
-    public URN_AuthorityFactory(final Hints hints) {
-        this(new AllAuthoritiesFactory(hints));
+    public URN_AuthorityFactory(final Hints userHints) {
+        this(new AllAuthoritiesFactory(userHints));
     }
 
     /**

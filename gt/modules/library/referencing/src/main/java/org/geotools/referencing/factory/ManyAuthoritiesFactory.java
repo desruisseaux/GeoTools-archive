@@ -108,18 +108,12 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
     private final ThreadLocal/*<Boolean>*/ inProgress = new ThreadLocal();
 
     /**
-     * User-supplied hints provided at construction time.
-     * Its content may or may not be identical to {@link #hints}.
-     */
-    private final Hints userHints;
-
-    /**
      * Creates a new factory using the specified hints.
      *
-     * @param hints An optional set of hints, or {@code null} if none.
+     * @param userHints An optional set of hints, or {@code null} if none.
      */
-    public ManyAuthoritiesFactory(final Hints hints) {
-        this(hints, null);
+    public ManyAuthoritiesFactory(final Hints userHints) {
+        this(userHints, null);
     }
 
     /**
@@ -134,14 +128,14 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      * fallbacks}, to be tried in iteration order only if the first acceptable factory failed to
      * create the requested object.
      *
-     * @param hints An optional set of hints, or {@code null} if none.
+     * @param userHints An optional set of hints, or {@code null} if none.
      * @param factories A set of user-specified factories to try before to delegate
      *        to {@link ReferencingFactoryFinder}.
      */
-    public ManyAuthoritiesFactory(final Hints hints,
+    public ManyAuthoritiesFactory(final Hints userHints,
             final Collection/*<? extends AuthorityFactory>*/ factories)
     {
-        this(hints, factories, (char) 0);
+        this(userHints, factories, (char) 0);
     }
 
     /**
@@ -150,18 +144,17 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      *
      * @deprecated Override the {@link #getSeparator} method instead.
      */
-    ManyAuthoritiesFactory(final Hints hints,
+    ManyAuthoritiesFactory(final Hints userHints,
                            final Collection/*<? extends AuthorityFactory>*/ factories,
                            final char separator)
     {
         super(NORMAL_PRIORITY);
         this.separator = separator;
-        this.userHints = new Hints(hints);
         if (factories!=null && !factories.isEmpty()) {
             for (final Iterator it=factories.iterator(); it.hasNext();) {
                 final Object factory = it.next();
                 if (factory instanceof Factory) {
-                    this.hints.putAll(((Factory) factory).getImplementationHints());
+                    hints.putAll(((Factory) factory).getImplementationHints());
                 }
             }
             this.factories = createFallbacks(factories);
@@ -342,15 +335,6 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
             c = code.charAt(i);
         } while (Character.isWhitespace(c));
         return Character.isJavaIdentifierPart(c);
-    }
-
-    /**
-     * Returns a copy of the hints specified by the user at construction time. It may or may
-     * not be the same than the {@linkplain #getImplementationHints implementation hints} for
-     * this class.
-     */
-    final Hints getUserHints() {
-        return new Hints(userHints);
     }
 
     /**

@@ -138,14 +138,14 @@ public final class FactoryGroup extends ReferencingFactory {
      * and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM} {@code FACTORY} hints.
      * <p>
      * This constructor is public mainly for {@link org.geotools.factory.FactoryCreator} usage.
-     * Consider invoking <code>{@linkplain #createInstance createInstance}(hints)</code> instead.
+     * Consider invoking <code>{@linkplain #createInstance createInstance}(userHints)</code> instead.
      *
-     * @param  hints The hints, or {@code null} if none.
+     * @param userHints The hints, or {@code null} if none.
      *
      * @since 2.2
      */
-    public FactoryGroup(final Hints hints) {
-        final Hints reduced = new Hints(hints);
+    public FactoryGroup(final Hints userHints) {
+        final Hints reduced = new Hints(userHints);
         /*
          * If hints are provided, we will fetch factory immediately (instead of storing the hints
          * in an inner field) because most factories will retain few hints, while the Hints map
@@ -162,9 +162,9 @@ public final class FactoryGroup extends ReferencingFactory {
          */
         if (!reduced.isEmpty()) {
             setHintsInto(reduced);
-            this.hints.putAll(reduced);
+            hints.putAll(reduced);
             initialize();
-            this.hints.clear();
+            hints.clear();
         }
     }
 
@@ -172,11 +172,13 @@ public final class FactoryGroup extends ReferencingFactory {
      * Returns the factory for the specified hint, or {@code null} if the hint is not a factory
      * instance. It could be for example a {@link Class}.
      */
-    private Factory extract(final Map hints, final Hints.Key key) {
-        final Object candidate = getHintValue(hints, key);
-        if (candidate instanceof Factory) {
-            hints.remove(key);
-            return (Factory) candidate;
+    private static Factory extract(final Map reduced, final Hints.Key key) {
+        if (reduced != null) {
+            final Object candidate = reduced.get(key);
+            if (candidate instanceof Factory) {
+                reduced.remove(key);
+                return (Factory) candidate;
+            }
         }
         return null;
     }

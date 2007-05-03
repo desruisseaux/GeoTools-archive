@@ -129,15 +129,15 @@ public class TransformedAuthorityFactory extends AuthorityFactoryAdapter {
      * @param authority The authority to wraps (example: {@code "EPSG"}). If {@code null},
      *                  then all authority factories must be explicitly specified in the
      *                  set of hints.
-     * @param hints     An optional set of hints, or {@code null} if none.
+     * @param userHints An optional set of hints, or {@code null} if none.
      * @throws FactoryRegistryException if at least one factory can not be obtained.
      *
      * @since 2.4
      */
-    protected TransformedAuthorityFactory(final String authority, final Hints hints)
+    protected TransformedAuthorityFactory(final String authority, final Hints userHints)
             throws FactoryRegistryException
     {
-        super(authority, hints);
+        super(authority, userHints);
     }
 
     /**

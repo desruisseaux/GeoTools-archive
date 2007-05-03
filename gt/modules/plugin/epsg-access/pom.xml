@@ -40,7 +40,7 @@
     Connection to EPSG database using MS-Access engine. This is the primary 
     format released by EPSG, so it should be understood as the most "official" 
     one. This plugin is very short and contains nothing else than connection 
-     parameters. The user must install himself the EPSG database on his machine.
+    parameters. The user must install himself the EPSG database on his machine.
   </description>
 
   <licenses>
@@ -81,6 +81,28 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
+
+
+
+  <!-- =========================================================== -->
+  <!--     Compilation                                             -->
+  <!-- =========================================================== -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <!--
+            Indicates whether the build will continue even if there are compilation errors.
+            We allow the build to continue because this module has a dependency to the
+            JDBC-ODBC bridge bundled in Sun JDK, which may not be available on all platforms.
+          -->
+          <failOnError>false</failOnError>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 
 </project>

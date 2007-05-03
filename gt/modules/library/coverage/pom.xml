@@ -111,7 +111,7 @@
   <!--     Dependency Management                                   -->
   <!-- =========================================================== -->
   <dependencies>
-      <dependency>
+    <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-api</artifactId>
       <version>${project.version}</version>
@@ -121,12 +121,12 @@
       <artifactId>gt2-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
-        <dependency>
+    <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-main</artifactId>
       <version>${project.version}</version>
     </dependency>
-      <dependency>
+    <dependency>
       <groupId>com.vividsolutions</groupId>
       <artifactId>jts</artifactId>
       <!-- The version number is specified in the parent POM. -->

@@ -117,15 +117,15 @@ public class FactoryUsingAnsiSQL extends FactoryUsingSQL {
     /**
      * Constructs an authority factory using the specified connection.
      *
-     * @param hints      The underlying factories used for objects creation.
+     * @param userHints  The underlying factories used for objects creation.
      * @param connection The connection to the underlying EPSG database.
      *
      * @since 2.2
      */
-    public FactoryUsingAnsiSQL(final Hints      hints,
+    public FactoryUsingAnsiSQL(final Hints      userHints,
                                final Connection connection)
     {
-        super(hints, connection);
+        super(userHints, connection);
         for (int i=0; i<ANSI.length; i++) {
             map.put(ANSI[i], ANSI[++i]);
         }
