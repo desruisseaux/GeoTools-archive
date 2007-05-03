@@ -32,6 +32,7 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.Query;
 import org.geotools.data.complex.filter.FilterAttributeExtractor;
 import org.geotools.data.complex.filter.XPath;
+import org.geotools.data.complex.filter.XPath.Step;
 import org.geotools.feature.iso.AttributeFactoryImpl;
 import org.geotools.feature.iso.Types;
 import org.opengis.feature.Attribute;
@@ -466,7 +467,7 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
                 targetXpathAttr = insertIndexInXpathOfComplex(target, targetXpath, index);
 
             } else if (isLeafOfNestedComplexType(targetXpath, target.getDescriptor())) {
-                targetXpathAttr = insertIndexInXpathOfLeafAttr(target, targetXpath, index);
+                targetXpathAttr = setLeafInexInXPathExpression(target, targetXpath, index);
             } else {
                 throw new IllegalArgumentException(
                         "Attribute must be complex type or belong to the grouping attributes");
@@ -620,25 +621,25 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
     }
 
     /**
-     * Inserts the index in the xpath of a complex attribute.
+     * Sets the given index to the leaf node of an xpath expression
      * 
      * @param featureType
      * @param attrXpath
-     * @param index
+     * @param xpathIndex
      * 
      * @return String xPath with index
      */
-    private final String insertIndexInXpathOfLeafAttr(final Attribute root, final String attrXpath,
-            final int index) {
+    private final String setLeafInexInXPathExpression(final Attribute root, final String attrXpath,
+            final int xpathIndex) {
 
         org.opengis.feature.type.Name name = root.getDescriptor().getName();
         List/* <XPath.Step> */stepList = XPath.steps(name, attrXpath);
-
-        int insertPosition = stepList.size() - 1;
-
-        String indexXpath = insertIndexInXpath(root, attrXpath, index, insertPosition);
-
-        return indexXpath;
+        int leafIndex = stepList.size() - 1;
+        XPath.Step lastStep = (XPath.Step) stepList.get(leafIndex);
+        lastStep = new Step(lastStep.getName(), xpathIndex);
+        stepList.set(leafIndex, lastStep);
+        String xpath = XPath.Step.toString(stepList);
+        return xpath;
     }
 
     /**

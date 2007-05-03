@@ -320,35 +320,6 @@ public class XPath {
         throw new IllegalStateException();
     }
 
-    /*
-     * private ComplexAttribute appendComplexProperty(final ComplexAttribute
-     * parent, final XPath.Step currStep, final AttributeDescriptor
-     * currStepDescriptor) {
-     * 
-     * AttributeBuilder builder = new AttributeBuilder(featureFactory);
-     * PropertyName attExp = FF.property(currStep.toString()); Object
-     * addressedObj = attExp.evaluate(parent);
-     * 
-     * ComplexAttribute newAttribute;
-     * 
-     * if (addressedObj == null) { builder.init(parent); // we need the actual
-     * Name or the builder will use the // parent's namespace,which might be
-     * wrong if (currStepDescriptor != null) { Name stepName =
-     * currStepDescriptor.getName(); builder.add(null, stepName); } else {
-     * String currStepLocalName = currStep.getName(); builder.add(null,
-     * currStepLocalName); }
-     * 
-     * ComplexAttribute attribute = (ComplexAttribute) builder.build(); Object
-     * newParentValue = attribute.get(); parent.set(newParentValue);
-     * 
-     * addressedObj = attExp.evaluate(attribute); newAttribute =
-     * (ComplexAttribute) addressedObj; if (addressedObj == null) {
-     * System.out.println("break here"); } } else { if (addressedObj instanceof
-     * Collection) { Collection collection = ((Collection) addressedObj);
-     * newAttribute = (ComplexAttribute) collection.iterator().next(); } else {
-     * newAttribute = (ComplexAttribute) addressedObj; } } return newAttribute; }
-     */
-
     private Attribute setValue(final AttributeDescriptor descriptor, final String id, Object value,
             final int index, final ComplexAttribute parent, final AttributeType targetNodeType) {
 
