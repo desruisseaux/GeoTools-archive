@@ -1,27 +1,14 @@
-/*
- *    GeoTools - OpenSource mapping toolkit
- *    http://geotools.org
- *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
- *    
- *    This library is free software; you can redistribute it and/or
- *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation;
- *    version 2.1 of the License.
- *
- *    This library is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
+/**
+ * 
  */
 package org.geotools.styling.visitor;
 
 import java.util.Stack;
 
 import org.geotools.event.GTCloneUtil;
-import org.geotools.filter.Expression;
-import org.opengis.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.visitor.DuplicatorFilterVisitor;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
+import org.geotools.filter.visitor.DuplicatingFilterVisitor;
 import org.geotools.styling.AnchorPoint;
 import org.geotools.styling.ColorMap;
 import org.geotools.styling.ColorMapEntry;
@@ -51,54 +38,36 @@ import org.geotools.styling.Symbol;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.styling.UserLayer;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.expression.Expression;
 
 /**
- * Used to duplicate a Style object (anything in the SLD hierarchy).
- * <p>
- * Some methods in this visitor use a clone method to duplicate, rather than
- * constructing a new object. This should be made consistent with the other
- * methods, and tested.
- * </p>
+ * Creates a deep copy of a Style.
  * 
- * @author Cory Horner, Refractions Research Inc.
- * @source $URL$
- * @deprecated use {@link DuplicatingStyleVisitor}
+ * @author Jesse
  */
-public class DuplicatorStyleVisitor implements StyleVisitor {
-    Stack pages = new Stack(); // need a Stack as Filter structure is recursive
-    
-    //Stack pages; // need a Stack as Filter structure is recursive
-    StyleFactory sf;
+public class DuplicatingStyleVisitor extends DuplicatingFilterVisitor implements StyleVisitor{
+	
+	private final StyleFactory sf;
 
-    /** TODO: support duplication of pure open gis filters */
-    public DuplicatorFilterVisitor copyFilter;
-        
-    public DuplicatorStyleVisitor(StyleFactory sf, FilterFactory ff) { // FilterFactory factory 
-        this.sf = sf;
-        this.copyFilter = new DuplicatorFilterVisitor( ff );
-    }
+	public DuplicatingStyleVisitor() {
+		this( CommonFactoryFinder.getStyleFactory(GeoTools.getDefaultHints()) );
+	}
+	
+	public DuplicatingStyleVisitor(StyleFactory styleFactory) {
+		this.sf=styleFactory;
+	}
+	public DuplicatingStyleVisitor(StyleFactory styleFactory, FilterFactory2 factory) {
+		super( factory );
+		this.sf=styleFactory;
+	}
 
-    
-    /** Duplicate an expression using copyFilter */
-    public Expression copy( Expression expression ){
-        expression.accept( copyFilter );
-        return (Expression) copyFilter.getPages().pop();
-    }
-    
-    /** Duplicate an expression using copyFilter */
-    public Filter copy( org.geotools.filter.Filter filter ){
-        filter.accept( copyFilter );
-        return (Filter) copyFilter.getPages().pop();
-    }
-    public void setStyleFactory(StyleFactory styleFactory) {
-        this.sf = styleFactory;
-    }
-    public Stack getPages() {
-        return pages;
-    }
-    public Object getCopy() {
-        return pages.firstElement();
-    }
+	private Stack pages=new Stack();
+	
+	public Object getCopy() {
+		return pages.peek();
+	}
     public void visit(StyledLayerDescriptor sld) {
         StyledLayerDescriptor copy = null;
 
@@ -108,10 +77,10 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
         for (int i = 0; i < length; i++) {
             if (layers[i] instanceof UserLayer) {
                 ((UserLayer) layers[i]).accept(this);
-                layersCopy[i] = (UserLayer) getPages().pop();
+                layersCopy[i] = (UserLayer) pages.pop();
             } else if (layers[i] instanceof NamedLayer) {
                 ((NamedLayer) layers[i]).accept(this);
-                layersCopy[i] = (NamedLayer) getPages().pop();
+                layersCopy[i] = (NamedLayer) pages.pop();
             }
         }
 
@@ -121,7 +90,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
         copy.setTitle(sld.getTitle());
         copy.setStyledLayers(layersCopy);
 
-        getPages().push(copy);
+        pages.push(copy);
     }
 
     public void visit(NamedLayer layer) {
@@ -133,7 +102,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
         for (int i = 0; i < length; i++) {
             if (style[i] != null) {
                 style[i].accept(this);
-                styleCopy[i] = (Style) getPages().pop();
+                styleCopy[i] = (Style) pages.pop();
             }
         }
 
@@ -144,7 +113,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
         for (int i = 0; i < length; i++) {
             if (lfc[i] != null) {
                 lfc[i].accept(this);
-                lfcCopy[i] = (FeatureTypeConstraint) getPages().pop();
+                lfcCopy[i] = (FeatureTypeConstraint) pages.pop();
             }
         }
 
@@ -156,7 +125,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
         }
 
         copy.setLayerFeatureConstraints(lfcCopy);
-        getPages().push(copy);
+        pages.push(copy);
     }
 
     public void visit(UserLayer layer) {
@@ -169,7 +138,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
         for (int i = 0; i < length; i++) {
             if (style[i] != null) {
                 style[i].accept(this);
-                styleCopy[i] = (Style) getPages().pop();
+                styleCopy[i] = (Style) pages.pop();
             }
         }
 
@@ -180,7 +149,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
         for (int i = 0; i < length; i++) {
             if (lfc[i] != null) {
                 lfc[i].accept(this);
-                lfcCopy[i] = (FeatureTypeConstraint) getPages().pop();
+                lfcCopy[i] = (FeatureTypeConstraint) pages.pop();
             }
         }
 
@@ -189,7 +158,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
         copy.setUserStyles(styleCopy);
         copy.setLayerFeatureConstraints(lfcCopy);
 
-        getPages().push(copy);
+        pages.push(copy);
     }
 
     public void visit(Style style) {
@@ -201,7 +170,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
         for (int i = 0; i < length; i++) {
             if (fts[i] != null) {
                 fts[i].accept(this);
-                ftsCopy[i] = (FeatureTypeStyle) getPages().pop();
+                ftsCopy[i] = (FeatureTypeStyle) pages.pop();
             }
         }
 
@@ -211,7 +180,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
         copy.setTitle(style.getTitle());
         copy.setFeatureTypeStyles(ftsCopy);
 
-        getPages().push(copy);
+        pages.push(copy);
     }
 
     public void visit(Rule rule) {
@@ -220,8 +189,8 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
         Filter filterCopy = null;
 
         if (rule.getFilter() != null) {
-            org.geotools.filter.Filter filter = (org.geotools.filter.Filter) rule.getFilter();
-            filterCopy = copy( filter );
+            Filter filter = rule.getFilter();
+            filterCopy = (Filter) filter.accept(this, null);
         }
 
         Graphic[] legendGraphic = rule.getLegendGraphic();
@@ -231,7 +200,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
         for (int i = 0; i < length; i++) {
             if (legendGraphic[i] != null) {
                 legendGraphic[i].accept(this);
-                legendGraphicCopy[i] = (Graphic) getPages().pop();
+                legendGraphicCopy[i] = (Graphic) pages.pop();
             }
         }
 
@@ -242,7 +211,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
         for (int i = 0; i < length; i++) {
             if (symbolizer[i] != null) {
                 symbolizer[i].accept(this);
-                symbolizerCopy[i] = (Symbolizer) getPages().pop();
+                symbolizerCopy[i] = (Symbolizer) pages.pop();
             }
         }
 
@@ -257,7 +226,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
         copy.setTitle(rule.getTitle());
         copy.setSymbolizers(symbolizerCopy);
 
-        getPages().push(copy);
+        pages.push(copy);
     }
 
     public void visit(FeatureTypeStyle fts) {
@@ -269,7 +238,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
         for (int i = 0; i < length; i++) {
             if (rules[i] != null) {
                 rules[i].accept(this);
-                rulesCopy[i] = (Rule) getPages().pop();
+                rulesCopy[i] = (Rule) pages.pop();
             }
         }
 
@@ -281,7 +250,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
         copy.setRules(rulesCopy);
         copy.setSemanticTypeIdentifiers((String[]) fts.getSemanticTypeIdentifiers().clone());
         
-        getPages().push(copy);
+        pages.push(copy);
     }
 
     public void visit(Fill fill) {
@@ -293,7 +262,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
             throw new RuntimeException(erp);
         }
 
-        getPages().push(copy);
+        pages.push(copy);
     }
 
     public void visit(Stroke stroke) {
@@ -305,7 +274,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
             throw new RuntimeException(erp);
         }
 
-        getPages().push(copy);
+        pages.push(copy);
     }
 
     public void visit(Symbolizer sym) {
@@ -322,7 +291,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
             throw new RuntimeException(erp);
         }
 
-        getPages().push(copy);
+        pages.push(copy);
     }
 
     public void visit(LineSymbolizer line) {
@@ -334,7 +303,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
             throw new RuntimeException(erp);
         }
 
-        getPages().push(copy);
+        pages.push(copy);
     }
 
     public void visit(PolygonSymbolizer poly) {
@@ -346,7 +315,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
             throw new RuntimeException(erp);
         }
 
-        getPages().push(copy);
+        pages.push(copy);
     }
 
     public void visit(TextSymbolizer text) {
@@ -358,7 +327,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
             throw new RuntimeException(erp);
         }
 
-        getPages().push(copy);
+        pages.push(copy);
     }
 
     public void visit(RasterSymbolizer raster) {
@@ -370,7 +339,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
             throw new RuntimeException(erp);
         }
 
-        getPages().push(copy);
+        pages.push(copy);
     }
 
     public void visit(Graphic gr) {
@@ -380,7 +349,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
 
         if (gr.getDisplacement() != null) {
             gr.getDisplacement().accept(this);
-            displacementCopy = (Displacement) getPages().pop();
+            displacementCopy = (Displacement) pages.pop();
         }
 
         ExternalGraphic[] externalGraphics = gr.getExternalGraphics();
@@ -390,7 +359,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
         for (int i = 0; i < length; i++) {
             if (externalGraphics[i] != null) {
                 externalGraphics[i].accept(this);
-                externalGraphicsCopy[i] = (ExternalGraphic) getPages().pop();
+                externalGraphicsCopy[i] = (ExternalGraphic) pages.pop();
             }
         }
 
@@ -400,29 +369,26 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
         for (int i = 0; i < length; i++) {
             if (marks[i] != null) {
                 marks[i].accept(this);
-                marksCopy[i] = (Mark) getPages().pop();
+                marksCopy[i] = (Mark) pages.pop();
             }
         }
 
         Expression opacityCopy = null;
 
         if (gr.getOpacity() != null) {
-            gr.getOpacity().accept(copyFilter);            
-            opacityCopy = (Expression) copyFilter.getPages().pop();
+        	opacityCopy = (Expression) gr.getOpacity().accept(this, null);            
         }
 
         Expression rotationCopy = null;
 
         if (gr.getRotation() != null) {
-            gr.getRotation().accept(copyFilter);
-            rotationCopy = (Expression) copyFilter.getPages().pop();
+        	rotationCopy = (Expression) gr.getRotation().accept(this, null);
         }
 
         Expression sizeCopy = null;
 
         if (gr.getSize() != null) {
-            gr.getSize().accept(copyFilter);
-            sizeCopy = (Expression) copyFilter.getPages().pop();
+        	sizeCopy  = (Expression) gr.getSize().accept(this, null);
         }
 
         Symbol[] symbols = gr.getSymbols();
@@ -432,7 +398,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
         for (int i = 0; i < length; i++) {
             if (symbols[i] != null) {
                 symbols[i].accept(this);
-                symbolCopys[i] = (Symbol) getPages().pop();
+                symbolCopys[i] = (Symbol) pages.pop();
             }
         }
 
@@ -441,12 +407,12 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
         copy.setDisplacement(displacementCopy);
         copy.setExternalGraphics(externalGraphicsCopy);
         copy.setMarks(marksCopy);
-        copy.setOpacity(opacityCopy);
-        copy.setRotation(rotationCopy);
-        copy.setSize(sizeCopy);
+        copy.setOpacity((org.geotools.filter.Expression) opacityCopy);
+        copy.setRotation((org.geotools.filter.Expression) rotationCopy);
+        copy.setSize((org.geotools.filter.Expression) sizeCopy);
         copy.setSymbols(symbolCopys);
 
-        getPages().push(copy);
+        pages.push(copy);
     }
     
     public void visit(Mark mark) {
@@ -456,42 +422,42 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
 
         if (mark.getFill() != null) {
             mark.accept( this );
-            fillCopy = (Fill) getPages().pop();
+            fillCopy = (Fill) pages.pop();
         }
 
         Expression rotationCopy = null;
 
         if (mark.getRotation() != null) {
-            rotationCopy = copy( mark.getRotation() );
+            rotationCopy = (Expression) mark.getRotation().accept(this, null);
         }
 
         Expression sizeCopy = null;
 
         if (mark.getSize() != null) {
-            sizeCopy = copy( mark.getSize() );
+            sizeCopy = (Expression) mark.getSize().accept(this, null);
         }
 
         Stroke strokeCopy = null;
 
         if (mark.getStroke() != null) {
             mark.getStroke().accept(this);
-            strokeCopy = (Stroke) getPages().pop();
+            strokeCopy = (Stroke) pages.pop();
         }
 
         Expression wellKnownNameCopy = null;
 
         if (mark.getWellKnownName() != null) {
-            wellKnownNameCopy = copy( mark.getWellKnownName() );
+            wellKnownNameCopy = (Expression) mark.getWellKnownName().accept(this, null);
         }
 
         copy = sf.createMark();
         copy.setFill(fillCopy);
-        copy.setRotation(rotationCopy);
-        copy.setSize(sizeCopy);
+        copy.setRotation((org.geotools.filter.Expression) rotationCopy);
+        copy.setSize((org.geotools.filter.Expression) sizeCopy);
         copy.setStroke(strokeCopy);
-        copy.setWellKnownName(wellKnownNameCopy);
+        copy.setWellKnownName((org.geotools.filter.Expression) wellKnownNameCopy);
 
-        getPages().push(copy);
+        pages.push(copy);
     }
 
     public void visit(ExternalGraphic exgr) {
@@ -503,7 +469,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
             throw new RuntimeException(erp);
         }
 
-        getPages().push(copy);
+        pages.push(copy);
     }
 
     public void visit(PointPlacement pp) {
@@ -515,7 +481,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
             throw new RuntimeException(erp);
         }
 
-        getPages().push(copy);
+        pages.push(copy);
     }
 
     public void visit(AnchorPoint ap) {
@@ -527,7 +493,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
             throw new RuntimeException(erp);
         }
 
-        getPages().push(copy);
+        pages.push(copy);
     }
 
     public void visit(Displacement dis) {
@@ -539,7 +505,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
             throw new RuntimeException(erp);
         }
 
-        getPages().push(copy);
+        pages.push(copy);
     }
 
     public void visit(LinePlacement lp) {
@@ -551,7 +517,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
             throw new RuntimeException(erp);
         }
 
-        getPages().push(copy);
+        pages.push(copy);
     }
 
     public void visit(Halo halo) {
@@ -563,7 +529,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
             throw new RuntimeException(erp);
         }
 
-        getPages().push(copy);
+        pages.push(copy);
     }
 
     public void visit(FeatureTypeConstraint ftc) {
@@ -575,7 +541,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
             throw new RuntimeException(erp);
         }
 
-        getPages().push(copy);
+        pages.push(copy);
     }
 
 	public void visit(ColorMap arg0) {

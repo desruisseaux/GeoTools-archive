@@ -15,50 +15,61 @@
  */
 package org.geotools.renderer.shape;
 
-import java.util.Iterator;
-
-import org.geotools.filter.Filter;
-import org.geotools.filter.Filters;
 import org.geotools.filter.IllegalFilterException;
-import org.geotools.filter.LiteralExpression;
-import org.geotools.filter.LogicFilter;
+import org.geotools.filter.visitor.DuplicatingFilterVisitor;
 import org.geotools.geometry.jts.JTS;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.spatial.BBOX;
+import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.geometry.MismatchedDimensionException;
 
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Transforms all GeometryExpressions with the provided transform.
+ * <p>
+ * extraData may be a filterfactory2
+ * </p>
  * @author Jesse
  */
-public class FilterTransformer extends AbstractProcessFilterGeometiresVisitor {
+public class FilterTransformer extends DuplicatingFilterVisitor {
 
     final MathTransform mt;
     
     public FilterTransformer(final MathTransform mt) {
-        super();
         this.mt = mt;
     }
-
-
-    public void visit(LogicFilter filter) {
-        for (Iterator iter = filter.getFilterIterator(); iter.hasNext();) {
-            org.opengis.filter.Filter element = (org.opengis.filter.Filter) iter.next();
-            Filters.accept( element, this );
-        }
+    
+    public Object visit(BBOX filter, Object extraData) {
+		String propertyName=filter.getPropertyName();
+		double [] coords= new double[4];
+		coords[0]=filter.getMinX();
+		coords[1]=filter.getMinY();
+		coords[2]=filter.getMaxX();
+		coords[3]=filter.getMaxY();
+		String srs=filter.getSRS();
+		
+		double[] dest=new double[4];
+		try {
+			mt.transform(coords, 0, dest, 0, 2);
+		} catch (TransformException e) {
+			throw new RuntimeException(e);
+		}
+		
+		return getFactory(extraData).bbox(propertyName, dest[0], dest[1], dest[2], dest[3], srs);
+		
     }
-
-    public void visit(LiteralExpression expression) {
-        Object value = expression.getLiteral();
+    
+    public Object visit(Literal expression, Object extraData) {
+        Object value = expression.getValue();
         try {
             if( value instanceof com.vividsolutions.jts.geom.Geometry ){
-                expression.setLiteral(JTS.transform((com.vividsolutions.jts.geom.Geometry)value, mt));
-	        }
-	        if( value instanceof Envelope ){
-	                expression.setLiteral(JTS.transform((Envelope)value, mt));
-	        }
+                return getFactory(extraData).literal(JTS.transform((com.vividsolutions.jts.geom.Geometry)value, mt));
+        }
+            if( value instanceof Envelope ){
+                return getFactory(extraData).literal(JTS.transform((Envelope)value, mt));
+        }
         } catch (MismatchedDimensionException e) {
             throw new RuntimeException(e);
         } catch (IllegalFilterException e) {
@@ -66,6 +77,6 @@ public class FilterTransformer extends AbstractProcessFilterGeometiresVisitor {
         } catch (TransformException e) {
             throw new RuntimeException(e);
         }
+        return super.visit(expression, extraData);
     }
-
 }

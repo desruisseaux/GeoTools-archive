@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.Stack;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.FactoryNotFoundException;
@@ -65,22 +64,31 @@ import org.opengis.filter.spatial.Intersects;
 import org.opengis.filter.spatial.Overlaps;
 import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
-import org.opengis.geometry.Geometry;
 
 /**
  * Used to duplication Filters and/or Expressions. 
  * <p>Returns the copy.  
- * Extra data can be used to provide a {@link FilterFactory2}.
+ * Extra data can be used to provide a {@link FilterFactory2} but this is NOT required.
  * Thread safe class.
  *  </ul>
  * @author Jesse
  *
  */
-public class FilterDuplicatorVisitor implements FilterVisitor, ExpressionVisitor{
+public class DuplicatingFilterVisitor implements FilterVisitor, ExpressionVisitor{
 
-	private FilterFactory2 getFactory(Object extraData) {
-		if( extraData instanceof FilterFactory2)
-			return (FilterFactory2) extraData;
+	private final FilterFactory2 factory;
+
+	public DuplicatingFilterVisitor() {
+		this(findFactory2());
+		
+	}
+	
+
+	public DuplicatingFilterVisitor(FilterFactory2 factory) {
+		this.factory = factory;
+	}
+	
+	private static FilterFactory2 findFactory2() {
 		Set factories = CommonFactoryFinder.getFilterFactories(GeoTools.getDefaultHints());
 		for (Iterator iter = factories.iterator(); iter.hasNext();) {
 			FilterFactory factory = (FilterFactory) iter.next();
@@ -89,6 +97,12 @@ public class FilterDuplicatorVisitor implements FilterVisitor, ExpressionVisitor
 			}
 		}
 		throw new FactoryNotFoundException("There is no FilterFactory2 instance available for the default system hints");
+	}
+
+	protected FilterFactory2 getFactory(Object extraData) {
+		if( extraData instanceof FilterFactory2)
+			return (FilterFactory2) extraData;
+		return factory;
 	}
 
 	public Object visit(ExcludeFilter filter, Object extraData) {
@@ -117,7 +131,7 @@ public class FilterDuplicatorVisitor implements FilterVisitor, ExpressionVisitor
 			FeatureId featureId = (FeatureId) filter;
 			return getFactory(extraData).featureId(featureId.getID());
 		}
-		return getFactory(extraData).id(filter.getIDs());
+		return getFactory(extraData).id(filter.getIdentifiers());
 	}
 
 	public Object visit(Not filter, Object extraData) {

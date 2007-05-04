@@ -429,10 +429,13 @@ public class ShapeFileIndexer {
             tree.insert(cnt++,
                 new Envelope(rec.minX, rec.maxX, rec.minY, rec.maxY));
 
-            if (verbose && ((cnt % 500) == 0)) {
+            if (verbose && ((cnt % 1000) == 0)) {
                 System.out.print('.');
             }
+            if( cnt%100000 == 0 )
+            	System.out.print('\n');
         }
+        System.out.println("done");
         }finally{
 	        channelIdx.close();
 	        fisIdx.close();

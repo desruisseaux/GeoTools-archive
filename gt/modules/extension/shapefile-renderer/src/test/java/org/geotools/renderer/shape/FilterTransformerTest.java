@@ -4,14 +4,14 @@ import java.awt.geom.AffineTransform;
 
 import junit.framework.TestCase;
 
-import org.geotools.filter.BBoxExpression;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.FilterType;
-import org.geotools.filter.LiteralExpression;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.Or;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.spatial.BBOX;
 import org.opengis.referencing.operation.MathTransform;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -21,8 +21,9 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 public class FilterTransformerTest extends TestCase {
 
 
-    private FilterTransformer filterTransformer;
-    private final FilterFactory filterFactory=FilterFactoryFinder.createFilterFactory();
+    private static final String DEFAULT = "4326";
+	private FilterTransformer filterTransformer;
+    private final FilterFactory filterFactory=CommonFactoryFinder.getFilterFactory(null);
     protected void setUp() throws Exception {
         super.setUp();
         AffineTransform t=AffineTransform.getTranslateInstance(10,10);
@@ -34,39 +35,41 @@ public class FilterTransformerTest extends TestCase {
     public void testVisitBBoxExpression() throws Exception {
         Envelope envelope = new Envelope(0,10,0,10);
         GeometryFactory geometryFactory=new GeometryFactory();
-        LiteralExpression lit=filterFactory.createLiteralExpression(geometryFactory.toGeometry(envelope));
-        lit.accept(filterTransformer);
-        assertTrue(geometryFactory.toGeometry(new Envelope(10,20,10,20)).equals((Geometry)lit.getLiteral()));
+        Literal lit = filterFactory.literal(geometryFactory.toGeometry(envelope));
+        lit = (Literal) lit.accept(filterTransformer, null);
+        assertTrue(geometryFactory.toGeometry(new Envelope(10,20,10,20)).equals((Geometry)lit.getValue()));
     }
     
     public void testVisitCompareFilter() throws Exception {
-        Envelope envelope = new Envelope(0,10,0,10);
-        GeometryFactory geometryFactory=new GeometryFactory();
-        org.geotools.filter.GeometryFilter filter=filterFactory.createGeometryFilter(FilterType.GEOMETRY_BBOX);
+        BBOX filter = filterFactory.bbox("geom", 0, 0, 10, 10, DEFAULT);
         
-        BBoxExpression bboxFilter = filterFactory.createBBoxExpression(envelope);
-        filter.addLeftGeometry(bboxFilter);
-        filter.addRightGeometry(filterFactory.createAttributeExpression("geom"));
-        filter.accept(filterTransformer);
-        assertTrue(geometryFactory.toGeometry(new Envelope(10,20,10,20)).equals((Geometry)bboxFilter.getLiteral()));
+        BBOX result = (BBOX) filter.accept(filterTransformer, null);
+        assertEquals(10.0, result.getMinX(),0.000001);
+        assertEquals(10.0, result.getMinY(),0.000001);
+        assertEquals(20.0, result.getMaxX(),0.000001);
+        assertEquals(20.0, result.getMaxY(),0.000001);
     }
     
     public void testVisitORFilter() throws Exception {
-        GeometryFactory geometryFactory=new GeometryFactory();
-        org.geotools.filter.GeometryFilter one=filterFactory.createGeometryFilter(FilterType.GEOMETRY_BBOX);
-        BBoxExpression bboxFilter = filterFactory.createBBoxExpression(new Envelope(0,10,0,10));
-        one.addLeftGeometry(bboxFilter);
-        one.addRightGeometry(filterFactory.createAttributeExpression("geom"));
+        BBOX bbox1 = filterFactory.bbox("geom", 0, 0, 10, 10, DEFAULT);
+        BBOX bbox2 = filterFactory.bbox("geom", 10, 10, 20, 20, DEFAULT);
         
-        org.geotools.filter.GeometryFilter two=filterFactory.createGeometryFilter(FilterType.GEOMETRY_BBOX);
-        BBoxExpression bboxFilter2 = filterFactory.createBBoxExpression(new Envelope(20,10,20,10));
-        two.addLeftGeometry(bboxFilter2);
-        two.addRightGeometry(filterFactory.createAttributeExpression("geom2"));
-        
+        Or or = filterFactory.or(bbox1, bbox2);
         // TEST filter.None because it was a bug before
-        one.or(two).or(Filter.NONE).accept(filterTransformer);
-        assertTrue(geometryFactory.toGeometry(new Envelope(10,20,10,20)).equals((Geometry)bboxFilter.getLiteral()));
-        assertTrue(geometryFactory.toGeometry(new Envelope(30,20,30,20)).equals((Geometry)bboxFilter2.getLiteral()));
+        or = (Or) or.accept(filterTransformer, null);
+
+        bbox1=(BBOX) or.getChildren().get(0);
+        bbox2=(BBOX) or.getChildren().get(1);
+        
+        assertEquals(10.0, bbox1.getMinX(),0.000001);
+        assertEquals(10.0, bbox1.getMinY(),0.000001);
+        assertEquals(20.0, bbox1.getMaxX(),0.000001);
+        assertEquals(20.0, bbox1.getMaxY(),0.000001);
+
+        assertEquals(20.0, bbox2.getMinX(),0.000001);
+        assertEquals(20.0, bbox2.getMinY(),0.000001);
+        assertEquals(30.0, bbox2.getMaxX(),0.000001);
+        assertEquals(30.0, bbox2.getMaxY(),0.000001);
     }
 
 }

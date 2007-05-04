@@ -61,9 +61,7 @@ import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.FilterAttributeExtractor;
-import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.Filters;
-import org.geotools.filter.visitor.DuplicatorFilterVisitor;
 import org.geotools.geometry.jts.Decimator;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.LiteCoordinateSequenceFactory;
@@ -75,7 +73,6 @@ import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
-import org.geotools.referencing.crs.DefaultGeocentricCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.renderer.GTRenderer;
@@ -94,10 +91,9 @@ import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.Rule;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleAttributeExtractor;
-import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
-import org.geotools.styling.visitor.DuplicatorStyleVisitor;
+import org.geotools.styling.visitor.DuplicatingStyleVisitor;
 import org.geotools.util.NumberRange;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.FactoryException;
@@ -312,14 +308,13 @@ public class ShapefileRenderer implements GTRenderer {
                     Rule r = rules[j];
                     
                     // make copy so I don't accidentally modify style
-                    DuplicatorStyleVisitor duplicator = new DuplicatorStyleVisitor(StyleFactoryFinder.createStyleFactory(),
-                            FilterFactoryFinder.createFilterFactory());
+                    DuplicatingStyleVisitor duplicator = new DuplicatingStyleVisitor();
                     r.accept(duplicator);
                     r=(Rule) duplicator.getCopy();
                     if ( r.getFilter()!=null ){
                         // now reproject the geometries in filter because geoms are retrieved projected to screen space
                         FilterTransformer transformer= new  FilterTransformer(mt);
-                        Filters.accept(r.getFilter(), transformer);
+                        r.setFilter((Filter) r.getFilter().accept(transformer, null));
                     }
                     if (isWithInScale(r)) {
                         if (r.hasElseFilter()) {
@@ -750,31 +745,9 @@ public class ShapefileRenderer implements GTRenderer {
         StyleAttributeExtractor sae = new StyleAttributeExtractor(){
             public void visit( Rule rule ) {
 
-                DuplicatorStyleVisitor dupeStyleVisitor = new DuplicatorStyleVisitor(
-                        StyleFactoryFinder.createStyleFactory(), FilterFactoryFinder
-                                .createFilterFactory());
+                DuplicatingStyleVisitor dupeStyleVisitor = new DuplicatingStyleVisitor();
                 dupeStyleVisitor.visit(rule);
                 Rule clone = (Rule) dupeStyleVisitor.getCopy();
-
-                // Rule clone=StyleFactoryFinder.createStyleFactory().createRule();
-                // clone.setAbstract(rule.getAbstract());
-                // clone.setFilter(rule.getFilter());
-                // clone.setSymbolizers(rule.getSymbolizers());
-                // clone.setIsElseFilter(rule.hasElseFilter());
-                // clone.setLegendGraphic(rule.getLegendGraphic());
-                // clone.setMaxScaleDenominator(rule.getMaxScaleDenominator());
-                // clone.setMinScaleDenominator(rule.getMinScaleDenominator());
-                // clone.setName(rule.getName());
-                // clone.setTitle(rule.getTitle());
-                //                    
-                // if ((query != Query.ALL)
-                // && !query.getFilter().equals(Filter.NONE)) {
-                // if (clone.getFilter() == null) {
-                // clone.setFilter(query.getFilter());
-                // } else {
-                // clone.setFilter(clone.getFilter().and(query.getFilter()));
-                // }
-                // }
 
                 super.visit(clone);
             }
@@ -1210,9 +1183,9 @@ public class ShapefileRenderer implements GTRenderer {
             return;
         } // Other arguments get checked later
         // First, create the bbox in real world coordinates
-        Envelope mapArea;
+        ReferencedEnvelope mapArea;
         try {
-            mapArea = RendererUtilities.createMapEnvelope(paintArea, worldToScreen);
+            mapArea = RendererUtilities.createMapEnvelope(paintArea, worldToScreen, getContext().getCoordinateReferenceSystem());
             paint(graphics, paintArea, mapArea, worldToScreen);
         } catch (NoninvertibleTransformException e) {
             fireErrorEvent(new Exception("Can't create pixel to world transform", e));
@@ -1336,14 +1309,9 @@ public class ShapefileRenderer implements GTRenderer {
 
                 DefaultQuery query = new DefaultQuery(currLayer.getQuery());
                 if( query.getFilter() !=null ){
-                    // make copy so I don't accidentally modify filter
-                    DuplicatorFilterVisitor duplicator = new DuplicatorFilterVisitor (FilterFactoryFinder.createFilterFactory());
-                    Filters.accept(query.getFilter(),duplicator);
-                    query.setFilter((Filter) duplicator.getCopy());
-                    
                     // now reproject the geometries in filter because geoms are retrieved projected to screen space
                     FilterTransformer transformer= new  FilterTransformer(mt);
-                    Filters.accept(query.getFilter(),transformer);
+                    query.setFilter((Filter) query.getFilter().accept(transformer, null));
                 }
                 
                 // by processing the filter we can further restrict the maximum bounds that are
@@ -1394,12 +1362,14 @@ public class ShapefileRenderer implements GTRenderer {
         return RendererUtilities.calculateOGCScale(envelope, paintArea.width, hints);
     }
     
-    private void renderWithStreamingRenderer(MapLayer layer, Graphics2D graphics, Rectangle paintArea, Envelope envelope, AffineTransform transform) {
-		MapContext context=new DefaultMapContext(new MapLayer[]{layer});
+    private void renderWithStreamingRenderer(MapLayer layer, Graphics2D graphics, Rectangle paintArea, ReferencedEnvelope envelope, AffineTransform transform) {
+		MapContext context=new DefaultMapContext(new MapLayer[]{layer}, envelope.getCoordinateReferenceSystem());
 		StreamingRenderer renderer=new StreamingRenderer();
 		renderer.setContext(context);
 		renderer.setJava2DHints(getJava2DHints());
-		renderer.setRendererHints(getRendererHints());
+		Map rendererHints2 = new HashMap();
+		rendererHints2.put(LABEL_CACHE_KEY, labelCache);
+		renderer.setRendererHints(rendererHints2);
 		renderer.paint(graphics, paintArea, envelope, transform);
 	}
 

@@ -1140,7 +1140,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 			indexer.setMax(maxDepth);
 
 			try {
-				indexer.index(false, readWriteLock);
+				indexer.index(true, readWriteLock);
 			} catch (MalformedURLException e) {
 				throw new TreeException(e);
 			} catch (LockTimeoutException e) {
