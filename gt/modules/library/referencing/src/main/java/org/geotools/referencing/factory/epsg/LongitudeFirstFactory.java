@@ -109,6 +109,7 @@ public class LongitudeFirstFactory extends DeferredAuthorityFactory implements C
      */
     public LongitudeFirstFactory(final Hints userHints) {
         super(userHints, DefaultFactory.PRIORITY + relativePriority());
+        // See comment in createBackingStore() method body.
         hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
         put(userHints, Hints.FORCE_STANDARD_AXIS_DIRECTIONS);
         put(userHints, Hints.FORCE_STANDARD_AXIS_UNITS);
@@ -157,15 +158,35 @@ public class LongitudeFirstFactory extends DeferredAuthorityFactory implements C
     }
 
     /**
-     * Returns the {@link DefaultFactory} instance to be used as the backing store.
+     * Returns the factory instance (usually {@link DefaultFactory})
+     * to be used as the backing store.
      *
-     * @throws FactoryException If no {@link DefaultFactory} instance was found.
+     * @throws FactoryException If no suitable factory instance was found.
      */
     protected AbstractAuthorityFactory createBackingStore() throws FactoryException {
-        final DefaultFactory factory;
+        /*
+         * Set the hints for the backing store to fetch. I'm not sure that we should request a
+         * org.geotools.referencing.factory.epsg.DefaultFactory implementation; for now we are
+         * making this requirement mostly as a safety in order to get an implementation that is
+         * known to work, but we could relax that in a future version. AbstractAuthorityFactory
+         * is the minimal class required with current OrderedAxisAuthorityFactory API.
+         *
+         * The really important hints are the FORCE_*_AXIS_* handled by this class, which MUST
+         * be set to FALSE. This is especially important for FORCE_LONGITUDE_FIRST_AXIS_ORDER,
+         * which must be set to a different value than the value set by the constructor in order
+         * to prevent LongitudeFirstFactory to fetch itself. The other hints must also be set to
+         * false since forcing axis directions / units is handled by OrderedAxisAuthorityFactory
+         * and we don't want the backing store to interfer with that.
+         */
+        final Hints backingStoreHints;
+        backingStoreHints = new Hints(Hints.CRS_AUTHORITY_FACTORY, DefaultFactory.class);
+        backingStoreHints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE);
+        backingStoreHints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS,   Boolean.FALSE);
+        backingStoreHints.put(Hints.FORCE_STANDARD_AXIS_UNITS,        Boolean.FALSE);
+        final AbstractAuthorityFactory factory;
         try {
-            factory = (DefaultFactory) ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG",
-                        new Hints(Hints.CRS_AUTHORITY_FACTORY, DefaultFactory.class));
+            factory = (AbstractAuthorityFactory)
+                    ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG", backingStoreHints);
         } catch (FactoryNotFoundException exception) {
             throw new org.geotools.referencing.factory.FactoryNotFoundException(exception);
         } catch (FactoryRegistryException exception) {
