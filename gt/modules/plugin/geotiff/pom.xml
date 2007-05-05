@@ -109,7 +109,14 @@
       <artifactId>gt2-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- We need this to make the referencing module useful -->
+    <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>jai_imageio</artifactId>
+      <scope>provided</scope>  <!-- Users should execute JAI installer. -->
+    </dependency>
+
+    <!-- Test dependencies -->
+    <!-- We need epsg-hsql to make the referencing module useful. -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-epsg-hsql</artifactId>
@@ -120,6 +127,12 @@
       <groupId>org.geotools</groupId>
       <artifactId>gt2-sample-data</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>jai_codec</artifactId>
+      <!-- The version number is specified in the parent POM. -->
       <scope>test</scope>
     </dependency>
   </dependencies>

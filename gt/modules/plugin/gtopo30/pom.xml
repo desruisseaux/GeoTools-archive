@@ -94,29 +94,25 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>jai_imageio</artifactId>
+      <scope>provided</scope>  <!-- Users should execute JAI installer. -->
+    </dependency>
+
+    <!-- Test dependencies -->
+    <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-sample-data</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>jai_codec</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+      <scope>test</scope>
+    </dependency>
   </dependencies>
-
-
-  <!-- =========================================================== -->
-  <!--     Build Configuration                                     -->
-  <!-- =========================================================== -->
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-        <!--   Set this to 'true' to bypass unit tests entirely. -->
-        <!--  <skip>${allow.test.skip}</skip>                    -->
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 
 
 </project>

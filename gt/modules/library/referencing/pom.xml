@@ -166,10 +166,19 @@
       <artifactId>gt2-metadata</artifactId>
       <version>${project.version}</version>
     </dependency>
+
+    <!-- Test dependencies -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-sample-data</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- Required for ImageParameterDescriptor test. -->
+      <groupId>javax.media</groupId>
+      <artifactId>jai_codec</artifactId>
+      <!-- The version number is specified in the parent POM. -->
       <scope>test</scope>
     </dependency>
   </dependencies>

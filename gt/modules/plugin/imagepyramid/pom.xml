@@ -125,10 +125,24 @@
       <artifactId>gt2-shapefile</artifactId>
       <version>${project.version}</version>
     </dependency>  
+
+    <!-- Test dependencies -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-sample-data</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>jai_codec</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>jai_imageio</artifactId>
+      <!-- The version number is specified in the parent POM. -->
       <scope>test</scope>
     </dependency>
   </dependencies>

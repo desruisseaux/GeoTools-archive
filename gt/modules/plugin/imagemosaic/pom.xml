@@ -69,64 +69,78 @@
   <!-- =========================================================== -->
   <!--     Dependency Management                                   -->
   <!-- =========================================================== -->
- <dependencies>
-  <dependency>
-    <groupId>org.geotools</groupId>
-    <artifactId>gt2-api</artifactId>
-    <version>${project.version}</version>
-  </dependency>
-  <dependency>
-    <groupId>org.geotools</groupId>
-    <artifactId>gt2-main</artifactId>
-    <version>${project.version}</version>
-  </dependency>
-  <dependency>
-    <groupId>org.geotools</groupId>
-    <artifactId>gt2-referencing</artifactId>
-    <version>${project.version}</version>
-  </dependency>
-  <dependency>
-    <groupId>org.geotools</groupId>
-    <artifactId>gt2-coverage</artifactId>
-    <version>${project.version}</version>
-  </dependency>
-  <dependency>
-    <groupId>com.vividsolutions</groupId>
-    <artifactId>jts</artifactId>
-    <!-- The version number is specified in the parent POM. -->
-  </dependency>
-  <dependency>
-    <groupId>javax.units</groupId>
-    <artifactId>jsr108</artifactId>
-    <!-- The version number is specified in the parent POM. -->
-  </dependency>
-  <dependency>
-    <groupId>java3d</groupId>
-    <artifactId>vecmath</artifactId>
-    <!-- The version number is specified in the parent POM. -->
-  </dependency>
-  <dependency>
-    <groupId>org.geotools</groupId>
-    <artifactId>gt2-epsg-hsql</artifactId>
-    <version>${project.version}</version>
-  </dependency>
-  <dependency>
-    <groupId>hsqldb</groupId>
-    <artifactId>hsqldb</artifactId>
-    <!-- The version number is specified in the parent POM. -->
-  </dependency>
-  <dependency>
-    <groupId>org.geotools</groupId>
-    <artifactId>gt2-shapefile</artifactId>
-    <version>${project.version}</version>
-  </dependency>
-  <dependency>
-    <groupId>org.geotools</groupId>
-    <artifactId>gt2-sample-data</artifactId>
-    <version>${project.version}</version>
-    <scope>test</scope>
-  </dependency>
- </dependencies>
+  <dependencies>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-main</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-referencing</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-coverage</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.vividsolutions</groupId>
+      <artifactId>jts</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+    </dependency>
+    <dependency>
+      <groupId>javax.units</groupId>
+      <artifactId>jsr108</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+    </dependency>
+    <dependency>
+      <groupId>java3d</groupId>
+      <artifactId>vecmath</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-epsg-hsql</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-shapefile</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-sample-data</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>jai_codec</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>jai_imageio</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
 
 </project>

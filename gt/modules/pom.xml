@@ -50,6 +50,19 @@
 
 
   <!-- =========================================================== -->
+  <!--     Dependencies to be inherited by all modules.            -->
+  <!-- =========================================================== -->
+  <dependencies>
+    <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>jai_core</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+      <scope>provided</scope>  <!-- Users should execute JAI installer. -->
+    </dependency>
+  </dependencies>
+
+
+  <!-- =========================================================== -->
   <!--     Build Configuration                                     -->
   <!--         copies all JARs in a single directory.              -->
   <!-- =========================================================== -->

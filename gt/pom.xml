@@ -19,10 +19,6 @@
   <!--       modify the build process in certain conditions.       -->
   <!--                                                             -->
   <!--   Available profiles are:                                   -->
-  <!--     nojai              Works with JAI stricktly using the   -->
-  <!--                        jar dependencies (rather then as a   -->
-  <!--                        JDK & JRE extension)                 -->
-  <!--                                                             -->
   <!--     extensive.tests    Performs more extensive tests than   -->
   <!--                        the default. Only a few modules      -->
   <!--                        check for this profile.              -->
@@ -105,34 +101,6 @@
       <properties>
         <stress.skip.pattern>disabled</stress.skip.pattern>
       </properties>
-    </profile>
-    <profile>
-      <id>nojai</id>
-      <activation>
-        <os>
-          <family>mac</family>
-        </os>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>javax.media</groupId>
-          <artifactId>jai_core</artifactId>
-          <version>1.1.3</version>
-          <scope>provided</scope>
-        </dependency>
-        <dependency>
-          <groupId>javax.media</groupId>
-          <artifactId>jai_codec</artifactId>
-          <version>1.1.3</version>
-          <scope>provided</scope>
-        </dependency>
-        <dependency>
-          <groupId>javax.media</groupId>
-          <artifactId>jai_imageio</artifactId>
-          <version>1.1</version>
-          <scope>provided</scope>
-        </dependency>
-      </dependencies>
     </profile>
     <profile>
       <id>java5</id>
@@ -548,7 +516,6 @@
   <!-- =========================================================== -->
   <dependencyManagement>
     <dependencies>
-
       <!-- GeoAPI and its dependencies -->
       <dependency>
         <groupId>org.opengis</groupId>
@@ -559,6 +526,23 @@
         <groupId>javax.units</groupId>
         <artifactId>jsr108</artifactId>
         <version>0.01</version>
+      </dependency>
+
+      <!-- Java Advanced Imaging (JAI) -->
+      <dependency>
+        <groupId>javax.media</groupId>
+        <artifactId>jai_core</artifactId>
+        <version>1.1.3</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.media</groupId>
+        <artifactId>jai_codec</artifactId>
+        <version>1.1.3</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.media</groupId>
+        <artifactId>jai_imageio</artifactId>
+        <version>1.1</version>
       </dependency>
 
       <!-- Mathematic, geometries, SVG... -->
@@ -783,10 +767,6 @@
 
   <!-- =========================================================== -->
   <!--     Dependencies to be inherited by all modules.            -->
-  <!--     In some previous Geotools version, those dependencies   -->
-  <!--     were specified in module pom.xml. However, experience   -->
-  <!--     that aggregated javadoc fails if the GeoAPI dependency  -->
-  <!--     is not specified at this level.                         -->
   <!-- =========================================================== -->
   <dependencies>
     <dependency>
