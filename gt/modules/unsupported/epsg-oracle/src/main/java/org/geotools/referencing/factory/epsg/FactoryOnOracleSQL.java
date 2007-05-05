@@ -169,7 +169,9 @@ public class FactoryOnOracleSQL extends DefaultFactory {
      */
     protected DataSource createDataSource() throws SQLException {
         DataSource source = super.createDataSource();
-        
+        if( source != null ){
+            return source;
+        }
         final Properties p = load();
         int portNumber;
         try {
@@ -197,7 +199,7 @@ public class FactoryOnOracleSQL extends DefaultFactory {
      */
     protected AbstractAuthorityFactory createBackingStore(final Hints hints) throws SQLException {
         final Connection connection = getDataSource().getConnection();
-        final FactoryUsingAnsiSQL factory = new FactoryUsingAnsiSQL(hints, connection);
+        final FactoryUsingAnsiSQL factory = new FactoryUsingOracleSQL(hints, connection);
         if (schema != null) {
             factory.setSchema(schema);
         }

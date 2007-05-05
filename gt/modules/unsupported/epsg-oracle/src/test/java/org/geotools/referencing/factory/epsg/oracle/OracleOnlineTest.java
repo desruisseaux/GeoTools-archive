@@ -8,19 +8,45 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
 import javax.naming.Context;
+import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
 import oracle.jdbc.pool.OracleDataSource;
 import oracle.jdbc.pool.OracleDataSourceFactory;
 
 import org.apache.commons.dbcp.BasicDataSourceFactory;
+import org.geotools.factory.GeoTools;
 import org.geotools.factory.JNDI;
+import org.geotools.referencing.factory.epsg.DefaultFactory;
 import org.geotools.test.OnlineTestCase;
 
+/**
+ * This represents an online test case.
+ * <p>
+ * To run this test you
+ * will need to supply a "fixture" in "%USERHOME%/.geotools/epsg/oracle.properties"
+ * The contents of this file are as follows:
+ * <pre><code>
+ * user=****
+ * password=****
+ * url=jdbc:oracle:thin:@ant:1521:orcl
+ * </code></pre>
+ * <p>
+ * This test requires ojdbc14.jar in order to run.
+ * <p>
+ * <b>Instructions for Maven:</b> set the environmental variable
+ * "oracle.jdbc" to true (this will enable the oracle.jdbc-true profile and disable
+ * the oracle.jdbc-false profile) ... basically sticking a real ojdbc14.jar in your
+ * path so we have a real driver to work with.
+ * <p>
+ * @author Jody
+ *
+ */
 public class OracleOnlineTest extends OnlineTestCase {
     DataSource datasource;
     Connection connection;
@@ -39,55 +65,55 @@ public class OracleOnlineTest extends OnlineTestCase {
     static final int DATASOURCE= 1;
     
     protected void connect() throws Exception {
-        Context context = JNDI.getInitialContext( null );
-                
         //BasicDataSourceFactory factory = new BasicDataSourceFactory();
         final int TECHNIQUE = DATASOURCE;
-        if( TECHNIQUE == DATASOURCE ){
-            OracleDataSource source = new OracleDataSource();
-            //source.setDriverType( fixture.getProperty("driverClassName"));
-            
-            //source.setPortNumber( Integer.parseInt( fixture.getProperty("port")) );
-            //source.setServerName( fixture.getProperty("host"));
-            source.setUser( fixture.getProperty("user"));
-            source.setPassword( fixture.getProperty("password"));
-            source.setURL( fixture.getProperty("url"));
-            
-            connection = source.getConnection();
+        OracleDataSource source;
+        source = new OracleDataSource();
+        //source.setDriverType( fixture.getProperty("driverClassName"));
+        
+        //source.setPortNumber( Integer.parseInt( fixture.getProperty("port")) );
+        //source.setServerName( fixture.getProperty("host"));
+        source.setUser( fixture.getProperty("user"));
+        source.setPassword( fixture.getProperty("password"));
+        source.setURL( fixture.getProperty("url"));
+        
+        connection = source.getConnection();
+        datasource = source;
+        try {
+            DatabaseMetaData metaData = connection.getMetaData();        
+            String user = fixture.getProperty("user").toUpperCase();
+            ResultSet epsgTables = metaData.getTables( null, user, "EPSG%", null );
+            List list = new ArrayList();
+            while( epsgTables.next() ){
+                list.add( epsgTables.getObject( 3 ));
+            }
+            if( list.isEmpty() ){
+                throw new SQLException("Could not find EPSG tables");
+            }
         }
-        else if (TECHNIQUE == DRIVER ){
-            String host = fixture.getProperty("host");
-            String port = fixture.getProperty("port");
-            String database = fixture.getProperty("database");
-            String url = JDBC_PATH + host + ":" + port + ":" + database;
-            
-            String user = fixture.getProperty("user");
-            String password = fixture.getProperty("password");
-            connection = DriverManager.getConnection(url, user, password);
+        finally {
+            connection.close();
         }
         
-        DatabaseMetaData metaData = connection.getMetaData();        
+        //System.out.println( list );
+        Hashtable env = new Hashtable();
+        env.put( Context.INITIAL_CONTEXT_FACTORY, "org.osjava.sj.memory.MemoryContextFactory" );
         
-        //dump( "schemas", metaData.getSchemas() );
-        String user = fixture.getProperty("user").toUpperCase();
-        ResultSet epsgTables = metaData.getTables( null, user, "EPSG%", null );
-        List list = new ArrayList();
-        while( epsgTables.next() ){
-            list.add( epsgTables.getObject( 3 ));
-        }
-        if( list.isEmpty() ){
-            throw new SQLException("Could not find EPSG tables");
-        }
-        System.out.println( list );
-    }   
+        InitialContext context = new InitialContext(env);
+        String name = context.composeName("jdbc/EPSG", ""); // jdbc/EPSG
+        System.out.println( name );
+        context.bind( name, source );
+        
+        JNDI.init( context );
+    }
 
     protected void disconnect() throws Exception {
         connection.close();
         connection = null;
         datasource = null;
     }
-    
-    public void testConnection() throws Exception{
+    /*
+    public void XtestConnection() throws Exception{
         assertNotNull( connection );
         
         DatabaseMetaData metaData = connection.getMetaData();     
@@ -110,4 +136,5 @@ public class OracleOnlineTest extends OnlineTestCase {
             System.out.println();
         }       
     }
+    */
 }
