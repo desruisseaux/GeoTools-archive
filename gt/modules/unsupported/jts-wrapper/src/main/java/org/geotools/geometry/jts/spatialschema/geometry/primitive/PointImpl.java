@@ -17,6 +17,7 @@ import java.util.Set;
 import org.opengis.go.CommonFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
@@ -36,6 +37,7 @@ import org.geotools.factory.BasicFactories;
 import org.geotools.geometry.jts.spatialschema.geometry.DirectPositionImpl;
 import org.geotools.geometry.jts.spatialschema.geometry.GeometryImpl;
 import org.geotools.geometry.jts.JTSUtils;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 
 
 /**
@@ -66,7 +68,7 @@ public class PointImpl extends GeometryImpl implements Point {
      * Creates a new {@code PointImpl}.
      */
     public PointImpl() {
-        this(null, null);
+    	this( null, DefaultGeographicCRS.WGS84 );
     }
 
     /**
@@ -168,5 +170,29 @@ public class PointImpl extends GeometryImpl implements Point {
     public OrientablePrimitive[] getProxy() {
         return null;
     }
+
+	public int hashCode() {
+		final int PRIME = 31;
+		int result = 1;
+		result = PRIME * result + ((position == null) ? 0 : position.hashCode());
+		return result;
+	}
+
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final PointImpl other = (PointImpl) obj;
+		if (position == null) {
+			if (other.position != null)
+				return false;
+		} else if (!position.equals(other.position))
+			return false;
+		return true;
+	}
+
 }
 

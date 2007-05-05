@@ -87,17 +87,17 @@ public class DimensionModel {
      */
     public static int toD( CoordinateReferenceSystem crs ){
         if( crs == null ){
-            return 2; // hack
+            return 2; // default to 2
         }
         int dimension = crs.getCoordinateSystem().getDimension();
         if( dimension == 2 ){
-            return 1;
+            return TWO_DIMENSIONIAL;
         }
         else if( dimension == 3 ){
-            return 2;
+            return THREE_DIMENSIONIAL;
         }
         else {
-            return 3;
+            return -1; // not supported
         }
     }
     

@@ -42,14 +42,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.geometry.iso.coordinate.LineStringImpl;
 import org.geotools.geometry.iso.io.GeometryToString;
+import org.geotools.geometry.iso.primitive.CurveBoundaryImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.OrientableCurveImpl;
-import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
+import org.geotools.geometry.iso.primitive.PointImpl;
 import org.geotools.geometry.iso.util.DoubleOperation;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
@@ -94,15 +94,11 @@ public class CompositeCurveImpl extends CompositeImpl<OrientableCurveImpl>
 	 * CompositeCurve
 	 * 
 	 * Constructs a Composite Curve
-	 * 
-	 * @param factory
-	 * 
 	 * @param generator
 	 */
-	protected CompositeCurveImpl(FeatGeomFactoryImpl factory,
-			List<OrientableCurve> generator) {
+	protected CompositeCurveImpl(List<OrientableCurve> generator) {
 		/* Pass elements to super constructor */
-		super(factory, generator);
+		super(generator);
 		this.checkConsistency();
 	}
 
@@ -118,13 +114,18 @@ public class CompositeCurveImpl extends CompositeImpl<OrientableCurveImpl>
 		CurveImpl c0 = (CurveImpl) ci.next();
 		;
 		//this.envelope = new EnvelopeImpl(c0.getEnvelope());
-		this.envelope = c0.getGeometryFactory().getCoordinateFactory().createEnvelope(c0.getEnvelope());
+		this.envelope = new EnvelopeImpl(c0.getEnvelope());
 		while (ci.hasNext()) {
 			CurveImpl c1 = (CurveImpl) ci.next();
 			this.envelope.expand(c1.getEnvelope());
-			if (!c0.getEndPoint().equals(c1.getStartPoint()))
+			
+			DirectPosition startPoint = c1.getStartPoint();
+			DirectPosition endPoint = c0.getEndPoint();
+			if (!endPoint.equals(startPoint)){
 				throw new IllegalArgumentException(
 						"Curve elements are not continous. The end point of a curve has to accord to the start point of the following curve."); //$NON-NLS-1$
+			}
+			c0 = c1;
 		}
 
 	}
@@ -150,13 +151,11 @@ public class CompositeCurveImpl extends CompositeImpl<OrientableCurveImpl>
 			throw new IllegalArgumentException(
 					"Could not create the boundary of CompositeCurve."); //$NON-NLS-1$
 		TreeSet<Complex> result = new TreeSet<Complex>();
-		PrimitiveFactoryImpl pf = this.getGeometryFactory()
-				.getPrimitiveFactory();
-		result.add(pf.createCurveBoundary(
-				pf.createPoint((DirectPositionImpl) ((CurveImpl) generator
-						.get(0)).getStartPoint()),
-				pf.createPoint((DirectPositionImpl) ((CurveImpl) generator
-						.get(0)).getEndPoint())));
+		result.add( new CurveBoundaryImpl( getCoordinateReferenceSystem(), 
+				new PointImpl( ((CurveImpl) generator
+						.get(0)).getStartPoint()), new PointImpl( ((CurveImpl) generator
+								.get(0)).getEndPoint()) ) );
+
 		return result;
 	}
 
@@ -249,7 +248,10 @@ public class CompositeCurveImpl extends CompositeImpl<OrientableCurveImpl>
 			// the boundary is null if the composite curve is closed
 			return null;
 		else
-			return this.getGeometryFactory().getPrimitiveFactory().createCurveBoundary(start, end);
+			return new CurveBoundaryImpl(getCoordinateReferenceSystem(),
+					new PointImpl((DirectPositionImpl) start.clone()),
+					new PointImpl((DirectPositionImpl) end.clone()));
+			//return this.getFeatGeometryFactory().getPrimitiveFactory().createCurveBoundary(start, end);
 	}
 
 	/**
@@ -345,7 +347,8 @@ public class CompositeCurveImpl extends CompositeImpl<OrientableCurveImpl>
 		while (elementIter.hasNext()) {
 			newElements.add((Curve) elementIter.next().clone());
 		}
-		return (CompositeCurveImpl) this.getGeometryFactory().getComplexFactory().createCompositeCurve(newElements);
+		return (CompositeCurveImpl) new CompositeCurveImpl(newElements);
+		//return (CompositeCurveImpl) this.getFeatGeometryFactory().getComplexFactory().createCompositeCurve(newElements);
 	}
 
 	/* (non-Javadoc)
@@ -470,6 +473,31 @@ public class CompositeCurveImpl extends CompositeImpl<OrientableCurveImpl>
 	 */
 	public String toString() {
 		return GeometryToString.getString(this);
+	}
+
+	@Override
+	public int hashCode() {
+		final int PRIME = 31;
+		int result = 1;
+		result = PRIME * result + ((envelope == null) ? 0 : envelope.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final CompositeCurveImpl other = (CompositeCurveImpl) obj;
+		if (envelope == null) {
+			if (other.envelope != null)
+				return false;
+		} else if (!envelope.equals(other.envelope))
+			return false;
+		return true;
 	}
 
 }

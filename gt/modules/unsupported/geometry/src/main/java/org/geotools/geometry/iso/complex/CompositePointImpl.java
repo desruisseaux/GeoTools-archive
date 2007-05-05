@@ -41,17 +41,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
-import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.geometry.iso.io.GeometryToString;
-import org.geotools.geometry.iso.primitive.BoundaryImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
 import org.opengis.geometry.Boundary;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.complex.Complex;
 import org.opengis.geometry.complex.CompositePoint;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * A separate class for composite point, CompositePoint (Figure 27) is included
@@ -61,6 +58,9 @@ import org.opengis.geometry.complex.CompositePoint;
  */
 public class CompositePointImpl extends CompositeImpl<PointImpl> implements CompositePoint {
 
+	public CompositePointImpl(PointImpl generator) {
+		this( generator.getCoordinateReferenceSystem(), generator );
+	}
 	/**
 	 * The association role Composition::generator associates this Composite
 	 * Point to the single primitive in this complex. CompositePoint::generator
@@ -69,12 +69,12 @@ public class CompositePointImpl extends CompositeImpl<PointImpl> implements Comp
 	 * The generator is realised by the element ArrayList of the super class
 	 * Complex and will be passed through the super constructor
 	 * 
-	 * @param factory
+	 * @param crs
 	 * @param generator
 	 */
-	public CompositePointImpl(FeatGeomFactoryImpl factory, PointImpl generator) {
+	public CompositePointImpl(CoordinateReferenceSystem crs, PointImpl generator) {
 		/* Call super constructor; elements will be set later */
-		super(factory);
+		super(crs);
 		List<PointImpl> list = new ArrayList<PointImpl>();
 		list.add(generator);
 		this.setElements(list);

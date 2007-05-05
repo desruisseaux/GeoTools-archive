@@ -42,7 +42,6 @@ import java.util.List;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
-import org.opengis.geometry.coordinate.Triangle;
 import org.opengis.geometry.primitive.SurfacePatch;
 
 /**
@@ -297,8 +296,7 @@ public class TinImpl extends TriangulatedSurfaceImpl {
 	 * @return ArrayList<TriangleImpl>
 	 */
 	public List<TriangleImpl> getTriangles() {
-		List<TriangleImpl> triangles = this.getGeometryFactory().getListFactory()
-				.createTriangleList();
+		List<TriangleImpl> triangles = new ArrayList<TriangleImpl>(); //this.getFeatGeometryFactory().getListFactory().createTriangleList();
 		for (SurfacePatch sp : this.getPatches()) {
 			triangles.add((TriangleImpl) sp);
 		}

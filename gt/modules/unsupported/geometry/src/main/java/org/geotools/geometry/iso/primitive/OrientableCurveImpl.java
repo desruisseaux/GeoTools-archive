@@ -36,8 +36,8 @@
 
 package org.geotools.geometry.iso.primitive;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.opengis.geometry.primitive.OrientableCurve;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * 
@@ -58,10 +58,10 @@ public abstract class OrientableCurveImpl extends OrientablePrimitiveImpl
 	/**
 	 * Constructor
 	 * 
-	 * @param factory
+	 * @param crs
 	 */
-	protected OrientableCurveImpl(FeatGeomFactoryImpl factory) {
-		super(factory);
+	protected OrientableCurveImpl(CoordinateReferenceSystem crs) {
+		super(crs);
 	}
 
 	/**

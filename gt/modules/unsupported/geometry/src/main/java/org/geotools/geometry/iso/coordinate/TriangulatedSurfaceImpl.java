@@ -45,6 +45,7 @@ import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.opengis.geometry.coordinate.Polygon;
 import org.opengis.geometry.coordinate.Triangle;
 import org.opengis.geometry.coordinate.TriangulatedSurface;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * 
@@ -60,12 +61,12 @@ public class TriangulatedSurfaceImpl extends PolyhedralSurfaceImpl implements
 	/**
 	 * Constructor
 	 * 
-	 * @param factory
+	 * @param crs
 	 * @param triangles
 	 */
-	public TriangulatedSurfaceImpl(FeatGeomFactoryImpl factory,
+	public TriangulatedSurfaceImpl(CoordinateReferenceSystem crs,
 			List<Polygon> triangles) {
-		super(factory, triangles);
+		super(crs, triangles);
 	}
 
 	/**

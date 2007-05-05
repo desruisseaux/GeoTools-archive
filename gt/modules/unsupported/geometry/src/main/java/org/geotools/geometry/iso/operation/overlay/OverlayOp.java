@@ -209,7 +209,7 @@ public class OverlayOp extends GeometryGraphOperation {
 		 * mixed-precision arguments where the second arg has greater precision
 		 * than the first.
 		 */
-		this.geomFeatFactory = g0.getGeometryFactory();
+		this.geomFeatFactory = g0.getFeatGeometryFactory();
 		// geomFact = g0.getFactory();
 	}
 

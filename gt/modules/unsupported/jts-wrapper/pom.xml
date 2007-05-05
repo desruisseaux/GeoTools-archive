@@ -94,6 +94,12 @@
       <artifactId>commons-logging</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
+	<dependency>
+	    <groupId>picocontainer</groupId>
+	    <artifactId>picocontainer</artifactId>
+	    <version>3</version>
+	    <scope>test</scope>
+	</dependency> 
   </dependencies>
 
 

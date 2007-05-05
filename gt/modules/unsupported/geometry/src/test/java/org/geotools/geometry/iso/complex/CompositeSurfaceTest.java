@@ -7,7 +7,7 @@ import junit.framework.TestCase;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.complex.ComplexFactoryImpl;
-import org.geotools.geometry.iso.coordinate.CoordinateFactoryImpl;
+import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.complex.CompositeSurface;
@@ -30,7 +30,7 @@ public class CompositeSurfaceTest extends TestCase {
 		
 		ComplexFactoryImpl complf = aGeomFactory.getComplexFactory();
 		PrimitiveFactoryImpl pf = aGeomFactory.getPrimitiveFactory();
-		CoordinateFactoryImpl cf = aGeomFactory.getCoordinateFactory();
+		GeometryFactoryImpl cf = aGeomFactory.getGeometryFactoryImpl();
 
 		List<DirectPosition> directPositionList = new ArrayList<DirectPosition>();
 		directPositionList.add(cf.createDirectPosition(new double[] {20, 10}));

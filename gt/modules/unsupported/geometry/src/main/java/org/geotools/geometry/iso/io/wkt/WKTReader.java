@@ -115,13 +115,13 @@ public class WKTReader {
 	private static final String R_PAREN = ")";
 
 	private PrimitiveFactory primitiveFactory;
-	private GeometryFactory coordinateFactory;
+	private GeometryFactory geometryFactory;
     private PositionFactory positionFactory;
 
 	private StreamTokenizer tokenizer;
 
-    public WKTReader(PrimitiveFactory aPrimitiveFactory, GeometryFactory aCoordinateFactory){
-        this( aPrimitiveFactory, aCoordinateFactory, new PositionFactoryImpl( aCoordinateFactory.getCoordinateReferenceSystem(),null) );
+    public WKTReader(PrimitiveFactory aPrimitiveFactory, GeometryFactory aGeometryFactory){
+        this( aPrimitiveFactory, aGeometryFactory, new PositionFactoryImpl( aGeometryFactory.getCoordinateReferenceSystem(),null) );
     }
 	/**
 	 * Creates a reader that creates objects using the given
@@ -131,9 +131,9 @@ public class WKTReader {
 	 *            the factory used to create <code>Geometry</code>s.
 	 */
 	public WKTReader(PrimitiveFactory aPrimitiveFactory,
-			GeometryFactory aCoordinateFactory, PositionFactory aPositionFactory ) {
+			GeometryFactory aGeometryFactory, PositionFactory aPositionFactory ) {
 		this.primitiveFactory = aPrimitiveFactory;
-		this.coordinateFactory = aCoordinateFactory;
+		this.geometryFactory = aGeometryFactory;
         this.positionFactory = aPositionFactory;
 	}
 
@@ -537,14 +537,13 @@ public class WKTReader {
 	private OrientableCurve createCurve(Coordinate[] aCoords) {
 		List<Position> points = new ArrayList<Position>();
 		for (int i = 0; i < aCoords.length; i++) {
-			points
-					.add(this.positionFactory
-							.createPosition(this.coordinateFactory
+			points.add(this.positionFactory
+							.createPosition(this.geometryFactory
 									.createDirectPosition((aCoords[i]
 											.getCoordinates()))));
 		}
 		// Create List of CurveSegment´s (LineString´s)
-		LineString lineString = this.coordinateFactory.createLineString(points);
+		LineString lineString = this.geometryFactory.createLineString(points);
 		List<CurveSegment> segments = new ArrayList<CurveSegment>();
 		segments.add(lineString);
 		return this.primitiveFactory.createCurve(segments);

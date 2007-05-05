@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import junit.framework.TestCase;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.geotools.geometry.iso.coordinate.CoordinateFactoryImpl;
+import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.coordinate.PositionImpl;
 import org.geotools.geometry.iso.io.wkt.ParseException;
 import org.geotools.geometry.iso.io.wkt.WKTReader;
@@ -79,7 +79,7 @@ public class IsSimpleOperationTest extends TestCase {
 
 	private CurveImpl createCurveA(FeatGeomFactoryImpl aGeomFactory) {
 
-		CoordinateFactoryImpl tCoordFactory = aGeomFactory.getCoordinateFactory();
+		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
 		PrimitiveFactoryImpl tPrimFactory = aGeomFactory.getPrimitiveFactory();
 		
 		// Self-Intersecting Curve
@@ -105,7 +105,7 @@ public class IsSimpleOperationTest extends TestCase {
 
 	private CurveImpl createCurveB(FeatGeomFactoryImpl aGeomFactory) {
 
-		CoordinateFactoryImpl tCoordFactory = aGeomFactory.getCoordinateFactory();
+		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
 		PrimitiveFactoryImpl tPrimFactory = aGeomFactory.getPrimitiveFactory();
 		
 		// Non-Self-Intersecting Curve
@@ -131,7 +131,7 @@ public class IsSimpleOperationTest extends TestCase {
 	
 	private SurfaceImpl createSurfaceFromWKT(FeatGeomFactoryImpl aGeomFactory, String aWKTsurface) {
 		SurfaceImpl rSurface = null;
-		WKTReader wktReader = new WKTReader(aGeomFactory.getPrimitiveFactory(), aGeomFactory.getCoordinateFactory());
+		WKTReader wktReader = new WKTReader(aGeomFactory.getPrimitiveFactory(), aGeomFactory.getGeometryFactoryImpl());
 		try {
 			rSurface = (SurfaceImpl) wktReader.read(aWKTsurface);
 		} catch (ParseException e) {
@@ -142,7 +142,7 @@ public class IsSimpleOperationTest extends TestCase {
 	
 	private CurveImpl createCurveFromWKT(String aWKTcurve) {
 		CurveImpl rCurve = null;
-		WKTReader wktReader = new WKTReader(this.factory.getPrimitiveFactory(), this.factory.getCoordinateFactory());
+		WKTReader wktReader = new WKTReader(this.factory.getPrimitiveFactory(), this.factory.getGeometryFactoryImpl());
 		try {
 			rCurve = (CurveImpl) wktReader.read(aWKTcurve);
 		} catch (ParseException e) {

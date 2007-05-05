@@ -37,16 +37,11 @@
 
 package org.geotools.geometry.iso.coordinate;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.geotools.geometry.iso.util.DoubleOperation;
 import org.geotools.geometry.iso.util.algorithmND.AlgoPointND;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.DirectPosition;
-import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.geometry.coordinate.LineSegment;
-import org.opengis.geometry.coordinate.Position;
 
 /**
  * 
@@ -127,7 +122,11 @@ public class LineSegmentImpl extends LineStringImpl implements LineSegment {
         this( new PointArrayImpl( new DirectPositionImpl( crs, from ), new DirectPositionImpl( crs, to )), startParam );        
     }
 
-    /*
+    public LineSegmentImpl(DirectPosition one, DirectPosition two, double startParam) {
+    	this( new PointArrayImpl( one, two), startParam );    			
+	}
+
+	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.geotools.geometry.featgeom.coordinate.CurveSegmentImpl#isSimple()

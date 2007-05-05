@@ -42,10 +42,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.complex.CompositeCurveImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
-import org.geotools.geometry.iso.coordinate.LineSegmentImpl;
 import org.geotools.geometry.iso.coordinate.LineStringImpl;
 import org.geotools.geometry.iso.io.GeometryToString;
 import org.geotools.geometry.iso.operation.IsSimpleOp;
@@ -84,12 +82,10 @@ public class RingImpl extends CompositeCurveImpl implements Ring {
 
 	/**
 	 * Creates a Ring
-	 * 
-	 * @param factory
 	 * @param generator
 	 */
-	public RingImpl(FeatGeomFactoryImpl factory, List<OrientableCurve> generator) {
-		super(factory, generator);
+	public RingImpl(List<OrientableCurve> generator) {
+		super(generator);
 		this.checkConsistency(generator);
 	}
 
@@ -112,10 +108,11 @@ public class RingImpl extends CompositeCurveImpl implements Ring {
 		CurveImpl newCurve = oc0;
 		for (int i=1; i<aGenerator.size(); i++) {
 			CurveImpl nextCurve = (CurveImpl) aGenerator.get(i);
-			if (! newCurve.getEndPoint().equals(nextCurve.getStartPoint()))
+			DirectPosition startPoint = nextCurve.getStartPoint();
+			DirectPosition endPoint = newCurve.getEndPoint();
+			if (!endPoint.equals(startPoint))
 				throw new IllegalArgumentException("The curve segments are not continuous"); //$NON-NLS-1$
-			newCurve.merge((CurveImpl) aGenerator.get(i));
-
+			newCurve = newCurve.merge(nextCurve);
 		}
 
 		// Check Simplicity
@@ -135,7 +132,7 @@ public class RingImpl extends CompositeCurveImpl implements Ring {
 		while (elementIter.hasNext()) {
 			newElements.add((Curve) elementIter.next().clone());
 		}
-		return this.getGeometryFactory().getPrimitiveFactory().createRing(newElements);
+		return this.getFeatGeometryFactory().getPrimitiveFactory().createRing(newElements);
 	}
 
 	
@@ -247,6 +244,31 @@ public class RingImpl extends CompositeCurveImpl implements Ring {
 	 */
 	public String toString() {
 		return GeometryToString.getString(this);
+	}
+
+	@Override
+	public int hashCode() {
+		final int PRIME = 31;
+		int result = 1;
+		result = PRIME * result + ((surfaceBoundary == null) ? 0 : surfaceBoundary.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final RingImpl other = (RingImpl) obj;
+		if (surfaceBoundary == null) {
+			if (other.surfaceBoundary != null)
+				return false;
+		} else if (!surfaceBoundary.equals(other.surfaceBoundary))
+			return false;
+		return true;
 	}
 
 

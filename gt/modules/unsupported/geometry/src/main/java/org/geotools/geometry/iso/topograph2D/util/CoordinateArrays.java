@@ -82,7 +82,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
-import org.geotools.geometry.iso.coordinate.CoordinateFactoryImpl;
+import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.PositionImpl;
 import org.geotools.geometry.iso.topograph2D.Coordinate;
@@ -484,7 +484,7 @@ public class CoordinateArrays {
 	 * @return
 	 */
 	public static List<Position> toPositionList(
-			CoordinateFactoryImpl coordinateFactory, Coordinate[] coordArray) {
+			GeometryFactoryImpl coordinateFactory, Coordinate[] coordArray) {
 		List<Position> rList = new ArrayList<Position>();
 		for (int i = 0; i < coordArray.length; i++) {
 			rList.add(coordinateFactory.createPosition(coordArray[i]
@@ -501,7 +501,7 @@ public class CoordinateArrays {
 	 * @return
 	 */
 	public static List<DirectPositionImpl> toDirectPositionList(
-			CoordinateFactoryImpl coordinateFactory, Coordinate[] coordArray) {
+			GeometryFactoryImpl coordinateFactory, Coordinate[] coordArray) {
 		List<DirectPositionImpl> rList = new ArrayList<DirectPositionImpl>();
 		for (int i = 0; i < coordArray.length; i++) {
 			rList.add(coordinateFactory.createDirectPosition(coordArray[i]

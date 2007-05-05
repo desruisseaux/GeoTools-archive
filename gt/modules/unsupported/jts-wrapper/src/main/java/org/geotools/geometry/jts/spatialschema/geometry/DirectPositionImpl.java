@@ -12,6 +12,7 @@ package org.geotools.geometry.jts.spatialschema.geometry;
 //J2SE dependencies
 import java.awt.geom.Point2D;
 import java.io.Serializable;
+import java.util.Arrays;
 
 //openGIS dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -44,7 +45,19 @@ public class DirectPositionImpl implements Cloneable, DirectPosition, Position, 
     //  Fields
     //*************************************************************************
     
-    /**
+    private static int hashCode(double[] array) {
+		final int PRIME = 31;
+		if (array == null)
+			return 0;
+		int result = 1;
+		for (int index = 0; index < array.length; index++) {
+			long temp = Double.doubleToLongBits(array[index]);
+			result = PRIME * result + (int) (temp ^ (temp >>> 32));
+		}
+		return result;
+	}
+
+	/**
      * Comment for {@code ordinates}.
      */
     public final double[] ordinates;
@@ -221,4 +234,31 @@ public class DirectPositionImpl implements Cloneable, DirectPosition, Position, 
     public DirectPosition getPosition() {
         return this;
     }
+
+	public int hashCode() {
+		final int PRIME = 31;
+		int result = 1;
+		result = PRIME * result + ((crs == null) ? 0 : crs.hashCode());
+		result = PRIME * result + DirectPositionImpl.hashCode(ordinates);
+		return result;
+	}
+
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final DirectPositionImpl other = (DirectPositionImpl) obj;
+		if (crs == null) {
+			if (other.crs != null)
+				return false;
+		} else if (!crs.equals(other.crs))
+			return false;
+		if (!Arrays.equals(ordinates, other.ordinates))
+			return false;
+		return true;
+	}
+    
 }

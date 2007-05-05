@@ -41,13 +41,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.io.GeometryToString;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.complex.Complex;
 import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.primitive.SurfaceBoundary;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * The boundary of Surfaces shall be represented as SurfaceBoundary.
@@ -102,12 +102,13 @@ public class SurfaceBoundaryImpl extends PrimitiveBoundaryImpl implements
 
 	/**
 	 * 
+	 * @param crs
 	 * @param exterior
 	 * @param interior
 	 */
-	public SurfaceBoundaryImpl(FeatGeomFactoryImpl factory, Ring exterior,
+	public SurfaceBoundaryImpl(CoordinateReferenceSystem crs, Ring exterior,
 			List<Ring> interior) {
-		super(factory);
+		super(crs);
 		// TODO The consisty need to checked: Interior rings cannot cross each other or the exterior ring
 		this.exterior = exterior;
 		this.interior = interior;
@@ -143,7 +144,7 @@ public class SurfaceBoundaryImpl extends PrimitiveBoundaryImpl implements
 			newInteriors.add((Ring) interiors.next().clone());
 		}
 		// Use the cloned rings to create a new SurfaceBoundary
-		return this.getGeometryFactory().getPrimitiveFactory().createSurfaceBoundary(newExterior, newInteriors);
+		return this.getFeatGeometryFactory().getPrimitiveFactory().createSurfaceBoundary(newExterior, newInteriors);
 	}
 
 	/* (non-Javadoc)
@@ -218,6 +219,37 @@ public class SurfaceBoundaryImpl extends PrimitiveBoundaryImpl implements
 	 */
 	public String toString() {
 		return GeometryToString.getString(this);
+	}
+
+	@Override
+	public int hashCode() {
+		final int PRIME = 31;
+		int result = 1;
+		result = PRIME * result + ((exterior == null) ? 0 : exterior.hashCode());
+		result = PRIME * result + ((interior == null) ? 0 : interior.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final SurfaceBoundaryImpl other = (SurfaceBoundaryImpl) obj;
+		if (exterior == null) {
+			if (other.exterior != null)
+				return false;
+		} else if (!exterior.equals(other.exterior))
+			return false;
+		if (interior == null) {
+			if (other.interior != null)
+				return false;
+		} else if (!interior.equals(other.interior))
+			return false;
+		return true;
 	}
 	
 	

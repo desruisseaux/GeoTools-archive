@@ -113,8 +113,8 @@ public abstract class GeometryGraphOperation {
 		// setComputationPrecision(g1.getPrecisionModel());
 
 		// Throw Unsupported Dimension Exception if one of the geometries is not 2d or 2.5d
-		DimensionModel g0Dim = g0.getGeometryFactory().getDimensionModel();
-		DimensionModel g1Dim = g1.getGeometryFactory().getDimensionModel();
+		DimensionModel g0Dim = g0.getFeatGeometryFactory().getDimensionModel();
+		DimensionModel g1Dim = g1.getFeatGeometryFactory().getDimensionModel();
 		if (!g0Dim.is2D() || !g1Dim.is2D()) {
 			throw new UnsupportedDimensionException(
 					"This operations do only work in 2D");

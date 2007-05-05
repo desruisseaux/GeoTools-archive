@@ -39,10 +39,10 @@ package org.geotools.geometry.iso.primitive;
 
 import java.util.Set;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.opengis.geometry.complex.Complex;
 import org.opengis.geometry.primitive.OrientablePrimitive;
 import org.opengis.geometry.primitive.Primitive;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * 
@@ -110,26 +110,26 @@ public abstract class OrientablePrimitiveImpl extends PrimitiveImpl implements
 	/**
 	 * Constructor for empty Orientable Primitive
 	 * 
-	 * @param factory
+	 * @param crs
 	 * 
 	 */
-	protected OrientablePrimitiveImpl(FeatGeomFactoryImpl factory) {
-		super(factory, null, null, null);
+	protected OrientablePrimitiveImpl(CoordinateReferenceSystem crs) {
+		super(crs, null, null, null);
 		this.proxy = this.createProxy();
 	}
 
 	/**
 	 * Constructor 
 	 * 
-	 * @param factory
+	 * @param crs
 	 * @param containedPrimitive
 	 * @param containingPrimitive
 	 * @param complex
 	 */
-	protected OrientablePrimitiveImpl(FeatGeomFactoryImpl factory,
+	protected OrientablePrimitiveImpl(CoordinateReferenceSystem crs,
 			Set<Primitive> containedPrimitive,
 			Set<Primitive> containingPrimitive, Set<Complex> complex) {
-		super(factory, containedPrimitive, containingPrimitive, complex);
+		super(crs, containedPrimitive, containingPrimitive, complex);
 		this.proxy = this.createProxy();
 	}
 

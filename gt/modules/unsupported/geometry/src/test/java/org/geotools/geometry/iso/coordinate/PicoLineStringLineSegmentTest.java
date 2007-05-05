@@ -3,47 +3,80 @@ package org.geotools.geometry.iso.coordinate;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
-import org.geotools.geometry.iso.coordinate.LineStringImpl;
-import org.geotools.geometry.iso.coordinate.PositionImpl;
+import org.geotools.geometry.iso.PositionFactoryImpl;
+import org.geotools.geometry.iso.PrecisionModel;
+import org.geotools.geometry.iso.aggregate.AggregateFactoryImpl;
+import org.geotools.geometry.iso.complex.ComplexFactoryImpl;
+import org.geotools.geometry.iso.io.CollectionFactoryMemoryImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
+import org.geotools.geometry.iso.util.elem2D.Geo2DFactory;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.PositionFactory;
+import org.opengis.geometry.Precision;
+import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.geometry.coordinate.LineSegment;
 import org.opengis.geometry.coordinate.PointArray;
 import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.primitive.CurveSegment;
+import org.opengis.geometry.primitive.PrimitiveFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.picocontainer.PicoContainer;
+import org.picocontainer.defaults.DefaultPicoContainer;
 
-/**
- * Test case for LineString and LineSegment
- * 
- * @author Sanjay Jena
- *
- */
-public class LineStringLineSegmentTest extends TestCase {
+import junit.framework.TestCase;
+
+public class PicoLineStringLineSegmentTest extends TestCase {
 	
 	public void testMain() {
 		
-		FeatGeomFactoryImpl tGeomFactory = FeatGeomFactoryImpl.getDefault2D();
-		
-		this._testLineString1(tGeomFactory);
+		//FeatGeomFactoryImpl tGeomFactory = FeatGeomFactoryImpl.getDefault2D();
+		PicoContainer c = container( DefaultGeographicCRS.WGS84 );
+		assertNotNull(c);
+		this._testLineString1(c);
 		
 	}
 	
+	/**
+	 * Creates a pico container that knows about all the geom factories
+	 * @param crs
+	 * @return container
+	 */
+	protected PicoContainer container( CoordinateReferenceSystem crs ){
+		
+		DefaultPicoContainer container = new DefaultPicoContainer(); // parent
+		
+		// Teach Container about Factory Implementations we want to use
+		container.registerComponentImplementation(PositionFactoryImpl.class);
+		container.registerComponentImplementation(FeatGeomFactoryImpl.class);
+		container.registerComponentImplementation(AggregateFactoryImpl.class);
+		container.registerComponentImplementation(ComplexFactoryImpl.class);
+		container.registerComponentImplementation(GeometryFactoryImpl.class);
+		container.registerComponentImplementation(CollectionFactoryMemoryImpl.class);
+		container.registerComponentImplementation(PrimitiveFactoryImpl.class);
+		container.registerComponentImplementation(Geo2DFactory.class);
+		
+		// Teach Container about other dependacies needed
+		container.registerComponentInstance( crs );
+		Precision pr = new PrecisionModel();
+		container.registerComponentInstance( pr );
+		
+		return container;		
+	}
 	
-	private void _testLineString1(FeatGeomFactoryImpl aGeomFactory) {
+	private void _testLineString1(PicoContainer c) {
 		
-		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
-		PrimitiveFactoryImpl tPrimFactory = aGeomFactory.getPrimitiveFactory();
+		GeometryFactoryImpl tGeomFactory = (GeometryFactoryImpl) c.getComponentInstanceOfType(GeometryFactory.class);
+		PositionFactoryImpl tPosFactory = (PositionFactoryImpl) c.getComponentInstanceOfType(PositionFactory.class);
+		PrimitiveFactoryImpl tPrimFactory = (PrimitiveFactoryImpl) c.getComponentInstanceOfType(PrimitiveFactory.class);
 		
-		PositionImpl p1 = new PositionImpl(tCoordFactory.createDirectPosition(new double[]{-50,  0}));
-		PositionImpl p2 = new PositionImpl(tCoordFactory.createDirectPosition(new double[]{-30,  30}));
-		PositionImpl p3 = new PositionImpl(tCoordFactory.createDirectPosition(new double[]{0,  50}));
-		PositionImpl p4 = new PositionImpl(tCoordFactory.createDirectPosition(new double[]{30,  30}));
-		PositionImpl p5 = new PositionImpl(tCoordFactory.createDirectPosition(new double[]{50,  0}));
+		PositionImpl p1 = new PositionImpl(tPosFactory.createDirectPosition(new double[]{-50,  0}));
+		PositionImpl p2 = new PositionImpl(tPosFactory.createDirectPosition(new double[]{-30,  30}));
+		PositionImpl p3 = new PositionImpl(tPosFactory.createDirectPosition(new double[]{0,  50}));
+		PositionImpl p4 = new PositionImpl(tPosFactory.createDirectPosition(new double[]{30,  30}));
+		PositionImpl p5 = new PositionImpl(tPosFactory.createDirectPosition(new double[]{50,  0}));
 
 		LineStringImpl line1 = null;
 		
@@ -53,7 +86,7 @@ public class LineStringLineSegmentTest extends TestCase {
 		//PositionImpl arrayOfPoints[] = new PositionImpl[0];
 		ArrayList<Position> positionList = new ArrayList<Position>();
 		try {
-			line1 = tCoordFactory.createLineString(positionList); 
+			line1 = tGeomFactory.createLineString(positionList); 
 		} catch (IllegalArgumentException e) {
 			System.out.println("LineStringImpl - Number of Positions in array: 0 - Not accepted");
 		}
@@ -63,7 +96,7 @@ public class LineStringLineSegmentTest extends TestCase {
 
 		positionList.add(p1);
 		try {
-			line1 = tCoordFactory.createLineString(positionList); 
+			line1 = tGeomFactory.createLineString(positionList); 
 		} catch (IllegalArgumentException e) {
 			System.out.println("LineStringImpl - Number of Positions in array: 1 - Not accepted");
 		}
@@ -73,7 +106,7 @@ public class LineStringLineSegmentTest extends TestCase {
 
 		positionList.add(p2);
 		try {
-			line1 = tCoordFactory.createLineString(positionList); 
+			line1 = tGeomFactory.createLineString(positionList); 
 			System.out.println("LineStringImpl - Number of Positions in array: 2 - accepted");
 		} catch (IllegalArgumentException e) {
 			System.out.println("LineStringImpl - Number of Positions in array: 2 - Not accepted");
@@ -86,7 +119,7 @@ public class LineStringLineSegmentTest extends TestCase {
 		positionList.add(p4);
 		positionList.add(p5);
 		try {
-			line1 = tCoordFactory.createLineString(positionList); 
+			line1 = tGeomFactory.createLineString(positionList); 
 			System.out.println("LineStringImpl - Number of Positions in array: 5 - accepted");
 			System.out.println("\n" + line1);
 
@@ -264,13 +297,13 @@ public class LineStringLineSegmentTest extends TestCase {
         assertEquals(Math.round(dp[1]*100) , -83);
 		
 		// ***** merge(LineString)
-		PositionImpl p6 = new PositionImpl(tCoordFactory.createDirectPosition(new double[]{80,  40}));
-		PositionImpl p7 = new PositionImpl(tCoordFactory.createDirectPosition(new double[]{130,  60}));
+		PositionImpl p6 = new PositionImpl(tPosFactory.createDirectPosition(new double[]{80,  40}));
+		PositionImpl p7 = new PositionImpl(tPosFactory.createDirectPosition(new double[]{130,  60}));
 		ArrayList<Position> positionList2 = new ArrayList<Position>();
 		positionList2.add(p5);
 		positionList2.add(p6);
 		positionList2.add(p7);
-		LineStringImpl line2 = tCoordFactory.createLineString(positionList2);
+		LineStringImpl line2 = tGeomFactory.createLineString(positionList2);
 		
 		LineStringImpl line3 = line1.merge(line2);
 		System.out.println("Line1: " + line1);
@@ -321,5 +354,4 @@ public class LineStringLineSegmentTest extends TestCase {
 		System.out.println("Reversed. Line1: " + line1);
 
 	}
-
 }

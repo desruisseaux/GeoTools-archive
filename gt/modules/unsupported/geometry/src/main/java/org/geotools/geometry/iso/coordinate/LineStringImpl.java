@@ -602,6 +602,35 @@ public class LineStringImpl extends CurveSegmentImpl implements LineString {
     public String toString() {
         return "[LineString: " + this.controlPoints + "]"; //$NON-NLS-1$ //$NON-NLS-2$
     }
+	@Override
+	public int hashCode() {
+		final int PRIME = 31;
+		int result = 1;
+		result = PRIME * result + ((controlPoints == null) ? 0 : controlPoints.hashCode());
+		result = PRIME * result + ((envelope == null) ? 0 : envelope.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final LineStringImpl other = (LineStringImpl) obj;
+		if (controlPoints == null) {
+			if (other.controlPoints != null)
+				return false;
+		} else if (!controlPoints.equals(other.controlPoints))
+			return false;
+		if (envelope == null) {
+			if (other.envelope != null)
+				return false;
+		} else if (!envelope.equals(other.envelope))
+			return false;
+		return true;
+	}
 
     // Not used!
     // /**

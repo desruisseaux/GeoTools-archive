@@ -17,7 +17,7 @@ public class DirectPositionTest extends TestCase {
         super.setUp();
         
         FeatGeomFactoryImpl tGeomFactory = FeatGeomFactoryImpl.getDefault3D();        
-        gf = tGeomFactory.getCoordinateFactory();
+        gf = tGeomFactory.getGeometryFactoryImpl();
     }
 
 	public void testDirectPosition() {

@@ -6,17 +6,32 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.geotools.geometry.iso.coordinate.CoordinateFactoryImpl;
+import org.geotools.geometry.iso.PositionFactoryImpl;
+import org.geotools.geometry.iso.PrecisionModel;
+import org.geotools.geometry.iso.aggregate.AggregateFactoryImpl;
+import org.geotools.geometry.iso.complex.ComplexFactoryImpl;
+import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
+import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
+import org.geotools.geometry.iso.coordinate.LineSegmentImpl;
 import org.geotools.geometry.iso.coordinate.LineStringImpl;
 import org.geotools.geometry.iso.coordinate.PositionImpl;
+import org.geotools.geometry.iso.io.CollectionFactoryMemoryImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
+import org.geotools.geometry.iso.util.elem2D.Geo2DFactory;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.PositionFactory;
+import org.opengis.geometry.Precision;
 import org.opengis.geometry.complex.Complex;
 import org.opengis.geometry.complex.CompositeCurve;
 import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.primitive.CurveBoundary;
 import org.opengis.geometry.primitive.CurveSegment;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.picocontainer.PicoContainer;
+import org.picocontainer.defaults.DefaultPicoContainer;
 
 /**
  * @author sanjay
@@ -24,7 +39,7 @@ import org.opengis.geometry.primitive.CurveSegment;
  */
 public class CurveTest extends TestCase {
 	
-	public void testMain() {
+	public void XtestMain() {
 		
 		FeatGeomFactoryImpl tGeomFactory = FeatGeomFactoryImpl.getDefault2D();
 		
@@ -32,10 +47,58 @@ public class CurveTest extends TestCase {
 		
 	}
 	
+	/**
+	 * Creates a pico container that knows about all the geom factories
+	 * @param crs
+	 * @return container
+	 */
+	protected PicoContainer container( CoordinateReferenceSystem crs ){
+		
+		DefaultPicoContainer container = new DefaultPicoContainer(); // parent
+		
+		// Teach Container about Factory Implementations we want to use
+		container.registerComponentImplementation(PositionFactoryImpl.class);
+		container.registerComponentImplementation(FeatGeomFactoryImpl.class);
+		container.registerComponentImplementation(AggregateFactoryImpl.class);
+		container.registerComponentImplementation(ComplexFactoryImpl.class);
+		container.registerComponentImplementation(GeometryFactoryImpl.class);
+		container.registerComponentImplementation(CollectionFactoryMemoryImpl.class);
+		container.registerComponentImplementation(PrimitiveFactoryImpl.class);
+		container.registerComponentImplementation(Geo2DFactory.class);
+		
+		// Teach Container about other dependacies needed
+		container.registerComponentInstance( crs );
+		Precision pr = new PrecisionModel();
+		container.registerComponentInstance( pr );
+		
+		return container;		
+	}
+	
+	public void testCurveEquals(){
+		CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
+		PicoContainer container = container( crs ); // normal 2D
+		PrimitiveFactoryImpl factory = (PrimitiveFactoryImpl) container.getComponentInstanceOfType( PrimitiveFactoryImpl.class );
+		PositionFactory positionFactory = (PositionFactory ) container.getComponentInstanceOfType( PositionFactory.class );
+		
+		DirectPosition positionA = positionFactory.createDirectPosition(new double[]{10, 10});
+		DirectPosition positionB = positionFactory.createDirectPosition(new double[]{70, 30});
+		
+		CurveImpl expected = createCurve(positionA, positionB);		
+		CurveImpl actual = createCurve(positionA, positionB);
+		
+		assertEquals( expected, actual );
+	}
+
+	private CurveImpl createCurve(DirectPosition positionA, DirectPosition positionB) {
+		List segments = new ArrayList(1);
+		segments.add( new LineSegmentImpl( positionA.getCoordinateReferenceSystem(), positionA.getCoordinates(), positionB.getCoordinates(), 0) );
+		
+		return new CurveImpl( positionA.getCoordinateReferenceSystem(), segments );	
+	}
 	
 	private void _testCurve(FeatGeomFactoryImpl aGeomFactory) {
 		
-		CoordinateFactoryImpl tCoordFactory = aGeomFactory.getCoordinateFactory();
+		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
 		PrimitiveFactoryImpl tPrimFactory = aGeomFactory.getPrimitiveFactory();
 		
 		PositionImpl p1 = new PositionImpl(tCoordFactory.createDirectPosition(new double[]{-50,  0}));

@@ -43,9 +43,6 @@ import org.geotools.geometry.iso.coordinate.CurveSegmentImpl;
 import org.geotools.geometry.iso.coordinate.PositionImpl;
 import org.geotools.geometry.iso.coordinate.TriangleImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
-import org.opengis.geometry.coordinate.Position;
-import org.opengis.geometry.coordinate.Triangle;
-import org.opengis.geometry.primitive.Curve;
 
 
 

@@ -128,7 +128,7 @@ public class ConvexHull {
 	 * Create a new convex hull construction for the input {@link Geometry}.
 	 */
 	public ConvexHull(GeometryImpl geometry) {
-		this(extractCoordinates(geometry), geometry.getGeometryFactory());
+		this(extractCoordinates(geometry), geometry.getFeatGeometryFactory());
 	}
 
 	/**
@@ -244,7 +244,7 @@ public class ConvexHull {
 		}
 		if (inputPts.length == 2) {
 			//return geomFactory.createLineString(inputPts);
-			List<? extends Position> positions = CoordinateArrays.toPositionList(this.geomFactory.getCoordinateFactory(), this.inputPts);
+			List<? extends Position> positions = CoordinateArrays.toPositionList(this.geomFactory.getGeometryFactoryImpl(), this.inputPts);
 			return this.geomFactory.getPrimitiveFactory().createCurveByPositions((List<Position>) positions);
 		}
 
@@ -453,7 +453,7 @@ public class ConvexHull {
 	private Geometry lineOrPolygon(Coordinate[] coordinates) {
 
 		coordinates = cleanRing(coordinates);
-		List<? extends DirectPosition> positions = CoordinateArrays.toDirectPositionList(this.geomFactory.getCoordinateFactory(), coordinates);
+		List<? extends DirectPosition> positions = CoordinateArrays.toDirectPositionList(this.geomFactory.getGeometryFactoryImpl(), coordinates);
 		if (coordinates.length == 3) {
 			//return geomFactory.createLineString(new Coordinate[] {coordinates[0], coordinates[1] });
 			positions.remove(2);

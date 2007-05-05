@@ -6,7 +6,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.geotools.geometry.iso.coordinate.CoordinateFactoryImpl;
+import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.PositionImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
@@ -37,7 +37,7 @@ public class BoundaryTest extends TestCase {
 
 	private void _testCurveBoundary1(FeatGeomFactoryImpl aGeomFactory) {
 
-		CoordinateFactoryImpl tCoordFactory = aGeomFactory.getCoordinateFactory();
+		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
 		PrimitiveFactoryImpl tPrimitiveFactory = aGeomFactory.getPrimitiveFactory();
 		
 		DirectPositionImpl dp1 = tCoordFactory.createDirectPosition(new double[] {0, 0});
@@ -58,7 +58,7 @@ public class BoundaryTest extends TestCase {
 
 	private void _testSurfaceBoundary1(FeatGeomFactoryImpl aGeomFactory) {
 
-		CoordinateFactoryImpl tCoordFactory = aGeomFactory.getCoordinateFactory();
+		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
 		PrimitiveFactoryImpl tPrimFactory = aGeomFactory.getPrimitiveFactory();
 
 		/* Defining Positions for LineStrings */

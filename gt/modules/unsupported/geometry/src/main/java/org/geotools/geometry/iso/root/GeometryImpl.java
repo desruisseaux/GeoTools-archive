@@ -41,7 +41,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.iso.PositionFactoryImpl;
+import org.geotools.geometry.iso.PrecisionModel;
 import org.geotools.geometry.iso.UnsupportedDimensionException;
+import org.geotools.geometry.iso.aggregate.AggregateFactoryImpl;
 import org.geotools.geometry.iso.aggregate.MultiCurveImpl;
 import org.geotools.geometry.iso.aggregate.MultiPointImpl;
 import org.geotools.geometry.iso.aggregate.MultiPrimitiveImpl;
@@ -55,6 +58,7 @@ import org.geotools.geometry.iso.primitive.BoundaryImpl;
 import org.geotools.geometry.iso.primitive.CurveBoundaryImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
+import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
@@ -71,14 +75,18 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.Boundary;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
+import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.Precision;
+import org.opengis.geometry.PrecisionType;
 import org.opengis.geometry.TransfiniteSet;
 import org.opengis.geometry.aggregate.MultiPoint;
 import org.opengis.geometry.complex.Complex;
 import org.opengis.geometry.complex.ComplexFactory;
+import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.OrientableSurface;
 import org.opengis.geometry.primitive.Point;
+import org.opengis.geometry.primitive.PrimitiveFactory;
 import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.Geometry;
 
@@ -106,26 +114,55 @@ import org.opengis.geometry.Geometry;
 public abstract class GeometryImpl implements Geometry {
 
 	private boolean mutable = true;
-	protected FeatGeomFactoryImpl factory;
+	
+	/** @deprecated removing dependency on this larger factory holder */
+	protected FeatGeomFactoryImpl xfactory;
+
+	protected final CoordinateReferenceSystem crs;
+	protected final Precision percision;
+	protected final PrimitiveFactory primitiveFactory; // for making stuff like curve, point 
+	protected final GeometryFactory geometryFactory; // geometry for Line etc...
+	protected final PositionFactory positionFactory; // for position and point array
+	protected final ComplexFactory complexFactory; // surface and friends
 
 	/**
 	 * Creates a geometric root object.
 	 * 
 	 * @param factory The Geometry factory
 	 */
-	public GeometryImpl(FeatGeomFactoryImpl factory) {
+	protected GeometryImpl(FeatGeomFactoryImpl feat) {
+		this( feat.getCoordinateReferenceSystem(), feat.getPrecision(), feat.getGeometryFactory(), feat.getPrimitiveFactory(), feat.getAggregateFactory(), new PositionFactoryImpl(feat.getCoordinateReferenceSystem(), feat.getPrecision() ), feat.getComplexFactory());
 		// TODO documentation
-		this.factory = factory;
+		//this.factory = factory;
+	}
+		
+	protected GeometryImpl(CoordinateReferenceSystem coordinateReferenceSystem, Precision pm, GeometryFactory geometryFactory2, PrimitiveFactoryImpl primitiveFactory2, AggregateFactoryImpl aggregateFactory, PositionFactory positionFactory2, ComplexFactory complexFactory2 ){
+		this.crs = coordinateReferenceSystem;
+		this.percision = pm;
+		this.primitiveFactory = primitiveFactory2;
+		this.geometryFactory = geometryFactory2;
+		this.positionFactory = positionFactory2;
+		this.complexFactory = complexFactory2;
+	}
+
+	public GeometryImpl(CoordinateReferenceSystem coordinateReferenceSystem) {
+		this( coordinateReferenceSystem, new PrecisionModel() );
+	}
+
+	public GeometryImpl(CoordinateReferenceSystem coordinateReferenceSystem, Precision precision) {
+		this( coordinateReferenceSystem, precision, null, null, null, null, null );
 	}
 
 	/**
 	 * Return the root factory
 	 * 
+	 * @deprecated This is not a good idea, not all implementations will have FeatGeomFactoryImpl
 	 * @return FeatGeomFactoryImpl The root factory
 	 */
-	public FeatGeomFactoryImpl getGeometryFactory() {
+	public FeatGeomFactoryImpl getFeatGeometryFactory() {
+		throw new UnsupportedOperationException("No FeatGeomImpl");
 		// Return the root factory
-		return this.factory;
+		//return this.factory;
 	}
 	
 	
@@ -207,14 +244,10 @@ public abstract class GeometryImpl implements Geometry {
 	 * @see org.opengis.geometry.coordinate.root.Geometry#getCoordinateReferenceSystem()
 	 */
 	public CoordinateReferenceSystem getCoordinateReferenceSystem() {
-		// TODO semantic JR, SJ
-		// TODO implementation
-		// TODO test
-		// TODO documentation
-		return this.factory.getCoordinateReferenceSystem();
+		return crs;
 	}
     public Precision getPrecision() {
-        return factory.getPrecision();
+        return percision;
     }
 
 	/*
@@ -223,8 +256,7 @@ public abstract class GeometryImpl implements Geometry {
 	 * @see org.opengis.geometry.coordinate.root.Geometry#getCoordinateDimension()
 	 */
 	public int getCoordinateDimension() {
-		// Return the dimension of the coordinates of this geometry
-		return this.factory.getCoordinateDimension();
+		return crs.getCoordinateSystem().getDimension();
 	}
 
 	/*
@@ -285,15 +317,15 @@ public abstract class GeometryImpl implements Geometry {
 	}
 
 
-	/*
+	/**
+	 * Return a Primitive which represents the envelope of this Geometry instance
 	 * (non-Javadoc)
 	 * 
+	 * @return primitive representing the envelope of this Geometry
 	 * @see org.opengis.geometry.coordinate.root.Geometry#getMbRegion()
 	 */
 	public Geometry getMbRegion() {
-		// TODO test
-		// Return a Primitive which represents the envelope of this Geometry instance
-		return this.factory.getPrimitiveFactory().createPrimitive(this.getEnvelope());
+		return primitiveFactory.createPrimitive( this.getEnvelope() );
 	}
 
 
@@ -308,14 +340,14 @@ public abstract class GeometryImpl implements Geometry {
 		// MultiPoint: the average of the contained points
 		if (this instanceof PointImpl ||
 			this instanceof MultiPointImpl) {
-			CentroidPoint cp = new CentroidPoint(this.getGeometryFactory());
+			CentroidPoint cp = new CentroidPoint(this.getFeatGeometryFactory());
 			cp.add(this);
 			return cp.getCentroid();
 		} else
 			
 		// CurveBoundary: the average of start and end point
 		if (this instanceof CurveBoundaryImpl) {
-			CentroidPoint cp = new CentroidPoint(this.getGeometryFactory());
+			CentroidPoint cp = new CentroidPoint(this.getFeatGeometryFactory());
 			cp.add(((CurveBoundaryImpl)this).getStartPoint());
 			cp.add(((CurveBoundaryImpl)this).getEndPoint());
 			return cp.getCentroid();
@@ -327,14 +359,14 @@ public abstract class GeometryImpl implements Geometry {
 		if (this instanceof CurveImpl ||
 			this instanceof MultiCurveImpl ||
 			this instanceof RingImpl) {
-			CentroidLine cl = new CentroidLine(this.getGeometryFactory());
+			CentroidLine cl = new CentroidLine(this.getFeatGeometryFactory());
 			cl.add(this);
 			return cl.getCentroid();
 		} else
 			
 		// SurfaceBoundary: the average of the weighted line segments of all curves of the exterior and interior rings
 		if (this instanceof SurfaceBoundaryImpl) {
-				CentroidLine cl = new CentroidLine(this.getGeometryFactory());
+				CentroidLine cl = new CentroidLine(this.getFeatGeometryFactory());
 				cl.add(((SurfaceBoundaryImpl)this).getExterior());
 				Iterator<Ring> interiors = ((SurfaceBoundaryImpl)this).getInteriors().iterator();
 				while (interiors.hasNext()) {
@@ -348,7 +380,7 @@ public abstract class GeometryImpl implements Geometry {
 		// MultiSurface: the average of all contained surfaces (considers holes)
 		if (this instanceof SurfaceImpl ||
 			this instanceof MultiSurfaceImpl) {
-			CentroidArea2D ca = new CentroidArea2D(this.getGeometryFactory());
+			CentroidArea2D ca = new CentroidArea2D(this.getFeatGeometryFactory());
 			ca.add(this);
 			return ca.getCentroid();
 					
@@ -486,16 +518,14 @@ public abstract class GeometryImpl implements Geometry {
 	 * 
 	 * @see org.opengis.geometry.coordinate.TransfiniteSet#contains(org.opengis.geometry.coordinate.DirectPosition)
 	 */
-	public boolean contains(DirectPosition point) {
+	public boolean contains(DirectPosition position) {
 
 		// Return false, if the point doesn´t lie in the envelope of this object
-		if (!((EnvelopeImpl)this.getEnvelope()).intersects(point))
+		if (!((EnvelopeImpl)this.getEnvelope()).intersects(position))
 			return false;
 		
-		// Call this.contains(TansfiniteSet)
-		GeometryImpl p = this.factory.getPrimitiveFactory().createPoint((DirectPositionImpl)point);
-		// a.contains(p) = p.within(a)
-		return p.within(this);
+		GeometryImpl point = new PointImpl( position );
+		return point.within(this);
 	}
 
 	/*
@@ -920,26 +950,21 @@ public abstract class GeometryImpl implements Geometry {
 	 * 
 	 * @see org.opengis.geometry.coordinate.root.Geometry#getClosure()
 	 */
-	public Complex getClosure() {
-		ComplexFactory cf = this.factory.getComplexFactory();
-		
+	public Complex getClosure() {		
 		if (this instanceof ComplexImpl) {
 			// Return this Complex instance, because complexes already contain their boundary
 			// CompositePoint, CompositeCurve, CompositeSurface, Ring, CurveBoundary, SurfaceBoundary
 			return (Complex) this;
 		} else
-		if (this instanceof PointImpl) {
-			return cf.createCompositePoint((Point)this);
-		} else
 		if (this instanceof CurveImpl) {
 			List<OrientableCurve> cl = new ArrayList<OrientableCurve>();
 			cl.add((OrientableCurve) this);
-			return cf.createCompositeCurve(cl);
+			return complexFactory.createCompositeCurve(cl);
 		} else
 		if (this instanceof SurfaceImpl) {
 			List<OrientableSurface> cs = new ArrayList<OrientableSurface>();
 			cs.add( (OrientableSurface) this);
-			return cf.createCompositeSurface(cs);
+			return complexFactory.createCompositeSurface(cs);
 		} else
 		if (this instanceof MultiPrimitiveImpl) {
 			// TODO

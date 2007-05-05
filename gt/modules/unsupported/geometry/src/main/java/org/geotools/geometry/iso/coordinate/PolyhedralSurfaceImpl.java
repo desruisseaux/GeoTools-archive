@@ -44,6 +44,7 @@ import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.opengis.geometry.coordinate.Polygon;
 import org.opengis.geometry.coordinate.PolyhedralSurface;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * 
@@ -63,12 +64,12 @@ public class PolyhedralSurfaceImpl extends SurfaceImpl implements
 	 * PolyhedralSurface::PolyhedralSurface(tiles[1..n]: Polygon ) :
 	 * PolyhedralSurface
 	 * 
-	 * @param factory
+	 * @param crs
 	 * @param tiles
 	 */
-	public PolyhedralSurfaceImpl(FeatGeomFactoryImpl factory,
+	public PolyhedralSurfaceImpl(CoordinateReferenceSystem crs,
 			List<Polygon> tiles) {
-		super(factory, tiles);
+		super(crs, tiles);
 
 	}
 
@@ -78,7 +79,7 @@ public class PolyhedralSurfaceImpl extends SurfaceImpl implements
 	 */
 	public PolyhedralSurfaceImpl(FeatGeomFactoryImpl factory,
 			SurfaceBoundaryImpl boundary) {
-		super(factory, boundary);
+		super(boundary);
 	}
 	
     /* (non-Javadoc)

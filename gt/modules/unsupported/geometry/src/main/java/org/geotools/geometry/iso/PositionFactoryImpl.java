@@ -1,7 +1,5 @@
 package org.geotools.geometry.iso;
 
-import java.util.AbstractList;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;

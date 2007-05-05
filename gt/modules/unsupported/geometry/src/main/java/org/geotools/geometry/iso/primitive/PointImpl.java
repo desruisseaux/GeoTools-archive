@@ -36,8 +36,9 @@
 
 package org.geotools.geometry.iso.primitive;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.iso.complex.CompositePointImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
+import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.geometry.iso.io.GeometryToString;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
@@ -48,6 +49,7 @@ import org.opengis.geometry.primitive.Bearing;
 import org.opengis.geometry.primitive.OrientablePrimitive;
 import org.opengis.geometry.primitive.Point;
 import org.opengis.geometry.primitive.PrimitiveBoundary;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * 
@@ -79,15 +81,19 @@ public class PointImpl extends PrimitiveImpl implements Point {
 	 */
 	private DirectPositionImpl position = null;
 
+	public PointImpl(final DirectPosition position) {
+		super( position.getCoordinateReferenceSystem() );
+		this.position = new DirectPositionImpl( position );
+	}
 	/**
 	 * The constructor PointImpl creates a Point at a given position, backed by the DirectPosition
 	 * PointImpl::PointImpl(position : DirectPositionImpl) : PointImpl
 	 * 
-	 * @param factory
+	 * @param crs
 	 * @param dp
 	 */
-	public PointImpl(FeatGeomFactoryImpl factory, final DirectPositionImpl dp) {
-		super(factory, null, null, null);
+	public PointImpl(CoordinateReferenceSystem crs, final DirectPositionImpl dp) {
+		super(crs, null, null, null);
 		// Cloning of the DP is done in the factory class
 		this.position = dp;
 	}
@@ -98,8 +104,8 @@ public class PointImpl extends PrimitiveImpl implements Point {
 	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#clone()
 	 */
 	public PointImpl clone() throws CloneNotSupportedException {
-		return this.getGeometryFactory().getPrimitiveFactory().createPoint(
-				this.getPosition().getCoordinates());
+		return new PointImpl(this.position);
+		//return this.getGeometryFactory().getPrimitiveFactory().createPoint(this.getPosition().getCoordinates());
 	}
 
 	/*
@@ -122,8 +128,8 @@ public class PointImpl extends PrimitiveImpl implements Point {
 	 * @see org.opengis.geometry.primitive.Point#setPosition(org.opengis.geometry.coordinate.DirectPosition)
 	 */
 	public void setPosition(DirectPosition p) {
-		this.position = this.getGeometryFactory().getCoordinateFactory()
-				.createDirectPosition(p);
+		this.position = new DirectPositionImpl(p);
+		//this.position = this.getGeometryFactory().getGeometryFactoryImpl().createDirectPosition(p);
 	}
 
 	/**
@@ -205,8 +211,8 @@ public class PointImpl extends PrimitiveImpl implements Point {
 	 */
 	public Envelope getEnvelope() {
 		/* Return envelope only consisting of this point */
-		return this.getGeometryFactory().getCoordinateFactory().createEnvelope(
-				this.position.getCoordinates());
+		return new EnvelopeImpl(this.position);
+		//return this.getGeometryFactory().getGeometryFactoryImpl().createEnvelope(this.position.getCoordinates());
 	}
 
 	/**
@@ -294,4 +300,8 @@ public class PointImpl extends PrimitiveImpl implements Point {
 		return this.getPosition().equals(((PointImpl)pointSet).getPosition());
 	}
 
+	public Complex getClosure() {
+		return new CompositePointImpl( this );
+		// return complexFactory.createCompositePoint( this );
+	}
 }

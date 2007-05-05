@@ -83,7 +83,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.geotools.geometry.iso.coordinate.CoordinateFactoryImpl;
+import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.coordinate.PositionImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
@@ -110,7 +110,7 @@ public class LineBuilder {
 
 	private FeatGeomFactoryImpl featGeomFactory;
 
-	private CoordinateFactoryImpl coordinateFactory;
+	private GeometryFactoryImpl coordinateFactory;
 
 	private PrimitiveFactoryImpl primitiveFactory;
 
@@ -124,7 +124,7 @@ public class LineBuilder {
 			PointLocator ptLocator) {
 		this.op = op;
 		this.featGeomFactory = aFeatGeomFactory;
-		this.coordinateFactory = featGeomFactory.getCoordinateFactory();
+		this.coordinateFactory = featGeomFactory.getGeometryFactoryImpl();
 		this.primitiveFactory = featGeomFactory.getPrimitiveFactory();
 		this.ptLocator = ptLocator;
 	}

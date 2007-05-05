@@ -36,8 +36,8 @@
 
 package org.geotools.geometry.iso.primitive;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.opengis.geometry.primitive.PrimitiveBoundary;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * 
@@ -52,10 +52,10 @@ public abstract class PrimitiveBoundaryImpl extends BoundaryImpl implements
 		PrimitiveBoundary {
 
 	/**
-	 * @param factory
+	 * @param crs
 	 */
-	public PrimitiveBoundaryImpl(FeatGeomFactoryImpl factory) {
-		super(factory);
+	public PrimitiveBoundaryImpl(CoordinateReferenceSystem crs) {
+		super(crs);
 	}
 
 }

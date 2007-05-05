@@ -38,7 +38,9 @@
 package org.geotools.geometry.iso.primitive;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
@@ -46,6 +48,8 @@ import org.geotools.geometry.iso.coordinate.CurveSegmentImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.geometry.iso.coordinate.LineStringImpl;
+import org.geotools.geometry.iso.coordinate.PointArrayImpl;
+import org.geotools.geometry.iso.coordinate.PositionImpl;
 import org.geotools.geometry.iso.io.GeometryToString;
 import org.geotools.geometry.iso.operation.IsSimpleOp;
 import org.geotools.geometry.iso.operation.Merger;
@@ -62,6 +66,7 @@ import org.opengis.geometry.primitive.CurveBoundary;
 import org.opengis.geometry.primitive.CurveSegment;
 import org.opengis.geometry.primitive.OrientablePrimitive;
 import org.opengis.geometry.primitive.Point;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * Curve (Figure 11 of the ISO 19107 v5) is a descendent subtype of Primitive
@@ -154,16 +159,16 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 	 * of that to a direct position, then this direct position will be used to
 	 * construct a new Point.
 	 * 
-	 * @param factory
+	 * @param crs
 	 * @param segments
 	 * @throws IllegalArgumentException,
 	 *             if the array of CurveSegments is empty or does not fulfill
 	 *             the requirements of the CurveSegments
 	 */
-	public CurveImpl(FeatGeomFactoryImpl factory,
+	public CurveImpl(CoordinateReferenceSystem crs,
 			List<? extends CurveSegment> segments)
 			throws IllegalArgumentException {
-		super(factory);
+		super(crs);
 		this.initialize(segments);
 	}
 
@@ -196,6 +201,10 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 	// super(factory, containedPrimitive, containingPrimitive, complex);
 	// this.initialize(segments);
 	// }
+
+	public CurveImpl(LineSegment edge) {
+		this( edge.getControlPoints().getCoordinateReferenceSystem(), Collections.singletonList( edge ) );
+	}
 
 	/**
 	 * Initialize Curve attributes - Set segments - Calculate Envelope -
@@ -240,12 +249,14 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 		Point pt0 = toPoint( p0 );
 		Point pt1 = toPoint( p1 );
 		if (pt0 == null) {
-			pt0 = this.getGeometryFactory().getPrimitiveFactory().createPoint(
-					p0);
+			DirectPositionImpl copy = new DirectPositionImpl(p0.getPosition());
+			pt0 = new PointImpl(copy);
+			//pt0 = this.getFeatGeometryFactory().getPrimitiveFactory().createPoint(p0);
 		}
 		if (pt1 == null) {
-			pt1 = this.getGeometryFactory().getPrimitiveFactory().createPoint(
-					p1);
+			DirectPositionImpl copy = new DirectPositionImpl(p1.getPosition());
+			pt1 = new PointImpl(copy);
+			//pt1 = this.getFeatGeometryFactory().getPrimitiveFactory().createPoint(p1);
 		}
 		// Calculate and Set Boundary
 		this.boundary = this.calculateBoundary(pt0, pt1);
@@ -256,7 +267,7 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
         if( position instanceof Point ){
             return (Point) position;
         }
-        return new PointImpl( factory, new DirectPositionImpl(position));        
+        return new PointImpl( new DirectPositionImpl(position));        
     }
 	
 	/**
@@ -275,7 +286,8 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 			return null;
 		else
 		// Return the CurveBoundary defined by the start and end point of this curve
-			return this.getGeometryFactory().getPrimitiveFactory().createCurveBoundary(start, end);
+			return new CurveBoundaryImpl(getCoordinateReferenceSystem(), start, end);
+			//return this.getFeatGeometryFactory().getPrimitiveFactory().createCurveBoundary(start, end);
 	}
 
 	/*
@@ -291,7 +303,22 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 		for (int i=0; i<dPList.size(); i++) {
 			newDPList.add(dPList.get(i).clone());
 		}
-		return (CurveImpl) this.getGeometryFactory().getPrimitiveFactory().createCurveByDirectPositions(newDPList);
+
+		List<Position> rPositions = new LinkedList<Position>();
+		for (int i = 0; i < newDPList.size(); i++) {
+			rPositions.add(new PositionImpl(newDPList.get(i)));
+		}
+		// Create List of Position´s
+		List<Position> positionList = rPositions;
+		
+		// Create List of CurveSegment´s (LineString´s)
+		LineStringImpl lineString = new LineStringImpl(new PointArrayImpl(
+				positionList), 0.0);
+		List<CurveSegment> segments = new ArrayList<CurveSegment>();
+		segments.add(lineString);
+		return new CurveImpl(crs, segments);
+		
+		//return (CurveImpl) this.getFeatGeometryFactory().getPrimitiveFactory().createCurveByDirectPositions(newDPList);
 	}
 
 	/*
@@ -877,7 +904,7 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 	 */
 	public CurveImpl merge(CurveImpl other) {
 		// Test ok
-		Merger merger = new Merger(this.getGeometryFactory());
+		Merger merger = new Merger( crs );// new Merger(this.getFeatGeometryFactory());
 		return merger.merge(this, other);
 	}
 	
@@ -886,6 +913,43 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 	 */
 	public String toString() {
 		return GeometryToString.getString(this);
+	}
+
+	@Override
+	public int hashCode() {
+		final int PRIME = 31;
+		int result = 1;
+		result = PRIME * result + ((boundary == null) ? 0 : boundary.hashCode());
+		result = PRIME * result + ((curveSegments == null) ? 0 : curveSegments.hashCode());
+		result = PRIME * result + ((envelope == null) ? 0 : envelope.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final CurveImpl other = (CurveImpl) obj;
+		if (boundary == null) {
+			if (other.boundary != null)
+				return false;
+		} else if (!boundary.equals( (Object) other.boundary))
+			return false;
+		if (curveSegments == null) {
+			if (other.curveSegments != null)
+				return false;
+		} else if (!curveSegments.equals(other.curveSegments))
+			return false;
+		if (envelope == null) {
+			if (other.envelope != null)
+				return false;
+		} else if (!envelope.equals(other.envelope))
+			return false;
+		return true;
 	}
 
 

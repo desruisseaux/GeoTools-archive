@@ -40,7 +40,6 @@ package org.geotools.geometry.iso.complex;
 import java.util.List;
 import java.util.Set;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.SolidImpl;
@@ -71,14 +70,10 @@ public class CompositeSolidImpl extends CompositeImpl<SolidImpl> {
 	 * 
 	 * The Solids generators will be passed through the super constructor and
 	 * saved in the element ArrayList of the according Complex
-	 * 
-	 * @param factory
-	 * 
 	 * @param generator
 	 */
-	public CompositeSolidImpl(FeatGeomFactoryImpl factory,
-			List<CurveImpl> generator) {
-		super(factory, generator);
+	public CompositeSolidImpl(List<CurveImpl> generator) {
+		super(generator);
 	}
 
 	/**

@@ -37,9 +37,9 @@
 
 package org.geotools.geometry.iso.complex;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.primitive.BoundaryImpl;
 import org.opengis.geometry.complex.ComplexBoundary;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
@@ -48,10 +48,10 @@ import org.opengis.geometry.complex.ComplexBoundary;
 public abstract class ComplexBoundaryImpl extends BoundaryImpl implements ComplexBoundary {
 
 	/**
-	 * @param factory
+	 * @param crs
 	 */
-	public ComplexBoundaryImpl(FeatGeomFactoryImpl factory) {
-		super(factory);
+	public ComplexBoundaryImpl(CoordinateReferenceSystem crs) {
+		super(crs);
 		// TODO Auto-generated constructor stub
 	}
 }

@@ -38,8 +38,6 @@ package org.geotools.geometry.iso.complex;
 
 import java.util.List;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.geotools.geometry.iso.primitive.OrientableSurfaceImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
 import org.opengis.geometry.complex.ComplexFactory;
 import org.opengis.geometry.complex.CompositeCurve;
@@ -51,25 +49,23 @@ import org.opengis.geometry.primitive.Point;
 
 public class ComplexFactoryImpl implements ComplexFactory {
 
-	private FeatGeomFactoryImpl geometryFactory;
+	//private FeatGeomFactoryImpl geometryFactory;
 
 	/**
-	 * @param geometryFactory
 	 */
-	public ComplexFactoryImpl(FeatGeomFactoryImpl geometryFactory) {
-		this.geometryFactory = geometryFactory;
+	public ComplexFactoryImpl() {
 	}
 	
 	public CompositePoint createCompositePoint(Point generator) {
-		return new CompositePointImpl(this.geometryFactory, (PointImpl) generator);
+		return new CompositePointImpl((PointImpl) generator);
 	}
 	
 	public CompositeCurve createCompositeCurve(List<OrientableCurve> generator) {
-		return new CompositeCurveImpl(this.geometryFactory, generator);
+		return new CompositeCurveImpl(generator);
 	}
 
 	public CompositeSurface createCompositeSurface(List<OrientableSurface> generator) {
-		return new CompositeSurfaceImpl(this.geometryFactory, generator);
+		return new CompositeSurfaceImpl(generator);
 	}
 
 	

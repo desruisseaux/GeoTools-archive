@@ -39,10 +39,10 @@ package org.geotools.geometry.iso.primitive;
 
 import java.util.Set;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.opengis.geometry.complex.Complex;
 import org.opengis.geometry.primitive.OrientablePrimitive;
 import org.opengis.geometry.primitive.Primitive;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * 
@@ -64,23 +64,23 @@ public abstract class OrientableSurfaceImpl extends OrientablePrimitiveImpl
 	/**
 	 * Constructor
 	 * 
-	 * @param factory
+	 * @param crs
 	 * 
 	 */
-	protected OrientableSurfaceImpl(FeatGeomFactoryImpl factory) {
-		super(factory);
+	protected OrientableSurfaceImpl(CoordinateReferenceSystem crs) {
+		super(crs);
 	}
 
 	/**
-	 * @param factory
+	 * @param crs
 	 * @param containedPrimitive
 	 * @param containingPrimitive
 	 * @param complex
 	 */
-	protected OrientableSurfaceImpl(FeatGeomFactoryImpl factory,
+	protected OrientableSurfaceImpl(CoordinateReferenceSystem crs,
 			Set<Primitive> containedPrimitive,
 			Set<Primitive> containingPrimitive, Set<Complex> complex) {
-		super(factory, containedPrimitive, containingPrimitive, complex);
+		super(crs, containedPrimitive, containingPrimitive, complex);
 	}
 
 	// /**

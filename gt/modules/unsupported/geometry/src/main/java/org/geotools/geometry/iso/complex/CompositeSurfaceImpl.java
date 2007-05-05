@@ -42,7 +42,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.geometry.iso.primitive.OrientableSurfaceImpl;
 import org.opengis.geometry.DirectPosition;
@@ -77,14 +76,10 @@ public class CompositeSurfaceImpl extends CompositeImpl<OrientableSurfaceImpl>
 	 * NOTE To get a full representation of the elements in the Complex, the
 	 * Curves and Points on the boundary of the generator set of Surfaces would
 	 * be added to the curves in the generator list.
-	 * 
-	 * @param factory
-	 * 
 	 * @param generator
 	 */
-	public CompositeSurfaceImpl(FeatGeomFactoryImpl factory,
-			List<? extends OrientableSurface> generator) {
-		super(factory, generator);
+	public CompositeSurfaceImpl(List<? extends OrientableSurface> generator) {
+		super(generator);
 	}
 
 //	/**
@@ -248,7 +243,8 @@ public class CompositeSurfaceImpl extends CompositeImpl<OrientableSurfaceImpl>
 		
 		Surface actSurf = (Surface) surfIter.next();
 		/* Use envelope of the first Curve as base for the new envelope */
-		EnvelopeImpl rEnv = this.getGeometryFactory().getCoordinateFactory().createEnvelope(actSurf.getEnvelope());
+		EnvelopeImpl rEnv = new EnvelopeImpl(actSurf.getEnvelope());
+		//EnvelopeImpl rEnv = this.getFeatGeometryFactory().getGeometryFactoryImpl().createEnvelope(actSurf.getEnvelope());
 		
 		/* Add envelopes of the other Curves */
 		while (surfIter.hasNext()) {

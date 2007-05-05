@@ -19,6 +19,12 @@
     <version>2.4-SNAPSHOT</version>
   </parent>
   
+  <properties>
+    <allow.test.skip>true</allow.test.skip>
+    <allow.test.failure.ignore>true</allow.test.failure.ignore>
+    <maven.test.skip>true</maven.test.skip>
+  </properties>
+  
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
@@ -149,8 +155,19 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-epsg-hsql</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+	<dependency>
+	    <groupId>picocontainer</groupId>
+	    <artifactId>picocontainer</artifactId>
+	    <version>3</version>
+	    <scope>test</scope>
+	</dependency>       
   </dependencies>
 
 

@@ -3,7 +3,7 @@ package org.geotools.geometry.iso.coordinate;
 import junit.framework.TestCase;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.geotools.geometry.iso.coordinate.CoordinateFactoryImpl;
+import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.coordinate.LineSegment;
@@ -21,7 +21,7 @@ public class CoordinateFactoryTest extends TestCase {
 
 	private void _testCoordinateObjects(FeatGeomFactoryImpl aFactory) {
 		
-		CoordinateFactoryImpl cf = aFactory.getCoordinateFactory();
+		GeometryFactoryImpl cf = aFactory.getGeometryFactoryImpl();
 		
 		// public DirectPositionImpl createDirectPosition();
 		DirectPosition dp1 = cf.createDirectPosition();

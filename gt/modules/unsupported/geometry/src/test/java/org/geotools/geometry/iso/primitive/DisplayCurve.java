@@ -3,7 +3,7 @@ package org.geotools.geometry.iso.primitive;
 import java.util.ArrayList;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.geotools.geometry.iso.coordinate.CoordinateFactoryImpl;
+import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.coordinate.PositionImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
@@ -30,7 +30,7 @@ public class DisplayCurve {
 
 	private static void _testRing1(FeatGeomFactoryImpl aGeomFactory) {
 
-		CoordinateFactoryImpl tCoordFactory = aGeomFactory.getCoordinateFactory();
+		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
 		PrimitiveFactoryImpl tPrimFactory = aGeomFactory.getPrimitiveFactory();
 		
 		/* Defining Positions for LineStrings */

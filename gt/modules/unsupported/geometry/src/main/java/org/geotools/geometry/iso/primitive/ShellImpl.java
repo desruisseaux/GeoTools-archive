@@ -62,7 +62,7 @@ public class ShellImpl extends CompositeSurfaceImpl implements Shell {
 	 */
 	public ShellImpl(FeatGeomFactoryImpl factory,
 			List<OrientableSurface> generator) {
-		super(factory, generator);
+		super(generator);
 	}
 
 	/*

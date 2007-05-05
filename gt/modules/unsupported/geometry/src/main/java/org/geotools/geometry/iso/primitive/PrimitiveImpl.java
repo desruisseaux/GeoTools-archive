@@ -46,6 +46,7 @@ import org.opengis.geometry.complex.Complex;
 import org.opengis.geometry.primitive.OrientablePrimitive;
 import org.opengis.geometry.primitive.Primitive;
 import org.opengis.geometry.primitive.PrimitiveBoundary;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * 
@@ -134,20 +135,24 @@ public abstract class PrimitiveImpl extends GeometryImpl implements Primitive {
 	protected Set<Complex> complex = null;
 
 	/**
-	 * @param factory
+	 * @param crs
 	 * @param containedPrimitive
 	 * @param containingPrimitive
 	 * @param complex
 	 */
-	protected PrimitiveImpl(FeatGeomFactoryImpl factory,
+	protected PrimitiveImpl(CoordinateReferenceSystem crs,
 			Set<Primitive> containedPrimitive,
 			Set<Primitive> containingPrimitive,
 			Set<Complex> complex) {
-		super(factory);
+		super(crs);
 		// the parameters may be null
 		this.containedPrimitive = containedPrimitive;
 		this.containingPrimitive = containingPrimitive;
 		this.complex = complex;
+	}
+
+	public PrimitiveImpl(CoordinateReferenceSystem coordinateReferenceSystem) {
+		super( coordinateReferenceSystem );
 	}
 
 	/* (non-Javadoc)
@@ -184,7 +189,7 @@ public abstract class PrimitiveImpl extends GeometryImpl implements Primitive {
 	}
 
 	/**
-	 * Adds a the super elemet where this object in contained in
+	 * Adds a the super element where this object in contained in
 	 * 
 	 * @param newSuperelement
 	 */

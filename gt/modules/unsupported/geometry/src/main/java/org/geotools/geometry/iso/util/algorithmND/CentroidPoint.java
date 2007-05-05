@@ -91,10 +91,8 @@ import org.opengis.geometry.primitive.Point;
  */
 public class CentroidPoint {
 	
-	private FeatGeomFactoryImpl factory = null;
-	
-	private int ptCount = 0;
-
+	private FeatGeomFactoryImpl factory = null;	
+	private int ptCount = 0;	
 	DirectPositionImpl centSum = null;
 
 	/**
@@ -104,7 +102,7 @@ public class CentroidPoint {
 	 */
 	public CentroidPoint(FeatGeomFactoryImpl factory) {
 		this.factory = factory;
-		this.centSum = this.factory.getCoordinateFactory().createDirectPosition();
+		this.centSum = this.factory.getGeometryFactoryImpl().createDirectPosition();
 	}
 
 	/**

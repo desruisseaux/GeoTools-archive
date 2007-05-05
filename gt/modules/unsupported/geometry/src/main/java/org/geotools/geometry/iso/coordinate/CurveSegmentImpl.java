@@ -39,7 +39,7 @@ package org.geotools.geometry.iso.coordinate;
 
 import org.geotools.geometry.iso.primitive.CurveBoundaryImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
-import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
+import org.geotools.geometry.iso.primitive.PointImpl;
 import org.geotools.geometry.iso.util.DoubleOperation;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
@@ -165,10 +165,9 @@ public abstract class CurveSegmentImpl implements CurveSegment {
 	 * @see org.opengis.geometry.primitive.CurveSegment#getBoundary()
 	 */
 	public CurveBoundaryImpl getBoundary() {
-		PrimitiveFactoryImpl pf = this.getCurve().getGeometryFactory()
-				.getPrimitiveFactory();
-		return pf.createCurveBoundary(pf.createPoint(this.getStartPoint()), pf
-				.createPoint(this.getEndPoint()));
+		return new CurveBoundaryImpl(this.getCurve().getCoordinateReferenceSystem(), 
+				new PointImpl(this.getStartPoint()), 
+				new PointImpl(this.getEndPoint()) );
 	}
 
 	public CurveInterpolation getInterpolation() {
@@ -348,12 +347,13 @@ public abstract class CurveSegmentImpl implements CurveSegment {
 		if (point0 == null && point1 == null)
 			return this.length();
 		if (point0 == null)
-			point0 = this.getCurve().getGeometryFactory()
-					.getCoordinateFactory()
-					.createPosition(this.getStartPoint());
+			point0 = new PositionImpl((DirectPosition) this.getStartPoint().clone());
+			//point0 = this.getCurve().getFeatGeometryFactory()
+				//.getGeometryFactoryImpl().createPosition(this.getStartPoint());
 		if (point1 == null)
-			point1 = this.getCurve().getGeometryFactory()
-					.getCoordinateFactory().createPosition(this.getEndPoint());
+			point1 = new PositionImpl((DirectPosition) this.getEndPoint().clone());
+			//point1 = this.getCurve().getFeatGeometryFactory()
+					//.getGeometryFactoryImpl().createPosition(this.getEndPoint());
 		/* Get all Params for closest points to startposition point1 */
 		ParamForPoint obj0 = this.getParamForPoint(point0.getPosition());
 		/* Get all Params for closest points to endposition point2 */

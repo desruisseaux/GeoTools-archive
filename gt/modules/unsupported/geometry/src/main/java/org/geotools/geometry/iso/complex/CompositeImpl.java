@@ -39,9 +39,9 @@ package org.geotools.geometry.iso.complex;
 
 import java.util.List;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.opengis.geometry.complex.Composite;
 import org.opengis.geometry.primitive.Primitive;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * A geometric composite, Composite, shall be a geometric complex with an
@@ -78,23 +78,20 @@ public abstract class CompositeImpl<T> extends ComplexImpl implements Composite 
 	 * Composite::generator[1..n] : Primitive Is realised by the ArrayList of
 	 * elements in the super Class Complex The Generator elements will be passed
 	 * through the super constructor
-	 * 
-	 * @param factory
 	 * @param generatorElements
 	 */
-	public CompositeImpl(FeatGeomFactoryImpl factory,
-			List<? extends Primitive> generatorElements) {
-		super(factory, generatorElements);
+	public CompositeImpl(List<? extends Primitive> generatorElements) {
+		super(generatorElements);
 	}
 
 	/**
 	 * Constructs a Composite by calling the super constructor Elements have to
 	 * be added after
 	 * 
-	 * @param factory
+	 * @param crs
 	 */
-	public CompositeImpl(FeatGeomFactoryImpl factory) {
-		super(factory);
+	public CompositeImpl(CoordinateReferenceSystem crs) {
+		super(crs);
 	}
 
 	/**

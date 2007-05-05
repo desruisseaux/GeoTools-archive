@@ -6,7 +6,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.geotools.geometry.iso.coordinate.CoordinateFactoryImpl;
+import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.coordinate.LineStringImpl;
 import org.geotools.geometry.iso.coordinate.PositionImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
@@ -50,7 +50,7 @@ public class Dimension2o5DTest extends TestCase {
 		System.out.println("\n" + curve1);
 		System.out.println("\nCoordinate Dimension: " + curve1.getCoordinateDimension());
 		System.out.println("\nDimension: " + curve1.getDimension(null));
-		System.out.println("\nDimension Model: " + curve1.getGeometryFactory().getDimensionModel());
+		System.out.println("\nDimension Model: " + curve1.getFeatGeometryFactory().getDimensionModel());
 		System.out.println("Length of Curve is " + curve1.length());
 		System.out.println("Envelope of the Curve is " +  curve1.getEnvelope());
 	}
@@ -61,12 +61,12 @@ public class Dimension2o5DTest extends TestCase {
 		System.out.println("\n" + surface);
 		System.out.println("\n Coordinate Dimension: " + surface.getCoordinateDimension());
 		System.out.println("\n Dimension: " + surface.getDimension(null));
-		System.out.println("\n Dimension Model: " + surface.getGeometryFactory().getDimensionModel());
+		System.out.println("\n Dimension Model: " + surface.getFeatGeometryFactory().getDimensionModel());
 		System.out.println("\n Envelope: " + surface.getEnvelope());
 	}
 	
 	private Curve _createCurve1(FeatGeomFactoryImpl aGeomFactory) {
-		CoordinateFactoryImpl tCoordFactory = aGeomFactory.getCoordinateFactory();
+		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
 		PrimitiveFactoryImpl tPrimFactory = aGeomFactory.getPrimitiveFactory();
 
 		PositionImpl p1 = new PositionImpl(tCoordFactory.createDirectPosition(new double[]{-50,  0, 0}));
@@ -103,7 +103,7 @@ public class Dimension2o5DTest extends TestCase {
 	}
 	
 	private Curve _createCurve2(FeatGeomFactoryImpl aGeomFactory) {
-		CoordinateFactoryImpl tCoordFactory = aGeomFactory.getCoordinateFactory();
+		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
 		PrimitiveFactoryImpl tPrimFactory = aGeomFactory.getPrimitiveFactory();
 
 		PositionImpl p1 = new PositionImpl(tCoordFactory.createDirectPosition(new double[]{10, 0, 100}));
@@ -143,7 +143,7 @@ public class Dimension2o5DTest extends TestCase {
 	
 	
 	private Surface _createSurface1(FeatGeomFactoryImpl aGeomFactory) {
-		CoordinateFactoryImpl tCoordFactory = aGeomFactory.getCoordinateFactory();
+		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
 		PrimitiveFactoryImpl tPrimFactory = aGeomFactory.getPrimitiveFactory();
 
 		List<DirectPosition> directPositionList = new ArrayList<DirectPosition>();
@@ -165,7 +165,7 @@ public class Dimension2o5DTest extends TestCase {
 	}
 
 	public Surface _createSurface2(FeatGeomFactoryImpl aGeomFactory) {
-		CoordinateFactoryImpl tCoordFactory = aGeomFactory.getCoordinateFactory();
+		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
 		PrimitiveFactoryImpl tPrimFactory = aGeomFactory.getPrimitiveFactory();
 
 		List<DirectPosition> directPositionList = new ArrayList<DirectPosition>();

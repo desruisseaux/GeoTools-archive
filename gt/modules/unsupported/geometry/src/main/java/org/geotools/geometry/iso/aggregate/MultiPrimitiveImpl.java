@@ -40,6 +40,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.geometry.iso.io.GeometryToString;
 import org.geotools.geometry.iso.root.GeometryImpl;
@@ -91,7 +92,7 @@ public class MultiPrimitiveImpl extends AggregateImpl implements MultiPrimitive 
 	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getEnvelope()
 	 */
 	public Envelope getEnvelope() {
-		EnvelopeImpl env = super.getGeometryFactory().getCoordinateFactory().createEnvelope(new double[] {0, 0});
+		EnvelopeImpl env = new EnvelopeImpl(new DirectPositionImpl( getCoordinateReferenceSystem(), (new double[] {0, 0})) );
 		Iterator<? extends Geometry> elementIter = this.elements.iterator();
 		while (elementIter.hasNext()) {
 			env.add((EnvelopeImpl)((Primitive)elementIter.next()).getEnvelope());

@@ -2,13 +2,18 @@ package org.geotools.geometry.iso.primitive;
 
 import junit.framework.TestCase;
 
+import org.geotools.filter.GeometryFilterImpl;
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.geotools.geometry.iso.coordinate.CoordinateFactoryImpl;
+import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
+import org.geotools.referencing.CRS;
 import org.opengis.geometry.complex.Complex;
 import org.opengis.geometry.complex.CompositePoint;
+import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.geometry.primitive.Point;
+import org.opengis.geometry.primitive.PrimitiveFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * @author sanjay
@@ -24,10 +29,25 @@ public class PointTest extends TestCase {
 		
 	}
 	
+	public void testGoodPoint() throws Exception {
+		CoordinateReferenceSystem crs = CRS.decode( "EPSG:4326");		
+		assertNotNull( crs );
+
+		FeatGeomFactoryImpl geometryFactory = new FeatGeomFactoryImpl(crs);
+		PrimitiveFactory primitiveFactory = new PrimitiveFactoryImpl(crs); // null;
+		
+		assertEquals( crs, primitiveFactory.getCoordinateReferenceSystem() );
+		
+		Point point = primitiveFactory.createPoint( new double[]{1,1} );
+		
+		assertNotNull( point );
+		assertEquals( crs, point.getCoordinateReferenceSystem() );
+		assertSame( crs, point.getCoordinateReferenceSystem() );		
+	}
 	
 	private void _testPoint(FeatGeomFactoryImpl aGeomFactory) {
 		
-		CoordinateFactoryImpl tCoordFactory = aGeomFactory.getCoordinateFactory();
+		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
 		PrimitiveFactoryImpl tPrimFactory = aGeomFactory.getPrimitiveFactory();
 		
 		double[] coord = new double[]{10, 32000};

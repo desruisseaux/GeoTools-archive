@@ -44,6 +44,7 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.complex.Complex;
 import org.opengis.geometry.primitive.CurveBoundary;
 import org.opengis.geometry.primitive.Point;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * The boundary of Curves shall be represented as CurveBoundary.
@@ -68,12 +69,12 @@ public class CurveBoundaryImpl extends PrimitiveBoundaryImpl implements
 	/**
 	 * Constructor
 	 * 
-	 * @param factory
+	 * @param crs
 	 * @param start
 	 * @param end
 	 */
-	public CurveBoundaryImpl(FeatGeomFactoryImpl factory, Point start, Point end) {
-		super(factory);
+	public CurveBoundaryImpl(CoordinateReferenceSystem crs, Point start, Point end) {
+		super(crs);
 		if (start.equals(end))
 			throw new IllegalArgumentException("Start- and Endpoint of the CurveBoundary cannot be equal");
 		this.startPoint = start;
@@ -88,7 +89,7 @@ public class CurveBoundaryImpl extends PrimitiveBoundaryImpl implements
 	public CurveBoundaryImpl clone() throws CloneNotSupportedException {
 		// ok
 		// Return new CurveBoundary with the cloned start and end point of this CurveBoundary
-		return this.getGeometryFactory().getPrimitiveFactory().createCurveBoundary(this.getStartPoint().clone(), this.getEndPoint().clone());
+		return this.getFeatGeometryFactory().getPrimitiveFactory().createCurveBoundary(this.getStartPoint().clone(), this.getEndPoint().clone());
 	}
 
 	/*
@@ -139,7 +140,8 @@ public class CurveBoundaryImpl extends PrimitiveBoundaryImpl implements
 		// TODO Test
 		/* Build Envelope with StartPoint */
 		// EnvelopeImpl tmpEnv = new EnvelopeImpl(this.startPoint.getPosition(), this.startPoint.getPosition());
-		EnvelopeImpl tmpEnv = this.getGeometryFactory().getCoordinateFactory().createEnvelope(this.startPoint.getEnvelope());
+		
+		EnvelopeImpl tmpEnv = new EnvelopeImpl(this.startPoint.getEnvelope());
 		/* Extend Envelope with EndPoint */
 		tmpEnv.expand(this.endPoint.getPosition().getCoordinates());
 		return tmpEnv;
@@ -177,6 +179,37 @@ public class CurveBoundaryImpl extends PrimitiveBoundaryImpl implements
 	public DirectPosition getRepresentativePoint() {
 		// Use start point of Boundary as representative point
 		return this.startPoint.getPosition();
+	}
+
+	@Override
+	public int hashCode() {
+		final int PRIME = 31;
+		int result = 1;
+		result = PRIME * result + ((endPoint == null) ? 0 : endPoint.hashCode());
+		result = PRIME * result + ((startPoint == null) ? 0 : startPoint.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final CurveBoundaryImpl other = (CurveBoundaryImpl) obj;
+		if (endPoint == null) {
+			if (other.endPoint != null)
+				return false;
+		} else if (!endPoint.equals(other.endPoint))
+			return false;
+		if (startPoint == null) {
+			if (other.startPoint != null)
+				return false;
+		} else if (!startPoint.equals(other.startPoint))
+			return false;
+		return true;
 	}
 
 }

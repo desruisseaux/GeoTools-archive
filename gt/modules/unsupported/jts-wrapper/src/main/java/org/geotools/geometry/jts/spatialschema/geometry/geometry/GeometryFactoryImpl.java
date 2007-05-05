@@ -130,7 +130,7 @@ public class GeometryFactoryImpl implements GeometryFactory {
     public LineString createLineString(final List/*<Position>*/ points) {
         LineString result = new LineStringImpl();
         PointArray pa = result.getControlPoints();
-        List list = pa.positions();
+        List list = pa;
         Iterator it = points.iterator();
         while (it.hasNext()) {
 //            Object o = it.next();

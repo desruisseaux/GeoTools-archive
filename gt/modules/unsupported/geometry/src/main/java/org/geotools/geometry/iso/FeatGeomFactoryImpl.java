@@ -41,7 +41,7 @@ import java.util.Set;
 
 import org.geotools.geometry.iso.aggregate.AggregateFactoryImpl;
 import org.geotools.geometry.iso.complex.ComplexFactoryImpl;
-import org.geotools.geometry.iso.coordinate.CoordinateFactoryImpl;
+import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.io.CollectionFactory;
 import org.geotools.geometry.iso.io.CollectionFactoryMemoryImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
@@ -58,8 +58,8 @@ import org.opengis.geometry.primitive.Primitive;
  * The Feature Geometry Factory is the most upper factory and is responsible for
  * the management of:
  * 
- *  - The used Coordinate Factory implementation (GeoAPI GeometryFactory). Each
- *    Feature Geometry Factory can only hold one Coordinate Factory implementation.
+ *  - The used Geometry Factory implementation (GeoAPI GeometryFactory). Each
+ *    Feature Geometry Factory can only hold one Geometry Factory implementation.
  *    
  *  - The used Primitive Factory implementation (GeoAPI PrimitiveFactory). Each
  *    Feature Geometry Factory can only hold one Primitive Factory implementation.
@@ -96,14 +96,14 @@ public class FeatGeomFactoryImpl {
 	 * @param dimension
 	 * @return CoordinateFactory
 	 */
-	public static CoordinateFactoryImpl getDefaultCoordinateFactory(
+	public static GeometryFactoryImpl getDefaultCoordinateFactory(
 			DimensionModel dimension) {
 		if (dimension.is2D()) {
-			return getDefault2D().getCoordinateFactory();
+			return getDefault2D().getGeometryFactoryImpl();
 		} else if (dimension.is2o5D()) {
-			return getDefault2o5D().getCoordinateFactory();
+			return getDefault2o5D().getGeometryFactoryImpl();
 		} else if (dimension.is3D()) {
-			return getDefault3D().getCoordinateFactory();
+			return getDefault3D().getGeometryFactoryImpl();
 		} else {
 			return null;
 		}
@@ -134,7 +134,7 @@ public class FeatGeomFactoryImpl {
 	// The used precision model
 	private PrecisionModel precisionModel = null;
 
-	private CoordinateFactoryImpl coordinateFactory;
+	private GeometryFactoryImpl geometryFactory;
 
 	private PrimitiveFactoryImpl primitiveFactory;
     
@@ -150,6 +150,9 @@ public class FeatGeomFactoryImpl {
 	// 2.5D and 3D
 	private DimensionModel dimensionModel = null;
 
+	public FeatGeomFactoryImpl(CoordinateReferenceSystem crs ){
+		this( crs, crs.getCoordinateSystem().getDimension() );
+	}
 	/**
 	 * Private Constructor
 	 * 
@@ -159,9 +162,10 @@ public class FeatGeomFactoryImpl {
 	private FeatGeomFactoryImpl(CoordinateReferenceSystem crs,
 			int dimensionModel) {
 		this.coordinateReferenceSystem = crs;
-		this.coordinateFactory = new CoordinateFactoryImpl(this);
-		this.primitiveFactory = new PrimitiveFactoryImpl(this);
-		this.complexFactory = new ComplexFactoryImpl(this);
+		this.geometryFactory = new GeometryFactoryImpl(this);
+		this.primitiveFactory = new PrimitiveFactoryImpl(crs);
+		this.positionFactory = new PositionFactoryImpl(crs, new PrecisionModel());
+		this.complexFactory = new ComplexFactoryImpl();
 		this.aggregateFactory = new AggregateFactoryImpl(this);
 		this.collectionFactory = new CollectionFactoryMemoryImpl();
 
@@ -172,6 +176,7 @@ public class FeatGeomFactoryImpl {
 		this.precisionModel = new PrecisionModel();
 	}
 
+	
 	/**
 	 * Returns the Feature Geometry Factory for 2 dimensional space
 	 * 
@@ -223,10 +228,11 @@ public class FeatGeomFactoryImpl {
 	 * @throws Exception
 	 */
 	public int getCoordinateDimension() {
+		return coordinateReferenceSystem.getCoordinateSystem().getDimension();
 		// Auskommentiert und ersetzt durch Sanjay, da Endlos-Schleife
 		// Stattdessen wird Membervariable mDimension eingefuegt.
 		// return this.getCoordinateDimension();
-		return this.dimensionModel.getCoordinateDimension();
+		//return this.dimensionModel.getCoordinateDimension();
 	}
 
 	/**
@@ -262,14 +268,14 @@ public class FeatGeomFactoryImpl {
 	}
 
 	/**
-	 * @return Returns the coordinateFactory.
+	 * @return Returns the coordinateFactoryImpl.
 	 */
-	public CoordinateFactoryImpl getCoordinateFactory() {
-		return this.coordinateFactory;
+	public GeometryFactoryImpl getGeometryFactoryImpl() {
+		return this.geometryFactory;
 	}
 
     public GeometryFactory getGeometryFactory() {
-        return this.coordinateFactory;
+        return this.geometryFactory;
     }
 	/**
 	 * @return Returns the primitiveFactory.

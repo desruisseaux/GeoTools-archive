@@ -37,7 +37,6 @@
 
 package org.geotools.geometry.iso.primitive;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.opengis.geometry.DirectPosition;
@@ -66,12 +65,10 @@ public class SolidImpl extends PrimitiveImpl implements Solid {
 	 * systems, any solid is definable by its boundary. The default constructor
 	 * for a Solid is from a properly structured set of Shells organized as a
 	 * SolidBoundary. Solid::Solid(boundary : SolidBoundary) : Solid
-	 * 
-	 * @param factory
 	 * @param boundary
 	 */
-	public SolidImpl(FeatGeomFactoryImpl factory, SolidBoundary boundary) {
-		super(factory, null, null, null);
+	public SolidImpl(SolidBoundary boundary) {
+		super(boundary.getCoordinateReferenceSystem(), null, null, null);
 		this.envelope = (EnvelopeImpl) boundary.getEnvelope();
 	}
 

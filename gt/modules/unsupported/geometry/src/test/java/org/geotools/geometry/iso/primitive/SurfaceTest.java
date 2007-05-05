@@ -6,7 +6,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.geotools.geometry.iso.coordinate.CoordinateFactoryImpl;
+import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
@@ -38,7 +38,7 @@ public class SurfaceTest extends TestCase {
 
 	private List<Triangle> _testTriangle1(FeatGeomFactoryImpl aGeomFactory) {
 		
-		CoordinateFactoryImpl tCoordFactory = aGeomFactory.getCoordinateFactory();
+		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
 		PrimitiveFactoryImpl tPrimFactory = aGeomFactory.getPrimitiveFactory();
 
 		ArrayList<double[][]> tDoubleList = new ArrayList<double[][]>();
@@ -82,7 +82,7 @@ public class SurfaceTest extends TestCase {
 
 	public Surface _testSurface2(FeatGeomFactoryImpl aGeomFactory) {
 		
-		CoordinateFactoryImpl tCoordFactory = aGeomFactory.getCoordinateFactory();
+		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
 		PrimitiveFactoryImpl tPrimFactory = aGeomFactory.getPrimitiveFactory();
 
 		List<DirectPosition> directPositionList = new ArrayList<DirectPosition>();

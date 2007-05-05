@@ -41,11 +41,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
 import org.opengis.geometry.complex.Complex;
 import org.opengis.geometry.primitive.Primitive;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * 
@@ -99,12 +99,10 @@ public abstract class ComplexImpl extends GeometryImpl implements Complex {
 
 	/**
 	 * 
-	 * @param factory
 	 * @param elements
 	 */
-	public ComplexImpl(FeatGeomFactoryImpl factory,
-			List<? extends Primitive> elements) {
-		super(factory);
+	public ComplexImpl(List<? extends Primitive> elements) {
+		super(elements.get(0).getCoordinateReferenceSystem());
 		if (elements.isEmpty())
 			throw new IllegalArgumentException(
 					"Array of Elements is empty. At least one element expected."); //$NON-NLS-1$
@@ -117,10 +115,10 @@ public abstract class ComplexImpl extends GeometryImpl implements Complex {
 	/**
 	 * Constructs a Complex Elements have to be added after
 	 * 
-	 * @param factory
+	 * @param crs
 	 */
-	public ComplexImpl(FeatGeomFactoryImpl factory) {
-		super(factory);
+	public ComplexImpl(CoordinateReferenceSystem crs) {
+		super(crs);
 		this.elements = null;
 		this.subComplex = null;
 		this.superComplex = null;

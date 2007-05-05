@@ -39,10 +39,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
+import org.geotools.geometry.iso.coordinate.LineStringImpl;
+import org.geotools.geometry.iso.coordinate.PointArrayImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
-import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.primitive.CurveSegment;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * Merges curves at end points
@@ -52,12 +55,21 @@ import org.opengis.geometry.DirectPosition;
  */
 public class Merger {
 	
-	FeatGeomFactoryImpl mFactory = null;
+	//FeatGeomFactoryImpl mFactory = null;
+	CoordinateReferenceSystem crs;
 	
+	/*
 	public Merger(FeatGeomFactoryImpl factory) {
 		this.mFactory = factory;
+		this.crs = factory.getCoordinateReferenceSystem();
 	}
+	*/
 	
+	public Merger(CoordinateReferenceSystem crs) {
+		// TODO Auto-generated constructor stub
+		this.crs = crs;
+	}
+
 	/**
 	 * Merges a list of continuous curves into a new single curve.
 	 * In order two neighboured curves are merged, their end and startpoint must be equal.
@@ -127,20 +139,34 @@ public class Merger {
 	 */
 	private CurveImpl mergeContinuousCurves(List<CurveImpl> curves) {
 
-		List<DirectPosition> newDPList = new ArrayList<DirectPosition>();
+		List<Position> positionList = new ArrayList<Position>();
 		
 		int i=0;
 		int j=0;
 		for (i=0; i<curves.size(); i++) {
 			List<DirectPositionImpl> dPList = curves.get(i).asDirectPositions();
 			for (j=0; j<dPList.size()-1; j++) {
-				newDPList.add(dPList.get(j).clone());
+				positionList.add(dPList.get(j).clone());
 			}
-		}
+		}		
+		positionList.add(curves.get(curves.size()-1).getEndPoint());
 		
-		newDPList.add(curves.get(curves.size()-1).getEndPoint());
+		// Create List of CurveSegment큦 (LineString큦)
+		LineStringImpl lineString = new LineStringImpl(new PointArrayImpl(positionList), 0.0);
+		// LineStringImpl lineString =
+		// coordFactory.createLineString(aPositions);
+		List<CurveSegment> segments = new ArrayList<CurveSegment>();
+		segments.add(lineString);
 		
-		return (CurveImpl) this.mFactory.getPrimitiveFactory().createCurveByDirectPositions(newDPList);
+		// Create List of OrientableCurve큦 (Curve큦)
+		// test OK
+		if (segments == null)
+			throw new NullPointerException();
+		
+		// A curve will be created
+		// - The curve will be set as parent curves for the Curve segments
+		// - Start and end params for the CurveSegments will be set
+		return new CurveImpl( crs, segments);
 	}
 	
 	

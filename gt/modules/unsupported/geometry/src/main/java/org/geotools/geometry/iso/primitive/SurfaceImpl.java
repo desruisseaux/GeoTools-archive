@@ -43,8 +43,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
+import org.geotools.geometry.iso.coordinate.PolygonImpl;
 import org.geotools.geometry.iso.coordinate.SurfacePatchImpl;
 import org.geotools.geometry.iso.io.GeometryToString;
 import org.geotools.geometry.iso.operation.IsSimpleOp;
@@ -59,6 +59,7 @@ import org.opengis.geometry.primitive.OrientableSurface;
 import org.opengis.geometry.primitive.Surface;
 import org.opengis.geometry.primitive.SurfaceBoundary;
 import org.opengis.geometry.primitive.SurfacePatch;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * 
@@ -125,12 +126,12 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 	 * 
 	 * Surface::Surface(patch[1..n] : SurfacePatch) : Surface
 	 * 
-	 * @param factory
+	 * @param crs
 	 * @param patch
 	 */
-	public SurfaceImpl(FeatGeomFactoryImpl factory,
+	public SurfaceImpl(CoordinateReferenceSystem crs,
 			List<? extends SurfacePatch> patch) {
-		super(factory, null, null, null);
+		super(crs, null, null, null);
 		this.initializeSurface(patch);
 	}
 
@@ -143,15 +144,12 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 	 * which will define the surface interior.
 	 * 
 	 * Surface::Surface(bdy : SurfaceBoundary) : Surface
-	 * 
-	 * @param factory
-	 * 
 	 * @param boundary
 	 *            The SurfaceBoundary which defines the Surface
 	 */
-	public SurfaceImpl(FeatGeomFactoryImpl factory, SurfaceBoundary boundary) {
+	public SurfaceImpl(SurfaceBoundary boundary) {
 
-		super(factory, null, null, null);
+		super(boundary.getCoordinateReferenceSystem(), null, null, null);
 
 		// Set Boundary
 		this.boundary = boundary;
@@ -162,8 +160,7 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 		// TODO Is it really necessary to create the surface patches?
 		// Create Surface Patch on basis of the Boundary
 		ArrayList<SurfacePatch> newPatchList = new ArrayList<SurfacePatch>();
-		newPatchList.add((SurfacePatch)this.getGeometryFactory().getCoordinateFactory()
-				.createPolygon(boundary, this));
+		newPatchList.add(new PolygonImpl((SurfaceBoundaryImpl)boundary, (SurfaceImpl)this));
 		this.patch = newPatchList;
 	}
 
@@ -199,7 +196,7 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 		// Build the envelope for the Surface based on the SurfacePatch envelopes
 		SurfacePatchImpl tFirstPatch = (SurfacePatchImpl) patch.get(0);
 		//this.envelope = new EnvelopeImpl(tFirstPatch.getEnvelope());
-		this.envelope = this.getGeometryFactory().getCoordinateFactory().createEnvelope(tFirstPatch.getEnvelope());
+		this.envelope = this.getFeatGeometryFactory().getGeometryFactoryImpl().createEnvelope(tFirstPatch.getEnvelope());
 		for (SurfacePatch p : patch)
 			((EnvelopeImpl) this.envelope).expand(((SurfacePatchImpl) p)
 					.getEnvelope());
@@ -222,15 +219,15 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 		if (patches.size() == 1)
 			return (SurfaceBoundaryImpl) firstPatch.getBoundary();
 
-		Surface firstPatchSurface = this.getGeometryFactory().getPrimitiveFactory().createSurface(firstPatch.getBoundary());
+		Surface firstPatchSurface = this.getFeatGeometryFactory().getPrimitiveFactory().createSurface(firstPatch.getBoundary());
 		Set<OrientableSurface> surfaceList = new HashSet<OrientableSurface>();
 		
 		for (int i=1; i<patches.size(); i++) {
 			SurfacePatch nextPatch = patches.get(i); 
-			surfaceList.add(this.getGeometryFactory().getPrimitiveFactory().createSurface(nextPatch.getBoundary()));
+			surfaceList.add(this.getFeatGeometryFactory().getPrimitiveFactory().createSurface(nextPatch.getBoundary()));
 		}
 		
-		MultiSurface ms = this.getGeometryFactory().getAggregateFactory().createMultiSurface(surfaceList);
+		MultiSurface ms = this.getFeatGeometryFactory().getAggregateFactory().createMultiSurface(surfaceList);
 		TransfiniteSet unionResultSurface = firstPatchSurface.union(ms);
 		if (! (unionResultSurface instanceof SurfaceImpl))
 			throw new IllegalArgumentException("Surface patches are not continuous");
@@ -321,7 +318,7 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 		// Test OK
 		// Clone SurfaceBoundary and use it to create new Surface
 		SurfaceBoundary newBoundary = (SurfaceBoundary) this.boundary.clone();
-		return this.getGeometryFactory().getPrimitiveFactory().createSurface(newBoundary);
+		return this.getFeatGeometryFactory().getPrimitiveFactory().createSurface(newBoundary);
 	}
 
 	/*

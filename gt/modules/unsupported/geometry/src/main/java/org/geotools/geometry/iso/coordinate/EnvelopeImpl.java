@@ -129,7 +129,7 @@ public class EnvelopeImpl implements Envelope {
 		// TODO test
 		// TODO documentation
 		// Return zero, which is the lowest index the coordinate could have
-		return 0;
+		return pMin.getOrdinate(dimension);
 	}
 
 	/*
@@ -144,7 +144,7 @@ public class EnvelopeImpl implements Envelope {
 		// TODO documentation
 		// Return the coordinate dimension minus 1
 		//return this.pMin.getDimension() - 1;
-		return 0;
+		return pMax.getOrdinate(dimension);
 	}
 
 	/*
@@ -430,6 +430,22 @@ public class EnvelopeImpl implements Envelope {
 	 * @return
 	 * @throws UnsupportedDimensionException 
 	 */
+	public DirectPositionImpl getNWCornerOld() throws UnsupportedDimensionException {
+		// Test ok (indirect by Primitive Factory Test)
+		
+		DirectPositionImpl rDP = null;
+		CoordinateReferenceSystem crs = getCoordinateReferenceSystem();
+        int D = DimensionModel.toD( crs );
+        if ( D == DimensionModel.TWO_DIMENSIONIAL ) {
+        	rDP = new DirectPositionImpl( crs, new double[]{this.pMin.getOrdinate(X), this.pMax.getOrdinate(Y)});
+		} else
+            if ( D == DimensionModel.TWOoFIVE_DIMENSIONIAL ) {
+            	rDP = new DirectPositionImpl( crs, new double[]{this.pMin.getOrdinate(X), this.pMax.getOrdinate(Y), this.pMin.getOrdinate(Z)});
+            } else {
+            	throw new UnsupportedDimensionException("3d not supported.");
+            }
+		return rDP;
+	}
 	public DirectPositionImpl getNWCorner() throws UnsupportedDimensionException {
 		// Test ok (indirect by Primitive Factory Test)
 		
@@ -440,13 +456,12 @@ public class EnvelopeImpl implements Envelope {
         	rDP = new DirectPositionImpl( crs, new double[]{this.pMin.getOrdinate(X), this.pMax.getOrdinate(Y)});
 		} else
             if ( D == DimensionModel.TWOoFIVE_DIMENSIONIAL ) {
-			rDP = new DirectPositionImpl( crs, new double[]{this.pMin.getOrdinate(X), this.pMax.getOrdinate(Y), this.pMin.getOrdinate(Z)});
-		} else {
-			throw new UnsupportedDimensionException("3d not supported.");
-		}
+            	rDP = new DirectPositionImpl( crs, new double[]{this.pMin.getOrdinate(X), this.pMax.getOrdinate(Y), this.pMin.getOrdinate(Z)});
+            } else {
+            	throw new UnsupportedDimensionException("3d not supported.");
+            }
 		return rDP;
 	}
-
 
 	/**
 	 * Verifies whether a DirectPosition2D lays within the envelope or at its

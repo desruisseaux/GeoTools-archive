@@ -220,7 +220,7 @@ public abstract class EdgeRing {
 		for (int i = 0; i < this.pts.size(); i++) {
 			double[] doubleCoords = ((Coordinate) this.pts.get(i))
 					.getCoordinates();
-			DirectPosition dp = this.mFeatGeomFactory.getCoordinateFactory()
+			DirectPosition dp = this.mFeatGeomFactory.getGeometryFactoryImpl()
 					.createDirectPosition(doubleCoords);
 			dpList.add(dp);
 		}

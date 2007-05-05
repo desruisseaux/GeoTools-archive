@@ -36,6 +36,8 @@
 
 package org.geotools.geometry.iso.coordinate;
 
+import java.util.Arrays;
+
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.util.DoubleOperation;
 import org.geotools.geometry.iso.util.algorithmND.AlgoPointND;
@@ -80,17 +82,18 @@ public class DirectPositionImpl implements DirectPosition {
 		this.crs = crs;        
 		this.coordinate = new double[N];
 		for (int i = 0; i < N; ++i){
-			this.coordinate[i] = 0.0;
+			this.coordinate[i] = Double.NaN;
         }
 	}
 
 	/**
 	 * Creates a direct Position by using coordinates of another direct Position
-	 * @param factory
+	 * @param crs
 	 * @param coord
 	 */
 	public DirectPositionImpl(CoordinateReferenceSystem crs, double[] coord) {
 		this.crs = crs;
+		assert (coord.length == crs.getCoordinateSystem().getDimension());
 		this.coordinate = coord;
 	}
 
@@ -100,8 +103,7 @@ public class DirectPositionImpl implements DirectPosition {
 	/**
 	 * Creates a direct Position by using coordinates of another direct Position
 	 * 
-	 * @param factory
-	 * @param p
+	 * @param position
 	 */
 	public DirectPositionImpl(final DirectPosition position) {
 		this.crs = position.getCoordinateReferenceSystem();
@@ -122,7 +124,7 @@ public class DirectPositionImpl implements DirectPosition {
 	}
 
 	/**
-	 * @param factory
+	 * @param crs
 	 * @param x
 	 * @param y
 	 * @param z
@@ -130,6 +132,7 @@ public class DirectPositionImpl implements DirectPosition {
 	public DirectPositionImpl(CoordinateReferenceSystem crs, double x, double y,
 			double z) {
 		this.crs = crs;
+		assert (3 == crs.getCoordinateSystem().getDimension());
 		this.coordinate = new double[] { x, y, z };
 	}
 
@@ -143,6 +146,7 @@ public class DirectPositionImpl implements DirectPosition {
 	public DirectPositionImpl( CoordinateReferenceSystem crs, double x, double y,
 			double z, double m) {
 		this.crs = crs;
+		assert (5 == crs.getCoordinateSystem().getDimension());
 		this.coordinate = new double[] { x, y, z, m };
 	}
 
@@ -150,6 +154,7 @@ public class DirectPositionImpl implements DirectPosition {
 	 * The Feature Geometry Factory can be accessed through this getter-method.
 	 * Hereby Coordinate classes get possibility to get the factory´s instance.
 	 * TODO I don´t know if this is a clear design, but it works for now. (SJ)
+	 * @deprecated We no longer pass or store a factory to this class
 	 * @return GeometryFactoryImpl
 	 */
 	private FeatGeomFactoryImpl XgetGeometryFactory() {
@@ -307,6 +312,14 @@ public class DirectPositionImpl implements DirectPosition {
 			return this.equals((DirectPosition) o, 0);
 		else
 			return false;
+	}
+	
+	public int hashCode() {
+		final int PRIME = 31;
+		int result = 1;
+		result = PRIME * result + Arrays.hashCode(coordinate);
+		result = PRIME * result + ((crs == null) ? 0 : crs.hashCode());
+		return result;
 	}
 
 	/**

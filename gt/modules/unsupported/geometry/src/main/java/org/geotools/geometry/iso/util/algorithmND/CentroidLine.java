@@ -110,7 +110,7 @@ public class CentroidLine {
 	 */
 	public CentroidLine(FeatGeomFactoryImpl factory) {
 		this.factory = factory;
-		this.centSum = this.factory.getCoordinateFactory().createDirectPosition();
+		this.centSum = this.factory.getGeometryFactoryImpl().createDirectPosition();
 	}
 
 	/**

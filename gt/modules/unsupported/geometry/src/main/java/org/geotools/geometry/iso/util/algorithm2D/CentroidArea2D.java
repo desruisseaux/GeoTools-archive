@@ -148,7 +148,7 @@ public class CentroidArea2D {
 	}
 
 	public DirectPositionImpl getCentroid() {
-		DirectPositionImpl centroid = this.factory.getCoordinateFactory().createDirectPosition();
+		DirectPositionImpl centroid = this.factory.getGeometryFactoryImpl().createDirectPosition();
 		centroid.setX(this.centSumX / 3 / this.areasum2);
 		centroid.setY(this.centSumY / 3 / this.areasum2);
 		return centroid;

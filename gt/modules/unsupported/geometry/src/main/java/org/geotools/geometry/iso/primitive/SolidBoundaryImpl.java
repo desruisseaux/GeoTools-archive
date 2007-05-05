@@ -40,12 +40,12 @@ package org.geotools.geometry.iso.primitive;
 import java.util.ArrayList;
 import java.util.Set;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.complex.Complex;
 import org.opengis.geometry.primitive.Shell;
 import org.opengis.geometry.primitive.SolidBoundary;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * The boundary of Solids shall be represented as SolidBoundary.
@@ -76,10 +76,10 @@ public class SolidBoundaryImpl extends PrimitiveBoundaryImpl implements
 	private ArrayList interior = null; /* ArrayList of Shell */
 
 	/**
-	 * @param factory
+	 * @param crs
 	 */
-	public SolidBoundaryImpl(FeatGeomFactoryImpl factory) {
-		super(factory);
+	public SolidBoundaryImpl(CoordinateReferenceSystem crs) {
+		super(crs);
 		// TODO Auto-generated constructor stub
 	}
 
