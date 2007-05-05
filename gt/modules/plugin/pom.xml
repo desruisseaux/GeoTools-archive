@@ -86,6 +86,7 @@
   <modules>
     <!--module>arcgrid</module--> <!-- Java 1.4 and Java 5 only -->
     <module>epsg-access</module>
+    <module>epsg-extension</module>
     <module>epsg-hsql</module>
     <module>epsg-postgresql</module>
     <module>epsg-wkt</module>

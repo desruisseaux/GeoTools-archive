@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-unsupported</artifactId>
+    <artifactId>gt2-plugin</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -27,13 +27,13 @@
   <artifactId>gt2-epsg-extension</artifactId>
   <packaging>jar</packaging>
   <name>Extensions to EPSG authority factory</name>
-  <url>http://maven.geotools.fr/reports/modules/unsupported/epsg-extension/</url>
+  <url>http://maven.geotools.fr/reports/modules/plugin/epsg-extension/</url>
   
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/epsg-extension/
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/plugin/epsg-extension/
     </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/epsg-extension/</url>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/epsg-extension/</url>
   </scm>
   
   <description>

@@ -105,7 +105,6 @@
     <module>arcsde</module>
     <module>db2</module>
     <module>directory</module>
-    <module>epsg-extension</module>
     <module>epsg-oracle</module>    
     <module>geomedia</module>
     <module>gml</module>
