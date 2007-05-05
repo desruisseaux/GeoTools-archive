@@ -1045,7 +1045,9 @@ public class CoverageStack extends AbstractCoverage {
      * @throws PointOutsideCoverageException if {@code coord} is outside coverage.
      * @throws CannotEvaluateException if the computation failed for some other reason.
      */
-    public Object evaluate(final DirectPosition coord) {
+    public Object evaluate(final DirectPosition coord)
+            throws CannotEvaluateException
+    {
         return evaluate(coord, (double[]) null);
     }
     
@@ -1108,8 +1110,7 @@ public class CoverageStack extends AbstractCoverage {
         dest       = lower.evaluate(reduce(coord, lower), dest);
         assert !(z<lowerZ || z>upperZ) : z;   // Uses !(...) in order to accepts NaN.
         final double ratio = (z-lowerZ) / (upperZ-lowerZ);
-        final int length = byteBuffer.length;
-        for (int i=0; i<length; i++) {
+        for (int i=0; i<byteBuffer.length; i++) {
             dest[i] = (byte)Math.round(dest[i] + ratio*(byteBuffer[i]-dest[i]));
         }
         return dest;
@@ -1144,8 +1145,7 @@ public class CoverageStack extends AbstractCoverage {
         dest      = lower.evaluate(reduce(coord, lower), dest);
         assert !(z<lowerZ || z>upperZ) : z;   // Uses !(...) in order to accepts NaN.
         final double ratio = (z-lowerZ) / (upperZ-lowerZ);
-        final int length = intBuffer.length;
-        for (int i=0; i<length; i++) {
+        for (int i=0; i<intBuffer.length; i++) {
             dest[i] = (int)Math.round(dest[i] + ratio*(intBuffer[i]-dest[i]));
         }
         return dest;
@@ -1179,8 +1179,7 @@ public class CoverageStack extends AbstractCoverage {
         dest        = lower.evaluate(reduce(coord, lower), dest);
         assert !(z<lowerZ || z>upperZ) : z;   // Uses !(...) in order to accepts NaN.
         final double ratio = (z-lowerZ) / (upperZ-lowerZ);
-        final int length = floatBuffer.length;
-        for (int i=0; i<length; i++) {
+        for (int i=0; i<floatBuffer.length; i++) {
             final float lower = dest[i];
             final float upper = floatBuffer[i];
             float value = (float)(lower + ratio*(upper-lower));
@@ -1230,8 +1229,7 @@ public class CoverageStack extends AbstractCoverage {
         dest         = lower.evaluate(reduce(coord, lower), dest);
         assert !(z<lowerZ || z>upperZ) : z;   // Uses !(...) in order to accepts NaN.
         final double ratio = (z-lowerZ) / (upperZ-lowerZ);
-        final int length = doubleBuffer.length;
-        for (int i=0; i<length; i++)  {
+        for (int i=0; i<doubleBuffer.length; i++) {
             final double lower = dest[i];
             final double upper = doubleBuffer[i];
             double value = lower + ratio*(upper-lower);

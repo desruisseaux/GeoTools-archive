@@ -167,13 +167,13 @@ public class AbstractFactory implements Factory, RegisterableService {
      * all user-provided hints. They should select only the relevant hints and resolve them as of
      * {@linkplain Factory#getImplementationHints implementation hints} contract.
      * <p>
-     * <strong>Reminder:</strong> the primary use of this map is to check if this factory can be
-     * reused. It is not for creating new factories. This explain why this field is not an instance
-     * of {@link Hints}. An other reason is to allow for null values, as of
-     * {@linkplain Factory#getImplementationHints implementation hints} contract.
-     * <p>
-     * Once the hints are accessibles to the user (this usually means when the subclass
-     * construction is finished), this map should not change anymore.
+     * <b>Note:</b> This field is not an instance of {@link Hints} because:
+     * <ul>
+     *   <li>The primary use of this map is to check if this factory can be reused.
+     *       It is not for creating new factories.</li>
+     *   <li>This map needs to allow null values, as of
+     *       {@linkplain Factory#getImplementationHints implementation hints} contract.</li>
+     * </ul>
      */
     protected final Map hints = new LinkedHashMap();
 

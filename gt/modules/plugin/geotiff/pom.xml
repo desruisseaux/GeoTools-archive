@@ -116,8 +116,8 @@
     </dependency>
 
     <!-- Test dependencies -->
-    <!-- We need epsg-hsql to make the referencing module useful. -->
     <dependency>
+      <!-- We need this to make the referencing module useful. -->
       <groupId>org.geotools</groupId>
       <artifactId>gt2-epsg-hsql</artifactId>
       <version>${project.version}</version>

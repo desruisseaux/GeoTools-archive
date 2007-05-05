@@ -242,6 +242,8 @@ public class BufferedCoordinateOperationFactory extends AbstractCoordinateOperat
                                                final CoordinateReferenceSystem targetCRS)
             throws OperationNotFoundException, FactoryException
     {
+        ensureNonNull("sourceCRS", sourceCRS);
+        ensureNonNull("targetCRS", targetCRS);
         final CRSPair key = new CRSPair(sourceCRS, targetCRS);
         CoordinateOperation op;
         synchronized (hints) { // This lock is indirectly required by getBackingFactory().

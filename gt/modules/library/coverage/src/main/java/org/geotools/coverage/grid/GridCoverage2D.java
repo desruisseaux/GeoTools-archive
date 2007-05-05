@@ -25,16 +25,7 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.ColorModel;
-import java.awt.image.ComponentSampleModel;
-import java.awt.image.DataBuffer;
-import java.awt.image.IndexColorModel;
-import java.awt.image.PixelInterleavedSampleModel;
-import java.awt.image.Raster;
-import java.awt.image.RasterFormatException;
-import java.awt.image.RenderedImage;
-import java.awt.image.SampleModel;
-import java.awt.image.WritableRenderedImage;
+import java.awt.image.*; // Numerous imports here.
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.renderable.RenderableImage;
 import java.io.IOException;
@@ -100,7 +91,7 @@ import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.resources.XArray;
-import org.geotools.resources.image.CoverageUtilities;
+import org.geotools.resources.coverage.CoverageUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Logging;
@@ -162,7 +153,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * first needed. May appears also in the {@link #sources} list.
      */
     private transient GridCoverage2D inverse;
-    
+
     /**
      * The raster data.
      */
@@ -173,12 +164,12 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * This image will be created only when first needed during serialization.
      */
     private RenderedImage serializedImage;
-    
+
     /**
      * The grid geometry.
      */
     protected final GridGeometry2D gridGeometry;
-    
+
     /**
      * List of sample dimension information for the grid coverage.
      * For a grid coverage, a sample dimension is a band. The sample dimension information
@@ -438,11 +429,11 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     }
 
     /**
-     * Return the value vector for a given point in the coverage.
+     * Returns the value vector for a given point in the coverage.
      * A value for each sample dimension is included in the vector.
      */
     public Object evaluate(final DirectPosition point) throws CannotEvaluateException {
-    	final int dataType = image.getSampleModel().getDataType();
+        final int dataType = image.getSampleModel().getDataType();
         switch (dataType) {
             case DataBuffer.TYPE_BYTE:   return evaluate(point, (byte  []) null);
             case DataBuffer.TYPE_SHORT:  // Fall through
@@ -453,7 +444,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
             default: throw new CannotEvaluateException();
         }
     }
-    
+
     /**
      * Returns a sequence of byte values for a given point in the coverage.
      *
@@ -476,7 +467,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         }
         return dest;
     }
-    
+
     /**
      * Returns a sequence of integer values for a given point in the coverage.
      *
@@ -691,7 +682,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     public RenderedImage getRenderedImage() {
         return image;
     }
-    
+
     /**
      * Returns 2D view of this grid coverage as a renderable image.
      * This method allows interoperability with Java2D.
@@ -711,6 +702,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     /**
      * {inheritDoc}
      */
+    //@Override
     public void show(String title, final int xAxis, final int yAxis) {
         final GridCoverage2D displayable = geophysics(false);
         if (displayable != this) {
@@ -734,6 +726,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     /**
      * {inheritDoc}
      */
+    //@Override
     public void show(final String title) {
         show(title, gridGeometry.axisDimensionX, gridGeometry.axisDimensionY);
     }
@@ -758,7 +751,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         public Renderable() {
             super(gridGeometry.axisDimensionX, gridGeometry.axisDimensionY);
         }
-        
+
         /**
          * Returns a rendered image with a default width and height in pixels.
          *
@@ -773,7 +766,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
             return super.createDefaultRendering();
         }
     }
-    
+
     /**
      * Hints that the given area may be needed in the near future. Some implementations
      * may spawn a thread or threads to compute the tiles while others may ignore the hint.
@@ -784,8 +777,8 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      *             {@link #getCoordinateReferenceSystem}.
      */
     public void prefetch(final Rectangle2D area) {
-        final Point[] tileIndices=image.getTileIndices(gridGeometry.inverseTransform(area));
-        if (tileIndices!=null) {
+        final Point[] tileIndices = image.getTileIndices(gridGeometry.inverseTransform(area));
+        if (tileIndices != null) {
             image.prefetchTiles(tileIndices);
         }
     }
@@ -895,9 +888,8 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         final int                      numBands = image.getNumBands();
         final int                   visibleBand = CoverageUtilities.getVisibleBand(image);
         final GridSampleDimension[] targetBands = (GridSampleDimension[]) sampleDimensions.clone();
-        final int length = targetBands.length;
-        assert length == numBands : length;
-        for (int i=0; i<length; i++) {
+        assert targetBands.length == numBands : targetBands.length;
+        for (int i=0; i<targetBands.length; i++) {
             targetBands[i] = targetBands[i].geophysics(geo);
         }
         /*

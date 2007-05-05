@@ -44,7 +44,7 @@ import javax.media.jai.PlanarImage;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.GridCoverage;
-import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies

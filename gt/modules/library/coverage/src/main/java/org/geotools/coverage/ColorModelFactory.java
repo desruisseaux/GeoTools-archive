@@ -35,7 +35,7 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ColorUtilities;
 import org.geotools.resources.image.ComponentColorModelJAI;
-import org.geotools.util.SoftValueHashMap;
+import org.geotools.util.WeakValueHashMap;
 
 
 /**
@@ -50,11 +50,25 @@ import org.geotools.util.SoftValueHashMap;
  */
 final class ColorModelFactory {
     /**
-     * Modèles de couleurs suggérés pour l'affichage des catégories. Ces modèles de couleurs
-     * peuvent être construits à partir des couleurs qui ont été définies dans les différentes
-     * catégories du tableau {@link #categories}.
+     * A pool of color models previously created by {@link #getColorModel}.
+     *
+     * <b>Note:</b> we use {@linkplain java.lang.ref.WeakReference weak references} instead of
+     * {@linkplain java.lang.ref.SoftReference soft references} because the intend is not to
+     * cache the values. The intend is to share existing instances in order to reduce memory
+     * usage. Rational:
+     *
+     * <ul>
+     *   <li>{@link ColorModel} may consume a lot of memory. A 16 bits indexed color model
+     *       can consume up to 256 kb. We don't want to retain such large objects longer
+     *       than necessary. We want to share existing instances without preventing the
+     *       garbage collector to collect them.</li>
+     *   <li>{@link #getColorModel()} is reasonably fast if invoked only occasionally, so it
+     *       is not worth consuming 256 kb for saving the few milliseconds requirying for
+     *       building a new color model. Client code should retains their own reference to a
+     *       {@link ColorModel} if they plan to reuse it often in a short period of time.</li>
+     * </ul>
      */
-    private static final Map colors = new SoftValueHashMap();
+    private static final Map/*<ColorModelFactory,ColorModel>*/ colors = new WeakValueHashMap();
 
     /**
      * The list of categories for the construction of a single instance of a {@link ColorModel}.

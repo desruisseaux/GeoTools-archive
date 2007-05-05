@@ -40,7 +40,8 @@ import org.geotools.coverage.processing.DefaultProcessor;
 import org.geotools.coverage.processing.Operations;
 import org.geotools.coverage.processing.operation.FilteredSubsample;
 import org.geotools.factory.Hints;
-import org.geotools.resources.image.CoverageUtilities;
+import org.geotools.resources.coverage.CoverageUtilities;
+
 
 /**
  * Tests the "filtered subsample" operation.

@@ -93,7 +93,7 @@ import org.opengis.referencing.operation.Projection;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.MathTransformFactory;
-import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.geometry.Envelope;
 import org.opengis.util.Cloneable;
 
 // Geotools dependencies

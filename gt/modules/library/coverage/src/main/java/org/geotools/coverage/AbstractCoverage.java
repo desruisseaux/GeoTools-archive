@@ -19,40 +19,22 @@
  */
 package org.geotools.coverage;
 
-// Images
-import java.awt.RenderingHints;
-import java.awt.image.ColorModel;
-import java.awt.image.RenderedImage;
-import java.awt.image.SampleModel;
-import java.awt.image.renderable.ParameterBlock;
-import java.awt.image.renderable.RenderableImage;
-import java.awt.image.renderable.RenderContext;
-
-// Geometry
+// J2SE dependencies
 import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-
-// Miscellaneous
 import java.awt.EventQueue;
 import java.awt.Frame;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.geom.*;
+import java.awt.image.*;
+import java.awt.image.renderable.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 
 // JAI dependencies
 import javax.media.jai.ImageFunction;
@@ -69,13 +51,7 @@ import javax.media.jai.util.CaselessStringKey;           // For Javadoc
 import javax.media.jai.widget.ScrollingImagePanel;
 
 // OpenGIS dependencies
-import org.opengis.coverage.CannotEvaluateException;
-import org.opengis.coverage.CommonPointRule;
-import org.opengis.coverage.Coverage;
-import org.opengis.coverage.DomainObject;
-import org.opengis.coverage.GeometryValuePair;
-import org.opengis.coverage.MetadataNameNotFoundException;
-import org.opengis.coverage.PointOutsideCoverageException;    // For javadoc
+import org.opengis.coverage.*;
 import org.opengis.coverage.grid.GridCoverage;                // For javadoc
 import org.opengis.coverage.grid.GridGeometry;                // For javadoc
 import org.opengis.coverage.processing.GridCoverageProcessor; // For javadoc

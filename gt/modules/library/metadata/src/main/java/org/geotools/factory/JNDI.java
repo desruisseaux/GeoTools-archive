@@ -48,10 +48,13 @@ public final class JNDI {
     private JNDI() {
     }
     
-    /** Used for force the initial context for test cases ... or as needed */
+    /**
+     * Used for force the initial context for test cases ... or as needed.
+     */
     public static void init( InitialContext context ){
         JNDI.context = context;
     }
+
     /**
      * Returns the default initial context.
      *
@@ -63,7 +66,7 @@ public final class JNDI {
             throws NamingException
     {
         if (context == null) {
-            context = new InitialContext();            
+            context = new InitialContext();
         }
         return context;
     }
