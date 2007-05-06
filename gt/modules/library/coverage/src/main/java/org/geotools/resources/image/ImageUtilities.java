@@ -16,7 +16,6 @@
  */
 package org.geotools.resources.image;
 
-// J2SE dependencies
 import java.awt.Dimension;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
@@ -85,41 +84,49 @@ import com.sun.media.jai.util.ImageUtil;
  * @author Simone Giannecchini
  */
 public final class ImageUtilities {
-	/**{@link RenderingHints} used to prevent {@link JAI} operations from expanding 
-	 * {@link IndexColorModel}s.*/
-	public final static RenderingHints DONT_REPLACE_INDEX_COLOR_MODEL = new RenderingHints(
-			JAI.KEY_REPLACE_INDEX_COLOR_MODEL, Boolean.FALSE);
-	
-	/**{@link RenderingHints} used to force {@link JAI} operations to expand 
-	 * {@link IndexColorModel}s.*/
-	public final static RenderingHints REPLACE_INDEX_COLOR_MODEL = new RenderingHints(
-			JAI.KEY_REPLACE_INDEX_COLOR_MODEL, Boolean.TRUE);
-	
-	/**{@link RenderingHints} for requesting Nreaset Neighbor intepolation.*/
-	public static final RenderingHints NN_INTERPOLATION_HINT = new RenderingHints(
-			JAI.KEY_INTERPOLATION, new InterpolationNearest());
+    /**
+     * {@link RenderingHints} used to prevent {@link JAI} operations from expanding
+     * {@link IndexColorModel}s.
+     */
+    public final static RenderingHints DONT_REPLACE_INDEX_COLOR_MODEL = new RenderingHints(
+                    JAI.KEY_REPLACE_INDEX_COLOR_MODEL, Boolean.FALSE);
 
-	/**{@link RenderingHints} for avoiding caching of {@link JAI} {@link RenderedOp}s.*/
-	public static final RenderingHints NOCACHE_HINT = new RenderingHints(
-			JAI.KEY_TILE_CACHE, null);
-	
-	/**
-	 * Cached instance of a {@link RenderingHints} for controlling border extension on 
-	 * {@link JAI} operations. It contains an instance of a {@link BorderExtenderCopy}.
-	 */
-	public final static RenderingHints EXTEND_BORDER_BY_COPYING = new RenderingHints(
-			JAI.KEY_BORDER_EXTENDER, BorderExtender
-			.createInstance(BorderExtender.BORDER_COPY));
-	
-	/**
-	 * Cached instance of a {@link RenderingHints} for controlling border extension on 
-	 * {@link JAI} operations. It contains an instance of a {@link BorderExtenderReflect}.
-	 */
-	public final static RenderingHints EXTEND_BORDER_BY_REFLECT = new RenderingHints(
-			JAI.KEY_BORDER_EXTENDER, BorderExtender
-			.createInstance(BorderExtender.BORDER_REFLECT));
-	
-	/**
+    /**
+     * {@link RenderingHints} used to force {@link JAI} operations to expand
+     * {@link IndexColorModel}s.
+     */
+    public final static RenderingHints REPLACE_INDEX_COLOR_MODEL = new RenderingHints(
+                    JAI.KEY_REPLACE_INDEX_COLOR_MODEL, Boolean.TRUE);
+
+    /**
+     * {@link RenderingHints} for requesting Nearest Neighbor intepolation.
+     */
+    public static final RenderingHints NN_INTERPOLATION_HINT = new RenderingHints(
+                    JAI.KEY_INTERPOLATION, new InterpolationNearest());
+
+    /**
+     * {@link RenderingHints} for avoiding caching of {@link JAI} {@link RenderedOp}s.
+     */
+    public static final RenderingHints NOCACHE_HINT = new RenderingHints(
+                    JAI.KEY_TILE_CACHE, null);
+
+    /**
+     * Cached instance of a {@link RenderingHints} for controlling border extension on 
+     * {@link JAI} operations. It contains an instance of a {@link BorderExtenderCopy}.
+     */
+    public final static RenderingHints EXTEND_BORDER_BY_COPYING = new RenderingHints(
+                    JAI.KEY_BORDER_EXTENDER, BorderExtender
+                    .createInstance(BorderExtender.BORDER_COPY));
+
+    /**
+     * Cached instance of a {@link RenderingHints} for controlling border extension on 
+     * {@link JAI} operations. It contains an instance of a {@link BorderExtenderReflect}.
+     */
+    public final static RenderingHints EXTEND_BORDER_BY_REFLECT = new RenderingHints(
+                    JAI.KEY_BORDER_EXTENDER, BorderExtender
+                    .createInstance(BorderExtender.BORDER_REFLECT));
+
+    /**
      * The default tile size. This default tile size can be
      * overridden with a call to {@link JAI#setDefaultTileSize}.
      */
@@ -173,7 +180,7 @@ public final class ImageUtilities {
      * equal to those of the given {@link RenderedImage}, and then the {@linkplain #toTileSize
      * tile size is updated according the image size}. This method never returns {@code null}.
      */
-    public final static ImageLayout getImageLayout(final RenderedImage image) {
+    public static ImageLayout getImageLayout(final RenderedImage image) {
         return getImageLayout(image, true);
     }
 
@@ -230,7 +237,7 @@ public final class ImageUtilities {
      *
      * This method may returns {@code null} if no rendering hints is proposed.
      */
-    public final static RenderingHints getRenderingHints(final RenderedImage image) {
+    public static RenderingHints getRenderingHints(final RenderedImage image) {
         final ImageLayout layout = getImageLayout(image, false);
         return (layout!=null) ? new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout) : null;
     }
@@ -268,7 +275,7 @@ public final class ImageUtilities {
      *       words, the size that left as few empty pixels as possible).</li>
      * </ul>
      */
-    public final static Dimension toTileSize(final Dimension size) {
+    public static Dimension toTileSize(final Dimension size) {
         Dimension defaultSize = JAI.getDefaultTileSize();
         if (defaultSize == null) {
             defaultSize = GEOTOOLS_DEFAULT_TILE_SIZE;
@@ -356,7 +363,7 @@ public final class ImageUtilities {
      * @param  sources The list of sources {@link RenderedImage}.
      * @return A new {@code ImageLayout}, or the original {@code layout} if no change was needed.
      */
-    public final static ImageLayout createIntersection(final ImageLayout layout, final List sources) {
+    public static ImageLayout createIntersection(final ImageLayout layout, final List sources) {
         ImageLayout result = layout;
         if (result == null) {
             result = new ImageLayout();
@@ -421,7 +428,7 @@ public final class ImageUtilities {
      * @return The interpolation object for the specified type.
      * @throws IllegalArgumentException if the specified interpolation type is not a know one.
      */
-    public final static Interpolation toInterpolation(final Object type) throws IllegalArgumentException {
+    public static Interpolation toInterpolation(final Object type) throws IllegalArgumentException {
         if (type instanceof Interpolation) {
             return (Interpolation) type;
         } else if (type instanceof CharSequence) {
@@ -442,7 +449,7 @@ public final class ImageUtilities {
      *
      * @param Interpolation The interpolation object.
      */
-    public final static String getInterpolationName(final Interpolation interp) {
+    public static String getInterpolationName(final Interpolation interp) {
         final String prefix = "Interpolation";
         for (Class classe = interp.getClass(); classe!=null; classe=classe.getSuperclass()) {
             String name = Utilities.getShortName(classe);
@@ -499,15 +506,8 @@ public final class ImageUtilities {
         }
     }
 
-
-
-
-
-
-
     /**
      * Tiles the specified image.
-     * 
      * <p>
      * Usually, the tiling doesn't need to be performed as a separated operation. The
      * {@link ImageLayout} hint with tile information can be provided to most JAI operators.
@@ -520,20 +520,17 @@ public final class ImageUtilities {
      *         were tiled on disk) and failed.
      *
      * @since 2.3
-     *
-     *  
      */
-    public final static RenderedOp tileImage(RenderedOp image) throws IOException {
+    public static RenderedOp tileImage(final RenderedOp image) throws IOException {
         // /////////////////////////////////////////////////////////////////////
         //
         // initialization
         //
         // /////////////////////////////////////////////////////////////////////
-        final int width = image.getWidth();
-
-        final int height = image.getHeight();
+        final int width      = image.getWidth();
+        final int height     = image.getHeight();
         final int tileHeight = image.getTileHeight();
-        final int tileWidth = image.getTileWidth();
+        final int tileWidth  = image.getTileWidth();
 
         boolean needToTile = false;
 
@@ -543,21 +540,21 @@ public final class ImageUtilities {
         //
         // /////////////////////////////////////////////////////////////////////
         // getting the reader
-        final Object o = image
-                .getProperty(ImageReadDescriptor.PROPERTY_NAME_IMAGE_READER);
-        if ((o instanceof ImageReader)) {
+        final Object o = image.getProperty(ImageReadDescriptor.PROPERTY_NAME_IMAGE_READER);
+        if (o instanceof ImageReader) {
             final ImageReader reader = (ImageReader) o;
-            if (!reader.isImageTiled(0))
+            if (!reader.isImageTiled(0)) {
                 needToTile = true;
+            }
         }
         // /////////////////////////////////////////////////////////////////////
         //
         // If the original image has tileW==W &&tileH==H it is untiled.
         //
         // /////////////////////////////////////////////////////////////////////
-        if (!needToTile&&tileWidth == width && tileHeight <= height)
+        if (!needToTile && tileWidth == width && tileHeight <= height) {
             needToTile = true;
-
+        }
         // /////////////////////////////////////////////////////////////////////
         //
         // tiling central.
@@ -567,21 +564,17 @@ public final class ImageUtilities {
 
             // tiling the original image by providing a suitable layout
             final ImageLayout layout = getImageLayout(image);
-            layout.unsetValid(ImageLayout.COLOR_MODEL_MASK|ImageLayout.SAMPLE_MODEL_MASK);
+            layout.unsetValid(ImageLayout.COLOR_MODEL_MASK | ImageLayout.SAMPLE_MODEL_MASK);
 
             // changing parameters related to the tiling
-            final RenderingHints hints = new RenderingHints(
-                    JAI.KEY_IMAGE_LAYOUT, layout);
+            final RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
 
             // reading the image
             final ParameterBlockJAI pbjFormat = new ParameterBlockJAI("Format");
             pbjFormat.addSource(image);
-            pbjFormat.setParameter("dataType", image.getSampleModel()
-                    .getDataType());
+            pbjFormat.setParameter("dataType", image.getSampleModel().getDataType());
 
-            return  JAI
-                    .create("Format", pbjFormat, hints);
-
+            return JAI.create("Format", pbjFormat, hints);
         }
         return image;
     }

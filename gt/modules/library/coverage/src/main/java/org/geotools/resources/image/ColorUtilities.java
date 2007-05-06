@@ -41,6 +41,7 @@ import org.geotools.resources.XMath;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Simone Giannecchini
  */
 public final class ColorUtilities {
     /**
@@ -54,31 +55,24 @@ public final class ColorUtilities {
     private ColorUtilities() {
     }
 
-	/**
-	 * Creates an sRGB color with the specified red, green, blue, and alpha
-	 * values in the range (0 - 255).
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if <code>r</code>, <code>g</code>, <code>b</code> or
-	 *             <code>a</code> are outside of the range 0 to 255, inclusive
-	 * @param r
-	 *            the red component
-	 * @param g
-	 *            the green component
-	 * @param b
-	 *            the blue component
-	 * @param a
-	 *            the alpha component
-	 * @see #getRed
-	 * @see #getGreen
-	 * @see #getBlue
-	 * @see #getAlpha
-	 * @see #getRGB
-	 */
-	public static int getIntFromColor(int r, int g, int b, int a) {
-		return ((a & 0xFF) << 24) | ((r & 0xFF) << 16) | ((g & 0xFF) << 8)
-				| ((b & 0xFF) << 0);
-	}
+    /**
+     * Creates an sRGB color with the specified red, green, blue, and alpha
+     * values in the range (0 - 255).
+     * 
+     * @param  r the red component
+     * @param  g the green component
+     * @param  b the blue component
+     * @param  a the alpha component
+     * @throws IllegalArgumentException if {@coder}, {@code g}, {@code b}
+     *         or {@code a} are outside of the range 0 to 255, inclusive.
+     */
+    public static int getIntFromColor(int r, int g, int b, int a) {
+        return ((a & 0xFF) << 24) |
+               ((r & 0xFF) << 16) |
+               ((g & 0xFF) <<  8) |
+               ((b & 0xFF) <<  0);
+    }
+
     /**
      * Returns a subarray of the specified color array. The {@code lower} and
      * {@code upper} index will be clamb into the {@code palette} range.
@@ -189,7 +183,7 @@ public final class ColorUtilities {
     {
         boolean hasAlpha = false;
         int  transparent = -1;
-		final int length = ARGB.length;
+        final int length = ARGB.length;
         for (int i=0; i<length; i++) {
             final int alpha = ARGB[i] & 0xFF000000;
             if (alpha != 0xFF000000) {
@@ -217,15 +211,18 @@ public final class ColorUtilities {
      *
      * <center><pre>(1 << getBitCount(mapSize)) >= mapSize</pre></center>
      */
-    public static int getBitCount(int mapSize) {
-        if (--mapSize <= 1) {
+    public static int getBitCount(final int mapSize) {
+        int max = mapSize - 1;
+        if (max <= 1) {
             return 1;
         }
         int count = 0;
-        while (mapSize != 0) {
+        do {
             count++;
-            mapSize >>= 1;
-        }
+            max >>= 1;
+        } while (max != 0);
+        assert (1 << count) >= mapSize : mapSize;
+        assert (1 << (count-1)) < mapSize : mapSize;
         return count;
     }
 
@@ -239,7 +236,7 @@ public final class ColorUtilities {
     }
 
     /**
-     * Transform a color from XYZ color space to LAB. The color are transformed
+     * Transforms a color from XYZ color space to LAB. The color are transformed
      * in place. This method returns {@code color} for convenience.
      * Reference: http://www.brucelindbloom.com/index.html?ColorDifferenceCalc.html
      */
@@ -262,7 +259,7 @@ public final class ColorUtilities {
     }
 
     /**
-     * Compute the distance E (CIE 1994) between two colors in LAB color space.
+     * Computes the distance E (CIE 1994) between two colors in LAB color space.
      * Reference: http://www.brucelindbloom.com/index.html?ColorDifferenceCalc.html
      */
     private static float colorDistance(final float[] lab1, final float[] lab2) {
@@ -385,62 +382,42 @@ public final class ColorUtilities {
         }
         return model.getNumComponents();
     }
-	/**
-	 * Tells us if a specific {@link IndexColorModel} contains only gray color
-	 * or not, ignoring alpha information.
-	 * 
-	 * <p>
-	 * Note that if the
-	 * 
-	 * @param icm
-	 *            {@link IndexColorModel} to be inspected.
-	 * @param checkTransparents
-	 *            tells me if I have to include in my search fully transparent
-	 *            pixels.
-	 * @return true if the palette is grayscale, false otherwise.
-	 */
-	public static boolean isGrayPalette(final IndexColorModel icm,
-			final boolean checkTransparents) {
-		int r;
-		int g;
-		int b;
-		int a = 255;
-		final int mapSize = icm.getMapSize();
-		boolean hasAlpha = icm.hasAlpha();
-		boolean gray = true;
-		for (int i = 0; i < mapSize; i++) {
-			// //
-			//
-			// get the color for this pixel including the alpha information only
-			// if it is requested.
-			//
-			// //
-			r = icm.getRed(i);
-			g = icm.getGreen(i);
-			b = icm.getBlue(i);
-			if (hasAlpha && checkTransparents) {
-				// //
-				//
-				// If this entry is transparent and we were not asked to check
-				// transparents pixels, let's leave
-				// if it is requested.
-				//
-				// //
-				a = icm.getAlpha(i);
-				if (a == 0)
-					continue;
-			}
-			
-			// //
-			//
-			// If gray, all components are the same.
-			//
-			// //
-			gray = gray && r == g && g == b;
-			if (!gray)
-				break;
 
-		}
-		return gray;
-	}
+    /**
+     * Tells us if a specific {@link IndexColorModel} contains only gray color
+     * or not, ignoring alpha information.
+     *
+     * @param  icm {@link IndexColorModel} to be inspected.
+     * @param  ignoreTransparents {@code true} if the RGB values of fully transparent pixels
+     *         (the ones with an {@linkplain IndexColorModel#getAlpha(int) alpha} value of 0)
+     *         should not be taken in account during the check for gray color.
+     * @return {@code true} if the palette is grayscale, {@code false} otherwise.
+     */
+    public static boolean isGrayPalette(final IndexColorModel icm, boolean ignoreTransparents) {
+        if (!icm.hasAlpha()) {
+            // We will not check transparent pixels if there is none in the color model.
+            ignoreTransparents = false;
+        }
+        final int mapSize = icm.getMapSize();
+        for (int i=0; i<mapSize; i++) {
+            if (ignoreTransparents) {
+                // If this entry is transparent and we were asked
+                // to check transparents pixels, let's leave.
+                final int a = icm.getAlpha(i);
+                if (a == 0) {
+                    continue;
+                }
+            }
+            // get the color for this pixel including the
+            // alpha information only if it is requested.
+            final int r = icm.getRed  (i);
+            final int g = icm.getGreen(i);
+            final int b = icm.getBlue (i);
+            // If gray, all components are the same.
+            if (r != g || g != b) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

@@ -16,9 +16,7 @@
  */
 package org.geotools.resources.coverage;
 
-// J2SE and JAI dependencies
 import java.awt.RenderingHints;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
@@ -31,35 +29,21 @@ import javax.media.jai.InterpolationBilinear;
 import javax.media.jai.InterpolationNearest;
 import javax.media.jai.PropertySource;
 
+import org.opengis.coverage.SampleDimension;
+import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.referencing.operation.MathTransform1D;
+import org.opengis.referencing.operation.TransformException;
+
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.RenderedCoverage;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.factory.Hints;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultFeatureType;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureCollections;
-import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.geotools.feature.type.GeometricAttributeType;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.util.NumberRange;
-import org.opengis.coverage.SampleDimension;
-import org.opengis.coverage.grid.GridCoverage;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform1D;
-import org.opengis.referencing.operation.TransformException;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 
 /**
@@ -93,8 +77,7 @@ public class CoverageUtilities {
      * Retrieves a best guess for the sample value to use for background,
      * inspecting the categories of the provided {@link GridCoverage2D}.
      * 
-     * @param coverage
-     *            to use for guessing background values.
+     * @param coverage to use for guessing background values.
      * @return an array of double values to use as a background.
      */
     public static double[] getBackgroundValues(GridCoverage2D coverage) {
@@ -189,31 +172,36 @@ public class CoverageUtilities {
      * The need for this method arose in consideration of the fact that applying most operations
      * on coverage whose {@link ColorModel} is an instance of {@link IndexColorModel} may lead to
      * unpredictable results depending on the applied {@link Interpolation} (think about applying
-     * "Scale" with {@link InterpolationBilinear} on a {@link GridCoverage2D} with an
+     * "Scale" with {@link InterpolationBilinear} on a non-geophysics {@link GridCoverage2D} with an
      * {@link IndexColorModel}) or more simply on the operation itself ("SubsampleAverage" cannot
      * be applied at all on a {@link GridCoverage2D} backed by an {@link IndexColorModel}).
-     *
      *
      * <p>
      * This method suggests the actions to take depending on the structure of the provided
      * {@link GridCoverage2D}, the provided {@link Interpolation} and if the operation uses
      * a filter or not (this is useful for operations like SubsampleAverage or FilteredSubsample).
      *
+     * <p>
+     * In general the idea is as follows: If the original coverage is backed by a
+     * {@link RenderedImage} with an {@link IndexColorModel}, we have the following cases:
+     *
+     * <ul>
+     *  <li>if the interpolation is {@link InterpolationNearest} and there is no filter involved
+     *      we can apply the operation on the {@link IndexColorModel}-backed coverage with nor
+     *      probs.</li>
+     *  <li>If the interpolations in of higher order or there is a filter to apply we have to
+     *      options:
+     *      <ul>
+     *        <li>If the coverage has a twin geophysics view we need to go back to it and apply
+     *            the operation there.</li>
+     *        <li>If the coverage has no geophysics view (an orthophoto with an intrisic
+     *            {@link IndexColorModel} view) we need to perform an RGB(A) color expansion
+     *            before applying the operation.</li>
+     *      </ul>
+     *  </li>
+     * </ul>
      *
      * <p>
-     * In general the idea is as follows: If the original coverage is backed by a {@link RenderedImage}
-     * with an {@link IndexColorModel}, we have the following cases:
-     *
-     * <1>if the interpolation is {@link InterpolationNearest} and there is no filter involved we can
-     * apply the operation on the {@link IndexColorModel}-backed coverage with nor probs.
-     * <2>If the interpolations in of higeher order or there is a filter to apply we have to options:
-     * 	<a>If the coverage has a twin geophysics vew we need to go back to it and apply the operation
-     *     there.
-     *  <b>If the coverage has no geophysics view (an orthophoto with an intrisic {@link IndexColorModel}
-     *     view) we need to perform an RGB(A) color expansion before applying the operation.
-     *
-     *
-     *<p>
      * A special case is when we want to apply an operation on the geophysics view of a coverage that
      * does not involve high order interpolation of filters. In this case we suggest to apply the
      * operation on the non-geophysics view, which is usually much faster. Users may ignore this
@@ -224,17 +212,23 @@ public class CoverageUtilities {
      * @param hasFilter if the operation we will apply is going to use a filter.
      * @param hints to use when applying a certain operation.
      * @return 0 if nothing has to be done on the provided coverage, 1 if a color expansion has to be
-     * 		   provided, 2 if we need to employ the geophysics vew of the provided coverage,
-     * 		   3 if we suggest to  employ the non-geophysics vew of the provided coverage
+     *         provided, 2 if we need to employ the geophysics vew of the provided coverage,
+     *         3 if we suggest to  employ the non-geophysics vew of the provided coverage.
+     *
      * @since 2.3.1
+     *
+     * @todo Consider refactoring this method into {@link org.geotools.coverage.grid.ViewType},
+     *       or in some utility class related to it.
      */
-    public static int prepareSourcesForGCOperation(GridCoverage2D coverage,
-                    Interpolation interpolation, boolean hasFilter, RenderingHints hints)
+    public static int prepareSourcesForGCOperation(final GridCoverage2D coverage,
+            final Interpolation interpolation, final boolean hasFilter, final RenderingHints hints)
     {
-        RenderedImage sourceImage = coverage.getRenderedImage();
+        final RenderedImage sourceImage = coverage.getRenderedImage();
         boolean useNonGeoView = false;
-        if (hints != null && hints.containsKey(Hints.REPLACE_NON_GEOPHYSICS_VIEW)) {
-            useNonGeoView = !((Boolean) hints.get(Hints.REPLACE_NON_GEOPHYSICS_VIEW)).booleanValue();
+        if (hints != null) {
+            // REPLACE_NON_GEOPHYSICS_VIEW default value is 'true'.
+            // useNonGeoView value is the opposite of REPLACE_NON_GEOPHYSICS_VIEW.
+            useNonGeoView = Boolean.FALSE.equals(hints.get(Hints.REPLACE_NON_GEOPHYSICS_VIEW));
         }
         // the color model is indexed?
         final boolean isIndexColorModel = sourceImage.getColorModel() instanceof IndexColorModel;
@@ -255,14 +249,11 @@ public class CoverageUtilities {
         // floating-point image is derived from the integer image, not the
         // converse).
         //
-        // Note that if the Hint REPLACE_NON_GEOPHYSICS_VIEW is set to false
         // /////////////////////////////////////////////////////////////////////
-        List sources;
-        GridCoverage2D candidate;
         if (isNearestNeigborInterpolation && !hasFilter) {
-            candidate = coverage.geophysics(false);
+            final GridCoverage2D candidate = coverage.geophysics(false);
             if (candidate != coverage) {
-                sources = coverage.getRenderedImage().getSources();
+                final List sources = coverage.getRenderedImage().getSources();
                 if (sources != null) {
                     if (sources.contains(candidate.getRenderedImage())) {
                         return 3;
@@ -301,9 +292,8 @@ public class CoverageUtilities {
     }
 
     /**
-     * This method is responsible for telling me if the provided
-     * {@link GridCoverage} has {@link Category} objects twith a real
-     * transformation.
+     * Returns {@code true} if the provided {@link GridCoverage}
+     * has {@link Category} objects twith a real transformation.
      *
      * <p>
      * Common use case for this method is understanding if a
@@ -321,139 +311,48 @@ public class CoverageUtilities {
      * @param gridCoverage
      *            to check for the existence of categories with tranformations
      *            between original data and their rendered counterpart.
-     * @return false if this coverage has only a single view associated with it,
-     *         true otherwise.
+     * @return {@code false} if this coverage has only a single view associated with it,
+     *         {@code true} otherwise.
      */
     public static boolean hasRenderingCategories(final GridCoverage gridCoverage) {
-        boolean retVal = false;
-        // getting all the SampleDimensions of this coverage, if fany exist
+        // getting all the SampleDimensions of this coverage, if any exist
         final int numSampleDimensions = gridCoverage.getNumSampleDimensions();
-        if (numSampleDimensions > 0) {
-            final SampleDimension[] sampleDimensions = new SampleDimension[numSampleDimensions];
-            for (int i = 0; i < numSampleDimensions; i++) {
-                sampleDimensions[i] = gridCoverage.getSampleDimension(i);
-            }
-            // do they have any transformation that is not the identity?
-            return CoverageUtilities.hasTransform(sampleDimensions);
+        if (numSampleDimensions == 0) {
+            return false;
         }
-        return retVal;
+        final SampleDimension[] sampleDimensions = new SampleDimension[numSampleDimensions];
+        for (int i=0; i<numSampleDimensions; i++) {
+            sampleDimensions[i] = gridCoverage.getSampleDimension(i);
+        }
+        // do they have any transformation that is not the identity?
+        return hasTransform(sampleDimensions);
+    }
+
+    /**
+     * Wraps a grid coverage into a Feature. Code lifted from ArcGridDataSource
+     * (temporary).
+     *
+     * @deprecated Moved to {@link FeatureUtilities#wrapGridCoverage}.
+     */
+    public static FeatureCollection wrapGc(final GridCoverage coverage)
+            throws TransformException, SchemaException, IllegalAttributeException
+    {
+         return FeatureUtilities.wrapGridCoverage((GridCoverage2D) coverage);
     }
 
     /**
      * Wraps a grid coverage into a Feature. Code lifted from ArcGridDataSource
      * (temporary).
      * 
-     * @param gridCoverage
-     *            the grid coverage
-     * 
+     * @param gridCoverageReader the grid coverage 
      * @return a feature with the grid coverage envelope as the geometry and the
      *         grid coverage itself in the "grid" attribute
-     * @throws TransformException
-     * @throws SchemaException
-     * @throws IllegalAttributeException
+     *
+     * @deprecated Moved to {@link FeatureUtilities#wrapGridCoverageReader}.
      */
-    public final static FeatureCollection wrapGc(GridCoverage gridCoverage)
+    public static FeatureCollection wrapGcReader(AbstractGridCoverage2DReader reader)
             throws TransformException, SchemaException, IllegalAttributeException
     {
-        // create surrounding polygon
-        final PrecisionModel pm = new PrecisionModel();
-        final GeometryFactory gf = new GeometryFactory(pm, 0);
-        final Rectangle2D rect = ((GridCoverage2D) gridCoverage).getEnvelope2D();
-        final CoordinateReferenceSystem sourceCrs =
-                CRSUtilities.getCRS2D(((GridCoverage2D) gridCoverage).getCoordinateReferenceSystem());
-        final Coordinate[] coord = new Coordinate[5];
-        // if (lonFirst) {
-        coord[0] = new Coordinate(rect.getMinX(), rect.getMinY());
-        coord[1] = new Coordinate(rect.getMaxX(), rect.getMinY());
-        coord[2] = new Coordinate(rect.getMaxX(), rect.getMaxY());
-        coord[3] = new Coordinate(rect.getMinX(), rect.getMaxY());
-        coord[4] = new Coordinate(rect.getMinX(), rect.getMinY());
-
-        final LinearRing ring = gf.createLinearRing(coord);
-        final Polygon bounds = new Polygon(ring, null, gf);
-
-        // create the feature type
-        final GeometricAttributeType geom = new GeometricAttributeType("geom",
-                        Polygon.class, true, 1, 1, null, sourceCrs, null);
-        final AttributeType grid = AttributeTypeFactory.newAttributeType(
-                        "grid", GridCoverage.class);
-
-        final AttributeType[] attTypes = { geom, grid };
-        // Fix the schema name
-        final String typeName = "GridCoverage";
-        final DefaultFeatureType schema = (DefaultFeatureType) FeatureTypeBuilder
-                        .newFeatureType(attTypes, typeName);
-
-        // create the feature
-        Feature feature = schema.create(new Object[] { bounds, gridCoverage });
-
-        final FeatureCollection collection = FeatureCollections.newCollection();
-        collection.add(feature);
-
-        return collection;
-    }
-
-    /**
-     * Wraps a grid coverage into a Feature. Code lifted from ArcGridDataSource
-     * (temporary).
-     * 
-     * @param gridCoverageReader
-     *            the grid coverage 
-     * 
-     * @return a feature with the grid coverage envelope as the geometry and the
-     *         grid coverage itself in the "grid" attribute
-     * @throws TransformException
-     * @throws SchemaException
-     * @throws IllegalAttributeException
-     */
-    public final static FeatureCollection wrapGcReader(AbstractGridCoverage2DReader gridCoverageReader)
-            throws TransformException, SchemaException, IllegalAttributeException
-    {
-        // create surrounding polygon
-        final PrecisionModel pm = new PrecisionModel();
-        final GeometryFactory gf = new GeometryFactory(pm, 0);
-        final Rectangle2D rect = gridCoverageReader.getOriginalEnvelope().toRectangle2D();
-        final CoordinateReferenceSystem sourceCrs = CRSUtilities.getCRS2D(gridCoverageReader.getCrs());
-
-        // TODO hack to be removed
-        // final boolean lonFirst = !GridGeometry2D.swapXY(sourceCrs
-        // .getCoordinateSystem());
-        final Coordinate[] coord = new Coordinate[5];
-        // if (lonFirst) {
-        coord[0] = new Coordinate(rect.getMinX(), rect.getMinY());
-        coord[1] = new Coordinate(rect.getMaxX(), rect.getMinY());
-        coord[2] = new Coordinate(rect.getMaxX(), rect.getMaxY());
-        coord[3] = new Coordinate(rect.getMinX(), rect.getMaxY());
-        coord[4] = new Coordinate(rect.getMinX(), rect.getMinY());
-        // } else {
-        // coord[0] = new Coordinate(rect.getMinY(), rect.getMinX());
-        // coord[1] = new Coordinate(rect.getMaxY(), rect.getMinX());
-        // coord[2] = new Coordinate(rect.getMaxY(), rect.getMaxX());
-        // coord[3] = new Coordinate(rect.getMinY(), rect.getMaxX());
-        // coord[4] = new Coordinate(rect.getMinY(), rect.getMinX());
-        // }
-        final LinearRing ring = gf.createLinearRing(coord);
-        final Polygon bounds = new Polygon(ring, null, gf);
-
-        // create the feature type
-        final GeometricAttributeType geom = new GeometricAttributeType("geom",
-                        Polygon.class, true, 1, 1, null, sourceCrs, null);
-        final AttributeType grid = AttributeTypeFactory.newAttributeType(
-                        "grid", AbstractGridCoverage2DReader.class);
-
-        final AttributeType[] attTypes = { geom, grid };
-        // Fix the schema name
-        final String typeName = "GridCoverageReader";
-        final DefaultFeatureType schema = (DefaultFeatureType) FeatureTypeBuilder
-                        .newFeatureType(attTypes, typeName);
-
-        // create the feature
-        Feature feature = schema.create(new Object[] { bounds,
-                        gridCoverageReader });
-
-        final FeatureCollection collection = FeatureCollections.newCollection();
-        collection.add(feature);
-
-        return collection;
+        return FeatureUtilities.wrapGridCoverageReader(reader);
     }
 }
