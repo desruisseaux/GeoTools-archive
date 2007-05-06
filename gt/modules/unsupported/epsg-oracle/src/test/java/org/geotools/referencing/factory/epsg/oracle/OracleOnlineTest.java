@@ -17,7 +17,7 @@ import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
 import oracle.jdbc.pool.OracleDataSource;
-import oracle.jdbc.pool.OracleDataSourceFactory;
+//import oracle.jdbc.pool.OracleDataSourceFactory;
 
 import org.apache.commons.dbcp.BasicDataSourceFactory;
 import org.geotools.factory.GeoTools;
