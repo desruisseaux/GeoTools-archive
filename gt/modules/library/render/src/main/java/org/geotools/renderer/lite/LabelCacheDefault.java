@@ -135,12 +135,16 @@ public final class LabelCacheDefault implements LabelCache {
 	
 	protected SLDStyleFactory styleFactory=new SLDStyleFactory();
 	boolean stop=false;
+	Set enabledLayers=new HashSet();
 	Set activeLayers=new HashSet();
 	
 	LineLengthComparator lineLengthComparator = new LineLengthComparator ();
+
+	private boolean needsOrdering=false;
 	
 	public void stop() {
 		stop = true;
+		activeLayers.clear();
 	}
 
 	/**
@@ -151,12 +155,19 @@ public final class LabelCacheDefault implements LabelCache {
 	}
 	
 	public void clear() {
+		if( !activeLayers.isEmpty() ){
+			throw new IllegalStateException( activeLayers+" are layers that started rendering but have not completed," +
+					" stop() or endLayer() must be called before clear is called" );
+		}
         labelCache.clear();
         labelCacheNonGrouped.clear();
-		activeLayers.clear();
+		enabledLayers.clear();
 	}
 
 	public void clear(String layerId){
+		if( activeLayers.contains(layerId) ){
+			throw new IllegalStateException( layerId+" is still rendering, end the layer before calling clear." );
+		}
 		for (Iterator iter = labelCache.values().iterator(); iter.hasNext();) {
 			LabelCacheItem item = (LabelCacheItem) iter.next();
 			if( item.getLayerIds().contains(layerId) )
@@ -169,17 +180,19 @@ public final class LabelCacheDefault implements LabelCache {
 				iter.remove();
 		}
 		
-		activeLayers.remove(layerId);
+		enabledLayers.remove(layerId);
 		
 	}
 	
 	public void disableLayer(String layerId) {
-		activeLayers.remove(layerId);
+		needsOrdering=true;
+		enabledLayers.remove(layerId);
 	}
 	/**
 	 * @see org.geotools.renderer.lite.LabelCache#startLayer()
 	 */
 	public void startLayer(String layerId) {
+		enabledLayers.add(layerId);
 		activeLayers.add(layerId);
 	}
 
@@ -220,6 +233,7 @@ public final class LabelCacheDefault implements LabelCache {
 	 */
 	public void put(String layerId, TextSymbolizer symbolizer, Feature feature, LiteShape2 shape, Range scaleRange) 
 	{
+		needsOrdering=true;
 		try{
 			//get label and geometry				
 		    Object labelObj = symbolizer.getLabel().getValue(feature);
@@ -324,6 +338,7 @@ public final class LabelCacheDefault implements LabelCache {
 	 */
 	public void endLayer(String layerId, Graphics2D graphics, Rectangle displayArea) 
 	{
+		activeLayers.remove(layerId);
 	}
 
 	/**
@@ -333,6 +348,13 @@ public final class LabelCacheDefault implements LabelCache {
 	 *
 	 */
 	public List orderedLabels() {
+		ArrayList al = getActiveLabels();
+		
+		Collections.sort(al);
+		Collections.reverse(al);
+		return al;		
+	}
+	private ArrayList getActiveLabels() {
 		Collection c = labelCache.values();
 		ArrayList al = new ArrayList(); // modifiable (ie. sortable)
 		for (Iterator iter = c.iterator(); iter.hasNext();) {
@@ -346,15 +368,12 @@ public final class LabelCacheDefault implements LabelCache {
 			if( isActive(item.getLayerIds()) )
 					al.add(item);
 		}
-
-		Collections.sort(al);
-		Collections.reverse(al);
 		return al;
 	}
 	private boolean isActive(Set layerIds) {
 		for (Iterator iter = layerIds.iterator(); iter.hasNext();) {
 			String string = (String) iter.next();
-			if( activeLayers.contains(string) )
+			if( enabledLayers.contains(string) )
 				return true;
 			
 		}
@@ -364,9 +383,14 @@ public final class LabelCacheDefault implements LabelCache {
 	 * @see org.geotools.renderer.lite.LabelCache#end(java.awt.Graphics2D,
 	 *      java.awt.Rectangle)
 	 */
-	public void end(Graphics2D graphics, Rectangle displayArea) {
-		List glyphs = new ArrayList();
-        
+	public void end(Graphics2D graphics, Rectangle displayArea) 
+	{
+		if( !activeLayers.isEmpty() ){
+			throw new IllegalStateException( activeLayers+" are layers that started rendering but have not completed," +
+					" stop() or endLayer() must be called before end() is called" );
+		}
+		List glyphs=new ArrayList();
+		
         // Hack: let's reduce the display area width and height by one pixel.
         // If the rendered image is 256x256, proper rendering of polygons and
         // lines occurr only if the display area is [0,0; 256,256], yet if you
@@ -403,6 +427,7 @@ public final class LabelCacheDefault implements LabelCache {
 				// rendered (which is probably bad since it should be in
 				// area,line,point order
 				// TOD: as in NOTE above
+
 				Geometry geom = labelItem.getGeometry();
 
 				AffineTransform oldTransform = graphics.getTransform();
@@ -1045,6 +1070,7 @@ public final class LabelCacheDefault implements LabelCache {
 	 */
 	public MultiLineString clipLineString(LineString line, Polygon bbox,
 			Envelope displayGeomEnv) {
+		
 		Geometry clip = line;
 		line.geometryChanged();// djb -- jessie should do this during
 		// generalization
@@ -1659,7 +1685,8 @@ public final class LabelCacheDefault implements LabelCache {
 	}
 
 	public void enableLayer(String layerId) {
-		activeLayers.add(layerId);
+		needsOrdering=true;
+		enabledLayers.add(layerId);
 	}
 	
 }
