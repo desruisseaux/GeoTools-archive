@@ -162,7 +162,7 @@ public class JDBCDataStoreFactory extends AbstractFactory
                 if (!(((value = params.get(arrayParameters[i].key)) != null)
                         && (arrayParameters[i].type.isInstance(value)))) {
                     if (arrayParameters[i].required) {
-                    	LOGGER.warning("JDBCDataStoreFactory: can Process Cannot find param " + arrayParameters[i].key + ":" + arrayParameters[i].type + value );
+                    	LOGGER.config("JDBCDataStoreFactory: canProcess() Cannot find param " + arrayParameters[i].key + ":" + arrayParameters[i].type + value );
                         return (false);
                     }
                 }
@@ -321,7 +321,8 @@ public class JDBCDataStoreFactory extends AbstractFactory
      */
     public Param[] getParametersInfo() {
         return new Param[] {
-            DBTYPE,  USER, PASSWD, CHARSET, NAMESPACE, DRIVER, URLPREFIX
+        		  DBTYPE, SCHEMA, USER, PASSWD, CHARSET, NAMESPACE,DRIVER,URLPREFIX
+  
         };
     }
 }

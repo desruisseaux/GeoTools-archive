@@ -21,7 +21,7 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import javax.sql.ConnectionPoolDataSource;
+//import javax.sql.ConnectionPoolDataSource;
 
 /**
  * <p>
@@ -48,19 +48,24 @@ public class PGConnectionPool extends org.postgresql.jdbc2.optional.ConnectionPo
 	
 
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1157879368880510850L;
+
 	/** Standard logging instance */
 	private static final Logger LOGGER = Logger
 			.getLogger("org.geotools.data.geometryless");
 
-	private ConnectionPoolDataSource _nativePool;
+	//private ConnectionPoolDataSource _nativePool;
 
 	/** Creates configuration-driven JDBC driver class. */
 
 	private String _dbURL;
 
-	private String _username = "";
+	//private String _username = "";
 
-	private String _password = "";
+	//private String _password = "";
 
 	/**
 	 * Sets the JDBC database login credentials.

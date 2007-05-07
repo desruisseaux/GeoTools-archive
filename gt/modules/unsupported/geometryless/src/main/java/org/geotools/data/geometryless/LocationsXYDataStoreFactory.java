@@ -50,10 +50,12 @@ import org.geotools.factory.AbstractFactory;
  * 
  * @author Rob Atkinson, Social Change Online
  * @author Chris Holmes, TOPP
+
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/geometryless/src/main/java/org/geotools/data/geometryless/LocationsXYDataStoreFactory.java $
  * @version $Id: LocationsXYDataStoreFactory.java 25031 2007-04-05 09:52:31Z
  *          robatkinson $
+
  */
 public class LocationsXYDataStoreFactory extends AbstractFactory implements
         org.geotools.data.DataStoreFactorySpi {
@@ -191,12 +193,9 @@ public class LocationsXYDataStoreFactory extends AbstractFactory implements
                 if (!(((value = params.get(arrayParameters[i].key)) != null) && (arrayParameters[i].type
                         .isInstance(value)))) {
                     if (arrayParameters[i].required) {
-                        LOGGER
-                                .warning("LocationsXYDataStoreFactory: can Process Cannot find param "
-                                        + arrayParameters[i].key
-                                        + ":"
-                                        + arrayParameters[i].type
-                                        + value);
+
+                    	LOGGER.config("LocationsXYDataStoreFactory: canProcess() Cannot find param " + arrayParameters[i].key + ":" + arrayParameters[i].type + value );
+
                         return (false);
                     }
                 }

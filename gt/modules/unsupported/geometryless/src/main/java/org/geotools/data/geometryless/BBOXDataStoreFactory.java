@@ -198,7 +198,7 @@ public class BBOXDataStoreFactory extends AbstractFactory
                 if (!(((value = params.get(arrayParameters[i].key)) != null)
                         && (arrayParameters[i].type.isInstance(value)))) {
                     if (arrayParameters[i].required) {
-                    	LOGGER.warning("BBOXDataStoreFactory: can Process Cannot find param " + arrayParameters[i].key + ":" + arrayParameters[i].type + value );
+                    	LOGGER.config("BBOXDataStoreFactory: canProcess() Cannot find param " + arrayParameters[i].key + ":" + arrayParameters[i].type + value );
                         return (false);
                     }
                 }
