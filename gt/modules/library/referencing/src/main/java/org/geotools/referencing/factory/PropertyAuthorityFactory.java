@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Properties;
@@ -82,6 +83,12 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
      * The properties object for our properties file. Keys are the authority
      * code for a coordinate reference system and the associated value is a 
      * WKT string for the CRS.
+     * <p>
+     * It is technically possible to add or remove elements after they have been
+     * loaded by the constructor. However if such modification are made, then we
+     * should update {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER} accordingly.
+     * It may be an issue since hints are supposed to be immutable after factory
+     * construction. For now, this class to not allow addition of elements.
      */
     private final Properties definitions = new Properties();
 
@@ -147,9 +154,9 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
         super(factories, MINIMUM_PRIORITY + 10);
         // The following hints have no effect on this class behaviour,
         // but tell to the user what this factory do about axis order.
-        this.hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE);
-        this.hints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS,   Boolean.FALSE);
-        this.hints.put(Hints.FORCE_STANDARD_AXIS_UNITS,        Boolean.FALSE);
+        hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE);
+        hints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS,   Boolean.FALSE);
+        hints.put(Hints.FORCE_STANDARD_AXIS_UNITS,        Boolean.FALSE);
         ensureNonNull("authorities", authorities);
         if (authorities.length == 0) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.EMPTY_ARRAY));
@@ -160,6 +167,22 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
         final InputStream in = definitions.openStream();
         this.definitions.load(in);
         in.close();
+        /*
+         * If the WKT do not contains any AXIS[...] element, then every CRS will be created with
+         * the default (longitude,latitude) axis order. In such case this factory is insensitive
+         * to the FORCE_LONGITUDE_FIRST_AXIS_ORDER hint (i.e. every CRS to be created by this
+         * instance are invariant under the above-cited hint value) and we can remove it from
+         * the hint map. Removing this hint allow the CRS.decode(..., true) convenience method
+         * to find this factory (GEOT-1175).
+         */
+        final Symbols s = Symbols.DEFAULT;
+        for (final Iterator it=this.definitions.values().iterator(); it.hasNext();) {
+            final String wkt = (String) it.next();
+            if (s.containsAxis(wkt)) {
+                return;
+            }
+        }
+        hints.remove(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER);
     }
 
     /**

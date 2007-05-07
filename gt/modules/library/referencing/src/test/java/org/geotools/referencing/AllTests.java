@@ -82,6 +82,7 @@ public class AllTests extends TestCase {
         suite.addTest(org.geotools.referencing.cs                  .ComparableAxisWrapperTest      .suite());
         suite.addTest(org.geotools.referencing.cs                  .AbstractCSTest                 .suite());
         suite.addTest(org.geotools.referencing.cs                  .DefaultCartesianCSTest         .suite());
+        suite.addTest(org.geotools.referencing.wkt                 .SymbolsTest                    .suite());
         suite.addTest(org.geotools.referencing.wkt                 .ParserTest                     .suite());
         suite.addTest(org.geotools.referencing.operation           .LinearConversionTest           .suite());
         suite.addTest(org.geotools.referencing.operation           .Transform3DTest                .suite());

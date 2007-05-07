@@ -47,36 +47,36 @@ public class Symbols {
 
     /**
      * The character used for opening brace.
-     * Usually <code>'['</code>, but <code>'('</code> is legal as well.
+     * Usually {@code '['}, but {@code '('} is legal as well.
      */
     char open = '[';
 
     /**
      * The character used for closing brace.
-     * Usually <code>']'</code>, but <code>')'</code> is legal as well.
+     * Usually {@code ']'}, but {@code ')'} is legal as well.
      */
     char close = ']';
 
     /**
      * The character used for opening an array or enumeration.
-     * Usually <code>'{'</code>.
+     * Usually {@code '{'}.
      */
     final char openArray = '{';
 
     /**
      * The character used for closing an array or enumeration.
-     * Usually <code>'}'</code>.
+     * Usually {@code '}'}.
      */
     final char closeArray = '}';
 
     /**
      * The character used for quote.
-     * Usually <code>'"'</code>.
+     * Usually {@code '"'}.
      */
     final char quote = '"';
 
     /**
-     * The character used as a separator. Usually <code>','</code>, but would need
+     * The character used as a separator. Usually {@code ','}, but would need
      * to be changed if a non-English locale is used for formatting numbers.
      */
     char separator = ',';
@@ -163,5 +163,79 @@ public class Symbols {
     static {
         CURLY_BRACKETS.open  = '(';
         CURLY_BRACKETS.close = ')';
+    }
+
+    /**
+     * Returns {@code true} if the specified WKT contains at least one {@code AXIS[...]} element.
+     * This method try to make a quick checks taking in account a minimal set of WKT syntax rules.
+     *
+     * @since 2.4
+     */
+    public boolean containsAxis(final CharSequence wkt) {
+        return indexOf(wkt, "AXIS", 0) >= 0;
+    }
+
+    /**
+     * Returns the index after the specified element in the specified WKT, or -1 if not found.
+     * The element must be followed (ignoring spaces) by an opening bracket. If found, this
+     * method returns the index of the opening bracket after the element.
+     *
+     * @param  wkt The WKT to parse.
+     * @param  element The element to search. Must contains only uppercase letters.
+     * @param  index The index to start the search from.
+     */
+    private int indexOf(final CharSequence wkt, final String element, int index) {
+        assert element.equals(element.trim().toUpperCase(locale)) : element;
+        assert element.indexOf(quote) < 0 : element;
+        boolean isQuoting = false;
+        final int elementLength = element.length();
+        final int length = wkt.length();
+        if (index < length) {
+            char c = wkt.charAt(index);
+search:     while (true) {
+                // Do not parse any content between quotes.
+                if (c == quote) {
+                    isQuoting = !isQuoting;
+                }
+                if (isQuoting || !Character.isJavaIdentifierStart(c)) {
+                    if (++index == length) {
+                        break search;
+                    }
+                    c = wkt.charAt(index);
+                    continue;
+                }
+                // Checks if we have a match.
+                for (int j=0; j<elementLength; j++) {
+                    c = Character.toUpperCase(c);
+                    if (c != element.charAt(j)) {
+                        // No match. Skip all remaining letters and resume the search.
+                        while (Character.isJavaIdentifierPart(c)) {
+                            if (++index == length) {
+                                break search;
+                            }
+                            c = wkt.charAt(index);
+                        }
+                        continue search;
+                    }
+                    if (++index == length) {
+                        break search;
+                    }
+                    c = wkt.charAt(index);
+                }
+                // Checks if the next character (ignoring space) is an opening brace.
+                while (Character.isWhitespace(c)) {
+                    if (++index == length) {
+                        break search;
+                    }
+                    c = wkt.charAt(index);
+                }
+                for (int i=0; i<openingBrackets.length; i++) {
+                    if (c == openingBrackets[i]) {
+                        return index;
+                    }
+                }
+            }
+        }
+        return -1;
     }
 }

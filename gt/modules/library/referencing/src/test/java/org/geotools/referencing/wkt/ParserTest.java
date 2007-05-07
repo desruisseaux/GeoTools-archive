@@ -102,6 +102,7 @@ public final class ParserTest extends TestCase {
                "  UNIT[\"m\", 1.0],\n"                                   +
                "  AXIS[\"x\", EAST],\n"                                  +
                "  AXIS[\"y\", NORTH]]\n";
+        assertTrue(Symbols.DEFAULT.containsAxis(wkt1));
         crs1  = (DefaultProjectedCRS) parser.parseObject(wkt1);
         wkt2  = parser.format(crs1);
         crs2  = (DefaultProjectedCRS) parser.parseObject(wkt2);
@@ -135,6 +136,7 @@ public final class ParserTest extends TestCase {
                "  UNIT[\"m\", 1.0],\n"                                   +
                "  AXIS[\"x\", EAST],\n"                                  +
                "  AXIS[\"y\", NORTH]]\n";
+        assertTrue(Symbols.DEFAULT.containsAxis(wkt1));
         crs1  = (DefaultProjectedCRS) parser.parseObject(wkt1);
         wkt2  = parser.format(crs1);
         crs2  = (DefaultProjectedCRS) parser.parseObject(wkt2);
@@ -170,6 +172,7 @@ public final class ParserTest extends TestCase {
                "  AXIS[\"E\",EAST],\n"                                                                    +
                "  AXIS[\"N\",NORTH],\n"                                                                   +
                "  AUTHORITY[\"EPSG\",\"27700\"]]\n";
+        assertTrue(Symbols.DEFAULT.containsAxis(wkt1));
         crs1  = (DefaultProjectedCRS) parser.parseObject(wkt1);
         wkt2  = parser.format(crs1);
         crs2  = (DefaultProjectedCRS) parser.parseObject(wkt2);
@@ -205,6 +208,7 @@ public final class ParserTest extends TestCase {
                "  UNIT[\"feet\", 0.304800609601219],\n"               +
                "  AXIS[\"x\", EAST],\n"                               +
                "  AXIS[\"y\", NORTH]]\n";
+        assertTrue(Symbols.DEFAULT.containsAxis(wkt1));
         crs1  = (DefaultProjectedCRS) parser.parseObject(wkt1);
         wkt2  = parser.format(crs1);
         crs2  = (DefaultProjectedCRS) parser.parseObject(wkt2);
@@ -226,6 +230,7 @@ public final class ParserTest extends TestCase {
                "  PRIMEM[\"Greenwich\", 0],\n"                                          +
                "  UNIT[\"Decimal_Second\", 4.84813681109536e-06],\n"                    +
                "  AUTHORITY[\"EPSG\", \"100001\"]]";
+        assertFalse(Symbols.DEFAULT.containsAxis(wkt1));
         parser.parseObject(wkt1);
     }
 
@@ -252,6 +257,7 @@ public final class ParserTest extends TestCase {
                  " PARAMETER [\"False_Easting\", 180.598]," +
                  " PARAMETER[\"False_Northing\", -86.99]," +
                  " UNIT [\"Meter\", 1]]";
+        assertFalse(Symbols.DEFAULT.containsAxis(wkt));
         final Parser parser = new Parser();
         CoordinateReferenceSystem crs1 = parser.parseCoordinateReferenceSystem(wkt);
         final String check = parser.format(crs1);
