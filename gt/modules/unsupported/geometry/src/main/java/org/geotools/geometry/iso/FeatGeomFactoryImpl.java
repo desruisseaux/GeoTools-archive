@@ -96,7 +96,7 @@ public class FeatGeomFactoryImpl {
 	 * @param dimension
 	 * @return CoordinateFactory
 	 */
-	public static GeometryFactoryImpl getDefaultCoordinateFactory(
+	public static GeometryFactoryImpl getDefaultGeometryFactory(
 			DimensionModel dimension) {
 		if (dimension.is2D()) {
 			return getDefault2D().getGeometryFactoryImpl();
