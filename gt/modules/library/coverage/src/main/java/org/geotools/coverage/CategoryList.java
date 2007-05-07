@@ -202,8 +202,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
         final boolean isGeophysics = (this instanceof GeophysicsCategoryList);
         assert (inverse != null) == isGeophysics;
         this.categories = categories = (Category[]) categories.clone();
-        final int categoriesLength=categories.length;
-        for (int i=0; i<categoriesLength; i++) {
+        for (int i=0; i<categories.length; i++) {
             categories[i] = categories[i].geophysics(isGeophysics);
         }
         Arrays.sort(categories, this);
@@ -229,8 +228,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
                         range1.getMinValue(), range1.getMaxValue(),
                         range2.getMinValue(), range2.getMaxValue()
                     };
-                    final int argsLength=args.length;
-                    for (int j=0; j<argsLength; j++) {
+                    for (int j=0; j<args.length; j++) {
                         if (args[j] instanceof Number) {
                             final float value = ((Number) args[j]).floatValue();
                             if (Float.isNaN(value)) {
@@ -254,7 +252,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
          */
         Category nodata = Category.NODATA;
         final long nodataBits = Double.doubleToRawLongBits(Double.NaN);
-        for (int i=categoriesLength; --i>=0;) {
+        for (int i=categories.length; --i>=0;) {
             final Category candidate = categories[i];
             final double value = candidate.geophysics(true).minimum;
             if (Double.isNaN(value)) {
@@ -274,7 +272,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
          */
         double range = 0;
         Category main = null;
-        for (int i=categoriesLength; --i>=0;) {
+        for (int i=categories.length; --i>=0;) {
             final Category candidate = categories[i];
             if (candidate.isQuantitative()) {
                 final Category candidatePeer = candidate.geophysics(false);
@@ -294,7 +292,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
          */
         Category overflowFallback = null;
         if (searchNearest) {
-            for (int i=categoriesLength; --i>=0;) {
+            for (int i=categories.length; --i>=0;) {
                 final Category category = categories[i];
                 if (!Double.isNaN(category.maximum)) {
                     overflowFallback = category;
@@ -496,7 +494,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      * Returns the unit information for quantitative categories in this list. May returns
      * {@code null} if there is no quantitative categories in this list, or if there is no
      * unit information.
-     * <br><br>
+     * <p>
      * This method is to be overridden by {@link GeophysicsCategoryList}. The default implementation
      * returns {@code null} since sample values are not geophysics values as long as they have not
      * been transformed. The {@link GridSampleDimension} class will invoke

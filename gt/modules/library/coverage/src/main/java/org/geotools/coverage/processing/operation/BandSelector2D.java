@@ -16,7 +16,6 @@
  */
 package org.geotools.coverage.processing.operation;
 
-// J2SE dependencies
 import java.awt.RenderingHints;
 import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
@@ -27,12 +26,13 @@ import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 
+import org.opengis.parameter.ParameterValueGroup;
+
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.processing.OperationJAI;
 import org.geotools.resources.coverage.CoverageUtilities;
 import org.geotools.resources.image.ColorUtilities;
-import org.opengis.parameter.ParameterValueGroup;
 
 
 /**
@@ -82,7 +82,7 @@ final class BandSelector2D extends GridCoverage2D {
               null);                                 // Properties
 
         this.bandIndices = bandIndices;
-        assert bandIndices==null || bandIndices.length==bands.length;
+        assert bandIndices == null || bandIndices.length == bands.length;
     }
 
     /**
@@ -125,10 +125,9 @@ final class BandSelector2D extends GridCoverage2D {
              * "BandSelect", which make it possible to avoid to copy raster data.
              */
             if (bandIndices != null) {
-                final int bandIndicesLength=bandIndices.length;
-                if (bandIndices.length!=bandIndicesLength || !isIdentity(bandIndices)) {
+                if (bandIndices.length != sourceBands.length || !isIdentity(bandIndices)) {
                     targetBands = new GridSampleDimension[bandIndices.length];
-                    for (int i=0; i<bandIndicesLength; i++) {
+                    for (int i=0; i<bandIndices.length; i++) {
                         targetBands[i] = sourceBands[bandIndices[i]];
                     }
                 } else {
@@ -156,8 +155,7 @@ final class BandSelector2D extends GridCoverage2D {
             final int[] parentIndices = ((BandSelector2D)source).bandIndices;
             if (parentIndices != null) {
                 if (bandIndices != null) {
-                    final int bandIndicesLength=bandIndices.length;
-                    for (int i=0; i<bandIndicesLength; i++) {
+                    for (int i=0; i<bandIndices.length; i++) {
                         bandIndices[i] = parentIndices[bandIndices[i]];
                     }
                 } else {
@@ -193,8 +191,7 @@ final class BandSelector2D extends GridCoverage2D {
                 final IndexColorModel indexed = (IndexColorModel) colors;
                 final int[] ARGB = new int[indexed.getMapSize()];
                 indexed.getRGBs(ARGB);
-                colors = ColorUtilities.getIndexColorModel(ARGB, targetBands.length,
-                                                                 visibleTargetBand);
+                colors = ColorUtilities.getIndexColorModel(ARGB, targetBands.length, visibleTargetBand);
             } else {
                 colors = targetBands[visibleTargetBand]
                       .getColorModel(visibleTargetBand, targetBands.length);
@@ -224,8 +221,7 @@ final class BandSelector2D extends GridCoverage2D {
      * Returns {@code true} if the specified array contains increasing values 0, 1, 2...
      */
     private static boolean isIdentity(final int[] bands) {
-        final int length = bands.length;
-        for (int i=0; i<length; i++) {
+        for (int i=0; i<bands.length; i++) {
             if (bands[i] != i) {
                 return false;
             }

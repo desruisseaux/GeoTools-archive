@@ -176,8 +176,8 @@ public class SpatioTemporalCoverage3D extends AbstractCoverage {
             this.coverage = coverage;
             temporalCRS = DefaultTemporalCRS.wrap(CRS.getTemporalCRS(crs));
             if (temporalCRS == null) {
-                throw new IllegalArgumentException( // TODO: localize
-                        /*Errors.format(ErrorKeys.BAD_COORDINATE_SYSTEM)*/);
+                throw new IllegalArgumentException(
+                        Errors.format(ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM));
             }
             temporalDimension = CRSUtilities.getDimensionOf(crs, temporalCRS.getClass());
             final int  xDimension = (temporalDimension!=0) ? 0 : 1;

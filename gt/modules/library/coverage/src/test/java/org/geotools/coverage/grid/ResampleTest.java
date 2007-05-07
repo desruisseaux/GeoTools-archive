@@ -72,6 +72,8 @@ public final class ResampleTest extends GridCoverageTest {
      * in a windows. This flag is set to {@code true} if the test is run from
      * the command line through the {@code main(String[])} method. Otherwise
      * (for example if it is run from Maven), it is left to {@code false}.
+     *
+     * @todo Consider setting to {@link TestData#isInteractive}.
      */
     private static boolean SHOW = false;
 
@@ -81,15 +83,28 @@ public final class ResampleTest extends GridCoverageTest {
     private static final double EPS = 1E-6;
 
     /**
-     * The source grid coverage.
+     * The source grid coverage, to be initialized by {@link #setUp}.
+     * Contains 8-bits indexed color model for a PNG image, with categories.
      */
     private GridCoverage2D coverage;
-    
-	private GridCoverage2D indexedCoverage;
 
-	private GridCoverage2D indexedCoverageWithTransparency;
+    /**
+     * An other source coverage initialized by {@link #setUp}.
+     * Contains indexed color model for a GIF image, without categories.
+     */
+    private GridCoverage2D indexedCoverage;
 
-	private GridCoverage2D floatCoverage;
+    /**
+     * An other source coverage initialized by {@link #setUp}.
+     * Contains indexed color model for a GIF image, without categories.
+     */
+    private GridCoverage2D indexedCoverageWithTransparency;
+
+    /**
+     * An other source coverage initialized by {@link #setUp}.
+     * Contains float values.
+     */
+    private GridCoverage2D floatCoverage;
 
     /**
      * Constructs a test case with the given name.
@@ -103,10 +118,10 @@ public final class ResampleTest extends GridCoverageTest {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        coverage = getExample(0);
-		indexedCoverage = getExample(2);
-		indexedCoverageWithTransparency = getExample(3);
-		floatCoverage=getExample(4);
+        coverage                        = getExample(0);
+        indexedCoverage                 = getExample(2);
+        indexedCoverageWithTransparency = getExample(3);
+        floatCoverage                   = getExample(4);
     }
 
     /**
@@ -167,36 +182,49 @@ public final class ResampleTest extends GridCoverageTest {
         }
     }
 
-    private String projectTo( GridCoverage2D gc,final CoordinateReferenceSystem crs,
-            final GridGeometry2D       geometry)
-    {
-    	return projectTo(gc, crs, geometry, null,true);
-    }
     /**
      * Projects the specified image to the specified CRS.
      * The result will be displayed in a window if {@link #SHOW} is set to {@code true}.
      *
      * @return The operation name which was applied on the image, or {@code null} if none.
      */
-    private String projectTo( GridCoverage2D gc,final CoordinateReferenceSystem crs,
-                             final GridGeometry2D       geometry,Hints hints,boolean geo)
+    private static String projectTo(final GridCoverage2D            coverage,
+                                    final CoordinateReferenceSystem targetCRS,
+                                    final GridGeometry2D            geometry)
     {
-        final AbstractProcessor processor = (hints!=null)?new DefaultProcessor(hints):
-        	AbstractProcessor.getInstance();
+        return projectTo(coverage, targetCRS, geometry, null, true);
+    }
+
+    /**
+     * Projects the specified image to the specified CRS using the specified hints.
+     * The result will be displayed in a window if {@link #SHOW} is set to {@code true}.
+     *
+     * @return The operation name which was applied on the image, or {@code null} if none.
+     */
+    private static String projectTo(final GridCoverage2D            coverage,
+                                    final CoordinateReferenceSystem targetCRS,
+                                    final GridGeometry2D            geometry,
+                                    final Hints                     hints,
+                                    final boolean                   useGeophysics)
+    {
+        final AbstractProcessor processor = (hints != null) ? new DefaultProcessor(hints) : AbstractProcessor.getInstance();
         final String arg1; final Object value1;
         final String arg2; final Object value2;
-        if (crs != null) {
-            arg1="CoordinateReferenceSystem"; value1=crs;
+        if (targetCRS != null) {
+            arg1   = "CoordinateReferenceSystem";
+            value1 = targetCRS;
             if (geometry != null) {
-                arg2="GridGeometry"; value2=geometry;
+                arg2   = "GridGeometry";
+                value2 = geometry;
             } else {
-                arg2="InterpolationType"; value2="bilinear";
+                arg2   = "InterpolationType";
+                value2 = "bilinear";
             }
         } else {
-            arg1="GridGeometry";      value1=geometry;
-            arg2="InterpolationType"; value2="bilinear";
+            arg1 = "GridGeometry";      value1 = geometry;
+            arg2 = "InterpolationType"; value2 = "bilinear";
         }
-        GridCoverage2D projected = gc.geophysics(geo);
+        GridCoverage2D projected = coverage.geophysics(useGeophysics);
         final ParameterValueGroup param = processor.getOperation("Resample").getParameters();
         param.parameter("Source").setValue(projected);
         param.parameter(arg1).setValue(value1);
@@ -207,7 +235,7 @@ public final class ResampleTest extends GridCoverageTest {
         String operation = null;
         if (image instanceof RenderedOp) {
             operation = ((RenderedOp) image).getOperationName();
-            AbstractProcessor.LOGGER.fine("Applied \""+operation+"\" JAI operation.");
+            AbstractProcessor.LOGGER.fine("Applied \"" + operation + "\" JAI operation.");
         }
         if (SHOW) {
             Viewer.show(projected, operation);
@@ -222,10 +250,10 @@ public final class ResampleTest extends GridCoverageTest {
      * Tests the "Resample" operation with an identity transform.
      */
     public void testIdentity() {
-        assertEquals("Lookup", projectTo(coverage,coverage.getCoordinateReferenceSystem(), null));
-        assertNull( projectTo(indexedCoverage,indexedCoverage.getCoordinateReferenceSystem(), null));
-        assertNull( projectTo(indexedCoverageWithTransparency,indexedCoverageWithTransparency.getCoordinateReferenceSystem(), null));
-    	  assertNull( projectTo(floatCoverage,floatCoverage.getCoordinateReferenceSystem(), null));
+        assertEquals("Lookup", projectTo(coverage, coverage.getCoordinateReferenceSystem(), null));
+        assertNull(projectTo(indexedCoverage, indexedCoverage.getCoordinateReferenceSystem(), null));
+        assertNull(projectTo(indexedCoverageWithTransparency, indexedCoverageWithTransparency.getCoordinateReferenceSystem(), null));
+        assertNull(projectTo(floatCoverage, floatCoverage.getCoordinateReferenceSystem(), null));
     }
 
     /**
@@ -236,14 +264,15 @@ public final class ResampleTest extends GridCoverageTest {
                              new GeneralGridRange(new Rectangle(50,50,200,200)),
                              (MathTransform)null, null)));
         assertEquals("Crop", projectTo(indexedCoverage,null, new GridGeometry2D(
-                new GeneralGridRange(new Rectangle(50,50,100,100)),
-                (MathTransform)null, null)));
+                             new GeneralGridRange(new Rectangle(50,50,100,100)),
+                             (MathTransform)null, null)));
         assertEquals("Crop", projectTo(indexedCoverageWithTransparency,null, new GridGeometry2D(
-                new GeneralGridRange(new Rectangle(50,50,100,100)),
-                (MathTransform)null, null)));
-    	 assertEquals("Crop", projectTo(floatCoverage,null, new GridGeometry2D(
-                 new GeneralGridRange(new Rectangle(50,50,100,100)),
-                 (MathTransform)null, null),new Hints(Hints.REPLACE_NON_GEOPHYSICS_VIEW,Boolean.FALSE),false));
+                             new GeneralGridRange(new Rectangle(50,50,100,100)),
+                             (MathTransform)null, null)));
+        assertEquals("Crop", projectTo(floatCoverage,null, new GridGeometry2D(
+                             new GeneralGridRange(new Rectangle(50,50,100,100)),
+                             (MathTransform)null, null),
+                             new Hints(Hints.REPLACE_NON_GEOPHYSICS_VIEW, Boolean.FALSE), false));
     }
 
     /**
@@ -252,43 +281,54 @@ public final class ResampleTest extends GridCoverageTest {
     public void testStereographic() {
         assertEquals("Warp", projectTo(coverage,getProjectedCRS(coverage), null));
     }	
-    
+
     /**
      * Tests the "Resample" operation with a stereographic coordinate system.
-     * @throws FactoryException 
      */
     public void testsNad83() throws FactoryException {
-    	 final CoordinateReferenceSystem crs = CRS.parseWKT("GEOGCS[\"NAD83\",DATUM[\"North_American_Datum_1983\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY[\"EPSG\",\"6269\"]],PRIMEM[\"Greenwich\",0, AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9108\"]],AXIS[\"Lat\",NORTH],AXIS[\"Long\",EAST],AUTHORITY[\"EPSG\",\"4269\"]]");
-
-    	 
+        final CoordinateReferenceSystem crs = CRS.parseWKT(
+                "GEOGCS[\"NAD83\"," +
+                  "DATUM[\"North_American_Datum_1983\"," +
+                    "SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]]," +
+                    "TOWGS84[0,0,0,0,0,0,0],AUTHORITY[\"EPSG\",\"6269\"]]," +
+                  "PRIMEM[\"Greenwich\",0, AUTHORITY[\"EPSG\",\"8901\"]]," +
+                  "UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9108\"]]," +
+                  "AXIS[\"Lat\",NORTH]," +
+                  "AXIS[\"Long\",EAST]," +
+                  "AUTHORITY[\"EPSG\",\"4269\"]]");
         assertEquals("Warp", projectTo(indexedCoverage,crs, null));
         assertEquals("Warp", projectTo(indexedCoverageWithTransparency,crs, null));
-        assertEquals("Warp", projectTo(floatCoverage,crs, 
-        		null, new Hints(Hints.REPLACE_NON_GEOPHYSICS_VIEW,Boolean.FALSE),false));
+        assertEquals("Warp", projectTo(floatCoverage,crs, null,
+                             new Hints(Hints.REPLACE_NON_GEOPHYSICS_VIEW, Boolean.FALSE), false));
     }	
-     
+
     /**
      * Tests the "Resample" operation with an "Affine" transform.
      */
     public void testAffine() {
-
-		performAffine(coverage,null,true,"Lookup","Affine");
-		performAffine(indexedCoverage,null,true,"Lookup","Affine");
-		performAffine(indexedCoverageWithTransparency,null,false,"BandSelect","Affine");
-		performAffine(floatCoverage,new Hints(Hints.REPLACE_NON_GEOPHYSICS_VIEW,Boolean.FALSE),false,"Lookup","Affine");
-       
+        performAffine(coverage,                        null, true,  "Lookup",     "Affine");
+        performAffine(indexedCoverage,                 null, true,  "Lookup",     "Affine");
+        performAffine(indexedCoverageWithTransparency, null, false, "BandSelect", "Affine");
+        performAffine(floatCoverage, new Hints(Hints.REPLACE_NON_GEOPHYSICS_VIEW, Boolean.FALSE),
+                      false, "Lookup", "Affine");
     }
 
-	/**
-	 * Performs an Affine transformation on the provded {@link GridCoverage2D} using the 
-	 * Resample operation.
-	 * @param gc is the {@link GridCoverage2D} to apply the operation on.
-	 */
-	private void performAffine(GridCoverage2D gc,Hints hints, boolean geo,String testString1,String testString2 ) {
-		AffineTransform atr = getAffineTransform(gc);
+    /**
+     * Performs an Affine transformation on the provided {@link GridCoverage2D} using the 
+     * Resample operation.
+     *
+     * @param coverage the {@link GridCoverage2D} to apply the operation on.
+     */
+    private static void performAffine(final GridCoverage2D coverage,
+                                      final Hints          hints,
+                                      final boolean        useGeophysics,
+                                      final String         testString1,
+                                      final String         testString2)
+    {
+        final AffineTransform atr = getAffineTransform(coverage);
         atr.preConcatenate(AffineTransform.getTranslateInstance(5, 5));
-        MathTransform tr = ProjectiveTransform.create(atr);
-        CoordinateReferenceSystem crs = gc.getCoordinateReferenceSystem();
+        final MathTransform tr = ProjectiveTransform.create(atr);
+        CoordinateReferenceSystem crs = coverage.getCoordinateReferenceSystem();
         crs = new DefaultDerivedCRS("F2", new DefaultOperationMethod(tr), crs, tr, crs.getCoordinateSystem());
         /*
          * Note: In current Resampler implementation, the affine transform effect tested
@@ -296,49 +336,53 @@ public final class ResampleTest extends GridCoverageTest {
          *       here.  It would be visible however with more elaborated viewer like the
          *       one provided in the {@code org.geotools.renderer} package.
          */
-        String operation = projectTo(gc, crs, null);
-        if(operation!=null)
-        ;//	assertEquals(testString1, operation);
-        operation =projectTo(gc,null, new GridGeometry2D(null, tr, null),hints,geo );
-        if(operation!=null)
-        ;//	assertEquals(testString2,operation);
-	}
+        String operation = projectTo(coverage, crs, null);
+        if (operation != null) {
+            // TODO
+            // assertEquals(testString1, operation);
+        }
+        operation = projectTo(coverage, null, new GridGeometry2D(null, tr, null), hints, useGeophysics);
+        if (operation != null) {
+            // TODO
+            // assertEquals(testString2, operation);
+        }
+    }
 
     /**
      * Tests <var>X</var>,<var>Y</var> translation in the {@link GridGeometry} after
      * a "Resample" operation.
      */
     public void testTranslation() throws NoninvertibleTransformException {
-
         doTranslation(coverage);
         doTranslation(indexedCoverage);
         doTranslation(indexedCoverageWithTransparency);
-        
     }
 
-	/**
-	 * Performs a translation using the "Resample" operation.
-	 * @param grid is the {@link GridCoverage2D} to apply the translation on.
-	 * @throws NoninvertibleTransformException
-	 */
-	private void doTranslation(GridCoverage2D grid) throws NoninvertibleTransformException {
-		final int    transX =  -253;
+    /**
+     * Performs a translation using the "Resample" operation.
+     *
+     * @param grid the {@link GridCoverage2D} to apply the translation on.
+     */
+    private void doTranslation(GridCoverage2D grid) throws NoninvertibleTransformException {
+        final int    transX =  -253;
         final int    transY =  -456;
         final double scaleX =  0.04;
         final double scaleY = -0.04;
-        ParameterBlock block = new ParameterBlock().addSource(grid.getRenderedImage())
-                                                         .add((float)transX).add((float)transY);
-        RenderedImage img = JAI.create("Translate", block);
-        assertEquals("Incorrect X translation", transX, img.getMinX());
-        assertEquals("Incorrect Y translation", transY, img.getMinY());
+        final ParameterBlock block = new ParameterBlock().
+                addSource(grid.getRenderedImage()).
+                add((float) transX).
+                add((float) transY);
+        RenderedImage image = JAI.create("Translate", block);
+        assertEquals("Incorrect X translation", transX, image.getMinX());
+        assertEquals("Incorrect Y translation", transY, image.getMinY());
         /*
          * Create a grid coverage from the translated image but with the same envelope.
          * Consequently, the 'gridToCoordinateSystem' should be translated by the same
          * amount, with the opposite sign.
          */
-        AffineTransform expected = getAffineTransform(grid);
+        final AffineTransform expected = getAffineTransform(grid);
         grid = (GridCoverage2D) FactoryFinder.getGridCoverageFactory(null).create("Translated",
-                                  img, grid.getEnvelope(), grid.getSampleDimensions(),
+                                  image, grid.getEnvelope(), grid.getSampleDimensions(),
                                   new GridCoverage2D[]{grid}, grid.getProperties());
         expected.translate(-transX, -transY);
         assertEquals(expected, getAffineTransform(grid));
@@ -347,19 +391,19 @@ public final class ResampleTest extends GridCoverageTest {
          * The envelope is left unchanged. The "Resample" operation should compute automatically
          * new image bounds.
          */
-        AffineTransform at = AffineTransform.getScaleInstance(scaleX, scaleY);
-        MathTransform   tr = ProjectiveTransform.create(at);
-        GridGeometry2D geometry = new GridGeometry2D(null, tr, null);
+        final AffineTransform at = AffineTransform.getScaleInstance(scaleX, scaleY);
+        final MathTransform   tr = ProjectiveTransform.create(at);
+        final GridGeometry2D geometry = new GridGeometry2D(null, tr, null);
         grid = (GridCoverage2D) Operations.DEFAULT.resample(grid,
                 grid.getCoordinateReferenceSystem(), geometry, null);
         assertEquals(at, getAffineTransform(grid));
-        img = grid.getRenderedImage();
+        image = grid.getRenderedImage();
         expected.preConcatenate(at.createInverse());
-        Point point = new Point(transX, transY);
-        expected.transform(point, point); // Round toward neareast integer
-        assertEquals("Incorrect X translation", point.x, img.getMinX());
-        assertEquals("Incorrect Y translation", point.y, img.getMinY());
-	}
+        final Point point = new Point(transX, transY);
+        assertSame(point, expected.transform(point, point)); // Round toward neareast integer
+        assertEquals("Incorrect X translation", point.x, image.getMinX());
+        assertEquals("Incorrect Y translation", point.y, image.getMinY());
+    }
 
     /**
      * Inherited test disabled for this suite.
@@ -381,7 +425,7 @@ public final class ResampleTest extends GridCoverageTest {
      */
     public static void main(final String[] args) {
         SHOW = true;
-        org.geotools.util.MonolineFormatter.initGeotools(AbstractProcessor.OPERATION);
+        org.geotools.util.Logging.GEOTOOLS.forceMonolineConsoleOutput(AbstractProcessor.OPERATION);
         junit.textui.TestRunner.run(suite());
     }
 }

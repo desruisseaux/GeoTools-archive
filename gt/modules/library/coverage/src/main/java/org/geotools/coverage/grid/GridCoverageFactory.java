@@ -117,7 +117,6 @@ public class GridCoverageFactory extends AbstractFactory {
         CoordinateReferenceSystem defaultCRS = null;
         String tileEncoding = null;
         if (userHints != null) {
-            // TODO: remove casts when we will be allowed to compile for J2SE 1.5.
             defaultCRS = (CoordinateReferenceSystem) userHints.get(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM);
             if (Utilities.equals(defaultCRS, DefaultGeographicCRS.WGS84) ||
                 Utilities.equals(defaultCRS, DefaultGeographicCRS.WGS84_3D))
@@ -243,8 +242,7 @@ public class GridCoverageFactory extends AbstractFactory {
             int i = 0;
             final float[] row = matrix[j];
             if (row != null) {
-                final int length = row.length;
-                for (; i<length; i++) {
+                for (; i<row.length; i++) {
                     raster.setSample(i, j, 0, row[i]);
                 }
             }

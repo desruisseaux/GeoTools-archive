@@ -54,10 +54,11 @@ import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import org.geotools.util.NumberRange;
 
 import com.sun.media.jai.codecimpl.util.RasterFactory;
+
 
 /**
  * Tests the {@link GridCoverage2D} implementation. This class can also be used
@@ -72,6 +73,10 @@ import com.sun.media.jai.codecimpl.util.RasterFactory;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @todo Refactor this class to some factory that do not extends {@link TestCase}.
+ *       Try to make it available to other coverage modules if possible, together
+ *       with the test data.
  */
 public class GridCoverageTest extends TestCase {
     /**
@@ -311,7 +316,7 @@ public class GridCoverageTest extends TestCase {
      * Returns the number of available image which may be used as example.
      */
     public static int getNumExamples() {
-        return 1; // TODO: set to '2' if we commit the 'CHL01195.png' image (160 ko).
+        return 1; // TODO: set to '5' if we commit the 'CHL01195.png' image (160 ko).
     }
 
     /**
@@ -328,7 +333,7 @@ public class GridCoverageTest extends TestCase {
         final Category[]         categories;
         final CoordinateReferenceSystem crs;
         final Rectangle2D            bounds;
-        final GridSampleDimension[] bands;
+        final GridSampleDimension[]   bands;
         switch (number) {
             default: {
                 throw new IllegalArgumentException(String.valueOf(number));
@@ -370,15 +375,15 @@ public class GridCoverageTest extends TestCase {
                 
                 break;
             }
-            case 2:{
+            case 2: {
             	////
             	//
             	// 	WORLD DEM
             	//
             	////
-            	path="world_dem.gif";
+            	path   = "world_dem.gif";
                 bounds = new Rectangle2D.Double(-180,-90, 360, 180);
-                crs  = DefaultGeographicCRS.WGS84;
+                crs    = DefaultGeographicCRS.WGS84;
                 bands=null;
                 break;
             }
@@ -388,20 +393,19 @@ public class GridCoverageTest extends TestCase {
             	// 	WORLD BATHY
             	//
             	////
-            	path="BATHY.gif";
+            	path   = "BATHY.gif";
                 bounds = new Rectangle2D.Double(-180,-90, 360, 180);
-                crs  = DefaultGeographicCRS.WGS84;
-                bands=null;
+                crs    = DefaultGeographicCRS.WGS84;
+                bands  = null;
                 break;
             }
-            
-            case 4:{
+            case 4: {
             	////
             	//
-            	// 	A float covearage
+            	// 	A float coverage
             	//
             	////
-            	 /*
+            	/*
                  * Set the pixel values.  Because we use only one tile with one band, the code below
                  * is pretty similar to the code we would have if we were just setting the values in
                  * a matrix.
@@ -421,15 +425,15 @@ public class GridCoverageTest extends TestCase {
                  * color (or grayscale) is performed on the fly everytime the image is rendered.
                  */
                 Color[] colors = new Color[] {Color.BLUE, Color.CYAN, Color.WHITE, Color.YELLOW, Color.RED};
-                return factory.create("My colored coverage", raster, new Envelope2D(DefaultGeographicCRS.WGS84,35, -41, 35+45, -41+46),
+                return factory.create("My colored coverage", raster,
+                        new Envelope2D(DefaultGeographicCRS.WGS84, 35, -41, 35+45, -41+46),
                                     null, null, null, new Color[][] {colors}, null);
                 
             }
         }
-
-        final GeneralEnvelope    envelope = new GeneralEnvelope(bounds);
-        final RenderedImage         image = ImageIO.read(TestData.getResource(GridCoverageTest.class, path));
-        final String             filename = new File(path).getName();
+        final GeneralEnvelope envelope = new GeneralEnvelope(bounds);
+        final RenderedImage      image = ImageIO.read(TestData.getResource(GridCoverageTest.class, path));
+        final String          filename = new File(path).getName();
         envelope.setCoordinateReferenceSystem(crs);
         return (GridCoverage2D) factory.create(filename, image, envelope, bands, null, null);
     }
