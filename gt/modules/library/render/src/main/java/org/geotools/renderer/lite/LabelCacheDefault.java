@@ -159,6 +159,7 @@ public final class LabelCacheDefault implements LabelCache {
 			throw new IllegalStateException( activeLayers+" are layers that started rendering but have not completed," +
 					" stop() or endLayer() must be called before clear is called" );
 		}
+		needsOrdering=true;
         labelCache.clear();
         labelCacheNonGrouped.clear();
 		enabledLayers.clear();
@@ -168,6 +169,8 @@ public final class LabelCacheDefault implements LabelCache {
 		if( activeLayers.contains(layerId) ){
 			throw new IllegalStateException( layerId+" is still rendering, end the layer before calling clear." );
 		}
+		needsOrdering=true;
+
 		for (Iterator iter = labelCache.values().iterator(); iter.hasNext();) {
 			LabelCacheItem item = (LabelCacheItem) iter.next();
 			if( item.getLayerIds().contains(layerId) )
@@ -407,7 +410,13 @@ public final class LabelCacheDefault implements LabelCache {
 				.getMinX(), displayArea.getMaxX(), displayArea.getMinY(),
 				displayArea.getMaxY()));
 
-		List items = orderedLabels(); // both grouped and non-grouped
+		
+		List items; // both grouped and non-grouped
+		if ( needsOrdering ){
+			items = orderedLabels();
+		} else {
+			items = getActiveLabels();
+		}
 		for (Iterator labelIter = items.iterator(); labelIter.hasNext();) {
 			if (stop)
 				return;
@@ -456,10 +465,10 @@ public final class LabelCacheDefault implements LabelCache {
 
 				// DJB: this is where overlapping labels are forbidden (first
 				// out of the map has priority)
-                Rectangle glyphBounds = glyphVector
-                .getPixelBounds(new FontRenderContext(tempTransform,
-                        true, false), 0, 0);
+				Rectangle glyphBounds = glyphVector.getPixelBounds(null, 0, 0);
 
+				glyphBounds=tempTransform.createTransformedShape(glyphBounds).getBounds();
+				
                 // is  this offscreen? We assume offscreen as anything that is outside
                 // or crosses the rendering borders, since in tiled rendering
                 // we have to insulate ourself from other tiles

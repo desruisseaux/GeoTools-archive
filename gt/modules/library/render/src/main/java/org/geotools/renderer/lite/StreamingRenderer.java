@@ -275,8 +275,6 @@ public final class StreamingRenderer implements GTRenderer {
 
 	private boolean canTransform;
 
-	private String layerId;
-
 	/**
 	 * Creates a new instance of LiteRenderer without a context. Use it only to
 	 * gain access to utility methods of this class or if you want to render
@@ -619,7 +617,7 @@ public final class StreamingRenderer implements GTRenderer {
 				// extract the feature type stylers from the style object
 				// and process them
 				processStylers(graphics, currLayer, worldToScreenTransform,
-						destinationCrs, mapExtent, screenSize);
+						destinationCrs, mapExtent, screenSize, i+"");
 			} catch (Throwable t) {
 				LOGGER.log(Level.SEVERE, t.getLocalizedMessage(), t);
 				fireErrorEvent(new Exception(new StringBuffer(
@@ -1503,6 +1501,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 * @param destinationCrs -
 	 *            The destination CRS, or null if no reprojection is required
 	 * @param screenSize
+	 * @param layerId 
 	 * @throws IOException
 	 * @throws IllegalAttributeException
 	 * @throws IllegalFilterException
@@ -1510,7 +1509,7 @@ public final class StreamingRenderer implements GTRenderer {
 	final private void processStylers(final Graphics2D graphics,
 			MapLayer currLayer, AffineTransform at,
 			CoordinateReferenceSystem destinationCrs, Envelope mapArea,
-			Rectangle screenSize) throws IllegalFilterException, IOException,
+			Rectangle screenSize, String layerId) throws IllegalFilterException, IOException,
 			IllegalAttributeException {
 
 		/*
@@ -1585,7 +1584,7 @@ public final class StreamingRenderer implements GTRenderer {
 					}
 					feature = iterator.next(); // read the content
 					for (t = 0; t < n_lfts; t++) {
-						process(currLayer, feature, fts_array[t], scaleRange, at, destinationCrs);
+						process(currLayer, feature, fts_array[t], scaleRange, at, destinationCrs, layerId);
                         // draw the content on the image(s)
 					}
 				} catch (Throwable tr) {
@@ -1619,10 +1618,11 @@ public final class StreamingRenderer implements GTRenderer {
 	 * @param content
 	 * @param feature 
 	 * @param style
+	 * @param layerId 
 	 */
 	final private void process(MapLayer currLayer, Object content, LiteFeatureTypeStyle style,
 			Range scaleRange, AffineTransform at,
-			CoordinateReferenceSystem destinationCrs)
+			CoordinateReferenceSystem destinationCrs, String layerId)
 			throws TransformException, FactoryException {
 		boolean doElse = true;
 		Rule[] elseRuleList = style.elseRules;
@@ -1641,7 +1641,7 @@ public final class StreamingRenderer implements GTRenderer {
 				doElse = false;
 				symbolizers = r.getSymbolizers();
 				processSymbolizers(currLayer, graphics, content, symbolizers, scaleRange,
-						at, destinationCrs);
+						at, destinationCrs, layerId);
 			}
 		}
 
@@ -1652,7 +1652,7 @@ public final class StreamingRenderer implements GTRenderer {
 				symbolizers = r.getSymbolizers();
 
 				processSymbolizers(currLayer, graphics, content, symbolizers, scaleRange,
-						at, destinationCrs);
+						at, destinationCrs, layerId);
 
 			}
 		}
@@ -1675,13 +1675,14 @@ public final class StreamingRenderer implements GTRenderer {
 	 *            the style factory happy
 	 * @param shape
 	 * @param destinationCrs
+	 * @param layerId 
 	 * @throws TransformException
 	 * @throws FactoryException
 	 */
 	final private void processSymbolizers(MapLayer currLayer, final Graphics2D graphics,
 			final Object drawMe, final Symbolizer[] symbolizers,
 			Range scaleRange, AffineTransform at,
-			CoordinateReferenceSystem destinationCrs)
+			CoordinateReferenceSystem destinationCrs, String layerId)
 			throws TransformException, FactoryException {
 		LiteShape2 shape;
 		Geometry g;
