@@ -21,6 +21,7 @@ public class AllTests {
 		suite.addTestSuite(IDFunctionExpressionTest.class);
 		suite.addTestSuite(EmfAppSchemaReaderTest.class);
 		suite.addTestSuite(XMLConfigReaderTest.class);
+		suite.addTestSuite(BoreholeTest.class);
 		
 		//$JUnit-END$
 		return suite;
