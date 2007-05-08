@@ -295,6 +295,10 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
         for (Iterator itr = attMappings.iterator(); itr.hasNext();) {
 
             AttributeMapping mapping = (AttributeMapping) itr.next();
+            if(targetNode.getName().getLocalPart().equals(mapping.getTargetXPath())){
+                //ignore the top level mapping for the Feature itself as it was already set
+                continue;
+            }
 
             if (mapping.isMultiValued()) {
                 setMultivaluedAttribute(targetFeature, mapping, currentGroup);

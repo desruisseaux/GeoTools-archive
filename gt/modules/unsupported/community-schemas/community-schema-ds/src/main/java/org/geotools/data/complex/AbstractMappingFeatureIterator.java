@@ -102,21 +102,16 @@ abstract class AbstractMappingFeatureIterator implements Iterator/* <Feature> */
         Name name = mapping.getTargetFeature().getName();
         this.featureSource = store.access(name);
 
-        List attMappingsWithoutRootFeature = new ArrayList();
         List attributeMappings = mapping.getAttributeMappings();
 
         for (Iterator it = attributeMappings.iterator(); it.hasNext();) {
             AttributeMapping attMapping = (AttributeMapping) it.next();
             if (name.getLocalPart().equals(attMapping.getTargetXPath())) {
                 featureFidMapping = attMapping.getIdentifierExpression();
-            } else {
-                attMappingsWithoutRootFeature.add(attMapping);
             }
         }
 
-        this.mapping = new FeatureTypeMapping(mapping.getSource(), mapping
-                .getTargetFeature(), attMappingsWithoutRootFeature);
-        this.mapping.setGroupByAttNames(mapping.getGroupByAttNames());
+        this.mapping = mapping;
 
         if (featureFidMapping == null
                 || Expression.NIL.equals(featureFidMapping)) {

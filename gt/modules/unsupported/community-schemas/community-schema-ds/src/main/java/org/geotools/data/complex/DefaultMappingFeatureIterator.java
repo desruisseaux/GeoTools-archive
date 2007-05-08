@@ -87,6 +87,12 @@ class DefaultMappingFeatureIterator extends AbstractMappingFeatureIterator {
 
         for (Iterator itr = mappings.iterator(); itr.hasNext();) {
             AttributeMapping attMapping = (AttributeMapping) itr.next();
+
+            if(targetNodeName.getLocalPart().equals(attMapping.getTargetXPath())){
+                //ignore the top level mapping for the Feature itself as it was already set
+                continue;
+            }
+            
             Expression sourceExp = attMapping.getSourceExpression();
             String targetXpathProperty = attMapping.getTargetXPath();
             // TODO: optimize here
