@@ -15,12 +15,18 @@
  */
 package org.geotools.util;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.FactoryCreator;
 import org.geotools.factory.FactoryRegistry;
+import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
+import org.geotools.resources.LazySet;
 
 /**
  * Convenience class for converting an object from one type to an object of another.
@@ -28,13 +34,53 @@ import org.geotools.factory.Hints;
  * @author Justin Deoliveira, The Open Planning Project
  * @since 2.4
  */
-public class Converters {
+public final class Converters {
 
 	/**
 	 * Cached list of converter factories
 	 */
 	static List factories;
 	
+    /**
+     * The service registry for this manager.
+     * Will be initialized only when first needed.
+     */
+    private static FactoryRegistry registry;
+
+    /**
+     * Returns the service registry. The registry will be created the first
+     * time this method is invoked.
+     */
+    private static FactoryRegistry getServiceRegistry() {
+        assert Thread.holdsLock(Converters.class);
+        if (registry == null) {
+            registry = new FactoryCreator(Arrays.asList(new Class[] {
+            		ConverterFactory.class,}));
+        }
+        return registry;
+    }
+    
+    private static Hints addDefaultHints(final Hints hints) {
+        final Hints completed = GeoTools.getDefaultHints();
+        if (hints != null) {
+            completed.add(hints);
+        }
+        return completed;
+    }
+    
+
+    /**
+     * Returns a set of all available implementations for the {@link ConverterFactory} interface.
+     *
+     * @param  hints An optional map of hints, or {@code null} if none.
+     * @return Set of available ConverterFactory implementations.
+     */
+    public static synchronized Set getConverterFactories(Hints hints) {
+        hints = addDefaultHints(hints);
+        return new LazySet(getServiceRegistry().getServiceProviders(
+                ConverterFactory.class, null, hints));
+    }
+
 	/**
 	 * Convenience for {@link #convert(Object, Class, Hints)}
 	 * 
@@ -98,21 +144,10 @@ public class Converters {
 	/**
 	 * Processed the {@link ConverterFactory} extension point.
 	 * 
-	 * @return A list of converter factories.
+	 * @return A collection of converter factories.
 	 * @since 2.4 
 	 */
-	static List factories() {
-		if ( factories == null ) {
-			synchronized ( Converters.class ) {
-				if ( factories == null ) {
-					Iterator i = FactoryRegistry.lookupProviders( ConverterFactory.class );
-					factories = new ArrayList();
-					while( i.hasNext() ) factories.add( i.next() );
-				}
-			}
-			
-		}
-		
-		return factories;
+	static Collection factories() {
+		return getConverterFactories(GeoTools.getDefaultHints());
 	}
 }
