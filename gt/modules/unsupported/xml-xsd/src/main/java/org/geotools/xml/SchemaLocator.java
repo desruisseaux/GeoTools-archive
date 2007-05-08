@@ -92,9 +92,11 @@ public class SchemaLocator implements XSDSchemaLocator {
 		            logger.log( Level.WARNING, msg, t );
 		        }
 			}
+                        
+                        return this.schema;
 		}
 		
-		return this.schema;
+		return null;
 	}
 	    
 	/**
