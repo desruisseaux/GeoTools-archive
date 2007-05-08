@@ -201,7 +201,7 @@ public class LocationsXYDataStoreFactory extends AbstractFactory implements
                 }
             }
         } else {
-            LOGGER.warning("LocationsXYDataStoreFactory: can Process Cannot find params ");
+            LOGGER.finer("LocationsXYDataStoreFactory: can Process Cannot find params ");
             return (false);
         }
 

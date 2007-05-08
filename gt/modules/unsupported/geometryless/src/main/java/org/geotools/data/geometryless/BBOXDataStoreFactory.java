@@ -204,7 +204,7 @@ public class BBOXDataStoreFactory extends AbstractFactory
                 }
             }
         } else {
-                   	LOGGER.warning("BBOXDataStoreFactory: can Process Cannot find params " );
+                   	LOGGER.finer("BBOXDataStoreFactory: can Process Cannot find params " );
             return (false);
         }
 

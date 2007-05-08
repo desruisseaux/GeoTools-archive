@@ -168,7 +168,7 @@ public class JDBCDataStoreFactory extends AbstractFactory
                 }
             }
         } else {
-                   	LOGGER.warning("JDBCDataStoreFactory: can Process Cannot find params " );
+                   	LOGGER.finer("JDBCDataStoreFactory: can Process Cannot find params " );
             return (false);
         }
 
