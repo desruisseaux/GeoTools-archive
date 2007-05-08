@@ -21,8 +21,8 @@ package org.geotools.styling;
 //import java.util.logging.Logger;
 // OpenGIS dependencies
 import org.geotools.event.AbstractGTComponent;
-import org.geotools.filter.Expression;
 import org.geotools.resources.Utilities;
+import org.opengis.filter.expression.Expression;
 import org.opengis.util.Cloneable;
 
 

@@ -191,8 +191,8 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 				indexedDS.getSchema().getDefaultGeometry().getName());
 		GeometryFilter filter = fac
 				.createGeometryFilter(FilterType.GEOMETRY_BBOX);
-		filter.addRightGeometry(attrExpression);
-		filter.addLeftGeometry(bbox);
+		filter.addLeftGeometry(attrExpression);
+		filter.addRightGeometry(bbox);
 		features = indexedDS.getFeatureSource().getFeatures(filter);
 		FeatureCollection features2 = baselineDS.getFeatureSource()
 				.getFeatures(filter);

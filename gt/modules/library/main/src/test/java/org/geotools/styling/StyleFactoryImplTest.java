@@ -18,10 +18,11 @@ package org.geotools.styling;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.Feature;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -36,8 +37,7 @@ import java.util.logging.Logger;
  */
 public class StyleFactoryImplTest extends TestCase {
     static StyleFactory styleFactory;
-    static FilterFactory filterFactory = FilterFactoryFinder
-        .createFilterFactory();
+    static FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory(null);        
     static Feature feature;
     protected static final Logger LOGGER = Logger
     .getLogger("org.geotools.styling");
@@ -65,7 +65,7 @@ public class StyleFactoryImplTest extends TestCase {
     public void testCreateStyle() {
         LOGGER.finer("testCreateStyle");
 
-        styleFactory = StyleFactoryFinder.createStyleFactory();
+        styleFactory = CommonFactoryFinder.getStyleFactory(null);
 
         assertNotNull("Failed to build styleFactory", styleFactory);
     }
@@ -150,40 +150,40 @@ public class StyleFactoryImplTest extends TestCase {
         LOGGER.finer("testCreateStroke");
 
         Stroke s = styleFactory.createStroke(filterFactory
-                .createLiteralExpression("#000000"),
-                filterFactory.createLiteralExpression(2.0));
+                .literal("#000000"),
+                filterFactory.literal(2.0));
 
         assertNotNull("Failed to build stroke ", s);
 
-        s = styleFactory.createStroke(filterFactory.createLiteralExpression(
-                    "#000000"), filterFactory.createLiteralExpression(2.0),
-                filterFactory.createLiteralExpression(0.5));
+        s = styleFactory.createStroke(filterFactory.literal(
+                    "#000000"), filterFactory.literal(2.0),
+                filterFactory.literal(0.5));
 
         assertNotNull("Failed to build stroke ", s);
 
-        s = styleFactory.createStroke(filterFactory.createLiteralExpression(
-                    "#000000"), filterFactory.createLiteralExpression(2.0),
-                filterFactory.createLiteralExpression(0.5),
-                filterFactory.createLiteralExpression("bevel"),
-                filterFactory.createLiteralExpression("square"),
+        s = styleFactory.createStroke(filterFactory.literal(
+                    "#000000"), filterFactory.literal(2.0),
+                filterFactory.literal(0.5),
+                filterFactory.literal("bevel"),
+                filterFactory.literal("square"),
                 new float[] { 1.1f, 2.1f, 6f, 2.1f, 1.1f, 5f },
-                filterFactory.createLiteralExpression(3), null, null);
+                filterFactory.literal(3), null, null);
 
         assertNotNull("Failed to build stroke ", s);
 
         assertEquals("Wrong color ", "#000000",
-            s.getColor().getValue(feature).toString());
+            s.getColor().evaluate(feature).toString());
         assertEquals("Wrong width ", "2.0",
-            s.getWidth().getValue(feature).toString());
+            s.getWidth().evaluate(feature).toString());
         assertEquals("Wrong opacity ", "0.5",
-            s.getOpacity().getValue(feature).toString());
+            s.getOpacity().evaluate(feature).toString());
         assertEquals("Wrong linejoin ", "bevel",
-            s.getLineJoin().getValue(feature).toString());
+            s.getLineJoin().evaluate(feature).toString());
         assertEquals("Wrong linejoin ", "square",
-            s.getLineCap().getValue(feature).toString());
+            s.getLineCap().evaluate(feature).toString());
         assertEquals("Broken dash array", 2.1f, s.getDashArray()[1], 0.001f);
         assertEquals("Wrong dash offset ", "3",
-            s.getDashOffset().getValue(feature).toString());
+            s.getDashOffset().evaluate(feature).toString());
     }
 
     /**
@@ -193,13 +193,13 @@ public class StyleFactoryImplTest extends TestCase {
     public void testCreateFill() {
         LOGGER.finer("testCreateFill");
 
-        Fill f = styleFactory.createFill(filterFactory.createLiteralExpression(
+        Fill f = styleFactory.createFill(filterFactory.literal(
                     "#808080"));
 
         assertNotNull("Failed to build fill", f);
 
-        f = styleFactory.createFill(filterFactory.createLiteralExpression(
-                    "#808080"), filterFactory.createLiteralExpression(1.0));
+        f = styleFactory.createFill(filterFactory.literal(
+                    "#808080"), filterFactory.literal(1.0));
         assertNotNull("Failed to build fill", f);
 
         f = styleFactory.createFill(null);
@@ -244,11 +244,11 @@ public class StyleFactoryImplTest extends TestCase {
                 m = (Mark) method.invoke(styleFactory, (Object[]) null);
                 assertNotNull("Failed to get " + names[i] + " mark ", m);
 
-                Expression exp = filterFactory.createLiteralExpression(names[i]);
+                Expression exp = filterFactory.literal(names[i]);
                 assertEquals("Wrong sort of mark returned ", exp,
                     m.getWellKnownName());
                 assertEquals("Wrong size of mark returned ", "6",
-                    m.getSize().getValue(feature).toString());
+                    m.getSize().evaluate(feature).toString());
             } catch (InvocationTargetException ite) {
                 ite.getTargetException().printStackTrace();
                 fail("InvocationTargetException " + ite.getTargetException());
@@ -272,9 +272,9 @@ public class StyleFactoryImplTest extends TestCase {
             };
         Mark[] marks = new Mark[] { styleFactory.getCircleMark() };
         Mark[] symbols = new Mark[0];
-        Expression opacity = filterFactory.createLiteralExpression(0.5);
-        Expression size = filterFactory.createLiteralExpression(10);
-        Expression rotation = filterFactory.createLiteralExpression(145.0);
+        Expression opacity = filterFactory.literal(0.5);
+        Expression size = filterFactory.literal(10);
+        Expression rotation = filterFactory.literal(145.0);
         Graphic g = styleFactory.createGraphic(externalGraphics, marks,
                 symbols, opacity, size, rotation);
 
@@ -288,23 +288,23 @@ public class StyleFactoryImplTest extends TestCase {
     public void testCreateFont() {
         LOGGER.finer("testCreateFont");
 
-        Expression fontFamily = filterFactory.createLiteralExpression("Times");
-        Expression fontStyle = filterFactory.createLiteralExpression("Italic");
-        Expression fontWeight = filterFactory.createLiteralExpression("Bold");
-        Expression fontSize = filterFactory.createLiteralExpression("12");
+        Expression fontFamily = filterFactory.literal("Times");
+        Expression fontStyle = filterFactory.literal("Italic");
+        Expression fontWeight = filterFactory.literal("Bold");
+        Expression fontSize = filterFactory.literal("12");
         Font f = styleFactory.createFont(fontFamily, fontStyle, fontWeight,
                 fontSize);
 
         assertNotNull("Failed to build font", f);
 
         assertEquals("Wrong font type ", "Times",
-            f.getFontFamily().getValue(feature).toString());
+            f.getFontFamily().evaluate(feature).toString());
         assertEquals("Wrong font Style ", "Italic",
-            f.getFontStyle().getValue(feature).toString());
+            f.getFontStyle().evaluate(feature).toString());
         assertEquals("Wrong font weight ", "Bold",
-            f.getFontWeight().getValue(feature).toString());
+            f.getFontWeight().evaluate(feature).toString());
         assertEquals("Wrong font size ", "12",
-            f.getFontSize().getValue(feature).toString());
+            f.getFontSize().evaluate(feature).toString());
     }
 
     /**
@@ -315,7 +315,7 @@ public class StyleFactoryImplTest extends TestCase {
         LOGGER.finer("testCreateLinePlacement");
 
         LinePlacement lp = styleFactory.createLinePlacement(filterFactory
-                .createLiteralExpression(10));
+                .literal(10));
 
         assertNotNull("failed to create LinePlacement", lp);
     }
@@ -328,27 +328,27 @@ public class StyleFactoryImplTest extends TestCase {
         LOGGER.finer("testCreatePointPlacement");
 
         AnchorPoint anchorPoint = styleFactory.createAnchorPoint(filterFactory
-                .createLiteralExpression(1.0),
-                filterFactory.createLiteralExpression(0.5));
+                .literal(1.0),
+                filterFactory.literal(0.5));
         Displacement displacement = styleFactory.createDisplacement(filterFactory
-                .createLiteralExpression(10.0),
-                filterFactory.createLiteralExpression(5.0));
-        Expression rotation = filterFactory.createLiteralExpression(90.0);
+                .literal(10.0),
+                filterFactory.literal(5.0));
+        Expression rotation = filterFactory.literal(90.0);
         PointPlacement pp = styleFactory.createPointPlacement(anchorPoint,
                 displacement, rotation);
 
         assertNotNull("failed to create PointPlacement", pp);
 
         assertEquals("Wrong X anchorPoint ", "1.0",
-            pp.getAnchorPoint().getAnchorPointX().getValue(feature).toString());
+            pp.getAnchorPoint().getAnchorPointX().evaluate(feature).toString());
         assertEquals("Wrong Y anchorPoint ", "0.5",
-            pp.getAnchorPoint().getAnchorPointY().getValue(feature).toString());
+            pp.getAnchorPoint().getAnchorPointY().evaluate(feature).toString());
         assertEquals("Wrong X displacement ", "10.0",
-            pp.getDisplacement().getDisplacementX().getValue(feature).toString());
+            pp.getDisplacement().getDisplacementX().evaluate(feature).toString());
         assertEquals("Wrong Y displacement ", "5.0",
-            pp.getDisplacement().getDisplacementY().getValue(feature).toString());
+            pp.getDisplacement().getDisplacementY().evaluate(feature).toString());
         assertEquals("Wrong Rotation ", "90.0",
-            pp.getRotation().getValue(feature).toString());
+            pp.getRotation().evaluate(feature).toString());
     }
 
     /**
@@ -359,12 +359,12 @@ public class StyleFactoryImplTest extends TestCase {
         LOGGER.finer("testCreateHalo");
 
         Halo h = styleFactory.createHalo(styleFactory.getDefaultFill(),
-                filterFactory.createLiteralExpression(4));
+                filterFactory.literal(4));
 
         assertNotNull("Failed to build halo", h);
 
         assertEquals("Wrong radius", 4,
-            ((Number) h.getRadius().getValue(feature)).intValue());
+            ((Number) h.getRadius().evaluate(feature)).intValue());
     }
 
     //    

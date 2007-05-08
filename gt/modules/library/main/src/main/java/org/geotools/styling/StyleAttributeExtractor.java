@@ -15,8 +15,9 @@
  */
 package org.geotools.styling;
 
-import org.opengis.filter.Filter;
 import org.geotools.filter.FilterAttributeExtractor;
+import org.opengis.filter.Filter;
+import org.opengis.filter.expression.ExpressionVisitor;
 
 
 /**
@@ -38,7 +39,6 @@ import org.geotools.filter.FilterAttributeExtractor;
 
 public class StyleAttributeExtractor extends FilterAttributeExtractor
     implements StyleVisitor {
-
 
 	/**
 	 *   if the default geometry is used, this will be true.  See GEOS-469
@@ -74,7 +74,7 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
         Filter filter = rule.getFilter();
 
         if (filter != null) {
-            ((org.geotools.filter.Filter)filter).accept(this);
+            filter.accept( this, null );
         }
 
         Symbolizer[] symbolizers = rule.getSymbolizers();
@@ -109,11 +109,11 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
      */
     public void visit(Fill fill) {
         if (fill.getBackgroundColor() != null) {
-            fill.getBackgroundColor().accept(this);
+            fill.getBackgroundColor().accept((ExpressionVisitor) this, null);
         }
 
         if (fill.getColor() != null) {
-            fill.getColor().accept(this);
+            fill.getColor().accept(this, null );
         }
 
         if (fill.getGraphicFill() != null) {
@@ -121,7 +121,7 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
         }
 
         if (fill.getOpacity() != null) {
-            fill.getOpacity().accept(this);
+            fill.getOpacity().accept(this, null );
         }
     }
 
@@ -130,11 +130,11 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
      */
     public void visit(Stroke stroke) {
         if (stroke.getColor() != null) {
-            stroke.getColor().accept(this);
+            stroke.getColor().accept(this, null );
         }
 
         if (stroke.getDashOffset() != null) {
-            stroke.getDashOffset().accept(this);
+            stroke.getDashOffset().accept(this, null );
         }
 
         if (stroke.getGraphicFill() != null) {
@@ -146,19 +146,19 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
         }
 
         if (stroke.getLineCap() != null) {
-            stroke.getLineCap().accept(this);
+            stroke.getLineCap().accept(this, null);
         }
 
         if (stroke.getLineJoin() != null) {
-            stroke.getLineJoin().accept(this);
+            stroke.getLineJoin().accept(this, null);
         }
 
         if (stroke.getOpacity() != null) {
-            stroke.getOpacity().accept(this);
+            stroke.getOpacity().accept(this, null);
         }
 
         if (stroke.getWidth() != null) {
-            stroke.getWidth().accept(this);
+            stroke.getWidth().accept(this, null );
         }
     }
 
@@ -202,7 +202,7 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
         }
 
         if (rs.getOpacity() != null) {
-            rs.getOpacity().accept(this);
+            rs.getOpacity().accept(this, null);
         }
     }
 
@@ -295,19 +295,19 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
                 Font font = fonts[i];
 
                 if (font.getFontFamily() != null) {
-                    font.getFontFamily().accept(this);
+                    font.getFontFamily().accept(this,null);
                 }
 
                 if (font.getFontSize() != null) {
-                    font.getFontSize().accept(this);
+                    font.getFontSize().accept(this,null);
                 }
 
                 if (font.getFontStyle() != null) {
-                    font.getFontStyle().accept(this);
+                    font.getFontStyle().accept(this,null);
                 }
 
                 if (font.getFontWeight() != null) {
-                    font.getFontWeight().accept(this);
+                    font.getFontWeight().accept(this,null);
                 }
             }
         }
@@ -317,7 +317,7 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
         }
 
         if (text.getLabel() != null) {
-            text.getLabel().accept(this);
+            text.getLabel().accept(this,null);
         }
 
         if (text.getPlacement() != null) {
@@ -325,7 +325,7 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
         }
 
         if (text.getPriority() != null) {
-            text.getPriority().accept(this);
+            text.getPriority().accept(this,null);
         }
     }
 
@@ -343,15 +343,15 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
         }
 
         if (gr.getOpacity() != null) {
-            gr.getOpacity().accept(this);
+            gr.getOpacity().accept(this,null);
         }
 
         if (gr.getRotation() != null) {
-            gr.getRotation().accept(this);
+            gr.getRotation().accept(this,null);
         }
 
         if (gr.getSize() != null) {
-            gr.getSize().accept(this);
+            gr.getSize().accept(this,null);
         }
         
         if (gr.getDisplacement() != null)
@@ -371,15 +371,15 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
         }
 
         if (mark.getRotation() != null) {
-            mark.getRotation().accept(this);
+            mark.getRotation().accept(this,null);
         }
 
         if (mark.getSize() != null) {
-            mark.getSize().accept(this);
+            mark.getSize().accept(this,null);
         }
         
         if(mark.getWellKnownName() != null)
-            mark.getWellKnownName().accept(this);
+            mark.getWellKnownName().accept(this,null);
     }
 
     /**
@@ -402,7 +402,7 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
         }
 
         if (pp.getRotation() != null) {
-            pp.getRotation().accept(this);
+            pp.getRotation().accept(this,null);
         }
     }
 
@@ -411,11 +411,11 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
      */
     public void visit(AnchorPoint ap) {
         if (ap.getAnchorPointX() != null) {
-            ap.getAnchorPointX().accept(this);
+            ap.getAnchorPointX().accept(this,null);
         }
 
         if (ap.getAnchorPointY() != null) {
-            ap.getAnchorPointY().accept(this);
+            ap.getAnchorPointY().accept(this,null);
         }
     }
 
@@ -424,11 +424,11 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
      */
     public void visit(Displacement dis) {
         if (dis.getDisplacementX() != null) {
-            dis.getDisplacementX().accept(this);
+            dis.getDisplacementX().accept(this,null);
         }
 
         if (dis.getDisplacementY() != null) {
-            dis.getDisplacementY().accept(this);
+            dis.getDisplacementY().accept(this,null);
         }
     }
 
@@ -437,7 +437,7 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
      */
     public void visit(LinePlacement lp) {
         if (lp.getPerpendicularOffset() != null) {
-            lp.getPerpendicularOffset().accept(this);
+            lp.getPerpendicularOffset().accept(this,null);
         }
     }
 
@@ -450,7 +450,7 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
         }
 
         if (halo.getRadius() != null) {
-            halo.getRadius().accept(this);
+            halo.getRadius().accept(this,null);
         }
     }
 

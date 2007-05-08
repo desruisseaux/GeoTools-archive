@@ -78,6 +78,7 @@ import org.opengis.filter.spatial.Within;
  * set out in this class does not meet your needs.  This class visits in sequence
  * i.e. Left - Middle - Right for all expressions which have sub-expressions.
  * </p>
+ * @deprecated Please use DefaultFilterVisitor (to stick with only opengis Filter)
  * @author James Macgill, Penn State
  * @author Justin Deoliveira, The Open Planning Project
  * @source $URL$
@@ -94,6 +95,7 @@ public class AbstractFilterVisitor implements org.geotools.filter.FilterVisitor,
      * Empty constructor
      */
     public AbstractFilterVisitor() {
+        this( new NullExpressionVisitor() );
     }
 
     /**
@@ -108,17 +110,17 @@ public class AbstractFilterVisitor implements org.geotools.filter.FilterVisitor,
     }
     
     /**
-     * Does nothing.
+     * Does nothing; will return provided data unmodified.
      */
     public Object visit(IncludeFilter filter, Object data) {
-    	return filter;
+    	return data;
     }
     
     /**
-     * Does nothing.
+     * Does nothing; will return provided data unmodified.
      */
     public Object visit(ExcludeFilter filter, Object data) {
-    	return filter;
+    	return data;
     }
     
     /**
@@ -159,18 +161,15 @@ public class AbstractFilterVisitor implements org.geotools.filter.FilterVisitor,
      * expression visitor was set.
      */
     public Object visit(PropertyIsBetween filter, Object data) {
-    	if ( expressionVisitor != null ) {
-    		if ( filter.getLowerBoundary() != null ) {
-        		filter.getLowerBoundary().accept( expressionVisitor, data );
-        	}
-        	if ( filter.getExpression() != null ) {
-        		filter.getExpression().accept( expressionVisitor, data );
-        	}
-        	if ( filter.getUpperBoundary() != null ) {
-        		filter.getUpperBoundary().accept( expressionVisitor, data );
-        	}
+    	if ( filter.getLowerBoundary() != null ) {
+    		filter.getLowerBoundary().accept( expressionVisitor, data );
     	}
-    	
+    	if ( filter.getExpression() != null ) {
+    		filter.getExpression().accept( expressionVisitor, data );
+    	}
+    	if ( filter.getUpperBoundary() != null ) {
+    		filter.getUpperBoundary().accept( expressionVisitor, data );
+    	}    	
     	return filter;
     }
     /**

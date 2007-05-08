@@ -26,8 +26,11 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 
-import org.geotools.filter.Expression;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
 import org.geotools.filter.ExpressionBuilder;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -45,8 +48,7 @@ public class SLDParser {
 	private static final java.util.logging.Logger LOGGER = java.util.logging.Logger
 			.getLogger("org.geotools.styling");
 
-	private static final org.geotools.filter.FilterFactory FILTERFACTORY = org.geotools.filter.FilterFactoryFinder
-			.createFilterFactory();
+	private FilterFactory ff;
 
 	// protected java.io.InputStream instream;
 	protected InputSource source;
@@ -71,9 +73,14 @@ public class SLDParser {
 	 *            The StyleFactory to use to build the style
 	 */
 	public SLDParser(StyleFactory factory) {
-		this.factory = factory;
+		this( factory, CommonFactoryFinder.getFilterFactory( GeoTools.getDefaultHints() ));
 	}
 
+    public SLDParser(StyleFactory factory, FilterFactory filterFactory) {
+        this.factory = factory;
+        this.ff = filterFactory;
+    }
+    
 	/**
 	 * Creates a new instance of SLDStyler
 	 * 
@@ -313,7 +320,7 @@ public class SLDParser {
 			dom = db.parse(source);
 			// for our next trick do something with the dom.
 
-			NodeList nodes = findElements(dom, "StyledLayerDescriptor");
+			//NodeList nodes = findElements(dom, "StyledLayerDescriptor");
 
 			StyledLayerDescriptor sld = parseDescriptor(dom
 					.getDocumentElement());// should only be one per file
@@ -1010,8 +1017,7 @@ public class SLDParser {
 			}
 			if(childName.equalsIgnoreCase("Literal")) {
 				try {
-					return (Expression) ExpressionBuilder
-							.parse(child.getFirstChild().getNodeValue());
+					return (Expression) ExpressionBuilder.parse(child.getFirstChild().getNodeValue());
 				} catch (Exception e) {
 					// TODO: handle exception
 				}
@@ -1093,7 +1099,7 @@ public class SLDParser {
 	private ColorMapEntry parseColorMapEntry(Node root) {
 		ColorMapEntry symbol = factory.createColorMapEntry();
 		
-		Expression exp = null;
+		//Expression exp = null;
 		
 		NamedNodeMap atts = root.getAttributes();
 
@@ -1102,15 +1108,15 @@ public class SLDParser {
 		}
 
 		if( atts.getNamedItem("color") != null ) {
-			symbol.setColor(FILTERFACTORY.createLiteralExpression(atts.getNamedItem("color").getNodeValue()));
+			symbol.setColor(ff.literal(atts.getNamedItem("color").getNodeValue()));
 		}
 
 		if( atts.getNamedItem("opacity") != null ) {
-			symbol.setOpacity(FILTERFACTORY.createLiteralExpression(atts.getNamedItem("opacity").getNodeValue()));
+			symbol.setOpacity(ff.literal(atts.getNamedItem("opacity").getNodeValue()));
 		}
 
 		if( atts.getNamedItem("quantity") != null ) {
-			symbol.setQuantity(FILTERFACTORY.createLiteralExpression(atts.getNamedItem("quantity").getNodeValue()));
+			symbol.setQuantity(ff.literal(atts.getNamedItem("quantity").getNodeValue()));
 		}
 		
 		return symbol;
@@ -1854,7 +1860,7 @@ public class SLDParser {
 			LOGGER.finest("parsing pointPlacement");
 		}
 
-		Expression rotation = FILTERFACTORY.createLiteralExpression(0.0);
+		Expression rotation = ff.literal(0.0);
 		AnchorPoint ap = null;
 		Displacement dp = null;
 
@@ -1896,7 +1902,7 @@ public class SLDParser {
 			LOGGER.finest("parsing linePlacement");
 		}
 
-		Expression offset = FILTERFACTORY.createLiteralExpression(0.0);
+		Expression offset = ff.literal(0.0);
 		NodeList children = root.getChildNodes();
 
 		for (int i = 0; i < children.getLength(); i++) {
@@ -1996,9 +2002,9 @@ public class SLDParser {
 		if (LOGGER.isLoggable(Level.FINEST)) {
 			LOGGER.finest("parsing halo");
 		}
-		Halo halo = factory.createHalo(factory.createFill(FILTERFACTORY
-				.createLiteralExpression("#FFFFFF")), FILTERFACTORY
-				.createLiteralExpression(1.0));
+		Halo halo = factory.createHalo(factory.createFill(ff
+				.literal("#FFFFFF")), ff
+				.literal(1.0));
 
 		NodeList children = root.getChildNodes();
 

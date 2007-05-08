@@ -19,7 +19,11 @@ package org.geotools.styling;
 
 // OpenGIS dependencies
 import org.geotools.event.AbstractGTComponent;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
 import org.geotools.resources.Utilities;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 import org.opengis.util.Cloneable;
 
 
@@ -37,18 +41,19 @@ public class PointPlacementImpl extends AbstractGTComponent
         .getLogger("org.geotools.core");
 
     // TODO: make container ready
-    private static final org.geotools.filter.FilterFactory filterFactory = org.geotools.filter.FilterFactoryFinder
-        .createFilterFactory();
+    private final FilterFactory filterFactory;
     private AnchorPoint anchorPoint = new AnchorPointImpl();
     private Displacement displacement = new DisplacementImpl();
-    private org.geotools.filter.Expression rotation = null;
+    private Expression rotation = null;
 
-    /**
-     * Creates a new instance of DefaultPointPlacement
-     */
-    public PointPlacementImpl() {
+    public PointPlacementImpl(){
+        this( CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints()));
+    }
+
+    public PointPlacementImpl(FilterFactory factory) {
+        filterFactory = factory;
         try {
-            rotation = filterFactory.createLiteralExpression(new Integer(0));
+            rotation = filterFactory.literal(new Integer(0));
         } catch (org.geotools.filter.IllegalFilterException ife) {
             LOGGER.severe("Failed to build defaultPointPlacement: " + ife);
         }
@@ -110,7 +115,7 @@ public class PointPlacementImpl extends AbstractGTComponent
      *
      * @return The rotation of the label.
      */
-    public org.geotools.filter.Expression getRotation() {
+    public Expression getRotation() {
         return rotation;
     }
 
@@ -119,7 +124,7 @@ public class PointPlacementImpl extends AbstractGTComponent
      *
      * @param rotation New value of property rotation.
      */
-    public void setRotation(org.geotools.filter.Expression rotation) {
+    public void setRotation(Expression rotation) {
         this.rotation = rotation;
         fireChanged();
     }

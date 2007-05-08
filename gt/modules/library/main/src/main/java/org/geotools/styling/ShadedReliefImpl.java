@@ -18,29 +18,30 @@
 package org.geotools.styling;
 
 import org.geotools.event.AbstractGTComponent;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 
 /**
- * DOCUMENT ME!
+ * Application of relief shading
  *
  * @author iant
  * @source $URL$
  */
 public class ShadedReliefImpl extends AbstractGTComponent
     implements ShadedRelief {
-    private static FilterFactory filterFactory = FilterFactoryFinder
-        .createFilterFactory();
+    private FilterFactory filterFactory;
     private Expression reliefFactor;
     private boolean brightness = false;
 
-    /**
-     * Creates a new instance of ShadedReliefImpl
-     */
-    public ShadedReliefImpl() {
-        reliefFactor = filterFactory.createLiteralExpression(55);
+    public ShadedReliefImpl(){
+        this( CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints()));
+    }
+
+    public ShadedReliefImpl(FilterFactory factory) {
+        filterFactory = factory;
+        reliefFactor = filterFactory.literal(55);
     }
 
     /**

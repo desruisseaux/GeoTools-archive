@@ -16,10 +16,10 @@
 package org.geotools.styling;
 
 import org.geotools.event.AbstractGTComponent;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 
 /**
  * DOCUMENT ME!
@@ -27,19 +27,21 @@ import org.geotools.filter.FilterFactoryFinder;
  */
 public class SelectedChannelTypeImpl extends AbstractGTComponent
     implements SelectedChannelType {
-    private static FilterFactory filterFactory = FilterFactoryFinder
-        .createFilterFactory();
+    private FilterFactory filterFactory;
 
     //private Expression contrastEnhancement;
     private ContrastEnhancement contrastEnhancement;
     private String name = "channel";
 
-    /**
-     * Creates a new instance of SelectedChannelImpl
-     */
-    public SelectedChannelTypeImpl() {
+    
+    public SelectedChannelTypeImpl(){
+        this( CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints()));
+    }
+
+    public SelectedChannelTypeImpl(FilterFactory factory) {
+        filterFactory = factory;
         contrastEnhancement = contrastEnhancement(filterFactory
-                .createLiteralExpression(1.0));
+                .literal(1.0));
     }
 
     public String getChannelName() {
@@ -68,7 +70,7 @@ public class SelectedChannelTypeImpl extends AbstractGTComponent
 
     protected ContrastEnhancement contrastEnhancement(Expression expr) {
         ContrastEnhancement enhancement = new ContrastEnhancementImpl();
-        enhancement.setGammaValue(filterFactory.createLiteralExpression(1.0));
+        enhancement.setGammaValue(filterFactory.literal(1.0));
 
         return enhancement;
     }

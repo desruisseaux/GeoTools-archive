@@ -22,9 +22,9 @@ import java.awt.Composite;
 import java.awt.Paint;
 
 import org.geotools.feature.Feature;
-import org.geotools.filter.Expression;
 import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.Stroke;
+import org.opengis.filter.expression.Expression;
 
 
 /**
@@ -76,8 +76,8 @@ public class DynamicLineStyle2D extends org.geotools.renderer.style.LineStyle2D 
 
         // get the other properties needed for the stroke
         float[] dashes = stroke.getDashArray();
-        float width = ((Number) stroke.getWidth().getValue(feature)).floatValue();
-        float dashOffset = ((Number) stroke.getDashOffset().getValue(feature)).floatValue();
+        float width = ((Float) stroke.getWidth().evaluate(feature, Float.class)).floatValue();
+        float dashOffset = ((Float) stroke.getDashOffset().evaluate(feature, Float.class)).floatValue();
 
         // Simple optimization: let java2d use the fast drawing path if the line width
         // is small enough...
@@ -107,7 +107,7 @@ public class DynamicLineStyle2D extends org.geotools.renderer.style.LineStyle2D 
             return null;
         }
 
-        float opacity = ((Number) stroke.getOpacity().getValue(feature)).floatValue();
+        float opacity = ((Float) stroke.getOpacity().evaluate(feature,Float.class)).floatValue();
         Composite composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity);
 
         return composite;
@@ -126,7 +126,13 @@ public class DynamicLineStyle2D extends org.geotools.renderer.style.LineStyle2D 
         }
 
         // the foreground color
-        Paint contourPaint = Color.decode((String) stroke.getColor().getValue(feature));
+        Paint contourPaint = (Color) stroke.getColor().evaluate(feature,Color.class);
+        if( contourPaint == null ){            
+            String text = (String) stroke.getColor().evaluate(feature,String.class);
+            if( text != null ){
+                contourPaint = Color.decode( text );
+            }
+        }
 
         // if a graphic fill is to be used, prepare the paint accordingly....
         org.geotools.styling.Graphic gr = stroke.getGraphicFill();
@@ -147,7 +153,7 @@ public class DynamicLineStyle2D extends org.geotools.renderer.style.LineStyle2D 
         String result = defaultValue;
 
         if (e != null) {
-            result = (String) e.getValue(feature);
+            result = (String) e.evaluate( feature, defaultValue.getClass() );
 
             if (result == null) {
                 result = defaultValue;

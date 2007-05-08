@@ -119,21 +119,6 @@ public class StyleImpl extends AbstractGTComponent
         fireChanged();
     }
 
-    /**
-     * Convenience method for logging a message with an exception.
-     *
-     * @param method DOCUMENT ME!
-     * @param message DOCUMENT ME!
-     * @param exception DOCUMENT ME!
-     */
-    private static void severe(final String method, final String message,
-        final Exception exception) {
-        final LogRecord record = new LogRecord(Level.SEVERE, message);
-        record.setSourceMethodName(method);
-        record.setThrown(exception);
-        LOGGER.log(record);
-    }
-
     public void accept(StyleVisitor visitor) {
         visitor.visit(this);
     }

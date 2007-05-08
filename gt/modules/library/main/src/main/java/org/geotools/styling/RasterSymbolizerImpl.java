@@ -18,10 +18,10 @@
 package org.geotools.styling;
 
 import org.geotools.event.AbstractGTComponent;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 
 /**
  * DOCUMENT ME!
@@ -32,8 +32,7 @@ import org.geotools.filter.FilterFactoryFinder;
 public class RasterSymbolizerImpl extends AbstractGTComponent
     implements RasterSymbolizer {
     // TODO: make container ready
-    private FilterFactory filterFactory = FilterFactoryFinder
-        .createFilterFactory();
+    private FilterFactory filterFactory;
     private ChannelSelection channelSelection = new ChannelSelectionImpl();
     private ColorMap colorMap = new ColorMapImpl();
     private ContrastEnhancement contrastEnhancement = new ContrastEnhancementImpl();
@@ -43,12 +42,14 @@ public class RasterSymbolizerImpl extends AbstractGTComponent
     private Expression opacity;
     private Expression overlap;
 
-    /**
-     * Creates a new instance of RasterSymbolizerImpl
-     */
-    public RasterSymbolizerImpl() {
-        opacity = filterFactory.createLiteralExpression(1.0);
-        overlap = filterFactory.createLiteralExpression("Random");
+    public RasterSymbolizerImpl(){
+        this( CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints()));
+    }
+
+    public RasterSymbolizerImpl(FilterFactory factory) {
+        filterFactory = factory;
+        opacity = filterFactory.literal(1.0);
+        overlap = filterFactory.literal("Random");
     }
 
     public int hashcode() {

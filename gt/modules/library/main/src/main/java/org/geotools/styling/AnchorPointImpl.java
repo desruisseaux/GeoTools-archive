@@ -19,9 +19,10 @@ package org.geotools.styling;
 
 // OpenGIS dependencies
 import org.geotools.event.AbstractGTComponent;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
 
@@ -38,18 +39,21 @@ public class AnchorPointImpl extends AbstractGTComponent implements AnchorPoint,
     /** The logger for the default core module. */
     private static final java.util.logging.Logger LOGGER = java.util.logging.Logger
         .getLogger("org.geotools.core");
-    private FilterFactory filterFactory = FilterFactoryFinder
-        .createFilterFactory();
+    private FilterFactory filterFactory;
     private Expression anchorPointX = null;
     private Expression anchorPointY = null;
 
+    public AnchorPointImpl() {
+        this( CommonFactoryFinder.getFilterFactory( GeoTools.getDefaultHints() ) );
+    }
     /**
      * Creates a new instance of DefaultAnchorPoint
      */
-    public AnchorPointImpl() {
+    public AnchorPointImpl( FilterFactory filterFactory ) {
+        this.filterFactory = filterFactory; 
         try {
-            anchorPointX = filterFactory.createLiteralExpression(new Double(0.0));
-            anchorPointY = filterFactory.createLiteralExpression(new Double(0.5));
+            anchorPointX = filterFactory.literal( 0.0 );
+            anchorPointY = filterFactory.literal( 0.5 );
         } catch (org.geotools.filter.IllegalFilterException ife) {
             LOGGER.severe("Failed to build defaultAnchorPoint: " + ife);
         }

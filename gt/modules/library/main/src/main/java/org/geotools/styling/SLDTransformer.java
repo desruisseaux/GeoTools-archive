@@ -17,10 +17,11 @@ package org.geotools.styling;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureSource;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.Expression;
 import org.opengis.filter.Filter;
+import org.opengis.filter.expression.Expression;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.filter.FilterTransformer;
 import org.geotools.gml.producer.FeatureTransformer;
@@ -129,7 +130,7 @@ public class SLDTransformer extends TransformerBase {
      */
     public static final void main(String[] args) throws Exception {
         java.net.URL url = new java.io.File(args[0]).toURL();
-        SLDParser s = new SLDParser(StyleFactoryFinder.createStyleFactory(), url);
+        SLDParser s = new SLDParser( CommonFactoryFinder.getStyleFactory( null), url);
         SLDTransformer transformer = new SLDTransformer();
         transformer.setIndentation(4);
         transformer.transform(s.readXML(),

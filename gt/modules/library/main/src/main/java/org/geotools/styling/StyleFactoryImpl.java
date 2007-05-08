@@ -17,10 +17,11 @@
  */
 package org.geotools.styling;
 
-import org.geotools.filter.Expression;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
 import org.opengis.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 
 
 /**
@@ -35,9 +36,16 @@ import org.geotools.filter.FilterFactoryFinder;
 public class StyleFactoryImpl extends AbstractStyleFactory
     implements StyleFactory2 {
 	
-    private static final FilterFactory filterFactory = FilterFactoryFinder
-        .createFilterFactory();
+    private FilterFactory filterFactory;
 
+    public StyleFactoryImpl() {
+        this( CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints()));
+    }
+
+    protected StyleFactoryImpl(FilterFactory factory) {
+        filterFactory = factory;
+    }
+    
     public Style createStyle() {
         return new StyleImpl();
     }
@@ -177,7 +185,7 @@ public class StyleFactoryImpl extends AbstractStyleFactory
      */
     public Stroke createStroke(Expression color, Expression width) {
         return createStroke(color, width,
-            filterFactory.createLiteralExpression(1.0));
+            filterFactory.literal(1.0));
     }
 
     /**
@@ -194,9 +202,9 @@ public class StyleFactoryImpl extends AbstractStyleFactory
     public Stroke createStroke(Expression color, Expression width,
         Expression opacity) {
         return createStroke(color, width, opacity,
-            filterFactory.createLiteralExpression("miter"),
-            filterFactory.createLiteralExpression("butt"), null,
-            filterFactory.createLiteralExpression(0.0), null, null);
+            filterFactory.literal("miter"),
+            filterFactory.literal("butt"), null,
+            filterFactory.literal(0.0), null, null);
     }
 
     /**
@@ -289,7 +297,7 @@ public class StyleFactoryImpl extends AbstractStyleFactory
 
     public Fill createFill(Expression color) {
         return createFill(color, null,
-            filterFactory.createLiteralExpression(1.0), null);
+            filterFactory.literal(1.0), null);
     }
 
     public Mark createMark(Expression wellKnownName, Stroke stroke, Fill fill,
@@ -322,45 +330,45 @@ public class StyleFactoryImpl extends AbstractStyleFactory
     }
 
     public Mark getSquareMark() {
-        Mark mark = createMark(filterFactory.createLiteralExpression("Square"),
+        Mark mark = createMark(filterFactory.literal("Square"),
                 getDefaultStroke(), getDefaultFill(),
-                filterFactory.createLiteralExpression(6),
-                filterFactory.createLiteralExpression(0));
+                filterFactory.literal(6),
+                filterFactory.literal(0));
 
         return mark;
     }
 
     public Mark getCircleMark() {
         Mark mark = getDefaultMark();
-        mark.setWellKnownName(filterFactory.createLiteralExpression("Circle"));
+        mark.setWellKnownName(filterFactory.literal("Circle"));
 
         return mark;
     }
 
     public Mark getCrossMark() {
         Mark mark = getDefaultMark();
-        mark.setWellKnownName(filterFactory.createLiteralExpression("Cross"));
+        mark.setWellKnownName(filterFactory.literal("Cross"));
 
         return mark;
     }
 
     public Mark getXMark() {
         Mark mark = getDefaultMark();
-        mark.setWellKnownName(filterFactory.createLiteralExpression("X"));
+        mark.setWellKnownName(filterFactory.literal("X"));
 
         return mark;
     }
 
     public Mark getTriangleMark() {
         Mark mark = getDefaultMark();
-        mark.setWellKnownName(filterFactory.createLiteralExpression("Triangle"));
+        mark.setWellKnownName(filterFactory.literal("Triangle"));
 
         return mark;
     }
 
     public Mark getStarMark() {
         Mark mark = getDefaultMark();
-        mark.setWellKnownName(filterFactory.createLiteralExpression("Star"));
+        mark.setWellKnownName(filterFactory.literal("Star"));
 
         return mark;
     }
@@ -501,8 +509,8 @@ public class StyleFactoryImpl extends AbstractStyleFactory
         Fill fill = new FillImpl();
 
         try {
-            fill.setColor(filterFactory.createLiteralExpression("#808080"));
-            fill.setOpacity(filterFactory.createLiteralExpression(
+            fill.setColor(filterFactory.literal("#808080"));
+            fill.setOpacity(filterFactory.literal(
                     new Double(1.0)));
         } catch (org.geotools.filter.IllegalFilterException ife) {
             throw new RuntimeException("Error creating fill", ife);
@@ -530,15 +538,15 @@ public class StyleFactoryImpl extends AbstractStyleFactory
 
     public Stroke getDefaultStroke() {
         try {
-            Stroke stroke = createStroke(filterFactory.createLiteralExpression(
+            Stroke stroke = createStroke(filterFactory.literal(
                         "#000000"),
-                    filterFactory.createLiteralExpression(new Integer(1)));
+                    filterFactory.literal(new Integer(1)));
 
-            stroke.setDashOffset(filterFactory.createLiteralExpression(
+            stroke.setDashOffset(filterFactory.literal(
                     new Integer(0)));
-            stroke.setLineCap(filterFactory.createLiteralExpression("butt"));
-            stroke.setLineJoin(filterFactory.createLiteralExpression("miter"));
-            stroke.setOpacity(filterFactory.createLiteralExpression(
+            stroke.setLineCap(filterFactory.literal("butt"));
+            stroke.setLineJoin(filterFactory.literal("miter"));
+            stroke.setOpacity(filterFactory.literal(
                     new Integer(1)));
 
             return stroke;
@@ -579,11 +587,11 @@ public class StyleFactoryImpl extends AbstractStyleFactory
         Font font = new FontImpl();
 
         try {
-            font.setFontSize(filterFactory.createLiteralExpression(
+            font.setFontSize(filterFactory.literal(
                     new Integer(10)));
-            font.setFontStyle(filterFactory.createLiteralExpression("normal"));
-            font.setFontWeight(filterFactory.createLiteralExpression("normal"));
-            font.setFontFamily(filterFactory.createLiteralExpression("Serif"));
+            font.setFontStyle(filterFactory.literal("normal"));
+            font.setFontWeight(filterFactory.literal("normal"));
+            font.setFontFamily(filterFactory.literal("Serif"));
         } catch (org.geotools.filter.IllegalFilterException ife) {
             throw new RuntimeException("Error creating font", ife);
         }
@@ -594,9 +602,9 @@ public class StyleFactoryImpl extends AbstractStyleFactory
     public Graphic createDefaultGraphic() {
         Graphic graphic = new GraphicImpl();
 
-        graphic.setSize(filterFactory.createLiteralExpression(6));
-        graphic.setOpacity(filterFactory.createLiteralExpression(1.0));
-        graphic.setRotation(filterFactory.createLiteralExpression(0.0));
+        graphic.setSize(filterFactory.literal(6));
+        graphic.setOpacity(filterFactory.literal(1.0));
+        graphic.setRotation(filterFactory.literal(0.0));
 
         return graphic;
     }
@@ -613,11 +621,11 @@ public class StyleFactoryImpl extends AbstractStyleFactory
      */
     public PointPlacement getDefaultPointPlacement() {
         return this.createPointPlacement(this.createAnchorPoint(
-                filterFactory.createLiteralExpression(0),
-                filterFactory.createLiteralExpression(0.5)),
-            this.createDisplacement(filterFactory.createLiteralExpression(0),
-                filterFactory.createLiteralExpression(0)),
-            filterFactory.createLiteralExpression(0));
+                filterFactory.literal(0),
+                filterFactory.literal(0.5)),
+            this.createDisplacement(filterFactory.literal(0),
+                filterFactory.literal(0)),
+            filterFactory.literal(0));
     }
 
     public RasterSymbolizer createRasterSymbolizer() {
@@ -668,7 +676,7 @@ public class StyleFactoryImpl extends AbstractStyleFactory
 
     public RasterSymbolizer getDefaultRasterSymbolizer() {
         return createRasterSymbolizer("geom",
-            filterFactory.createLiteralExpression(1.0), null, null, null, null,
+            filterFactory.literal(1.0), null, null, null, null,
             null, null);
     }
 

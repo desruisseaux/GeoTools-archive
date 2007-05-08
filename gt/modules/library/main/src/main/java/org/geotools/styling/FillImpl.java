@@ -20,10 +20,11 @@ package org.geotools.styling;
 import java.util.logging.Logger;
 
 import org.geotools.event.AbstractGTComponent;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
 import org.geotools.resources.Utilities;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 import org.opengis.util.Cloneable;
 
 
@@ -45,7 +46,7 @@ public class FillImpl extends AbstractGTComponent implements Fill, Cloneable {
 
     /** Creates a new instance of DefaultFill */
     protected FillImpl() {
-    	this( FilterFactoryFinder.createFilterFactory() );
+    	this( CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints()));
     }
 
     public FillImpl(FilterFactory factory) {
@@ -96,7 +97,7 @@ public class FillImpl extends AbstractGTComponent implements Fill, Cloneable {
     public void setColor(String rgb) {
     	if( color.toString() == rgb ) return;
     	
-    	setColor( filterFactory.createLiteralExpression(rgb) );    	    
+    	setColor( filterFactory.literal(rgb) );    	    
     }
 
     /**
@@ -140,7 +141,7 @@ public class FillImpl extends AbstractGTComponent implements Fill, Cloneable {
         LOGGER.fine("setting bg color with " + rgb + " as a string");
     	if( backgroundColor.toString() == rgb ) return;
     	
-    	setBackgroundColor( filterFactory.createLiteralExpression(rgb) );
+    	setBackgroundColor( filterFactory.literal(rgb) );
     }
 
     /**
@@ -175,7 +176,7 @@ public class FillImpl extends AbstractGTComponent implements Fill, Cloneable {
     public void setOpacity(String opacity) {
     	if( this.opacity.toString() == opacity ) return;
     	
-    	setOpacity( filterFactory.createLiteralExpression(opacity) );
+    	setOpacity( filterFactory.literal(opacity) );
     }
 
     /**

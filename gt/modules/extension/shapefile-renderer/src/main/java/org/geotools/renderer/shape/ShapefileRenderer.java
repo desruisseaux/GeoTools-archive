@@ -757,7 +757,7 @@ public class ShapefileRenderer implements GTRenderer {
 
         
         FilterAttributeExtractor qae = new FilterAttributeExtractor();
-        Filters.accept(query.getFilter(),qae);
+        query.getFilter().accept(qae,null);
         Set ftsAttributes=new HashSet(sae.getAttributeNameSet());
         ftsAttributes.addAll(qae.getAttributeNameSet());
         return (String[]) ftsAttributes.toArray(new String[0]);

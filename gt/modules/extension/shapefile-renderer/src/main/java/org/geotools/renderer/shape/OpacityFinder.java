@@ -19,8 +19,6 @@
  */
 package org.geotools.renderer.shape;
 
-import org.geotools.filter.Expression;
-import org.geotools.filter.LiteralExpression;
 import org.geotools.styling.AnchorPoint;
 import org.geotools.styling.ColorMap;
 import org.geotools.styling.ColorMapEntry;
@@ -47,6 +45,8 @@ import org.geotools.styling.StyledLayerDescriptor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.styling.UserLayer;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Literal;
 
 
 /**
@@ -125,9 +125,9 @@ public class OpacityFinder implements StyleVisitor {
 
     private void checkOpacity(Expression exp) {
         if (exp != null) {
-            if (exp instanceof LiteralExpression) {
-                LiteralExpression literal = (LiteralExpression) exp;
-                Object obj = literal.getLiteral();
+            if (exp instanceof Literal) {
+                Literal literal = (Literal) exp;
+                Object obj = literal.getValue();
                 float opacity;
 
                 if (obj instanceof Integer) {
@@ -148,7 +148,6 @@ public class OpacityFinder implements StyleVisitor {
                 } else {
                     return;
                 }
-
                 if ((opacity > 0.01) && (opacity < 0.99)) {
                     this.hasOpacity = true;
                 }

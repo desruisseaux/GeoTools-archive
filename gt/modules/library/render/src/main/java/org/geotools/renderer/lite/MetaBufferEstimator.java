@@ -17,7 +17,6 @@ package org.geotools.renderer.lite;
 
 import java.util.logging.Logger;
 
-import org.geotools.filter.Filter;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.styling.AnchorPoint;
 import org.geotools.styling.ColorMap;
@@ -46,6 +45,7 @@ import org.geotools.styling.StyledLayerDescriptor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.styling.UserLayer;
+import org.opengis.filter.Filter;
 import org.opengis.filter.expression.Literal;
 
 /**
@@ -90,10 +90,10 @@ public class MetaBufferEstimator extends FilterAttributeExtractor implements Sty
     }
 
     public void visit(Rule rule) {
-        Filter filter = (Filter) rule.getFilter();
+        Filter filter = rule.getFilter();
 
         if (filter != null) {
-            filter.accept(this);
+            filter.accept(this, null);
         }
 
         Symbolizer[] symbolizers = rule.getSymbolizers();
@@ -188,7 +188,7 @@ public class MetaBufferEstimator extends FilterAttributeExtractor implements Sty
         }
 
         if (rs.getOpacity() != null) {
-            rs.getOpacity().accept(this);
+            rs.getOpacity().accept(this,null);
         }
     }
 

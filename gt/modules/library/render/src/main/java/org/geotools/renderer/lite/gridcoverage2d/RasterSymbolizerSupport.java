@@ -28,11 +28,11 @@ import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
-import org.geotools.filter.Expression;
 import org.geotools.styling.ColorMapEntry;
 import org.geotools.styling.RasterSymbolizer;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.filter.expression.Expression;
 
 /**
  * A helper class for {@link GridCoverage} objects rendering SLD stylers
@@ -111,17 +111,14 @@ public final class RasterSymbolizerSupport {
 	public float getOpacity() {
 		float alpha = 1.0f;
 		Expression exp = this.symbolizer.getOpacity();
-		if (exp == null)
+		if (exp == null){
 			return alpha;
-		Object obj = exp.getValue(null);
-		if (obj == null)
+        }
+		Number number = (Number) exp.evaluate(null,Float.class);
+		if (number == null){
 			return alpha;
-		Number num = null;
-		if (obj instanceof Number)
-			num = (Number) obj;
-		if (num == null)
-			return alpha;
-		return num.floatValue();
+        }
+		return number.floatValue();
 	}
 
 	public Map getCategories(final int band) {
@@ -175,39 +172,59 @@ public final class RasterSymbolizerSupport {
 					.getColorMapEntries();
 			final int numColors = colors.length;
 			colorTable = new Color[numColors];
-			Object obj;
-			Expression exp;
-			Double opacity;
-			Integer intval;
-			int i;
+			double opacity;
 			for (int ci = 0; ci < numColors; ci++) {
-				exp = colors[ci].getColor();
-				if (exp == null)
+                opacity = toOpacity( colors[ci].getOpacity() );
+				colorTable[ci] = toColor( colors[ci].getColor(), opacity );
+				if (colorTable[ci] == null){
 					return null;
-				obj = exp.getValue(null);
-				if (obj == null)
-					return null;
-				opacity = (colors[ci].getOpacity() != null ? (colors[ci]
-						.getOpacity().getValue(null) instanceof String ? Double
-						.valueOf((String) colors[ci].getOpacity()
-								.getValue(null)) : (Double) colors[ci]
-						.getOpacity().getValue(null)) : new Double(1.0));
-				intval = Integer.decode((String) obj);
-				i = intval.intValue();
-				colorTable[ci] = new Color((i >> 16) & 0xFF, (i >> 8) & 0xFF,
-						i & 0xFF, new Double(Math.ceil(255.0 * opacity
-								.floatValue())).intValue());
-				if (colorTable[ci] == null)
-					return null;
+                }
 			}
 		}
 
 		return colorTable;
 	}
+    public static Color toColor( Expression exp, double opacity ){
+        if (exp == null){
+            return null;
+        }
+        Color color = (Color) exp.evaluate(null, Color.class);
+        int alpha = new Double(Math.ceil(255.0 * opacity)).intValue();        
+        if( color != null ){                       
+            return new Color( color.getRed(), color.getGreen(), color.getBlue(), alpha );            
+        }
+        else {
+            // the value morphing code failed us .. let's try by hand
+            Object obj = exp.evaluate( null );
+            if (obj == null){
+                return null;
+            }
+            Integer  intval = Integer.decode((String) obj);
+            int i = intval.intValue();            
+            return new Color((i >> 16) & 0xFF, (i >> 8) & 0xFF, i & 0xFF, alpha);
+        }
+    }
+    public static double toOpacity( Expression opacity ) {
+        if (opacity == null) {
+            return 1.0;
+        }
+         
+        Double value = (Double) opacity.evaluate(null, Double.class);
+        if (value == null) {
+            return 1.0;
+        }
+        return value.doubleValue();
+//
+//        opacity = (colors[ci].getOpacity() != null
+//                ? (colors[ci].getOpacity().getValue(null) instanceof String
+//                        ? Double.valueOf((String) colors[ci].getOpacity().getValue(null))
+//                        : (Double) colors[ci].getOpacity().getValue(null))
+//                : new Double(1.0));
+    }
 
 	/**
-	 * Transform the supplied RGB colors.
-	 */
+     * Transform the supplied RGB colors.
+     */
 	public SampleDimension transformColormap(final int band,
 			SampleDimension dimension, final Map[] colorMaps) {
 		if (colorMaps == null || colorMaps.length == 0) {

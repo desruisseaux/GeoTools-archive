@@ -18,8 +18,11 @@ package org.geotools.styling;
 
 import org.geotools.event.AbstractGTComponent;
 import org.geotools.event.GTList;
-import org.geotools.filter.Expression;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
 import org.geotools.resources.Utilities;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 import org.opengis.util.Cloneable;
 
 // OpenGIS dependencies
@@ -39,24 +42,27 @@ import java.util.Map;
  */
 public class TextSymbolizerImpl extends AbstractGTComponent
     implements TextSymbolizer2, Cloneable {
-    private static final org.geotools.filter.FilterFactory filterFactory = org.geotools.filter.FilterFactoryFinder
-        .createFilterFactory();
+    private final FilterFactory filterFactory;
     private Fill fill;
     private java.util.List fonts = new GTList(this, "fonts");
     private Halo halo;
     private LabelPlacement placement;
     private String geometryPropertyName = null;
-    private org.geotools.filter.Expression label = null;
+    private Expression label = null;
     private Graphic graphic = null;
     private Expression priority = null;
     private HashMap optionsMap = null; //null=nothing in it
 
+    protected TextSymbolizerImpl() {
+        this( CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints()) );
+    }
     /**
      * Creates a new instance of DefaultTextSymbolizer
      */
-    protected TextSymbolizerImpl() {
+    protected TextSymbolizerImpl( FilterFactory factory ) {
+        this.filterFactory = factory;
         fill = new FillImpl();
-        fill.setColor(filterFactory.createLiteralExpression("#000000")); // default text fill is black
+        fill.setColor(filterFactory.literal("#000000")); // default text fill is black
         halo = null;
         placement = new PointPlacementImpl();
     }
@@ -169,7 +175,7 @@ public class TextSymbolizerImpl extends AbstractGTComponent
      *
      * @return Label expression.
      */
-    public org.geotools.filter.Expression getLabel() {
+    public Expression getLabel() {
         return label;
     }
 

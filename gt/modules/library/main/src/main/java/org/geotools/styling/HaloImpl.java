@@ -19,10 +19,11 @@ package org.geotools.styling;
 
 // OpenGIS dependencies
 import org.geotools.event.AbstractGTComponent;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
 import org.geotools.resources.Utilities;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 import org.opengis.util.Cloneable;
 
 
@@ -39,10 +40,10 @@ public class HaloImpl extends AbstractGTComponent implements Halo, Cloneable {
         .getLogger("org.geotools.core");
     private FilterFactory filterFactory;
     private Fill fill = new FillImpl();
-    private org.geotools.filter.Expression radius = null;
+    private Expression radius = null;
 
     public HaloImpl() {
-        this(FilterFactoryFinder.createFilterFactory());
+        this( CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints()));
     }
 
     public HaloImpl(FilterFactory factory) {
@@ -57,12 +58,12 @@ public class HaloImpl extends AbstractGTComponent implements Halo, Cloneable {
 
     private void init() {
         try {
-            radius = filterFactory.createLiteralExpression(new Integer(1));
+            radius = filterFactory.literal(1);
         } catch (org.geotools.filter.IllegalFilterException ife) {
             LOGGER.severe("Failed to build defaultHalo: " + ife);
         }
 
-        fill.setColor(filterFactory.createLiteralExpression("#FFFFFF")); // default halo is white
+        fill.setColor(filterFactory.literal("#FFFFFF")); // default halo is white
     }
 
     /**
@@ -90,7 +91,7 @@ public class HaloImpl extends AbstractGTComponent implements Halo, Cloneable {
      *
      * @return Value of property radius.
      */
-    public org.geotools.filter.Expression getRadius() {
+    public Expression getRadius() {
         return radius;
     }
 

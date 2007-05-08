@@ -19,10 +19,11 @@ package org.geotools.styling;
 
 // OpenGIS dependencies
 import org.geotools.event.AbstractGTComponent;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
 import org.geotools.resources.Utilities;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 import org.opengis.util.Cloneable;
 
 
@@ -43,15 +44,15 @@ public class DisplacementImpl extends AbstractGTComponent
     private Expression displacementY = null;
 
     public DisplacementImpl() {
-        this(FilterFactoryFinder.createFilterFactory());
+        this( CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints() ));
     }
 
     public DisplacementImpl(FilterFactory factory) {
         filterFactory = factory;
 
         try {
-            displacementX = filterFactory.createLiteralExpression(new Integer(0));
-            displacementY = filterFactory.createLiteralExpression(new Integer(0));
+            displacementX = filterFactory.literal( 0 );
+            displacementY = filterFactory.literal(0);
         } catch (org.geotools.filter.IllegalFilterException ife) {
             LOGGER.severe("Failed to build defaultDisplacement: " + ife);
         }
@@ -61,8 +62,8 @@ public class DisplacementImpl extends AbstractGTComponent
         filterFactory = factory;
 
         try {
-            displacementX = filterFactory.createLiteralExpression(new Integer(0));
-            displacementY = filterFactory.createLiteralExpression(new Integer(0));
+            displacementX = filterFactory.literal( 0 );
+            displacementY = filterFactory.literal( 0 );
         } catch (org.geotools.filter.IllegalFilterException ife) {
             LOGGER.severe("Failed to build defaultDisplacement: " + ife);
         }

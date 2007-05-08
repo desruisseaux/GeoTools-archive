@@ -38,7 +38,7 @@
  */
 package org.geotools.styling;
 
-import org.geotools.filter.Expression;
+import org.opengis.filter.expression.Expression;
 
 
 /**

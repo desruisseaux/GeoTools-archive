@@ -435,7 +435,7 @@ public class ShapeFileIndexer {
             if( cnt%100000 == 0 )
             	System.out.print('\n');
         }
-        System.out.println("done");
+        if( verbose ) System.out.println("done");
         }finally{
 	        channelIdx.close();
 	        fisIdx.close();

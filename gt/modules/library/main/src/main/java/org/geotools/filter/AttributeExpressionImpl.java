@@ -60,7 +60,7 @@ public class AttributeExpressionImpl extends DefaultExpression
      * 
      * @param xpath the String xpath to the attribute.
      */
-    protected AttributeExpressionImpl( String xpath ){
+    public AttributeExpressionImpl( String xpath ){
     	attPath = xpath;
     	schema = null;
     	this.expressionType = ATTRIBUTE;    	

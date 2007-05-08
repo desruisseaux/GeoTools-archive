@@ -76,7 +76,7 @@ import org.opengis.filter.spatial.Within;
  */
 public class DuplicatingFilterVisitor implements FilterVisitor, ExpressionVisitor{
 
-	private final FilterFactory2 factory;
+	protected final FilterFactory2 factory;
 
 	public DuplicatingFilterVisitor() {
 		this(findFactory2());

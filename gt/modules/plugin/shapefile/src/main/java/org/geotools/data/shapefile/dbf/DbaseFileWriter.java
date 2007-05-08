@@ -108,7 +108,7 @@ public class DbaseFileWriter  {
     for (int i = 0; i < header.getNumFields(); i++) {
       String fieldString = fieldString(record[i], i);
       if ( header.getFieldLength(i) != fieldString.getBytes().length) {
-          System.out.println(i + " : " + header.getFieldName(i)+" value = "+fieldString+"");
+          //System.out.println(i + " : " + header.getFieldName(i)+" value = "+fieldString+"");
           buffer.put(new byte[header.getFieldLength(i)]);
       }else{
           buffer.put(fieldString.getBytes());

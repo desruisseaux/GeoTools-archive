@@ -16,10 +16,10 @@
 package org.geotools.styling;
 
 import org.geotools.event.AbstractGTComponent;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 
 /**
  * Default color map entry implementation
@@ -29,10 +29,8 @@ import org.geotools.filter.FilterFactoryFinder;
  */
 public class ColorMapEntryImpl extends AbstractGTComponent
     implements ColorMapEntry {
-    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger
-        .getLogger("org.geotools.core");
-    private static final FilterFactory filterFactory = FilterFactoryFinder
-        .createFilterFactory();
+    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger("org.geotools.core");
+    private static final FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints());
     private Expression quantity;
     private Expression opacity;
     private Expression color;

@@ -188,7 +188,7 @@ public class FilterAttributeExtractorTest extends TestCase {
 
     private void assertAttributeName(Filter filter, String[] names) {
         fae.clear();
-        filter.accept(fae);
+        filter.accept(fae, null);
 
         Set attNames = fae.getAttributeNameSet();
 
@@ -229,8 +229,8 @@ public class FilterAttributeExtractorTest extends TestCase {
         testAttribute = new AttributeExpressionImpl(testSchema, "testString");
 
         NullFilter filter = fac.createNullFilter();
-
-        assertAttributeName(filter, new String[0]);
+        filter.nullCheckValue( (Expression) fac.property("foo") );
+        assertAttributeName( filter, new String[]{"foo"} );        
     }
 
     /**

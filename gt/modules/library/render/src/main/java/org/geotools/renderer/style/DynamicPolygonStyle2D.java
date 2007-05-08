@@ -54,7 +54,7 @@ public class DynamicPolygonStyle2D extends org.geotools.renderer.style.PolygonSt
             return null;
         }
 
-        Paint fillPaint = Color.decode((String) fill.getColor().getValue(feature));
+        Paint fillPaint = (Color) fill.getColor().evaluate(feature, Color.class);
 
         // if a graphic fill is to be used, prepare the paint accordingly....
         org.geotools.styling.Graphic gr = fill.getGraphicFill();
@@ -78,7 +78,7 @@ public class DynamicPolygonStyle2D extends org.geotools.renderer.style.PolygonSt
         }
 
         // get the opacity and prepare the composite
-        float opacity = ((Number) fill.getOpacity().getValue(feature)).floatValue();
+        float opacity = ((Float) fill.getOpacity().evaluate(feature,Float.class)).floatValue();
 
         if (opacity == 1) {
             return null;

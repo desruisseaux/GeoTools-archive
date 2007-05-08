@@ -15,10 +15,10 @@
  */
 package org.geotools.styling;
 
+import org.opengis.filter.expression.Expression;
 import org.geotools.event.GTComponent;
 import org.geotools.event.GTConstant;
 import org.geotools.filter.ConstantExpression;
-import org.geotools.filter.Expression;
 
 
 /**

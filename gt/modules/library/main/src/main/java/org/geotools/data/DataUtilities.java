@@ -1448,8 +1448,9 @@ public class DataUtilities {
      * visit( Filter ) and visit( Expression ) will pass their arguments off to
      * more specialized functions.
      * </p>
+     * @deprecated TODO: Traversal 
      */
-    public abstract static class AbstractFilterVisitor implements FilterVisitor {
+    abstract static class AbstractFilterVisitor implements FilterVisitor {
         /**
          * DOCUMENT ME!
          *
@@ -1591,12 +1592,11 @@ public class DataUtilities {
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @author $author$
-     * @version $Revision: 1.23 $
+     * Will traverse the entire data structure
+     * 
+     * @deprecated Please use org.geotools.filter.visitor.AbstractFilterVisitor
      */
-    public abstract static class Traversal extends AbstractFilterVisitor {
+    abstract static class Traversal extends AbstractFilterVisitor {
         abstract void traverse(Filter filter);
 
         abstract void traverse(Expression expression);

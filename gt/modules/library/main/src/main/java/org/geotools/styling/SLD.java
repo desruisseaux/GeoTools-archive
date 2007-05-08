@@ -26,8 +26,8 @@ import java.util.Set;
 import org.geotools.event.GTComponent;
 import org.geotools.event.GTRoot;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.Expression;
 import org.opengis.filter.Filter;
+import org.opengis.filter.expression.Expression;
 import org.geotools.filter.Filters;
 
 

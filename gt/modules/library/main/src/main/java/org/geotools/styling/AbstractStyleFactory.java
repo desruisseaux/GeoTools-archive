@@ -15,11 +15,11 @@
  */
 package org.geotools.styling;
 
-import org.geotools.filter.Expression;
-
 import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
+
+import org.opengis.filter.expression.Expression;
 
 
 /**

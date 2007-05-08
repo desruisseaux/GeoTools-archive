@@ -15,8 +15,6 @@
  */
 package org.geotools.styling;
 
-import org.opengis.filter.Filter;
-import org.geotools.filter.FilterAttributeExtractor;
 
 
 /**
@@ -51,7 +49,7 @@ public class StyleAttributeExtractorTruncated extends StyleAttributeExtractor
 	        }
 
 	        if (rs.getOpacity() != null) {
-	            rs.getOpacity().accept(this);
+	            rs.getOpacity().accept(this, null);
 	        }
 	    }
 
@@ -119,19 +117,19 @@ public class StyleAttributeExtractorTruncated extends StyleAttributeExtractor
 	                Font font = fonts[i];
 
 	                if (font.getFontFamily() != null) {
-	                    font.getFontFamily().accept(this);
+	                    font.getFontFamily().accept(this,null);
 	                }
 
 	                if (font.getFontSize() != null) {
-	                    font.getFontSize().accept(this);
+	                    font.getFontSize().accept(this,null);
 	                }
 
 	                if (font.getFontStyle() != null) {
-	                    font.getFontStyle().accept(this);
+	                    font.getFontStyle().accept(this,null);
 	                }
 
 	                if (font.getFontWeight() != null) {
-	                    font.getFontWeight().accept(this);
+	                    font.getFontWeight().accept(this,null);
 	                }
 	            }
 	        }

@@ -22,8 +22,12 @@ import org.geotools.factory.GeoTools;
 import org.geotools.filter.IllegalFilterException;
 import org.opengis.filter.And;
 import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.PropertyIsGreaterThan;
 import org.opengis.filter.PropertyIsLessThan;
+import org.opengis.filter.expression.Add;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Literal;
 
 
 /**
@@ -57,6 +61,23 @@ public class DuplicateFilterVisitorTest extends TestCase {
     	//compare it
     	assertNotNull(newFilter);
     	assertEquals( and, newFilter );
+    }    
+    public void testOptimizationExample(){
+        Expression add = fac.add(fac.literal(1), fac.literal(2));
+        class Optimization extends DuplicatingFilterVisitor {
+            public Object visit( Add expression, Object extraData ) {
+                Expression expr1 = expression.getExpression1();
+                Expression expr2 = expression.getExpression2();
+                if( expr1 instanceof Literal && expr2 instanceof Literal){
+                    Double number1 = (Double) expr1.evaluate(null,Double.class);
+                    Double number2 = (Double) expr2.evaluate(null,Double.class);
+                    
+                    return factory.literal( number1.doubleValue() + number2.doubleValue() );
+                }
+                return super.visit(expression, extraData);
+            }
+        };
+        Expression modified = (Expression) add.accept( new Optimization(), null );
+        assertTrue( modified instanceof Literal );
     }
-    
 }

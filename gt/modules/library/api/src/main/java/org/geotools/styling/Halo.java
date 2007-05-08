@@ -19,8 +19,8 @@
  */
 package org.geotools.styling;
 
+import org.opengis.filter.expression.Expression;
 import org.geotools.event.GTComponent;
-import org.geotools.filter.Expression;
 
 
 /**

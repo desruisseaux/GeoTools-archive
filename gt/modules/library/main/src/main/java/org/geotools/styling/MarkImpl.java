@@ -19,7 +19,10 @@ package org.geotools.styling;
 
 // OpenGIS dependencies
 import org.geotools.event.AbstractGTComponent;
-import org.geotools.filter.Expression;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 import org.opengis.util.Cloneable;
 
 
@@ -36,8 +39,7 @@ public class MarkImpl extends AbstractGTComponent implements Mark, Cloneable {
         .getLogger("org.geotools.styling");
 
     //TODO: Make container ready
-    private static final org.geotools.filter.FilterFactory filterFactory = org.geotools.filter.FilterFactoryFinder
-        .createFilterFactory();
+    private final FilterFactory filterFactory;
     private Fill fill;
     private Stroke stroke;
 
@@ -49,7 +51,18 @@ public class MarkImpl extends AbstractGTComponent implements Mark, Cloneable {
     /**
      * Creates a new instance of DefaultMark
      */
-    protected MarkImpl() {
+    public MarkImpl() {
+        this( CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints()));        
+    }
+
+    public MarkImpl(String name) {
+        this( CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints()));
+        LOGGER.fine("creating " + name + " type mark");
+        setWellKnownName(name);
+    }
+
+    public MarkImpl( FilterFactory filterFactory ) {
+        this.filterFactory = filterFactory;
         LOGGER.fine("creating defaultMark");
 
         try {
@@ -57,18 +70,12 @@ public class MarkImpl extends AbstractGTComponent implements Mark, Cloneable {
             fill = sfac.getDefaultFill();
             stroke = sfac.getDefaultStroke();
 
-            wellKnownName = filterFactory.createLiteralExpression("square");
-            size = filterFactory.createLiteralExpression(new Integer(6));
-            rotation = filterFactory.createLiteralExpression(new Double(0.0));
+            wellKnownName = filterFactory.literal("square");
+            size = filterFactory.literal(new Integer(6));
+            rotation = filterFactory.literal(new Double(0.0));
         } catch (org.geotools.filter.IllegalFilterException ife) {
             severe("<init>", "Failed to build default mark: ", ife);
         }
-    }
-
-    public MarkImpl(String name) {
-        this();
-        LOGGER.fine("creating " + name + " type mark");
-        setWellKnownName(name);
     }
 
     /**
@@ -147,7 +154,7 @@ public class MarkImpl extends AbstractGTComponent implements Mark, Cloneable {
     }
 
     public void setSize(int size) {
-        setSize(filterFactory.createLiteralExpression(size));
+        setSize(filterFactory.literal(size));
     }
 
     /**
@@ -165,7 +172,7 @@ public class MarkImpl extends AbstractGTComponent implements Mark, Cloneable {
     }
 
     public void setWellKnownName(String name) {
-        setWellKnownName(filterFactory.createLiteralExpression(name));
+        setWellKnownName(filterFactory.literal(name));
     }
 
     public void setRotation(Expression rotation) {
@@ -175,7 +182,7 @@ public class MarkImpl extends AbstractGTComponent implements Mark, Cloneable {
     }
 
     public void setRotation(double rotation) {
-        setRotation(filterFactory.createLiteralExpression(rotation));
+        setRotation(filterFactory.literal(rotation));
     }
 
     /**

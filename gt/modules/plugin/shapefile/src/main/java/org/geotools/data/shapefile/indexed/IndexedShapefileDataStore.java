@@ -380,7 +380,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 		String defaultGeomName = schema.getDefaultGeometry().getName();
 
         FilterAttributeExtractor fae= new FilterAttributeExtractor();
-        Filters.accept( query.getFilter(),fae);
+        query.getFilter().accept(fae, null);
         
         Set attributes=new HashSet(Arrays.asList(propertyNames));
         attributes.addAll(fae.getAttributeNameSet());
@@ -1140,7 +1140,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 			indexer.setMax(maxDepth);
 
 			try {
-				indexer.index(true, readWriteLock);
+				indexer.index(false, readWriteLock);
 			} catch (MalformedURLException e) {
 				throw new TreeException(e);
 			} catch (LockTimeoutException e) {

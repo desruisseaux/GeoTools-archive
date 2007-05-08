@@ -18,10 +18,10 @@ package org.geotools.styling.visitor;
 import java.util.Stack;
 
 import org.geotools.event.GTCloneUtil;
-import org.geotools.filter.Expression;
 import org.opengis.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.visitor.DuplicatorFilterVisitor;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.expression.Expression;
+import org.geotools.filter.visitor.DuplicatingFilterVisitor;
 import org.geotools.styling.AnchorPoint;
 import org.geotools.styling.ColorMap;
 import org.geotools.styling.ColorMapEntry;
@@ -70,25 +70,26 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
     //Stack pages; // need a Stack as Filter structure is recursive
     StyleFactory sf;
 
+    
     /** TODO: support duplication of pure open gis filters */
-    public DuplicatorFilterVisitor copyFilter;
+    public DuplicatingFilterVisitor copyFilter;
         
-    public DuplicatorStyleVisitor(StyleFactory sf, FilterFactory ff) { // FilterFactory factory 
+    public DuplicatorStyleVisitor(StyleFactory sf, FilterFactory2 ff) { // FilterFactory factory 
         this.sf = sf;
-        this.copyFilter = new DuplicatorFilterVisitor( ff );
+        this.copyFilter = new DuplicatingFilterVisitor( ff );
     }
 
     
     /** Duplicate an expression using copyFilter */
     public Expression copy( Expression expression ){
-        expression.accept( copyFilter );
-        return (Expression) copyFilter.getPages().pop();
+        return (Expression) expression.accept( copyFilter, null );
+        //return (Expression) copyFilter.getPages().pop();
     }
     
     /** Duplicate an expression using copyFilter */
     public Filter copy( org.geotools.filter.Filter filter ){
-        filter.accept( copyFilter );
-        return (Filter) copyFilter.getPages().pop();
+        return (Filter) filter.accept( copyFilter, null );
+//        return (Filter) copyFilter.getPages().pop();
     }
     public void setStyleFactory(StyleFactory styleFactory) {
         this.sf = styleFactory;
@@ -406,23 +407,20 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
 
         Expression opacityCopy = null;
 
-        if (gr.getOpacity() != null) {
-            gr.getOpacity().accept(copyFilter);            
-            opacityCopy = (Expression) copyFilter.getPages().pop();
+        if (gr.getOpacity() != null) {                        
+            opacityCopy = (Expression) gr.getOpacity().accept(copyFilter,null);
         }
 
         Expression rotationCopy = null;
 
-        if (gr.getRotation() != null) {
-            gr.getRotation().accept(copyFilter);
-            rotationCopy = (Expression) copyFilter.getPages().pop();
+        if (gr.getRotation() != null) {            
+            rotationCopy = (Expression) gr.getRotation().accept(copyFilter,null);
         }
 
         Expression sizeCopy = null;
 
-        if (gr.getSize() != null) {
-            gr.getSize().accept(copyFilter);
-            sizeCopy = (Expression) copyFilter.getPages().pop();
+        if (gr.getSize() != null) {            
+            sizeCopy = (Expression) gr.getSize().accept(copyFilter,null);
         }
 
         Symbol[] symbols = gr.getSymbols();
@@ -461,14 +459,14 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
 
         Expression rotationCopy = null;
 
-        if (mark.getRotation() != null) {
-            rotationCopy = copy( mark.getRotation() );
+        if (mark.getRotation() != null) {            
+            rotationCopy = (Expression) mark.getRotation().accept(copyFilter,null);
         }
 
         Expression sizeCopy = null;
 
         if (mark.getSize() != null) {
-            sizeCopy = copy( mark.getSize() );
+            sizeCopy = (Expression) mark.getSize().accept(copyFilter,null);
         }
 
         Stroke strokeCopy = null;
@@ -481,7 +479,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
         Expression wellKnownNameCopy = null;
 
         if (mark.getWellKnownName() != null) {
-            wellKnownNameCopy = copy( mark.getWellKnownName() );
+            wellKnownNameCopy = (Expression) mark.getWellKnownName().accept(copyFilter,null);
         }
 
         copy = sf.createMark();

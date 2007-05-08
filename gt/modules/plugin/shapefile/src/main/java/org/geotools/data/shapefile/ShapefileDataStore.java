@@ -219,13 +219,13 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         }
 
         try {
-            System.out.println("found metadata = " + xmlURL);
+            //System.out.println("found metadata = " + xmlURL);
 
             ShpXmlFileReader reader = new ShpXmlFileReader(xmlURL);
 
             Map map = new HashMap();
             map.put("shp.xml", reader.parse());
-            System.out.println("parsed ..." + xmlURL);
+            //System.out.println("parsed ..." + xmlURL);
 
             return map;
         } catch (Throwable t) {
@@ -393,10 +393,10 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         String[] propertyNames = query.getPropertyNames();
         String defaultGeomName = schema.getDefaultGeometry().getName();
         
-        // gather attributes needed by the query too, they will be used by the
-        // query filter
+        // gather attributes needed by the query tool, they will be used by the query filter
         StyleAttributeExtractor extractor = new StyleAttributeExtractor();
-        Filters.accept( query.getFilter(), extractor);
+        Filter filter = query.getFilter();
+        filter.accept(extractor, null);
         String[] filterAttnames = extractor.getAttributeNames();
 
         // check if the geometry is the one and only attribute needed

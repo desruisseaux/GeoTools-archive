@@ -16,10 +16,13 @@
 package org.geotools.filter.spatial;
 
 import org.geotools.feature.Feature;
+import org.geotools.filter.AttributeExpressionImpl;
+import org.geotools.filter.AttributeExpressionImpl2;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.GeometryFilterImpl;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.BBOX;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -27,8 +30,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class BBOXImpl extends GeometryFilterImpl implements BBOX {
 
-	double minx,miny,maxx,maxy;
-	String propertyName;
+	double minx,miny,maxx,maxy;	
 	String srs;
 	
 	public BBOXImpl(FilterFactory factory,Expression e1,Expression e2) {
@@ -39,11 +41,12 @@ public class BBOXImpl extends GeometryFilterImpl implements BBOX {
 	}
 
 	public String getPropertyName() {
-		return propertyName;
+        PropertyName propertyName = (PropertyName) getExpression1();
+        return propertyName.getPropertyName();
 	}
 
 	public void setPropertyName(String propertyName) {
-		this.propertyName = propertyName;
+        setExpression1( new AttributeExpressionImpl( propertyName ));
 	}
 	
 	public String getSRS() {

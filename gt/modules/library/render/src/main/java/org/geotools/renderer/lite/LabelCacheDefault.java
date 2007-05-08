@@ -42,11 +42,11 @@ import java.util.Set;
 import javax.media.jai.util.Range;
 
 import org.geotools.feature.Feature;
-import org.geotools.filter.LiteralExpression;
 import org.geotools.geometry.jts.LiteShape2;
 import org.geotools.renderer.style.SLDStyleFactory;
 import org.geotools.renderer.style.TextStyle2D;
 import org.geotools.styling.TextSymbolizer;
+import org.opengis.filter.expression.Literal;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -213,19 +213,10 @@ public final class LabelCacheDefault implements LabelCache {
 			return DEFAULT_PRIORITY;
 
 		// evaluate
-		Object o = symbolizer.getPriority().getValue(feature);
-		if (o == null)
-			return DEFAULT_PRIORITY;
-
-		if (o instanceof Number)
-			return ((Number) o).doubleValue();
-
-		String oStr = o.toString();
-
-		try {
-			double d = Double.parseDouble(oStr);
-			return d;
-		} catch (Exception e) {
+        try {
+            Double number = (Double) symbolizer.getPriority().evaluate( feature, Double.class );
+            return number.doubleValue();
+        } catch (Exception e) {
 			return DEFAULT_PRIORITY;
 		}
 	}
@@ -239,14 +230,14 @@ public final class LabelCacheDefault implements LabelCache {
 		needsOrdering=true;
 		try{
 			//get label and geometry				
-		    Object labelObj = symbolizer.getLabel().getValue(feature);
+		    String label = (String) symbolizer.getLabel().evaluate(feature, String.class);
 		    
-			if (labelObj == null)
-				return;
-		    String label = labelObj.toString().trim(); //DJB: remove white space from label
-		    if (label.length() ==0)
+			if (label == null) return;
+            
+		    label = label.trim();
+		    if (label.length() ==0){
 		    	return; // dont label something with nothing!
-		    
+            }
 		    double priorityValue = getPriority(symbolizer,feature);
 		    boolean group = isGrouping(symbolizer);
 		    if (!(group))
@@ -280,7 +271,7 @@ public final class LabelCacheDefault implements LabelCache {
 					// add only in the non-default case or non-literal. Ie.
 					// area()
 					if ((symbolizer.getPriority() != null)
-							&& (!(symbolizer.getPriority() instanceof LiteralExpression)))
+							&& (!(symbolizer.getPriority() instanceof Literal)))
 						lci.setPriority(lci.getPriority() + priorityValue); // djb--
 					// changed
 					// because
@@ -750,12 +741,12 @@ public final class LabelCacheDefault implements LabelCache {
 	 */
 	private void paintLineStringLabel(GlyphVector glyphVector, LineString line,
 			TextStyle2D textStyle, AffineTransform tempTransform) {
-		Point start = line.getStartPoint();
-		Point end = line.getEndPoint();
-		double dx = end.getX() - start.getX();
-		double dy = end.getY() - start.getY();
-		double slope = dy / dx;
-		double theta = Math.atan(slope);
+		//Point start = line.getStartPoint();
+		//Point end = line.getEndPoint();
+		//double dx = end.getX() - start.getX();
+		//double dy = end.getY() - start.getY();
+		//double slope = dy / dx;
+		//double theta = Math.atan(slope);
 		// double rotation=theta;
 
 		double rotation = middleTheta(line, 0.5);

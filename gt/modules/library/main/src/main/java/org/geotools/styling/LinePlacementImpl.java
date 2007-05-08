@@ -17,10 +17,11 @@
 package org.geotools.styling;
 
 import org.geotools.event.AbstractGTComponent;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
 import org.geotools.resources.Utilities;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 import org.opengis.util.Cloneable;
 
 // J2SE dependencies
@@ -42,7 +43,7 @@ public class LinePlacementImpl extends AbstractGTComponent
     private Expression perpendicularOffset = null;
 
     public LinePlacementImpl() {
-        this(FilterFactoryFinder.createFilterFactory());
+        this( CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints()));
     }
 
     public LinePlacementImpl(FilterFactory factory) {
@@ -60,8 +61,7 @@ public class LinePlacementImpl extends AbstractGTComponent
      */
     private void init() {
         try {
-            perpendicularOffset = filterFactory.createLiteralExpression(new Integer(
-                        0));
+            perpendicularOffset = filterFactory.literal(0);
         } catch (org.geotools.filter.IllegalFilterException ife) {
             LOGGER.severe("Failed to build defaultLinePlacement: " + ife);
         }

@@ -21,28 +21,28 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Set;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.filter.AttributeExpressionImpl;
-import org.geotools.filter.Expression;
-import org.geotools.filter.ExpressionType;
-import org.geotools.filter.FidFilter;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
+import org.geotools.test.TestData;
+import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Id;
 import org.opengis.filter.Not;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.spatial.BinarySpatialOperator;
 import org.opengis.filter.spatial.Disjoint;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.FilterType;
-import org.geotools.filter.GeometryFilter;
-import org.geotools.filter.LogicFilter;
-import org.geotools.test.TestData;
 
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 
 
@@ -53,8 +53,8 @@ import com.vividsolutions.jts.geom.Polygon;
  * @source $URL$
  */
 public class SLDStyleTest extends TestCase {
-    StyleFactory sf = StyleFactoryFinder.createStyleFactory();
-    FilterFactory ff = FilterFactoryFinder.createFilterFactory();
+    StyleFactory sf = CommonFactoryFinder.getStyleFactory( GeoTools.getDefaultHints() );
+    FilterFactory ff = CommonFactoryFinder.getFilterFactory( GeoTools.getDefaultHints() );
     StyleBuilder sb = new StyleBuilder(sf, ff);
 
     /**
@@ -110,7 +110,7 @@ public class SLDStyleTest extends TestCase {
         Rule rule = fts.getRules()[0];
         LineSymbolizer lineSym = (LineSymbolizer) rule.getSymbolizers()[0];
         assertEquals(4,
-            ((Number) lineSym.getStroke().getWidth().getValue(null)).intValue());
+            ((Number) lineSym.getStroke().getWidth().evaluate( null, Number.class )).intValue());
     }
 
     /**
@@ -228,7 +228,8 @@ public class SLDStyleTest extends TestCase {
     
     public void testParseSLD_NameSpaceAware() throws Exception {
         URL surl = TestData.getResource(this, "test-ns.sld");
-        StyleFactory factory = StyleFactoryFinder.createStyleFactory();
+        StyleFactory factory = CommonFactoryFinder.getStyleFactory(null);
+        
         SLDParser stylereader = new SLDParser(factory, surl);
         StyledLayerDescriptor sld = stylereader.parseSLD();
         
@@ -247,7 +248,7 @@ public class SLDStyleTest extends TestCase {
      * @throws Exception boom
      */
     public void testParseSLDNamedLayersOnly() throws Exception {
-        StyleFactory factory = StyleFactoryFinder.createStyleFactory();
+        StyleFactory factory = CommonFactoryFinder.getStyleFactory(null);
         java.net.URL surl = TestData.getResource(this, "namedLayers.sld");
         SLDParser stylereader = new SLDParser(factory, surl);
 
@@ -283,7 +284,7 @@ public class SLDStyleTest extends TestCase {
      * @throws Exception boom
      */
     public void testParseSLDNamedAndUserLayers() throws Exception {
-        StyleFactory factory = StyleFactoryFinder.createStyleFactory();
+        StyleFactory factory = CommonFactoryFinder.getStyleFactory(null);
         java.net.URL surl = TestData.getResource(this, "mixedLayerTypes.sld");
         SLDParser stylereader = new SLDParser(factory, surl);
 
@@ -309,7 +310,7 @@ public class SLDStyleTest extends TestCase {
     public void testParseGeometryFilters() throws IOException {
         final String TYPE_NAME = "testType";
         final String GEOMETRY_ATTR = "Polygons";
-        StyleFactory factory = StyleFactoryFinder.createStyleFactory();
+        StyleFactory factory = CommonFactoryFinder.getStyleFactory(null);
         java.net.URL surl = TestData.getResource(this, "spatialFilter.xml");
         SLDParser stylereader = new SLDParser(factory, surl);
 
@@ -328,20 +329,21 @@ public class SLDStyleTest extends TestCase {
         Filter filter = fts.getRules()[0].getFilter();
         assertTrue( filter instanceof Not );
 
-        Filter spatialFilter = (Filter) ((LogicFilter) filter).getFilterIterator()
-                                         .next();
+        BinarySpatialOperator spatialFilter = (BinarySpatialOperator) ((BinaryLogicOperator) filter).getChildren().get(0);
         assertTrue( spatialFilter instanceof Disjoint );
 
-        Expression left = ((GeometryFilter) spatialFilter).getLeftGeometry();
-        Expression right = ((GeometryFilter) spatialFilter).getRightGeometry();
-        assertEquals(ExpressionType.ATTRIBUTE, left.getType());
-        assertEquals(ExpressionType.LITERAL_GEOMETRY, right.getType());
+        Expression left = spatialFilter.getExpression1();
+        Expression right = spatialFilter.getExpression2();
+                
+        assertTrue( left instanceof PropertyName );
+        
+        assertTrue( right instanceof Literal );
+        assertTrue( right.evaluate(null) instanceof Geometry );
 
-        assertEquals(GEOMETRY_ATTR,
-            ((AttributeExpressionImpl) left).getAttributePath());
-        assertTrue(right.getValue(null) instanceof Polygon);
+        assertEquals(GEOMETRY_ATTR, ((PropertyName)left).getPropertyName() );
+        assertTrue( right.evaluate(null) instanceof Polygon);
 
-        Envelope bbox = ((Polygon) right.getValue(null)).getEnvelopeInternal();
+        Envelope bbox = ((Polygon) right.evaluate(null)).getEnvelopeInternal();
         assertEquals(-10D, bbox.getMinX(), 0);
         assertEquals(-10D, bbox.getMinY(), 0);
         assertEquals(10D, bbox.getMaxX(), 0);
@@ -354,7 +356,7 @@ public class SLDStyleTest extends TestCase {
      * @throws IOException boom
      */
     public void testParseFidFilter() throws IOException {
-        StyleFactory factory = StyleFactoryFinder.createStyleFactory();
+        StyleFactory factory = CommonFactoryFinder.getStyleFactory(null);
         java.net.URL surl = TestData.getResource(this, "fidFilter.xml");
         SLDParser stylereader = new SLDParser(factory, surl);
 
@@ -374,8 +376,9 @@ public class SLDStyleTest extends TestCase {
         Filter filter = fts.getRules()[0].getFilter();
         assertTrue( filter instanceof Id);
 
-        FidFilter fidFilter = (FidFilter) filter;
-        String[] fids = fidFilter.getFids();
+        Id fidFilter = (Id) filter;
+        Set ids = fidFilter.getIDs();
+        String[] fids = (String[]) ids.toArray(new String[ ids.size()] );
         assertEquals("Wrong number of fids", 5, fids.length);
         
         Arrays.sort(fids);

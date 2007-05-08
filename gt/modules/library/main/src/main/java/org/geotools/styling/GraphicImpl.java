@@ -17,10 +17,11 @@
 package org.geotools.styling;
 
 import org.geotools.event.AbstractGTComponent;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
 import org.geotools.resources.Utilities;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 import org.opengis.util.Cloneable;
 
 // J2SE dependencies
@@ -54,7 +55,7 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic,
      * Creates a new instance of DefaultGraphic
      */
     protected GraphicImpl() {
-        this(FilterFactoryFinder.createFilterFactory());
+        this( CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints())); 
     }
 
     public GraphicImpl(FilterFactory factory) {
@@ -296,7 +297,7 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic,
     }
 
     public void setOpacity(double opacity) {
-        setOpacity(filterFactory.createLiteralExpression(opacity));
+        setOpacity(filterFactory.literal(opacity));
     }
 
     /**
@@ -318,7 +319,7 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic,
     }
 
     public void setRotation(double rotation) {
-        setRotation(filterFactory.createLiteralExpression(rotation));
+        setRotation(filterFactory.literal(rotation));
     }
 
     /**
@@ -340,7 +341,7 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic,
     }
 
     public void setSize(int size) {
-        setSize(filterFactory.createLiteralExpression(size));
+        setSize(filterFactory.literal(size));
     }
 
     public void setGeometryPropertyName(String name) {

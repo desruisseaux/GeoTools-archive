@@ -19,19 +19,18 @@ import java.awt.Color;
 import java.util.Arrays;
 import java.util.Iterator;
 
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.AbstractFilter;
-import org.geotools.filter.AttributeExpression;
-import org.geotools.filter.BetweenFilter;
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.PropertyIsBetween;
 import org.opengis.filter.PropertyIsGreaterThan;
 import org.opengis.filter.PropertyIsLessThan;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.PropertyName;
 
 /**
  * An utility class designed to ease style building by convinience methods.
@@ -68,7 +67,7 @@ public class StyleBuilder {
      * use the default StyleFactory and FilterFactory
      */
     public StyleBuilder() {
-    	this( StyleFactoryFinder.createStyleFactory() );
+    	this( CommonFactoryFinder.getStyleFactory( GeoTools.getDefaultHints() ) );
     }
 
     /**
@@ -77,7 +76,7 @@ public class StyleBuilder {
      * @param styleFactory the StyleFactory to use in building Styles
      */
     public StyleBuilder(StyleFactory styleFactory ) {
-        this( styleFactory, FilterFactoryFinder.createFilterFactory() );
+        this( styleFactory, CommonFactoryFinder.getFilterFactory( GeoTools.getDefaultHints() ) );
     }
 
     /**
@@ -86,7 +85,7 @@ public class StyleBuilder {
      * @param filterFactory Use this FilterFactory to build the style
      */
     public StyleBuilder(FilterFactory filterFactory ) {
-        this( StyleFactoryFinder.createStyleFactory(), filterFactory );
+        this( CommonFactoryFinder.getStyleFactory( GeoTools.getDefaultHints() ), filterFactory );
     }
 
     /**
@@ -1625,7 +1624,7 @@ public class StyleBuilder {
 
         String colorCode = "#" + redCode + greenCode + blueCode;
 
-        return ff.createLiteralExpression(colorCode.toUpperCase());
+        return ff.literal(colorCode.toUpperCase());
     }
 
     /**
@@ -1636,7 +1635,7 @@ public class StyleBuilder {
      * @return the expression
      */
     public Expression literalExpression(double value) {
-        return ff.createLiteralExpression(value);
+        return ff.literal(value);
     }
 
     /**
@@ -1647,7 +1646,7 @@ public class StyleBuilder {
      * @return the expression
      */
     public Expression literalExpression(int value) {
-        return ff.createLiteralExpression(value);
+        return ff.literal(value);
     }
 
     /**
@@ -1661,7 +1660,7 @@ public class StyleBuilder {
         Expression result = null;
 
         if (value != null) {
-            result = ff.createLiteralExpression(value);
+            result = ff.literal(value);
         }
 
         return result;
@@ -1680,7 +1679,7 @@ public class StyleBuilder {
         Expression result = null;
 
         if (value != null) {
-            result = ff.createLiteralExpression(value);
+            result = ff.literal(value);
         }
 
         return result;
@@ -1697,9 +1696,7 @@ public class StyleBuilder {
      */
     public Expression attributeExpression(String attributeName)
         throws org.geotools.filter.IllegalFilterException {
-        org.geotools.filter.AttributeExpression attribute =
-        	ff.createAttributeExpression( attributeName );
-        return attribute;
+        return ff.property( attributeName );
     }
 
     /**
@@ -1722,7 +1719,7 @@ public class StyleBuilder {
         FeatureType schema)
         throws IllegalFilterException {
         //grab attribute col
-        AttributeExpression value = ff.createAttributeExpression(name);
+        PropertyName value = ff.property(name);
         String geomName = schema.getDefaultGeometry().getName();
 
         double[] values = new double[fc.size()];
@@ -1763,10 +1760,10 @@ public class StyleBuilder {
         for (int i = 1; i < (colors.length - 1); i++) {
             rules[i] = sf.createRule();
 
-            BetweenFilter cf = ff.createBetweenFilter();
-            cf.addLeftValue(ff.createLiteralExpression(breaks[i - 1]));
-            cf.addRightValue(ff.createLiteralExpression(breaks[i]));
-            cf.addMiddleValue(value);
+            Expression expr = value;
+            Expression lower = ff.literal(breaks[i - 1]);
+            Expression upper = ff.literal(breaks[i]);
+            PropertyIsBetween cf = ff.between(expr, lower, upper);
             
             LOGGER.fine(cf.toString());
             c = this.createColor(colors[i]);

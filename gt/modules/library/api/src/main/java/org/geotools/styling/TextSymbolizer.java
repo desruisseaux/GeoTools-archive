@@ -39,7 +39,7 @@
 package org.geotools.styling;
 
 import java.util.Map;
-import org.geotools.filter.Expression;
+import org.opengis.filter.expression.Expression;
 
 
 /**

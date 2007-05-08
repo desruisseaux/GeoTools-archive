@@ -55,6 +55,7 @@ import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.referencing.CRS;
+import org.opengis.filter.expression.Expression;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -564,31 +565,31 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         ShapefileDataStore s = new ShapefileDataStore(url);
         
         // attributes other than geometry can be ignored here
-        Query q = new DefaultQuery(s.getSchema().getTypeName(), Filter.INCLUDE, new String[] {"the_geom"});
-        FeatureReader fr = s.getFeatureReader(s.getSchema().getTypeName(), q);
-        assertEquals(1, fr.getFeatureType().getAttributeCount());
-        assertEquals("the_geom", fr.getFeatureType().getAttributeTypes()[0].getName());
+        Query query = new DefaultQuery(s.getSchema().getTypeName(), Filter.INCLUDE, new String[] {"the_geom"});
+        FeatureReader reader = s.getFeatureReader(s.getSchema().getTypeName(), query);
+        assertEquals(1, reader.getFeatureType().getAttributeCount());
+        assertEquals("the_geom", reader.getFeatureType().getAttributeTypes()[0].getName());
         
         // here too, the filter is using the geometry only
         FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         GeometryFactory gc = new GeometryFactory();
         LinearRing ring = gc.createLinearRing(new Coordinate[] {new Coordinate(0,0), new Coordinate(10,0), new Coordinate(10,10), new Coordinate(0,10), new Coordinate(0,0)});
-        Polygon p = gc.createPolygon(ring, null);
+        Polygon polygon = gc.createPolygon(ring, null);
         GeometryFilter gf = ff.createGeometryFilter(Filter.GEOMETRY_BBOX);
         gf.addLeftGeometry(ff.createAttributeExpression("the_geom"));
-        gf.addRightGeometry(ff.createLiteralExpression(p));
-        q = new DefaultQuery(s.getSchema().getTypeName(), gf, new String[] {"the_geom"});
-        fr = s.getFeatureReader(s.getSchema().getTypeName(), q);
-        assertEquals(1, fr.getFeatureType().getAttributeCount());
-        assertEquals("the_geom", fr.getFeatureType().getAttributeTypes()[0].getName());
+        gf.addRightGeometry(ff.createLiteralExpression(polygon));
+        query = new DefaultQuery(s.getSchema().getTypeName(), gf, new String[] {"the_geom"});
+        reader = s.getFeatureReader( s.getSchema().getTypeName(), query);
+        assertEquals(1, reader.getFeatureType().getAttributeCount());
+        assertEquals("the_geom", reader.getFeatureType().getAttributeTypes()[0].getName());
         
         // here not, we need state_name in the feature type, so open the dbf file please
         CompareFilter cf = ff.createCompareFilter(Filter.COMPARE_EQUALS);
         cf.addLeftValue(ff.createAttributeExpression("STATE_NAME"));
         cf.addRightValue(ff.createLiteralExpression("Illinois"));
-        q = new DefaultQuery(s.getSchema().getTypeName(), cf, new String[] {"the_geom"});
-        fr = s.getFeatureReader(s.getSchema().getTypeName(), q);
-        assertEquals(s.getSchema(), fr.getFeatureType());
+        query = new DefaultQuery(s.getSchema().getTypeName(), cf, new String[] {"the_geom"});
+        reader = s.getFeatureReader(s.getSchema().getTypeName(), query);
+        assertEquals(s.getSchema(), reader.getFeatureType());
     }
 
 }

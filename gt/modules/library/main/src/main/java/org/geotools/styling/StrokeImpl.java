@@ -16,9 +16,10 @@
 package org.geotools.styling;
 
 import org.geotools.event.AbstractGTComponent;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 import org.opengis.util.Cloneable;
 
 // J2SE depedencies
@@ -50,7 +51,7 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke,
      * Creates a new instance of Stroke
      */
     protected StrokeImpl() {
-        this(FilterFactoryFinder.createFilterFactory());
+        this( CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints()));
     }
 
     protected StrokeImpl(FilterFactory factory) {
@@ -119,7 +120,7 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke,
      * @param color The color of the stroke encoded as a hexidecimal RGB value.
      */
     public void setColor(String color) {
-        setColor(filterFactory.createLiteralExpression(color));
+        setColor(filterFactory.literal(color));
     }
 
     /**
@@ -394,7 +395,7 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke,
     }
 
     public java.awt.Color getColor(org.geotools.feature.Feature feature) {
-        return java.awt.Color.decode((String) this.getColor().getValue(feature));
+        return java.awt.Color.decode((String) this.getColor().evaluate(feature));
     }
 
     public void accept(StyleVisitor visitor) {
