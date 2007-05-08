@@ -80,7 +80,7 @@ public final class AllAuthoritiesFactoryTest extends TestCase {
         final Collection codes = all.getAuthorityCodes(CoordinateReferenceSystem.class);
         assertFalse(codes.isEmpty());
         assertTrue(codes.contains("CRS:84"));
-        assertTrue(codes.contains("AUTO2:42001"));
+        assertTrue(codes.contains("AUTO:42001"));
     }
 
     /**
