@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.image.io;
+package org.geotools.image.io.text;
 
 // J2SE and JAI dependencies
 import java.awt.Point;
@@ -48,92 +48,55 @@ import org.geotools.resources.i18n.DescriptionKeys;
 /**
  * An image decoder for matrix of floating-point numbers.
  *
+ * @since 2.4
  * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/coverage/src/main/java/org/geotools/image/io/TextMatrixImageReader.java $
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class TextMatrixImageReader extends TextImageReader {
     /**
      * The matrix data.
      */
     private float[] data;
-    
+
     /**
-     * The image width. This number has no
-     * signification if {@link #data} is null.
+     * The image width. This number has no signification if {@link #data} is null.
      */
     private int width;
-    
+
     /**
-     * The image height. This number is valid
-     * only if {@link #completed} is true.
+     * The image height. This number is valid only if {@link #completed} is true.
      */
     private int height;
-    
+
     /**
      * The expected height, or 0 if unknow. This number
      * has no signification if {@link #data} is null.
      */
     private int expectedHeight;
-    
+
     /**
      * {@code true} if {@link #data} contains all data, or {@code false}
-     * if {@link #data} contains only the first line. This field has no signification
-     * if {@link #data} is null.
+     * if {@link #data} contains only the first line. This field has no
+     * signification if {@link #data} is null.
      */
     private boolean completed;
-    
+
     /**
      * The cached range.
      */
     private Range range;
-    
+
     /**
-     * Construct a new image reader storing pixels
-     * as {@link DataBuffer#TYPE_FLOAT}.
+     * Constructs a new image reader storing pixels as {@link DataBuffer#TYPE_FLOAT}.
      *
-     * @param provider the {@link ImageReaderSpi} that is
-     *                 invoking this constructor, or null.
+     * @param provider the {@link ImageReaderSpi} that is invoking this constructor,
+     *        or {@code null}.
      */
     protected TextMatrixImageReader(final ImageReaderSpi provider) {
         super(provider, DataBuffer.TYPE_FLOAT);
     }
-    
-    /**
-     * Clear all cached data.
-     */
-    private void clear() {
-        completed      = false;
-        range          = null;
-        data           = null;
-        width          = 0;
-        height         = 0;
-        expectedHeight = 0;
-    }
-    
-    /**
-     * Restores the image reader to its initial state.
-     */
-    public void reset() {
-        clear();
-        super.reset();
-    }
-    
-    /**
-     * Sets the input source to use. Input may be one of the following object (in preference
-     * order): {@link java.io.File}, {@link java.net.URL}, {@link java.io.BufferedReader},
-     * {@link java.io.Reader}, {@link java.io.InputStream} or {@link javax.imageio.stream.ImageInputStream}.
-     */
-    public void setInput(final Object  input,
-                         final boolean seekForwardOnly,
-                         final boolean ignoreMetadata)
-    {
-        clear();
-        super.setInput(input, seekForwardOnly, ignoreMetadata);
-    }
-    
+
     /**
      * Load data. No subsampling is performed.
      *
@@ -149,7 +112,7 @@ public class TextMatrixImageReader extends TextImageReader {
         }
         float[] values = (data!=null) ? new float[width] : null;
         int     offset = width*height;
-        
+
         final BufferedReader input = getReader();
         final LineFormat    format = getLineFormat(imageIndex);
         final float       padValue = (float)getPadValue(imageIndex);
@@ -168,7 +131,7 @@ public class TextMatrixImageReader extends TextImageReader {
             } catch (ParseException exception) {
                 throw new IIOException(getPositionString(exception.getLocalizedMessage()), exception);
             }
-            if (data==null) {
+            if (data == null) {
                 data = new float[1024];
             }
             final int newOffset = offset + (width=values.length);
@@ -185,14 +148,14 @@ public class TextMatrixImageReader extends TextImageReader {
             if (!all) {
                 final long streamLength = getStreamLength(imageIndex, imageIndex+1);
                 if (streamLength >= 0) {
-                    expectedHeight = (int) (streamLength / (line.length()+1));
+                    expectedHeight = (int) (streamLength / (line.length() + 1));
                 }
                 break;
             }
             /*
              * Update progress.
              */
-            if (height<=expectedHeight) {
+            if (height <= expectedHeight) {
                 processImageProgress(height*100f/expectedHeight);
                 if (abortRequested()) {
                     processReadAborted();
@@ -200,7 +163,7 @@ public class TextMatrixImageReader extends TextImageReader {
                 }
             }
         }
-        if ((completed=all)==true) {
+        if ((completed = all) == true) {
             data = XArray.resize(data, offset);
             expectedHeight = height;
         }
@@ -209,7 +172,7 @@ public class TextMatrixImageReader extends TextImageReader {
         }
         return false;
     }
-    
+
     /**
      * Returns the width in pixels of the given image within the input source.
      *
@@ -225,7 +188,7 @@ public class TextMatrixImageReader extends TextImageReader {
         }
         return width;
     }
-    
+
     /**
      * Returns the height in pixels of the given image within the input source.
      * Calling this method may force loading of full image.
@@ -242,7 +205,7 @@ public class TextMatrixImageReader extends TextImageReader {
         }
         return height;
     }
-    
+
     /**
      * Reads the image indexed by {@code imageIndex}.
      *
@@ -329,7 +292,7 @@ public class TextMatrixImageReader extends TextImageReader {
         final int dstYMin = dstRegion.y;
         final int dstXMax = dstRegion.width  + dstXMin;
         final int dstYMax = dstRegion.height + dstYMin;
-        
+
         int srcY = srcRegion.y;
         for (int y=dstYMin; y<dstYMax; y++) {
             assert(srcY < srcRegion.y+srcRegion.height);
@@ -344,7 +307,7 @@ public class TextMatrixImageReader extends TextImageReader {
         }
         return image;
     }
-    
+
     /**
      * Returns the expected range of values for a band.
      * Calling this method may force loading of full image.
@@ -371,10 +334,24 @@ public class TextMatrixImageReader extends TextImageReader {
         }
         return range;
     }
-    
-    
-    
-    
+
+    /**
+     * Closes the input stream and disposes the resources that was specific to that stream.
+     */
+    //@Override
+    public void close() throws IOException {
+        completed      = false;
+        range          = null;
+        data           = null;
+        width          = 0;
+        height         = 0;
+        expectedHeight = 0;
+        super.close();
+    }
+
+
+
+
     /**
      * Service provider interface (SPI) for {@link TextMatrixImageReader}s.
      * This SPI provides all necessary implementations for creating default
@@ -401,21 +378,19 @@ public class TextMatrixImageReader extends TextImageReader {
      * can gain more control by creating subclasses of {@link TextMatrixImageReader}
      * <strong>and</strong> {@code Spi} and overriding some of their methods.
      *
-     * @version 1.0
      * @author Martin Desruisseaux
      */
     public static class Spi extends TextImageReader.Spi {
         /**
-         * Construct a new SPI with name "matrix" and MIME type "text/matrix".
+         * Constructs a new SPI with name {@code "matrix"} and MIME type {@code "text/matrix"}.
          */
         public Spi() {
             this("matrix", "text/matrix");
         }
-        
+
         /**
          * Construct a new SPI for {@link TextMatrixImageReader}. This
-         * constructor initialize the following fields to default
-         * values:
+         * constructor initialize the following fields to default values:
          *
          * <ul>
          *   <li>Image format names ({@link #names}):
@@ -438,9 +413,9 @@ public class TextMatrixImageReader extends TextImageReader {
          */
         public Spi(final String name, final String mime) {
             super(name, mime);
-            pluginClassName = "org.geotools.image.io.TextMatrixImageReader";
+            pluginClassName = "org.geotools.image.io.text.TextMatrixImageReader";
         }
-        
+
         /**
          * Returns a brief, human-readable description of this service provider
          * and its associated implementation. The resulting string should be
@@ -452,7 +427,7 @@ public class TextMatrixImageReader extends TextImageReader {
         public String getDescription(final Locale locale) {
             return Descriptions.getResources(locale).getString(DescriptionKeys.CODEC_MATRIX);
         }
-        
+
         /**
          * Returns an instance of the ImageReader implementation associated
          * with this service provider.
@@ -464,16 +439,13 @@ public class TextMatrixImageReader extends TextImageReader {
         public ImageReader createReaderInstance(final Object extension) throws IOException {
             return new TextMatrixImageReader(this);
         }
-        
+
         /**
-         * Vérifie si la ligne a un nombre de valeurs acceptable. Cette méthode est appelée
-         * automatiquement par {@link #canDecodeLine} avec en argument le nombre de valeurs
-         * dans une des premières lignes trouvées dans la source. Cette indication n'est
-         * qu'approximative et il est correct de retourner {@link Boolean#FALSE} de façon
-         * conservative.
+         * Returns {@link Boolean#TRUE} if the specified parser seems to have a valid content.
          */
-        Boolean isValueCountAcceptable(final int count) {
-            return count>10 ? Boolean.TRUE : Boolean.FALSE;
+        //@Override
+        Boolean isValidContent(final LineFormat parser) {
+            return parser.getValueCount() > 10 ? Boolean.TRUE : Boolean.FALSE;
         }
     }
 }

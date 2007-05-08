@@ -16,9 +16,7 @@
  */
 package org.geotools.image.io;
 
-// J2SE dependencies
 import java.awt.color.ColorSpace;
-
 import org.geotools.resources.Utilities;
 
 
@@ -28,8 +26,6 @@ import org.geotools.resources.Utilities;
  * @author Martin Desruisseaux
  * @source $URL$
  * @version $Id$
- *
- * @since 2.1
  */
 final class ScaledColorSpace extends ColorSpace {
     /**
@@ -62,7 +58,7 @@ final class ScaledColorSpace extends ColorSpace {
      */
     public ScaledColorSpace(final int numComponents, final float minimum, final float maximum) {
         super(TYPE_GRAY, numComponents);
-        scale  = (maximum-minimum)/(MAX_VALUE-MIN_VALUE);
+        scale  = (maximum - minimum) / (MAX_VALUE - MIN_VALUE);
         offset = minimum - MIN_VALUE*scale;
     }
     
@@ -70,9 +66,9 @@ final class ScaledColorSpace extends ColorSpace {
      * Returns a RGB color for a gray scale value.
      */
     public float[] toRGB(final float[] values) {
-        float value = (values[0]-offset)/scale;
+        float value = (values[0] - offset) / scale;
         if (Float.isNaN(value)) {
-            value=MIN_VALUE;
+            value = MIN_VALUE;
         }
         return new float[] {value, value, value};
     }
@@ -83,7 +79,7 @@ final class ScaledColorSpace extends ColorSpace {
      */
     public float[] fromRGB(final float[] RGB) {
         final float[] values = new float[getNumComponents()];
-        values[0] = (RGB[0]+RGB[1]+RGB[2])/3*scale + offset;
+        values[0] = (RGB[0] + RGB[1] + RGB[2]) / 3 * scale + offset;
         return values;
     }
     
@@ -93,12 +89,12 @@ final class ScaledColorSpace extends ColorSpace {
     public float[] toCIEXYZ(final float[] values) {
         float value = (values[0]-offset)/scale;
         if (Float.isNaN(value)) {
-            value=MIN_VALUE;
+            value = MIN_VALUE;
         }
         return new float[] {
-            value*0.9642f,
-            value*1.0000f,
-            value*0.8249f
+            value * 0.9642f,
+            value * 1.0000f,
+            value * 0.8249f
         };
     }
     
@@ -115,20 +111,21 @@ final class ScaledColorSpace extends ColorSpace {
      * Returns the minimum value for the specified RGB component.
      */
     public float getMinValue(final int component) {
-        return MIN_VALUE*scale + offset;
+        return MIN_VALUE * scale + offset;
     }
     
     /**
      * Returns the maximum value for the specified RGB component.
      */
     public float getMaxValue(final int component) {
-        return MAX_VALUE*scale + offset;
+        return MAX_VALUE * scale + offset;
     }
     
     /**
      * Returns a string representation of this color model.
      */
     public String toString() {
-        return Utilities.getShortClassName(this)+'['+getMinValue(0)+", "+getMaxValue(0)+']';
+        return Utilities.getShortClassName(this) + 
+                '[' + getMinValue(0) + ", " + getMaxValue(0) + ']';
     }
 }

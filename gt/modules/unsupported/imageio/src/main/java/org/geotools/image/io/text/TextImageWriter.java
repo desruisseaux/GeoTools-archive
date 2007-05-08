@@ -14,9 +14,12 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.image.io;
+package org.geotools.image.io.text;
 
 // Input/output
+import java.awt.geom.AffineTransform;
+import java.io.IOException;
+import javax.imageio.IIOImage;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
@@ -33,8 +36,6 @@ import javax.imageio.spi.ImageWriterSpi;
  * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/coverage/src/main/java/org/geotools/image/io/TextImageWriter.java $
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 abstract class TextImageWriter extends ImageWriter {
     /**
@@ -46,42 +47,41 @@ abstract class TextImageWriter extends ImageWriter {
     protected TextImageWriter(final ImageWriterSpi provider) {
         super(provider);
     }
-    
+
     /**
      * Appends a complete image stream containing a single image.
      */
-    //  public void write(final IIOMetadata streamMetadata, final IIOImage image, final ImageWriteParam param) throws IOException
-    //  {write(image.getRenderedImage(), new AffineTransform(), new Theme[0], param);}
-    
+//    public void write(final IIOMetadata streamMetadata, final IIOImage image,
+//                      final ImageWriteParam param) throws IOException
+//    {
+//        write(image.getRenderedImage(), new AffineTransform(), new Theme[0], param);
+//    }
+
     /**
-     * Returns always {@code null} since
-     * this encoder doesn't support meta-data.
+     * Returns always {@code null} since this encoder doesn't support meta-data.
      */
     public IIOMetadata getDefaultStreamMetadata(ImageWriteParam param) {
         return null;
     }
-    
+
     /**
-     * Returns always {@code null} since
-     * this encoder doesn't support meta-data.
+     * Returns always {@code null} since this encoder doesn't support meta-data.
      */
     public IIOMetadata getDefaultImageMetadata(ImageTypeSpecifier imageType,
                                                ImageWriteParam    param)
     {
         return null;
     }
-    
+
     /**
-     * Returns always {@code inData} since
-     * this encoder doesn't support meta-data.
+     * Returns always {@code inData} since this encoder doesn't support meta-data.
      */
     public IIOMetadata convertStreamMetadata(IIOMetadata inData, ImageWriteParam param) {
         return inData;
     }
-    
+
     /**
-     * Returns always {@code inData} since
-     * this encoder doesn't support meta-data.
+     * Returns always {@code inData} since this encoder doesn't support meta-data.
      */
     public IIOMetadata convertImageMetadata(IIOMetadata        inData,
                                             ImageTypeSpecifier imageType,

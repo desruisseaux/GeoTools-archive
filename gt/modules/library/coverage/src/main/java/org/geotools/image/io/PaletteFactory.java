@@ -332,7 +332,7 @@ public class PaletteFactory {
      * @throws IIOException si une erreur est survenue lors de l'interprétation des codes de couleurs.
      */
     private Color[] getColors(final BufferedReader input) throws IOException {
-        int values[]=new int[3]; // On attend exactement 3 composantes par ligne.
+        int values[] = new int[3]; // On attend exactement 3 composantes par ligne.
         final LineFormat reader = (locale!=null) ? new LineFormat(locale) : new LineFormat();
         final List colors       = new ArrayList();
         String line; while ((line=input.readLine())!=null) try {

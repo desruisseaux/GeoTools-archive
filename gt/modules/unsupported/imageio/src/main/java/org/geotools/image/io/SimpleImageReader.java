@@ -16,15 +16,13 @@
  */
 package org.geotools.image.io;
 
-// Input/output
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
 import java.awt.image.BandedSampleModel;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.SampleModel;
-import java.io.File;
-import java.io.IOException;
+import java.io.*; // Many imports, including some for javadoc only.
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collections;
@@ -40,6 +38,7 @@ import javax.media.jai.ComponentSampleModelJAI;
 import javax.media.jai.util.Range;
 
 import org.geotools.util.Logging;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ComponentColorModelJAI;
@@ -48,15 +47,14 @@ import org.geotools.resources.image.ComponentColorModelJAI;
 /**
  * Base class for simple image decoders. "Simple" images are usually flat binary
  * or ASCII files with no meta-data and no color information. There pixel values
- * may be floating point values instead of integers.  Such formats are of common
- * use in remote sensing.
+ * may be floating point values instead of integers.
  * <p>
  * This base class makes it easier to construct images from floating point values.
  * It provides default implementations for most {@link ImageReader} methods. Since
- * {@code SimpleImageReader} does not expect to know anything about image's
- * color, it uses a grayscale color space scaled to fit the range of values.
- * Displaying such an image may be very slow. Consequently, users who want
- * to display image are encouraged to change data type and color space with
+ * {@code SimpleImageReader} does not expect to know anything about image's color,
+ * it uses a grayscale color space scaled to fit the range of values. Displaying
+ * such an image may be very slow. Consequently, users who want to display image
+ * are encouraged to change data type and color space with
  * <a href="http://java.sun.com/products/java-media/jai/">Java Advanced Imaging</a>
  * operators after reading.
  *
@@ -64,105 +62,141 @@ import org.geotools.resources.image.ComponentColorModelJAI;
  * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/coverage/src/main/java/org/geotools/image/io/SimpleImageReader.java $
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @see TextRecordImageReader
- * @see TextMatrixImageReader
  */
 public abstract class SimpleImageReader extends ImageReader {
     /**
      * Tells if we should use {@link javax.media.jai.ComponentSampleModelJAI}
      * instead of the more standard {@link java.awt.image.ComponentSampleModel}.
      * There is two problems with model provided with J2SE 1.4:
-     *
+     * <p>
      * <ul>
-     *   <li>As of J2SE 1.4.0, {@link ImageTypeSpecifier#createBanded}
-     *       doesn't accept {@link DataBuffer#TYPE_FLOAT} and
-     *       {@link DataBuffer#TYPE_DOUBLE} argument.</li>
-     *   <li>As of JAI 1.1, operators don't accept Java2D's
-     *       {@link java.awt.image.DataBufferFloat} and
-     *       {@link java.awt.image.DataBufferDouble}.
-     *       They require JAI's DataBuffer instead.</li>
+     *   <li>As of J2SE 1.4.0, {@link ImageTypeSpecifier#createBanded} doesn't accept
+     *       {@link DataBuffer#TYPE_FLOAT} and {@link DataBuffer#TYPE_DOUBLE} argument.</li>
+     *   <li>As of JAI 1.1, operators don't accept Java2D's {@link java.awt.image.DataBufferFloat}
+     *       and {@link java.awt.image.DataBufferDouble}. They require JAI's DataBuffer instead.</li>
      * </ul>
-     *
-     * This flag is set to {@code true} for J2SE 1.4.
-     * It may be turned to {@code false} with future
-     * J2SE and JAI versions.
+     * <p>
+     * This flag is set to {@code true} for J2SE 1.4. It may be
+     * changed to {@code false} with future J2SE and JAI versions.
      */
-    static final boolean USE_JAI_MODEL = true;
-    
+    private static final boolean USE_JAI_MODEL = true;
+
+    /**
+     * The stream to {@linkplain #close close} on {@link #setInput(Object,boolean,boolean)
+     * setInput(...)}, {@link #reset} or {@link #dispose} method invocation. This stream is
+     * typically an {@linkplain InputStream input stream} or a {@linkplain Reader reader}
+     * created by {@link #getInputStream} or similar methods in subclasses.
+     * <p>
+     * This field is never equals to the user-specified {@linkplain #input input}, since the
+     * usual {@link ImageReader} contract is to <strong>not</strong> close the user-provided
+     * stream. It is set to a non-null value only if a stream has been created from an other
+     * user object like {@link File} or {@link URL}.
+     *
+     * @see #getInputStream
+     * @see org.geotools.image.io.text.TextImageReader#getReader
+     * @see #close
+     *
+     * @since 2.4
+     */
+    protected Closeable closeOnReset;
+
+    /**
+     * {@link #input} as an input stream, or {@code null} if none.
+     *
+     * @see #getInputStream
+     */
+    private InputStream stream;
+
     /**
      * The stream position when {@link #setInput} is invoked.
      */
     private long streamOrigin;
-    
+
     /**
      * Constructs a new image reader.
      *
-     * @param provider The {@link ImageReaderSpi} that is invoking this constructor, or
-     *                 {@code null}.
+     * @param provider The {@link ImageReaderSpi} that is invoking this constructor,
+     *        or {@code null} if none.
      */
     protected SimpleImageReader(final ImageReaderSpi provider) {
         super(provider);
     }
-    
+
     /**
-     * Sets the input source to use. If {@code input} is {@code null},
-     * any currently set input source will be removed.
+     * Sets the input source to use. Input may be one of the following object:
+     * {@link File}, {@link URL}, {@link Reader} (for ASCII data), {@link InputStream} or
+     * {@link ImageInputStream}. If {@code input} is {@code null}, then any currently
+     * set input source will be removed.
      *
      * @param input           The input object to use for future decoding.
-     * @param seekForwardOnly If true, images and metadata may only be read
+     * @param seekForwardOnly If {@code true}, images and metadata may only be read
      *                        in ascending order from this input source.
-     * @param ignoreMetadata  If true, metadata may be ignored during reads.
+     * @param ignoreMetadata  If {@code true}, metadata may be ignored during reads.
+     *
+     * @see #getInput
+     * @see #getInputStream
      */
     public void setInput(final Object  input,
                          final boolean seekForwardOnly,
                          final boolean ignoreMetadata)
     {
+        closeSilently();
         super.setInput(input, seekForwardOnly, ignoreMetadata);
         if (input instanceof ImageInputStream) {
             try {
                 streamOrigin = ((ImageInputStream) input).getStreamPosition();
             } catch (IOException exception) {
                 streamOrigin = 0;
-                Logging.unexpectedException("org.geotools.gcs",
+                Logging.unexpectedException("org.geotools.image.io",
                         SimpleImageReader.class, "setInput", exception);
             }
         }
     }
-    
+
     /**
-     * Vérifie si l'index de l'image est dans la plage des valeurs
-     * autorisées. L'index maximal autorisé est obtenu en appelant
-     * <code>{@link #getNumImages getNumImages}(false)</code>.
+     * Ensures that the specified image index is inside the expected range.
+     * The expected range is {@link #minIndex minIndex} inclusive (initially 0)
+     * to <code>{@link #getNumImages getNumImages}(false)</code> exclusive.
      *
-     * @param  imageIndex Index dont on veut vérifier la validité.
-     * @throws IndexOutOfBoundsException si l'index spécifié n'est pas valide.
-     * @throws IOException si l'opération a échouée à cause d'une erreur d'entrés/sorties.
+     * @param  imageIndex Index to check for validity.
+     * @throws IndexOutOfBoundsException if the specified index is outside the expected range.
+     * @throws IOException If the operation failed because of an I/O error.
+     *
+     * @since 2.4
      */
-    final void checkImageIndex(final int imageIndex) throws IOException, IndexOutOfBoundsException {
+    protected void checkImageIndex(final int imageIndex)
+            throws IOException, IndexOutOfBoundsException
+    {
         final int numImages = getNumImages(false);
-        if (imageIndex<minIndex || (imageIndex>=numImages && numImages>=0)) {
-            throw new IndexOutOfBoundsException(String.valueOf(imageIndex));
+        if (imageIndex < minIndex || (imageIndex >= numImages && numImages >= 0)) {
+            throw new IndexOutOfBoundsException(Errors.format(ErrorKeys.VALUE_OUT_OF_BOUNDS_$3,
+                    new Integer(imageIndex), new Integer(minIndex), new Integer(numImages-1)));
         }
     }
-    
+
     /**
-     * Vérifie si l'index de la bande est dans la plage des valeurs
-     * autorisées. L'index maximal autorisé est obtenu en appelant
-     * {@link #getNumBands}. L'index de l'image sera aussi vérifié.
+     * Ensures that the specified band index is inside the expected range. The expected
+     * range is 0 inclusive to <code>{@link #getNumBands getNumBands}(imageIndex)</code>
+     * exclusive.
      *
-     * @param  imageIndex Index de l'image dont on veut vérifier la validité.
-     * @param  bandIndex  Index de la bande dont on veut vérifier la validité.
-     * @throws IndexOutOfBoundsException si l'index spécifié n'est pas valide.
-     * @throws IOException si l'opération a échouée à cause d'une erreur d'entrés/sorties.
+     * @param  imageIndex The image index.
+     * @param  bandIndex Index to check for validity.
+     * @throws IndexOutOfBoundsException if the specified index is outside the expected range.
+     * @throws IOException If the operation failed because of an I/O error.
+     *
+     * @since 2.4
      */
-    final void checkBandIndex(final int imageIndex, final int bandIndex) throws IOException, IndexOutOfBoundsException {
+    protected void checkBandIndex(final int imageIndex, final int bandIndex)
+            throws IOException, IndexOutOfBoundsException
+    {
         // Call 'getNumBands' first in order to call 'checkImageIndex'.
-        if (bandIndex>=getNumBands(imageIndex) || bandIndex<0) {
-            throw new IndexOutOfBoundsException(String.valueOf(bandIndex));
+        final int numBands = getNumBands(imageIndex);
+        if (bandIndex >= numBands || bandIndex < 0) {
+            throw new IndexOutOfBoundsException(Errors.format(ErrorKeys.VALUE_OUT_OF_BOUNDS_$3,
+                    new Integer(bandIndex), new Integer(0), new Integer(numBands-1)));
         }
     }
-    
+
     /**
      * Returns the number of images available from the current input source.
      * The default implementation returns 1.
@@ -181,7 +215,7 @@ public abstract class SimpleImageReader extends ImageReader {
         }
         throw new IllegalStateException(Errors.format(ErrorKeys.NO_IMAGE_INPUT));
     }
-    
+
     /**
      * Returns the number of bands available for the specified image.
      * The default implementation returns 1.
@@ -193,7 +227,7 @@ public abstract class SimpleImageReader extends ImageReader {
         checkImageIndex(imageIndex);
         return 1;
     }
-    
+
     /**
      * Returns metadata associated with the given image. Since many raw images
      * can't store metadata, the default implementation returns {@code null}.
@@ -204,7 +238,7 @@ public abstract class SimpleImageReader extends ImageReader {
         checkImageIndex(imageIndex);
         return null;
     }
-    
+
     /**
      * Returns metadata associated with the input source as a whole. Since many raw images
      * can't store metadata, the default implementation returns {@code null}.
@@ -214,7 +248,7 @@ public abstract class SimpleImageReader extends ImageReader {
     public IIOMetadata getStreamMetadata() throws IOException {
         return null;
     }
-    
+
     /**
      * Returns a collection of {@link ImageTypeSpecifier} containing possible image
      * types to which the given image may be decoded. The default implementation
@@ -227,7 +261,7 @@ public abstract class SimpleImageReader extends ImageReader {
     public Iterator getImageTypes(final int imageIndex) throws IOException {
         return Collections.singleton(getRawImageType(imageIndex)).iterator();
     }
-    
+
     /**
      * Returns an image type specifier indicating the {@link SampleModel} and {@link ColorModel}
      * which most closely represents the "raw" internal format of the image. The default
@@ -238,10 +272,11 @@ public abstract class SimpleImageReader extends ImageReader {
      * @return The image type (never {@code null}).
      * @throws IOException If an error occurs reading the format information from the input source.
      */
+    //@Override
     public ImageTypeSpecifier getRawImageType(final int imageIndex) throws IOException {
         return getRawImageType(imageIndex, getNumBands(imageIndex));
     }
-    
+
     /**
      * Returns an image type specifier indicating the {@link SampleModel} and
      * {@link ColorModel} which most closely represents the "raw" internal
@@ -251,16 +286,18 @@ public abstract class SimpleImageReader extends ImageReader {
      * @param  numBands   The number of bands.
      * @return The image type (never {@code null}).
      * @throws IOException If an error occurs reading the format information from the input source.
+     *
+     * @since 2.4
      */
-    final ImageTypeSpecifier getRawImageType(final int imageIndex, final int numBands)
-        throws IOException
+    protected ImageTypeSpecifier getRawImageType(final int imageIndex, final int numBands)
+            throws IOException
     {
         final int dataType = getRawDataType(imageIndex);
         final int[] bankIndices = new int[numBands];
         final int[] bandOffsets = new int[numBands];
         for (int i=numBands; --i>=0;) bankIndices[i]=i;
         final ColorSpace colorSpace = getColorSpace(imageIndex, 0, numBands);
-        
+
         if (USE_JAI_MODEL) {
             final ColorModel cm = new ComponentColorModelJAI(colorSpace, null, false, false,
                                                              Transparency.OPAQUE, dataType);
@@ -271,7 +308,7 @@ public abstract class SimpleImageReader extends ImageReader {
                                                    bandOffsets, dataType, false, false);
         }
     }
-    
+
     /**
      * Returns the data type which most closely represents the "raw"
      * internal data of the image. It should be a constant from
@@ -288,7 +325,7 @@ public abstract class SimpleImageReader extends ImageReader {
         checkImageIndex(imageIndex);
         return DataBuffer.TYPE_FLOAT;
     }
-    
+
     /**
      * Returns the expected range of values for a band. Implementation
      * may read image data, or just returns some raisonable range.
@@ -301,8 +338,8 @@ public abstract class SimpleImageReader extends ImageReader {
      * @throws IOException If an error occurs reading the data information from the input source.
      */
     public abstract Range getExpectedRange(final int imageIndex, final int bandIndex)
-        throws IOException;
-    
+            throws IOException;
+
     /**
      * Returns a default color space. Default implementation returns a
      * grayscale color space scaled to fit {@link #getExpectedRange}.
@@ -337,7 +374,7 @@ public abstract class SimpleImageReader extends ImageReader {
         }
         return ColorSpace.getInstance(ColorSpace.CS_GRAY);
     }
-    
+
     /**
      * Convenience method returning the destination band for the
      * specified source band. If the specified source band is not
@@ -357,7 +394,7 @@ public abstract class SimpleImageReader extends ImageReader {
         }
         return -1;
     }
-    
+
     /**
      * Convenience method returning the source
      * band for the specified destination band.
@@ -376,20 +413,23 @@ public abstract class SimpleImageReader extends ImageReader {
         }
         throw new IllegalArgumentException(String.valueOf(destBand));
     }
-    
+
     /**
-     * Retourne la longueur (en nombre d'octets) des données à lire, ou {@code -1} si cette longueur
-     * n'est pas connue.  Cette méthode examine le type d'entré (@link #getInput}) et appelle une méthode
-     * {@link File#length()}, {@link ImageInputStream#length()} ou {@link URLConnection#getContentLength()}
-     * en fonction du type d'entré.
+     * Returns the stream length in bytes, or {@code -1} if unknown. This method checks the
+     * {@linkplain #input input} type and invokes one of {@link File#length()},
+     * {@link ImageInputStream#length()} ou {@link URLConnection#getContentLength()} method
+     * accordingly.
      *
-     * @throws IOException si une erreur est survenue.
+     * @return The stream length, or -1 is unknown.
+     * @throws IOException if an I/O error occured.
+     *
+     * @since 2.4
      */
-    final long getStreamLength() throws IOException {
-        final Object input=getInput();
+    protected long getStreamLength() throws IOException {
+        final Object input = getInput();
         if (input instanceof ImageInputStream) {
             long length = ((ImageInputStream) input).length();
-            if (length>=0) {
+            if (length >= 0) {
                 length -= streamOrigin;
             }
             return length;
@@ -405,45 +445,116 @@ public abstract class SimpleImageReader extends ImageReader {
         }
         return -1;
     }
-    
+
     /**
-     * Retourne une approximation du nombre d'octets du flot occupés par les
-     * images {@code fromImage} inclusivement jusqu'à {@code toImage}
-     * exclusivement. L'implémentation par défaut calcule cette longueur en
-     * supposant que toutes les images se divisent la longueur totale du flot
-     * en parts égales.
+     * Returns the {@linkplain #input input} as an {@linkplain InputStream input stream} object.
+     * If the input is already an input stream, it is returned unchanged. Otherwise this method
+     * creates a new {@linkplain InputStream input stream} (usually <strong>not</strong>
+     * {@linkplain BufferedInputStream buffered}) from {@link File}, {@link URL},
+     * {@link URLConnection} or {@link ImageInputStream} inputs.
+     * <p>
+     * This method creates a new {@linkplain InputStream input stream} only when first invoked.
+     * All subsequent calls will returns the same instance. Consequently, the returned stream
+     * should never be closed by the caller. It may be {@linkplain #close closed} automatically
+     * when {@link #setInput setInput(...)}, {@link #reset()} or {@link #dispose()} methods are
+     * invoked.
      *
-     * @param fromImage Index de la première image à prendre en compte.
-     * @param   toImage Index suivant celui de la dernière image à prendre en
-     *                  compte, ou -1 pour prendre en compte toutes les images
-     *                  restantes jusqu'à la fin du flot.
-     * @return Le nombre d'octets occupés par les images spécifiés, ou -1 si
-     *         cette longueur n'a pas pu être calculée. Si le calcul précis de
-     *         cette longueur serait prohibitif, cette méthode est autorisée à
-     *         retourner une simple approximation ou même à retourner la longueur
-     *         totale du flot.
-     * @throws IOException si une erreur est survenue lors de la lecture du flot.
+     * @return {@link #getInput} as an {@link InputStream}. This input stream is usually
+     *         not {@linkplain BufferedInputStream buffered}.
+     * @throws IllegalStateException if the {@linkplain #input input} is not set.
+     * @throws IOException If the input stream can't be created for an other reason.
+     *
+     * @see #getInput
+     * @see org.geotools.image.io.text.TextImageReader#getReader
+     *
+     * @since 2.4
      */
-    final long getStreamLength(final int fromImage, int toImage) throws IOException {
-        long length = getStreamLength();
-        if (length > 0) {
-            final int numImages = getNumImages(false);
-            if (numImages > 0) {
-                if (toImage == -1) {
-                    toImage=numImages;
-                }
-                if (fromImage<0 || fromImage>numImages) {
-                    throw new IndexOutOfBoundsException(String.valueOf(fromImage));
-                }
-                if (toImage<0 || toImage>numImages) {
-                    throw new IndexOutOfBoundsException(String.valueOf(  toImage));
-                }
-                if (fromImage > toImage) {
-                    throw new IllegalArgumentException();
-                }
-                return length * (toImage-fromImage) / numImages;
+    protected InputStream getInputStream() throws IllegalStateException, IOException {
+        if (stream == null) {
+            final Object input = getInput();
+            if (input == null) {
+                throw new IllegalStateException(Errors.format(ErrorKeys.NO_IMAGE_INPUT));
+            }
+            if (input instanceof InputStream) {
+                stream = (InputStream) input;
+                closeOnReset = null; // We don't own the stream, so don't close it.
+            } else if (input instanceof File) {
+                stream = new FileInputStream((File) input);
+                closeOnReset = stream;
+            } else if (input instanceof URL) {
+                stream = ((URL) input).openStream();
+                closeOnReset = stream;
+            } else if (input instanceof URLConnection) {
+                stream = ((URLConnection) input).getInputStream();
+                closeOnReset = stream;
+            } else if (input instanceof ImageInputStream) {
+                stream = new InputStreamAdapter((ImageInputStream) input);
+                closeOnReset = null; // We don't own the ImageInputStream, so don't close it.
+            } else {
+                throw new IllegalStateException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
+                        Utilities.getShortClassName(input),
+                        Utilities.getShortClassName(InputStream.class)));
             }
         }
-        return length;
+        return stream;
+    }
+
+    /**
+     * Closes the input stream created by {@link #getInputStream()}. This method does nothing
+     * if the input stream is the {@linkplain #input input} instance given by the user rather
+     * than a stream created by this class from a {@link File} or {@link URL} input.
+     * <p>
+     * This method is invoked automatically by {@link #setInput(Object,boolean,boolean)
+     * setInput(...)}, {@link #reset} or {@link #dispose} methods and doesn't need to be
+     * invoked explicitly. It has protected access only in order to allow overriding by
+     * subclasses.
+     *
+     * @throws IOException if an error occured while closing the stream.
+     *
+     * @see #closeOnReset
+     *
+     * @since 2.4
+     */
+    protected void close() throws IOException {
+        if (closeOnReset != null) {
+            closeOnReset.close();
+        }
+        closeOnReset = null;
+        stream = null;
+    }
+
+    /**
+     * Invokes {@link #close} and log the exception if any. This method is invoked from
+     * methods that do not allow {@link IOException} to be thrown. Since we will not use
+     * the stream anymore after closing it, it should not be a big deal if an error occured.
+     */
+    private void closeSilently() {
+        try {
+            close();
+        } catch (IOException exception) {
+            Logging.unexpectedException("org.geotools.image.io", getClass(), "close", exception);
+        }
+    }
+
+    /**
+     * Restores the {@code SimpleImageReader} to its initial state. If an input stream were
+     * created by a previous call to {@link #getInputStream}, it will be {@linkplain #close
+     * closed} before to reset this reader.
+     */
+    //@Override
+    public void reset() {
+        closeSilently();
+        super.reset();
+    }
+
+    /**
+     * Allows any resources held by this reader to be released. If an input stream were created
+     * by a previous call to {@link #getInputStream}, it will be {@linkplain #close closed}
+     * before to dispose this reader.
+     */
+    //@Override
+    public void dispose() {
+        closeSilently();
+        super.dispose();
     }
 }

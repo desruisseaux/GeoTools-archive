@@ -17,6 +17,7 @@
 package org.geotools.io;
 
 // Text format
+import java.lang.reflect.Array;
 import java.text.FieldPosition;
 import java.text.Format;
 import java.text.NumberFormat;
@@ -33,13 +34,13 @@ import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
- * Parse a line of text data. This class is mostly used for parsing lines in a matrix or a table.
+ * Parses a line of text data. This class is mostly used for parsing lines in a matrix or a table.
  * Each column may contains numbers, dates, or other objects parseable by some {@link Format}
  * implementations. The example below reads dates in the first column and numbers in all
  * remaining columns.
  *
  * <blockquote><pre>
- * final LineParser parser=new LineFormat(new Format[] {
+ * final LineParser parser = new LineFormat(new Format[] {
  *     {@link java.text.DateFormat#getDateTimeInstance()},
  *     {@link java.text.NumberFormat#getNumberInstance()}
  * });
@@ -55,7 +56,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * <blockquote><pre>
  * &nbsp;double[] data=null;
  * &nbsp;final {@link java.io.BufferedReader} in = new {@link java.io.BufferedReader}(new {@link java.io.FileReader}("MATRIX.TXT"));
- * &nbsp;for ({@link String} line; (line=in.readLine())!=null;) {
+ * &nbsp;for ({@link String} line; (line=in.readLine()) != null;) {
  * &nbsp;    parser.setLine(line);
  * &nbsp;    data = parser.getValues(data);
  * &nbsp;    // ... process 'data' here ...
@@ -64,20 +65,18 @@ import org.geotools.resources.i18n.ErrorKeys;
  *
  * This code can work as well with dates instead of numbers. In this case, the values returned
  * will be microseconds ellapsed since January 1st, 1970.
- * <br><br>
+ * <p>
  * A {@link ParseException} may be thrown because a string can't be parsed, because an object
  * can't be converted into a number or because a line don't have the expected number of columns.
  * In all case, it is possible to gets the index of the first problem found using
  * {@link ParseException#getErrorOffset}.
- *
- * @todo This class is intented to be a subclass of {@link Format}.
  *
  * @since 2.0
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class LineFormat {
+public class LineFormat extends Format {
     /**
      * Nombre de données valides dans le tableau {@link #data}.
      * Il s'agit du nombre de données lues lors du dernier appel
@@ -104,7 +103,7 @@ public class LineFormat {
      * Objet {@link ParsePosition} utilisé lors de la lecture pour spécifier quelle
      * partie de la chaîne doit être interprétée.
      */
-    private final ParsePosition position=new ParsePosition(0);
+    private final ParsePosition position = new ParsePosition(0);
 
     /**
      * Index du caractère auquel commençaient les éléments qui ont été lus. Par exemple
@@ -128,97 +127,93 @@ public class LineFormat {
     }
 
     /**
-     * Construit un objet qui lira des nombres écrits selon les convention du
-     * pays spécifié. Par exemple on peut spécifier {@link Locale#US} pour lire
-     * des nombres qui utilisent le point comme séparateur décimal.
+     * Constructs a new line parser for the specified locale. For example {@link Locale#US}
+     * may be used for reading numbers using the dot as decimal separator.
      */
     public LineFormat(final Locale locale) {
         this(NumberFormat.getNumberInstance(locale));
     }
 
     /**
-     * Construit un objet qui lira des dates, des nombres ou
-     * tous autres objets écrits selon le format spécifié.
+     * Constructs a new line parser using the specified format for every columns.
      *
-     * @param format Format à utiliser.
-     * @throws NullPointerException si {@code format} est nul.
+     * @param format The format to use.
+     * @throws IllegalArgumentException if {@code format} is null.
      */
-    public LineFormat(final Format format) throws NullPointerException {
+    public LineFormat(final Format format) throws IllegalArgumentException {
         this.data   = new Object[16];
-        this.limits = new int   [16+1];
+        this.limits = new int[data.length + 1];
         this.format = new Format[] {format};
-        if (format==null) {
-            final Integer one=new Integer(1);
-            throw new NullPointerException(Errors.format(ErrorKeys.NULL_FORMAT_$2, one, one));
+        if (format == null) {
+            final Integer one = new Integer(1);
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_FORMAT_$2, one, one));
         }
     }
 
     /**
-     * Construit un objet qui lira des dates, des nombres ou tous autres objets écrits selon
-     * les formats spécifiés. Le tableau de format spécifié en argument donne les formats
-     * attendus des premières colonnes. Par exemple {@code formats[0]} donne le format
-     * de la première colonne, {@code formats[1]} donne le format de la deuxième colonne,
-     * etc. S'il y a plus de colonnes que de formats spécifiés, le dernier format sera réutilisé
-     * pour toutes les colonnes restantes.
+     * Constructs a new line parser using the specified format objects. For example the first
+     * column will be parsed using {@code formats[0]}; the second column will be parsed using
+     * {@code formats[1]}, <cite>etc.</cite> If there is more columns than formats, then the
+     * last format object is reused for all remaining columns.
      *
-     * @param formats Tableau de formats à utiliser.
-     * @throws NullPointerException si {@code formats} est nul ou si si un des formats est nul.
+     * @param  formats The formats to use for parsing.
+     * @throws IllegalArgumentException if {@code formats} is null or an element of
+     *         {@code format} is null.
      */
-    public LineFormat(final Format[] formats) throws NullPointerException {
+    public LineFormat(final Format[] formats) throws IllegalArgumentException {
         this.data   = new Object[formats.length];
         this.format = new Format[formats.length];
-        this.limits = new int   [formats.length+1];
+        this.limits = new int   [formats.length + 1];
         System.arraycopy(formats, 0, format, 0, formats.length);
         for (int i=0; i<format.length; i++) {
-            if (format[i]==null) {
-                throw new NullPointerException(Errors.format(ErrorKeys.NULL_FORMAT_$2,
-                                               new Integer(i+1), new Integer(format.length)));
+            if (format[i] == null) {
+                throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_FORMAT_$2,
+                        new Integer(i+1), new Integer(format.length)));
             }
         }
     }
 
     /**
-     * Oublie toute les données mémorisées. Le prochain appel
-     * de la méthode {@link #getValueCount} retournera 0.
+     * Clear this parser. Next call to {@link #getValueCount} will returns 0.
      */
-    public synchronized void clear() {
-        line=null;
+    public void clear() {
+        line = null;
         Arrays.fill(data, null);
-        count=0;
+        count = 0;
     }
 
     /**
-     * Défini la prochaine ligne qui sera à interpréter.
+     * Parse the specified line. The content is immediately parsed and values
+     * can be obtained using one of the {@code getValues(...)} method.
      *
-     * @param  line Ligne à interpréter.
-     * @return Nombre d'éléments trouvés dans la ligne. Cette information peut
-     *         aussi être obtenue par un appel à {@link #getValueCount}.
-     * @throws ParseException si des éléments n'ont pas pu être interprétés.
+     * @param  line The line to parse.
+     * @return The number of elements parsed in the specified line.
+     *         The same information can be obtained with {@link #getValueCount}.
+     * @throws ParseException If at least one column can't be parsed.
      */
     public int setLine(final String line) throws ParseException {
         return setLine(line, 0, line.length());
     }
 
     /**
-     * Défini la prochaine ligne qui sera à interpréter.
+     * Parse a substring of the specified line. The content is immediately parsed
+     * and values can be obtained using one of the {@code getValues(...)} method.
      *
-     * @param  line  Ligne à interpréter.
-     * @param  lower Index du premier caractère de {@code line} à prendre en compte.
-     * @param  upper Index suivant celui du dernier caractère de {@code line} à prendre en compte.
-     * @return Nombre d'éléments trouvés dans la ligne. Cette information peut
-     *         aussi être obtenue par un appel à {@link #getValueCount}.
-     * @throws ParseException si des éléments n'ont pas pu être interprétés.
+     * @param  line  The line to parse.
+     * @param  lower Index of the first character in {@code line} to parse.
+     * @param  upper Index after the last character in {@code line} to parse.
+     * @return The number of elements parsed in the specified line.
+     *         The same information can be obtained with {@link #getValueCount}.
+     * @throws ParseException If at least one column can't be parsed.
      */
-    public synchronized int setLine(final String line, int lower, final int upper)
-        throws ParseException
-    {
+    public int setLine(final String line, int lower, final int upper) throws ParseException {
         /*
          * Retient la ligne que l'utilisateur nous demande
          * de lire et oublie toutes les anciennes valeurs.
          */
-        this.line=line;
+        this.line = line;
         Arrays.fill(data, null);
-        count=0;
+        count = 0;
         /*
          * Procède au balayage de toutes les valeurs qui se trouvent sur la ligne spécifiée.
          * Le balayage s'arrêtera lorsque {@code lower} aura atteint {@code upper}.
@@ -236,12 +231,12 @@ public class LineFormat {
              * qui apparaîtra éventuellement en HTML afin de pouvoir souligner la partie fautive.
              */
             position.setIndex(lower);
-            final Object datum=format[Math.min(count, format.length-1)].parseObject(line, position);
-            final int next=position.getIndex();
-            if (datum==null || next<=lower) {
+            final Object datum = format[Math.min(count, format.length-1)].parseObject(line, position);
+            final int next = position.getIndex();
+            if (datum == null || next <= lower) {
                 final int error = position.getErrorIndex();
                 int end = error;
-                while (end<upper && !Character.isWhitespace(line.charAt(end))) end++;
+                while (end < upper && !Character.isWhitespace(line.charAt(end))) end++;
                 throw new ParseException(Errors.format(ErrorKeys.PARSE_EXCEPTION_$2,
                           line.substring(lower, end).trim(),
                           line.substring(error, Math.min(error+1, end))), error);
@@ -258,36 +253,53 @@ public class LineFormat {
             data[count++] = datum;
             lower = next;
         }
-        limits[count]=lower;
+        limits[count] = lower;
         return count;
     }
 
     /**
-     * Retourne le nombre de données trouvées dans la dernière
-     * ligne à avoir été spécifiée à {@link #setLine(String)}.
+     * Returns the number of elements found in the last line parsed by
+     * {@link #setLine(String)}.
      */
-    public synchronized int getValueCount() {
+    public int getValueCount() {
         return count;
     }
 
     /**
-     * Modifie ou ajoute une valeur. L'index de la valeur doit être compris de
-     * 0 à {@link #getValueCount} inclusivement. Si l'index est égal au nombre
-     * de données retourné par {@link #getValueCount}, alors {@code value}
-     * sera ajouté à la fin des données existante et une colonne sera ajoutée.
+     * Set all values in the current line. The {@code values} argument must be an array,
+     * which may be of primitive type.
      *
-     * @param  index Index de la donnée à modifier ou ajouter.
-     * @param  value Nouvelle valeur à retenir.
-     * @throws ArrayIndexOutOfBoundsException si l'index est en dehors de la plage permise.
+     * @param  values The array to set as values.
+     * @throws IllegalArgumentException if {@code values} is not an array.
+     *
+     * @since 2.4
      */
-    public synchronized void setValue(final int index, final Object value)
-        throws ArrayIndexOutOfBoundsException
+    public void setValues(final Object values) throws IllegalArgumentException {
+        final int length = Array.getLength(values);
+        data = XArray.resize(data, length);
+        for (int i=0; i<length; i++) {
+            data[i] = Array.get(values, i);
+        }
+        count = length;
+    }
+
+    /**
+     * Set or add a value to current line. The index should be in the range 0 to
+     * {@link #getValueCount} inclusively. If the index is equals to {@link #getValueCount},
+     * then {@code value} will be appended as a new column after existing data.
+     *
+     * @param  index Index of the value to add or modify.
+     * @param  value The new value.
+     * @throws ArrayIndexOutOfBoundsException If the index is outside the expected range.
+     */
+    public void setValue(final int index, final Object value)
+            throws ArrayIndexOutOfBoundsException
     {
         if (index > count) {
             throw new ArrayIndexOutOfBoundsException(index);
         }
         if (value == null) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, "value"));
         }
         if (index == count) {
             if (index == data.length) {
@@ -295,23 +307,31 @@ public class LineFormat {
             }
             count++;
         }
-        data[index]=value;
+        data[index] = value;
     }
 
     /**
-     * Retourne la valeur à l'index spécifié. Cet index doit être
-     * compris de 0 inclusivement jusqu'à {@link #getValueCount}
-     * exclusivement.
+     * Returns the value at the specified index. The index should be in the range
+     * 0 inclusively to {@link #getValueCount} exclusively.
      *
-     * @param  index Index de la donnée demandée.
-     * @return Valeur à l'index demandé.
-     * @throws ArrayIndexOutOfBoundsException si l'index est en dehors de la plage permise.
+     * @param  index Index of the value to fetch.
+     * @return The value at the specified index.
+     * @throws ArrayIndexOutOfBoundsException If the index is outside the expected range.
      */
-    public synchronized Object getValue(final int index) throws ArrayIndexOutOfBoundsException {
+    public Object getValue(final int index) throws ArrayIndexOutOfBoundsException {
         if (index < count) {
             return data[index];
         }
         throw new ArrayIndexOutOfBoundsException(index);
+    }
+
+    /**
+     * Returns all values.
+     */
+    private Object getValues() {
+        final Object[] values = new Object[count];
+        System.arraycopy(data, 0, values, 0, count);
+        return values;
     }
 
     /**
@@ -331,30 +351,28 @@ public class LineFormat {
                 error = exception;
             }
         }
-        ParseException exception = new ParseException(Errors.format(ErrorKeys.UNPARSABLE_NUMBER_$1,
-                                                      data[index]), limits[index]);
-        if (error!=null) {
+        ParseException exception = new ParseException(
+                Errors.format(ErrorKeys.UNPARSABLE_NUMBER_$1, data[index]), limits[index]);
+        if (error != null) {
             exception.initCause(error);
         }
         throw exception;
     }
 
     /**
-     * Copie vers le tableau spécifié les valeurs lues dans la ligne. Cette méthode peut être
-     * appelée après {@link #setLine(String)} pour copier vers {@code array} les valeurs
-     * qui ont été lues. Si {@code array} est nul, cette méthode créera et retournera un
-     * tableau qui aura la longueur tout juste suffisante pour contenir toutes les données.
-     * Mais si {@code array} est non-nul, alors cette méthode exigera que la longueur du
-     * tableau soit égale au nombre de données.
+     * Copies all values to the specified array. This method is typically invoked after
+     * {@link #setLine(String)} for fetching the values just parsed. If {@code array} is
+     * null, this method creates and returns a new array with a length equals to number
+     * of elements parsed. If {@code array} is not null, then this method will thrown an
+     * exception if the array length is not exactly equals to the number of elements
+     * parsed.
      *
-     * @param  array Tableau dans lequel copier les valeurs.
-     * @return {@code array} s'il était non-nul, ou un tableau nouvellement
-     *         créé avec la bonne longueur si {@code array} était nul.
-     * @throws ParseException si {@code array} était non-nul et que sa longueur
-     *         ne correspond pas au nombre de données lues, ou si une des données lues
-     *         n'est pas convertible en nombre.
+     * @param  array The array to copy values into.
+     * @return {@code array} if it was not null, or a new array otherwise.
+     * @throws ParseException If {@code array} was not null and its length is not equals to
+     *         the number of elements parsed, or if at least one element can't be parsed.
      */
-    public synchronized double[] getValues(double[] array) throws ParseException {
+    public double[] getValues(double[] array) throws ParseException {
         if (array != null) {
             checkLength(array.length);
         } else {
@@ -367,21 +385,19 @@ public class LineFormat {
     }
 
     /**
-     * Copie vers le tableau spécifié les valeurs lues dans la ligne. Cette méthode peut être
-     * appelée après {@link #setLine(String)} pour copier vers {@code array} les valeurs
-     * qui ont été lues. Si {@code array} est nul, cette méthode créera et retournera un
-     * tableau qui aura la longueur tout juste suffisante pour contenir toutes les données.
-     * Mais si {@code array} est non-nul, alors cette méthode exigera que la longueur du
-     * tableau soit égale au nombre de données.
+     * Copies all values to the specified array. This method is typically invoked after
+     * {@link #setLine(String)} for fetching the values just parsed. If {@code array} is
+     * null, this method creates and returns a new array with a length equals to number
+     * of elements parsed. If {@code array} is not null, then this method will thrown an
+     * exception if the array length is not exactly equals to the number of elements
+     * parsed.
      *
-     * @param  array Tableau dans lequel copier les valeurs.
-     * @return {@code array} s'il était non-nul, ou un tableau nouvellement
-     *         créé avec la bonne longueur si {@code array} était nul.
-     * @throws ParseException si {@code array} était non-nul et que sa longueur
-     *         ne correspond pas au nombre de données lues, ou si une des données lues
-     *         n'est pas convertible en nombre.
+     * @param  array The array to copy values into.
+     * @return {@code array} if it was not null, or a new array otherwise.
+     * @throws ParseException If {@code array} was not null and its length is not equals to
+     *         the number of elements parsed, or if at least one element can't be parsed.
      */
-    public synchronized float[] getValues(float[] array) throws ParseException {
+    public float[] getValues(float[] array) throws ParseException {
         if (array != null) {
             checkLength(array.length);
         } else {
@@ -394,21 +410,19 @@ public class LineFormat {
     }
 
     /**
-     * Copie vers le tableau spécifié les valeurs lues dans la ligne. Cette méthode peut être
-     * appelée après {@link #setLine(String)} pour copier vers {@code array} les valeurs
-     * qui ont été lues. Si {@code array} est nul, cette méthode créera et retournera un
-     * tableau qui aura la longueur tout juste suffisante pour contenir toutes les données.
-     * Mais si {@code array} est non-nul, alors cette méthode exigera que la longueur du
-     * tableau soit égale au nombre de données.
+     * Copies all values to the specified array. This method is typically invoked after
+     * {@link #setLine(String)} for fetching the values just parsed. If {@code array} is
+     * null, this method creates and returns a new array with a length equals to number
+     * of elements parsed. If {@code array} is not null, then this method will thrown an
+     * exception if the array length is not exactly equals to the number of elements
+     * parsed.
      *
-     * @param  array Tableau dans lequel copier les valeurs.
-     * @return {@code array} s'il était non-nul, ou un tableau nouvellement
-     *         créé avec la bonne longueur si {@code array} était nul.
-     * @throws ParseException si {@code array} était non-nul et que sa longueur
-     *         ne correspond pas au nombre de données lues, ou si une des données lues
-     *         n'est pas convertible en nombre entier de type {@code long}.
+     * @param  array The array to copy values into.
+     * @return {@code array} if it was not null, or a new array otherwise.
+     * @throws ParseException If {@code array} was not null and its length is not equals to
+     *         the number of elements parsed, or if at least one element can't be parsed.
      */
-    public synchronized long[] getValues(long[] array) throws ParseException {
+    public long[] getValues(long[] array) throws ParseException {
         if (array != null) {
             checkLength(array.length);
         } else {
@@ -416,7 +430,7 @@ public class LineFormat {
         }
         for (int i=0; i<count; i++) {
             final Number n = getNumber(i);
-            if ((array[i]=n.longValue()) != n.doubleValue()) {
+            if ((array[i] = n.longValue()) != n.doubleValue()) {
                 throw notAnInteger(i);
             }
         }
@@ -424,21 +438,19 @@ public class LineFormat {
     }
 
     /**
-     * Copie vers le tableau spécifié les valeurs lues dans la ligne. Cette méthode peut être
-     * appelée après {@link #setLine(String)} pour copier vers {@code array} les valeurs
-     * qui ont été lues. Si {@code array} est nul, cette méthode créera et retournera un
-     * tableau qui aura la longueur tout juste suffisante pour contenir toutes les données.
-     * Mais si {@code array} est non-nul, alors cette méthode exigera que la longueur du
-     * tableau soit égale au nombre de données.
+     * Copies all values to the specified array. This method is typically invoked after
+     * {@link #setLine(String)} for fetching the values just parsed. If {@code array} is
+     * null, this method creates and returns a new array with a length equals to number
+     * of elements parsed. If {@code array} is not null, then this method will thrown an
+     * exception if the array length is not exactly equals to the number of elements
+     * parsed.
      *
-     * @param  array Tableau dans lequel copier les valeurs.
-     * @return {@code array} s'il était non-nul, ou un tableau nouvellement
-     *         créé avec la bonne longueur si {@code array} était nul.
-     * @throws ParseException si {@code array} était non-nul et que sa longueur
-     *         ne correspond pas au nombre de données lues, ou si une des données lues
-     *         n'est pas convertible en nombre entier de type {@code int}.
+     * @param  array The array to copy values into.
+     * @return {@code array} if it was not null, or a new array otherwise.
+     * @throws ParseException If {@code array} was not null and its length is not equals to
+     *         the number of elements parsed, or if at least one element can't be parsed.
      */
-    public synchronized int[] getValues(int[] array) throws ParseException {
+    public int[] getValues(int[] array) throws ParseException {
         if (array != null) {
             checkLength(array.length);
         } else {
@@ -446,7 +458,7 @@ public class LineFormat {
         }
         for (int i=0; i<count; i++) {
             final Number n = getNumber(i);
-            if ((array[i]=n.intValue()) != n.doubleValue()) {
+            if ((array[i] = n.intValue()) != n.doubleValue()) {
                 throw notAnInteger(i);
             }
         }
@@ -454,21 +466,19 @@ public class LineFormat {
     }
 
     /**
-     * Copie vers le tableau spécifié les valeurs lues dans la ligne. Cette méthode peut être
-     * appelée après {@link #setLine(String)} pour copier vers {@code array} les valeurs
-     * qui ont été lues. Si {@code array} est nul, cette méthode créera et retournera un
-     * tableau qui aura la longueur tout juste suffisante pour contenir toutes les données.
-     * Mais si {@code array} est non-nul, alors cette méthode exigera que la longueur du
-     * tableau soit égale au nombre de données.
+     * Copies all values to the specified array. This method is typically invoked after
+     * {@link #setLine(String)} for fetching the values just parsed. If {@code array} is
+     * null, this method creates and returns a new array with a length equals to number
+     * of elements parsed. If {@code array} is not null, then this method will thrown an
+     * exception if the array length is not exactly equals to the number of elements
+     * parsed.
      *
-     * @param  array Tableau dans lequel copier les valeurs.
-     * @return {@code array} s'il était non-nul, ou un tableau nouvellement
-     *         créé avec la bonne longueur si {@code array} était nul.
-     * @throws ParseException si {@code array} était non-nul et que sa longueur
-     *         ne correspond pas au nombre de données lues, ou si une des données lues
-     *         n'est pas convertible en nombre entier de type {@code short}.
+     * @param  array The array to copy values into.
+     * @return {@code array} if it was not null, or a new array otherwise.
+     * @throws ParseException If {@code array} was not null and its length is not equals to
+     *         the number of elements parsed, or if at least one element can't be parsed.
      */
-    public synchronized short[] getValues(short[] array) throws ParseException {
+    public short[] getValues(short[] array) throws ParseException {
         if (array != null) {
             checkLength(array.length);
         } else {
@@ -476,7 +486,7 @@ public class LineFormat {
         }
         for (int i=0; i<count; i++) {
             final Number n = getNumber(i);
-            if ((array[i]=n.shortValue()) != n.doubleValue()) {
+            if ((array[i] = n.shortValue()) != n.doubleValue()) {
                 throw notAnInteger(i);
             }
         }
@@ -484,21 +494,19 @@ public class LineFormat {
     }
 
     /**
-     * Copie vers le tableau spécifié les valeurs lues dans la ligne. Cette méthode peut être
-     * appelée après {@link #setLine(String)} pour copier vers {@code array} les valeurs
-     * qui ont été lues. Si {@code array} est nul, cette méthode créera et retournera un
-     * tableau qui aura la longueur tout juste suffisante pour contenir toutes les données.
-     * Mais si {@code array} est non-nul, alors cette méthode exigera que la longueur du
-     * tableau soit égale au nombre de données.
+     * Copies all values to the specified array. This method is typically invoked after
+     * {@link #setLine(String)} for fetching the values just parsed. If {@code array} is
+     * null, this method creates and returns a new array with a length equals to number
+     * of elements parsed. If {@code array} is not null, then this method will thrown an
+     * exception if the array length is not exactly equals to the number of elements
+     * parsed.
      *
-     * @param  array Tableau dans lequel copier les valeurs.
-     * @return {@code array} s'il était non-nul, ou un tableau nouvellement
-     *         créé avec la bonne longueur si {@code array} était nul.
-     * @throws ParseException si {@code array} était non-nul et que sa longueur
-     *         ne correspond pas au nombre de données lues, ou si une des données lues
-     *         n'est pas convertible en nombre entier de type {@code byte}.
+     * @param  array The array to copy values into.
+     * @return {@code array} if it was not null, or a new array otherwise.
+     * @throws ParseException If {@code array} was not null and its length is not equals to
+     *         the number of elements parsed, or if at least one element can't be parsed.
      */
-    public synchronized byte[] getValues(byte[] array) throws ParseException {
+    public byte[] getValues(byte[] array) throws ParseException {
         if (array != null) {
             checkLength(array.length);
         } else {
@@ -506,7 +514,7 @@ public class LineFormat {
         }
         for (int i=0; i<count; i++) {
             final Number n = getNumber(i);
-            if ((array[i]=n.byteValue()) != n.doubleValue()) {
+            if ((array[i] = n.byteValue()) != n.doubleValue()) {
                 throw notAnInteger(i);
             }
         }
@@ -520,9 +528,9 @@ public class LineFormat {
      * @throws ParseException si le nombre de données lues ne correspond pas au nombre de données attendues.
      */
     private void checkLength(final int expected) throws ParseException {
-        if (count!=expected) {
-            final int lower=limits[Math.min(count, expected  )];
-            final int upper=limits[Math.min(count, expected+1)];
+        if (count != expected) {
+            final int lower = limits[Math.min(count, expected  )];
+            final int upper = limits[Math.min(count, expected+1)];
             throw new ParseException(Errors.format(count<expected ?
                                      ErrorKeys.LINE_TOO_SHORT_$2 : ErrorKeys.LINE_TOO_LONG_$3,
                                      new Integer(count), new Integer(expected),
@@ -542,20 +550,99 @@ public class LineFormat {
     }
 
     /**
-     * Retourne les données sous forme de chaîne de caractères. Toutes
-     * les données seront formatées en utilisant les formats déclarés au
-     * constructeur. Les colonnes seront séparées par des tabulations.
-     * Il n'y aura pas de retour chariot à la fin de la ligne.
+     * Returns a string representation of current line. All columns are formatted using
+     * the {@link Format} object specified at construction time. Columns are separated
+     * by tabulation.
      */
+    //@Override
     public String toString() {
-        final FieldPosition field=new FieldPosition(0);
-        StringBuffer buffer=new StringBuffer();
+        return toString(new StringBuffer()).toString();
+    }
+
+    /**
+     * Formats a string representation of current line. All columns are formatted using
+     * the {@link Format} object specified at construction time. Columns are separated
+     * by tabulation.
+     */
+    private StringBuffer toString(StringBuffer buffer) {
+        final FieldPosition field = new FieldPosition(0);
         for (int i=0; i<count; i++) {
-            if (i!=0) {
+            if (i != 0) {
                 buffer.append('\t');
             }
             buffer = format[Math.min(format.length-1, i)].format(data[i], buffer, field);
         }
-        return buffer.toString();
+        return buffer;
+    }
+
+    /**
+     * Formats an object and appends the resulting text to a given string buffer.
+     * This method invokes <code>{@linkplain #setValues setValues}(values)</code>,
+     * then formats all columns using the {@link Format} object specified at
+     * construction time. Columns are separated by tabulation.
+     *
+     * @since 2.4
+     */
+    public StringBuffer format(final Object values, final StringBuffer toAppendTo,
+                               final FieldPosition position)
+    {
+        setValues(values);
+        return toString(toAppendTo);
+    }
+
+    /**
+     * Returns the index of the end of the specified line.
+     */
+    private static int getLineEnd(final String source, int offset, final boolean s) {
+        final int length = source.length();
+        while (offset < length) {
+            final char c = source.charAt(offset);
+            if ((c == '\r' || c == '\n') == s) {
+                break;
+            }
+            offset++;
+        }
+        return offset;
+    }
+
+    /**
+     * Parses text from a string to produce an object.
+     *
+     * @since 2.4
+     */
+    public Object parseObject(final String source, final ParsePosition position) {
+        final int lower = position.getIndex();
+        final int upper = getLineEnd(source, lower, true);
+        try {
+            setLine(source.substring(lower, upper));
+            position.setIndex(getLineEnd(source, upper, false));
+            return getValues();
+        } catch (ParseException e) {
+            position.setErrorIndex(e.getErrorOffset());
+            return null; // As of java.text.Format contract.
+        }
+    }
+
+    /**
+     * Parses text from the beginning of the given string to produce an object. 
+     *
+     * @since 2.4
+     */
+    //@Override
+    public Object parseObject(final String source) throws ParseException {
+        setLine(source.substring(0, getLineEnd(source, 0, true)));
+        return getValues();
+    }
+
+    /**
+     * Returns a clone of this parser. In current implementation, this
+     * clone is <strong>not</strong> for usage in concurrent thread.
+     */
+    //@Override
+    public Object clone() {
+        final LineFormat copy = (LineFormat) super.clone();
+        copy.data   = (Object[]) data.clone();
+        copy.limits = (int[])  limits.clone();
+        return copy;
     }
 }

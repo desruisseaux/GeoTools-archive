@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.image.io;
+package org.geotools.image.io.text;
 
 // J2SE dependencies
 import java.util.Arrays;
@@ -49,7 +49,6 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * computed when needed. The interval computation should be accurate even if there is
  * missing and/or duplicated records.
  *
- * @since 2.1
  * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/coverage/src/main/java/org/geotools/image/io/RecordList.java $
  * @version $Id$
  * @author Martin Desruisseaux
@@ -148,8 +147,8 @@ final class RecordList {
         }
         for (int i=0; i<limit; i++) {
             final double value = line[i];
-            if (value<min[i]) min[i]=value;
-            if (value>max[i]) max[i]=value;
+            if (value < min[i]) min[i] = value;
+            if (value > max[i]) max[i] = value;
             data[upper+i] = (float)value;
         }
         Arrays.fill(data, upper+limit, nextUpper, Float.NaN);
@@ -162,8 +161,8 @@ final class RecordList {
      * en mémoire pendant encore quelque temps.
      */
     public void trimToSize() {
-        if (data!=null) {
-            data=XArray.resize(data, upper);
+        if (data != null) {
+            data = XArray.resize(data, upper);
         }
     }
     
@@ -207,7 +206,7 @@ final class RecordList {
      * ou {@link Double#NaN} si cette valeur n'est pas connue.
      */
     public double getMinimum(final int column) {
-        return (min!=null && min[column]<=max[column]) ? min[column] : Double.NaN;
+        return (min != null && min[column] <= max[column]) ? min[column] : Double.NaN;
     }
     
     /**
@@ -215,7 +214,7 @@ final class RecordList {
      * ou {@link Double#NaN} si cette valeur n'est pas connue.
      */
     public double getMaximum(final int column) {
-        return (max!=null && max[column]>=min[column]) ? max[column] : Double.NaN;
+        return (max != null && max[column] >= min[column]) ? max[column] : Double.NaN;
     }
     
     /**
@@ -229,13 +228,13 @@ final class RecordList {
      *         ne sont pas distribués à un interval régulier.
      */
     private float getInterval(final int column, final float eps) throws IIOException {
-        if (interval==null) {
-            if (columnCount<=0) {
+        if (interval == null) {
+            if (columnCount <= 0) {
                 return Float.NaN;
             }
             interval = new float[columnCount];
         }
-        if (interval[column]!=0) {
+        if (interval[column] != 0) {
             return interval[column];
         }
         /*
@@ -247,7 +246,7 @@ final class RecordList {
         for (int i=column; i<upper; i+=columnCount) {
             array[count++] = data[i];
         }
-        assert count==array.length;
+        assert count == array.length;
         Arrays.sort(array);
         /*
          * Elimine les doublons. Lorsque des doublons seront trouvés, ils iront de
@@ -266,7 +265,7 @@ final class RecordList {
                 upper = lower-1;
             }
         }
-        if (upper!=lower) {
+        if (upper != lower) {
             System.arraycopy(array, upper, array, lower, count-upper);
             final int oldCount = count;
             count -= (upper-lower);
@@ -277,14 +276,16 @@ final class RecordList {
          * l'interval entre tous les points est un multiple entier de cet interval
          * minimal (on tient compte ainsi des éventuels données manquantes).
          */
-        float delta=Float.POSITIVE_INFINITY;
+        float delta = Float.POSITIVE_INFINITY;
         for (int i=1; i<count; i++) {
-            final float d=array[i]-array[i-1];
+            final float d = array[i] - array[i-1];
             assert d>0;
-            if (d<delta) delta=d;
+            if (d < delta) {
+                delta = d;
+            }
         }
         for (int i=1; i<count; i++) {
-            float e=(array[i]-array[i-1])/delta;
+            float e = (array[i] - array[i-1]) / delta;
             if (Math.abs(e-Math.rint(e)) > eps) {
                 throw new IIOException(Errors.format(ErrorKeys.NOT_A_GRID));
             }
@@ -305,7 +306,7 @@ final class RecordList {
      *         ne sont pas distribués à un interval régulier.
      */
     public int getPointCount(final int column, final float eps) throws IIOException {
-        return (int)Math.round((getMaximum(column)-getMinimum(column))/getInterval(column, eps)) +1;
+        return (int)Math.round((getMaximum(column) - getMinimum(column)) / getInterval(column, eps)) +1;
     }
     
     /**
@@ -320,20 +321,18 @@ final class RecordList {
     public String toString(final int xColumn, final int yColumn, final float eps) {
         float xCount = Float.NaN;
         float yCount = Float.NaN;
-        if (xColumn>=0) try {
+        if (xColumn >= 0) try {
             xCount = getPointCount(xColumn, eps);
         } catch (IIOException exception) {
             // Ignore.
         }
-        if (yColumn>=0) try {
+        if (yColumn >= 0) try {
             yCount = getPointCount(yColumn, eps);
         } catch (IIOException exception) {
             // Ignore.
         }
-        final StringBuffer buffer = new StringBuffer();
-        buffer.append(Vocabulary.format(VocabularyKeys.POINT_COUNT_IN_GRID_$3,
-                      new Integer(upper), new Float(xCount), new Float(yCount)));
-        return buffer.toString();
+        return Vocabulary.format(VocabularyKeys.POINT_COUNT_IN_GRID_$3,
+                new Integer(upper), new Float(xCount), new Float(yCount));
     }
     
     /**
@@ -342,12 +341,7 @@ final class RecordList {
      * mémorisées.
      */
     public String toString() {
-        final StringBuffer buffer=new StringBuffer(Utilities.getShortClassName(this));
-        buffer.append('[');
-        buffer.append(getLineCount());
-        buffer.append("\u00A0\u00D7\u00A0");
-        buffer.append(getColumnCount());
-        buffer.append(']');
-        return buffer.toString();
+        return Utilities.getShortClassName(this) +
+                '[' + getLineCount() + "\u00A0\u00D7\u00A0" + getColumnCount() + ']';
     }
 }

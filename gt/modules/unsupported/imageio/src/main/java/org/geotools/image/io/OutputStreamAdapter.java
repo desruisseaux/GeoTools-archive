@@ -23,61 +23,64 @@ import javax.imageio.stream.ImageOutputStream;
 
 
 /**
- * Wraps an {@link ImageOutputStream} into a standard {@link java.io.OutputStream}.
+ * Wraps an {@link ImageOutputStream} into a standard {@link OutputStream}.
  *
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 final class OutputStreamAdapter extends OutputStream {
     /**
      * The wrapped image output stream.
      */
     private final ImageOutputStream output;
-    
+
     /**
      * Construct a new output stream.
      */
     public OutputStreamAdapter(final ImageOutputStream output) {
-        this.output=output;
+        this.output = output;
     }
-    
+
     /**
      * Writes the specified byte to this output stream.
+     *
      * @throws IOException if an I/O error occurs.
      */
     public void write(final int b) throws IOException {
         output.write(b);
     }
-    
+
     /**
      * Writes {@code b.length} bytes from the specified byte array.
+     *
      * @throws IOException if an I/O error occurs.
      */
     public void write(final byte[] b) throws IOException {
         output.write(b);
     }
-    
+
     /**
      * Writes {@code len} bytes from the specified byte array.
+     *
      * @throws IOException if an I/O error occurs.
      */
     public void write(final byte[] b, final int off, final int len) throws IOException {
         output.write(b, off, len);
     }
-    
+
     /**
      * Forces any buffered output bytes to be written out.
+     *
      * @throws IOException if an I/O error occurs.
      */
     public void flush() throws IOException {
         output.flush();
     }
-    
+
     /**
      * Closes this output stream.
+     *
      * @throws IOException if an I/O error occurs.
      */
     public void close() throws IOException {
