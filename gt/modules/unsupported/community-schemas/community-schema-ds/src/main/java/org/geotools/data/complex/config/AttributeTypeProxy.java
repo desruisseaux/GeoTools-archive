@@ -71,4 +71,13 @@ public class AttributeTypeProxy implements AttributeType {
         getSubject().putUserData(key, value);
     }
 
+    public boolean equals(Object o){
+        AttributeType subject = getSubject();
+        return subject.equals(o);
+    }
+
+    public int hashCode(){
+        AttributeType subject = getSubject();
+        return subject.hashCode();
+    }
 }

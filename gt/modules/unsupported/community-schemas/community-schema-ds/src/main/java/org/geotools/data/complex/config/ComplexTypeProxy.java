@@ -3,6 +3,7 @@ package org.geotools.data.complex.config;
 import java.util.Collection;
 import java.util.Map;
 
+import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.TypeName;
 
@@ -27,5 +28,5 @@ public class ComplexTypeProxy extends AttributeTypeProxy implements ComplexType 
 	public boolean isInline() {
 		return ((ComplexType)getSubject()).isInline();
 	}
-
+    
 }
