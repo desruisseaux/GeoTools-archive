@@ -30,84 +30,22 @@ import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.AuthorityFactory;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.ObjectFactory;
-import org.opengis.referencing.NoSuchIdentifierException;
-import org.opengis.referencing.crs.CRSFactory;
-import org.opengis.referencing.crs.CompoundCRS;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.crs.DerivedCRS;
-import org.opengis.referencing.crs.EngineeringCRS;
-import org.opengis.referencing.crs.GeocentricCRS;
-import org.opengis.referencing.crs.GeographicCRS;
-import org.opengis.referencing.crs.ImageCRS;
-import org.opengis.referencing.crs.ProjectedCRS;
-import org.opengis.referencing.crs.TemporalCRS;
-import org.opengis.referencing.crs.VerticalCRS;
-import org.opengis.referencing.cs.AffineCS;
-import org.opengis.referencing.cs.AxisDirection;
-import org.opengis.referencing.cs.CSFactory;
-import org.opengis.referencing.cs.CartesianCS;
-import org.opengis.referencing.cs.CoordinateSystem;
-import org.opengis.referencing.cs.CoordinateSystemAxis;
-import org.opengis.referencing.cs.CylindricalCS;
-import org.opengis.referencing.cs.EllipsoidalCS;
-import org.opengis.referencing.cs.LinearCS;
-import org.opengis.referencing.cs.PolarCS;
-import org.opengis.referencing.cs.SphericalCS;
-import org.opengis.referencing.cs.TimeCS;
-import org.opengis.referencing.cs.UserDefinedCS;
-import org.opengis.referencing.cs.VerticalCS;
-import org.opengis.referencing.datum.Datum;
-import org.opengis.referencing.datum.DatumFactory;
-import org.opengis.referencing.datum.Ellipsoid;
-import org.opengis.referencing.datum.EngineeringDatum;
-import org.opengis.referencing.datum.GeodeticDatum;
-import org.opengis.referencing.datum.ImageDatum;
-import org.opengis.referencing.datum.PixelInCell;
-import org.opengis.referencing.datum.PrimeMeridian;
-import org.opengis.referencing.datum.TemporalDatum;
-import org.opengis.referencing.datum.VerticalDatum;
-import org.opengis.referencing.datum.VerticalDatumType;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.Conversion;
-import org.opengis.referencing.operation.OperationMethod;
+import org.opengis.referencing.*;
+import org.opengis.referencing.cs.*;
+import org.opengis.referencing.crs.*;
+import org.opengis.referencing.datum.*;
+import org.opengis.referencing.operation.*;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
+import org.geotools.factory.BufferedFactory;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.wkt.Parser;
 import org.geotools.referencing.wkt.Symbols;
-import org.geotools.referencing.crs.DefaultCompoundCRS;
-import org.geotools.referencing.crs.DefaultDerivedCRS;
-import org.geotools.referencing.crs.DefaultEngineeringCRS;
-import org.geotools.referencing.crs.DefaultGeocentricCRS;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.referencing.crs.DefaultImageCRS;
-import org.geotools.referencing.crs.DefaultProjectedCRS;
-import org.geotools.referencing.crs.DefaultTemporalCRS;
-import org.geotools.referencing.crs.DefaultVerticalCRS;
-import org.geotools.referencing.cs.AbstractCS;
-import org.geotools.referencing.cs.DefaultAffineCS;
-import org.geotools.referencing.cs.DefaultCartesianCS;
-import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
-import org.geotools.referencing.cs.DefaultCylindricalCS;
-import org.geotools.referencing.cs.DefaultEllipsoidalCS;
-import org.geotools.referencing.cs.DefaultLinearCS;
-import org.geotools.referencing.cs.DefaultPolarCS;
-import org.geotools.referencing.cs.DefaultSphericalCS;
-import org.geotools.referencing.cs.DefaultTimeCS;
-import org.geotools.referencing.cs.DefaultUserDefinedCS;
-import org.geotools.referencing.cs.DefaultVerticalCS;
-import org.geotools.referencing.datum.DefaultEllipsoid;
-import org.geotools.referencing.datum.DefaultEngineeringDatum;
-import org.geotools.referencing.datum.DefaultGeodeticDatum;
-import org.geotools.referencing.datum.DefaultImageDatum;
-import org.geotools.referencing.datum.DefaultPrimeMeridian;
-import org.geotools.referencing.datum.DefaultTemporalDatum;
-import org.geotools.referencing.datum.DefaultVerticalDatum;
+import org.geotools.referencing.cs.*;
+import org.geotools.referencing.crs.*;
+import org.geotools.referencing.datum.*;
 import org.geotools.referencing.operation.DefaultOperationMethod;
 import org.geotools.util.WeakHashSet;
 
@@ -125,7 +63,7 @@ import org.geotools.util.WeakHashSet;
  * @author Martin Desruisseaux
  */
 public class GeotoolsFactory extends ReferencingFactory
-        implements CSFactory, DatumFactory, CRSFactory
+        implements CSFactory, DatumFactory, CRSFactory, BufferedFactory
 {
     /**
      * The object to use for parsing <cite>Well-Known Text</cite> (WKT) strings.

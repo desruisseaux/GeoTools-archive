@@ -76,12 +76,11 @@ public final class AllAuthoritiesFactoryTest extends TestCase {
      * Tests the {@link AllAuthoritiesFactory#getAuthorityCodes} method.
      */
     public void testAuthorityCodes() throws FactoryException {
-        final CRSAuthorityFactory all  = AllAuthoritiesFactory.DEFAULT;
+        final CRSAuthorityFactory all = AllAuthoritiesFactory.DEFAULT;
         final Collection codes = all.getAuthorityCodes(CoordinateReferenceSystem.class);
         assertFalse(codes.isEmpty());
         assertTrue(codes.contains("CRS:84"));
-// "AUTO" fails on Java 1.4, and "AUTO2" fails on Java 5. Needs to investigate why.
-//      assertTrue(codes.contains("AUTO:42001"));
+        assertTrue(codes.contains("AUTO:42001") || codes.contains("AUTO2:42001"));
     }
 
     /**

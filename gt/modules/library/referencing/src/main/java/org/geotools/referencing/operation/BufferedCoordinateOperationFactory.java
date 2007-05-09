@@ -29,6 +29,7 @@ import org.opengis.referencing.operation.OperationNotFoundException;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
+import org.geotools.factory.BufferedFactory;
 import org.geotools.resources.Utilities;
 import org.geotools.util.SoftValueHashMap;
 import org.geotools.referencing.ReferencingFactoryFinder;
@@ -50,7 +51,9 @@ import org.geotools.referencing.ReferencingFactoryFinder;
  * @author Simone Giannecchini
  * @author Martin Desruisseaux
  */
-public class BufferedCoordinateOperationFactory extends AbstractCoordinateOperationFactory {
+public class BufferedCoordinateOperationFactory extends AbstractCoordinateOperationFactory
+        implements BufferedFactory
+{
     /**
      * The priority level for this factory.
      */

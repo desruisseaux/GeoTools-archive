@@ -22,10 +22,10 @@ import java.util.ArrayList;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeModel;
-import javax.swing.tree.DefaultTreeModel;
 
 // Geotools dependencies
 import org.geotools.resources.XArray;
+import org.geotools.resources.OptionalDependencies;
 
 
 /**
@@ -97,60 +97,6 @@ public final class Trees {
     }
 
     /**
-     * Construit une chaîne de caractères qui contiendra le
-     * noeud spécifié ainsi que tous les noeuds enfants.
-     *
-     * @param model  Arborescence à écrire.
-     * @param node   Noeud de l'arborescence à écrire.
-     * @param buffer Buffer dans lequel écrire le noeud.
-     * @param level  Niveau d'indentation (à partir de 0).
-     * @param last   Indique si les niveaux précédents sont en train d'écrire leurs derniers items.
-     * @return       Le tableau {@code last}, qui peut éventuellement avoir été agrandit.
-     */
-    private static boolean[] toString(final TreeModel model, final Object node,
-                                      final StringBuffer buffer, final int level, boolean[] last)
-    {
-        for (int i=0; i<level; i++) {
-            if (i != level-1) {
-                buffer.append(last[i] ? '\u00A0' : '\u2502');
-                buffer.append("\u00A0\u00A0\u00A0");
-            } else {
-                buffer.append(last[i] ? '\u2514': '\u251C');
-                buffer.append("\u2500\u2500\u2500");
-            }
-        }
-        buffer.append(node);
-        buffer.append('\n');
-        if (level >= last.length) {
-            last = XArray.resize(last, level*2);
-        }
-        final int count=model.getChildCount(node);
-        for (int i=0; i<count; i++) {
-            last[level] = (i == count-1);
-            last=toString(model, model.getChild(node,i), buffer, level+1, last);
-        }
-        return last;
-    }
-
-    /**
-     * Returns a graphical representation  of the specified tree model. This representation can
-     * be printed to the {@linkplain System#out standard output stream} (for example) if it uses
-     * a monospaced font and supports unicode.
-     *
-     * @param  tree The tree to format.
-     * @param  root First node to format.
-     * @return A string representation of the tree, or {@code null} if it doesn't contain any node.
-     */
-    private static String toString(final TreeModel tree, final Object root) {
-        if (root == null) {
-            return null;
-        }
-        final StringBuffer buffer = new StringBuffer();
-        toString(tree, root, buffer, 0, new boolean[64]);
-        return buffer.toString();
-    }
-
-    /**
      * Returns a graphical representation of the specified tree model. This representation can
      * be printed to the {@linkplain System#out standard output stream} (for example) if it uses
      * a monospaced font and supports unicode.
@@ -159,7 +105,7 @@ public final class Trees {
      * @return A string representation of the tree, or {@code null} if it doesn't contain any node.
      */
     public static String toString(final TreeModel tree) {
-        return toString(tree, tree.getRoot());
+        return OptionalDependencies.toString(tree);
     }
 
     /**
@@ -171,6 +117,6 @@ public final class Trees {
      * @return A string representation of the tree, or {@code null} if it doesn't contain any node.
      */
     public static String toString(final TreeNode node) {
-        return toString(new DefaultTreeModel(node, true));
+        return OptionalDependencies.toString(node);
     }
 }

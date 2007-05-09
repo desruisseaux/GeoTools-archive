@@ -31,7 +31,7 @@ import org.geotools.util.Logging;
 import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.referencing.factory.AllAuthoritiesFactory;
+import org.geotools.referencing.factory.ManyAuthoritiesFactory;
 import org.geotools.referencing.factory.BufferedAuthorityFactory;
 
 
@@ -41,7 +41,7 @@ import org.geotools.referencing.factory.BufferedAuthorityFactory;
  * This class gathers together a lot of logic in order to capture the following ideas:
  * <ul>
  *   <li>Uses {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER} to swap ordinate order if needed.</li>
- *   <li>Uses {@link AllAuthoritiesFactory} to access CRSAuthorities in the environment.</li>
+ *   <li>Uses {@link ManyAuthoritiesFactory} to access CRSAuthorities in the environment.</li>
  * </ul>
  * 
  * @since 2.3
@@ -55,7 +55,7 @@ final class DefaultAuthorityFactory extends BufferedAuthorityFactory implements 
      * Creates a new authority factory with the specified hints.
      */
     DefaultAuthorityFactory(final Hints hints) {
-        super(new AllAuthoritiesFactory(hints, ReferencingFactoryFinder.getCRSAuthorityFactories(hints)));
+        super(new ManyAuthoritiesFactory(hints, ReferencingFactoryFinder.getCRSAuthorityFactories(hints)));
     }
 
     /**

@@ -19,6 +19,9 @@ package org.geotools.referencing.factory;
 // J2SE dependencies
 import java.util.Set;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -307,6 +310,23 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
         if (factory instanceof Factory) {
             hints.putAll(((Factory) factory).getImplementationHints());
         }
+    }
+
+    /**
+     * Returns the direct dependencies. The returned list contains the backing store specified
+     * at construction time, or the exception if the backing store can't be obtained.
+     */
+    //@Override
+    Collection/*<?>*/ dependencies() {
+        final List/*<?>*/ dep = new ArrayList(4);
+        Object factory;
+        try {
+            factory = getAuthorityFactory(null);
+        } catch (FactoryException e) {
+            factory = e;
+        }
+        dep.add(factory);
+        return dep;
     }
 
     /**
@@ -842,7 +862,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      * is to catch the {@link FactoryException} for methods that don't allow it. The protected
      * method should be used instead when this exception is allowed.
      */
-    private AuthorityFactory getAuthorityFactory() {
+    final AuthorityFactory getAuthorityFactory() {
         try {
             return getAuthorityFactory(null);
         } catch (FactoryException cause) {

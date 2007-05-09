@@ -1068,6 +1068,9 @@ public final class CRS {
      *   <p><b>{@code -factories}</b><br>
      *       Lists all availables CRS authority factories.</p>
      *
+     *   <p><b>{@code -factoryTree}</b><br>
+     *       Lists authority factory dependencies as a tree.</p>
+     *
      *   <p><b>{@code -help}</b><br>
      *       Prints the list of options.</p>
      *

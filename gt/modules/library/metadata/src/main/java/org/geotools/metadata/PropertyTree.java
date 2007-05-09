@@ -33,8 +33,9 @@ import org.opengis.util.CodeList;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
-import org.geotools.resources.Utilities;
 import org.geotools.resources.XMath;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.OptionalDependencies;
 
 
 /**
@@ -104,7 +105,8 @@ final class PropertyTree {
      */
     public MutableTreeNode asTree(final Object metadata) {
         final String name = Utilities.getShortName(standard.getInterface(metadata.getClass()));
-        final DefaultMutableTreeNode root = createTreeNode(localize(name), metadata, true);
+        final DefaultMutableTreeNode root =
+                OptionalDependencies.createTreeNode(localize(name), metadata, true);
         append(root, metadata);
         return root;
     }
@@ -154,7 +156,7 @@ final class PropertyTree {
         } else {
             asText = String.valueOf(value);
         }
-        branch.add(createTreeNode(asText, value, false));
+        branch.add(OptionalDependencies.createTreeNode(asText, value, false));
     }
 
     /**
@@ -169,7 +171,8 @@ final class PropertyTree {
             final Object value = entry.getValue();
             if (!PropertyAccessor.isEmpty(value)) {
                 final String name = localize((String) entry.getKey());
-                final DefaultMutableTreeNode child = createTreeNode(name, value, true);
+                final DefaultMutableTreeNode child = 
+                        OptionalDependencies.createTreeNode(name, value, true);
                 append(child, value);
                 branch.add(child);
             }
@@ -307,62 +310,5 @@ final class PropertyTree {
             }
             toString(child, buffer, indent+2, lineSeparator);
         }
-    }
-
-
-    // -------- TreeNode workaround ---------------------------------------------------------------
-    /**
-     * Constructor for {@link org.geotools.gui.swing.tree.NamedTreeNode}.
-     */
-    private static Constructor treeNodeConstructor;
-
-    /**
-     * Set to {@code true} if {@link #treeNodeConstructor} can't be obtained.
-     */
-    private static boolean noNamedTreeNode = false;
-
-    /**
-     * Creates an initially empty tree node.
-     *
-     * @param name   The value to be returned by {@link TreeNode#toString}.
-     * @param object The user object to be returned by the tree node. May
-     *               or may not be the same than {@code name}.
-     * @param allowsChildren if children are allowed.
-     */
-    private static DefaultMutableTreeNode createTreeNode(final String name,
-                                                         final Object object,
-                                                         final boolean allowsChildren)
-    {
-        /*
-         * If the "modules/extension/swing-widgets" JAR is in the classpath,  then create an
-         * instance of NamedTreeNode (see org.geotools.swing.tree javadoc for an explanation
-         * about why the NamedTreeNode workaround is needed).  We use reflection because the
-         * swing-widgets module is optional,  so we fallback on the standard Swing object if
-         * we can't create an instance of NamedTreeNode.   We will attempt to use reflection
-         * only once in order to avoid a overhead if the swing-widgets module is not available.
-         *
-         * The swing-widgets module contains a "NamedTreeNodeTest" for making sure that the
-         * NamedTreeNode instances are properly created.
-         *
-         * Note: No need to sychronize; this is not a big deal if we make the attempt twice.
-         */
-        if (!noNamedTreeNode) try {
-            if (treeNodeConstructor == null) {
-                treeNodeConstructor = Class.forName("org.geotools.gui.swing.tree.NamedTreeNode").
-                        getConstructor(new Class[] {String.class, Object.class, Boolean.TYPE});
-            }
-            return (DefaultMutableTreeNode) treeNodeConstructor.newInstance(
-                    new Object[] {name, object, Boolean.valueOf(allowsChildren)});
-        } catch (Exception e) {
-            /*
-             * There is a large amount of checked and unchecked exceptions that the above code
-             * may thrown. We catch all of them because a reasonable fallback exists (creation
-             * of the default Swing object below).  Note that none of the unchecked exceptions
-             * (IllegalArgumentException, NullPointerException...) should occurs, except maybe
-             * SecurityException. Maybe we could let the unchecked exceptions propagate...
-             */
-            noNamedTreeNode = true;
-        }
-        return new DefaultMutableTreeNode(name, allowsChildren);
     }
 }

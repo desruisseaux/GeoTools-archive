@@ -230,7 +230,7 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
          * a FallbackAuthorityFactory object.  The definitive factories are stored into an array
          * (the order is significant) without duplicated values.
          */
-        final ArrayList/*<AuthorityFactory,Integer>*/ result = new ArrayList();
+        final ArrayList/*<AuthorityFactory>*/ result = new ArrayList();
         for (int i=0; i<factoriesByType.length; i++) {
             final List forType = factoriesByType[i];
             if (forType != null) {
@@ -253,6 +253,22 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
                     positions.put(factory, new Integer(~position.intValue()));
                 }
                 result.add(factory);
+            }
+        }
+        /*
+         * If a factory duplicates the primary factory of a FallbackAuthorityFactory,
+         * remove the former.
+         */
+        for (int i=result.size(); --i>=0;) {
+            AuthorityFactory factory = (AuthorityFactory) result.get(i);
+            if (factory instanceof FallbackAuthorityFactory) {
+                factory = ((FallbackAuthorityFactory) factory).getAuthorityFactory();
+                for (int j=result.size(); --j>=0;) {
+                    if (result.get(j) == factory) {
+                        result.remove(j);
+                        if (j <= i) i--;
+                    }
+                }
             }
         }
         /*
@@ -375,6 +391,16 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
     public String getBackingStoreDescription() throws FactoryException {
         // We have no authority code, so we can't pick a particular factory.
         return null;
+    }
+
+    /**
+     * Returns the direct dependencies. Current implemenation returns the internal structure
+     * because we know that this package will not modifies it. But if the method become public,
+     * we will need to returns a unmodifiable view.
+     */
+    //@Override
+    Collection/*<?>*/ dependencies() {
+        return factories;
     }
 
     /**

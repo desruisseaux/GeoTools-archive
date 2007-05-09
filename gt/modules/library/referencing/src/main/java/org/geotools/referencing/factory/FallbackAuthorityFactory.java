@@ -253,6 +253,17 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     }
 
     /**
+     * Returns the direct dependencies. The returned list contains the backing store and the
+     * fallback specified at construction time, or the exception if they can't be obtained.
+     */
+    //@Override
+    Collection/*<?>*/ dependencies() {
+        final Collection/*<?>*/ dep = super.dependencies();
+        dep.add(fallback);
+        return dep;
+    }
+
+    /**
      * Returns the set of authority code for the specified type. The default implementation
      * returns the union of the authority codes from the <cite>primary</cite> and the
      * <cite>fallback</cite> factories.

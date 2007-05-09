@@ -46,9 +46,10 @@ import javax.imageio.spi.ServiceRegistry; // For javadoc
  * state (i.e. return value of {@link #isAvailable} varying in an unpredictable way). The behavior
  * is undetermined if the {@code isAvailable()} state changes with time.
  *
- * @author Martin Desruisseaux
+ * @since 2.0
  * @source $URL$
  * @version $Id$
+ * @author Martin Desruisseaux
  *
  * @see org.geotools.data.DataStoreFactorySpi#isAvailable
  */

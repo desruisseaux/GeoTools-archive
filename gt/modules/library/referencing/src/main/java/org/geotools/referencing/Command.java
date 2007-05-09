@@ -33,7 +33,6 @@ import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
-import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperation;
@@ -44,11 +43,11 @@ import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.io.TableWriter;
-import org.geotools.io.IndentedLineWriter;
 import org.geotools.referencing.wkt.Parser;
 import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
+import org.geotools.referencing.factory.FactoryDependencies;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Vocabulary;
@@ -108,6 +107,7 @@ final class Command {
         out.println(" -codes         : Lists all available CRS codes with their description.");
         out.println(" -colors        : Enable syntax coloring on ANSI X3.64 compatible terminal.");
         out.println(" -factories     : Lists all availables CRS authority factories.");
+        out.println(" -factoryTree   : Lists authority factory dependencies as a tree.");
         out.println(" -help          : Prints this message.");
         out.println(" -locale=ARG    : Formats texts in the specified locale.");
         out.println(" -operations    : Prints all available coordinate operations between a pair of CRS.");
@@ -352,6 +352,16 @@ final class Command {
     }
 
     /**
+     * Prints all {@linkplain AuthorityFactory authority factory} dependencies as a tree.
+     */
+    private static void printAuthorityFactoryDependencies(final PrintWriter out, final boolean colors) {
+        final FactoryDependencies printer = new FactoryDependencies(CRS.getAuthorityFactory(true));
+        printer.setColorEnabled(colors);
+        printer.print(out);
+        out.flush();
+    }
+
+    /**
      * Dispose the factory.
      */
     private void dispose() throws FactoryException {
@@ -375,6 +385,12 @@ final class Command {
         if (arguments.getFlag("-factories")) {
             args = arguments.getRemainingArguments(0);
             factories(out);
+            return;
+        }
+        if (arguments.getFlag("-factoryTree")) {
+            final boolean colors = arguments.getFlag("-colors");
+            args = arguments.getRemainingArguments(0);
+            printAuthorityFactoryDependencies(out, colors);
             return;
         }
         final String authority = arguments.getOptionalString("-authority");

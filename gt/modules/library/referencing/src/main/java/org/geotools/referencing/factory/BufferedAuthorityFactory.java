@@ -47,8 +47,7 @@ import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
-import org.geotools.factory.Factory;
-import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.factory.BufferedFactory;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -75,7 +74,7 @@ import org.geotools.resources.i18n.LoggingKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
+public class BufferedAuthorityFactory extends AbstractAuthorityFactory implements BufferedFactory {
     /**
      * The default value for {@link #maxStrongReferences}.
      */
@@ -83,9 +82,9 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
 
     /**
      * The underlying authority factory. This field may be {@code null} if this object was
-     * created by the {@linkplain #BufferedAuthorityFactory(FactoryGroup,int) package protected
-     * constructor}. In this case, the subclass is responsible for creating the backing store
-     * when {@link DeferredAuthorityFactory#createBackingStore} is invoked.
+     * created by the {@linkplain #BufferedAuthorityFactory(AbstractAuthorityFactory,int)
+     * package protected constructor}. In this case, the subclass is responsible for creating
+     * the backing store when {@link DeferredAuthorityFactory#createBackingStore} is invoked.
      *
      * @see #getBackingStore
      * @see DeferredAuthorityFactory#createBackingStore
@@ -192,6 +191,21 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (backingStore instanceof CoordinateOperationAuthorityFactory) {
             hints.put(Hints.COORDINATE_OPERATION_AUTHORITY_FACTORY, backingStore);
         }
+    }
+
+    /**
+     * Returns the direct dependencies. The returned list contains the backing store
+     * specified at construction time, or the exception if it can't be obtained.
+     */
+    //@Override
+    Collection/*<?>*/ dependencies() {
+        Object factory;
+        try {
+            factory = getBackingStore();
+        } catch (FactoryException e) {
+            factory = e;
+        }
+        return Collections.singleton(factory);
     }
 
     /**

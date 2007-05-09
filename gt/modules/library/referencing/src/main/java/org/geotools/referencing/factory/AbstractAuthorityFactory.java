@@ -21,6 +21,7 @@ package org.geotools.referencing.factory;
 
 // J2SE dependencies
 import java.util.Set;
+import java.util.Collection;
 import java.util.Collections;
 import javax.units.Unit;
 
@@ -92,6 +93,18 @@ public abstract class AbstractAuthorityFactory extends ReferencingFactory
      */
     boolean isAvailable() {
         return true;
+    }
+
+    /**
+     * Returns the direct {@linkplain AuthorityFactory authority factory} dependencies,
+     * which may be {@code null}. This method should not returns indirect dependencies.
+     * Elements should be instance of {@link AuthorityFactory} or {@link FactoryException}
+     * if a particular dependency can't be obtained.
+     * <p>
+     * The default implementation always returns an empty set.
+     */
+    Collection/*<?>*/ dependencies() {
+        return Collections.EMPTY_SET;
     }
 
     /**
