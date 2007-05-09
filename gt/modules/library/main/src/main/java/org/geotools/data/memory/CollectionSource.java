@@ -39,11 +39,17 @@ public class CollectionSource implements Source {
     }
 
     public Collection content( Filter filter ) {
+        return content(filter, Integer.MAX_VALUE);
+    }
+    
+    public Collection content( Filter filter, int countLimit ) {
         List list = new ArrayList();
-        for( Iterator i = collection.iterator(); i.hasNext();){
+        int count = 0;
+        for( Iterator i = collection.iterator(); i.hasNext() && count < countLimit;){
             Object obj = i.next();
             if( filter.evaluate( obj )){
                 list.add( obj );
+                count++;
             }
         }
         return Collections.unmodifiableList( list );

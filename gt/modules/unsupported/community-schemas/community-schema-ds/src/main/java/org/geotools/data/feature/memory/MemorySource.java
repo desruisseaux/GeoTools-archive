@@ -1,6 +1,7 @@
 package org.geotools.data.feature.memory;
 
 import java.io.IOException;
+import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -24,109 +25,145 @@ import com.vividsolutions.jts.geom.Envelope;
 
 public class MemorySource implements FeatureSource2 {
 
-	private FeatureType type;
+    private FeatureType type;
 
-	private Collection content;
+    private Collection content;
 
-	private MemoryDataAccess dataStore;
+    private MemoryDataAccess dataStore;
 
-	public MemorySource(MemoryDataAccess dataStore, FeatureType type,
-			Collection collection) {
-		this.dataStore = dataStore;
-		this.type = type;
-		this.content = collection;
-	}
+    public MemorySource(MemoryDataAccess dataStore, FeatureType type, Collection collection) {
+        this.dataStore = dataStore;
+        this.type = type;
+        this.content = collection;
+    }
 
-	public Collection content() {
-		return Collections.unmodifiableCollection(content);
-	}
+    public Collection content() {
+        return Collections.unmodifiableCollection(content);
+    }
 
-	public Collection content(String query, String queryLanguage) {
-		throw new UnsupportedOperationException();
-	}
+    public Collection content(String query, String queryLanguage) {
+        throw new UnsupportedOperationException();
+    }
 
-	public Collection content(Filter filter) {
-		return new FilteringCollection(content(), filter);
-	}
+    public Collection content(Filter filter) {
+        return content(filter, Integer.MAX_VALUE);
+    }
 
-	public Object describe() {
-		return dataStore.describe(type.getName());
-	}
+    public Collection content(Filter filter, final int countLimit) {
+        final Collection content = new FilteringCollection(content(), filter);
+        Collection collection = content;
+        if (countLimit >= 0 && countLimit < Integer.MAX_VALUE) {
+            collection = new AbstractCollection() {
+                public Iterator iterator() {
+                    return new Iterator() {
+                        int count = 0;
 
-	public void dispose() {
-	}
+                        Iterator subject = content.iterator();
 
-	public FilterCapabilities getFilterCapabilities() {
-		throw new UnsupportedOperationException();
-	}
+                        public boolean hasNext() {
+                            boolean hasNext = subject.hasNext();
+                            return hasNext && count <= countLimit;
+                        }
 
-	public GeoResourceInfo getInfo() {
-		throw new UnsupportedOperationException();
-	}
+                        public Object next() {
+                            Object next = subject.next();
+                            count++;
+                            return next;
+                        }
 
-	public Name getName() {
-		return type.getName();
-	}
+                        public void remove() {
+                            throw new UnsupportedOperationException();
+                        }
+                    };
+                }
 
-	public void setTransaction(Transaction t) {
-		throw new UnsupportedOperationException();
-	}
+                public int size() {
+                    int contentSize = content.size();
+                    return Math.min(contentSize, countLimit);
+                }
+            };
+        }
+        return collection;
+    }
 
-	public void addFeatureListener(FeatureListener listener) {
-		throw new UnsupportedOperationException();
-	}
+    public Object describe() {
+        return dataStore.describe(type.getName());
+    }
 
-	public Envelope getBounds() throws IOException {
-		return getBounds(Filter.INCLUDE);
-	}
+    public void dispose() {
+    }
 
-	public Envelope getBounds(Query query) throws IOException {
-		return getBounds(query.getFilter());
-	}
+    public FilterCapabilities getFilterCapabilities() {
+        throw new UnsupportedOperationException();
+    }
 
-	private Envelope getBounds(Filter filter) throws IOException {
-		Collection collection = content(filter);
-		Feature f;
-		ReferencedEnvelope env = new ReferencedEnvelope(this.type.getCRS());
-		for (Iterator it = collection.iterator(); it.hasNext();) {
-			f = (Feature) it.next();
-			env.include(f.getBounds());
-		}
-		return env;
-	}
+    public GeoResourceInfo getInfo() {
+        throw new UnsupportedOperationException();
+    }
 
-	public int getCount(Query query) throws IOException {
-		Collection collection = content(query.getFilter());
-		int count = 0;
-		for (Iterator it = collection.iterator(); it.hasNext();) {
-			it.next();
-			count++;
-		}
-		return count;
-	}
+    public Name getName() {
+        return type.getName();
+    }
 
-	public DataStore getDataStore() {
-		return dataStore;
-	}
+    public void setTransaction(Transaction t) {
+        throw new UnsupportedOperationException();
+    }
 
-	public FeatureCollection getFeatures(Query query) throws IOException {
-		throw new UnsupportedOperationException();
-	}
+    public void addFeatureListener(FeatureListener listener) {
+        throw new UnsupportedOperationException();
+    }
 
-	public FeatureCollection getFeatures(Filter filter) throws IOException {
-		throw new UnsupportedOperationException();
-	}
+    public Envelope getBounds() throws IOException {
+        return getBounds(Filter.INCLUDE);
+    }
 
-	public FeatureCollection getFeatures() throws IOException {
-		throw new UnsupportedOperationException();
-	}
+    public Envelope getBounds(Query query) throws IOException {
+        return getBounds(query.getFilter());
+    }
 
-	public org.geotools.feature.FeatureType getSchema() {
-		throw new UnsupportedOperationException();
-	}
+    private Envelope getBounds(Filter filter) throws IOException {
+        Collection collection = content(filter);
+        Feature f;
+        ReferencedEnvelope env = new ReferencedEnvelope(this.type.getCRS());
+        for (Iterator it = collection.iterator(); it.hasNext();) {
+            f = (Feature) it.next();
+            env.include(f.getBounds());
+        }
+        return env;
+    }
 
-	public void removeFeatureListener(FeatureListener listener) {
-		throw new UnsupportedOperationException();
-	}
+    public int getCount(Query query) throws IOException {
+        Collection collection = content(query.getFilter());
+        int count = 0;
+        for (Iterator it = collection.iterator(); it.hasNext();) {
+            it.next();
+            count++;
+        }
+        return count;
+    }
+
+    public DataStore getDataStore() {
+        return dataStore;
+    }
+
+    public FeatureCollection getFeatures(Query query) throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
+    public FeatureCollection getFeatures(Filter filter) throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
+    public FeatureCollection getFeatures() throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
+    public org.geotools.feature.FeatureType getSchema() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void removeFeatureListener(FeatureListener listener) {
+        throw new UnsupportedOperationException();
+    }
 
 }

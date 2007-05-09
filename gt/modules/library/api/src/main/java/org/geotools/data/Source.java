@@ -97,6 +97,14 @@ public interface Source /*<Content,Description>*/ {
     Collection /*<Content>*/ content(Filter filter);
 
     /**
+     * A collection containing all the data indicated by the filter, with a maximum
+     * of <code>countLimit</code> elements.
+     *
+     * @return A immutable Collection, may be empty, but never <code>null</code>
+     */
+    Collection /*<Content>*/ content(Filter filter, int countLimit);
+
+    /**
      * Description of content in an appropriate format.
      * <ul>
      *   <li>AttributeDescriptor: when serving up features</li>

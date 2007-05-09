@@ -64,19 +64,20 @@ class MappingFeatureSource implements FeatureSource2 {
     }
 
     public Envelope getBounds() throws IOException {
-        Envelope bounds = store.getBounds(namedQuery(Filter.INCLUDE));
+        Envelope bounds = store.getBounds(namedQuery(Filter.INCLUDE, Integer.MAX_VALUE));
         return bounds;
     }
 
-    private DefaultQuery namedQuery(Filter filter) {
+    private DefaultQuery namedQuery(Filter filter, int countLimit) {
         DefaultQuery query = new DefaultQuery();
         query.setTypeName(getName().getLocalPart());
         query.setFilter(filter);
+        query.setMaxFeatures(countLimit);
         return query;
     }
 
     private DefaultQuery namedQuery(Query query) {
-        DefaultQuery namedQuery = namedQuery(query.getFilter());
+        DefaultQuery namedQuery = namedQuery(query.getFilter(), query.getMaxFeatures());
         namedQuery.setPropertyNames(query.getPropertyNames());
         namedQuery.setCoordinateSystem(query.getCoordinateSystem());
         namedQuery.setHandle(query.getHandle());
@@ -131,10 +132,14 @@ class MappingFeatureSource implements FeatureSource2 {
     }
 
     public Collection content(final Filter filter) {
+        return content(filter, Integer.MAX_VALUE);
+    }
+    
+    public Collection content(final Filter filter, final int countLimit) {
         Collection collection = new AbstractCollection() {
             public Iterator iterator() {
                 Iterator iterator;
-                Query query = namedQuery(filter);
+                Query query = namedQuery(filter, countLimit);
                 try {
                     if (0 == mappings.getGroupByAttNames().size()) {
                         iterator = new DefaultMappingFeatureIterator(store, mappings, query);
@@ -151,11 +156,11 @@ class MappingFeatureSource implements FeatureSource2 {
                 int count;
                 try {
                     if (0 == mappings.getGroupByAttNames().size()) {
-                        count = store.getCount(namedQuery(Filter.INCLUDE));
+                        count = store.getCount(namedQuery(filter, countLimit));
                     } else {
                         GroupingFeatureIterator it = (GroupingFeatureIterator) iterator();
                         int groupedCount = 0;
-                        while (it.hasNext()) {
+                        while (it.hasNext() && groupedCount < countLimit) {
                             //this prvents the full complex feature
                             //to be created, but just to advance the
                             //surrogate iterator by group

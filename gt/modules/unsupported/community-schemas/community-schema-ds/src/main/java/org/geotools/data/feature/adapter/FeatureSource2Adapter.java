@@ -6,6 +6,7 @@ import java.util.Collection;
 
 import org.geotools.catalog.GeoResourceInfo;
 import org.geotools.data.DataStore;
+import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
@@ -100,9 +101,16 @@ public class FeatureSource2Adapter implements FeatureSource2 {
     }
 
     public Collection content(Filter filter) {
+        return content(filter, Integer.MAX_VALUE);
+    }
+    
+    public Collection content(Filter filter, int countLimit) {
         FeatureCollection features;
         try {
-            features = source.getFeatures(filter);
+            DefaultQuery query = new DefaultQuery(source.getSchema().getTypeName());
+            query.setFilter(filter);
+            query.setMaxFeatures(countLimit);
+            features = source.getFeatures(query);
         } catch (IOException e) {
             throw (RuntimeException) new RuntimeException().initCause(e);
         }
