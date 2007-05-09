@@ -40,23 +40,26 @@ public class FunctionFinder {
 
         try {
             // load the caches at first access
-            if (functionExpressionCache == null) {
-                functionExpressionCache = new HashMap();
-                functionImplCache = new HashMap();
-
-                
-                Set functions = CommonFactoryFinder.getFunctionExpressions( null );                
-                for (Iterator it = functions.iterator(); it.hasNext();) {
-                    FunctionExpression function = (FunctionExpression) it.next();
-                    functionExpressionCache.put(function.getName().toLowerCase(), function.getClass());
-                }
-
-                functions = CommonFactoryFinder.getFunctions( null );                                
-                for (Iterator i = functions.iterator(); i.hasNext();) {
-                    FunctionImpl function = (FunctionImpl) i.next();
-                    functionImplCache.put(function.getName().toLowerCase(), function.getClass());
-                }
-            }
+        	synchronized (this) {
+			
+	            if (functionExpressionCache == null) {
+	                functionExpressionCache = new HashMap();
+	                functionImplCache = new HashMap();
+	
+	                
+	                Set functions = CommonFactoryFinder.getFunctionExpressions( null );                
+	                for (Iterator it = functions.iterator(); it.hasNext();) {
+	                    FunctionExpression function = (FunctionExpression) it.next();
+	                    functionExpressionCache.put(function.getName().toLowerCase(), function.getClass());
+	                }
+	
+	                functions = CommonFactoryFinder.getFunctions( null );                                
+	                for (Iterator i = functions.iterator(); i.hasNext();) {
+	                    FunctionImpl function = (FunctionImpl) i.next();
+	                    functionImplCache.put(function.getName().toLowerCase(), function.getClass());
+	                }
+	            }
+        	}
             
             // cache lookup
             Class clazz = (Class) functionExpressionCache.get(name.toLowerCase());
