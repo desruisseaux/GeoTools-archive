@@ -38,20 +38,20 @@ package org.geotools.geometry.iso.aggregate;
 
 import java.util.Set;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.opengis.geometry.Boundary;
 import org.opengis.geometry.aggregate.MultiCurve;
 import org.opengis.geometry.primitive.OrientableCurve;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class MultiCurveImpl extends MultiPrimitiveImpl implements MultiCurve {
 
 	/**
 	 * Creates a MultiCurve by a set of Curves.
-	 * @param factory
+	 * @param crs
 	 * @param curves Set of Curves which shall be contained by the MultiCurve
 	 */
-	public MultiCurveImpl(FeatGeomFactoryImpl factory, Set<OrientableCurve> curves) {
-		super(factory, curves);
+	public MultiCurveImpl(CoordinateReferenceSystem crs, Set<OrientableCurve> curves) {
+		super(crs, curves);
 	}
 
 	/* (non-Javadoc)

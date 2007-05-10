@@ -82,11 +82,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
-import org.geotools.geometry.iso.coordinate.PositionImpl;
+import org.geotools.geometry.iso.coordinate.LineStringImpl;
+import org.geotools.geometry.iso.coordinate.PointArrayImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
-import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.topograph2D.DirectedEdge;
 import org.geotools.geometry.iso.topograph2D.DirectedEdgeStar;
 import org.geotools.geometry.iso.topograph2D.Edge;
@@ -99,6 +97,7 @@ import org.opengis.geometry.coordinate.LineString;
 import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.primitive.CurveSegment;
 import org.opengis.geometry.primitive.OrientableCurve;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
@@ -108,11 +107,12 @@ import org.opengis.geometry.primitive.OrientableCurve;
 public class LineBuilder {
 	private OverlayOp op;
 
-	private FeatGeomFactoryImpl featGeomFactory;
+	//private FeatGeomFactoryImpl featGeomFactory;
+	private CoordinateReferenceSystem crs;
 
-	private GeometryFactoryImpl coordinateFactory;
+	//private GeometryFactoryImpl coordinateFactory;
 
-	private PrimitiveFactoryImpl primitiveFactory;
+	//private PrimitiveFactoryImpl primitiveFactory;
 
 	private PointLocator ptLocator;
 
@@ -120,12 +120,12 @@ public class LineBuilder {
 
 	private List<OrientableCurve> resultLineList = new ArrayList<OrientableCurve>();
 
-	public LineBuilder(OverlayOp op, FeatGeomFactoryImpl aFeatGeomFactory,
+	public LineBuilder(OverlayOp op, CoordinateReferenceSystem crs,
 			PointLocator ptLocator) {
 		this.op = op;
-		this.featGeomFactory = aFeatGeomFactory;
-		this.coordinateFactory = featGeomFactory.getGeometryFactoryImpl();
-		this.primitiveFactory = featGeomFactory.getPrimitiveFactory();
+		this.crs = crs;
+		//this.coordinateFactory = featGeomFactory.getGeometryFactoryImpl();
+		//this.primitiveFactory = featGeomFactory.getPrimitiveFactory();
 		this.ptLocator = ptLocator;
 	}
 
@@ -248,13 +248,12 @@ public class LineBuilder {
 			Edge e = (Edge) it.next();
 			Label label = e.getLabel();
 
-            List<Position> positions = CoordinateArrays.toPositionList(coordinateFactory, e
+            List<Position> positions = CoordinateArrays.toPositionList(crs, e
                     .getCoordinates());
-			LineString line = coordinateFactory.createLineString( positions );					
+			LineString line = new LineStringImpl(new PointArrayImpl( positions ), 0.0); //coordinateFactory.createLineString( positions );					
 			LinkedList<CurveSegment> tLineStrings = new LinkedList<CurveSegment>();
 			tLineStrings.add((CurveSegment) line);
-			CurveImpl curve = primitiveFactory
-					.createCurve((List<CurveSegment>) tLineStrings);
+			CurveImpl curve = new CurveImpl(crs, (List<CurveSegment>) tLineStrings); //primitiveFactory.createCurve((List<CurveSegment>) tLineStrings);
 			resultLineList.add(curve);
 			e.setInResult(true);
 

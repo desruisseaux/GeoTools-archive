@@ -81,14 +81,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
-import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.topograph2D.Coordinate;
 import org.geotools.geometry.iso.topograph2D.Label;
 import org.geotools.geometry.iso.topograph2D.Node;
 import org.geotools.geometry.iso.util.algorithm2D.PointLocator;
-import org.opengis.geometry.coordinate.GeometryFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // import java.util.*;
 // import com.vividsolutions.jts.geom.*;
@@ -103,17 +102,18 @@ import org.opengis.geometry.coordinate.GeometryFactory;
 public class PointBuilder {
 	private OverlayOp op;
 
-	private FeatGeomFactoryImpl featGeomFactory;
+	//private FeatGeomFactoryImpl featGeomFactory;
+	private CoordinateReferenceSystem crs;
 
-	private PrimitiveFactoryImpl primitiveFactory;
+	//private PrimitiveFactoryImpl primitiveFactory;
 
 	private List resultPointList = new ArrayList();
 
-	public PointBuilder(OverlayOp op, FeatGeomFactoryImpl aFeatGeomFactory,
+	public PointBuilder(OverlayOp op, CoordinateReferenceSystem crs,
 			PointLocator ptLocator) {
 		this.op = op;
-		this.featGeomFactory = aFeatGeomFactory;
-		this.primitiveFactory = featGeomFactory.getPrimitiveFactory();
+		this.crs = crs;
+		//this.primitiveFactory = featGeomFactory.getPrimitiveFactory();
 		// ptLocator is never used in this class
 	}
 
@@ -189,7 +189,8 @@ public class PointBuilder {
 	private void filterCoveredNodeToPoint(Node n) {
 		Coordinate coord = n.getCoordinate();
 		if (!op.isCoveredByLA(coord)) {
-			PointImpl pt = primitiveFactory.createPoint(coord.getCoordinates());
+			PointImpl pt = new PointImpl(new DirectPositionImpl(crs, coord.getCoordinates()));
+			//PointImpl pt = primitiveFactory.createPoint(coord.getCoordinates());
 			resultPointList.add(pt);
 		}
 	}

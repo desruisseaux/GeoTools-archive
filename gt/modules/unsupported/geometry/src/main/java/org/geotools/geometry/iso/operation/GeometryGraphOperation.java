@@ -77,7 +77,6 @@
 
 package org.geotools.geometry.iso.operation;
 
-import org.geotools.geometry.iso.DimensionModel;
 import org.geotools.geometry.iso.PrecisionModel;
 import org.geotools.geometry.iso.UnsupportedDimensionException;
 import org.geotools.geometry.iso.root.GeometryImpl;
@@ -113,11 +112,14 @@ public abstract class GeometryGraphOperation {
 		// setComputationPrecision(g1.getPrecisionModel());
 
 		// Throw Unsupported Dimension Exception if one of the geometries is not 2d or 2.5d
-		DimensionModel g0Dim = g0.getFeatGeometryFactory().getDimensionModel();
-		DimensionModel g1Dim = g1.getFeatGeometryFactory().getDimensionModel();
-		if (!g0Dim.is2D() || !g1Dim.is2D()) {
+		//DimensionModel g0Dim = g0.getFeatGeometryFactory().getDimensionModel();
+		//DimensionModel g1Dim = g1.getFeatGeometryFactory().getDimensionModel();
+		int g0Dim = g0.getCoordinateReferenceSystem().getCoordinateSystem().getDimension();
+		int g1Dim = g1.getCoordinateReferenceSystem().getCoordinateSystem().getDimension();
+		if (g0Dim != 2 || g1Dim != 2) {
+		//if (!g0Dim.is2D() || !g1Dim.is2D()) {
 			throw new UnsupportedDimensionException(
-					"This operations do only work in 2D");
+					"This operation only works in 2D");
 		}
 
 		arg = new GeometryGraph[2];

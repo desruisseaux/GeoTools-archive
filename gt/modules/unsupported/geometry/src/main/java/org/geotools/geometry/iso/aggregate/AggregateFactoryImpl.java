@@ -48,19 +48,21 @@ import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.OrientableSurface;
 import org.opengis.geometry.primitive.Point;
 import org.opengis.geometry.primitive.Primitive;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * 
  */
 public class AggregateFactoryImpl implements AggregateFactory {
 
-	private FeatGeomFactoryImpl geometryFactory;
+	//private FeatGeomFactoryImpl geometryFactory;
+	private CoordinateReferenceSystem crs;
 
 	/**
-	 * @param geometryFactory
+	 * @param crs
 	 */
-	public AggregateFactoryImpl(FeatGeomFactoryImpl geometryFactory) {
-		this.geometryFactory = geometryFactory;
+	public AggregateFactoryImpl(CoordinateReferenceSystem crs) {
+		this.crs = crs;
 	}
 	
 	/**
@@ -69,7 +71,7 @@ public class AggregateFactoryImpl implements AggregateFactory {
 	 * @return
 	 */
 	public MultiPrimitive createMultiPrimitive(Set<Primitive> primitives) {
-		return new MultiPrimitiveImpl(this.geometryFactory, primitives);
+		return new MultiPrimitiveImpl(crs, primitives);
 	}
 
 	/**
@@ -78,7 +80,7 @@ public class AggregateFactoryImpl implements AggregateFactory {
 	 * @return
 	 */
 	public MultiPoint createMultiPoint(Set<Point> points) {
-		return new MultiPointImpl(this.geometryFactory, points);
+		return new MultiPointImpl(crs, points);
 	}
 
 	
@@ -88,7 +90,7 @@ public class AggregateFactoryImpl implements AggregateFactory {
 	 * @return
 	 */
 	public MultiCurve createMultiCurve(Set<OrientableCurve> curves) {
-		return new MultiCurveImpl(this.geometryFactory, curves);
+		return new MultiCurveImpl(crs, curves);
 	}
 
 	/**
@@ -97,7 +99,7 @@ public class AggregateFactoryImpl implements AggregateFactory {
 	 * @return
 	 */
 	public MultiSurface createMultiSurface(Set<OrientableSurface> surfaces) {
-		return new MultiSurfaceImpl(this.geometryFactory, surfaces);
+		return new MultiSurfaceImpl(crs, surfaces);
 	}
 
 	

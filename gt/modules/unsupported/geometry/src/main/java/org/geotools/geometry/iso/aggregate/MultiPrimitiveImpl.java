@@ -39,7 +39,6 @@ package org.geotools.geometry.iso.aggregate;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.geometry.iso.io.GeometryToString;
@@ -51,17 +50,18 @@ import org.opengis.geometry.aggregate.MultiPrimitive;
 import org.opengis.geometry.complex.Complex;
 import org.opengis.geometry.primitive.Primitive;
 import org.opengis.geometry.Geometry;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 public class MultiPrimitiveImpl extends AggregateImpl implements MultiPrimitive {
 
 	/**
 	 * Creates a MultiPrimitive by a set of Primitives.
-	 * @param factory
+	 * @param crs
 	 * @param primitives Set of Primitives which shall be contained by the MultiPrimitive
 	 */
-	public MultiPrimitiveImpl(FeatGeomFactoryImpl factory, Set<? extends Primitive> primitives) {
-		super(factory, primitives);
+	public MultiPrimitiveImpl(CoordinateReferenceSystem crs, Set<? extends Primitive> primitives) {
+		super(crs, primitives);
 	}
 
 	/* (non-Javadoc)

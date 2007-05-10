@@ -144,7 +144,8 @@ public class SurfaceBoundaryImpl extends PrimitiveBoundaryImpl implements
 			newInteriors.add((Ring) interiors.next().clone());
 		}
 		// Use the cloned rings to create a new SurfaceBoundary
-		return this.getFeatGeometryFactory().getPrimitiveFactory().createSurfaceBoundary(newExterior, newInteriors);
+		return new SurfaceBoundaryImpl(getCoordinateReferenceSystem(),
+				newExterior, newInteriors);
 	}
 
 	/* (non-Javadoc)

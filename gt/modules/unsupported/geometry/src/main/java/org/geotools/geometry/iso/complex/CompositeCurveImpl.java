@@ -96,7 +96,7 @@ public class CompositeCurveImpl extends CompositeImpl<OrientableCurveImpl>
 	 * Constructs a Composite Curve
 	 * @param generator
 	 */
-	protected CompositeCurveImpl(List<OrientableCurve> generator) {
+	public CompositeCurveImpl(List<OrientableCurve> generator) {
 		/* Pass elements to super constructor */
 		super(generator);
 		this.checkConsistency();

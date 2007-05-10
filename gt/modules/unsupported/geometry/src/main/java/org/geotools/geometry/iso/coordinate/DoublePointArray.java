@@ -1,8 +1,10 @@
 package org.geotools.geometry.iso.coordinate;
 
 import java.util.AbstractList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.geotools.geometry.iso.util.DoubleOperation;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.PointArray;
@@ -11,13 +13,20 @@ import org.opengis.geometry.coordinate.Position;
 /**
  * This implementation is a "fast" wrapper over top of a double array.
  * <p>
- * The returned DirectPositions are pure wrappers over top of the array.
+ * The returned DirectPositions are pure wrappers over top of the array. The
+ * number of ordinates used per each DirectPosition is based on the CRS. We
+ * start counting from the start position, in order to do subList efficiently.
  * </p>
  * @author Jody
  */
 public class DoublePointArray extends AbstractList<Position> implements PointArray {
     
+	/** This is the array we are "wrapping" */
     double[] array;
+    /**
+     * This is the start index into array, each DirectPosition
+     * will be defined relative to start.
+     */
     int start;
     int end;
     CoordinateReferenceSystem crs;
@@ -31,7 +40,14 @@ public class DoublePointArray extends AbstractList<Position> implements PointArr
         this.start = start;
         this.end = end;
     }
-    
+    @Override
+    public List<Position> subList(int fromIndex, int toIndex) {
+    	int subStart = start+(fromIndex*getDimension());
+    	int subEnd = start+(toIndex*getDimension());
+    	
+    	return new DoublePointArray( crs, array, subStart, subEnd );
+    	//return super.subList(fromIndex, toIndex);
+    }
     @Override
     public DirectPosition get( int index ) {
         int D = getDimension();
@@ -75,7 +91,52 @@ public class DoublePointArray extends AbstractList<Position> implements PointArr
     }
     public List<Position> positions() {
         return this;
-    }    
+    }
+	@Override
+	public int hashCode() {
+		final int PRIME = 31;
+		int result = super.hashCode();
+		result = PRIME * result + Arrays.hashCode(array);
+		result = PRIME * result + ((crs == null) ? 0 : crs.hashCode());
+		result = PRIME * result + end;
+		result = PRIME * result + start;
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof DoublePointArray)
+			return this.equals((DoublePointArray) obj, 0);
+		else
+			return false;
+	}   
+	
+	/**
+	 * Compares coodinates of DoublePointArray and allows a tolerance value in
+	 * the comparison.
+	 * 
+	 * @param dpArray
+	 *            Direct Position to compare with
+	 * @param tol Epsilon tolerance value
+	 * @return TRUE, if coordinates accord concording to the tolerance value, FALSE if they dont.
+	 */
+	public boolean equals(DoublePointArray dpArray, double tol) {
+		int D = dpArray.getDimension();
+		if( D != getDimension() ) return false;
+		
+		if (dpArray.length() != length()) return false;
+		
+		// only compare the positions within the start/end of the larger array
+		for (int x=0; x<dpArray.length(); x++) {
+			DirectPosition ddPos = dpArray.get(x);
+			DirectPosition thisddPos = get(x);
+			for (int i = 0; i < D; ++i) {
+				if (Math.abs(DoubleOperation.subtract(ddPos.getOrdinate(i), thisddPos.getOrdinate(i))) > tol)
+					return false;
+			}
+		}
+		return true;
+	}	
+	
 }
 /**
  * Represents a DirectPosition wrapper of a secion of a double array.

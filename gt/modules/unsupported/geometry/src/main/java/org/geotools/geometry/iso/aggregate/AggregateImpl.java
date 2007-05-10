@@ -38,10 +38,10 @@ package org.geotools.geometry.iso.aggregate;
 
 import java.util.Set;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
 import org.opengis.geometry.aggregate.Aggregate;
 import org.opengis.geometry.Geometry;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * @author roehrig
@@ -54,10 +54,10 @@ public abstract class AggregateImpl extends GeometryImpl implements Aggregate {
 	protected Set<? extends Geometry> elements = null;
 
 	/**
-	 * @param factory
+	 * @param crs
 	 */
-	public AggregateImpl(FeatGeomFactoryImpl factory, Set<? extends Geometry> elements) {
-		super(factory);
+	public AggregateImpl(CoordinateReferenceSystem crs, Set<? extends Geometry> elements) {
+		super(crs);
 		this.elements = elements;
 	}
 

@@ -78,9 +78,15 @@
 package org.geotools.geometry.iso.topograph2D;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
+import org.geotools.geometry.iso.coordinate.LineStringImpl;
+import org.geotools.geometry.iso.coordinate.PointArrayImpl;
+import org.geotools.geometry.iso.coordinate.PositionImpl;
+import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
@@ -88,7 +94,11 @@ import org.geotools.geometry.iso.topograph2D.util.CoordinateArrays;
 import org.geotools.geometry.iso.util.Assert;
 import org.geotools.geometry.iso.util.algorithm2D.CGAlgorithms;
 import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.primitive.CurveSegment;
+import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.Ring;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public abstract class EdgeRing {
 
@@ -121,13 +131,14 @@ public abstract class EdgeRing {
 	// a list of EdgeRings which are holes in this EdgeRing
 	private ArrayList holes = new ArrayList();
 
-	protected FeatGeomFactoryImpl mFeatGeomFactory;
+	//protected FeatGeomFactoryImpl mFeatGeomFactory;
+	protected CoordinateReferenceSystem crs;
 
 	protected CGAlgorithms cga;
 
-	public EdgeRing(DirectedEdge start, FeatGeomFactoryImpl featGeomFactory,
+	public EdgeRing(DirectedEdge start, CoordinateReferenceSystem crs,
 			CGAlgorithms cga) {
-		this.mFeatGeomFactory = featGeomFactory;
+		this.crs = crs;
 		this.cga = cga;
 		this.computePoints(start);
 		this.computeRing();
@@ -179,25 +190,23 @@ public abstract class EdgeRing {
 	/**
 	 * Creates a Surface based on the given ring and holes
 	 * 
-	 * @param aGeometryFactory
 	 * @return the created Surface
 	 */
 	// TODO don´t need the geomfactory parameter because it owns this parameter
 	// as member variable
-	public SurfaceImpl toPolygon(FeatGeomFactoryImpl aGeometryFactory) {
+	public SurfaceImpl toPolygon() {
 
 		List<Ring> interiorRings = new ArrayList<Ring>();
 
 		for (int i = 0; i < holes.size(); i++) {
 			interiorRings.add(((EdgeRing) holes.get(i)).getRing());
 		}
+		
+		SurfaceBoundaryImpl surfaceBoundary = new SurfaceBoundaryImpl(crs,
+				this.getRing(), interiorRings);
+			//aGeometryFactory.getPrimitiveFactory().createSurfaceBoundary(this.getRing(),interiorRings);
 
-		SurfaceBoundaryImpl surfaceBoundary = aGeometryFactory
-				.getPrimitiveFactory().createSurfaceBoundary(this.getRing(),
-						interiorRings);
-
-		return aGeometryFactory.getPrimitiveFactory().createSurface(
-				surfaceBoundary);
+		return new SurfaceImpl(surfaceBoundary); //aGeometryFactory.getPrimitiveFactory().createSurface(surfaceBoundary);
 	}
 
 	/**
@@ -214,20 +223,30 @@ public abstract class EdgeRing {
 		// coord[i] = (Coordinate) pts.get(i);
 		// }
 
-		Coordinate[] coord = new Coordinate[this.pts.size()];
-		List<DirectPosition> dpList = new ArrayList<DirectPosition>();
+		//Coordinate[] coord = new Coordinate[this.pts.size()];
+		List<Position> dpList = new LinkedList<Position>();
 
 		for (int i = 0; i < this.pts.size(); i++) {
 			double[] doubleCoords = ((Coordinate) this.pts.get(i))
 					.getCoordinates();
-			DirectPosition dp = this.mFeatGeomFactory.getGeometryFactoryImpl()
-					.createDirectPosition(doubleCoords);
+			Position dp = new PositionImpl( new DirectPositionImpl(crs, doubleCoords) );
 			dpList.add(dp);
 		}
+		
+		// Create List of CurveSegment´s (LineString´s)
+		LineStringImpl lineString = new LineStringImpl(new PointArrayImpl(
+				dpList), 0.0);
+		List<CurveSegment> segments = new ArrayList<CurveSegment>();
+		segments.add(lineString);
+		
+		// Create List of OrientableCurve´s (Curve´s)
+		OrientableCurve curve = new CurveImpl(crs, segments);
+		List<OrientableCurve> orientableCurves = new ArrayList<OrientableCurve>();
+		orientableCurves.add(curve);
 
-		// ring = geometryFactory.createLinearRing(coord);
-		this.ring = (RingImpl) this.mFeatGeomFactory.getPrimitiveFactory()
-				.createRingByDirectPositions(dpList);
+		this.ring = (RingImpl) new RingImpl(orientableCurves);		
+		// this.ring = (RingImpl) this.mFeatGeomFactory.getPrimitiveFactory().createRingByDirectPositions(dpList);
+		
 		// See if the Ring is counterclockwise oriented
 		this.isHole = this.cga.isCCW(CoordinateArrays
 				.toCoordinateArray(this.ring.asDirectPositions()));
@@ -315,7 +334,7 @@ public abstract class EdgeRing {
 	 * skipped.
 	 */
 	protected void mergeLabel(Label deLabel, int geomIndex) {
-		int loc = deLabel.getLocation(geomIndex, Position.RIGHT);
+		int loc = deLabel.getLocation(geomIndex, org.geotools.geometry.iso.topograph2D.Position.RIGHT);
 		// no information to be had from this label
 		if (loc == Location.NONE)
 			return;

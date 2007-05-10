@@ -77,11 +77,11 @@
 
 package org.geotools.geometry.iso.operation.overlay;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.topograph2D.DirectedEdge;
 import org.geotools.geometry.iso.topograph2D.Edge;
 import org.geotools.geometry.iso.topograph2D.EdgeRing;
 import org.geotools.geometry.iso.util.algorithm2D.CGAlgorithms;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
@@ -93,8 +93,8 @@ import org.geotools.geometry.iso.util.algorithm2D.CGAlgorithms;
 public class MinimalEdgeRing extends EdgeRing {
 
 	public MinimalEdgeRing(DirectedEdge start,
-			FeatGeomFactoryImpl geometryFactory, CGAlgorithms cga) {
-		super(start, geometryFactory, cga);
+			CoordinateReferenceSystem crs, CGAlgorithms cga) {
+		super(start, crs, cga);
 	}
 
 	public DirectedEdge getNext(DirectedEdge de) {

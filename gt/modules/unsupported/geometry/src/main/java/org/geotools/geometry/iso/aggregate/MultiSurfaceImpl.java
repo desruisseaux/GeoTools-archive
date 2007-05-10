@@ -38,21 +38,21 @@ package org.geotools.geometry.iso.aggregate;
 
 import java.util.Set;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.opengis.geometry.Boundary;
 import org.opengis.geometry.aggregate.MultiSurface;
 import org.opengis.geometry.primitive.OrientableSurface;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class MultiSurfaceImpl extends MultiPrimitiveImpl implements MultiSurface {
 
 	
 	/**
 	 * Creates a MultiSurface by a set of Curves.
-	 * @param factory
+	 * @param crs
 	 * @param surfaces Set of Surfaces which shall be contained by the MultiSurface
 	 */
-	public MultiSurfaceImpl(FeatGeomFactoryImpl factory, Set<OrientableSurface> surfaces) {
-		super(factory, surfaces);
+	public MultiSurfaceImpl(CoordinateReferenceSystem crs, Set<OrientableSurface> surfaces) {
+		super(crs, surfaces);
 	}
 
 	/* (non-Javadoc)

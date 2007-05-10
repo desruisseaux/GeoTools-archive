@@ -54,6 +54,7 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.geometry.MismatchedReferenceSystemException;
+import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.coordinate.LineSegment;
 import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.primitive.Curve;
@@ -76,12 +77,14 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
 	// geometryFactory
 	// private FeatGeomFactoryImpl xgeometryFactory;
 	private CoordinateReferenceSystem crs;
+	private PositionFactory positionFactory;
 
 	/**
 	 * @param crs
 	 */
-	public PrimitiveFactoryImpl(CoordinateReferenceSystem crs) {
+	public PrimitiveFactoryImpl(CoordinateReferenceSystem crs, PositionFactory positionFactory) {
 		this.crs = crs;
+		this.positionFactory = positionFactory;
 	}
 
 	/*
@@ -93,6 +96,17 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
 		// TODO test
 		// TODO documentation
 		return this.crs;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.geometry.primitive.PrimitiveFactory#getCoordinateReferenceSystem()
+	 */
+	public PositionFactory getPositionFactory() {
+		// TODO test
+		// TODO documentation
+		return this.positionFactory;
 	}
 
 	/**
@@ -116,9 +130,8 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
 			throw new NullPointerException();
 		if (coord.length != this.getDimension())
 			throw new MismatchedDimensionException();
-		// The coordinate array will be cloned in the GeometryFactory
-		return new PointImpl(new DirectPositionImpl(
-				getCoordinateReferenceSystem(), coord));
+
+		return new PointImpl(positionFactory.createDirectPosition(coord));
 	}
 
 	/**
@@ -156,7 +169,7 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
 		if (position.getPosition().getDimension() != this.getDimension()) {
 			throw new MismatchedDimensionException();
 		}
-		DirectPositionImpl copy = new DirectPositionImpl(position.getPosition());
+		DirectPositionImpl copy = (DirectPositionImpl) positionFactory.createDirectPosition(position.getPosition().getCoordinates());
 		return new PointImpl(copy);
 	}
 
@@ -360,9 +373,9 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
 				max = envelope.getMaximum(d);
 			}
 			if (positions.isEmpty()) {
-				DirectPositionImpl min1 = new DirectPositionImpl(crs);
+				DirectPositionImpl min1 = (DirectPositionImpl) positionFactory.createDirectPosition(null);//new DirectPositionImpl(crs);
 				min1.setOrdinate(d, min);
-				DirectPositionImpl max1 = new DirectPositionImpl(crs);
+				DirectPositionImpl max1 = (DirectPositionImpl) positionFactory.createDirectPosition(null);//new DirectPositionImpl(crs);
 				max1.setOrdinate(d, max);
 
 				positions.add(min1);
@@ -375,7 +388,7 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
 				// copy and update max
 				List<DirectPosition> copy = new ArrayList<DirectPosition>();
 				for (DirectPosition position : positions) {
-					DirectPositionImpl maxN = new DirectPositionImpl(position);
+					DirectPositionImpl maxN = (DirectPositionImpl) positionFactory.createDirectPosition(position.getCoordinates()); //new DirectPositionImpl(position);
 					maxN.setOrdinate(d, max);
 				}
 				positions.addAll(copy);
@@ -393,14 +406,14 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
 	public PrimitiveImpl createPrimitive(Envelope bounds)
 			throws MismatchedReferenceSystemException,
 			MismatchedDimensionException {
-		final int D = crs.getCoordinateSystem().getDimension();
+		//final int D = crs.getCoordinateSystem().getDimension();
 		
 		LineSegment segment = processBoundsToSegment(bounds);		
 		return processSegmentToPrimitive( bounds, segment, 1 );		
 	}
 	
 	private PrimitiveImpl processSegmentToPrimitive(Envelope bounds, LineSegment segment, int dimension) {
-		int D = crs.getCoordinateSystem().getDimension();
+		//int D = crs.getCoordinateSystem().getDimension();
 		CoordinateSystemAxis axis = crs.getCoordinateSystem().getAxis( dimension );
 		
 		if( axis.getDirection() == AxisDirection.OTHER ){
@@ -438,8 +451,8 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
 		CoordinateReferenceSystem crs = bounds.getCoordinateReferenceSystem();
 		CoordinateSystemAxis axis = crs.getCoordinateSystem().getAxis( D );
 		
-		DirectPosition positionA = new DirectPositionImpl(crs);
-		DirectPosition positionB = new DirectPositionImpl(crs);		
+		DirectPosition positionA = positionFactory.createDirectPosition(null); //new DirectPositionImpl(crs);
+		DirectPosition positionB = positionFactory.createDirectPosition(null); //new DirectPositionImpl(crs);		
 		if( axis.getDirection() != AxisDirection.OTHER ){
 			positionA.setOrdinate(D, bounds.getMinimum(D) );
 			positionB.setOrdinate(D, bounds.getMaximum(D) );
@@ -455,16 +468,16 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
 	 * @return
 	 */
 	public RingImpl processBoundsToRing( Envelope bounds, LineSegment segment, final int D ){
-		DirectPosition one = new DirectPositionImpl( segment.getStartPoint() );
+		DirectPosition one = positionFactory.createDirectPosition(segment.getStartPoint().getCoordinates()); //new DirectPositionImpl( segment.getStartPoint() );
 		one.setOrdinate( D, bounds.getMinimum(D) );
 		
-		DirectPosition two = new DirectPositionImpl( segment.getEndPoint() );
+		DirectPosition two = positionFactory.createDirectPosition(segment.getEndPoint().getCoordinates()); //new DirectPositionImpl( segment.getEndPoint() );
 		two.setOrdinate( D, bounds.getMinimum(D) );
 		
-		DirectPosition three = new DirectPositionImpl( two );
+		DirectPosition three = positionFactory.createDirectPosition(two.getCoordinates()); //new DirectPositionImpl( two );
 		three.setOrdinate( D, bounds.getMaximum(D) );
 		
-		DirectPosition four = new DirectPositionImpl( one );
+		DirectPosition four = positionFactory.createDirectPosition(one.getCoordinates()); //new DirectPositionImpl( one );
 		four.setOrdinate( D, bounds.getMaximum(D) );
 		
 		LineSegment edge1 = new LineSegmentImpl( one, two, 0.0 );

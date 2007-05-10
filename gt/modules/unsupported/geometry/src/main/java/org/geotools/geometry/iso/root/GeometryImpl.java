@@ -50,6 +50,8 @@ import org.geotools.geometry.iso.aggregate.MultiPointImpl;
 import org.geotools.geometry.iso.aggregate.MultiPrimitiveImpl;
 import org.geotools.geometry.iso.aggregate.MultiSurfaceImpl;
 import org.geotools.geometry.iso.complex.ComplexImpl;
+import org.geotools.geometry.iso.complex.CompositeCurveImpl;
+import org.geotools.geometry.iso.complex.CompositeSurfaceImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.geometry.iso.operation.overlay.OverlayOp;
@@ -115,42 +117,24 @@ public abstract class GeometryImpl implements Geometry {
 
 	private boolean mutable = true;
 	
-	/** @deprecated removing dependency on this larger factory holder */
-	protected FeatGeomFactoryImpl xfactory;
+	//protected FeatGeomFactoryImpl xfactory;
 
 	protected final CoordinateReferenceSystem crs;
 	protected final Precision percision;
-	protected final PrimitiveFactory primitiveFactory; // for making stuff like curve, point 
-	protected final GeometryFactory geometryFactory; // geometry for Line etc...
+	//protected final PrimitiveFactory primitiveFactory; // for making stuff like curve, point 
+	//protected final GeometryFactory geometryFactory; // geometry for Line etc...
 	protected final PositionFactory positionFactory; // for position and point array
-	protected final ComplexFactory complexFactory; // surface and friends
+	//protected final ComplexFactory complexFactory; // surface and friends
 
-	/**
-	 * Creates a geometric root object.
-	 * 
-	 * @param factory The Geometry factory
-	 */
-	protected GeometryImpl(FeatGeomFactoryImpl feat) {
-		this( feat.getCoordinateReferenceSystem(), feat.getPrecision(), feat.getGeometryFactory(), feat.getPrimitiveFactory(), feat.getAggregateFactory(), new PositionFactoryImpl(feat.getCoordinateReferenceSystem(), feat.getPrecision() ), feat.getComplexFactory());
-		// TODO documentation
-		//this.factory = factory;
-	}
 		
-	protected GeometryImpl(CoordinateReferenceSystem coordinateReferenceSystem, Precision pm, GeometryFactory geometryFactory2, PrimitiveFactoryImpl primitiveFactory2, AggregateFactoryImpl aggregateFactory, PositionFactory positionFactory2, ComplexFactory complexFactory2 ){
-		this.crs = coordinateReferenceSystem;
+	public GeometryImpl(CoordinateReferenceSystem crs, Precision pm ){
+		this.crs = crs;
 		this.percision = pm;
-		this.primitiveFactory = primitiveFactory2;
-		this.geometryFactory = geometryFactory2;
-		this.positionFactory = positionFactory2;
-		this.complexFactory = complexFactory2;
+		this.positionFactory = new PositionFactoryImpl(crs, pm);
 	}
 
 	public GeometryImpl(CoordinateReferenceSystem coordinateReferenceSystem) {
 		this( coordinateReferenceSystem, new PrecisionModel() );
-	}
-
-	public GeometryImpl(CoordinateReferenceSystem coordinateReferenceSystem, Precision precision) {
-		this( coordinateReferenceSystem, precision, null, null, null, null, null );
 	}
 
 	/**
@@ -325,6 +309,7 @@ public abstract class GeometryImpl implements Geometry {
 	 * @see org.opengis.geometry.coordinate.root.Geometry#getMbRegion()
 	 */
 	public Geometry getMbRegion() {
+		PrimitiveFactoryImpl primitiveFactory = new PrimitiveFactoryImpl(crs, positionFactory);
 		return primitiveFactory.createPrimitive( this.getEnvelope() );
 	}
 
@@ -959,12 +944,12 @@ public abstract class GeometryImpl implements Geometry {
 		if (this instanceof CurveImpl) {
 			List<OrientableCurve> cl = new ArrayList<OrientableCurve>();
 			cl.add((OrientableCurve) this);
-			return complexFactory.createCompositeCurve(cl);
+			return new CompositeCurveImpl(cl);
 		} else
 		if (this instanceof SurfaceImpl) {
 			List<OrientableSurface> cs = new ArrayList<OrientableSurface>();
 			cs.add( (OrientableSurface) this);
-			return complexFactory.createCompositeSurface(cs);
+			return new CompositeSurfaceImpl(cs);
 		} else
 		if (this instanceof MultiPrimitiveImpl) {
 			// TODO

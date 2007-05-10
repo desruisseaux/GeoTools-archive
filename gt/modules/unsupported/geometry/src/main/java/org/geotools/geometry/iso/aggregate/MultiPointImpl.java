@@ -38,10 +38,10 @@ package org.geotools.geometry.iso.aggregate;
 
 import java.util.Set;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.opengis.geometry.Boundary;
 import org.opengis.geometry.aggregate.MultiPoint;
 import org.opengis.geometry.primitive.Point;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * @author roehrig
@@ -51,11 +51,11 @@ public class MultiPointImpl extends MultiPrimitiveImpl implements MultiPoint {
 
 	/**
 	 * Creates a MultiPoint by a set of Points.
-	 * @param factory
+	 * @param crs
 	 * @param points Set of Points which shall be contained by the MultiPoint
 	 */
-	public MultiPointImpl(FeatGeomFactoryImpl factory, Set<Point> points) {
-		super(factory, points);
+	public MultiPointImpl(CoordinateReferenceSystem crs, Set<Point> points) {
+		super(crs, points);
 	}
 	
 	/* (non-Javadoc)

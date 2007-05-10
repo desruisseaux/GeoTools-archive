@@ -4,10 +4,13 @@ import junit.framework.TestCase;
 
 import org.geotools.filter.GeometryFilterImpl;
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.iso.PositionFactoryImpl;
+import org.geotools.geometry.iso.PrecisionModel;
 import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.referencing.CRS;
+import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.complex.Complex;
 import org.opengis.geometry.complex.CompositePoint;
 import org.opengis.geometry.coordinate.GeometryFactory;
@@ -34,7 +37,8 @@ public class PointTest extends TestCase {
 		assertNotNull( crs );
 
 		FeatGeomFactoryImpl geometryFactory = new FeatGeomFactoryImpl(crs);
-		PrimitiveFactory primitiveFactory = new PrimitiveFactoryImpl(crs); // null;
+		PositionFactory positionFactory = new PositionFactoryImpl(crs, new PrecisionModel());
+		PrimitiveFactory primitiveFactory = new PrimitiveFactoryImpl(crs, positionFactory); // null;
 		
 		assertEquals( crs, primitiveFactory.getCoordinateReferenceSystem() );
 		

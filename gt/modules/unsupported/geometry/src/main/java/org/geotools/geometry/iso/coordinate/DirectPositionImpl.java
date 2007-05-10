@@ -328,17 +328,17 @@ public class DirectPositionImpl implements DirectPosition {
 	 * DirectPosition (not DirectPositionImpl), so that the equals method is
 	 * found for DirectPosition´s and DirectPositionImpl´s
 	 * 
-	 * @param p
+	 * @param position
 	 *            Direct Position to compare with
 	 * @param tol Epsilon tolerance value
 	 * @return TRUE, if coordinates accord concording to the tolerance value, FALSE if they dont.
 	 */
-	public boolean equals(DirectPosition p, double tol) {
-		if (p.getDimension() != this.getDimension())
-			return false;
-		double coord[] = p.getCoordinates();
-		for (int i = 0; i < this.coordinate.length; ++i) {
-			if (Math.abs(DoubleOperation.subtract(coord[i], this.coordinate[i])) > tol)
+	public boolean equals(DirectPosition position, double tol) {
+		int D = position.getDimension();
+		if( D != getDimension() ) return false;
+		
+		for (int i = 0; i < D; ++i) {
+			if (Math.abs(DoubleOperation.subtract(position.getOrdinate(i), this.coordinate[i])) > tol)
 				return false;
 		}
 		return true;

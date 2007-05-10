@@ -86,6 +86,7 @@ import org.geotools.geometry.iso.topograph2D.DirectedEdgeStar;
 import org.geotools.geometry.iso.topograph2D.EdgeRing;
 import org.geotools.geometry.iso.topograph2D.Node;
 import org.geotools.geometry.iso.util.algorithm2D.CGAlgorithms;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
@@ -109,8 +110,8 @@ import org.geotools.geometry.iso.util.algorithm2D.CGAlgorithms;
 public class MaximalEdgeRing extends EdgeRing {
 
 	public MaximalEdgeRing(DirectedEdge start,
-			FeatGeomFactoryImpl geometryFactory, CGAlgorithms cga) {
-		super(start, geometryFactory, cga);
+			CoordinateReferenceSystem crs, CGAlgorithms cga) {
+		super(start, crs, cga);
 	}
 
 	public DirectedEdge getNext(DirectedEdge de) {
@@ -140,7 +141,7 @@ public class MaximalEdgeRing extends EdgeRing {
 		do {
 			if (de.getMinEdgeRing() == null) {
 				EdgeRing minEr = new MinimalEdgeRing(de,
-						super.mFeatGeomFactory, cga);
+						super.crs, cga);
 				minEdgeRings.add(minEr);
 			}
 			de = de.getNext();

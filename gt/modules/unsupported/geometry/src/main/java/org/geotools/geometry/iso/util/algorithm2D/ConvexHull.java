@@ -244,7 +244,7 @@ public class ConvexHull {
 		}
 		if (inputPts.length == 2) {
 			//return geomFactory.createLineString(inputPts);
-			List<? extends Position> positions = CoordinateArrays.toPositionList(this.geomFactory.getGeometryFactoryImpl(), this.inputPts);
+			List<? extends Position> positions = CoordinateArrays.toPositionList(this.geomFactory.getCoordinateReferenceSystem(), this.inputPts);
 			return this.geomFactory.getPrimitiveFactory().createCurveByPositions((List<Position>) positions);
 		}
 

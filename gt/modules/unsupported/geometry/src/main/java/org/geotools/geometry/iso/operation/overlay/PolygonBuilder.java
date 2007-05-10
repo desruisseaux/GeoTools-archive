@@ -82,7 +82,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
@@ -96,6 +95,7 @@ import org.geotools.geometry.iso.util.Assert;
 import org.geotools.geometry.iso.util.algorithm2D.CGAlgorithms;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.primitive.Surface;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * Forms {@link Surface}s out of a graph of {@link DirectedEdge}s. The edges
@@ -107,7 +107,8 @@ public class PolygonBuilder {
     final static int Y = 1;
     final static int Z = 2;
     
-	private FeatGeomFactoryImpl featGeomyFactory;
+	//private FeatGeomFactoryImpl featGeomyFactory;
+    private CoordinateReferenceSystem crs;
 
 	private CGAlgorithms cga;
 
@@ -115,8 +116,8 @@ public class PolygonBuilder {
 	// private NodeMap nodes;
 	private List shellList = new ArrayList();
 
-	public PolygonBuilder(FeatGeomFactoryImpl aFeatGeomFactory, CGAlgorithms cga) {
-		this.featGeomyFactory = aFeatGeomFactory;
+	public PolygonBuilder(CoordinateReferenceSystem crs, CGAlgorithms cga) {
+		this.crs = crs;
 		this.cga = cga;
 	}
 
@@ -163,7 +164,7 @@ public class PolygonBuilder {
 				// if this edge has not yet been processed
 				if (de.getEdgeRing() == null) {
 					MaximalEdgeRing er = new MaximalEdgeRing(de,
-							featGeomyFactory, cga);
+							crs, cga);
 					maxEdgeRings.add(er);
 					er.setInResult();
 					// System.out.println("max node degree = " +
@@ -351,7 +352,7 @@ public class PolygonBuilder {
 		for (Iterator it = shellList.iterator(); it.hasNext();) {
 			EdgeRing er = (EdgeRing) it.next();
 
-			SurfaceImpl poly = er.toPolygon(featGeomyFactory);
+			SurfaceImpl poly = er.toPolygon();
 			resultPolyList.add(poly);
 		}
 		return resultPolyList;

@@ -102,6 +102,7 @@ import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.OrientableSurface;
 import org.opengis.geometry.primitive.Point;
 import org.opengis.geometry.Geometry;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * Computes the overlay of two {@link Geometry}s. The overlay can be used to
@@ -178,7 +179,8 @@ public class OverlayOp extends GeometryGraphOperation {
 
 	private final PointLocator ptLocator = new PointLocator();
 
-	private FeatGeomFactoryImpl geomFeatFactory;
+	//private FeatGeomFactoryImpl geomFeatFactory;
+	private CoordinateReferenceSystem crs;
 
 	private GeometryImpl resultGeom;
 
@@ -209,8 +211,8 @@ public class OverlayOp extends GeometryGraphOperation {
 		 * mixed-precision arguments where the second arg has greater precision
 		 * than the first.
 		 */
-		this.geomFeatFactory = g0.getFeatGeometryFactory();
-		// geomFact = g0.getFactory();
+		//this.geomFeatFactory = g0.getFeatGeometryFactory();
+		this.crs = g0.getCoordinateReferenceSystem();
 	}
 
 	/**
@@ -283,16 +285,16 @@ public class OverlayOp extends GeometryGraphOperation {
 
 		findResultAreaEdges(opCode);
 		cancelDuplicateResultEdges();
-		PolygonBuilder polyBuilder = new PolygonBuilder(geomFeatFactory, cga);
+		PolygonBuilder polyBuilder = new PolygonBuilder(crs, cga);
 		polyBuilder.add(this.graph);
 
 		this.resultPolyList = polyBuilder.getPolygons();
 
-		LineBuilder lineBuilder = new LineBuilder(this, geomFeatFactory,
+		LineBuilder lineBuilder = new LineBuilder(this, crs,
 				ptLocator);
 		this.resultLineList = lineBuilder.build(opCode);
 
-		PointBuilder pointBuilder = new PointBuilder(this, geomFeatFactory,
+		PointBuilder pointBuilder = new PointBuilder(this, crs,
 				ptLocator);
 		this.resultPointList = pointBuilder.build(opCode);
 
@@ -634,7 +636,8 @@ public class OverlayOp extends GeometryGraphOperation {
 //		geomList.addAll(resultPolyList);
 
 		// build the most specific geometry possible
-		return this.geomFeatFactory.createGeometry(
+		FeatGeomFactoryImpl gf = new FeatGeomFactoryImpl(crs);
+		return gf.createGeometry(
 				resultPolyList, resultLineList, resultPointList);
 	}
 

@@ -132,7 +132,7 @@ public class RingImpl extends CompositeCurveImpl implements Ring {
 		while (elementIter.hasNext()) {
 			newElements.add((Curve) elementIter.next().clone());
 		}
-		return this.getFeatGeometryFactory().getPrimitiveFactory().createRing(newElements);
+		return new RingImpl(newElements);
 	}
 
 	

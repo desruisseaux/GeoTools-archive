@@ -162,11 +162,12 @@ public class FeatGeomFactoryImpl {
 	private FeatGeomFactoryImpl(CoordinateReferenceSystem crs,
 			int dimensionModel) {
 		this.coordinateReferenceSystem = crs;
-		this.geometryFactory = new GeometryFactoryImpl(this);
-		this.primitiveFactory = new PrimitiveFactoryImpl(crs);
 		this.positionFactory = new PositionFactoryImpl(crs, new PrecisionModel());
+		
+		this.geometryFactory = new GeometryFactoryImpl(this);
+		this.primitiveFactory = new PrimitiveFactoryImpl(crs, positionFactory);
 		this.complexFactory = new ComplexFactoryImpl();
-		this.aggregateFactory = new AggregateFactoryImpl(this);
+		this.aggregateFactory = new AggregateFactoryImpl(crs);
 		this.collectionFactory = new CollectionFactoryMemoryImpl();
 
 		// Create the dimension model

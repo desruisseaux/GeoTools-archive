@@ -3,25 +3,19 @@ package org.geotools.geometry.iso.primitive;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.PositionFactoryImpl;
 import org.geotools.geometry.iso.PrecisionModel;
 import org.geotools.geometry.iso.aggregate.AggregateFactoryImpl;
 import org.geotools.geometry.iso.complex.ComplexFactoryImpl;
-import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.coordinate.LineSegmentImpl;
 import org.geotools.geometry.iso.coordinate.LineStringImpl;
 import org.geotools.geometry.iso.coordinate.PositionImpl;
 import org.geotools.geometry.iso.io.CollectionFactoryMemoryImpl;
-import org.geotools.geometry.iso.primitive.CurveImpl;
-import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.util.elem2D.Geo2DFactory;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.DirectPosition;
-import org.opengis.geometry.Envelope;
 import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.Precision;
 import org.opengis.geometry.complex.Complex;
@@ -33,11 +27,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.picocontainer.PicoContainer;
 import org.picocontainer.defaults.DefaultPicoContainer;
 
-/**
- * @author sanjay
- *
- */
-public class CurveTest extends TestCase {
+import junit.framework.TestCase;
+
+public class PicoCurveTest extends TestCase {
 	
 	public void testMain() {
 		
@@ -277,5 +269,4 @@ public class CurveTest extends TestCase {
 
 		
 	}
-
 }
