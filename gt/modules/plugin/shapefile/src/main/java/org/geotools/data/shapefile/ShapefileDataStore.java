@@ -743,6 +743,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         long temp = System.currentTimeMillis();
         
         String s = crs.toWKT();        
+        s = s.replaceAll("\n", "").replaceAll("  ", "");
         FileWriter out = new FileWriter(getStorageFile(prjURL, temp));
             
         try {
@@ -844,8 +845,11 @@ public class ShapefileDataStore extends AbstractFileDataStore {
 
         if (cs != null) {
             String s = cs.toWKT();
-            FileWriter out = new FileWriter(getStorageFile(prjURL, temp));
+            //.prj files should have no carriage returns in them, this messes up
+            //ESRI's ArcXXX software, so we'll be compatible
+            s = s.replaceAll("\n", "").replaceAll("  ", "");
             
+            FileWriter out = new FileWriter(getStorageFile(prjURL, temp));
             try {
                 out.write(s);
             } finally {
