@@ -119,7 +119,7 @@ public class Formatter {
      * @see AbstractParser#isColorEnabled
      * @see AbstractParser#setColorEnabled
      */
-    boolean colors = false;
+    boolean colorEnabled = false;
 
     /**
      * The unit for formatting measures, or {@code null} for the "natural" unit of each WKT
@@ -250,7 +250,7 @@ public class Formatter {
      * should be a constant from {@link X364}.
      */
     private void setColor(final String color) {
-        if (colors) {
+        if (colorEnabled) {
             buffer.append(color);
         }
     }
@@ -260,7 +260,7 @@ public class Formatter {
      * unless syntax coloring has been explicitly enabled.
      */
     private void resetColor() {
-        if (colors) {
+        if (colorEnabled) {
             buffer.append(X364.DEFAULT);
         }
     }
@@ -356,7 +356,7 @@ public class Formatter {
         indent(+1);
         lineChanged = false;
         String keyword = formattable.formatWKT(this);
-        if (colors && invalidWKT) {
+        if (colorEnabled && invalidWKT) {
             invalidWKT = false;
             buffer.insert(base, ERROR_COLOR + X364.BACKGROUND_DEFAULT);
             base += ERROR_COLOR.length();
@@ -509,7 +509,7 @@ public class Formatter {
                 } catch (IllegalStateException exception) {
                     // May happen if a parameter is mandatory (e.g. "semi-major")
                     // but no value has been set for this parameter.
-                    if (colors) {
+                    if (colorEnabled) {
                         buffer.insert(stop, X364.BACKGROUND_DEFAULT);
                         buffer.insert(start, ERROR_COLOR);
                     }

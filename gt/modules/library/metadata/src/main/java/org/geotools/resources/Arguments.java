@@ -432,19 +432,49 @@ public class Arguments {
      * @return An array of remaining arguments. Will never be longer than {@code max}.
      */
     public String[] getRemainingArguments(final int max) {
-        int count=0;
+        int count = 0;
         final String[] left = new String[Math.min(max, arguments.length)];
         for (int i=0; i<arguments.length; i++) {
             final String arg = arguments[i];
             if (arg != null) {
                 if (count >= max) {
                     illegalArgument(new IllegalArgumentException(Errors.getResources(locale).
-                                    format(ErrorKeys.UNKNOW_PARAMETER_$1, arguments[i])));
+                                    format(ErrorKeys.UNEXPECTED_PARAMETER_$1, arguments[i])));
                 }
                 left[count++] = arg;
             }
         }
         return (String[]) XArray.resize(left, count);
+    }
+
+    /**
+     * Returns the list of unprocessed arguments, which should not begin by the specified prefix. This
+     * method invokes <code>{@linkplain #getRemainingArguments(int) getRemainingArguments}(max)</code>
+     * and verifies that none of the remaining arguments start with {@code forbiddenPrefix}. The
+     * forbidden prefix is usually {@code '-'}, the character used for options as in
+     * "{@code -locale}", <cite>etc.</cite>
+     *
+     * @param  max Maximum remaining arguments autorized.
+     * @param  forbiddenPrefix The forbidden prefix, usually {@code '-'}.
+     * @return An array of remaining arguments. Will never be longer than {@code max}.
+     *
+     * @since 2.4
+     */
+    public String[] getRemainingArguments(final int max, final char forbiddenPrefix) {
+        final String[] arguments = getRemainingArguments(max);
+        for (int i=0; i<arguments.length; i++) {
+            String argument = arguments[i];
+            if (argument != null) {
+                argument = argument.trim();
+                if (argument.length() != 0) {
+                    if (argument.charAt(0) == forbiddenPrefix) {
+                        illegalArgument(new IllegalArgumentException(Errors.getResources(locale).
+                                        format(ErrorKeys.UNKNOW_PARAMETER_$1, argument)));
+                    }
+                }
+            }
+        }
+        return arguments;
     }
 
     /**

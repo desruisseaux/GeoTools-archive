@@ -20,6 +20,8 @@
 package org.geotools.referencing.factory;
 
 // J2SE dependencies
+import java.util.Collection;
+import java.util.Collections;
 import java.util.logging.Logger;
 
 // OpenGIS dependencies
@@ -121,5 +123,16 @@ public class ReferencingFactory extends AbstractFactory implements Factory {
             throw new InvalidParameterValueException(Errors.format(
                         ErrorKeys.NULL_ARGUMENT_$1, name), name, object);
         }
+    }
+
+    /**
+     * Returns the direct {@linkplain Factory factory} dependencies, which may be {@code null}.
+     * This method should not returns indirect dependencies. Elements should be instance of
+     * {@link Factory} or {@link FactoryException} if a particular dependency can't be obtained.
+     * <p>
+     * The default implementation always returns an empty set.
+     */
+    Collection/*<?>*/ dependencies() {
+        return Collections.EMPTY_SET;
     }
 }

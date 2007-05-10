@@ -61,6 +61,14 @@ public class URN_EPSG_Test extends TestCase {
     }
 
     /**
+     * Tests {@link AuthorityFactoryAdapter#isCodeMethodOverriden}.
+     */
+    public void testMethodOverriden() {
+        final Versioned test = new Versioned();
+        assertTrue(test.isCodeMethodOverriden());
+    }
+
+    /**
      * Tests the 4326 code.
      */
     public void test4326() throws FactoryException {

@@ -24,5 +24,5 @@ package org.geotools.factory;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public interface BufferedFactory {
+public interface BufferedFactory extends Factory {
 }

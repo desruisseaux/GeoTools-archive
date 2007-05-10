@@ -50,6 +50,8 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.FactoryDependencies;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.CRSUtilities;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 
@@ -106,8 +108,9 @@ final class Command {
         out.println(" -bursawolfs    : Lists Bursa-Wolf parameters for the specified CRS.");
         out.println(" -codes         : Lists all available CRS codes with their description.");
         out.println(" -colors        : Enable syntax coloring on ANSI X3.64 compatible terminal.");
+        out.println(" -dependencies  : Lists authority factory dependencies as a tree.");
         out.println(" -factories     : Lists all availables CRS authority factories.");
-        out.println(" -factoryTree   : Lists authority factory dependencies as a tree.");
+        out.println(" -forcexy       : Force \"longitude first\" axis order.");
         out.println(" -help          : Prints this message.");
         out.println(" -locale=ARG    : Formats texts in the specified locale.");
         out.println(" -operations    : Prints all available coordinate operations between a pair of CRS.");
@@ -355,7 +358,8 @@ final class Command {
      * Prints all {@linkplain AuthorityFactory authority factory} dependencies as a tree.
      */
     private static void printAuthorityFactoryDependencies(final PrintWriter out, final boolean colors) {
-        final FactoryDependencies printer = new FactoryDependencies(CRS.getAuthorityFactory(true));
+        final FactoryDependencies printer = new FactoryDependencies(CRS.getAuthorityFactory(false));
+        printer.setAttributeEnabled(true);
         printer.setColorEnabled(colors);
         printer.print(out);
         out.flush();
@@ -377,6 +381,9 @@ final class Command {
         final Arguments arguments = new Arguments(args);
         final PrintWriter out = arguments.out;
         Locale.setDefault(arguments.locale);
+        if (arguments.getFlag("-forcexy")) {
+            Hints.putSystemDefault(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
+        }
         if (arguments.getFlag("-help")) {
             args = arguments.getRemainingArguments(0);
             help(out);
@@ -387,7 +394,7 @@ final class Command {
             factories(out);
             return;
         }
-        if (arguments.getFlag("-factoryTree")) {
+        if (arguments.getFlag("-dependencies")) {
             final boolean colors = arguments.getFlag("-colors");
             args = arguments.getRemainingArguments(0);
             printAuthorityFactoryDependencies(out, colors);
@@ -401,16 +408,16 @@ final class Command {
                 args = arguments.getRemainingArguments(0);
                 command.codes(out);
             } else if (arguments.getFlag("-bursawolfs")) {
-                args = arguments.getRemainingArguments(Integer.MAX_VALUE);
+                args = arguments.getRemainingArguments(Integer.MAX_VALUE, '-');
                 command.bursaWolfs(out, args);
             } else if (arguments.getFlag("-operations")) {
-                args = arguments.getRemainingArguments(2);
+                args = arguments.getRemainingArguments(2, '-');
                 command.operations(out, args);
             } else if (arguments.getFlag("-transform")) {
-                args = arguments.getRemainingArguments(2);
+                args = arguments.getRemainingArguments(2, '-');
                 command.transform(out, args);
             } else {
-                args = arguments.getRemainingArguments(Integer.MAX_VALUE);
+                args = arguments.getRemainingArguments(Integer.MAX_VALUE, '-');
                 command.list(out, args);
             }
             out.flush();

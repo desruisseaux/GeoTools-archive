@@ -129,7 +129,7 @@ public abstract class AbstractParser extends Format {
      * @since 2.4
      */
     public boolean isColorEnabled() {
-        return getFormatter().colors;
+        return getFormatter().colorEnabled;
     }
 
     /**
@@ -140,8 +140,8 @@ public abstract class AbstractParser extends Format {
      *
      * @since 2.4
      */
-    public void setColorEnabled(final boolean colors) {
-        getFormatter().colors = colors;
+    public void setColorEnabled(final boolean enabled) {
+        getFormatter().colorEnabled = enabled;
     }
 
     /**

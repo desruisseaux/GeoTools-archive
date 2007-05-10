@@ -37,6 +37,7 @@ import javax.units.Unit;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.cs.*;
@@ -266,6 +267,21 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
             LOGGER.log(record);
         }
         return false;
+    }
+
+    /**
+     * If this factory is a wrapper for the specified factory that do not add any additional
+     * {@linkplain #getAuthorityCodes authority codes}, returns {@code true}. This method is
+     * for {@link FallbackAuthorityFactory} internal use only and should not be public. A
+     * cheap test without {@link #getBackingStore} invocation is suffisient for our needs.
+     */
+    //@Override
+    boolean sameAuthorityCodes(final AuthorityFactory factory) {
+        final AbstractAuthorityFactory backingStore = this.backingStore; // Protect from changes.
+        if (backingStore != null && backingStore.sameAuthorityCodes(factory)) {
+            return true;
+        }
+        return super.sameAuthorityCodes(factory);
     }
 
     /**

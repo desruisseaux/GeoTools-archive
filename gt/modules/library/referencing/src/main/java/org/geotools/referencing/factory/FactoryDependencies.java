@@ -31,25 +31,29 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 // OpenGIS dependencies
+import org.opengis.metadata.citation.Citation;
+import org.opengis.referencing.Factory;
 import org.opengis.referencing.AuthorityFactory;
+import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
+import org.opengis.referencing.cs.CSFactory;
 import org.opengis.referencing.cs.CSAuthorityFactory;
+import org.opengis.referencing.datum.DatumFactory;
 import org.opengis.referencing.datum.DatumAuthorityFactory;
 import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
 
 // Geotools dependencies
 import org.geotools.factory.BufferedFactory;
 import org.geotools.factory.OptionalFactory;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.resources.OptionalDependencies;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.X364;
-import org.opengis.metadata.citation.Citation;
 
 
 /**
- * Build a tree of factory dependencies. Current version work only with
- * {@linkplain AuthorityFactory authority factories} extending the classes
- * defined in this package.
+ * Build a tree of factory dependencies.
  *
  * @since 2.4
  * @source $URL$
@@ -58,64 +62,100 @@ import org.opengis.metadata.citation.Citation;
  */
 public class FactoryDependencies {
     /**
-     * A list of interfaces that may be implemented by this class.
-     * Used by {@link #createTree()}.
+     * A list of interfaces that may be implemented by this class. Used for
+     * the properties printed between parenthesis by {@link #createTree()}.
      */
     private static final Class[] TYPES = {
-        CRSAuthorityFactory.class,
-        CSAuthorityFactory.class,
-        DatumAuthorityFactory.class,
-        CoordinateOperationAuthorityFactory.class,
-        BufferedFactory.class,
-        OptionalFactory.class
+        CRSFactory                          .class,
+        CRSAuthorityFactory                 .class,
+        CSFactory                           .class,
+        CSAuthorityFactory                  .class,
+        DatumFactory                        .class,
+        DatumAuthorityFactory               .class,
+        CoordinateOperationFactory          .class,
+        CoordinateOperationAuthorityFactory .class,
+        BufferedFactory                     .class,
+        OptionalFactory                     .class,
+        Factory                             .class  // Processed in a special way.
     };
 
     /**
      * Labels for {@link #TYPES}.
      */
     private static final String[] TYPE_LABELS = {
-        "crs", "cs", "datum", "operation", "buffered", "optional"
+        "crs", "crs", "cs", "cs", "datum", "datum", "operation", "operation",
+        "buffered", "optional", "registered"
     };
+
+    /**
+     * The number of elements in {@link #TYPES} which are referencing factories.
+     * They are printed in a different color than the last elements.
+     */
+    private static final int FACTORY_COUNT = TYPES.length - 3;
 
     /**
      * The factory to format.
      */
-    private final AuthorityFactory factory;
+    private final Factory factory;
 
     /**
      * {@code true} for applying colors on a ANSI X3.64 (aka ECMA-48 and ISO/IEC 6429)
      * compliant output device.
      */
-    private boolean colors;
+    private boolean colorEnabled;
+
+    /**
+     * {@code true} for printing attributes {@link #TYPE_LABELS} between parenthesis
+     * after the factory name.
+     */
+    private boolean attributes;
 
     /**
      * Creates a new dependency tree for the specified factory.
      */
-    public FactoryDependencies(final AuthorityFactory factory) {
+    public FactoryDependencies(final Factory factory) {
         this.factory = factory;
     }
 
     /**
      * Returns {@code true} if syntax coloring is enabled.
-     * By default, syntax coloring is disabled.
+     * Syntax coloring is disabled by default.
      */
     public boolean isColorEnabled() {
-        return colors;
+        return colorEnabled;
     }
 
     /**
      * Enables or disables syntax coloring on ANSI X3.64 (aka ECMA-48 and ISO/IEC 6429)
      * compatible terminal. By default, syntax coloring is disabled.
      */
-    public void setColorEnabled(final boolean colors) {
-        this.colors = colors;
+    public void setColorEnabled(final boolean enabled) {
+        colorEnabled = enabled;
+    }
+
+    /**
+     * Returns {@code true} if attributes are to be printed.
+     * By default, attributes are not printed.
+     */
+    public boolean isAttributeEnabled() {
+        return attributes;
+    }
+
+    /**
+     * Enables or disables the addition of attributes after factory names. Attributes
+     * are labels like "{@code crs}", "{@code datum}", <cite>etc.</cite> put between
+     * parenthesis. They give indications on the services implemented by the factory
+     * (e.g. {@link CRSAuthorityFactory}, {@link DatumAuthorityFactory}, <cite>etc.</cite>).
+     */
+    public void setAttributeEnabled(final boolean enabled) {
+        attributes = enabled;
     }
 
     /**
      * Prints the dependencies as a tree to the specified printer.
      */
     public void print(final PrintWriter out) {
-        out.write(OptionalDependencies.toString(asTree()));
+        out.print(OptionalDependencies.toString(asTree()));
     }
 
     /**
@@ -138,16 +178,16 @@ public class FactoryDependencies {
     /**
      * Returns the dependencies for the specified factory.
      */
-    private MutableTreeNode createTree(final AuthorityFactory factory, final Set/*<AuthorityFactory>*/ done) {
+    private MutableTreeNode createTree(final Factory factory, final Set/*<Factory>*/ done) {
         final DefaultMutableTreeNode root = createNode(factory);
-        if (factory instanceof AbstractAuthorityFactory) {
-            final Collection dep = ((AbstractAuthorityFactory) factory).dependencies();
+        if (factory instanceof ReferencingFactory) {
+            final Collection dep = ((ReferencingFactory) factory).dependencies();
             if (dep != null) {
                 for (final Iterator it=dep.iterator(); it.hasNext();) {
                     final Object element = it.next();
                     final MutableTreeNode child;
-                    if (element instanceof AuthorityFactory) {
-                        final AuthorityFactory candidate = (AuthorityFactory) element;
+                    if (element instanceof Factory) {
+                        final Factory candidate = (Factory) element;
                         if (!done.add(candidate)) {
                             continue;
                         }
@@ -156,7 +196,7 @@ public class FactoryDependencies {
                             throw new AssertionError(); // Should never happen.
                         }
                     } else {
-                        child = OptionalDependencies.createTreeNode(element.toString(), element, false);
+                        child = OptionalDependencies.createTreeNode(String.valueOf(element), element, false);
                     }
                     root.add(child);
                 }
@@ -168,42 +208,67 @@ public class FactoryDependencies {
     /**
      * Creates a single node for the specified factory.
      */
-    private DefaultMutableTreeNode createNode(final AuthorityFactory factory) {
+    private DefaultMutableTreeNode createNode(final Factory factory) {
         final StringBuffer buffer =
                 new StringBuffer(Utilities.getShortClassName(factory)).append('[');
-        final Citation authority = factory.getAuthority();
-        if (authority != null) {
-            final Collection identifiers = authority.getIdentifiers();
-            if (identifiers != null) {
-                boolean next = false;
-                for (final Iterator it=identifiers.iterator(); it.hasNext();) {
-                    if (next) {
-                        buffer.append(", ");
+        if (factory instanceof AuthorityFactory) {
+            final Citation authority = ((AuthorityFactory) factory).getAuthority();
+            if (authority != null) {
+                final Collection identifiers = authority.getIdentifiers();
+                if (identifiers != null && !identifiers.isEmpty()) {
+                    boolean next = false;
+                    for (final Iterator it=identifiers.iterator(); it.hasNext();) {
+                        if (next) {
+                            buffer.append(", ");
+                        }
+                        appendIdentifier(buffer, (String) it.next());
+                        next = true;
                     }
-                    if (colors) buffer.append(X364.MAGENTA);
-                    buffer.append('"').append(it.next()).append('"');
-                    if (colors) buffer.append(X364.DEFAULT);
-                    next = true;
-                }            
+                } else {
+                    appendIdentifier(buffer, authority.getTitle());
+                }
             }
+        } else {
+            if (colorEnabled) buffer.append(X364.RED);
+            buffer.append("direct");
+            if (colorEnabled) buffer.append(X364.DEFAULT);
         }
         buffer.append(']');
-        boolean hasFound = false;
-        for (int i=0; i<TYPES.length; i++) {
-            final Class type = TYPES[i];
-            if (type.isInstance(factory)) {
+        if (attributes) {
+            boolean hasFound = false;
+            for (int i=0; i<TYPES.length; i++) {
+                final Class type = TYPES[i];
+                if (!type.isInstance(factory)) {
+                    continue;
+                }
+                if (type.equals(Factory.class)) { // Special case.
+                    if (!ReferencingFactoryFinder.isRegistered(factory)) {
+                        continue;
+                    }
+                }
                 buffer.append(hasFound ? ", " : " (");
-                if (colors) {
-                    buffer.append(AuthorityFactory.class.isAssignableFrom(type) ? X364.GREEN : X364.CYAN);
+                if (colorEnabled) {
+                    buffer.append(i < FACTORY_COUNT ? X364.GREEN : X364.CYAN);
                 }
                 buffer.append(TYPE_LABELS[i]);
-                if (colors) buffer.append(X364.DEFAULT);
+                if (colorEnabled) {
+                    buffer.append(X364.DEFAULT);
+                }
                 hasFound = true;
             }
-        }
-        if (hasFound) {
-            buffer.append(')');
+            if (hasFound) {
+                buffer.append(')');
+            }
         }
         return OptionalDependencies.createTreeNode(buffer.toString(), factory, true);
+    }
+
+    /**
+     * Appends an identifier to the specified buffer.
+     */
+    private void appendIdentifier(final StringBuffer buffer, final CharSequence identifier) {
+        if (colorEnabled) buffer.append(X364.MAGENTA);
+        buffer.append('"').append(identifier).append('"');
+        if (colorEnabled) buffer.append(X364.DEFAULT);
     }
 }

@@ -22,6 +22,8 @@ package org.geotools.referencing.factory;
 // J2SE dependencies and extensions
 import java.util.Map;
 import java.util.Set;
+import java.util.LinkedHashSet;
+import java.util.Collection;
 import java.util.Collections;
 
 // OpenGIS dependencies
@@ -109,5 +111,20 @@ public abstract class DirectAuthorityFactory extends AbstractAuthorityFactory {
             }
         }
         return super.getImplementationHints();
+    }
+
+    /**
+     * Returns the direct {@linkplain Factory factory} dependencies.
+     */
+    //@Override
+    Collection/*<?>*/ dependencies() {
+        if (factories != null) {
+            final Set dependencies = new LinkedHashSet(8);
+            dependencies.add(factories.getCRSFactory());
+            dependencies.add(factories.getCSFactory());
+            dependencies.add(factories.getDatumFactory());
+            return dependencies;
+        }
+        return super.dependencies();
     }
 }

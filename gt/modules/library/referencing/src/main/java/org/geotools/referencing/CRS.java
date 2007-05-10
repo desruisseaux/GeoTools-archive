@@ -1065,11 +1065,14 @@ public final class CRS {
      *       Windows users may need to set this encoding to the value returned by the
      *       {@code chcp} command line. This parameter need to be specified only once.</p>
      *
+     *   <p><b>{@code -dependencies}</b><br>
+     *       Lists authority factory dependencies as a tree.</p>
+     *
      *   <p><b>{@code -factories}</b><br>
      *       Lists all availables CRS authority factories.</p>
      *
-     *   <p><b>{@code -factoryTree}</b><br>
-     *       Lists authority factory dependencies as a tree.</p>
+     *   <p><b>{@code -forcexy}</b><br>
+     *       Force "longitude first" axis order.</p>
      *
      *   <p><b>{@code -help}</b><br>
      *       Prints the list of options.</p>

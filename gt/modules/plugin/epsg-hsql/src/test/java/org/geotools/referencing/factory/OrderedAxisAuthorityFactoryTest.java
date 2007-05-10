@@ -17,6 +17,7 @@
 package org.geotools.referencing.factory;
 
 // J2SE dependencies
+import java.util.Map;
 import java.util.logging.Level;
 
 // JUnit dependencies
@@ -107,11 +108,17 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
     private static OrderedAxisAuthorityFactory getFactory(final Hints hints) {
         CRSAuthorityFactory factory;
         factory = ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG", hints);
+
         assertTrue(factory.getClass().toString(), factory instanceof LongitudeFirstFactory);
-        factory = (CRSAuthorityFactory) ((LongitudeFirstFactory) factory).getImplementationHints()
-                   .get(Hints.CRS_AUTHORITY_FACTORY);
+        final LongitudeFirstFactory asLongitudeFirst = (LongitudeFirstFactory) factory;
+        final Map implementationHints = asLongitudeFirst.getImplementationHints();
+        factory = (CRSAuthorityFactory) implementationHints.get(Hints.CRS_AUTHORITY_FACTORY);
+
         assertTrue(factory.getClass().toString(), factory instanceof OrderedAxisAuthorityFactory);
-        return (OrderedAxisAuthorityFactory) factory;
+        final OrderedAxisAuthorityFactory asOrdered = (OrderedAxisAuthorityFactory) factory;
+        assertFalse(asOrdered.isCodeMethodOverriden());
+
+        return asOrdered;
     }
 
     /**

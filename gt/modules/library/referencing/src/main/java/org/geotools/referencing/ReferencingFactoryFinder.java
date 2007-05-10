@@ -664,6 +664,17 @@ loop:       for (int i=0; ; i++) {
     }
 
     /**
+     * Returns {@code true} if the specified factory is registered. A factory may have been
+     * registered by {@link #scanForPlugins()} if it was declared in a {@code META-INF/services}
+     * file, or it may have been {@linkplain #addAuthorityFactory added programmatically}.
+     *
+     * @since 2.4
+     */
+    public static synchronized boolean isRegistered(final Factory factory) {
+        return factory.equals(getServiceRegistry().getServiceProviderByClass(factory.getClass()));
+    }
+
+    /**
      * Scans for factory plug-ins on the application class path. This method is
      * needed because the application class path can theoretically change, or
      * additional plug-ins may become available. Rather than re-scanning the

@@ -330,6 +330,59 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     }
 
     /**
+     * If this factory is a wrapper for the specified factory that do not add any additional
+     * {@linkplain #getAuthorityCodes authority codes}, returns {@code true}. This method is
+     * for {@link FallbackAuthorityFactory} internal use only and should not be public. We
+     * expect only a simple check, so we don't invoke the {@code getFooAuthorityFactory(...)}
+     * methods.
+     */
+    //@Override
+    boolean sameAuthorityCodes(final AuthorityFactory factory) {
+        if (!isCodeMethodOverriden()) {
+            /*
+             * Tests wrapped factories only if the 'toBackingFactoryCode(String)' method is not
+             * overwritten, otherwise we can't assume that the authority codes are the same. The
+             * impact on the main subclasses are usually as below:
+             *
+             *     URN_AuthorityFactory           - excluded
+             *     HTTP_AuthorityFactory          - excluded
+             *     OrderedAxisAuthorityFactory    - make the test below
+             *     FallbackAuthorityFactory       - make the test below
+             *
+             * Note: in the particular case of FallbackAuthorityFactory, we test the
+             *       primary factory only, not the fallback. This behavior matches the
+             *       FallbackAuthorityFactory.create(boolean,int,Iterator) need, which
+             *       will process this case in a special way.
+             */
+            if (sameAuthorityCodes(crsFactory,       factory) &&
+                sameAuthorityCodes(csFactory,        factory) &&
+                sameAuthorityCodes(datumFactory,     factory) &&
+                sameAuthorityCodes(operationFactory, factory))
+            {
+                return true;
+            }
+        }
+        return super.sameAuthorityCodes(factory);
+    }
+
+    /**
+     * Helper methods for {@link #sameAuthorityCodes(AuthorityFactory)} and
+     * {@link FallbackAuthorityFactory#create(boolean,int,Iterator)} implementations. If there is no
+     * backing store, returns {@code true} in order to take in account only the backing stores that
+     * are assigned. This behavior match the need of the above-cited implementations.
+     */
+    static boolean sameAuthorityCodes(final AuthorityFactory backingStore,
+                                      final AuthorityFactory factory)
+    {
+        if (backingStore instanceof AbstractAuthorityFactory) {
+            if (((AbstractAuthorityFactory) backingStore).sameAuthorityCodes(factory)) {
+                return true;
+            }
+        }
+        return (factory == backingStore) || (backingStore == null);
+    }
+
+    /**
      * Returns {@code true} if this factory is ready for use. This default implementation
      * checks the availability of CRS, CS, datum and operation authority factories specified
      * at construction time.
@@ -419,8 +472,8 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     }
 
     /**
-     * Returns one of the underlying factories as an instance of the Geotools implementation.
-     * If there is none of them, then returns {@code null} or throws an exception if {@code caller}
+     * Returns one of the underlying factories as an instance of the Geotools implementation. If
+     * there is none of them, then returns {@code null} or throws an exception if {@code caller}
      * is not null.
      */
     private AbstractAuthorityFactory getGeotoolsFactory(final String caller, final String code)
@@ -862,7 +915,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      * is to catch the {@link FactoryException} for methods that don't allow it. The protected
      * method should be used instead when this exception is allowed.
      */
-    final AuthorityFactory getAuthorityFactory() {
+    private AuthorityFactory getAuthorityFactory() {
         try {
             return getAuthorityFactory(null);
         } catch (FactoryException cause) {
@@ -1080,5 +1133,26 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      */
     protected String toBackingFactoryCode(final String code) throws FactoryException {
         return code;
+    }
+
+    /**
+     * Returns {@code true} if the {@link #toBackingFactoryCode} method is overriden.
+     */
+    final boolean isCodeMethodOverriden() {
+        final Class[] arguments = new Class[] {String.class};
+        for (Class type=getClass(); !AuthorityFactoryAdapter.class.equals(type); type=type.getSuperclass()) {
+            try {
+                type.getDeclaredMethod("toBackingFactoryCode", arguments);
+            } catch (NoSuchMethodException e) {
+                // The method is not overriden in this class.
+                // Checks in the super-class.
+                continue;
+            } catch (SecurityException e) {
+                // We are not allowed to get this information.
+                // Conservatively assumes that the method is overriden.
+            }
+            return true;
+        }
+        return false;
     }
 }

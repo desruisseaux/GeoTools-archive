@@ -172,120 +172,79 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
     {
         /*
          * 'authorities' Will contains the set of all authorities found without duplicate values
-         * in the sense of Citations.identifierMatches(...). 'factoriesByType' will contains the
-         * collection of factories for each (authority,type) pair.
+         * in the sense of Citations.identifierMatches(...). 'factoriesByAuthority' will contains
+         * the collection of factories for each authority.
          */
         int authorityCount = 0;
         final Citation[] authorities = new Citation[factories.size()];
-        final List[] factoriesByType = new List[authorities.length * FACTORY_TYPES.length];
-        final Map/*<AuthorityFactory,Integer>*/ positions = new IdentityHashMap();
+        final List[] factoriesByAuthority = new List[authorities.length];
         for (final Iterator it=factories.iterator(); it.hasNext();) {
             final AuthorityFactory factory = (AuthorityFactory) it.next();
-            Citation authority = factory.getAuthority();
-            /*
-             * Remember the factory position for later use, in order to preserve iteration order.
-             * We take the opportunity for trimming duplicated factories (should not occur often).
-             * Note: we store XORed values (~, not -) as a flag for use after the enclosing loop.
-             */
-            final Integer old = (Integer) positions.put(factory, new Integer(~positions.size()));
-            if (old != null) {
-                positions.put(factory, old);
-                continue;
-            }
             /*
              * Check if the authority has already been meet previously. If the authority is found
-             * (no matter the type), then 'authorityIndex' is set to its index. Otherwise the new
-             * authority is added to the 'authorities' list.
+             * then 'authorityIndex' is set to its index. Otherwise the new authority is added to
+             * the 'authorities' list.
              */
-            int authorityBase;
-            for (authorityBase=0; authorityBase<authorityCount; authorityBase++) {
-                final Citation candidate = authorities[authorityBase];
+            Citation authority = factory.getAuthority();
+            int authorityIndex;
+            for (authorityIndex=0; authorityIndex<authorityCount; authorityIndex++) {
+                final Citation candidate = authorities[authorityIndex];
                 if (Citations.identifierMatches(candidate, authority)) {
                     authority = candidate;
                     break;
                 }
             }
-            if (authorityBase == authorityCount) {
+            final List/*<AuthorityFactory>*/ list;
+            if (authorityIndex == authorityCount) {
                 authorities[authorityCount++] = authority;
+                factoriesByAuthority[authorityIndex] = list = new ArrayList(4);
+            } else {
+                list = factoriesByAuthority[authorityIndex];
             }
-            /*
-             * For each type, check if the factory implements the corresponding interface. If it
-             * does, then the factory is added to the list of factories for this (authority,type)
-             * pair. Otherwise it is silently ignored.
-             */
-            authorityBase *= FACTORY_TYPES.length;
-            for (int i=0; i<FACTORY_TYPES.length; i++) {
-                final Class type = FACTORY_TYPES[i];
-                if (type.isInstance(factory)) {
-                    List forType = factoriesByType[authorityBase + i];
-                    if (forType == null) {
-                        factoriesByType[authorityBase + i] = forType = new ArrayList();
-                    }
-                    forType.add(factory);
-                }
+            if (!list.contains(factory)) {
+                list.add(factory);
             }
         }
         /*
-         * For each (authority,type) pair with two or more factories, chain those factories into
-         * a FallbackAuthorityFactory object.  The definitive factories are stored into an array
-         * (the order is significant) without duplicated values.
+         * For each authority, chains the factories into a FallbackAuthorityFactory object.
          */
         final ArrayList/*<AuthorityFactory>*/ result = new ArrayList();
-        for (int i=0; i<factoriesByType.length; i++) {
-            final List forType = factoriesByType[i];
-            if (forType != null) {
-                AuthorityFactory factory = (AuthorityFactory) forType.get(0);
-                Integer position = (Integer) positions.get(factory);
-                if (forType.size() != 1) {
-                    final Class type = FACTORY_TYPES[i % FACTORY_TYPES.length];
-                    factory = FallbackAuthorityFactory.create(type, forType);
-                    if (position.intValue() < 0) {
-                        position = new Integer(~position.intValue());
+        final List/*<AuthorityFactory>*/ buffer = new ArrayList(4);
+        for (int i=0; i<authorityCount; i++) {
+            final Collection list = factoriesByAuthority[i];
+            while (!list.isEmpty()) {
+                AuthorityFactory primary = null;
+                boolean needOtherChains = false;
+                for (final Iterator it=list.iterator(); it.hasNext();) {
+                    final AuthorityFactory fallback = (AuthorityFactory) it.next();
+                    if (primary == null) {
+                        primary = fallback;
+                    } else if (!FallbackAuthorityFactory.chainable(primary, fallback)) {
+                        needOtherChains = true;
+                        continue;
                     }
-                    if (positions.put(factory, position) != null) {
-                        throw new AssertionError(factory); // Should never happen.
-                    }
-                } else if (position.intValue() >= 0) {
-                    // Factory already added to the list.
-                    continue;
-                } else {
-                    // Factory without fallback, and not yet added to the list.
-                    positions.put(factory, new Integer(~position.intValue()));
-                }
-                result.add(factory);
-            }
-        }
-        /*
-         * If a factory duplicates the primary factory of a FallbackAuthorityFactory,
-         * remove the former.
-         */
-        for (int i=result.size(); --i>=0;) {
-            AuthorityFactory factory = (AuthorityFactory) result.get(i);
-            if (factory instanceof FallbackAuthorityFactory) {
-                factory = ((FallbackAuthorityFactory) factory).getAuthorityFactory();
-                for (int j=result.size(); --j>=0;) {
-                    if (result.get(j) == factory) {
-                        result.remove(j);
-                        if (j <= i) i--;
+                    buffer.add(fallback);
+                    if (!needOtherChains) {
+                        it.remove();
                     }
                 }
+                result.add(FallbackAuthorityFactory.create(buffer));
+                buffer.clear();
             }
         }
-        /*
-         * Sort the factories in iteration order (i.e. in the same order than the user-supplied
-         * factories).
-         */
         result.trimToSize();
-        Collections.sort(result, new Comparator/*<AuthorityFactory>*/() {
-            public int compare(final Object f1, final Object f2) {
-                final int p1 = ((Integer) positions.get(f1)).intValue();
-                final int p2 = ((Integer) positions.get(f2)).intValue();
-                assert p1 >= 0 : p1;
-                assert p2 >= 0 : p2;
-                return p1 - p2;
-            }
-        });
         return result;
+    }
+
+    /**
+     * If this factory is a wrapper for the specified factory that do not add any additional
+     * {@linkplain #getAuthorityCodes authority codes}, returns {@code true}. This method is
+     * for {@link FallbackAuthorityFactory} internal use only.
+     */
+    //@Override
+    boolean sameAuthorityCodes(final AuthorityFactory factory) {
+        // We don't want to inherit AuthorityFactoryAdapter implementation here.
+        return factory == this;
     }
 
     /**
