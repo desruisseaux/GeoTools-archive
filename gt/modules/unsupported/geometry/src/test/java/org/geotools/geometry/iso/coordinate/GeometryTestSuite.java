@@ -3,13 +3,13 @@ package org.geotools.geometry.iso.coordinate;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-public class CoordinateTestSuite {
+public class GeometryTestSuite {
 	
     public static Test suite() {
 
         TestSuite suite = new TestSuite();
 	
-        suite.addTestSuite(CoordinateFactoryTest.class);
+        suite.addTestSuite(GeometryFactoryTest.class);
         suite.addTestSuite(DirectPositionTest.class);
         suite.addTestSuite(EnvelopeTest.class);
         suite.addTestSuite(LineStringLineSegmentTest.class);

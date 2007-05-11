@@ -16,13 +16,14 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.Precision;
+import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.picocontainer.PicoContainer;
 import org.picocontainer.defaults.DefaultPicoContainer;
 
 import junit.framework.TestCase;
 
-public class LineSegmentTest extends TestCase {
+public class PicoLineSegmentTest extends TestCase {
 
 	protected PicoContainer container( CoordinateReferenceSystem crs ){
 		
@@ -49,14 +50,14 @@ public class LineSegmentTest extends TestCase {
 	public void testEquals(){
 		CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
 		PicoContainer container = container( crs ); // normal 2D
-		PrimitiveFactoryImpl factory = (PrimitiveFactoryImpl) container.getComponentInstanceOfType( PrimitiveFactoryImpl.class );
+		GeometryFactoryImpl factory = (GeometryFactoryImpl) container.getComponentInstanceOfType( GeometryFactory.class );
 		PositionFactory positionFactory = (PositionFactory ) container.getComponentInstanceOfType( PositionFactory.class );
 		
 		DirectPosition positionA = positionFactory.createDirectPosition(new double[]{10, 10});
 		DirectPosition positionB = positionFactory.createDirectPosition(new double[]{70, 30});
 		
 		LineSegmentImpl expected = createLineSegment(positionA, positionB);		
-		LineSegmentImpl actual = createLineSegment(positionA, positionB);
+		LineSegmentImpl actual = (LineSegmentImpl) factory.createLineSegment(positionA, positionB);
 		
 		assertEquals( expected, actual );
 	}

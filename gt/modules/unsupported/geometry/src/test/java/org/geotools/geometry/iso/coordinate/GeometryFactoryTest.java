@@ -9,7 +9,7 @@ import org.opengis.geometry.Envelope;
 import org.opengis.geometry.coordinate.LineSegment;
 import org.opengis.geometry.coordinate.Position;
 
-public class CoordinateFactoryTest extends TestCase {
+public class GeometryFactoryTest extends TestCase {
 	
 	public void testMain() {
 		

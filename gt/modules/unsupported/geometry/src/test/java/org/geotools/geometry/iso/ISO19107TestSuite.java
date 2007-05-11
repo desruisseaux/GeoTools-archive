@@ -2,7 +2,7 @@ package org.geotools.geometry.iso;
 
 import org.geotools.geometry.iso.aggregate.AggregateTestSuite;
 import org.geotools.geometry.iso.complex.ComplexTestSuite;
-import org.geotools.geometry.iso.coordinate.CoordinateTestSuite;
+import org.geotools.geometry.iso.coordinate.GeometryTestSuite;
 import org.geotools.geometry.iso.operations.OperationsTestSuite;
 import org.geotools.geometry.iso.primitive.PrimitiveTestSuite;
 import junit.framework.Test;
@@ -15,7 +15,7 @@ public class ISO19107TestSuite {
         TestSuite suite = new TestSuite();
 	
         // *** COORDINATES
-        suite.addTest(CoordinateTestSuite.suite());
+        suite.addTest(GeometryTestSuite.suite());
         
         // *** PRIMITIVES
         suite.addTest(PrimitiveTestSuite.suite());

@@ -249,4 +249,35 @@ public class PolygonImpl extends SurfacePatchImpl implements Polygon {
 		return 0;
 	}
 
+	@Override
+	public int hashCode() {
+		final int PRIME = 31;
+		int result = 1;
+		result = PRIME * result + ((envelope == null) ? 0 : envelope.hashCode());
+		result = PRIME * result + ((spanningSurface == null) ? 0 : spanningSurface.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final PolygonImpl other = (PolygonImpl) obj;
+		if (envelope == null) {
+			if (other.envelope != null)
+				return false;
+		} else if (!envelope.equals(other.envelope))
+			return false;
+		if (spanningSurface == null) {
+			if (other.spanningSurface != null)
+				return false;
+		} else if (!spanningSurface.equals(other.spanningSurface))
+			return false;
+		return true;
+	}
+
 }
