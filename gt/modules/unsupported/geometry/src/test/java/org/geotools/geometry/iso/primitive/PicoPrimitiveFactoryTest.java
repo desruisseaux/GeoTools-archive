@@ -27,7 +27,7 @@ import org.picocontainer.defaults.DefaultPicoContainer;
 
 import junit.framework.TestCase;
 
-public class PrimitiveFactoryTest2 extends TestCase {
+public class PicoPrimitiveFactoryTest extends TestCase {
 	
 	/**
 	 * Creates a pico container that knows about all the geom factories

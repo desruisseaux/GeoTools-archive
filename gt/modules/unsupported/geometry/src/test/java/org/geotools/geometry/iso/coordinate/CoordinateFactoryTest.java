@@ -25,9 +25,9 @@ public class CoordinateFactoryTest extends TestCase {
 		
 		// public DirectPositionImpl createDirectPosition();
 		DirectPosition dp1 = cf.createDirectPosition();
-		assertTrue(dp1.getOrdinate(0) == 0.0);
-		assertTrue(dp1.getOrdinate(1) == 0.0);
-		assertTrue(dp1.getOrdinate(2) == 0.0);
+		assertTrue(Double.compare(dp1.getOrdinate(0), Double.NaN) == 0);
+		assertTrue(Double.compare(dp1.getOrdinate(1), Double.NaN) == 0);
+		assertTrue(Double.compare(dp1.getOrdinate(2), Double.NaN) == 0);
 		
 		// public DirectPositionImpl createDirectPosition(double[] coord);
 		double[] da = new double[3];
@@ -44,22 +44,22 @@ public class CoordinateFactoryTest extends TestCase {
 		//			DirectPosition upperCorner)
 		Envelope env1 = cf.createEnvelope(dp1, dp2);
 		DirectPosition lc = env1.getLowerCorner();
-		assertTrue(lc.getOrdinate(0) == 0.0);
-		assertTrue(lc.getOrdinate(1) == -115000.0);
-		assertTrue(lc.getOrdinate(2) == 0.0);
+		assertTrue(Double.compare(lc.getOrdinate(0), Double.NaN) == 0);
+		assertTrue(Double.compare(lc.getOrdinate(1), Double.NaN) == 0);
+		assertTrue(Double.compare(lc.getOrdinate(2), Double.NaN) == 0);
 		DirectPosition uc = env1.getUpperCorner();
 		assertTrue(uc.getOrdinate(0) == 10.0);
-		assertTrue(uc.getOrdinate(1) == 0.0);
+		assertTrue(uc.getOrdinate(1) == -115000.0);
 		assertTrue(uc.getOrdinate(2) == 0.0000000125);
 		env1 = cf.createEnvelope(dp2, dp1);
 		lc = env1.getLowerCorner();
-		assertTrue(lc.getOrdinate(0) == 0.0);
+		assertTrue(lc.getOrdinate(0) == 10.0);
 		assertTrue(lc.getOrdinate(1) == -115000.0);
-		assertTrue(lc.getOrdinate(2) == 0.0);
+		assertTrue(lc.getOrdinate(2) == 0.0000000125);
 		uc = env1.getUpperCorner();
-		assertTrue(uc.getOrdinate(0) == 10.0);
-		assertTrue(uc.getOrdinate(1) == 0.0);
-		assertTrue(uc.getOrdinate(2) == 0.0000000125);
+		assertTrue(Double.compare(uc.getOrdinate(0), Double.NaN) == 0);
+		assertTrue(Double.compare(uc.getOrdinate(1), Double.NaN) == 0);
+		assertTrue(Double.compare(uc.getOrdinate(2), Double.NaN) == 0);
 		
 		// public Position createPosition(DirectPosition dp);
 		Position pos1 = cf.createPosition(dp2);
@@ -70,9 +70,9 @@ public class CoordinateFactoryTest extends TestCase {
 		// public LineSegment createLineSegment(Position startPoint, Position endPoint);
 		Position pos2 = cf.createPosition(dp1);
 		LineSegment seg1 = cf.createLineSegment(pos1, pos2);
-		assertTrue(seg1.getEndPoint().getOrdinate(0) == 0.0);
-		assertTrue(seg1.getEndPoint().getOrdinate(1) == 0.0);
-		assertTrue(seg1.getEndPoint().getOrdinate(2) == 0.0);
+		assertTrue(Double.compare(seg1.getEndPoint().getOrdinate(0), Double.NaN) == 0.0);
+		assertTrue(Double.compare(seg1.getEndPoint().getOrdinate(1), Double.NaN) == 0.0);
+		assertTrue(Double.compare(seg1.getEndPoint().getOrdinate(2), Double.NaN) == 0.0);
 		assertTrue(seg1.getStartPoint().getOrdinate(0) == 10.0);
 		assertTrue(seg1.getStartPoint().getOrdinate(1) == -115000.0);
 		assertTrue(seg1.getStartPoint().getOrdinate(2) == 0.0000000125);

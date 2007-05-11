@@ -164,7 +164,7 @@ public class FeatGeomFactoryImpl {
 		this.coordinateReferenceSystem = crs;
 		this.positionFactory = new PositionFactoryImpl(crs, new PrecisionModel());
 		
-		this.geometryFactory = new GeometryFactoryImpl(this);
+		this.geometryFactory = new GeometryFactoryImpl(crs, positionFactory);
 		this.primitiveFactory = new PrimitiveFactoryImpl(crs, positionFactory);
 		this.complexFactory = new ComplexFactoryImpl();
 		this.aggregateFactory = new AggregateFactoryImpl(crs);

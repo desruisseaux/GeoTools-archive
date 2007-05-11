@@ -38,12 +38,14 @@ package org.geotools.geometry.iso.coordinate;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.iso.aggregate.MultiPrimitiveImpl;
+import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
+import org.geotools.geometry.iso.primitive.RingImpl;
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.geometry.iso.util.Assert;
@@ -52,6 +54,7 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.geometry.MismatchedReferenceSystemException;
+import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.aggregate.MultiPrimitive;
 import org.opengis.geometry.coordinate.Arc;
 import org.opengis.geometry.coordinate.ArcByBulge;
@@ -73,6 +76,8 @@ import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.coordinate.Tin;
 import org.opengis.geometry.coordinate.Triangle;
 import org.opengis.geometry.coordinate.TriangulatedSurface;
+import org.opengis.geometry.primitive.CurveSegment;
+import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.primitive.Surface;
 import org.opengis.geometry.primitive.SurfaceBoundary;
@@ -92,20 +97,23 @@ public class GeometryFactoryImpl implements GeometryFactory {
 	// **************************************************************************
 	// **************************************************************************
 
-	private FeatGeomFactoryImpl geometryFactory;
+	//private FeatGeomFactoryImpl geometryFactory;
+	private CoordinateReferenceSystem crs;
+	private PositionFactory positionFactory;
 
 	/**
-	 * @param geometryFactory
+	 * @param crs
 	 */
-	public GeometryFactoryImpl(FeatGeomFactoryImpl geometryFactory) {
-		this.geometryFactory = geometryFactory;
+	public GeometryFactoryImpl(CoordinateReferenceSystem crs, PositionFactory pf) {
+		this.crs = crs;
+		this.positionFactory = pf;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.opengis.geometry.coordinate.Factory#getCoordinateReferenceSystem()
 	 */
 	public CoordinateReferenceSystem getCoordinateReferenceSystem() {
-		return this.geometryFactory.getCoordinateReferenceSystem();
+		return this.crs;
 	}
 	
 	/**
@@ -116,7 +124,7 @@ public class GeometryFactoryImpl implements GeometryFactory {
 	 */
 	public int getDimension() {
 		//  Test OK
-		return this.geometryFactory.getCoordinateDimension();
+		return this.crs.getCoordinateSystem().getDimension();
 	}
 
 
@@ -131,7 +139,7 @@ public class GeometryFactoryImpl implements GeometryFactory {
 	 */
 	public DirectPositionImpl createDirectPosition() {
 		// Test ok
-		return new DirectPositionImpl( getCoordinateReferenceSystem() );
+		return (DirectPositionImpl) positionFactory.createDirectPosition(null);
 	}
 
 	/* (non-Javadoc)
@@ -144,7 +152,7 @@ public class GeometryFactoryImpl implements GeometryFactory {
 		if (coord.length != this.getDimension())
 			throw new MismatchedDimensionException();
 		// Create a DirectPosition which references to a COPY of the given double array
-		return new DirectPositionImpl( this.getCoordinateReferenceSystem(), coord );
+		return (DirectPositionImpl) positionFactory.createDirectPosition(coord);
 	}
 
 	/* (non-Javadoc)
@@ -155,7 +163,7 @@ public class GeometryFactoryImpl implements GeometryFactory {
 			DirectPosition upperCorner)
 	throws MismatchedReferenceSystemException, MismatchedDimensionException {
 		// Test ok
-		return new EnvelopeImpl((DirectPosition)lowerCorner.clone(), (DirectPosition)upperCorner.clone());
+		return new EnvelopeImpl((DirectPosition) positionFactory.createPosition(lowerCorner), (DirectPosition) positionFactory.createPosition(upperCorner));
 	}
 
 	/* (non-Javadoc)
@@ -219,7 +227,7 @@ public class GeometryFactoryImpl implements GeometryFactory {
 	 */
 	public MultiPrimitive createMultiPrimitive() {
 		// ok - this method will disappear from GeoAPI soon
-		return this.geometryFactory.getAggregateFactory().createMultiPrimitive(null);
+		return new MultiPrimitiveImpl(crs, null);
 	}
 
 
@@ -235,7 +243,7 @@ public class GeometryFactoryImpl implements GeometryFactory {
 	 * @return DirectPositionImpl
 	 */
 	public DirectPositionImpl createDirectPosition(DirectPosition dp) {
-		return new DirectPositionImpl( dp.getCoordinateReferenceSystem(), dp.getCoordinates() );
+		return (DirectPositionImpl) positionFactory.createDirectPosition(dp.getCoordinates() );
 	}
 
 	/**
@@ -277,7 +285,7 @@ public class GeometryFactoryImpl implements GeometryFactory {
 	 */
 	public Position createPosition(DirectPosition dp) {
 		// Test ok
-		return new PositionImpl((DirectPosition) dp.clone());
+		return new PositionImpl((DirectPosition) positionFactory.createPosition(dp));
 	}
 
 	/**
@@ -414,10 +422,14 @@ public class GeometryFactoryImpl implements GeometryFactory {
 			List<LineStringImpl> lineStrings) {
 		if (lineStrings == null)
 			lineStrings = new ArrayList<LineStringImpl>(coordLists.size());
-		GeometryFactoryImpl cf = this.geometryFactory.getGeometryFactoryImpl();
+		//GeometryFactoryImpl cf = this.geometryFactory.getGeometryFactoryImpl();
 		double startPar = 0.0;
 		for (List<double[]> coordList : coordLists) {
-			List<Position> positions = cf.createPositions(coordList, null);
+			//List<Position> positions = cf.createPositions(coordList, null);
+			List<Position> positions = positionFactory.createPositionList();
+			for (double[] coords : coordList) {
+				positions.add(createPosition(coords));
+			}
 			PointArrayImpl pai = createPointArray(positions);
 			lineStrings.add(createLineString(pai, startPar));
 			startPar += pai.getDistanceSum();
@@ -447,22 +459,32 @@ public class GeometryFactoryImpl implements GeometryFactory {
 	public TriangleImpl createTriangle(TriangulatedSurface ts,
 			DirectPosition p1, DirectPosition p2, DirectPosition p3) {
 
-		PrimitiveFactoryImpl primFactory = this.geometryFactory
-				.getPrimitiveFactory();
+		//PrimitiveFactoryImpl primFactory = this.geometryFactory.getPrimitiveFactory();
 
 		// Create a SurfaceBoundary for the Triangle
 
-		List<DirectPosition> positionList = new ArrayList<DirectPosition>();
+		List<Position> positionList = new ArrayList<Position>();
 		positionList.add(p1);
 		positionList.add(p2);
 		positionList.add(p3);
 		positionList.add(p1);
 
-		Ring exterior = primFactory.createRingByDirectPositions(positionList);
+		//Ring exterior = primFactory.createRingByDirectPositions(positionList);
+
+		// Create List of CurveSegment´s (LineString´s)
+		LineStringImpl lineString = new LineStringImpl(new PointArrayImpl(
+				positionList), 0.0);
+		List<CurveSegment> segments = new ArrayList<CurveSegment>();
+		segments.add(lineString);		
+		OrientableCurve curve = new CurveImpl(crs, segments);
+		List<OrientableCurve> orientableCurves = new ArrayList<OrientableCurve>();
+		orientableCurves.add(curve);
+		
+		Ring exterior = new RingImpl(orientableCurves);
 		List<Ring> interiorList = new ArrayList<Ring>();
 
-		SurfaceBoundaryImpl triangleBoundary = primFactory
-				.createSurfaceBoundary(exterior, interiorList);
+		SurfaceBoundaryImpl triangleBoundary = 
+			new SurfaceBoundaryImpl(crs, exterior, interiorList); 
 
 		return new TriangleImpl(triangleBoundary, ts, new PositionImpl(p1),
 				new PositionImpl(p2), new PositionImpl(p3));

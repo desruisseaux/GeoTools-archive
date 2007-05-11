@@ -50,7 +50,7 @@ public class Dimension2o5DTest extends TestCase {
 		System.out.println("\n" + curve1);
 		System.out.println("\nCoordinate Dimension: " + curve1.getCoordinateDimension());
 		System.out.println("\nDimension: " + curve1.getDimension(null));
-		System.out.println("\nDimension Model: " + curve1.getFeatGeometryFactory().getDimensionModel());
+		//System.out.println("\nDimension Model: " + curve1.getFeatGeometryFactory().getDimensionModel());
 		System.out.println("Length of Curve is " + curve1.length());
 		System.out.println("Envelope of the Curve is " +  curve1.getEnvelope());
 	}
@@ -61,7 +61,7 @@ public class Dimension2o5DTest extends TestCase {
 		System.out.println("\n" + surface);
 		System.out.println("\n Coordinate Dimension: " + surface.getCoordinateDimension());
 		System.out.println("\n Dimension: " + surface.getDimension(null));
-		System.out.println("\n Dimension Model: " + surface.getFeatGeometryFactory().getDimensionModel());
+		//System.out.println("\n Dimension Model: " + surface.getFeatGeometryFactory().getDimensionModel());
 		System.out.println("\n Envelope: " + surface.getEnvelope());
 	}
 	

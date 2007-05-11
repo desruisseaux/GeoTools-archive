@@ -69,7 +69,7 @@ public class PicoCurveTest extends TestCase {
 	public void testCurveEquals(){
 		CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
 		PicoContainer container = container( crs ); // normal 2D
-		PrimitiveFactoryImpl factory = (PrimitiveFactoryImpl) container.getComponentInstanceOfType( PrimitiveFactoryImpl.class );
+		//PrimitiveFactoryImpl factory = (PrimitiveFactoryImpl) container.getComponentInstanceOfType( PrimitiveFactoryImpl.class );
 		PositionFactory positionFactory = (PositionFactory ) container.getComponentInstanceOfType( PositionFactory.class );
 		
 		DirectPosition positionA = positionFactory.createDirectPosition(new double[]{10, 10});
