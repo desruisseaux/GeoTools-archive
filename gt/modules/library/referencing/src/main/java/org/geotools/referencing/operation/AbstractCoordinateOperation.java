@@ -511,6 +511,7 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
                     return equals(this.targetCRS, that.targetCRS, compareMetadata);
                 } finally {
                     AbstractDerivedCRS._COMPARING.set(Boolean.FALSE);
+                    // TODO: use _COMPARING.remove() when we will be allowed to compile for J2SE 1.5.
                 }
             }
         }

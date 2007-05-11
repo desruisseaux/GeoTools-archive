@@ -59,6 +59,26 @@ public class DefaultCoordinateSystemAxisTest extends TestCase {
     }
 
     /**
+     * Tests the {@link DefaultCoordinateSystemAxis#nameMatches} method.
+     *
+     * @todo Use "static import" when we will be allowed to compile for J2SE 1.5.
+     */
+    public void testNameMatches() {
+        assertTrue (DefaultCoordinateSystemAxis.LONGITUDE.nameMatches(
+                    DefaultCoordinateSystemAxis.GEODETIC_LONGITUDE.getName().getCode()));
+        assertFalse(DefaultCoordinateSystemAxis.LONGITUDE.nameMatches(
+                    DefaultCoordinateSystemAxis.GEODETIC_LATITUDE.getName().getCode()));
+        assertFalse(DefaultCoordinateSystemAxis.LONGITUDE.nameMatches(
+                    DefaultCoordinateSystemAxis.ALTITUDE.getName().getCode()));
+        assertFalse(DefaultCoordinateSystemAxis.X.nameMatches(
+                    DefaultCoordinateSystemAxis.LONGITUDE.getName().getCode()));
+        assertFalse(DefaultCoordinateSystemAxis.X.nameMatches(
+                    DefaultCoordinateSystemAxis.EASTING.getName().getCode()));
+        assertFalse(DefaultCoordinateSystemAxis.X.nameMatches(
+                    DefaultCoordinateSystemAxis.NORTHING.getName().getCode()));
+    }
+
+    /**
      * Tests the {@link DefaultCoordinateSystemAxis#getPredefined(String)} method.
      *
      * @todo Use "static import" when we will be allowed to compile for J2SE 1.5.

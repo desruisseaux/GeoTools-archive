@@ -688,6 +688,7 @@ scanForType:    for (int i=0; i<FACTORY_TYPES.length; i++) {
             }
         } finally {
             inProgress.set(Boolean.FALSE);
+            // TODO: use inProgress.remove() when we will be allowed to compile for J2SE 1.5.
         }
         return codes;
     }

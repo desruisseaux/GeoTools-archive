@@ -565,6 +565,35 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
         ALIASES.put("lon",                GEODETIC_LONGITUDE);
         ALIASES.put("longitude",          GEODETIC_LONGITUDE);
         ALIASES.put("geodetic longitude", GEODETIC_LONGITUDE);
+        /*
+         * "x" and "y" are sometime used in WKT for meaning "Easting" and "Northing".
+         * We could be tempted to add them as alias in this map, but experience shows
+         * that such alias have a lot of indesirable side effet. "x" and "y" are used
+         * for too many things ("Easting", "Westing", "Geocentric X", "Display right",
+         * "Display left", etc.) and declaring them as alias introduces confusion in
+         * AbstractCS constructor (during the check of axis directions), in
+         * PredefinedCS.standard(CoordinateSystem), etc.
+         */
+    }
+
+    /**
+     * Special cases for "x" and "y" names. "x" is considered equivalent to "Easting"
+     * or "Westing", but the converse is not true. Note: by avoiding to put "x" in the
+     * {@link #ALIASES} map, we avoid undesirable side effects like considering "Easting"
+     * as equivalent to "Westing".
+     */
+    private static boolean nameMatchesXY(String name1, final String name2) {
+        name1 = name1.trim();
+        if (name1.length() == 0) {
+            final DefaultCoordinateSystemAxis axis;
+            switch (Character.toLowerCase(name1.charAt(0))) {
+                case 'x': axis=EASTING;  break;
+                case 'y': axis=NORTHING; break;
+                default : return false;
+            }
+            return axis.nameMatches(name2) || axis.getOpposite().nameMatches(name2);
+        }
+        return false;
     }
 
     /**
@@ -1094,7 +1123,11 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
             return true;
         }
         /*
-         * The standard comparaisons didn't worked. Check for the special cases.
+         * The standard comparaisons didn't worked. Check for the aliases. Note: we don't
+         * test for 'nameMatchesXY(...)' here because the "x" and "y" axis names are too
+         * generic. We test them only in the 'equals' method, which has the extra-safety
+         * of units comparaison (so less risk to treat incompatible axis as equivalent).
+         *
          * TODO: replace Object by CoordinateSystemAxis when we will be allowed
          * to compile for J2SE 1.5.
          */
@@ -1153,12 +1186,24 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
              *       because in this case a stricter check has already been performed by
              *       the 'equals' method in the superclass.
              */
-            if (!nameMatches(that.getName().getCode())) {
+            final String name1 = that.getName().getCode();
+            if (!nameMatches(name1)) {
                 // The above test checked for special cases ("Lat" / "Lon" aliases, etc.).
                 // The next line may not, but is tested anyway in case the user overrided
                 // the 'that.nameMatches(...)' method.
-                if (!nameMatches(that, getName().getCode())) {
-                    return false;
+                final String name2 = getName().getCode();
+                if (!nameMatches(that, name2)) {
+                    // For the needs of AbstractCS.axisColinearWith(...), we must stop here.
+                    // In addition it may be safer to not test 'nameMatchesXY' when we don't
+                    // have the extra-safety of units comparaison, because "x" and "y" names
+                    // are too generic.
+                    if (!compareUnit) {
+                        return false;
+                    }
+                    // Last chance: check for the special case of "x" and "y" axis names.
+                    if (!nameMatchesXY(name1, name2) && !nameMatchesXY(name2, name1)) {
+                        return false;
+                    }
                 }
             }
         }

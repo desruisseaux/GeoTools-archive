@@ -302,6 +302,7 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
                         source  = sourceCRS;
                     } finally {
                         processing.set(Boolean.FALSE);
+                        // TODO: use processing.remove() when we will be allowed to compile for J2SE 1.5.
                     } else {
                         prepend = null;
                     }
@@ -311,6 +312,7 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
                         target = targetCRS;
                     } finally {
                         processing.set(Boolean.FALSE);
+                        // TODO: use processing.remove() when we will be allowed to compile for J2SE 1.5.
                     } else {
                         append = null;
                     }

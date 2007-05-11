@@ -211,7 +211,6 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
                                     name, direction.name()));
                         }
                     }
-                    continue;
                 }
             }
         }

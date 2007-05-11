@@ -313,6 +313,7 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
                                   compareMetadata);
                 } finally {
                     _COMPARING.set(Boolean.FALSE);
+                    // TODO: use _COMPARING.remove() when we will be allowed to compile for J2SE 1.5.
                 }
             }
         }
