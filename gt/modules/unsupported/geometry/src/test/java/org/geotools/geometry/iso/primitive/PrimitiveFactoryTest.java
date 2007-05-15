@@ -124,11 +124,34 @@ public class PrimitiveFactoryTest extends TestCase {
 		// indirect: public SurfaceImpl createSurfaceByDirectPositions(List<DirectPosition> positions);
 		// indirect: public SurfaceBoundaryImpl createSurfaceBoundary(Ring exterior, List<Ring> interiors);
 		// indirect: public Ring createRingByDirectPositions(List<DirectPosition> directPositions);
-		DirectPosition dp1 = posf.createDirectPosition(new double[]{10, 10, 10});
-		DirectPosition dp2 = posf.createDirectPosition(new double[]{70, 30, 90});
-		Envelope env1 = cf.createEnvelope(dp1, dp2);
-		PrimitiveImpl prim1 = (PrimitiveImpl) pf.createPrimitive(env1);
-		assertNotNull(prim1);
+		
+		// 2.5D (and 3D) is not supported for envelope creation yet, so skip that test
+//		DirectPosition dp1 = posf.createDirectPosition(new double[]{10, 10, 10});
+//		DirectPosition dp2 = posf.createDirectPosition(new double[]{70, 30, 90});
+//		Envelope env1 = cf.createEnvelope(dp1, dp2);
+//		PrimitiveImpl prim1 = (PrimitiveImpl) pf.createPrimitive(env1);
+//		assertNotNull(prim1);
+		
+		// test 2.5D point creation
+		double[] da = new double[3];
+		da[0] = 10.0;
+		da[1] = -115000.0;
+		da[2] = 0.0000000125;
+		Point p1 = pf.createPoint(da);
+		assertTrue(p1.getPosition().getOrdinate(0) == 10.0);
+		assertTrue(p1.getPosition().getOrdinate(1) == -115000.0);
+		assertTrue(p1.getPosition().getOrdinate(2) == 0.0000000125);
+
+		// public PointImpl createPoint(Position position);
+		// public PointImpl createPoint(DirectPositionImpl dp);
+		da[0] = 999999999.0;
+		da[1] = 100.0;
+		da[2] = -0.00000565;
+		Position pos1 = new DirectPositionImpl( pf.getCoordinateReferenceSystem(),  da );
+		Point p2 = pf.createPoint(pos1);
+		assertTrue(p2.getPosition().getOrdinate(0) == 999999999.0);
+		assertTrue(p2.getPosition().getOrdinate(1) == 100.0);
+		assertTrue(p2.getPosition().getOrdinate(2) == -0.00000565);
 		
 	}
 

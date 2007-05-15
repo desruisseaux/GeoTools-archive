@@ -459,11 +459,11 @@ public class ConvexHull {
 	private Geometry lineOrPolygon(Coordinate[] coordinates) {
 
 		coordinates = cleanRing(coordinates);
-		List<? extends DirectPosition> positions = CoordinateArrays.toDirectPositionList(this.crs, coordinates);
+		List<Position> positions = CoordinateArrays.toPositionList(this.crs, coordinates);
 		if (coordinates.length == 3) {
 			positions.remove(2);
 			LineStringImpl lineString = new LineStringImpl(new PointArrayImpl(
-					(List<Position>) positions), 0.0);
+					positions), 0.0);
 			List<CurveSegment> segments = new ArrayList<CurveSegment>();
 			segments.add(lineString);
 			return new CurveImpl(this.crs, segments);
@@ -471,7 +471,7 @@ public class ConvexHull {
 		}
 		
 		LineStringImpl lineString = new LineStringImpl(new PointArrayImpl(
-				(List<Position>) positions), 0.0);
+				positions), 0.0);
 		List<CurveSegment> segments = new ArrayList<CurveSegment>();
 		segments.add(lineString);		
 		OrientableCurve curve = new CurveImpl(crs, segments);
