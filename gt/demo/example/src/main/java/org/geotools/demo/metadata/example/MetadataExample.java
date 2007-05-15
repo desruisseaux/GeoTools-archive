@@ -11,7 +11,6 @@ import org.geotools.metadata.iso.citation.ResponsiblePartyImpl;
 import org.geotools.metadata.iso.citation.TelephoneImpl;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.metadata.citation.Citation;
-import org.opengis.metadata.citation.Telephone;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class MetadataExample {
@@ -26,8 +25,8 @@ public class MetadataExample {
     
     public static void telephone(){
         TelephoneImpl phone = new TelephoneImpl();
-        phone.setVoice("555-1234");
-        phone.setFacsimile("555-2FAX");
+        phone.setVoice(Collections.singleton("555-1234"));
+        phone.setFacsimile(Collections.singleton("555-2FAX"));
         System.out.println( phone );
     }
     
