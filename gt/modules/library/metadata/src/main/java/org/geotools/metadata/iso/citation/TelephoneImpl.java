@@ -18,7 +18,9 @@
  */
 package org.geotools.metadata.iso.citation;
 
-// OpenGIS dependencies
+import java.util.Collection;
+
+//OpenGIS dependencies
 import org.opengis.metadata.citation.Telephone;
 
 // Geotools dependencies
@@ -43,12 +45,12 @@ public class TelephoneImpl extends MetadataEntity implements Telephone {
     /**
      * Telephone number by which individuals can speak to the responsible organization or individual.
      */
-    private String voice;
+    private Collection voice;
 
     /**
      * Telephone number of a facsimile machine for the responsible organization or individual.
      */
-    private String facsimile;
+    private Collection facsimile;
 
     /**
      * Constructs a default telephone.
@@ -69,7 +71,7 @@ public class TelephoneImpl extends MetadataEntity implements Telephone {
      * Returns the telephone number by which individuals can speak to the responsible
      * organization or individual.
      */
-    public String getVoice() {
+    public Collection getVoice() {
         return voice;
     }
 
@@ -77,7 +79,7 @@ public class TelephoneImpl extends MetadataEntity implements Telephone {
      * Set the telephone number by which individuals can speak to the responsible
      * organization or individual.
      */
-    public synchronized void setVoice(final String newValue) {
+    public synchronized void setVoice(final Collection newValue) {
         checkWritePermission();
         voice = newValue;
     }
@@ -86,7 +88,7 @@ public class TelephoneImpl extends MetadataEntity implements Telephone {
      * Returns the telephone number of a facsimile machine for the responsible organization
      * or individual.
      */
-    public String getFacsimile() {
+    public Collection getFacsimile() {
         return facsimile;
     }
 
@@ -94,7 +96,7 @@ public class TelephoneImpl extends MetadataEntity implements Telephone {
      * Set the telephone number of a facsimile machine for the responsible organization
      * or individual.
      */
-    public synchronized void setFacsimile(final String newValue) {
+    public synchronized void setFacsimile(final Collection newValue) {
         checkWritePermission();
         facsimile = newValue;
     }

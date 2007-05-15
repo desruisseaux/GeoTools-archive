@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -1083,8 +1084,8 @@ public class WMSComplexTypes {
 					address = (AddressImpl) value[i].getValue();
 				}
 				
-				if (sameName(elems[3], value[i])) {					
-					String voice = (String) value[i].getValue();
+				if (sameName(elems[3], value[i])) {
+					Collection voice = Collections.singleton(value[i].getValue());
 					if (telephone == null) {
 						telephone = new TelephoneImpl();
 					}
@@ -1092,7 +1093,7 @@ public class WMSComplexTypes {
 				}
 				
 				if (sameName(elems[4], value[i])) {
-					String fax = (String) value[i].getValue();
+                    Collection fax = Collections.singleton(value[i].getValue());
 					if (telephone == null) {
 						telephone = new TelephoneImpl();
 					}
