@@ -14,7 +14,9 @@ import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.primitive.OrientableSurface;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 public class RelateOperatorsTest extends TestCase {
@@ -23,6 +25,7 @@ public class RelateOperatorsTest extends TestCase {
 	private static final boolean T = true;
 
 	private FeatGeomFactoryImpl factory = FeatGeomFactoryImpl.getDefault2D();
+	private CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
 	
 	private PointImpl pointA = this.createPointA();
 	private PointImpl pointB = this.createPointB();
@@ -591,7 +594,7 @@ public class RelateOperatorsTest extends TestCase {
 	
 	private PointImpl createPointFromWKT(String aWKTpoint) {
 		PointImpl rPoint = null;
-		WKTReader wktReader = new WKTReader(this.factory.getPrimitiveFactory(), this.factory.getGeometryFactoryImpl());
+		WKTReader wktReader = new WKTReader(this.crs);
 		try {
 			rPoint = (PointImpl) wktReader.read(aWKTpoint);
 		} catch (ParseException e) {
@@ -604,7 +607,7 @@ public class RelateOperatorsTest extends TestCase {
 	
 	private CurveImpl createCurveFromWKT(String aWKTcurve) {
 		CurveImpl rCurve = null;
-		WKTReader wktReader = new WKTReader(this.factory.getPrimitiveFactory(), this.factory.getGeometryFactoryImpl());
+		WKTReader wktReader = new WKTReader(this.crs);
 		try {
 			rCurve = (CurveImpl) wktReader.read(aWKTcurve);
 		} catch (ParseException e) {
@@ -615,7 +618,7 @@ public class RelateOperatorsTest extends TestCase {
 	
 	private SurfaceImpl createSurfaceFromWKT(String aWKTsurface) {
 		SurfaceImpl rSurface = null;
-		WKTReader wktReader = new WKTReader(this.factory.getPrimitiveFactory(), this.factory.getGeometryFactoryImpl());
+		WKTReader wktReader = new WKTReader(this.crs);
 		try {
 			rSurface = (SurfaceImpl) wktReader.read(aWKTsurface);
 		} catch (ParseException e) {

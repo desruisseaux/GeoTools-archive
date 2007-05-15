@@ -8,17 +8,15 @@ import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.aggregate.MultiCurveImpl;
 import org.geotools.geometry.iso.aggregate.MultiPointImpl;
 import org.geotools.geometry.iso.aggregate.MultiSurfaceImpl;
-import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.io.wkt.ParseException;
 import org.geotools.geometry.iso.io.wkt.WKTReader;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.DirectPosition;
-import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.primitive.Curve;
-import org.opengis.geometry.primitive.CurveBoundary;
 import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.OrientableSurface;
 import org.opengis.geometry.primitive.Point;
@@ -26,17 +24,20 @@ import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.primitive.Surface;
 import org.opengis.geometry.primitive.SurfaceBoundary;
 import org.opengis.geometry.Geometry;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import junit.framework.TestCase;
 
 public class ConvexHullTest extends TestCase {
 
 	private FeatGeomFactoryImpl factory = null;
+	private CoordinateReferenceSystem crs = null;
 
 	public void testMain() {
 		
 		// === 2D ===
 		this.factory = FeatGeomFactoryImpl.getDefault2D();
+		this.crs = DefaultGeographicCRS.WGS84;
 		
 		// Test Points, MultiPoints and CompositePoints
 		this._testPoints();
@@ -248,7 +249,7 @@ public class ConvexHullTest extends TestCase {
 	
 	private PointImpl createPointFromWKT(String aWKTpoint) {
 		PointImpl rPoint = null;
-		WKTReader wktReader = new WKTReader(this.factory.getPrimitiveFactory(), this.factory.getGeometryFactoryImpl());
+		WKTReader wktReader = new WKTReader(this.crs);
 		try {
 			rPoint = (PointImpl) wktReader.read(aWKTpoint);
 		} catch (ParseException e) {
@@ -261,7 +262,7 @@ public class ConvexHullTest extends TestCase {
 	
 	private CurveImpl createCurveFromWKT(String aWKTcurve) {
 		CurveImpl rCurve = null;
-		WKTReader wktReader = new WKTReader(this.factory.getPrimitiveFactory(), this.factory.getGeometryFactoryImpl());
+		WKTReader wktReader = new WKTReader(this.crs);
 		try {
 			rCurve = (CurveImpl) wktReader.read(aWKTcurve);
 		} catch (ParseException e) {
@@ -272,7 +273,7 @@ public class ConvexHullTest extends TestCase {
 	
 	private SurfaceImpl createSurfaceFromWKT(String aWKTsurface) {
 		SurfaceImpl rSurface = null;
-		WKTReader wktReader = new WKTReader(this.factory.getPrimitiveFactory(), this.factory.getGeometryFactoryImpl());
+		WKTReader wktReader = new WKTReader(this.crs);
 		try {
 			rSurface = (SurfaceImpl) wktReader.read(aWKTsurface);
 		} catch (ParseException e) {

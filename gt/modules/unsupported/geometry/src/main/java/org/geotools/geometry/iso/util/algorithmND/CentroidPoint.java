@@ -76,13 +76,13 @@ package org.geotools.geometry.iso.util.algorithmND;
 
 import java.util.Iterator;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.aggregate.MultiPointImpl;
 import org.geotools.geometry.iso.complex.CompositePointImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
 import org.opengis.geometry.primitive.Point;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * Computes the centroid of a point geometry.
@@ -91,18 +91,19 @@ import org.opengis.geometry.primitive.Point;
  */
 public class CentroidPoint {
 	
-	private FeatGeomFactoryImpl factory = null;	
+	//private FeatGeomFactoryImpl factory = null;	
+	private CoordinateReferenceSystem crs = null;
 	private int ptCount = 0;	
 	DirectPositionImpl centSum = null;
 
 	/**
 	 * Creates a new Centroid operation
 	 * 
-	 * @param factory
+	 * @param crs
 	 */
-	public CentroidPoint(FeatGeomFactoryImpl factory) {
-		this.factory = factory;
-		this.centSum = this.factory.getGeometryFactoryImpl().createDirectPosition();
+	public CentroidPoint(CoordinateReferenceSystem crs) {
+		this.crs = crs;
+		this.centSum = new DirectPositionImpl(crs); //this.factory.getGeometryFactoryImpl().createDirectPosition();
 	}
 
 	/**
@@ -121,7 +122,7 @@ public class CentroidPoint {
 				this.add((DirectPositionImpl) points.next().getPosition());
 			}
 		} else if (geom instanceof CompositePointImpl) {
-			this.add((GeometryImpl) ((CompositePointImpl)geom).getGenerators().get(0));
+			this.add((DirectPositionImpl) ((CompositePointImpl)geom).getGenerators().get(0));
 		}
 	}
 

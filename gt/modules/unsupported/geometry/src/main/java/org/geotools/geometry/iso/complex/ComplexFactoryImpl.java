@@ -46,18 +46,21 @@ import org.opengis.geometry.complex.CompositeSurface;
 import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.OrientableSurface;
 import org.opengis.geometry.primitive.Point;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class ComplexFactoryImpl implements ComplexFactory {
 
 	//private FeatGeomFactoryImpl geometryFactory;
+	private CoordinateReferenceSystem crs;
 
 	/**
 	 */
-	public ComplexFactoryImpl() {
+	public ComplexFactoryImpl(CoordinateReferenceSystem crs) {
+		this.crs = crs;
 	}
 	
 	public CompositePoint createCompositePoint(Point generator) {
-		return new CompositePointImpl((PointImpl) generator);
+		return new CompositePointImpl(crs, (PointImpl) generator);
 	}
 	
 	public CompositeCurve createCompositeCurve(List<OrientableCurve> generator) {

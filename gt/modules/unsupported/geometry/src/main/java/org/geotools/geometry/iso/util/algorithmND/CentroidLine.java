@@ -76,17 +76,14 @@ package org.geotools.geometry.iso.util.algorithmND;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.aggregate.MultiCurveImpl;
 import org.geotools.geometry.iso.complex.CompositeCurveImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
-import org.opengis.geometry.primitive.Curve;
 import org.opengis.geometry.primitive.OrientableCurve;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
@@ -97,7 +94,8 @@ import org.opengis.geometry.primitive.OrientableCurve;
  */
 public class CentroidLine {
 	
-	private FeatGeomFactoryImpl factory = null;
+	//private FeatGeomFactoryImpl factory = null;
+	private CoordinateReferenceSystem crs = null;
 	
 	DirectPositionImpl centSum = null;
 	
@@ -106,11 +104,11 @@ public class CentroidLine {
 	/**
 	 * Creates a new Centroid operation
 	 * 
-	 * @param factory
+	 * @param crs
 	 */
-	public CentroidLine(FeatGeomFactoryImpl factory) {
-		this.factory = factory;
-		this.centSum = this.factory.getGeometryFactoryImpl().createDirectPosition();
+	public CentroidLine(CoordinateReferenceSystem crs) {
+		this.crs = crs;
+		this.centSum = new DirectPositionImpl(crs); //this.factory.getGeometryFactoryImpl().createDirectPosition();
 	}
 
 	/**

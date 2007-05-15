@@ -84,7 +84,6 @@ import java.util.List;
 import java.util.Stack;
 import java.util.TreeSet;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.aggregate.MultiCurveImpl;
 import org.geotools.geometry.iso.aggregate.MultiPointImpl;
 import org.geotools.geometry.iso.aggregate.MultiPrimitiveImpl;
@@ -93,10 +92,10 @@ import org.geotools.geometry.iso.complex.CompositeCurveImpl;
 import org.geotools.geometry.iso.complex.CompositePointImpl;
 import org.geotools.geometry.iso.complex.CompositeSurfaceImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
-import org.geotools.geometry.iso.coordinate.PositionImpl;
+import org.geotools.geometry.iso.coordinate.LineStringImpl;
+import org.geotools.geometry.iso.coordinate.PointArrayImpl;
 import org.geotools.geometry.iso.primitive.CurveBoundaryImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
-import org.geotools.geometry.iso.primitive.OrientableCurveImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
@@ -109,9 +108,12 @@ import org.geotools.geometry.iso.topograph2D.util.UniqueCoordinateArrayFilter;
 import org.geotools.geometry.iso.util.Assert;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.primitive.CurveSegment;
 import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.OrientableSurface;
+import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.Geometry;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * Computes the convex hull of a {@link Geometry}. The convex hull is the
@@ -120,7 +122,8 @@ import org.opengis.geometry.Geometry;
  * Uses the Graham Scan algorithm. Asymptotic running time: O(n*log(n))
  */
 public class ConvexHull {
-	private FeatGeomFactoryImpl geomFactory;
+	//private FeatGeomFactoryImpl geomFactory;
+	private CoordinateReferenceSystem crs;
 
 	private Coordinate[] inputPts;
 
@@ -128,16 +131,16 @@ public class ConvexHull {
 	 * Create a new convex hull construction for the input {@link Geometry}.
 	 */
 	public ConvexHull(GeometryImpl geometry) {
-		this(extractCoordinates(geometry), geometry.getFeatGeometryFactory());
+		this(extractCoordinates(geometry), geometry.getCoordinateReferenceSystem());
 	}
 
 	/**
 	 * Create a new convex hull construction for the input {@link Coordinate}
 	 * array.
 	 */
-	public ConvexHull(Coordinate[] pts, FeatGeomFactoryImpl geomFactory) {
+	public ConvexHull(Coordinate[] pts, CoordinateReferenceSystem crs) {
 		inputPts = pts;
-		this.geomFactory = geomFactory;
+		this.crs = crs;
 	}
 
 	/**
@@ -240,12 +243,15 @@ public class ConvexHull {
 		}
 		if (inputPts.length == 1) {
 			// 1 point: return Point
-			return this.geomFactory.getPrimitiveFactory().createPoint(inputPts[0].getCoordinates());
+			return new PointImpl( new DirectPositionImpl(crs, inputPts[0].getCoordinates()) ); //this.geomFactory.getPrimitiveFactory().createPoint(inputPts[0].getCoordinates());
 		}
 		if (inputPts.length == 2) {
-			//return geomFactory.createLineString(inputPts);
-			List<? extends Position> positions = CoordinateArrays.toPositionList(this.geomFactory.getCoordinateReferenceSystem(), this.inputPts);
-			return this.geomFactory.getPrimitiveFactory().createCurveByPositions((List<Position>) positions);
+			List<Position> positions = CoordinateArrays.toPositionList(this.crs, this.inputPts);
+			LineStringImpl lineString = new LineStringImpl(new PointArrayImpl(positions), 0.0);
+			List<CurveSegment> segments = new ArrayList<CurveSegment>();
+			segments.add(lineString);
+			return new CurveImpl(this.crs, segments);
+			//return this.geomFactory.getPrimitiveFactory().createCurveByPositions((List<Position>) positions);
 		}
 
 		Coordinate[] reducedPts = inputPts;
@@ -453,15 +459,33 @@ public class ConvexHull {
 	private Geometry lineOrPolygon(Coordinate[] coordinates) {
 
 		coordinates = cleanRing(coordinates);
-		List<? extends DirectPosition> positions = CoordinateArrays.toDirectPositionList(this.geomFactory.getGeometryFactoryImpl(), coordinates);
+		List<? extends DirectPosition> positions = CoordinateArrays.toDirectPositionList(this.crs, coordinates);
 		if (coordinates.length == 3) {
-			//return geomFactory.createLineString(new Coordinate[] {coordinates[0], coordinates[1] });
 			positions.remove(2);
-			return this.geomFactory.getPrimitiveFactory().createCurveByDirectPositions((List<DirectPosition>) positions);
+			LineStringImpl lineString = new LineStringImpl(new PointArrayImpl(
+					(List<Position>) positions), 0.0);
+			List<CurveSegment> segments = new ArrayList<CurveSegment>();
+			segments.add(lineString);
+			return new CurveImpl(this.crs, segments);
+			//return this.geomFactory.getPrimitiveFactory().createCurveByDirectPositions((List<Position>) positions);
 		}
-		return this.geomFactory.getPrimitiveFactory().createSurfaceByDirectPositions((List<DirectPosition>) positions);
-		//LinearRing linearRing = geomFactory.createLinearRing(coordinates);
-		//return geomFactory.createPolygon(linearRing, null);
+		
+		LineStringImpl lineString = new LineStringImpl(new PointArrayImpl(
+				(List<Position>) positions), 0.0);
+		List<CurveSegment> segments = new ArrayList<CurveSegment>();
+		segments.add(lineString);		
+		OrientableCurve curve = new CurveImpl(crs, segments);
+		List<OrientableCurve> orientableCurves = new ArrayList<OrientableCurve>();
+		orientableCurves.add(curve);
+		
+		Ring exterior = new RingImpl(orientableCurves);
+		List<Ring> interiorList = new ArrayList<Ring>();
+
+		SurfaceBoundaryImpl sb = 
+			new SurfaceBoundaryImpl(crs, exterior, interiorList); 
+		return new SurfaceImpl(sb);
+		
+		//return this.geomFactory.getPrimitiveFactory().createSurfaceByDirectPositions((List<DirectPosition>) positions);
 	}
 
 	/**

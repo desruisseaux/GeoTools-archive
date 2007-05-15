@@ -8,17 +8,20 @@ import org.geotools.geometry.iso.io.wkt.WKTReader;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class SetOperationsTest extends TestCase {
 	
 	public void testMain() {
 		
-		FeatGeomFactoryImpl tGeomFactory = FeatGeomFactoryImpl.getDefault2D();
+		//FeatGeomFactoryImpl tGeomFactory = FeatGeomFactoryImpl.getDefault2D();
+		CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
 		
 		// Primitive / Primitive - Tests
-		this._testCurvePolygon(tGeomFactory);
-		this._testPolygonPolygon(tGeomFactory);
-		this._testCurveCurve(tGeomFactory);
+		this._testCurvePolygon(crs);
+		this._testPolygonPolygon(crs);
+		this._testCurveCurve(crs);
 
 		// Primitive / Complex - Tests
 
@@ -30,14 +33,14 @@ public class SetOperationsTest extends TestCase {
 	}
 	
 	
-	private void _testPolygonPolygon(FeatGeomFactoryImpl aGeomFactory) {
+	private void _testPolygonPolygon(CoordinateReferenceSystem crs) {
 
-		SurfaceImpl surfaceAwithoutHole = this.createSurfaceAwithoutHole(aGeomFactory);
-		SurfaceImpl surfaceAwithHole = this.createSurfaceAwithHole(aGeomFactory);
-		SurfaceImpl surfaceAwithTwoHoles = this.createSurfaceAwithTwoHoles(aGeomFactory);
-		SurfaceImpl surfaceBwithoutHole = this.createSurfaceBwithoutHole(aGeomFactory);
-		SurfaceImpl surfaceBwithHole = this.createSurfaceBwithHole(aGeomFactory);
-		SurfaceImpl surfaceC = this.createSurfaceC(aGeomFactory);
+		SurfaceImpl surfaceAwithoutHole = this.createSurfaceAwithoutHole(crs);
+		SurfaceImpl surfaceAwithHole = this.createSurfaceAwithHole(crs);
+		SurfaceImpl surfaceAwithTwoHoles = this.createSurfaceAwithTwoHoles(crs);
+		SurfaceImpl surfaceBwithoutHole = this.createSurfaceBwithoutHole(crs);
+		SurfaceImpl surfaceBwithHole = this.createSurfaceBwithHole(crs);
+		SurfaceImpl surfaceC = this.createSurfaceC(crs);
 		
 		SurfaceImpl s1 = null;
 		SurfaceImpl s2 = null;
@@ -100,16 +103,16 @@ public class SetOperationsTest extends TestCase {
 
 	}
 
-	private void _testCurvePolygon(FeatGeomFactoryImpl aGeomFactory) {
+	private void _testCurvePolygon(CoordinateReferenceSystem crs) {
 
-		SurfaceImpl surfaceAwithoutHole = this.createSurfaceAwithoutHole(aGeomFactory);
-		SurfaceImpl surfaceAwithHole = this.createSurfaceAwithHole(aGeomFactory);
-		SurfaceImpl surfaceAwithTwoHoles = this.createSurfaceAwithTwoHoles(aGeomFactory);
-		SurfaceImpl surfaceBwithoutHole = this.createSurfaceBwithoutHole(aGeomFactory);
-		SurfaceImpl surfaceBwithHole = this.createSurfaceBwithHole(aGeomFactory);
-		SurfaceImpl surfaceC = this.createSurfaceC(aGeomFactory);
-		CurveImpl curveA = this.createCurveA(aGeomFactory);
-		CurveImpl curveF = this.createCurveF(aGeomFactory);
+		SurfaceImpl surfaceAwithoutHole = this.createSurfaceAwithoutHole(crs);
+		SurfaceImpl surfaceAwithHole = this.createSurfaceAwithHole(crs);
+		SurfaceImpl surfaceAwithTwoHoles = this.createSurfaceAwithTwoHoles(crs);
+		SurfaceImpl surfaceBwithoutHole = this.createSurfaceBwithoutHole(crs);
+		SurfaceImpl surfaceBwithHole = this.createSurfaceBwithHole(crs);
+		SurfaceImpl surfaceC = this.createSurfaceC(crs);
+		CurveImpl curveA = this.createCurveA(crs);
+		CurveImpl curveF = this.createCurveF(crs);
 
 		GeometryImpl g1 = null;
 		GeometryImpl g2 = null;
@@ -130,13 +133,13 @@ public class SetOperationsTest extends TestCase {
 
 	}
 	
-	private void _testCurveCurve(FeatGeomFactoryImpl aGeomFactory) {
+	private void _testCurveCurve(CoordinateReferenceSystem crs) {
 
-		CurveImpl curveA = this.createCurveA(aGeomFactory);
-		CurveImpl curveB = this.createCurveB(aGeomFactory);
-		CurveImpl curveC = this.createCurveC(aGeomFactory);
-		CurveImpl curveD = this.createCurveD(aGeomFactory);
-		CurveImpl curveE = this.createCurveE(aGeomFactory);
+		CurveImpl curveA = this.createCurveA(crs);
+		CurveImpl curveB = this.createCurveB(crs);
+		CurveImpl curveC = this.createCurveC(crs);
+		CurveImpl curveD = this.createCurveD(crs);
+		CurveImpl curveE = this.createCurveE(crs);
 		
 		CurveImpl c1 = null;
 		CurveImpl c2 = null;
@@ -204,9 +207,9 @@ public class SetOperationsTest extends TestCase {
 
 	
 	
-	private CurveImpl createCurveFromWKT(FeatGeomFactoryImpl aGeomFactory, String aWKTcurve) {
+	private CurveImpl createCurveFromWKT(CoordinateReferenceSystem crs, String aWKTcurve) {
 		CurveImpl rCurve = null;
-		WKTReader wktReader = new WKTReader(aGeomFactory.getPrimitiveFactory(), aGeomFactory.getGeometryFactoryImpl());
+		WKTReader wktReader = new WKTReader(crs);
 		try {
 			rCurve = (CurveImpl) wktReader.read(aWKTcurve);
 		} catch (ParseException e) {
@@ -215,9 +218,9 @@ public class SetOperationsTest extends TestCase {
 		return rCurve;
 	}
 
-	private SurfaceImpl createSurfaceFromWKT(FeatGeomFactoryImpl aGeomFactory, String aWKTsurface) {
+	private SurfaceImpl createSurfaceFromWKT(CoordinateReferenceSystem crs, String aWKTsurface) {
 		SurfaceImpl rSurface = null;
-		WKTReader wktReader = new WKTReader(aGeomFactory.getPrimitiveFactory(), aGeomFactory.getGeometryFactoryImpl());
+		WKTReader wktReader = new WKTReader(crs);
 		try {
 			rSurface = (SurfaceImpl) wktReader.read(aWKTsurface);
 		} catch (ParseException e) {
@@ -243,68 +246,68 @@ public class SetOperationsTest extends TestCase {
 	}
 
 	
-	private SurfaceImpl createSurfaceAwithoutHole(FeatGeomFactoryImpl aGeomFactory) {
+	private SurfaceImpl createSurfaceAwithoutHole(CoordinateReferenceSystem crs) {
 		String wktSurface1 = "SURFACE ((10 90, 30 50, 70 30, 120 40, 150 70, 150 120, 100 150, 30 140, 10 90))";
-		return this.createSurfaceFromWKT(aGeomFactory, wktSurface1);
+		return this.createSurfaceFromWKT(crs, wktSurface1);
 	}
 	
-	private SurfaceImpl createSurfaceAwithHole(FeatGeomFactoryImpl aGeomFactory) {
+	private SurfaceImpl createSurfaceAwithHole(CoordinateReferenceSystem crs) {
 		String wktSurface1 = "SURFACE ((10 90, 30 50, 70 30, 120 40, 150 70, 150 120, 100 150, 30 140, 10 90), (90 60, 110 100, 120 90, 100 60, 90 60))";
-		return this.createSurfaceFromWKT(aGeomFactory, wktSurface1);
+		return this.createSurfaceFromWKT(crs, wktSurface1);
 	}
 
-	private SurfaceImpl createSurfaceAwithTwoHoles(FeatGeomFactoryImpl aGeomFactory) {
+	private SurfaceImpl createSurfaceAwithTwoHoles(CoordinateReferenceSystem crs) {
 		String wktSurface1 = "SURFACE ((10 90, 30 50, 70 30, 120 40, 150 70, 150 120, 100 150, 30 140, 10 90), (90 60, 110 100, 120 90, 100 60, 90 60), (30 100, 30 120, 50 120, 50 100, 30 100))";
-		return this.createSurfaceFromWKT(aGeomFactory, wktSurface1);
+		return this.createSurfaceFromWKT(crs, wktSurface1);
 	}
 
-	private SurfaceImpl createSurfaceBwithoutHole(FeatGeomFactoryImpl aGeomFactory) {
+	private SurfaceImpl createSurfaceBwithoutHole(CoordinateReferenceSystem crs) {
 		// Clockwise oriented
 		String wktSurface1 = "SURFACE ((100 10, 70 50, 90 100, 160 140, 200 90, 170 20, 100 10))";
-		return this.createSurfaceFromWKT(aGeomFactory, wktSurface1);
+		return this.createSurfaceFromWKT(crs, wktSurface1);
 	}
 
-	private SurfaceImpl createSurfaceBwithHole(FeatGeomFactoryImpl aGeomFactory) {
+	private SurfaceImpl createSurfaceBwithHole(CoordinateReferenceSystem crs) {
 		// Clockwise oriented
 		String wktSurface1 = "SURFACE ((100 10, 70 50, 90 100, 160 140, 200 90, 170 20, 100 10), (120 30, 110 50, 120 80, 170 80, 160 40, 120 30))";
-		return this.createSurfaceFromWKT(aGeomFactory, wktSurface1);
+		return this.createSurfaceFromWKT(crs, wktSurface1);
 	}
 	
-	private SurfaceImpl createSurfaceC(FeatGeomFactoryImpl aGeomFactory) {
+	private SurfaceImpl createSurfaceC(CoordinateReferenceSystem crs) {
 		// Clockwise oriented
 		String wktSurface1 = "SURFACE ((0 50, 50 50, 50 150, 20 140, 0 50))";
-		return this.createSurfaceFromWKT(aGeomFactory, wktSurface1);
+		return this.createSurfaceFromWKT(crs, wktSurface1);
 	}
 	
 	
-	private CurveImpl createCurveA(FeatGeomFactoryImpl aGeomFactory) {
+	private CurveImpl createCurveA(CoordinateReferenceSystem crs) {
 		String wktCurve1 = "CURVE(30 20, 10 50, 100 120, 100 70, 10 140)";
-		return this.createCurveFromWKT(aGeomFactory, wktCurve1);
+		return this.createCurveFromWKT(crs, wktCurve1);
 	}
 	
-	private CurveImpl createCurveB(FeatGeomFactoryImpl aGeomFactory) {
+	private CurveImpl createCurveB(CoordinateReferenceSystem crs) {
 		String wktCurve1 = "CURVE(30 20, 50 20, 80 20)";
-		return this.createCurveFromWKT(aGeomFactory, wktCurve1);
+		return this.createCurveFromWKT(crs, wktCurve1);
 	}
 	
-	private CurveImpl createCurveC(FeatGeomFactoryImpl aGeomFactory) {
+	private CurveImpl createCurveC(CoordinateReferenceSystem crs) {
 		String wktCurve1 = "CURVE(40 60, 40 30, 40 10)";
-		return this.createCurveFromWKT(aGeomFactory, wktCurve1);
+		return this.createCurveFromWKT(crs, wktCurve1);
 	}
 
-	private CurveImpl createCurveD(FeatGeomFactoryImpl aGeomFactory) {
+	private CurveImpl createCurveD(CoordinateReferenceSystem crs) {
 		String wktCurve1 = "CURVE(70 20, 100 20)";
-		return this.createCurveFromWKT(aGeomFactory, wktCurve1);
+		return this.createCurveFromWKT(crs, wktCurve1);
 	}
 	
-	private CurveImpl createCurveE(FeatGeomFactoryImpl aGeomFactory) {
+	private CurveImpl createCurveE(CoordinateReferenceSystem crs) {
 		String wktCurve1 = "CURVE(40 40, 40 50)";
-		return this.createCurveFromWKT(aGeomFactory, wktCurve1);
+		return this.createCurveFromWKT(crs, wktCurve1);
 	}
 
-	private CurveImpl createCurveF(FeatGeomFactoryImpl aGeomFactory) {
+	private CurveImpl createCurveF(CoordinateReferenceSystem crs) {
 		String wktCurve1 = "CURVE(80 200, 80 -100)";
-		return this.createCurveFromWKT(aGeomFactory, wktCurve1);
+		return this.createCurveFromWKT(crs, wktCurve1);
 	}
 
 	

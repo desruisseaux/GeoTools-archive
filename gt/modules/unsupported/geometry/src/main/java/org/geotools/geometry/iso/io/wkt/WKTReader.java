@@ -84,20 +84,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.geotools.geometry.iso.PositionFactoryImpl;
+import org.geotools.geometry.iso.coordinate.LineStringImpl;
+import org.geotools.geometry.iso.coordinate.PointArrayImpl;
+import org.geotools.geometry.iso.primitive.CurveImpl;
+import org.geotools.geometry.iso.primitive.PointImpl;
+import org.geotools.geometry.iso.primitive.RingImpl;
+import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
+import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.geometry.iso.util.AssertionFailedException;
-import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.geometry.coordinate.LineString;
 import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.primitive.Curve;
 import org.opengis.geometry.primitive.CurveSegment;
 import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.Point;
-import org.opengis.geometry.primitive.PrimitiveFactory;
 import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.primitive.Surface;
 import org.opengis.geometry.primitive.SurfaceBoundary;
 import org.opengis.geometry.Geometry;
 import org.opengis.geometry.PositionFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * 
@@ -114,26 +120,25 @@ public class WKTReader {
 
 	private static final String R_PAREN = ")";
 
-	private PrimitiveFactory primitiveFactory;
-	private GeometryFactory geometryFactory;
+	//private PrimitiveFactoryImpl primitiveFactory;
+	//private GeometryFactoryImpl geometryFactory;
     private PositionFactory positionFactory;
+    private CoordinateReferenceSystem crs;
 
 	private StreamTokenizer tokenizer;
 
-    public WKTReader(PrimitiveFactory aPrimitiveFactory, GeometryFactory aGeometryFactory){
-        this( aPrimitiveFactory, aGeometryFactory, new PositionFactoryImpl( aGeometryFactory.getCoordinateReferenceSystem(),null) );
+    public WKTReader(CoordinateReferenceSystem crs){
+        this( crs, new PositionFactoryImpl(crs,null) );
     }
 	/**
 	 * Creates a reader that creates objects using the given
-	 * {@link GeometryFactory}.
-	 * 
-	 * @param geometryFactory
-	 *            the factory used to create <code>Geometry</code>s.
+	 * {@link crs}.
+	 * @param crs
+	 *  
 	 */
-	public WKTReader(PrimitiveFactory aPrimitiveFactory,
-			GeometryFactory aGeometryFactory, PositionFactory aPositionFactory ) {
-		this.primitiveFactory = aPrimitiveFactory;
-		this.geometryFactory = aGeometryFactory;
+	public WKTReader(CoordinateReferenceSystem crs,
+			PositionFactory aPositionFactory ) {
+		this.crs = crs;
         this.positionFactory = aPositionFactory;
 	}
 
@@ -447,8 +452,7 @@ public class WKTReader {
 		if (nextToken.equals(EMPTY)) {
 			return null;
 		}
-		Point point = primitiveFactory.createPoint(this.getPreciseCoordinate()
-				.getCoordinates());
+		Point point = new PointImpl(positionFactory.createDirectPosition( this.getPreciseCoordinate().getCoordinates() )); //primitiveFactory.createPoint(this.getPreciseCoordinate().getCoordinates());
 		getNextCloser();
 		return point;
 	}
@@ -488,7 +492,7 @@ public class WKTReader {
 	private Ring readLinearRingText() throws IOException, ParseException {
 		List<OrientableCurve> curves = new ArrayList<OrientableCurve>();
 		curves.add(this.createCurve(this.getCoordinates()));
-		return this.primitiveFactory.createRing(curves);
+		return new RingImpl(curves); //this.primitiveFactory.createRing(curves);
 
 	}
 
@@ -512,7 +516,7 @@ public class WKTReader {
 		String nextToken = getNextEmptyOrOpener();
 
 		if (nextToken.equals(EMPTY)) {
-			return this.primitiveFactory.createSurface((SurfaceBoundary) null);
+			return new SurfaceImpl((SurfaceBoundary) null); //this.primitiveFactory.createSurface((SurfaceBoundary) null);
 		}
 
 		ArrayList<Ring> holes = new ArrayList<Ring>();
@@ -523,9 +527,9 @@ public class WKTReader {
 			holes.add(hole);
 			nextToken = getNextCloserOrComma();
 		}
-		SurfaceBoundary sfb = this.primitiveFactory.createSurfaceBoundary(
-				shell, holes);
-		return this.primitiveFactory.createSurface(sfb);
+		SurfaceBoundary sfb = new SurfaceBoundaryImpl(crs,
+				shell, holes); //this.primitiveFactory.createSurfaceBoundary(shell, holes);
+		return new SurfaceImpl(sfb); //this.primitiveFactory.createSurface(sfb);
 	}
 
 	/**
@@ -538,15 +542,15 @@ public class WKTReader {
 		List<Position> points = new ArrayList<Position>();
 		for (int i = 0; i < aCoords.length; i++) {
 			points.add(this.positionFactory
-							.createPosition(this.geometryFactory
+							.createPosition(this.positionFactory
 									.createDirectPosition((aCoords[i]
 											.getCoordinates()))));
 		}
 		// Create List of CurveSegment´s (LineString´s)
-		LineString lineString = this.geometryFactory.createLineString(points);
+		LineString lineString = new LineStringImpl(new PointArrayImpl( points ), 0.0); //this.geometryFactory.createLineString(points);
 		List<CurveSegment> segments = new ArrayList<CurveSegment>();
 		segments.add(lineString);
-		return this.primitiveFactory.createCurve(segments);
+		return new CurveImpl(crs, segments); //this.primitiveFactory.createCurve(segments);
 	}
 
 }

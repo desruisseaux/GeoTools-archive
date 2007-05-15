@@ -1,33 +1,29 @@
 package org.geotools.geometry.iso.operations;
 
-import java.util.ArrayList;
-
 import junit.framework.TestCase;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
-import org.geotools.geometry.iso.coordinate.PositionImpl;
 import org.geotools.geometry.iso.io.wkt.ParseException;
 import org.geotools.geometry.iso.io.wkt.WKTReader;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
-import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.Boundary;
 import org.opengis.geometry.complex.Complex;
 import org.opengis.geometry.complex.CompositeCurve;
 import org.opengis.geometry.complex.CompositePoint;
 import org.opengis.geometry.complex.CompositeSurface;
-import org.opengis.geometry.coordinate.Position;
-import org.opengis.geometry.primitive.CurveSegment;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class ClosureTest extends TestCase {
 
-	private FeatGeomFactoryImpl factory = null;
+	//private FeatGeomFactoryImpl factory = null;
+	private CoordinateReferenceSystem crs = null;
 
 	public void testMain() {
 		
-		this.factory = FeatGeomFactoryImpl.getDefault2D();
+		//this.factory = FeatGeomFactoryImpl.getDefault2D();
+		this.crs = DefaultGeographicCRS.WGS84;
 		
 		// Test Curves
 		this._testAll();
@@ -82,7 +78,7 @@ public class ClosureTest extends TestCase {
 	
 	private PointImpl createPointFromWKT(String aWKTpoint) {
 		PointImpl rPoint = null;
-		WKTReader wktReader = new WKTReader(this.factory.getPrimitiveFactory(), this.factory.getGeometryFactoryImpl());
+		WKTReader wktReader = new WKTReader(this.crs);
 		try {
 			rPoint = (PointImpl) wktReader.read(aWKTpoint);
 		} catch (ParseException e) {
@@ -94,7 +90,7 @@ public class ClosureTest extends TestCase {
 	
 	private CurveImpl createCurveFromWKT(String aWKTcurve) {
 		CurveImpl rCurve = null;
-		WKTReader wktReader = new WKTReader(this.factory.getPrimitiveFactory(), this.factory.getGeometryFactoryImpl());
+		WKTReader wktReader = new WKTReader(this.crs);
 		try {
 			rCurve = (CurveImpl) wktReader.read(aWKTcurve);
 		} catch (ParseException e) {
@@ -105,7 +101,7 @@ public class ClosureTest extends TestCase {
 	
 	private SurfaceImpl createSurfaceFromWKT(String aWKTsurface) {
 		SurfaceImpl rSurface = null;
-		WKTReader wktReader = new WKTReader(this.factory.getPrimitiveFactory(), this.factory.getGeometryFactoryImpl());
+		WKTReader wktReader = new WKTReader(this.crs);
 		try {
 			rSurface = (SurfaceImpl) wktReader.read(aWKTsurface);
 		} catch (ParseException e) {

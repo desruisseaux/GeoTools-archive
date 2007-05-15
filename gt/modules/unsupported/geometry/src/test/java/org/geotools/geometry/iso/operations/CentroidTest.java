@@ -14,19 +14,22 @@ import org.geotools.geometry.iso.io.wkt.WKTReader;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
-import org.opengis.geometry.primitive.Curve;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.OrientableSurface;
 import org.opengis.geometry.primitive.Point;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class CentroidTest extends TestCase {
 	
 	private FeatGeomFactoryImpl factory = null;
+	private CoordinateReferenceSystem crs = null;
 
 	public void testMain() {
 		
 		// === 2D ===
 		this.factory = FeatGeomFactoryImpl.getDefault2D();
+		this.crs = DefaultGeographicCRS.WGS84;
 		
 		// Test Points and MultiPoints
 		this._testPoints2D();
@@ -40,6 +43,7 @@ public class CentroidTest extends TestCase {
 		
 		// === 3D ===
 		this.factory = FeatGeomFactoryImpl.getDefault3D();
+		this.crs = DefaultGeographicCRS.WGS84_3D;
 		
 		// Test Points and MultiPoints
 		this._testPoints3D();
@@ -107,6 +111,7 @@ public class CentroidTest extends TestCase {
 		// Curve
 
 		res = this.createCurveA().getCentroid().getCoordinates();
+		System.out.println(Math.round(res[0] * 1000));
 		assertTrue(Math.round(res[0] * 1000) == 58146);
 		assertTrue(Math.round(res[1] * 100) == 8811);
 
@@ -198,7 +203,7 @@ public class CentroidTest extends TestCase {
 	
 	private PointImpl createPointFromWKT(String aWKTpoint) {
 		PointImpl rPoint = null;
-		WKTReader wktReader = new WKTReader(this.factory.getPrimitiveFactory(), this.factory.getGeometryFactoryImpl());
+		WKTReader wktReader = new WKTReader(this.crs);
 		try {
 			rPoint = (PointImpl) wktReader.read(aWKTpoint);
 		} catch (ParseException e) {
@@ -209,7 +214,7 @@ public class CentroidTest extends TestCase {
 	
 	private CurveImpl createCurveFromWKT(String aWKTcurve) {
 		CurveImpl rCurve = null;
-		WKTReader wktReader = new WKTReader(this.factory.getPrimitiveFactory(), this.factory.getGeometryFactoryImpl());
+		WKTReader wktReader = new WKTReader(this.crs);
 		try {
 			rCurve = (CurveImpl) wktReader.read(aWKTcurve);
 		} catch (ParseException e) {
@@ -220,7 +225,7 @@ public class CentroidTest extends TestCase {
 	
 	private SurfaceImpl createSurfaceFromWKT(String aWKTsurface) {
 		SurfaceImpl rSurface = null;
-		WKTReader wktReader = new WKTReader(this.factory.getPrimitiveFactory(), this.factory.getGeometryFactoryImpl());
+		WKTReader wktReader = new WKTReader(this.crs);
 		try {
 			rSurface = (SurfaceImpl) wktReader.read(aWKTsurface);
 		} catch (ParseException e) {
@@ -271,7 +276,7 @@ public class CentroidTest extends TestCase {
 		points.add(this.createPointB());
 		points.add(this.createPointC());
 		points.add(this.createPointD());
-		return (MultiPointImpl) this.factory.getAggregateFactory().createMultiPoint(points);
+		return (MultiPointImpl) new MultiPointImpl(crs, points); //this.factory.getAggregateFactory().createMultiPoint(points);
 	}
 	
 	private MultiPointImpl createMultiPointA3D() {

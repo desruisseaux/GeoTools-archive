@@ -12,16 +12,20 @@ import org.geotools.geometry.iso.io.wkt.WKTReader;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.primitive.CurveSegment;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class IsSimpleOperationTest extends TestCase {
 
 	private FeatGeomFactoryImpl factory = null;
+	private CoordinateReferenceSystem crs;
 
 	public void testMain() {
 		
 		this.factory = FeatGeomFactoryImpl.getDefault2D();
+		this.crs = DefaultGeographicCRS.WGS84;
 		
 		// Test Curves
 		this._testCurves();
@@ -129,9 +133,9 @@ public class IsSimpleOperationTest extends TestCase {
 		
 	}
 	
-	private SurfaceImpl createSurfaceFromWKT(FeatGeomFactoryImpl aGeomFactory, String aWKTsurface) {
+	private SurfaceImpl createSurfaceFromWKT(CoordinateReferenceSystem crs, String aWKTsurface) {
 		SurfaceImpl rSurface = null;
-		WKTReader wktReader = new WKTReader(aGeomFactory.getPrimitiveFactory(), aGeomFactory.getGeometryFactoryImpl());
+		WKTReader wktReader = new WKTReader(crs);
 		try {
 			rSurface = (SurfaceImpl) wktReader.read(aWKTsurface);
 		} catch (ParseException e) {
@@ -142,7 +146,7 @@ public class IsSimpleOperationTest extends TestCase {
 	
 	private CurveImpl createCurveFromWKT(String aWKTcurve) {
 		CurveImpl rCurve = null;
-		WKTReader wktReader = new WKTReader(this.factory.getPrimitiveFactory(), this.factory.getGeometryFactoryImpl());
+		WKTReader wktReader = new WKTReader(this.crs);
 		try {
 			rCurve = (CurveImpl) wktReader.read(aWKTcurve);
 		} catch (ParseException e) {
@@ -174,12 +178,12 @@ public class IsSimpleOperationTest extends TestCase {
 
 	private SurfaceImpl createSurfaceAHoleNotTouchesShell(FeatGeomFactoryImpl aGeomFactory) {
 		String wktSurface1 = "SURFACE ((10 90, 30 50, 70 30, 120 40, 150 70, 150 120, 100 150, 30 140, 10 90), (90 60, 110 100, 120 90, 100 60, 90 60))";
-		return this.createSurfaceFromWKT(aGeomFactory, wktSurface1);
+		return this.createSurfaceFromWKT(crs, wktSurface1);
 	}
 
 	private SurfaceImpl createSurfaceAHoleTouchesShell(FeatGeomFactoryImpl aGeomFactory) {
 		String wktSurface1 = "SURFACE ((10 90, 30 50, 70 30, 120 40, 150 70, 150 120, 100 150, 30 140, 10 90), (30 140, 60 140, 60 130, 40 120, 30 140))";
-		return this.createSurfaceFromWKT(aGeomFactory, wktSurface1);
+		return this.createSurfaceFromWKT(crs, wktSurface1);
 	}
 	
 

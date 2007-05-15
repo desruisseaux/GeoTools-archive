@@ -77,7 +77,6 @@ package org.geotools.geometry.iso.util.algorithm2D;
 import java.util.Iterator;
 import java.util.List;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.aggregate.MultiSurfaceImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
@@ -86,6 +85,7 @@ import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
 import org.opengis.geometry.primitive.OrientableSurface;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 
@@ -101,7 +101,8 @@ import org.opengis.geometry.primitive.OrientableSurface;
  */
 public class CentroidArea2D {
 
-	private FeatGeomFactoryImpl factory = null;
+	//private FeatGeomFactoryImpl factory = null;
+	private CoordinateReferenceSystem crs = null;
 	
 	// the point all triangles are based at
 	private DirectPositionImpl basePt = null;
@@ -119,10 +120,10 @@ public class CentroidArea2D {
 	/**
 	 * Creates a new Centroid operation
 	 * 
-	 * @param factory
+	 * @param crs
 	 */
-	public CentroidArea2D(FeatGeomFactoryImpl factory) {
-		this.factory = factory;
+	public CentroidArea2D(CoordinateReferenceSystem crs) {
+		this.crs = crs;
 		this.basePt = null;
 		
 	}
@@ -148,7 +149,7 @@ public class CentroidArea2D {
 	}
 
 	public DirectPositionImpl getCentroid() {
-		DirectPositionImpl centroid = this.factory.getGeometryFactoryImpl().createDirectPosition();
+		DirectPositionImpl centroid =  new DirectPositionImpl(crs); //this.factory.getGeometryFactoryImpl().createDirectPosition();
 		centroid.setX(this.centSumX / 3 / this.areasum2);
 		centroid.setY(this.centSumY / 3 / this.areasum2);
 		return centroid;

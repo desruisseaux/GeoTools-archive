@@ -166,7 +166,7 @@ public class FeatGeomFactoryImpl {
 		
 		this.geometryFactory = new GeometryFactoryImpl(crs, positionFactory);
 		this.primitiveFactory = new PrimitiveFactoryImpl(crs, positionFactory);
-		this.complexFactory = new ComplexFactoryImpl();
+		this.complexFactory = new ComplexFactoryImpl(crs);
 		this.aggregateFactory = new AggregateFactoryImpl(crs);
 		this.collectionFactory = new CollectionFactoryMemoryImpl();
 

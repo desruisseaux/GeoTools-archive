@@ -10,7 +10,9 @@ public class ComplexTestSuite {
         TestSuite suite = new TestSuite();
 	
         suite.addTestSuite(CompositeSurfaceTest.class);
-
+        suite.addTestSuite(PicoCompositeSurfaceTest.class);
+        suite.addTestSuite(PicoCompositeCurveTest.class);
+        suite.addTestSuite(PicoCompositePointTest.class);
 
         return suite;
     }

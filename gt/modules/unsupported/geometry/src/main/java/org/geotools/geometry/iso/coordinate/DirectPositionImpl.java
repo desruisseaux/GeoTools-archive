@@ -403,7 +403,12 @@ public class DirectPositionImpl implements DirectPosition {
 			throw new MismatchedDimensionException();
 		
 		for (int i=0; i < this.coordinate.length; i++) {
-			this.coordinate[i] = DoubleOperation.add(this.coordinate[i], values[i]);
+			if (Double.compare(this.coordinate[i], Double.NaN) == 0) {
+				this.coordinate[i] = values[i];
+			}
+			else {
+				this.coordinate[i] = DoubleOperation.add(this.coordinate[i], values[i]);
+			}
 		}		
 	}
 	
@@ -417,7 +422,12 @@ public class DirectPositionImpl implements DirectPosition {
 			throw new MismatchedDimensionException();
 		
 		for (int i=0; i < this.coordinate.length; i++) {
-			this.coordinate[i] = DoubleOperation.add(this.coordinate[i], otherDP.getOrdinate(i));
+			if (Double.compare(this.coordinate[i], Double.NaN) == 0) {
+				this.coordinate[i] = otherDP.getOrdinate(i);
+			}
+			else {
+				this.coordinate[i] = DoubleOperation.add(this.coordinate[i], otherDP.getOrdinate(i));
+			}
 		}		
 	}
 

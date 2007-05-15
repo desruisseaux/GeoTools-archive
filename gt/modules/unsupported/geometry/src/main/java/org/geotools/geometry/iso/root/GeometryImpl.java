@@ -44,7 +44,6 @@ import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.PositionFactoryImpl;
 import org.geotools.geometry.iso.PrecisionModel;
 import org.geotools.geometry.iso.UnsupportedDimensionException;
-import org.geotools.geometry.iso.aggregate.AggregateFactoryImpl;
 import org.geotools.geometry.iso.aggregate.MultiCurveImpl;
 import org.geotools.geometry.iso.aggregate.MultiPointImpl;
 import org.geotools.geometry.iso.aggregate.MultiPrimitiveImpl;
@@ -52,16 +51,13 @@ import org.geotools.geometry.iso.aggregate.MultiSurfaceImpl;
 import org.geotools.geometry.iso.complex.ComplexImpl;
 import org.geotools.geometry.iso.complex.CompositeCurveImpl;
 import org.geotools.geometry.iso.complex.CompositeSurfaceImpl;
-import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.geometry.iso.operation.overlay.OverlayOp;
 import org.geotools.geometry.iso.operation.relate.RelateOp;
-import org.geotools.geometry.iso.primitive.BoundaryImpl;
 import org.geotools.geometry.iso.primitive.CurveBoundaryImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
-import org.geotools.geometry.iso.primitive.PrimitiveImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
@@ -79,16 +75,10 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.Precision;
-import org.opengis.geometry.PrecisionType;
 import org.opengis.geometry.TransfiniteSet;
-import org.opengis.geometry.aggregate.MultiPoint;
 import org.opengis.geometry.complex.Complex;
-import org.opengis.geometry.complex.ComplexFactory;
-import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.OrientableSurface;
-import org.opengis.geometry.primitive.Point;
-import org.opengis.geometry.primitive.PrimitiveFactory;
 import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.Geometry;
 
@@ -325,14 +315,14 @@ public abstract class GeometryImpl implements Geometry {
 		// MultiPoint: the average of the contained points
 		if (this instanceof PointImpl ||
 			this instanceof MultiPointImpl) {
-			CentroidPoint cp = new CentroidPoint(this.getFeatGeometryFactory());
+			CentroidPoint cp = new CentroidPoint(this.crs);
 			cp.add(this);
 			return cp.getCentroid();
 		} else
 			
 		// CurveBoundary: the average of start and end point
 		if (this instanceof CurveBoundaryImpl) {
-			CentroidPoint cp = new CentroidPoint(this.getFeatGeometryFactory());
+			CentroidPoint cp = new CentroidPoint(this.crs);
 			cp.add(((CurveBoundaryImpl)this).getStartPoint());
 			cp.add(((CurveBoundaryImpl)this).getEndPoint());
 			return cp.getCentroid();
@@ -344,14 +334,14 @@ public abstract class GeometryImpl implements Geometry {
 		if (this instanceof CurveImpl ||
 			this instanceof MultiCurveImpl ||
 			this instanceof RingImpl) {
-			CentroidLine cl = new CentroidLine(this.getFeatGeometryFactory());
+			CentroidLine cl = new CentroidLine(this.crs);
 			cl.add(this);
 			return cl.getCentroid();
 		} else
 			
 		// SurfaceBoundary: the average of the weighted line segments of all curves of the exterior and interior rings
 		if (this instanceof SurfaceBoundaryImpl) {
-				CentroidLine cl = new CentroidLine(this.getFeatGeometryFactory());
+				CentroidLine cl = new CentroidLine(this.crs);
 				cl.add(((SurfaceBoundaryImpl)this).getExterior());
 				Iterator<Ring> interiors = ((SurfaceBoundaryImpl)this).getInteriors().iterator();
 				while (interiors.hasNext()) {
@@ -365,7 +355,7 @@ public abstract class GeometryImpl implements Geometry {
 		// MultiSurface: the average of all contained surfaces (considers holes)
 		if (this instanceof SurfaceImpl ||
 			this instanceof MultiSurfaceImpl) {
-			CentroidArea2D ca = new CentroidArea2D(this.getFeatGeometryFactory());
+			CentroidArea2D ca = new CentroidArea2D(this.crs);
 			ca.add(this);
 			return ca.getCentroid();
 					

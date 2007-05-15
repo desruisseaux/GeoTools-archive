@@ -142,7 +142,7 @@ public class CompositePointImpl extends CompositeImpl<PointImpl> implements Comp
 	@Override
 	public int getDimension(DirectPosition point) {
 		// TODO Auto-generated method stub
-		return 0;
+		return this.getCoordinateDimension();
 	}
 
 	/* (non-Javadoc)
