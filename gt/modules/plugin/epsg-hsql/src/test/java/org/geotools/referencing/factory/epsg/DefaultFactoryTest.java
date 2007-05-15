@@ -730,6 +730,42 @@ public class DefaultFactoryTest extends TestCase {
     }
 
     /**
+     * Compares a WKT found in the field with the EPSG equivalent.
+     *
+     * @see http://jira.codehaus.org/browse/GEOT-1268
+     */
+    public void testEquivalent() throws FactoryException {
+        final String wkt =
+            "PROJCS[\"NAD_1983_StatePlane_Massachusetts_Mainland_FIPS_2001\", " +
+              "GEOGCS[\"GCS_North_American_1983\", " +
+                "DATUM[\"D_North_American_1983\", " +
+                  "SPHEROID[\"GRS_1980\", 6378137.0, 298.257222101]], " +
+                "PRIMEM[\"Greenwich\", 0.0], " +
+                "UNIT[\"degree\", 0.017453292519943295], " +
+                "AXIS[\"Longitude\", EAST], " +
+                "AXIS[\"Latitude\", NORTH]], " +
+              "PROJECTION[\"Lambert_Conformal_Conic\"], " +
+              "PARAMETER[\"central_meridian\", -71.5], " +
+              "PARAMETER[\"latitude_of_origin\", 41.0], " +
+              "PARAMETER[\"standard_parallel_1\", 41.71666666666667], " +
+              "PARAMETER[\"scale_factor\", 1.0], " +
+              "PARAMETER[\"false_easting\", 200000.0], " +
+              "PARAMETER[\"false_northing\", 750000.0], " +
+              "PARAMETER[\"standard_parallel_2\", 42.68333333333334], " +
+              "UNIT[\"m\", 1.0], " +
+              "AXIS[\"x\", EAST], " +
+              "AXIS[\"y\", NORTH]]";
+
+        final CoordinateReferenceSystem crs1 = CRS.parseWKT(wkt);
+        final CoordinateReferenceSystem crs2 = CRS.decode("EPSG:26986");
+
+        // This is the current state of Geotools, but it is wrong. The CRS should be equivalent.
+        // We will change to 'assertTrue' if a MapProjection.equivalent(MapProjection) method is
+        // implemented in some future Geotools version.
+        assertFalse(CRS.equalsIgnoreMetadata(crs1, crs2));
+    }
+
+    /**
      * Tests {@link DefaultFactory#find} method.
      */
     public void testFind() throws FactoryException {

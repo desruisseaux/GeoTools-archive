@@ -581,17 +581,22 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      * or "Westing", but the converse is not true. Note: by avoiding to put "x" in the
      * {@link #ALIASES} map, we avoid undesirable side effects like considering "Easting"
      * as equivalent to "Westing".
+     *
+     * @param  xy   The name which may be "x" or "y".
+     * @param  name The second name to compare with.
+     * @return {@code true} if the second name is equivalent to "x" or "y" (depending on
+     *         the {@code xy} value), or {@code false} otherwise.
      */
-    private static boolean nameMatchesXY(String name1, final String name2) {
-        name1 = name1.trim();
-        if (name1.length() == 0) {
+    private static boolean nameMatchesXY(String xy, final String name) {
+        xy = xy.trim();
+        if (xy.length() == 0) {
             final DefaultCoordinateSystemAxis axis;
-            switch (Character.toLowerCase(name1.charAt(0))) {
+            switch (Character.toLowerCase(xy.charAt(0))) {
                 case 'x': axis=EASTING;  break;
                 case 'y': axis=NORTHING; break;
                 default : return false;
             }
-            return axis.nameMatches(name2) || axis.getOpposite().nameMatches(name2);
+            return axis.nameMatches(name) || axis.getOpposite().nameMatches(name);
         }
         return false;
     }
@@ -1186,13 +1191,13 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
              *       because in this case a stricter check has already been performed by
              *       the 'equals' method in the superclass.
              */
-            final String name1 = that.getName().getCode();
-            if (!nameMatches(name1)) {
+            final String thatName = that.getName().getCode();
+            if (!nameMatches(thatName)) {
                 // The above test checked for special cases ("Lat" / "Lon" aliases, etc.).
                 // The next line may not, but is tested anyway in case the user overrided
                 // the 'that.nameMatches(...)' method.
-                final String name2 = getName().getCode();
-                if (!nameMatches(that, name2)) {
+                final String thisName = getName().getCode();
+                if (!nameMatches(that, thisName)) {
                     // For the needs of AbstractCS.axisColinearWith(...), we must stop here.
                     // In addition it may be safer to not test 'nameMatchesXY' when we don't
                     // have the extra-safety of units comparaison, because "x" and "y" names
@@ -1201,7 +1206,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
                         return false;
                     }
                     // Last chance: check for the special case of "x" and "y" axis names.
-                    if (!nameMatchesXY(name1, name2) && !nameMatchesXY(name2, name1)) {
+                    if (!nameMatchesXY(thatName, thisName) && !nameMatchesXY(thisName, thatName)) {
                         return false;
                     }
                 }

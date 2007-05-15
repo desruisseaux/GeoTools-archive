@@ -1,10 +1,27 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<project name="Rename" default="rename">
+<!--
+  Renames the table names in the SQL scripts provided by EPSG.  Those SQL scripts use
+  different table names than the ones in the original MS-Access database. For example
+  "Coordinate Reference System" has been renamed as "epsg_coordinatereferencesystem",
+  which is more difficult to read.   In addition the "epsg_" prefix is redundant with
+  schema name. Assuming that a "epsg" schema has been created in the target database,
+  this Ant script replaces the "epsg_" prefix by the "epsg." schema name and restores
+  the original MS-Access table names.
+
+  This script is optional;  users don't need to run it in order to use Geotools EPSG
+  factories backed by a PostgreSQL database.   It is provided only for users who may
+  prefer a database in its own schema with more readable table names rather than the
+  default structure.
+
+  $URL$
+  $Id$
+  -->
+
+<project name="ReplaceSchema" default="rename">
   <target name="rename">
     <replace dir=".">
       <include name="*.sql"/>
-      <include name="**/manifest.mf"/>
       <replacefilter token="epsg_versionhistory"             value="epsg.&quot;Version History&quot;"                      />
       <replacefilter token="epsg_unitofmeasure"              value="epsg.&quot;Unit of Measure&quot;"                      />
       <replacefilter token="epsg_supersession"               value="epsg.&quot;Supersession&quot;"                         />
