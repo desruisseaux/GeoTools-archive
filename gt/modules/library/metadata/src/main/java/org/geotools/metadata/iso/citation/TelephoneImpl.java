@@ -19,11 +19,7 @@
 package org.geotools.metadata.iso.citation;
 
 import java.util.Collection;
-
-//OpenGIS dependencies
 import org.opengis.metadata.citation.Telephone;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 
 
@@ -40,17 +36,18 @@ public class TelephoneImpl extends MetadataEntity implements Telephone {
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -8237503664554861494L;
-    
-    /**
-     * Telephone number by which individuals can speak to the responsible organization or individual.
-     */
-    private Collection voice;
+    private static final long serialVersionUID = 4920157673337669241L;
 
     /**
-     * Telephone number of a facsimile machine for the responsible organization or individual.
+     * Telephone numbers by which individuals can speak to the responsible organization or
+     * individual.
      */
-    private Collection facsimile;
+    private Collection voices;
+
+    /**
+     * Telephone numbers of a facsimile machine for the responsible organization or individual.
+     */
+    private Collection facsimiles;
 
     /**
      * Constructs a default telephone.
@@ -70,34 +67,81 @@ public class TelephoneImpl extends MetadataEntity implements Telephone {
     /**
      * Returns the telephone number by which individuals can speak to the responsible
      * organization or individual.
+     *
+     * @deprecated Replaced by {@link #getVoices}.
      */
-    public Collection getVoice() {
-        return voice;
+    public synchronized String getVoice() {
+        return voices == null || voices.isEmpty() ? null : (String) voices.iterator().next();
+    }
+
+    /**
+     * Returns the telephone numbers by which individuals can speak to the responsible
+     * organization or individual.
+     *
+     * @since 2.4
+     */
+    public synchronized Collection getVoices() {
+        return voices = nonNullCollection(voices, String.class);
     }
 
     /**
      * Set the telephone number by which individuals can speak to the responsible
      * organization or individual.
+     *
+     * @deprecated Replaced by {@link #setVoices}.
      */
-    public synchronized void setVoice(final Collection newValue) {
-        checkWritePermission();
-        voice = newValue;
+    public void setVoice(final String newValue) {
+        setVoices(java.util.Collections.singleton(newValue));
+    }
+
+    /**
+     * Set the telephone numbers by which individuals can speak to the responsible
+     * organization or individual.
+     *
+     * @since 2.4
+     */
+    public synchronized void setVoices(final Collection newValues) {
+        voices = copyCollection(newValues, voices, String.class);
     }
 
     /**
      * Returns the telephone number of a facsimile machine for the responsible organization
      * or individual.
+     *
+     * @deprecated Replaced by {@link #getFacsimiles}.
      */
-    public Collection getFacsimile() {
-        return facsimile;
+    public synchronized String getFacsimile() {
+        return facsimiles == null || facsimiles.isEmpty() ? null :
+            (String) facsimiles.iterator().next();
+    }
+
+    /**
+     * Returns the telephone numbers of a facsimile machine for the responsible organization
+     * or individual.
+     *
+     * @since 2.4
+     */
+    public synchronized Collection getFacsimiles() {
+        return facsimiles = nonNullCollection(facsimiles, String.class);
     }
 
     /**
      * Set the telephone number of a facsimile machine for the responsible organization
      * or individual.
+     *
+     * @deprecated Replaced by {@link #setFacsimiles}.
      */
-    public synchronized void setFacsimile(final Collection newValue) {
-        checkWritePermission();
-        facsimile = newValue;
+    public void setFacsimile(final String newValue) {
+        setFacsimiles(java.util.Collections.singleton(newValue));
+    }
+
+    /**
+     * Set the telephone number of a facsimile machine for the responsible organization
+     * or individual.
+     *
+     * @since 2.4
+     */
+    public synchronized void setFacsimiles(final Collection newValues) {
+        facsimiles = copyCollection(newValues, facsimiles, String.class);
     }
 }

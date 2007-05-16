@@ -366,6 +366,7 @@ public class GeneralDirectPosition implements DirectPosition, Serializable {
      * Returns a hash value for the specified ordinates.
      *
      * @todo Remove this method when we will alowed to use J2SE 1.5 runtime.
+     *       Put inline with GeoAPI definition.
      */
     static int hashCode(final double[] ordinates) {
         long code = (int)serialVersionUID;
