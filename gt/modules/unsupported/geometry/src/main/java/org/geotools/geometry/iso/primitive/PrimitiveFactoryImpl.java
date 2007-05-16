@@ -352,51 +352,51 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
 	 * 
 	 * @see org.opengis.geometry.primitive.PrimitiveFactory#createPrimitive(org.opengis.geometry.coordinate.Envelope)
 	 */
-	public PrimitiveImpl createPrimitive_try2(Envelope envelope)
-			throws MismatchedReferenceSystemException,
-			MismatchedDimensionException {
-
-		List<DirectPosition> positions = new ArrayList<DirectPosition>();
-
-		for (int d = 0; d < crs.getCoordinateSystem().getDimension(); d++) {
-			CoordinateSystemAxis axis = crs.getCoordinateSystem().getAxis(d);
-			AxisDirection direction = axis.getDirection();
-			double min, max;
-			if (direction == AxisDirection.OTHER) {
-				// we are going to "skip" min/max calculation on OTHER
-				// used for 2.5 D stuff
-				min = Double.NaN;
-				max = Double.NaN;
-			} else {
-				// figure out min & max from envelope
-				min = envelope.getMinimum(d);
-				max = envelope.getMaximum(d);
-			}
-			if (positions.isEmpty()) {
-				DirectPositionImpl min1 = (DirectPositionImpl) positionFactory.createDirectPosition(null);//new DirectPositionImpl(crs);
-				min1.setOrdinate(d, min);
-				DirectPositionImpl max1 = (DirectPositionImpl) positionFactory.createDirectPosition(null);//new DirectPositionImpl(crs);
-				max1.setOrdinate(d, max);
-
-				positions.add(min1);
-				positions.add(max1);
-			} else {
-				// update min in place
-				for (DirectPosition minN : positions) {
-					minN.setOrdinate(d, min);
-				}
-				// copy and update max
-				List<DirectPosition> copy = new ArrayList<DirectPosition>();
-				for (DirectPosition position : positions) {
-					DirectPositionImpl maxN = (DirectPositionImpl) positionFactory.createDirectPosition(position.getCoordinates()); //new DirectPositionImpl(position);
-					maxN.setOrdinate(d, max);
-				}
-				positions.addAll(copy);
-			}
-		}
-
-		return this.createSurfaceByDirectPositions(positions);
-	}
+//	public PrimitiveImpl createPrimitive_try2(Envelope envelope)
+//			throws MismatchedReferenceSystemException,
+//			MismatchedDimensionException {
+//
+//		List<DirectPosition> positions = new ArrayList<DirectPosition>();
+//
+//		for (int d = 0; d < crs.getCoordinateSystem().getDimension(); d++) {
+//			CoordinateSystemAxis axis = crs.getCoordinateSystem().getAxis(d);
+//			AxisDirection direction = axis.getDirection();
+//			double min, max;
+//			if (direction == AxisDirection.OTHER) {
+//				// we are going to "skip" min/max calculation on OTHER
+//				// used for 2.5 D stuff
+//				min = Double.NaN;
+//				max = Double.NaN;
+//			} else {
+//				// figure out min & max from envelope
+//				min = envelope.getMinimum(d);
+//				max = envelope.getMaximum(d);
+//			}
+//			if (positions.isEmpty()) {
+//				DirectPositionImpl min1 = (DirectPositionImpl) positionFactory.createDirectPosition(null);//new DirectPositionImpl(crs);
+//				min1.setOrdinate(d, min);
+//				DirectPositionImpl max1 = (DirectPositionImpl) positionFactory.createDirectPosition(null);//new DirectPositionImpl(crs);
+//				max1.setOrdinate(d, max);
+//
+//				positions.add(min1);
+//				positions.add(max1);
+//			} else {
+//				// update min in place
+//				for (DirectPosition minN : positions) {
+//					minN.setOrdinate(d, min);
+//				}
+//				// copy and update max
+//				List<DirectPosition> copy = new ArrayList<DirectPosition>();
+//				for (DirectPosition position : positions) {
+//					DirectPositionImpl maxN = (DirectPositionImpl) positionFactory.createDirectPosition(position.getCoordinates()); //new DirectPositionImpl(position);
+//					maxN.setOrdinate(d, max);
+//				}
+//				positions.addAll(copy);
+//			}
+//		}
+//
+//		return this.createSurfaceByDirectPositions(positions);
+//	}
 	
 	/*
 	 * (non-Javadoc)
