@@ -2,7 +2,6 @@ package org.geotools.geometry.xml;
 
 import junit.framework.TestCase;
 
-import org.geotools.TestData;
 import org.xml.sax.InputSource;
 
 import java.io.FileInputStream;
@@ -14,11 +13,10 @@ import java.util.logging.Logger;
 /**
  * @author <a href="mailto:joel@lggi.com">Joel Skelton</a>
  */
-public class RunStoredTests extends TestCase {
+public class RunStoredTest extends TestCase {
     private static final Logger LOG = Logger.getLogger("org.geotools.geometry");
 
-    private static String TEST_DIRECTORY = "xml/geometry";
-    //private static String TEST_DIRECTORY = "src/main/resources/org/geotools/test-data/xml/geometry/LineTests.xml"
+    private static String TEST_DIRECTORY = "src/main/resources/org/geotools/test-data/xml/geometry";
     //TODO: use TestData.copy and acquire files from sample-data module
     
     private FilenameFilter xmlFilter = new FilenameFilter() {
@@ -33,7 +31,8 @@ public class RunStoredTests extends TestCase {
      */
     public void testGeometriesFromXML() throws IOException {
         GeometryTestParser parser = new GeometryTestParser();
-        File dir = TestData.file(TEST_DIRECTORY);
+        File dir = new File(TEST_DIRECTORY);
+        System.out.println("PATH="+dir.getAbsolutePath());
         if (dir.isDirectory()) {
             for (File testFile : dir.listFiles(xmlFilter)) {
             	LOG.info("Loading test description file:" + testFile);
