@@ -128,7 +128,7 @@ public class WKTReader {
 	private StreamTokenizer tokenizer;
 
     public WKTReader(CoordinateReferenceSystem crs){
-        this( crs, new PositionFactoryImpl(crs,null) );
+        this( crs, new PositionFactoryImpl(crs) );
     }
 	/**
 	 * Creates a reader that creates objects using the given

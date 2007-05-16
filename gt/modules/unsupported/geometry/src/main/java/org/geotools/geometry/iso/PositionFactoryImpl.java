@@ -31,6 +31,10 @@ import org.opengis.geometry.coordinate.Position;
 public class PositionFactoryImpl implements PositionFactory {
 	private Precision precision;
 
+	public PositionFactoryImpl(CoordinateReferenceSystem crs) {
+		this(crs, new PrecisionModel(PrecisionType.DOUBLE));
+	}	
+	
 	public PositionFactoryImpl(CoordinateReferenceSystem crs,
 			Precision precision) {
 		assert( precision.getType() == PrecisionType.DOUBLE );

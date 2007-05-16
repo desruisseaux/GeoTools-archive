@@ -8,7 +8,7 @@ public class AggregateTestSuite {
     public static Test suite() {
         TestSuite suite = new TestSuite();
 	
-        //suite.addTestSuite(CompositeSurfaceTest.class);
+        suite.addTestSuite(PicoMultiCurveTest.class);
 
         return suite;
     }

@@ -1,27 +1,34 @@
-package org.geotools.geometry.iso.primitive;
+package org.geotools.geometry.iso.aggregate;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.PositionFactoryImpl;
 import org.geotools.geometry.iso.PrecisionModel;
-import org.geotools.geometry.iso.aggregate.AggregateFactoryImpl;
 import org.geotools.geometry.iso.complex.ComplexFactoryImpl;
 import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.io.CollectionFactoryMemoryImpl;
+import org.geotools.geometry.iso.primitive.CurveImpl;
+import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.util.elem2D.Geo2DFactory;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.PositionFactory;
-import org.opengis.geometry.primitive.Point;
-import org.opengis.geometry.primitive.PrimitiveFactory;
+import org.opengis.geometry.Precision;
+import org.opengis.geometry.aggregate.AggregateFactory;
+import org.opengis.geometry.aggregate.MultiCurve;
+import org.opengis.geometry.coordinate.GeometryFactory;
+import org.opengis.geometry.coordinate.LineSegment;
+import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.picocontainer.PicoContainer;
 import org.picocontainer.defaults.DefaultPicoContainer;
-import org.opengis.geometry.Precision;
 
 import junit.framework.TestCase;
 
-public class PicoPointTest extends TestCase {
-	
+public class PicoMultiCurveTest extends TestCase {
+
 	/**
 	 * Creates a pico container that knows about all the geom factories
 	 * @param crs
@@ -49,44 +56,35 @@ public class PicoPointTest extends TestCase {
 		return container;		
 	}
 	
-	protected void createPointAndTest(PicoContainer c, double[] ords) {
+	public void testMain() {
 		
-		// create point and position factories from pico container
-		PositionFactoryImpl positionFactory = (PositionFactoryImpl) c.getComponentInstanceOfType( PositionFactory.class );
-		PrimitiveFactoryImpl primitiveFactory = (PrimitiveFactoryImpl) c.getComponentInstanceOfType( PrimitiveFactory.class );
-		assertSame( positionFactory.getCoordinateReferenceSystem(), primitiveFactory.getCoordinateReferenceSystem() );
-		assertNotNull(positionFactory);
-		assertNotNull(primitiveFactory);
-		
-		// create position and point
-		DirectPosition here = positionFactory.createDirectPosition(ords);
-		Point point = primitiveFactory.createPoint(here); 
-		assertNotNull(here.getCoordinateReferenceSystem());
-		assertNotNull(point.getCoordinateReferenceSystem());
-		assertEquals(here.getCoordinateReferenceSystem(), point.getCoordinateReferenceSystem());
-		assertEquals(here, point.getPosition());
-		assertEquals(here.hashCode(), point.getPosition().hashCode());
-	}
-	
-	public void testWSG84Point(){
-		
-		// create 2D point
 		PicoContainer c = container( DefaultGeographicCRS.WGS84 );
-		assertNotNull(c);
 		
-		// Do actually test stuff
-		double[] ords = { 48.44, -123.37 };
-		createPointAndTest(c, ords);
+		this._testMultiCurve(c);
 	}
 	
-	public void testWSG843DPoint(){
+	private void _testMultiCurve(PicoContainer c) {
+
+		AggregateFactoryImpl af = (AggregateFactoryImpl) c.getComponentInstanceOfType(AggregateFactory.class);
+		GeometryFactoryImpl gf = (GeometryFactoryImpl) c.getComponentInstanceOfType( GeometryFactory.class );
+		PositionFactory pf = (PositionFactory ) c.getComponentInstanceOfType( PositionFactory.class );
 		
-		// create 3D point
-		PicoContainer c = container( DefaultGeographicCRS.WGS84_3D );
-		assertNotNull(c);
+		DirectPosition dp1 = pf.createDirectPosition(new double[]{10, 30});
+		DirectPosition dp2 = pf.createDirectPosition(new double[]{70, 15});
+		LineSegment line1 = gf.createLineSegment(dp1, pf.createDirectPosition(new double[]{20, 40}));
+		LineSegment line2 = gf.createLineSegment(dp2, pf.createDirectPosition(new double[]{45, 25}));
+		Set<OrientableCurve> curves = new HashSet<OrientableCurve>();
+		curves.add( new CurveImpl( line1 ) );
+		curves.add( new CurveImpl( line2 ) );
+		MultiCurve mc = af.createMultiCurve(curves);
 		
-		// Do actually test stuff
-		double[] ords = { 48.44, -123.37, 0.0 };
-		createPointAndTest(c, ords);
+		assertNotNull(mc);
+		//assertNotNull(mc.getBoundary());
+		assertNotNull(mc.getEnvelope());
+		assertEquals(mc.getCoordinateDimension(), 2);
+		assertEquals(mc.getElements().size(), 2);
+		assertEquals(mc.getElements(), curves);
+		
 	}
+
 }
