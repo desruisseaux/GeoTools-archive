@@ -25,8 +25,8 @@ public class MetadataExample {
     
     public static void telephone(){
         TelephoneImpl phone = new TelephoneImpl();
-        phone.setVoice(Collections.singleton("555-1234"));
-        phone.setFacsimile(Collections.singleton("555-2FAX"));
+        phone.setVoices(Collections.singleton("555-1234"));
+        phone.setFacsimiles(Collections.singleton("555-2FAX"));
         System.out.println( phone );
     }
     

@@ -1085,11 +1085,11 @@ public class WMSComplexTypes {
 				}
 				
 				if (sameName(elems[3], value[i])) {
-					Collection voice = Collections.singleton(value[i].getValue());
+					Collection voices = Collections.singleton(value[i].getValue());
 					if (telephone == null) {
 						telephone = new TelephoneImpl();
 					}
-					telephone.setVoice(voice);
+					telephone.setVoices(voices);
 				}
 				
 				if (sameName(elems[4], value[i])) {
@@ -1097,7 +1097,7 @@ public class WMSComplexTypes {
 					if (telephone == null) {
 						telephone = new TelephoneImpl();
 					}
-					telephone.setFacsimile(fax);
+					telephone.setFacsimiles(fax);
 				}				
 				
 				contact.setPhone(telephone);
