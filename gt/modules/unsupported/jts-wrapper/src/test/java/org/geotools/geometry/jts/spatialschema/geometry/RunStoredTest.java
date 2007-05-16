@@ -30,8 +30,8 @@ import java.io.IOException;
  * @author Jody Garnett
  * @author Joel Skelton
  */
-public class RunStoredTests extends TestCase {
-    private static final Log LOG = LogFactory.getLog(RunStoredTests.class);
+public class RunStoredTest extends TestCase {
+    private static final Log LOG = LogFactory.getLog(RunStoredTest.class);
     private static String TEST_DIRECTORY = "src/main/resources/org/geotools/test-data/xml/geometry";
 
     private FilenameFilter xmlFilter = new FilenameFilter() {
