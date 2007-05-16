@@ -449,9 +449,9 @@ public abstract class TextImageReader extends SimpleImageReader {
         /**
          * Returns {@code true} if the supplied source object appears to be of the format
          * supported by this reader. The default implementation tries to parse the first
-         * few lines.
+         * few lines up to 1024 characters.
          *
-         * @param  source The object (typically an ImageInputStream) to be decoded.
+         * @param  source The object (typically an {@link ImageInputStream}) to be decoded.
          * @return {@code true} if the source <em>seems</em> readable.
          * @throws IOException If an error occured during reading.
          */
@@ -462,9 +462,9 @@ public abstract class TextImageReader extends SimpleImageReader {
         /**
          * Returns {@code true} if the supplied source object appears to be of the format
          * supported by this reader. The default implementation tries to parse the first
-         * few lines.
+         * few lines up to the specified number of characters.
          *
-         * @param  source The object (typically an ImageInputStream) to be decoded.
+         * @param  source The object (typically an {@link ImageInputStream}) to be decoded.
          * @param  readAheadLimit Maximum number of characters to read. If this amount is reached
          *         but this method still unable to make a choice, then it conservatively returns
          *         {@code false}.
@@ -476,16 +476,39 @@ public abstract class TextImageReader extends SimpleImageReader {
         {
             final TestReader test = new TestReader(this);
             test.setInput(source);
-            final Boolean can = test.canDecode(readAheadLimit);
+            final boolean result = test.canDecode(readAheadLimit);
             test.close();
-            return Boolean.TRUE.equals(can);
+            return result;
         }
 
         /**
-         * Returns {@link Boolean#TRUE} if the specified parser seems to have a valid content.
+         * Returns {@code true} if the content of the first few rows seems valid, or {@code false}
+         * otherwise. The number of rows depends on the row length and the {@code readAheadLimit}
+         * argument given to {@link #canDecodeInput(Object,int) canDecodeInput}.
+         * <p>
+         * The default implementation returns {@code true} if there is at least one row
+         * and every row have the same number of columns.
          */
-        Boolean isValidContent(final LineFormat parser) {
-            return Boolean.TRUE;
+        protected boolean isValidContent(final double[][] rows) {
+            if (rows.length == 0) {
+                return false;
+            }
+            final int length = rows[0].length;
+            for (int i=1; i<rows.length; i++) {
+                if (rows[i].length != length) {
+                    return false;
+                }
+            }
+            return isValidColumnCount(length);
+        }
+
+        /**
+         * Returns {@code true} if the specified row length is valid. If unsure, this methods
+         * may conservatively returns {@code false}. The default implementation always returns
+         * {@code true}.
+         */
+        boolean isValidColumnCount(final int count) {
+            return true;
         }
     }
 }

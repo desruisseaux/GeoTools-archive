@@ -26,6 +26,7 @@ import javax.media.jai.util.Range;
 // Geotools dependencies
 import org.geotools.io.LineFormat;
 import org.geotools.util.NumberRange;
+import org.geotools.resources.XArray;
 
 
 /**
@@ -123,22 +124,22 @@ final class TestReader extends TextImageReader {
      *
      * @param  readAheadLimit Maximum number of characters to read. If this amount is reached
      *         but this method still unable to make a choice, then it returns {@code null}.
-     * @return {@link Boolean#TRUE} if the source <em>seems</em> readable, {@link Boolean#FALSE}
-     *         if it is not readeable, or {@code null} if this method don't know.
+     * @return {@code true} if the source <em>seems</em> readable, {@code false} otherwise.
      * @throws IOException If an error occured during reading.
      */
-    final Boolean canDecode(final int readAheadLimit) throws IOException {
+    final boolean canDecode(final int readAheadLimit) throws IOException {
         final Reader input = getReader(readAheadLimit);
         if (input == null) {
-            return null;
+            return false;
         }
         final TextImageReader.Spi spi = (TextImageReader.Spi) originatingProvider;
         final char[]     buffer = new char[readAheadLimit];
         final int        length = input.read(buffer);
         final LineFormat parser = getLineFormat(0);
-        Boolean          choice = null;
+        double[][] rows = new double[16][];
+        int rowCount = 0;
         int lower = 0;
-        while (lower < readAheadLimit) {
+scan:   while (lower < readAheadLimit) {
             // Skip line feeds at the begining of the line.
             // They may be a rest from the previous line.
             char c = buffer[lower];
@@ -151,28 +152,31 @@ final class TestReader extends TextImageReader {
             int upper = lower;
             while ((c = buffer[upper]) != '\r' && c != '\n') {
                 if (++upper >= readAheadLimit) {
-                    return choice;
+                    break scan;
                 }
             }
             // Try to parse a line.
             final String line = new String(buffer, lower, upper-lower);
             if (!isComment(line)) {
-                final int count;
                 try {
-                    count = parser.setLine(line);
-                } catch (ParseException exception) {
-                    return Boolean.FALSE;
-                }
-                if (count != 0) {
-                    if (Boolean.FALSE.equals(spi.isValidContent(parser))) {
-                        return Boolean.FALSE;
+                    if (parser.setLine(line) != 0) {
+                        if (rowCount == rows.length) {
+                            rows = (double[][]) XArray.resize(rows, rows.length * 2);
+                        }
+                        rows[rowCount] = parser.getValues(rows[rowCount]);
+                        rowCount++;
                     }
-                    choice = Boolean.TRUE;
+                } catch (ParseException exception) {
+                    return false;
                 }
             }
             lower = upper;
         }
-        return choice;
+        if (originatingProvider instanceof TextImageReader.Spi) {
+            rows = (double[][]) XArray.resize(rows, rowCount);
+            return ((TextImageReader.Spi) originatingProvider).isValidContent(rows);
+        }
+        return true;
     }
 
     /**

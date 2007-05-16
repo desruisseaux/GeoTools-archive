@@ -389,7 +389,7 @@ public class TextMatrixImageReader extends TextImageReader {
         }
 
         /**
-         * Construct a new SPI for {@link TextMatrixImageReader}. This
+         * Constructs a new SPI for {@link TextMatrixImageReader}. This
          * constructor initialize the following fields to default values:
          *
          * <ul>
@@ -441,11 +441,14 @@ public class TextMatrixImageReader extends TextImageReader {
         }
 
         /**
-         * Returns {@link Boolean#TRUE} if the specified parser seems to have a valid content.
+         * Returns {@code true} if the specified row length is valid. The default implementation
+         * returns {@code true} if the row seems "long", where "long" is arbitrary fixed to 10
+         * columns. This is an arbitrary choice, which is why this method is not public. It may
+         * be changed in any future Geotools version.
          */
         //@Override
-        Boolean isValidContent(final LineFormat parser) {
-            return parser.getValueCount() > 10 ? Boolean.TRUE : Boolean.FALSE;
+        boolean isValidColumnCount(final int count) {
+            return count > 10;
         }
     }
 }
