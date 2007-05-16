@@ -32,7 +32,6 @@ public class RunStoredTest extends TestCase {
     public void testGeometriesFromXML() throws IOException {
         GeometryTestParser parser = new GeometryTestParser();
         File dir = new File(TEST_DIRECTORY);
-        System.out.println("PATH="+dir.getAbsolutePath());
         if (dir.isDirectory()) {
             for (File testFile : dir.listFiles(xmlFilter)) {
             	LOG.info("Loading test description file:" + testFile);
