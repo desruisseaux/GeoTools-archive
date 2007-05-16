@@ -38,6 +38,7 @@ package org.geotools.geometry.iso.coordinate;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -227,7 +228,7 @@ public class GeometryFactoryImpl implements GeometryFactory {
 	 */
 	public MultiPrimitive createMultiPrimitive() {
 		// ok - this method will disappear from GeoAPI soon
-		return new MultiPrimitiveImpl(crs, null);
+		return new MultiPrimitiveImpl(crs, new HashSet());
 	}
 
 

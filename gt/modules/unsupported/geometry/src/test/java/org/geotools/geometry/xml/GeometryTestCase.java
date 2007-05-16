@@ -66,7 +66,7 @@ public class GeometryTestCase {
 
     /**
      * Run any test operations stored for this test case
-     * @return
+     * @return result
      */
     public boolean runTestCases() {
         boolean result = true;
@@ -74,7 +74,7 @@ public class GeometryTestCase {
         for (GeometryTestOperation op : operationList) {
             LOG.info("Running test case:" + op);
             if (!op.run(geomA, geomB)) {
-                LOG.info(op.toString() + " failed");
+                LOG.severe(op.toString() + " failed");
                 result = false;
             }
         }

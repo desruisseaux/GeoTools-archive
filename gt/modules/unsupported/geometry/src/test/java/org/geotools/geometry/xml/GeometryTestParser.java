@@ -21,14 +21,13 @@ import org.xml.sax.SAXException;
 import org.xml.sax.InputSource;
 import org.geotools.geometry.text.WKTParser;
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 
 
 /**
  * @author <a href="mailto:joel@lggi.com">Joel Skelton</a>
  */
 public class GeometryTestParser {
-    private static final Logger LOG = Logger.getLogger("org.geotools.geometry");
+    private static final Logger LOGGER = Logger.getLogger("org.geotools.geometry");
 
     private DocumentBuilderFactory documentBuilderFactory;
     private DocumentBuilder documentBuilder;
@@ -52,20 +51,19 @@ public class GeometryTestParser {
     }
 
     /**
-     * 
      * @param inputSource
-     * @return
+     * @return GeometryTestContainer
      */
     public GeometryTestContainer parseTestDefinition(InputSource inputSource) {
         Document doc = null;
         try {
             doc = documentBuilder.parse(inputSource);
         } catch (SAXException e) {
-            LOG.log( Level.FINE, e.getMessage(), e);
+            LOGGER.log( Level.FINE, e.getMessage(), e);
             throw new RuntimeException("", e);
 
         } catch (IOException e) {
-            LOG.log( Level.FINE, e.getMessage(), e);
+            LOGGER.log( Level.FINE, e.getMessage(), e);
             throw new RuntimeException("", e);
 
         }
@@ -75,7 +73,7 @@ public class GeometryTestParser {
         try {
             test = processRootNode(element);
         } catch (ParseException e) {
-            LOG.log( Level.FINE, e.getMessage(), e);
+            LOGGER.log( Level.FINE, e.getMessage(), e);
             throw new RuntimeException("", e);
 
         }
@@ -86,7 +84,7 @@ public class GeometryTestParser {
     /**
      * Processes the root "run" node
      * @param node
-     * @return
+     * @return GeometryTestContainer
      * @throws ParseException
      */
     public GeometryTestContainer processRootNode(Node node) throws ParseException {
@@ -123,7 +121,7 @@ public class GeometryTestParser {
      * b.
      *
      * @param testCaseNode
-     * @return
+     * @return GeometryTestCase
      */
     private GeometryTestCase readTestCase(Node testCaseNode) throws ParseException {
         Node child = testCaseNode.getFirstChild();
@@ -158,7 +156,7 @@ public class GeometryTestParser {
      * and looks for arg1, arg2, and arg3. The value of the text subnode is
      * the value of the expected result
      * @param testNode a test node from the xml file
-     * @return
+     * @return GeometryTestOperation
      */
     private GeometryTestOperation loadTestOperation(Node testNode) {
 
@@ -182,7 +180,7 @@ public class GeometryTestParser {
             try {
                 expectedResult = wktFactory.parse(expectedString);
             } catch (ParseException e) {
-                LOG.log( Level.FINE, "Couldn't parse [" + expectedString + "]", e);
+                LOGGER.log( Level.FINE, "Couldn't parse [" + expectedString + "]", e);
                 throw new RuntimeException("Couldn't parse [" + expectedString + "]", e);
             }
         }
@@ -197,7 +195,7 @@ public class GeometryTestParser {
         try {
             geom = wktFactory.parse(wktString);
         } catch (ParseException e) {
-            LOG.log( Level.FINE, "Can't parse [" + wktString + "]", e);            
+            LOGGER.log( Level.FINE, "Can't parse [" + wktString + "]", e);            
             throw new RuntimeException("Can't parse [" + wktString + "]", e);
         }
         return geom;
