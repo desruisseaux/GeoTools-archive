@@ -85,6 +85,8 @@ public class PicoMultiCurveTest extends TestCase {
 		assertEquals(mc.getElements().size(), 2);
 		assertEquals(mc.getElements(), curves);
 		
+		// test equals
+		assertTrue(mc.equals(new MultiCurveImpl(mc.getCoordinateReferenceSystem(), curves)));
 	}
 
 }

@@ -81,5 +81,8 @@ public class PicoCompositePointTest extends TestCase {
 		assertEquals(comppoint1.getCoordinateDimension(), p1.getCoordinateDimension());
 		assertEquals(comppoint2.getCoordinateDimension(), p2.getCoordinateDimension());
 		
+		// test equals
+		assertTrue(comppoint1.equals(new CompositePointImpl(p1)));
+		
 	}
 }

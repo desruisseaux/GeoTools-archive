@@ -62,6 +62,9 @@ public class CompositeSurfaceTest extends TestCase {
 		assertTrue(dp[0] == 20);
 		assertTrue(dp[1] == 10);
 		
+		// test equals
+		assertTrue(comps1.equals(new CompositeSurfaceImpl(surfaceList)));
+		
 		// Boundary operation of CompositeSurface not implemented yet. Hence isCycle doesn´t work yet.
 		//assertTrue(comps1.isCycle() == false);
 

@@ -1,6 +1,7 @@
 package org.geotools.geometry.iso.primitive;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,6 +32,7 @@ import org.opengis.geometry.primitive.Primitive;
 import org.opengis.geometry.primitive.PrimitiveFactory;
 import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.primitive.Surface;
+import org.opengis.geometry.primitive.SurfaceBoundary;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.picocontainer.PicoContainer;
 import org.picocontainer.defaults.DefaultPicoContainer;
@@ -170,6 +172,12 @@ public class PicoPrimitiveFactoryTest extends TestCase {
 		
 		PrimitiveImpl impl = factory.createPrimitive(bounds);
 		assertNotNull(impl);
+		
+		// test equals
+		SurfaceBoundary boundary = new SurfaceBoundaryImpl( crs, expectedRing, Collections.EMPTY_LIST );
+		SurfaceImpl expected = new SurfaceImpl( boundary );
+		assertEquals(expected.getBoundary(), impl.getBoundary());
+		assertTrue(expected.equals(impl));
 	}
 	
 	public void testBoundaryEquals() {

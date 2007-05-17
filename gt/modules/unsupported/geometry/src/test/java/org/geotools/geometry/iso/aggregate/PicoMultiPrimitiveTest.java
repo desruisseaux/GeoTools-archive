@@ -104,5 +104,8 @@ public class PicoMultiPrimitiveTest extends TestCase {
 		System.out.println(mp);
 		System.out.println(mp.getBoundary());
 		//assertNotNull(mp.getBoundary());
+		
+		// test equals
+		assertTrue(mp.equals(new MultiPrimitiveImpl(mp.getCoordinateReferenceSystem(), primitives)));
 	}
 }

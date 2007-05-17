@@ -438,4 +438,35 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 		return this.getBoundary().getRepresentativePoint();
 	}
 
+	@Override
+	public int hashCode() {
+		final int PRIME = 31;
+		int result = 1;
+		result = PRIME * result + ((boundary == null) ? 0 : boundary.hashCode());
+		result = PRIME * result + ((envelope == null) ? 0 : envelope.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final SurfaceImpl other = (SurfaceImpl) obj;
+		if (boundary == null) {
+			if (other.boundary != null)
+				return false;
+		} else if (!boundary.equals(other.boundary))
+			return false;
+		if (envelope == null) {
+			if (other.envelope != null)
+				return false;
+		} else if (!envelope.equals(other.envelope))
+			return false;
+		return true;
+	}
+
 }

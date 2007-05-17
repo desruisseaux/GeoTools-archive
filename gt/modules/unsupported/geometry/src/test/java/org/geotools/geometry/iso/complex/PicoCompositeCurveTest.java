@@ -115,5 +115,8 @@ public class PicoCompositeCurveTest extends TestCase {
 		assertEquals(dp[0], 100.0);
 		assertEquals(dp[1], 80.0);
 		
+		// test equals
+		assertTrue(compcurve.equals(new CompositeCurveImpl(curveList)));
+		
 	}
 }

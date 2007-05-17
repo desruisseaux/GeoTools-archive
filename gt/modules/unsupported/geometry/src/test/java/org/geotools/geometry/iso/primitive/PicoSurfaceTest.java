@@ -149,7 +149,8 @@ public class PicoSurfaceTest extends TestCase {
 		assertTrue(dp[0] == 20);
 		assertTrue(dp[1] == 10);
 
-
+		assertTrue(surface2.equals(surface3));
+		
 		return surface2;
 
 	}

@@ -87,5 +87,8 @@ public class PicoMultiPointTest extends TestCase {
 		assertEquals(mp.getEnvelope().getUpperCorner().getOrdinate(0), 70.0);
 		assertEquals(mp.getEnvelope().getUpperCorner().getOrdinate(1), 35.0);
 		
+		// test equals
+		assertTrue(mp.equals(new MultiPointImpl(mp.getCoordinateReferenceSystem(), points)));
+		
 	}
 }

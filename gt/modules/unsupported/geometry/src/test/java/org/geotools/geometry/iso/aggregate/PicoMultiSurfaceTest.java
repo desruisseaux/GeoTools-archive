@@ -10,30 +10,20 @@ import org.geotools.geometry.iso.PositionFactoryImpl;
 import org.geotools.geometry.iso.PrecisionModel;
 import org.geotools.geometry.iso.complex.ComplexFactoryImpl;
 import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
-import org.geotools.geometry.iso.coordinate.LineSegmentImpl;
 import org.geotools.geometry.iso.io.CollectionFactoryMemoryImpl;
-import org.geotools.geometry.iso.primitive.CurveImpl;
-import org.geotools.geometry.iso.primitive.OrientableSurfaceImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
-import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.geometry.iso.util.elem2D.Geo2DFactory;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.Precision;
 import org.opengis.geometry.aggregate.AggregateFactory;
-import org.opengis.geometry.coordinate.LineSegment;
-import org.opengis.geometry.primitive.Curve;
-import org.opengis.geometry.primitive.CurveSegment;
-import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.OrientableSurface;
-import org.opengis.geometry.primitive.Primitive;
 import org.opengis.geometry.primitive.PrimitiveFactory;
 import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.primitive.Surface;
-import org.opengis.geometry.primitive.SurfacePatch;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.picocontainer.PicoContainer;
 import org.picocontainer.defaults.DefaultPicoContainer;
@@ -97,5 +87,8 @@ public class PicoMultiSurfaceTest extends TestCase {
 		System.out.println(ms);
 		System.out.println(ms.getBoundary());
 		//assertNotNull(ms.getBoundary());
+		
+		// test equals
+		assertTrue(ms.equals(new MultiSurfaceImpl(ms.getCoordinateReferenceSystem(), surfaces)));
 	}
 }
