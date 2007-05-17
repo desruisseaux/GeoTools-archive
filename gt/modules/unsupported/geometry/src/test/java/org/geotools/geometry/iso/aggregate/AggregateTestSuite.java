@@ -9,6 +9,9 @@ public class AggregateTestSuite {
         TestSuite suite = new TestSuite();
 	
         suite.addTestSuite(PicoMultiCurveTest.class);
+        suite.addTestSuite(PicoMultiPointTest.class);
+        suite.addTestSuite(PicoMultiPrimitiveTest.class);
+        suite.addTestSuite(PicoMultiSurfaceTest.class);
 
         return suite;
     }

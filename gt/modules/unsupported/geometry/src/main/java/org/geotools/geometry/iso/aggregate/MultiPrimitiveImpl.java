@@ -84,8 +84,7 @@ public class MultiPrimitiveImpl extends AggregateImpl implements MultiPrimitive 
 	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getDimension(org.opengis.geometry.coordinate.DirectPosition)
 	 */
 	public int getDimension(DirectPosition point) {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.crs.getCoordinateSystem().getDimension();
 	}
 
 	/* (non-Javadoc)

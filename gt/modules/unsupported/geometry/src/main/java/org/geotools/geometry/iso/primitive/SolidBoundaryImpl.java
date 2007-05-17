@@ -118,8 +118,7 @@ public class SolidBoundaryImpl extends PrimitiveBoundaryImpl implements
 	 */
 	@Override
 	public int getDimension(DirectPosition point) {
-		// TODO Dimension of a SolidBoundary is 2 or 3??
-		return 2;
+		return point.getDimension();
 	}
 
 	@Override

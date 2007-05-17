@@ -39,10 +39,10 @@ package org.geotools.geometry.iso.primitive;
 
 import java.util.List;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.complex.CompositeSurfaceImpl;
 import org.opengis.geometry.primitive.OrientableSurface;
 import org.opengis.geometry.primitive.Shell;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * 
@@ -57,10 +57,10 @@ import org.opengis.geometry.primitive.Shell;
 public class ShellImpl extends CompositeSurfaceImpl implements Shell {
 
 	/**
-	 * @param factory
+	 * @param crs
 	 * @param generator
 	 */
-	public ShellImpl(FeatGeomFactoryImpl factory,
+	public ShellImpl(CoordinateReferenceSystem crs,
 			List<OrientableSurface> generator) {
 		super(generator);
 	}
