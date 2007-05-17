@@ -116,7 +116,7 @@ public class ComplexDataStoreTest extends TestCase {
         final String localName = "RoadSegment";
         final Name typeName = Types.attributeName(namespaceUri, localName);
 
-        URL configUrl = getClass().getResource("test-data/roadsegments.xml");
+        URL configUrl = getClass().getResource("/test-data/roadsegments.xml");
 
         ComplexDataStoreDTO config = new XMLConfigDigester().parse(configUrl);
 
@@ -406,7 +406,7 @@ public class ComplexDataStoreTest extends TestCase {
         final String localName = "RoadSegment";
         final TypeName typeName = new org.geotools.feature.type.TypeName(nsUri, localName);
 
-        final URL configUrl = getClass().getResource("test-data/roadsegments.xml");
+        final URL configUrl = getClass().getResource("/test-data/roadsegments.xml");
 
         ComplexDataStoreDTO config = new XMLConfigDigester().parse(configUrl);
 

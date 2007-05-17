@@ -44,8 +44,8 @@ public class EmfAppSchemaReaderTest extends TestCase {
     }
 
     public void testParseSimpleFeatureType() throws Exception {
-        String res = "simpleFeature.xsd";
-        URL resource = TestData.getResource(this, res);
+        String res = "/test-data/simpleFeature.xsd";
+        URL resource = getClass().getResource(res);
 
         schemaLoader.parse(resource);
 
@@ -107,8 +107,8 @@ public class EmfAppSchemaReaderTest extends TestCase {
     }
 
     public void testComplexFeatureType() throws Exception {
-        String res = "complexFeature.xsd";
-        URL resource = TestData.getResource(this, res);
+        String res = "/test-data/complexFeature.xsd";
+        URL resource = getClass().getResource(res);
         schemaLoader.parse(resource);
 
         Map registry = schemaLoader.getTypeRegistry();
@@ -183,8 +183,8 @@ public class EmfAppSchemaReaderTest extends TestCase {
     }
 
     public void testSimpleAttributeFromComplexDeclaration() throws Exception {
-        String res = "complexFeature.xsd";
-        URL resource = TestData.getResource(this, res);
+        String res = "/test-data/complexFeature.xsd";
+        URL resource = getClass().getResource(res);
         schemaLoader.parse(resource);
 
         Map registry = schemaLoader.getTypeRegistry();

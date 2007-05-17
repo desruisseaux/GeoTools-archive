@@ -42,8 +42,8 @@
       <parameters>
         <Parameter>
           <name>directory</name>
-          <!-- path can be relative to working dir -->
-          <value>C:\Program Files\Apache Software Foundation\Tomcat 5.5\webapps\geoserver-c\data\featureTypes\Borehole</value>
+          <!-- path can be relative to this file if starts with "file: -->
+          <value>file:./</value>
         </Parameter>
       </parameters>
     </DataStore>
@@ -57,7 +57,7 @@
         Imports and includes at the schemas will be followed as long
         as they're relative paths.
       -->
-      <schemaUri>commonSchemas/www.seegrid.csiro.au/xsd/XMML/1/borehole.xsd</schemaUri>
+      <schemaUri>commonSchemas/XMML/1/borehole.xsd</schemaUri>
     </FeatureType>
   </targetTypes>
   <typeMappings>

@@ -34,9 +34,9 @@ public class ComplexDataStoreFactoryTest extends TestCase {
         factory = new ComplexDataStoreFactory();
         params = new HashMap();
         params.put("dbtype", "complex");
-        URL resource = org.geotools.test.TestData.getResource(this, "roadsegments.xml");
+        URL resource = getClass().getResource("/test-data/roadsegments.xml");
         if (resource == null) {
-            fail("Can't find resouce test-data/roadsegments.xml");
+            fail("Can't find resouce /test-data/roadsegments.xml");
         }
         params.put("url", resource);
     }

@@ -72,7 +72,7 @@ public class BoreholeTest extends TestCase {
 
     private static final String GEONS = "http://www.seegrid.csiro.au/xml/geometry";
 
-    final String schemaBase = "test-data/commonSchemas/www.seegrid.csiro.au/xsd/";
+    final String schemaBase = "/test-data/";
 
     EmfAppSchemaReader reader;
 
@@ -127,7 +127,7 @@ public class BoreholeTest extends TestCase {
         // load geosciml schema
 
         try {
-            loadSchema(schemaBase + "XMML/1/borehole.xsd");
+            loadSchema(schemaBase + "commonSchemas/XMML/1/borehole.xsd");
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
@@ -210,7 +210,7 @@ public class BoreholeTest extends TestCase {
 
     public void testLoadMappingsConfig() throws Exception {
         XMLConfigDigester reader = new XMLConfigDigester();
-        URL url = getClass().getResource("test-data/BoreholeTest_properties.xml");
+        URL url = getClass().getResource(schemaBase + "BoreholeTest_properties.xml");
 
         ComplexDataStoreDTO config = reader.parse(url);
 
@@ -270,7 +270,7 @@ public class BoreholeTest extends TestCase {
 
     public void testDataStore() throws Exception {
         final Map dsParams = new HashMap();
-        final URL url = getClass().getResource("test-data/BoreholeTest_properties.xml");
+        final URL url = getClass().getResource(schemaBase + "BoreholeTest_properties.xml");
         dsParams.put("dbtype", "complex");
         dsParams.put("url", url.toExternalForm());
 
