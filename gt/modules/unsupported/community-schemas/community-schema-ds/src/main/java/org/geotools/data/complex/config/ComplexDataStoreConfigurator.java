@@ -16,6 +16,7 @@
  */
 package org.geotools.data.complex.config;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -380,6 +381,8 @@ public class ComplexDataStoreConfigurator {
             id = dsconfig.getId();
 
             Map datastoreParams = dsconfig.getParams();
+            
+            datastoreParams = resolveRelativePaths(datastoreParams);
 
             ComplexDataStoreConfigurator.LOGGER.fine("looking for datastore " + id);
 
@@ -395,6 +398,44 @@ public class ComplexDataStoreConfigurator {
         }
 
         return datastores;
+    }
+
+    /**
+     * Resolves any source datastore parameter settled as a file path relative
+     * to the location of the xml mappings configuration file as an absolute path
+     * and returns a new Map with it.
+     * 
+     * @param datastoreParams
+     * @return
+     * @throws MalformedURLException 
+     */
+    private Map resolveRelativePaths(final Map datastoreParams) throws MalformedURLException {
+        Map resolvedParams = new HashMap();
+        
+        for(Iterator it = datastoreParams.entrySet().iterator(); it.hasNext();){
+            Map.Entry entry = (Map.Entry) it.next();
+            String key = (String) entry.getKey();
+            String value = (String) entry.getValue();
+            if(value != null && value.startsWith("file:")){
+                value = value.substring("file:".length());
+                File f = new File(value);
+                if(!f.isAbsolute()){
+                    LOGGER.fine("resolving relative path " + value + 
+                            " for datastore parameter " + key);
+                    URL baseSchemasUrl = new URL(config.getBaseSchemasUrl());
+                    URL resolvedUrl = new URL(baseSchemasUrl, value);
+                    value = resolvedUrl.toExternalForm();
+                    if(value.startsWith("file:")){
+                        value = value.substring("file:".length());
+                    }
+                    LOGGER.fine("new value for " + key + ": " + value);
+                }
+            }
+            
+            resolvedParams.put(key, value);
+        }
+        
+        return resolvedParams;
     }
 
     /**
