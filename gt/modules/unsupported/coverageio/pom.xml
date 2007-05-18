@@ -37,7 +37,7 @@
   </scm>
 
   <description>
-    Base classes for coverage I/O operations.
+    Base classes for image and coverage I/O operations. Contains some codecs for ASCII grids.
   </description>
 
   <licenses>
@@ -47,6 +47,7 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+
 
 
   <!-- =========================================================== -->
@@ -69,9 +70,9 @@
       <name>Simone Giannecchini</name>
       <id>simboss</id>
       <email>simone.giannecchini@geo-solutions.it</email>
+      <organization>GeoSolutions</organization>
       <roles>
         <role>Java Developer</role>
-        <role>Documentation</role>
       </roles>
     </developer>
   </developers>
@@ -83,17 +84,17 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
+      <artifactId>gt2-metadata</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
       <artifactId>gt2-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-coverage</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt2-imageio</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
