@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.image;
+package org.geotools.image.io;
 
 // J2SE dependencies
 import java.util.Map;
@@ -35,93 +35,132 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 // Geotools dependencies
+import org.geotools.resources.Utilities;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.image.ColorUtilities;
 
 
 /**
- * Fabrique de modèles de couleurs indexés.
- * 
+ * A set of RGB colors created by a {@linkplain PaletteFactory palette factory} from a name.
+ * A palette can create {@linkplain IndexColorModel Index color models} or
+ * {@linkplain ImageTypeSpecifier image type specifiers}
+ *
+ * @since 2.4
+ * @source $URL$
  * @version $Id$
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  */
 public abstract class Palette {
     /**
-     * Ensemble des palettes déjà construites.
+     * The originating factory.
      */
-    private static final Map<Palette,Palette> POOL = new HashMap<Palette,Palette>();
+    private final PaletteFactory factory;
 
     /**
-     * Le nom de palette qui permet de construire l'objet {@link IndexColorModel}.
+     * The name of this palette.
      */
-    protected final String palette;
+    protected final String name;
 
     /**
-     * La borne supérieure de la plage des valeurs autorisées (on considère 
-     * celles-ci de 0 inclusivement à {@code size} exclusivement).
+     * Index of the first valid element (inclusive) in the {@linkplain IndexColorModel
+     * index color model} to be created. This is usually 0.
      */
-    protected final int size;
+    protected final int lower;
 
     /**
-     * Le modèle des pixels.
+     * Index of the last valid element (exclusive) in the {@linkplain IndexColorModel
+     * index color model} to be created. This is usually equals to
+     * {@link IndexColorModel#getMapSize}.
+     */
+    protected final int upper;
+
+    /**
+     * The sample model to be given to {@link ImageTypeSpecifier}.
      */
     private transient SampleModel samples;
 
     /**
-     * Une référence faible vers le modèle des couleurs. Ce modèle peut être volumineux
-     * (jusqu'à 256 ko). Ce volume explique que l'on utilise une référence faible.
+     * A weak reference to the color model. This color model may consume a significant
+     * amount of memory (up to 256 kb). Consequently, we will prefer {@link WeakReference}
+     * over {@link java.lang.ref.SoftReference}. The purpose of this weak reference is to
+     * share existing instances, not to cache it since it is cheap to rebuild.
      */
-    private transient Reference<ColorModel> colors;
+    private transient Reference/*<ColorModel>*/ colors;
 
     /**
-     * Une référence faible vers le type s'image retourné par {@link #getImageTypeSpecifier}.
-     * On ne conserve pas de référence dure vers {@link ImageTypeSpecifier} car ce dernier
-     * contient lui-même une référence vers le modèle de couleurs, et on ne veut pas empêcher
-     * le ramasse-miettes de le collecter.
+     * A weak reference to the image specifier to be returned by {@link #getImageTypeSpecifier}.
+     * We use weak reference because the image specifier contains a reference to the color model
+     * and we don't want to prevent it to be garbage collected. We prefer weak instead of soft
+     * reference for the same reason than {@link #colors}.
+     *
+     * @see #colors
      */
-    private transient Reference<ImageTypeSpecifier> specifier;
+    private transient Reference/*<ImageTypeSpecifier>*/ specifier;
 
     /**
-     * Construit une palette du nom et de la taille spécifiée.
+     * Creates a palette with the specified name and size. The size is the value that will be
+     * returned by {@link IndexColorModel#getMapSize}.
+     *
+     * @param factory The originating factory.
+     * @param name    The palette name.
+     * @param lower   Index of the first valid element (inclusive) in the
+     *                {@linkplain IndexColorModel index color model} to be created.
+     *                This is usually 0.
+     * @param upper   Index of the last valid element (exclusive) in the
+     *                {@linkplain IndexColorModel index color model} to be created.
+     *                This is usually equals to {@link IndexColorModel#getMapSize}.
      */
-    protected Palette(final String palette, final int size) {
-        this.palette = palette;
-        this.size    = size;
+    protected Palette(final PaletteFactory factory, final String name, final int lower, final int upper) {
+        this.factory = factory;
+        this.name    = name;
+        this.lower   = lower;
+        this.upper   = upper;
     }
 
     /**
-     * Construit et retourne les codes de couleurs ARGB. Cette méthode est appelée automatiquement
-     * la première fois où la palette est demandée, et le résultat sera conservé dans une cache pour
-     * réutilisation par d'autres images.
+     * Creates and returns ARGB values for the {@linkplain IndexColorModel index color model} to be
+     * created. This method is invoked automatically the first time the color model is required, or
+     * when it need to be rebuilt.
      *
-     * @throws  IOException             En cas d'erreur de lecture de la palette.
-     * @throws  IIOException            En cas d'erreur logique de la palette.
-     * @throws  FileNotFoundException   Si le fichier {@code palette} n'existe pas.
+     * @throws  FileNotFoundException If the RGB values need to be read from a file and this file
+     *                                (typically inferred from {@link #name}) is not found.
+     * @throws  IOException           If an other find of I/O error occured.
+     * @throws  IIOException          If an other kind of error prevent this method to complete.
      */
     protected abstract int[] createARGB() throws IOException;
 
     /**
-     * Construit un descripteur de type d'image pour cette palette. Cette méthode tente de
-     * réutiliser le modèle de couleurs si possible, car ce dernier peut être volumineux
-     * (jusqu'à 256 ko).
+     * Creates an image type specifier for this palette. This method tries to reuse the color
+     * model if possible, since it may consume a significant amount of memory.
      *
-     * @throws  IOException             En cas d'erreur de lecture de la palette.
-     * @throws  IIOException            En cas d'erreur logique de la palette.
-     * @throws  FileNotFoundException   Si le fichier {@code palette} n'existe pas.
+     * @throws  FileNotFoundException If the RGB values need to be read from a file and this file
+     *          (typically inferred from {@link #name}) is not found.
+     * @throws  IOException  If an other find of I/O error occured.
+     * @throws  IIOException If an other kind of error prevent this method to complete.
      */
     private ImageTypeSpecifier createImageTypeSpecifier() throws IOException {
+        /*
+         * First checks the weak references.
+         */
         if (specifier != null) {
-            final ImageTypeSpecifier candidate = specifier.get();
+            final ImageTypeSpecifier candidate = (ImageTypeSpecifier) specifier.get();
             if (candidate != null) {
                 return candidate;
             }
         }
         if (samples!=null && colors!=null) {
-            final ColorModel candidate = colors.get();
+            final ColorModel candidate = (ColorModel) colors.get();
             if (candidate != null) {
-                return new ImageTypeSpecifier(candidate, samples);
+                final ImageTypeSpecifier its = new ImageTypeSpecifier(candidate, samples);
+                specifier = new WeakReference(its);
+                return its;
             }
         }
+        /*
+         * Nothing reacheable. Rebuild the specifier.
+         */
         final int[] ARGB = createARGB();
         final byte[] A = new byte[ARGB.length];
         final byte[] R = new byte[ARGB.length];
@@ -130,15 +169,16 @@ public abstract class Palette {
         for (int i=0; i<ARGB.length; i++) {
             int code = ARGB[i];
             B[i] = (byte) ((code       ) & 0xFF);
-            G[i] = (byte) ((code >>>=8 ) & 0xFF);
-            R[i] = (byte) ((code >>>=8 ) & 0xFF);
-            A[i] = (byte) ((code >>>=8 ) & 0xFF);
+            G[i] = (byte) ((code >>>= 8) & 0xFF);
+            R[i] = (byte) ((code >>>= 8) & 0xFF);
+            A[i] = (byte) ((code >>>= 8) & 0xFF);
         }
         final int bits = ColorUtilities.getBitCount(ARGB.length);
-        final int type = (ARGB.length <= 256) ? DataBuffer.TYPE_BYTE : DataBuffer.TYPE_USHORT;
+        final int type = (bits <= 8) ? DataBuffer.TYPE_BYTE : DataBuffer.TYPE_USHORT;
         final boolean packed = (bits==1 || bits==2 || bits==4);
+        final boolean dense  = (packed || bits==8 || bits==16);
         final ImageTypeSpecifier its;
-        if ((packed || bits==8 || bits==16) && (1 << bits) == ARGB.length) {
+        if (dense && (1 << bits) == ARGB.length) {
             its = ImageTypeSpecifier.createIndexed(R,G,B,A, bits, type);
         } else {
             /*
@@ -158,25 +198,26 @@ public abstract class Palette {
             its = new ImageTypeSpecifier(colors, samples);
         }
         samples   = its.getSampleModel();
-        colors    = new WeakReference<ColorModel>(its.getColorModel());
-        specifier = new WeakReference<ImageTypeSpecifier>(its);
+        colors    = new WeakReference/*<ColorModel>*/(its.getColorModel());
+        specifier = new WeakReference/*<ImageTypeSpecifier>*/(its);
         return its;
     }
 
     /**
-     * Retourne le type d'image associé à cette palette.
+     * Returns an image type specifier for this palette.
      *
-     * @throws  IOException             En cas d'erreur de lecture de la palette.
-     * @throws  IIOException            En cas d'erreur logique de la palette.
-     * @throws  FileNotFoundException   Si le fichier {@code palette} n'existe pas.
+     * @throws  FileNotFoundException If the RGB values need to be read from a file and this file
+     *          (typically inferred from {@link #name}) is not found.
+     * @throws  IOException  If an other find of I/O error occured.
+     * @throws  IIOException If an other kind of error prevent this method to complete.
      */
     protected final ImageTypeSpecifier getImageTypeSpecifier() throws IOException {
-        synchronized (POOL) {
-            Palette candidate = POOL.get(this);
+        synchronized (factory.palettes) {
+            Palette candidate = (Palette) factory.palettes.get(this);
             if (candidate == null) {
                 candidate = this;
-                if (POOL.put(this, this) != null) {
-                    // Ce cas ne devrait jamais se produire.
+                if (factory.palettes.put(this, this) != null) {
+                    // Should never happen.
                     throw new AssertionError(this);
                 }
             }
@@ -185,16 +226,17 @@ public abstract class Palette {
     }
 
     /**
-     * Procède à la lecture des couleurs à partir des ressources de l'application.
+     * Reads ARGB values from file or resources.
      *
-     * @throws  IOException             En cas d'erreur de lecture de la palette.
-     * @throws  IIOException            En cas d'erreur logique de la palette.
-     * @throws  FileNotFoundException   Si le fichier {@code palette} n'existe pas.
+     * @throws  FileNotFoundException If the RGB values need to be read from a file and this file
+     *                       (typically inferred from {@link #name}) is not found.
+     * @throws  IOException  If an other find of I/O error occured.
+     * @throws  IIOException If an other kind of error prevent this method to complete.
      */
     final Color[] readColors() throws IOException {
-        final Color[] colors = Utilities.getPaletteFactory().getColors(palette);
+        final Color[] colors = factory.getColors(name);
         if (colors == null) {
-            throw new FileNotFoundException("Palette non trouvée : " + palette);
+            throw new FileNotFoundException(Errors.format(ErrorKeys.FILE_DOES_NOT_EXIST_$1, name));
         }
         return colors;
     }
@@ -212,9 +254,9 @@ public abstract class Palette {
      * @throws  IIOException            En cas d'erreur logique de la palette.
      * @throws  FileNotFoundException   Si le fichier {@code palette} n'existe pas.
      */
-    public static ImageTypeSpecifier forNodataFirst(final String palette, final int size) throws IOException {
-        return new NodataFirst(palette, size).getImageTypeSpecifier();
-    }
+//    public static ImageTypeSpecifier forNodataFirst(final String palette, final int size) throws IOException {
+//        return new NodataFirst(palette, 0, size).getImageTypeSpecifier();
+//    }
 
     /**
      * Fabrique de modèles de couleurs où les données manquantes sont représentées par
@@ -224,8 +266,10 @@ public abstract class Palette {
         /**
          * Construit une palette du nom spécifié.
          */
-        public NodataFirst(final String name, final int size) {
-            super(name, size);
+        public NodataFirst(final PaletteFactory factory, final String name,
+                           final int lower, final int upper)
+        {
+            super(factory, name, lower, upper);
         }
 
         /**
@@ -233,12 +277,12 @@ public abstract class Palette {
          */
         protected int[] createARGB() throws IOException {
             final Color[] colors = readColors();
-            final int[] ARGB = new int[size];
+            final int[] ARGB = new int[upper];
             /*
              * On VEUT que la première valeur du tableau ARGB soit 0,
              * car c'est la valeur signalant une absence de données.
              */
-            ColorUtilities.expand(colors, ARGB, 1, size);
+            ColorUtilities.expand(colors, ARGB, lower+1, upper);
             return ARGB;
         }
     }
@@ -257,9 +301,9 @@ public abstract class Palette {
      * @throws  IIOException            En cas d'erreur logique de la palette.
      * @throws  FileNotFoundException   Si le fichier {@code palette} n'existe pas.
      */
-    public static ImageTypeSpecifier forNodataLast(final String palette, final int size) throws IOException {
-        return new NodataLast(palette, size).getImageTypeSpecifier();
-    }
+//    public static ImageTypeSpecifier forNodataLast(final String palette, final int size) throws IOException {
+//        return new NodataLast(palette, 0, size).getImageTypeSpecifier();
+//    }
 
     /**
      * Fabrique de modèles de couleurs où les données manquantes sont représentées par
@@ -269,8 +313,9 @@ public abstract class Palette {
         /**
          * Construit une palette du nom spécifié.
          */
-        public NodataLast(final String name, final int size) {
-            super(name, size);
+        public NodataLast(final PaletteFactory factory, final String name,
+                          final int lower, final int upper) {
+            super(factory, name, lower, upper);
         }
 
         /**
@@ -278,12 +323,12 @@ public abstract class Palette {
          */
         protected int[] createARGB() throws IOException {
             final Color[] colors = readColors();
-            final int[] ARGB = new int[size];
+            final int[] ARGB = new int[upper];
             /*
              * On VEUT que la dernière valeur du tableau ARGB soit 0,
              * car c'est la valeur signalant une absence de données.
              */
-            ColorUtilities.expand(colors, ARGB, 0, (size-1));
+            ColorUtilities.expand(colors, ARGB, lower, (upper-1));
             return ARGB;
         }
     }
@@ -305,11 +350,12 @@ public abstract class Palette {
      * @throws  IIOException            En cas d'erreur de 'parsing' de la palette.
      * @throws  FileNotFoundException   Si le fichier {@code palette} n'existe pas.
      */
-    public static ImageTypeSpecifier forRepeated(final String palette, final int size,
-                                                 final int validSize, final int pageCount)
-            throws IOException {
-        return new Repeated(palette, size, validSize, pageCount).getImageTypeSpecifier();
-    }
+//    public static ImageTypeSpecifier forRepeated(final String palette, final int size,
+//                                                 final int validSize, final int pageCount)
+//            throws IOException
+//    {
+//        return new Repeated(palette, size, validSize, pageCount).getImageTypeSpecifier();
+//    }
 
     /**
      * Fabrique de modèles de couleurs où une palette est répétée un certain nombre de fois.
@@ -330,8 +376,10 @@ public abstract class Palette {
         /**
          * Construit une palette du nom spécifié.
          */
-        public Repeated(final String name, final int size, final int validSize, final int pageCount) {
-            super(name, size);
+        public Repeated(final PaletteFactory factory, final String name,
+                        final int lower, final int upper, final int validSize, final int pageCount)
+        {
+            super(factory, name, lower, upper);
             this.validSize = validSize;
             this.pageCount = pageCount;
         }
@@ -340,6 +388,7 @@ public abstract class Palette {
          * {@inheritDoc}
          */
         protected int[] createARGB() throws IOException {
+            final int size = upper - lower;
             final Color[] colors = readColors();
             final int[] ARGB = new int[size];
             final int pageSize = size / pageCount;
@@ -347,18 +396,18 @@ public abstract class Palette {
              * La plage des valeurs dans les images SST varie de 0 à 512...
              * on construit donc un modèle de 512 couleurs.
              */
-            ColorUtilities.expand(colors, ARGB, 0, validSize);
+            ColorUtilities.expand(colors, ARGB, lower, lower + validSize);
             /*
              * Les valeurs comprises entre 512 et 1024 correpondent à un absence de données.
              */
             final Color[] c = new Color[] {Color.BLACK, Color.WHITE};
-            ColorUtilities.expand(c, ARGB, validSize, pageSize);
+            ColorUtilities.expand(c, ARGB, lower + validSize, lower + pageSize);
             /* 
              * L'information de qualité est codé sur 3 bits... il y a donc 8 niveau de qualité
              * On répète donc le modèle de couleurs huit fois.
              */
             for (int i=1; i<pageCount; i++) {
-                System.arraycopy(ARGB, 0, ARGB, pageSize*i, pageSize);
+                System.arraycopy(ARGB, lower, ARGB, lower + pageSize*i, pageSize);
             }
             return ARGB;
         }
@@ -366,7 +415,7 @@ public abstract class Palette {
         /**
          * {@inheritDoc}
          */
-        @Override
+        //@Override
         public int hashCode() {
             return super.hashCode() ^ (((pageCount*37) ^ validSize) * 37);
         }
@@ -374,7 +423,7 @@ public abstract class Palette {
         /**
          * {@inheritDoc}
          */
-        @Override
+        //@Override
         public boolean equals(final Object object) {
             if (object == this) {
                 return true;
@@ -391,23 +440,24 @@ public abstract class Palette {
     /**
      * Retourne une valeur représentative de cette palette de couleurs.
      */
-    @Override
+    //@Override
     public int hashCode() {
-        return getClass().hashCode() ^ palette.hashCode() ^ size;
+        return getClass().hashCode() ^ name.hashCode() ^ upper;
     }
 
     /**
      * Compare cette palette avec la palette spécifiée.
      */
-    @Override
+    //@Override
     public boolean equals(final Object object) {
         if (object == this) {
             return true;
         }
         if (object != null && getClass().equals(object.getClass())) {
             final Palette that = (Palette) object;
-            return this.size == that.size &&
-                    org.geotools.resources.Utilities.equals(this.palette, that.palette);
+            return this.lower == that.lower &&
+                   this.upper == that.upper &&
+                   Utilities.equals(this.name, that.name);
         }
         return false;
     }
@@ -416,8 +466,8 @@ public abstract class Palette {
      * Retourne une représentation textuelle de cette palette. Cette méthode
      * est utilisée principalement à des fins de déboguages.
      */
-    @Override
+    //@Override
     public String toString() {
-        return org.geotools.resources.Utilities.getShortClassName(this) + '[' + palette + ' ' + size + " couleurs]";
+        return Utilities.getShortClassName(this) + '[' + name + ' ' + (upper-lower) + " colors]";
     }
 }

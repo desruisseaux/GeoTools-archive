@@ -97,8 +97,11 @@ public abstract class SimpleImageReader extends ImageReader {
      * @see #close
      *
      * @since 2.4
+     *
+     * @todo The field type will be changed to {@link Closeable} when we will be allowed
+     *       to compile for J2SE 1.5.
      */
-    protected Closeable closeOnReset;
+    protected Object closeOnReset;
 
     /**
      * {@link #input} as an input stream, or {@code null} if none.
@@ -517,7 +520,15 @@ public abstract class SimpleImageReader extends ImageReader {
      */
     protected void close() throws IOException {
         if (closeOnReset != null) {
-            closeOnReset.close();
+            // TODO: replace the remaining of this block by the following line
+            //       when we will be allowed to compile for J2SE 1.5.
+            //closeOnReset.close();
+            if (closeOnReset instanceof InputStream) {
+                ((InputStream) closeOnReset).close();
+            }
+            if (closeOnReset instanceof Reader) {
+                ((Reader) closeOnReset).close();
+            }
         }
         closeOnReset = null;
         stream = null;

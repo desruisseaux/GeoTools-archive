@@ -23,20 +23,12 @@ import java.awt.image.RenderedImage;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.awt.image.IndexColorModel;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 import javax.imageio.IIOException;
+import java.util.*;
 
 // Geotools dependencies
 import org.geotools.io.DefaultFileFilter;
@@ -45,14 +37,14 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ColorUtilities;
+import org.geotools.util.Logging;
 
 
 /**
- * A factory class for {@link IndexColorModel} objects.
- * Default implementation for this class create {@link IndexColorModel} objects from
- * palette definition files. Definition files are text files containing an arbitrary
- * number of lines, each line containing RGB components ranging from 0 to 255 inclusive.
- * Empty line and line starting with '#' are ignored. Example:
+ * A factory for {@linkplain IndexColorModel index color models} created from RGB values listed
+ * in files. The palette definition files are text files containing an arbitrary number of lines,
+ * each line containing RGB components ranging from 0 to 255 inclusive. Empty line and line
+ * starting with the {@code '#'} character are ignored. Example:
  *
  * <blockquote><pre>
  * # RGB codes for SeaWiFs images
@@ -69,8 +61,8 @@ import org.geotools.resources.image.ColorUtilities;
  * <i>etc...</i>
  * </pre></blockquote>
  *
- * The number of RGB codes doesn't have to match an {@link IndexColorModel}'s
- * map size. RGB codes will be automatically interpolated RGB values when needed.
+ * The number of RGB codes doesn't have to match the target {@linkplain IndexColorModel#getMapSize
+ * color map size}. RGB codes will be automatically interpolated as needed.
  *
  * @since 2.1
  * @source $URL$
@@ -79,46 +71,83 @@ import org.geotools.resources.image.ColorUtilities;
  */
 public class PaletteFactory {
     /**
+     * The file which contains a list of available color palettes. This file is optional
+     * and used only in last resort, since scanning a directory content is more reliable.
+     * If such file exists in the same directory than the one that contains the palettes,
+     * this file will be used by {@link #getAvailableNames}.
+     */
+    private static final String LIST_FILE = "list.txt";
+
+    /**
+     * The default palette factory.
+     */
+    private static PaletteFactory defaultFactory;
+
+    /**
      * The parent factory, or {@code null} if there is none. The parent factory
      * will be queried if a palette was not found in current factory.
      */
     private final PaletteFactory parent;
-    
+
     /**
      * The class loader from which to load the palette definition files. If {@code null} and
-     * {@link #altLoader} is null as well, then loading will occurs from the system current
+     * {@link #loader} is null as well, then loading will occurs from the system current
      * working directory.
      */
-    private final ClassLoader loader;
-    
+    private final ClassLoader classloader;
+
     /**
-     * An alternative to {@link #loader} for loading resources. At most one of {@code loader}
-     * and {@code altLoader} can be non-null. If both are {@code null}, then loading will occurs
-     * from the system current working directory.
+     * An alternative to {@link #classloader} for loading resources. At most one of
+     * {@code classloader} and {@code loader} can be non-null. If both are {@code null},
+     * then loading will occurs from the system current working directory.
      */
-    private final Class altLoader;
-    
+    private final Class loader;
+
     /**
      * The base directory from which to search for palette definition files.
-     * If {@code null}, then the working directory (".") is assumed.
+     * If {@code null}, then the working directory ({@code "."}) is assumed.
      */
     private final File directory;
-    
+
     /**
-     * File extension.
+     * The file extension.
      */
     private final String extension;
-    
+
     /**
      * The charset to use for parsing files, or {@code null} for the current default.
      */
     private final Charset charset;
-    
+
     /**
      * The locale to use for parsing files. or {@code null} for the current default.
      */
     private final Locale locale;
-    
+
+    /**
+     * The set of palettes already created. This is for internal use by {@link Palette} only.
+     */
+    final Map/*<Palette,Palette>*/ palettes = new HashMap/*<Palette,Palette>*/();
+
+    /**
+     * Gets the default palette factory. This default instance search for
+     * {@code org/geotools/image/io/colors/*.pal} files where {@code '*'}
+     * are the names to be specified to {@link #getIndexColorModel} and
+     * similar methods.
+     */
+    public static synchronized PaletteFactory getDefault() {
+        if (defaultFactory == null) {
+            defaultFactory = new PaletteFactory(
+            /* parent factory */ null,
+            /* class loader   */ PaletteFactory.class,
+            /* root directory */ new File("colors"),
+            /* extension      */ ".pal",
+            /* character set  */ Charset.forName("ISO-8859-1"),
+            /* locale         */ Locale.US);
+        }
+        return defaultFactory;
+    }
+
     /**
      * Constructs a palette factory using an optional {@linkplain ClassLoader class loader}
      * for loading palette definition files.
@@ -147,15 +176,15 @@ public class PaletteFactory {
         if (extension!=null && !extension.startsWith(".")) {
             extension = '.' + extension;
         }
-        this.parent    = parent;
-        this.loader    = loader;
-        this.altLoader = null;
-        this.directory = directory;
-        this.extension = extension;
-        this.charset   = charset;
-        this.locale    = locale;
+        this.parent      = parent;
+        this.classloader = loader;
+        this.loader      = null;
+        this.directory   = directory;
+        this.extension   = extension;
+        this.charset     = charset;
+        this.locale      = locale;
     }
-    
+
     /**
      * Constructs a palette factory using an optional {@linkplain Class class} for loading
      * palette definition files. Using a {@linkplain Class class} instead of a {@linkplain
@@ -189,13 +218,13 @@ public class PaletteFactory {
         if (extension!=null && !extension.startsWith(".")) {
             extension = '.' + extension;
         }
-        this.parent    = parent;
-        this.loader    = null;
-        this.altLoader = loader;
-        this.directory = directory;
-        this.extension = extension;
-        this.charset   = charset;
-        this.locale    = locale;
+        this.parent      = parent;
+        this.classloader = null;
+        this.loader      = loader;
+        this.directory   = directory;
+        this.extension   = extension;
+        this.charset     = charset;
+        this.locale      = locale;
     }
 
     /**
@@ -215,50 +244,94 @@ public class PaletteFactory {
      * @since 2.3
      */
     protected InputStream getResourceAsStream(final String name) {
-        if (altLoader != null) {
-            return altLoader.getResourceAsStream(name);
-        }
         if (loader != null) {
             return loader.getResourceAsStream(name);
+        }
+        if (classloader != null) {
+            return classloader.getResourceAsStream(name);
         }
         return null;
     }
 
     /**
      * Returns the list of available palette names. Any item in this list can be specified as
-     * argument to {@link #getColors(String)} or {@link #getIndexColorModel(String)} methods.
+     * argument to {@link #getPalette(String)}.
      *
      * @return The list of available palette name, or {@code null} if this method
      *         is unable to fetch this information.
      */
     public String[] getAvailableNames() {
+        final Set names = new TreeSet();
+        PaletteFactory factory = this;
+        do {
+            factory.getAvailableNames(names);
+            factory = factory.parent;
+        } while (parent != null);
+        return (String[]) names.toArray(new String[names.size()]);
+    }
+
+    /**
+     * Adds available palette names to the specified collection.
+     */
+    private void getAvailableNames(final Collection names) {
         File dir = (directory != null) ? directory : new File(".");
-        if (loader != null) {
+        if (classloader != null) {
+            dir = toFile(classloader.getResource(dir.getPath()));
+            if (dir == null) {
+                // Directory not found.
+                getAvailableNamesFromListFile(names);
+                return;
+            }
+        } else if (loader != null) {
             dir = toFile(loader.getResource(dir.getPath()));
             if (dir == null) {
                 // Directory not found.
-                return null;
-            }
-        } else if (altLoader != null) {
-            dir = toFile(altLoader.getResource(dir.getPath()));
-            if (dir == null) {
-                // Directory not found.
-                return null;
+                getAvailableNamesFromListFile(names);
+                return;
             }
         }
         if (!dir.isDirectory()) {
-            return null;
+            getAvailableNamesFromListFile(names);
+            return;
         }
-        final String[] names = dir.list(new DefaultFileFilter('*'+extension));
+        final String[] list = dir.list(new DefaultFileFilter('*' + extension));
         final int extLg = extension.length();
-        for (int i=0; i<names.length; i++) {
-            final String name = names[i];
-            final int lg = name.length();
-            if (lg>extLg && name.regionMatches(true, lg-extLg, extension, 0, extLg)) {
-                names[i] = name.substring(0, lg-extLg);
+        for (int i=0; i<list.length; i++) {
+            final String filename = list[i];
+            final int lg = filename.length();
+            if (lg>extLg && filename.regionMatches(true, lg-extLg, extension, 0, extLg)) {
+                names.add(filename.substring(0, lg-extLg));
             }
         }
-        return names;
+    }
+
+    /**
+     * Adds available palette names to the specified collection.
+     * The names are read from the {@value #LIST_FILE} directory.
+     */
+    private void getAvailableNamesFromListFile(final Collection names) {
+        try {
+            final BufferedReader in =
+                    getReader(new File(directory, LIST_FILE).getPath(), "getAvailableNames");
+            if (in != null) {
+                String line;
+                while ((line = in.readLine()) != null) {
+                    line = line.trim();
+                    if (line.length() != 0 && line.charAt(0) != '#') {
+                        names.add(line);
+                    }
+                }
+                in.close();
+            }
+        } catch (IOException e) {
+            /*
+             * Logs a warning but do not stop. The only consequence is that the name list
+             * will be incomplete. We log the message as if came from getAvailableNames(),
+             * which is the public method that invoked this one.
+             */
+            Logging.unexpectedException("org.geotools.image.io",
+                    PaletteFactory.class, "getAvailableNames", e);
+        }
     }
 
     /**
@@ -271,20 +344,32 @@ public class PaletteFactory {
         }
         return null;
     }
-    
+
     /**
-     * Returns a buffered reader for the specified name.
+     * Returns a buffered reader for the specified palette.
      *
      * @param  The palette's name to load. This name doesn't need to contains a path
      *         or an extension. Path and extension are set according value specified
      *         at construction time.
-     * @return A buffered reader to read {@code name}.
+     * @return A buffered reader to read {@code name}, or {@code null} if the resource is not found.
      * @throws IOException if an I/O error occured.
      */
-    private BufferedReader getReader(String name) throws IOException {
+    private LineNumberReader getPaletteReader(String name) throws IOException {
         if (extension!=null && !name.endsWith(extension)) {
             name += extension;
         }
+        return getReader(name, "getColors");
+    }
+
+    /**
+     * Returns a buffered reader for the specified filename.
+     *
+     * @param  The filename. Path and extension are set according value specified
+     *         at construction time.
+     * @return A buffered reader to read {@code name}, or {@code null} if the resource is not found.
+     * @throws IOException if an I/O error occured.
+     */
+    private LineNumberReader getReader(final String name, final String caller) throws IOException {
         final File   file = new File(directory, name);
         final String path = file.getPath().replace(File.separatorChar, '/');
         InputStream stream;
@@ -299,57 +384,105 @@ public class PaletteFactory {
             }
         } catch (SecurityException e) {
             // 'getColors' is the public method that invoked this private method.
-            Utilities.recoverableException("org.geotools.image",
-                    PaletteFactory.class, "getColors", e);
+            Utilities.recoverableException("org.geotools.image.io",
+                    PaletteFactory.class, caller, e);
             return null;
         }
-        return getReader(stream);
-    }
-    
-    /**
-     * Returns a buffered reader for the specified stream.
-     *
-     * @param  The input stream.
-     * @return A buffered reader to read the input stream.
-     * @throws IOException if an I/O error occured.
-     */
-    private BufferedReader getReader(final InputStream stream) throws IOException {
         final Reader reader = (charset!=null) ? new InputStreamReader(stream, charset) :
                                                 new InputStreamReader(stream);
-        return new BufferedReader(reader);
+        return new LineNumberReader(reader);
     }
-    
+
     /**
-     * Procède au chargement d'un ensemble de couleurs. Les couleurs doivent
-     * être codées sur trois colonnes dans un fichier texte. Les colonnes
-     * doivent être des entiers de 0 à 255 correspondant (dans l'ordre) aux
-     * couleurs rouge (R), verte (G) et bleue (B). Les lignes vierges ainsi
-     * que les lignes dont le premier caractère non-blanc est # seront ignorées.
+     * Reads the colors declared in the specified input stream. Colors must be encoded on 1, 3
+     * or 4 columns. If 1 colors, it is assumed gray scale. If 3 colors, it is assumed RGB values.
+     * If 4 columns, it is assumed RGBA values. Values must be in the 0-255 ranges. Empty lines
+     * and lines starting by {@code '#'} are ignored.
      *
-     * @param  input Flot contenant les codes de couleurs de la palette.
-     * @return Couleurs obtenues à partir des codes lues.
-     * @throws IOException si une erreur est survenue lors de la lecture.
-     * @throws IIOException si une erreur est survenue lors de l'interprétation des codes de couleurs.
+     * @param  input The stream to read.
+     * @param  name  The palette name to read. Used for formatting error message only.
+     * @return The colors.
+     * @throws IOException if an I/O error occured.
+     * @throws IIOException if a syntax error occured.
      */
-    private Color[] getColors(final BufferedReader input) throws IOException {
-        int values[] = new int[3]; // On attend exactement 3 composantes par ligne.
+    private Color[] getColors(final LineNumberReader input, final String name) throws IOException {
+        int values[] = null;
         final LineFormat reader = (locale!=null) ? new LineFormat(locale) : new LineFormat();
         final List colors       = new ArrayList();
-        String line; while ((line=input.readLine())!=null) try {
-            line=line.trim();
+        String line; while ((line=input.readLine()) != null) try {
+            line = line.trim();
             if (line.length() == 0)        continue;
             if (line.charAt(0) == '#')     continue;
             if (reader.setLine(line) == 0) continue;
             values = reader.getValues(values);
-            colors.add(new Color(byteValue(values[0]), byteValue(values[1]), byteValue(values[2])));
+            int A=255,R,G,B;
+            switch (values.length) {
+                case 4: A = byteValue(values[3]); // fall through
+                case 3: B = byteValue(values[2]);
+                        G = byteValue(values[1]);
+                        R = byteValue(values[0]);
+                        break;
+                case 1: R=G=B = byteValue(values[0]);
+                        break;
+                default: {
+                    throw syntaxError(input, name, null);
+                }
+            }
+            final Color color;
+            try {
+                color = new Color(R, G, B, A);
+            } catch (IllegalArgumentException exception) {
+                /*
+                 * Color constructor checks the RGBA value and throws an IllegalArgumentException
+                 * if they are not in the 0-255 range. Intercept this exception and rethrows as a
+                 * checked IIOException, since we want to notify the user that the palette file is
+                 * badly formatted. (additional note: it is somewhat redundant with byteValue(int)
+                 * work. Lets keep it as a safety).
+                 */
+                throw syntaxError(input, name, exception);
+            }
+            colors.add(color);
         } catch (ParseException exception) {
-            final IIOException error = new IIOException(exception.getLocalizedMessage());
-            error.initCause(exception);
-            throw error;
+            throw syntaxError(input, name, exception);
         }
         return (Color[]) colors.toArray(new Color[colors.size()]);
     }
-    
+
+    /**
+     * Prepares an exception for the specified cause, which may be {@code null}.
+     */
+    private static IIOException syntaxError(final LineNumberReader input, final String name,
+                                            final Exception cause)
+    {
+        String message = Errors.format(ErrorKeys.BAD_LINE_IN_FILE_$2, name, new Integer(input.getLineNumber()));
+        if (cause != null) {
+            message += cause.getLocalizedMessage();
+        }
+        return new IIOException(message, cause);
+    }
+
+    /**
+     * Load colors from an URL.
+     *
+     * @param  url The palette's URL.
+     * @return The set of colors, or {@code null} if the set was not found.
+     * @throws IOException if an error occurs during reading.
+     * @throws IIOException if an error occurs during parsing.
+     *
+     * @deprecated This method should not be defined here since {@code PaletteFactory} is all
+     *             about name relative to a directory specified at construction time. If a user
+     *             wants the functionality provided by this method, he should consider creating
+     *             a new instance of {@code PaletteFactory}.
+     */
+    public Color[] getColors(final URL url) throws IOException {
+        final InputStream stream = url.openStream();
+        final LineNumberReader reader = new LineNumberReader((charset!=null) ?
+                new InputStreamReader(stream, charset) : new InputStreamReader(stream));
+        final Color[] colors = getColors(reader, url.getFile());
+        reader.close();
+        return colors;
+    }
+
     /**
      * Load colors from a definition file.
      *
@@ -361,47 +494,33 @@ public class PaletteFactory {
      * @throws IIOException if an error occurs during parsing.
      */
     public Color[] getColors(final String name) throws IOException {
-        final BufferedReader reader = getReader(name);
+        final LineNumberReader reader = getPaletteReader(name);
         if (reader == null) {
             return (parent!=null) ? parent.getColors(name) : null;
         }
-        final Color[] colors = getColors(reader);
+        final Color[] colors = getColors(reader, name);
         reader.close();
         return colors;
     }
-    
+
     /**
-     * Load colors from an URL.
-     *
-     * @param  url The palette's URL.
-     * @return The set of colors, or {@code null} if the set was not found.
-     * @throws IOException if an error occurs during reading.
-     * @throws IIOException if an error occurs during parsing.
-     */
-    public Color[] getColors(final URL url) throws IOException {
-        final BufferedReader reader = getReader(url.openStream());
-        final Color[] colors = getColors(reader);
-        reader.close();
-        return colors;
-    }
-    
-    /**
-     * Load an index color model from a definition file.
+     * Loads an index color model from a definition file.
      * The returned model will use index from 0 to 255 inclusive.
      *
      * @param  name The palette's name to load. This name doesn't need to contains a path
      *              or an extension. Path and extension are set according value specified
      *              at construction time.
      * @return The index color model, or {@code null} if the palettes was not found.
+     *
      * @throws IOException if an error occurs during reading.
      * @throws IIOException if an error occurs during parsing.
      */
     public IndexColorModel getIndexColorModel(final String name) throws IOException {
         return getIndexColorModel(name, 0, 256);
     }
-    
+
     /**
-     * Load an index color model from a definition file.
+     * Loads an index color model from a definition file.
      * The returned model will use index from {@code lower} inclusive to
      * {@code upper} exclusive. Other index will have a transparent color.
      *
@@ -411,6 +530,7 @@ public class PaletteFactory {
      * @param  lower Palette's lower index (inclusive).
      * @param  upper Palette's upper index (exclusive).
      * @return The index color model, or {@code null} if the palettes was not found.
+     *
      * @throws IOException if an error occurs during reading.
      * @throws IIOException if an error occurs during parsing.
      *
@@ -437,19 +557,22 @@ public class PaletteFactory {
         ColorUtilities.expand(colors, ARGB, lower, upper);
         return ColorUtilities.getIndexColorModel(ARGB);
     }
-    
+
     /**
      * Ensure that the specified valus is inside the {@code [0..255]} range.
      * If the value is outside that range, a {@link ParseException} is thrown.
      */
     private static int byteValue(final int value) throws ParseException {
-        if (value>=0 && value<256) return value;
+        if (value>=0 && value<256) {
+            return value;
+        }
         throw new ParseException(Errors.format(ErrorKeys.RGB_OUT_OF_RANGE_$1,
                                  new Integer(value)), 0);
     }
 
     /**
      * Returns the specified color palette as an image of the specified size.
+     * This is useful for looking visually at a color palette.
      *
      * @param  name The palette's name to load. This name doesn't need to contains a path
      *              or an extension. Path and extension are set according value specified
