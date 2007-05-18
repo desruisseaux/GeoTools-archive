@@ -164,13 +164,10 @@
           <artifactId>jsde_sdk</artifactId>
           <version>${sde.version}</version>
         </dependency>
-        <!-- TODO: This dependencies should be removed when we will be allowed to
-          compile for JSE 5. This JAR duplicates edu.oswego.concurrent
-          inherited from main. -->
         <dependency>
-          <groupId>com.esri</groupId>
-          <artifactId>jsde_concurrent</artifactId>
-          <version>${sde.version}</version>
+          <groupId>edu.oswego</groupId>
+          <artifactId>concurrent</artifactId>
+          <!-- version provided by main pom -->
         </dependency>
         <dependency>
           <groupId>com.esri</groupId>
