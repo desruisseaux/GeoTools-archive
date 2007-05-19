@@ -141,30 +141,24 @@ public class MetadataException extends IIOException {
     public String toString() {
         final MetadataBuilder.Key key = getMetadataKey();
         final String alias = getMetadataAlias();
-        if (key==null && alias==null) {
+        if (key == null && alias == null) {
             return super.toString();
         }
         final StringBuffer buffer = new StringBuffer(getClass().getName());
         buffer.append('[');
         if (key != null) {
-            buffer.append("key=\"");
-            buffer.append(key);
-            buffer.append('"');
+            buffer.append("key=\"").append(key).append('"');
             if (alias != null) {
                 buffer.append(", ");
             }
         }
         if (alias != null) {
-            buffer.append("alias=\"");
-            buffer.append(alias);
-            buffer.append('"');
+            buffer.append("alias=\"").append(alias).append('"');
         }
         buffer.append(']');
         final String message = getLocalizedMessage();
         if (message != null) {
-            buffer.append(':');
-            buffer.append(System.getProperty("line.separator", "\n"));
-            buffer.append(message);
+            buffer.append(':').append(System.getProperty("line.separator", "\n")).append(message);
         }
         return buffer.toString();
     }

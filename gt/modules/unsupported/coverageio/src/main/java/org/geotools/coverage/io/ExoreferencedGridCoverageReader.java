@@ -25,14 +25,15 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 
 // OpenGIS dependencies
-import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
+import org.geotools.factory.Hints;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.coverage.GridSampleDimension;
 
 
 /**
@@ -53,73 +54,90 @@ public class ExoreferencedGridCoverageReader extends AbstractGridCoverageReader 
     /**
      * The object to use for parsing the meta-data.
      */
-    protected MetadataBuilder metadata;
-    
+    protected final MetadataBuilder metadata;
+
     /**
      * File extension (by default the same than format name).
      */
     private final String extension;
-    
+
     /**
-     * Construct a new <code>ExoreferencedGridCoverageReader</code>
+     * Constructs a new {@code ExoreferencedGridCoverageReader}
      * using the specified {@link MetadataBuilder}.
      *
+     * @param hints The factory hints to use.
      * @param formatName The name for this format. This format name should be
      *        understood by {@link ImageIO#getImageReadersByFormatName(String)},
      *        unless {@link #getImageReaders} is overridden.
      * @param parser The {@link MetadataBuilder} to use for reading geographic metadata.
      */
-    public ExoreferencedGridCoverageReader(final String formatName, final MetadataBuilder parser) {
-        this(formatName, formatName, parser);
+    public ExoreferencedGridCoverageReader(final Hints hints,
+                                           final String formatName,
+                                           final MetadataBuilder parser)
+    {
+        this(hints, formatName, formatName, parser);
     }
-    
+
     /**
-     * Construct a new <code>ExoreferencedGridCoverageReader</code>
+     * Constructs a new {@code ExoreferencedGridCoverageReader}
      * using the specified {@link MetadataBuilder}.
      *
+     * @param hints The factory hints to use.
      * @param formatName The name for this format. This format name should be
      *        understood by {@link ImageIO#getImageReadersByFormatName(String)},
      *        unless {@link #getImageReaders} is overridden.
      * @param extension Filename's extensions for file of this format.
      * @param parser The {@link MetadataBuilder} to use for reading geographic metadata.
      */
-    public ExoreferencedGridCoverageReader(final String formatName,
+    public ExoreferencedGridCoverageReader(final Hints hints,
+                                           final String formatName,
                                            final String extension,
                                            final MetadataBuilder parser)
     {
-        super(formatName);
+        super(hints, formatName);
         metadata = parser;
-        if (parser==null) {
+        if (parser == null) {
             throw new IllegalArgumentException();
         }
         this.extension = extension;
     }
-    
+
     /**
-     * Restores the <code>AbstractGridCoverageReader</code> to its initial state.
+     * Restores the coverage reader to its initial state.
      *
      * @throws IOException if an error occurs while disposing resources.
      */
+    //@Override
     public synchronized void reset() throws IOException {
         metadata.clear();
         super.reset();
     }
-    
+
     /**
-     * Sets the input source to the given object. The input must be
-     * {@link File} or an {@link URL} object. The input source must
-     * be the <em>metadata</em> file or URL. The image file or URL
-     * will be derived from the metadata filename by a call to
+     * Sets the current {@linkplain Locale locale} of this grid coverage reader to the given value.
+     * A value of {@code null} removes any previous setting, and indicates that the reader should
+     * localize as it sees fit.
+     */
+    //@Override
+    public synchronized void setLocale(final Locale locale) {
+        super.setLocale(locale);
+        metadata.setUserLocale(locale);
+    }
+
+    /**
+     * Sets the input source to the given object. The input must be {@link File} or an
+     * {@link URL} object. The input source must be the <em>metadata</em> file or URL.
+     * The image file or URL will be derived from the metadata filename by a call to
      * {@link #toImageFileName}, which may be overridden.
      *
      * @param  input The {@link File} or {@link URL} to be read.
-     * @param  seekForwardOnly if <code>true</code>, grid coverages
-     *         and metadata may only be read in ascending order from
-     *         the input source.
+     * @param  seekForwardOnly if {@code true}, grid coverages and metadata may only
+     *         be read in ascending order from the input source.
      * @throws IOException if an I/O operation failed.
      * @throws IllegalArgumentException if input is not an instance
      *         of a classe supported by this reader.
      */
+    //@Override
     public synchronized void setInput(Object input, final boolean seekForwardOnly)
             throws IOException
     {
@@ -139,31 +157,29 @@ public class ExoreferencedGridCoverageReader extends AbstractGridCoverageReader 
         }
         super.setInput(input, seekForwardOnly);
     }
-    
+
     /**
-     * Returns the filename for image data. This method is invoked by
-     * {@link #setInput} after {@link #metadata} has been loaded.
-     * Default implementation just replace the file extension by the
-     * <code>extension</code> argument specified to the constructor.
+     * Returns the filename for image data. This method is invoked by {@link #setInput} after
+     * {@link #metadata} has been loaded. Default implementation just replace the file extension
+     * by the {@code extension} argument specified to the constructor.
      *
-     * @param  filename The filename part of metadata file. This
-     *         is the filename part of the file supplied by users
-     *         to {@link #setInput}.
-     * @return The filename to use for for the image file. The
-     *         directory is assumed to be the same than the metadata file.
+     * @param  filename The filename part of metadata file. This is the filename part
+     *         of the file supplied by users to {@link #setInput}.
+     * @return The filename to use for for the image file. The directory is assumed
+     *         to be the same than the metadata file.
      */
     protected String toImageFileName(String filename) {
         int ext = filename.lastIndexOf('.');
-        if (ext<0) {
-            ext=filename.length();
+        if (ext < 0) {
+            ext = filename.length();
         }
-        return filename.substring(0, ext)+'.'+extension;
+        return filename.substring(0, ext) + '.' + extension;
     }
-    
+
     /**
      * Returns the coordinate system for the {@link GridCoverage} to be read.
      * The default implementation invokes
-     * <code>{@link #metadata}.{@link MetadataBuilder#getCoordinateReferenceSystem()
+     * <code>{@linkplain #metadata}.{@linkplain MetadataBuilder#getCoordinateReferenceSystem()
      * getCoordinateReferenceSystem()}</code>.
      *
      * @param  index The index of the image to be queried.
@@ -179,11 +195,11 @@ public class ExoreferencedGridCoverageReader extends AbstractGridCoverageReader 
         checkImageIndex(index);
         return metadata.getCoordinateReferenceSystem();
     }
-    
+
     /**
      * Returns the envelope for the {@link GridCoverage} to be read.
      * The default implementation invokes
-     * <code>{@link #metadata}.{@link MetadataBuilder#getEnvelope() getEnvelope()}</code>.
+     * <code>{@linkplain #metadata}.{@linkplain MetadataBuilder#getEnvelope() getEnvelope()}</code>.
      *
      * @param  index The index of the image to be queried.
      * @return The envelope for the {@link GridCoverage} at the specified index.
@@ -196,12 +212,11 @@ public class ExoreferencedGridCoverageReader extends AbstractGridCoverageReader 
         checkImageIndex(index);
         return metadata.getEnvelope();
     }
-    
+
     /**
      * Returns the grid range for the {@link GridCoverage} to be read.
-     * The default implementation try to invoke
-     * <code>{@link #metadata}.{@link MetadataBuilder#getGridRange() getGridRange()}</code>,
-     * and fallback to <code>super.getGridRange(index)</code> if the later fails.
+     * The default implementation invokes
+     * <code>{@linkplain #metadata}.{@linkplain MetadataBuilder#getGridRange() getGridRange()}</code>.
      *
      * @param  index The index of the image to be queried.
      * @return The grid range for the {@link GridCoverage} at the specified index.
@@ -210,17 +225,18 @@ public class ExoreferencedGridCoverageReader extends AbstractGridCoverageReader 
      * @throws IOException if an error occurs reading the width information from
      *         the input source.
      */
+    //@Override
     public synchronized GridRange getGridRange(final int index) throws IOException {
         checkImageIndex(index);
         return metadata.getGridRange();
     }
-    
+
     /**
      * Returns the sample dimensions for each band of the {@link GridCoverage}
      * to be read. If sample dimensions are not known, then this method returns
-     * <code>null</code>. The default implementation invokes
-     * <code>{@link #metadata}.{@link MetadataBuilder#getSampleDimensions()
-     *       getSampleDimensions()}</code>.
+     * {@code null}. The default implementation invokes
+     * <code>{@linkplain #metadata}.{@linkplain MetadataBuilder#getSampleDimensions()
+     * getSampleDimensions()}</code>.
      *
      * @param  index The index of the image to be queried.
      * @return The category lists for the {@link GridCoverage} at the specified index.
@@ -230,18 +246,9 @@ public class ExoreferencedGridCoverageReader extends AbstractGridCoverageReader 
      * @throws IOException if an error occurs reading the width information from
      *         the input source.
      */
-    public synchronized SampleDimension[] getSampleDimensions(final int index) throws IOException {
+    //@Override
+    public synchronized GridSampleDimension[] getSampleDimensions(final int index) throws IOException {
         checkImageIndex(index);
         return metadata.getSampleDimensions();
-    }
-    
-    /**
-     * Sets the current {@link Locale} of this <code>AbstractGridCoverageReader</code>
-     * to the given value. A value of <code>null</code> removes any previous
-     * setting, and indicates that the reader should localize as it sees fit.
-     */
-    public synchronized void setLocale(final Locale locale) {
-        super.setLocale(locale);
-        metadata.setUserLocale(locale);
     }
 }

@@ -79,7 +79,7 @@ public abstract class SimpleImageReader extends ImageReader {
      * This flag is set to {@code true} for J2SE 1.4. It may be
      * changed to {@code false} with future J2SE and JAI versions.
      */
-    private static final boolean USE_JAI_MODEL = true;
+    static final boolean USE_JAI_MODEL = true;
 
     /**
      * The stream to {@linkplain #close close} on {@link #setInput(Object,boolean,boolean)

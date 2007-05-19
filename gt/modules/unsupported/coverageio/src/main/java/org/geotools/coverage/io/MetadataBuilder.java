@@ -22,31 +22,14 @@ package org.geotools.coverage.io;
 // J2SE dependencies
 import java.awt.Image;
 import java.awt.image.RenderedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Serializable;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.*;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
@@ -63,7 +46,6 @@ import javax.media.jai.ParameterList;
 import javax.media.jai.PropertySource;
 
 // OpenGIS dependencies
-import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -113,6 +95,7 @@ import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.operation.DefiningConversion;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.GridSampleDimension;
 import org.geotools.geometry.GeneralEnvelope;
 
 
@@ -539,7 +522,7 @@ public class MetadataBuilder {
      * @see #Z_RESOLUTION
      */
     public static final Key DEPTH = new EnvelopeKey("Depth", (byte)2, EnvelopeKey.SIZE);
-    
+
     /**
      * The source (the file path or the URL) specified during the last call to a {@code load(...)}
      * method.
@@ -565,7 +548,7 @@ public class MetadataBuilder {
      * and dates. If {@code null}, then the default pattern is used.
      */
     private String numberPattern, datePattern;
-    
+
     /**
      * The metadata, or {@code null} if none. Keys are the caseless metadata names
      * as {@link Key} objects, and values are arbitrary objects (usually {@link String}s).
@@ -602,26 +585,26 @@ public class MetadataBuilder {
      * actual objects.
      */
     private transient Map cache;
-    
+
     /**
      * The factories to use for constructing ellipsoids, projections, coordinate reference systems...
      */
     private final FactoryGroup factories;
-    
+
     /**
      * The locale to use for formatting messages, or {@code null} for a default locale.
      * This is <strong>not</strong> the local to use for parsing the file. This later locale
      * is specified by {@link #getLocale}.
      */
     private Locale userLocale;
-    
+
     /**
      * Constructs a new {@code MetadataBuilder} using default factories.
      */
     public MetadataBuilder() {
         this(FactoryGroup.createInstance(null));
     }
-    
+
     /**
      * Constructs a new {@code MetadataBuilder} using the specified factories.
      */
@@ -706,7 +689,7 @@ public class MetadataBuilder {
         }
         throw new IllegalArgumentException(Utilities.getShortName(type));
     }
-    
+
     /**
      * Clears this metadata set. If the same {@code MetadataBuilder} object is used for parsing
      * many files, then {@code clear()} should be invoked prior any {@code load(...)} method.
@@ -718,7 +701,7 @@ public class MetadataBuilder {
         metadata = null;
         cache    = null;
     }
-    
+
     /**
      * Reads all metadata from a text file. The default implementation invokes
      * {@link #load(BufferedReader)}. Note that this method do not invokes {@link #clear}
@@ -739,7 +722,7 @@ public class MetadataBuilder {
         load(in);
         in.close();
     }
-    
+
     /**
      * Reads all metadata from an URL. The default implementation invokes
      * {@link #load(BufferedReader)}. Note that this method do not invokes {@link #clear}
@@ -760,7 +743,7 @@ public class MetadataBuilder {
         load(in);
         in.close();
     }
-    
+
     /**
      * Reads all metadata from a stream. The default implementation invokes
      * {@link #parseLine} for each non-empty line found in the stream. Notes:
@@ -800,7 +783,7 @@ public class MetadataBuilder {
             add((String)null, comments.toString());
         }
     }
-    
+
     /**
      * Parses a line and add the key-value pair to this metadata set. The default implementation
      * takes the substring on the left side of the first occurence of the {@linkplain #getSeparator
@@ -845,7 +828,7 @@ public class MetadataBuilder {
         }
         return false;
     }
-    
+
     /**
      * Add all metadata from the specified grid coverage. This method can be used together with
      * {@link #listMetadata} as a way to format the metadata for an arbitrary grid coverage.
@@ -888,7 +871,7 @@ public class MetadataBuilder {
             add(keyAsAlias, key.getValue(coverage));
         }
     }
-    
+
     /**
      * Add all metadata from the specified image.
      *
@@ -940,7 +923,7 @@ public class MetadataBuilder {
             }
         }
     }
-    
+
     /**
      * Add a metadata for the specified key. Keys are case-insensitive, ignore leading and
      * trailing whitespaces and consider any other whitespace sequences as equal to a single
@@ -1210,7 +1193,7 @@ public class MetadataBuilder {
     public synchronized boolean contains(final Key key) {
         return getOptional(key) != null;
     }
-    
+
     /**
      * Returns the metadata for the specified key. This method expect a format neutral, case
      * insensitive {@link Key} argument. In order to maps the key to the actual name used in
@@ -1234,7 +1217,7 @@ public class MetadataBuilder {
         throw new MissingMetadataException(Errors.getResources(userLocale).
                   getString(ErrorKeys.UNDEFINED_PROPERTY_$1, key), key, lastAlias);
     }
-    
+
     /**
      * Returns a metadata as a {@code double} value. The default implementation invokes
      * {@link #getAsDouble(Key)} or {@link #getAsDate(Key)} according the metadata type:
@@ -1257,7 +1240,7 @@ public class MetadataBuilder {
             return getAsDouble(key);
         }
     }
-    
+
     /**
      * Returns a metadata as a {@code double} value. The default implementation
      * invokes <code>{@link #get get}(key)</code> and parse the resulting value with
@@ -1284,7 +1267,7 @@ public class MetadataBuilder {
             throw new MetadataException(exception, key, lastAlias);
         }
     }
-    
+
     /**
      * Returns a metadata as a {@code int} value. The default implementation
      * invokes <code>{@link #getAsDouble getAsDouble}(key)</code> and make sure
@@ -1309,7 +1292,7 @@ public class MetadataBuilder {
         }
         return integer;
     }
-    
+
     /**
      * Returns a metadata as a {@link Date} value. The default implementation
      * invokes <code>{@link #get get}(key)</code> and parse the resulting value with
@@ -1410,7 +1393,7 @@ public class MetadataBuilder {
         }
         return null;
     }
-    
+
     /**
      * Returns the source file name or URL. This is the path specified
      * during the last call to a {@code load(...)} method.
@@ -1453,7 +1436,7 @@ public class MetadataBuilder {
             return defaultValue;
         }
     }
-    
+
     /**
      * Returns the units. The default implementation invokes
      * <code>{@linkplain #get get}({@linkplain #UNITS})</code>
@@ -1478,7 +1461,7 @@ public class MetadataBuilder {
             throw new MetadataException("Unknow unit: "+text, UNITS, lastAlias);
         }
     }
-    
+
     /**
      * Check if {@code toSearch} appears in the {@code list} array.
      * Search is case-insensitive. This is a temporary patch (will be removed
@@ -1492,7 +1475,7 @@ public class MetadataBuilder {
         }
         return false;
     }
-    
+
     /**
      * Returns the geodetic datum. The default implementation invokes
      * <code>{@linkplain #get get}({@linkplain #DATUM})</code>
@@ -1516,7 +1499,7 @@ public class MetadataBuilder {
         checkEllipsoid(text, "getGeodeticDatum");
         return org.geotools.referencing.datum.DefaultGeodeticDatum.WGS84;
     }
-    
+
     /**
      * Returns the ellipsoid. The default implementation invokes
      * <code>{@linkplain #get get}({@linkplain #ELLIPSOID})</code>
@@ -1540,7 +1523,7 @@ public class MetadataBuilder {
         checkEllipsoid(text, "getEllipsoid");
         return org.geotools.referencing.datum.DefaultEllipsoid.WGS84;
     }
-    
+
     /**
      * Check if the supplied ellipsoid is WGS 1984.
      * This is a temporary patch.
@@ -1564,7 +1547,7 @@ public class MetadataBuilder {
             }
         }
     }
-    
+
     /** Temporary flag for {@link #checkEllipsoid}. */
     private static boolean emittedWarning;
 
@@ -1586,7 +1569,7 @@ public class MetadataBuilder {
         }
         parameter.setValue(value);
     }
-    
+
     /**
      * Returns the projection. The default implementation performs the following steps:
      * <p>
@@ -1730,7 +1713,7 @@ public class MetadataBuilder {
         cache(CACHE_KEY, defining);
         return defining;
     }
-    
+
     /**
      * Returns the coordinate reference system. The default implementation constructs a CRS
      * from the information provided by {@link #getUnit}, {@link #getGeodeticDatum} and
@@ -1796,7 +1779,7 @@ public class MetadataBuilder {
             throw new MetadataException(exception, COORDINATE_REFERENCE_SYSTEM, crsAlias);
         }
     }
-    
+
     /**
      * Convenience method returning the envelope in geographic coordinate system using WGS
      * 1984 datum.
@@ -1834,7 +1817,7 @@ public class MetadataBuilder {
         cache(CACHE_KEY, box);
         return box;
     }
-    
+
     /**
      * Returns the envelope. The default implementation constructs an envelope
      * using the values from the following keys:
@@ -1932,7 +1915,7 @@ public class MetadataBuilder {
                       ErrorKeys.INCONSISTENT_PROPERTY_$1, resKey), resKey, lastAlias);
         }
     }
-    
+
     /**
      * Returns the grid range. Default implementation fetchs the metadata values
      * for keys {@link #WIDTH} and {@link #HEIGHT}, and transform the resulting
@@ -1975,7 +1958,7 @@ public class MetadataBuilder {
         cache(CACHE_KEY, range);
         return range;
     }
-    
+
     /**
      * Returns the sample dimensions for each band of the {@link GridCoverage}
      * to be read. If sample dimensions are not know, then this method returns
@@ -1983,10 +1966,10 @@ public class MetadataBuilder {
      *
      * @throws MetadataException if the operation failed.
      */
-    public SampleDimension[] getSampleDimensions() throws MetadataException {
+    public GridSampleDimension[] getSampleDimensions() throws MetadataException {
         return null;
     }
-    
+
     /**
      * Sets the current {@link Locale} of this {@code MetadataBuilder}
      * to the given value. A value of {@code null} removes any previous
@@ -2058,7 +2041,7 @@ public class MetadataBuilder {
             }
         }
     }
-    
+
     /**
      * Returns a string representation of this metadata set. The default implementation
      * write the class name and the envelope in geographic coordinates, as returned by
@@ -2114,7 +2097,7 @@ public class MetadataBuilder {
         if (str != null) {
             str = str.trim();
             StringBuffer buffer = null;
-loop:       for (int i=str.length(); --i>=0;) {
+    loop:       for (int i=str.length(); --i>=0;) {
                 if (Character.isSpaceChar(str.charAt(i))) {
                     final int upper = i;
                     do if (--i < 0) break loop;
