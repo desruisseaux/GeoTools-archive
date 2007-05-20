@@ -683,6 +683,11 @@
         <version>1.7.0</version>
       </dependency>
       <dependency>
+        <groupId>commons-httpclient</groupId>
+        <artifactId>commons-httpclient</artifactId>
+        <version>3.0.1</version>
+      </dependency>
+      <dependency>
         <groupId>velocity</groupId>
         <artifactId>velocity</artifactId>
         <version>1.4</version>
@@ -748,6 +753,13 @@
         <version>10.2.0</version>
       </dependency>
 
+      <!-- Grid data formats -->
+      <dependency>
+        <groupId>edu.ucar</groupId>
+        <artifactId>netcdf</artifactId>
+        <version>2.2.20</version>
+      </dependency>
+ 
       <!-- Tests or legacy -->
       <dependency>
         <groupId>junit</groupId>

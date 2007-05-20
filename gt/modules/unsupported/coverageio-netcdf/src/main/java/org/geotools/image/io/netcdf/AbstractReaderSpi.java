@@ -26,7 +26,7 @@ import ucar.nc2.Variable;  // For javadoc
 
 // Geomatys dependencies
 import org.geotools.image.io.SampleConverter;
-import org.geotools.image.io.FileBasedReaderSpi;
+import org.geotools.image.io.FileImageReader;
 
 
 /**
@@ -43,7 +43,7 @@ import org.geotools.image.io.FileBasedReaderSpi;
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  */
-public abstract class AbstractReaderSpi extends FileBasedReaderSpi implements SampleConverter {
+public abstract class AbstractReaderSpi extends FileImageReader.Spi implements SampleConverter {
     /**
      * List of legal names for NetCDF readers.
      */
@@ -90,10 +90,11 @@ public abstract class AbstractReaderSpi extends FileBasedReaderSpi implements Sa
      * @param 
      */
     public AbstractReaderSpi(final String variable, final int offset, final int nodata) {
+        super("NetCDF", "image/x-netcdf");
         names            = NAMES;
         suffixes         = SUFFIXES;
-        vendorName       = "Geomatys";
-        version          = "1.0";
+        vendorName       = "Geotools";
+        version          = "2.4";
         pluginClassName  = "org.geotools.image.io.netcdf.DefaultReader";
         this.variable    = variable;
         this.offset      = offset;
@@ -103,7 +104,7 @@ public abstract class AbstractReaderSpi extends FileBasedReaderSpi implements Sa
     /**
      * Retourne une description de ce format d'image.
      */
-    @Override
+    //@Override
     public String getDescription(final Locale locale) {
         return "Decodeur d'images NetCDF";
     }

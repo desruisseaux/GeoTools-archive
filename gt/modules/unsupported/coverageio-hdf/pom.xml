@@ -24,20 +24,20 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-coverageio-netcdf</artifactId>
+  <artifactId>gt2-coverageio-hdf</artifactId>
   <packaging>jar</packaging>
-  <name>Coverage I/O for NetCDF format</name>
-  <url>http://maven.geotools.fr/reports/modules/unsupported/coverageio-netcdf/</url>
+  <name>Coverage I/O for HDF format</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/coverageio-hdf/</url>
 
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/coverageio-netcdf/
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/coverageio-hdf/
     </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/coverageio-netcdf/</url>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/coverageio-hdf/</url>
   </scm>
 
   <description>
-    Coverage I/O for NetCDF format.
+    Coverage I/O for HDF format.
   </description>
 
   <licenses>
@@ -87,11 +87,6 @@
       <groupId>org.geotools</groupId>
       <artifactId>gt2-coverage</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>edu.ucar</groupId>
-      <artifactId>netcdf</artifactId>
-      <!-- The version number is specified in the parent POM. -->
     </dependency>
   </dependencies>
 

@@ -307,15 +307,14 @@ public abstract class SimpleImageReader extends ImageReader {
         final int[] bandOffsets = new int[numBands];
         for (int i=numBands; --i>=0;) bankIndices[i]=i;
         final ColorSpace colorSpace = getColorSpace(imageIndex, 0, numBands);
-
         if (USE_JAI_MODEL) {
-            final ColorModel cm = new ComponentColorModelJAI(colorSpace, null, false, false,
-                                                             Transparency.OPAQUE, dataType);
-            return new ImageTypeSpecifier(cm, new ComponentSampleModelJAI(dataType, 1, 1, 1, 1,
-                                                                     bankIndices, bandOffsets));
+            final ColorModel cm = new ComponentColorModelJAI(
+                    colorSpace, null, false, false, Transparency.OPAQUE, dataType);
+            return new ImageTypeSpecifier(cm, new ComponentSampleModelJAI(
+                    dataType, 1, 1, 1, 1, bankIndices, bandOffsets));
         } else {
-            return ImageTypeSpecifier.createBanded(colorSpace, bankIndices,
-                                                   bandOffsets, dataType, false, false);
+            return ImageTypeSpecifier.createBanded(
+                    colorSpace, bankIndices, bandOffsets, dataType, false, false);
         }
     }
 
@@ -360,10 +359,10 @@ public abstract class SimpleImageReader extends ImageReader {
      * @return A default color space scaled to fit data.
      * @throws IOException if an input operation failed.
      */
-    final ColorSpace getColorSpace(final int imageIndex,
+    private ColorSpace getColorSpace(final int imageIndex,
                                    final int bandIndex,
                                    final int numBands)
-        throws IOException
+            throws IOException
     {
         final int dataType = getRawDataType(imageIndex);
         if (dataType!=DataBuffer.TYPE_BYTE) {
@@ -371,7 +370,7 @@ public abstract class SimpleImageReader extends ImageReader {
             if (range!=null && Number.class.isAssignableFrom(range.getElementClass())) {
                 final Number minimum = (Number) range.getMinValue();
                 final Number maximum = (Number) range.getMaxValue();
-                if (minimum!=null && maximum!=null) {
+                if (minimum != null && maximum != null) {
                     final float minValue = minimum.floatValue();
                     final float maxValue = maximum.floatValue();
                     if (minValue<maxValue && !Float.isInfinite(minValue) &&

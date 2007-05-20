@@ -24,7 +24,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
 import javax.imageio.spi.ImageReaderSpi;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -72,24 +75,39 @@ public abstract class FileImageReader extends SimpleImageReader {
     }
 
     /**
+     * Ensures that the specified file can be read.
+     *
+     * @throws FileNotFoundException if the file is not found or can not be read.
+     */
+    private static void ensureFileExists(final File file) throws FileNotFoundException {
+        if (!file.isFile() || !file.canRead()) {
+            throw new FileNotFoundException(Errors.format(ErrorKeys.FILE_DOES_NOT_EXIST_$1, file));
+        }
+    }
+
+    /**
      * Returns the {@linkplain #input input} as a file. If the input is not a file,
      * then its content is copied to a temporary file and the temporary file is returned.
      *
      * @return The {@linkplain #input input} as a file.
+     * @throws FileNotFoundException if the file is not found or can not be read.
      * @throws IOException if a copy was necessary but failed.
      */
     protected File getInputFile() throws IOException {
         if (inputFile != null) {
+            ensureFileExists(inputFile);
             return inputFile;
         }
         if (input instanceof File) {
             inputFile = (File) input;
+            ensureFileExists(inputFile);
             return inputFile;
         }
         if (input instanceof URL) {
             final URL sourceURL = (URL) input;
             if (sourceURL.getProtocol().equalsIgnoreCase("file")) {
                 inputFile = new File(URLDecoder.decode(sourceURL.getFile(), getURLEncoding()));
+                ensureFileExists(inputFile);
                 return inputFile;
             }
         }

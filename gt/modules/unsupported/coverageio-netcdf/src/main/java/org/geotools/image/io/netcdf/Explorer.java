@@ -18,6 +18,7 @@ package org.geotools.image.io.netcdf;
 
 // J2SE dependencies
 import java.util.List;
+import java.util.Iterator;
 import java.io.File;
 import java.io.Writer;
 import java.io.IOException;
@@ -25,9 +26,9 @@ import java.io.IOException;
 // NetCDF dependencies
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
-import ucar.nc2.DataType;
 import ucar.nc2.Dimension;
 import ucar.ma2.Array;
+import ucar.ma2.DataType;
 import ucar.ma2.IndexIterator;
 
 // Geotools dependencies
@@ -37,47 +38,48 @@ import org.geotools.math.Statistics;
 
 
 /**
- * Fournit des informations sur le contenu d'un fichier NetCDF. Cette classe se lance à partir
- * de la ligne de commande.
- * <p>
- * Les options permises sont:
+ * Provides informations about the content of a NetCDF file. Command line options are:
  * <table>
  *   <tr>
  *     <td><code>-variable=</code><var>nom</var></td>
- *     <td>Affiche des informations à propos de la variable nommée dans chaque fichier.</td>
+ *     <td>Prints informations about the specified variable.</td>
  *   </tr>
  * </table>
- * 
+ *
+ * @since 2.4
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
 final class Explorer {
     /**
-     * Ecrit le contenu du fichier spécifié vers le flot de sortie spécifié. Cette méthode ne
-     * détaille pas les variables. Utilisez {@link #dump(Variable,Writer)} pour avoir plus
-     * d'information sur une variable en particulier.
+     * Prints the content of the specified file into the specified stream. This method do not
+     * print variable informations. Use {@link #dump(Variable,Writer)} for information about a
+     * specific variable.
      */
     private static void dump(final NetcdfFile file, final Writer out) throws IOException {
         final TableWriter table = new TableWriter(out, " \u2502 ");
-        @SuppressWarnings("unchecked")
-        final List<Variable> variables = (List<Variable>) file.getVariables();
+        //@SuppressWarnings("unchecked")
+        final List/*<Variable>*/ variables = (List/*<Variable>*/) file.getVariables();
         table.nextLine('\u2500');
-        table.write("Type\tNom\tDimensions\tLongueurs");
+        table.write("Type\tName\tDimensions\tLengths");
         table.nextLine();
         table.nextLine('\u2500');
-        for (final Variable v : variables) {
+        for (final Iterator it=variables.iterator(); it.hasNext();) {
+            final Variable v = (Variable) it.next();
             table.write(String.valueOf(v.getDataType()));
             table.nextColumn();
             table.write(v.getName());
             /*
-             * Ensemble des dimensions pour une variable.
+             * The set of dimensions for a variable.
              */
-            @SuppressWarnings("unchecked")
-            final List<Dimension> dimensions = (List<Dimension>) v.getDimensions();
+            //@SuppressWarnings("unchecked")
+            final List/*<Dimension>*/ dimensions = (List/*<Dimension>*/) v.getDimensions();
             for (int info=0; info<=1; info++) {
                 table.nextColumn();
                 boolean first = true;
-                for (final Dimension dim : dimensions) {
+                for (final Iterator it2=dimensions.iterator(); it2.hasNext();) {
+                    final Dimension dim = (Dimension) it2.next();
                     final String text;
                     switch (info) {
                         case 0:  text = dim.getName(); break;
@@ -99,17 +101,18 @@ final class Explorer {
     }
 
     /**
-     * Ecrit le contenu de la variable spécifiée vers le flot de sortie spécifié.
+     * Prints informations about the specified variable into the specified stream.
      */
     private static void dump(final Variable variable, final Writer out) throws IOException {
         final TableWriter table = new TableWriter(out, " \u2502 ");
         table.nextLine('\u2500');
-        table.write("Dimension\tLongueur\tIllimitée");
+        table.write("Dimension\tLength\tUnlimited");
         table.nextLine();
         table.nextLine('\u2500');
-        @SuppressWarnings("unchecked")
-        final List<Dimension> dimensions = (List<Dimension>) variable.getDimensions();
-        for (final Dimension dim : dimensions) {
+        //@SuppressWarnings("unchecked")
+        final List/*<Dimension>*/ dimensions = (List/*<Dimension>*/) variable.getDimensions();
+        for (final Iterator it=dimensions.iterator(); it.hasNext();) {
+            final Dimension dim = (Dimension) it.next();
             table.write(dim.getName());
             table.nextColumn();
             table.setAlignment(TableWriter.ALIGN_RIGHT);
@@ -122,7 +125,7 @@ final class Explorer {
         table.nextLine('\u2500');
         table.flush();
         /*
-         * Obtient des statistiques sur cette variable.
+         * Get statistics about the variable.
          */
         final Statistics stats = new Statistics();
         final Array      array = variable.read();
@@ -145,7 +148,7 @@ final class Explorer {
     }
 
     /**
-     * Exécute à partir de la ligne de commande.
+     * Executes from the command line.
      */
     public static void main(String[] args) throws IOException {
         final Arguments arguments = new Arguments(args);
@@ -154,13 +157,14 @@ final class Explorer {
         for (int i=0; i<args.length; i++) {
             final String filename = args[i];
             arguments.out.println(filename);
-            final NetcdfFile file = new NetcdfFile(filename);
+            final NetcdfFile file = NetcdfFile.open(filename);
             if (variable == null) {
                 dump(file, arguments.out);
             } else {
-                @SuppressWarnings("unchecked")
-                final List<Variable> variables = (List<Variable>) file.getVariables();
-                for (final Variable v : variables) {
+                //@SuppressWarnings("unchecked")
+                final List/*<Variable>*/ variables = (List/*<Variable>*/) file.getVariables();
+                for (final Iterator it=variables.iterator(); it.hasNext();) {
+                    final Variable v = (Variable) it.next();
                     if (v.getName().trim().equalsIgnoreCase(variable)) {
                         dump(v, arguments.out);
                     }

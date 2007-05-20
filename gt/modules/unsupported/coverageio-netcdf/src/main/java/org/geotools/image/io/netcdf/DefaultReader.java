@@ -18,14 +18,17 @@ package org.geotools.image.io.netcdf;
 
 // J2SE dependencies
 import java.util.List;
+import java.util.Iterator;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.awt.image.DataBuffer;
 import java.io.File;
 import java.io.IOException;
+import java.io.FileNotFoundException;
 import javax.imageio.IIOException;
 import javax.imageio.ImageReadParam;
+import javax.media.jai.util.Range;
 
 // NetCDF dependencies
 import ucar.nc2.NetcdfFile;
@@ -33,54 +36,51 @@ import ucar.nc2.Variable;
 import ucar.ma2.Array;
 import ucar.ma2.Index;
 import ucar.ma2.InvalidRangeException;
-
-// Geotools dependencies
-import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
-import static org.geotools.resources.i18n.ErrorKeys.*;
+import org.geotools.resources.i18n.ErrorKeys;
 
 // Geomatys dependencies
 import org.geotools.image.io.SampleConverter;
-import org.geotools.image.io.FileBasedReader;
-import org.geotools.image.io.FileBasedReaderSpi;
+import org.geotools.image.io.FileImageReader;
 
 
 /**
- * Implémentation par défaut des décodeurs d'images au format NetCDF. Dans la plupart des
- * cas, il ne sera pas nécessaire de créer des classes dérivées. Des classes dérivées
- * de {@link AbstractReaderSpi} suffisent.
- * 
+ * Base implementation for NetCDF image reader. In most case, there is no need to subclass.
+ * Subclassing {@link AbstractReaderSpi} should be suffisient.
+ *
+ * @since 2.4
+ * @source $URL$
  * @version $Id$
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  */
-public class DefaultReader extends FileBasedReader {
+public class DefaultReader extends FileImageReader {
     /**
-     * Dimension correspondant aux colonnes. Doit être constant, car il y aura des appels
-     * à {@link Array#set0} codés en dur.
-     */
-    private int X_DIMENSION = 3;
-
-    /**
-     * Dimension correspondant aux lignes. Doit être constant, car il y aura des appels
-     * à {@link Array#set1} codés en dur.
-     */
-    private int Y_DIMENSION = 2;
-
-    /**
-     * Le fichier NetCDF, ou {@code null} s'il n'a pas encore été ouvert.
+     * The NetCDF file, or {@code null} if not yet open.
      */
     private NetcdfFile file;
-
-    /**
-     * L'ensemble des données du phénomène étudié.
-     */
-    private Variable variable;
 
     /**
      * The name of the {@linkplain Variable variable} to be read in a NetCDF file.
      */
     private final String variableName;
+
+    /**
+     * The data from the NetCDF file.
+     */
+    private Variable variable;
+
+    /**
+     * The dimension in {@link #variable} to use as image width.
+     * Default value is 0.
+     */
+    private int xDimension = 0;
+
+    /**
+     * The dimension in {@link #variable} to use as image height.
+     * Default value is 1.
+     */
+    private int yDimension = 1;
 
     /**
      * The converter for sample values.
@@ -100,86 +100,80 @@ public class DefaultReader extends FileBasedReader {
     }
 
     /**
-     * Spécifie la source des données à utiliser en entrée.
-     * Cette source devrait être de préférence un objet de type {@link File}.
+     * Returns the dimension in the NetCDF {@linkplain Variable variable} where to fetch
+     * column data. This is usually a format-specific parameter. The default value is 0.
      */
-    @Override
-    public void setInput(final Object input, final boolean seekForwardOnly, final boolean ignoreMetadata) {
-        super.setInput(input, seekForwardOnly, ignoreMetadata);
-        if (file != null) {
-            try {
-                file.close();
-            } catch (IOException e) {
-                LOGGER.warning("Echec lors de la fermeture du fichier précédent.");
-                /*
-                 * On continue. Ce n'est qu'un avertissement car de toute façon on
-                 * n'utilisera plus ce fichier.
-                 */
-            }
-            file = null;
-            variable = null;
-        }
+    public int getXDimension() {
+        return xDimension;
     }
 
     /**
-     * Retourne la largeur de l'image.
+     * Set the dimension in the NetCDF {@linkplain Variable variable} where to fetch
+     * column data. This is usually a format-specific parameter. The default value is 0.
+     */
+    public void setXDimension(final int x) {
+        xDimension = x;
+    }
+
+    /**
+     * Returns the dimension in the NetCDF {@linkplain Variable variable} where to fetch
+     * row data. This is usually a format-specific parameter. The default value is 1.
+     */
+    public int getYDimension() {
+        return yDimension;
+    }
+
+    /**
+     * Set the dimension in the NetCDF {@linkplain Variable variable} where to fetch
+     * row data. This is usually a format-specific parameter. The default value is 1.
+     */
+    public void setYDimension(final int y) {
+        yDimension = y;
+    }
+
+    /**
+     * Returns the image width.
      */
     public int getWidth(final int imageIndex) throws IOException {
         prepareVariable(imageIndex);
-        return variable.getDimension(X_DIMENSION).getLength();
+        return variable.getDimension(xDimension).getLength();
     }
 
     /**
-     * Retourne la hauteur de l'image.
+     * Returns the image height.
      */
     public int getHeight(final int imageIndex) throws IOException {
         prepareVariable(imageIndex);
-        return variable.getDimension(Y_DIMENSION).getLength();
+        return variable.getDimension(yDimension).getLength();
     }
-    
-    public void setXDimension(final int x) {
-        this.X_DIMENSION = x;
-    }
-    
-    public void setYDimension(final int y) {
-        this.Y_DIMENSION = y;
-    }
-    
-    private static void set(final Index index, final int dimension, final int value) {
-        switch(dimension) {
-            case 0: index.set0(value); break;
-            case 1: index.set1(value); break;
-            case 2: index.set2(value); break;
-            case 3: index.set3(value); break;
-            case 4: index.set4(value); break;
-            case 5: index.set5(value); break;
-            case 6: index.set6(value); break;
-        }
-    }
-    
+
     /**
-     * Vérifie que les données ont bien été chargée dans {@link #variable} pour l'image spécifiée.
-     * Si les données ont déjà été chargée lors d'un appel précédent, alors cette méthode ne fait
-     * rien.
+     */
+    public Range getExpectedRange(final int imageIndex, final int bandIndex) throws IOException {
+        throw new UnsupportedOperationException(); // TODO
+    }
+
+    /**
+     * Ensures that data are loaded in the {@link #variable}. If data are already loaded,
+     * then this method do nothing.
      * 
-     * @param   imageIndex L'index de l'image à traiter.
-     * @throws  IndexOutOfBoundsException Si {@code indexImage} est différent de 0,
-     *          car on considère qu'il n'y a qu'une image par fichier HDF.
-     * @throws  IllegalStateException Si le champ {@link #input} n'a pas été initialisé via
-     *          {@link #setInput setInput(...)}.
-     * @throws  IIOException Si le fichier NetCDF ne semble pas correct.
-     * @throws  IOException Si la lecture a échouée pour une autre raison.
+     * @param   imageIndex The image index.
+     * @throws  IndexOutOfBoundsException if the specified index is outside the expected range.
+     * @throws  IllegalStateException If {@link #input} is not set.
+     * @throws  IOException If the operation failed because of an I/O error.
      */
     private void prepareVariable(final int imageIndex) throws IOException {
-        if (imageIndex != 0) {
-            throw new IndexOutOfBoundsException(Errors.format(ILLEGAL_ARGUMENT_$2, "imageIndex", imageIndex));
-        }
+        checkImageIndex(imageIndex);
         if (variable == null) {
             final File inputFile = getInputFile();
-            file = new NetcdfFile(inputFile.getPath()); // TODO: consider using NetcdfFileCache.acquire(...)
-            @SuppressWarnings("unchecked")
-            final List<Variable> variables = (List<Variable>) file.getVariables();
-            for (final Variable v : variables) {
+            file = NetcdfFile.open(inputFile.getPath()); // TODO: consider using NetcdfFileCache.acquire(...)
+            if (file == null) {
+                throw new FileNotFoundException(Errors.format(ErrorKeys.FILE_DOES_NOT_EXIST_$1, file));
+            }
+            //@SuppressWarnings("unchecked")
+            final List/*<Variable>*/ variables = (List/*<Variable>*/) file.getVariables();
+            for (final Iterator it=variables.iterator(); it.hasNext();) {
+                final Variable v = (Variable) it.next();
                 if (variableName.equalsIgnoreCase(v.getName().trim())) {
                     variable = v;
                     return;
@@ -187,21 +181,20 @@ public class DefaultReader extends FileBasedReader {
             }
             file.close();
             file = null;
-            throw new IIOException("La variable \"" + variableName + "\" n'a pas été trouvée.");
+            throw new IIOException(Errors.format(
+                    ErrorKeys.VARIABLE_NOT_FOUND_IN_FILE_$2, variableName, file));
         }
     }
 
     /**
-     * Construit une image à partir des paramètre de lecture spécifiés.
-     *
-     * @throws  IOException Si la lecture de l'image a échouée.
+     * Creates an image from the specified parameters.
      */
     public BufferedImage read(final int imageIndex, final ImageReadParam param) throws IOException {
         clearAbortRequest();
         checkReadParamBandSettings(param, 1, 1);
         prepareVariable(imageIndex);
-        final int            width  = variable.getDimension(X_DIMENSION).getLength();
-        final int            height = variable.getDimension(Y_DIMENSION).getLength();
+        final int            width  = variable.getDimension(xDimension).getLength();
+        final int            height = variable.getDimension(yDimension).getLength();
         final BufferedImage  image  = getDestination(param, getImageTypes(imageIndex), width, height);
         final WritableRaster raster = image.getRaster();
         final Rectangle   srcRegion = new Rectangle();
@@ -217,14 +210,14 @@ public class DefaultReader extends FileBasedReader {
         computeRegions(param, width, height, image, srcRegion, destRegion);
         processImageStarted(imageIndex);
         /*
-         * Procède à la lecture de la sous-région demandée par l'utilisateur.
+         * Read the requested sub-region only.
          */
         final int[] shape  = variable.getShape();
         final int[] origin = new int[shape.length];
-        origin [X_DIMENSION] = srcRegion.x;
-        origin [Y_DIMENSION] = srcRegion.y;
-        shape  [X_DIMENSION] = srcRegion.width;
-        shape  [Y_DIMENSION] = srcRegion.height;
+        origin[xDimension] = srcRegion.x;
+        origin[yDimension] = srcRegion.y;
+        shape [xDimension] = srcRegion.width;
+        shape [yDimension] = srcRegion.height;
         final Array array;
         try {
             array = variable.read(origin, shape);
@@ -234,12 +227,14 @@ public class DefaultReader extends FileBasedReader {
         final Index index = array.getIndex();
         final float toPercent = 100f / height;
         final int type = raster.getTransferType();
-        final int xmax = destRegion.x + destRegion.width;
-        final int ymax = destRegion.y + destRegion.height;
-        for (int yi=0,y=destRegion.y+destRegion.height; --y>=destRegion.y;) {
-            set(index, Y_DIMENSION, yi);
-            for (int xi=0,x=destRegion.x; x<xmax; x++) {
-                set(index, X_DIMENSION, xi);
+        final int xmin = destRegion.x;
+        final int ymin = destRegion.y;
+        final int xmax = destRegion.width  + xmin;
+        final int ymax = destRegion.height + ymin;
+        for (int yi=0,y=ymax; --y>=ymin;) {
+            set(index, yDimension, yi);
+            for (int xi=0,x=xmin; x<xmax; x++) {
+                set(index, xDimension, xi);
                 switch (type) {
                     case DataBuffer.TYPE_DOUBLE: {
                         raster.setSample(x, y, 0, converter.convert(array.getDouble(index)));
@@ -268,10 +263,38 @@ public class DefaultReader extends FileBasedReader {
     }
 
     /**
-     * Lance une exception un peu plus explicite lorsqu'une erreur est survenue
-     * lors de la lecture d'un fichier NetCDF.
+     * Sets the index value at the specified dimension.
      */
-    private static IIOException netcdfFailure(final Exception e) {
-        return new IIOException("Echec lors de la lecture du fichier NetCDF", e);
+    private static void set(final Index index, final int dimension, final int value) {
+        switch(dimension) {
+            case 0: index.set0(value); break;
+            case 1: index.set1(value); break;
+            case 2: index.set2(value); break;
+            case 3: index.set3(value); break;
+            case 4: index.set4(value); break;
+            case 5: index.set5(value); break;
+            case 6: index.set6(value); break;
+            default: throw new IndexOutOfBoundsException(String.valueOf(dimension));
+        }
+    }
+
+    /**
+     * Wraps a generic exception into a {@link IIOException}.
+     */
+    private IIOException netcdfFailure(final Exception e) throws IOException {
+        return new IIOException(Errors.format(ErrorKeys.CANT_READ_$1, getInputFile()), e);
+    }
+
+    /**
+     * Closes the NetCDF file.
+     */
+    //@Override
+    protected void close() throws IOException {
+        variable = null;
+        if (file != null) {
+            file.close();
+            file = null;
+        }
+        super.close();
     }
 }

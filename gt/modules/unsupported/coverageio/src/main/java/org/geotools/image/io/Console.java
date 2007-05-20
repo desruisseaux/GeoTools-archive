@@ -239,22 +239,22 @@ public final class Console {
         final PrintWriter out = arguments.out;
         args = arguments.getRemainingArguments(Integer.MAX_VALUE);
         if (formats) {
-            out.println("Formats d'images:");
+            out.println("Images formats:");
             list(out, ImageIO.getReaderFormatNames(), ImageIO.getWriterFormatNames());
         }
         if (mimes) {
-            out.println("Types MIMES:");
+            out.println("MIMES types:");
             list(out, ImageIO.getReaderMIMETypes(), ImageIO.getWriterMIMETypes());
         }
         for (int i=0; i<args.length; i++) {
             final String filename = args[i];
             final RenderedImage image = read(new File(filename));
-            if (props) {
+            if (show || props) {
                 out.println(filename);
-                out.print("  X-min  : "); out.println(image.getMinX());
-                out.print("  Y-min  : "); out.println(image.getMinY());
-                out.print("  Largeur: "); out.println(image.getWidth());
-                out.print("  Hauteur: "); out.println(image.getHeight());
+                out.print("  min X  : "); out.println(image.getMinX());
+                out.print("  min Y  : "); out.println(image.getMinY());
+                out.print("  Width  : "); out.println(image.getWidth());
+                out.print("  Height : "); out.println(image.getHeight());
             }
             if (show) {
                 final Frame frame = new Frame(filename);
