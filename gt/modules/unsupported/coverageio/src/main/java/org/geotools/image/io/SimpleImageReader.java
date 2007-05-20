@@ -22,9 +22,11 @@ import java.awt.image.BandedSampleModel;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.SampleModel;
+import java.awt.image.RenderedImage; // For javadoc
 import java.io.*; // Many imports, including some for javadoc only.
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.logging.Logger;
 import java.util.Collections;
 import java.util.Iterator;
 
@@ -64,6 +66,11 @@ import org.geotools.resources.image.ComponentColorModelJAI;
  * @author Martin Desruisseaux
  */
 public abstract class SimpleImageReader extends ImageReader {
+    /**
+     * The logger to use for events related to this image reader.
+     */
+    public static final Logger LOGGER = Logger.getLogger("org.geotools.image.io");
+
     /**
      * Tells if we should use {@link javax.media.jai.ComponentSampleModelJAI}
      * instead of the more standard {@link java.awt.image.ComponentSampleModel}.
@@ -150,7 +157,7 @@ public abstract class SimpleImageReader extends ImageReader {
                 streamOrigin = ((ImageInputStream) input).getStreamPosition();
             } catch (IOException exception) {
                 streamOrigin = 0;
-                Logging.unexpectedException("org.geotools.image.io",
+                Logging.unexpectedException(LOGGER.getName(),
                         SimpleImageReader.class, "setInput", exception);
             }
         }
@@ -379,42 +386,57 @@ public abstract class SimpleImageReader extends ImageReader {
     }
 
     /**
-     * Convenience method returning the destination band for the
-     * specified source band. If the specified source band is not
-     * to be read, then this method returns -1.
+     * Convenience method returning the destination band for the specified source band.
+     * If the specified source band is not to be read, then this method returns -1.
+     *
+     * @param sourceBands The {@linkplain ImageReadParam#getSourceBands source bands}
+     *        to be read from the image file.
+     * @param destinationBands The {@linkplain ImageReadParam#getDestinationBands destination bands}
+     *        in which to store the values in the {@linkplain RenderedImage rendered image}.
+     * @param band The source band number to be converted into a destination band number.
+     * @return The destination band number, or -1 if none.
      */
-    static int sourceToDestBand(final int[] sourceBands,
-                                final int[] destinationBands,
-                                final int   srcBand)
+    protected static int sourceToDestBand(final int[] sourceBands,
+                                          final int[] destinationBands,
+                                          final int   band)
     {
-        if (sourceBands==null) {
-            return (destinationBands!=null) ? destinationBands[srcBand] : srcBand;
+        if (sourceBands == null) {
+            return (destinationBands != null) ? destinationBands[band] : band;
         }
         for (int i=0; i<sourceBands.length; i++) {
-            if (sourceBands[i] == srcBand) {
-                return (destinationBands!=null) ? destinationBands[i] : i;
+            if (sourceBands[i] == band) {
+                return (destinationBands != null) ? destinationBands[i] : i;
             }
         }
         return -1;
     }
 
     /**
-     * Convenience method returning the source
-     * band for the specified destination band.
+     * Convenience method returning the source band for the specified destination band.
+     *
+     * @param sourceBands The {@linkplain ImageReadParam#getSourceBands source bands}
+     *        to be read from the image file.
+     * @param destinationBands The {@linkplain ImageReadParam#getDestinationBands destination bands}
+     *        in which to store the values in the {@linkplain RenderedImage rendered image}.
+     * @param band The destination band number to be converted into a source band number.
+     * @return The destination band number.
+     * @throws IllegalArgumentException if no destination band was found for the given source band.
      */
-    static int destToSourceBand(final int[] sourceBands,
-                                final int[] destinationBands,
-                                final int   destBand)
+    protected static int destToSourceBand(final int[] sourceBands,
+                                          final int[] destinationBands,
+                                          final int   band)
+            throws IllegalArgumentException
     {
-        if (destinationBands==null) {
-            return (sourceBands!=null) ? sourceBands[destBand] : destBand;
+        if (destinationBands == null) {
+            return (sourceBands != null) ? sourceBands[band] : band;
         }
         for (int i=0; i<destinationBands.length; i++) {
-            if (destinationBands[i] == destBand) {
-                return (sourceBands!=null) ? sourceBands[i] : i;
+            if (destinationBands[i] == band) {
+                return (sourceBands != null) ? sourceBands[i] : i;
             }
         }
-        throw new IllegalArgumentException(String.valueOf(destBand));
+        throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
+                "band", new Integer(band)));
     }
 
     /**
@@ -508,9 +530,9 @@ public abstract class SimpleImageReader extends ImageReader {
      * than a stream created by this class from a {@link File} or {@link URL} input.
      * <p>
      * This method is invoked automatically by {@link #setInput(Object,boolean,boolean)
-     * setInput(...)}, {@link #reset} or {@link #dispose} methods and doesn't need to be
-     * invoked explicitly. It has protected access only in order to allow overriding by
-     * subclasses.
+     * setInput(...)}, {@link #reset}, {@link #dispose} or {@link #finalize} methods and
+     * doesn't need to be invoked explicitly. It has protected access only in order to
+     * allow overriding by subclasses.
      *
      * @throws IOException if an error occured while closing the stream.
      *
@@ -543,7 +565,7 @@ public abstract class SimpleImageReader extends ImageReader {
         try {
             close();
         } catch (IOException exception) {
-            Logging.unexpectedException("org.geotools.image.io", getClass(), "close", exception);
+            Logging.unexpectedException(LOGGER.getName(), getClass(), "close", exception);
         }
     }
 
@@ -567,5 +589,70 @@ public abstract class SimpleImageReader extends ImageReader {
     public void dispose() {
         closeSilently();
         super.dispose();
+    }
+
+    /**
+     * Closes the streams. This method is automatically invoked by the garbage collector.
+     */
+    //@Override
+    protected void finalize() throws Throwable {
+        close();
+        super.finalize();
+    }
+
+
+
+
+    /**
+     * Service provider interface (SPI) for {@link SimpleImageReader}s.
+     *
+     * @since 2.4
+     * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/coverage/src/main/java/org/geotools/image/io/TextImageReader.java $
+     * @version $Id$
+     * @author Martin Desruisseaux
+     */
+    public static abstract class Spi extends ImageReaderSpi {
+        /**
+         * List of legal input types for {@link SimpleImageReader}.
+         */
+        private static final Class[] INPUT_TYPES = new Class[] {
+            File.class,
+            URL.class,
+            URLConnection.class,
+            InputStream.class,
+            ImageInputStream.class
+        };
+
+        /**
+         * Constructs a new SPI for {@link SimpleImageReader}. This constructor
+         * initializes the following fields to default values:
+         *
+         * <ul>
+         *   <li>Image format names ({@link #names}):
+         *       An array of lenght 1 containing the {@code name} argument.
+         *
+         *   <li>MIME type ({@link #MIMETypes}):
+         *       An array of length 1 containing the {@code mime} argument.
+         *
+         *   <li>Input types ({@link #inputTypes}):
+         *       {@link File}, {@link URL}, {@link InputStream} et {@link ImageInputStream}.</li>
+         * </ul>
+         *
+         * Others fields should be set by subclasses
+         * (usually in their constructors).
+         *
+         * @param name Format name, or {@code null} to let {@link #names} unset.
+         * @param mime MIME type, or {@code null} to let {@link #MIMETypes} unset.
+         */
+        public Spi(final String name, final String mime) {
+            if (name != null) {
+                names = new String[] {name};
+            }
+            if (mime != null) {
+                MIMETypes = new String[] {mime};
+            }
+            inputTypes = INPUT_TYPES;
+            vendorName = "Geotools";
+        }
     }
 }

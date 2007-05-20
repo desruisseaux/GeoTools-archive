@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Logger;
 import javax.imageio.IIOException;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
@@ -202,7 +201,7 @@ public class TextRecordImageReader extends TextImageReader {
         super(provider, rawImageType);
         clear();
         if (rawImageType == DataBuffer.TYPE_DOUBLE) {
-            Logger.getLogger("org.geotools.image.io").warning("Type double is deprecated.");
+            LOGGER.warning("Type double is deprecated.");
         }
     }
 

@@ -29,6 +29,7 @@ import java.io.PrintWriter;
 import java.io.FileOutputStream;
 import java.io.DataOutputStream;
 import java.io.BufferedOutputStream;
+import java.awt.Frame;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import javax.imageio.ImageIO;
@@ -46,8 +47,10 @@ import org.geotools.resources.Utilities;
 
 
 /**
- * Utilitaires de lignes de commandes.
+ * Command line utilities.
  *
+ * @since 2.4
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
@@ -86,9 +89,9 @@ public final class Console {
             return ImageIO.read(file);
         }
         final String extension = filename.substring(dot+1);
-        final Iterator<ImageReader> it = ImageIO.getImageReadersBySuffix(extension);
-        if (it!=null) while (it.hasNext()) {
-            final ImageReader reader = it.next();
+        final Iterator/*<ImageReader>*/ it = ImageIO.getImageReadersBySuffix(extension);
+        if (it != null) while (it.hasNext()) {
+            final ImageReader reader = (ImageReader) it.next();
             final ImageReaderSpi spi = reader.getOriginatingProvider();
             final ImageInputStream input;
             if (spi!=null && acceptFile(spi.getInputTypes())) {
@@ -128,9 +131,9 @@ public final class Console {
             filename += ".png";
             file      = new File(file.getParentFile(), filename);
         }
-        final Iterator<ImageWriter> it = ImageIO.getImageWritersBySuffix(extension);
+        final Iterator/*<ImageWriter>*/ it = ImageIO.getImageWritersBySuffix(extension);
         if (it!=null && it.hasNext()) {
-            final ImageWriter writer = it.next();
+            final ImageWriter writer = (ImageWriter) it.next();
             final ImageWriterSpi spi = writer.getOriginatingProvider();
             final ImageOutputStream output;
             if (spi!=null && acceptFile(spi.getOutputTypes())) {
@@ -179,19 +182,21 @@ public final class Console {
         final String READ       = "R  ";
         final String WRITE      = "  W";
         final String READ_WRITE = "R/W";
-        final Map<String,String> formats = new TreeMap<String,String>();
-        final Map<String,String> names   = new HashMap<String,String>();
+        final Map/*<String,String>*/ formats = new TreeMap/*<String,String>*/();
+        final Map/*<String,String>*/ names   = new HashMap/*<String,String>*/();
         int length = 0;
         boolean secondPass = false;
         do {
             final String label = secondPass ? WRITE : READ;
-            for (final String name : secondPass ? writers : readers) {
+            final String[] codecs = secondPass ? writers : readers;
+            for (int i=0; i<codecs.length; i++) {
+                final String name = codecs[i];
                 final String identifier = name.toLowerCase();
-                String old = names.put(identifier, name);
+                String old = (String) names.put(identifier, name);
                 if (old!=null && old.compareTo(name) > 0) {
                     names.put(identifier, old);
                 }
-                old = formats.put(identifier, label);
+                old = (String) formats.put(identifier, label);
                 if (old!=null && old!=label) {
                     formats.put(identifier, READ_WRITE);
                 }
@@ -201,8 +206,9 @@ public final class Console {
                 }
             }
         } while ((secondPass = !secondPass) == true);
-        for (final Map.Entry<String,String> format : formats.entrySet()) {
-            final String name = names.get(format.getKey());
+        for (final Iterator it=formats.entrySet().iterator(); it.hasNext();) {
+            final Map.Entry/*<String,String>*/ format = (Map.Entry) it.next();
+            final String name = (String) names.get(format.getKey());
             out.print("  ");
             out.print(name);
             out.print(Utilities.spaces(length - name.length()));
@@ -213,16 +219,15 @@ public final class Console {
     }
 
     /**
-     * Utilitaires de ligne de commande.
-     * Les options suivantes sont autorisées:
+     * Command line tool. Options are
      * <p>
      * <ul>
      *   <li>{@code -formats}<br>
-     *       Liste les formats disponibles.</li>
+     *       Lists available formats.</li>
      *   <li>{@code -mimes}<br>
-     *       Liste les types mimes disponibles.</li>
+     *       Lists available mime types.</li>
      *   <li>{@code -show} <var>filename</var><br>
-     *       Lit l'image spécifié et affiche.</li>
+     *       Read and display the specified file.</li>
      * </ul>
      */
     public static void main(String[] args) throws IOException {
@@ -241,7 +246,8 @@ public final class Console {
             out.println("Types MIMES:");
             list(out, ImageIO.getReaderMIMETypes(), ImageIO.getWriterMIMETypes());
         }
-        for (final String filename : args) {
+        for (int i=0; i<args.length; i++) {
+            final String filename = args[i];
             final RenderedImage image = read(new File(filename));
             if (props) {
                 out.println(filename);
@@ -251,7 +257,10 @@ public final class Console {
                 out.print("  Hauteur: "); out.println(image.getHeight());
             }
             if (show) {
-                org.geotools.image.Utilities.show(image, filename);
+                final Frame frame = new Frame(filename);
+                frame.add(new javax.media.jai.widget.ScrollingImagePanel(image, 512, 512));
+                frame.pack();
+                frame.setVisible(true);
             }
         }
     }

@@ -361,7 +361,7 @@ public abstract class TextImageReader extends SimpleImageReader {
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    public static abstract class Spi extends ImageReaderSpi {
+    public static abstract class Spi extends SimpleImageReader.Spi {
         /**
          * List of legal input types for {@link TextImageReader}.
          */
@@ -435,15 +435,9 @@ public abstract class TextImageReader extends SimpleImageReader {
          * @param mime MIME type, or {@code null} to let {@link #MIMETypes} unset.
          */
         public Spi(final String name, final String mime) {
-            if (name != null) {
-                names = new String[] {name};
-            }
-            if (mime != null) {
-                MIMETypes = new String[] {mime};
-            }
+            super(name, mime);
             suffixes   = EXTENSIONS;
             inputTypes = INPUT_TYPES;
-            vendorName = "Geotools";
         }
 
         /**
