@@ -221,12 +221,13 @@ public final class ConnectionPool {
         public void connectionClosed(ConnectionEvent event) {
             LOGGER.fine("Connection closed - adding to available connections.");
 
+            
             PooledConnection conn = (PooledConnection) event.getSource();
-            ManagedPooledConnection mConn = getInUseManagedPooledConnection(conn);
-
-            mConn.inUse = false;
-
             synchronized (mutex) {
+                ManagedPooledConnection mConn = getInUseManagedPooledConnection(conn);
+    
+                mConn.inUse = false;
+
                 usedConnections.remove(mConn);
                 availableConnections.addLast(mConn);
             }
@@ -242,18 +243,18 @@ public final class ConnectionPool {
          */
         public void connectionErrorOccurred(ConnectionEvent event) {
             PooledConnection conn = (PooledConnection) event.getSource();
-            ManagedPooledConnection mConn = getInUseManagedPooledConnection(conn);
-
-            conn.removeConnectionEventListener(this);
-
-            try {
-                conn.close();
-            } catch (SQLException e) {
-                // don't need to do anything here, just log it
-                LOGGER.log(Level.WARNING, "Error closing a connection", e);
-            }
-
             synchronized (mutex) {
+                ManagedPooledConnection mConn = getInUseManagedPooledConnection(conn);
+    
+                conn.removeConnectionEventListener(this);
+    
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    // don't need to do anything here, just log it
+                    LOGGER.log(Level.WARNING, "Error closing a connection", e);
+                }
+
                 usedConnections.remove(mConn);
             }
         }
