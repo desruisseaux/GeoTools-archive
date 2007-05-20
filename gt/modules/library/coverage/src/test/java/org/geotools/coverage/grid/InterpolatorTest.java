@@ -44,6 +44,13 @@ import org.geotools.coverage.grid.Interpolator2D;
  */
 public class InterpolatorTest extends GridCoverageTest {
     /**
+     * Small value for comparaison of sample values. Since most grid coverage implementation in
+     * Geotools 2 store geophysics values as {@code float} numbers, this {@code EPS} value must
+     * be of the order of {@code float} relative precision, not {@code double}.
+     */
+    private static final double EPS = 1E-5;
+
+    /**
      * The interpolators to use.
      */
     private Interpolation[] interpolations;
@@ -83,6 +90,7 @@ public class InterpolatorTest extends GridCoverageTest {
      * The default implementation applies a set of interpolations
      * on <code>coverage</code>.
      */
+    //@Override
     protected GridCoverage2D transform(final GridCoverage2D coverage) {
         return Interpolator2D.create(coverage, interpolations);
     }
@@ -92,6 +100,7 @@ public class InterpolatorTest extends GridCoverageTest {
      * at the center of pixels, all interpolations results should be identical to
      * a result without interpolation.
      */
+    //@Override
     public void testGridCoverage() {
         final GridCoverage2D coverage = getRandomCoverage();
         assertTrue(coverage instanceof Interpolator2D);

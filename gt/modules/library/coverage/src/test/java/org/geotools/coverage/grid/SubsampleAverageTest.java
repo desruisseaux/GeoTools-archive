@@ -59,11 +59,12 @@ public class SubsampleAverageTest extends GridCoverageTest {
     /**
      * The source grid coverage.
      */
-	private GridCoverage2D indexedCoverage;
+    private GridCoverage2D indexedCoverage;
 
-	private GridCoverage2D indexedCoverageWithTransparency;
+    private GridCoverage2D indexedCoverageWithTransparency;
 
-	private GridCoverage2D originallyIndexedCoverage;
+    private GridCoverage2D originallyIndexedCoverage;
+
     /**
      * Creates a test suite for the given name.
      */
@@ -88,111 +89,104 @@ public class SubsampleAverageTest extends GridCoverageTest {
         junit.textui.TestRunner.run(SubsampleAverageTest.class);
     }
 
-	/**
-	 * Set up common objects used for all tests.
-	 */
-	protected void setUp() throws Exception {
-		super.setUp();
-		originallyIndexedCoverage = getExample(0);
-		indexedCoverage = getExample(2);
-		indexedCoverageWithTransparency = getExample(3);
-	}
+    /**
+     * Set up common objects used for all tests.
+     */
+    //@Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        originallyIndexedCoverage       = GridCoverageExamples.getExample(0);
+        indexedCoverage                 = GridCoverageExamples.getExample(2);
+        indexedCoverageWithTransparency = GridCoverageExamples.getExample(3);
+    }
 
-	/**
-	 * Tests the "SubsampleAverage" operation.
-	 * @throws IOException 
-	 */
+    /**
+     * Tests the "SubsampleAverage" operation.
+     * @throws IOException 
+     */
+    public void testSubsampleAverage() throws IOException {
+        // on this one the Subsample average should do an RGB expansion
+        subsampleAverage(indexedCoverage.geophysics(true));
+        // on this one the Subsample average should do an RGB expansion
+        // preserving alpha
+        subsampleAverage(indexedCoverageWithTransparency.geophysics(true));
+        // on this one the subsample average should go back to the geophysiscs
+        // view before being applied
+        subsampleAverage(originallyIndexedCoverage.geophysics(true));
 
-	public void testSubsampleAverage() throws IOException {
-		// on this one the Subsample average should do an RGB expansion
-		subsampleAverage(indexedCoverage.geophysics(true));
-		// on this one the Subsample average should do an RGB expansion
-		// preserving alpha
-		subsampleAverage(indexedCoverageWithTransparency.geophysics(true));
-		// on this one the subsample average should go back to the geophysiscs
-		// view before being applied
-		subsampleAverage(originallyIndexedCoverage.geophysics(true));
+        // on this one the Subsample average should do an RGB expansion
+        subsampleAverage(indexedCoverage.geophysics(false));
+        // on this one the Subsample average should do an RGB expansion
+        // preserving alpha
+        subsampleAverage(indexedCoverageWithTransparency.geophysics(false));
+        // on this one the subsample average should go back to the geophysiscs
+        // view before being applied
+        subsampleAverage(originallyIndexedCoverage.geophysics(false));
 
-		// on this one the Subsample average should do an RGB expansion
-		subsampleAverage(indexedCoverage.geophysics(false));
-		// on this one the Subsample average should do an RGB expansion
-		// preserving alpha
-		subsampleAverage(indexedCoverageWithTransparency.geophysics(false));
-		// on this one the subsample average should go back to the geophysiscs
-		// view before being applied
-		subsampleAverage(originallyIndexedCoverage.geophysics(false));
+        // on this one the subsample average should NOT go back to the
+        // geophysiscs view before being applied
+        subsampleAverage(GridCoverageExamples.getExample(4).geophysics(false),
+                new Hints(Hints.REPLACE_NON_GEOPHYSICS_VIEW, Boolean.FALSE));
 
-		// on this one the subsample average should NOT go back to the
-		// geophysiscs
-		// view before being applied
-		subsampleAverage(getExample(4).geophysics(false), new Hints(
-				Hints.REPLACE_NON_GEOPHYSICS_VIEW,
-						Boolean.FALSE));
+        // on this one the subsample average should go back to the
+        // geophysiscs view before being applied
+        subsampleAverage(GridCoverageExamples.getExample(4).geophysics(false),
+                new Hints(Hints.REPLACE_NON_GEOPHYSICS_VIEW, Boolean.FALSE));
+    }
 
-		
-		// on this one the subsample average should go back to the
-		// geophysiscs
-		// view before being applied
-		subsampleAverage(getExample(4).geophysics(false),
-				new Hints(Hints.REPLACE_NON_GEOPHYSICS_VIEW,
-						Boolean.FALSE));
-	}
-	public void subsampleAverage(GridCoverage2D coverage){
-		subsampleAverage(coverage, null);
-	}
+    public void subsampleAverage(GridCoverage2D coverage){
+        subsampleAverage(coverage, null);
+    }
 
-	public void subsampleAverage(GridCoverage2D coverage,RenderingHints hints) {
+    public void subsampleAverage(GridCoverage2D coverage,RenderingHints hints) {
+        // caching initial properties
+        RenderedImage originalImage = coverage.getRenderedImage();
+        int w = originalImage.getWidth();
+        int h = originalImage.getHeight();
 
-		// caching initial properties
-		RenderedImage originalImage = coverage.getRenderedImage();
-		int w = originalImage.getWidth();
-		int h = originalImage.getHeight();
+        // get the processor and prepare the first operation
+        final DefaultProcessor processor = new DefaultProcessor(hints);
+        final ParameterValueGroup param = processor.getOperation("SubsampleAverage").getParameters();
+        param.parameter("Source").setValue(coverage);
+        param.parameter("scaleX").setValue(new Double(0.5));
+        param.parameter("scaleY").setValue(new Double(0.5));
+        param.parameter("Interpolation").setValue(
+                Interpolation.getInstance(Interpolation.INTERP_NEAREST));
+        param.parameter("BorderExtender").setValue(
+                BorderExtenderCopy.createInstance(BorderExtender.BORDER_COPY));
+        GridCoverage2D scaled = (GridCoverage2D) processor.doOperation(param);
+        RenderedImage scaledImage = scaled.getRenderedImage();
+        assertTrue(scaledImage.getWidth() == (int) (w / 2.0f));
+        assertTrue(scaledImage.getHeight() == (int) (h / 2.0f));
+        w = scaledImage.getWidth();
+        h = scaledImage.getHeight();
 
-		// get the processor and prepare the first operation
-		final DefaultProcessor processor = new DefaultProcessor(hints);
-		final ParameterValueGroup param = processor.getOperation(
-				"SubsampleAverage").getParameters();
-		param.parameter("Source").setValue(coverage);
-		param.parameter("scaleX").setValue(new Double(0.5));
-		param.parameter("scaleY").setValue(new Double(0.5));
-		param.parameter("Interpolation").setValue(
-				Interpolation.getInstance(Interpolation.INTERP_NEAREST));
-		param.parameter("BorderExtender").setValue(
-				BorderExtenderCopy.createInstance(BorderExtender.BORDER_COPY));
-		GridCoverage2D scaled = (GridCoverage2D) processor.doOperation(param);
-		RenderedImage scaledImage = scaled.getRenderedImage();
-		assertTrue(scaledImage.getWidth() == (int) (w / 2.0f));
-		assertTrue(scaledImage.getHeight() == (int) (h / 2.0f));
-		w = scaledImage.getWidth();
-		h = scaledImage.getHeight();
+        // show the result
+        if (SHOW) {
+            Viewer.show(coverage, coverage.getName().toString());
+            Viewer.show(scaled, scaled.getName().toString());
+        } else {
+            // Force computation
+            assertNotNull(coverage.getRenderedImage().getData());
+            assertNotNull(scaled.getRenderedImage().getData());
+        }
 
-		// show the result
-		if (SHOW) {
-			Viewer.show(coverage, coverage.getName().toString());
-			Viewer.show(scaled, scaled.getName().toString());
-		} else {
-			// Force computation
-			assertNotNull(coverage.getRenderedImage().getData());
-			assertNotNull(scaled.getRenderedImage().getData());
-		}
+        // use the default processor and then scale again
+        scaled = (GridCoverage2D) Operations.DEFAULT.subsampleAverage(scaled,
+                0.3333, 0.3333, Interpolation.getInstance(Interpolation.INTERP_NEAREST),
+                BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+        scaledImage = scaled.getRenderedImage();
+        // I had to comment this out since sometimes this evaluation fails
+        // unexpectedly. I think it is a JAI issue because here below I using
+        // the rule they claim to follow.
+        // assertTrue(scaledImage.getWidth() == (int)(w / 3.0f));
+        // assertTrue(scaledImage.getHeight() == (int)(h / 3.0f));
 
-		// use the default processor and then scale again
-		scaled = (GridCoverage2D) Operations.DEFAULT.subsampleAverage(scaled,
-				0.3333, 0.3333, Interpolation
-						.getInstance(Interpolation.INTERP_NEAREST),
-				BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-		scaledImage = scaled.getRenderedImage();
-		// I add to comment this out since sometimes this evaluation fails
-		// unexpectedly. I think it is a JAI issue because here below I using
-		// the rule they claim to follow.
-		// assertTrue(scaledImage.getWidth() == (int)(w / 3.0f));
-		// assertTrue(scaledImage.getHeight() == (int)(h / 3.0f));
-
-		if (SHOW) {
-			Viewer.show(scaled, scaled.getName().toString());
-		} else {
-			// Force computation
-			assertNotNull(scaled.getRenderedImage().getData());
-		}
-	}
+        if (SHOW) {
+            Viewer.show(scaled, scaled.getName().toString());
+        } else {
+            // Force computation
+            assertNotNull(scaled.getRenderedImage().getData());
+        }
+    }
 }

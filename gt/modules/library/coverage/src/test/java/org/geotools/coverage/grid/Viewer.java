@@ -254,7 +254,7 @@ public class Viewer extends JPanel {
             out.println("Usage: Viewer [options] example");
             out.println();
             out.print("Where \"example\" is the number of the requested example (0 to ");
-            out.print(GridCoverageTest.getNumExamples()-1);
+            out.print(GridCoverageExamples.getNumExamples()-1);
             out.println(" inclusive)");
             out.println("and [options] includes:");
             out.println();
@@ -267,7 +267,7 @@ public class Viewer extends JPanel {
             out.flush();
             return;
         }
-        GridCoverage2D coverage = GridCoverageTest.getExample(Integer.parseInt(args[0]));
+        GridCoverage2D coverage = GridCoverageExamples.getExample(Integer.parseInt(args[0]));
         if (geophysics != null) {
             coverage = coverage.geophysics(geophysics.booleanValue());
         }

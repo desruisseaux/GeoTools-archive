@@ -77,7 +77,7 @@ public class CropTest extends GridCoverageTest {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        coverage = getExample(0);
+        coverage = GridCoverageExamples.getExample(0);
     }
 
     /**

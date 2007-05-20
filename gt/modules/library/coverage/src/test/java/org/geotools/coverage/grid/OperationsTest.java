@@ -106,7 +106,7 @@ public final class OperationsTest extends GridCoverageTest {
     protected void setUp() throws IOException {
         processor = Operations.DEFAULT;
         if (SST == null) {
-            SST = getExample(0);
+            SST = GridCoverageExamples.getExample(0);
         }
     }
 
@@ -116,6 +116,7 @@ public final class OperationsTest extends GridCoverageTest {
      *
      * @todo Applies some operation.
      */
+    //@Override
     protected GridCoverage2D transform(final GridCoverage2D coverage) {
         return ((GridCoverage2D) processor.nodataFilter(coverage.geophysics(true))).geophysics(false);
     }

@@ -118,16 +118,17 @@ public final class ResampleTest extends GridCoverageTest {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        coverage                        = getExample(0);
-        indexedCoverage                 = getExample(2);
-        indexedCoverageWithTransparency = getExample(3);
-        floatCoverage                   = getExample(4);
+        coverage                        = GridCoverageExamples.getExample(0);
+        indexedCoverage                 = GridCoverageExamples.getExample(2);
+        indexedCoverageWithTransparency = GridCoverageExamples.getExample(3);
+        floatCoverage                   = GridCoverageExamples.getExample(4);
     }
 
     /**
      * Applies an operation on the specified coverage.
      * This is invoked before to run the tests defined in the super-class.
      */
+    //@Override
     protected GridCoverage2D transform(final GridCoverage2D coverage) {
         return (GridCoverage2D) Operations.DEFAULT.resample(coverage, getProjectedCRS(coverage));
     }
