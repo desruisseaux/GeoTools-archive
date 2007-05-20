@@ -35,7 +35,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 // Geotools dependencies
 import org.geotools.referencing.CRS;
 import org.geotools.resources.Arguments;
-// import org.geotools.coverage.grid.GridCoverageTest;
 
 
 /**
@@ -44,8 +43,6 @@ import org.geotools.resources.Arguments;
  * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/coverage/src/test/java/org/geotools/coverage/io/MetadataBuilderTest.java $
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @todo Partially disabled until we provide {@link GridCoverageTest} in {@code sample-data} module.
  */
 public class MetadataBuilderTest extends TestCase {
     /**
@@ -190,8 +187,7 @@ public class MetadataBuilderTest extends TestCase {
         parser.addAlias(MetadataBuilder.WIDTH,         "Width"       );
         parser.addAlias(MetadataBuilder.HEIGHT,        "Height"      );
         
-        final GridCoverage coverage = null; //GridCoverageTest.getExample(0);
-        if (true) return; // TODO
+        final GridCoverage coverage = GridCoverageExamples.getExample(0);
         parser.add(coverage);
         if (out != null) {
             out.println(parser);
