@@ -118,7 +118,7 @@
 
 
         <AttributeMapping>
-          <targetAttribute>relatedObservation/WaterObservation/observedProperty/name</targetAttribute>
+          <targetAttribute>relatedObservation/WaterObservation/observedProperty/Phenomenon/name</targetAttribute>
           <sourceExpression>
 
             <OCQL>determinand_code</OCQL>
