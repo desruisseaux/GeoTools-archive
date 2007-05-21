@@ -16,20 +16,7 @@
  */
 package org.geotools.data.complex;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import junit.framework.TestCase;
-
 import org.geotools.data.DataAccessFinder;
 import org.geotools.data.complex.config.ComplexDataStoreConfigurator;
 import org.geotools.data.complex.config.ComplexDataStoreDTO;
@@ -49,54 +36,55 @@ import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 /**
  * DOCUMENT ME!
- * 
+ *
  * @author Rob Atkinson
  * @version $Id$
  */
 public class TimeSeriesTest extends TestCase {
-    private static final Logger LOGGER = Logger
-            .getLogger(TimeSeriesTest.class.getPackage().getName());
-
+    private static final Logger LOGGER = Logger.getLogger(TimeSeriesTest.class.getPackage()
+                                                                              .getName());
     private static final String AWNS = "http://brs.gov.au/awdip/0.2";
-
     private static final String CVNS = "http://www.opengis.net/cv/0.0";
-    
     private static final String SANS = "http://www.seegrid.csiro.au/xml/sampling";
-
     private static final String OMNS = "http://www.opengis.net/om";
-
     private static final String SWENS = "http://www.opengis.net/swe";
-
     private static final String GMLNS = "http://www.opengis.net/gml";
-
     private static final String GEONS = "http://www.seegrid.csiro.au/xml/geometry";
-
     final String schemaBase = "/test-data/";
-
     EmfAppSchemaReader reader;
-
     private FeatureSource2 source;
 
     /**
      * DOCUMENT ME!
-     * 
-     * @throws Exception
-     *             DOCUMENT ME!
+     *
+     * @throws Exception DOCUMENT ME!
      */
     protected void setUp() throws Exception {
         super.setUp();
         reader = EmfAppSchemaReader.newInstance();
+
         //Logging.GEOTOOLS.forceMonolineConsoleOutput(Level.FINEST);
     }
 
     /**
      * DOCUMENT ME!
-     * 
-     * @throws Exception
-     *             DOCUMENT ME!
+     *
+     * @throws Exception DOCUMENT ME!
      */
     protected void tearDown() throws Exception {
         super.tearDown();
@@ -104,9 +92,12 @@ public class TimeSeriesTest extends TestCase {
 
     /**
      * 
-     * @param location
-     *            schema location path discoverable through
-     *            getClass().getResource()
+    DOCUMENT ME!
+     *
+     * @param location schema location path discoverable through
+     *        getClass().getResource()
+     *
+     * @throws IOException DOCUMENT ME!
      */
     private void loadSchema(String location) throws IOException {
         // load needed GML types directly from the gml schemas
@@ -116,18 +107,17 @@ public class TimeSeriesTest extends TestCase {
     }
 
     /**
-     * Tests if the schema-to-FM parsing code developed for complex datastore
-     * configuration loading can parse the GeoSciML types
-     * 
+     * Tests if the schema-to-FM parsing code developed for complex
+     * datastore configuration loading can parse the GeoSciML types
+     *
      * @throws Exception
      */
-    public void testParseSchema() throws Exception {
+    public void XtestParseSchema() throws Exception {
         /*
          * not found types and elements:
          */
 
         // load geosciml schema
-
         try {
             loadSchema(schemaBase + "SampleSite.xsd");
         } catch (Exception e) {
@@ -137,71 +127,71 @@ public class TimeSeriesTest extends TestCase {
 
         Map typeRegistry = reader.getTypeRegistry();
 
-        TypeName typeName = Types.typeName(AWNS, "SiteSinglePhenomTimeSeriesType");
+        TypeName typeName = Types.typeName(AWNS,
+                "SiteSinglePhenomTimeSeriesType");
         ComplexType testType = (ComplexType) typeRegistry.get(typeName);
         assertNotNull(testType);
         assertTrue(testType instanceof FeatureType);
 
         AttributeType superType = testType.getSuper();
         assertNotNull(superType);
+
         TypeName superTypeName = Types.typeName(AWNS, "SamplingSiteType");
         assertEquals(superTypeName, superType.getName());
         assertTrue(superType instanceof FeatureType);
-/*
-        // ensure all needed types were parsed and aren't just empty proxies
-        Collection properties = borehole.getProperties();
-        assertEquals(16, properties.size());
-        Map expectedNamesAndTypes = new HashMap();
-        //from gml:AbstractFeatureType
-        expectedNamesAndTypes.put(name(GMLNS, "metaDataProperty"), typeName(GMLNS, "MetaDataPropertyType"));
-        expectedNamesAndTypes.put(name(GMLNS, "description"), typeName(GMLNS, "StringOrRefType"));
-        expectedNamesAndTypes.put(name(GMLNS, "name"), typeName(GMLNS, "CodeType"));
-        expectedNamesAndTypes.put(name(GMLNS, "boundedBy"), typeName(GMLNS, "BoundingShapeType"));
-        expectedNamesAndTypes.put(name(GMLNS, "location"), typeName(GMLNS, "LocationPropertyType"));
-        //from sa:ProfileType
-        expectedNamesAndTypes.put(name(SANS, "begin"), typeName(GMLNS, "PointPropertyType"));
-        expectedNamesAndTypes.put(name(SANS, "end"), typeName(GMLNS, "PointPropertyType"));
-        expectedNamesAndTypes.put(name(SANS, "length"), typeName(SWENS, "RelativeMeasureType"));
-        expectedNamesAndTypes.put(name(SANS, "shape"), typeName(GEONS, "Shape1DPropertyType"));
-        //sa:SamplingFeatureType
-        expectedNamesAndTypes.put(name(SANS, "member"), typeName(SANS, "SamplingFeaturePropertyType"));
-        expectedNamesAndTypes.put(name(SANS, "surveyDetails"), typeName(SANS, "SurveyProcedurePropertyType"));
-        expectedNamesAndTypes.put(name(SANS, "associatedSpecimen"), typeName(SANS, "SpecimenPropertyType"));
-        expectedNamesAndTypes.put(name(SANS, "relatedObservation"), typeName(OMNS, "AbstractObservationPropertyType"));
-        //from xmml:BoreholeType
-        expectedNamesAndTypes.put(name(XMMLNS, "drillMethod"), typeName(XMMLNS, "drillCode"));
-        expectedNamesAndTypes.put(name(XMMLNS, "collarDiameter"), typeName(GMLNS, "MeasureType"));
-        expectedNamesAndTypes.put(name(XMMLNS, "log"), typeName(XMMLNS, "LogPropertyType"));
 
-        for (Iterator it = expectedNamesAndTypes.entrySet().iterator(); it.hasNext();) {
-            Map.Entry entry = (Entry) it.next();
-            Name dName = (Name) entry.getKey();
-            TypeName tName = (TypeName) entry.getValue();
-            
-            AttributeDescriptor d = (AttributeDescriptor) Types.descriptor(borehole, dName);
-            assertNotNull("Descriptor not found: " + dName, d);
-            AttributeType type;
-            try {
-                type = d.getType();
-            } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "type not parsed for "
-                        + ((AttributeDescriptor) d).getName(), e);
-                throw e;
-            }
-            assertNotNull(type);
-            assertNotNull(type.getName());
-            assertNotNull(type.getBinding());
-            if (tName != null) {
-                assertEquals(tName, type.getName());
-            }
-        }
-
-        TypeName tcl = Types.typeName(SWENS, "TypedCategoryListType");
-        AttributeType typedCategoryListType = (AttributeType) typeRegistry.get(tcl);
-        assertNotNull(typedCategoryListType);
-        assertFalse(typedCategoryListType instanceof ComplexType);
-  */
-  
+        /*
+           // ensure all needed types were parsed and aren't just empty proxies
+           Collection properties = borehole.getProperties();
+           assertEquals(16, properties.size());
+           Map expectedNamesAndTypes = new HashMap();
+           //from gml:AbstractFeatureType
+           expectedNamesAndTypes.put(name(GMLNS, "metaDataProperty"), typeName(GMLNS, "MetaDataPropertyType"));
+           expectedNamesAndTypes.put(name(GMLNS, "description"), typeName(GMLNS, "StringOrRefType"));
+           expectedNamesAndTypes.put(name(GMLNS, "name"), typeName(GMLNS, "CodeType"));
+           expectedNamesAndTypes.put(name(GMLNS, "boundedBy"), typeName(GMLNS, "BoundingShapeType"));
+           expectedNamesAndTypes.put(name(GMLNS, "location"), typeName(GMLNS, "LocationPropertyType"));
+           //from sa:ProfileType
+           expectedNamesAndTypes.put(name(SANS, "begin"), typeName(GMLNS, "PointPropertyType"));
+           expectedNamesAndTypes.put(name(SANS, "end"), typeName(GMLNS, "PointPropertyType"));
+           expectedNamesAndTypes.put(name(SANS, "length"), typeName(SWENS, "RelativeMeasureType"));
+           expectedNamesAndTypes.put(name(SANS, "shape"), typeName(GEONS, "Shape1DPropertyType"));
+           //sa:SamplingFeatureType
+           expectedNamesAndTypes.put(name(SANS, "member"), typeName(SANS, "SamplingFeaturePropertyType"));
+           expectedNamesAndTypes.put(name(SANS, "surveyDetails"), typeName(SANS, "SurveyProcedurePropertyType"));
+           expectedNamesAndTypes.put(name(SANS, "associatedSpecimen"), typeName(SANS, "SpecimenPropertyType"));
+           expectedNamesAndTypes.put(name(SANS, "relatedObservation"), typeName(OMNS, "AbstractObservationPropertyType"));
+           //from xmml:BoreholeType
+           expectedNamesAndTypes.put(name(XMMLNS, "drillMethod"), typeName(XMMLNS, "drillCode"));
+           expectedNamesAndTypes.put(name(XMMLNS, "collarDiameter"), typeName(GMLNS, "MeasureType"));
+           expectedNamesAndTypes.put(name(XMMLNS, "log"), typeName(XMMLNS, "LogPropertyType"));
+           for (Iterator it = expectedNamesAndTypes.entrySet().iterator(); it.hasNext();) {
+               Map.Entry entry = (Entry) it.next();
+               Name dName = (Name) entry.getKey();
+               TypeName tName = (TypeName) entry.getValue();
+        
+               AttributeDescriptor d = (AttributeDescriptor) Types.descriptor(borehole, dName);
+               assertNotNull("Descriptor not found: " + dName, d);
+               AttributeType type;
+               try {
+                   type = d.getType();
+               } catch (Exception e) {
+                   LOGGER.log(Level.SEVERE, "type not parsed for "
+                           + ((AttributeDescriptor) d).getName(), e);
+                   throw e;
+               }
+               assertNotNull(type);
+               assertNotNull(type.getName());
+               assertNotNull(type.getBinding());
+               if (tName != null) {
+                   assertEquals(tName, type.getName());
+               }
+           }
+           TypeName tcl = Types.typeName(SWENS, "TypedCategoryListType");
+           AttributeType typedCategoryListType = (AttributeType) typeRegistry.get(tcl);
+           assertNotNull(typedCategoryListType);
+           assertFalse(typedCategoryListType instanceof ComplexType);
+         */
     }
 
     private TypeName typeName(String ns, String localName) {
@@ -212,10 +202,10 @@ public class TimeSeriesTest extends TestCase {
         return new org.geotools.feature.Name(ns, localName);
     }
 
-/*    
     public void testLoadMappingsConfig() throws Exception {
         XMLConfigDigester reader = new XMLConfigDigester();
-        URL url = getClass().getResource(schemaBase + "BoreholeTest_properties.xml");
+        URL url = getClass()
+                      .getResource(schemaBase + "TimeSeriesTest_properties.xml");
 
         ComplexDataStoreDTO config = reader.parse(url);
 
@@ -224,85 +214,56 @@ public class TimeSeriesTest extends TestCase {
         assertNotNull(mappings);
         assertEquals(1, mappings.size());
 
-        FeatureTypeMapping mapping = (FeatureTypeMapping) mappings.iterator().next();
+        FeatureTypeMapping mapping = (FeatureTypeMapping) mappings.iterator()
+                                                                  .next();
 
         AttributeDescriptor targetFeature = mapping.getTargetFeature();
         assertNotNull(targetFeature);
         assertNotNull(targetFeature.getType());
-        assertEquals(XMMLNS, targetFeature.getName().getNamespaceURI());
-        assertEquals("Borehole", targetFeature.getName().getLocalPart());
-
-        source = mapping.getSource();
-        assertNotNull(source);
-        org.geotools.feature.FeatureType schema = source.getSchema();
-        String typeName = schema.getTypeName();
-        assertEquals("boreholes_denormalized", typeName);
-
-        List groupingAttributes = mapping.getGroupByAttNames();
-
-        assertEquals(4, groupingAttributes.size());
-
-        assertTrue(groupingAttributes.contains("QS"));
-        assertTrue(groupingAttributes.contains("NUMB"));
-        assertTrue(groupingAttributes.contains("BSUFF"));
-        assertTrue(groupingAttributes.contains("RT"));
-     
-         * assertTrue(groupingAttributes.contains("BGS_ID"));
-         * assertTrue(groupingAttributes.contains("NAME"));
-         * assertTrue(groupingAttributes.contains("ORIGINAL_N"));
-         * assertTrue(groupingAttributes.contains("CONFIDENTI"));
-         * assertTrue(groupingAttributes.contains("LENGTHC"));
-         * assertTrue(groupingAttributes.contains("SHAPE"));
-        
+        assertEquals(AWNS, targetFeature.getName().getNamespaceURI());
+        assertEquals("SiteSinglePhenomTimeSeries", targetFeature.getName().getLocalPart());
 
         List attributeMappings = mapping.getAttributeMappings();
-        assertEquals(24, attributeMappings.size());
-
         AttributeMapping attMapping = (AttributeMapping) attributeMappings.get(0);
         assertNotNull(attMapping);
-        assertEquals("Borehole", attMapping.getTargetXPath());
-
-        Expression idExpression = attMapping.getIdentifierExpression();
-        assertNotNull(idExpression);
-        assertTrue(idExpression instanceof Function);
-        Function idFunction = (Function) idExpression;
-        assertEquals("strConcat", idFunction.getName());
-        assertTrue(idFunction.getParameters().get(0) instanceof Literal);
-        assertTrue(idFunction.getParameters().get(1) instanceof PropertyName);
-
-        assertEquals(Expression.NIL, attMapping.getSourceExpression());
+        assertEquals("relatedObservation/WaterObservation", attMapping.getTargetXPath());
+        
+        // now test the use of specific subtype overriding a general node type 
+        attMapping = (AttributeMapping) attributeMappings.get(2);
+        assertNotNull(attMapping);
+        assertEquals("SiteSinglePhenomTimeSeries", attMapping.getTargetXPath());
+        AttributeType tNode = attMapping.getTargetNodeInstance();
+        assertEquals("PhenomenonTimeSeriesType", tNode.getName());
+                
     }
 
     public void testDataStore() throws Exception {
         final Map dsParams = new HashMap();
-        final URL url = getClass().getResource(schemaBase + "BoreholeTest_properties.xml");
+        final URL url = getClass().getResource(schemaBase + "TimeSeriesTest_properties.xml");
         dsParams.put("dbtype", "complex");
         dsParams.put("url", url.toExternalForm());
 
         Map propsParams = new HashMap();
 
-        final Name typeName = new org.geotools.feature.Name(XMMLNS, "Borehole");
+        final Name typeName = new org.geotools.feature.Name(AWNS, "SiteSinglePhenomTimeSeries");
 
         FeatureAccess mappingDataStore = (FeatureAccess) DataAccessFinder.createAccess(dsParams);
         assertNotNull(mappingDataStore);
-        AttributeDescriptor borehole = (AttributeDescriptor) mappingDataStore.describe(typeName);
-        assertNotNull(borehole);
-        assertTrue(borehole.getType() instanceof FeatureType);
-        FeatureType boreholeType = (FeatureType) borehole.getType();
+        AttributeDescriptor attDesc = (AttributeDescriptor) mappingDataStore.describe(typeName);
+        assertNotNull(attDesc);
+        assertTrue(attDesc.getType() instanceof FeatureType);
+        FeatureType fType = (FeatureType) attDesc.getType();
 
         FeatureSource2 fSource = (FeatureSource2) mappingDataStore.access(typeName);
 
         // make a getFeatures request with a nested properties filter.
-        // note that the expected result count is set to 65 since that's the
-        // number
-        // of results I get from a sql select on min_time_d = 'carnian'
-        final int EXPECTED_RESULT_COUNT = 10;
+        // note that the expected result count is 6 - 3 sites x 2 phenomena 
+        final int EXPECTED_RESULT_COUNT = 6;
 
         Collection features = fSource.content();
 
         int resultCount = features.size();
-        String msg = "be sure difference in result count is not due to different dataset."
-                + " Query used should be min_time_d = 'carnian'";
+        String msg = "be sure difference in result count is not due to different dataset.";
         assertEquals(msg, EXPECTED_RESULT_COUNT, resultCount);
 
         Feature feature;
@@ -312,7 +273,6 @@ public class TimeSeriesTest extends TestCase {
             count++;
         }
         assertEquals(EXPECTED_RESULT_COUNT, count);
-  }
-*/
 
+    }
 }
