@@ -248,6 +248,21 @@ public final class DirectCreationTest extends TestCase {
         }    
         doTransform(new DirectPosition2D(-123.1, 49.2166666666),
                     new DirectPosition2D(-13688089.02443480, 6304639.84599441), transform);
+
+        //ellipsoidal with latitude of origin not zero, (simone)
+        params.parameter("semi_major")      .setValue(6378137.0);
+        params.parameter("semi_minor")      .setValue(6356752.314245);
+        params.parameter("latitude_of_origin").setValue(38);
+        params.parameter("central_meridian").setValue(     3.03);
+        params.parameter("scale_factor")    .setValue(      1.0);
+        params.parameter("false_easting")   .setValue(      0.0);
+        params.parameter("false_northing")  .setValue(      0.0);
+        transform = mtFactory.createParameterizedTransform(params);
+        if (VERBOSE) {
+            System.out.println(transform);
+        }    
+        doTransform(new DirectPosition2D(4.999999999999999,26.996561536844165),
+                    new DirectPosition2D(173029.94823812644, 2448819.342941506), transform);
         
         
         ///////////////////////////////////////
