@@ -107,7 +107,7 @@ public class AttributeTypeImpl extends PropertyTypeImpl implements AttributeType
 	 * @return whether other is equal to this attribute Type.
 	 */
 	public boolean equals(Object other) {
-		if (!(other instanceof AttributeTypeImpl)) {
+		if (!(other instanceof AttributeType)) {
 			return false;
 		}
 

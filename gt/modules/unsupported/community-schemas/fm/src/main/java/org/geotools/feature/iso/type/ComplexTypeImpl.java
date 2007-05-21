@@ -99,16 +99,20 @@ public class ComplexTypeImpl extends AttributeTypeImpl implements ComplexType {
 	}
 	
 	public boolean equals(Object o){
-    	if(!(o instanceof ComplexTypeImpl)){
+    	if(!(o instanceof ComplexType)){
     		return false;
     	}
     	if(!super.equals(o)){
     		return false;
     	}
-    	Collection otherSchema = ((ComplexTypeImpl)o).SCHEMA;
-    	if(!SCHEMA.equals(otherSchema)){
-    		return false;
+    	if( o  instanceof ComplexTypeImpl )
+    	{
+    		Collection otherSchema = ((ComplexTypeImpl)o).SCHEMA;
+    	   	if(!SCHEMA.equals(otherSchema)){
+        		return false;
+        	}
     	}
+ 
     	return true;
     }
     

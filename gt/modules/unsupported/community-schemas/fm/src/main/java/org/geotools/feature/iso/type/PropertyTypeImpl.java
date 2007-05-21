@@ -69,7 +69,7 @@ public class PropertyTypeImpl implements PropertyType {
 
 	
 	public boolean equals(Object other) {
-		if (!(other instanceof PropertyTypeImpl)) {
+		if (!(other instanceof PropertyType)) {
 			return false;
 		}
 		
