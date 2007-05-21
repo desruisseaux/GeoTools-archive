@@ -235,7 +235,7 @@ public class TimeSeriesTest extends TestCase {
             attMapping.getTargetXPath());
 
         AttributeType tNode = attMapping.getTargetNodeInstance();
-        assertEquals("PhenomenonTimeSeriesType", tNode.getName());
+        assertEquals("PhenomenonTimeSeriesType", tNode.getName().getLocalPart());
     }
 
     public void testDataStore() throws Exception {
