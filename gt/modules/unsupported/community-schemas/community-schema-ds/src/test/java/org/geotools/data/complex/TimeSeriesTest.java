@@ -91,8 +91,7 @@ public class TimeSeriesTest extends TestCase {
     }
 
     /**
-     * 
-    DOCUMENT ME!
+     * DOCUMENT ME!
      *
      * @param location schema location path discoverable through
      *        getClass().getResource()
@@ -221,37 +220,46 @@ public class TimeSeriesTest extends TestCase {
         assertNotNull(targetFeature);
         assertNotNull(targetFeature.getType());
         assertEquals(AWNS, targetFeature.getName().getNamespaceURI());
-        assertEquals("SiteSinglePhenomTimeSeries", targetFeature.getName().getLocalPart());
+        assertEquals("SiteSinglePhenomTimeSeries",
+            targetFeature.getName().getLocalPart());
 
         List attributeMappings = mapping.getAttributeMappings();
         AttributeMapping attMapping = (AttributeMapping) attributeMappings.get(0);
         assertNotNull(attMapping);
-        assertEquals("relatedObservation/WaterObservation", attMapping.getTargetXPath());
-        
+        assertEquals("SiteSinglePhenomTimeSeries", attMapping.getTargetXPath());
+
         // now test the use of specific subtype overriding a general node type 
         attMapping = (AttributeMapping) attributeMappings.get(2);
         assertNotNull(attMapping);
-        assertEquals("SiteSinglePhenomTimeSeries", attMapping.getTargetXPath());
+        assertEquals("relatedObservation/WaterObservation",
+            attMapping.getTargetXPath());
+
         AttributeType tNode = attMapping.getTargetNodeInstance();
         assertEquals("PhenomenonTimeSeriesType", tNode.getName());
-                
     }
 
     public void testDataStore() throws Exception {
         final Map dsParams = new HashMap();
-        final URL url = getClass().getResource(schemaBase + "TimeSeriesTest_properties.xml");
+        final URL url = getClass()
+                            .getResource(schemaBase
+                + "TimeSeriesTest_properties.xml");
         dsParams.put("dbtype", "complex");
         dsParams.put("url", url.toExternalForm());
 
         Map propsParams = new HashMap();
 
-        final Name typeName = new org.geotools.feature.Name(AWNS, "SiteSinglePhenomTimeSeries");
+        final Name typeName = new org.geotools.feature.Name(AWNS,
+                "SiteSinglePhenomTimeSeries");
 
-        FeatureAccess mappingDataStore = (FeatureAccess) DataAccessFinder.createAccess(dsParams);
+        FeatureAccess mappingDataStore = (FeatureAccess) DataAccessFinder
+            .createAccess(dsParams);
         assertNotNull(mappingDataStore);
-        AttributeDescriptor attDesc = (AttributeDescriptor) mappingDataStore.describe(typeName);
+
+        AttributeDescriptor attDesc = (AttributeDescriptor) mappingDataStore
+            .describe(typeName);
         assertNotNull(attDesc);
         assertTrue(attDesc.getType() instanceof FeatureType);
+
         FeatureType fType = (FeatureType) attDesc.getType();
 
         FeatureSource2 fSource = (FeatureSource2) mappingDataStore.access(typeName);
@@ -268,11 +276,12 @@ public class TimeSeriesTest extends TestCase {
 
         Feature feature;
         int count = 0;
+
         for (Iterator it = features.iterator(); it.hasNext();) {
             feature = (Feature) it.next();
             count++;
         }
-        assertEquals(EXPECTED_RESULT_COUNT, count);
 
+        assertEquals(EXPECTED_RESULT_COUNT, count);
     }
 }
