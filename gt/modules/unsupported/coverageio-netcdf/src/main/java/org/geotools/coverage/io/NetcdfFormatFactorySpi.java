@@ -54,7 +54,7 @@ public class NetcdfFormatFactorySpi implements GridFormatFactorySpi {
         }
 
         //System.out.println("depth :" + DEPTH);
-        return new NetcdfFormat(DEPTH);
+        return null;// TODO new NetcdfFormat(DEPTH);
     }
 
     /**

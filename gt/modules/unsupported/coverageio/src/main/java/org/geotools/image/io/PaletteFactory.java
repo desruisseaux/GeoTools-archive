@@ -285,7 +285,7 @@ public class PaletteFactory {
          * are optional. But if they are present, we assume that their content are accurate.
          */
         String filename = new File(directory, LIST_FILE).getPath();
-        BufferedReader in = getReader(filename, "getAvailableNames");
+        BufferedReader in = getReader(LIST_FILE, "getAvailableNames");
         try {
             if (in != null) {
                 readNames(in, names);

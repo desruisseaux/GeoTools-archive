@@ -86,7 +86,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public abstract class AbstractGridCoverageReader {
+public abstract class AbstractGridCoverageReader implements GridCoverageReader {
     /**
      * The logger for the {@link #getGridCoverage} method.
      */

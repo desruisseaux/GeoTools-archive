@@ -98,6 +98,11 @@ public abstract class FileImageReader extends SimpleImageReader {
             ensureFileExists(inputFile);
             return inputFile;
         }
+        if (input instanceof String) {
+            inputFile = new File((String) input);
+            ensureFileExists(inputFile);
+            return inputFile;
+        }
         if (input instanceof File) {
             inputFile = (File) input;
             ensureFileExists(inputFile);

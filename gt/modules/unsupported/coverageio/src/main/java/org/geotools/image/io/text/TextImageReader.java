@@ -371,7 +371,8 @@ public abstract class TextImageReader extends SimpleImageReader {
             URLConnection.class,
             Reader.class,
             InputStream.class,
-            ImageInputStream.class
+            ImageInputStream.class,
+            String.class  // To be interpreted as file path.
         };
 
         /**

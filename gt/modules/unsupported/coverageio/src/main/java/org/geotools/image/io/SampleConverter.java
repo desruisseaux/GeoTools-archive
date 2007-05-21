@@ -28,10 +28,17 @@ import java.awt.image.Raster;  // For javadoc
  * Users can also implement this interface in order to convert <em>signed</em> integers
  * into <em>unsigned</em> integers, by applying an offset to the values.
  *
+ * @since 2.4
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public interface SampleConverter {
+    /**
+     * A sample converter that do not performs any conversion.
+     */
+    SampleConverter IDENTITY = new IdentityConverter();
+
     /**
      * Converts a double-precision value before to store it in the raster.
      * Subclasses should override this method if some fixed values need to

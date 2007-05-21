@@ -37,7 +37,7 @@ import org.geotools.parameter.ParameterGroup;
  *
  * @author Cédric Briançon
  */
-public class NetcdfFormat extends AbstractGridFormat implements Format {
+public abstract class NetcdfFormat extends AbstractGridFormat implements Format {
     /**
      * A temporary variable to store the depth.
      */

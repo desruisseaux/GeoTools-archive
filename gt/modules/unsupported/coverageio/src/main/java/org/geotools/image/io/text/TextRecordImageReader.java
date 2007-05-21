@@ -680,15 +680,15 @@ public class TextRecordImageReader extends TextImageReader {
      * type des données à lire.
      *
      * @param  imageIndex Index de l'image dont on veut les types.
-     * @param  numBanfd Nombre de bandes.
+     * @param  numDstBand Nombre de bandes.
      * @return Itérateur balayant les types de l'image.
      * @throws IndexOutOfBoundsException si {@code imageIndex} est invalide.
      * @throws IllegalStateException si aucune source n'a été spécifiée avec {@link #setInput}.
      * @throws IIOException si l'opération a échoué pour une autre raison.
      */
-    private Iterator getImageTypes(final int imageIndex, final int numBands) throws IOException {
+    private Iterator getImageTypes(final int imageIndex, final int numDstBands) throws IOException {
         final List list = new ArrayList();
-        list.add(getRawImageType(imageIndex, numBands));
+        list.add(getRawImageType(imageIndex, numDstBands));
         for (final Iterator it=getImageTypes(imageIndex); it.hasNext();) {
             list.add((ImageTypeSpecifier) it.next());
         }

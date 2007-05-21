@@ -32,7 +32,7 @@ import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
-import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.geometry.Envelope;
 
 // Geotools dependencies
 import org.geotools.coverage.grid.GeneralGridRange;
@@ -45,7 +45,7 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.image.ImageWorker;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.image.io.netcdf.AbstractReaderSpi;
+import org.geotools.image.io.netcdf.DefaultReader;
 
 
 /**
@@ -54,7 +54,7 @@ import org.geotools.image.io.netcdf.AbstractReaderSpi;
  * @version $Id$
  * @author Cédric Briançon
  */
-public class NetcdfReader extends AbstractGridCoverage2DReader implements GridCoverageReader {
+public class NetcdfReader extends AbstractGridCoverage2DReader {
     /**
      * The entry to log messages during the process.
      */
@@ -63,7 +63,7 @@ public class NetcdfReader extends AbstractGridCoverage2DReader implements GridCo
     /**
      * The reader Spi for netCDF images.
      */
-    private AbstractReaderSpi readerSpi; 
+    private DefaultReader.Spi readerSpi; 
 
     /**
      * The format that created this reader.
@@ -131,35 +131,35 @@ public class NetcdfReader extends AbstractGridCoverage2DReader implements GridCo
     /**
      * Get the names of metadata. Not implemented in this project.
      */
-    public String[] getMetadataNames() throws IOException {
+    public String[] getMetadataNames() {
         throw new UnsupportedOperationException("Not implemented.");
     }
 
     /**
      * Get the metadata value for a specified fields. Not implemented in this project.
      */
-    public String getMetadataValue(String string) throws IOException, MetadataNameNotFoundException {
+    public String getMetadataValue(String string) throws MetadataNameNotFoundException {
         throw new UnsupportedOperationException("Not implemented.");
     }
 
     /**
      * Not implemented.
      */
-    public String[] listSubNames() throws IOException {
+    public String[] listSubNames() {
         return null;
     }
 
     /**
      * Not implemented.
      */
-    public String getCurrentSubname() throws IOException {
+    public String getCurrentSubname() {
         return null;
     }
 
     /**
      * Not implemented.
      */
-    public boolean hasMoreGridCoverages() throws IOException {
+    public boolean hasMoreGridCoverages() {
         throw new UnsupportedOperationException("Not implemented.");
     }
 
@@ -173,7 +173,7 @@ public class NetcdfReader extends AbstractGridCoverage2DReader implements GridCo
      */
     public GridCoverage read(GeneralParameterValue[] params) throws IllegalArgumentException, IOException {
         final GeneralEnvelope requestedEnvelope = new GeneralEnvelope(originalEnvelope);
-        readerSpi = new IfremerReaderSpi(depth);
+        readerSpi = null; // TODO new IfremerReaderSpi(depth);
         final ImageReader reader = readerSpi.createReaderInstance(null);
         reader.setInput(source);
         RenderedImage image = reader.read(0);
@@ -184,7 +184,7 @@ public class NetcdfReader extends AbstractGridCoverage2DReader implements GridCo
     /**
      * Not implemented.
      */
-    public void skip() throws IOException {
+    public void skip() {
         throw new UnsupportedOperationException("Only one NetCDF image supported.");
     }
 

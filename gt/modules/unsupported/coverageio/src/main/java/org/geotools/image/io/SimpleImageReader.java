@@ -30,8 +30,8 @@ import java.util.logging.Logger;
 import java.util.Collections;
 import java.util.Iterator;
 
-import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
+import javax.imageio.ImageReadParam;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.spi.ImageReaderSpi;
@@ -275,8 +275,7 @@ public abstract class SimpleImageReader extends ImageReader {
     /**
      * Returns an image type specifier indicating the {@link SampleModel} and {@link ColorModel}
      * which most closely represents the "raw" internal format of the image. The default
-     * implementation returns an image type specifier for a {@link BandedSampleModel} of
-     * data type {@link #getRawDataType}.
+     * implementation delegates to {@link #getRawImageType(int,int)}.
      *
      * @param  imageIndex The index of the image to be queried.
      * @return The image type (never {@code null}).
@@ -288,25 +287,52 @@ public abstract class SimpleImageReader extends ImageReader {
     }
 
     /**
-     * Returns an image type specifier indicating the {@link SampleModel} and
-     * {@link ColorModel} which most closely represents the "raw" internal
-     * format of the image.
+     * Returns an image type specifier indicating the {@link SampleModel} and {@link ColorModel}
+     * which most closely represents the "raw" internal format of the image. The default
+     * implementation returns one of the following:
+     * <p>
+     * <ul>
+     *   <li>If the {@linkplain #originatingProvider originating provider} declares a
+     *       {@linkplain SimpleImageReader.Spi#getForcedImageType forced image type} to
+     *       be applied to every images of this format, then this type is returned.</li>
+     *   <li>Otherwise a default image type is computed with a {@linkplain BandedSampleModel
+     *       banded sample model} of {@linkplain #getRawDataType raw data type} and a color
+     *       model calibrated for the {@linkplain #getExpectedRange expected range} of sample
+     *       values. Note that the later may be expensive since it may require a full scan of
+     *       image data.</li>
+     * </ul>
      *
-     * @param  imageIndex The index of the image to be queried.
-     * @param  numBands   The number of bands.
+     * @param imageIndex The index of the image to be queried.
+     * @param numDstBand The number of bands, usually equals to {@link #getNumBands}
+     *                   but not always. It can also be the number of destination bands
+     *                   during a {@linkplain #read(int,ImageReadParam)} operation.
      * @return The image type (never {@code null}).
      * @throws IOException If an error occurs reading the format information from the input source.
      *
+     * @see SimpleImageReader.Spi#getForcedImageType
+     *
      * @since 2.4
      */
-    protected ImageTypeSpecifier getRawImageType(final int imageIndex, final int numBands)
+    protected ImageTypeSpecifier getRawImageType(final int imageIndex, final int numDstBand)
             throws IOException
     {
+        if (originatingProvider instanceof Spi) {
+            final Spi spi = (Spi) originatingProvider;
+            final ImageTypeSpecifier candidate = spi.getForcedImageType(imageIndex);
+            if (candidate != null && candidate.getNumBands() == numDstBand) {
+                return candidate;
+            }
+        }
+        /*
+         * Creates a default image type specifier.
+         */
         final int dataType = getRawDataType(imageIndex);
-        final int[] bankIndices = new int[numBands];
-        final int[] bandOffsets = new int[numBands];
-        for (int i=numBands; --i>=0;) bankIndices[i]=i;
-        final ColorSpace colorSpace = getColorSpace(imageIndex, 0, numBands);
+        final int[] bankIndices = new int[numDstBand];
+        final int[] bandOffsets = new int[numDstBand];
+        for (int i=numDstBand; --i>=0;) {
+            bankIndices[i] = i;
+        }
+        final ColorSpace colorSpace = getColorSpace(imageIndex, 0, numDstBand);
         if (USE_JAI_MODEL) {
             final ColorModel cm = new ComponentColorModelJAI(
                     colorSpace, null, false, false, Transparency.OPAQUE, dataType);
@@ -360,12 +386,12 @@ public abstract class SimpleImageReader extends ImageReader {
      * @throws IOException if an input operation failed.
      */
     private ColorSpace getColorSpace(final int imageIndex,
-                                   final int bandIndex,
-                                   final int numBands)
+                                     final int bandIndex,
+                                     final int numBands)
             throws IOException
     {
         final int dataType = getRawDataType(imageIndex);
-        if (dataType!=DataBuffer.TYPE_BYTE) {
+        if (dataType != DataBuffer.TYPE_BYTE) {
             final Range range = getExpectedRange(imageIndex, bandIndex);
             if (range!=null && Number.class.isAssignableFrom(range.getElementClass())) {
                 final Number minimum = (Number) range.getMinValue();
@@ -373,8 +399,8 @@ public abstract class SimpleImageReader extends ImageReader {
                 if (minimum != null && maximum != null) {
                     final float minValue = minimum.floatValue();
                     final float maxValue = maximum.floatValue();
-                    if (minValue<maxValue && !Float.isInfinite(minValue) &&
-                                             !Float.isInfinite(maxValue))
+                    if (minValue < maxValue && !Float.isInfinite(minValue) &&
+                                               !Float.isInfinite(maxValue))
                     {
                         return new ScaledColorSpace(numBands, minValue, maxValue);
                     }
@@ -502,6 +528,12 @@ public abstract class SimpleImageReader extends ImageReader {
             if (input instanceof InputStream) {
                 stream = (InputStream) input;
                 closeOnReset = null; // We don't own the stream, so don't close it.
+            } else if (input instanceof ImageInputStream) {
+                stream = new InputStreamAdapter((ImageInputStream) input);
+                closeOnReset = null; // We don't own the ImageInputStream, so don't close it.
+            } else if (input instanceof String) {
+                stream = new FileInputStream((String) input);
+                closeOnReset = stream;
             } else if (input instanceof File) {
                 stream = new FileInputStream((File) input);
                 closeOnReset = stream;
@@ -511,9 +543,6 @@ public abstract class SimpleImageReader extends ImageReader {
             } else if (input instanceof URLConnection) {
                 stream = ((URLConnection) input).getInputStream();
                 closeOnReset = stream;
-            } else if (input instanceof ImageInputStream) {
-                stream = new InputStreamAdapter((ImageInputStream) input);
-                closeOnReset = null; // We don't own the ImageInputStream, so don't close it.
             } else {
                 throw new IllegalStateException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
                         Utilities.getShortClassName(input),
@@ -619,7 +648,8 @@ public abstract class SimpleImageReader extends ImageReader {
             URL.class,
             URLConnection.class,
             InputStream.class,
-            ImageInputStream.class
+            ImageInputStream.class,
+            String.class // To be interpreted as file path.
         };
 
         /**
@@ -652,6 +682,41 @@ public abstract class SimpleImageReader extends ImageReader {
             }
             inputTypes = INPUT_TYPES;
             vendorName = "Geotools";
+        }
+
+        /**
+         * Returns the image type to apply to every images, or {@code null} if none. The
+         * default implementation always returns {@code null}, which means that the image
+         * type will be computed dynamically from image data. Subclasses may override this
+         * method for two reasons:
+         * <p>
+         * <ul>
+         *   <li>When a constant color palette is wanted for a whole data series, for example
+         *       for all <cite>Sea Surface Temperature</cite> (SST) images from some specific
+         *       provider. A constant color palette make it easier to compare different images
+         *       at different time.</li>
+         *   <li>For improving performances, since the default {@link SimpleImageReader}
+         *       implementation may scan the whole image in order to get the minimum and
+         *       maximum sample values, and build an appropriate color scale from that.</li>
+         * </ul>
+         * <p>
+         * In the particular case of images using an {@linkplain java.awt.image.IndexColorModel
+         * index color model}, the {@link Palette} class provides convenience methods for creating
+         * the type specified. Subclasses can use a code similar to:
+         *
+         * <blockquote><pre>
+         * return {@linkplain PaletteFactory}.getDefault()
+         *         .{@linkplain PaletteFactory#getPalettePadValueFirst getPalettePadValueFirst}(PALETTE_NAME, MAXIMUM - MINIMUM)
+         *         .{@linkplain Palette#getImageTypeSpecifier getImageTypeSpecifier}();
+         * </pre></blockquote>
+         *
+         * where {@code PALETTE_NAME} is a string used in order to locate a file of RGB values,
+         * and {@code MINIMUM} / {@code MAXIMUM} are some fixed range of legal sample values.
+         *
+         * @see SimpleImageReader#getRawImageType(int,int)
+         */
+        public ImageTypeSpecifier getForcedImageType(final int imageIndex) throws IOException {
+            return null;
         }
     }
 }

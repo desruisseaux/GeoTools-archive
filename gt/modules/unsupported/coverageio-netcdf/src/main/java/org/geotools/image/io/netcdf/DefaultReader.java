@@ -19,6 +19,7 @@ package org.geotools.image.io.netcdf;
 // J2SE dependencies
 import java.util.List;
 import java.util.Iterator;
+import java.util.Locale;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
@@ -27,7 +28,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.FileNotFoundException;
 import javax.imageio.IIOException;
+import javax.imageio.ImageReader;
 import javax.imageio.ImageReadParam;
+import javax.imageio.ImageTypeSpecifier;
 import javax.media.jai.util.Range;
 
 // NetCDF dependencies
@@ -35,18 +38,23 @@ import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
 import ucar.ma2.Array;
 import ucar.ma2.Index;
+import ucar.ma2.DataType;
+import ucar.ma2.IndexIterator;
 import ucar.ma2.InvalidRangeException;
+
+// Geomatys dependencies
+import org.geotools.util.NumberRange;
+import org.geotools.image.io.PaletteFactory;
+import org.geotools.image.io.FileImageReader;
+import org.geotools.image.io.SampleConverter;
+import org.geotools.image.io.IntegerConverter;
+import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
-// Geomatys dependencies
-import org.geotools.image.io.SampleConverter;
-import org.geotools.image.io.FileImageReader;
-
 
 /**
- * Base implementation for NetCDF image reader. In most case, there is no need to subclass.
- * Subclassing {@link AbstractReaderSpi} should be suffisient.
+ * Base implementation for NetCDF image reader.
  *
  * @since 2.4
  * @source $URL$
@@ -57,6 +65,8 @@ import org.geotools.image.io.FileImageReader;
 public class DefaultReader extends FileImageReader {
     /**
      * The NetCDF file, or {@code null} if not yet open.
+     *
+     * @todo Uses {@link ucar.nc2.dataset.NetcdfDataset} instead.
      */
     private NetcdfFile file;
 
@@ -87,16 +97,20 @@ public class DefaultReader extends FileImageReader {
      */
     private final SampleConverter converter;
 
+    /**
+     * The ranges for each image index, or {@code null} if unknown.
+     */
+    private Range[] ranges;
+
     /** 
      * Constructs a new NetCDF reader.
      *
-     * @param spi       The service provider.
-     * @param variable  The default name of the {@linkplain Variable variable} to be read.
+     * @param spi The service provider.
      */
-    public DefaultReader(final AbstractReaderSpi spi, final String variableName) {
+    public DefaultReader(final Spi spi) {
         super(spi);
-        this.variableName = variableName;
-        this.converter    = spi;
+        this.variableName = spi.variable;
+        this.converter    = spi.converter;
     }
 
     /**
@@ -148,9 +162,107 @@ public class DefaultReader extends FileImageReader {
     }
 
     /**
+     * Returns the range of values. The default implementation scans the file content.
      */
     public Range getExpectedRange(final int imageIndex, final int bandIndex) throws IOException {
-        throw new UnsupportedOperationException(); // TODO
+        checkImageIndex(imageIndex);
+        if (ranges == null) {
+            ranges = new Range[imageIndex + 1];
+        } else if (ranges.length <= imageIndex) {
+            ranges = (Range[]) XArray.resize(ranges, imageIndex + 1);
+        }
+        Range range = ranges[imageIndex];
+        if (range == null) {
+            ranges[imageIndex] = range = computeExpectedRange(imageIndex);
+        }
+        return range;
+    }
+
+    /**
+     * Computes the range of values.
+     */
+    private Range computeExpectedRange(final int imageIndex) throws IOException {
+        prepareVariable(imageIndex);
+        final Array    array = variable.read();
+        final DataType type  = variable.getDataType();
+        if (type.equals(DataType.BYTE)) {
+            byte min = Byte.MAX_VALUE;
+            byte max = Byte.MIN_VALUE;
+            for (final IndexIterator it=array.getIndexIterator(); it.hasNext();) {
+                final byte value = (byte) converter.convert(it.getByteNext());
+                if (value < min) min = value;
+                if (value > max) max = value;
+            }
+            if (min < max) {
+                return new NumberRange(min, max);
+            }
+        } else if (type.equals(DataType.SHORT) || type.equals(DataType.INT)) {
+            int min = Integer.MAX_VALUE;
+            int max = Integer.MIN_VALUE;
+            for (final IndexIterator it=array.getIndexIterator(); it.hasNext();) {
+                final int value = converter.convert(it.getIntNext());
+                if (value < min) min = value;
+                if (value > max) max = value;
+            }
+            if (min < max) {
+                return new NumberRange(min, max);
+            }
+        } else if (type.equals(DataType.FLOAT)) {
+            float min = Float.POSITIVE_INFINITY;
+            float max = Float.NEGATIVE_INFINITY;
+            for (final IndexIterator it=array.getIndexIterator(); it.hasNext();) {
+                final float value = converter.convert(it.getFloatNext());
+                if (value < min) min = value;
+                if (value > max) max = value;
+            }
+            if (min < max) {
+                return new NumberRange(min, max);
+            }
+        } else {
+            double min = Double.POSITIVE_INFINITY;
+            double max = Double.NEGATIVE_INFINITY;
+            for (final IndexIterator it=array.getIndexIterator(); it.hasNext();) {
+                final double value = converter.convert(it.getDoubleNext());
+                if (value < min) min = value;
+                if (value > max) max = value;
+            }
+            if (min < max) {
+                return new NumberRange(min, max);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the data type which most closely represents the "raw" internal data of the image.
+     *
+     * @param  imageIndex The index of the image to be queried.
+     * @return The data type.
+     * @throws IOException If an error occurs reading the format information from the input source.
+     */
+    //@Override
+    public int getRawDataType(final int imageIndex) throws IOException {
+        prepareVariable(imageIndex);
+        final DataType type = variable.getDataType();
+        if (DataType.BOOLEAN.equals(type) || DataType.BYTE.equals(type)) {
+            return DataBuffer.TYPE_BYTE;
+        }
+        if (DataType.CHAR.equals(type)) {
+            return DataBuffer.TYPE_USHORT;
+        }
+        if (DataType.SHORT.equals(type)) {
+            return variable.isUnsigned() ? DataBuffer.TYPE_USHORT : DataBuffer.TYPE_SHORT;
+        }
+        if (DataType.INT.equals(type)) {
+            return DataBuffer.TYPE_INT;
+        }
+        if (DataType.FLOAT.equals(type)) {
+            return DataBuffer.TYPE_FLOAT;
+        }
+        if (DataType.LONG.equals(type) || DataType.DOUBLE.equals(type)) {
+            return DataBuffer.TYPE_DOUBLE;
+        }
+        return DataBuffer.TYPE_UNDEFINED;
     }
 
     /**
@@ -290,11 +402,135 @@ public class DefaultReader extends FileImageReader {
      */
     //@Override
     protected void close() throws IOException {
+        ranges = null;
         variable = null;
         if (file != null) {
             file.close();
             file = null;
         }
         super.close();
+    }
+
+
+
+
+    /**
+     * The service provider for {@link DefaultReader}. This class requires the list of
+     * {@linkplain Variable variables} to read. This list can be obtained by the following
+     * instruction:
+     *
+     * <blockquote>
+     * <code>java org.geotools.image.io.netcdf.Explorer</code> <var>fichier</var>
+     * </blockquote>
+     * 
+     * @version $Id$
+     * @author Antoine Hnawia
+     * @author Martin Desruisseaux
+     */
+    public static class Spi extends FileImageReader.Spi {
+        /**
+         * List of legal names for NetCDF readers.
+         */
+        private static final String[] NAMES = new String[] {"netcdf", "NetCDF"};
+
+        /**
+         * Default list of file's extensions.
+         */
+        private static final String[] SUFFIXES = new String[] {"nc", "NC"};
+
+        /**
+         * The name of the {@linkplain Variable variable} to be read in a NetCDF file.
+         */
+        private final String variable;
+
+        /**
+         * The sample converter. Default to {@linkplain SampleConverter#IDENTITY identity}.
+         */
+        protected SampleConverter converter = SampleConverter.IDENTITY;
+
+        /**
+         * The name of a color palette to fetch from the {@linkplain PaletteFactory#getDefault
+         * default palette factory}, or {@code null} if none.
+         */
+        protected String paletteName;
+
+        /**
+         * The color palette size. Valid only if {@link #paletteName} is non-null.
+         */
+        protected int paletteSize;
+
+        /**
+         * Constructs a service provider for the specified variable name.
+         *
+         * @param variable The default name of the {@linkplain Variable variable} to be read.
+         */
+        public Spi(final String variable) {
+            super("NetCDF", "image/x-netcdf");
+            names            = NAMES;
+            suffixes         = SUFFIXES;
+            vendorName       = "Geotools";
+            version          = "2.4";
+            pluginClassName  = "org.geotools.image.io.netcdf.DefaultReader";
+            this.variable    = variable;
+        }
+
+        /**
+         * Constructs a service provider for the specified variable name and color palette.
+         *
+         * @param variable The default name of the {@linkplain Variable variable} to be read.
+         * @param palette  The name of a color palette to fetch from the
+         *                 {@linkplain PaletteFactory#getDefault default palette factory}.
+         * @param lower    The lowest sample value, inclusive.
+         * @param upper    The highest sample value, exclusive.
+         * @param padValue The pad value.
+         *
+         * @todo The pad value may be available in variable properties instead.
+         */
+        public Spi(final String variable, final String palette,
+                   final int lower, final int upper, final int padValue)
+        {
+            this(variable);
+            paletteName = palette;
+            paletteSize = upper - lower;
+            converter   = new IntegerConverter(padValue, 1-lower);
+        }
+
+        /**
+         * Returns a description for this provider.
+         */
+        //@Override
+        public String getDescription(final Locale locale) {
+            return "NetCDF image decoder"; // TODO: localize
+        }
+
+        /**
+         * Checks if the specified input seems to be a readeable NetCDF file.
+         * This method is only for indication purpose. Current implementation
+         * conservatively returns {@code false}.
+         *
+         * @todo Implements a more advanced check.
+         */
+        public boolean canDecodeInput(final Object source) throws IOException {
+            return false;
+        }
+
+        /**
+         * Constructs a NetCDF image reader.
+         */
+        public ImageReader createReaderInstance(final Object extension) throws IOException {
+            return new DefaultReader(this);
+        }
+
+        /**
+         * If a constant palette was specified to the constructor, returns a type specifier for it.
+         */
+        //@Override
+        public ImageTypeSpecifier getForcedImageType(final int imageIndex) throws IOException {
+            if (paletteName == null) {
+                return super.getForcedImageType(imageIndex);
+            }
+            return PaletteFactory.getDefault().getPalettePadValueFirst(paletteName, paletteSize).
+                    getImageTypeSpecifier();
+        }
     }
 }

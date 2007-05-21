@@ -38,6 +38,7 @@ import javax.media.jai.util.Range;
 
 // Geotools dependencies
 import org.geotools.io.LineFormat;
+import org.geotools.util.NumberRange;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -274,7 +275,7 @@ public class TextMatrixImageReader extends TextImageReader {
          * If a direct mapping is possible, perform it.
          */
         if (isDirect && (param==null || param.getDestination()==null)) {
-            final ImageTypeSpecifier type = getRawImageType(imageIndex);
+            final ImageTypeSpecifier type = getRawImageType(imageIndex, numDstBands);
             final SampleModel       model = type.getSampleModel().createCompatibleSampleModel(width,height);
             final DataBuffer       buffer = new DataBufferFloat(data, data.length);
             final WritableRaster   raster = Raster.createWritableRaster(model, buffer, null);
@@ -319,17 +320,17 @@ public class TextMatrixImageReader extends TextImageReader {
      */
     public Range getExpectedRange(final int imageIndex, final int bandIndex) throws IOException {
         checkBandIndex(imageIndex, bandIndex);
-        if (range==null) {
+        if (range == null) {
             load(imageIndex, true);
             float minimum = Float.POSITIVE_INFINITY;
             float maximum = Float.NEGATIVE_INFINITY;
             for (int i=0; i<data.length; i++) {
                 final float value = data[i];
-                if (value<minimum) minimum=value;
-                if (value>maximum) maximum=value;
+                if (value < minimum) minimum = value;
+                if (value > maximum) maximum = value;
             }
-            if (minimum<maximum) {
-                range = new Range(Float.class, new Float(minimum), new Float(maximum));
+            if (minimum < maximum) {
+                range = new NumberRange(minimum, maximum);
             }
         }
         return range;
