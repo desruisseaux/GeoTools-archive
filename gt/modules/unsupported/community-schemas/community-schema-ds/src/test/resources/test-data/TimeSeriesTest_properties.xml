@@ -22,6 +22,11 @@
     </Namespace>
 
     <Namespace>
+      <prefix>cv</prefix>
+      <uri>http://www.opengis.net/cv/0.0</uri>
+    </Namespace>
+    
+    <Namespace>
       <prefix>sa</prefix>
       <uri>http://www.seegrid.csiro.au/xml/sampling/0.0</uri>
     </Namespace>
@@ -126,6 +131,50 @@
 
 
         </AttributeMapping>
+        
+<AttributeMapping>
+          <targetAttribute>relatedObservation/WaterObservation/result</targetAttribute>
+          <targetAttributeNode>cv:CompactDiscreteTimeCoveragePropertyType</targetAttributeNode>
+        </AttributeMapping>
+       
+        <AttributeMapping>
+          <targetAttribute>relatedObservation/WaterObservation/result/CompactDiscreteTimeCoverage[1]</targetAttribute>
+          <targetAttributeNode>cv:CompactDiscreteTimeCoverageType</targetAttributeNode>
+          
+        </AttributeMapping>
+        
+        <AttributeMapping>
+          <targetAttribute>relatedObservation/WaterObservation/result/CompactDiscreteTimeCoverage[1]/element</targetAttribute>
+          <targetAttributeNode>cv:CompactTimeValuePairPropertyType</targetAttributeNode>
+          <isMultiple>true</isMultiple>
+        </AttributeMapping>
+        <AttributeMapping>
+          <targetAttribute>relatedObservation/WaterObservation/result/CompactDiscreteTimeCoverage[1]/element/CompactTimeValuePair</targetAttribute>
+          <targetAttributeNode>cv:CompactTimeValuePairType</targetAttributeNode>
+        </AttributeMapping>
+        <AttributeMapping>
+          <targetAttribute>relatedObservation/WaterObservation/result/CompactDiscreteTimeCoverage[1]/element/CompactTimeValuePair/geometry</targetAttribute>
+          <sourceExpression>
+            <OCQL>sample_time_position</OCQL>
+          </sourceExpression>
+        </AttributeMapping>
+        
+        <AttributeMapping>
+          <targetAttribute>relatedObservation/WaterObservation/result/CompactDiscreteTimeCoverage[1]/element/CompactTimeValuePair/value</targetAttribute>
+          <sourceExpression>
+            <OCQL>result</OCQL>
+          </sourceExpression>
+          <ClientProperty>
+            <name>xsi:type</name>
+            <value>"gml:MeasureType"</value>
+          </ClientProperty>
+          <ClientProperty>
+            <name>uom</name>
+            <value>'mm'</value>
+          </ClientProperty>
+        </AttributeMapping>
+        
+        
       </attributeMappings>
     </FeatureTypeMapping>
   </typeMappings>

@@ -111,7 +111,7 @@ public class TimeSeriesTest extends TestCase {
      *
      * @throws Exception
      */
-    public void XtestParseSchema() throws Exception {
+    public void targttestParseSchema() throws Exception {
         /*
          * not found types and elements:
          */
@@ -139,39 +139,30 @@ public class TimeSeriesTest extends TestCase {
         assertEquals(superTypeName, superType.getName());
         assertTrue(superType instanceof FeatureType);
 
-        /*
+        Collection properties = testType.getProperties();
+        
+
            // ensure all needed types were parsed and aren't just empty proxies
-           Collection properties = borehole.getProperties();
-           assertEquals(16, properties.size());
-           Map expectedNamesAndTypes = new HashMap();
+
+        Map expectedNamesAndTypes = new HashMap();
            //from gml:AbstractFeatureType
            expectedNamesAndTypes.put(name(GMLNS, "metaDataProperty"), typeName(GMLNS, "MetaDataPropertyType"));
            expectedNamesAndTypes.put(name(GMLNS, "description"), typeName(GMLNS, "StringOrRefType"));
            expectedNamesAndTypes.put(name(GMLNS, "name"), typeName(GMLNS, "CodeType"));
            expectedNamesAndTypes.put(name(GMLNS, "boundedBy"), typeName(GMLNS, "BoundingShapeType"));
            expectedNamesAndTypes.put(name(GMLNS, "location"), typeName(GMLNS, "LocationPropertyType"));
-           //from sa:ProfileType
-           expectedNamesAndTypes.put(name(SANS, "begin"), typeName(GMLNS, "PointPropertyType"));
-           expectedNamesAndTypes.put(name(SANS, "end"), typeName(GMLNS, "PointPropertyType"));
-           expectedNamesAndTypes.put(name(SANS, "length"), typeName(SWENS, "RelativeMeasureType"));
-           expectedNamesAndTypes.put(name(SANS, "shape"), typeName(GEONS, "Shape1DPropertyType"));
-           //sa:SamplingFeatureType
-           expectedNamesAndTypes.put(name(SANS, "member"), typeName(SANS, "SamplingFeaturePropertyType"));
-           expectedNamesAndTypes.put(name(SANS, "surveyDetails"), typeName(SANS, "SurveyProcedurePropertyType"));
-           expectedNamesAndTypes.put(name(SANS, "associatedSpecimen"), typeName(SANS, "SpecimenPropertyType"));
+       //sa:SamplingFeatureType
            expectedNamesAndTypes.put(name(SANS, "relatedObservation"), typeName(OMNS, "AbstractObservationPropertyType"));
-           //from xmml:BoreholeType
-           expectedNamesAndTypes.put(name(XMMLNS, "drillMethod"), typeName(XMMLNS, "drillCode"));
-           expectedNamesAndTypes.put(name(XMMLNS, "collarDiameter"), typeName(GMLNS, "MeasureType"));
-           expectedNamesAndTypes.put(name(XMMLNS, "log"), typeName(XMMLNS, "LogPropertyType"));
+
            for (Iterator it = expectedNamesAndTypes.entrySet().iterator(); it.hasNext();) {
                Map.Entry entry = (Entry) it.next();
                Name dName = (Name) entry.getKey();
                TypeName tName = (TypeName) entry.getValue();
         
-               AttributeDescriptor d = (AttributeDescriptor) Types.descriptor(borehole, dName);
+               AttributeDescriptor d = (AttributeDescriptor) Types.descriptor(testType, dName);
                assertNotNull("Descriptor not found: " + dName, d);
                AttributeType type;
+               LOGGER.log(Level.INFO, "type " + ((AttributeDescriptor) d).getName() + tName.toString() );ay,
                try {
                    type = d.getType();
                } catch (Exception e) {
@@ -186,11 +177,6 @@ public class TimeSeriesTest extends TestCase {
                    assertEquals(tName, type.getName());
                }
            }
-           TypeName tcl = Types.typeName(SWENS, "TypedCategoryListType");
-           AttributeType typedCategoryListType = (AttributeType) typeRegistry.get(tcl);
-           assertNotNull(typedCategoryListType);
-           assertFalse(typedCategoryListType instanceof ComplexType);
-         */
     }
 
     private TypeName typeName(String ns, String localName) {
