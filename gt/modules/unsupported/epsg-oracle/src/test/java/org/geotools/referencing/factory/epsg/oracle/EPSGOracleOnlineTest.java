@@ -13,7 +13,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.datum.GeodeticDatum;
 
-public class EPSGOracleOnlineTest extends OracleOnlineTest {
+public class EPSGOracleOnlineTest extends OracleOnlineTestCase {
 
     public void testWSG84() throws Exception {
         CoordinateReferenceSystem crs = CRS.decode("EPSG:4326");

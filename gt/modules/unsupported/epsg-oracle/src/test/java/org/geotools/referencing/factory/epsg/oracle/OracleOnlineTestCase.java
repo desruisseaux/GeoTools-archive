@@ -47,7 +47,7 @@ import org.geotools.test.OnlineTestCase;
  * @author Jody
  *
  */
-public class OracleOnlineTest extends OnlineTestCase {
+public class OracleOnlineTestCase extends OnlineTestCase {
     DataSource datasource;
     Connection connection;
 
@@ -69,10 +69,7 @@ public class OracleOnlineTest extends OnlineTestCase {
         final int TECHNIQUE = DATASOURCE;
         OracleDataSource source;
         source = new OracleDataSource();
-        //source.setDriverType( fixture.getProperty("driverClassName"));
-        
-        //source.setPortNumber( Integer.parseInt( fixture.getProperty("port")) );
-        //source.setServerName( fixture.getProperty("host"));
+
         source.setUser( fixture.getProperty("user"));
         source.setPassword( fixture.getProperty("password"));
         source.setURL( fixture.getProperty("url"));
@@ -101,7 +98,7 @@ public class OracleOnlineTest extends OnlineTestCase {
         
         InitialContext context = new InitialContext(env);
         String name = context.composeName("jdbc/EPSG", ""); // jdbc/EPSG
-        System.out.println( name );
+        //System.out.println( name );
         context.bind( name, source );
         
         JNDI.init( context );
