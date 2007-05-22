@@ -125,9 +125,9 @@ public class Mercator2SP extends Mercator {
                 new NamedIdentifier(Citations.GEOTOOLS, Vocabulary.formatInternational(
                                     VocabularyKeys.CYLINDRICAL_MERCATOR_PROJECTION))
             }, new ParameterDescriptor[] {
-                SEMI_MAJOR,       SEMI_MINOR,
-                CENTRAL_MERIDIAN, STANDARD_PARALLEL,LATITUDE_OF_ORIGIN,
-                FALSE_EASTING,    FALSE_NORTHING
+                SEMI_MAJOR, SEMI_MINOR,
+                STANDARD_PARALLEL, LATITUDE_OF_ORIGIN, CENTRAL_MERIDIAN,
+                FALSE_EASTING, FALSE_NORTHING
             });
 
         /**

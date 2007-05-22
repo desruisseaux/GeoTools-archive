@@ -101,7 +101,7 @@ public abstract class Mercator extends MapProjection {
             // 'scaleFactor' to 1. We still use the '*=' operator rather than '=' in case a
             // user implementation still provides a scale factor for its custom projections.
             standardParallel = Math.abs(doubleValue(expected,
-                                        AbstractProvider.STANDARD_PARALLEL, parameters));
+                    AbstractProvider.STANDARD_PARALLEL, parameters));
             ensureLatitudeInRange(AbstractProvider.STANDARD_PARALLEL, standardParallel, false);
             if (isSpherical) {
                 scaleFactor *= Math.cos(standardParallel);
@@ -109,11 +109,21 @@ public abstract class Mercator extends MapProjection {
                 scaleFactor *= msfn(Math.sin(standardParallel),
                                     Math.cos(standardParallel));
             }
-            globalScale = scaleFactor*semiMajor;
+            globalScale = scaleFactor * semiMajor;
         } else {
             // No standard parallel. Instead, uses the scale factor explicitely provided.
             standardParallel = Double.NaN;
         }
+        /*
+         * A correction that allows us to employs a latitude of origin that is not
+         * correspondent to the equator. See Snyder and al. for reference, page 47.
+         * The scale correction is multiplied with the global scale, which allows
+         * MapProjection superclass to merge this correction with the scale factor
+         * in a single multiplication.
+         */
+        final double sinPhi = Math.sin(latitudeOfOrigin);
+        globalScale *= (Math.cos(latitudeOfOrigin) /
+                (Math.sqrt(1 - excentricitySquared * sinPhi * sinPhi)));
     }
 
     /**
@@ -141,20 +151,7 @@ public abstract class Mercator extends MapProjection {
                     ErrorKeys.POLE_PROJECTION_$1, new Latitude(Math.toDegrees(y))));
         }
 
-        // /////////////////////////////////////////////////////////////////////
-		//
-		// This correction allows us to employs a latitude of origin that is not
-		// correspondent to the equator. See Snyderet al. for reference, page
-		// 47.
-		//
-		// /////////////////////////////////////////////////////////////////////
-		final double sinPhi = Math.sin(latitudeOfOrigin);
-		final double scaleCorrection = (Math.cos(this.latitudeOfOrigin) / (Math
-				.sqrt(1 - this.excentricitySquared * sinPhi * sinPhi)));
-        
-        x*=scaleCorrection;
-		y = -Math.log(tsfn(y, Math.sin(y)))
-				* scaleCorrection;
+        y = -Math.log(tsfn(y, Math.sin(y)));
 
         if (ptDst != null) {
             ptDst.setLocation(x,y);
@@ -170,19 +167,6 @@ public abstract class Mercator extends MapProjection {
     protected Point2D inverseTransformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException
     {
-        // /////////////////////////////////////////////////////////////////////
-		//
-		// This correction allows us to employs a latitude of origin that is not
-		// correspondent to the equator. See Snyderet al. for reference, page
-		// 47.
-		//
-		// /////////////////////////////////////////////////////////////////////
-		final double sinPhi = Math.sin(latitudeOfOrigin);
-		final double scaleCorrection = (Math.cos(this.latitudeOfOrigin) / (Math
-				.sqrt(1 - this.excentricitySquared * sinPhi * sinPhi)));
-		y/=scaleCorrection;
-		x/=scaleCorrection;
-		
         y = Math.exp(-y);
         y = cphi2(y);
 
@@ -229,20 +213,8 @@ public abstract class Mercator extends MapProjection {
             }
             // Compute using ellipsoidal formulas, for comparaison later.
             assert (ptDst = super.transformNormalized(x, y, ptDst)) != null;
-          
-            // /////////////////////////////////////////////////////////////////////
-    		//
-    		// This correction allows us to employs a latitude of origin that is not
-    		// correspondent to the equator. See Snyderet al. for reference, page
-    		// 47.
-    		//
-    		// /////////////////////////////////////////////////////////////////////
-    		final double sinPhi = Math.sin(latitudeOfOrigin);
-    		final double scaleCorrection = (Math.cos(this.latitudeOfOrigin) / (Math
-    				.sqrt(1 - this.excentricitySquared * sinPhi * sinPhi)));
-    		
-            x*=scaleCorrection;
-            y = Math.log(Math.tan((Math.PI/4) + 0.5*y))*scaleCorrection;
+
+            y = Math.log(Math.tan((Math.PI/4) + 0.5*y));
 
             assert checkTransform(x, y, ptDst);
             if (ptDst != null) {
@@ -262,19 +234,6 @@ public abstract class Mercator extends MapProjection {
             // Compute using ellipsoidal formulas, for comparaison later.
             assert (ptDst = super.inverseTransformNormalized(x, y, ptDst)) != null;
 
-            // /////////////////////////////////////////////////////////////////////
-    		//
-    		// This correction allows us to employs a latitude of origin that is not
-    		// correspondent to the equator. See Snyderet al. for reference, page
-    		// 47.
-    		//
-    		// /////////////////////////////////////////////////////////////////////
-    		final double sinPhi = Math.sin(latitudeOfOrigin);
-    		final double scaleCorrection = (Math.cos(this.latitudeOfOrigin) / (Math
-    				.sqrt(1 - this.excentricitySquared * sinPhi * sinPhi)));
-    		x/=scaleCorrection;
-    		y/=scaleCorrection;
-    		
             y = (Math.PI/2) - 2.0*Math.atan(Math.exp(-y));
 
             assert checkInverseTransform(x, y, ptDst);

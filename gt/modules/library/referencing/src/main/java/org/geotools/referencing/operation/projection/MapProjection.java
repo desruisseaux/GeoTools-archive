@@ -247,9 +247,9 @@ public abstract class MapProjection extends AbstractMathTransform
         falseEasting        = doubleValue(expected, AbstractProvider.FALSE_EASTING,      values);
         falseNorthing       = doubleValue(expected, AbstractProvider.FALSE_NORTHING,     values);
         isSpherical         = (semiMajor == semiMinor);
-        excentricitySquared = 1.0 - (semiMinor*semiMinor)/(semiMajor*semiMajor);
+        excentricitySquared = 1.0 - (semiMinor * semiMinor) / (semiMajor * semiMajor);
         excentricity        = Math.sqrt(excentricitySquared);
-        globalScale         = scaleFactor*semiMajor;
+        globalScale         = scaleFactor * semiMajor;
         ensureLongitudeInRange(AbstractProvider.CENTRAL_MERIDIAN,   centralMeridian,  true);
         ensureLatitudeInRange (AbstractProvider.LATITUDE_OF_ORIGIN, latitudeOfOrigin, true);
     }
@@ -895,8 +895,8 @@ public abstract class MapProjection extends AbstractMathTransform
         {
             final double x0 = ptSrc.getX();
             final double y0 = ptSrc.getY();
-            ptDst = inverseTransformNormalized((x0 - falseEasting )/globalScale,
-                                               (y0 - falseNorthing)/globalScale, ptDst);
+            ptDst = inverseTransformNormalized((x0 - falseEasting ) / globalScale,
+                                               (y0 - falseNorthing) / globalScale, ptDst);
             /*
              * Makes sure that the longitude after conversion stay within +/- PI radians. As a
              * special case, we do not check the range if no rotation were applied on the longitude.
