@@ -41,9 +41,9 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class GeometryTransformer extends TransformerBase {
     
-    private boolean useDummyZ = false;
+    protected boolean useDummyZ = false;
     
-    private int numDecimals = 4;
+    protected int numDecimals = 4;
     
     public void setUseDummyZ(boolean flag){
         useDummyZ = flag;
