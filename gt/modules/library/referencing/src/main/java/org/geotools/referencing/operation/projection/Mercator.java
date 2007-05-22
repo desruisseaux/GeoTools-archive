@@ -70,6 +70,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
+ * @author Simone Giannecchini
  */
 public abstract class Mercator extends MapProjection {
     /**
