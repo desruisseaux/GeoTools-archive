@@ -17,6 +17,7 @@ package org.geotools.coverage.io;
 
 // J2SE dependencies
 import java.util.HashMap;
+import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
 
 // OpenGIS dependencies
 import org.opengis.coverage.grid.Format;
@@ -27,7 +28,7 @@ import org.opengis.parameter.GeneralParameterDescriptor;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.data.DataSourceException;
-import org.geotools.data.coverage.grid.AbstractGridFormat;
+import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
 
@@ -37,7 +38,7 @@ import org.geotools.parameter.ParameterGroup;
  *
  * @author Cédric Briançon
  */
-public abstract class NetcdfFormat extends AbstractGridFormat implements Format {
+public class NetcdfFormat extends AbstractGridFormat implements Format {
     /**
      * A temporary variable to store the depth.
      */
@@ -105,5 +106,9 @@ public abstract class NetcdfFormat extends AbstractGridFormat implements Format 
      */
     public boolean accepts(Object object) {
         return true;
+    }
+
+    public GeoToolsWriteParams getDefaultImageIOWriteParameters() {
+        throw new UnsupportedOperationException();
     }
 }

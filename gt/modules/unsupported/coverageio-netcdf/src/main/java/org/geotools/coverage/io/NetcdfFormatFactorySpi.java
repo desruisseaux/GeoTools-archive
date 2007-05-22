@@ -25,7 +25,7 @@ import java.util.Map;
 import org.opengis.coverage.grid.Format;
 
 // Geotools dependencies
-import org.geotools.data.coverage.grid.GridFormatFactorySpi;
+import org.geotools.coverage.grid.io.GridFormatFactorySpi;
 
 
 /**
@@ -54,7 +54,7 @@ public class NetcdfFormatFactorySpi implements GridFormatFactorySpi {
         }
 
         //System.out.println("depth :" + DEPTH);
-        return null;// TODO new NetcdfFormat(DEPTH);
+        return new NetcdfFormat(DEPTH);
     }
 
     /**
@@ -82,5 +82,12 @@ public class NetcdfFormatFactorySpi implements GridFormatFactorySpi {
      */
     public Map getImplementationHints() {
         return Collections.EMPTY_MAP;
+    }
+
+    /**
+     */
+    public static void main(String[] args) {
+        System.out.println(org.geotools.coverage.grid.io.GridFormatFinder.getAvailableFormats());
+        System.out.println(new NetcdfFormatFactorySpi().createFormat().getDescription());
     }
 }

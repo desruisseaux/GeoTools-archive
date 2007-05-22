@@ -2,6 +2,7 @@ bell
 blue-red
 CHLA-Nasa
 CHLA-SeaWifs
+dem
 grayscale
 rainbow
 red-blue

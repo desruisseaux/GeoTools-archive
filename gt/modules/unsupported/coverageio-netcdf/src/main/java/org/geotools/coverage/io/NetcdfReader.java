@@ -39,7 +39,7 @@ import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.processing.Operations;
 import org.geotools.data.DataSourceException;
-import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
+import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.image.ImageWorker;
@@ -97,7 +97,7 @@ public class NetcdfReader extends AbstractGridCoverage2DReader {
         }               
         this.originalEnvelope = new GeneralEnvelope(crs);
         this.originalEnvelope.setRange(0, -180, +180);
-        this.originalEnvelope.setRange(0, -90, +90);
+        this.originalEnvelope.setRange(1, -90, +90);
         this.originalGridRange = new GeneralGridRange(originalEnvelope);
         if (input == null) {
             throw new DataSourceException("No source set to read this coverage.");
@@ -173,7 +173,12 @@ public class NetcdfReader extends AbstractGridCoverage2DReader {
      */
     public GridCoverage read(GeneralParameterValue[] params) throws IllegalArgumentException, IOException {
         final GeneralEnvelope requestedEnvelope = new GeneralEnvelope(originalEnvelope);
-        readerSpi = null; // TODO new IfremerReaderSpi(depth);
+        try {
+            // Experimental; will be replaced by something more generic soon (work in progress)
+            readerSpi = (DefaultReader.Spi) Class.forName("fr.geomatys.image.io.netcdf.TemperatureReaderSpi").newInstance();
+        } catch (Exception e) {
+            throw new IOException(e.toString());
+        }
         final ImageReader reader = readerSpi.createReaderInstance(null);
         reader.setInput(source);
         RenderedImage image = reader.read(0);
