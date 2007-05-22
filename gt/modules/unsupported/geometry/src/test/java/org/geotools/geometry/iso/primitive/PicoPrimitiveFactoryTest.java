@@ -16,7 +16,6 @@ import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.coordinate.LineSegmentImpl;
-import org.geotools.geometry.iso.coordinate.PolygonImpl;
 import org.geotools.geometry.iso.io.CollectionFactoryMemoryImpl;
 import org.geotools.geometry.iso.util.elem2D.Geo2DFactory;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -31,7 +30,6 @@ import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.Primitive;
 import org.opengis.geometry.primitive.PrimitiveFactory;
 import org.opengis.geometry.primitive.Ring;
-import org.opengis.geometry.primitive.Surface;
 import org.opengis.geometry.primitive.SurfaceBoundary;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.picocontainer.PicoContainer;
@@ -237,6 +235,7 @@ public class PicoPrimitiveFactoryTest extends TestCase {
 		Curve s2 = new CurveImpl(crs, curves);
 		
 		Set<Primitive> primitives = new HashSet<Primitive>();
+		System.out.println(s.getBoundary());
 		primitives.add(s);
 		primitives.add(s2);
 		MultiPrimitiveImpl mp = new MultiPrimitiveImpl(crs, primitives);

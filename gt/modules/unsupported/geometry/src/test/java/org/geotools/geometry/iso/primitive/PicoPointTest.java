@@ -66,6 +66,7 @@ public class PicoPointTest extends TestCase {
 		assertEquals(here.getCoordinateReferenceSystem(), point.getCoordinateReferenceSystem());
 		assertEquals(here, point.getPosition());
 		assertEquals(here.hashCode(), point.getPosition().hashCode());
+		assertEquals(point.getCentroid(), here);
 	}
 	
 	public void testWSG84Point(){

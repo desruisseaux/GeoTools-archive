@@ -919,7 +919,6 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 	public int hashCode() {
 		final int PRIME = 31;
 		int result = 1;
-		result = PRIME * result + ((boundary == null) ? 0 : boundary.hashCode());
 		result = PRIME * result + ((curveSegments == null) ? 0 : curveSegments.hashCode());
 		result = PRIME * result + ((envelope == null) ? 0 : envelope.hashCode());
 		return result;
@@ -934,11 +933,6 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 		if (getClass() != obj.getClass())
 			return false;
 		final CurveImpl other = (CurveImpl) obj;
-		if (boundary == null) {
-			if (other.boundary != null)
-				return false;
-		} else if (!boundary.equals( (Object) other.boundary))
-			return false;
 		if (curveSegments == null) {
 			if (other.curveSegments != null)
 				return false;
@@ -951,6 +945,8 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 			return false;
 		return true;
 	}
+
+
 
 
 }

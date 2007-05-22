@@ -61,6 +61,8 @@
 </test>
 </case>
 
+<!-- the following tests expects the multipoints to return a boundary, but the ISO 19107 specs state 
+	that a point and hence multipoints, should return an empty boundary 
 <case>
   <desc>mL - 2 lines with common endpoint</desc>
   <a>
@@ -132,7 +134,11 @@
   </op>
 </test>
 </case>
+-->
 
+<!-- the following tests expects the linestrings (implemented as curves) to return a boundary, but 
+	the ISO 19107 specs state that curves with the same start and end point (closed) should return
+	an empty boundary. 
 <case>
   <desc>A - polygon with no holes</desc>
   <a>
@@ -161,5 +167,6 @@
   </op>
 </test>
 </case>
+-->
 
 </run>

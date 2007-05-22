@@ -41,6 +41,7 @@ import java.util.Arrays;
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.util.DoubleOperation;
 import org.geotools.geometry.iso.util.algorithmND.AlgoPointND;
+import org.geotools.referencing.CRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
@@ -291,6 +292,34 @@ public class DirectPositionImpl implements DirectPosition {
 	}
 
 	/**
+	 * Compares coodinates of Direct Positions and allows a tolerance value in
+	 * the comparison Implementation Note: Parameter has to be of Type
+	 * DirectPosition (not DirectPositionImpl), so that the equals method is
+	 * found for DirectPosition큦 and DirectPositionImpl큦
+	 * 
+	 * @param position
+	 *            Direct Position to compare with
+	 * @param tol Epsilon tolerance value
+	 * @return TRUE, if coordinates accord concording to the tolerance value, FALSE if they dont.
+	 */
+	public boolean equals(DirectPosition position, double tol) {
+		int D = position.getDimension();
+		if( D != getDimension() ) return false;
+		
+		// use CRS.equalsIgnoreMetadata for effeciency and to avoid various issues with comparing
+		// CRS such as coordinate order.
+		if ( !CRS.equalsIgnoreMetadata(getCoordinateReferenceSystem(), position.getCoordinateReferenceSystem()) ) {
+			return false;
+		}
+		
+		for (int i = 0; i < D; ++i) {
+			if (Math.abs(DoubleOperation.subtract(position.getOrdinate(i), this.coordinate[i])) > tol)
+				return false;
+		}
+		return true;
+	}	
+	
+	/**
 	 * Compares coodinates of DirectPosition Implementation Note: Parameter has
 	 * to be of Type DirectPosition (not DirectPositionImpl), so that the equals
 	 * method is found for DirectPosition큦 and DirectPositionImpl큦
@@ -322,27 +351,7 @@ public class DirectPositionImpl implements DirectPosition {
 		return result;
 	}
 
-	/**
-	 * Compares coodinates of Direct Positions and allows a tolerance value in
-	 * the comparison Implementation Note: Parameter has to be of Type
-	 * DirectPosition (not DirectPositionImpl), so that the equals method is
-	 * found for DirectPosition큦 and DirectPositionImpl큦
-	 * 
-	 * @param position
-	 *            Direct Position to compare with
-	 * @param tol Epsilon tolerance value
-	 * @return TRUE, if coordinates accord concording to the tolerance value, FALSE if they dont.
-	 */
-	public boolean equals(DirectPosition position, double tol) {
-		int D = position.getDimension();
-		if( D != getDimension() ) return false;
-		
-		for (int i = 0; i < D; ++i) {
-			if (Math.abs(DoubleOperation.subtract(position.getOrdinate(i), this.coordinate[i])) > tol)
-				return false;
-		}
-		return true;
-	}
+
 
 	
 	public String toString() {

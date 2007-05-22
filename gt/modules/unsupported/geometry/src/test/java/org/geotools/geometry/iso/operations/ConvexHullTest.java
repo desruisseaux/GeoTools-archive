@@ -8,6 +8,7 @@ import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.aggregate.MultiCurveImpl;
 import org.geotools.geometry.iso.aggregate.MultiPointImpl;
 import org.geotools.geometry.iso.aggregate.MultiSurfaceImpl;
+import org.geotools.geometry.iso.coordinate.LineStringImpl;
 import org.geotools.geometry.iso.io.wkt.ParseException;
 import org.geotools.geometry.iso.io.wkt.WKTReader;
 import org.geotools.geometry.iso.primitive.CurveImpl;
@@ -79,7 +80,34 @@ public class ConvexHullTest extends TestCase {
 		assertTrue(pos.get(4).getOrdinate(0) == 70);
 		assertTrue(pos.get(4).getOrdinate(1) == 10);
 		
+		// compare multipoint to expected value
+		//MULTIPOINT(130 240, 130 240, 130 240, 570 240, 570 240, 570 240, 650 240)
+		//LINESTRING(130 240, 650 240)
+		Set<Point> points = new HashSet<Point>();
+		points.add(this.createPointFromWKT("POINT(130 240)"));
+		points.add(this.createPointFromWKT("POINT(130 240)"));
+		points.add(this.createPointFromWKT("POINT(130 240)"));
+		points.add(this.createPointFromWKT("POINT(570 240)"));
+		points.add(this.createPointFromWKT("POINT(570 240)"));
+		points.add(this.createPointFromWKT("POINT(570 240)"));
+		points.add(this.createPointFromWKT("POINT(650 240)"));
+		MultiPointImpl mp = (MultiPointImpl) this.factory.getAggregateFactory().createMultiPoint(points);
 		
+		CurveImpl line = this.createCurveFromWKT("CURVE(130 240, 650 240)");
+		
+		assertTrue(mp.getConvexHull().equals(line));
+		CurveImpl ch = (CurveImpl) mp.getConvexHull();
+		//LineStringImpl ls = (LineStringImpl) ch;
+		//System.out.println(ls);
+		//LineStringImpl ls2 = ch2.asLineString();
+		//System.out.println(ls2);
+		//System.out.println(ls.equals(ls2));
+		System.out.println(ch.equals(line));
+		System.out.println(line.equals(mp.getConvexHull()));
+		//LineStringImpl ls = (LineStringImpl) ch.getSegments();
+		//LineStringImpl ls2 =(LineStringImpl) line.getSegments();
+		//ls.getControlPoints().equals(ls2.getControlPoints());
+		//assertEquals(mp.getConvexHull(),line);
 	}
 	
 	private void _testCurves() {
