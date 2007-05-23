@@ -189,6 +189,13 @@ public class ConvexHull {
 				positions.addAll(((SurfaceImpl)surfaceIter.next()).getBoundary().getExterior().asDirectPositions());
 			}
 		} else if (geom instanceof MultiPrimitiveImpl) {
+			positions = new HashSet<Geometry>();
+			positions = ((MultiPrimitiveImpl)geom).getElements();
+			Iterator<Geometry> iterator = positions.iterator();
+			while (iterator.hasNext()) {
+				//positions.addAll(iterator.next().getBoundary()
+			}
+			
 			Assert.isTrue(false, "not implemented yet");
 		} else if (geom instanceof CompositePointImpl) {
 			positions = new ArrayList<DirectPositionImpl>();

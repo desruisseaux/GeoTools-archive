@@ -39,6 +39,7 @@ package org.geotools.geometry.iso.coordinate;
 import org.geotools.geometry.iso.primitive.PointImpl;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.primitive.Point;
 
 /**
  * @author Jackson Roehrig & Sanjay Jena
@@ -134,6 +135,34 @@ public class PositionImpl implements Position {
 
 	public String toString() {
 		return "[GM_Position: " + this.getPosition() + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		final int PRIME = 31;
+		int result = 1;
+		result = PRIME * result + ((position == null) ? 0 : position.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		// compare objs based on their type
+		if (position instanceof DirectPosition || position instanceof DirectPositionImpl) {
+			DirectPositionImpl dp = (DirectPositionImpl) position;
+			return dp.equals(obj);
+		}
+		else if (position instanceof Point || position instanceof PointImpl) {
+			PointImpl point = (PointImpl) position;
+			return point.equals(obj);
+		}
+		else {
+			return position.equals(obj);
+		}
 	}
 
 }

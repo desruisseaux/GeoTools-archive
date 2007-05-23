@@ -574,6 +574,29 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 	public int getDimension() {
 		return crs.getCoordinateSystem().getDimension();
 	}
+	@Override
+	public int hashCode() {
+		final int PRIME = 31;
+		int result = super.hashCode();
+		result = PRIME * result + ((crs == null) ? 0 : crs.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final PointArrayImpl other = (PointArrayImpl) obj;
+		if (crs == null) {
+			if (other.crs != null)
+				return false;
+		} else if (!crs.equals(other.crs))
+			return false;
+		return true;
+	}
 
 
 
