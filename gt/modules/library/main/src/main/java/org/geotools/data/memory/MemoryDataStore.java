@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -98,7 +99,10 @@ public class MemoryDataStore extends AbstractDataStore {
     public void addFeatures(FeatureReader reader) throws IOException {
         try {
             FeatureType featureType;
-            Map featureMap = new HashMap();
+            // use an order preserving map, so that features are returned in the same
+            // order as they were inserted. This is important for repeatable rendering
+            // of overlapping features.
+            Map featureMap = new LinkedHashMap();
             String typeName;
             Feature feature;
 
@@ -335,7 +339,8 @@ public class MemoryDataStore extends AbstractDataStore {
             // we have a conflict
             throw new IOException(typeName + " already exists");
         }
-            Map featuresMap = new HashMap();
+            // insertion order preserving map
+            Map featuresMap = new LinkedHashMap();
             schema.put(typeName, featureType);
             memory.put(typeName, featuresMap);
     }

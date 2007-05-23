@@ -395,9 +395,68 @@ public class MemoryDataStoreTest extends DataTestCase {
         reader = data.getFeatureReader(new DefaultQuery("road", rd1Filter), t);
         assertEquals(1, count(reader));
     }
+    
+    /**
+     * When a data store is loaded with a reader, it would be nice if the memory
+     * data store preserved feature order, so that features are always rendered
+     * the same way (rendering is different if order changes and features do overlap)
+     */
+    public void testOrderPreservationRoad() throws Exception {
+        assertOrderSame(roadFeatures);
+    }
+    
+    public void testOrderPreservationRiver() throws Exception {
+        assertOrderSame(riverFeatures);
+    }
+    
+    public void testOrderPreservationMemFetures() throws Exception {
+        SimpleFeature[] dynFeatures = new SimpleFeature[3];
+        dynFeatures[0] = (SimpleFeature)roadType.create(new Object[] {
+                new Integer(1),
+                line(new int[] { 1, 1, 2, 2, 4, 2, 5, 1 }),
+                "r1",
+            }
+        );
+        dynFeatures[1] = (SimpleFeature)roadType.create(new Object[] {
+                new Integer(2), line(new int[] { 3, 0, 3, 2, 3, 3, 3, 4 }),
+                "r2"
+            }
+        );
+        dynFeatures[2] = (SimpleFeature)roadType.create(new Object[] {
+                new Integer(3),
+                line(new int[] { 3, 2, 4, 2, 5, 3 }), "r3"
+            }
+        );
+        assertOrderSame(dynFeatures);
+    }
+    
+    void assertOrderSame(Feature[] features) throws Exception {
+        // init using readers
+        FeatureReader reader = DataUtilities.reader(features);
+        DataStore store1 = new MemoryDataStore(reader);
+        assertReaderOrderSame(features, store1);
+        
+        // init using array directly
+        DataStore store2 = new MemoryDataStore(features);
+        assertReaderOrderSame(features, store2);
+    }
 
-    void assertCovered( Feature[] features, FeatureReader reader ) throws NoSuchElementException,
-            IOException, IllegalAttributeException {
+    private void assertReaderOrderSame(Feature[] features, DataStore store) throws IOException, IllegalAttributeException {
+        FeatureReader r1 = store.getFeatureReader(new DefaultQuery(features[0].getFeatureType().getTypeName()), Transaction.AUTO_COMMIT);
+        FeatureReader r2 = DataUtilities.reader(features);
+        
+        while(r1.hasNext() && r2.hasNext()) {
+            Feature f1 = r1.next();
+            Feature f2 = r2.next();
+            assertEquals(f1, f2);
+        }
+        assertEquals(r1.hasNext(), r2.hasNext());
+        r1.close();
+        r2.close();
+    }
+
+    void assertCovered(Feature[] features, FeatureReader reader)
+        throws NoSuchElementException, IOException, IllegalAttributeException {
         int count = 0;
 
         try {
