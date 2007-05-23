@@ -17,6 +17,7 @@ package org.geotools.feature;
 
 import java.rmi.server.UID;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.opengis.util.Cloneable;
 
@@ -67,6 +68,8 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
 
     /** The collection that this Feature is a member of */
     private FeatureCollection parent;
+    
+//    private static final Pattern NON_WORD_PATTERN = Pattern.compile(":");
 
     /**
      * Creates a new instance of flat feature, which must take a flat feature
@@ -125,7 +128,10 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
         // NCNameChar ::= Letter | Digit | '.' | '-' | '_' | CombiningChar | Extender
         // We have to fix the generated UID replacing all non word chars with an _ (it seems
         // they area all ":")
-        return "fid-" + new UID().toString().replaceAll( "\\W","_" );
+//        return "fid-" + NON_WORD_PATTERN.matcher(new UID().toString()).replaceAll("_");
+        // optimization, since the UID toString uses only ":" and converts long and integers
+        // to strings for the rest, so the only non word character is really ":"
+        return "fid-" + new UID().toString().replace(':', '_');
     }
 
     /**
