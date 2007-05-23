@@ -4,6 +4,11 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
+import junit.framework.Assert;
+import junit.framework.Protectable;
+import junit.framework.Test;
+import junit.framework.TestResult;
+
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Geometry;
 import org.opengis.geometry.TransfiniteSet;
@@ -11,12 +16,13 @@ import org.opengis.geometry.TransfiniteSet;
 /**
  * @author <a href="mailto:joel@lggi.com">Joel Skelton</a>
  */
-public class GeometryTestOperation {
+public class GeometryTestOperation extends Assert {
     private String operation;
     private String arg1;
     private String arg2;
     private String arg3;
     private Object expectedResult;
+    private Object actualResult;
     private Map<String, OperationHandler> operationMap;
 
     private static final Logger LOG = Logger.getLogger("org.geotools.geometry");
@@ -35,6 +41,7 @@ public class GeometryTestOperation {
         this.arg2 = arg2;
         this.arg3 = arg3;
         this.expectedResult = expectedResult;
+        this.actualResult = null;
 
         setupOperationMap();
 
@@ -132,8 +139,8 @@ public class GeometryTestOperation {
             Boolean expected = (Boolean)expectedResult;
             Geometry geom1 = setGeomArg(arg1, a, b);
             Geometry geom2 = setGeomArg(arg2, a, b);
-            boolean result = geom1.contains(geom2);
-            return result == expected;
+            actualResult = geom1.contains(geom2);
+            return actualResult == expected;
         }
     }
 
@@ -151,8 +158,8 @@ public class GeometryTestOperation {
             Boolean expected = (Boolean)expectedResult;
             Geometry geom1 = setGeomArg(arg1, a, b);
             Geometry geom2 = setGeomArg(arg2, a, b);
-            boolean result = geom1.intersects(geom2);
-            return result == expected;
+            actualResult = geom1.intersects(geom2);
+            return actualResult == expected;
         }
     }
 
@@ -169,8 +176,8 @@ public class GeometryTestOperation {
         public boolean doOperation(Geometry a, Geometry b) {
             Boolean expected = (Boolean)expectedResult;
             Geometry geom1 = setGeomArg(arg1, a, b);
-            boolean result = geom1.isSimple();
-            return result == expected;
+            actualResult = geom1.isSimple();
+            return actualResult == expected;
         }
     }
 
@@ -190,6 +197,7 @@ public class GeometryTestOperation {
             Geometry geom1 = setGeomArg(arg1, a, b);
             Geometry geom2 = setGeomArg(arg2, a, b);
             TransfiniteSet result = geom1.intersection(geom2);
+            actualResult = result;
             return compareTransfiniteSetResult(result);
         }
     }
@@ -207,6 +215,7 @@ public class GeometryTestOperation {
         public boolean doOperation(Geometry a, Geometry b) {
             Geometry geom1 = setGeomArg(arg1, a, b);
             TransfiniteSet result = geom1.getBoundary();
+            actualResult = result;
             return compareTransfiniteSetResult(result);
         }
     }    
@@ -224,6 +233,7 @@ public class GeometryTestOperation {
         public boolean doOperation(Geometry a, Geometry b) {
             Geometry geom1 = setGeomArg(arg1, a, b);
             DirectPosition result = geom1.getCentroid();
+            actualResult = result;
             return compareDirectPositionResult(result);
         }
     }    
@@ -241,6 +251,7 @@ public class GeometryTestOperation {
         public boolean doOperation(Geometry a, Geometry b) {
             Geometry geom1 = setGeomArg(arg1, a, b);
             DirectPosition result = geom1.getRepresentativePoint();
+            actualResult = result;
             return compareDirectPositionResult(result);
         }
     }    
@@ -260,6 +271,7 @@ public class GeometryTestOperation {
         public boolean doOperation(Geometry a, Geometry b) {
             Geometry geom1 = setGeomArg(arg1, a, b);
             TransfiniteSet result = geom1.getConvexHull();
+            actualResult = result;
             return compareTransfiniteSetResult(result);
         }
     }    
@@ -278,6 +290,7 @@ public class GeometryTestOperation {
             Geometry geom1 = setGeomArg(arg1, a, b);
             Geometry geom2 = setGeomArg(arg2, a, b);
             TransfiniteSet result = geom1.difference(geom2);
+            actualResult = result;
             return compareTransfiniteSetResult(result);
         }
     }    
@@ -296,6 +309,7 @@ public class GeometryTestOperation {
             Geometry geom1 = setGeomArg(arg1, a, b);
             Geometry geom2 = setGeomArg(arg2, a, b);
             TransfiniteSet result = geom1.symmetricDifference(geom2);
+            actualResult = result;
             return compareTransfiniteSetResult(result);
         }
     }
@@ -314,6 +328,7 @@ public class GeometryTestOperation {
             Geometry geom1 = setGeomArg(arg1, a, b);
             Geometry geom2 = setGeomArg(arg2, a, b);
             TransfiniteSet result = geom1.union(geom2);
+            actualResult = result;
             return compareTransfiniteSetResult(result);
         }
     }
@@ -325,7 +340,28 @@ public class GeometryTestOperation {
      * @return a formatted string
      */
     public String toString() {
-        return operation + " arg1=" + arg1 + " arg2=" + arg2 + " arg3=" + arg3;  
+        StringBuffer buf = new StringBuffer();
+        buf.append( operation );        
+        if( arg1 != null ){
+            buf.append( " arg1=");
+            buf.append( arg1 );
+        }
+        if( arg2 != null ){
+            buf.append( " arg2=");
+            buf.append( arg2 );
+        }
+        if( arg3 != null ){
+            buf.append( " arg3=");
+            buf.append( arg3 );
+        }
+        buf.append( " expected ");
+        buf.append( expectedResult );
+        return buf.toString();  
+    }
+    
+    public void runTest(Geometry a, Geometry b) {       
+        boolean test = operationMap.get(operation).doOperation(a, b);
+        assertTrue( toString()+"but was "+actualResult, test );
     }
 
 }

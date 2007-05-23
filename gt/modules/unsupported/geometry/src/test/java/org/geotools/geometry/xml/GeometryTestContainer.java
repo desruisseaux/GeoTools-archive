@@ -4,6 +4,11 @@ package org.geotools.geometry.xml;
 import java.util.List;
 import java.util.ArrayList;
 
+import junit.framework.AssertionFailedError;
+import junit.framework.Test;
+import junit.framework.TestResult;
+import junit.framework.TestSuite;
+
 /**
  * the {@code GeometryTest} class is a container that holds a {@code List} of
  * {@code GeometryTestCase}s and provides a way to execute them all.
@@ -11,7 +16,7 @@ import java.util.ArrayList;
  */
 public class GeometryTestContainer {
     private List<GeometryTestCase> testCases;
-
+    
     /**
      * Constructor
      */
@@ -23,7 +28,7 @@ public class GeometryTestContainer {
      * Adds a constructed test case into the list of available tests
      * @param testCase
      */
-    public void addTestCase(GeometryTestCase testCase) {
+    public void addTestCase(GeometryTestCase testCase) {        
         testCases.add(testCase);
     }
 
@@ -39,6 +44,12 @@ public class GeometryTestContainer {
         }
         return true;
     }
-
+    
+    public void addToTestSuite( String name, TestSuite suite ){
+        for (GeometryTestCase testCase : testCases) {
+            testCase.setName( name );
+            suite.addTest( testCase );
+        }
+    }
 
 }

@@ -4,6 +4,10 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import junit.framework.Protectable;
+import junit.framework.Test;
+import junit.framework.TestResult;
+
 import org.opengis.geometry.Geometry;
 
 /**
@@ -13,13 +17,18 @@ import org.opengis.geometry.Geometry;
  * to those geometries
  * @author <a href="mailto:joel@lggi.com">Joel Skelton</a>
  */
-public class GeometryTestCase {
+public class GeometryTestCase implements Test {
+    private String name;
     private static final Logger LOG = Logger.getLogger("org.geotools.geometry");
     private List<GeometryTestOperation> operationList;
     private Geometry geomA;
     private Geometry geomB;
     private String description;
 
+    public void setName(String name) {
+        this.name = name;
+    }
+    
     /**
      * Constructor
      */
@@ -79,5 +88,40 @@ public class GeometryTestCase {
             }
         }
         return result;
+    }
+    public int countTestCases() {
+        return 1;
+    }
+
+    public String toString() {
+        return this.description;
+        //return name + "("+this.description+")";
+    }
+
+    
+    public void run( TestResult result ) {
+        result.startTest( this );            
+        Protectable p= new Protectable() {
+            public void protect() throws Throwable {
+                runBare();
+            }
+        };
+        result.runProtected( this, p);
+        result.endTest( this );
+    }
+    
+    public void runBare() throws Throwable {
+        Throwable exception= null;
+        try {
+            runTest();
+        } catch (Throwable running) {
+            exception= running;
+        }
+        if (exception != null) throw exception;
+    }
+    public void runTest() {
+        for (GeometryTestOperation op : operationList) {
+            op.runTest( geomA, geomB );            
+        }
     }
 }
