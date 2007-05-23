@@ -78,7 +78,7 @@ public class TypeName implements org.opengis.feature.type.TypeName {
             return namespace;
         }
 
-        return namespace + local;
+        return new StringBuffer(namespace).append(':').append(local).toString();
     }
 
     /**

@@ -95,7 +95,7 @@ public class Name implements org.opengis.feature.type.Name {
             return namespace;
         }
 
-        return namespace + local;
+        return new StringBuffer(namespace).append(':').append(local).toString();
     }
 
     /**
