@@ -5,9 +5,6 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 
 import junit.framework.Assert;
-import junit.framework.Protectable;
-import junit.framework.Test;
-import junit.framework.TestResult;
 
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Geometry;
@@ -47,6 +44,24 @@ public class GeometryTestOperation extends Assert {
 
     }
 
+    /**
+     * Returns the operation to be performed.
+     * 
+     * @return String operation 
+     */
+    public String getOperation() {
+        return operation;
+    }
+    
+    /**
+     * Sets the expected result.
+     * 
+     * @param expectedResult
+     */
+    public void setExpectedResult(Object expectedResult) {
+        this.expectedResult = expectedResult;
+    }
+    
     private void setupOperationMap() {
         operationMap = new HashMap<String, OperationHandler>();
         OperationHandler noOpHandler = new NoOp();
@@ -332,8 +347,6 @@ public class GeometryTestOperation extends Assert {
             return compareTransfiniteSetResult(result);
         }
     }
-        
-    
     
     /**
      * Returns a string describing the operation for logging
@@ -361,7 +374,7 @@ public class GeometryTestOperation extends Assert {
     
     public void runTest(Geometry a, Geometry b) {       
         boolean test = operationMap.get(operation).doOperation(a, b);
-        assertTrue( toString()+"but was "+actualResult, test );
+        assertTrue(toString() + " but was " + actualResult, test);
     }
 
 }

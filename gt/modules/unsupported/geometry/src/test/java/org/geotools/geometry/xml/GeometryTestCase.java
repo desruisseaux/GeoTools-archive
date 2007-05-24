@@ -1,5 +1,6 @@
 package org.geotools.geometry.xml;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.logging.Logger;
@@ -27,6 +28,10 @@ public class GeometryTestCase implements Test {
 
     public void setName(String name) {
         this.name = name;
+    }
+    
+    public String getName() {
+        return name;
     }
     
     /**
@@ -63,7 +68,31 @@ public class GeometryTestCase implements Test {
     public void addTestOperation(GeometryTestOperation op) {
         operationList.add(op);
     }
+    
+    public void removeTestOperation(GeometryTestOperation op) {
+        operationList.remove(op);
+    }
+    
+    public GeometryTestOperation findTestOperation(String name) {
+        Iterator<GeometryTestOperation> operations = operationList.iterator();
+        while (operations.hasNext()) {
+            GeometryTestOperation operation = operations.next();
+            if (name.equalsIgnoreCase(operation.getOperation())) {
+                return operation;
+            }
+        }
+        return null;
+    }
 
+    /**
+     * Returns the current description text
+     * 
+     * @return String description
+     */
+    public String getDescription() {
+        return description;
+    }
+    
     /**
      * Sets the description text string for this test case. The
      * description is used for logging results.

@@ -3,10 +3,8 @@ package org.geotools.geometry.xml;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Properties;
 
-import junit.framework.AssertionFailedError;
-import junit.framework.Test;
-import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 /**
@@ -45,10 +43,15 @@ public class GeometryTestContainer {
         return true;
     }
     
-    public void addToTestSuite( String name, TestSuite suite ){
+    public void addToTestSuite(String name, TestSuite suite, Properties excludes) {
         for (GeometryTestCase testCase : testCases) {
-            testCase.setName( name );
-            suite.addTest( testCase );
+            //only add the test case if its description is NOT in the excludes list
+            if (!GeometryConformanceTest.isExcluded(excludes, testCase.getDescription())) {
+                testCase.setName(name);
+                //check for overrides on operations
+                testCase = GeometryConformanceTest.overrideOps(testCase, excludes);
+                suite.addTest(testCase);
+            }
         }
     }
 

@@ -1,7 +1,5 @@
 package org.geotools.geometry.xml;
 
-
-
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
@@ -94,6 +92,7 @@ public class GeometryTestParser {
         }
         GeometryTestContainer test = new GeometryTestContainer();
         Node child = node.getFirstChild();
+        //TODO: use the precision model
         String precisionModel = "FLOATING";
         while (child != null) {
             if (child.getNodeType() == Node.ELEMENT_NODE) {
@@ -125,22 +124,20 @@ public class GeometryTestParser {
      */
     private GeometryTestCase readTestCase(Node testCaseNode) throws ParseException {
         Node child = testCaseNode.getFirstChild();
-        GeometryTestOperation operation = null;
-
         GeometryTestCase testCase = new GeometryTestCase();
 
         while (child != null) {
             if (child.getNodeType() == Node.ELEMENT_NODE) {
                 String name = child.getNodeName();
                 if (name.equalsIgnoreCase("test")) {
-                    testCase.addTestOperation(loadTestOperation(child));
+                    GeometryTestOperation op = loadTestOperation(child);
+                    testCase.addTestOperation(op);
                 } else if (name.equalsIgnoreCase("a")) {
                     testCase.setGeometryA(loadTestGeometry(child));
                 } else if (name.equalsIgnoreCase("b")) {
                     testCase.setGeometryB(loadTestGeometry(child));
                 } else if (name.equalsIgnoreCase("desc")) {
                     testCase.setDescription(getNodeText(child));
-
                 } else {
                     throw new ParseException("Unexpected: " + name, 0);
                 }
