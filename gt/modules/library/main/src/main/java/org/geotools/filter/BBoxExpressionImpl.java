@@ -25,7 +25,12 @@ import com.vividsolutions.jts.geom.TopologyException;
 
 /**
  * Implements a Bounding Box expression.
- *
+ * <p>
+ * Please note this is exactly the same as doing:
+ * <code>
+ * filterFactory.literal( JTS.toGeometry( bounds ) );
+ * </code>
+ * 
  * @author Ian Turton, CCG
  * @source $URL$
  * @version $Id$

@@ -49,8 +49,7 @@ import org.geotools.test.OnlineTestCase;
  */
 public class OracleOnlineTestCase extends OnlineTestCase {
     DataSource datasource;
-    Connection connection;
-
+    
     /** Creates PostGIS-specific JDBC driver class. */
     private static final String DRIVER_CLASS = "oracle.jdbc.driver.OracleDriver";
 
@@ -74,8 +73,9 @@ public class OracleOnlineTestCase extends OnlineTestCase {
         source.setPassword( fixture.getProperty("password"));
         source.setURL( fixture.getProperty("url"));
         
-        connection = source.getConnection();
         datasource = source;
+
+        Connection connection = source.getConnection();        
         try {
             DatabaseMetaData metaData = connection.getMetaData();        
             String user = fixture.getProperty("user").toUpperCase();
@@ -105,8 +105,6 @@ public class OracleOnlineTestCase extends OnlineTestCase {
     }
 
     protected void disconnect() throws Exception {
-        connection.close();
-        connection = null;
         datasource = null;
     }
     /*

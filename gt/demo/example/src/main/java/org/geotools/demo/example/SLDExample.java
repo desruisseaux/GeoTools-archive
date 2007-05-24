@@ -1,79 +1,33 @@
 package org.geotools.demo.example;
 
-import java.net.URL;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-
-import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFinder;
-import org.geotools.data.DefaultQuery;
-import org.geotools.data.FeatureSource;
-import org.geotools.data.Query;
-import org.geotools.data.ows.CRSEnvelope;
-import org.geotools.data.ows.Layer;
-import org.geotools.data.ows.WMSCapabilities;
-import org.geotools.data.wms.WebMapServer;
-import org.geotools.data.wms.request.GetMapRequest;
-import org.geotools.data.wms.response.GetMapResponse;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.FilterType;
-import org.geotools.filter.GeometryFilter;
-import org.geotools.gui.swing.JMapPane;
-import org.geotools.styling.FeatureTypeStyle;
-import org.geotools.styling.LineSymbolizer;
-import org.geotools.styling.Rule;
-import org.geotools.styling.SLD;
-import org.geotools.styling.Stroke;
-import org.geotools.styling.Style;
-import org.geotools.styling.StyleFactory;
-import org.geotools.styling.StyleFactoryFinder;
-import org.geotools.styling.Symbolizer;
-
-import com.vividsolutions.jts.geom.Envelope;
-
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.Action;
-import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JToolBar;
 import javax.swing.WindowConstants;
 
+import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
 import org.geotools.gui.swing.JMapPane;
-import org.geotools.gui.swing.PanAction;
-import org.geotools.gui.swing.ResetAction;
-import org.geotools.gui.swing.SelectAction;
-import org.geotools.gui.swing.ZoomInAction;
-import org.geotools.gui.swing.ZoomOutAction;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
-import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.lite.StreamingRenderer;
-import org.geotools.styling.SLDParser;
+import org.geotools.styling.FeatureTypeStyle;
+import org.geotools.styling.LineSymbolizer;
+import org.geotools.styling.Rule;
+import org.geotools.styling.Stroke;
+import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
-import org.geotools.styling.StyleFactoryFinder;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.styling.Symbolizer;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
 
 /**
  * This example also works against a local geoserver.
@@ -113,18 +67,18 @@ public class SLDExample {
 	}
 	
 	static Style demoStyle(String typeName) throws Exception {
-		StyleFactory sf = StyleFactoryFinder.createStyleFactory();
-		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
+		StyleFactory sf = CommonFactoryFinder.getStyleFactory( GeoTools.getDefaultHints() );
+		FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2( GeoTools.getDefaultHints() );
 		
 		Stroke stroke = sf.createStroke(
-			ff.createLiteralExpression("#FF0000"),
-			ff.createLiteralExpression(2));
+			ff.literal("#FF0000"),
+			ff.literal(2));
 		
 		LineSymbolizer lineSymbolizer = sf.createLineSymbolizer();		
 		lineSymbolizer.setStroke( stroke );
 		
 		Rule rule = sf.createRule();
-		rule.setFilter( Filter.NONE );
+		rule.setFilter( Filter.INCLUDE );
 		rule.setSymbolizers( new Symbolizer[]{ lineSymbolizer });
 		
 		FeatureTypeStyle type = sf.createFeatureTypeStyle();
@@ -145,8 +99,8 @@ public class SLDExample {
 	        frame.getContentPane().add( mp);
 		    mp.setMapArea(source.getBounds());
 		    
-		    MapContext context = new DefaultMapContext();
-		    context.setAreaOfInterest(source.getBounds());
+		    MapContext context = new DefaultMapContext( DefaultGeographicCRS.WGS84 );
+		    context.setAreaOfInterest(source.getBounds(), DefaultGeographicCRS.WGS84 );
 		    context.addLayer( source, style );
 		    //context.getLayerBounds();
 		    

@@ -1,14 +1,11 @@
 package org.geotools.demo.example;
 
-import java.io.IOException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.swing.JOptionPane;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
@@ -18,14 +15,16 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.FilterType;
-import org.geotools.filter.GeometryFilter;
+import org.geotools.geometry.jts.JTS;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.spatial.Intersects;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -75,10 +74,9 @@ public class WFSExample {
 		String geomName = schema.getDefaultGeometry().getName();
 		Envelope bbox = new Envelope( -100.0, -70, 25, 40 );
 		
-		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-		GeometryFilter filter = ff.createGeometryFilter( FilterType.GEOMETRY_INTERSECTS);
-		filter.addLeftGeometry( ff.createAttributeExpression( geomName ));
-		filter.addRightGeometry( ff.createBBoxExpression( bbox ));
+        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2( GeoTools.getDefaultHints() );
+		Object polygon = JTS.toGeometry( bbox );
+        Intersects filter = ff.intersects( ff.property( geomName ), ff.literal( polygon ) );
 		
 		Query query = new DefaultQuery( typeName, filter, new String[]{ geomName } );
 		FeatureCollection features = source.getFeatures( query );
@@ -118,9 +116,9 @@ public class WFSExample {
 		System.out.println( "Metadata Bounds:"+ source.getBounds() );
 
 		// Step 5 - query
-		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
+		FilterFactory ff = CommonFactoryFinder.getFilterFactory( GeoTools.getDefaultHints() );
 		
-		DefaultQuery query = new DefaultQuery( typeName, Filter.ALL );
+		DefaultQuery query = new DefaultQuery( typeName, Filter.INCLUDE );
 		query.setMaxFeatures(2);
 		FeatureCollection features = source.getFeatures( query );
 
@@ -140,7 +138,7 @@ public class WFSExample {
 
 		FeatureStore store = (FeatureStore) source;
 		store.setTransaction( t );
-		Filter filter = ff.createFidFilter(fid);
+		Filter filter = ff.id( Collections.singleton( ff.featureId(fid)));
 		try {
 			store.removeFeatures( filter );
 		}

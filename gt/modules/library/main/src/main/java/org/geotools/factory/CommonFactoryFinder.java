@@ -17,6 +17,7 @@ package org.geotools.factory;
 
 // J2SE dependencies
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Set;
 
 // Geotools dependencies
@@ -36,6 +37,7 @@ import org.geotools.resources.LazySet;
 
 // OpenGIS dependencies
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.FilterFactory2;
 
 
 /**
@@ -290,6 +292,19 @@ public final class CommonFactoryFinder {
                 FilterFactory.class, null, hints, Hints.FILTER_FACTORY);
     }
 
+    public static synchronized FilterFactory2 getFilterFactory2(Hints hints)
+            throws FactoryRegistryException
+    {
+        Set all = getFilterFactories(hints);
+        for( Iterator i=all.iterator();i.hasNext();){
+            FilterFactory factory = (FilterFactory) i.next();
+            if( factory instanceof FilterFactory2){
+                return (FilterFactory2) factory;
+            }
+        }
+        throw new FactoryRegistryException("Could not locate an implementation of FilterFactory2");
+    }
+    
     /**
      * Returns a set of all available implementations for the {@link FilterFactory} interface.
      *

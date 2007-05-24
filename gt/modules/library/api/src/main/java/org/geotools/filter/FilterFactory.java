@@ -108,12 +108,12 @@ public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory
         throws IllegalFilterException;
 
     /**
-     * Creates a BBox Expression from an envelope.
+     * Creates a literal geometry expression from an envelope.
      *
      * @param env the envelope to use for this bounding box.
      *
      * @return The newly created BBoxExpression.
-     *
+     * @deprecated Please use filterFactory.literal( JTS.toGeometry( bounds ) )
      * @throws IllegalFilterException if there were creation problems.
      */
     public BBoxExpression createBBoxExpression(Envelope env)
