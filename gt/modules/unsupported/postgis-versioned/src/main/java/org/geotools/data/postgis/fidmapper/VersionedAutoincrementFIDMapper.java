@@ -40,7 +40,7 @@ class VersionedAutoincrementFIDMapper extends MultiColumnFIDMapper implements Ve
                 colType, Types.NUMERIC }, new int[] { colSize, 8 }, new int[] { 0, 0 },
                 new boolean[] { true, false });
         returnFIDColumnsAsAttributes = true;
-        autoIncrementMapper = new PostGISAutoIncrementFIDMapper(tableName, colName, colType);
+        autoIncrementMapper = new PostGISAutoIncrementFIDMapper(tableSchemaName, tableName, colName, colType);
     }
 
     public String getUnversionedFid(String versionedFID) {
