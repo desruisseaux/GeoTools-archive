@@ -111,7 +111,7 @@ public class PostgisFIDMapperFactory extends DefaultFIDMapperFactory {
     protected FIDMapper buildSingleColumnFidMapper(String schema,
         String tableName, Connection connection, ColumnInfo ci) {
         if (ci.isAutoIncrement()) {
-            return new PostGISAutoIncrementFIDMapper(tableName,
+            return new PostGISAutoIncrementFIDMapper(schema, tableName,
                 ci.getColName(), ci.getDataType());
         }
 

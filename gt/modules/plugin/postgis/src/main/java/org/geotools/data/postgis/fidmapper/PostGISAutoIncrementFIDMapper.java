@@ -46,8 +46,8 @@ public class PostGISAutoIncrementFIDMapper extends AutoIncrementFIDMapper
         /** The actual name of the sequence, if we have found it */
         String sequenceName = null;
         
-        public PostGISAutoIncrementFIDMapper(String tableName, String colName, int dataType) {
-                super(tableName, colName, dataType);
+        public PostGISAutoIncrementFIDMapper(String tableSchemaName, String tableName, String colName, int dataType) {
+                super(tableSchemaName, tableName, colName, dataType);
         }
         
         public PostGISAutoIncrementFIDMapper(String tableName, String colName, int dataType, 
@@ -84,7 +84,7 @@ public class PostGISAutoIncrementFIDMapper extends AutoIncrementFIDMapper
                     String sql = "SELECT currval(pg_get_serial_sequence('\"";
                     String schema = getTableSchemaName();
                     if (schema != null && !schema.equals("")) {
-                        sql = sql + schema + "."; 
+                        sql = sql + schema + "\".\""; 
                     }
                     sql = sql + getTableName() + "\"','" + getColumnName() + "'))";
                     rs = statement.executeQuery(sql); 

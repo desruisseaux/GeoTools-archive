@@ -1,5 +1,6 @@
 package org.geotools.data.postgis;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -11,6 +12,8 @@ import java.sql.Statement;
  */
 public class AbstractPostgisOnlineTestCase extends PostgisOnlineTestCase {
     
+    public static final String TEST_SCHEMA = "gt_test";
+
     protected PostgisDataStore ds;
     
     /** simple table with serial (int4) primary key */
@@ -25,6 +28,8 @@ public class AbstractPostgisOnlineTestCase extends PostgisOnlineTestCase {
     final protected String table5 = "tmp_pgtest 5";
     /** simple table with int4 primary key, sequence as default value, WITHOUT OIDS, and space in name */
     final protected String table6 = "tmp_pgtest 6";
+    /** just like table1, but will be inserted in a different schema */
+    final protected String table7 =  "tmp_pgtest_7";
     
     protected void connect() throws Exception {
         super.connect();
@@ -61,6 +66,8 @@ public class AbstractPostgisOnlineTestCase extends PostgisOnlineTestCase {
         st.execute(sql);
         sql = preSql + "'public', '" + table3 + "'" + postSql;
         st.execute(sql);
+        sql = preSql + "'" + TEST_SCHEMA +"', '" + table7 + "'" + postSql;
+        st.execute(sql);
     }
     
     protected void purgeGeometryColumns(Statement st) throws Exception {
@@ -75,6 +82,13 @@ public class AbstractPostgisOnlineTestCase extends PostgisOnlineTestCase {
         createTable4(st);
         createTable5(st);
         createTable6(st);
+        createTestSchema(st);
+        createTable7(st);
+    }
+    
+    protected void createTestSchema(Statement st) throws Exception {
+        String sql = "CREATE SCHEMA " + TEST_SCHEMA;
+        st.execute(sql);
     }
     
     protected void createTable1(Statement st) throws Exception {
@@ -132,6 +146,13 @@ public class AbstractPostgisOnlineTestCase extends PostgisOnlineTestCase {
                 + table6 + "_pkey\" PRIMARY KEY (fid)" + ") WITHOUT OIDS;";
         st.execute(sql);
     }
+    
+    protected void createTable7(Statement st) throws Exception {
+        String sql = "CREATE TABLE " + TEST_SCHEMA + "." + table7 + "(" + "fid serial NOT NULL,"
+        + "name varchar(10), the_geom geometry, " + "CONSTRAINT " + table7
+        + "_pkey PRIMARY KEY (fid)" + ") WITH OIDS;";
+        st.execute(sql);
+    }
 
     protected void dropTables(Statement st) throws Exception {
         dropTable(st, table1);
@@ -143,16 +164,22 @@ public class AbstractPostgisOnlineTestCase extends PostgisOnlineTestCase {
         dropTable(st, table5);
         dropTable(st, table6);
         dropSequence(st, table6 + "_fid_seq");
+        dropTable(st, table7);
+        dropSequence(st, TEST_SCHEMA + "." + table7 + "_fid_seq");
+        dropSchema(st, TEST_SCHEMA);
     }
     
     protected void dropTable(Statement st, String tableName) throws Exception {
-        String sql = "SELECT COUNT(tablename) FROM pg_tables WHERE tablename = '" + tableName + "'";
+        String sql = "SELECT schemaname, tablename FROM pg_tables WHERE tablename = '" + tableName + "'";
         ResultSet rs = st.executeQuery(sql);
-        rs.next();
-        int exists = rs.getInt(1);
+        boolean exists = rs.next();
+        String schemaName = "public";
+        if(exists) {
+            schemaName = rs.getString(1);
+        }
         rs.close();
-        if (exists > 0) {
-            sql = "DROP TABLE \"" + tableName + "\"";
+        if (exists) {
+            sql = "DROP TABLE \"" + schemaName + "\".\"" + tableName + "\"";
             st.execute(sql);
         }
     }
@@ -171,5 +198,16 @@ public class AbstractPostgisOnlineTestCase extends PostgisOnlineTestCase {
 
     protected String getFixtureId() {
         return "postgis.typical";
+    }
+    
+    protected void dropSchema(Statement st, String schemaName) throws Exception {
+        String sql = "SELECT nspname FROM pg_namespace WHERE nspname = '" + schemaName + "'";
+        ResultSet rs = st.executeQuery(sql);
+        boolean exists = rs.next();
+        rs.close();
+        if(exists) {
+            sql = "DROP SCHEMA " + schemaName;
+            st.execute(sql);
+        }
     }
 }
