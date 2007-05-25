@@ -1062,6 +1062,9 @@
         <inherited>true</inherited>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
+        <configuration>
+          <attach>true</attach>
+        </configuration>
         <executions>
           <execution>
             <id>attach-sources</id>
