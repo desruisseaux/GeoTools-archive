@@ -68,9 +68,6 @@ public class WorldImageReaderTest extends WorldImageBaseTestCase {
 		final String[] fileList = test_data_dir.list(new MyFileFilter());
 		final int length = fileList.length;
 		for (int i = 0; i < length; i++) {
-			logger.info(fileList[i]);
-
-
 			// file
 			in = TestData.file(this, fileList[i]);
 			this.read(in);
@@ -106,6 +103,8 @@ public class WorldImageReaderTest extends WorldImageBaseTestCase {
 		// can we read it?
 		assertTrue(new WorldImageFormat().accepts(source));
 
+		logger.info(((File)source).getAbsolutePath());
+		
 		// get a reader
 		wiReader = new WorldImageReader(source);
 

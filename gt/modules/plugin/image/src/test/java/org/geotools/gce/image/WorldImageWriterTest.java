@@ -55,22 +55,16 @@ public class WorldImageWriterTest extends WorldImageBaseTestCase {
 	/** The format for the image e will write. */
 	private String format;
 
-    private List tempFiles = new ArrayList();
 
 	public WorldImageWriterTest(String name) {
 		super(name);
 	}
-    
-    protected void tearDown() throws Exception {
-        super.tearDown();
-        
-        for (Iterator it = tempFiles.iterator(); it.hasNext();) {
-            File f = (File) it.next();
-            if(!f.delete())
-                f.deleteOnExit();
-        }
-    }
 
+	protected void setUp() throws Exception {
+		super.setUp();
+		File testData = TestData.file(this, ".");
+		new File(testData,"write").mkdir();
+	}
 	/**
 	 * This method simply read all the respecting a predefined pattern inside
 	 * the testData directory and then it tries to read, write and re-read them
@@ -92,8 +86,6 @@ public class WorldImageWriterTest extends WorldImageBaseTestCase {
 		final File test_data_dir = TestData.file(this, null);
 		final String[] fileList = test_data_dir.list(new MyFileFilter());
 		final int length = fileList.length;
-		URL url = null;
-		File file = null;
 		final int numSupportedFormat = supportedFormat.length;
 		for (int j = 0; j < numSupportedFormat; j++) {
 			format = supportedFormat[j];
@@ -102,12 +94,12 @@ public class WorldImageWriterTest extends WorldImageBaseTestCase {
 			for (int i = 0; i < length; i++) {
 				buff.append(" file is ").append(fileList[i]).append("\n");
 				// url
-				url = TestData.getResource(this, fileList[i]);
+				final URL url = TestData.getResource(this, fileList[i]);
 				assertTrue(url != null);
 				this.write(url);
 
 				// getting file
-				file = TestData.file(this, fileList[i]);
+				final File file = TestData.file(this, fileList[i]);
 				assertTrue(file != null);
 				// starting write test
 				this.write(file);
@@ -147,9 +139,9 @@ public class WorldImageWriterTest extends WorldImageBaseTestCase {
 
 		// remember to provide a valid name, it wil be mde unique by the helper
 		// function temp
-		final StringBuffer buff = new StringBuffer("temp").append(".").append(format);
+		final StringBuffer buff = new StringBuffer("./write/temp").append(".").append(format);
 		final File tempFile =TestData.temp(this, buff.toString());
-		tempFile.deleteOnExit();
+
 
 		// getting a writer
 		final WorldImageWriter wiWriter = new WorldImageWriter(tempFile);

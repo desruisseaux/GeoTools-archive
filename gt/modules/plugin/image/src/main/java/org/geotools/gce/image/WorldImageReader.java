@@ -638,9 +638,11 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 			final Iterator it=ext.iterator();
 			if(!it.hasNext())
 				throw new DataSourceException("Unable to parse extension "+extension);
+			do{
 			file2Parse = new File(new StringBuffer(base).append((String)it.next()
 					).toString());
-
+			}while(!file2Parse.exists()&&it.hasNext());
+			
 			if (file2Parse.exists()) {
 				// parse world file
 				final WorldFileReader reader = new WorldFileReader(file2Parse);
