@@ -210,4 +210,9 @@ public class CRSEnvelope implements Envelope {
     public void setMinY(double minY) {
         this.minY = minY;
     }
+
+	public String toString() {
+		return epsgCode.toString()+" ["+minX+","+minY+" "+maxX+","+maxY+"]";
+	}
+    
 }
