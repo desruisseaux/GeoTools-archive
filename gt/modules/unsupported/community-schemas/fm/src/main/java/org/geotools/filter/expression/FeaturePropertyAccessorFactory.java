@@ -1,7 +1,10 @@
 package org.geotools.filter.expression;
 
+import java.util.Enumeration;
+
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathIntrospector;
+import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
 import org.geotools.factory.Hints;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.iso.AttributeImpl;
@@ -16,6 +19,7 @@ import org.geotools.feature.iso.simple.SimpleFeatureImpl;
 import org.geotools.feature.iso.type.AttributeDescriptorImpl;
 import org.geotools.feature.iso.type.FeatureTypeImpl;
 import org.geotools.feature.iso.xpath.AttributeDescriptorPropertyHandler;
+import org.geotools.feature.iso.xpath.AttributeNodePointerFactory;
 import org.geotools.feature.iso.xpath.AttributePropertyHandler;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
@@ -25,6 +29,7 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.FeatureType;
+import org.xml.sax.helpers.NamespaceSupport;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -43,9 +48,17 @@ import com.vividsolutions.jts.geom.Geometry;
  * </p>
  * 
  * @author Justin Deoliveira, The Open Planning Project
+ * @author Gabriel Roldan, Axios Engineering
  * 
  */
 public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
+
+    static {
+        // unfortunatley, jxpath only works against concreate classes
+        // JXPathIntrospector.registerDynamicClass(DefaultFeature.class,
+        // FeaturePropertyHandler.class);
+        JXPathContextReferenceImpl.addNodePointerFactory(new AttributeNodePointerFactory());
+    }
 
     /** Single instnace is fine - we are not stateful */
     static PropertyAccessor ATTRIBUTE_ACCESS = new FeaturePropertyAccessor();
@@ -60,7 +73,8 @@ public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
         if (xpath == null)
             return null;
 
-        if (!ComplexAttribute.class.isAssignableFrom(type) && !ComplexType.class.isAssignableFrom(type)
+        if (!ComplexAttribute.class.isAssignableFrom(type)
+                && !ComplexType.class.isAssignableFrom(type)
                 && !AttributeDescriptor.class.isAssignableFrom(type))
             return null; // we only work with simple feature
 
@@ -73,7 +87,15 @@ public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
 
         // check for simple property access
         // if (xpath.matches("(\\w+:)?(\\w+)")) {
-        return ATTRIBUTE_ACCESS;
+        NamespaceSupport namespaces = null;
+        if (hints != null) {
+            namespaces = (NamespaceSupport) hints.get(PropertyAccessorFactory.FILTER_FACTORY_NAMESPACE_AWARE);
+        }
+        if (namespaces == null) {
+            return ATTRIBUTE_ACCESS;
+        } else {
+            return new FeaturePropertyAccessor(namespaces);
+        }
         // }
 
         // return null;
@@ -191,12 +213,20 @@ public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
             JXPathIntrospector.registerDynamicClass(TextualAttribute.class,
                     AttributePropertyHandler.class);
 
-
-
             JXPathIntrospector.registerDynamicClass(AttributeDescriptorImpl.class,
                     AttributeDescriptorPropertyHandler.class);
             JXPathIntrospector.registerDynamicClass(FeatureTypeImpl.class,
                     AttributeDescriptorPropertyHandler.class);
+        }
+
+        private NamespaceSupport namespaces;
+
+        public FeaturePropertyAccessor() {
+            namespaces = new NamespaceSupport();
+        }
+
+        public FeaturePropertyAccessor(NamespaceSupport namespaces) {
+            this.namespaces = namespaces;
         }
 
         public boolean canHandle(Object object, String xpath, Class target) {
@@ -212,6 +242,12 @@ public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
 
             JXPathContext context = JXPathContext.newContext(object);
             context.setLenient(true);
+            Enumeration declaredPrefixes = namespaces.getDeclaredPrefixes();
+            while (declaredPrefixes.hasMoreElements()) {
+                String prefix = (String) declaredPrefixes.nextElement();
+                String uri = namespaces.getURI(prefix);
+                context.registerNamespace(prefix, uri);
+            }
 
             Object value = context.getValue(xpath);
 
