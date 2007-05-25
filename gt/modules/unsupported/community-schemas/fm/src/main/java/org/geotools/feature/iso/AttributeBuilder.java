@@ -47,9 +47,16 @@ public class AttributeBuilder {
 
     /**
      * Type of complex attribute being built.
+     * This field is mutually exclusive with {@link #descriptor}
      */
     AttributeType type;
 
+    /**
+     * Descriptor of complex attribute being built.
+     * This field is mutually exclusive with {@link #type}
+     */
+    AttributeDescriptor descriptor;
+    
     /**
      * Contained properties (associations + attributes)
      */
@@ -97,6 +104,7 @@ public class AttributeBuilder {
      * directly after being instantiated.
      */
     public void init() {
+        descriptor = null;
         type = null;
         properties = null;
         crs = null;
@@ -113,6 +121,7 @@ public class AttributeBuilder {
     public void init(Attribute attribute) {
         init();
 
+        descriptor = attribute.getDescriptor();
         type = attribute.getType();
 
         if (attribute instanceof ComplexAttribute) {
@@ -166,6 +175,19 @@ public class AttributeBuilder {
      */
     public void setType(AttributeType type) {
         this.type = type;
+        this.descriptor = null;
+    }
+
+    /**
+     * Sets the descriptor of the attribute being built.
+     * <p>
+     * When building a complex attribute, this type is used a reference to
+     * obtain the types of contained attributes.
+     * </p>
+     */
+    public void setDescriptor(AttributeDescriptor descriptor) {
+        this.descriptor = descriptor;
+        this.type = descriptor.getType();
     }
 
     /**
@@ -550,7 +572,7 @@ public class AttributeBuilder {
      * @return The build attribute.
      */
     public Attribute build(String id) {
-        Attribute built = create(properties(), type, null, id);
+        Attribute built = create(properties(), type, descriptor, id);
 
         // if geometry, set the crs
         if (built instanceof GeometryAttribute) {

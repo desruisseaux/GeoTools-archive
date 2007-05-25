@@ -7,6 +7,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.XMLConstants;
+import javax.xml.namespace.QName;
+
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.iso.type.AttributeTypeImpl;
 import org.geotools.filter.Filter;
@@ -92,8 +95,7 @@ public class Types {
      *            The other name.
      */
     public static Name attributeName(Name name) {
-        return new org.geotools.feature.Name(name.getNamespaceURI(), name
-                .getLocalPart());
+        return new org.geotools.feature.Name(name.getNamespaceURI(), name.getLocalPart());
     }
 
     /**
@@ -134,8 +136,7 @@ public class Types {
      *            The other name.
      */
     public static TypeName typeName(Name name) {
-        return new org.geotools.feature.type.TypeName(name.getNamespaceURI(),
-                name.getLocalPart());
+        return new org.geotools.feature.type.TypeName(name.getNamespaceURI(), name.getLocalPart());
     }
 
     /**
@@ -249,19 +250,20 @@ public class Types {
      * 
      * @return The first descriptor, or null if no match.
      */
-    public static PropertyDescriptor descriptor(ComplexType type, String name, AttributeType actualType) {
+    public static PropertyDescriptor descriptor(ComplexType type, String name,
+            AttributeType actualType) {
         List match = descriptors(type, name);
 
-        if (match.isEmpty()){
+        if (match.isEmpty()) {
             Collection properties = type.getProperties();
-            for(Iterator it = properties.iterator(); it.hasNext();){
+            for (Iterator it = properties.iterator(); it.hasNext();) {
                 PropertyDescriptor desc = (PropertyDescriptor) it.next();
-                if(!(desc instanceof AttributeDescriptor)){
+                if (!(desc instanceof AttributeDescriptor)) {
                     continue;
                 }
                 AttributeDescriptor attDesc = (AttributeDescriptor) desc;
                 AttributeType attType = attDesc.getType();
-                if(isSuperType(actualType, attType)){
+                if (isSuperType(actualType, attType)) {
                     return attDesc;
                 }
             }
@@ -270,20 +272,21 @@ public class Types {
 
         return (PropertyDescriptor) match.get(0);
     }
-    
-    public static PropertyDescriptor descriptor(ComplexType type, Name name, AttributeType actualType) {
+
+    public static PropertyDescriptor descriptor(ComplexType type, Name name,
+            AttributeType actualType) {
         List match = descriptors(type, name);
 
-        if (match.isEmpty()){
+        if (match.isEmpty()) {
             Collection properties = type.getProperties();
-            for(Iterator it = properties.iterator(); it.hasNext();){
+            for (Iterator it = properties.iterator(); it.hasNext();) {
                 PropertyDescriptor desc = (PropertyDescriptor) it.next();
-                if(!(desc instanceof AttributeDescriptor)){
+                if (!(desc instanceof AttributeDescriptor)) {
                     continue;
                 }
                 AttributeDescriptor attDesc = (AttributeDescriptor) desc;
                 AttributeType attType = attDesc.getType();
-                if(isSuperType(actualType, attType)){
+                if (isSuperType(actualType, attType)) {
                     return attDesc;
                 }
             }
@@ -306,8 +309,7 @@ public class Types {
      * 
      * @return The first descriptor, or null if no match.
      */
-    public static PropertyDescriptor descriptor(ComplexType type, String name,
-            String namespace) {
+    public static PropertyDescriptor descriptor(ComplexType type, String name, String namespace) {
         return descriptor(type, new org.geotools.feature.Name(namespace, name));
     }
 
@@ -344,8 +346,7 @@ public class Types {
      * @return The list of descriptors named 'name', or an empty list if none
      *         such match.
      */
-    public static List/* <PropertyDescriptor> */descriptors(ComplexType type,
-            String name) {
+    public static List/* <PropertyDescriptor> */descriptors(ComplexType type, String name) {
         if (name == null)
             return Collections.EMPTY_LIST;
 
@@ -359,12 +360,12 @@ public class Types {
             }
         }
 
-        //only look up in the super type if the descriptor is not found
-        //as a direct child definition
-        if(match.size() == 0){
+        // only look up in the super type if the descriptor is not found
+        // as a direct child definition
+        if (match.size() == 0) {
             AttributeType superType = type.getSuper();
-            if(superType instanceof ComplexType){
-                List superDescriptors = descriptors((ComplexType)superType, name);
+            if (superType instanceof ComplexType) {
+                List superDescriptors = descriptors((ComplexType) superType, name);
                 match.addAll(superDescriptors);
             }
         }
@@ -382,8 +383,7 @@ public class Types {
      * @return The list of descriptors named 'name', or an empty list if none
      *         such match.
      */
-    public static List/* <PropertyDescriptor> */descriptors(ComplexType type,
-            Name name) {
+    public static List/* <PropertyDescriptor> */descriptors(ComplexType type, Name name) {
         if (name == null)
             return Collections.EMPTY_LIST;
 
@@ -391,14 +391,15 @@ public class Types {
 
         for (Iterator itr = type.getProperties().iterator(); itr.hasNext();) {
             PropertyDescriptor descriptor = (PropertyDescriptor) itr.next();
-            if (name.equals(descriptor.getName())) {
+            Name descriptorName = descriptor.getName();
+            if (name.equals(descriptorName)) {
                 match.add(descriptor);
             }
         }
-        
-        //only look up in the super type if the descriptor is not found
-        //as a direct child definition
-        if(match.size() == 0){
+
+        // only look up in the super type if the descriptor is not found
+        // as a direct child definition
+        if (match.size() == 0) {
             AttributeType superType = type.getSuper();
             if (superType instanceof ComplexType) {
                 List superDescriptors = descriptors((ComplexType) superType, name);
@@ -437,8 +438,7 @@ public class Types {
      * @throws IllegalArgumentException
      *             if parsing is attempted and is unsuccessful.
      */
-    public static Object parse(AttributeType type, Object content)
-            throws IllegalArgumentException {
+    public static Object parse(AttributeType type, Object content) throws IllegalArgumentException {
 
         // JD: TODO: this is pretty lame
         if (type instanceof AttributeTypeImpl) {
@@ -473,8 +473,7 @@ public class Types {
      *             In the event that content violates any restrictions specified
      *             by the attribute.
      */
-    public static void validate(Attribute attribute)
-            throws IllegalAttributeException {
+    public static void validate(Attribute attribute) throws IllegalAttributeException {
 
         validate(attribute, attribute.get());
     }
@@ -497,15 +496,14 @@ public class Types {
         validate(attribute.getType(), attribute, attributeContent, false);
     }
 
-    public static void validate(AttributeType type, Attribute attribute,
-            Object attributeContent) throws IllegalAttributeException {
+    public static void validate(AttributeType type, Attribute attribute, Object attributeContent)
+            throws IllegalAttributeException {
 
         validate(type, attribute, attributeContent, false);
     }
 
     protected static void validate(AttributeType type, Attribute attribute,
-            Object attributeContent, boolean isSuper)
-            throws IllegalAttributeException {
+            Object attributeContent, boolean isSuper) throws IllegalAttributeException {
 
         if (type == null) {
             throw new IllegalAttributeException("null type");
@@ -513,15 +511,13 @@ public class Types {
 
         if (attributeContent == null) {
             if (!attribute.nillable()) {
-                throw new IllegalAttributeException(type.getName()
-                        + " not nillable");
+                throw new IllegalAttributeException(type.getName() + " not nillable");
             }
             return;
         }
 
         if (type.isIdentified() && attribute.getID() == null) {
-            throw new NullPointerException(type.getName()
-                    + " is identified, null id not accepted");
+            throw new NullPointerException(type.getName() + " is identified, null id not accepted");
         }
 
         if (!isSuper) {
@@ -574,24 +570,20 @@ public class Types {
                     return fatt.get();
                 }
 
-                public void set(Object newValue)
-                        throws IllegalArgumentException {
-                    throw new UnsupportedOperationException(
-                            "Modification is not supported");
+                public void set(Object newValue) throws IllegalArgumentException {
+                    throw new UnsupportedOperationException("Modification is not supported");
                 }
 
                 public Object operation(Name arg0, List arg1) {
-                    throw new UnsupportedOperationException(
-                            "Operation is not supported");
+                    throw new UnsupportedOperationException("Operation is not supported");
                 }
             };
 
-            for (Iterator itr = type.getRestrictions().iterator(); itr
-                    .hasNext();) {
+            for (Iterator itr = type.getRestrictions().iterator(); itr.hasNext();) {
                 Filter f = (Filter) itr.next();
                 if (!f.evaluate(fake)) {
-                    throw new IllegalAttributeException("Attribute instance ("
-                            + fake.getID() + ")" + "fails to pass filter: " + f);
+                    throw new IllegalAttributeException("Attribute instance (" + fake.getID() + ")"
+                            + "fails to pass filter: " + f);
                 }
             }
         }
@@ -602,8 +594,7 @@ public class Types {
         }
     }
 
-    public static void validate(ComplexAttribute attribute)
-            throws IllegalArgumentException {
+    public static void validate(ComplexAttribute attribute) throws IllegalArgumentException {
 
     }
 
@@ -612,13 +603,11 @@ public class Types {
 
     }
 
-    protected static void validate(ComplexType type,
-            ComplexAttribute attribute, Collection content)
+    protected static void validate(ComplexType type, ComplexAttribute attribute, Collection content)
             throws IllegalAttributeException {
 
         // do normal validation
-        validate((AttributeType) type, (Attribute) attribute, (Object) content,
-                false);
+        validate((AttributeType) type, (Attribute) attribute, (Object) content, false);
 
         if (content == null) {
             // not really much else we can do
@@ -650,8 +639,8 @@ public class Types {
             }
 
             if (!contains) {
-                throw new IllegalArgumentException("Attribute of type "
-                        + attType.getName() + " found at index " + index
+                throw new IllegalArgumentException("Attribute of type " + attType.getName()
+                        + " found at index " + index
                         + " but this type is not allowed by this descriptor");
             }
 
@@ -682,16 +671,13 @@ public class Types {
         }
     }
 
-    private static void validateSequence(SequenceType type,
-            ComplexAttribute att, Collection content)
+    private static void validateSequence(SequenceType type, ComplexAttribute att, Collection content)
             throws IllegalAttributeException {
 
         if (!(att instanceof Sequence)) {
-            throw new IllegalAttributeException(
-                    "Attribute must be instance of: "
-                            + Sequence.class.getName()
-                            + " for type instance of: "
-                            + SequenceType.class.getName());
+            throw new IllegalAttributeException("Attribute must be instance of: "
+                    + Sequence.class.getName() + " for type instance of: "
+                    + SequenceType.class.getName());
         }
 
         // sequence must be instance of list
@@ -703,8 +689,7 @@ public class Types {
         processSequence((List) type.attributes(), (List) content);
     }
 
-    private static void processSequence(
-            List/* <AttributeDescriptor> */sequence,
+    private static void processSequence(List/* <AttributeDescriptor> */sequence,
             List/* <Attribute> */content) throws IllegalAttributeException {
 
         Iterator ditr = sequence.iterator();
@@ -729,48 +714,43 @@ public class Types {
             int min = ad.getMinOccurs();
             int max = ad.getMaxOccurs();
             if (occurences < min || occurences > max) {
-                throw new IllegalAttributeException("Found " + occurences
-                        + " occurences of " + ad.getName() + " when between "
-                        + min + " and " + max + " expected");
+                throw new IllegalAttributeException("Found " + occurences + " occurences of "
+                        + ad.getName() + " when between " + min + " and " + max + " expected");
             }
 
         } while (ditr.hasNext());
 
         if (!remaining.isEmpty()) {
             throw new IllegalAttributeException(
-                    "Extra content found beyond the specified in the schema: "
-                            + remaining);
+                    "Extra content found beyond the specified in the schema: " + remaining);
         }
     }
 
-    private static void validateChoice(ChoiceType type, ComplexAttribute att,
-            Collection content) throws IllegalAttributeException {
+    private static void validateChoice(ChoiceType type, ComplexAttribute att, Collection content)
+            throws IllegalAttributeException {
 
         if (!(att instanceof Choice)) {
-            throw new IllegalAttributeException(
-                    "Attribute must be instance of: " + Choice.class.getName()
-                            + " for type instance of: "
-                            + ChoiceType.class.getName());
+            throw new IllegalAttributeException("Attribute must be instance of: "
+                    + Choice.class.getName() + " for type instance of: "
+                    + ChoiceType.class.getName());
         }
 
         processChoice((Set) type.attributes(), content);
     }
 
     private static void processChoice(Set/* <AttributeDescriptor> */choice,
-            Collection/* <Attribute> */content)
-            throws IllegalAttributeException {
+            Collection/* <Attribute> */content) throws IllegalAttributeException {
 
         // TODO: implement
     }
 
-    private static void validateAll(ComplexType type, ComplexAttribute att,
-            Collection content) throws IllegalAttributeException {
+    private static void validateAll(ComplexType type, ComplexAttribute att, Collection content)
+            throws IllegalAttributeException {
         processAll(type.attributes(), content);
     }
 
     private static void processAll(Collection/* <AttributeDescriptor> */all,
-            Collection/* <Attribute> */content)
-            throws IllegalAttributeException {
+            Collection/* <Attribute> */content) throws IllegalAttributeException {
 
         // TODO: JD: this can be definitley be optimzed, as written its O(n^2)
 
@@ -791,20 +771,69 @@ public class Types {
                 }
             }
 
-            if (occurences < ad.getMinOccurs()
-                    || occurences > ad.getMaxOccurs()) {
-                throw new IllegalAttributeException("Found " + occurences
-                        + " of " + ad.getName() + " when type"
-                        + "specifies between " + min + " and " + max);
+            if (occurences < ad.getMinOccurs() || occurences > ad.getMaxOccurs()) {
+                throw new IllegalAttributeException("Found " + occurences + " of " + ad.getName()
+                        + " when type" + "specifies between " + min + " and " + max);
             }
         }
 
         if (!remaining.isEmpty()) {
             throw new IllegalAttributeException(
-                    "Extra content found beyond the specified in the schema: "
-                            + remaining);
+                    "Extra content found beyond the specified in the schema: " + remaining);
         }
 
+    }
+
+    public static QName toQName(Name featurePath) {
+        if (featurePath == null) {
+            return null;
+        }
+        String namespace = featurePath.getNamespaceURI();
+        String localName = featurePath.getLocalPart();
+        QName qName;
+        if (null == namespace) {
+            qName = new QName(localName);
+        } else {
+            qName = new QName(namespace, localName);
+        }
+        return qName;
+    }
+
+    public static Name toName(QName name) {
+        if (XMLConstants.NULL_NS_URI.equals(name.getNamespaceURI())) {
+            return attributeName(name.getLocalPart());
+        }
+        return attributeName(name.getNamespaceURI(), name.getLocalPart());
+    }
+
+    public static TypeName toTypeName(QName name) {
+        if (XMLConstants.NULL_NS_URI.equals(name.getNamespaceURI())) {
+            return typeName(name.getLocalPart());
+        }
+        return typeName(name.getNamespaceURI(), name.getLocalPart());
+    }
+
+    public static boolean equals(Name name, QName qName) {
+        if (name == null && qName != null) {
+            return false;
+        }
+        if (qName == null && name != null) {
+            return false;
+        }
+        if (XMLConstants.NULL_NS_URI.equals(qName.getNamespaceURI())) {
+            if (null != name.getNamespaceURI()) {
+                return false;
+            }else{
+                return name.getLocalPart().equals(qName.getLocalPart());
+            }
+        }
+        if (null == name.getNamespaceURI()
+                && !XMLConstants.NULL_NS_URI.equals(qName.getNamespaceURI())) {
+            return false;
+        }
+
+        return name.getNamespaceURI().equals(qName.getNamespaceURI())
+                && name.getLocalPart().equals(qName.getLocalPart());
     }
 
     // /** Wander up getSuper gathering all memberTypes */
