@@ -117,8 +117,13 @@ public abstract class FileImageReader extends SimpleImageReader {
             }
         }
         /*
-         * Can not convert the input directly to a file. Creates a temporary file using the
-         * first declared image suffix (e.g. "png"), or "tmp" if there is no suffix declared.
+         * Can not convert the input directly to a file. Asks the input stream
+         * before to create the temporary file in case an exception is thrown.
+         */
+        final InputStream in = getInputStream();
+        /*
+         * Creates a temporary file using the first declared image suffix
+         * (e.g. "png"), or "tmp" if there is no suffix declared.
          */
         String suffix = "tmp";
         if (originatingProvider != null) {
@@ -137,9 +142,8 @@ public abstract class FileImageReader extends SimpleImageReader {
          * Note that there is no need to use instance of BufferedInputStream or
          * BufferedOutputStream since we already use a 8 kb buffer.
          */
-        final OutputStream out    = new FileOutputStream(inputFile);
-        final InputStream  in     = getInputStream();
-        final byte[]       buffer = new byte[8192];
+        final OutputStream out = new FileOutputStream(inputFile);
+        final byte[]    buffer = new byte[8192];
         int length;
         while ((length=in.read(buffer)) >= 0) {
             out.write(buffer, 0, length);

@@ -31,13 +31,12 @@ import javax.imageio.IIOException;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageTypeSpecifier;
-import javax.media.jai.util.Range;
 
 // NetCDF dependencies
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
 import ucar.ma2.Array;
-import ucar.ma2.Index;
+import ucar.ma2.Range;
 import ucar.ma2.DataType;
 import ucar.ma2.IndexIterator;
 import ucar.ma2.InvalidRangeException;
@@ -64,6 +63,12 @@ import org.geotools.resources.i18n.ErrorKeys;
  */
 public class DefaultReader extends FileImageReader {
     /**
+     * The default source bands to read from the NetCDF file.
+     * Also the default destination bands in the buffered image.
+     */
+    private static final int[] DEFAULT_BANDS = new int[] {0};
+
+    /**
      * The NetCDF file, or {@code null} if not yet open.
      *
      * @todo Uses {@link ucar.nc2.dataset.NetcdfDataset} instead.
@@ -72,8 +77,15 @@ public class DefaultReader extends FileImageReader {
 
     /**
      * The name of the {@linkplain Variable variable} to be read in a NetCDF file.
+     * The first name is assigned to image index 0, the second name to image index 1,
+     * <cite>etc.</cite>.
      */
-    private final String variableName;
+    private final String[] variableNames;
+
+    /**
+     * The image index of the current {@linkplain #variable variable}.
+     */
+    private int variableIndex;
 
     /**
      * The data from the NetCDF file.
@@ -82,15 +94,21 @@ public class DefaultReader extends FileImageReader {
 
     /**
      * The dimension in {@link #variable} to use as image width.
-     * Default value is 0.
+     * Will be computed by {@link #prepareVariable} as the last dimension.
      */
-    private int xDimension = 0;
+    private int xDimension;
 
     /**
      * The dimension in {@link #variable} to use as image height.
-     * Default value is 1.
+     * Will be computed by {@link #prepareVariable} as the 2th last dimension.
      */
-    private int yDimension = 1;
+    private int yDimension;
+
+    /**
+     * The dimension in {@link #variable} to use as bands.
+     * Will be computed by {@link #prepareVariable} as the 3th last dimension.
+     */
+    private int zDimension;
 
     /**
      * The converter for sample values.
@@ -100,7 +118,7 @@ public class DefaultReader extends FileImageReader {
     /**
      * The ranges for each image index, or {@code null} if unknown.
      */
-    private Range[] ranges;
+    private NumberRange[] ranges;
 
     /** 
      * Constructs a new NetCDF reader.
@@ -109,40 +127,21 @@ public class DefaultReader extends FileImageReader {
      */
     public DefaultReader(final Spi spi) {
         super(spi);
-        this.variableName = spi.variable;
-        this.converter    = spi.converter;
+        this.variableNames = spi.variables;
+        this.converter     = spi.converter;
     }
 
     /**
-     * Returns the dimension in the NetCDF {@linkplain Variable variable} where to fetch
-     * column data. This is usually a format-specific parameter. The default value is 0.
+     * Returns the number of images available from the current input source.
+     *
+     * @throws IllegalStateException if the input source has not been set.
+     * @throws IOException if an error occurs reading the information from the input source.
      */
-    public int getXDimension() {
-        return xDimension;
-    }
-
-    /**
-     * Set the dimension in the NetCDF {@linkplain Variable variable} where to fetch
-     * column data. This is usually a format-specific parameter. The default value is 0.
-     */
-    public void setXDimension(final int x) {
-        xDimension = x;
-    }
-
-    /**
-     * Returns the dimension in the NetCDF {@linkplain Variable variable} where to fetch
-     * row data. This is usually a format-specific parameter. The default value is 1.
-     */
-    public int getYDimension() {
-        return yDimension;
-    }
-
-    /**
-     * Set the dimension in the NetCDF {@linkplain Variable variable} where to fetch
-     * row data. This is usually a format-specific parameter. The default value is 1.
-     */
-    public void setYDimension(final int y) {
-        yDimension = y;
+    //@Override
+    public int getNumImages(final boolean allowSearch) throws IllegalStateException, IOException {
+        ensureFileOpen();
+        // TODO: consider returning the actual number of images in the file.
+        return variableNames.length;
     }
 
     /**
@@ -164,14 +163,14 @@ public class DefaultReader extends FileImageReader {
     /**
      * Returns the range of values. The default implementation scans the file content.
      */
-    public Range getExpectedRange(final int imageIndex, final int bandIndex) throws IOException {
+    public javax.media.jai.util.Range getExpectedRange(final int imageIndex, final int bandIndex) throws IOException {
         checkImageIndex(imageIndex);
         if (ranges == null) {
-            ranges = new Range[imageIndex + 1];
+            ranges = new NumberRange[imageIndex + 1];
         } else if (ranges.length <= imageIndex) {
-            ranges = (Range[]) XArray.resize(ranges, imageIndex + 1);
+            ranges = (NumberRange[]) XArray.resize(ranges, imageIndex + 1);
         }
-        Range range = ranges[imageIndex];
+        NumberRange range = ranges[imageIndex];
         if (range == null) {
             ranges[imageIndex] = range = computeExpectedRange(imageIndex);
         }
@@ -181,14 +180,15 @@ public class DefaultReader extends FileImageReader {
     /**
      * Computes the range of values.
      */
-    private Range computeExpectedRange(final int imageIndex) throws IOException {
+    private NumberRange computeExpectedRange(final int imageIndex) throws IOException {
         prepareVariable(imageIndex);
-        final Array    array = variable.read();
-        final DataType type  = variable.getDataType();
+        final DataType    type = variable.getDataType();
+        final Array      array = variable.read();
+        final IndexIterator it = array.getIndexIterator();
         if (type.equals(DataType.BYTE)) {
             byte min = Byte.MAX_VALUE;
             byte max = Byte.MIN_VALUE;
-            for (final IndexIterator it=array.getIndexIterator(); it.hasNext();) {
+            while (it.hasNext()) {
                 final byte value = (byte) converter.convert(it.getByteNext());
                 if (value < min) min = value;
                 if (value > max) max = value;
@@ -199,7 +199,7 @@ public class DefaultReader extends FileImageReader {
         } else if (type.equals(DataType.SHORT) || type.equals(DataType.INT)) {
             int min = Integer.MAX_VALUE;
             int max = Integer.MIN_VALUE;
-            for (final IndexIterator it=array.getIndexIterator(); it.hasNext();) {
+            while (it.hasNext()) {
                 final int value = converter.convert(it.getIntNext());
                 if (value < min) min = value;
                 if (value > max) max = value;
@@ -210,7 +210,7 @@ public class DefaultReader extends FileImageReader {
         } else if (type.equals(DataType.FLOAT)) {
             float min = Float.POSITIVE_INFINITY;
             float max = Float.NEGATIVE_INFINITY;
-            for (final IndexIterator it=array.getIndexIterator(); it.hasNext();) {
+            while (it.hasNext()) {
                 final float value = converter.convert(it.getFloatNext());
                 if (value < min) min = value;
                 if (value > max) max = value;
@@ -221,7 +221,7 @@ public class DefaultReader extends FileImageReader {
         } else {
             double min = Double.POSITIVE_INFINITY;
             double max = Double.NEGATIVE_INFINITY;
-            for (final IndexIterator it=array.getIndexIterator(); it.hasNext();) {
+            while (it.hasNext()) {
                 final double value = converter.convert(it.getDoubleNext());
                 if (value < min) min = value;
                 if (value > max) max = value;
@@ -266,6 +266,33 @@ public class DefaultReader extends FileImageReader {
     }
 
     /**
+     * Returns parameters initialized with default values appropriate for this format.
+     *
+     * @return Parameters which may be used to control the decoding process using a set
+     *         of default settings.
+     */
+    //@Override
+    public ImageReadParam getDefaultReadParam() {
+        final ImageReadParam param = super.getDefaultReadParam();
+        param.setSourceBands     (DEFAULT_BANDS);
+        param.setDestinationBands(DEFAULT_BANDS);
+        return param;
+    }
+
+    /**
+     * Ensures that the NetCDF file is open, but do not load any variable yet.
+     */
+    private void ensureFileOpen() throws IOException {
+        if (file == null) {
+            final File inputFile = getInputFile();
+            file = NetcdfFile.open(inputFile.getPath()); // TODO: consider using NetcdfFileCache.acquire(...)
+            if (file == null) {
+                throw new FileNotFoundException(Errors.format(ErrorKeys.FILE_DOES_NOT_EXIST_$1, file));
+            }
+        }
+    }
+
+    /**
      * Ensures that data are loaded in the {@link #variable}. If data are already loaded,
      * then this method do nothing.
      * 
@@ -276,23 +303,24 @@ public class DefaultReader extends FileImageReader {
      */
     private void prepareVariable(final int imageIndex) throws IOException {
         checkImageIndex(imageIndex);
-        if (variable == null) {
-            final File inputFile = getInputFile();
-            file = NetcdfFile.open(inputFile.getPath()); // TODO: consider using NetcdfFileCache.acquire(...)
-            if (file == null) {
-                throw new FileNotFoundException(Errors.format(ErrorKeys.FILE_DOES_NOT_EXIST_$1, file));
-            }
+        if (variable == null || variableIndex != imageIndex) {
+            ensureFileOpen();
+            final String variableName = variableNames[imageIndex];
+            // TODO: consider using 'findVariable'
             //@SuppressWarnings("unchecked")
             final List/*<Variable>*/ variables = (List/*<Variable>*/) file.getVariables();
             for (final Iterator it=variables.iterator(); it.hasNext();) {
                 final Variable v = (Variable) it.next();
                 if (variableName.equalsIgnoreCase(v.getName().trim())) {
                     variable = v;
+                    variableIndex = imageIndex;
+                    final int rank = v.getRank();
+                    xDimension = rank - 1;
+                    yDimension = rank - 2;
+                    zDimension = rank - 3;
                     return;
                 }
             }
-            file.close();
-            file = null;
             throw new IIOException(Errors.format(
                     ErrorKeys.VARIABLE_NOT_FOUND_IN_FILE_$2, variableName, file));
         }
@@ -303,91 +331,134 @@ public class DefaultReader extends FileImageReader {
      */
     public BufferedImage read(final int imageIndex, final ImageReadParam param) throws IOException {
         clearAbortRequest();
-        checkReadParamBandSettings(param, 1, 1);
         prepareVariable(imageIndex);
+        /*
+         * Fetchs the parameters that are not already processed by utility
+         * methods like 'getDestination' or 'computeRegions' (invoked below).
+         */
+        final int strideX, strideY;
+        final int[] srcBands, dstBands;
+        if (param != null) {
+            strideX  = param.getSourceXSubsampling();
+            strideY  = param.getSourceYSubsampling();
+            srcBands = param.getSourceBands();
+            dstBands = param.getDestinationBands();
+        } else {
+            strideX  = 1;
+            strideY  = 1;
+            srcBands = null;
+            dstBands = null;
+        }
+        /*
+         * Gets the destination image of appropriate size. We create it now
+         * since it is a convenient way to get the number of destination bands.
+         */
         final int            width  = variable.getDimension(xDimension).getLength();
         final int            height = variable.getDimension(yDimension).getLength();
         final BufferedImage  image  = getDestination(param, getImageTypes(imageIndex), width, height);
         final WritableRaster raster = image.getRaster();
-        final Rectangle   srcRegion = new Rectangle();
-        final Rectangle  destRegion = new Rectangle();
-        final int strideX, strideY;
-        if (param != null) {
-            strideX = param.getSourceXSubsampling();
-            strideY = param.getSourceYSubsampling();
-        } else {
-            strideX = 1;
-            strideY = 1;
-        }
-        computeRegions(param, width, height, image, srcRegion, destRegion);
-        processImageStarted(imageIndex);
         /*
-         * Read the requested sub-region only.
+         * Checks the band setting. If the NetCDF file is at least 3D, the
+         * data along the 'z' dimension are considered as different bands.
          */
-        final int[] shape  = variable.getShape();
-        final int[] origin = new int[shape.length];
-        origin[xDimension] = srcRegion.x;
-        origin[yDimension] = srcRegion.y;
-        shape [xDimension] = srcRegion.width;
-        shape [yDimension] = srcRegion.height;
-        final Array array;
-        try {
-            array = variable.read(origin, shape);
-        } catch (InvalidRangeException e) {
-            throw netcdfFailure(e);
+        final boolean hasZ    = (zDimension >= 0);
+        final int numSrcBands = hasZ ? variable.getDimension(zDimension).getLength() : 1;
+        final int numDstBands = raster.getNumBands();
+        if (param != null) {
+            // Do not test for 'param == null' since our default 'srcBands'
+            // value is not the same than the one documented in Image I/O.
+            checkReadParamBandSettings(param, numSrcBands, numDstBands);
         }
-        final Index index = array.getIndex();
-        final float toPercent = 100f / height;
+        /*
+         * Computes the source region (in the NetCDF file) and the destination region
+         * (in the buffered image). Copies those informations into UCAR Range structure.
+         */
+        final Rectangle  srcRegion = new Rectangle();
+        final Rectangle destRegion = new Rectangle();
+        computeRegions(param, width, height, image, srcRegion, destRegion);
+        final Range[] ranges = new Range[variable.getRank()];
+        for (int i=0; i<ranges.length; i++) {
+            final int first, length, stride;
+            if (i == xDimension) {
+                first  = srcRegion.x;
+                length = srcRegion.width;
+                stride = strideX;
+            } else if (i == yDimension) {
+                first  = srcRegion.y;
+                length = srcRegion.height;
+                stride = strideY;
+            } else {
+                first  = 0;
+                length = 1;
+                stride = 1;
+            }
+            try {
+                ranges[i] = new Range(first, first+length-1, stride);
+            } catch (InvalidRangeException e) {
+                throw netcdfFailure(e);
+            }
+        }
+        final List sections = Range.toList(ranges);
+        /*
+         * Reads the requested sub-region only.
+         */
+        processImageStarted(imageIndex);
+        final float toPercent = 100f / numDstBands;
         final int type = raster.getTransferType();
         final int xmin = destRegion.x;
         final int ymin = destRegion.y;
         final int xmax = destRegion.width  + xmin;
         final int ymax = destRegion.height + ymin;
-        for (int yi=0,y=ymax; --y>=ymin;) {
-            set(index, yDimension, yi);
-            for (int xi=0,x=xmin; x<xmax; x++) {
-                set(index, xDimension, xi);
-                switch (type) {
-                    case DataBuffer.TYPE_DOUBLE: {
-                        raster.setSample(x, y, 0, converter.convert(array.getDouble(index)));
-                        break;
-                    }
-                    case DataBuffer.TYPE_FLOAT: {
-                        raster.setSample(x, y, 0, converter.convert(array.getFloat(index)));
-                        break;
-                    }
-                    default: {
-                        raster.setSample(x, y, 0, converter.convert(array.getInt(index)));
-                        break;
-                    }
-                }
-                xi += strideX;
-            }
-            yi += strideY;
-            processImageProgress(yi * toPercent);
+        for (int zi=0; zi<numDstBands; zi++) {
+            /*
+             * Checks for abort request before the call to variable.read(...). We don't perform
+             * this check in a deeper loop because the costly part is the call to 'read', which
+             * can't process the abort request. The loop that copy the pixels is fast, so there
+             * is few reasons to check for abort request there.
+             */
             if (abortRequested()) {
                 processReadAborted();
                 return image;
             }
+            final int srcBand = (srcBands == null) ? zi : srcBands[zi];
+            final int dstBand = (dstBands == null) ? zi : dstBands[zi];
+            final Array array;
+            try {
+                if (hasZ) {
+                    ranges[zDimension] = new Range(srcBand, srcBand, 1);
+                }
+                array = variable.read(sections);
+            } catch (InvalidRangeException e) {
+                throw netcdfFailure(e);
+            }
+            final IndexIterator it = array.getIndexIterator();
+            for (int y=ymax; --y>=ymin;) {
+                for (int x=xmin; x<xmax; x++) {
+                    switch (type) {
+                        case DataBuffer.TYPE_DOUBLE: {
+                            raster.setSample(x, y, dstBand, converter.convert(it.getDoubleNext()));
+                            break;
+                        }
+                        case DataBuffer.TYPE_FLOAT: {
+                            raster.setSample(x, y, dstBand, converter.convert(it.getFloatNext()));
+                            break;
+                        }
+                        default: {
+                            raster.setSample(x, y, dstBand, converter.convert(it.getIntNext()));
+                            break;
+                        }
+                    }
+                }
+            }
+            /*
+             * Reports progress here, not in the deeper loop, because the costly part is the
+             * call to 'variable.read(...)' which can't report progress.  The loop that copy
+             * pixel values is fast, so reporting progress there would be pointless.
+             */
+            processImageProgress(zi * toPercent);
         }
         processImageComplete();
         return image;
-    }
-
-    /**
-     * Sets the index value at the specified dimension.
-     */
-    private static void set(final Index index, final int dimension, final int value) {
-        switch(dimension) {
-            case 0: index.set0(value); break;
-            case 1: index.set1(value); break;
-            case 2: index.set2(value); break;
-            case 3: index.set3(value); break;
-            case 4: index.set4(value); break;
-            case 5: index.set5(value); break;
-            case 6: index.set6(value); break;
-            default: throw new IndexOutOfBoundsException(String.valueOf(dimension));
-        }
     }
 
     /**
@@ -439,9 +510,9 @@ public class DefaultReader extends FileImageReader {
         private static final String[] SUFFIXES = new String[] {"nc", "NC"};
 
         /**
-         * The name of the {@linkplain Variable variable} to be read in a NetCDF file.
+         * The names of the {@linkplain Variable variable} to be read in a NetCDF file.
          */
-        private final String variable;
+        private final String[] variables;
 
         /**
          * The sample converter. Default to {@linkplain SampleConverter#IDENTITY identity}.
@@ -460,24 +531,25 @@ public class DefaultReader extends FileImageReader {
         protected int paletteSize;
 
         /**
-         * Constructs a service provider for the specified variable name.
+         * Constructs a service provider for the specified variable names. The first name
+         * is assigned to image index 0, the second name to image index 1, <cite>etc.</cite>.
          *
-         * @param variable The default name of the {@linkplain Variable variable} to be read.
+         * @param variable The names of the {@linkplain Variable variables} to be read.
          */
-        public Spi(final String variable) {
+        public Spi(final String[] variables) {
             super("NetCDF", "image/x-netcdf");
             names            = NAMES;
             suffixes         = SUFFIXES;
             vendorName       = "Geotools";
             version          = "2.4";
             pluginClassName  = "org.geotools.image.io.netcdf.DefaultReader";
-            this.variable    = variable;
+            this.variables   = (String[]) variables.clone();
         }
 
         /**
          * Constructs a service provider for the specified variable name and color palette.
          *
-         * @param variable The default name of the {@linkplain Variable variable} to be read.
+         * @param variable The names of the {@linkplain Variable variables} to be read.
          * @param palette  The name of a color palette to fetch from the
          *                 {@linkplain PaletteFactory#getDefault default palette factory}.
          * @param lower    The lowest sample value, inclusive.
@@ -486,10 +558,10 @@ public class DefaultReader extends FileImageReader {
          *
          * @todo The pad value may be available in variable properties instead.
          */
-        public Spi(final String variable, final String palette,
+        public Spi(final String[] variables, final String palette,
                    final int lower, final int upper, final int padValue)
         {
-            this(variable);
+            this(variables);
             paletteName = palette;
             paletteSize = upper - lower;
             converter   = new IntegerConverter(padValue, 1-lower);
