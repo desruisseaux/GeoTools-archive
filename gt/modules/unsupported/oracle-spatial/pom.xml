@@ -129,7 +129,7 @@
           <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>dummy_spatial</artifactId>
-            <version>8.1.8</version>         
+            <version>8.1.8</version> <!-- Do not necessarly match the oracle.jdbc version number. -->
             <scope>provided</scope>
           </dependency>        
         </dependencies>                  
