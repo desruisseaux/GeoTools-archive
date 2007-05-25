@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.geotools.data.complex.filter.XPath;
 import org.geotools.data.feature.FeatureSource2;
 import org.geotools.data.feature.memory.MemoryDataAccess;
 import org.geotools.factory.CommonFactoryFinder;
@@ -24,6 +25,7 @@ import org.opengis.feature.type.TypeFactory;
 import org.opengis.feature.type.TypeName;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
+import org.xml.sax.helpers.NamespaceSupport;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -61,10 +63,9 @@ public class TestData {
 
         FeatureType wq_plusType;
 
-        AttributeType detdesc = builder.name("determinand_description").bind(
-                String.class).attribute();
-        AttributeType result = builder.name("result").bind(Float.class)
+        AttributeType detdesc = builder.name("determinand_description").bind(String.class)
                 .attribute();
+        AttributeType result = builder.name("result").bind(Float.class).attribute();
 
         builder.setName("measurement");
         builder.addAttribute("determinand_description", detdesc);
@@ -78,14 +79,10 @@ public class TestData {
          * </ul>
          */
 
-        AttributeType sitename = builder.name("sitename").bind(String.class)
-                .attribute();
-        AttributeType anzlic_no = builder.name("anzlic_no").bind(String.class)
-                .attribute();
-        AttributeType project_no = builder.name("project_no")
-                .bind(String.class).attribute();
-        AttributeType location = builder.name("location").bind(Point.class)
-                .geometry();
+        AttributeType sitename = builder.name("sitename").bind(String.class).attribute();
+        AttributeType anzlic_no = builder.name("anzlic_no").bind(String.class).attribute();
+        AttributeType project_no = builder.name("project_no").bind(String.class).attribute();
+        AttributeType location = builder.name("location").bind(Point.class).geometry();
 
         builder.setName("wq_plus");
         builder.addAttribute("sitename", sitename);
@@ -109,10 +106,8 @@ public class TestData {
 
         FeatureType sampleType;
 
-        AttributeType parameter = builder.name("parameter").bind(String.class)
-                .attribute();
-        AttributeType value = builder.name("value").bind(Double.class)
-                .attribute();
+        AttributeType parameter = builder.name("parameter").bind(String.class).attribute();
+        AttributeType value = builder.name("value").bind(Double.class).attribute();
 
         builder.setName("measurement");
         builder.addAttribute("parameter", parameter);
@@ -133,12 +128,12 @@ public class TestData {
      * <pre>
      * </pre>
      * 
-     * @param simpleStore
+     * @param targetFeature
      * @return
      * @throws Exception
      */
     public static List/* <AttributeMapping> */createMappingsColumnsAndValues(
-            MemoryDataAccess simpleStore) throws Exception {
+            AttributeDescriptor targetFeature) throws Exception {
 
         List mappings = new LinkedList();
         AttributeMapping attMapping;
@@ -149,32 +144,34 @@ public class TestData {
 
         source = ff.literal("ph");
         target = "sample/measurement[1]/parameter";
-        attMapping = new AttributeMapping(null, source, target);
+        // empty nssupport as the test properties have no namespace
+        NamespaceSupport namespaces = new NamespaceSupport();
+        attMapping = new AttributeMapping(null, source, XPath.steps(targetFeature, target, namespaces));
         mappings.add(attMapping);
 
         source = ff.property("ph");
         target = "sample/measurement[1]/value";
-        attMapping = new AttributeMapping(null, source, target);
+        attMapping = new AttributeMapping(null, source, XPath.steps(targetFeature, target, namespaces));
         mappings.add(attMapping);
 
         source = ff.literal("temp");
         target = "sample/measurement[2]/parameter";
-        attMapping = new AttributeMapping(null, source, target);
+        attMapping = new AttributeMapping(null, source, XPath.steps(targetFeature, target, namespaces));
         mappings.add(attMapping);
 
         source = ff.property("temp");
         target = "sample/measurement[2]/value";
-        attMapping = new AttributeMapping(null, source, target);
+        attMapping = new AttributeMapping(null, source, XPath.steps(targetFeature, target, namespaces));
         mappings.add(attMapping);
 
         source = ff.literal("turbidity");
         target = "sample/measurement[3]/parameter";
-        attMapping = new AttributeMapping(null, source, target);
+        attMapping = new AttributeMapping(null, source, XPath.steps(targetFeature, target, namespaces));
         mappings.add(attMapping);
 
         source = ff.property("turbidity");
         target = "sample/measurement[3]/value";
-        attMapping = new AttributeMapping(null, source, target);
+        attMapping = new AttributeMapping(null, source, XPath.steps(targetFeature, target, namespaces));
         mappings.add(attMapping);
 
         return mappings;
@@ -234,11 +231,15 @@ public class TestData {
      * @return
      * @throws Exception
      */
-    public static FeatureTypeMapping createMappingsGroupByStation(
-            MemoryDataAccess simpleStore) throws Exception {
-        TypeName typeName = WATERSAMPLE_TYPENAME;
-        final FeatureSource2 wsSource = (FeatureSource2) simpleStore
-                .access(typeName);
+    public static FeatureTypeMapping createMappingsGroupByStation(MemoryDataAccess simpleStore)
+            throws Exception {
+        TypeName sourceTypeName = WATERSAMPLE_TYPENAME;
+        final FeatureSource2 wsSource = (FeatureSource2) simpleStore.access(sourceTypeName);
+
+        FeatureType targetType = createComplexWaterQualityType();
+        TypeFactory tf = new TypeFactoryImpl();
+        AttributeDescriptor targetFeature = tf.createAttributeDescriptor(targetType, targetType
+                .getName(), 0, Integer.MAX_VALUE, true);
 
         List mappings = new LinkedList();
         Expression id;
@@ -250,45 +251,48 @@ public class TestData {
         id = ff.property("station_no");
         source = Expression.NIL;
         target = "wq_plus";
-        mappings.add(new AttributeMapping(id, source, target));
+        NamespaceSupport namespaces = new NamespaceSupport();
+        mappings.add(new AttributeMapping(id, source, XPath
+                .steps(targetFeature, target, namespaces)));
 
         source = ff.property("sitename");
         target = "wq_plus/sitename";
-        mappings.add(new AttributeMapping(null, source, target));
+        mappings.add(new AttributeMapping(null, source, XPath.steps(targetFeature, target,
+                namespaces)));
 
         source = ff.property("anzlic_no");
         target = "wq_plus/anzlic_no";
-        mappings.add(new AttributeMapping(null, source, target));
+        mappings.add(new AttributeMapping(null, source, XPath.steps(targetFeature, target,
+                namespaces)));
 
         source = ff.property("project_no");
         target = "wq_plus/project_no";
-        mappings.add(new AttributeMapping(null, source, target));
+        mappings.add(new AttributeMapping(null, source, XPath.steps(targetFeature, target,
+                namespaces)));
 
         id = ff.property("id");
         source = null;
         target = "wq_plus/measurement";
-        mappings
-                .add(new AttributeMapping(id, source, target, null, true, null));
+        mappings.add(new AttributeMapping(id, source, XPath
+                .steps(targetFeature, target, namespaces), null, true, null));
 
         source = ff.property("determinand_description");
         target = "wq_plus/measurement/determinand_description";
-        mappings.add(new AttributeMapping(null, source, target));
+        mappings.add(new AttributeMapping(null, source, XPath.steps(targetFeature, target,
+                namespaces)));
 
         source = ff.property("results_value");
         target = "wq_plus/measurement/result";
-        mappings.add(new AttributeMapping(null, source, target));
+        mappings.add(new AttributeMapping(null, source, XPath.steps(targetFeature, target,
+                namespaces)));
 
         source = ff.property("location");
         target = "wq_plus/location";
-        mappings.add(new AttributeMapping(null, source, target));
+        mappings.add(new AttributeMapping(null, source, XPath.steps(targetFeature, target,
+                namespaces)));
 
-        FeatureType targetType = createComplexWaterQualityType();
-        TypeFactory tf = new TypeFactoryImpl();
-        AttributeDescriptor targetFeature = tf.createAttributeDescriptor(
-                targetType, targetType.getName(), 0, Integer.MAX_VALUE, true);
-
-        FeatureTypeMapping mapper = new FeatureTypeMapping(wsSource,
-                targetFeature, mappings);
+        FeatureTypeMapping mapper = new FeatureTypeMapping(wsSource, targetFeature, mappings,
+                namespaces);
 
         List/* <String> */groupingAttributes = new ArrayList/* <String> */();
         groupingAttributes.add("station_no");
@@ -389,8 +393,7 @@ public class TestData {
      * @return
      * @throws Exception
      */
-    public static MemoryDataAccess createDenormalizedWaterQualityResults()
-            throws Exception {
+    public static MemoryDataAccess createDenormalizedWaterQualityResults() throws Exception {
         MemoryDataAccess dataStore = new MemoryDataAccess();
         SimpleTypeFactory tf = new SimpleTypeFactoryImpl();
         SimpleTypeBuilder builder = new SimpleTypeBuilder(tf);
@@ -418,8 +421,7 @@ public class TestData {
         for (int groupValue = 1; groupValue <= NUM_STATIONS; groupValue++) {
 
             for (int measurement = 1; measurement <= groupValue; measurement++) {
-                String fid = type.getName().getLocalPart() + "." + groupValue
-                        + "." + measurement;
+                String fid = type.getName().getLocalPart() + "." + groupValue + "." + measurement;
                 SimpleFeature f = af.createSimpleFeature(type, fid, null);
                 f.set("station_no", "station_no." + groupValue);
                 f.set("sitename", "sitename" + groupValue);
@@ -428,15 +430,11 @@ public class TestData {
 
                 String sufix = "_" + groupValue + "_" + measurement;
                 f.set("id", "id" + sufix);
-                f.set("sample_collection_date", "sample_collection_date"
-                        + sufix);
-                f.set("determinand_description", "determinand_description"
-                        + sufix);
-                f.set("results_value",
-                        new Float(groupValue + "." + measurement));
+                f.set("sample_collection_date", "sample_collection_date" + sufix);
+                f.set("determinand_description", "determinand_description" + sufix);
+                f.set("results_value", new Float(groupValue + "." + measurement));
 
-                f.set("location", gf.createPoint(new Coordinate(groupValue,
-                        groupValue)));
+                f.set("location", gf.createPoint(new Coordinate(groupValue, groupValue)));
 
                 dataStore.addFeatureInternal(f);
             }

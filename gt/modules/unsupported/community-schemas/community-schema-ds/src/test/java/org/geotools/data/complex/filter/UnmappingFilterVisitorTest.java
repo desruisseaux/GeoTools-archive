@@ -6,21 +6,27 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import junit.framework.TestCase;
 
 import org.geotools.data.complex.AttributeMapping;
 import org.geotools.data.complex.FeatureTypeMapping;
 import org.geotools.data.complex.TestData;
+import org.geotools.data.complex.filter.XPath.Step;
+import org.geotools.data.complex.filter.XPath.StepList;
 import org.geotools.data.feature.FeatureSource2;
 import org.geotools.data.feature.memory.MemoryDataAccess;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.iso.TypeBuilder;
+import org.geotools.feature.iso.Types;
 import org.geotools.filter.FilterType;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.Name;
 import org.opengis.feature.type.TypeFactory;
 import org.opengis.filter.And;
 import org.opengis.filter.BinaryLogicOperator;
@@ -38,6 +44,7 @@ import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.Multiply;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.Intersects;
+import org.xml.sax.helpers.NamespaceSupport;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -106,19 +113,21 @@ public class UnmappingFilterVisitorTest extends TestCase {
         // create the mapping definition
         List attMappings = new LinkedList();
 
+        NamespaceSupport namespaces = new NamespaceSupport();
+        
         Function aoiExpr = ff.function("buffer", ff.property("location"), ff
                 .literal(10));
 
-        attMappings.add(new AttributeMapping(null, aoiExpr, "areaOfInfluence"));
+        attMappings.add(new AttributeMapping(null, aoiExpr, XPath.steps(targetFeature, "areaOfInfluence", namespaces)));
 
         Function strConcat = ff.function("strConcat", ff.property("anzlic_no"),
                 ff.property("project_no"));
 
-        attMappings.add(new AttributeMapping(null, strConcat, "concatenated"));
+        attMappings.add(new AttributeMapping(null, strConcat, XPath.steps(targetFeature, "concatenated", namespaces)));
 
         FeatureSource2 simpleSource = mapping.getSource();
         FeatureTypeMapping mapping = new FeatureTypeMapping(simpleSource,
-                targetFeature, attMappings);
+                targetFeature, attMappings, namespaces);
         return mapping;
     }
 
@@ -153,10 +162,17 @@ public class UnmappingFilterVisitorTest extends TestCase {
     public void testUnrollFidToFid() throws Exception {
 
         AttributeMapping featureMapping = null;
-        String featurePath = mapping.getTargetFeature().getName().getLocalPart();
+        
+        Name featurePath = mapping.getTargetFeature().getName();
+        QName featureName = Types.toQName(featurePath);
         for(Iterator it = mapping.getAttributeMappings().iterator(); it.hasNext();){
             AttributeMapping attMapping = (AttributeMapping) it.next();
-            if(featurePath.equals(attMapping.getTargetXPath())){
+            StepList targetXPath = attMapping.getTargetXPath();
+            if(targetXPath.size() > 1){
+                continue;
+            }
+            Step step = (Step) targetXPath.get(0);
+            if(featureName.equals(step.getName())){
                 featureMapping = attMapping;
                 break;
             }

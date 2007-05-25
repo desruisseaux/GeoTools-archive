@@ -26,6 +26,7 @@ import org.geotools.data.feature.FeatureSource2;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.expression.Expression;
+import org.xml.sax.helpers.NamespaceSupport;
 
 /**
  * 
@@ -49,6 +50,8 @@ public class FeatureTypeMapping {
      * an XPath expression addressing the mapped property of the target schema.
      */
     List/* <AttributeMapping> */attributeMappings;
+    
+    NamespaceSupport namespaces;
 
     /**
      * No parameters constructor for use by the digester configuration engine as
@@ -59,50 +62,28 @@ public class FeatureTypeMapping {
         this.target = null;
         this.attributeMappings = new LinkedList();
         this.groupByAttNames = Collections.EMPTY_LIST;
+        this.namespaces = new NamespaceSupport();
     }
 
-    public FeatureTypeMapping(FeatureSource2 source,
-            AttributeDescriptor target, List/* <AttributeMapping> */mappings) {
+    public FeatureTypeMapping(FeatureSource2 source, AttributeDescriptor target,
+            List/* <AttributeMapping> */mappings, NamespaceSupport namespaces) {
         this.source = source;
         this.target = target;
-        this.attributeMappings = new LinkedList/* <AttributeMapping> */(
-                mappings);
+        this.attributeMappings = new LinkedList/* <AttributeMapping> */(mappings);
+        this.namespaces = namespaces;
 
         this.groupByAttNames = Collections.EMPTY_LIST;
     }
 
-    public void addAttributeMapping(Expression idExpression,
-            Expression sourceExpression, String targetXpath) {
-        addAttributeMapping(idExpression, sourceExpression, targetXpath, null);
-    }
-
-    /**
-     * 
-     * @param sourceExpression
-     * @param targetXpath
-     * @param targetNodeReference
-     *            if provided, instances of <code>targetXpath</code> will be
-     *            created as the <code>AtrributeDescriptor</code> referenced
-     *            by this name.
-     */
-    public void addAttributeMapping(Expression idExpression,
-            Expression sourceExpression, String targetXpath,
-            AttributeDescriptor targetNodeReference) {
-
-        if (sourceExpression == null || targetXpath == null) {
-            throw new NullPointerException("expression: " + sourceExpression
-                    + ", target attribtue: " + targetXpath);
-        }
-
-        AttributeMapping attMapping = new AttributeMapping(idExpression,
-                sourceExpression, targetXpath);
-        this.attributeMappings.add(attMapping);
-    }
-
+   
     public List/* <AttributeMapping> */getAttributeMappings() {
         return new ArrayList(attributeMappings);
     }
 
+    public NamespaceSupport getNamespaces(){
+        return namespaces;
+    }
+    
     /**
      * Has to be called after {@link #setTargetType(FeatureType)}
      * 
@@ -117,17 +98,6 @@ public class FeatureTypeMapping {
         this.source = source;
     }
 
-    /*
-     * private void setDefaultFidMapping() { FilterFactory ff =
-     * CommonFactoryFinder.getFilterFactory(null); // TODO: this could be
-     * replaced by property("@id"); Expression mainFidExpression =
-     * ff.function("getID", new Expression[0]); if (mainFidExpression == null) {
-     * throw new IllegalStateException( "The getID function expression was not
-     * found. Check the FunctionExpression SPI state"); }
-     * this.fidExpressions.put(target.getName().getLocalPart(),
-     * mainFidExpression); }
-     */
-
     public AttributeDescriptor getTargetFeature() {
         return this.target;
     }
@@ -141,7 +111,7 @@ public class FeatureTypeMapping {
     }
 
     public void setGroupByAttNames(List/* <String> */groupByAttNames) {
-        this.groupByAttNames = groupByAttNames == null ? Collections.EMPTY_LIST
-                : Collections.unmodifiableList(groupByAttNames);
+        this.groupByAttNames = groupByAttNames == null ? Collections.EMPTY_LIST : Collections
+                .unmodifiableList(groupByAttNames);
     }
 }

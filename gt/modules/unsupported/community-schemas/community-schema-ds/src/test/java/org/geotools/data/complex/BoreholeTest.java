@@ -35,6 +35,7 @@ import org.geotools.data.complex.config.ComplexDataStoreConfigurator;
 import org.geotools.data.complex.config.ComplexDataStoreDTO;
 import org.geotools.data.complex.config.EmfAppSchemaReader;
 import org.geotools.data.complex.config.XMLConfigDigester;
+import org.geotools.data.complex.filter.XPath.StepList;
 import org.geotools.data.feature.FeatureAccess;
 import org.geotools.data.feature.FeatureSource2;
 import org.geotools.feature.iso.Types;
@@ -66,7 +67,7 @@ public class BoreholeTest extends TestCase {
 
     private static final String OMNS = "http://www.opengis.net/om";
 
-    private static final String SWENS = "http://www.opengis.net/swe";
+    private static final String SWENS = "http://www.opengis.net/swe/0.0";
 
     private static final String GMLNS = "http://www.opengis.net/gml";
 
@@ -255,7 +256,9 @@ public class BoreholeTest extends TestCase {
 
         AttributeMapping attMapping = (AttributeMapping) attributeMappings.get(0);
         assertNotNull(attMapping);
-        assertEquals("Borehole", attMapping.getTargetXPath());
+        StepList targetXPath = attMapping.getTargetXPath();
+        assertNotNull(targetXPath);
+        assertEquals("xmml:Borehole", targetXPath.toString());
 
         Expression idExpression = attMapping.getIdentifierExpression();
         assertNotNull(idExpression);

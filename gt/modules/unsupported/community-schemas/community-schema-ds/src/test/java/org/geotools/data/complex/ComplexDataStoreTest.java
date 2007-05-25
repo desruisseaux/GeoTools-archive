@@ -44,6 +44,7 @@ import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.geometry.BoundingBox;
+import org.xml.sax.helpers.NamespaceSupport;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Point;
@@ -69,12 +70,14 @@ public class ComplexDataStoreTest extends TestCase {
         AttributeDescriptor targetFeature = tf.createAttributeDescriptor(targetType, targetType
                 .getName(), 0, Integer.MAX_VALUE, true);
         targetName = targetFeature.getName();
-        List mappings = TestData.createMappingsColumnsAndValues(ds);
+        List mappings = TestData.createMappingsColumnsAndValues(targetFeature);
 
         TypeName sourceName = TestData.WATERSAMPLE_TYPENAME;
         FeatureSource2 source = (FeatureSource2) ds.access(sourceName);
 
-        mapping = new FeatureTypeMapping(source, targetFeature, mappings);
+        // empty nssupport as the sample types have no namespace defined
+        NamespaceSupport namespaces = new NamespaceSupport();
+        mapping = new FeatureTypeMapping(source, targetFeature, mappings, namespaces);
 
         dataStore = new ComplexDataStore(Collections.singleton(mapping));
 

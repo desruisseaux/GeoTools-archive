@@ -21,9 +21,20 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.geotools.data.Query;
 import org.geotools.data.complex.filter.XPath;
+import org.geotools.data.complex.filter.XPath.Step;
+import org.geotools.data.complex.filter.XPath.StepList;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.Hints;
 import org.geotools.feature.iso.AttributeBuilder;
+import org.geotools.feature.iso.Types;
+import org.geotools.filter.FilterFactoryImpl;
+import org.geotools.filter.FilterFactoryImplNamespaceAware;
+import org.geotools.filter.expression.FeaturePropertyAccessorFactory;
+import org.geotools.filter.expression.PropertyAccessorFactory;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.Feature;
@@ -31,7 +42,9 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
+import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
+import org.xml.sax.helpers.NamespaceSupport;
 
 /**
  * A Feature iterator that operates over the FeatureSource of a
@@ -50,11 +63,17 @@ class DefaultMappingFeatureIterator extends AbstractMappingFeatureIterator {
 
     private XPath xpathAttributeBuilder;
 
-    public DefaultMappingFeatureIterator(ComplexDataStore store,
-            FeatureTypeMapping mapping, Query query) throws IOException {
+    public DefaultMappingFeatureIterator(ComplexDataStore store, FeatureTypeMapping mapping,
+            Query query) throws IOException {
         super(store, mapping, query);
         xpathAttributeBuilder = new XPath();
         xpathAttributeBuilder.setFeatureFactory(super.attf);
+
+        NamespaceSupport namespaces = mapping.getNamespaces();
+        // FilterFactory namespaceAwareFilterFactory =
+        // CommonFactoryFinder.getFilterFactory(hints);
+        FilterFactory namespaceAwareFilterFactory = new FilterFactoryImplNamespaceAware(namespaces);
+        xpathAttributeBuilder.setFilterFactory(namespaceAwareFilterFactory);
     }
 
     public Object/* Feature */next() {
@@ -71,8 +90,7 @@ class DefaultMappingFeatureIterator extends AbstractMappingFeatureIterator {
     }
 
     private Feature computeNext() {
-        ComplexAttribute sourceInstance = (ComplexAttribute) this.sourceFeatures
-                .next();
+        ComplexAttribute sourceInstance = (ComplexAttribute) this.sourceFeatures.next();
         final AttributeDescriptor targetNode = mapping.getTargetFeature();
         final Name targetNodeName = targetNode.getName();
         final List mappings = mapping.getAttributeMappings();
@@ -81,30 +99,30 @@ class DefaultMappingFeatureIterator extends AbstractMappingFeatureIterator {
         String id = super.extractIdForFeature(sourceInstance);
 
         AttributeBuilder builder = new AttributeBuilder(attf);
-        builder.setType(targetType);
+        builder.setDescriptor(targetNode);
 
         Feature mapped = (Feature) builder.build(id);
 
         for (Iterator itr = mappings.iterator(); itr.hasNext();) {
             AttributeMapping attMapping = (AttributeMapping) itr.next();
-
-            if(targetNodeName.getLocalPart().equals(attMapping.getTargetXPath())){
-                //ignore the top level mapping for the Feature itself as it was already set
-                continue;
+            StepList targetXpathProperty = attMapping.getTargetXPath();
+            if (targetXpathProperty.size() == 1) {
+                Step rootStep = (Step) targetXpathProperty.get(0);
+                QName stepName = rootStep.getName();
+                if (Types.equals(targetNodeName, stepName)) {
+                    // ignore the top level mapping for the Feature itself
+                    // as it was already set
+                    continue;
+                }
             }
-            
+
             Expression sourceExp = attMapping.getSourceExpression();
-            String targetXpathProperty = attMapping.getTargetXPath();
-            // TODO: optimize here
-            targetXpathProperty = XPath.Step.toString(XPath.steps(
-                    targetNodeName, targetXpathProperty));
             AttributeType targetNodeType = attMapping.getTargetNodeInstance();
 
             Object value = super.getValue(sourceExp, sourceInstance);
             id = extractIdForAttribute(attMapping, sourceInstance);
 
-            xpathAttributeBuilder.set(mapped, targetXpathProperty, value, id,
-                    targetNodeType);
+            xpathAttributeBuilder.set(mapped, targetXpathProperty, value, id, targetNodeType);
         }
 
         return mapped;

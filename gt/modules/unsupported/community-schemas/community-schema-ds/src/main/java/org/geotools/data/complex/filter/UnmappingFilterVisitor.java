@@ -26,9 +26,15 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.XMLConstants;
+import javax.xml.namespace.QName;
+
 import org.geotools.data.complex.AttributeMapping;
 import org.geotools.data.complex.FeatureTypeMapping;
+import org.geotools.data.complex.filter.XPath.Step;
+import org.geotools.data.complex.filter.XPath.StepList;
 import org.geotools.factory.CommonFactoryFinder;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.And;
 import org.opengis.filter.BinaryComparisonOperator;
@@ -73,6 +79,7 @@ import org.opengis.filter.spatial.Intersects;
 import org.opengis.filter.spatial.Overlaps;
 import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
+import org.xml.sax.helpers.NamespaceSupport;
 
 /**
  * A Filter visitor that traverse a Filter or Expression made against a complex
@@ -98,14 +105,13 @@ import org.opengis.filter.spatial.Within;
  * 
  * @author Gabriel Roldan, Axios Engineering
  */
-public class UnmappingFilterVisitor implements
-        org.opengis.filter.FilterVisitor, ExpressionVisitor {
-    private static final Logger LOGGER = Logger
-            .getLogger(UnmappingFilterVisitor.class.getPackage().getName());
+public class UnmappingFilterVisitor implements org.opengis.filter.FilterVisitor, ExpressionVisitor {
+    private static final Logger LOGGER = Logger.getLogger(UnmappingFilterVisitor.class.getPackage()
+            .getName());
 
     private Filter unrolled = Filter.INCLUDE;
 
-    private Map/* <List<XPath.Step>, Expression> */attributeMappings;
+    private Map/* <StepList, Expression> */attributeMappings;
 
     FeatureTypeMapping mappings;
 
@@ -116,29 +122,19 @@ public class UnmappingFilterVisitor implements
      * visit(*Expression) holds the unmapped expression here. Package visible
      * just for unit tests
      */
-    List/* <Expression> */unrolledExpressions = new ArrayList/* <Expression> */(
-            2);
+    List/* <Expression> */unrolledExpressions = new ArrayList/* <Expression> */(2);
 
     public UnmappingFilterVisitor(FeatureTypeMapping mappings) {
         this.mappings = mappings;
-
-        this.attributeMappings = new HashMap/* <List<XPath.Step>, Expression> */();
+        this.attributeMappings = new HashMap/* <StepList, Expression> */();
         Name featureNode = mappings.getTargetFeature().getName();
 
-        for (Iterator itr = mappings.getAttributeMappings().iterator(); itr
-                .hasNext();) {
+        for (Iterator itr = mappings.getAttributeMappings().iterator(); itr.hasNext();) {
             AttributeMapping attMapping = (AttributeMapping) itr.next();
             Expression exp = attMapping.getSourceExpression();
-            String targetAttribute = attMapping.getTargetXPath();
+            StepList targetAttribute = attMapping.getTargetXPath();
 
-            List/* <XPath.Step> */simplifiedSteps;
-            try {
-                simplifiedSteps = XPath.steps(featureNode, targetAttribute);
-            } catch (RuntimeException e) {
-                e.printStackTrace();
-                throw e;
-            }
-            this.attributeMappings.put(simplifiedSteps, exp);
+            this.attributeMappings.put(targetAttribute, exp);
         }
     }
 
@@ -183,8 +179,7 @@ public class UnmappingFilterVisitor implements
      * built on the unmapped expressions pointing to the surrogate type
      * attributes.
      */
-    public Expression[] visitBinaryComparisonOperator(
-            BinaryComparisonOperator filter) {
+    public Expression[] visitBinaryComparisonOperator(BinaryComparisonOperator filter) {
         Expression left = filter.getExpression1();
         Expression right = filter.getExpression2();
 
@@ -274,23 +269,34 @@ public class UnmappingFilterVisitor implements
         Set fids = filter.getIdentifiers();
 
         Name target = mappings.getTargetFeature().getName();
+        String namespace = target.getNamespaceURI();
+        if (namespace == null) {
+            namespace = XMLConstants.NULL_NS_URI;
+        }
         String name = target.getLocalPart();
 
         Expression fidExpression = null;
 
-        for (Iterator it = mappings.getAttributeMappings().iterator(); it
-                .hasNext();) {
+        for (Iterator it = mappings.getAttributeMappings().iterator(); it.hasNext();) {
             AttributeMapping attMapping = (AttributeMapping) it.next();
-            String targetXPath = attMapping.getTargetXPath();
-            if (name.equals(targetXPath)) {
-                fidExpression = attMapping.getIdentifierExpression();
-                break;
+            StepList targetXPath = attMapping.getTargetXPath();
+            if (targetXPath.size() > 1) {
+                continue;
+            }
+
+            Step step = (Step) targetXPath.get(0);
+            QName stepName = step.getName();
+            if (namespace.equals(stepName.getNamespaceURI())) {
+                if (name.equals(stepName.getLocalPart())) {
+                    fidExpression = attMapping.getIdentifierExpression();
+                    break;
+                }
             }
         }
 
         if (fidExpression == null) {
-            throw new IllegalStateException("No FID expression found for type "
-                    + target + ". Did you mean Expression.NIL?");
+            throw new IllegalStateException("No FID expression found for type " + target
+                    + ". Did you mean Expression.NIL?");
         }
 
         if (Expression.NIL.equals(fidExpression)) {
@@ -313,8 +319,8 @@ public class UnmappingFilterVisitor implements
         try {
             for (Iterator it = fids.iterator(); it.hasNext();) {
                 Identifier fid = (Identifier) it.next();
-                Filter comparison = UnmappingFilterVisitor.ff.equals(fidExpression, UnmappingFilterVisitor.ff.literal(fid
-                        .toString()));
+                Filter comparison = UnmappingFilterVisitor.ff.equals(fidExpression,
+                        UnmappingFilterVisitor.ff.literal(fid.toString()));
                 UnmappingFilterVisitor.LOGGER.finest("Adding unmapped fid filter " + comparison);
                 unrolled = unrolled == null ? comparison : UnmappingFilterVisitor.ff.or(unrolled,
                         comparison);
@@ -558,15 +564,15 @@ public class UnmappingFilterVisitor implements
     public Object visit(PropertyName expr, Object arg1) {
 
         String targetXPath = expr.getPropertyName();
-        Name name = mappings.getTargetFeature().getName();
-        List simplifiedSteps = XPath.steps(name, targetXPath);
+        NamespaceSupport namespaces = mappings.getNamespaces();
+        AttributeDescriptor root = mappings.getTargetFeature();
+        
+        StepList simplifiedSteps = XPath.steps(root, targetXPath, namespaces);
 
-        Expression sourceExpression = (Expression) this.attributeMappings
-                .get(simplifiedSteps);
+        Expression sourceExpression = (Expression) this.attributeMappings.get(simplifiedSteps);
 
         if (sourceExpression == null) {
-            throw new IllegalArgumentException("Don't know how to map "
-                    + targetXPath);
+            throw new IllegalArgumentException("Don't know how to map " + targetXPath);
         }
 
         this.unrolledExpressions.add(sourceExpression);

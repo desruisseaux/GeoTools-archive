@@ -44,6 +44,7 @@ import org.geotools.data.Transaction;
 import org.geotools.data.complex.filter.FilterAttributeExtractor;
 import org.geotools.data.complex.filter.UnmappingFilterVisitor;
 import org.geotools.data.complex.filter.XPath;
+import org.geotools.data.complex.filter.XPath.StepList;
 import org.geotools.data.feature.FeatureAccess;
 import org.geotools.data.feature.FeatureSource2;
 import org.geotools.data.feature.adapter.GTComlexFeatureTypeAdapter;
@@ -56,6 +57,7 @@ import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.PropertyName;
+import org.xml.sax.helpers.NamespaceSupport;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -282,7 +284,6 @@ public class ComplexDataStore /* extends AbstractDataStore */implements FeatureA
         final FeatureType mappedType;
 
         final AttributeDescriptor targetDescriptor = mapping.getTargetFeature();
-        final Name targetName = targetDescriptor.getName();
         mappedType = (FeatureType) targetDescriptor.getType();
 
         if (mappingProperties != null && mappingProperties.length > 0) {
@@ -295,17 +296,16 @@ public class ComplexDataStore /* extends AbstractDataStore */implements FeatureA
 
             for (Iterator itr = requestedProperties.iterator(); itr.hasNext();) {
                 String requestedPropertyXPath = (String) itr.next();
-                List/* <XPath.Step> */requestedPropertySteps;
-                requestedPropertySteps = XPath.steps(targetName, requestedPropertyXPath);
+                StepList requestedPropertySteps;
+                NamespaceSupport namespaces = mapping.getNamespaces();
+                requestedPropertySteps = XPath.steps(targetDescriptor, requestedPropertyXPath,
+                        namespaces);
 
                 for (Iterator aitr = attMappings.iterator(); aitr.hasNext();) {
                     final AttributeMapping entry = (AttributeMapping) aitr.next();
-                    final String mappedPropertyXPath = entry.getTargetXPath();
+                    final StepList targetSteps = entry.getTargetXPath();
                     final Expression sourceExpression = entry.getSourceExpression();
                     final Expression idExpression = entry.getIdentifierExpression();
-
-                    List/* <XPath.Step> */targetSteps;
-                    targetSteps = XPath.steps(targetName, mappedPropertyXPath);
 
                     // i.e.: requested "measurement", found mapping of
                     // "measurement/result".

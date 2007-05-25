@@ -3,16 +3,20 @@ package org.geotools.data.complex.filter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.XMLConstants;
+import javax.xml.namespace.QName;
+
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.Hints;
 import org.geotools.feature.iso.AttributeBuilder;
 import org.geotools.feature.iso.AttributeFactoryImpl;
 import org.geotools.feature.iso.Types;
 import org.geotools.feature.iso.type.TypeFactoryImpl;
+import org.geotools.util.CheckedArrayList;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.FeatureFactory;
@@ -20,10 +24,13 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.Name;
+import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.feature.type.TypeFactory;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
+import org.opengis.util.Cloneable;
+import org.xml.sax.helpers.NamespaceSupport;
 
 /**
  * Utility class to evaluate XPath expressions against an Attribute instance,
@@ -75,12 +82,57 @@ public class XPath {
         this.featureFactory = featureFactory;
     }
 
-    public static class Step {
+    public static class StepList extends CheckedArrayList implements List, Cloneable {
+
+        private StepList() {
+            super(XPath.Step.class);
+        }
+
+        private StepList(StepList steps) {
+            super(XPath.Step.class);
+            addAll(steps);
+        }
+
+        public String toString() {
+            StringBuffer sb = new StringBuffer();
+            for (Iterator it = iterator(); it.hasNext();) {
+                Step s = (Step) it.next();
+                sb.append(s.toString());
+                if (it.hasNext()) {
+                    sb.append("/");
+                }
+            }
+            return sb.toString();
+        }
+
+        public Object clone() {
+            StepList copy = new StepList();
+            Step step;
+            for (Iterator it = iterator(); it.hasNext();) {
+                step = (Step) it.next();
+                copy.add(step.clone());
+            }
+            return copy;
+        }
+    }
+
+    /**
+     * 
+     * @author gabriel
+     * 
+     */
+    public static class Step implements Cloneable {
         private int index;
 
-        private String attributeName;
+        private QName attributeName;
 
-        public Step(String name, int index) {
+        public Step(final QName name, final int index) {
+            if (name == null) {
+                throw new NullPointerException("name");
+            }
+            if (index < 1) {
+                throw new IllegalArgumentException("index shall be >= 1");
+            }
             this.attributeName = name;
             this.index = index;
         }
@@ -89,12 +141,16 @@ public class XPath {
             return index;
         }
 
-        public String getName() {
+        public QName getName() {
             return attributeName;
         }
 
         public String toString() {
-            StringBuffer sb = new StringBuffer(attributeName);
+            StringBuffer sb = new StringBuffer();
+            if (null != attributeName.getPrefix()) {
+                sb.append(attributeName.getPrefix()).append(':');
+            }
+            sb.append(attributeName.getLocalPart());
             if (index > 1) {
                 sb.append("[").append(index).append("]");
             }
@@ -113,24 +169,9 @@ public class XPath {
             return 17 * attributeName.hashCode() + 37 * index;
         }
 
-        public static String toString(List/* <Step> */stepList) {
-            StringBuffer sb = new StringBuffer();
-            for (Iterator it = stepList.iterator(); it.hasNext();) {
-                Step s = (Step) it.next();
-                sb.append(s.getName());
-                if (s.getIndex() > 1) {
-                    sb.append("[").append(s.getIndex()).append("]");
-                }
-                if (it.hasNext()) {
-                    sb.append("/");
-                }
-            }
-            return sb.toString();
+        public Object clone() {
+            return new Step(this.attributeName, this.index);
         }
-    }
-
-    public static List/* <Step> */steps(String xpathExpression) throws IllegalArgumentException {
-        return XPath.steps(null, xpathExpression);
     }
 
     /**
@@ -139,9 +180,11 @@ public class XPath {
      * <p>
      * </p>
      * 
-     * @param rootName
-     *            used to ignore the first step in xpathExpression if the
-     *            expression's first step is named as rootName.
+     * @param root
+     *            non null descriptor of the root attribute, generally the
+     *            Feature descriptor. Used to ignore the first step in
+     *            xpathExpression if the expression's first step is named as
+     *            rootName.
      * 
      * @param xpathExpression
      * @return
@@ -149,8 +192,12 @@ public class XPath {
      *             if <code>xpathExpression</code> has no steps or it isn't a
      *             valid XPath expression against <code>type</code>.
      */
-    public static List/* <Step> */steps(Name rootName, String xpathExpression)
-            throws IllegalArgumentException {
+    public static StepList steps(AttributeDescriptor root, String xpathExpression,
+            NamespaceSupport namespaces) throws IllegalArgumentException {
+
+        if (root == null) {
+            throw new NullPointerException("root");
+        }
 
         if (xpathExpression == null) {
             throw new NullPointerException("xpathExpression");
@@ -162,12 +209,12 @@ public class XPath {
             throw new IllegalArgumentException("expression is empty");
         }
 
-        List/* <Step> */steps = new LinkedList/* <Step> */();
-        steps.add(new Step(".", 1));
+        StepList steps = new StepList();
 
         if ("/".equals(xpathExpression)) {
-            return steps;
+            xpathExpression = root.getName().getLocalPart();
         }
+
         if (xpathExpression.startsWith("/")) {
             xpathExpression = xpathExpression.substring(1);
         }
@@ -179,43 +226,89 @@ public class XPath {
         }
 
         int startIndex = 0;
-        if (rootName != null && rootName.getLocalPart().equals(partialSteps[0])) {
-            XPath.LOGGER.finer("ignoring type name, since its redundant");
-            startIndex = 1;
-        }
 
         for (int i = startIndex; i < partialSteps.length; i++) {
+
             String step = partialSteps[i];
+
             if (step.indexOf('[') != -1) {
-                XPath.LOGGER.finer("removing index from step " + step);
                 int start = step.indexOf('[');
                 int end = step.indexOf(']');
                 String stepName = step.substring(0, start);
                 int stepIndex = Integer.parseInt(step.substring(start + 1, end));
-                steps.add(new Step(stepName, stepIndex));
+                QName qName = deglose(stepName, root, namespaces);
+                steps.add(new Step(qName, stepIndex));
             } else if ("..".equals(step)) {
                 steps.remove(steps.size() - 1);
             } else if (".".equals(step)) {
                 continue;
             } else {
-                // steps.add(new Step(step, steps.size() + 1));
-                steps.add(new Step(step, 1));
+                QName qName = deglose(step, root, namespaces);
+                steps.add(new Step(qName, 1));
             }
         }
 
-        // verify final location path is valid
-        /*
-         * StringBuffer sb = new StringBuffer(); for (Iterator it =
-         * steps.iterator(); it.hasNext();) {
-         * sb.append(((Step)it.next()).getName()); if (it.hasNext()) {
-         * sb.append("/"); } } String finalPath = sb.toString();
-         * AttributeDescriptor addressedType = (AttributeDescriptor) get(node,
-         * finalPath); if (addressedType == null) { throw new
-         * IllegalArgumentException("final location path '" + finalPath + "'
-         * does not addresses an attribute of " + node); }
-         * 
-         */
+        // XPath simplification phase: if the xpath expression contains more
+        // nodes
+        // than the root node itself, and the root node is present, remove the
+        // root
+        // node as it is redundant
+        if (root != null && steps.size() > 1) {
+            Step step = (Step) steps.get(0);
+            Name rootName = root.getName();
+            QName stepName = step.getName();
+            if (Types.equals(rootName, stepName)) {
+                LOGGER.fine("removing root name from xpath " + steps + " as it is redundant");
+                steps.remove(0);
+            }
+        }
+
         return steps;
+    }
+
+    private static QName deglose(final String prefixedName, final AttributeDescriptor root,
+            final NamespaceSupport namespaces) {
+        if (prefixedName == null) {
+            throw new NullPointerException("prefixedName");
+        }
+
+        QName name = null;
+
+        final String prefix;
+        final String namespaceUri;
+        final String localName;
+        final Name rootName = root.getName();
+        final String defaultNamespace = rootName.getNamespaceURI() == null ? XMLConstants.NULL_NS_URI
+                : rootName.getNamespaceURI();
+
+        int prefixIdx = prefixedName.indexOf(':');
+
+        if (prefixIdx == -1) {
+            localName = prefixedName;
+            namespaceUri = defaultNamespace;
+            if (XMLConstants.NULL_NS_URI.equals(defaultNamespace)) {
+                prefix = XMLConstants.DEFAULT_NS_PREFIX;
+            } else {
+                if (!localName.equals(rootName.getLocalPart())) {
+                    LOGGER.warning("Using root's namespace " + defaultNamespace
+                            + " for step named '" + localName + "', as no prefix was stated");
+                }
+                prefix = namespaces.getPrefix(defaultNamespace);
+
+                if (prefix == null) {
+                    throw new IllegalStateException("Default namespace is not mapped to a prefix: "
+                            + defaultNamespace);
+                }
+            }
+        } else {
+            prefix = prefixedName.substring(0, prefixIdx);
+            localName = prefixedName.substring(prefixIdx + 1);
+            namespaceUri = namespaces.getURI(prefix);
+        }
+
+        name = new QName(namespaceUri, localName, prefix);
+
+        return name;
     }
 
     /**
@@ -238,62 +331,86 @@ public class XPath {
      *            <code>xpath</code>, or <code>null</code> if unknown
      * @return
      */
-    public Attribute set(final Attribute att, final String xpath, Object value, String id,
+    public Attribute set(final Attribute att, final StepList xpath, Object value, String id,
             AttributeType targetNodeType) {
         if (XPath.LOGGER.isLoggable(Level.CONFIG)) {
             XPath.LOGGER.entering("XPath", "set", new Object[] { att, xpath, value, id,
                     targetNodeType });
         }
 
+        final StepList steps = new StepList(xpath);
+
+        // if (steps.size() < 2) {
+        // throw new IllegalArgumentException("parent not yet built for " +
+        // xpath);
+        // }
+
         ComplexAttribute parent = (ComplexAttribute) att;
         Name rootName = null;
-        if (att.getDescriptor() != null) {
-            rootName = att.getDescriptor().getName();
+        if (parent.getDescriptor() != null) {
+            rootName = parent.getDescriptor().getName();
+            Step rootStep = (Step) steps.get(0);
+            QName stepName = rootStep.getName();
+            if (stepName.getLocalPart().equals(rootName.getLocalPart())) {
+                if (XMLConstants.NULL_NS_URI.equals(stepName.getNamespaceURI())
+                        || stepName.getNamespaceURI().equals(rootName.getNamespaceURI())) {
+                    // first step is the self reference to att, so skip it
+                    steps.remove(0);
+                }
+            }
         }
-        List steps = XPath.steps(rootName, xpath);
 
-        if (steps.size() < 2) {
-            throw new IllegalArgumentException("parent not yet built for " + xpath);
-        }
+        Iterator stepsIterator = steps.iterator();
 
-        // first step is the self reference to att, so skip it
-        Iterator stepsIterator = steps.subList(1, steps.size()).iterator();
         for (; stepsIterator.hasNext();) {
             final XPath.Step currStep = (Step) stepsIterator.next();
             final ComplexType parentType = (ComplexType) parent.getType();
-            final String currStepLocalName = currStep.getName();
+            final QName stepName = currStep.getName();
+            final Name attributeName = Types.toName(stepName);
+
             AttributeDescriptor currStepDescriptor = null;
+
             if (targetNodeType == null) {
-                currStepDescriptor = (AttributeDescriptor) Types.descriptor(parentType,
-                        currStepLocalName);
-                if(currStepDescriptor == null){
-                    //need to take the non easy way, may be the instance has a value
-                    //for this step with a different name, of a derived type of the
-                    //one declared in the parent type
-                    PropertyName name = FF.property(currStepLocalName);
+                if (null == attributeName.getNamespaceURI()) {
+                    currStepDescriptor = (AttributeDescriptor) Types.descriptor(parentType,
+                            attributeName.getLocalPart());
+                } else {
+                    currStepDescriptor = (AttributeDescriptor) Types.descriptor(parentType,
+                            attributeName);
+                }
+
+                if (currStepDescriptor == null) {
+                    // need to take the non easy way, may be the instance has a
+                    // value for this step with a different name, of a derived
+                    // type of the one declared in the parent type
+                    String prefixedStepName = currStep.toString();
+                    PropertyName name = FF.property(prefixedStepName);
                     Attribute child = (Attribute) name.evaluate(parent);
-                    if(child != null){
+                    if (child != null) {
                         currStepDescriptor = child.getDescriptor();
                     }
                 }
             } else {
-                // @todo: no target node namespace check here, we need XPath to
-                // be namespace aware
-                AttributeDescriptor actualDescriptor = (AttributeDescriptor) Types.descriptor(
-                        parentType, currStepLocalName, targetNodeType);
+                AttributeDescriptor actualDescriptor;
+                if (null == attributeName.getNamespaceURI()) {
+                    actualDescriptor = (AttributeDescriptor) Types.descriptor(parentType,
+                            attributeName.getLocalPart(), targetNodeType);
+                } else {
+                    actualDescriptor = (AttributeDescriptor) Types.descriptor(parentType,
+                            attributeName, targetNodeType);
+                }
+
                 if (actualDescriptor != null) {
-                    String namespace = actualDescriptor.getName().getNamespaceURI();
-                    Name name = Types.attributeName(namespace, currStepLocalName);
                     int minOccurs = actualDescriptor.getMinOccurs();
                     int maxOccurs = actualDescriptor.getMaxOccurs();
                     boolean nillable = actualDescriptor.isNillable();
                     currStepDescriptor = descriptorFactory.createAttributeDescriptor(
-                            targetNodeType, name, minOccurs, maxOccurs, nillable);
+                            targetNodeType, attributeName, minOccurs, maxOccurs, nillable);
                 }
             }
 
             if (currStepDescriptor == null) {
-                throw new IllegalArgumentException(currStepLocalName
+                throw new IllegalArgumentException(currStep
                         + " is not a valid location path for type " + parentType.getName());
             }
 
@@ -302,7 +419,7 @@ public class XPath {
             if (isLastStep) {
                 // reached the leaf
                 if (currStepDescriptor == null) {
-                    throw new IllegalArgumentException(currStepLocalName
+                    throw new IllegalArgumentException(currStep
                             + " is not a valid location path for type " + parentType.getName());
                 }
                 int index = currStep.getIndex();
@@ -366,10 +483,11 @@ public class XPath {
         return leafAttribute;
     }
 
-    public boolean isComplexType(final String attrXPath, final AttributeDescriptor featureType) {
-        PropertyName attExp = FF.property(attrXPath);
+    public boolean isComplexType(final StepList attrXPath, final AttributeDescriptor featureType) {
+        PropertyName attExp = FF.property(attrXPath.toString());
         Object type = attExp.evaluate(featureType);
         if (type == null) {
+            type = attExp.evaluate(featureType);
             throw new IllegalArgumentException("path not found: " + attrXPath);
         }
 

@@ -19,6 +19,7 @@ package org.geotools.data.complex;
 import java.util.Collections;
 import java.util.Map;
 
+import org.geotools.data.complex.filter.XPath.StepList;
 import org.geotools.resources.Utilities;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.filter.expression.Expression;
@@ -38,7 +39,8 @@ public class AttributeMapping {
     private Expression sourceExpression;
 
     /** DOCUMENT ME! */
-    private String targetXPath;
+    //private String targetXPath;
+    private StepList targetXPath;
 
     private boolean isMultiValued;
 
@@ -60,12 +62,12 @@ public class AttributeMapping {
      *            DOCUMENT ME!
      */
     public AttributeMapping(Expression idExpression,
-            Expression sourceExpression, String targetXPath) {
+            Expression sourceExpression, StepList targetXPath) {
         this(idExpression, sourceExpression, targetXPath, null, false, null);
     }
 
     public AttributeMapping(Expression idExpression,
-            Expression sourceExpression, String targetXPath,
+            Expression sourceExpression, StepList targetXPath,
             AttributeType targetNodeInstance, boolean isMultiValued,
             Map clientProperties) {
 
@@ -101,7 +103,7 @@ public class AttributeMapping {
      * 
      * @return DOCUMENT ME!
      */
-    public String getTargetXPath() {
+    public StepList getTargetXPath() {
         return targetXPath;
     }
 

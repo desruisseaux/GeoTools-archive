@@ -28,14 +28,21 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.xml.XMLConstants;
+import javax.xml.namespace.QName;
 
 import org.geotools.data.DataAccess;
 import org.geotools.data.DataAccessFinder;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.complex.AttributeMapping;
 import org.geotools.data.complex.FeatureTypeMapping;
+import org.geotools.data.complex.filter.XPath;
+import org.geotools.data.complex.filter.XPath.Step;
+import org.geotools.data.complex.filter.XPath.StepList;
 import org.geotools.data.feature.FeatureAccess;
 import org.geotools.data.feature.FeatureSource2;
 import org.geotools.feature.iso.Types;
@@ -46,6 +53,7 @@ import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.TypeName;
 import org.opengis.filter.expression.Expression;
+import org.xml.sax.helpers.NamespaceSupport;
 
 /**
  * Utility class to create a set of {@linkPlain
@@ -74,6 +82,12 @@ public class ComplexDataStoreConfigurator {
     private Map sourceDataStores;
 
     /**
+     * Placeholder for the prefix:namespaceURI mappings declared in the
+     * Namespaces section of the mapping file.
+     */
+    private NamespaceSupport namespaces;
+
+    /**
      * Creates a new ComplexDataStoreConfigurator object.
      * 
      * @param config
@@ -83,6 +97,14 @@ public class ComplexDataStoreConfigurator {
      */
     private ComplexDataStoreConfigurator(ComplexDataStoreDTO config) {
         this.config = config;
+        namespaces = new NamespaceSupport();
+        Map nsMap = config.getNamespaces();
+        for (Iterator it = nsMap.entrySet().iterator(); it.hasNext();) {
+            Map.Entry entry = (Entry) it.next();
+            String prefix = (String) entry.getKey();
+            String namespace = (String) entry.getValue();
+            namespaces.declarePrefix(prefix, namespace);
+        }
     }
 
     /**
@@ -148,12 +170,12 @@ public class ComplexDataStoreConfigurator {
 
             FeatureSource2 featureSoruce = getFeatureSource(dto);
             AttributeDescriptor target = getTargetDescriptor(dto);
-            List attMappings = getAttributeMappings(dto);
+            List attMappings = getAttributeMappings(target, dto.getAttributeMappings());
             List groupByAtts = dto.getGroupbyAttributeNames();
 
             FeatureTypeMapping mapping;
 
-            mapping = new FeatureTypeMapping(featureSoruce, target, attMappings);
+            mapping = new FeatureTypeMapping(featureSoruce, target, attMappings, namespaces);
 
             if (groupByAtts.size() > 0) {
                 mapping.setGroupByAttNames(groupByAtts);
@@ -184,7 +206,8 @@ public class ComplexDataStoreConfigurator {
      * @param attDtos
      * @return
      */
-    private List getAttributeMappings(List attDtos) throws IOException {
+    private List getAttributeMappings(final AttributeDescriptor root, final List attDtos)
+            throws IOException {
         List attMappings = new LinkedList();
 
         for (Iterator it = attDtos.iterator(); it.hasNext();) {
@@ -197,6 +220,8 @@ public class ComplexDataStoreConfigurator {
             String expectedInstanceTypeName = attDto.getTargetAttributeSchemaElement();
 
             final String targetXPath = attDto.getTargetAttributePath();
+            final StepList targetXPathSteps = XPath.steps(root, targetXPath, namespaces);
+            validateConfiguredNamespaces(targetXPathSteps);
 
             final boolean isMultiValued = attDto.isMultiple();
 
@@ -222,10 +247,32 @@ public class ComplexDataStoreConfigurator {
             }
 
             AttributeMapping attMapping = new AttributeMapping(idExpression, sourceExpression,
-                    targetXPath, expectedInstanceOf, isMultiValued, clientProperties);
+                    targetXPathSteps, expectedInstanceOf, isMultiValued, clientProperties);
             attMappings.add(attMapping);
         }
         return attMappings;
+    }
+
+    /**
+     * Throws an IllegalArgumentException if some Step in the given xpath
+     * StepList has a prefix for which no prefix to namespace mapping were
+     * provided (as in the Namespaces section of the mappings xml configuration
+     * file)
+     * 
+     * @param targetXPathSteps
+     */
+    private void validateConfiguredNamespaces(StepList targetXPathSteps) {
+        for (Iterator it = targetXPathSteps.iterator(); it.hasNext();) {
+            Step step = (Step) it.next();
+            QName name = step.getName();
+            if (!XMLConstants.DEFAULT_NS_PREFIX.equals(name.getPrefix())) {
+                if (XMLConstants.DEFAULT_NS_PREFIX.equals(name.getNamespaceURI())) {
+                    throw new IllegalArgumentException("location step " + step + " has prefix "
+                            + name.getPrefix() + " for which no namespace was set. "
+                            + "(Check the Namespaces section in the config file)");
+                }
+            }
+        }
     }
 
     private Expression parseOgcCqlExpression(String sourceExpr) throws DataSourceException {
@@ -270,12 +317,6 @@ public class ComplexDataStoreConfigurator {
             clientProperties.put(qName, expression);
         }
         return clientProperties;
-    }
-
-    private List getAttributeMappings(TypeMapping dto) throws IOException {
-        List attMappingDtos = dto.getAttributeMappings();
-        List attMappings = getAttributeMappings(attMappingDtos);
-        return attMappings;
     }
 
     private FeatureSource2 getFeatureSource(TypeMapping dto) throws IOException {
@@ -381,7 +422,7 @@ public class ComplexDataStoreConfigurator {
             id = dsconfig.getId();
 
             Map datastoreParams = dsconfig.getParams();
-            
+
             datastoreParams = resolveRelativePaths(datastoreParams);
 
             ComplexDataStoreConfigurator.LOGGER.fine("looking for datastore " + id);
@@ -402,39 +443,39 @@ public class ComplexDataStoreConfigurator {
 
     /**
      * Resolves any source datastore parameter settled as a file path relative
-     * to the location of the xml mappings configuration file as an absolute path
-     * and returns a new Map with it.
+     * to the location of the xml mappings configuration file as an absolute
+     * path and returns a new Map with it.
      * 
      * @param datastoreParams
      * @return
-     * @throws MalformedURLException 
+     * @throws MalformedURLException
      */
     private Map resolveRelativePaths(final Map datastoreParams) throws MalformedURLException {
         Map resolvedParams = new HashMap();
-        
-        for(Iterator it = datastoreParams.entrySet().iterator(); it.hasNext();){
+
+        for (Iterator it = datastoreParams.entrySet().iterator(); it.hasNext();) {
             Map.Entry entry = (Map.Entry) it.next();
             String key = (String) entry.getKey();
             String value = (String) entry.getValue();
-            if(value != null && value.startsWith("file:")){
+            if (value != null && value.startsWith("file:")) {
                 value = value.substring("file:".length());
                 File f = new File(value);
-                if(!f.isAbsolute()){
-                    LOGGER.fine("resolving relative path " + value + 
-                            " for datastore parameter " + key);
+                if (!f.isAbsolute()) {
+                    LOGGER.fine("resolving relative path " + value + " for datastore parameter "
+                            + key);
                     URL baseSchemasUrl = new URL(config.getBaseSchemasUrl());
                     URL resolvedUrl = new URL(baseSchemasUrl, value);
                     value = resolvedUrl.toExternalForm();
-                    if(value.startsWith("file:")){
+                    if (value.startsWith("file:")) {
                         value = value.substring("file:".length());
                     }
                     LOGGER.fine("new value for " + key + ": " + value);
                 }
             }
-            
+
             resolvedParams.put(key, value);
         }
-        
+
         return resolvedParams;
     }
 
@@ -462,11 +503,9 @@ public class ComplexDataStoreConfigurator {
             // prefixed");
         }
 
-        Map namespaces = config.getNamespaces();
-
         String nsPrefix = prefixedName.substring(0, prefixIdx);
         String localName = prefixedName.substring(prefixIdx + 1);
-        String nsUri = (String) namespaces.get(nsPrefix);
+        String nsUri = namespaces.getURI(nsPrefix);
 
         name = new org.geotools.feature.type.TypeName(nsUri, localName);
 
@@ -487,11 +526,9 @@ public class ComplexDataStoreConfigurator {
             // prefixed");
         }
 
-        Map namespaces = config.getNamespaces();
-
         String nsPrefix = prefixedName.substring(0, prefixIdx);
         String localName = prefixedName.substring(prefixIdx + 1);
-        String nsUri = (String) namespaces.get(nsPrefix);
+        String nsUri = namespaces.getURI(nsPrefix);
 
         name = Types.attributeName(nsUri, localName);
 
