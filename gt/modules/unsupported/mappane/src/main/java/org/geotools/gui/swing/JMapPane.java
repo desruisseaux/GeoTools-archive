@@ -49,12 +49,12 @@ import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
-import org.opengis.filter.FilterFactory;
-import org.opengis.filter.spatial.SpatialOperator;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
 /**
@@ -75,6 +75,11 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 public class JMapPane extends JPanel implements MouseListener,
         HighlightChangeListener, PropertyChangeListener {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8647971481359690499L;
+
+	/**
      * what renders the map
      */
     GTRenderer renderer;
@@ -132,11 +137,11 @@ public class JMapPane extends JPanel implements MouseListener,
     /** 
      * a factory for filters
      */
-    FilterFactory ff;
+    FilterFactory2 ff;
     /** 
      * a factory for geometries
      */
-    GeometryFactory gf = new GeometryFactory();
+    GeometryFactory gf = new GeometryFactory();//FactoryFinder.getGeometryFactory(null);
     /** 
      * the collections of features to be selected or highlighted
      */
@@ -194,7 +199,7 @@ public class JMapPane extends JPanel implements MouseListener,
         super(layout, isDoubleBuffered);
         
 
-        ff = org.geotools.factory.CommonFactoryFinder.getFilterFactory(null);
+        ff = (FilterFactory2) org.geotools.factory.CommonFactoryFinder.getFilterFactory(null);
         setRenderer(render);
 
         setContext(context);
@@ -469,20 +474,15 @@ public class JMapPane extends JPanel implements MouseListener,
     }
 
     public FeatureCollection doSelection(double x, double y, int layer) {
-        org.opengis.filter.spatial.BinarySpatialOperator f = null;
+        
         FeatureCollection select = null;
-        //Geometry geometry = gf.createPoint(new Coordinate(x, y));
-        org.opengis.geometry.Geometry geometry = null;
-        try {
-            f = ff.contains("",geometry);
-        } catch (IllegalFilterException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        Geometry geometry = gf.createPoint(new Coordinate(x, y));
+        //org.opengis.geometry.Geometry geometry = new Point();
+        
 
         if (layer == -1) {
             for (int i = 0; i < context.getLayers().length; i++) {
-                FeatureCollection fx = findFeature(f, i);
+                FeatureCollection fx = findFeature(geometry, i);
                 if (select != null) {
                     select.addAll(fx);
                 } else {
@@ -490,20 +490,21 @@ public class JMapPane extends JPanel implements MouseListener,
                 }
             }
         } else {
-            select = findFeature(f, layer);
+            select = findFeature(geometry, layer);
         }
         return select;
     }
 
     /**
-     * @param f -
-     *            a partial geometry filter. The geom name will be added
+     * @param geometry -
+     *            a geometry to construct the filter with
      * @param i -
      *            the index of the layer to search
      * @throws IndexOutOfBoundsException
      */
-    private FeatureCollection findFeature(SpatialOperator f, int i)
+    private FeatureCollection findFeature(Geometry geometry, int i)
             throws IndexOutOfBoundsException {
+    	org.opengis.filter.spatial.BinarySpatialOperator f = null;
         FeatureCollection fcol = null;
         if (context != null && i > context.getLayers().length) {
             return fcol;
@@ -515,6 +516,14 @@ public class JMapPane extends JPanel implements MouseListener,
                     .getDefaultGeometry().getName();
             if (name == "")
                 name = "the_geom";
+            
+            try {
+                f = ff.contains(ff.property(name),ff.literal(geometry));
+                
+            } catch (IllegalFilterException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
             //f.addLeftGeometry(ff.property(name));
             // System.out.println("looking with " + f);
             FeatureCollection fc = layer.getFeatureSource().getFeatures(f);

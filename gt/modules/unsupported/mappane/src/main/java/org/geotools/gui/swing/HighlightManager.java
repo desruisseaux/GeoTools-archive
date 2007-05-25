@@ -25,14 +25,13 @@ import java.awt.event.MouseMotionAdapter;
 
 import javax.swing.event.EventListenerList;
 
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.GeometryFilter;
+
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.gui.swing.event.HighlightChangeListener;
 import org.geotools.gui.swing.event.HighlightChangedEvent;
 import org.geotools.map.MapLayer;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -48,7 +47,7 @@ public class HighlightManager extends MouseMotionAdapter {
     /**
      * The filterfactory needed to create the highlight filter
      */
-    FilterFactory ff = FilterFactoryFinder.createFilterFactory();
+    FilterFactory2 ff = (FilterFactory2) org.geotools.factory.CommonFactoryFinder.getFilterFactory(null);
     /**
      * the geometry factory to convert the mouse point to a jts.Point
      */
@@ -81,13 +80,12 @@ public class HighlightManager extends MouseMotionAdapter {
         double mapX = (x * width / (double) bounds.width) + mapArea.getMinX();
         double mapY = ((bounds.getHeight() - y) * height / (double) bounds.height)
                 + mapArea.getMinY();
-        GeometryFilter f = null;
+        Filter f = null;
 
         Geometry geometry = gf.createPoint(new Coordinate(mapX, mapY));
         try {
-            f = ff.createGeometryFilter(GeometryFilter.GEOMETRY_CONTAINS);
-            f.addRightGeometry(ff.createLiteralExpression(geometry));
-            f.addLeftGeometry(ff.createAttributeExpression(geomName));
+            f = ff.contains(ff.property(geomName),ff.literal(geometry));
+            
             if(f==lastFilter) return;
             lastFilter=f;
             this.highlightChanged(e.getSource(), f);

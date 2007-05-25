@@ -17,18 +17,20 @@ package org.geotools.gui.swing.event;
 
 import java.util.EventObject;
 
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
+
+
 
 
 public class HighlightChangedEvent extends EventObject{
     Object source;
     
     Filter filter;
-    public HighlightChangedEvent(Object source,Filter filter){
+    public HighlightChangedEvent(Object source,org.opengis.filter.Filter filter2){
         super(source);
         this.source = source;
         
-        this.filter = filter;
+        this.filter = filter2;
     }
     public Filter getFilter() {
         return filter;
