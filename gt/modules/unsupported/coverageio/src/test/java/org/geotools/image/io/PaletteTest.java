@@ -29,7 +29,9 @@ import junit.framework.TestSuite;
 /**
  * Tests {@link Palette} and {@link PaletteFactory}.
  *
- * @author desruisseaux
+ * @source $URL$
+ * @version $Id$
+ * @author Martin Desruisseaux
  */
 public class PaletteTest extends TestCase {
     /**

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeModel;
+import org.w3c.dom.Node;
 
 // Geotools dependencies
 import org.geotools.resources.XArray;
@@ -94,6 +95,15 @@ public final class Trees {
             path = getPathsToUserObject(model, value, path, length+1, list);
         }
         return path;
+    }
+
+    /**
+     * Creates a Swing root tree node from a XML root tree node. Together with
+     * {@link #toString(TreeNode)}, this method provides a convenient way to print
+     * the content of a XML document for debugging purpose.
+     */
+    public static TreeNode xmlToSwing(final Node node) {
+        return OptionalDependencies.xmlToSwing(node);
     }
 
     /**

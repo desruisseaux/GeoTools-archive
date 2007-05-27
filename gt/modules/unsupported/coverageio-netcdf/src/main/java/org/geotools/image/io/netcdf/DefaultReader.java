@@ -18,7 +18,6 @@ package org.geotools.image.io.netcdf;
 
 // J2SE dependencies
 import java.util.List;
-import java.util.Iterator;
 import java.util.Locale;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -31,15 +30,17 @@ import javax.imageio.IIOException;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.metadata.IIOMetadata;
 
 // NetCDF dependencies
-import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
 import ucar.ma2.Array;
 import ucar.ma2.Range;
 import ucar.ma2.DataType;
 import ucar.ma2.IndexIterator;
 import ucar.ma2.InvalidRangeException;
+import ucar.nc2.dataset.NetcdfDataset;
+import ucar.nc2.util.CancelTask;
 
 // Geomatys dependencies
 import org.geotools.util.NumberRange;
@@ -61,7 +62,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  */
-public class DefaultReader extends FileImageReader {
+public class DefaultReader extends FileImageReader implements CancelTask {
     /**
      * The default source bands to read from the NetCDF file.
      * Also the default destination bands in the buffered image.
@@ -69,11 +70,33 @@ public class DefaultReader extends FileImageReader {
     private static final int[] DEFAULT_BANDS = new int[] {0};
 
     /**
-     * The NetCDF file, or {@code null} if not yet open.
-     *
-     * @todo Uses {@link ucar.nc2.dataset.NetcdfDataset} instead.
+     * The dimension <strong>relative to the rank</strong> in {@link #variable} to use as image
+     * width. The actual dimension is {@code variable.getRank() - X_DIMENSION}. Is hard-coded
+     * because the loop in the {@code read} method expects this order.
      */
-    private NetcdfFile file;
+    private static final int X_DIMENSION = 1;
+
+    /**
+     * The dimension <strong>relative to the rank</strong> in {@link #variable} to use as image
+     * height. The actual dimension is {@code variable.getRank() - Y_DIMENSION}. Is hard-coded
+     * because the loop in the {@code read} method expects this order.
+     */
+    private static final int Y_DIMENSION = 2;
+
+    /**
+     * The dimension <strong>relative to the rank</strong> in {@link #variable} to use as image
+     * bands. The actual dimension is {@code variable.getRank() - Z_DIMENSION}. Is hard-coded
+     * because the loop in the {@code read} method expects this order.
+     *
+     * @todo In this particular case, the "hard constant" could be relaxed into a modifiable
+     *       parameter.
+     */
+    private static final int Z_DIMENSION = 3;
+
+    /**
+     * The NetCDF file, or {@code null} if not yet open.
+     */
+    private NetcdfDataset file;
 
     /**
      * The name of the {@linkplain Variable variable} to be read in a NetCDF file.
@@ -93,24 +116,6 @@ public class DefaultReader extends FileImageReader {
     private Variable variable;
 
     /**
-     * The dimension in {@link #variable} to use as image width.
-     * Will be computed by {@link #prepareVariable} as the last dimension.
-     */
-    private int xDimension;
-
-    /**
-     * The dimension in {@link #variable} to use as image height.
-     * Will be computed by {@link #prepareVariable} as the 2th last dimension.
-     */
-    private int yDimension;
-
-    /**
-     * The dimension in {@link #variable} to use as bands.
-     * Will be computed by {@link #prepareVariable} as the 3th last dimension.
-     */
-    private int zDimension;
-
-    /**
      * The converter for sample values.
      */
     private final SampleConverter converter;
@@ -119,6 +124,11 @@ public class DefaultReader extends FileImageReader {
      * The ranges for each image index, or {@code null} if unknown.
      */
     private NumberRange[] ranges;
+
+    /**
+     * The last error from the NetCDF library.
+     */
+    private String lastError;
 
     /** 
      * Constructs a new NetCDF reader.
@@ -149,7 +159,7 @@ public class DefaultReader extends FileImageReader {
      */
     public int getWidth(final int imageIndex) throws IOException {
         prepareVariable(imageIndex);
-        return variable.getDimension(xDimension).getLength();
+        return variable.getDimension(variable.getRank() - X_DIMENSION).getLength();
     }
 
     /**
@@ -157,7 +167,7 @@ public class DefaultReader extends FileImageReader {
      */
     public int getHeight(final int imageIndex) throws IOException {
         prepareVariable(imageIndex);
-        return variable.getDimension(yDimension).getLength();
+        return variable.getDimension(variable.getRank() - Y_DIMENSION).getLength();
     }
 
     /**
@@ -234,6 +244,14 @@ public class DefaultReader extends FileImageReader {
     }
 
     /**
+     * Returns the metadata associated with the input source as a whole.
+     */
+    //@Override
+    public IIOMetadata getStreamMetadata() throws IOException {
+        return super.getStreamMetadata();
+    }
+
+    /**
      * Returns the data type which most closely represents the "raw" internal data of the image.
      *
      * @param  imageIndex The index of the image to be queried.
@@ -284,10 +302,18 @@ public class DefaultReader extends FileImageReader {
      */
     private void ensureFileOpen() throws IOException {
         if (file == null) {
+            /*
+             * Clears the 'abort' flag here (instead of in 'read' method only) because
+             * we pass this ImageReader instance to the NetCDF DataSet as a CancelTask.
+             */
+            lastError = null;
+            clearAbortRequest();
             final File inputFile = getInputFile();
-            file = NetcdfFile.open(inputFile.getPath()); // TODO: consider using NetcdfFileCache.acquire(...)
+            // TODO: consider using NetcdfDatasetCache.acquire(...) below.
+            file = NetcdfDataset.openDataset(inputFile.getPath(), false, this);
             if (file == null) {
-                throw new FileNotFoundException(Errors.format(ErrorKeys.FILE_DOES_NOT_EXIST_$1, file));
+                throw new FileNotFoundException(Errors.format(
+                        ErrorKeys.FILE_DOES_NOT_EXIST_$1, inputFile));
             }
         }
     }
@@ -305,24 +331,19 @@ public class DefaultReader extends FileImageReader {
         checkImageIndex(imageIndex);
         if (variable == null || variableIndex != imageIndex) {
             ensureFileOpen();
-            final String variableName = variableNames[imageIndex];
-            // TODO: consider using 'findVariable'
-            //@SuppressWarnings("unchecked")
-            final List/*<Variable>*/ variables = (List/*<Variable>*/) file.getVariables();
-            for (final Iterator it=variables.iterator(); it.hasNext();) {
-                final Variable v = (Variable) it.next();
-                if (variableName.equalsIgnoreCase(v.getName().trim())) {
-                    variable = v;
-                    variableIndex = imageIndex;
-                    final int rank = v.getRank();
-                    xDimension = rank - 1;
-                    yDimension = rank - 2;
-                    zDimension = rank - 3;
-                    return;
-                }
+            final String name = variableNames[imageIndex];
+            final Variable candidate = file.findVariable(name);
+            if (candidate == null) {
+                throw new IIOException(Errors.format(
+                        ErrorKeys.VARIABLE_NOT_FOUND_IN_FILE_$2, name, file.getLocation()));
             }
-            throw new IIOException(Errors.format(
-                    ErrorKeys.VARIABLE_NOT_FOUND_IN_FILE_$2, variableName, file));
+            final int rank = candidate.getRank();
+            if (rank < Math.max(X_DIMENSION, Y_DIMENSION)) {
+                throw new IIOException(Errors.format(
+                        ErrorKeys.NOT_TWO_DIMENSIONAL_$1, new Integer(rank)));
+            }
+            variableIndex = imageIndex;
+            variable = candidate;
         }
     }
 
@@ -353,19 +374,20 @@ public class DefaultReader extends FileImageReader {
          * Gets the destination image of appropriate size. We create it now
          * since it is a convenient way to get the number of destination bands.
          */
-        final int            width  = variable.getDimension(xDimension).getLength();
-        final int            height = variable.getDimension(yDimension).getLength();
+        final int            rank   = variable.getRank();
+        final int            width  = variable.getDimension(rank - X_DIMENSION).getLength();
+        final int            height = variable.getDimension(rank - Y_DIMENSION).getLength();
         final BufferedImage  image  = getDestination(param, getImageTypes(imageIndex), width, height);
         final WritableRaster raster = image.getRaster();
         /*
          * Checks the band setting. If the NetCDF file is at least 3D, the
          * data along the 'z' dimension are considered as different bands.
          */
-        final boolean hasZ    = (zDimension >= 0);
-        final int numSrcBands = hasZ ? variable.getDimension(zDimension).getLength() : 1;
+        final boolean hasZ    = (rank >= Z_DIMENSION);
+        final int numSrcBands = hasZ ? variable.getDimension(rank - Z_DIMENSION).getLength() : 1;
         final int numDstBands = raster.getNumBands();
         if (param != null) {
-            // Do not test for 'param == null' since our default 'srcBands'
+            // Do not test when 'param == null' since our default 'srcBands'
             // value is not the same than the one documented in Image I/O.
             checkReadParamBandSettings(param, numSrcBands, numDstBands);
         }
@@ -376,21 +398,28 @@ public class DefaultReader extends FileImageReader {
         final Rectangle  srcRegion = new Rectangle();
         final Rectangle destRegion = new Rectangle();
         computeRegions(param, width, height, image, srcRegion, destRegion);
-        final Range[] ranges = new Range[variable.getRank()];
+        final Range[] ranges = new Range[rank];
         for (int i=0; i<ranges.length; i++) {
             final int first, length, stride;
-            if (i == xDimension) {
-                first  = srcRegion.x;
-                length = srcRegion.width;
-                stride = strideX;
-            } else if (i == yDimension) {
-                first  = srcRegion.y;
-                length = srcRegion.height;
-                stride = strideY;
-            } else {
-                first  = 0;
-                length = 1;
-                stride = 1;
+            switch (rank - i) {
+                case X_DIMENSION: {
+                    first  = srcRegion.x;
+                    length = srcRegion.width;
+                    stride = strideX;
+                    break;
+                }
+                case Y_DIMENSION: {
+                    first  = srcRegion.y;
+                    length = srcRegion.height;
+                    stride = strideY;
+                    break;
+                }
+                default: {
+                    first  = 0;
+                    length = 1;
+                    stride = 1;
+                    break;
+                }
             }
             try {
                 ranges[i] = new Range(first, first+length-1, stride);
@@ -410,22 +439,13 @@ public class DefaultReader extends FileImageReader {
         final int xmax = destRegion.width  + xmin;
         final int ymax = destRegion.height + ymin;
         for (int zi=0; zi<numDstBands; zi++) {
-            /*
-             * Checks for abort request before the call to variable.read(...). We don't perform
-             * this check in a deeper loop because the costly part is the call to 'read', which
-             * can't process the abort request. The loop that copy the pixels is fast, so there
-             * is few reasons to check for abort request there.
-             */
-            if (abortRequested()) {
-                processReadAborted();
-                return image;
-            }
             final int srcBand = (srcBands == null) ? zi : srcBands[zi];
             final int dstBand = (dstBands == null) ? zi : dstBands[zi];
             final Array array;
             try {
                 if (hasZ) {
-                    ranges[zDimension] = new Range(srcBand, srcBand, 1);
+                    ranges[rank - Z_DIMENSION] = new Range(srcBand, srcBand, 1);
+                    // No need to update 'sections' since it wraps directly the 'ranges' array.
                 }
                 array = variable.read(sections);
             } catch (InvalidRangeException e) {
@@ -451,11 +471,24 @@ public class DefaultReader extends FileImageReader {
                 }
             }
             /*
+             * Checks for abort requests after reading. It would be a waste of a potentially
+             * good image (maybe the abort request occured after we just finished the reading)
+             * if we didn't implemented the 'isCancel()' method. But because of the later, which
+             * is checked by the NetCDF library, we can't assume that the image is complete.
+             */
+            if (abortRequested()) {
+                processReadAborted();
+                return image;
+            }
+            /*
              * Reports progress here, not in the deeper loop, because the costly part is the
              * call to 'variable.read(...)' which can't report progress.  The loop that copy
              * pixel values is fast, so reporting progress there would be pointless.
              */
             processImageProgress(zi * toPercent);
+        }
+        if (lastError != null) {
+            throw new IIOException(lastError);
         }
         processImageComplete();
         return image;
@@ -465,16 +498,32 @@ public class DefaultReader extends FileImageReader {
      * Wraps a generic exception into a {@link IIOException}.
      */
     private IIOException netcdfFailure(final Exception e) throws IOException {
-        return new IIOException(Errors.format(ErrorKeys.CANT_READ_$1, getInputFile()), e);
+        return new IIOException(Errors.format(ErrorKeys.CANT_READ_$1, file.getLocation()), e);
     }
 
+    /**
+     * Invoked by the NetCDF library during read operation in order to check if the task has
+     * been canceled.
+     */
+    public boolean isCancel() {
+        return abortRequested();
+    }
+
+    /**
+     * Invoked by the NetCDF library when an error occured during the read operation.
+     */
+    public void setError(final String message) {
+        lastError = message;
+    }
+    
     /**
      * Closes the NetCDF file.
      */
     //@Override
     protected void close() throws IOException {
-        ranges = null;
-        variable = null;
+        lastError = null;
+        ranges    = null;
+        variable  = null;
         if (file != null) {
             file.close();
             file = null;

@@ -20,8 +20,11 @@ package org.geotools.resources;
 import java.lang.reflect.Constructor;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreeModel;
+import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultMutableTreeNode;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 
 /**
@@ -95,6 +98,32 @@ public final class OptionalDependencies {
     }
 
     /**
+     * Creates a Swing root tree node from a XML root tree node. Together with
+     * {@link #toString(TreeNode)}, this method provides a convenient way to print
+     * the content of a XML document for debugging purpose.
+     * <p>
+     * This method should not be defined here, since this class is about optional dependencies.
+     * It should be defined in {@link org.geotools.gui.swing.tree.Trees} instead. However we put
+     * it here (for now) because it is used in some module that don't want to depend on widgets.
+     */
+    public static MutableTreeNode xmlToSwing(final Node node) {
+        final DefaultMutableTreeNode root = createTreeNode(node.getNodeName(), node, true);
+        for (Node child=node.getFirstChild(); child!=null; child=child.getNextSibling()) {
+            root.add(xmlToSwing(child));
+        }
+        final NamedNodeMap attributes = node.getAttributes();
+        final int length = attributes.getLength();
+        for (int i=0; i<length; i++) {
+            final Node attribute = attributes.item(i);
+            if (attribute != null) {
+                String label = attribute.getNodeName() + "=\"" + attribute.getNodeValue() + '"';
+                root.add(createTreeNode(label, attribute, false));
+            }
+        }
+        return root;
+    }
+
+    /**
      * Construit une chaîne de caractères qui contiendra le
      * noeud spécifié ainsi que tous les noeuds enfants.
      *
@@ -153,6 +182,10 @@ public final class OptionalDependencies {
      * Returns a graphical representation of the specified tree model. This representation can
      * be printed to the {@linkplain System#out standard output stream} (for example) if it uses
      * a monospaced font and supports unicode.
+     * <p>
+     * This method should not be defined here, since this class is about optional dependencies.
+     * It should be defined in {@link org.geotools.gui.swing.tree.Trees} instead. However we put
+     * it here (for now) because it is used in some module that don't want to depend on widgets.
      *
      * @param  tree The tree to format.
      * @return A string representation of the tree, or {@code null} if it doesn't contain any node.
@@ -165,6 +198,10 @@ public final class OptionalDependencies {
      * Returns a graphical representation of the specified tree. This representation can be
      * printed to the {@linkplain System#out standard output stream} (for example) if it uses
      * a monospaced font and supports unicode.
+     * <p>
+     * This method should not be defined here, since this class is about optional dependencies.
+     * It should be defined in {@link org.geotools.gui.swing.tree.Trees} instead. However we put
+     * it here (for now) because it is used in some module that don't want to depend on widgets.
      *
      * @param  node The root node of the tree to format.
      * @return A string representation of the tree, or {@code null} if it doesn't contain any node.
