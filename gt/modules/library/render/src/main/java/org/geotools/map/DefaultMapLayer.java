@@ -441,7 +441,7 @@ public class DefaultMapLayer implements MapLayer {
 	 * @param event
 	 *            The event to be fired
 	 */
-	private void fireMapLayerListenerLayerChanged(
+	protected void fireMapLayerListenerLayerChanged(
 			org.geotools.map.event.MapLayerEvent event) {
 		if (listenerList == null) {
 			return;
@@ -463,7 +463,7 @@ public class DefaultMapLayer implements MapLayer {
 	 * @param event
 	 *            The event to be fired
 	 */
-	private void fireMapLayerListenerLayerShown(
+    protected void fireMapLayerListenerLayerShown(
 			org.geotools.map.event.MapLayerEvent event) {
 		if (listenerList == null) {
 			return;
@@ -485,7 +485,7 @@ public class DefaultMapLayer implements MapLayer {
 	 * @param event
 	 *            The event to be fired
 	 */
-	private void fireMapLayerListenerLayerHidden(
+    protected void fireMapLayerListenerLayerHidden(
 			org.geotools.map.event.MapLayerEvent event) {
 		if (listenerList == null) {
 			return;
