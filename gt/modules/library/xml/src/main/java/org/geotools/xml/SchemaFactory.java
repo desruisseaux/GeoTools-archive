@@ -342,7 +342,7 @@ public class SchemaFactory {
                 schema=merge(schema, (Schema) schemas.get(targetNamespace));
             }
             
-            schemas.put(targetNamespace, contentHandler.getSchema());
+            schemas.put(targetNamespace, schema);
 
         } else {
             Schema sh = (Schema) schemas.get(targetNamespace);
