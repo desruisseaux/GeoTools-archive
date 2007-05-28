@@ -335,12 +335,13 @@ public class Filters {
      * </code></pre>
      * </p>
      *
-     * @param expr
-     * @param TYPE DOCUMENT ME!
+     * @param expr This only really works for downcasting literals to a value
+     * @param Target type
      *
-     * @return First available color, or null.
+     * @return expr smunched into indicated type
      */
     public static Object asType(Expression expr, Class TYPE) {
+        // TODO use the new converters stuff
         if (expr == null) {
             return null;
         }
@@ -355,6 +356,8 @@ public class Filters {
         else if (expr instanceof Function) {
         		Function function = (Function) expr;
         		List params = function.getParameters();
+            // JG - fix me this looks really wrong?
+            // taking the first parameter that matches?
             if ( params != null && params.size() != 0 ) {
                 for (int i = 0; i < params.size(); i++) {
                     Expression e = (Expression) params.get(i);
@@ -368,7 +371,7 @@ public class Filters {
         }
         else {
             try { // this is a bad idea, not expected to work much
-                Object value = expr.evaluate(null);
+                Object value = expr.evaluate(null, TYPE );
 
                 if (TYPE.isInstance(value)) {
                     return value;

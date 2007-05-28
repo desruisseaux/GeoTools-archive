@@ -28,6 +28,7 @@ import org.geotools.event.GTRoot;
 import org.geotools.feature.FeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Literal;
 import org.geotools.filter.Filters;
 
 
@@ -201,16 +202,25 @@ public class SLD {
 
         return opacity(stroke);
     }
-
     public static double opacity(Stroke stroke) {
         if (stroke == null) {
             return Double.NaN;
         }
+        return opacity( stroke.getOpacity() );
+    }
+    public static double opacity(RasterSymbolizer rasterSymbolizer ){
+        if( rasterSymbolizer == null ){
+            return 1.0;
+        }
+        return opacity( rasterSymbolizer.getOpacity() );
+    }
 
-        Expression opacityExp = stroke.getOpacity();
-        double opacity = Double.parseDouble(opacityExp.toString());
-
-        return opacity;
+    private static double opacity( Expression opacity ) {
+        if( opacity == null ){
+            return 1.0;
+        }
+        Double numeric = (Double) opacity.evaluate( null, Double.class);        
+        return numeric.doubleValue();
     }
 
     /**

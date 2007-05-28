@@ -59,6 +59,7 @@ import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.image.CoverageUtilities;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.styling.RasterSymbolizer;
+import org.geotools.styling.SLD;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.filter.expression.Literal;
 import org.opengis.parameter.ParameterValueGroup;
@@ -805,11 +806,10 @@ public final class GridCoverageRenderer {
 		// //
 		// Opacity
 		// //
-		float opacity = ((Double) ((Literal) symbolizer.getOpacity())
-				.getValue()).floatValue();
-
+        double opacity = SLD.opacity( symbolizer );        
+        
 		graphics.setComposite( AlphaComposite.getInstance( AlphaComposite.DST_IN ) );
-		Color c = new Color(0.0f, 0.0f, 0.0f, opacity);
+		Color c = new Color(0.0f, 0.0f, 0.0f, (float) opacity);
 		graphics.setColor(c);
 		graphics.fillRect(0, 0, this.destinationSize.width, this.destinationSize.height);
 		
