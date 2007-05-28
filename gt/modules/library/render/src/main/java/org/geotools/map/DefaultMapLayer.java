@@ -17,6 +17,7 @@
  */
 package org.geotools.map;
 
+import java.io.IOException;
 import java.util.Collection;
 
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
@@ -32,10 +33,13 @@ import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.event.MapLayerEvent;
 import org.geotools.resources.image.CoverageUtilities;
 import org.geotools.styling.Style;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
 /**
@@ -45,7 +49,9 @@ import org.opengis.referencing.operation.TransformException;
  * @source $URL$
  */
 public class DefaultMapLayer implements MapLayer {
-    /** Holds value of property Source? */
+    
+
+	/** Holds value of property Source? */
     private Source source = null;
 
 	/** Holds value of property FeatureSource. */
@@ -90,7 +96,7 @@ public class DefaultMapLayer implements MapLayer {
 	public DefaultMapLayer(FeatureSource featureSource, Style style,
 			String title) {
 		if ((featureSource == null) || (style == null) || (title == null)) {
-			throw new NullPointerException();
+			//throw new NullPointerException();
 		}
 
 		// enable data source listening
@@ -395,7 +401,23 @@ public class DefaultMapLayer implements MapLayer {
 		fireMapLayerListenerLayerChanged(new MapLayerEvent(this,
 				MapLayerEvent.FILTER_CHANGED));
 	}
-
+	public ReferencedEnvelope getBounds() {
+		
+		CoordinateReferenceSystem sourceCrs = featureSource.getSchema().getDefaultGeometry()
+				.getCoordinateSystem();
+		ReferencedEnvelope env;
+		try {
+			env = new ReferencedEnvelope(featureSource.getBounds(), sourceCrs);
+			return env;
+		} catch (MismatchedDimensionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
 	// ------------------------------------------------------------------------
 	// EVENT HANDLING CODE
 	// ------------------------------------------------------------------------

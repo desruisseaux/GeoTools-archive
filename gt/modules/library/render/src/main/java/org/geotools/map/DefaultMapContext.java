@@ -551,11 +551,13 @@ public class DefaultMapContext implements MapContext {
 		CoordinateReferenceSystem sourceCrs;
 		for (int i = 0; i < length; i++) {
 			layer = (MapLayer) layerList.get(i);
-			fs = layer.getFeatureSource();
+			/*fs = layer.getFeatureSource();
 			sourceCrs = fs.getSchema().getDefaultGeometry()
 					.getCoordinateSystem();
-			env = new ReferencedEnvelope(fs.getBounds(), sourceCrs);
-
+			env = new ReferencedEnvelope(fs.getBounds(), sourceCrs);*/
+			
+			env = layer.getBounds();
+			sourceCrs = env.getCoordinateReferenceSystem();
 			if (env == null) {
 				continue;
 			} else {

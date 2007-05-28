@@ -18,6 +18,7 @@ package org.geotools.map;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.Source;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.event.MapLayerListener;
 import org.geotools.styling.Style;
 
@@ -127,7 +128,11 @@ public interface MapLayer {
      * @param query
      */
     void setQuery(Query query);
-
+    /**
+     * find out the bounds of the layer
+     * @return - the layer's bounds
+     */
+    ReferencedEnvelope getBounds();
     /**
      * Add a listener to notify when a layer property changes. Changes include
      * layer visibility and the title text.
