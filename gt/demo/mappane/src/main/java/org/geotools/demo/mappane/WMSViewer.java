@@ -17,28 +17,11 @@ package org.geotools.demo.mappane;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Image;
 import java.awt.RenderingHints;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
 
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
-import javax.imageio.stream.ImageInputStreamImpl;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -48,44 +31,27 @@ import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
 import javax.swing.WindowConstants;
 
-import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.grid.GridCoverageFactory;
-import org.geotools.data.FeatureSource;
-import org.geotools.data.ows.CRSEnvelope;
 import org.geotools.data.ows.Layer;
-import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.wms.WebMapServer;
-import org.geotools.data.wms.request.GetMapRequest;
-import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.PanAction;
 import org.geotools.gui.swing.ResetAction;
-import org.geotools.gui.swing.SelectAction;
 import org.geotools.gui.swing.ZoomInAction;
 import org.geotools.gui.swing.ZoomOutAction;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
-import org.geotools.map.MapLayer;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.lite.StreamingRenderer;
-import org.geotools.styling.FeatureTypeStyle;
-import org.geotools.styling.RasterSymbolizer;
-import org.geotools.styling.Rule;
-import org.geotools.styling.SLDParser;
-import org.geotools.styling.Style;
-import org.geotools.styling.StyleFactory;
-import org.geotools.styling.Symbolizer;
-import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import com.sun.media.imageioimpl.plugins.jpeg2000.ImageInputStreamWrapper;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
- * Sample application that may be used to try JMapPane from the command line.
+ * Sample application that may be used to try JMapPane 
+ * to view WMS Layers
  * 
  * @author Ian Turton
  */
@@ -220,6 +186,8 @@ public class WMSViewer implements ActionListener {
 
 	public void actionPerformed(ActionEvent e) {
 		WMSChooser wmc = new WMSChooser(frame, "Select WMS", true);
+		//wmc.setServer("http://www.geovista.psu.edu/geoserver/wms");
+		wmc.setVisible(true);
 		int returnVal = wmc.getLayer();
 		if (returnVal == -1) {
 			return;

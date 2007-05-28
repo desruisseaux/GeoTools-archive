@@ -47,7 +47,7 @@ public class WMSMapLayer extends DefaultMapLayer implements MapLayer,
 
 	GridCoverage2D grid;
 
-	private ReferencedEnvelope bbox;
+	private ReferencedEnvelope bbox,bounds;
 
 	private int width = 400;
 
@@ -120,6 +120,7 @@ public class WMSMapLayer extends DefaultMapLayer implements MapLayer,
 
 			}
 			bbox = new ReferencedEnvelope(bb);
+			bounds= bbox;
 		}
 		// fix the bounds for the shape of the window.
 
@@ -145,9 +146,10 @@ public class WMSMapLayer extends DefaultMapLayer implements MapLayer,
 				 */
 				grid = gcf.create(layer.getTitle(), image, bbox);
 				System.out.println("fetched new grid");
-				if (featureSource == null)
+				//if (featureSource == null)
 					featureSource = DataUtilities.source(FeatureUtilities
 							.wrapGridCoverage(grid));
+					
 
 				fireMapLayerListenerLayerChanged(new MapLayerEvent(this,
 						MapLayerEvent.DATA_CHANGED));
@@ -263,6 +265,11 @@ public class WMSMapLayer extends DefaultMapLayer implements MapLayer,
 	 */
 	public void setExceptions(String exceptions) {
 		this.exceptions = exceptions;
+	}
+
+	public ReferencedEnvelope getBounds() {
+		System.out.println("got bounds");
+		return bounds;
 	}
 
 }

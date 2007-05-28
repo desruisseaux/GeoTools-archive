@@ -33,6 +33,8 @@ import org.geotools.data.wms.WebMapServer;
 import org.geotools.ows.ServiceException;
 
 public class WMSChooser extends JDialog implements ActionListener{
+	private  String server = "http://localhost:8080/geoserver/wms";
+	private String request = "?REQUEST=GetCapabilities";
 	URL url; 
 	WebMapServer wms;
 	WMSCapabilities caps;
@@ -72,18 +74,12 @@ public class WMSChooser extends JDialog implements ActionListener{
 	private void init() {
 		try {
 			this.setSize(400,200);
-			url = new URL("http://localhost:8080/geoserver/wms?REQUEST=GetCapabilities");
+			url = new URL(server+request);
 			wms = new WebMapServer(url);
 
-			caps = wms.getCapabilities();
 			
-			for( Iterator i = caps.getLayerList().iterator(); i.hasNext();){
-				Layer layer = (Layer) i.next();
-				layerNames.add(layer.getTitle());
-				layers.add(layer);
-				
-				
-			}
+			
+			setupLayersList();
 //			Create and initialize the buttons.
 	        JButton cancelButton = new JButton("Cancel");
 	        cancelButton.addActionListener(this);
@@ -128,7 +124,7 @@ public class WMSChooser extends JDialog implements ActionListener{
 	        contentPane.add(listPane, BorderLayout.CENTER);
 	        contentPane.add(buttonPane, BorderLayout.PAGE_END);
 
-			this.setVisible(true);
+			
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -140,6 +136,19 @@ public class WMSChooser extends JDialog implements ActionListener{
 			e.printStackTrace();
 		}
 		
+	}
+
+	private void setupLayersList() {
+		caps = wms.getCapabilities();
+		layers.clear();
+		layerNames.clear();
+		for( Iterator i = caps.getLayerList().iterator(); i.hasNext();){
+			Layer layer = (Layer) i.next();
+			layerNames.add(layer.getTitle());
+			layers.add(layer);
+			
+			
+		}
 	}
 
 	public int getLayer() {
@@ -164,5 +173,32 @@ public class WMSChooser extends JDialog implements ActionListener{
 
 	public void setWms(WebMapServer wms) {
 		this.wms = wms;
+		setupLayersList();
+	}
+
+	public String getServer() {
+		return server;
+	}
+
+	public void setServer(String server) {
+		this.server = server;
+		System.out.println("setting server to "+server);
+		try {
+			url = new URL(server+request);
+			System.out.println("url "+url.toString());
+			wms = new WebMapServer(url);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ServiceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		setupLayersList();
+		
 	}
 }
