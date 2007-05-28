@@ -18,6 +18,7 @@ package org.geotools.demo.mappane;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -65,13 +66,18 @@ import org.geotools.gui.swing.ZoomInAction;
 import org.geotools.gui.swing.ZoomOutAction;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
+import org.geotools.map.MapLayer;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.lite.StreamingRenderer;
+import org.geotools.styling.FeatureTypeStyle;
+import org.geotools.styling.RasterSymbolizer;
+import org.geotools.styling.Rule;
 import org.geotools.styling.SLDParser;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
+import org.geotools.styling.Symbolizer;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -92,6 +98,10 @@ public class WMSViewer implements ActionListener {
 
 	JLabel text;
 
+	GTRenderer renderer;
+
+	MapContext context;
+
 	final JFileChooser jfc = new JFileChooser();
 
 	public WMSViewer() {
@@ -110,7 +120,7 @@ public class WMSViewer implements ActionListener {
 		Action zoomIn = new ZoomInAction(mp);
 		Action zoomOut = new ZoomOutAction(mp);
 		Action pan = new PanAction(mp);
-		Action select = new SelectAction(mp);
+		// Action select = new SelectAction(mp);
 		Action reset = new ResetAction(mp);
 		jtb.add(zoomIn);
 		jtb.add(zoomOut);
@@ -118,7 +128,7 @@ public class WMSViewer implements ActionListener {
 		jtb.addSeparator();
 		jtb.add(reset);
 		jtb.addSeparator();
-		jtb.add(select);
+		// jtb.add(select);
 		final JButton button = new JButton();
 		button.setText("CRS");
 		button.setToolTipText("Change map prjection");
@@ -166,56 +176,46 @@ public class WMSViewer implements ActionListener {
 		mp.repaint();
 	}
 
-	public void load(GridCoverage2D grid) throws Exception {
+	public void load(WMSMapLayer layer) throws Exception {
 
-		Envelope2D env = grid.getEnvelope2D();
+		Envelope2D env = layer.getGrid().getEnvelope2D();
 		Envelope en = new Envelope(env.x, env.y, env.width, env.height);
 		mp.setMapArea(en);
-		StyleFactory factory = CommonFactoryFinder.getStyleFactory(null);
 
-		// SLDParser stylereader = new SLDParser(factory,sld);
-		// org.geotools.styling.Style[] style = stylereader.readXML();
-
-		CoordinateReferenceSystem crs = grid.getCoordinateReferenceSystem();
+		CoordinateReferenceSystem crs = layer.getGrid()
+				.getCoordinateReferenceSystem();
 		if (crs == null)
 			crs = DefaultGeographicCRS.WGS84;
-		MapContext context = new DefaultMapContext(crs);
-		context.addLayer(grid, factory.createStyle());
-		context.getLayerBounds();
-		mp.setHighlightLayer(context.getLayer(0));
-
-		GTRenderer renderer;
-		if (false) {
-			renderer = new StreamingRenderer();
-			HashMap hints = new HashMap();
-			hints.put("memoryPreloadingEnabled", Boolean.TRUE);
-			renderer.setRendererHints(hints);
-		} else {
-			renderer = new StreamingRenderer();
-			HashMap hints = new HashMap();
-			hints.put("memoryPreloadingEnabled", Boolean.FALSE);
-			renderer.setRendererHints(hints);
+		if (context == null) {
+			context = new DefaultMapContext(crs);
 		}
-		mp.setRenderer(renderer);
-		mp.setContext(context);
+		//this allows us to listen for resize events and ask for the right size image
+		mp.addComponentListener(layer);
+		context.addLayer(layer);
+		context.addMapBoundsListener(layer);
+		// System.out.println(context.getLayerBounds());
+		// mp.setHighlightLayer(context.getLayer(0));
 
+		if (renderer == null) {
+			if (false) {
+				renderer = new StreamingRenderer();
+				HashMap hints = new HashMap();
+				hints.put("memoryPreloadingEnabled", Boolean.TRUE);
+				renderer.setRendererHints(hints);
+			} else {
+				renderer = new StreamingRenderer();
+				HashMap hints = new HashMap();
+				hints.put("memoryPreloadingEnabled", Boolean.FALSE);
+				renderer.setRendererHints(hints);
+				RenderingHints rhints = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
+				((StreamingRenderer)renderer).setJava2DHints(rhints);
+			}
+			mp.setRenderer(renderer);
+			mp.setContext(context);
+		}
 		// mp.getRenderer().addLayer(new RenderedMapScale());
 		frame.repaint();
 		frame.doLayout();
-	}
-
-	public static URL aquireURL(String target) {
-		if (new File(target).exists()) {
-			try {
-				return new File(target).toURL();
-			} catch (MalformedURLException e) {
-			}
-		}
-		try {
-			return new URL(target);
-		} catch (MalformedURLException e) {
-			return null;
-		}
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -226,67 +226,12 @@ public class WMSViewer implements ActionListener {
 		}
 		WebMapServer wms = wmc.getWms();
 		Layer l = (Layer) wmc.getLayers().get(returnVal);
-		GetMapRequest mapRequest = wms.createGetMapRequest();
-		mapRequest.addLayer(l);
-
-		mapRequest.setDimensions(mp.getWidth(), mp.getHeight());
-		mapRequest.setFormat("image/png");
-		Set srs = l.getSrs();
-		String crs;
-		if (srs.contains("EPSG:4326")) {// really we should get the underlying map pane CRS
-			crs = "EPSG:4326";
-		} else {
-			crs = (String) srs.iterator().next();
-		}
-		System.out.println("crs = " + crs);
-		HashMap bboxes = l.getBoundingBoxes();
-		Set keys = bboxes.keySet();
-		String k="";
-		for(Iterator it = keys.iterator();it.hasNext();k=(String)it.next()) {
-			System.out.println(k+" -> "+bboxes.get(k));
-		}
-		
-		CRSEnvelope bb = (CRSEnvelope) bboxes.get(crs);
-		if (bb == null) {// something bad happened
-			bb= l.getLatLonBoundingBox();
-			bb.setEPSGCode("EPSG:4326"); // for some reason WMS doesn't set this.
-			
-		} 
-		// fix the bounds for the shape of the window.
-		
-		System.out.println(bb.toString());
-		mapRequest.setBBox(bb);
-
-		URL request = mapRequest.getFinalURL();
-		System.out.println(request.toString());
+		WMSMapLayer layer = new WMSMapLayer(wms, l);
 		try {
-			
-			String type = request.openConnection().getContentType();
-			if (type.equalsIgnoreCase("image/png")) {
-				BufferedImage image = ImageIO.read(request.openStream());
-				GridCoverageFactory gcf = new GridCoverageFactory();
-				Envelope2D env = new Envelope2D(bb
-						.getCoordinateReferenceSystem(), bb.getMinX(), bb
-						.getMinY(), bb.getLength(0), bb.getLength(1));
-				GridCoverage2D grid = gcf.create(l.getTitle(), image, env);
-				load(grid);
-			} else {
-				System.out.println("error content type is " + type);
-				if (type.startsWith("text")) {
-					String line = "";
-					BufferedReader br = new BufferedReader(
-							new InputStreamReader(request.openStream()));
-					while ((line = br.readLine()) != null) {
-						System.out.println(line);
-					}
-				}
-			}
-		} catch (IOException e1) {
+			load(layer);
+		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		} catch (Exception ex) {
-			// TODO Auto-generated catch block
-			ex.printStackTrace();
 		}
 	}
 
