@@ -993,7 +993,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
             if (i == tupleToSkip) {
                 // Avoid to test the same table twice.  Note that this test also avoid a
                 // NullPointerException if 'stmt' is null, since 'lastObjectType' should
-                // be -2 in this case.
+                // be -1 in this case.
                 continue;
             }
             try {
@@ -1022,7 +1022,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
                     }
                 }
                 /*
-                 * Checks if at least one record if found for the code. If the code is the primary
+                 * Checks if at least one record is found for the code. If the code is the primary
                  * key, then we will stop at the first table found since a well-formed EPSG database
                  * should not contains any duplicate identifiers. In the code is a name, then search
                  * in all tables since duplicate names exist.
@@ -1037,12 +1037,15 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
                     }
                     index = (i < 0) ? lastObjectType : i;
                     if (isPrimaryKey) {
-                        lastObjectType = index;
+                        // Don't scan other tables, since primary keys should be unique.
+                        // Note that names may be duplicated, so we don't stop for names.
                         break;
                     }
                 }
                 if (isPrimaryKey) {
-                    statements.remove(KEY);
+                    if (statements.remove(KEY) == null) {
+                        throw new AssertionError(code); // Should never happen.
+                    }
                 }
                 stmt.close();
             } catch (SQLException exception) {
@@ -1052,6 +1055,9 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
         /*
          * If a record has been found in one table, then delegates to the appropriate method.
          */
+        if (isPrimaryKey) {
+            lastObjectType = index;
+        }
         if (index >= 0) {
             switch (index) {
                 case 0:  return buffered.createCoordinateReferenceSystem(code);

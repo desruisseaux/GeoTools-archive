@@ -18,6 +18,10 @@ package org.geotools.gui.swing.referencing;
 
 // J2SE dependencies
 import java.util.Locale;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Collection;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Component;
@@ -38,6 +42,7 @@ import javax.swing.JTextField;
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
@@ -46,7 +51,9 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.SwingUtilities;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.ReferencingFactoryFinder;
+import org.geotools.referencing.factory.FallbackAuthorityFactory;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.gui.swing.IconFactory;
 
@@ -119,7 +126,39 @@ public class AuthorityCodesComboBox extends JComponent {
      * @throws FactoryException if the factory can't provide CRS codes.
      */
     public AuthorityCodesComboBox() throws FactoryRegistryException, FactoryException {
-        this(ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG", null));
+        this("EPSG");
+    }
+
+    /**
+     * Creates a CRS chooser backed by the specified authority factory.
+     *
+     * @param  authority The authority identifier (e.g. {@code "EPSG"}).
+     * @throws FactoryRegistryException if no authority factory has been found.
+     * @throws FactoryException if the factory can't provide CRS codes.
+     *
+     * @since 2.4
+     */
+    public AuthorityCodesComboBox(final String authority)
+            throws FactoryRegistryException, FactoryException
+    {
+        // TODO: remove the cast when we will be allowed to compile for J2SE 1.5.
+        this((CRSAuthorityFactory)
+                FallbackAuthorityFactory.create(CRSAuthorityFactory.class,
+                filter(ReferencingFactoryFinder.getCRSAuthorityFactories(null), authority)));
+    }
+
+    /**
+     * Returns a collection containing only the factories of the specified authority.
+     */
+    private static Collection filter(final Collection factories, final String authority) {
+        final List filtered = new ArrayList();
+        for (final Iterator it=factories.iterator(); it.hasNext();) {
+            final AuthorityFactory factory = (AuthorityFactory) it.next();
+            if (Citations.identifierMatches(factory.getAuthority(), authority)) {
+                filtered.add(factory);
+            }
+        }
+        return filtered;
     }
 
     /**
