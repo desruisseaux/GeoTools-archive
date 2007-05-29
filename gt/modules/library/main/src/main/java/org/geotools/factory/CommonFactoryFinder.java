@@ -154,14 +154,32 @@ public final class CommonFactoryFinder {
      * Returns a set of all available implementations for the {@link FunctionExpression} interface.
      * 
      * @param  hints An optional map of hints, or {@code null} if none.
-     * @return Set<FunctonImpl> of available style factory implementations.
+     * @return Set of available function expression implementations.
      */
     public static synchronized Set getFunctions(Hints hints) {
         hints = addDefaultHints(hints);
         return new LazySet(getServiceRegistry().getServiceProviders(
                 FunctionImpl.class, null, hints));
     }    
-    
+
+    /**
+     * Returns the first implementation of {@link FeatureLockFactory} matching the specified hints.
+     * If no implementation matches, a new one is created if possible or an exception is thrown
+     * otherwise.
+     *
+     * @param  hints An optional map of hints, or {@code null} if none.
+     * @return The first feature lock factory that matches the supplied hints.
+     * @throws FactoryRegistryException if no implementation was found or can be created for the
+     *         {@link FeatureLockFactory} interface.
+     *
+     * @see Hints#FEATURE_LOCK_FACTORY
+     */
+    public static synchronized FeatureLockFactory getFeatureLockFactory(Hints hints) {
+        hints = addDefaultHints(hints);
+        return (FeatureLockFactory) getServiceRegistry().getServiceProvider(
+                FeatureLockFactory.class, null, hints, Hints.FEATURE_LOCK_FACTORY);
+    }
+
     /**
      * Returns a set of all available implementations for the {@link FeatureLockFactory} interface.
      * 
@@ -173,18 +191,12 @@ public final class CommonFactoryFinder {
         return new LazySet(getServiceRegistry().getServiceProviders(
                 FeatureLockFactory.class, null, hints));
     }
-    
-    public static synchronized FeatureLockFactory getFeatureLockFactory(Hints hints) {
-        hints = addDefaultHints(hints);
-        return (FeatureLockFactory) getServiceRegistry().getServiceProvider(
-                FeatureLockFactory.class, null, hints, Hints.FEATURE_LOCK_FACTORY);
-    }
-    
+
     /**
      * Returns a set of all available implementations for the {@link FileDataStoreFactorySpi} interface.
      * 
      * @param  hints An optional map of hints, or {@code null} if none.
-     * @return Set<FileDataStoreFactorySpi> of available style factory implementations.
+     * @return Set of available file data store factory implementations.
      */
     public static synchronized Set getFileDataStoreFactories(Hints hints) {
         hints = addDefaultHints(hints);
@@ -193,38 +205,51 @@ public final class CommonFactoryFinder {
     }
 
     /**
+     * Returns the first implementation of {@link AttributeTypeFactory} matching the specified hints.
+     * If no implementation matches, a new one is created if possible or an exception is thrown
+     * otherwise.
+     * <p>
+     * If no hints are provided, this method typically returns an instance of
+     * {@link org.geotools.feature.DefaultAttributeTypeFactory}.
+     *
+     * @param  hints An optional map of hints, or {@code null} if none.
+     * @return The first attribute type factory that matches the supplied hints.
+     * @throws FactoryRegistryException if no implementation was found or can be created for the
+     *         {@link AttributeTypeFactory} interface.
+     *
+     * @see Hints#ATTRIBUTE_TYPE_FACTORY
+     * @see org.geotools.feature.DefaultAttributeTypeFactory
+     */
+    public static synchronized AttributeTypeFactory getAttributeTypeFactory(Hints hints) {
+        hints = addDefaultHints(hints);
+        return (AttributeTypeFactory) getServiceRegistry().getServiceProvider(
+                AttributeTypeFactory.class, null, hints, Hints.ATTRIBUTE_TYPE_FACTORY);
+    }
+
+    /**
      * Returns a set of all available implementations for the {@link AttributeTypeFactory} interface.
      *
      * @param  hints An optional map of hints, or {@code null} if none.
-     * @return Set<AttributeTypeFactory> of available factory implementations.
+     * @return Set of available attribute type factory implementations.
      */
     public static synchronized Set getAttributeTypeFactories(Hints hints) {
         hints = addDefaultHints(hints);
         return new LazySet(getServiceRegistry().getServiceProviders(
                 AttributeTypeFactory.class, null, hints));
     }
+
     /**
-     * The default AttributeTypeFactory.
-     * <p>
-     * Initially set to DefaultAttributeTypeFactory.
-     */
-    public static synchronized AttributeTypeFactory getAttributeTypeFactory(Hints hints) {
-        hints = addDefaultHints(hints);
-        return (AttributeTypeFactory) getServiceRegistry().getServiceProvider(
-                AttributeTypeFactory.class, null, hints, Hints.ATTRIBUTE_TYPE_FACTORY );
-    }
-    
-    /**
-     * Returns a set of all available implementations for the {@link AttributeTypeFactory} interface.
+     * Returns a set of all available implementations for the {@link FeatureTypeFactory} interface.
      *
      * @param  hints An optional map of hints, or {@code null} if none.
-     * @return Set<AttributeTypeFactory> of available factory implementations.
+     * @return Set of available feature type factory implementations.
      */
     public static synchronized Set getAttributeFeatureFactories(Hints hints) {
         hints = addDefaultHints(hints);
         return new LazySet(getServiceRegistry().getServiceProviders(
                 FeatureTypeFactory.class, null, hints));
     }
+
     /**
      * The default AttributeTypeFactory.
      * <p>
@@ -240,38 +265,43 @@ public final class CommonFactoryFinder {
     public static synchronized FeatureTypeFactory getFeatureTypeFactory(Hints hints) {
         hints = addDefaultHints(hints);
         FeatureTypeFactory factory = new DefaultFeatureTypeFactory();        
-        factory.setName( (String) hints.get( Hints.FEATURE_TYPE_FACTORY_NAME));
+        factory.setName((String) hints.get(Hints.FEATURE_TYPE_FACTORY_NAME));
         return factory;
-        
+
         //return (FeatureTypeFactory) getServiceRegistry().getServiceProvider(
         //        FeatureTypeFactory.class, null, hints, Hints.FEATURE_TYPE_FACTORY );
     }
-    
+
+    /**
+     * Returns the first implementation of {@link FeatureCollections} matching the specified hints.
+     * If no implementation matches, a new one is created if possible or an exception is thrown
+     * otherwise.
+     *
+     * @param  hints An optional map of hints, or {@code null} if none.
+     * @return The first feature collections that matches the supplied hints.
+     * @throws FactoryRegistryException if no implementation was found or can be created for the
+     *         {@link FeatureCollections} interface.
+     *
+     * @see Hints#FEATURE_COLLECTIONS
+     */
+    public static synchronized FeatureCollections getFeatureCollections(Hints hints) {
+        hints = addDefaultHints(hints);
+        return (FeatureCollections) getServiceRegistry().getServiceProvider(
+                FeatureCollections.class, null, hints, Hints.FEATURE_COLLECTIONS);
+    }
+
     /**
      * Returns a set of all available implementations for the {@link FeatureCollections} interface.
      *
      * @param  hints An optional map of hints, or {@code null} if none.
-     * @return Set<FeatureCollections> of available implementations.
+     * @return Set of available feature collections implementations.
      */
     public static synchronized Set getFeatureCollectionsSet(Hints hints) {
         hints = addDefaultHints(hints);
         return new LazySet(getServiceRegistry().getServiceProviders(
                 FeatureCollections.class, null, hints));
     }    
-    /**
-     * The default FeatureCollections instance.
-     * <p>
-     * Access to a utility class to let you work with FeatureCollections.
-     * </p>
-     * @param hints
-     * @return FeatureCollections utility class
-     */
-    public static synchronized FeatureCollections getFeatureCollections(Hints hints) {
-        hints = addDefaultHints(hints);
-        return (FeatureCollections) getServiceRegistry().getServiceProvider(
-                FeatureCollections.class, null, hints, Hints.FEATURE_COLLECTIONS );
-    }
-    
+
     /**
      * Returns the first implementation of {@link FilterFactory} matching the specified hints.
      * If no implementation matches, a new one is created if possible or an exception is thrown
@@ -292,19 +322,6 @@ public final class CommonFactoryFinder {
                 FilterFactory.class, null, hints, Hints.FILTER_FACTORY);
     }
 
-    public static synchronized FilterFactory2 getFilterFactory2(Hints hints)
-            throws FactoryRegistryException
-    {
-        Set all = getFilterFactories(hints);
-        for( Iterator i=all.iterator();i.hasNext();){
-            FilterFactory factory = (FilterFactory) i.next();
-            if( factory instanceof FilterFactory2){
-                return (FilterFactory2) factory;
-            }
-        }
-        throw new FactoryRegistryException("Could not locate an implementation of FilterFactory2");
-    }
-    
     /**
      * Returns a set of all available implementations for the {@link FilterFactory} interface.
      *
@@ -315,6 +332,35 @@ public final class CommonFactoryFinder {
         hints = addDefaultHints(hints);
         return new LazySet(getServiceRegistry().getServiceProviders(
                 FilterFactory.class, null, hints));
+    }
+
+    /**
+     * Returns the first implementation of {@link FilterFactory2} matching the specified hints.
+     * This is a convenience method invoking {@link #getFilterFactory} with a hint value set
+     * for requerying a {@link FactoryFilter2} implementation.
+     *
+     * @param  hints An optional map of hints, or {@code null} if none.
+     * @return The first filter factory that matches the supplied hints.
+     * @throws FactoryRegistryException if no implementation was found or can be created for the
+     *         {@link FilterFactory2} interface.
+     *
+     * @see Hints#FILTER_FACTORY
+     */
+    public static FilterFactory2 getFilterFactory2(Hints hints)
+            throws FactoryRegistryException
+    {
+        final Object h = hints.get(Hints.FILTER_FACTORY);
+        if (!(h instanceof Class ? FilterFactory2.class.isAssignableFrom((Class) h)
+                                 : h instanceof FilterFactory2))
+        {
+            /*
+             * Add the hint value only if the user didn't provided a suitable hint.
+             * In any case, do not change the user-supplied hints; clone them first.
+             */
+            hints = new Hints(hints);
+            hints.put(Hints.FILTER_FACTORY, FilterFactory2.class);
+        }
+        return (FilterFactory2) getFilterFactory(hints);
     }
 
     /**
