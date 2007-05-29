@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -133,8 +134,9 @@ public class WMSMapLayer extends DefaultMapLayer implements MapLayer,
 		InputStream is=null;
 		try {
 
-			String type = request.openConnection().getContentType();
-			is = request.openStream();
+			URLConnection connection = request.openConnection();
+			String type = connection.getContentType();
+			is = connection.getInputStream();
 			if (type.equalsIgnoreCase("image/png")) {
 				BufferedImage image = ImageIO.read(is);
 
@@ -238,7 +240,9 @@ public class WMSMapLayer extends DefaultMapLayer implements MapLayer,
 	}
 
 	public void componentShown(ComponentEvent e) {
-		// TODO Auto-generated method stub
+		Component c = (Component) e.getSource();
+		width = c.getWidth();
+		height = c.getHeight();
 
 	}
 
