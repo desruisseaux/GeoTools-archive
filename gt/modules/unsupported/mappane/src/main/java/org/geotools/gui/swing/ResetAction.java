@@ -43,12 +43,22 @@ public class ResetAction extends AbstractAction {
     }
     public void actionPerformed(ActionEvent e) {
         // TODO Auto-generated method stub
+
+    	if(map==null) {
+    		System.out.println("no map set in reset");
+    		return;
+    	}
+    	if(map.context==null) {
+    		System.out.println("no context set in reset");
+    		return;
+    	}
         try {
 			map.mapArea = map.context.getLayerBounds();
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+
         map.setReset(true);
         map.repaint();
     }
