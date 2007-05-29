@@ -37,6 +37,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -261,7 +262,7 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
         try {
             DatabaseMetaData dbMetaData = conn.getMetaData();
 
-            Map pkMap = new HashMap();
+            Map pkMap = new LinkedHashMap();
             pkInfo = dbMetaData.getPrimaryKeys(catalog, schema, typeName);
             pkMetadataFound = true;
 
