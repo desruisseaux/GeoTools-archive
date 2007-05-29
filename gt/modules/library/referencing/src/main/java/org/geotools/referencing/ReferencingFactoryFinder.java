@@ -425,6 +425,17 @@ loop:       for (int i=0; ; i++) {
      * {@link Hints#FORCE_STANDARD_AXIS_UNITS        FORCE_STANDARD_AXIS_UNITS},
      * {@link Hints#FORCE_STANDARD_AXIS_DIRECTIONS   FORCE_STANDARD_AXIS_DIRECTIONS} and
      * {@link Hints#VERSION                          VERSION}.
+     * <p>
+     * <b>TIP:</b> The EPSG official factory and the EPSG extensions (additional CRS provided by
+     * ESRI and others) are two distinct factories. Call to {@code getCRSAuthorityFactory("EPSG",
+     * null)} returns only one of those, usually the official EPSG factory. If the union of those
+     * two factories is wanted, then a chain of fallbacks is wanted. Consider using something like:
+     *
+     * <blockquote><code>
+     * {@linkplain org.geotools.referencing.factory.FallbackAuthorityFactory#create(Class,
+     * java.util.Collection) FallbackAuthorityFactory.create}(CRSAuthorityFactory.class,
+     * {@linkplain #getCRSAuthorityFactories getCRSAuthorityFactories}(hints));
+     * </code></blockquote>
      *
      * @param  authority The desired authority (e.g. "EPSG").
      * @param  hints An optional map of hints, or {@code null} if none.
