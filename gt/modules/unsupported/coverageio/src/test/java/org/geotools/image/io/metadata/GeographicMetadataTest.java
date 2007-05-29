@@ -84,6 +84,8 @@ public class GeographicMetadataTest extends TestCase {
         final GeographicMetadata metadata = new GeographicMetadata();
         metadata.addAxis("latitude",  "north", "degrees");
         metadata.addAxis("longitude", "east",  "degrees");
+        metadata.setCoordinateSystem("WGS84", "geographic");
+        metadata.setDatum("WGS84");
 
 //      System.out.println(metadata);
         final String text = metadata.toString();

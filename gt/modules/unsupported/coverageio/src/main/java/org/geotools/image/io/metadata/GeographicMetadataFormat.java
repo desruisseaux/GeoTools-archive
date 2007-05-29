@@ -142,8 +142,8 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
         addElement  ("Envelope",          "GridGeometry",      CHILD_POLICY_SEQUENCE);
         addElement  ("CoordinateValues",  "Envelope",          CHILD_POLICY_EMPTY);
         addElement  ("CoordinateRange",   "Envelope",          CHILD_POLICY_EMPTY);
-        addAttribute("CoordinateRange",   "minCoordinate",     DATATYPE_DOUBLE, true, null);
-        addAttribute("CoordinateRange",   "maxCoordinate",     DATATYPE_DOUBLE, true, null);
+        addAttribute("CoordinateRange",   "minimum",           DATATYPE_DOUBLE, true, null);
+        addAttribute("CoordinateRange",   "maximum",           DATATYPE_DOUBLE, true, null);
         addElement  ("AffineTransform",   "GridGeometry",      CHILD_POLICY_EMPTY);
         addAttribute("AffineTransform",   "elements",          DATATYPE_DOUBLE, true,
                 6, maximumDimensions * (maximumDimensions - 1));

@@ -62,6 +62,18 @@ public class GeographicMetadata extends IIOMetadata {
     private IIOMetadataNode datum;
 
     /**
+     * The grid geometry node.
+     * Will be created only when first needed.
+     */
+    private IIOMetadataNode gridGeometry;
+
+    /**
+     * The envelope node.
+     * Will be created only when first needed.
+     */
+    private IIOMetadataNode envelope;
+
+    /**
      * Creates a default metadata instance. This constructor defines no standard or native format.
      * The only format defined is the {@linkplain GeographicMetadataFormat geographic} one.
      */
@@ -170,6 +182,65 @@ public class GeographicMetadata extends IIOMetadata {
     }
 
     /**
+     * Set the grid geometry to the specified value.
+     *
+     * This method is not yet public because there is no parameter yet.
+     */
+    private void setGridGeometry() {
+        if (gridGeometry == null) {
+            gridGeometry = new IIOMetadataNode("GridGeometry");
+            root.appendChild(gridGeometry);
+        }
+    }
+
+    /**
+     * Set the envelope to the specified value.
+     *
+     * This method is not yet public because there is no parameter yet.
+     */
+    private void setEnvelope() {
+        if (gridGeometry == null) {
+            setGridGeometry(/*null*/);
+        }
+        if (envelope == null) {
+            envelope = new IIOMetadataNode("Envelope");
+            gridGeometry.appendChild(envelope);
+        }
+    }
+
+    /**
+     * Add the range of values for an envelope along a dimension. The ranges
+     * should be added in the same order than {@linkplain #addAxis axis}.
+     *
+     * @param values The coordinate values.
+     */
+    public void addCoordinateRange(final double minimum, final double maximum) {
+        if (envelope == null) {
+            setEnvelope();
+        }
+        final IIOMetadataNode range = new IIOMetadataNode("CoordinateRange");
+        setAttribute(range, "minimum", Double.toString(minimum));
+        setAttribute(range, "maximum", Double.toString(maximum));
+        envelope.appendChild(range);
+    }
+
+    /**
+     * Add coordinate values for an envelope along a dimension. This method may be invoked
+     * in replacement of {@link #addCoordinateRange} when every cell coordinates need to be
+     * specified explicitly.
+     *
+     * @param values The coordinate values.
+     */
+    public void addCoordinateValues(final double[] values) {
+        if (envelope == null) {
+            setEnvelope();
+        }
+        final IIOMetadataNode cv = new IIOMetadataNode("CoordinateValues");
+        cv.setUserObject(values);
+        envelope.appendChild(cv);
+    }
+
+    /**
      * Checks the format name.
      */
     private void checkFormatName(final String formatName) throws IllegalArgumentException {
@@ -209,10 +280,12 @@ public class GeographicMetadata extends IIOMetadata {
      * Resets all the data stored in this object to default values.
      */
     public void reset() {
-        root  = new IIOMetadataNode(GeographicMetadataFormat.FORMAT_NAME);
-        crs   = null;
-        cs    = null;
-        datum = null;
+        root         = new IIOMetadataNode(GeographicMetadataFormat.FORMAT_NAME);
+        crs          = null;
+        cs           = null;
+        datum        = null;
+        gridGeometry = null;
+        envelope     = null;
     }
 
     /**
