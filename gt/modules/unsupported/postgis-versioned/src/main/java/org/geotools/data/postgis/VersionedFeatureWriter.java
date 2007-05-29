@@ -289,8 +289,7 @@ class VersionedFeatureWriter implements FeatureWriter {
                 // TODO: check this, I'm not sure this is the proper handling
                 String id = null;
                 if (oldFeature != null) {
-                    id = liveFeature.getID().substring(featureType.getTypeName().length() + 1) + "&"
-                            + state.getRevision();
+                    id = mapper.createVersionedFid(liveFeature.getID(), state.getRevision()); 
                 } else if (!mapper.hasAutoIncrementColumns()) {
                     id = mapper.createID(state.getConnection(), newFeature, null);
                 }

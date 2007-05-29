@@ -44,7 +44,11 @@ class VersionedMulticolumnFIDMapper extends MultiColumnFIDMapper implements Vers
     public String getUnversionedFid(String versionedFID) {
         // we assume revision is the last column, since it has been added with
         // an alter table "add". Also, we make the fid "typed" to ensure WFS keeps on working
-        return tableName + "." + versionedFID.substring(0, versionedFID.lastIndexOf('&'));
+        return tableName + "." + versionedFID.substring(versionedFID.indexOf('&') + 1);
+    }
+
+    public String createVersionedFid(String externalFID, long revision) {
+        return revision + "&" + externalFID.substring(tableName.length() + 1);
     }
 
     public Object[] getUnversionedPKAttributes(String FID) throws IOException {
@@ -54,23 +58,27 @@ class VersionedMulticolumnFIDMapper extends MultiColumnFIDMapper implements Vers
                     + "', it's " + FID + " instead");
 
         // leverage superclass parsing, then throw away the last element
-        Object[] values = getPKAttributes(FID.substring(tableName.length() + 1) + "&0");
+        Object[] values = super.getPKAttributes("0&" + FID.substring(tableName.length() + 1));
         Object[] unversioned = new Object[values.length - 1];
-        System.arraycopy(values, 0, unversioned, 0, unversioned.length);
+        System.arraycopy(values, 1, unversioned, 0, unversioned.length);
         return unversioned;
     }
 
     public String createID(Connection conn, Feature feature, Statement statement)
             throws IOException {
-        if (colNames.length == 2 && feature.getAttribute(colNames[0]) == null) {
+        if (colNames.length == 2 && feature.getAttribute(colNames[1]) == null) {
             try {
-                feature.setAttribute(colNames[0], (new UID()).toString());
+                feature.setAttribute(colNames[1], (new UID()).toString());
             } catch (IllegalAttributeException e) {
                 throw new DataSourceException("Could not generate key for the "
                         + "unset primary key column " + colNames[0], e);
             }
         }
         return super.createID(conn, feature, statement);
+    }
+    
+    public Object[] getPKAttributes(String FID) throws IOException {
+        return super.getPKAttributes(FID);
     }
 
 }

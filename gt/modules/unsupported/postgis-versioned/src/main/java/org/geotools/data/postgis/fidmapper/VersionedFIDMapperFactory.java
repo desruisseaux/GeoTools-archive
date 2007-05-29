@@ -98,11 +98,11 @@ public class VersionedFIDMapperFactory extends DefaultFIDMapperFactory {
 
     protected FIDMapper buildSingleColumnVersionedFidMapper(String schema, String tableName,
             Connection connection, ColumnInfo[] colInfos) {
-        if (colInfos[0].isAutoIncrement() && colInfos.length == 2) {
-            return new VersionedAutoincrementFIDMapper(schema, tableName, colInfos[0].colName,
-                    colInfos[0].dataType, colInfos[0].decimalDigits);
-        } else if (isIntegralType(colInfos[0].dataType)) {
-            throw new IllegalArgumentException("For the moment, max inc is not supported");
+        if (colInfos[1].isAutoIncrement() && colInfos.length == 2) {
+            return new VersionedAutoincrementFIDMapper(schema, tableName, colInfos[1].colName,
+                    colInfos[1].dataType, colInfos[0].decimalDigits);
+        } else if (isIntegralType(colInfos[1].dataType)) {
+            return buildMultiColumnFIDMapper(schema, tableName, connection, colInfos);
         } else {
             return buildMultiColumnFIDMapper(schema, tableName, connection, colInfos);
         }

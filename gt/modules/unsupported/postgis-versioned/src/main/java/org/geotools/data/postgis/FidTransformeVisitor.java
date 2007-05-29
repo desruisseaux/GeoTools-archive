@@ -77,16 +77,18 @@ class FidTransformeVisitor extends DuplicatorFilterVisitor {
                 continue;
             }
             Filter idf = null;
-            for (int i = 0; i < attributes.length; i++) {
-                if ("revision".equals(mapper.getColumnName(i)))
+            for (int i = 0, j = 0; i < attributes.length; j++) {
+                String colName = mapper.getColumnName(j);
+                if ("revision".equals(colName))
                     continue;
                 CompareFilter equal = ff.createCompareFilter(Filter.COMPARE_EQUALS);
-                equal.addLeftValue(ff.createAttributeExpression(mapper.getColumnName(i)));
+                equal.addLeftValue(ff.createAttributeExpression(colName));
                 equal.addRightValue(ff.createLiteralExpression(attributes[i]));
                 if (idf == null)
                     idf = equal;
                 else
                     idf = idf.and(equal);
+                i++;
             }
             if (external == null)
                 external = idf;

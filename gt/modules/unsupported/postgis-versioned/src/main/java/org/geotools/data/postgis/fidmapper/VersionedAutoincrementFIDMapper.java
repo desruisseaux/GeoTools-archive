@@ -36,9 +36,9 @@ class VersionedAutoincrementFIDMapper extends MultiColumnFIDMapper implements Ve
 
     public VersionedAutoincrementFIDMapper(String tableSchemaName, String tableName,
             String colName, int colType, int colSize) {
-        super(tableSchemaName, tableName, new String[] { colName, "revision" }, new int[] {
+        super(tableSchemaName, tableName, new String[] { "revision", colName }, new int[] {
                 colType, Types.NUMERIC }, new int[] { colSize, 8 }, new int[] { 0, 0 },
-                new boolean[] { true, false });
+                new boolean[] { false, true });
         returnFIDColumnsAsAttributes = true;
         autoIncrementMapper = new PostGISAutoIncrementFIDMapper(tableSchemaName, tableName, colName, colType);
     }
@@ -46,7 +46,11 @@ class VersionedAutoincrementFIDMapper extends MultiColumnFIDMapper implements Ve
     public String getUnversionedFid(String versionedFID) {
         // we assume revision is the last column, since it has been added with
         // an alter table "add". Also, we make the fid "typed" to ensure WFS keeps on working
-        return tableName + "." + versionedFID.substring(0, versionedFID.lastIndexOf('&'));
+        return tableName + "." + versionedFID.substring(versionedFID.lastIndexOf('&') + 1);
+    }
+    
+    public String createVersionedFid(String extenalFID, long revision) {
+        return revision + "&" + extenalFID.substring(tableName.length() + 1);
     }
 
     public Object[] getUnversionedPKAttributes(String FID) throws IOException {
@@ -64,16 +68,18 @@ class VersionedAutoincrementFIDMapper extends MultiColumnFIDMapper implements Ve
 
     public String createID(Connection conn, Feature feature, Statement statement)
             throws IOException {
-        if (feature.getAttribute(colNames[0]) == null) {
+        if (feature.getAttribute(colNames[1]) == null) {
             try {
                 String id = autoIncrementMapper.createID(conn, feature, statement);
-                feature.setAttribute(colNames[0], new Long(id));
+                feature.setAttribute(colNames[1], new Long(id));
             } catch (Exception e) {
                 throw new DataSourceException("Could not generate key for the "
-                        + "unset primary key column " + colNames[0], e);
+                        + "unset primary key column " + colNames[1], e);
             }
         }
         return super.createID(conn, feature, statement);
     }
+
+    
 
 }

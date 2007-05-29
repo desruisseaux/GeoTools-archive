@@ -46,4 +46,6 @@ public interface VersionedFIDMapper extends FIDMapper {
      * @throws IOException
      */
     public Object[] getUnversionedPKAttributes(String FID) throws IOException;
+    
+    public String createVersionedFid(String extenalFID, long revision);
 }
