@@ -30,6 +30,7 @@ import javax.units.Unit;
 // OpenGIS dependencies
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.citation.Citation;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.util.InternationalString;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.referencing.IdentifiedObject;
@@ -46,6 +47,7 @@ import org.geotools.factory.Factory;
 import org.geotools.factory.AbstractFactory;
 import org.geotools.factory.OptionalFactory;
 import org.geotools.factory.FactoryRegistryException;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.resources.i18n.Logging;
@@ -151,11 +153,23 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      * @param factory The factory to wrap.
      */
     protected AuthorityFactoryAdapter(final AuthorityFactory factory) {
-        this((factory instanceof   CRSAuthorityFactory) ? (  CRSAuthorityFactory) factory : null,
-             (factory instanceof    CSAuthorityFactory) ? (   CSAuthorityFactory) factory : null,
-             (factory instanceof DatumAuthorityFactory) ? (DatumAuthorityFactory) factory : null,
-             (factory instanceof CoordinateOperationAuthorityFactory) ?
-                                (CoordinateOperationAuthorityFactory) factory : null);
+        this(factory, null);
+    }
+
+    /**
+     * For {@link FallbackAuthorityFactory} constructor only.
+     */
+    AuthorityFactoryAdapter(final AuthorityFactory factory, final AuthorityFactory fallback) {
+        this((factory  instanceof   CRSAuthorityFactory) ?   (CRSAuthorityFactory) factory  : 
+             (fallback instanceof   CRSAuthorityFactory) ?   (CRSAuthorityFactory) fallback : null,
+             (factory  instanceof    CSAuthorityFactory) ?    (CSAuthorityFactory) factory  :
+             (fallback instanceof    CSAuthorityFactory) ?    (CSAuthorityFactory) fallback : null,
+             (factory  instanceof DatumAuthorityFactory) ? (DatumAuthorityFactory) factory  :
+             (fallback instanceof DatumAuthorityFactory) ? (DatumAuthorityFactory) fallback : null,
+             (factory  instanceof CoordinateOperationAuthorityFactory) ?
+                    (CoordinateOperationAuthorityFactory) factory :
+             (fallback instanceof CoordinateOperationAuthorityFactory) ?
+                    (CoordinateOperationAuthorityFactory) fallback : null);
     }
 
     /**
@@ -903,11 +917,14 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     }
 
     /**
-     * Creates an exception for a missing factory.
+     * Creates an exception for a missing factory. We actually returns an instance of
+     * {@link NoSuchAuthorityCodeException} because this kind of exception is treated
+     * especially by {@link FallbackAuthorityFactory}.
      */
-    private static FactoryException missingFactory(final Class category) {
-        return new FactoryException(Errors.format(ErrorKeys.FACTORY_NOT_FOUND_$1,
-                  Utilities.getShortName(category)));
+    private FactoryException missingFactory(final Class category, final String code) {
+        return new NoSuchAuthorityCodeException(Errors.format(ErrorKeys.FACTORY_NOT_FOUND_$1,
+                Utilities.getShortName(category)),
+                Citations.getIdentifier(getAuthority()), trimAuthority(code));
     }
 
     /**
@@ -984,7 +1001,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
         if (       csFactory != null) return        csFactory;
         if (    datumFactory != null) return     datumFactory;
         if (operationFactory != null) return operationFactory;
-        throw missingFactory(AuthorityFactory.class);
+        throw missingFactory(AuthorityFactory.class, code);
     }
 
     /**
@@ -1004,7 +1021,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
             throws FactoryException
     {
         if (datumFactory == null) {
-            throw missingFactory(DatumAuthorityFactory.class);
+            throw missingFactory(DatumAuthorityFactory.class, code);
         }
         return datumFactory;
     }
@@ -1026,7 +1043,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
             throws FactoryException
     {
         if (csFactory == null) {
-            throw missingFactory(CSAuthorityFactory.class);
+            throw missingFactory(CSAuthorityFactory.class, code);
         }
         return csFactory;
     }
@@ -1049,7 +1066,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
             throws FactoryException
     {
         if (crsFactory == null) {
-            throw missingFactory(CRSAuthorityFactory.class);
+            throw missingFactory(CRSAuthorityFactory.class, code);
         }
         return crsFactory;
     }
@@ -1072,7 +1089,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
             throws FactoryException
     {
         if (operationFactory == null) {
-            throw missingFactory(CoordinateOperationAuthorityFactory.class);
+            throw missingFactory(CoordinateOperationAuthorityFactory.class, code);
         }
         return operationFactory;
     }

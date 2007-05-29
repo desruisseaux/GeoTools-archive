@@ -817,7 +817,7 @@ public abstract class AbstractAuthorityFactory extends ReferencingFactory
     }
 
     /**
-     * Trim the authority scope, if present. For example if this factory is an EPSG authority
+     * Trims the authority scope, if present. For example if this factory is an EPSG authority
      * factory and the specified code start with the "EPSG:" prefix, then the prefix is removed.
      * Otherwise, the string is returned unchanged (except for leading and trailing spaces).
      *
@@ -825,6 +825,11 @@ public abstract class AbstractAuthorityFactory extends ReferencingFactory
      * @return The code without the authority scope.
      */
     protected String trimAuthority(String code) {
+        /*
+         * IMPLEMENTATION NOTE: This method is overrided in PropertyAuthorityFactory. If
+         * implementation below is modified, it is probably worth to revisit the overrided
+         * method as well.
+         */
         code = code.trim();
         final GenericName name  = NameFactory.create(code);
         final GenericName scope = name.getScope();

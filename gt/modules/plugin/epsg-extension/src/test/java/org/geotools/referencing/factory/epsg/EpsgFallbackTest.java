@@ -23,6 +23,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
 
 // Geotools dependencies
 import org.geotools.referencing.CRS;
@@ -212,5 +213,40 @@ public class EpsgFallbackTest extends TestCase {
         assertFalse(identifiers.isEmpty());
         NamedIdentifier expected = new NamedIdentifier(Citations.EPSG, "42102");
         assertTrue(identifiers.contains(expected));
+    }
+
+    /**
+     * This CRS is defined in {@code esri.properties}.
+     */
+    public void test54004() throws FactoryException {
+        final CRSAuthorityFactory factory = CRS.getAuthorityFactory(false);
+        final String code = "EPSG:54004";
+        final CoordinateReferenceSystem crs = factory.createCoordinateReferenceSystem(code);
+        assertNotNull(crs);
+        assertSame(crs, CRS.decode(code, true));
+        assertEquals("World_Mercator", String.valueOf(factory.getDescriptionText(code)));
+
+        // Equivalent standard ESPG
+        final CoordinateReferenceSystem standard = factory.createCoordinateReferenceSystem("EPSG:3395");
+        assertEquals("WGS 84 / World Mercator", String.valueOf(factory.getDescriptionText("EPSG:3395")));
+        // TODO: enable if we implement more intelligent 'equalsIgnoreMetadata'
+        //assertTrue(CRS.equalsIgnoreMetadata(crs, standard));
+    }
+
+    /**
+     * Tests the obtention of various codes.
+     */
+    public void testCodes() throws FactoryException {
+        final CRSAuthorityFactory factory = CRS.getAuthorityFactory(false);
+        final Collection codes = factory.getAuthorityCodes(ProjectedCRS.class);
+        assertTrue (codes.contains("EPSG:3395"));    // Defined in EPSG database
+        assertTrue (codes.contains("EPSG:54004"));   // Defined in ESRI database
+        assertFalse(codes.contains("ESRI:54004"));
+        assertTrue (codes.contains("EPSG:42304"));   // Defined in unnamed database
+        assertTrue (codes.contains("EPSG:26742"));   // Defined in EPSG database
+        assertTrue (codes.contains("EPSG:42102"));   // Defined in unnamed database
+        assertFalse(codes.contains("EPSG:4326"));    // This is a GeographicCRS, not a ProjectedCRS
+        assertTrue (codes.contains("EPSG:100002"));  // Defined in unnamed database
+        assertFalse(codes.contains("EPSG:100001"));  // This is a GeographicCRS, not a ProjectedCRS
     }
 }

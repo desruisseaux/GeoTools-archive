@@ -584,4 +584,28 @@ public final class Citations {
             return false;
         }
     }
+
+    /**
+     * Returns the shortest identifier for the specified citation, or the title if there is
+     * no identifier. This method is useful for extracting the namespace from an authority,
+     * for example {@code "EPSG"}.
+     *
+     * @since 2.4
+     */
+    public static String getIdentifier(final Citation citation) {
+        String identifier = null;
+        for (final Iterator it=citation.getIdentifiers().iterator(); it.hasNext();) {
+            final String candidate = ((String) it.next()).trim();
+            final int length = candidate.length();
+            if (length != 0) {
+                if (identifier == null || length < identifier.length()) {
+                    identifier = candidate;
+                }
+            }
+        }
+        if (identifier == null) {
+            identifier = String.valueOf(citation.getTitle());
+        }
+        return identifier;
+    }
 }

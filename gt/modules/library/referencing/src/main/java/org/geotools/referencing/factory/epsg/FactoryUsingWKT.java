@@ -25,6 +25,7 @@ import java.util.TreeSet;
 import java.util.TreeMap;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -46,6 +47,7 @@ import org.geotools.referencing.factory.DeferredAuthorityFactory;
 import org.geotools.referencing.factory.FactoryNotFoundException;
 import org.geotools.referencing.factory.PropertyAuthorityFactory;
 import org.geotools.metadata.iso.citation.Citations;
+import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.io.TableWriter;
 import org.geotools.io.IndentedLineWriter;
 import org.geotools.resources.Arguments;
@@ -90,6 +92,13 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
      * @deprecated Moved to {@link GeoTools#CRS_AUTHORITY_EXTRA_DIRECTORY}.
      */
     public static final String CRS_DIRECTORY_KEY = GeoTools.CRS_AUTHORITY_EXTRA_DIRECTORY;
+
+    /**
+     * The authority. Will be created only when first needed.
+     *
+     * @see #getAuthority
+     */
+    private Citation authority;
 
     /**
      * The default filename to read. The default {@code FactoryUsingWKT} implementation will
@@ -171,45 +180,54 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
     }
 
     /**
-     * Returns the authority. The default implementation returns {@link Citations#EPSG EPSG}
-     * in order to register the extra CRS in the "EPSG" namespace, even if the code defined
-     * in the property file may not be official EPSG codes.
-     * <p>
-     * Subclasses should return the authority that define the extension to the EPSG database.
-     * For example {@link EsriExtension} returns the {@linkplain Citations#ESRI ESRI} authority.
-     * However the CRS created by this method will typically contain more than one
-     * {@linkplain CoordinateReferenceSystem#getIdentifiers identifier}, one for each
-     * authority returned by {@link #getAuthorities}, and the {@linkplain Citations#EPSG EPSG}
-     * authority is typically in this list.
+     * Returns the authority. The default implementation returns the first citation returned
+     * by {@link #getAuthorities()}, with the addition of identifiers from all additional
+     * authorities returned by the above method.
      *
      * @see #getAuthorities
      */
     //@Override
     public Citation getAuthority() {
-        return Citations.EPSG;
+        // No need to synchronize; this is not a big deal if we create this object twice.
+        if (authority == null) {
+            final Citation[] authorities = getAuthorities();
+            switch (authorities.length) {
+                case 0: authority = Citations.EPSG; break;
+                case 1: authority = authorities[0]; break;
+                default: {
+                    final CitationImpl c = new CitationImpl(authorities[0]);
+                    final Collection types = c.getIdentifierTypes();
+                    final Collection identifiers = c.getIdentifiers();
+                    for (int i=1; i<authorities.length; i++) {
+                        types.add("Authority name");
+                        identifiers.add(Citations.getIdentifier(authorities[i]));
+                    }
+                    c.freeze();
+                    authority = c;
+                    break;
+                }
+            }
+        }
+        return authority;
     }
 
     /**
      * Returns the set of authorities to use as {@linkplain CoordinateReferenceSystem#getIdentifiers
      * identifiers} for the CRS to be created. This set is given to the
      * {@linkplain PropertyAuthorityFactory#PropertyAuthorityFactory(FactoryGroup, Citation[], URL)
-     * properties-backed factory constructor}. The {@linkplain Citations#EPSG EPSG} authority should
-     * be last.
+     * properties-backed factory constructor}.
+     * <p>
+     * The default implementation returns a singleton containing only {@linkplain Citations#EPSG
+     * EPSG}. Subclasses should override this method in order to enumerate all relevant authorities,
+     * with {@linkplain Citations#EPSG EPSG} in last position. For example {@link EsriExtension}
+     * returns {{@linkplain Citations#ESRI ESRI}, {@linkplain Citations#EPSG EPSG}}.
      *
      * @since 2.4
      */
     protected Citation[] getAuthorities() {
-        final Citation authority = getAuthority();
-        if (Citations.EPSG.equals(authority)) {
-            return new Citation[] {
-                authority
-            };
-        } else {
-            return new Citation[] {
-                authority,
-                Citations.EPSG
-            };
-        }
+        return new Citation[] {
+            Citations.EPSG
+        };
     }
 
     /**

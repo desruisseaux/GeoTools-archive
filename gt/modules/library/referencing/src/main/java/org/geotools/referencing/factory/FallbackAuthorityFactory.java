@@ -57,6 +57,9 @@ import org.geotools.factory.FactoryNotFoundException;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @todo Needs a mechanism for avoiding to query the same factory twice when the fallback is the
+ *       same instance than the primary factory for some {@link AuthorityFactory} interfaces.
  */
 public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
@@ -94,7 +97,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     protected FallbackAuthorityFactory(final AuthorityFactory primary,
                                        final AuthorityFactory fallback)
     {
-        super(primary);
+        super(primary, fallback);
         ensureNonNull("fallback", fallback);
         this.fallback = (fallback instanceof AbstractAuthorityFactory) ?
                 (AbstractAuthorityFactory) fallback : new AuthorityFactoryAdapter(fallback);
@@ -935,6 +938,11 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     private static AuthorityFactory create(final int mask,
             final AuthorityFactory primary, final AuthorityFactory fallback)
     {
+        /*
+         * The following assertion fails if we try to implements some
+         * interfaces not supported by the primary or fallback factory.
+         */
+        assert (mask & ~(interfaceMask(primary) | interfaceMask(fallback))) == 0 : mask;
         final AuthorityFactory factory;
         /*
          * In the 'switch' statement below, we do not implement all possible combinaisons
@@ -961,6 +969,12 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
             case  0: factory = new FallbackAuthorityFactory(primary, fallback); break;
             default: throw new AssertionError(mask); // Should never happen.
         }
+        /*
+         * The following assertion fails if 'factory' implements some interfaces
+         * that wasn't requested. The opposite is allowed however: 'factory' may
+         * not implement every requested interfaces.
+         */
+        assert (interfaceMask(factory) & ~mask) == 0 : mask;
         return factory;
     }
 

@@ -108,9 +108,6 @@ public final class OptionalDependencies {
      */
     public static MutableTreeNode xmlToSwing(final Node node) {
         final DefaultMutableTreeNode root = createTreeNode(node.getNodeName(), node, true);
-        for (Node child=node.getFirstChild(); child!=null; child=child.getNextSibling()) {
-            root.add(xmlToSwing(child));
-        }
         final NamedNodeMap attributes = node.getAttributes();
         final int length = attributes.getLength();
         for (int i=0; i<length; i++) {
@@ -119,6 +116,9 @@ public final class OptionalDependencies {
                 String label = attribute.getNodeName() + "=\"" + attribute.getNodeValue() + '"';
                 root.add(createTreeNode(label, attribute, false));
             }
+        }
+        for (Node child=node.getFirstChild(); child!=null; child=child.getNextSibling()) {
+            root.add(xmlToSwing(child));
         }
         return root;
     }

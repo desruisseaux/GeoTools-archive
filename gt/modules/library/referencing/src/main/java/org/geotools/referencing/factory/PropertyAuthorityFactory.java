@@ -37,12 +37,15 @@ import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.datum.DatumAuthorityFactory;
 import org.opengis.util.InternationalString;
+import org.opengis.util.GenericName;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.referencing.wkt.Symbols;
 import org.geotools.referencing.NamedIdentifier;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.util.DerivedSet;
+import org.geotools.util.NameFactory;
 import org.geotools.util.SimpleInternationalString;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -381,6 +384,31 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
         } catch (ParseException exception) {
             throw new FactoryException(exception);
         }
+    }
+
+    /**
+     * Trims the authority scope, if present. If more than one authority were given at
+     * {@linkplain #PropertyAuthorityFactory(FactoryGroup, Citation[], URL) construction time},
+     * then any of them may appears as the scope in the supplied code.
+     *
+     * @param  code The code to trim.
+     * @return The code without the authority scope.
+     */
+    //@Override
+    protected String trimAuthority(String code) {
+        code = code.trim();
+        final GenericName name  = NameFactory.create(code);
+        final GenericName scope = name.getScope();
+        if (scope == null) {
+            return code;
+        }
+        final String candidate = scope.toString();
+        for (int i=0; i<authorities.length; i++) {
+            if (Citations.identifierMatches(authorities[i], candidate)) {
+                return name.asLocalName().toString().trim();
+            }
+        }
+        return code;
     }
 
     /**

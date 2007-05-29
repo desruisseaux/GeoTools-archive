@@ -25,7 +25,6 @@ import org.opengis.referencing.FactoryException;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.metadata.iso.citation.CitationImpl;
 
 
 /**
@@ -48,18 +47,6 @@ public class EsriExtension extends FactoryUsingWKT {
     public static final String FILENAME = "esri.properties";
 
     /**
-     * The ESRI authority expanded with a "EPSG" identifier.
-     */
-    private static final Citation AUTHORITY;
-    static {
-        final CitationImpl c = new CitationImpl(Citations.ESRI);
-        c.getIdentifierTypes().add("Authority name");
-        c.getIdentifiers().add("EPSG");
-        c.freeze();
-        AUTHORITY = c;
-    }
-
-    /**
      * Constructs an authority factory using the default set of factories.
      */
     public EsriExtension() {
@@ -74,13 +61,6 @@ public class EsriExtension extends FactoryUsingWKT {
      */
     public EsriExtension(final Hints hints) {
         super(hints, DEFAULT_PRIORITY - 5);
-    }
-
-    /**
-     * Returns the authority, which is derived from {@link Citations#ESRI ESRI}.
-     */
-    public Citation getAuthority() {
-        return AUTHORITY;
     }
 
     /**
