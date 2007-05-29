@@ -16,6 +16,7 @@
 package org.geotools.gui.swing;
 
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 import java.net.URL;
 
 import javax.swing.AbstractAction;
@@ -42,7 +43,12 @@ public class ResetAction extends AbstractAction {
     }
     public void actionPerformed(ActionEvent e) {
         // TODO Auto-generated method stub
-        map.mapArea = map.context.getAreaOfInterest();
+        try {
+			map.mapArea = map.context.getLayerBounds();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
         map.setReset(true);
         map.repaint();
     }
