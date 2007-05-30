@@ -10,16 +10,12 @@
   <b>
     POLYGON ((40 340, 720 320, 720 240, 40 260, 40 340))
   </b>
-  <!-- this test does not pass in the geometry module because it creates a multiprimitive of
-  	curves that are closed, and closed curves return empty boundaries (as per the ISO 19107 specs).  
-  	The empty boundaries will not be equal to the boundary of the polygon from arg1="A"
   <test>
     <op name="getboundary" arg1="A">
       MULTILINESTRING ((280 560, 60 180, 720 80, 280 560), 
         (420 360, 200 360, 320 180, 420 360))
           </op>
   </test>
-  -->
   <test>
     <op name="convexhull" arg1="A">
       POLYGON ((720 80, 60 180, 280 560, 720 80))

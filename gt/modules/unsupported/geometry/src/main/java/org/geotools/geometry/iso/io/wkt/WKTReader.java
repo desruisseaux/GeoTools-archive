@@ -429,7 +429,8 @@ public class WKTReader {
 			return readPointText();
 		} else if (type.equalsIgnoreCase(WKTConstants.WKT_CURVE)) {
 			return readLineStringText();
-		} else if (type.equalsIgnoreCase(WKTConstants.WKT_SURFACE)) {
+		} else if ( type.equalsIgnoreCase(WKTConstants.WKT_SURFACE) ||
+				type.equalsIgnoreCase(WKTConstants.WKT_POLYGON) ) {
 			return readPolygonText();
 		}
 		throw new ParseException("Unknown geometry type: " + type);

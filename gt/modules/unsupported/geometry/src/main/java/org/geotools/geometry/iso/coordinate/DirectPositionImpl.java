@@ -293,9 +293,7 @@ public class DirectPositionImpl implements DirectPosition {
 
 	/**
 	 * Compares coodinates of Direct Positions and allows a tolerance value in
-	 * the comparison Implementation Note: Parameter has to be of Type
-	 * DirectPosition (not DirectPositionImpl), so that the equals method is
-	 * found for DirectPosition´s and DirectPositionImpl´s
+	 * the comparison
 	 * 
 	 * @param position
 	 *            Direct Position to compare with
@@ -312,7 +310,11 @@ public class DirectPositionImpl implements DirectPosition {
 			return false;
 		}
 		
+		// comparing a NaN ordinate to a non-NaN ordinate should return false, but two
+		// ordinates that are both NaN should considered equal.
 		for (int i = 0; i < D; ++i) {
+			if (Double.isNaN(position.getOrdinate(i)) && Double.isNaN(this.coordinate[i]))
+				continue;
 			if (Math.abs(DoubleOperation.subtract(position.getOrdinate(i), this.coordinate[i])) > tol)
 				return false;
 		}
@@ -337,7 +339,7 @@ public class DirectPositionImpl implements DirectPosition {
 	// }
 	// TODO JR: nach zur kenntnisnahme und zustimmung bitte obiges kommentar loeschen
 	public boolean equals(Object o) {
-		if (o instanceof DirectPosition || o instanceof DirectPositionImpl)
+		if (o instanceof DirectPosition)
 			return this.equals((DirectPosition) o, 0);
 		else
 			return false;

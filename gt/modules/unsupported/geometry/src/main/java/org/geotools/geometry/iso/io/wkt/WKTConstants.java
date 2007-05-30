@@ -49,5 +49,7 @@ public class WKTConstants {
 	public static String WKT_CURVE = "CURVE";
 
 	public static String WKT_SURFACE = "SURFACE";
+	
+	public static String WKT_POLYGON = "POLYGON";
 
 }

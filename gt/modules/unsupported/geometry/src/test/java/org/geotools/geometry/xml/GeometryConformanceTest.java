@@ -28,6 +28,8 @@ import junit.framework.TestSuite;
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.text.WKTParser;
 import org.geotools.test.TestData;
+import org.opengis.geometry.Boundary;
+import org.opengis.geometry.aggregate.MultiPrimitive;
 import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.geometry.primitive.PrimitiveFactory;
 import org.xml.sax.InputSource;
@@ -156,7 +158,16 @@ public class GeometryConformanceTest extends TestSuite {
                     if (op != null) {
                         testCase.removeTestOperation(op);
                         //check for override, rather than just remove
-                        if (!operationValue.equalsIgnoreCase("skipped")) {
+                        if (operationValue.equalsIgnoreCase("skipped")) {
+                        	continue;
+                        }
+                        if (operationValue.equalsIgnoreCase("boundary")) {
+                        	// post process into a surface boundary
+                        	MultiPrimitive curves = (MultiPrimitive) op.getExpectedResult();
+                        	Boundary boundary = curves.getBoundary();
+                        	op.setExpectedResult( boundary );
+                        }
+                        else { // try parsing this thing as WKT
                             FeatGeomFactoryImpl default2D = FeatGeomFactoryImpl.getDefault2D();
                             GeometryFactory geomFact = default2D.getGeometryFactory();
                             PrimitiveFactory primFact = default2D.getPrimitiveFactory();

@@ -97,7 +97,10 @@ import org.geotools.geometry.iso.coordinate.PointArrayImpl;
 import org.geotools.geometry.iso.primitive.CurveBoundaryImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
+import org.geotools.geometry.iso.primitive.PrimitiveBoundaryImpl;
+import org.geotools.geometry.iso.primitive.PrimitiveImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
+import org.geotools.geometry.iso.primitive.SolidBoundaryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
@@ -111,6 +114,7 @@ import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.primitive.CurveSegment;
 import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.OrientableSurface;
+import org.opengis.geometry.primitive.Primitive;
 import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.Geometry;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -176,27 +180,50 @@ public class ConvexHull {
 			positions = ((MultiPointImpl)geom).getElements();
 		} else if (geom instanceof MultiCurveImpl) {
 			// Add all curves of the set
-			positions = new HashSet<CurveImpl>();
+			positions = new HashSet<DirectPositionImpl>();
 			Iterator<OrientableCurve> curveIter = ((MultiCurveImpl)geom).getElements().iterator();
 			while(curveIter.hasNext()) {
 				positions.addAll(((CurveImpl)curveIter.next()).asDirectPositions());
 			}
 		} else if (geom instanceof MultiSurfaceImpl) {
 			// Add all exterior rings of the surfaceboundaries of the surfaces in the set
-			positions = new HashSet<SurfaceImpl>();
+			positions = new HashSet<DirectPositionImpl>();
 			Iterator<OrientableSurface> surfaceIter = ((MultiSurfaceImpl)geom).getElements().iterator();
 			while(surfaceIter.hasNext()) {
 				positions.addAll(((SurfaceImpl)surfaceIter.next()).getBoundary().getExterior().asDirectPositions());
 			}
 		} else if (geom instanceof MultiPrimitiveImpl) {
-			positions = new HashSet<Geometry>();
-			positions = ((MultiPrimitiveImpl)geom).getElements();
-			Iterator<Geometry> iterator = positions.iterator();
-			//while (iterator.hasNext()) {
-				//positions.addAll(iterator.next().getBoundary()
-			//}
-			
-			Assert.isTrue(false, "not implemented yet");
+			positions = new HashSet<PointImpl>();
+			Iterator<Primitive> iterator = ((MultiPrimitiveImpl)geom).getElements().iterator();
+			while (iterator.hasNext()) {
+				PrimitiveImpl prim = ((PrimitiveImpl)iterator.next());
+				
+				// if this is a point, it has no boundary so just add the point
+				if (prim instanceof PointImpl) {
+					positions.add(prim);
+				}
+				else {
+					// this is not a point, so get its boundary and add its
+					// positions to the list.
+					PrimitiveBoundaryImpl pb = (PrimitiveBoundaryImpl) (prim.getBoundary());
+					 if (pb instanceof CurveBoundaryImpl) {
+						 CurveBoundaryImpl boundary = (CurveBoundaryImpl) pb; 
+						 positions.add(boundary.getStartPoint());
+						 positions.add(boundary.getEndPoint());
+					 }
+					 else if (pb instanceof SolidBoundaryImpl) {
+						 SolidBoundaryImpl boundary = (SolidBoundaryImpl) pb; 
+						 positions.addAll(boundary.getExterior().getElements());
+					 }
+					 else if (pb instanceof SurfaceBoundaryImpl) {
+						 SurfaceBoundaryImpl boundary = (SurfaceBoundaryImpl) pb; 
+						 positions.addAll(boundary.getExterior().asDirectPositions());
+					 }
+				}
+				
+			}	
+
+			//Assert.isTrue(false, "not implemented yet");
 		} else if (geom instanceof CompositePointImpl) {
 			positions = new ArrayList<DirectPositionImpl>();
 			positions.add(((CompositePointImpl)geom).getElements().iterator().next());

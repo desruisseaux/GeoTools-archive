@@ -78,7 +78,11 @@ public class GeometryTestOperation extends Assert {
         operationMap.put("union", new UnionOp());
     }
 
-    private Geometry setGeomArg(String s, Geometry a, Geometry b) {
+    protected Object getExpectedResult() {
+		return expectedResult;
+	}
+
+	private Geometry setGeomArg(String s, Geometry a, Geometry b) {
         if (s.equalsIgnoreCase("a")) {
             return a;
         } else if (s.equalsIgnoreCase("b")) {

@@ -36,18 +36,12 @@
 
 package org.geotools.geometry.iso.aggregate;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
-import org.geotools.geometry.iso.complex.ComplexImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.geometry.iso.io.GeometryToString;
-import org.geotools.geometry.iso.primitive.BoundaryImpl;
-import org.geotools.geometry.iso.primitive.CurveBoundaryImpl;
-import org.geotools.geometry.iso.primitive.PrimitiveBoundaryImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
 import org.opengis.geometry.Boundary;
@@ -55,9 +49,7 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.aggregate.MultiPrimitive;
 import org.opengis.geometry.complex.Complex;
-import org.opengis.geometry.primitive.Curve;
 import org.opengis.geometry.primitive.Primitive;
-import org.opengis.geometry.primitive.PrimitiveBoundary;
 import org.opengis.geometry.Geometry;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -86,7 +78,7 @@ public class MultiPrimitiveImpl extends AggregateImpl implements MultiPrimitive 
 	 */
 	public Boundary getBoundary() {
 		
-		/*
+		// union the various primitives together and return the boundary of that
 		Boundary boundary = null;
 		Iterator iterator = this.elements.iterator();
 		while (iterator.hasNext()) {
@@ -100,9 +92,9 @@ public class MultiPrimitiveImpl extends AggregateImpl implements MultiPrimitive 
 		}
 		
 		return boundary;
-		*/
 		
-		return null;
+		
+		//return null;
 	}
 
 	/* (non-Javadoc)
