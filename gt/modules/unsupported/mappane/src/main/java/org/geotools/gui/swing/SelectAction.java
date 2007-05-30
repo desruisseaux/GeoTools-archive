@@ -15,6 +15,7 @@
  */
 package org.geotools.gui.swing;
 
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.net.URL;
 
@@ -41,6 +42,7 @@ public class SelectAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         // TODO Auto-generated method stub
         map.setState(JMapPane.Select);
+        map.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
     public ImageIcon getIcon() {
         return icon;
