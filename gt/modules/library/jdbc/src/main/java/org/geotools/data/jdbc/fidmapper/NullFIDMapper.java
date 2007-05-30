@@ -55,7 +55,9 @@ public class NullFIDMapper extends AbstractFIDMapper {
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getID(java.lang.Object[])
      */
     public String getID(Object[] attributes) {
-        return (new UID()).toString();
+        // optimization, since the UID toString uses only ":" and converts long and integers
+        // to strings for the rest, so the only non word character is really ":"
+        return "nfm-" + new UID().toString().replace(':', '_');
     }
 
     /**

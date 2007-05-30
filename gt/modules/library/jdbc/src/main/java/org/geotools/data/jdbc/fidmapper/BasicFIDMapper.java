@@ -129,7 +129,10 @@ public class BasicFIDMapper extends AbstractFIDMapper {
         // NCNameChar ::= Letter | Digit | '.' | '-' | '_' | CombiningChar | Extender
         // We have to fix the generated UID replacing all non word chars with an _ (it seems
         // they area all ":")
-        return "fid-" + new UID().toString().replaceAll( "\\W","_" );
+//        return "fid-" + new UID().toString().replaceAll( "\\W","_" );
+//      optimization, since the UID toString uses only ":" and converts long and integers
+        // to strings for the rest, so the only non word character is really ":"
+        return "fid-" + new UID().toString().replace(':', '_');
     }
 
 }
