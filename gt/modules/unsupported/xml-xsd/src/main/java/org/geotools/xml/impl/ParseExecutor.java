@@ -101,7 +101,8 @@ public class ParseExecutor implements Visitor {
         		
         		if ( value == null ) {
         			//have not preprocessed raw string yet
-        			value = parseFacets( instance );
+        			//value = parseFacets( instance );
+                    value = preParse( instance );
         			
         			//if the type is simple or complex and mixed, use the 
         			// text as is, other wise trim it, turning to null if the 
@@ -228,27 +229,18 @@ public class ParseExecutor implements Visitor {
     			List parsed = new ArrayList();
     			for ( int i = 0; i < list.length; i++ ) {
     				//create a pseudo declaration
-    				XSDFeature feature = null;
-    				if ( instance instanceof AttributeInstance ) {
-    					XSDAttributeDeclaration attribute = 
-    						XSDFactory.eINSTANCE.createXSDAttributeDeclaration();
-    					attribute.setTypeDefinition( itemType );
-    				}
-    				else {
-    					XSDElementDeclaration element = 
-    						XSDFactory.eINSTANCE.createXSDElementDeclaration();
-    					element.setTypeDefinition( itemType );
-    				}
-    				
+				final XSDElementDeclaration element = 
+					XSDFactory.eINSTANCE.createXSDElementDeclaration();
+				element.setTypeDefinition( itemType );
+                	
     				if ( instance.getName() != null ) {
-    					feature.setName( instance.getName() );
+    					element.setName( instance.getName() );
     				}
     				if ( instance.getNamespace() != null ) {
-    					feature.setTargetNamespace( instance.getNamespace() );
+    					element.setTargetNamespace( instance.getNamespace() );
     				}
     				
     				//create a new instance of the specified type
-    				final XSDFeature declaration = feature;
     				InstanceComponentImpl theInstance = new InstanceComponentImpl() {
 
 						public XSDTypeDefinition getTypeDefinition() {
@@ -256,7 +248,7 @@ public class ParseExecutor implements Visitor {
 						}
 						
 						public XSDNamedComponent getDeclaration() {
-							return declaration;
+							return element;
 						};
 						
 					};
@@ -264,7 +256,7 @@ public class ParseExecutor implements Visitor {
     				
     				//perform the parse
     				ParseExecutor executor = new ParseExecutor( theInstance, null, context, parser );
-    				parser.getBindingWalker().walk( feature, executor, context );
+    				parser.getBindingWalker().walk( element, executor, context );
     				
     				parsed.add( executor.getValue() );
     			}
@@ -274,7 +266,7 @@ public class ParseExecutor implements Visitor {
     		else if ( type.getVariety() == XSDVariety.UNION_LITERAL ) {
     			//union, "valueSpace" and "lexicalSpace" facets are the union of the contained
     			// datatypes
-    			return null;
+    			return text;
     		}
     		else {
     			
@@ -285,12 +277,12 @@ public class ParseExecutor implements Visitor {
     				facets.add( facet );
     			}
     			
-    			return null;
+    			return text;
     		}
     		
     	}
     	
-    	return null;
+    	return text;
     }
     
     protected Object parseFacets(InstanceComponent instance) {
