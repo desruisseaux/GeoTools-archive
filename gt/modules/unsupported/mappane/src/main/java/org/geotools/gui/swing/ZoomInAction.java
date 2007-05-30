@@ -15,6 +15,7 @@
  */
 package org.geotools.gui.swing;
 
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.net.URL;
 
@@ -44,6 +45,7 @@ public class ZoomInAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         // TODO Auto-generated method stub
         map.setState(JMapPane.ZoomIn);
+        map.setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
     }
     public ImageIcon getIcon() {
         return icon;

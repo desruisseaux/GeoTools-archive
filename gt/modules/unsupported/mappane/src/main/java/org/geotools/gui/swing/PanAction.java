@@ -15,6 +15,7 @@
  */
 package org.geotools.gui.swing;
 
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.net.URL;
 
@@ -60,6 +61,7 @@ public class PanAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         
         map.setState(JMapPane.Pan);
+        map.setCursor(new Cursor(Cursor.MOVE_CURSOR));
     }
     
     /**
