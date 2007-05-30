@@ -298,7 +298,7 @@ public class JMapPane extends JPanel implements MouseListener,MouseMotionListene
 
 	public void setState(int state) {
 		this.state = state;
-		System.out.println("State: " + state);
+//		System.out.println("State: " + state);
 	}
 
 	public double getZoomFactor() {
@@ -396,7 +396,7 @@ public class JMapPane extends JPanel implements MouseListener,MouseMotionListene
 
 	private boolean reset = false;
 
-	private FeatureCollection toolFeature;
+	
 
 	protected void paintComponent(Graphics g) {
 
@@ -736,8 +736,8 @@ public class JMapPane extends JPanel implements MouseListener,MouseMotionListene
 	}
 
 	private void processDrag(int x1, int y1, int x2, int y2) {
-		System.out.println("processing drag from " + x1 + "," + y1 + " -> "
-				+ x2 + "," + y2);
+//		System.out.println("processing drag from " + x1 + "," + y1 + " -> "
+//				+ x2 + "," + y2);
 		if (x1 == x2 && y1 == y2) {
 			if (isClickable())
 				mouseClicked(new MouseEvent(this, 0, new Date().getTime(), 0,
@@ -762,14 +762,14 @@ public class JMapPane extends JPanel implements MouseListener,MouseMotionListene
 			// calculate X offsets from start point to the end Point
 			double deltaX1 = endX - startX;
 
-			System.out.println("deltaX " + deltaX1);
+			//System.out.println("deltaX " + deltaX1);
 			// new edges
 			double left = mapArea.getMinX() - deltaX1;
 			double right = mapArea.getMaxX() - deltaX1;
 			// now for Y
 			double deltaY1 = endY - startY;
 
-			System.out.println("deltaY " + deltaY1);
+			//System.out.println("deltaY " + deltaY1);
 			double bottom = mapArea.getMinY() - deltaY1;
 			double top = mapArea.getMaxY() - deltaY1;
 			Coordinate ll = new Coordinate(left, bottom);
@@ -889,6 +889,17 @@ public class JMapPane extends JPanel implements MouseListener,MouseMotionListene
 
 	public void layerAdded(MapLayerListEvent event) {
 		changed = true;
+		
+		if(context.getLayers().length==1) {// the first one
+			
+			try {
+				mapArea = context.getLayerBounds();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			reset=true;
+		}
 		repaint();
 
 	}
@@ -901,7 +912,7 @@ public class JMapPane extends JPanel implements MouseListener,MouseMotionListene
 
 	public void layerChanged(MapLayerListEvent event) {
 		changed = true;
-		System.out.println("layer changed - repaint");
+		//System.out.println("layer changed - repaint");
 		repaint();
 	}
 
