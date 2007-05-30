@@ -98,6 +98,11 @@ public class GML2ParsingUtils {
         //fid
         String fid = (String) node.getAttributeValue("fid");
 
+        if (fid == null) {
+            //look for id
+            fid = (String) node.getAttributeValue("id");
+        }
+
         //create feature
         return GML2ParsingUtils.feature(fType, fid, node);
     }
