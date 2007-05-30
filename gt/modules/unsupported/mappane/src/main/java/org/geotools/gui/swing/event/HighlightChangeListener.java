@@ -18,7 +18,6 @@ package org.geotools.gui.swing.event;
 import java.util.EventListener;
 
 
-
-public interface HighlightChangeListener extends EventListener{
+public interface HighlightChangeListener extends EventListener {
     public void highlightChanged(HighlightChangedEvent e);
 }

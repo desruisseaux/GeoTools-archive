@@ -18,7 +18,6 @@ package org.geotools.gui.swing;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.net.URL;
-
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
@@ -29,26 +28,24 @@ import javax.swing.ImageIcon;
  *
  */
 public class ZoomOutAction extends AbstractAction {
-    
     /**
      * a simple zoom out action
      */
     private static final long serialVersionUID = 8669650422678543113L;
     private ImageIcon icon;
     JMapPane map;
-    
-    public ZoomOutAction(JMapPane map){
+
+    public ZoomOutAction(JMapPane map) {
         URL url = this.getClass().getResource("resources/ZoomOut16.gif"); //$NON-NLS-1$
         icon = new ImageIcon(url);
-        this.putValue(Action.SMALL_ICON,icon);
-        this.putValue(Action.NAME,Messages.getString("ZoomOutAction.1")); //$NON-NLS-1$
+        this.putValue(Action.SMALL_ICON, icon);
+        this.putValue(Action.NAME, Messages.getString("ZoomOutAction.1")); //$NON-NLS-1$
         this.map = map;
     }
+
     public void actionPerformed(ActionEvent e) {
-        // TODO Auto-generated method stub
+
         map.setState(JMapPane.ZoomOut);
         map.setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
     }
-    
 }
-
