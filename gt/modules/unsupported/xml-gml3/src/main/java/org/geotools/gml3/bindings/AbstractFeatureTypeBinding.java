@@ -15,21 +15,16 @@
  */
 package org.geotools.gml3.bindings;
 
-import org.eclipse.xsd.XSDElementDeclaration;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import java.util.Iterator;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gml2.FeatureTypeCache;
-import org.geotools.util.Converters;
 import org.geotools.xml.AbstractComplexBinding;
-import org.geotools.xml.BindingFactory;
 import org.geotools.xml.BindingWalkerFactory;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
@@ -101,22 +96,24 @@ public class AbstractFeatureTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        //get the definition of the element
-        XSDElementDeclaration decl = instance.getElementDeclaration();
+        return GML3ParsingUtils.parseFeature(instance, node, value, ftCache, bwFactory);
 
-        //look for a feature type in the cache
-        FeatureType fType = ftCache.get(decl.getName());
-
-        if (fType == null) {
-            fType = GML3ParsingUtils.featureType(decl, bwFactory);
-            ftCache.put(fType);
-        }
-
-        //TODO: this could pick up wrong thing, node api needs to be 
-        // namespace aware
-        String fid = (String) node.getAttributeValue("id");
-
-        return GML3ParsingUtils.feature(fType, fid, node);
+        //        //get the definition of the element
+        //        XSDElementDeclaration decl = instance.getElementDeclaration();
+        //
+        //        //look for a feature type in the cache
+        //        FeatureType fType = ftCache.get(decl.getName());
+        //
+        //        if (fType == null) {
+        //            fType = GML3ParsingUtils.featureType(decl, bwFactory);
+        //            ftCache.put(fType);
+        //        }
+        //
+        //        //TODO: this could pick up wrong thing, node api needs to be 
+        //        // namespace aware
+        //        String fid = (String) node.getAttributeValue("id");
+        //
+        //        return GML3ParsingUtils.feature(fType, fid, node);
     }
 
     public Element encode(Object object, Document document, Element value)
