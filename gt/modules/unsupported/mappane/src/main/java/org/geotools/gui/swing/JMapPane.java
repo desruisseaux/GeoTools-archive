@@ -33,6 +33,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JPanel;
 
@@ -47,6 +49,9 @@ import org.geotools.map.event.MapLayerListEvent;
 import org.geotools.map.event.MapLayerListListener;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.renderer.GTRenderer;
+import org.geotools.renderer.lite.LabelCache;
+import org.geotools.renderer.lite.LabelCacheDefault;
+import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.styling.Graphic;
 import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.Mark;
@@ -77,8 +82,8 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * 
  */
 
-public class JMapPane extends JPanel implements MouseListener,MouseMotionListener,
-		 HighlightChangeListener, PropertyChangeListener,
+public class JMapPane extends JPanel implements MouseListener,
+		MouseMotionListener, HighlightChangeListener, PropertyChangeListener,
 		MapLayerListListener {
 	/**
 	 * 
@@ -193,6 +198,8 @@ public class JMapPane extends JPanel implements MouseListener,MouseMotionListene
 
 	boolean changed = true;
 
+	LabelCache labelCache = new LabelCacheDefault();
+
 	public JMapPane() {
 		this(null, true, null, null);
 	}
@@ -258,6 +265,12 @@ public class JMapPane extends JPanel implements MouseListener,MouseMotionListene
 	}
 
 	public void setRenderer(GTRenderer renderer) {
+		if (renderer instanceof StreamingRenderer) {
+
+			Map hints = new HashMap();
+			hints.put(StreamingRenderer.LABEL_CACHE_KEY, labelCache);
+			renderer.setRendererHints(hints);
+		}
 		this.renderer = renderer;
 
 		if (this.context != null) {
@@ -298,7 +311,7 @@ public class JMapPane extends JPanel implements MouseListener,MouseMotionListene
 
 	public void setState(int state) {
 		this.state = state;
-//		System.out.println("State: " + state);
+		// System.out.println("State: " + state);
 	}
 
 	public double getZoomFactor() {
@@ -396,8 +409,6 @@ public class JMapPane extends JPanel implements MouseListener,MouseMotionListene
 
 	private boolean reset = false;
 
-	
-
 	protected void paintComponent(Graphics g) {
 
 		super.paintComponent(g);
@@ -424,11 +435,14 @@ public class JMapPane extends JPanel implements MouseListener,MouseMotionListene
 			Graphics2D ig = baseImage.createGraphics();
 			/* System.out.println("rendering"); */
 			renderer.setContext(context);
+			labelCache.clear(); // work around anoying labelcache bug
+			
 			// when we tell the context that the bounds have changed WMSLayers
 			// can refresh them selves
 			context.setAreaOfInterest(mapArea, context
 					.getCoordinateReferenceSystem());
 			// draw the map
+
 			renderer.paint((Graphics2D) ig, dr, mapArea);
 		}
 		((Graphics2D) g).drawImage(baseImage, 0, 0, this);
@@ -513,8 +527,10 @@ public class JMapPane extends JPanel implements MouseListener,MouseMotionListene
 		double deltaX = /* Math.abs */((r.getWidth() / scale) - mapWidth);
 		double deltaY = /* Math.abs */((r.getHeight() / scale) - mapHeight);
 
-		/*System.out.println("delta x " + deltaX);
-		System.out.println("delta y " + deltaY);*/
+		/*
+		 * System.out.println("delta x " + deltaX); System.out.println("delta y " +
+		 * deltaY);
+		 */
 		/* create the new extent */
 		Coordinate ll = new Coordinate(mapArea.getMinX() - (deltaX / 2.0),
 				mapArea.getMinY() - (deltaY / 2.0));
@@ -673,8 +689,6 @@ public class JMapPane extends JPanel implements MouseListener,MouseMotionListene
 
 	}
 
-
-
 	int startX, startY;
 
 	private boolean clickable;
@@ -682,18 +696,18 @@ public class JMapPane extends JPanel implements MouseListener,MouseMotionListene
 	public void mousePressed(MouseEvent e) {
 		startX = e.getX();
 		startY = e.getY();
-		lastX=0;
-		lastY=0;
-		
+		lastX = 0;
+		lastY = 0;
+
 	}
 
 	public void mouseReleased(MouseEvent e) {
 		int endX = e.getX();
 		int endY = e.getY();
-		
-		if(state==JMapPane.ZoomIn||state==JMapPane.ZoomOut) {
+
+		if (state == JMapPane.ZoomIn || state == JMapPane.ZoomOut) {
 			drawRectangle(this.getGraphics());
-		}else if(state == JMapPane.Pan){
+		} else if (state == JMapPane.Pan) {
 			this.getGraphics().translate(0, 0);
 		}
 		lastX = 0;
@@ -708,36 +722,34 @@ public class JMapPane extends JPanel implements MouseListener,MouseMotionListene
 		int y = e.getY();
 		if (state == JMapPane.Pan) {
 			// move the image with the mouse
-			if(lastX > 0 && lastY > 0) {
-				int dx = lastX -startX;
-				int dy = lastY -startY;
-				//System.out.println("translate "+dx+","+dy);
+			if (lastX > 0 && lastY > 0) {
+				int dx = lastX - startX;
+				int dy = lastY - startY;
+				// System.out.println("translate "+dx+","+dy);
 				graphics.clearRect(0, 0, this.getWidth(), this.getHeight());
 				((Graphics2D) graphics).drawImage(baseImage, dx, dy, this);
-				
+
 			}
 			lastX = x;
 			lastY = y;
 		} else if (state == JMapPane.ZoomIn || state == JMapPane.ZoomOut) {
-			
-			
-			
+
 			graphics.setXORMode(Color.RED);
 			if (lastX > 0 && lastY > 0)
 				drawRectangle(graphics);
 			// draw new box
-			
+
 			lastX = x;
 			lastY = y;
 			drawRectangle(graphics);
-			
+
 		}
-	
+
 	}
 
 	private void processDrag(int x1, int y1, int x2, int y2) {
-//		System.out.println("processing drag from " + x1 + "," + y1 + " -> "
-//				+ x2 + "," + y2);
+		// System.out.println("processing drag from " + x1 + "," + y1 + " -> "
+		// + x2 + "," + y2);
 		if (x1 == x2 && y1 == y2) {
 			if (isClickable())
 				mouseClicked(new MouseEvent(this, 0, new Date().getTime(), 0,
@@ -762,14 +774,14 @@ public class JMapPane extends JPanel implements MouseListener,MouseMotionListene
 			// calculate X offsets from start point to the end Point
 			double deltaX1 = endX - startX;
 
-			//System.out.println("deltaX " + deltaX1);
+			// System.out.println("deltaX " + deltaX1);
 			// new edges
 			double left = mapArea.getMinX() - deltaX1;
 			double right = mapArea.getMaxX() - deltaX1;
 			// now for Y
 			double deltaY1 = endY - startY;
 
-			//System.out.println("deltaY " + deltaY1);
+			// System.out.println("deltaY " + deltaY1);
 			double bottom = mapArea.getMinY() - deltaY1;
 			double top = mapArea.getMaxY() - deltaY1;
 			Coordinate ll = new Coordinate(left, bottom);
@@ -889,16 +901,16 @@ public class JMapPane extends JPanel implements MouseListener,MouseMotionListene
 
 	public void layerAdded(MapLayerListEvent event) {
 		changed = true;
-		
-		if(context.getLayers().length==1) {// the first one
-			
+
+		if (context.getLayers().length == 1) {// the first one
+
 			try {
 				mapArea = context.getLayerBounds();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			reset=true;
+			reset = true;
 		}
 		repaint();
 
@@ -912,7 +924,7 @@ public class JMapPane extends JPanel implements MouseListener,MouseMotionListene
 
 	public void layerChanged(MapLayerListEvent event) {
 		changed = true;
-		//System.out.println("layer changed - repaint");
+		// System.out.println("layer changed - repaint");
 		repaint();
 	}
 
@@ -932,7 +944,8 @@ public class JMapPane extends JPanel implements MouseListener,MouseMotionListene
 		int bottom = Math.min(startY, lastY);
 		int width = right - left;
 		int height = top - bottom;
-		//System.out.println("drawing rect("+left+","+bottom+","+ width+","+ height+")");
+		// System.out.println("drawing rect("+left+","+bottom+","+ width+","+
+		// height+")");
 		graphics.drawRect(left, bottom, width, height);
 
 	}
@@ -950,6 +963,6 @@ public class JMapPane extends JPanel implements MouseListener,MouseMotionListene
 
 	public void mouseMoved(MouseEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }
