@@ -88,7 +88,8 @@ public class DirectPositionListTypeBinding extends AbstractComplexBinding {
         throws Exception {
         CoordinateReferenceSystem crs = GML3ParsingUtils.crs(node);
 
-        double[] values = (double[]) value;
+        //double[] values = (double[]) value;
+        Double[] values = (Double[]) value;
         BigInteger count = (BigInteger) node.getAttributeValue("count");
 
         if (count == null) {
@@ -111,15 +112,15 @@ public class DirectPositionListTypeBinding extends AbstractComplexBinding {
         if (dim == 1) {
             for (int i = 0; i < count.intValue(); i++) {
                 dps[i] = new DirectPosition1D(crs);
-                dps[i].setOrdinate(0, values[i]);
+                dps[i].setOrdinate(0, values[i].doubleValue());
             }
         } else {
             int j = 0;
 
             for (int i = 0; i < count.intValue(); i++) {
                 dps[i] = new DirectPosition2D(crs);
-                dps[i].setOrdinate(0, values[j++]);
-                dps[i].setOrdinate(1, values[j++]);
+                dps[i].setOrdinate(0, values[j++].doubleValue());
+                dps[i].setOrdinate(1, values[j++].doubleValue());
             }
         }
 

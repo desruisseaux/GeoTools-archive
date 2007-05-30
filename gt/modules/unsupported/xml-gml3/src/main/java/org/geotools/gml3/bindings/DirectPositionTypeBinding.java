@@ -92,16 +92,17 @@ public class DirectPositionTypeBinding extends AbstractComplexBinding {
         throws Exception {
         CoordinateReferenceSystem crs = GML3ParsingUtils.crs(node);
 
-        double[] position = (double[]) value;
+        //double[] position = (double[]) value;
+        Double[] position = (Double[]) value;
         DirectPosition dp = null;
 
         if (position.length < 2) {
             dp = (crs != null) ? new DirectPosition1D(crs) : new DirectPosition1D();
-            dp.setOrdinate(0, position[0]);
+            dp.setOrdinate(0, position[0].doubleValue());
         } else {
             dp = (crs != null) ? new DirectPosition2D(crs) : new DirectPosition2D();
-            dp.setOrdinate(0, position[0]);
-            dp.setOrdinate(1, position[1]);
+            dp.setOrdinate(0, position[0].doubleValue());
+            dp.setOrdinate(1, position[1].doubleValue());
         }
 
         return dp;

@@ -15,6 +15,7 @@
  */
 package org.geotools.gml3.bindings;
 
+import java.util.List;
 import javax.xml.namespace.QName;
 import org.geotools.xml.AbstractSimpleBinding;
 import org.geotools.xml.InstanceComponent;
@@ -58,7 +59,8 @@ public class DoubleListBinding extends AbstractSimpleBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return double[].class;
+        //return double[].class;
+        return Double[].class;
     }
 
     /**
@@ -69,13 +71,17 @@ public class DoubleListBinding extends AbstractSimpleBinding {
      */
     public Object parse(InstanceComponent instance, Object value)
         throws Exception {
-        String[] values = ((String) value).split(" +");
-        double[] doubles = new double[values.length];
+        List list = (List) value;
 
-        for (int i = 0; i < values.length; i++) {
-            doubles[i] = Double.parseDouble(values[i]);
-        }
+        return list.toArray(new Double[list.size()]);
 
-        return doubles;
+        //        String[] values = ((String) value).split(" +");
+        //        double[] doubles = new double[values.length];
+        //
+        //        for (int i = 0; i < values.length; i++) {
+        //            doubles[i] = Double.parseDouble(values[i]);
+        //        }
+        //
+        //        return doubles;
     }
 }
