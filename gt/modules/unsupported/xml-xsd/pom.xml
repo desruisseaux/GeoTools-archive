@@ -77,7 +77,7 @@
   </developers>
 
 
-	<dependencyManagement>
+  <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>commons-collections</groupId>
@@ -85,7 +85,7 @@
         <version>3.1</version>
       </dependency>
     </dependencies>
-	</dependencyManagement>
+  </dependencyManagement>
 
   <!-- =========================================================== -->
   <!--     Dependency Management                                   -->
