@@ -20,6 +20,7 @@ package org.geotools.gui.swing;
  * 
  */
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.LayoutManager;
@@ -245,7 +246,7 @@ public class JMapPane extends JPanel implements MouseListener,MouseMotionListene
 		pointSelectionStyle = setupStyle(POINT, Color.cyan);
 
 		lineSelectionStyle = setupStyle(LINE, Color.cyan);
-
+		setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
 	}
 
 	/**
