@@ -242,7 +242,7 @@ class WFSFeatureType implements FeatureType {
          * @return an id for the feature.
          */
         String defaultID() {
-            return "fid-" + (new UID()).toString();
+            return "fid-" + new UID().toString().replace(':', '_');
         }
 
         /**
