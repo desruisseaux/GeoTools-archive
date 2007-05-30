@@ -89,7 +89,7 @@ public class WMSMapLayer extends DefaultMapLayer implements MapLayer,
 	private void setGrid() {
 		GetMapRequest mapRequest = wms.createGetMapRequest();
 		mapRequest.addLayer(layer);
-		System.out.println(width + " " + height);
+		//System.out.println(width + " " + height);
 		mapRequest.setDimensions(getWidth(), getHeight());
 		mapRequest.setFormat("image/png");
 		if(bgColour!=null)mapRequest.setBGColour(bgColour);
@@ -102,14 +102,14 @@ public class WMSMapLayer extends DefaultMapLayer implements MapLayer,
 		} else {
 			crs = (String) srs.iterator().next();
 		}
-		System.out.println("crs = " + crs);
+		//System.out.println("crs = " + crs);
 		if (bbox == null) {
 			HashMap bboxes = layer.getBoundingBoxes();
 			Set keys = bboxes.keySet();
 			String k = "";
 			for (Iterator it = keys.iterator(); it.hasNext(); k = (String) it
 					.next()) {
-				System.out.println(k + " -> " + bboxes.get(k));
+				//System.out.println(k + " -> " + bboxes.get(k));
 			}
 
 			CRSEnvelope bb = (CRSEnvelope) bboxes.get(crs);
@@ -125,12 +125,12 @@ public class WMSMapLayer extends DefaultMapLayer implements MapLayer,
 		}
 		// fix the bounds for the shape of the window.
 
-		System.out.println(bbox.toString());
+		//System.out.println(bbox.toString());
 		mapRequest.setBBox(bbox.getMinX() + "," + bbox.getMinY() + ","
 				+ bbox.getMaxX() + "," + bbox.getMaxY());
 		mapRequest.setTransparent(transparent);
 		URL request = mapRequest.getFinalURL();
-		System.out.println(request.toString());
+		//System.out.println(request.toString());
 		InputStream is=null;
 		try {
 
@@ -147,7 +147,7 @@ public class WMSMapLayer extends DefaultMapLayer implements MapLayer,
 				 * ReferencedEnvelope(env); }
 				 */
 				grid = gcf.create(layer.getTitle(), image, bbox);
-				System.out.println("fetched new grid");
+				//System.out.println("fetched new grid");
 				//if (featureSource == null)
 					featureSource = DataUtilities.source(FeatureUtilities
 							.wrapGridCoverage(grid));
@@ -186,10 +186,10 @@ public class WMSMapLayer extends DefaultMapLayer implements MapLayer,
 	public void mapBoundsChanged(MapBoundsEvent event) {
 
 		bbox = ((MapContext) event.getSource()).getAreaOfInterest();
-		System.out.println("old:" + bbox + "\n" + "new:"
-				+ event.getOldAreaOfInterest());
+//		System.out.println("old:" + bbox + "\n" + "new:"
+//				+ event.getOldAreaOfInterest());
 		if (!bbox.equals(event.getOldAreaOfInterest())) {
-			System.out.println("bbox changed - fetching new grid");
+			//System.out.println("bbox changed - fetching new grid");
 			setGrid();
 		}
 	}
@@ -272,7 +272,7 @@ public class WMSMapLayer extends DefaultMapLayer implements MapLayer,
 	}
 
 	public ReferencedEnvelope getBounds() {
-		System.out.println("got bounds");
+		//System.out.println("got bounds");
 		return bounds;
 	}
 

@@ -154,7 +154,9 @@ public class WMSViewer implements ActionListener {
 			crs = DefaultGeographicCRS.WGS84;
 		if (context == null) {
 			context = new DefaultMapContext(crs);
+			mp.setContext(context);
 		}
+		
 		//this allows us to listen for resize events and ask for the right size image
 		mp.addComponentListener(layer);
 		context.addLayer(layer);
@@ -177,7 +179,7 @@ public class WMSViewer implements ActionListener {
 				((StreamingRenderer)renderer).setJava2DHints(rhints);
 			}
 			mp.setRenderer(renderer);
-			mp.setContext(context);
+			
 		}
 		// mp.getRenderer().addLayer(new RenderedMapScale());
 		frame.repaint();
