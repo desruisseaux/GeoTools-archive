@@ -15,30 +15,32 @@
  */
 package org.geotools.util;
 
+import java.util.Calendar;
+import java.util.Date;
+
+import javax.xml.bind.DatatypeConverter;
+
 import org.geotools.factory.Hints;
-import org.opengis.feature.Attribute;
 
 /**
+ * Handles converting Dates to Strings
  * 
- * @author Gabriel Roldan, Axios Engineering
+ * @author Gabriel Roldan, Axios Engineering.
  */
-public class AttributeConverterFactory implements ConverterFactory {
+public class DateConverterFactory implements ConverterFactory {
 
     public Converter createConverter(Class source, Class target, Hints hints) {
-        if (!(Attribute.class.isAssignableFrom(source))) {
-            return null;
-        }
-        return new Converter() {
-            public Object convert(Object source, Class target) throws Exception {
-                Attribute att = (Attribute) source;
-                Object value = att.get();
-                if (value == null) {
-                    return null;
+        if (Date.class.isAssignableFrom(source) && String.class.equals(target)) {
+            return new Converter() {
+                public Object convert(Object source, Class target) throws Exception {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime((Date) source);
+                    String printDate = DatatypeConverter.printDate(calendar);
+                    return printDate;
                 }
-                Object convertedValue = Converters.convert(value, target);
-                return convertedValue;
-            }
-        };
+            };
+        }
+        return null;
     }
 
 }
