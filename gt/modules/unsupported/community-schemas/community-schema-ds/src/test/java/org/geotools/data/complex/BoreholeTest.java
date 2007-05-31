@@ -277,8 +277,6 @@ public class BoreholeTest extends TestCase {
         dsParams.put("dbtype", "complex");
         dsParams.put("url", url.toExternalForm());
 
-        Map propsParams = new HashMap();
-
         final Name typeName = new org.geotools.feature.Name(XMMLNS, "Borehole");
 
         FeatureAccess mappingDataStore = (FeatureAccess) DataAccessFinder.createAccess(dsParams);

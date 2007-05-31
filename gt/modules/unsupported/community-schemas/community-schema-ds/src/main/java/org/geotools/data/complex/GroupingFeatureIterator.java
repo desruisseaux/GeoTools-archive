@@ -154,6 +154,12 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
     /** counter to ensure maxFeatures is not exceeded */
     private int featureCounter;
 
+    /**
+     * flag to avoid fetching multiple source feature in repeated calld to
+     * hasNext() without calls to nex() in the middle
+     */
+    private boolean hasNextCalled;
+
     private List/* <String> */groupByAttributeNames;
 
     private List/* <AttributeMapping> */groupingMappings = new ArrayList();
@@ -245,19 +251,27 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
      * @return boolean true if exist next feature, false in other case.
      */
     public final boolean hasNext() {
-        if (featureCounter >= maxFeatures) {
-            return false;
+        if (hasNextCalled) {
+            return curSrcFeature != null;
         }
 
-        boolean exists = this.sourceFeatures.hasNext();
+        boolean exists = false;
 
-        if (exists && this.curSrcFeature == null) {
-            this.curSrcFeature = (Feature) this.sourceFeatures.next();
+        if (featureCounter < maxFeatures) {
+            
+            exists = this.sourceFeatures.hasNext();
+
+            if (exists && this.curSrcFeature == null) {
+                this.curSrcFeature = (Feature) this.sourceFeatures.next();
+            }
         }
 
         if (!exists) {
             GroupingFeatureIterator.LOGGER.finest("no more features, produced " + featureCounter);
         }
+        
+        hasNextCalled = true;
+        
         return exists;
     }
 
@@ -268,6 +282,9 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
         if (!hasNext()) {
             throw new IllegalStateException("there are no more features in this iterator");
         }
+        //note hasNextCalled is going to be updated in createCurrentGroup()
+        //as it might be called directly to improve performance in
+        //calculating the resultset size
         Feature next = computeNext();
         ++featureCounter;
         return next;
@@ -336,6 +353,10 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
      * Iterate over the source features while they belong to the same set of
      * grouping attributes.
      * 
+     * <p>
+     * Each time this method is called {@link #hasNextCalled} is set to false
+     * </p>
+     * 
      * @return the set of Features from the source resultset that belongs to the
      *         same group.
      */
@@ -354,7 +375,7 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
             }
             currentGroup.add(this.curSrcFeature);
         }
-
+        hasNextCalled = false;
         return currentGroup;
         // [[Attribute[station_no:station_no:@:station_no.2]],
         // [Attribute[sitename:sitename:@:sitename2]],

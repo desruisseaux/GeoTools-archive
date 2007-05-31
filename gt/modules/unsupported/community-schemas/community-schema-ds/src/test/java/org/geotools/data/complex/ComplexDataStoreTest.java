@@ -341,63 +341,38 @@ public class ComplexDataStoreTest extends TestCase {
         assertEquals(EXPECTED_FEATURE_COUNT, featureCount);
     }
 
-    /**
-     * Tests that GroupByFeatureReader respects attribute order when creating
-     * the mapped Features. That is, mapped attributes appear in the schema
-     * declared order.
-     * 
-     * @throws Exception
-     */
-    // Commented out since it is no longer needed for the featuresource to
-    // produce
-    // content in the schema specified order. That has to be handled at encoding
-    // time with a schema assisted encoder
-    // public void testGroupByFeatureReaderRespectsAttributeOrder() throws
-    // Exception {
-    //
-    // LOGGER.info("DATA TEST: testGroupByFeatureReaderRespectsAttributeOrder");
-    //
-    // // dataStore with denormalized wq_ir_results type
-    // MemoryDataAccess dataStore;
-    // dataStore = TestData.createDenormalizedWaterQualityResults();
-    // // mapping definitions from simple wq_ir_results type to complex wq_plus
-    // // type
-    // FeatureTypeMapping mapper;
-    // mapper = TestData.createMappingsGroupByStation(dataStore);
-    //
-    // AttributeDescriptor targetFeature = mapper.getTargetFeature();
-    // targetType = (FeatureType) targetFeature.getType();
-    // targetName = targetFeature.getName();
-    //
-    // Set/* <FeatureTypeMapping> */mappings = Collections.singleton(mapper);
-    //
-    // ComplexDataStore complexDataStore = new ComplexDataStore(mappings);
-    // Source complexSource = complexDataStore.access(targetName);
-    // assertNotNull(complexSource);
-    //
-    // Collection complexFeatures = complexSource.content();
-    // assertNotNull(complexFeatures);
-    //
-    // Iterator it = complexFeatures.iterator();
-    // Feature currFeature = (Feature) it.next();
-    //
-    // Collection/* <? extends StructuralDescriptor> */sequence =
-    // targetType.getProperties();
-    //
-    // List/* <Attribute> */atts = (List) currFeature.get();
-    // int idx = 0;
-    // for (Iterator itr = sequence.iterator(); itr.hasNext();) {
-    // AttributeDescriptor node = (AttributeDescriptor) itr.next();
-    // AttributeType attType = node.getType();
-    // Attribute attribute = (Attribute) atts.get(idx);
-    // String msg = "Expected " + attType.getName() + " at index " + idx + " but
-    // got "
-    // + attribute.getType().getName();
-    // assertEquals(msg, attType, attribute.getType());
-    // idx++;
-    // }
-    // LOGGER.info(currFeature.toString());
-    // }
+    public void testGroupingFeatureIterator() throws Exception {
+        // dataStore with denormalized wq_ir_results type
+        MemoryDataAccess dataStore = TestData.createDenormalizedWaterQualityResults();
+        // mapping definitions from simple wq_ir_results type to complex wq_plus
+        // type
+        FeatureTypeMapping mapper = TestData.createMappingsGroupByStation(dataStore);
+
+        targetName = mapper.getTargetFeature().getName();
+
+        Set/* <FeatureTypeMapping> */mappings = Collections.singleton(mapper);
+
+        ComplexDataStore complexDataStore = new ComplexDataStore(mappings);
+
+        Source complexSource = complexDataStore.access(targetName);
+        assertNotNull(complexSource);
+
+        FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+        Filter filter = ff.equals(ff.property("anzlic_no"), ff.literal("anzlic_no1"));
+        Collection complexFeatures = complexSource.content(filter);
+        assertNotNull(complexFeatures);
+
+        Iterator it = complexFeatures.iterator();
+        Name measurementName = Types.attributeName("measurement");
+
+        while (it.hasNext()) {
+            assertTrue(it.hasNext());
+            Feature currFeature = (Feature) it.next();
+            assertNotNull(currFeature);
+        }
+    }
+
+
     /**
      * Loads config from an xml config file which uses a property datastore as
      * source of features.

@@ -24,11 +24,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.xml.namespace.QName;
+
 import org.geotools.data.Query;
 import org.geotools.data.Source;
+import org.geotools.data.complex.filter.XPath;
+import org.geotools.data.complex.filter.XPath.Step;
+import org.geotools.data.complex.filter.XPath.StepList;
 import org.geotools.data.feature.FeatureSource2;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.iso.AttributeFactoryImpl;
+import org.geotools.feature.iso.Types;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.Feature;
@@ -106,8 +112,15 @@ abstract class AbstractMappingFeatureIterator implements Iterator/* <Feature> */
 
         for (Iterator it = attributeMappings.iterator(); it.hasNext();) {
             AttributeMapping attMapping = (AttributeMapping) it.next();
-            if (name.getLocalPart().equals(attMapping.getTargetXPath())) {
+            StepList targetXPath = attMapping.getTargetXPath();
+            if(targetXPath.size() > 1){
+                continue;
+            }
+            Step step = (Step) targetXPath.get(0);
+            QName stepName = step.getName();
+            if (Types.equals(name, stepName)) {
                 featureFidMapping = attMapping.getIdentifierExpression();
+                break;
             }
         }
 
