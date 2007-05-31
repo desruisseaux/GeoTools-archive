@@ -18,10 +18,10 @@
 package org.geotools.data.complex.filter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -91,13 +91,12 @@ import org.xml.sax.helpers.NamespaceSupport;
  * 
  * <pre>
  * <code>
- *                       Filter filterOnTargetType = ...
- *                       FeatureTypeMappings schemaMapping = ....
+ *    Filter filterOnTargetType = ...
+ *    FeatureTypeMappings schemaMapping = ....
  *                       
- *                       UnMappingFilterVisitor visitor = new UnmappingFilterVisitor(schemaMapping);
- *                       visitor.visit(filterOnTargetType);
- *                       
- *                       Filter filterOnSourceType = visitor.getUnrolledFilter();
+ *    UnMappingFilterVisitor visitor = new UnmappingFilterVisitor(schemaMapping);
+ *    Filter filterOnSourceType = (Filter)filterOnTargetType.accept(visitor, null);
+ *    
  * </code>
  * </pre>
  * 
@@ -109,11 +108,7 @@ public class UnmappingFilterVisitor implements org.opengis.filter.FilterVisitor,
     private static final Logger LOGGER = Logger.getLogger(UnmappingFilterVisitor.class.getPackage()
             .getName());
 
-    private Filter unrolled = Filter.INCLUDE;
-
-    private Map/* <StepList, Expression> */attributeMappings;
-
-    FeatureTypeMapping mappings;
+    private FeatureTypeMapping mappings;
 
     private static final FilterFactory2 ff = (FilterFactory2) CommonFactoryFinder
             .getFilterFactory(null);
@@ -122,99 +117,92 @@ public class UnmappingFilterVisitor implements org.opengis.filter.FilterVisitor,
      * visit(*Expression) holds the unmapped expression here. Package visible
      * just for unit tests
      */
-    List/* <Expression> */unrolledExpressions = new ArrayList/* <Expression> */(2);
-
     public UnmappingFilterVisitor(FeatureTypeMapping mappings) {
         this.mappings = mappings;
-        this.attributeMappings = new HashMap/* <StepList, Expression> */();
-        Name featureNode = mappings.getTargetFeature().getName();
-
-        for (Iterator itr = mappings.getAttributeMappings().iterator(); itr.hasNext();) {
-            AttributeMapping attMapping = (AttributeMapping) itr.next();
-            Expression exp = attMapping.getSourceExpression();
-            StepList targetAttribute = attMapping.getTargetXPath();
-
-            this.attributeMappings.put(targetAttribute, exp);
-        }
-    }
-
-    public UnmappingFilterVisitor(FeatureTypeMapping mappings,
-            Map/* <List<XPath.Step>, Expression> */attributeMappings) {
-        this.mappings = mappings;
-        this.attributeMappings = attributeMappings;
-    }
-
-    private UnmappingFilterVisitor copy() {
-        return new UnmappingFilterVisitor(mappings, attributeMappings);
     }
 
     /**
-     * Returns the Filter produced to operate over the original FeatureType.
-     * This method should be called only after {@linkplain #visit(Filter)} has
-     * been called.
+     * Used by methos that visited a filter that produced one or more filters
+     * over the surrogate feature type to combine them in an Or filter if
+     * necessary.
      * 
+     * @param combinedFilters
      * @return
      */
-    public Filter getUnrolledFilter() {
-        return unrolled;
-    }
-
-    /**
-     * Starts traversing the <code>filter</code>
-     */
-    public void visit(Filter filter) {
-        if (Filter.INCLUDE.equals(filter) || Filter.EXCLUDE.equals(filter)) {
-            this.unrolled = filter;
-            return;
+    private Filter combineOred(List combinedFilters) {
+        switch (combinedFilters.size()) {
+        case 0:
+            throw new IllegalArgumentException("No filters to combine");
+        case 1:
+            return (Filter) combinedFilters.get(0);
+        default:
+            return ff.or(combinedFilters);
         }
-        filter.accept(this, null);
-    }
-
-    public void visit(Expression expression) {
-        expression.accept(this, null);
     }
 
     /**
      * Returns a CompareFilter of the same type than <code>filter</code>, but
      * built on the unmapped expressions pointing to the surrogate type
      * attributes.
+     * 
+     * @return the scalar product of the evaluation of both expressions
      */
-    public Expression[] visitBinaryComparisonOperator(BinaryComparisonOperator filter) {
+    public Expression[][] visitBinaryComparisonOperator(BinaryComparisonOperator filter) {
         Expression left = filter.getExpression1();
         Expression right = filter.getExpression2();
 
-        left.accept(this, null);
-        right.accept(this, null);
+        List leftExpressions = (List) left.accept(this, null);
+        List rightExpressions = (List) right.accept(this, null);
 
-        if (this.unrolledExpressions.size() != 2) {
-            throw new IllegalStateException("Expected 2 unrolled expressions: "
-                    + this.unrolledExpressions);
+        if (leftExpressions.size() == 0) {
+            throw new IllegalStateException(left + " mapping not found");
         }
 
-        left = (Expression) this.unrolledExpressions.get(0);
-        right = (Expression) this.unrolledExpressions.get(1);
+        if (rightExpressions.size() == 0) {
+            throw new IllegalStateException(right + " mapping not found");
+        }
 
-        return new Expression[] { left, right };
-        // this.unrolled = newFilter;
+        Expression[][] product = buildExpressionsMatrix(leftExpressions, rightExpressions);
+
+        return product;
     }
 
-    public Expression[] visitBinarySpatialOp(BinarySpatialOperator filter) {
+    private Expression[][] buildExpressionsMatrix(List leftExpressions, List rightExpressions) {
+        Expression left;
+        Expression right;
+        Expression[][] product = new Expression[leftExpressions.size() * rightExpressions.size()][2];
+
+        int index = 0;
+        for (Iterator lefts = leftExpressions.iterator(); lefts.hasNext();) {
+            left = (Expression) lefts.next();
+            for (Iterator rights = rightExpressions.iterator(); rights.hasNext();) {
+                right = (Expression) rights.next();
+                product[index][0] = left;
+                product[index][1] = right;
+            }
+            index++;
+        }
+        return product;
+    }
+
+    public Expression[][] visitBinarySpatialOp(BinarySpatialOperator filter) {
         Expression left = filter.getExpression1();
         Expression right = filter.getExpression2();
 
-        left.accept(this, null);
-        right.accept(this, null);
+        List leftExpressions = (List) left.accept(this, null);
+        List rightExpressions = (List) right.accept(this, null);
 
-        if (this.unrolledExpressions.size() != 2) {
-            throw new IllegalStateException("Expected 2 unrolled expressions: "
-                    + this.unrolledExpressions);
+        if (leftExpressions.size() == 0) {
+            throw new IllegalStateException(left + " mapping not found");
         }
 
-        left = (Expression) this.unrolledExpressions.get(0);
-        right = (Expression) this.unrolledExpressions.get(1);
+        if (rightExpressions.size() == 0) {
+            throw new IllegalStateException(right + " mapping not found");
+        }
 
-        return new Expression[] { left, right };
-        // this.unrolled = newFilter;
+        Expression[][] product = buildExpressionsMatrix(leftExpressions, rightExpressions);
+
+        return product;
     }
 
     public List/* <Filter> */visitBinaryLogicOp(BinaryLogicOperator filter) {
@@ -222,10 +210,8 @@ public class UnmappingFilterVisitor implements org.opengis.filter.FilterVisitor,
         List unrolledFilers = new ArrayList();
         try {
             for (Iterator it = filter.getChildren().iterator(); it.hasNext();) {
-                UnmappingFilterVisitor helper = copy();
                 Filter next = (Filter) it.next();
-                helper.visit(next);
-                Filter unrolled = helper.getUnrolledFilter();
+                Filter unrolled = (Filter) next.accept(this, null);
                 unrolledFilers.add(unrolled);
             }
         } catch (Exception e) {
@@ -234,35 +220,32 @@ public class UnmappingFilterVisitor implements org.opengis.filter.FilterVisitor,
         return unrolledFilers;
     }
 
-    public Expression[] visitBinaryExpression(BinaryExpression expression) {
+    public Expression[][] visitBinaryExpression(BinaryExpression expression) {
         UnmappingFilterVisitor.LOGGER.finest(expression.toString());
 
         Expression left = expression.getExpression1();
         Expression right = expression.getExpression2();
 
-        UnmappingFilterVisitor helper = copy();
-        helper.visit(left);
-        left = (Expression) helper.unrolledExpressions.get(0);
+        List leftExpressions = (List) left.accept(this, null);
+        List rightExpressions = (List) right.accept(this, null);
 
-        helper = copy();
-        helper.visit(right);
-        right = (Expression) helper.unrolledExpressions.get(0);
+        Expression[][] product = buildExpressionsMatrix(leftExpressions, rightExpressions);
 
-        return new Expression[] { left, right };
+        return product;
     }
 
     public Object visit(ExcludeFilter filter, Object arg1) {
-        return this.unrolled = filter;
+        return filter;
     }
 
     public Object visit(IncludeFilter filter, Object arg1) {
-        return this.unrolled = filter;
+        return filter;
     }
 
     public Object visit(And filter, Object arg1) {
         List list = visitBinaryLogicOp(filter);
-        this.unrolled = UnmappingFilterVisitor.ff.and(list);
-        return this.unrolled;
+        Filter unrolled = ff.and(list);
+        return unrolled;
     }
 
     public Object visit(Id filter, Object arg1) {
@@ -300,7 +283,6 @@ public class UnmappingFilterVisitor implements org.opengis.filter.FilterVisitor,
         }
 
         if (Expression.NIL.equals(fidExpression)) {
-            this.unrolled = filter;
             return filter;
         }
 
@@ -309,8 +291,7 @@ public class UnmappingFilterVisitor implements org.opengis.filter.FilterVisitor,
         if (fidExpression instanceof Function) {
             Function fe = (Function) fidExpression;
             if ("getID".equalsIgnoreCase(fe.getName())) {
-                UnmappingFilterVisitor.LOGGER.finest("Fid mapping points to same ID as source");
-                this.unrolled = filter;
+                LOGGER.finest("Fid mapping points to same ID as source");
                 return unrolled;
             }
         }
@@ -331,234 +312,461 @@ public class UnmappingFilterVisitor implements org.opengis.filter.FilterVisitor,
         }
 
         UnmappingFilterVisitor.LOGGER.finer("unrolled fid filter is " + unrolled);
-        this.unrolled = unrolled;
         return unrolled;
     }
 
     public Object visit(Not filter, Object arg1) {
-        filter.getFilter().accept(this, null);
-        this.unrolled = UnmappingFilterVisitor.ff.not(this.unrolled);
+        Filter unrolled = (Filter) filter.getFilter().accept(this, null);
+        unrolled = ff.not(unrolled);
         return unrolled;
     }
 
     public Object visit(Or filter, Object arg1) {
         List list = visitBinaryLogicOp(filter);
-        this.unrolled = UnmappingFilterVisitor.ff.or(list);
+        Filter unrolled = ff.or(list);
         return unrolled;
     }
 
     public Object visit(PropertyIsBetween filter, Object arg1) {
-
         Expression expression = filter.getExpression();
         Expression lower = filter.getLowerBoundary();
         Expression upper = filter.getUpperBoundary();
 
-        expression.accept(this, null);
-        lower.accept(this, null);
-        upper.accept(this, null);
+        List expressions = (List) expression.accept(this, null);
+        List lowerExpressions = (List) lower.accept(this, null);
+        List upperExpressions = (List) upper.accept(this, null);
 
-        expression = (Expression) this.unrolledExpressions.get(0);
-        lower = (Expression) this.unrolledExpressions.get(1);
-        upper = (Expression) this.unrolledExpressions.get(2);
+        final int combinedSize = expressions.size() * lowerExpressions.size()
+                * upperExpressions.size();
+        List combinedFilters = new ArrayList(combinedSize);
 
-        PropertyIsBetween newFilter = UnmappingFilterVisitor.ff.between(expression, lower, upper);
+        for (Iterator lowers = lowerExpressions.iterator(); lowers.hasNext();) {
+            Expression floor = (Expression) lowers.next();
+            for (Iterator exprs = expressions.iterator(); exprs.hasNext();) {
+                Expression prop = (Expression) exprs.next();
+                for (Iterator uppers = upperExpressions.iterator(); uppers.hasNext();) {
+                    Expression roof = (Expression) uppers.next();
+                    PropertyIsBetween newFilter = ff.between(prop, floor, roof);
+                    combinedFilters.add(newFilter);
+                }
+            }
+        }
 
-        this.unrolled = newFilter;
-        return newFilter;
+        Filter unrolled = combineOred(combinedFilters);
+        return unrolled;
     }
 
     public Object visit(PropertyIsEqualTo filter, Object arg1) {
-        Expression[] expressions = visitBinaryComparisonOperator(filter);
-        unrolled = UnmappingFilterVisitor.ff.equals(expressions[0], expressions[1]);
+        Expression[][] expressions = visitBinaryComparisonOperator(filter);
+
+        List combinedFilters = new ArrayList(expressions.length);
+
+        for (int i = 0; i < expressions.length; i++) {
+            Expression left = expressions[i][0];
+            Expression right = expressions[i][1];
+            Filter unrolled = ff.equals(left, right);
+            combinedFilters.add(unrolled);
+        }
+
+        Filter unrolled = combineOred(combinedFilters);
         return unrolled;
     }
 
     public Object visit(PropertyIsNotEqualTo filter, Object arg1) {
-        Expression[] expressions = visitBinaryComparisonOperator(filter);
-        boolean matchingCase = filter.isMatchingCase();
-        unrolled = UnmappingFilterVisitor.ff.notEqual(expressions[0], expressions[1], matchingCase);
+        Expression[][] expressions = visitBinaryComparisonOperator(filter);
+
+        List combinedFilters = new ArrayList(expressions.length);
+
+        for (int i = 0; i < expressions.length; i++) {
+            Expression left = expressions[i][0];
+            Expression right = expressions[i][1];
+            Filter unrolled = ff.notEqual(left, right, filter.isMatchingCase());
+            combinedFilters.add(unrolled);
+        }
+
+        Filter unrolled = combineOred(combinedFilters);
         return unrolled;
     }
 
     public Object visit(PropertyIsGreaterThan filter, Object arg1) {
-        Expression[] expressions = visitBinaryComparisonOperator(filter);
-        unrolled = UnmappingFilterVisitor.ff.greater(expressions[0], expressions[1]);
+        Expression[][] expressions = visitBinaryComparisonOperator(filter);
+
+        List combinedFilters = new ArrayList(expressions.length);
+
+        for (int i = 0; i < expressions.length; i++) {
+            Expression left = expressions[i][0];
+            Expression right = expressions[i][1];
+            Filter unrolled = ff.greater(left, right);
+            combinedFilters.add(unrolled);
+        }
+
+        Filter unrolled = combineOred(combinedFilters);
         return unrolled;
     }
 
     public Object visit(PropertyIsGreaterThanOrEqualTo filter, Object arg1) {
-        Expression[] expressions = visitBinaryComparisonOperator(filter);
-        unrolled = UnmappingFilterVisitor.ff.greaterOrEqual(expressions[0], expressions[1]);
+        Expression[][] expressions = visitBinaryComparisonOperator(filter);
+
+        List combinedFilters = new ArrayList(expressions.length);
+
+        for (int i = 0; i < expressions.length; i++) {
+            Expression left = expressions[i][0];
+            Expression right = expressions[i][1];
+            Filter unrolled = ff.greaterOrEqual(left, right);
+            combinedFilters.add(unrolled);
+        }
+
+        Filter unrolled = combineOred(combinedFilters);
         return unrolled;
     }
 
     public Object visit(PropertyIsLessThan filter, Object arg1) {
-        Expression[] expressions = visitBinaryComparisonOperator(filter);
-        unrolled = UnmappingFilterVisitor.ff.less(expressions[0], expressions[1]);
+        Expression[][] expressions = visitBinaryComparisonOperator(filter);
+
+        List combinedFilters = new ArrayList(expressions.length);
+
+        for (int i = 0; i < expressions.length; i++) {
+            Expression left = expressions[i][0];
+            Expression right = expressions[i][1];
+            Filter unrolled = ff.less(left, right);
+            combinedFilters.add(unrolled);
+        }
+
+        Filter unrolled = combineOred(combinedFilters);
         return unrolled;
     }
 
     public Object visit(PropertyIsLessThanOrEqualTo filter, Object arg1) {
-        Expression[] expressions = visitBinaryComparisonOperator(filter);
-        unrolled = UnmappingFilterVisitor.ff.lessOrEqual(expressions[0], expressions[1]);
+        Expression[][] expressions = visitBinaryComparisonOperator(filter);
+
+        List combinedFilters = new ArrayList(expressions.length);
+
+        for (int i = 0; i < expressions.length; i++) {
+            Expression left = expressions[i][0];
+            Expression right = expressions[i][1];
+            Filter unrolled = ff.lessOrEqual(left, right);
+            combinedFilters.add(unrolled);
+        }
+
+        Filter unrolled = combineOred(combinedFilters);
         return unrolled;
     }
 
     public Object visit(PropertyIsLike filter, Object arg1) {
         Expression value = filter.getExpression();
-        value.accept(this, null);
-        Expression newValue = (Expression) this.unrolledExpressions.get(0);
+        List unrolledValues = (List) value.accept(this, null);
 
+        String literal = filter.getLiteral();
         String wildcard = filter.getWildCard();
         String single = filter.getSingleChar();
         String escape = filter.getEscape();
 
-        PropertyIsLike newFilter = UnmappingFilterVisitor.ff.like(newValue, filter.getLiteral(),
-                wildcard, single, escape);
-        this.unrolled = newFilter;
-        return newFilter;
+        List combined = new ArrayList(unrolledValues.size());
+        for (Iterator it = unrolledValues.iterator(); it.hasNext();) {
+            Expression sourceValue = (Expression) it.next();
+            PropertyIsLike newFilter = ff.like(sourceValue, literal, wildcard, single, escape);
+            combined.add(newFilter);
+        }
+        Filter unrolled = combineOred(combined);
+        return unrolled;
     }
 
     public Object visit(PropertyIsNull filter, Object arg1) {
         Expression nullCheck = filter.getExpression();
-        nullCheck.accept(this, null);
+        List sourceChecks = (List) nullCheck.accept(this, null);
 
-        Expression newCheckValue = (Expression) this.unrolledExpressions.get(0);
+        List combined = new ArrayList(sourceChecks.size());
 
-        this.unrolled = UnmappingFilterVisitor.ff.isNull(newCheckValue);
+        for (Iterator it = sourceChecks.iterator(); it.hasNext();) {
+            Expression sourceValue = (Expression) it.next();
+            Filter newFilter = ff.isNull(sourceValue);
+            combined.add(newFilter);
+        }
+
+        Filter unrolled = combineOred(combined);
         return unrolled;
     }
 
     public Object visit(BBOX filter, Object arg1) {
         String propertyName = filter.getPropertyName();
-        Expression name = UnmappingFilterVisitor.ff.property(propertyName);
-        name.accept(this, null);
-        name = (Expression) this.unrolledExpressions.get(0);
+        Expression name = ff.property(propertyName);
 
-        unrolled = UnmappingFilterVisitor.ff.bbox(name, filter.getMinX(), filter.getMinY(), filter
-                .getMaxX(), filter.getMaxY(), filter.getSRS());
+        final List sourceNames = (List) name.accept(this, null);
+
+        final List combined = new ArrayList(sourceNames.size());
+
+        for (Iterator it = sourceNames.iterator(); it.hasNext();) {
+            Expression sourceName = (Expression) it.next();
+            Filter unrolled = ff.bbox(sourceName, filter.getMinX(), filter.getMinY(), filter
+                    .getMaxX(), filter.getMaxY(), filter.getSRS());
+            combined.add(unrolled);
+        }
+
+        Filter unrolled = combineOred(combined);
+
         return unrolled;
     }
 
     public Object visit(Beyond filter, Object arg1) {
-        Expression[] exps = visitBinarySpatialOp(filter);
+        Expression[][] exps = visitBinarySpatialOp(filter);
 
-        unrolled = UnmappingFilterVisitor.ff.beyond(exps[0], exps[1], filter.getDistance(), filter
-                .getDistanceUnits());
+        List combinedFilters = new ArrayList(exps.length);
+
+        for (int i = 0; i < exps.length; i++) {
+            Expression left = exps[i][0];
+            Expression right = exps[i][1];
+
+            Filter unrolled = ff.beyond(left, right, filter.getDistance(), filter
+                    .getDistanceUnits());
+            combinedFilters.add(unrolled);
+        }
+
+        Filter unrolled = combineOred(combinedFilters);
         return unrolled;
     }
 
     public Object visit(Contains filter, Object arg1) {
-        Expression[] exps = visitBinarySpatialOp(filter);
-        unrolled = UnmappingFilterVisitor.ff.contains(exps[0], exps[1]);
+        Expression[][] exps = visitBinarySpatialOp(filter);
+
+        List combinedFilters = new ArrayList(exps.length);
+
+        for (int i = 0; i < exps.length; i++) {
+            Expression left = exps[i][0];
+            Expression right = exps[i][1];
+
+            Filter unrolled = ff.contains(left, right);
+            combinedFilters.add(unrolled);
+        }
+
+        Filter unrolled = combineOred(combinedFilters);
         return unrolled;
     }
 
     public Object visit(Crosses filter, Object arg1) {
-        Expression[] exps = visitBinarySpatialOp(filter);
-        unrolled = UnmappingFilterVisitor.ff.crosses(exps[0], exps[1]);
+        Expression[][] exps = visitBinarySpatialOp(filter);
+
+        List combinedFilters = new ArrayList(exps.length);
+
+        for (int i = 0; i < exps.length; i++) {
+            Expression left = exps[i][0];
+            Expression right = exps[i][1];
+
+            Filter unrolled = ff.crosses(left, right);
+            combinedFilters.add(unrolled);
+        }
+
+        Filter unrolled = combineOred(combinedFilters);
         return unrolled;
     }
 
     public Object visit(Disjoint filter, Object arg1) {
-        Expression[] exps = visitBinarySpatialOp(filter);
-        unrolled = UnmappingFilterVisitor.ff.disjoint(exps[0], exps[1]);
+        Expression[][] exps = visitBinarySpatialOp(filter);
+
+        List combinedFilters = new ArrayList(exps.length);
+
+        for (int i = 0; i < exps.length; i++) {
+            Expression left = exps[i][0];
+            Expression right = exps[i][1];
+
+            Filter unrolled = ff.disjoint(left, right);
+            combinedFilters.add(unrolled);
+        }
+
+        Filter unrolled = combineOred(combinedFilters);
         return unrolled;
     }
 
     public Object visit(DWithin filter, Object arg1) {
-        Expression[] exps = visitBinarySpatialOp(filter);
-        unrolled = UnmappingFilterVisitor.ff.dwithin(exps[0], exps[1], filter.getDistance(), filter
-                .getDistanceUnits());
+        Expression[][] exps = visitBinarySpatialOp(filter);
+
+        List combinedFilters = new ArrayList(exps.length);
+
+        for (int i = 0; i < exps.length; i++) {
+            Expression left = exps[i][0];
+            Expression right = exps[i][1];
+
+            Filter unrolled = ff.dwithin(left, right, filter.getDistance(), filter
+                    .getDistanceUnits());
+            combinedFilters.add(unrolled);
+        }
+
+        Filter unrolled = combineOred(combinedFilters);
         return unrolled;
     }
 
     public Object visit(Equals filter, Object arg1) {
-        Expression[] exps = visitBinarySpatialOp(filter);
-        unrolled = UnmappingFilterVisitor.ff.equal(exps[0], exps[1]);
+        Expression[][] exps = visitBinarySpatialOp(filter);
+
+        List combinedFilters = new ArrayList(exps.length);
+
+        for (int i = 0; i < exps.length; i++) {
+            Expression left = exps[i][0];
+            Expression right = exps[i][1];
+
+            Filter unrolled = ff.equal(left, right);
+            combinedFilters.add(unrolled);
+        }
+
+        Filter unrolled = combineOred(combinedFilters);
         return unrolled;
     }
 
     public Object visit(Intersects filter, Object arg1) {
-        Expression[] exps = visitBinarySpatialOp(filter);
-        unrolled = UnmappingFilterVisitor.ff.intersects(exps[0], exps[1]);
+        Expression[][] exps = visitBinarySpatialOp(filter);
+
+        List combinedFilters = new ArrayList(exps.length);
+
+        for (int i = 0; i < exps.length; i++) {
+            Expression left = exps[i][0];
+            Expression right = exps[i][1];
+
+            Filter unrolled = ff.intersects(left, right);
+            combinedFilters.add(unrolled);
+        }
+
+        Filter unrolled = combineOred(combinedFilters);
         return unrolled;
     }
 
     public Object visit(Overlaps filter, Object arg1) {
-        Expression[] exps = visitBinarySpatialOp(filter);
-        unrolled = UnmappingFilterVisitor.ff.overlaps(exps[0], exps[1]);
+        Expression[][] exps = visitBinarySpatialOp(filter);
+
+        List combinedFilters = new ArrayList(exps.length);
+
+        for (int i = 0; i < exps.length; i++) {
+            Expression left = exps[i][0];
+            Expression right = exps[i][1];
+
+            Filter unrolled = ff.overlaps(left, right);
+            combinedFilters.add(unrolled);
+        }
+
+        Filter unrolled = combineOred(combinedFilters);
         return unrolled;
     }
 
     public Object visit(Touches filter, Object arg1) {
-        Expression[] exps = visitBinarySpatialOp(filter);
-        unrolled = UnmappingFilterVisitor.ff.touches(exps[0], exps[1]);
+        Expression[][] exps = visitBinarySpatialOp(filter);
+
+        List combinedFilters = new ArrayList(exps.length);
+
+        for (int i = 0; i < exps.length; i++) {
+            Expression left = exps[i][0];
+            Expression right = exps[i][1];
+
+            Filter unrolled = ff.touches(left, right);
+            combinedFilters.add(unrolled);
+        }
+
+        Filter unrolled = combineOred(combinedFilters);
         return unrolled;
     }
 
     public Object visit(Within filter, Object arg1) {
-        Expression[] exps = visitBinarySpatialOp(filter);
-        unrolled = UnmappingFilterVisitor.ff.within(exps[0], exps[1]);
+        Expression[][] exps = visitBinarySpatialOp(filter);
+
+        List combinedFilters = new ArrayList(exps.length);
+
+        for (int i = 0; i < exps.length; i++) {
+            Expression left = exps[i][0];
+            Expression right = exps[i][1];
+
+            Filter unrolled = ff.within(left, right);
+            combinedFilters.add(unrolled);
+        }
+
+        Filter unrolled = combineOred(combinedFilters);
         return unrolled;
     }
 
     public Object visitNullFilter(Object arg0) {
-        return unrolled = Filter.EXCLUDE;
+        return Filter.EXCLUDE;
     }
 
     public Object visit(NilExpression expr, Object arg1) {
-        this.unrolledExpressions.add(expr);
-        return unrolledExpressions;
+        return Collections.singletonList(expr);
     }
 
     public Object visit(Add expr, Object arg1) {
-        Expression[] expressions = visitBinaryExpression(expr);
-        Expression add = UnmappingFilterVisitor.ff.add(expressions[0], expressions[1]);
-        unrolledExpressions.add(add);
-        return unrolledExpressions;
+        Expression[][] expressions = visitBinaryExpression(expr);
+
+        List combinedExpressions = new ArrayList(expressions.length);
+
+        for (int i = 0; i < expressions.length; i++) {
+            Expression left = expressions[i][0];
+            Expression right = expressions[i][1];
+            Expression sourceExpression = ff.add(left, right);
+            combinedExpressions.add(sourceExpression);
+        }
+
+        return combinedExpressions;
     }
 
     public Object visit(Divide expr, Object arg1) {
-        Expression[] expressions = visitBinaryExpression(expr);
-        Expression divide = UnmappingFilterVisitor.ff.divide(expressions[0], expressions[1]);
-        unrolledExpressions.add(divide);
-        return unrolledExpressions;
+        Expression[][] expressions = visitBinaryExpression(expr);
+
+        List combinedExpressions = new ArrayList(expressions.length);
+
+        for (int i = 0; i < expressions.length; i++) {
+            Expression left = expressions[i][0];
+            Expression right = expressions[i][1];
+            Expression sourceExpression = ff.divide(left, right);
+            combinedExpressions.add(sourceExpression);
+        }
+
+        return combinedExpressions;
     }
 
-    public Object visit(Function expr, Object arg1) {
-        List expressions = expr.getParameters();
+    /**
+     * @todo: support function arguments that map to more than one source
+     *        expression. For example, if the argumen <code>gml:name</code>
+     *        maps to source expressions <code>name</code> and
+     *        <code>description</code> because the mapping has attribute
+     *        mappings for both <code>gml:name[1] = name</code> and
+     *        <code>gml:name[2] = description</code>.
+     */
+    public Object visit(Function function, Object arg1) {
+
+        final List expressions = function.getParameters();
+
         List arguments = new ArrayList(expressions.size());
 
         for (Iterator it = expressions.iterator(); it.hasNext();) {
             Expression mappingExpression = (Expression) it.next();
-            UnmappingFilterVisitor helper = copy();
-            helper.visit(mappingExpression);
-            List list = helper.unrolledExpressions;
-            Expression unrolledExpression = (Expression) list.get(0);
+            List sourceExpressions = (List) mappingExpression.accept(this, null);
+            if (sourceExpressions.size() > 1) {
+                throw new UnsupportedOperationException("unrolling function arguments "
+                        + "that map to more than one source expressions " + "is not supported yet");
+            }
+            Expression unrolledExpression = (Expression) sourceExpressions.get(0);
             arguments.add(unrolledExpression);
         }
 
         Expression[] unmapped = new Expression[arguments.size()];
         unmapped = (Expression[]) arguments.toArray(unmapped);
 
-        Function unmappedFunction = UnmappingFilterVisitor.ff.function(expr.getName(), unmapped);
+        Function unmappedFunction = ff.function(function.getName(), unmapped);
 
-        this.unrolledExpressions.add(unmappedFunction);
-
-        return unmappedFunction;
+        return Collections.singletonList(unmappedFunction);
     }
 
     public Object visit(Literal expr, Object arg1) {
-        this.unrolledExpressions.add(expr);
-        return expr;
+        return Collections.singletonList(expr);
     }
 
     public Object visit(Multiply expr, Object arg1) {
-        Expression[] expressions = visitBinaryExpression(expr);
-        Expression multiply = UnmappingFilterVisitor.ff.multiply(expressions[0], expressions[1]);
-        unrolledExpressions.add(multiply);
-        return unrolledExpressions;
+        Expression[][] expressions = visitBinaryExpression(expr);
+
+        List combinedExpressions = new ArrayList(expressions.length);
+
+        for (int i = 0; i < expressions.length; i++) {
+            Expression left = expressions[i][0];
+            Expression right = expressions[i][1];
+            Expression sourceExpression = ff.multiply(left, right);
+            combinedExpressions.add(sourceExpression);
+        }
+
+        return combinedExpressions;
     }
 
     public Object visit(PropertyName expr, Object arg1) {
@@ -566,23 +774,62 @@ public class UnmappingFilterVisitor implements org.opengis.filter.FilterVisitor,
         String targetXPath = expr.getPropertyName();
         NamespaceSupport namespaces = mappings.getNamespaces();
         AttributeDescriptor root = mappings.getTargetFeature();
-        
+
         StepList simplifiedSteps = XPath.steps(root, targetXPath, namespaces);
 
-        Expression sourceExpression = (Expression) this.attributeMappings.get(simplifiedSteps);
+        List /* {Expression} */matchingMappings = findMappingsFor(simplifiedSteps);
 
-        if (sourceExpression == null) {
+        if (matchingMappings.size() == 0) {
             throw new IllegalArgumentException("Don't know how to map " + targetXPath);
         }
 
-        this.unrolledExpressions.add(sourceExpression);
-        return sourceExpression;
+        return matchingMappings;
+    }
+
+    /**
+     * Looks up for attribute mappings matching the xpath expression
+     * <code>propertyName</code>.
+     * <p>
+     * If any step in <code>propertyName</code> has index greater than 1, any
+     * mapping for the same property applies, regardless of the mapping. For
+     * example, if there are mappings for <code>gml:name[1]</code>,
+     * <code>gml:name[2]</code> and <code>gml:name[3]</code>, but
+     * propertyName is just <code>gml:name</code>, all three mappings apply.
+     * </p>
+     * 
+     * @param simplifiedSteps
+     * @return
+     */
+    private List /* {Expression} */findMappingsFor(final StepList propertyName) {
+        // collect all the mappings for the given property
+        // regardless of xpath index
+        List candidates = new LinkedList();
+
+        for (Iterator it = mappings.getAttributeMappings().iterator(); it.hasNext();) {
+            AttributeMapping attMapping = (AttributeMapping) it.next();
+            StepList targetProperty = attMapping.getTargetXPath();
+            Expression sourceExpr = attMapping.getSourceExpression();
+
+            if (propertyName.equalsIgnoreIndex(targetProperty)) {
+                candidates.add(sourceExpr);
+            }
+        }
+
+        return candidates;
     }
 
     public Object visit(Subtract expr, Object arg1) {
-        Expression[] expressions = visitBinaryExpression(expr);
-        Expression subtract = UnmappingFilterVisitor.ff.subtract(expressions[0], expressions[1]);
-        unrolledExpressions.add(subtract);
-        return unrolledExpressions;
+        Expression[][] expressions = visitBinaryExpression(expr);
+
+        List combinedExpressions = new ArrayList(expressions.length);
+
+        for (int i = 0; i < expressions.length; i++) {
+            Expression left = expressions[i][0];
+            Expression right = expressions[i][1];
+            Expression sourceExpression = ff.subtract(left, right);
+            combinedExpressions.add(sourceExpression);
+        }
+
+        return combinedExpressions;
     }
 }

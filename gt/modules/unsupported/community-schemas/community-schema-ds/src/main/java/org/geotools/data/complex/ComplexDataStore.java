@@ -117,11 +117,15 @@ public class ComplexDataStore /* extends AbstractDataStore */implements FeatureA
     /**
      * Returns the mapping suite for the given target type name.
      * 
+     * <p>
+     * Note this method is public just for unit testing pourposes
+     * </p>
+     * 
      * @param typeName
      * @return
      * @throws IOException
      */
-    private FeatureTypeMapping getMapping(String typeName) throws IOException {
+    public FeatureTypeMapping getMapping(String typeName) throws IOException {
         FeatureTypeMapping mapping = (FeatureTypeMapping) this.mappings.get(typeName);
         if (mapping == null) {
             StringBuffer availables = new StringBuffer("[");
@@ -348,9 +352,7 @@ public class ComplexDataStore /* extends AbstractDataStore */implements FeatureA
      */
     public static Filter unrollFilter(Filter complexFilter, FeatureTypeMapping mapping) {
         UnmappingFilterVisitor visitor = new UnmappingFilterVisitor(mapping);
-        complexFilter.accept(visitor, null);
-        // visitor.visit(complexFilter);
-        Filter unrolledFilter = visitor.getUnrolledFilter();
+        Filter unrolledFilter = (Filter) complexFilter.accept(visitor, null);
         return unrolledFilter;
     }
 

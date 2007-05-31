@@ -11,7 +11,6 @@ import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.factory.Hints;
 import org.geotools.feature.iso.AttributeBuilder;
 import org.geotools.feature.iso.AttributeFactoryImpl;
 import org.geotools.feature.iso.Types;
@@ -24,7 +23,6 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.Name;
-import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.feature.type.TypeFactory;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Literal;
@@ -114,6 +112,39 @@ public class XPath {
             }
             return copy;
         }
+
+        /**
+         * Compares this StepList with another for equivalence regardless of the
+         * indexes of each Step.
+         * 
+         * @param propertyName
+         * @return <code>true</code> if this step list has the same location
+         *         paths than <code>propertyName</code> ignoring the indexes
+         *         in each step. <code>false</code> otherwise.
+         */
+        public boolean equalsIgnoreIndex(StepList propertyName) {
+            if (propertyName == null) {
+                return false;
+            }
+            if (propertyName == this) {
+                return true;
+            }
+            if (size() != propertyName.size()) {
+                return false;
+            }
+            Iterator mine = iterator();
+            Iterator him = propertyName.iterator();
+            Step myStep;
+            Step hisStep;
+            while (mine.hasNext()) {
+                myStep = (Step) mine.next();
+                hisStep = (Step) him.next();
+                if (!myStep.equalsIgnoreIndex(hisStep)) {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 
     /**
@@ -135,6 +166,23 @@ public class XPath {
             }
             this.attributeName = name;
             this.index = index;
+        }
+
+        /**
+         * Compares this Step with another for equivalence ignoring the steps
+         * indexes.
+         * 
+         * @param hisStep
+         * @return
+         */
+        public boolean equalsIgnoreIndex(Step other) {
+            if (other == null) {
+                return false;
+            }
+            if (other == this) {
+                return true;
+            }
+            return other.getName().equals(getName());
         }
 
         public int getIndex() {

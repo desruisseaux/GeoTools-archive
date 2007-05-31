@@ -1,26 +1,34 @@
 package org.geotools.data.complex.filter;
 
+import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 
 import junit.framework.TestCase;
 
+import org.geotools.data.DataAccessFinder;
 import org.geotools.data.complex.AttributeMapping;
+import org.geotools.data.complex.ComplexDataStore;
 import org.geotools.data.complex.FeatureTypeMapping;
 import org.geotools.data.complex.TestData;
 import org.geotools.data.complex.filter.XPath.Step;
 import org.geotools.data.complex.filter.XPath.StepList;
+import org.geotools.data.feature.FeatureAccess;
 import org.geotools.data.feature.FeatureSource2;
 import org.geotools.data.feature.memory.MemoryDataAccess;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.iso.TypeBuilder;
 import org.geotools.feature.iso.Types;
+import org.geotools.filter.FilterFactoryImplNamespaceAware;
 import org.geotools.filter.FilterType;
+import org.geotools.gml3.bindings.GML;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -33,6 +41,7 @@ import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.Id;
+import org.opengis.filter.Or;
 import org.opengis.filter.PropertyIsBetween;
 import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.PropertyIsGreaterThan;
@@ -57,8 +66,7 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class UnmappingFilterVisitorTest extends TestCase {
 
-    private static FilterFactory2 ff = (FilterFactory2) CommonFactoryFinder
-            .getFilterFactory(null);
+    private static FilterFactory2 ff = (FilterFactory2) CommonFactoryFinder.getFilterFactory(null);
 
     private UnmappingFilterVisitor visitor;
 
@@ -91,43 +99,42 @@ public class UnmappingFilterVisitorTest extends TestCase {
      * @return
      * @throws Exception
      */
-    private FeatureTypeMapping createSampleDerivedAttributeMappings()
-            throws Exception {
+    private FeatureTypeMapping createSampleDerivedAttributeMappings() throws Exception {
         // create the target type
         TypeFactory tf = new org.geotools.feature.iso.type.TypeFactoryImpl();
         TypeBuilder builder = new TypeBuilder(tf);
 
-        AttributeType areaOfInfluence = builder.name("areaOfInfluence").bind(
-                Polygon.class).attribute();
-        AttributeType concatType = builder.name("concatenated").bind(
-                String.class).attribute();
+        AttributeType areaOfInfluence = builder.name("areaOfInfluence").bind(Polygon.class)
+                .attribute();
+        AttributeType concatType = builder.name("concatenated").bind(String.class).attribute();
 
         builder.setName("target");
         builder.addAttribute("areaOfInfluence", areaOfInfluence);
         builder.addAttribute("concatenated", concatType);
 
         FeatureType targetType = builder.feature();
-        AttributeDescriptor targetFeature = tf.createAttributeDescriptor(
-                targetType, targetType.getName(), 0, Integer.MAX_VALUE, true);
+        AttributeDescriptor targetFeature = tf.createAttributeDescriptor(targetType, targetType
+                .getName(), 0, Integer.MAX_VALUE, true);
 
         // create the mapping definition
         List attMappings = new LinkedList();
 
         NamespaceSupport namespaces = new NamespaceSupport();
-        
-        Function aoiExpr = ff.function("buffer", ff.property("location"), ff
-                .literal(10));
 
-        attMappings.add(new AttributeMapping(null, aoiExpr, XPath.steps(targetFeature, "areaOfInfluence", namespaces)));
+        Function aoiExpr = ff.function("buffer", ff.property("location"), ff.literal(10));
 
-        Function strConcat = ff.function("strConcat", ff.property("anzlic_no"),
-                ff.property("project_no"));
+        attMappings.add(new AttributeMapping(null, aoiExpr, XPath.steps(targetFeature,
+                "areaOfInfluence", namespaces)));
 
-        attMappings.add(new AttributeMapping(null, strConcat, XPath.steps(targetFeature, "concatenated", namespaces)));
+        Function strConcat = ff.function("strConcat", ff.property("anzlic_no"), ff
+                .property("project_no"));
+
+        attMappings.add(new AttributeMapping(null, strConcat, XPath.steps(targetFeature,
+                "concatenated", namespaces)));
 
         FeatureSource2 simpleSource = mapping.getSource();
-        FeatureTypeMapping mapping = new FeatureTypeMapping(simpleSource,
-                targetFeature, attMappings, namespaces);
+        FeatureTypeMapping mapping = new FeatureTypeMapping(simpleSource, targetFeature,
+                attMappings, namespaces);
         return mapping;
     }
 
@@ -140,9 +147,7 @@ public class UnmappingFilterVisitorTest extends TestCase {
         String fid = "station_no.1";
         Id fidFilter = ff.id(Collections.singleton(ff.featureId(fid)));
 
-        this.visitor.visit(fidFilter, null);
-
-        Filter unrolled = this.visitor.getUnrolledFilter();
+        Filter unrolled = (Filter) fidFilter.accept(visitor, null);
         assertNotNull(unrolled);
 
         Collection results = mapping.getSource().content(unrolled);
@@ -162,50 +167,45 @@ public class UnmappingFilterVisitorTest extends TestCase {
     public void testUnrollFidToFid() throws Exception {
 
         AttributeMapping featureMapping = null;
-        
+
         Name featurePath = mapping.getTargetFeature().getName();
         QName featureName = Types.toQName(featurePath);
-        for(Iterator it = mapping.getAttributeMappings().iterator(); it.hasNext();){
+        for (Iterator it = mapping.getAttributeMappings().iterator(); it.hasNext();) {
             AttributeMapping attMapping = (AttributeMapping) it.next();
             StepList targetXPath = attMapping.getTargetXPath();
-            if(targetXPath.size() > 1){
+            if (targetXPath.size() > 1) {
                 continue;
             }
             Step step = (Step) targetXPath.get(0);
-            if(featureName.equals(step.getName())){
+            if (featureName.equals(step.getName())) {
                 featureMapping = attMapping;
                 break;
             }
         }
-        
+
         featureMapping.setIdentifierExpression(Expression.NIL);
-        
+
         this.visitor = new UnmappingFilterVisitor(this.mapping);
 
-        Feature sourceFeature = (Feature) mapping.getSource().content()
-                .iterator().next();
+        Feature sourceFeature = (Feature) mapping.getSource().content().iterator().next();
 
         String fid = sourceFeature.getID();
-        
+
         Id fidFilter = ff.id(Collections.singleton(ff.featureId(fid)));
 
-        this.visitor.visit(fidFilter);
-
-        Filter unrolled = this.visitor.getUnrolledFilter();
+        Filter unrolled = (Filter) fidFilter.accept(visitor, null);
         assertNotNull(unrolled);
         assertTrue(unrolled instanceof Id);
 
         Collection results = mapping.getSource().content(unrolled);
         assertEquals(1, results.size());
-        SimpleFeature unmappedFeature = (SimpleFeature) results.iterator()
-                .next();
+        SimpleFeature unmappedFeature = (SimpleFeature) results.iterator().next();
         assertEquals(fid, unmappedFeature.getID());
     }
 
     public void testAttributeExpression() throws Exception {
         PropertyName ae = ff.property("/wq_plus/measurement/result");
-        visitor.visit(ae);
-        List unrolled = visitor.unrolledExpressions;
+        List unrolled = (List) ae.accept(visitor, null);
         assertNotNull(unrolled);
         assertEquals(1, unrolled.size());
 
@@ -227,12 +227,12 @@ public class UnmappingFilterVisitorTest extends TestCase {
 
         visitor = new UnmappingFilterVisitor(mapping);
         attExp = ff.property("areaOfInfluence");
-        visitor.visit(attExp);
+        List unrolledExpressions = (List) attExp.accept(visitor, null);
 
-        assertNotNull(visitor.unrolledExpressions);
-        assertEquals(1, visitor.unrolledExpressions.size());
+        assertNotNull(unrolledExpressions);
+        assertEquals(1, unrolledExpressions.size());
 
-        unmappedExpr = (Expression) visitor.unrolledExpressions.get(0);
+        unmappedExpr = (Expression) unrolledExpressions.get(0);
         assertTrue(unmappedExpr instanceof Function);
         Function fe = (Function) unmappedExpr;
         assertEquals("buffer", fe.getName());
@@ -243,13 +243,10 @@ public class UnmappingFilterVisitorTest extends TestCase {
     }
 
     public void testBetweenFilter() throws Exception {
-        PropertyIsBetween bf = ff.between(ff.property("measurement/result"), ff
-                .literal(1), ff.literal(2));
+        PropertyIsBetween bf = ff.between(ff.property("measurement/result"), ff.literal(1), ff
+                .literal(2));
 
-        visitor.visit(bf);
-
-        PropertyIsBetween unrolled = (PropertyIsBetween) visitor
-                .getUnrolledFilter();
+        PropertyIsBetween unrolled = (PropertyIsBetween) bf.accept(visitor, null);
         Expression att = unrolled.getExpression();
         assertTrue(att instanceof PropertyName);
         String propertyName = ((PropertyName) att).getPropertyName();
@@ -260,12 +257,10 @@ public class UnmappingFilterVisitorTest extends TestCase {
      * 
      */
     public void testCompareFilter() throws Exception {
-        PropertyIsEqualTo complexFilter = ff.equals(ff
-                .property("measurement/result"), ff.literal(1.1));
+        PropertyIsEqualTo complexFilter = ff.equals(ff.property("measurement/result"), ff
+                .literal(1.1));
 
-        visitor.visit((Filter) complexFilter);
-
-        Filter unrolled = visitor.getUnrolledFilter();
+        Filter unrolled = (Filter) complexFilter.accept(visitor, null);
         assertNotNull(unrolled);
         assertTrue(unrolled instanceof PropertyIsEqualTo);
         assertNotSame(complexFilter, unrolled);
@@ -282,19 +277,101 @@ public class UnmappingFilterVisitorTest extends TestCase {
     }
 
     /**
+     * There might be multiple mappings per propery name, like
+     * <code>gml:name[1] = att1</code>,
+     * <code>gml:name2 = strConcat(att2, att3)</code>,
+     * <code>gml:name[3] = "sampleValue</code>.
+     * <p>
+     * In the BoreHole test mapping used here, the following mappings exist for
+     * gml:name:
+     * <ul>
+     * <li>gml:name[1] = strConcat( strConcat(QS, strConcat("/", RT)),
+     * strConcat(strConcat("/", NUMB), strConcat("/", BSUFF)) )</li>
+     * <li>gml:name[2] = BGS_ID</li>
+     * <li>gml:name[3] = NAME</li>
+     * <li>gml:name[4] = ORIGINAL_N</li>
+     * </ul>
+     * 
+     * This means the "unrolled" filter for
+     * <code>gml:name = "SWADLINCOTE"</code> should be
+     * <code>strConcat( strConcat(QS, ...) = "SWADLINCOTE" 
+     *          OR BGS_ID = "SWADLINCOTE" 
+     *          OR NAME = "SWADLINCOTE" 
+     *          OR ORIGINAL_N = "SWADLINCOTE"</code>
+     * <p>
+     * 
+     * @throws Exception
+     */
+    public void testCompareFilterMultipleMappingsPerPropertyName() throws Exception {
+        final String schemaBase = "/test-data/";
+        final Map dsParams = new HashMap();
+        final URL url = getClass().getResource(schemaBase + "BoreholeTest_properties.xml");
+        dsParams.put("dbtype", "complex");
+        dsParams.put("url", url.toExternalForm());
+
+        final String XMMLNS = "http://www.opengis.net/xmml";
+        final Name typeName = new org.geotools.feature.Name(XMMLNS, "Borehole");
+
+        FeatureAccess mappingDataStore = (FeatureAccess) DataAccessFinder.createAccess(dsParams);
+        ComplexDataStore complexDs = (ComplexDataStore) mappingDataStore;
+        mapping = complexDs.getMapping(typeName.getLocalPart());
+
+        NamespaceSupport namespaces = new NamespaceSupport();
+        namespaces.declarePrefix("gml", GML.NAMESPACE);
+        namespaces.declarePrefix("xmml", XMMLNS);
+
+        FilterFactory2 ff = new FilterFactoryImplNamespaceAware(namespaces);
+        PropertyIsEqualTo complexFilter = ff.equals(ff.property("gml:name"), ff
+                .literal("SWADLINCOTE"));
+
+        visitor = new UnmappingFilterVisitor(mapping);
+
+        Filter unrolled = (Filter) complexFilter.accept(visitor, null);
+        assertNotNull(unrolled);
+        assertNotSame(complexFilter, unrolled);
+
+        assertTrue(unrolled.getClass().getName(), unrolled instanceof org.opengis.filter.Or);
+
+        Or oredFilter = (Or) unrolled;
+        List children = oredFilter.getChildren();
+        assertEquals(4, children.size());
+
+        assertTrue(children.get(0) instanceof PropertyIsEqualTo);
+        assertTrue(children.get(1) instanceof PropertyIsEqualTo);
+        assertTrue(children.get(2) instanceof PropertyIsEqualTo);
+        assertTrue(children.get(3) instanceof PropertyIsEqualTo);
+
+        PropertyIsEqualTo filter1 = (PropertyIsEqualTo) children.get(0);
+        PropertyIsEqualTo filter2 = (PropertyIsEqualTo) children.get(1);
+        PropertyIsEqualTo filter3 = (PropertyIsEqualTo) children.get(2);
+        PropertyIsEqualTo filter4 = (PropertyIsEqualTo) children.get(3);
+
+        assertTrue(filter1.getExpression1() instanceof Function);
+        assertTrue(filter2.getExpression1() instanceof PropertyName);
+        assertTrue(filter3.getExpression1() instanceof PropertyName);
+        assertTrue(filter4.getExpression1() instanceof PropertyName);
+
+        assertTrue(filter1.getExpression2() instanceof Literal);
+        assertTrue(filter2.getExpression2() instanceof Literal);
+        assertTrue(filter3.getExpression2() instanceof Literal);
+        assertTrue(filter4.getExpression2() instanceof Literal);
+
+        assertEquals("BGS_ID", ((PropertyName) filter2.getExpression1()).getPropertyName());
+        assertEquals("NAME", ((PropertyName) filter3.getExpression1()).getPropertyName());
+        assertEquals("ORIGINAL_N", ((PropertyName) filter4.getExpression1()).getPropertyName());
+    }
+
+    /**
      * 
      */
     public void testLogicFilterAnd() throws Exception {
-        PropertyIsEqualTo equals = ff.equals(ff.property("measurement/result"),
-                ff.literal(1.1));
+        PropertyIsEqualTo equals = ff.equals(ff.property("measurement/result"), ff.literal(1.1));
         PropertyIsGreaterThan greater = ff.greater(ff
-                .property("measurement/determinand_description"), ff
-                .literal("desc1"));
+                .property("measurement/determinand_description"), ff.literal("desc1"));
 
         And logicFilter = ff.and(equals, greater);
-        logicFilter.accept(visitor, null);
 
-        Filter unrolled = visitor.getUnrolledFilter();
+        Filter unrolled = (Filter) logicFilter.accept(visitor, null);
         assertNotNull(unrolled);
         assertTrue(unrolled instanceof And);
         assertNotSame(equals, unrolled);
@@ -321,25 +398,23 @@ public class UnmappingFilterVisitorTest extends TestCase {
         assertTrue(left instanceof PropertyName);
         assertTrue(right instanceof Literal);
 
-        assertEquals("determinand_description", ((PropertyName) left)
-                .getPropertyName());
+        assertEquals("determinand_description", ((PropertyName) left).getPropertyName());
         assertEquals("desc1", ((Literal) right).getValue());
     }
 
     public void testFunction() throws Exception {
-        Function fe = ff.function("strIndexOf", ff
-                .property("/measurement/determinand_description"), ff
-                .literal("determinand_description_1"));
+        Function fe = ff.function("strIndexOf",
+                ff.property("/measurement/determinand_description"), ff
+                        .literal("determinand_description_1"));
 
-        fe.accept(visitor, null);
+        List unrolledExpressions = (List) fe.accept(visitor, null);
 
-        Expression unmapped = (Expression) visitor.unrolledExpressions.get(0);
+        Expression unmapped = (Expression) unrolledExpressions.get(0);
         assertTrue(unmapped instanceof Function);
         List params = ((Function) unmapped).getParameters();
         assertEquals(2, params.size());
         assertTrue(params.get(0) instanceof PropertyName);
-        assertEquals("determinand_description", ((PropertyName) params.get(0))
-                .getPropertyName());
+        assertEquals("determinand_description", ((PropertyName) params.get(0)).getPropertyName());
     }
 
     public void testGeometryFilter() throws Exception {
@@ -348,15 +423,12 @@ public class UnmappingFilterVisitorTest extends TestCase {
         targetDescriptor = mapping.getTargetFeature();
         targetType = (FeatureType) targetDescriptor.getType();
 
-        Expression literalGeom = ff.literal(new GeometryFactory()
-                .createPoint(new Coordinate(1, 1)));
+        Expression literalGeom = ff
+                .literal(new GeometryFactory().createPoint(new Coordinate(1, 1)));
 
-        Intersects gf = ff.intersects(ff.property("areaOfInfluence"),
-                literalGeom);
+        Intersects gf = ff.intersects(ff.property("areaOfInfluence"), literalGeom);
 
-        gf.accept(visitor, null);
-
-        Filter unrolled = visitor.getUnrolledFilter();
+        Filter unrolled = (Filter) gf.accept(visitor, null);
         assertTrue(unrolled instanceof Intersects);
         assertNotSame(gf, unrolled);
 
@@ -378,13 +450,10 @@ public class UnmappingFilterVisitorTest extends TestCase {
         final String wildcard = "%";
         final String single = "?";
         final String escape = "\\";
-        PropertyIsLike like = ff.like(ff
-                .property("/measurement/determinand_description"), "%n_1_1",
-                wildcard, single, escape);
+        PropertyIsLike like = ff.like(ff.property("/measurement/determinand_description"),
+                "%n_1_1", wildcard, single, escape);
 
-        like.accept(visitor, null);
-
-        PropertyIsLike unmapped = (PropertyIsLike) visitor.getUnrolledFilter();
+        PropertyIsLike unmapped = (PropertyIsLike) like.accept(visitor, null);
         assertEquals(like.getLiteral(), unmapped.getLiteral());
         assertEquals(like.getWildCard(), unmapped.getWildCard());
         assertEquals(like.getSingleChar(), unmapped.getSingleChar());
@@ -392,15 +461,14 @@ public class UnmappingFilterVisitorTest extends TestCase {
 
         Expression unmappedExpr = unmapped.getExpression();
         assertTrue(unmappedExpr instanceof PropertyName);
-        assertEquals("determinand_description", ((PropertyName) unmappedExpr)
-                .getPropertyName());
+        assertEquals("determinand_description", ((PropertyName) unmappedExpr).getPropertyName());
     }
 
     public void testLiteralExpression() throws Exception {
         Expression literal = ff.literal(new Integer(0));
-        literal.accept(visitor, null);
-        assertEquals(1, visitor.unrolledExpressions.size());
-        assertSame(literal, visitor.unrolledExpressions.get(0));
+        List unrolledExpressions = (List) literal.accept(visitor, null);
+        assertEquals(1, unrolledExpressions.size());
+        assertSame(literal, unrolledExpressions.get(0));
     }
 
     public void testLogicFilter() throws Exception {
@@ -410,13 +478,12 @@ public class UnmappingFilterVisitorTest extends TestCase {
 
     private void testLogicFilter(short filterType) throws Exception {
         BinaryLogicOperator complexLogicFilter;
-        PropertyIsGreaterThan resultFilter = ff.greater(ff
-                .property("measurement/result"), ff.literal(new Integer(5)));
+        PropertyIsGreaterThan resultFilter = ff.greater(ff.property("measurement/result"), ff
+                .literal(new Integer(5)));
 
         PropertyIsBetween determFilter = ff.between(ff
                 .property("measurement/determinand_description"), ff
-                .literal("determinand_description_1_1"), ff
-                .literal("determinand_description_3_3"));
+                .literal("determinand_description_1_1"), ff.literal("determinand_description_3_3"));
 
         switch (filterType) {
         case FilterType.LOGIC_AND:
@@ -429,9 +496,7 @@ public class UnmappingFilterVisitorTest extends TestCase {
             throw new IllegalArgumentException();
         }
 
-        complexLogicFilter.accept(visitor, null);
-
-        Filter unmapped = visitor.getUnrolledFilter();
+        Filter unmapped = (Filter) complexLogicFilter.accept(visitor, null);
         assertNotNull(unmapped);
         assertTrue(unmapped instanceof BinaryLogicOperator);
         assertNotSame(complexLogicFilter, unmapped);
@@ -441,55 +506,49 @@ public class UnmappingFilterVisitorTest extends TestCase {
         List children = logicUnmapped.getChildren();
         assertEquals(2, children.size());
 
-        PropertyIsGreaterThan unmappedResult = (PropertyIsGreaterThan) children
-                .get(0);
+        PropertyIsGreaterThan unmappedResult = (PropertyIsGreaterThan) children.get(0);
         PropertyIsBetween unmappedDeterm = (PropertyIsBetween) children.get(1);
 
-        assertEquals("results_value", ((PropertyName) unmappedResult
-                .getExpression1()).getPropertyName());
+        assertEquals("results_value", ((PropertyName) unmappedResult.getExpression1())
+                .getPropertyName());
 
-        assertEquals(new Integer(5),
-                ((Literal) unmappedResult.getExpression2()).getValue());
+        assertEquals(new Integer(5), ((Literal) unmappedResult.getExpression2()).getValue());
 
-        assertEquals("determinand_description", ((PropertyName) unmappedDeterm
-                .getExpression()).getPropertyName());
-        assertEquals("determinand_description_1_1", ((Literal) unmappedDeterm
-                .getLowerBoundary()).getValue());
-        assertEquals("determinand_description_3_3", ((Literal) unmappedDeterm
-                .getUpperBoundary()).getValue());
+        assertEquals("determinand_description", ((PropertyName) unmappedDeterm.getExpression())
+                .getPropertyName());
+        assertEquals("determinand_description_1_1", ((Literal) unmappedDeterm.getLowerBoundary())
+                .getValue());
+        assertEquals("determinand_description_3_3", ((Literal) unmappedDeterm.getUpperBoundary())
+                .getValue());
     }
 
     public void testMathExpression() throws Exception {
         Literal literal = ff.literal(new Integer(2));
-        Multiply mathExp = ff.multiply(ff.property("measurement/result"),
-                literal);
+        Multiply mathExp = ff.multiply(ff.property("measurement/result"), literal);
 
-        mathExp.accept(visitor, null);
+        List unrolledExpressions = (List) mathExp.accept(visitor, null);
 
-        assertEquals(1, visitor.unrolledExpressions.size());
-        Expression unmapped = (Expression) visitor.unrolledExpressions.get(0);
+        assertEquals(1, unrolledExpressions.size());
+        Expression unmapped = (Expression) unrolledExpressions.get(0);
         assertTrue(unmapped instanceof Multiply);
         Multiply mathUnmapped = (Multiply) unmapped;
 
-        PropertyName unmappedAttt = (PropertyName) mathUnmapped
-                .getExpression1();
+        PropertyName unmappedAttt = (PropertyName) mathUnmapped.getExpression1();
         assertEquals("results_value", unmappedAttt.getPropertyName());
         assertSame(literal, mathUnmapped.getExpression2());
     }
 
     public void testNullFilter() throws Exception {
-        PropertyIsNull nullFilter = ff
-                .isNull(ff.property("measurement/result"));
+        PropertyIsNull nullFilter = ff.isNull(ff.property("measurement/result"));
 
-        nullFilter.accept(visitor, null);
+        Filter unrolled = (Filter) nullFilter.accept(visitor, null);
+        assertTrue(unrolled instanceof PropertyIsNull);
+        assertNotSame(nullFilter, unrolled);
 
-        assertTrue(visitor.getUnrolledFilter() instanceof PropertyIsNull);
-        assertNotSame(nullFilter, visitor.getUnrolledFilter());
-        PropertyIsNull unmapped = (PropertyIsNull) visitor.getUnrolledFilter();
+        PropertyIsNull unmapped = (PropertyIsNull) unrolled;
         Expression unmappedAtt = unmapped.getExpression();
         assertTrue(unmappedAtt instanceof PropertyName);
-        assertEquals("results_value", ((PropertyName) unmappedAtt)
-                .getPropertyName());
+        assertEquals("results_value", ((PropertyName) unmappedAtt).getPropertyName());
     }
 
 }
