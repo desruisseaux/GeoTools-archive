@@ -346,10 +346,12 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
 
     /**
      * The set of authority codes for different types. This map is used by the
-     * {@link #getAuthorityCodes} method. Note that this factory can't be disposed
-     * as long as some cached sets are in use (i.e. as long as this map is not empty).
-     * This is why a weak value map is mandatory here. The {@link AuthorityCodes#finalize}
-     * methods take care of closing the stamenents used by the sets.
+     * {@link #getAuthorityCodes} method.
+     * <p>
+     * Note that this factory can't be disposed as long as some cached sets are in use (i.e. as long as this map is not empty).
+     * This is why a weak value map is mandatory here.
+     * 
+     * The {@link AuthorityCodes#finalize} methods take care of closing the stamenents used by the sets.
      */
     private final Map/*<Class,Reference<AuthorityCodes>>*/ authorityCodes = new HashMap();
 
