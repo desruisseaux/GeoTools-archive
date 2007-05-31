@@ -126,7 +126,7 @@ public class Mercator2SP extends Mercator {
                                     VocabularyKeys.CYLINDRICAL_MERCATOR_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR, SEMI_MINOR,
-                STANDARD_PARALLEL, LATITUDE_OF_ORIGIN, CENTRAL_MERIDIAN,
+                STANDARD_PARALLEL_1, LATITUDE_OF_ORIGIN, CENTRAL_MERIDIAN,
                 FALSE_EASTING, FALSE_NORTHING
             });
 

@@ -1237,6 +1237,9 @@ public abstract class MapProjection extends AbstractMathTransform
         /**
          * The operation parameter descriptor for the {@linkplain Mercator#standardParallel standard
          * parallel} parameter value. Valid values range is from -90 to 90°. Default value is 0.
+         *
+         * @deprecated Use {@link #STANDARD_PARALLEL_1} instead.
+         *             Not to be confused with {@link PolarStereographic.ProviderB#STANDARD_PARALLEL}.
          */
         public static final ParameterDescriptor STANDARD_PARALLEL = createDescriptor(
                 new NamedIdentifier[] {

@@ -69,7 +69,7 @@ public class PolarStereographic extends Stereographic {
     /**
      * Maximum difference allowed when comparing real numbers.
      */
-    private static final double EPSILON = 1E-6;
+    private static final double EPSILON = 1E-8;
 
     /**
      * A constant used in the transformations.
@@ -80,7 +80,7 @@ public class PolarStereographic extends Stereographic {
     /**
      * Latitude of true scale, in radians (a.k.a. {@code "standard_parallel_1").
      */
-    final double latitudeTrueScale;
+    final double standardParallel;
 
     /**
      * {@code true} if this projection is for the south pole, or {@code false}
@@ -93,7 +93,7 @@ public class PolarStereographic extends Stereographic {
      *
      * @param  parameters The group of parameter values.
      * @param  descriptor The expected parameter descriptor.
-     * @param  forceSouthPole For projection to North pole if {@link Boolean#FALSE},
+     * @param  forceSouthPole Forces projection to North pole if {@link Boolean#FALSE},
      *         to South pole if {@link Boolean#TRUE}, or do not force (i.e. detect
      *         from other parameter values) if {@code null}.
      * @throws ParameterNotFoundException if a required parameter was not found.
@@ -107,16 +107,29 @@ public class PolarStereographic extends Stereographic {
         /*
          * Get "standard_parallel_1" parameter value. This parameter should be mutually exclusive
          * with "latitude_of_origin", but this is not a strict requirement for this constructor.
-         * The latitude of origin is specified in "Polar A" case, while the standard parallel is
-         * specified in all other cases.
+         *
+         *   +-----------------------------------+--------------------+-------------+
+         *   | Projection                        | Parameter          | Force pole  |
+         *   | --------------------------------- | ------------------ | ----------- |
+         *   | Polar Stereographic (variant A)   | Latitude of origin | auto detect |
+         *   | Polar Stereographic (variant B)   | Standard Parallel  | auto detect |
+         *   | Stereographic North Pole          | Standard Parallel  | North pole  |
+         *   | Stereographic South Pole          | Standard Parallel  | South pole  |
+         *   +-----------------------------------+--------------------+-------------+
+         *
+         * "Standard Parallel" (a.k.a. "Latitude true scale") default to 90°N for every cases
+         * (including Polar A, but it is meanless in this case), except for "Stereographic South
+         * Pole" where it default to 90°S.
          */
         final ParameterDescriptor trueScaleDescriptor = Boolean.TRUE.equals(forceSouthPole) ?
-                ProviderSouth.LATITUDE_TRUE_SCALE : ProviderNorth.LATITUDE_TRUE_SCALE;
+                ProviderSouth.STANDARD_PARALLEL : ProviderNorth.STANDARD_PARALLEL;
         final Collection expected = descriptor.descriptors();
         double latitudeTrueScale;
         if (isExpectedParameter(expected, trueScaleDescriptor)) {
+            // Any cases except Polar A
             latitudeTrueScale = doubleValue(expected, trueScaleDescriptor, parameters);
         } else {
+            // Polar A case
             latitudeTrueScale = (latitudeOfOrigin < 0) ? -Math.PI/2 : Math.PI/2;
         }
         ensureLatitudeInRange(trueScaleDescriptor, latitudeTrueScale, true);
@@ -133,8 +146,8 @@ public class PolarStereographic extends Stereographic {
         } else {
             southPole = (latitudeTrueScale < 0);
         }
-        this.latitudeOfOrigin  = (southPole) ? -(Math.PI/2) : +(Math.PI/2);
-        this.latitudeTrueScale = latitudeTrueScale;
+        this.latitudeOfOrigin = (southPole) ? -(Math.PI/2) : +(Math.PI/2);
+        this.standardParallel = latitudeTrueScale; // May be anything in [-90 .. +90] range.
         /*
          * Computes coefficients.
          */
@@ -222,10 +235,10 @@ public class PolarStereographic extends Stereographic {
      */
     public ParameterValueGroup getParameterValues() {
         final ParameterDescriptor trueScaleDescriptor = southPole ?
-                ProviderSouth.LATITUDE_TRUE_SCALE : ProviderNorth.LATITUDE_TRUE_SCALE;
+                ProviderSouth.STANDARD_PARALLEL : ProviderNorth.STANDARD_PARALLEL;
         final ParameterValueGroup values = super.getParameterValues();
         final Collection expected = getParameterDescriptors().descriptors();
-        set(expected, trueScaleDescriptor, values, latitudeTrueScale);
+        set(expected, trueScaleDescriptor, values, standardParallel);
         return values;
     }
 
@@ -247,9 +260,9 @@ public class PolarStereographic extends Stereographic {
         }
         if (super.equals(object)) {
             final PolarStereographic that = (PolarStereographic) object;
-            return        this.southPole         == that.southPole       &&
-                   equals(this.k0,                  that.k0)             &&
-                   equals(this.latitudeTrueScale,   that.latitudeTrueScale);
+            return this.southPole == that.southPole &&
+                   equals(this.k0,               that.k0) &&
+                   equals(this.standardParallel, that.standardParallel);
         }
         return false;
     }
@@ -289,7 +302,7 @@ public class PolarStereographic extends Stereographic {
         {
             super(parameters, descriptor, forceSouthPole);
             ensureSpherical();
-            final double phi = Math.abs(latitudeTrueScale);
+            final double phi = Math.abs(standardParallel);
             if (Math.abs(phi - Math.PI/2) >= EPSILON) {
                 k0 = 1 + Math.sin(phi);  // derived from (21-7) and (21-11)
             } else {
@@ -387,7 +400,7 @@ public class PolarStereographic extends Stereographic {
      * Compared to the default {@link PolarStereographic} implementation, the series
      * implementation is a little bit faster at the expense of a little bit less
      * accuracy. The default {@link PolarStereographic} implementation
-     * is an derivated work of Proj4, and is therefor better tested.
+     * is a derivated work of Proj4, and is therefor better tested.
      *
      * @version $Id$
      * @author Rueben Schulz
@@ -428,22 +441,22 @@ public class PolarStereographic extends Stereographic {
         {
             super(parameters, descriptor, forceSouthPole);
             // See Snyde P. 19, "Computation of Series"
-            final double e4 = excentricitySquared*excentricitySquared;
-            final double e6 = excentricitySquared*excentricitySquared*excentricitySquared;
-            final double e8 = excentricitySquared*excentricitySquared*excentricitySquared*excentricitySquared;
-            C = 7.0*e6/120.0 + 81.0*e8/1120.0;
-            D = 4279.0*e8/161280.0;
-            A = excentricitySquared/2.0 + 5.0*e4/24.0 + e6/12.0 + 13.0*e8/360.0 - C;
-            B = 2.0*(7.0*e4/48.0 + 29.0*e6/240.0 + 811.0*e8/11520.0) - 4.0*D;
+            final double e4 = excentricitySquared * excentricitySquared;
+            final double e6 = e4 * excentricitySquared;
+            final double e8 = e4 * e4;
+            C = 7.0/120.0 * e6 + 81.0/1120.0 * e8;
+            D = 4279.0/161280.0 * e8;
+            A = excentricitySquared/2.0 + 5.0/24.0*e4 + e6/12.0 + 13.0/360.0*e8 - C;
+            B = 2.0 * (7.0/48.0*e4 + 29.0/240.0*e6 + 811.0/11520.0*e8) - 4.0*D;
             C *= 4.0;
             D *= 8.0;
 
-            final double latTrueScale = Math.abs(latitudeTrueScale);
+            final double latTrueScale = Math.abs(standardParallel);
             if (Math.abs(latTrueScale - Math.PI/2) >= EPSILON) {
                 final double t = Math.sin(latTrueScale);
                 k0 = msfn(t, Math.cos(latTrueScale)) *
                              Math.sqrt(Math.pow(1+excentricity, 1+excentricity)*
-                             Math.pow(1-excentricity, 1-excentricity)) /
+                                       Math.pow(1-excentricity, 1-excentricity)) /
                              (2.0*tsfn(latTrueScale, t));
             } else {
                 k0 = 1.0;
@@ -565,12 +578,11 @@ public class PolarStereographic extends Stereographic {
      */
     public static final class ProviderB extends Stereographic.Provider {
         /**
-         * The operation parameter descriptor for the {@code latitudeTrueScale}
+         * The operation parameter descriptor for the {@code standardParallel}
          * parameter value. Valid values range is from -90 to 90°. The default
          * value is 90°N.
          */
-        public static final ParameterDescriptor LATITUDE_TRUE_SCALE =
-                ProviderNorth.LATITUDE_TRUE_SCALE;
+        public static final ParameterDescriptor STANDARD_PARALLEL = ProviderNorth.STANDARD_PARALLEL;
 
         /**
          * The parameters group.
@@ -581,7 +593,7 @@ public class PolarStereographic extends Stereographic {
                 new NamedIdentifier(Citations.GEOTOOLS, Provider.NAME)
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
-                CENTRAL_MERIDIAN,    LATITUDE_TRUE_SCALE,
+                CENTRAL_MERIDIAN,    STANDARD_PARALLEL,
                 FALSE_EASTING,       FALSE_NORTHING
             });
 
@@ -624,13 +636,13 @@ public class PolarStereographic extends Stereographic {
      */
     public static final class ProviderNorth extends Stereographic.Provider {
         /**
-         * The operation parameter descriptor for the {@code latitudeTrueScale}
+         * The operation parameter descriptor for the {@code standardParallel}
          * parameter value. Valid values range is from -90 to 90°. The default
          * value is 90°N.
          */
-        public static final ParameterDescriptor LATITUDE_TRUE_SCALE = createDescriptor(
+        public static final ParameterDescriptor STANDARD_PARALLEL = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(Citations.ESRI, "Standard_Parallel_1"),
+                    new NamedIdentifier(Citations.ESRI, "standard_parallel_1"),
                     new NamedIdentifier(Citations.EPSG, "Latitude of standard parallel")
                 },
                 90, -90, 90, NonSI.DEGREE_ANGLE);
@@ -643,7 +655,7 @@ public class PolarStereographic extends Stereographic {
                 new NamedIdentifier(Citations.GEOTOOLS, Provider.NAME)
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
-                CENTRAL_MERIDIAN,    LATITUDE_TRUE_SCALE,  SCALE_FACTOR,
+                CENTRAL_MERIDIAN,    STANDARD_PARALLEL,  SCALE_FACTOR,
                 FALSE_EASTING,       FALSE_NORTHING
             });
 
@@ -686,13 +698,13 @@ public class PolarStereographic extends Stereographic {
      */
     public static final class ProviderSouth extends Stereographic.Provider {
         /**
-         * The operation parameter descriptor for the {@code latitudeTrueScale}
+         * The operation parameter descriptor for the {@code standardParallel}
          * parameter value. Valid values range is from -90 to 90°. The default
          * value is 90°S.
          */
-        public static final ParameterDescriptor LATITUDE_TRUE_SCALE = createDescriptor(
+        public static final ParameterDescriptor STANDARD_PARALLEL = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(Citations.ESRI, "Standard_Parallel_1"),
+                    new NamedIdentifier(Citations.ESRI, "standard_parallel_1"),
                     new NamedIdentifier(Citations.EPSG, "Latitude of standard parallel")
                 },
                 -90, -90, 90, NonSI.DEGREE_ANGLE);
@@ -705,7 +717,7 @@ public class PolarStereographic extends Stereographic {
                 new NamedIdentifier(Citations.GEOTOOLS, Provider.NAME)
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
-                CENTRAL_MERIDIAN,    LATITUDE_TRUE_SCALE,  SCALE_FACTOR,
+                CENTRAL_MERIDIAN,    STANDARD_PARALLEL,  SCALE_FACTOR,
                 FALSE_EASTING,       FALSE_NORTHING
             });
 

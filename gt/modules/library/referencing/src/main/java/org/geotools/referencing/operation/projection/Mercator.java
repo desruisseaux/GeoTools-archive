@@ -96,14 +96,14 @@ public abstract class Mercator extends MapProjection {
         // Fetch parameters 
         super(parameters);
         final Collection expected = getParameterDescriptors().descriptors();
-        if (expected.contains(AbstractProvider.STANDARD_PARALLEL)) {
+        if (expected.contains(AbstractProvider.STANDARD_PARALLEL_1)) {
             // scaleFactor is not a parameter in the Mercator_2SP case and is computed from
             // the standard parallel.   The super-class constructor should have initialized
             // 'scaleFactor' to 1. We still use the '*=' operator rather than '=' in case a
             // user implementation still provides a scale factor for its custom projections.
             standardParallel = Math.abs(doubleValue(expected,
-                    AbstractProvider.STANDARD_PARALLEL, parameters));
-            ensureLatitudeInRange(AbstractProvider.STANDARD_PARALLEL, standardParallel, false);
+                    AbstractProvider.STANDARD_PARALLEL_1, parameters));
+            ensureLatitudeInRange(AbstractProvider.STANDARD_PARALLEL_1, standardParallel, false);
             if (isSpherical) {
                 scaleFactor *= Math.cos(standardParallel);
             }  else {
@@ -134,7 +134,7 @@ public abstract class Mercator extends MapProjection {
         final ParameterValueGroup values = super.getParameterValues();
         if (!Double.isNaN(standardParallel)) {
             final Collection expected = getParameterDescriptors().descriptors();
-            set(expected, AbstractProvider.STANDARD_PARALLEL, values, standardParallel);
+            set(expected, AbstractProvider.STANDARD_PARALLEL_1, values, standardParallel);
         }
         return values;
     }

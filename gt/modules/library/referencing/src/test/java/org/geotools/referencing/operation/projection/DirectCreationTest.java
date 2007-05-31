@@ -504,4 +504,70 @@ public final class DirectCreationTest extends TestCase {
         doTransform(new DirectPosition2D(14.370530947 , 50.071153856 ),
                     new DirectPosition2D(-746742.6075,  -1044389.4516), transform);
     }
+
+    /**
+     * Some tests for Stereographic projection.
+     */
+    public void testStereographic() throws FactoryException, TransformException {
+
+        ///////////////////////////////////////
+        //     Polar_Stereographic tests     //
+        ///////////////////////////////////////
+        if (VERBOSE) {
+            printParameters("Polar_Stereographic");
+        }
+        MathTransform transform;
+        ParameterValueGroup params;
+        
+        // From http://www.remotesensing.org/geotiff/proj_list/polar_stereographic.html
+        params = mtFactory.getDefaultParameters("Stereographic_North_Pole");
+        params.parameter("semi_major")         .setValue(6378137.0);
+        params.parameter("semi_minor")         .setValue(6356752.31424518);
+        params.parameter("standard_parallel_1").setValue( 71.0);
+        params.parameter("central_meridian")   .setValue(-96.0);
+        params.parameter("scale_factor")       .setValue(1.0);
+        params.parameter("false_easting")      .setValue(0);
+        params.parameter("false_northing")     .setValue(0);
+        transform = mtFactory.createParameterizedTransform(params);
+        if (VERBOSE) {
+            System.out.println(transform);
+        }
+        DirectPosition t = transform.inverse().transform(new DirectPosition2D(-2529570, -5341800), null);
+        doTransform(new DirectPosition2D(-121.33955, 39.1012523), // 121°20'22.38"W 39°6'4.508"N
+                    new DirectPosition2D(-2529570, -5341800), transform);
+
+        // From http://jira.codehaus.org/browse/GEOS-1037
+        if (true) {
+            // Disabled for now until we resolve GEOT-1236
+            return;
+        }
+        if (false) {
+            params = mtFactory.getDefaultParameters("Polar_Stereographic");
+            params.parameter("latitude_of_origin") .setValue(-90);
+            params.parameter("scale_factor")       .setValue(0.97276901289);
+        } else {
+            params = mtFactory.getDefaultParameters("Stereographic_South_Pole");
+            params.parameter("standard_parallel_1").setValue(-71.0);
+            params.parameter("scale_factor")       .setValue(1/0.9941925);
+        }
+        params.parameter("semi_major")         .setValue(6378137.0);
+        params.parameter("semi_minor")         .setValue(6356752.31424518);
+        params.parameter("central_meridian")   .setValue(0);
+        params.parameter("false_easting")      .setValue(0);
+        params.parameter("false_northing")     .setValue(0);
+        transform = mtFactory.createParameterizedTransform(params);
+        if (VERBOSE) {
+            System.out.println(transform);
+        }
+        final DirectPosition2D source = new DirectPosition2D(10, -85);
+        final DirectPosition2D target = new DirectPosition2D();
+        assertSame(target, transform.transform(source, target));
+        // 94393.98560813649, 535334.8944606802  (geotools)
+        // 94945.38           538462.02          (proj4)
+        // Facteur constant 0.9941925
+        System.out.println(source);
+        System.out.println(target);
+        assertSame(target, transform.inverse().transform(target, target));
+        System.out.println(target);
+    }
 }

@@ -68,7 +68,7 @@ public class EquidistantCylindrical extends MapProjection {
     private final double cosStandardParallel;
 
     /**
-     * {@linkplain Provider#STANDARD_PARALLEL Standard parallel} parameter.
+     * {@linkplain Provider#STANDARD_PARALLEL_1 Standard parallel} parameter.
      * Set to 0° for the {@link PlateCarree} case.
      */
     protected final double standardParallel;
@@ -85,10 +85,10 @@ public class EquidistantCylindrical extends MapProjection {
         // Fetch parameters 
         super(parameters);
         final Collection expected = getParameterDescriptors().descriptors();
-        if (expected.contains(Provider.STANDARD_PARALLEL)) {
+        if (expected.contains(Provider.STANDARD_PARALLEL_1)) {
             standardParallel = Math.abs(doubleValue(expected,
-                                        Provider.STANDARD_PARALLEL, parameters));
-            ensureLatitudeInRange(Provider.STANDARD_PARALLEL, standardParallel, false);
+                                        Provider.STANDARD_PARALLEL_1, parameters));
+            ensureLatitudeInRange(Provider.STANDARD_PARALLEL_1, standardParallel, false);
             cosStandardParallel = Math.cos(standardParallel);
         } else {
             // standard parallel is the equator (Plate Carree or Equirectangular)
@@ -112,7 +112,7 @@ public class EquidistantCylindrical extends MapProjection {
         final ParameterValueGroup values = super.getParameterValues();
         if (!Double.isNaN(standardParallel)) {
             final Collection expected = getParameterDescriptors().descriptors();
-            set(expected, Provider.STANDARD_PARALLEL, values, standardParallel);
+            set(expected, Provider.STANDARD_PARALLEL_1, values, standardParallel);
         }
         return values;
     }
@@ -207,7 +207,7 @@ public class EquidistantCylindrical extends MapProjection {
                                     VocabularyKeys.EQUIDISTANT_CYLINDRICAL_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,       SEMI_MINOR,
-                CENTRAL_MERIDIAN, STANDARD_PARALLEL,
+                CENTRAL_MERIDIAN, STANDARD_PARALLEL_1,
                 FALSE_EASTING,    FALSE_NORTHING
             });
 

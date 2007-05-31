@@ -112,12 +112,12 @@ import org.geotools.resources.i18n.VocabularyKeys;
  *
  * The {@code "Polar Stereographic (variant B)"}, {@code "Stereographic_North_Pole"},
  * and {@code "Stereographic_South_Pole"} cases include a
- * {@link StereographicPole.ProviderB#LATITUDE_TRUE_SCALE "standard_parallel_1"} parameter.
+ * {@link StereographicPole.ProviderB#STANDARD_PARALLEL "standard_parallel_1"} parameter.
  * This parameter sets the latitude with a scale factor equal to the supplied
- * scale factor. The {@code "Polar Stereographic (variant B)"} receives its
- * {@link Stereographic.Provider#LATITUDE_OF_ORIGIN "latitude_of_origin"} paramater
- * value from the hemisphere of the
- * {@link StereographicPole.ProviderB#LATITUDE_TRUE_SCALE "standard_parallel_1"} value.
+ * scale factor. The {@code "Polar Stereographic (variant A)"} receives its
+ * {@code "latitude_of_origin"} parameter value from the hemisphere of the
+ * {@link StereographicPole.Provider#LATITUDE_OF_ORIGIN "latitude_of_origin"} value
+ * (i.e. the value is forced to &plusmn;90°).
  * <p>
  *
  * <strong>References:</strong><ul>
