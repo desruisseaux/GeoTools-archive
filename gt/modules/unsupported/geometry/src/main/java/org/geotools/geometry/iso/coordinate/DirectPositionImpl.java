@@ -301,8 +301,8 @@ public class DirectPositionImpl implements DirectPosition {
 	 * @return TRUE, if coordinates accord concording to the tolerance value, FALSE if they dont.
 	 */
 	public boolean equals(DirectPosition position, double tol) {
-		int D = position.getDimension();
-		if( D != getDimension() ) return false;
+		int D = position.getCoordinateReferenceSystem().getCoordinateSystem().getDimension();
+		if( D != crs.getCoordinateSystem().getDimension() ) return false;
 		
 		// use CRS.equalsIgnoreMetadata for effeciency and to avoid various issues with comparing
 		// CRS such as coordinate order.

@@ -26,6 +26,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.iso.primitive.PointImpl;
 import org.geotools.geometry.text.WKTParser;
 import org.geotools.test.TestData;
 import org.opengis.geometry.Boundary;
@@ -46,6 +47,10 @@ import org.xml.sax.InputSource;
  *  for that description.
  *  - description=intersection|WKT TEXT: replaces the expectedResult value
  *  with the WKT text.
+ *  - description=intersection|boundary: for the case of multiprimitives, we need 
+ *  to convert the resulting geometry to a boundary to compare with
+ *  - description=intersection|point: for the case of points, we need to convert
+ *  the resulting geometry to a point instead of a position to compare with
  *  - description=intersection|skipped|union|skipped: skips both the 
  * intersection and union operations.
  * 
@@ -161,11 +166,16 @@ public class GeometryConformanceTest extends TestSuite {
                         if (operationValue.equalsIgnoreCase("skipped")) {
                         	continue;
                         }
-                        if (operationValue.equalsIgnoreCase("boundary")) {
+                        else if (operationValue.equalsIgnoreCase("boundary")) {
                         	// post process into a surface boundary
                         	MultiPrimitive curves = (MultiPrimitive) op.getExpectedResult();
                         	Boundary boundary = curves.getBoundary();
                         	op.setExpectedResult( boundary );
+                        }
+                        else if (operationValue.equalsIgnoreCase("point")) {
+                        	// post obj into a point
+                        	PointImpl point = (PointImpl) op.getExpectedResult();
+                        	op.setExpectedResult( point );
                         }
                         else { // try parsing this thing as WKT
                             FeatGeomFactoryImpl default2D = FeatGeomFactoryImpl.getDefault2D();

@@ -39,6 +39,7 @@ package org.geotools.geometry.iso.root;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.PositionFactoryImpl;
@@ -79,6 +80,7 @@ import org.opengis.geometry.TransfiniteSet;
 import org.opengis.geometry.complex.Complex;
 import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.OrientableSurface;
+import org.opengis.geometry.primitive.Primitive;
 import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.Geometry;
 
@@ -363,9 +365,33 @@ public abstract class GeometryImpl implements Geometry {
 		
 		// Missing: CompositePoint, CompositeCurve, CompositeSurface
 
-		// Operation not specified for:
 		// - MultiPrimitive
-		
+		// The ISO 19107 specs state that the centroid of a colleciton of primitives
+		// should only take into consideration the primitives with the largest
+		// dimension (ie: if there are points, lines and polygons, it only considers
+		// the polygons).
+		if (this instanceof MultiPrimitiveImpl) {
+			// First figure out what type of primtives should be considered in this
+			// multiprimitive
+			int maxD = this.getDimension(null);
+			
+			// get the centroid point of each element in this multiprimitive that matches
+			// the maxD dimension and return the average of the centroid points
+			CentroidPoint cp = new CentroidPoint(this.crs);
+			Set<Primitive> elems = ((MultiPrimitiveImpl)this).getElements();
+			Iterator<Primitive> iter = elems.iterator();
+			while (iter.hasNext()) {
+				Geometry prim = iter.next();
+				if (prim.getDimension(null) == maxD) {
+					cp.add(new PointImpl(prim.getCentroid()));
+				}
+			}
+			
+			// return the average of the centroid points
+			return cp.getCentroid();
+			
+		}
+	
 		Assert.isTrue(false, "The centroid operation is not defined for this geometry object");
 		return null;
 	}

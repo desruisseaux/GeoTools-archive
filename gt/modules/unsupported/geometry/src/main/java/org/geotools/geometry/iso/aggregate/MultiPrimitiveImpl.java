@@ -36,6 +36,7 @@
 
 package org.geotools.geometry.iso.aggregate;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -101,7 +102,21 @@ public class MultiPrimitiveImpl extends AggregateImpl implements MultiPrimitive 
 	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getDimension(org.opengis.geometry.coordinate.DirectPosition)
 	 */
 	public int getDimension(DirectPosition point) {
-		return this.crs.getCoordinateSystem().getDimension();
+		if (point != null) {
+			return point.getDimension();
+		}
+		else {
+			// return the largest dimension of all the contained elements in this collection
+			int maxD = 0;
+			Set<Primitive> elem = this.getElements();
+			Iterator<Primitive> iterator = elem.iterator();
+			while (iterator.hasNext()) {
+				Geometry prim = iterator.next();
+				int D = prim.getDimension(null);
+				if (D > maxD) maxD = D;
+			}
+			return maxD;
+		}
 	}
 
 	/* (non-Javadoc)

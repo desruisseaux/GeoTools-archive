@@ -6,6 +6,8 @@ import java.util.logging.Logger;
 
 import junit.framework.Assert;
 
+import org.geotools.geometry.iso.UnsupportedDimensionException;
+import org.geotools.geometry.iso.root.GeometryImpl;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Geometry;
 import org.opengis.geometry.TransfiniteSet;
@@ -76,6 +78,7 @@ public class GeometryTestOperation extends Assert {
         operationMap.put("isSimple", new IsSimpleOp());
         operationMap.put("symdifference", new SymmetricDifferenceOp());
         operationMap.put("union", new UnionOp());
+        operationMap.put("relate", new RelateOp());
     }
 
     protected Object getExpectedResult() {
@@ -258,7 +261,7 @@ public class GeometryTestOperation extends Assert {
     }    
     
     /**
-     * Class defining the centroid operation
+     * Class defining the representitivepoint operation
      */
     private class RepresentativePointOp extends OperationHandler {
         /**
@@ -278,7 +281,7 @@ public class GeometryTestOperation extends Assert {
         
     
     /**
-     * Class defining the boundary operation
+     * Class defining the convex hull operation
      */
     private class ConvexHullOp extends OperationHandler {
         /**
@@ -296,7 +299,7 @@ public class GeometryTestOperation extends Assert {
     }    
 
     /**
-     * Class defining the boundary operation
+     * Class defining the difference operation
      */
     private class DifferenceOp extends OperationHandler {
         /**
@@ -315,7 +318,7 @@ public class GeometryTestOperation extends Assert {
     }    
 
     /**
-     * Class defining the boundary operation
+     * Class defining the symdifference operation
      */
     private class SymmetricDifferenceOp extends OperationHandler {
         /**
@@ -334,7 +337,7 @@ public class GeometryTestOperation extends Assert {
     }
         
     /**
-     * Class defining the boundary operation
+     * Class defining the union operation
      */
     private class UnionOp extends OperationHandler {
         /**
@@ -349,6 +352,30 @@ public class GeometryTestOperation extends Assert {
             TransfiniteSet result = geom1.union(geom2);
             actualResult = result;
             return compareTransfiniteSetResult(result);
+        }
+    }
+    
+    /**
+     * Class defining the relate operation
+     */
+    private class RelateOp extends OperationHandler {
+        /**
+         * Calculates the relation of objects A and B (A + B)
+         * @param a Geometry object
+         * @param b Geometry object
+         * @return a boolean indicating whether the result matched the expectation
+         */
+        public boolean doOperation(Geometry a, Geometry b) {
+            GeometryImpl geom1 = (GeometryImpl) setGeomArg(arg1, a, b);
+            GeometryImpl geom2 = (GeometryImpl) setGeomArg(arg2, a, b);
+            boolean result = false;
+			try {
+				result = geom1.relate(geom2, arg3);
+			} catch (UnsupportedDimensionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+            return result;
         }
     }
     
