@@ -96,6 +96,7 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
      * what renders the map
      */
     GTRenderer renderer;
+    private GTRenderer highlightRenderer,selectionRenderer;
 
     /**
      * the map context to render
@@ -257,13 +258,26 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
 
     public void setRenderer(GTRenderer renderer) {
         if (renderer instanceof StreamingRenderer) {
-            Map hints = new HashMap();
-            hints.put(StreamingRenderer.LABEL_CACHE_KEY, labelCache);
+        	Map hints = renderer.getRendererHints();
+        	if(hints==null) {
+        		hints = new HashMap();
+        	}
+        	if(hints.containsKey(StreamingRenderer.LABEL_CACHE_KEY)) {
+        		labelCache = (LabelCache)hints.get(StreamingRenderer.LABEL_CACHE_KEY);
+        	}else {
+        		hints.put(StreamingRenderer.LABEL_CACHE_KEY, labelCache);
+        	}
             renderer.setRendererHints(hints);
         }
 
         this.renderer = renderer;
-
+        this.highlightRenderer = new StreamingRenderer();
+        this.selectionRenderer = new StreamingRenderer();
+        HashMap hints = new HashMap();
+    	hints.put("memoryPreloadingEnabled", Boolean.FALSE);
+        highlightRenderer.setRendererHints( hints );
+        selectionRenderer.setRendererHints(hints);
+        
         if (this.context != null) {
             this.renderer.setContext(this.context);
         }
@@ -461,13 +475,13 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
             selectionContext = new DefaultMapContext(DefaultGeographicCRS.WGS84);
 
             selectionContext.addLayer(selection, selectionStyle);
-            renderer.setContext(selectionContext);
+            selectionRenderer.setContext(selectionContext);
 
             selectImage = new BufferedImage(dr.width, dr.height, BufferedImage.TYPE_INT_ARGB);
 
             Graphics2D ig = selectImage.createGraphics();
             /* System.out.println("rendering selection"); */
-            renderer.paint((Graphics2D) ig, dr, mapArea);
+            selectionRenderer.paint((Graphics2D) ig, dr, mapArea);
 
             ((Graphics2D) g).drawImage(selectImage, 0, 0, this);
         }
@@ -491,10 +505,10 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
             MapContext highlightContext = new DefaultMapContext(DefaultGeographicCRS.WGS84);
 
             highlightContext.addLayer(highlightFeature, highlightStyle);
-            renderer.setContext(highlightContext);
+            highlightRenderer.setContext(highlightContext);
 
             /* System.out.println("rendering highlight"); */
-            renderer.paint((Graphics2D) g, dr, mapArea);
+            highlightRenderer.paint((Graphics2D) g, dr, mapArea);
         }
     }
 
