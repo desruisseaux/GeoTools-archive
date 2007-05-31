@@ -24,6 +24,9 @@ For more information, and documentation on the geotools library please see
 our community wiki at:
 - http://docs.codehaus.org/display/GEOTOOLS
 
+Or the user guide:
+- http://docs.codehaus.org/display/GEOTDOC
+
 You can find out more about each of the major modules by going to:
 - http://maven.geotools.fr/reports/
 - http://javadoc.geotools.fr/
@@ -72,11 +75,11 @@ In order to build GeoTools you will need a copy of Maven 2.  Maven is a project
 management tool from the Apache group.  You can obtain a copy of maven from: 
 - http://maven.apache.org/download.html
 
-At the time of writing, the build process was known to work with the Maven 2.0.4
+At the time of writing, the build process was known to work with the Maven 2.0.5
 release.
 
 Once you have maven installed, you can perform a full build by moving to the
-geotools2 folder and typing:
+geotools folder and typing:
 
 mvn install
 
@@ -90,7 +93,7 @@ in the process of removing deprecated classes, and finalizing documentation.
 
 GETTING INVOLVED
 ================
-If you are interested in the future development of GeoTools2 then feel free to
+If you are interested in the future development of GeoTools then feel free to
 join the geotools-devel mailing list and join in the weekly IRC sessions.
 
 We welcome contributions of new modules as well as keen developers who want to
@@ -100,11 +103,11 @@ For more general queries a a gt2-users mailing list is also available.
 
 You can find out more about the mailing lists and recent news by going to the
 GeoTools homepage at:
-- http://www.geotools.org
+- http://geotools.org
 
 And by reading the GeoTools guide at:
 - http://docs.codehaus.org/display/GEOTOOLS/Home
 
 Good luck and many thanks for your interest in GeoTools,
 
-The GeoTools2 Project Management Committee
+The GeoTools Project Management Committee
