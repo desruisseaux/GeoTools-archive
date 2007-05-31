@@ -78,7 +78,7 @@ public class XSAnyTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return Map.class;
+        return Object.class;
     }
 
     /**

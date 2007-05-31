@@ -761,7 +761,7 @@ public class XSSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType ANYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("anyType", Map.class);
+        .newAttributeType("anyType", Object.class);
 
     /**
      * <p>
