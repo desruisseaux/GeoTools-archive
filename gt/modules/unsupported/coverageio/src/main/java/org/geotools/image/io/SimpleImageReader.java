@@ -61,7 +61,7 @@ import org.geotools.resources.image.ComponentColorModelJAI;
  * operators after reading.
  *
  * @since 2.1
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/coverage/src/main/java/org/geotools/image/io/SimpleImageReader.java $
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
@@ -635,7 +635,7 @@ public abstract class SimpleImageReader extends ImageReader {
      * Service provider interface (SPI) for {@link SimpleImageReader}s.
      *
      * @since 2.4
-     * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/coverage/src/main/java/org/geotools/image/io/TextImageReader.java $
+     * @source $URL$
      * @version $Id$
      * @author Martin Desruisseaux
      */

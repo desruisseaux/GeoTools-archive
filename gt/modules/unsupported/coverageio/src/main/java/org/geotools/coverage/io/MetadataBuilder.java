@@ -141,7 +141,7 @@ import org.geotools.geometry.GeneralEnvelope;
  * {@link #getCoordinateReferenceSystem} method constructs a {@link CoordinateReferenceSystem}
  * object using available informations.
  *
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/coverage/src/main/java/org/geotools/coverage/io/MetadataBuilder.java $
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

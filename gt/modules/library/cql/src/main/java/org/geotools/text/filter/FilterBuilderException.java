@@ -23,7 +23,7 @@ import org.geotools.filter.text.cql2.Token;
 
 /**
  * @author  Ian Schneider
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/cql/src/main/java/org/geotools/text/filter/FilterBuilderException.java $
+ * @source $URL$
  * @deprecated use the {@link CQLException} class instead, this one is going to be set to package visibility
  */
 public class FilterBuilderException extends CQLException {

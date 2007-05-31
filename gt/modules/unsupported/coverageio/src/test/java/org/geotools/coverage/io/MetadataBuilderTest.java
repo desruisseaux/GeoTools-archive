@@ -40,7 +40,7 @@ import org.geotools.resources.Arguments;
 /**
  * Tests the {@link MetadataBuilder} implementation.
  *
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/coverage/src/test/java/org/geotools/coverage/io/MetadataBuilderTest.java $
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

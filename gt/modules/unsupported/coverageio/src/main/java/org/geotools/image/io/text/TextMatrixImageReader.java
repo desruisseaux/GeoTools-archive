@@ -50,7 +50,7 @@ import org.geotools.resources.i18n.DescriptionKeys;
  * An image decoder for matrix of floating-point numbers.
  *
  * @since 2.4
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/coverage/src/main/java/org/geotools/image/io/TextMatrixImageReader.java $
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

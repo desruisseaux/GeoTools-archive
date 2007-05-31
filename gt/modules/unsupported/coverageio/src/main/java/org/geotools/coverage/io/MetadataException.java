@@ -24,7 +24,7 @@ import javax.imageio.IIOException;
  * The base class for error related to grid coverage's metadata.
  * This exception is thrown by the helper class {@link MetadataBuilder}.
  *
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/coverage/src/main/java/org/geotools/coverage/io/MetadataException.java $
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *

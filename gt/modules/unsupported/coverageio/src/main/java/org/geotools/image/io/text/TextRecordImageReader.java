@@ -90,7 +90,7 @@ import org.geotools.resources.i18n.DescriptionKeys;
  * {@code TextRecordImageReader}, unless you want more control on the decoding process.
  *
  * @since 2.1
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/coverage/src/main/java/org/geotools/image/io/TextRecordImageReader.java $
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
@@ -764,7 +764,7 @@ public class TextRecordImageReader extends TextImageReader {
      * <strong>and</strong> {@code Spi} and overriding some of their methods.
      *
      * @since 2.1
-     * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/coverage/src/main/java/org/geotools/image/io/TextRecordImageReader.java $
+     * @source $URL$
      * @version $Id$
      * @author Martin Desruisseaux
      */

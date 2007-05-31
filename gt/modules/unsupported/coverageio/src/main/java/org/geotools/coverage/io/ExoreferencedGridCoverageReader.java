@@ -46,7 +46,7 @@ import org.geotools.coverage.GridSampleDimension;
  * values are read by a {@link ImageReader} object.
  *
  * @since 2.2
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/coverage/src/main/java/org/geotools/coverage/io/ExoreferencedGridCoverageReader.java $
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

@@ -33,7 +33,7 @@ import javax.imageio.spi.ImageWriterSpi;
  *
  * TODO: NOT YET IMPLEMENTED
  *
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/coverage/src/main/java/org/geotools/image/io/TextImageWriter.java $
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

@@ -32,7 +32,7 @@ import net.sf.jsqlparser.statement.select.SelectBody;
  * an POJO object model as defined by <a href="http://jsqlparser.sf.net">jsqlparser</a>
  *
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: SqlParser.java 18676 2006-03-15 00:48:34Z groldan $
+ * @version $Id$
  * @source $URL$
  * @since 2.3.x
   */

@@ -82,7 +82,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * on the result.
  *
  * @since 2.2
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/coverage/src/main/java/org/geotools/coverage/io/AbstractGridCoverageReader.java $
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

@@ -49,7 +49,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * computed when needed. The interval computation should be accurate even if there is
  * missing and/or duplicated records.
  *
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/coverage/src/main/java/org/geotools/image/io/RecordList.java $
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */

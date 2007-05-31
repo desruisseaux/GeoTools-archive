@@ -46,7 +46,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * method.
  *
  * @since 2.4
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/coverage/src/main/java/org/geotools/image/io/TextImageReader.java $
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
@@ -357,7 +357,7 @@ public abstract class TextImageReader extends SimpleImageReader {
      * </pre></blockquote>
      *
      * @since 2.4
-     * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/coverage/src/main/java/org/geotools/image/io/TextImageReader.java $
+     * @source $URL$
      * @version $Id$
      * @author Martin Desruisseaux
      */

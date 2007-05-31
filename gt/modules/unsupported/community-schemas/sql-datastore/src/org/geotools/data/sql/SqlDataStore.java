@@ -25,7 +25,7 @@ import org.geotools.data.DataStore;
  * </p>
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: SqlDataStore.java 18596 2006-03-12 03:38:10Z groldan $
+ * @version $Id$
  * @source $URL$
  * @since 2.3.x
  */
