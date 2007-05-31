@@ -76,7 +76,8 @@ public class HighlightManager extends MouseMotionAdapter {
         }
 
         Rectangle bounds = e.getComponent().getBounds();
-        Envelope mapArea = ((JMapPane) e.getSource()).mapArea;
+        JMapPane pane = (JMapPane) e.getSource();
+        Envelope mapArea = pane.mapArea;
         double x = (double) (e.getX());
         double y = (double) (e.getY());
         double width = mapArea.getWidth();
@@ -90,8 +91,10 @@ public class HighlightManager extends MouseMotionAdapter {
         Geometry geometry = gf.createPoint(new Coordinate(mapX, mapY));
 
         try {
+        	Filter bb = ff.bbox(ff.property(geomName),mapArea.getMinX(),mapArea.getMinY(),
+        			mapArea.getMaxX(),mapArea.getMaxY(),pane.getContext().getCoordinateReferenceSystem().toString());
             f = ff.contains(ff.property(geomName), ff.literal(geometry));
-
+            f = ff.and(bb,f);
             if (f == lastFilter) {
                 return;
             }
