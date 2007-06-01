@@ -47,25 +47,37 @@ public final class ContentEntry {
      */
     ContentDataStore dataStore;
 
-    protected ContentEntry(ContentDataStore dataStore, TypeName typeName) {
+    public ContentEntry(ContentDataStore dataStore, TypeName typeName) {
         this.typeName = typeName;
         this.dataStore = dataStore;
 
         this.state = new HashMap();
 
         //create a state for the auto commit transaction
-        ContentState autoState = new ContentState(this);
+        ContentState autoState = dataStore.createContentState(null);
         this.state.put(Transaction.AUTO_COMMIT, autoState);
     }
 
+    /**
+     * Qualified name of the entry.
+     */
     public TypeName getName() {
         return typeName;
     }
 
+    /**
+     * Unqualified name of the entry.
+     * <p>
+     * Equivalent to: <code>getName().getLocalPart()</code>.
+     * </p>
+     */
     public String getTypeName() {
         return typeName.getLocalPart();
     }
 
+    /**
+     * Backpointer to datastore.
+     */
     public ContentDataStore getDataStore() {
         return dataStore;
     }
