@@ -29,9 +29,9 @@ import com.vividsolutions.jts.geom.Envelope;
  * <p>
  * This class maintains a cache of certain aspects of a feature type which are
  * subject to the state of a dataset modified in a transaction. Examples of 
- * content to cache:
+ * such content:
  * <ul>
- * <li>Schmea FeatureType (per FeatureTypeFactory )
+ * <li>
  * <li>Type FeatureType (per FeatureTypeFactory )
  * <li>key: "bounds"; value: Envelope of dataset
  * <li>key: "count"; value: Number of features in dataset
@@ -43,24 +43,33 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class ContentState {
 	
+	/**
+	 * cached feature type
+	 */
 	protected FeatureType memberType;
-	
+	/**
+	 * cached feature collection type
+	 */
 	protected FeatureType collectionType;
+	/**
+	 * cached number of features
+	 */
+	protected int count = -1;
+	/**
+	 * cached bounds of features
+	 */
+	protected Envelope bounds;
+
+    /**
+     * entry maintaining the state
+     */
+    protected ContentEntry entry;
 
     /**
      * observers
      */
     private List listeners = new ArrayList(2);
-
-    /**
-     * entry maintaining the state
-     */
-    private ContentEntry entry;
-
-	private int count = -1;
-
-	private Envelope bounds;
-
+    
     /**
      * Creates a new state.
      *
@@ -71,8 +80,9 @@ public class ContentState {
         this.listeners = new ArrayList(2);
     }
     
-    public ContentState(ContentState state) {
+    protected ContentState(ContentState state) {
 		this( state.getEntry() );
+		
         memberType = state.memberType;
         collectionType = state.collectionType;
         count = state.count;
@@ -84,26 +94,33 @@ public class ContentState {
     }
     
     public void setMemberType( FeatureType memberType ){
-    	memberType = memberType;    	
+    	this.memberType = memberType;    	
     }
+    
     public FeatureType getCollectionType(){
     	return collectionType; 
-    }    
+    }
+    
     public void setCollectionType( FeatureType featureType ){
     	collectionType = featureType;    	
     }
+    
     public int getCount(){
     	return count;
     }
+    
     public void setCount(int count){
     	this.count = count;
     }
+    
     public Envelope getBounds(){
     	return bounds;
     }
+    
     public void setBounds( Envelope bounds ){
     	this.bounds = bounds;
     }
+    
     /**
      * Flushes the cache.
      */
@@ -157,10 +174,6 @@ public class ContentState {
      * @return A copy of the state.
      */
     public ContentState copy() {
-        try {
-            return (ContentState) clone();
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError("ContentState always can be copied");
-        }
+        return new ContentState( this );
     }
 }
