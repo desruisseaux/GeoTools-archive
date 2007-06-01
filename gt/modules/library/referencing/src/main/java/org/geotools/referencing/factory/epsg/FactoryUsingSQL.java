@@ -346,12 +346,19 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
 
     /**
      * The set of authority codes for different types. This map is used by the
-     * {@link #getAuthorityCodes} method.
+     * {@link #getAuthorityCodes} method as a cache for returning the set created
+     * in a previous call.
      * <p>
-     * Note that this factory can't be disposed as long as some cached sets are in use (i.e. as long as this map is not empty).
-     * This is why a weak value map is mandatory here.
-     * 
-     * The {@link AuthorityCodes#finalize} methods take care of closing the stamenents used by the sets.
+     * Note that this {@code FactoryUsingSQL} can not be disposed as long as this map is not
+     * empty, sinces {@link AuthorityCodes} cache some SQL statements and concequently require
+     * the {@linkplain #connection} to be open. This is why we use soft references rather than
+     * hard ones, in order to know when no {@link AuthorityCodes} are still in use.
+     * <p>
+     * The {@link AuthorityCodes#finalize} methods take care of closing the stamenents used by
+     * the sets. The {@link AuthorityCodes} reference in this map is then cleared by the garbage
+     * collector. The {@link #canDispose} method checks if there is any remaining live reference
+     * in this map, and returns {@code false} if some are found (thus blocking the call to
+     * {@link #dispose} by the {@link DefaultFactory} timer).
      */
     private final Map/*<Class,Reference<AuthorityCodes>>*/ authorityCodes = new HashMap();
 
