@@ -16,6 +16,8 @@
 package org.geotools.data.store;
 
 import java.io.IOException;
+import java.util.logging.Logger;
+
 import com.vividsolutions.jts.geom.Envelope;
 import org.opengis.feature.simple.SimpleTypeFactory;
 import org.opengis.filter.Filter;
@@ -60,6 +62,10 @@ public abstract class ContentFeatureSource implements FeatureSource {
         this.entry = entry;
     }
 
+    public ContentEntry getEntry() {
+    	return entry;
+    }
+    
     public void setTransaction(Transaction transaction) {
         this.transaction = transaction;
     }
@@ -156,6 +162,13 @@ public abstract class ContentFeatureSource implements FeatureSource {
     //
     // Internal API
     //
+    /**
+     * Returns the data store logger.
+     */
+    public Logger getLogger() {
+    	return ((ContentDataStore) getDataStore() ).getLogger();
+    }
+    
     /**
      * Creates a feature type for the entry.
      * <p>
