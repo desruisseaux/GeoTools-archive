@@ -105,8 +105,8 @@ public class CitationsTest extends TestCase {
         assertNotSame(PositionalAccuracyImpl.DATUM_SHIFT_APPLIED,
                       PositionalAccuracyImpl.DATUM_SHIFT_OMITTED);
 
-        final Collection appliedResults = PositionalAccuracyImpl.DATUM_SHIFT_APPLIED.getResult();
-        final Collection omittedResults = PositionalAccuracyImpl.DATUM_SHIFT_OMITTED.getResult();
+        final Collection appliedResults = PositionalAccuracyImpl.DATUM_SHIFT_APPLIED.getResults();
+        final Collection omittedResults = PositionalAccuracyImpl.DATUM_SHIFT_OMITTED.getResults();
         final ConformanceResult applied = (ConformanceResult) appliedResults.iterator().next();
         final ConformanceResult omitted = (ConformanceResult) omittedResults.iterator().next();
         assertNotSame(applied, omitted);

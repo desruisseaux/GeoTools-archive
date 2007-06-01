@@ -364,7 +364,7 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
     private static double getAccuracy0(final CoordinateOperation operation) {
         final Collection accuracies = operation.getPositionalAccuracy();
         for (final Iterator it=accuracies.iterator(); it.hasNext();) {
-            final Collection results = ((PositionalAccuracy) it.next()).getResult();
+            final Collection results = ((PositionalAccuracy) it.next()).getResults();
             for (final Iterator it2 = results.iterator(); it2.hasNext();) {
                 final Result accuracy = (Result) it2.next(); 
                 if (accuracy instanceof QuantitativeResult) {

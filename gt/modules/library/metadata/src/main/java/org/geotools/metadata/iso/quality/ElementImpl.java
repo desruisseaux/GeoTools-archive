@@ -212,11 +212,30 @@ public class ElementImpl extends MetadataEntity implements Element {
     }
 
     /**
+     * Date that the metadata was created.
+     * The array length is 1 for a single date, or 2 for a range.
+     * Returns {@code null} if this information is not available.
+     *
+     * @deprecated Replaced by {@link #getDates}.
+     */
+    public Date[] getDate() {
+        if (date1 == Long.MIN_VALUE) {
+            return null;
+        }
+        if (date2 == Long.MIN_VALUE) {
+            return new Date[] {new Date(date1)};
+        }
+        return new Date[] {new Date(date1), new Date(date2)};
+    }
+
+    /**
      * Returns the date or range of dates on which a data quality measure was applied.
      * The array length is 1 for a single date, or 2 for a range. Returns
      * an empty list if this information is not available.
+     *
+     * @since 2.4
      */
-    public synchronized Collection getDate() {
+    public synchronized Collection getDates() {
         if (date1 == Long.MIN_VALUE) {
             return Collections.EMPTY_LIST;
         }
@@ -226,14 +245,6 @@ public class ElementImpl extends MetadataEntity implements Element {
         return Arrays.asList(
             new Date[] {new Date(date1), new Date(date2)}
         );
-    }
-
-    /**
-     * Set the date or range of dates on which a data quality measure was applied.
-     * The collection size is 1 for a single date, or 2 for a range.
-     */
-    public void setDate(final Collection/*<Date>*/ newValues) {
-        setDate((Date[]) newValues.toArray(new Date[newValues.size()]));
     }
 
     /**
@@ -256,20 +267,26 @@ public class ElementImpl extends MetadataEntity implements Element {
         }
     }
 
-//    /**
-//     * Returns the value (or set of values) obtained from applying a data quality measure or
-//     * the out come of evaluating the obtained value (or set of values) against a specified
-//     * acceptable conformance quality level.
-//     *
-//     * @deprecated Use {@link #getResults} instead.
-//     */
-//    public Result getResult() {
-//        final Collection results = getResults();
-//        return results.isEmpty() ? null : (Result) results.iterator().next();
-//    }
-    // Remove this method and uncomment the code above if 'getResult' is renamed 'getResults'.
-    public Collection getResult() {
-        return getResults();
+    /**
+     * Set the date or range of dates on which a data quality measure was applied.
+     * The collection size is 1 for a single date, or 2 for a range.
+     *
+     * @since 2.4
+     */
+    public void setDates(final Collection/*<Date>*/ newValues) {
+        setDate((Date[]) newValues.toArray(new Date[newValues.size()]));
+    }
+
+    /**
+     * Returns the value (or set of values) obtained from applying a data quality measure or
+     * the out come of evaluating the obtained value (or set of values) against a specified
+     * acceptable conformance quality level.
+     *
+     * @deprecated Use {@link #getResults} instead.
+     */
+    public Result getResult() {
+        final Collection results = getResults();
+        return results.isEmpty() ? null : (Result) results.iterator().next();
     }
 
     /**
@@ -279,12 +296,8 @@ public class ElementImpl extends MetadataEntity implements Element {
      *
      * @deprecated Use {@link #setResults} instead.
      */
-//    public void setResult(final Result newValue) {
-//        setResults(Collections.singleton(newValue));
-//    }
-    // Remove this method and uncomment the code above if 'getResult' is renamed 'getResults'.
-    public void setResult(final Collection newValues) {
-        setResults(newValues);
+    public void setResult(final Result newValue) {
+        setResults(Collections.singleton(newValue));
     }
 
     /**
