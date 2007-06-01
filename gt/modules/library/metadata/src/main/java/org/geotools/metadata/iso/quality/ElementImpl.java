@@ -235,7 +235,7 @@ public class ElementImpl extends MetadataEntity implements Element {
      *
      * @since 2.4
      */
-    public synchronized Collection getDates() {
+    public synchronized Collection/*<Date>*/ getDates() {
         if (date1 == Long.MIN_VALUE) {
             return Collections.EMPTY_LIST;
         }
@@ -251,7 +251,7 @@ public class ElementImpl extends MetadataEntity implements Element {
      * Set the date or range of dates on which a data quality measure was applied.
      * The array length is 1 for a single date, or 2 for a range.
      *
-     * @deprecated Use {@link #setDate(Collection)} instead.
+     * @deprecated Use {@link #setDates(Collection)} instead.
      */
     public synchronized void setDate(final Date[] newValue) {
         checkWritePermission();
