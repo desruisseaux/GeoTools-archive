@@ -256,7 +256,17 @@ public abstract class ContentDataStore implements DataStore {
     //
     // Internal API
     //
-
+    /**
+     * Returns the logger for the datastore.
+     * <p>
+     * Subclasses should override to provide a differnt logging instance. This
+     * implementation uses the logger "org.geotools.data".
+     * </p>
+     */
+    public Logger getLogger() {
+    	return LOGGER;
+    }
+    
     /**
      * Creates a set of qualified names corresponding to the types that the
      * datastore provides.
@@ -282,7 +292,8 @@ public abstract class ContentDataStore implements DataStore {
      *
      * @return An new instance of {@link ContentFeatureSource} for the entry.
      */
-    protected abstract ContentFeatureSource createFeatureSource(ContentEntry entry);
+    protected abstract ContentFeatureSource createFeatureSource(ContentEntry entry)
+    	throws IOException;
 
     /**
      * Instantiates a new conent state for the entry.
@@ -292,7 +303,7 @@ public abstract class ContentDataStore implements DataStore {
      * </p>
      * @param entry The entry.
      * 
-     * @return A new instance of {@link ContentState} for the entry.
+     * @return A new instance of {@link ContentState} for the entry.	
      *
      */
     protected ContentState createContentState(ContentEntry entry) {
