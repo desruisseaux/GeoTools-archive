@@ -1,6 +1,9 @@
 package org.geotools.data.jdbc.collection;
 
 import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -8,13 +11,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.geotools.data.FeatureEvent;
 import org.geotools.data.FeatureListener;
-import org.geotools.data.FeatureSource;
+import org.geotools.data.jdbc.JDBCDataStore;
 import org.geotools.data.jdbc.JDBCFeatureSource;
-import org.geotools.data.store.ContentState;
+import org.geotools.data.jdbc.JDBCRunnable;
+import org.geotools.data.jdbc.JDBCState;
+import org.geotools.data.jdbc.JDBCUtils;
+import org.geotools.data.jdbc.SQLBuilder;
+import org.geotools.data.store.FeatureIteratorIterator;
 import org.geotools.feature.CollectionEvent;
 import org.geotools.feature.CollectionListener;
 import org.geotools.feature.Feature;
@@ -23,7 +29,6 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureList;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.collection.DelegateFeatureIterator;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.util.ProgressListener;
 import org.opengis.filter.Filter;
@@ -40,12 +45,25 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author Jody
  */
-public abstract class JDBCFeatureCollection implements FeatureCollection {
-	JDBCFeatureSource source;
+public class JDBCFeatureCollection implements FeatureCollection {
 
-	/** logger */
-	static Logger LOGGER = Logger.getLogger( "org.geotools.data.jdbc.collection" );
+	/**
+	 * feature sourfce the collection originated from.
+	 */
+	JDBCFeatureSource source;
+	/**
+	 * state of the feature source 
+	 */
+	JDBCState state;
+	/**
+	 * filter used to filter content.
+	 */
+	Filter filter;
 	
+	/**
+	 * feature listener which listens to the feautre source and 
+	 * forwards events to its listeners.
+	 */
 	FeatureListener listener = new FeatureListener(){
 		public void changed(FeatureEvent featureEvent) {
 			if( listeners.isEmpty() ) return;
@@ -57,10 +75,10 @@ public abstract class JDBCFeatureCollection implements FeatureCollection {
 			for( int i=0; i<notify.length; i++ ){
 				CollectionListener listener = notify[i];
 				try {
-					    listener.collectionChanged( event );
+				    listener.collectionChanged( event );
 				}
 				catch (Throwable t ){
-					LOGGER.log( Level.WARNING, "Problem encountered during notification of "+event, t );
+					source.getLogger().log( Level.WARNING, "Problem encountered during notification of "+event, t );
 				}
 			}
 		}			
@@ -72,10 +90,43 @@ public abstract class JDBCFeatureCollection implements FeatureCollection {
     /** Set of open resource iterators */
     protected final Set open = new HashSet();
 
-    /** A FeatureCollection backed onto the provided source */
-	JDBCFeatureCollection( JDBCFeatureSource source ){
+   public JDBCFeatureCollection( JDBCFeatureSource source, JDBCState state ) {
+		this( source, state, null );
+	}
+	
+	public JDBCFeatureCollection( JDBCFeatureSource source, JDBCState state, Filter filter ) {
 		this.source = source;
+		this.state = state;
+		this.filter = filter;
+		
+		//add the feautre source listener
 		source.addFeatureListener(listener);
+	
+		//ensure the state has a connection
+		if ( state.getConnection() == null ) {
+			state.setConnection( ((JDBCDataStore) source.getDataStore()).connection() );
+		}
+	}
+	
+	/**
+	 * @return The feautre source the collection originates from.
+	 */
+	public JDBCFeatureSource getFeatureSource() {
+		return source;
+	}
+	
+	/**
+	 * Sets a filter used to "filter" the content of the collection.
+	 */
+	public void setFilter(Filter filter) {
+		this.filter = filter;
+	}
+	
+	/**
+	 * @return The filter being used to "filter" the collection.
+	 */
+	public Filter getFilter() {
+		return filter;
 	}
 	
     /**
@@ -97,22 +148,46 @@ public abstract class JDBCFeatureCollection implements FeatureCollection {
     }
     
     // Iterators
-    public FeatureIterator features()(
-        FeatureIterator iterator = createFeatureIterator();
-        open.add( iterator ); // remember for later
+    public FeatureIterator features(){
+        FeatureIterator iterator;
+		try {
+			iterator = createFeatureIterator();
+		} 
+		catch (Exception e) {
+			throw new RuntimeException( e );
+		}
+        
+        // keep track of the iterator
+        open.add( iterator );
+        
         return iterator;
     }
-	public void close( FeatureIterator close ) {
+	
+    public void close( FeatureIterator close ) {
 		close.close();
 	    open.remove( close );
 	}
-	public Iterator iterator(){
+	
+	public Iterator iterator() {
 		FeatureIterator iterator = features();
-		
+		return new FeatureIteratorIterator( iterator );
+	}
+	
+	public void close(Iterator close) {
+		if ( close instanceof FeatureIteratorIterator ) {
+			FeatureIteratorIterator iterator = (FeatureIteratorIterator) close;
+			close( iterator.getDelegate() );
+		}
 	}
 
-    /** Typesafe access to contents of collection */
-    protected abstract FeatureIterator createFeatureIterator();
+    protected FeatureIterator createFeatureIterator() throws Exception {
+    	SQLBuilder sql = new SQLBuilder( (JDBCDataStore) source.getDataStore(), source );
+    	
+    	Statement st = state.getConnection().createStatement();
+    	st.execute( sql.select( filter ) );
+    	
+    	return new JDBCFeatureIterator( st, this );
+    }
     
     public void purge() {
         for( Iterator i = open.iterator(); i.hasNext(); ){
@@ -120,10 +195,11 @@ public abstract class JDBCFeatureCollection implements FeatureCollection {
             if( resource instanceof FeatureIterator ){
                 FeatureIterator resourceIterator = (FeatureIterator) resource;
                 try {
-                    closeIterator( resourceIterator );
+                    close( resourceIterator );
                 }
                 catch( Throwable e){
-                    // TODO: Log e = ln
+                	String msg = "Error occured closing iterator";
+                	source.getLogger().log( Level.WARNING, msg, e );
                 }
                 finally {
                     i.remove();
@@ -131,6 +207,7 @@ public abstract class JDBCFeatureCollection implements FeatureCollection {
             }
         }        
     }
+    
     /**
      * Accepts a visitor, which then visits each feature in the collection.
      * @throws IOException 
@@ -159,100 +236,141 @@ public abstract class JDBCFeatureCollection implements FeatureCollection {
         }
     }
 
-
-	public void close(Iterator close) {
-		
-	}
-
-	public FeatureType getFeatureType() {
-		return source.getFeatureType();
-	}
-
-	public FeatureType getSchema() {
+    public FeatureType getSchema() {
 		return source.getSchema();
 	}
 
-	public Iterator iterator() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public boolean add(Object arg0) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public boolean addAll(Collection arg0) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public void clear() {
-		// TODO Auto-generated method stub
+    public Envelope getBounds() {
 		
-	}
+		JDBCRunnable runnable = new JDBCRunnable() {
 
-	public boolean contains(Object o) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public boolean containsAll(Collection arg0) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public boolean isEmpty() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public boolean remove(Object o) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public boolean removeAll(Collection arg0) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public boolean retainAll(Collection arg0) {
-		// TODO Auto-generated method stub
-		return false;
+			public Object run(Statement statement) throws IOException, SQLException {
+				
+				Envelope bounds = new Envelope();
+				
+				SQLBuilder sql = 
+					new SQLBuilder( (JDBCDataStore) source.getDataStore(), source );
+				ResultSet rs = statement.executeQuery( sql.bounds( filter ) );
+				
+				if ( rs.next() ) {
+					bounds.init( (Envelope) rs.getObject( 1 ) );
+					while( rs.next() ) {
+						bounds.expandToInclude( (Envelope) rs.getObject( 1 ) );
+					}
+				}
+				else {
+					bounds.setToNull();
+				}
+				
+				rs.close();
+				
+				return bounds;
+			}
+			
+		};
+		
+		try {
+			return (Envelope) JDBCUtils.statement( state.getConnection(), runnable );
+		} 
+		catch (IOException e) {
+			throw new RuntimeException( e );
+		}
 	}
 
 	public int size() {
-		// TODO Auto-generated method stub
-		return 0;
+		JDBCRunnable runnable = new JDBCRunnable() {
+
+			public Object run(Statement statement) throws IOException, SQLException {
+				SQLBuilder sql = 
+					new SQLBuilder( (JDBCDataStore) source.getDataStore(), source );
+				
+				ResultSet rs = statement.executeQuery( sql.count( filter ) );
+				rs.next();
+				
+				Integer count = new Integer( rs.getInt( 1 ) );
+				rs.close();
+				
+				return count;
+			}
+			
+		};
+		
+		try {
+			return ((Integer)JDBCUtils.statement( state.getConnection(), runnable )).intValue();
+		} 
+		catch (IOException e) {
+			throw new RuntimeException( e );
+		}
+	}
+	
+	public boolean isEmpty() {
+		return size() == 0;
+	}
+	
+	public boolean add(Object o) {
+		throw new UnsupportedOperationException();
+	}
+
+	public boolean addAll(Collection arg0) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void clear() {
+		throw new UnsupportedOperationException();
+	}
+
+	public boolean contains(Object o) {
+		throw new UnsupportedOperationException();
+	}
+
+	public boolean containsAll(Collection arg0) {
+		throw new UnsupportedOperationException();
+	}
+
+	public boolean remove(Object o) {
+		throw new UnsupportedOperationException();
+	}
+
+	public boolean removeAll(Collection arg0) {
+		throw new UnsupportedOperationException();
+	}
+
+	public boolean retainAll(Collection arg0) {
+		throw new UnsupportedOperationException();
 	}
 
 	public Object[] toArray() {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	public Object[] toArray(Object[] arg0) {
+		throw new UnsupportedOperationException();
+	}
+
+	public FeatureList sort(SortBy order) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	public Object getAttribute(String xPath) {
+	
+	public FeatureCollection subCollection(Filter filter) {
 		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	//Feature API
+	public FeatureType getFeatureType() {
+		return null;
+	}
+	
+	public Object getAttribute(String xPath) {
 		return null;
 	}
 
 	public Object getAttribute(int index) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public Object[] getAttributes(Object[] attributes) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Envelope getBounds() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -288,3 +406,4 @@ public abstract class JDBCFeatureCollection implements FeatureCollection {
 	}
 
 }
+

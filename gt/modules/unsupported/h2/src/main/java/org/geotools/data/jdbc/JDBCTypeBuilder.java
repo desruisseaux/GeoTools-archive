@@ -11,6 +11,9 @@ import org.geotools.feature.simple.SimpleTypeBuilder;
 import org.opengis.feature.simple.SimpleTypeFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * Type Builder with which one can specify sql types as contants from the
@@ -79,6 +82,10 @@ public class JDBCTypeBuilder extends SimpleTypeBuilder {
         RMAPPINGS.put(Timestamp.class, new Integer(Types.TIMESTAMP));
 
         RMAPPINGS.put(Geometry.class, new Integer(Types.OTHER));
+        RMAPPINGS.put(Point.class, new Integer(Types.OTHER));
+        RMAPPINGS.put(LineString.class, new Integer(Types.OTHER));
+        RMAPPINGS.put(Polygon.class, new Integer(Types.OTHER));
+        
     }
 
     /**
@@ -90,16 +97,29 @@ public class JDBCTypeBuilder extends SimpleTypeBuilder {
 
     /**
      * Looks up the java class mapped to a particular sql type.
+     * 
+     * @throws IllegalArgumentException When there is no mapping for <tt>type</tt>
      */
-    public Class mapping(int type) {
-        return (Class) MAPPINGS.get(new Integer(type));
+    public Class mapping(int type) throws IllegalArgumentException {
+    	Class mapping = (Class) MAPPINGS.get(new Integer(type));
+    	if ( mapping == null ) {
+    		throw new IllegalArgumentException( "No such mapping for type: " + type );
+    	}
+    	
+    	return mapping;
     }
 
     /**
      * Looks up the sql type mapped to a particular java class.
+     * 
+     * @throws IllegalArgumentException When there is no mapping for <tt>clazz</tt>
      */
-    public int mapping(Class clazz) {
-        return ((Integer) RMAPPINGS.get(clazz)).intValue();
+    public int mapping(Class clazz) throws IllegalArgumentException {
+    	Integer mapping = (Integer) RMAPPINGS.get(clazz);
+    	if ( mapping == null ) {
+    		throw new IllegalArgumentException( "No such mapping for class: " + clazz.getName() );
+    	}
+        return mapping.intValue();
     }
 
     /**

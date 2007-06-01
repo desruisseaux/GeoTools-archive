@@ -1,3 +1,4 @@
+
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
@@ -16,11 +17,7 @@
 package org.geotools.data.jdbc;
 
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.geotools.data.FeatureListener;
+
 import org.geotools.data.store.ContentEntry;
 import org.geotools.data.store.ContentState;
 
@@ -54,3 +51,4 @@ public final class JDBCState extends ContentState {
     	super.flush();
     }
 }
+

@@ -7,7 +7,7 @@
 
 CREATE ALIAS geometryFromText for "org.openplans.spatialdbbox.JTS.geometryFromText";
 CREATE ALIAS geometryFromBytes for "org.openplans.spatialdbbox.JTS.geometryFromBytes";
-CREATE ALIAS envelope FOR "org.openplans.spatialdbbox.JTS.getEnvelope";
+CREATE ALIAS envelope FOR "org.openplans.spatialdbbox.JTS.getEnvelopeB";
 
 CREATE ALIAS equals FOR "org.openplans.spatialdbbox.StaticGeometry.equals";
 CREATE ALIAS toString FOR "org.openplans.spatialdbbox.StaticGeometry.toString";

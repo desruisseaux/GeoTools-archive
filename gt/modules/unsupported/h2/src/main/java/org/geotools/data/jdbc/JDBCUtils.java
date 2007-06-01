@@ -1,10 +1,14 @@
 package org.geotools.data.jdbc;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
@@ -75,10 +79,10 @@ public class JDBCUtils {
      * 
      * @throws Exception Any I/O errors that occur.
      */
-    static final String[] sqlTypeNames(FeatureType featureType, JDBCDataStore dataStore )
+    public static final String[] sqlTypeNames(FeatureType featureType, JDBCDataStore dataStore )
         throws Exception {
     
-        JDBCTypeBuilder typeBuilder = dataStore.typeBuilder();
+        JDBCTypeBuilder typeBuilder = dataStore.createTypeBuilder();
         
         //figure out what the sql types are
         int[] sqlTypes = new int[featureType.getAttributeCount()];
@@ -172,19 +176,23 @@ public class JDBCUtils {
      *
      * @throws Exception Any I/O errors that occur.
      */
-    static final FeatureType buildFeatureType(TypeName typeName, JDBCDataStore dataStore )
+    public static final FeatureType buildFeatureType(TypeName typeName, JDBCDataStore dataStore )
         throws Exception {
         
-        JDBCTypeBuilder builder = dataStore.typeBuilder();
+        JDBCTypeBuilder builder = dataStore.createTypeBuilder();
         
         //set up the name
         builder.setName( typeName.getLocalPart() );
-
+        
         //set the namespace, if not null
         if (typeName.getNamespaceURI() != null) {
             builder.setNamespaceURI(typeName.getNamespaceURI());
         }
-
+        else {
+        	//use the data store
+        	builder.setNamespaceURI( dataStore.getNamespaceURI() );
+        }
+        
         //get metadata about columns from database
         Connection conn = dataStore.connection();
 
@@ -278,10 +286,10 @@ public class JDBCUtils {
      *
      * @throws Exception Any I/O errors that occur.
      */
-    static final PrimaryKey primaryKey(TypeName typeName, JDBCDataStore dataStore ) 
+    public static final PrimaryKey primaryKey(TypeName typeName, JDBCDataStore dataStore ) 
         throws Exception {
       
-        JDBCTypeBuilder builder = dataStore.typeBuilder();
+        JDBCTypeBuilder builder = dataStore.createTypeBuilder();
         
         //get metadata from database
         Connection conn = dataStore.connection();
@@ -319,6 +327,95 @@ public class JDBCUtils {
                     new PrimaryKey.Column[keyColumns.size()]));
         } finally {
             conn.close();
+        }
+    }
+    
+    /**
+     * Utility method to safely execute an sql statement.
+     * <p>
+     * This method ensures that statements are properly closed, even when 
+     * exceptions occur.
+     * </p>
+     * <p>
+     * Any {@link SQLException}'s generated are wrapped in {@link IOException}.
+     * </p>
+     * <p>
+     * If an error occurs closing the statement n it is logged and not rethrown.
+     * </p>
+     * @param connection The database connection
+     * @param runner The code block to execute.
+     */
+    public static Object statement( Connection connection, JDBCRunnable runnable ) 
+    	throws IOException {
+    	
+    	//create a statement
+    	Statement st = null;
+    	try {
+    		st = connection.createStatement();
+    		
+    		//run it
+    		return runnable.run( st );
+    	}
+    	catch( SQLException e ) {
+    		throw (IOException) new IOException().initCause( e );
+    	}
+    	finally {
+    		if ( st != null ) {
+    			try {
+    				st.close();
+    			}
+    			catch( SQLException e ) {
+    				String msg = "Error occurred closing statement.";
+					JDBCDataStore.LOGGER.log( Level.WARNING, msg, e );
+    			}
+    		}
+    	}
+    }
+    
+    /**
+     * Utility method to safely execute an sql statement.
+     * <p>
+     * This method will obtain a new connection from the datastore, and close it
+     * when it is done, therefore it is not suitable for executing a statement 
+     * that is intended to be part of a transaction. Use {@link #statement(Connection, JDBCRunnable)}
+     * for this case.
+     * </p>
+     * <p>
+     * This method ensures that statements and connections are properly closed, 
+     * even when exceptions occur.
+     * </p>
+     * <p>
+     * Any {@link SQLException}'s generated are wrapped in {@link IOException}.
+     * </p>
+     * <p>
+     * If an error occurs closing the statement, or connection it is logged and 
+     * not rethrown.
+     * </p>
+     * @param dataStore The datastore.
+     * @param runner The code block to execute.
+     */
+    public static Object statement( JDBCDataStore dataStore, JDBCRunnable runnable )
+    	throws IOException {
+
+    	Connection conn = null;
+        try {
+        	//grab a connection
+        	conn = dataStore.connection();
+        	
+        	//execute the statement
+        	return statement( conn, runnable );
+        } 
+        finally {
+        	if ( conn != null ) {
+        		try {
+					conn.close();
+				} 
+        		catch (SQLException e) {
+        			String msg = "Error occurred closing connection.";
+					JDBCDataStore.LOGGER.log( Level.WARNING, msg, e );
+				}	
+        	}
+        	
         }
     }
 }

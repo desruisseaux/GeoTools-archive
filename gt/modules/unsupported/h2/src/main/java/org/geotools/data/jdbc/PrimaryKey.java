@@ -95,7 +95,7 @@ public class PrimaryKey {
      * A column in a primary key.
      *
      */
-    static class Column {
+    public static class Column {
         /**
          * THe column name;
          */

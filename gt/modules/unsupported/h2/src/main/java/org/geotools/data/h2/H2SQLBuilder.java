@@ -16,16 +16,23 @@
 package org.geotools.data.h2;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.io.WKTWriter;
+
+import org.geotools.data.Query;
+import org.geotools.data.jdbc.JDBCState;
+import org.geotools.data.jdbc.JDBCUtils;
+import org.geotools.data.jdbc.PrimaryKey;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.FeatureType;
+import org.geotools.filter.LikeFilterImpl;
+import org.geotools.geometry.jts.JTS;
+import org.geotools.referencing.CRS;
+import org.geotools.util.Converters;
 import org.opengis.filter.And;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.BinaryLogicOperator;
@@ -73,13 +80,10 @@ import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
 import org.opengis.metadata.Identifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.data.Query;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
-import org.geotools.filter.LikeFilterImpl;
-import org.geotools.geometry.jts.JTS;
-import org.geotools.referencing.CRS;
-import org.geotools.util.Converters;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.io.WKTWriter;
 
 
 /**
@@ -101,7 +105,7 @@ public class H2SQLBuilder implements FilterVisitor, ExpressionVisitor {
     /**
      * The state of the entry to create statements for
      */
-    H2ContentState state;
+    JDBCState state;
 
     /**
      * SQl Statement buffer
@@ -119,7 +123,7 @@ public class H2SQLBuilder implements FilterVisitor, ExpressionVisitor {
      * @param state The state of the entry the builder will create statements for.
      * @param filterFactory A factory used to create filter objects.
      */
-    public H2SQLBuilder(H2ContentState state, FilterFactory filterFactory) {
+    public H2SQLBuilder(JDBCState state, FilterFactory filterFactory) {
         this.state = state;
         this.filterFactory = filterFactory;
 
@@ -140,7 +144,7 @@ public class H2SQLBuilder implements FilterVisitor, ExpressionVisitor {
         String[] sqlTypeNames = null;
 
         try {
-            sqlTypeNames = H2Utils.sqlTypeNames(state);
+            sqlTypeNames = JDBCUtils.sqlTypeNames(state.getMemberType(),null );
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -164,14 +168,14 @@ public class H2SQLBuilder implements FilterVisitor, ExpressionVisitor {
 
         sql.append(" )");
 
-        Connection conn = state.getDataStore().connection();
+        Connection conn = null;//state.getDataStore().connection();
         
         return conn.prepareStatement( sql.toString() );
     }
     
     FeatureType featureType() {
         try {
-            return state.featureType();
+            return state.getMemberType();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -208,7 +212,7 @@ public class H2SQLBuilder implements FilterVisitor, ExpressionVisitor {
         String[] sqlTypeNames = null;
 
         try {
-            sqlTypeNames = H2Utils.sqlTypeNames(state);
+            //sqlTypeNames = H2Utils.sqlTypeNames(state);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -476,7 +480,7 @@ public class H2SQLBuilder implements FilterVisitor, ExpressionVisitor {
      *
      */
     public void table() {
-        name(state.getDataStore().getDatabaseSchema());
+        //name(state.getDataStore().getDatabaseSchema());
         sql.append(".");
         name(state.getEntry().getTypeName());
     }
@@ -591,7 +595,7 @@ public class H2SQLBuilder implements FilterVisitor, ExpressionVisitor {
     public Object visit(Id id, Object data) {
         try {
             //get the primary key
-            PrimaryKey key = state.primaryKey();
+            PrimaryKey key = null;//state.primaryKey();
 
             //prepare each column as a property name
             PropertyName[] columnNames = new PropertyName[key.columns.length];
@@ -727,7 +731,7 @@ public class H2SQLBuilder implements FilterVisitor, ExpressionVisitor {
                 crs = CRS.decode(bbox.getSRS());
                 data = crs;
             } catch (Exception ex) {
-                H2DataStore.LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+                //H2DataStore.LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
         }
 
@@ -977,7 +981,7 @@ public class H2SQLBuilder implements FilterVisitor, ExpressionVisitor {
     public Object visit(PropertyName propertyName, Object data) {
         try {
             //1. evaluate against the type to get the AttributeType
-            FeatureType featureType = state.featureType();
+            FeatureType featureType = state.getMemberType();
 
             AttributeType attributeType = (AttributeType) propertyName.evaluate(featureType);
 
@@ -990,7 +994,7 @@ public class H2SQLBuilder implements FilterVisitor, ExpressionVisitor {
             }
 
             //2. not in type, could it be a primary key?
-            PrimaryKey key = state.primaryKey();
+            PrimaryKey key = null; //state.primaryKey();
 
             //serach for the property in the primary key, encode it and return its type
             for (int i = 0; i < key.columns.length; i++) {
