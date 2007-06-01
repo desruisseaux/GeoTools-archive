@@ -68,6 +68,12 @@ public class GeographicMetadata extends IIOMetadata {
     private IIOMetadataNode gridGeometry;
 
     /**
+     * The grid geometry node.
+     * Will be created only when first needed.
+     */
+    private IIOMetadataNode gridRange;
+
+    /**
      * The envelope node.
      * Will be created only when first needed.
      */
@@ -100,12 +106,15 @@ public class GeographicMetadata extends IIOMetadata {
     /**
      * Set the attribute to the specified value, or remove the attribute if the value is null.
      */
-    private static void setAttribute(final Element node, final String name, final String value) {
+    private static void setAttribute(final Element node, final String name, String value, boolean isCodeList) {
         if (value == null) {
             if (node.hasAttribute(name)) {
                 node.removeAttribute(name);
             }
         } else {
+            if (isCodeList) {
+                value = value.replace('_', ' ').trim().toLowerCase();
+            }
             node.setAttribute(name, value);
         }
     }
@@ -114,16 +123,17 @@ public class GeographicMetadata extends IIOMetadata {
      * Set the coordinate reference system to the specified value.
      *
      * @param name The coordinate reference system name, or {@code null} if unknown.
-     * @param type The coordinate reference system type (usually {@code "geographic"}
-     *             or {@code "projected"}), or {@code null} if unknown.
+     * @param type The coordinate reference system type (usually
+     *             {@value GeographicMetadataFormat#GEOGRAPHIC} or
+     *             {@value GeographicMetadataFormat#PROJECTED}), or {@code null} if unknown.
      */
     public void setCoordinateReferenceSystem(final String name, final String type) {
         if (crs == null) {
             crs = new IIOMetadataNode("CoordinateReferenceSystem");
             root.appendChild(crs);
         }
-        setAttribute(crs, "name", name);
-        setAttribute(crs, "type", type);
+        setAttribute(crs, "name", name, false);
+        setAttribute(crs, "type", type, false);
     }
 
     /**
@@ -139,15 +149,16 @@ public class GeographicMetadata extends IIOMetadata {
             datum = new IIOMetadataNode("Datum");
             crs.appendChild(datum);
         }
-        setAttribute(datum, "name", name);
+        setAttribute(datum, "name", name, false);
     }
 
     /**
      * Set the coordinate system to the specified value.
      *
      * @param name The coordinate system name, or {@code null} if unknown.
-     * @param type The coordinate system type (usually {@code "ellipsoidal"}
-     *             or {@code "cartesian"}), or {@code null} if unknown.
+     * @param type The coordinate system type (usually
+     *             {@value GeographicMetadataFormat#ELLIPSOIDAL} or
+     *             {@value GeographicMetadataFormat#CARTESIAN}), or {@code null} if unknown.
      */
     public void setCoordinateSystem(final String name, final String type) {
         if (crs == null) {
@@ -157,8 +168,8 @@ public class GeographicMetadata extends IIOMetadata {
             cs = new IIOMetadataNode("CoordinateSystem");
             crs.appendChild(cs);
         }
-        setAttribute(cs, "name", name);
-        setAttribute(cs, "type", type);
+        setAttribute(cs, "name", name, false);
+        setAttribute(cs, "type", type, false);
     }
 
     /**
@@ -166,30 +177,56 @@ public class GeographicMetadata extends IIOMetadata {
      *
      * @param name The axis name, or {@code null} if unknown.
      * @param direction The axis direction (usually {@code "east"}, {@code "weast"},
-     *             {@code "north"}, {@code "south"}, {@code "up"} or {@code "down"}),
-     *             or {@code null} if unknown.
+     *        {@code "north"}, {@code "south"}, {@code "up"} or {@code "down"}),
+     *        or {@code null} if unknown.
      * @param units The axis units symbol, or {@code null} if unknown.
+     *
+     * @see org.opengis.referencing.cs.AxisDirection
      */
     public void addAxis(final String name, final String direction, final String units) {
         if (cs == null) {
             setCoordinateSystem(null, null);
         }
         final IIOMetadataNode axis = new IIOMetadataNode("Axis");
-        setAttribute(axis, "name",      name);
-        setAttribute(axis, "direction", direction);
-        setAttribute(axis, "units",     units);
+        setAttribute(axis, "name",      name,      false);
+        setAttribute(axis, "direction", direction, true);
+        setAttribute(axis, "units",     units,     false);
         cs.appendChild(axis);
     }
 
     /**
-     * Set the grid geometry to the specified value.
+     * Set the grid geometry to the specified value. The pixel orientation gives the point in
+     * a pixel corresponding to the Earth location of the pixel. In the JAI framework, this is
+     * typically the {@linkplain org.opengis.metadata.spatial.PixelOrientation#UPPER_LEFT
+     * upper left} corner. In some OGC specifications, this is often the pixel
+     * {@linkplain org.opengis.metadata.spatial.PixelOrientation#CENTER center}.
      *
-     * This method is not yet public because there is no parameter yet.
+     * @param pixelOrientation The pixel orientation (usually {@code "center"},
+     *        {@code "lower left"}, {@code "lower right"}, {@code "upper right"}
+     *        or {@code "upper left"}), or {@code null} if unknown.
+     *
+     * @see org.opengis.metadata.spatial.PixelOrientation
      */
-    private void setGridGeometry() {
+    public void setGridGeometry(final String pixelOrientation) {
         if (gridGeometry == null) {
             gridGeometry = new IIOMetadataNode("GridGeometry");
             root.appendChild(gridGeometry);
+        }
+        setAttribute(gridGeometry, "pixelOrientation", pixelOrientation, true);
+    }
+
+    /**
+     * Set the grid range to the specified value.
+     *
+     * This method is not yet public because there is no parameter yet.
+     */
+    private void setGridRange() {
+        if (gridGeometry == null) {
+            setGridGeometry(null);
+        }
+        if (gridRange == null) {
+            gridRange = new IIOMetadataNode("GridRange");
+            gridGeometry.appendChild(gridRange);
         }
     }
 
@@ -200,7 +237,7 @@ public class GeographicMetadata extends IIOMetadata {
      */
     private void setEnvelope() {
         if (gridGeometry == null) {
-            setGridGeometry(/*null*/);
+            setGridGeometry(null);
         }
         if (envelope == null) {
             envelope = new IIOMetadataNode("Envelope");
@@ -209,29 +246,54 @@ public class GeographicMetadata extends IIOMetadata {
     }
 
     /**
-     * Add the range of values for an envelope along a dimension. The ranges
+     * Adds the range of index along a dimension. The ranges
      * should be added in the same order than {@linkplain #addAxis axis}.
      *
-     * @param values The coordinate values.
+     * @param indexMin The minimal index value, inclusive. This is usually 0.
+     * @param indexMax The maximal index value, <strong>inclusive</strong>.
      */
-    public void addCoordinateRange(final double minimum, final double maximum) {
+    private void addGridRange(final int indexMin, final int indexMax) {
+        if (gridRange == null) {
+            setGridRange();
+        }
+        final IIOMetadataNode range = new IIOMetadataNode("IndexRange");
+        setAttribute(range, "minimum", Integer.toString(indexMin), false);
+        setAttribute(range, "maximum", Integer.toString(indexMax), false);
+        gridRange.appendChild(range);
+    }
+
+    /**
+     * Adds the range of values for an envelope along a dimension. The ranges
+     * should be added in the same order than {@linkplain #addAxis axis}.
+     *
+     * @param indexMin The minimal index value, inclusive. This is usually 0.
+     * @param indexMax The maximal index value, <strong>inclusive</strong>.
+     * @param valueMin The minimal coordinate value, inclusive.
+     * @param valueMax The maximal coordinate value, <strong>inclusive</strong>.
+     */
+    public void addCoordinateRange(final int    indexMin, final int    indexMax,
+                                   final double valueMin, final double valueMax)
+    {
+        addGridRange(indexMin, indexMax);
         if (envelope == null) {
             setEnvelope();
         }
         final IIOMetadataNode range = new IIOMetadataNode("CoordinateRange");
-        setAttribute(range, "minimum", Double.toString(minimum));
-        setAttribute(range, "maximum", Double.toString(maximum));
+        setAttribute(range, "minimum", Double.toString(valueMin), false);
+        setAttribute(range, "maximum", Double.toString(valueMax), false);
         envelope.appendChild(range);
     }
 
     /**
-     * Add coordinate values for an envelope along a dimension. This method may be invoked
+     * Adds coordinate values for an envelope along a dimension. This method may be invoked
      * in replacement of {@link #addCoordinateRange} when every cell coordinates need to be
      * specified explicitly.
      *
+     * @param indexMin The minimal index value, inclusive. This is usually 0.
      * @param values The coordinate values.
      */
-    public void addCoordinateValues(final double[] values) {
+    public void addCoordinateValues(final int indexMin, final double[] values) {
+        addGridRange(indexMin, indexMin + values.length);
         if (envelope == null) {
             setEnvelope();
         }

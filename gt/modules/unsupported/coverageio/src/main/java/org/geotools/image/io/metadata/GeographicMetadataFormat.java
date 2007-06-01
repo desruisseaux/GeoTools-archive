@@ -23,9 +23,9 @@ import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.metadata.IIOMetadataFormatImpl;
 
 // OpenGIS dependencies
+import org.opengis.geometry.Envelope;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.grid.GridGeometry;
-import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
@@ -63,24 +63,105 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
     private static final int MAXIMUM_BANDS = Short.MAX_VALUE;
 
     /**
+     * The geographic {@linkplain CoordinateReferenceSystem coordinate reference system} type.
+     * This is often used together with the {@linkplain #ELLIPSOIDAL ellipsoidal} coordinate
+     * system type.
+     *
+     * @see #setCoordinateReferenceSystem
+     */
+    public static final String GEOGRAPHIC = "geographic";
+
+    /**
+     * The geographic {@linkplain CoordinateReferenceSystem coordinate reference system} type
+     * with a vertical axis. This is often used together with a three-dimensional {@linkplain
+     * #ELLIPSOIDAL ellipsoidal} coordinate system type.
+     * <p>
+     * If the coordinate reference system has no vertical axis, or has additional axis of
+     * other kind than vertical (for example only a temporal axis), then the type should be
+     * the plain {@value #GEOGRAPHIC}. This is because such CRS are usually constructed as
+     * {@linkplain org.opengis.referencing.crs.CompoundCRS compound CRS} rather than a CRS
+     * with a three-dimensional coordinate system.
+     * <p>
+     * To be strict, a 3D CRS should be allowed only if the vertical axis is of the kind
+     * "height above the ellipsoid" (as opposed to "height above the geoid" for example),
+     * otherwise we have a compound CRS. But many datafile don't make this distinction.
+     *
+     * @see #setCoordinateReferenceSystem
+     */
+    public static final String GEOGRAPHIC_3D = "geographic3D";
+
+    /**
+     * The projected {@linkplain CoordinateReferenceSystem coordinate reference system} type.
+     * This is often used together with the {@linkplain #CARTESIAN cartesian} coordinate
+     * system type.
+     *
+     * @see #setCoordinateReferenceSystem
+     */
+    public static final String PROJECTED = "projected";
+
+    /**
+     * The projected {@linkplain CoordinateReferenceSystem coordinate reference system} type
+     * with a vertical axis. This is often used together with a three-dimensional {@linkplain
+     * #CARTESIAN cartesian} coordinate system type.
+     * <p>
+     * If the coordinate reference system has no vertical axis, or has additional axis of
+     * other kind than vertical (for example only a temporal axis), then the type should be
+     * the plain {@value #PROJECTED}. This is because such CRS are usually constructed as
+     * {@linkplain org.opengis.referencing.crs.CompoundCRS compound CRS} rather than a CRS
+     * with a three-dimensional coordinate system.
+     * <p>
+     * To be strict, a 3D CRS should be allowed only if the vertical axis is of the kind
+     * "height above the ellipsoid" (as opposed to "height above the geoid" for example),
+     * otherwise we have a compound CRS. But many datafile don't make this distinction.
+     *
+     * @see #setCoordinateReferenceSystem
+     */
+    public static final String PROJECTED_3D = "projected3D";
+
+    /**
+     * The ellipsoidal {@linkplain CoordinateSystem coordinate system} type.
+     *
+     * @see #setCoordinateSystem
+     */
+    public static final String ELLIPSOIDAL = "ellipsoidal";
+
+    /**
+     * The cartesian {@linkplain CoordinateSystem coordinate system} type.
+     *
+     * @see #setCoordinateSystem
+     */
+    public static final String CARTESIAN = "cartesian";
+
+    /**
      * Enumeration of valid coordinate reference system types.
      */
     private static final List/*<String>*/ CRS_TYPES = Arrays.asList(new String[] {
-        "geographic", "projected"
+        GEOGRAPHIC, PROJECTED
     });
 
     /**
      * Enumeration of valid coordinate system types.
      */
     private static final List/*<String>*/ CS_TYPES = Arrays.asList(new String[] {
-        "ellipsoidal", "cartesian"
+        ELLIPSOIDAL, CARTESIAN
     });
 
     /**
-     * Enumeration of valid axis directions.
+     * Enumeration of valid axis directions. We do not declare {@link String} constants for them
+     * since they are already available as {@linkplain org.opengis.referencing.cs.AxisDirection
+     * axis direction} code list.
      */
     private static final List/*<String>*/ DIRECTIONS = Arrays.asList(new String[] {
         "north", "east", "south", "west", "up", "down"
+    });
+
+    /**
+     * Enumeration of valid pixel orientation. We do not declare {@link String} constants for them
+     * since they are already available as {@linkplain org.opengis.metadata.spatial.PixelOrientation
+     * pixel orientation} code list.
+     */
+    private static final List/*<String>*/ PIXEL_ORIENTATIONS = Arrays.asList(new String[] {
+        "center", "lower left", "lower right", "upper right", "upper left"
     });
 
     /**
@@ -118,13 +199,13 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
          *   |           +-- Axis[0] (name, direction, units)
          *   |           +-- Axis[1] (name, direction, units)
          *   |           +-- ...etc...
-         *   +-- GridGeometry
+         *   +-- GridGeometry (pixelOrientation)
          *         +-- Envelope
          *         |     +-- CoordinateValues[0]
          *         |     +-- CoordinateRange[0] (minCoordinate, maxCoordinate)
          *         |     +-- CoordinateValues[1]
          *         |     +-- ...etc...
-         *         +-- AffineTransform (elements[6..?])
+         *         +-- AffineTransform (elements[6..n])
          */
         addElement  ("CoordinateReferenceSystem", rootName,    CHILD_POLICY_SOME);
         addAttribute("CoordinateReferenceSystem", "name",      DATATYPE_STRING);
@@ -138,12 +219,17 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
         addAttribute("Axis",              "name",              DATATYPE_STRING);
         addAttribute("Axis",              "direction",         DATATYPE_STRING, false, null, DIRECTIONS);
         addAttribute("Axis",              "units",             DATATYPE_STRING);
-        addElement  ("GridGeometry",       rootName,           CHILD_POLICY_CHOICE);
+        addElement  ("GridGeometry",       rootName,           CHILD_POLICY_SOME);
+        addAttribute("GridGeometry",      "pixelOrientation",  DATATYPE_STRING, false, "center", PIXEL_ORIENTATIONS);
+        addElement  ("GridRange",         "GridGeometry",      CHILD_POLICY_SEQUENCE);
+        addElement  ("IndexRange",        "GridRange",         CHILD_POLICY_EMPTY);
+        addAttribute("IndexRange",        "minimum",           DATATYPE_INTEGER, true, "0");
+        addAttribute("IndexRange",        "maximum",           DATATYPE_INTEGER, true, null); // inclusive
         addElement  ("Envelope",          "GridGeometry",      CHILD_POLICY_SEQUENCE);
         addElement  ("CoordinateValues",  "Envelope",          CHILD_POLICY_EMPTY);
         addElement  ("CoordinateRange",   "Envelope",          CHILD_POLICY_EMPTY);
         addAttribute("CoordinateRange",   "minimum",           DATATYPE_DOUBLE, true, null);
-        addAttribute("CoordinateRange",   "maximum",           DATATYPE_DOUBLE, true, null);
+        addAttribute("CoordinateRange",   "maximum",           DATATYPE_DOUBLE, true, null); // inclusive
         addElement  ("AffineTransform",   "GridGeometry",      CHILD_POLICY_EMPTY);
         addAttribute("AffineTransform",   "elements",          DATATYPE_DOUBLE, true,
                 6, maximumDimensions * (maximumDimensions - 1));

@@ -39,10 +39,11 @@ import ucar.ma2.Range;
 import ucar.ma2.DataType;
 import ucar.ma2.IndexIterator;
 import ucar.ma2.InvalidRangeException;
+import ucar.nc2.dataset.CoordSysBuilder;
 import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.util.CancelTask;
 
-// Geomatys dependencies
+// Geotools dependencies
 import org.geotools.util.NumberRange;
 import org.geotools.image.io.PaletteFactory;
 import org.geotools.image.io.FileImageReader;
@@ -129,6 +130,11 @@ public class DefaultReader extends FileImageReader implements CancelTask {
      * The last error from the NetCDF library.
      */
     private String lastError;
+
+    /**
+     * The stream metadata. Will be created only when first needed.
+     */
+    private IIOMetadata streamMetadata;
 
     /** 
      * Constructs a new NetCDF reader.
@@ -248,7 +254,12 @@ public class DefaultReader extends FileImageReader implements CancelTask {
      */
     //@Override
     public IIOMetadata getStreamMetadata() throws IOException {
-        return super.getStreamMetadata();
+        if (streamMetadata == null && !ignoreMetadata) {
+            ensureFileOpen();
+            CoordSysBuilder.addCoordinateSystems(file, this);
+            streamMetadata = new NetcdfMetadata(file);
+        }
+        return streamMetadata;
     }
 
     /**
@@ -521,9 +532,10 @@ public class DefaultReader extends FileImageReader implements CancelTask {
      */
     //@Override
     protected void close() throws IOException {
-        lastError = null;
-        ranges    = null;
-        variable  = null;
+        streamMetadata = null;
+        lastError      = null;
+        ranges         = null;
+        variable       = null;
         if (file != null) {
             file.close();
             file = null;
