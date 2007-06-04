@@ -45,7 +45,7 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
     /**
      * The metadata format name.
      */
-    public static final String FORMAT_NAME = "org.geotools";
+    public static final String FORMAT_NAME = "org.geotools.GridCoverage";
 
     /**
      * The maximum number of dimension allowed for the image coordinate system. Images must be
@@ -133,6 +133,24 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
     public static final String CARTESIAN = "cartesian";
 
     /**
+     * The geophysics {@linkplain SampleDimension sample dimension} type.
+     * Pixels in the {@linkplain java.awt.image.RenderedImage rendered image} produced by
+     * the image reader contain directly geophysics values like temperature or elevation.
+     * Sample type is typically {@code float} or {@code double} and missing value, if any,
+     * <strong>must</strong> be one of {@linkplain Float#isNaN NaN values}.
+     */
+    public static final String GEOPHYSICS = "geophysics";
+
+    /**
+     * The packed {@linkplain SampleDimension sample dimension} type.
+     * Pixels in the {@linkplain java.awt.image.RenderedImage rendered image} produced by
+     * the image reader contain packed data, typically as {@code byte} or {@code short}
+     * integer type. Conversions to geophysics values are performed by the application of
+     * a scale and offset. Some special values are typically used for missing values.
+     */
+    public static final String PACKED = "packed";
+
+    /**
      * Enumeration of valid coordinate reference system types.
      */
     private static final List/*<String>*/ CRS_TYPES = Arrays.asList(new String[] {
@@ -162,6 +180,13 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
      */
     private static final List/*<String>*/ PIXEL_ORIENTATIONS = Arrays.asList(new String[] {
         "center", "lower left", "lower right", "upper right", "upper left"
+    });
+
+    /**
+     * Enumeration of valid sample dimention types.
+     */
+    private static final List/*<String>*/ SAMPLE_TYPES = Arrays.asList(new String[] {
+        GEOPHYSICS, PACKED
     });
 
     /**
@@ -235,18 +260,20 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
                 6, maximumDimensions * (maximumDimensions - 1));
         /*
          * root
-         *   +-- SampleDimensions
-         *         +-- SampleDimension[0] (scale, offset, minValue, maxValue, fillValue)
-         *         +-- SampleDimension[1] (scale, offset, minValue, maxValue, fillValue)
+         *   +-- SampleDimensions (type)
+         *         +-- SampleDimension[0] (name, scale, offset, minValue, maxValue, fillValue)
+         *         +-- SampleDimension[1] (name, scale, offset, minValue, maxValue, fillValue)
          *         +-- ...etc...
          */
-        addElement  ("SampleDimensions", rootName,          1, maximumBands);
-        addElement  ("SampleDimension", "SampleDimensions", CHILD_POLICY_SOME);
-        addAttribute("SampleDimension", "scale",            DATATYPE_DOUBLE);
-        addAttribute("SampleDimension", "offset",           DATATYPE_DOUBLE);
-        addAttribute("SampleDimension", "minValue",         DATATYPE_DOUBLE);
-        addAttribute("SampleDimension", "maxValue",         DATATYPE_DOUBLE);
-        addAttribute("SampleDimension", "fillValue",        DATATYPE_DOUBLE);
+        addElement  ("SampleDimensions",  rootName,          1, maximumBands);
+        addAttribute("SampleDimensions", "type",             DATATYPE_STRING, false, null, SAMPLE_TYPES);
+        addElement  ("SampleDimension",  "SampleDimensions", CHILD_POLICY_SOME);
+        addAttribute("SampleDimension",  "name",             DATATYPE_STRING);
+        addAttribute("SampleDimension",  "scale",            DATATYPE_DOUBLE);
+        addAttribute("SampleDimension",  "offset",           DATATYPE_DOUBLE);
+        addAttribute("SampleDimension",  "minValue",         DATATYPE_DOUBLE);
+        addAttribute("SampleDimension",  "maxValue",         DATATYPE_DOUBLE);
+        addAttribute("SampleDimension",  "fillValue",        DATATYPE_DOUBLE);
         /*
          * Allow users to specify fully-constructed GeoAPI objects.
          */

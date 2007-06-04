@@ -25,11 +25,13 @@ import java.util.List;
 import org.opengis.referencing.cs.AxisDirection;
 
 // NetCDF dependencies
+import ucar.nc2.Variable;
 import ucar.nc2.dataset.AxisType;
 import ucar.nc2.dataset.CoordinateAxis;
 import ucar.nc2.dataset.CoordinateAxis1D;
 import ucar.nc2.dataset.CoordinateSystem;
 import ucar.nc2.dataset.NetcdfDataset;
+import ucar.nc2.dataset.VariableDS;
 
 // Geotools dependencies
 import org.geotools.image.io.metadata.GeographicMetadata;
@@ -72,22 +74,38 @@ final class NetcdfMetadata extends GeographicMetadata {
     }
 
     /**
-     * Creates metadata from the specified file. Note that
+     * Creates metadata from the specified file. This constructor is typically invoked
+     * for creating {@linkplain NetcdfReader#getStreamMetadata stream metadata}. Note that
      * {@link ucar.nc2.dataset.CoordSysBuilder#addCoordinateSystems} should have been invoked
      * (if needed) before this constructor.
      */
     public NetcdfMetadata(final NetcdfDataset file) {
         final List/*<CoordinateSystem>*/ systems = file.getCoordinateSystems();
         if (!systems.isEmpty()) {
-            add((CoordinateSystem) systems.get(0));
+            addCoordinateSystem((CoordinateSystem) systems.get(0));
         }
+    }
+
+    /**
+     * Creates metadata from the specified file. This constructor is typically invoked
+     * for creating {@linkplain NetcdfReader#getImageMetadata image metadata}. Note that
+     * {@link ucar.nc2.dataset.CoordSysBuilder#addCoordinateSystems} should have been invoked
+     * (if needed) before this constructor.
+     */
+    public NetcdfMetadata(final VariableDS variable) {
+        final List/*<CoordinateSystem>*/ systems = variable.getCoordinateSystems();
+        if (!systems.isEmpty()) {
+            addCoordinateSystem((CoordinateSystem) systems.get(0));
+        }
+        setSampleDimensions(GeographicMetadataFormat.PACKED);
+        addSampleDimension(variable);
     }
 
     /**
      * Adds the specified coordinate system. Current implementation can adds at most one
      * coordinate system, but this limitation may be revisited in a future Geotools version.
      */
-    private void add(final CoordinateSystem cs) {
+    private void addCoordinateSystem(final CoordinateSystem cs) {
         String crsType, csType;
         if (cs.isLatLon()) {
             crsType = cs.hasVerticalAxis() ? GeographicMetadataFormat.GEOGRAPHIC_3D
@@ -112,22 +130,26 @@ final class NetcdfMetadata extends GeographicMetadata {
          */
         final List/*<CoordinateAxis>*/ axis = cs.getCoordinateAxes();
         for (int i=axis.size(); --i>=0;) {
-            add((CoordinateAxis) axis.get(i));
+            addCoordinateAxis((CoordinateAxis) axis.get(i));
         }
+    }
+
+    /**
+     * Gets the name, as the "description", "title" or "standard name"
+     * attribute if possible, or as the variable name otherwise.
+     */
+    private static String getName(final Variable variable) {
+        String name = variable.getDescription();
+        if (name == null || (name=name.trim()).length() == 0) {
+            name = variable.getName();
+        }
+        return name;
     }
 
     /**
      * Adds the specified coordinate axis.
      */
-    private void add(final CoordinateAxis axis) {
-        /*
-         * Gets the axis name, as the "description", "title" or "standard name"
-         * attribute if possible, or as the variable name otherwise.
-         */
-        String name = axis.getDescription();
-        if (name == null || (name=name.trim()).length() == 0) {
-            name = axis.getName();
-        }
+    private void addCoordinateAxis(final CoordinateAxis axis) {
         /*
          * Gets the axis direction, taking in account the possible reversal or vertical axis.
          * Note that geographic and projected CRS have the same directions. We can distinguish
@@ -146,7 +168,7 @@ final class NetcdfMetadata extends GeographicMetadata {
          * Gets the axis units and add to the coordinate system.
          */
         final String units = axis.getUnitsString();
-        addAxis(name, direction, units);
+        addAxis(getName(axis), direction, units);
         /*
          * If the axis is not numeric, we can't process any further.
          * If it is, then adds the coordinate and index ranges.
@@ -167,6 +189,21 @@ final class NetcdfMetadata extends GeographicMetadata {
                 final double[] values = axis1D.getCoordValues();
                 addCoordinateValues(0, values);
             }
+        }
+    }
+
+    /**
+     * Adds sample dimension information for the specified variable.
+     */
+    private void addSampleDimension(final VariableDS variable) {
+        variable.setUseNaNs(true);
+        if (variable.isEnhanced()) {
+            final double offset    = variable.convertScaleOffsetMissing(0.0);
+            final double scale     = variable.convertScaleOffsetMissing(1.0) - offset;
+            final double minValue  = variable.getValidMin();
+            final double maxValue  = variable.getValidMax();
+            final double fillValue = Double.NaN;
+            addSampleDimension(getName(variable), scale, offset, minValue, maxValue, fillValue);
         }
     }
 }

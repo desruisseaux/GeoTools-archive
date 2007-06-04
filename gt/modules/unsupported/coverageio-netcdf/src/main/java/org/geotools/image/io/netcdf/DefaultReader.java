@@ -41,6 +41,7 @@ import ucar.ma2.IndexIterator;
 import ucar.ma2.InvalidRangeException;
 import ucar.nc2.dataset.CoordSysBuilder;
 import ucar.nc2.dataset.NetcdfDataset;
+import ucar.nc2.dataset.VariableDS;
 import ucar.nc2.util.CancelTask;
 
 // Geotools dependencies
@@ -112,7 +113,9 @@ public class DefaultReader extends FileImageReader implements CancelTask {
     private int variableIndex;
 
     /**
-     * The data from the NetCDF file.
+     * The data from the NetCDF file. Should be an instance of {@link VariableDS},
+     * but we will avoid casting before needed (in case we got something else for
+     * some reason).
      */
     private Variable variable;
 
@@ -132,9 +135,20 @@ public class DefaultReader extends FileImageReader implements CancelTask {
     private String lastError;
 
     /**
+     * {@code true} if {@link CoordSysBuilder#addCoordinateSystems} has been invoked
+     * for current file.
+     */
+    private boolean metadataLoaded;
+
+    /**
      * The stream metadata. Will be created only when first needed.
      */
     private IIOMetadata streamMetadata;
+
+    /**
+     * The current image metadata. Will be created only when first needed.
+     */
+    private IIOMetadata imageMetadata;
 
     /** 
      * Constructs a new NetCDF reader.
@@ -250,16 +264,41 @@ public class DefaultReader extends FileImageReader implements CancelTask {
     }
 
     /**
+     * Ensures that metadata are loaded.
+     */
+    private void ensureMetadataLoaded() throws IOException {
+        if (!metadataLoaded) {
+            CoordSysBuilder.addCoordinateSystems(file, this);
+            metadataLoaded = true;
+        }
+    }
+
+    /**
      * Returns the metadata associated with the input source as a whole.
      */
     //@Override
     public IIOMetadata getStreamMetadata() throws IOException {
         if (streamMetadata == null && !ignoreMetadata) {
             ensureFileOpen();
-            CoordSysBuilder.addCoordinateSystems(file, this);
+            ensureMetadataLoaded();
             streamMetadata = new NetcdfMetadata(file);
         }
         return streamMetadata;
+    }
+
+    /**
+     * Returns the metadata associated with the image at the specified index.
+     */
+    //@Override
+    public IIOMetadata getImageMetadata(final int imageIndex) throws IOException {
+        if (imageMetadata == null && !ignoreMetadata) {
+            prepareVariable(imageIndex);
+            if (variable instanceof VariableDS) {
+                ensureMetadataLoaded();
+                imageMetadata = new NetcdfMetadata((VariableDS) variable);
+            }
+        }
+        return imageMetadata;
     }
 
     /**
@@ -353,8 +392,9 @@ public class DefaultReader extends FileImageReader implements CancelTask {
                 throw new IIOException(Errors.format(
                         ErrorKeys.NOT_TWO_DIMENSIONAL_$1, new Integer(rank)));
             }
+            variable      = candidate;
             variableIndex = imageIndex;
-            variable = candidate;
+            imageMetadata = null;
         }
     }
 
@@ -532,7 +572,9 @@ public class DefaultReader extends FileImageReader implements CancelTask {
      */
     //@Override
     protected void close() throws IOException {
+        metadataLoaded = false;
         streamMetadata = null;
+        imageMetadata  = null;
         lastError      = null;
         ranges         = null;
         variable       = null;

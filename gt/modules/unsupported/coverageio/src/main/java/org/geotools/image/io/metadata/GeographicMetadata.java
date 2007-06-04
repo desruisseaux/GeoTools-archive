@@ -80,6 +80,12 @@ public class GeographicMetadata extends IIOMetadata {
     private IIOMetadataNode envelope;
 
     /**
+     * The sample dimension node.
+     * Will be created only when first needed.
+     */
+    private IIOMetadataNode sampleDimensions;
+
+    /**
      * Creates a default metadata instance. This constructor defines no standard or native format.
      * The only format defined is the {@linkplain GeographicMetadataFormat geographic} one.
      */
@@ -105,6 +111,10 @@ public class GeographicMetadata extends IIOMetadata {
 
     /**
      * Set the attribute to the specified value, or remove the attribute if the value is null.
+     *
+     * @param node  The node on which to set the attribute.
+     * @param name  The attribute name.
+     * @param value The attribute value.
      */
     private static void setAttribute(final Element node, final String name, String value, boolean isCodeList) {
         if (value == null) {
@@ -116,6 +126,23 @@ public class GeographicMetadata extends IIOMetadata {
                 value = value.replace('_', ' ').trim().toLowerCase();
             }
             node.setAttribute(name, value);
+        }
+    }
+
+    /**
+     * Set the attribute to the specified value, or remove the attribute if the value is NaN.
+     *
+     * @param node  The node on which to set the attribute.
+     * @param name  The attribute name.
+     * @param value The attribute value.
+     */
+    private static void setAttribute(final Element node, final String name, final double value) {
+        if (Double.isNaN(value) || Double.isInfinite(value)) {
+            if (node.hasAttribute(name)) {
+                node.removeAttribute(name);
+            }
+        } else {
+            node.setAttribute(name, Double.toString(value));
         }
     }
 
@@ -257,8 +284,8 @@ public class GeographicMetadata extends IIOMetadata {
             setGridRange();
         }
         final IIOMetadataNode range = new IIOMetadataNode("IndexRange");
-        setAttribute(range, "minimum", Integer.toString(indexMin), false);
-        setAttribute(range, "maximum", Integer.toString(indexMax), false);
+        range.setAttribute("minimum", Integer.toString(indexMin));
+        range.setAttribute("maximum", Integer.toString(indexMax));
         gridRange.appendChild(range);
     }
 
@@ -279,8 +306,8 @@ public class GeographicMetadata extends IIOMetadata {
             setEnvelope();
         }
         final IIOMetadataNode range = new IIOMetadataNode("CoordinateRange");
-        setAttribute(range, "minimum", Double.toString(valueMin), false);
-        setAttribute(range, "maximum", Double.toString(valueMax), false);
+        setAttribute(range, "minimum", valueMin);
+        setAttribute(range, "maximum", valueMax);
         envelope.appendChild(range);
     }
 
@@ -300,6 +327,54 @@ public class GeographicMetadata extends IIOMetadata {
         final IIOMetadataNode cv = new IIOMetadataNode("CoordinateValues");
         cv.setUserObject(values);
         envelope.appendChild(cv);
+    }
+
+    /**
+     * Set the sample dimensions to the specified value.
+     *
+     * @param type The type for all sample dimensions (usually
+     *             {@value GeographicMetadataFormat#GEOPHYSICS} or
+     *             {@value GeographicMetadataFormat#PACKED}), or {@code null} if unknown.
+     */
+    public void setSampleDimensions(final String type) {
+        if (sampleDimensions == null) {
+            sampleDimensions = new IIOMetadataNode("SampleDimensions");
+            root.appendChild(sampleDimensions);
+        }
+        setAttribute(sampleDimensions, "type", type, true);
+    }
+
+    /**
+     * Adds a sample dimension.
+     *
+     * @param name      The sample dimension name, or {@code null} if none.
+     * @param scale     The scale from packed to geophysics values,
+     *                  or {@code 1} if none.
+     * @param offset    The offset from packed to geophysics values,
+     *                  or {@code 0} if none.
+     * @param minValue  The minimal valid <em>packed</em> value,
+     *                  or {@link Double#NEGATIVE_INFINITY} if none.
+     * @param maxValue  The maximal valid <em>packed</em> value,
+     *                  or {@link Double#POSITIVE_INFINITY} if none.
+     * @param fillValue The packed value used for missing data,
+     *                  or {@link Double#NaN} if none.
+     */
+    public void addSampleDimension(final String name,
+                                   final double scale,    final double offset,
+                                   final double minValue, final double maxValue,
+                                   final double fillValue)
+    {
+        if (sampleDimensions == null) {
+            setSampleDimensions(null);
+        }
+        final IIOMetadataNode band = new IIOMetadataNode("SampleDimension");
+        setAttribute(band, "name",      name, false);
+        setAttribute(band, "scale",     scale    );
+        setAttribute(band, "offset",    offset   );
+        setAttribute(band, "minValue",  minValue );
+        setAttribute(band, "maxValue",  maxValue );
+        setAttribute(band, "fillValue", fillValue);
+        sampleDimensions.appendChild(band);
     }
 
     /**
