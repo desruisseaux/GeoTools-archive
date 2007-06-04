@@ -45,7 +45,7 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.image.ImageWorker;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.image.io.netcdf.DefaultReader;
+import org.geotools.image.io.netcdf.NetcdfImageReader;
 
 
 /**
@@ -63,7 +63,7 @@ public class NetcdfReader extends AbstractGridCoverage2DReader {
     /**
      * The reader Spi for netCDF images.
      */
-    private DefaultReader.Spi readerSpi; 
+    private NetcdfImageReader.Spi readerSpi; 
 
     /**
      * The format that created this reader.
@@ -175,7 +175,7 @@ public class NetcdfReader extends AbstractGridCoverage2DReader {
         final GeneralEnvelope requestedEnvelope = new GeneralEnvelope(originalEnvelope);
         try {
             // Experimental; will be replaced by something more generic soon (work in progress)
-            readerSpi = (DefaultReader.Spi) Class.forName("fr.geomatys.image.io.netcdf.TemperatureReaderSpi").newInstance();
+            readerSpi = (NetcdfImageReader.Spi) Class.forName("fr.geomatys.image.io.netcdf.TemperatureReaderSpi").newInstance();
         } catch (Exception e) {
             throw new IOException(e.toString());
         }

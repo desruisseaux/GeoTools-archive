@@ -64,7 +64,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  */
-public class DefaultReader extends FileImageReader implements CancelTask {
+public class NetcdfImageReader extends FileImageReader implements CancelTask {
     /**
      * The default source bands to read from the NetCDF file.
      * Also the default destination bands in the buffered image.
@@ -155,7 +155,7 @@ public class DefaultReader extends FileImageReader implements CancelTask {
      *
      * @param spi The service provider.
      */
-    public DefaultReader(final Spi spi) {
+    public NetcdfImageReader(final Spi spi) {
         super(spi);
         this.variableNames = spi.variables;
         this.converter     = spi.converter;
@@ -589,7 +589,7 @@ public class DefaultReader extends FileImageReader implements CancelTask {
 
 
     /**
-     * The service provider for {@link DefaultReader}. This class requires the list of
+     * The service provider for {@link NetcdfImageReader}. This class requires the list of
      * {@linkplain Variable variables} to read. This list can be obtained by the following
      * instruction:
      *
@@ -645,7 +645,7 @@ public class DefaultReader extends FileImageReader implements CancelTask {
             suffixes         = SUFFIXES;
             vendorName       = "Geotools";
             version          = "2.4";
-            pluginClassName  = "org.geotools.image.io.netcdf.DefaultReader";
+            pluginClassName  = "org.geotools.image.io.netcdf.NetcdfImageReader";
             this.variables   = (String[]) variables.clone();
         }
 
@@ -693,7 +693,7 @@ public class DefaultReader extends FileImageReader implements CancelTask {
          * Constructs a NetCDF image reader.
          */
         public ImageReader createReaderInstance(final Object extension) throws IOException {
-            return new DefaultReader(this);
+            return new NetcdfImageReader(this);
         }
 
         /**
