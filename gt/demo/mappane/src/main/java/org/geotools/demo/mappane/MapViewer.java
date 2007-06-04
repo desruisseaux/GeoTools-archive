@@ -152,7 +152,7 @@ public class MapViewer implements ActionListener{
         mp.setSelectionLayer(context.getLayer(0));
 
         GTRenderer renderer;
-        if( false ){
+        if( true ){ 
         	renderer = new StreamingRenderer();
         	HashMap hints = new HashMap();
         	hints.put("memoryPreloadingEnabled", Boolean.TRUE);
@@ -234,7 +234,6 @@ public class MapViewer implements ActionListener{
         	System.err.println("Could not find sld file: "+filepart+".sld");
         	System.exit(1);
         }
-
         mapV.load( shape, sld );
         }
     }
