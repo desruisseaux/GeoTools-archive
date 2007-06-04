@@ -1274,7 +1274,7 @@ public class ImageWorker {
 	 * @see BandSelectDescriptor
 	 */
 	public final ImageWorker retainLastBand() {
-		retainBands(getNumBands() - 1);
+		retainBands(new int[]{getNumBands() - 1});
 
 		// All post conditions for this method contract.
 		assert getNumBands() == 1;
