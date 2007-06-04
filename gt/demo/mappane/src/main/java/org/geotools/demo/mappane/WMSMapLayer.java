@@ -1,3 +1,18 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.demo.mappane;
 
 import java.awt.Component;
@@ -15,6 +30,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
+import javax.swing.SwingUtilities;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
@@ -25,6 +41,7 @@ import org.geotools.data.ows.Layer;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.FactoryRegistryException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
@@ -32,6 +49,7 @@ import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapBoundsEvent;
 import org.geotools.map.event.MapBoundsListener;
 import org.geotools.map.event.MapLayerEvent;
+import org.geotools.referencing.FactoryFinder;
 import org.geotools.resources.coverage.FeatureUtilities;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.RasterSymbolizer;
@@ -39,241 +57,267 @@ import org.geotools.styling.Rule;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.Symbolizer;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-public class WMSMapLayer extends DefaultMapLayer implements MapLayer,
-		MapBoundsListener, ComponentListener {
-	private Layer layer;
 
-	private WebMapServer wms;
+public class WMSMapLayer extends DefaultMapLayer implements MapLayer, MapBoundsListener,
+    ComponentListener {
+    static GridCoverageFactory gcf = new GridCoverageFactory();
+    private Layer layer;
+    private WebMapServer wms;
+    GridCoverage2D grid;
+    private ReferencedEnvelope bbox;
+    private ReferencedEnvelope bounds;
+    private int width = 400;
+    private int height = 200;
+    private StyleFactory factory = CommonFactoryFinder.getStyleFactory(null);
+    private boolean transparent = true;
+    private String bgColour;
+    private String exceptions = "application/vnd.ogc.se_inimage";
 
-	GridCoverage2D grid;
+    public WMSMapLayer(WebMapServer wms, Layer layer) {
+        super((FeatureSource) null, null, "");
+        this.layer = layer;
+        this.wms = wms;
+        setDefaultStyle();
+        setGrid();
+    }
 
-	private ReferencedEnvelope bbox,bounds;
+    public void setDefaultStyle() {
+        RasterSymbolizer symbolizer = factory.createRasterSymbolizer();
 
-	private int width = 400;
+        // SLDParser stylereader = new SLDParser(factory,sld);
+        // org.geotools.styling.Style[] style = stylereader.readXML();
+        Style style = factory.createStyle();
+        Rule[] rules = new Rule[1];
+        rules[0] = factory.createRule();
+        rules[0].setSymbolizers(new Symbolizer[] { symbolizer });
 
-	private int height = 200;
+        FeatureTypeStyle type = factory.createFeatureTypeStyle(rules);
+        style.addFeatureTypeStyle(type);
+        setStyle(style);
+    }
 
-	private StyleFactory factory = CommonFactoryFinder.getStyleFactory(null);
+    private void setGrid() {
+        GetMapRequest mapRequest = wms.createGetMapRequest();
+        mapRequest.addLayer(layer);
+        //System.out.println(width + " " + height);
+        mapRequest.setDimensions(getWidth(), getHeight());
+        mapRequest.setFormat("image/png");
 
-	private boolean transparent = true;
+        if (bgColour != null) {
+            mapRequest.setBGColour(bgColour);
+        }
 
-	private String bgColour;
+        mapRequest.setExceptions(exceptions);
 
-	private String exceptions="application/vnd.ogc.se_inimage";
+        Set srs = layer.getSrs();
+        String crs = "EPSG:4326";
 
-	static GridCoverageFactory gcf = new GridCoverageFactory();
+        if (srs.contains("EPSG:4326")) { // really we should get the underlying
+                                         // map pane CRS
+            crs = "EPSG:4326";
+        } else {
+            crs = (String) srs.iterator().next();
+        }
 
-	public WMSMapLayer(WebMapServer wms, Layer layer) {
-		super((FeatureSource) null, null, "");
-		this.layer = layer;
-		this.wms = wms;
-		setDefaultStyle();
-		setGrid();
-	}
+        //System.out.println("crs = " + crs);
+        if (bbox == null) {
+            HashMap bboxes = layer.getBoundingBoxes();
+            Set keys = bboxes.keySet();
+            String k = "";
 
-	public void setDefaultStyle() {
+            for (Iterator it = keys.iterator(); it.hasNext(); k = (String) it.next()) {
+                //System.out.println(k + " -> " + bboxes.get(k));
+            }
 
-		RasterSymbolizer symbolizer = factory.createRasterSymbolizer();
-		// SLDParser stylereader = new SLDParser(factory,sld);
-		// org.geotools.styling.Style[] style = stylereader.readXML();
-		Style style = factory.createStyle();
-		Rule[] rules = new Rule[1];
-		rules[0] = factory.createRule();
-		rules[0].setSymbolizers(new Symbolizer[] { symbolizer });
-		FeatureTypeStyle type = factory.createFeatureTypeStyle(rules);
-		style.addFeatureTypeStyle(type);
-		setStyle(style);
-	}
+            CRSEnvelope bb = (CRSEnvelope) bboxes.get(crs);
 
-	private void setGrid() {
-		GetMapRequest mapRequest = wms.createGetMapRequest();
-		mapRequest.addLayer(layer);
-		//System.out.println(width + " " + height);
-		mapRequest.setDimensions(getWidth(), getHeight());
-		mapRequest.setFormat("image/png");
-		if(bgColour!=null)mapRequest.setBGColour(bgColour);
-		mapRequest.setExceptions(exceptions);
-		Set srs = layer.getSrs();
-		String crs;
-		if (srs.contains("EPSG:4326")) {// really we should get the underlying
-			// map pane CRS
-			crs = "EPSG:4326";
-		} else {
-			crs = (String) srs.iterator().next();
-		}
-		//System.out.println("crs = " + crs);
-		if (bbox == null) {
-			HashMap bboxes = layer.getBoundingBoxes();
-			Set keys = bboxes.keySet();
-			String k = "";
-			for (Iterator it = keys.iterator(); it.hasNext(); k = (String) it
-					.next()) {
-				//System.out.println(k + " -> " + bboxes.get(k));
-			}
+            if (bb == null) { // something bad happened
+                bb = layer.getLatLonBoundingBox();
+                bb.setEPSGCode("EPSG:4326"); // for some reason WMS doesn't
+                                             // set
+                                             // this.
 
-			CRSEnvelope bb = (CRSEnvelope) bboxes.get(crs);
-			if (bb == null) {// something bad happened
-				bb = layer.getLatLonBoundingBox();
-				bb.setEPSGCode("EPSG:4326"); // for some reason WMS doesn't
-												// set
-				// this.
+                crs = "EPSG:4326";
+            }
 
-			}
-			bbox = new ReferencedEnvelope(bb);
-			bounds= bbox;
-		}
-		// fix the bounds for the shape of the window.
+            CoordinateReferenceSystem coordinateReferenceSystem = null;
 
-		//System.out.println(bbox.toString());
-		mapRequest.setBBox(bbox.getMinX() + "," + bbox.getMinY() + ","
-				+ bbox.getMaxX() + "," + bbox.getMaxY());
-		mapRequest.setTransparent(transparent);
-		URL request = mapRequest.getFinalURL();
-		//System.out.println(request.toString());
-		InputStream is=null;
-		try {
+            try {
+                coordinateReferenceSystem = FactoryFinder.getCRSAuthorityFactory("EPSG", null)
+                                                         .createCoordinateReferenceSystem(crs);
+            } catch (FactoryRegistryException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (FactoryException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
 
-			URLConnection connection = request.openConnection();
-			String type = connection.getContentType();
-			is = connection.getInputStream();
-			if (type.equalsIgnoreCase("image/png")) {
-				BufferedImage image = ImageIO.read(is);
+            bbox = new ReferencedEnvelope(bb.getMinX(), bb.getMaxX(), bb.getMinY(), bb.getMaxY(),
+                    coordinateReferenceSystem);
 
-				/*
-				 * if (bbox == null) { Envelope2D env = new Envelope2D(bb
-				 * .getCoordinateReferenceSystem(), bb.getMinX(), bb .getMinY(),
-				 * bb.getLength(0), bb.getLength(1)); bbox = new
-				 * ReferencedEnvelope(env); }
-				 */
-				grid = gcf.create(layer.getTitle(), image, bbox);
-				//System.out.println("fetched new grid");
-				//if (featureSource == null)
-					featureSource = DataUtilities.source(FeatureUtilities
-							.wrapGridCoverage(grid));
-					
+            bounds = bbox;
+        }
 
-				fireMapLayerListenerLayerChanged(new MapLayerEvent(this,
-						MapLayerEvent.DATA_CHANGED));
-			} else {
-				System.out.println("error content type is " + type);
-				if (type.startsWith("text")) {
-					String line = "";
-					BufferedReader br = new BufferedReader(
-							new InputStreamReader(is));
-					while ((line = br.readLine()) != null) {
-						System.out.println(line);
-					}
-				}
-			}
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (Exception ex) {
-			// TODO Auto-generated catch block
-			ex.printStackTrace();
-		}finally {
-			try {
-				if(is!=null)
-					is.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
+        // fix the bounds for the shape of the window.
 
-	public void mapBoundsChanged(MapBoundsEvent event) {
+        //System.out.println(bbox.toString());
+        mapRequest.setSRS(crs);
+        mapRequest.setBBox(bbox.getMinX() + "," + bbox.getMinY() + "," + bbox.getMaxX() + ","
+            + bbox.getMaxY());
+        mapRequest.setTransparent(transparent);
 
-		bbox = ((MapContext) event.getSource()).getAreaOfInterest();
-//		System.out.println("old:" + bbox + "\n" + "new:"
-//				+ event.getOldAreaOfInterest());
-		if (!bbox.equals(event.getOldAreaOfInterest())) {
-			//System.out.println("bbox changed - fetching new grid");
-			setGrid();
-		}
-	}
+        URL request = mapRequest.getFinalURL();
 
-	public int getHeight() {
-		return height;
-	}
+        //System.out.println(request.toString());
+        InputStream is = null;
 
-	public void setHeight(int height) {
-		this.height = height;
-	}
+        try {
+            URLConnection connection = request.openConnection();
+            String type = connection.getContentType();
+            is = connection.getInputStream();
 
-	public int getWidth() {
-		return width;
-	}
+            if (type.equalsIgnoreCase("image/png")) {
+                BufferedImage image = ImageIO.read(is);
 
-	public void setWidth(int width) {
-		this.width = width;
-	}
+                /*
+                 * if (bbox == null) { Envelope2D env = new Envelope2D(bb
+                 * .getCoordinateReferenceSystem(), bb.getMinX(), bb .getMinY(),
+                 * bb.getLength(0), bb.getLength(1)); bbox = new
+                 * ReferencedEnvelope(env); }
+                 */
+                grid = gcf.create(layer.getTitle(), image, bbox);
+                //System.out.println("fetched new grid");
+                //if (featureSource == null)
+                featureSource = DataUtilities.source(FeatureUtilities.wrapGridCoverage(grid));
 
-	public GridCoverage2D getGrid() {
-		return grid;
-	}
+                fireMapLayerListenerLayerChanged(new MapLayerEvent(this, MapLayerEvent.DATA_CHANGED));
+            } else {
+                System.out.println("error content type is " + type);
 
-	public boolean isTransparent() {
-		return transparent;
-	}
+                if (type.contains("text") || type.contains("xml")) {
+                    String line = "";
+                    BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
-	public void setTransparent(boolean transparent) {
-		this.transparent = transparent;
-	}
+                    while ((line = br.readLine()) != null) {
+                        System.out.println(line);
+                    }
+                }
+            }
+        } catch (IOException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        } catch (Exception ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
+        } finally {
+            try {
+                if (is != null) {
+                    is.close();
+                }
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
 
-	public void componentHidden(ComponentEvent e) {
-		// TODO Auto-generated method stub
+    public void mapBoundsChanged(MapBoundsEvent event) {
+        bbox = ((MapContext) event.getSource()).getAreaOfInterest();
 
-	}
+        //		System.out.println("old:" + bbox + "\n" + "new:"
+        //				+ event.getOldAreaOfInterest());
+        if (!bbox.equals(event.getOldAreaOfInterest())) {
+            System.out.println("bbox changed - fetching new grid");
 
-	public void componentMoved(ComponentEvent e) {
-		// TODO Auto-generated method stub
+            Thread t = new Thread() {
+                    public void run() {
+                        setGrid();
+                    }
+                };
 
-	}
+            SwingUtilities.invokeLater(t);
+        }
+    }
 
-	public void componentResized(ComponentEvent e) {
-		Component c = (Component) e.getSource();
-		width = c.getWidth();
-		height = c.getHeight();
+    public int getHeight() {
+        return height;
+    }
 
-	}
+    public void setHeight(int height) {
+        this.height = height;
+    }
 
-	public void componentShown(ComponentEvent e) {
-		Component c = (Component) e.getSource();
-		width = c.getWidth();
-		height = c.getHeight();
+    public int getWidth() {
+        return width;
+    }
 
-	}
+    public void setWidth(int width) {
+        this.width = width;
+    }
 
-	public String getBgColour() {
-		return bgColour;
-	}
+    public GridCoverage2D getGrid() {
+        return grid;
+    }
 
-	public void setBgColour(String bgColour) {
-		this.bgColour = bgColour;
-	}
+    public boolean isTransparent() {
+        return transparent;
+    }
 
-	public String getExceptions() {
-		return exceptions;
-	}
-	
-	/**
-	 * Set the type of exception reports.
-	 * Valid values are: 
-	 * "application/vnd.ogc.se_xml" (the default) 
-     * "application/vnd.ogc.se_inimage" 
-     * "application/vnd.ogc.se_blank" 
+    public void setTransparent(boolean transparent) {
+        this.transparent = transparent;
+    }
+
+    public void componentHidden(ComponentEvent e) {
+        // TODO Auto-generated method stub
+    }
+
+    public void componentMoved(ComponentEvent e) {
+        // TODO Auto-generated method stub
+    }
+
+    public void componentResized(ComponentEvent e) {
+        Component c = (Component) e.getSource();
+        width = c.getWidth();
+        height = c.getHeight();
+    }
+
+    public void componentShown(ComponentEvent e) {
+        Component c = (Component) e.getSource();
+        width = c.getWidth();
+        height = c.getHeight();
+    }
+
+    public String getBgColour() {
+        return bgColour;
+    }
+
+    public void setBgColour(String bgColour) {
+        this.bgColour = bgColour;
+    }
+
+    public String getExceptions() {
+        return exceptions;
+    }
+
+    /**
+     * Set the type of exception reports.
+     * Valid values are:
+     * "application/vnd.ogc.se_xml" (the default)
+     * "application/vnd.ogc.se_inimage"
+     * "application/vnd.ogc.se_blank"
      *
-	 * @param exceptions
-	 */
-	public void setExceptions(String exceptions) {
-		this.exceptions = exceptions;
-	}
+     * @param exceptions
+     */
+    public void setExceptions(String exceptions) {
+        this.exceptions = exceptions;
+    }
 
-	public ReferencedEnvelope getBounds() {
-		//System.out.println("got bounds");
-		return bounds;
-	}
-
+    public ReferencedEnvelope getBounds() {
+        //System.out.println("got bounds");
+        return bounds;
+    }
 }
