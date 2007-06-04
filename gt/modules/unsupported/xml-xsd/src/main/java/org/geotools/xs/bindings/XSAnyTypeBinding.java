@@ -109,21 +109,42 @@ public class XSAnyTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
+    	
+    	String text = null;
+    	if ((value != null) && value instanceof String) {
+            text = ((String) value).trim();
+            if ( "".equals( text ) ) {
+            	text = null;
+            }
+        }
+    	
+    	//if there is just some text, return it
+    	if ( node.getChildren().isEmpty() && node.getAttributes().isEmpty() 
+			&& text != null ) {
+    		return text;
+    	}
+    		
+    	//if there is only a single child, return it
+    	if ( node.getChildren().size() == 1 && node.getAttributes().isEmpty() 
+			&& text == null ) {
+    		return node.getChildValue( 0 );
+    	}
+    	
+    	//if there is a single attribute, return it
+    	if ( node.getAttributes().size() == 1 && node.getChildren().isEmpty()
+			&& text == null ) {
+    		return ((Node)node.getAttributes().get( 0 )).getValue();
+    	}
+    	
+    	//create a map of the elements and attributes
         Map map = new HashMap();
         List attributes = node.getAttributes();
         List children = node.getChildren();
         mapBinding(map, attributes);
         mapBinding(map, children);
 
-        //TODO: use the whitespace facet
-        String string = null;
-
-        if ((value != null) && value instanceof String) {
-            string = (String) value;
-        }
-
-        if (string != null && !"".equals( string.trim() ) ) {
-            map.put(null, string.trim() );
+        if (text != null && !"".equals( text.trim() ) ) {
+            map.put(null, text.trim() );
         }
 
         return map;
