@@ -108,7 +108,7 @@ public class HighlightManager extends MouseMotionAdapter {
     }
 
     /**
-     * add a HighlightChangedListener to this manager, not this need not
+     * add a HighlightChangedListener to this manager, note this need not
      * be a map which is why we pass a filter back not a map point.
      * @param l - the listener
      */
