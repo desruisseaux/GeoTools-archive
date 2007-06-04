@@ -22,8 +22,6 @@ package org.geotools.gui.swing;
  * rendering of the highlights. Thus the whole map is only redrawn when the bbox
  * changes, selection is only redrawn when the selected feature changes.
  *
- * If you intend to use this in production code you'll need to make selection
- * and highlighting work in the same way.
  *
  * @author Ian Turton
  *
@@ -50,12 +48,18 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
+
+import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.gui.swing.event.HighlightChangeListener;
 import org.geotools.gui.swing.event.HighlightChangedEvent;
+import org.geotools.gui.swing.event.SelectionChangeListener;
+import org.geotools.gui.swing.event.SelectionChangedEvent;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
@@ -75,33 +79,42 @@ import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
 
-
-
-public class JMapPane extends JPanel implements MouseListener, MouseMotionListener,
-    HighlightChangeListener, PropertyChangeListener, MapLayerListListener {
+public class JMapPane extends JPanel implements MouseListener,
+        MouseMotionListener, HighlightChangeListener,SelectionChangeListener, PropertyChangeListener,
+        MapLayerListListener {
     /**
      *
      */
     private static final long serialVersionUID = -8647971481359690499L;
+
     public static final int Reset = 0;
+
     public static final int ZoomIn = 1;
+
     public static final int ZoomOut = 2;
+
     public static final int Pan = 3;
+
     public static final int Select = 4;
+
     private static final int POLYGON = 0;
+
     private static final int LINE = 1;
+
     private static final int POINT = 2;
 
     /**
      * what renders the map
      */
     GTRenderer renderer;
-    private GTRenderer highlightRenderer,selectionRenderer;
+
+    private GTRenderer highlightRenderer, selectionRenderer;
 
     /**
      * the map context to render
      */
     MapContext context;
+
     private MapContext selectionContext;
 
     /**
@@ -137,7 +150,7 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
     /**
      * layer that selection works on
      */
-    private int selectionLayer = -1;
+    private MapLayer selectionLayer;
 
     /**
      * layer that highlight works on
@@ -173,26 +186,43 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
      * the collections of features to be selected or highlighted
      */
     FeatureCollection highlightFeature;
+
     private int state = ZoomIn;
 
     /**
      * how far to zoom in or out
      */
     private double zoomFactor = 2.0;
+
     Style lineHighlightStyle;
+
     Style pointHighlightStyle;
+
     Style polygonHighlightStyle;
+
     Style polygonSelectionStyle;
+
     Style pointSelectionStyle;
+
     Style lineSelectionStyle;
+
     boolean changed = true;
+
     LabelCache labelCache = new LabelCacheDefault();
+
     private boolean reset = false;
+
     int startX;
+
     int startY;
+
     private boolean clickable;
+
     int lastX;
+
     int lastY;
+
+    private SelectionManager selectionManager;
 
     public JMapPane() {
         this(null, true, null, null);
@@ -222,11 +252,12 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
      * @param context -
      *            what to draw
      */
-    public JMapPane(LayoutManager layout, boolean isDoubleBuffered, GTRenderer render,
-        MapContext context) {
+    public JMapPane(LayoutManager layout, boolean isDoubleBuffered,
+            GTRenderer render, MapContext context) {
         super(layout, isDoubleBuffered);
 
-        ff = (FilterFactory2) org.geotools.factory.CommonFactoryFinder.getFilterFactory(null);
+        ff = (FilterFactory2) org.geotools.factory.CommonFactoryFinder
+                .getFilterFactory(null);
         setRenderer(render);
 
         setContext(context);
@@ -234,7 +265,7 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
         this.addMouseListener(this);
         this.addMouseMotionListener(this);
         setHighlightManager(new HighlightManager(highlightLayer));
-
+        setSelectionManager(new SelectionManager(selectionLayer));
         lineHighlightStyle = setupStyle(LINE, Color.red);
 
         pointHighlightStyle = setupStyle(POINT, Color.red);
@@ -257,27 +288,29 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
     }
 
     public void setRenderer(GTRenderer renderer) {
+        Map hints = new HashMap();
         if (renderer instanceof StreamingRenderer) {
-        	Map hints = renderer.getRendererHints();
-        	if(hints==null) {
-        		hints = new HashMap();
-        	}
-        	if(hints.containsKey(StreamingRenderer.LABEL_CACHE_KEY)) {
-        		labelCache = (LabelCache)hints.get(StreamingRenderer.LABEL_CACHE_KEY);
-        	}else {
-        		hints.put(StreamingRenderer.LABEL_CACHE_KEY, labelCache);
-        	}
+            hints = renderer.getRendererHints();
+            if (hints == null) {
+                hints = new HashMap();
+            }
+            if (hints.containsKey(StreamingRenderer.LABEL_CACHE_KEY)) {
+                labelCache = (LabelCache) hints
+                        .get(StreamingRenderer.LABEL_CACHE_KEY);
+            } else {
+                hints.put(StreamingRenderer.LABEL_CACHE_KEY, labelCache);
+            }
             renderer.setRendererHints(hints);
         }
 
         this.renderer = renderer;
         this.highlightRenderer = new StreamingRenderer();
         this.selectionRenderer = new StreamingRenderer();
-        HashMap hints = new HashMap();
-    	hints.put("memoryPreloadingEnabled", Boolean.FALSE);
-        highlightRenderer.setRendererHints( hints );
+
+        hints.put("memoryPreloadingEnabled", Boolean.FALSE);
+        highlightRenderer.setRendererHints(hints);
         selectionRenderer.setRendererHints(hints);
-        
+
         if (this.context != null) {
             this.renderer.setContext(this.context);
         }
@@ -329,12 +362,15 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
         this.zoomFactor = zoomFactor;
     }
 
-    public int getSelectionLayer() {
+    public MapLayer getSelectionLayer() {
         return selectionLayer;
     }
 
-    public void setSelectionLayer(int selectionLayer) {
+    public void setSelectionLayer(MapLayer selectionLayer) {
         this.selectionLayer = selectionLayer;
+        if(selectionManager!=null) {
+            selectionManager.setSelectionLayer(selectionLayer);
+        }
     }
 
     public boolean isHighlight() {
@@ -440,7 +476,8 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
 
         if (changed) { /* if the map changed then redraw */
             changed = false;
-            baseImage = new BufferedImage(dr.width, dr.height, BufferedImage.TYPE_INT_ARGB);
+            baseImage = new BufferedImage(dr.width, dr.height,
+                    BufferedImage.TYPE_INT_ARGB);
 
             Graphics2D ig = baseImage.createGraphics();
             /* System.out.println("rendering"); */
@@ -449,7 +486,8 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
 
             // when we tell the context that the bounds have changed WMSLayers
             // can refresh them selves
-            context.setAreaOfInterest(mapArea, context.getCoordinateReferenceSystem());
+            context.setAreaOfInterest(mapArea, context
+                    .getCoordinateReferenceSystem());
             // draw the map
             renderer.paint((Graphics2D) ig, dr, mapArea);
         }
@@ -458,17 +496,21 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
 
         if ((selection != null) && (selection.size() > 0)) {
             // paint selection
-            /*
-             * String type = selection.getDefaultGeometry().getGeometryType();
-             * System.out.println(type); if(type==null) type="polygon";
-             */
-            String type = "polygon";
 
-            if (type.equalsIgnoreCase("polygon")) {
+            String type = selectionLayer.getFeatureSource().getSchema()
+            .getDefaultGeometry().getType().getName();
+            /*String type = selection.getDefaultGeometry().getGeometryType();*/
+            /*System.out.println(type);*/
+            if (type == null)
+                type = "polygon";
+
+            /* String type = "point"; */
+
+            if (type.toLowerCase().endsWith("polygon")) {
                 selectionStyle = polygonSelectionStyle;
-            } else if (type.equalsIgnoreCase("point")) {
+            } else if (type.toLowerCase().endsWith("point")) {
                 selectionStyle = pointSelectionStyle;
-            } else if (type.equalsIgnoreCase("line")) {
+            } else if (type.toLowerCase().endsWith("line")) {
                 selectionStyle = lineSelectionStyle;
             }
 
@@ -477,7 +519,8 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
             selectionContext.addLayer(selection, selectionStyle);
             selectionRenderer.setContext(selectionContext);
 
-            selectImage = new BufferedImage(dr.width, dr.height, BufferedImage.TYPE_INT_ARGB);
+            selectImage = new BufferedImage(dr.width, dr.height,
+                    BufferedImage.TYPE_INT_ARGB);
 
             Graphics2D ig = selectImage.createGraphics();
             /* System.out.println("rendering selection"); */
@@ -486,23 +529,34 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
             ((Graphics2D) g).drawImage(selectImage, 0, 0, this);
         }
 
-        if (highlight && (highlightFeature != null) && (highlightFeature.size() > 0)) {
+        if (highlight && (highlightFeature != null)
+                && (highlightFeature.size() > 0)) {
             /*
              * String type = selection.getDefaultGeometry().getGeometryType();
              * System.out.println(type); if(type==null) type="polygon";
              */
-            String type = "polygon";
-            Style highlightStyle = null;
+            String type = highlightLayer.getFeatureSource().getSchema()
+            .getDefaultGeometry().getType().getName();
+            /*String type = selection.getDefaultGeometry().getGeometryType();*/
+            //System.out.println(type);
+            if (type == null)
+                type = "polygon";
 
-            if (type.equalsIgnoreCase("polygon")) {
+            /* String type = "point"; */
+            Style highlightStyle = null;
+            if (type.toLowerCase().endsWith("polygon")) {
                 highlightStyle = polygonHighlightStyle;
-            } else if (type.equalsIgnoreCase("point")) {
+            } else if (type.toLowerCase().endsWith("point")) {
                 highlightStyle = pointHighlightStyle;
-            } else if (type.equalsIgnoreCase("line")) {
+            } else if (type.toLowerCase().endsWith("line")) {
                 highlightStyle = lineHighlightStyle;
             }
 
-            MapContext highlightContext = new DefaultMapContext(DefaultGeographicCRS.WGS84);
+
+
+
+            MapContext highlightContext = new DefaultMapContext(
+                    DefaultGeographicCRS.WGS84);
 
             highlightContext.addLayer(highlightFeature, highlightStyle);
             highlightRenderer.setContext(highlightContext);
@@ -516,9 +570,9 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
         double mapWidth = mapArea.getWidth(); /* get the extent of the map */
         double mapHeight = mapArea.getHeight();
         double scaleX = r.getWidth() / mapArea.getWidth(); /*
-         * calculate the new
-         * scale
-         */
+                                                             * calculate the new
+                                                             * scale
+                                                             */
 
         double scaleY = r.getHeight() / mapArea.getHeight();
         double scale = 1.0; // stupid compiler!
@@ -530,8 +584,8 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
         }
 
         /* calculate the difference in width and height of the new extent */
-        double deltaX =  /* Math.abs */((r.getWidth() / scale) - mapWidth);
-        double deltaY =  /* Math.abs */((r.getHeight() / scale) - mapHeight);
+        double deltaX = /* Math.abs */((r.getWidth() / scale) - mapWidth);
+        double deltaY = /* Math.abs */((r.getHeight() / scale) - mapHeight);
 
         /*
          * System.out.println("delta x " + deltaX); System.out.println("delta y " +
@@ -547,26 +601,14 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
         return new Envelope(ll, ur);
     }
 
-    public FeatureCollection doSelection(double x, double y, int layer) {
-        FeatureCollection select = null;
+    public void doSelection(double x, double y, MapLayer layer) {
+
         Geometry geometry = gf.createPoint(new Coordinate(x, y));
 
         // org.opengis.geometry.Geometry geometry = new Point();
-        if (layer == -1) {
-            for (int i = 0; i < context.getLayers().length; i++) {
-                FeatureCollection fx = findFeature(geometry, i);
 
-                if (select != null) {
-                    select.addAll(fx);
-                } else {
-                    select = fx;
-                }
-            }
-        } else {
-            select = findFeature(geometry, layer);
-        }
+            findFeature(geometry, layer);
 
-        return select;
     }
 
     /**
@@ -576,19 +618,20 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
      *            the index of the layer to search
      * @throws IndexOutOfBoundsException
      */
-    private FeatureCollection findFeature(Geometry geometry, int i)
-        throws IndexOutOfBoundsException {
+    private void findFeature(Geometry geometry, MapLayer layer)
+            throws IndexOutOfBoundsException {
         org.opengis.filter.spatial.BinarySpatialOperator f = null;
-        FeatureCollection fcol = null;
 
-        if ((context != null) && (i > context.getLayers().length)) {
-            return fcol;
+
+        if ((context == null) || (layer==null)) {
+            return ;
         }
 
-        MapLayer layer = context.getLayer(i);
+
 
         try {
-            String name = layer.getFeatureSource().getSchema().getDefaultGeometry().getName();
+            String name = layer.getFeatureSource().getSchema()
+                    .getDefaultGeometry().getName();
 
             if (name == "") {
                 name = "the_geom";
@@ -596,19 +639,21 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
 
             try {
                 f = ff.contains(ff.property(name), ff.literal(geometry));
+                if(selectionManager!=null) {
+                    System.out.println("selection changed");
+                    selectionManager.selectionChanged(this, f);
+
+                }
             } catch (IllegalFilterException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
 
-            // f.addLeftGeometry(ff.property(name));
+            /*// f.addLeftGeometry(ff.property(name));
             // System.out.println("looking with " + f);
             FeatureCollection fc = layer.getFeatureSource().getFeatures(f);
 
-            if (fc.size() > 0) {
-                // selectionStyle.getFeatureTypeStyles()[0].getRules()[0].setFilter(f);
-                selectionLayer = i;
-            }
+
 
             if (fcol == null) {
                 fcol = fc;
@@ -616,7 +661,7 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
                 // here we should set the defaultgeom type
             } else {
                 fcol.addAll(fc);
-            }
+            }*/
 
             /*
              * GeometryAttributeType gat =
@@ -629,18 +674,11 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
              * (Feature) fi.next(); System.out.println("selected " +
              * feat.getAttribute("STATE_NAME")); }
              */
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         } catch (IllegalFilterException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        } /*
-         * catch (IllegalAttributeException e) { // TODO Auto-generated
-         * catch block System.err.println(e.getMessage()); //
-         * e.printStackTrace(); }
-         */
-        return fcol;
+        }
+        return ;
     }
 
     public void mouseClicked(MouseEvent e) {
@@ -657,7 +695,7 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
 
         double mapX = ((x * width) / (double) bounds.width) + mapArea.getMinX();
         double mapY = (((bounds.getHeight() - y) * height) / (double) bounds.height)
-            + mapArea.getMinY();
+                + mapArea.getMinY();
 
         /*
          * System.out.println(""+x+"->"+mapX);
@@ -687,8 +725,8 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
             break;
 
         case Select:
-            selection = doSelection(mapX, mapY, selectionLayer);
-            repaint();
+            doSelection(mapX, mapY, selectionLayer);
+
 
             return;
 
@@ -696,8 +734,10 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
             return;
         }
 
-        Coordinate ll = new Coordinate(mapX - (width2 / zlevel), mapY - (height2 / zlevel));
-        Coordinate ur = new Coordinate(mapX + (width2 / zlevel), mapY + (height2 / zlevel));
+        Coordinate ll = new Coordinate(mapX - (width2 / zlevel), mapY
+                - (height2 / zlevel));
+        Coordinate ur = new Coordinate(mapX + (width2 / zlevel), mapY
+                + (height2 / zlevel));
 
         mapArea = new Envelope(ll, ur);
         // System.out.println("after area "+mapArea+"\nw:"+mapArea.getWidth()+"
@@ -726,13 +766,12 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
 
         if ((state == JMapPane.ZoomIn) || (state == JMapPane.ZoomOut)) {
             drawRectangle(this.getGraphics());
-        } else if (state == JMapPane.Pan) {
-            this.getGraphics().translate(0, 0);
         }
 
+
+        processDrag(startX, startY, endX, endY);
         lastX = 0;
         lastY = 0;
-        processDrag(startX, startY, endX, endY);
     }
 
     public void mouseDragged(MouseEvent e) {
@@ -763,6 +802,50 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
             lastX = x;
             lastY = y;
             drawRectangle(graphics);
+        } else if (state == JMapPane.Select && selectionLayer != null) {
+
+            // construct a new bbox filter
+            Rectangle bounds = this.getBounds();
+
+            double mapWidth = mapArea.getWidth();
+            double mapHeight = mapArea.getHeight();
+
+            double x1 = ((this.startX * mapWidth) / (double) bounds.width)
+                    + mapArea.getMinX();
+            double y1 = (((bounds.getHeight() - this.startY) * mapHeight) / (double) bounds.height)
+                    + mapArea.getMinY();
+            double x2 = ((x * mapWidth) / (double) bounds.width)
+                    + mapArea.getMinX();
+            double y2 = (((bounds.getHeight() - y) * mapHeight) / (double) bounds.height)
+                    + mapArea.getMinY();
+            double left = Math.min(x1, x2);
+            double right = Math.max(x1, x2);
+            double bottom = Math.min(y1, y2);
+            double top = Math.max(y1, y2);
+
+
+            String name = selectionLayer.getFeatureSource().getSchema()
+                    .getDefaultGeometry().getName();
+
+            if (name == "") {
+                name = "the_geom";
+            }
+            Filter bb = ff.bbox(ff.property(name), left, bottom, right, top,
+                    getContext().getCoordinateReferenceSystem().toString());
+            if(selectionManager!=null) {
+                selectionManager.selectionChanged(this, bb);
+            }
+
+            graphics.setXORMode(Color.green);
+
+            /*
+             * if ((lastX > 0) && (lastY > 0)) { drawRectangle(graphics); }
+             */
+
+            // draw new box
+            lastX = x;
+            lastY = y;
+            drawRectangle(graphics);
         }
     }
 
@@ -771,7 +854,8 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
         // + x2 + "," + y2);
         if ((x1 == x2) && (y1 == y2)) {
             if (isClickable()) {
-                mouseClicked(new MouseEvent(this, 0, new Date().getTime(), 0, x1, y1, y2, false));
+                mouseClicked(new MouseEvent(this, 0, new Date().getTime(), 0,
+                        x1, y1, y2, false));
             }
 
             return;
@@ -782,12 +866,14 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
         double mapWidth = mapArea.getWidth();
         double mapHeight = mapArea.getHeight();
 
-        double startX = ((x1 * mapWidth) / (double) bounds.width) + mapArea.getMinX();
+        double startX = ((x1 * mapWidth) / (double) bounds.width)
+                + mapArea.getMinX();
         double startY = (((bounds.getHeight() - y1) * mapHeight) / (double) bounds.height)
-            + mapArea.getMinY();
-        double endX = ((x2 * mapWidth) / (double) bounds.width) + mapArea.getMinX();
+                + mapArea.getMinY();
+        double endX = ((x2 * mapWidth) / (double) bounds.width)
+                + mapArea.getMinX();
         double endY = (((bounds.getHeight() - y2) * mapHeight) / (double) bounds.height)
-            + mapArea.getMinY();
+                + mapArea.getMinY();
 
         if (state == JMapPane.Pan) {
             // move the image with the mouse
@@ -811,7 +897,7 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
             mapArea = fixAspectRatio(this.getBounds(), new Envelope(ll, ur));
         } else if (state == JMapPane.ZoomIn) {
             // make the dragged rectangle (in map coords) the new BBOX
-            double left = Math.min(startX, endY);
+            double left = Math.min(startX, endX);
             double right = Math.max(startX, endX);
             double bottom = Math.min(startY, endY);
             double top = Math.max(startY, endY);
@@ -821,7 +907,7 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
             mapArea = fixAspectRatio(this.getBounds(), new Envelope(ll, ur));
         } else if (state == JMapPane.ZoomOut) {
             // make the dragged rectangle in screen coords the new map size?
-            double left = Math.min(startX, endY);
+            double left = Math.min(startX, endX);
             double right = Math.max(startX, endX);
             double bottom = Math.min(startY, endY);
             double top = Math.max(startY, endY);
@@ -840,6 +926,34 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
             Coordinate ur = new Coordinate(mapArea.getMaxX() + nDeltaX2,
                     mapArea.getMaxY() + nDeltaY2);
             mapArea = fixAspectRatio(this.getBounds(), new Envelope(ll, ur));
+        } else if (state == JMapPane.Select && selectionLayer !=null) {
+            double left = Math.min(startX, endX);
+            double right = Math.max(startX, endX);
+            double bottom = Math.min(startY, endY);
+            double top = Math.max(startY, endY);
+
+
+            String name = selectionLayer.getFeatureSource().getSchema()
+                    .getDefaultGeometry().getName();
+
+            if (name == "") {
+                name = "the_geom";
+            }
+            Filter bb = ff.bbox(ff.property(name), left, bottom, right, top,
+                    getContext().getCoordinateReferenceSystem().toString());
+            //System.out.println(bb.toString());
+            if(selectionManager!=null) {
+                selectionManager.selectionChanged(this, bb);
+            }
+            /*FeatureCollection fc;
+            selection = null;
+            try {
+                fc = selectionLayer.getFeatureSource().getFeatures(bb);
+                selection = fc;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+*/
         }
 
         repaint();
@@ -851,7 +965,8 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
     }
 
     private org.geotools.styling.Style setupStyle(int type, Color color) {
-        StyleFactory sf = org.geotools.factory.CommonFactoryFinder.getStyleFactory(null);
+        StyleFactory sf = org.geotools.factory.CommonFactoryFinder
+                .getStyleFactory(null);
         StyleBuilder sb = new StyleBuilder();
 
         org.geotools.styling.Style s = sf.createStyle();
@@ -906,7 +1021,7 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
 
         if (prop.equalsIgnoreCase("crs")) {
             context.setAreaOfInterest(context.getAreaOfInterest(),
-                (CoordinateReferenceSystem) evt.getNewValue());
+                    (CoordinateReferenceSystem) evt.getNewValue());
         }
     }
 
@@ -953,7 +1068,7 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
     }
 
     private void drawRectangle(Graphics graphics) {
-        // undraw last box
+        // undraw last box/draw new box
         int left = Math.min(startX, lastX);
         int right = Math.max(startX, lastX);
         int top = Math.max(startY, lastY);
@@ -977,5 +1092,37 @@ public class JMapPane extends JPanel implements MouseListener, MouseMotionListen
 
     public void mouseMoved(MouseEvent e) {
         // TODO Auto-generated method stub
+    }
+
+    public FeatureCollection getSelection() {
+        return selection;
+    }
+
+    public void setSelection(FeatureCollection selection) {
+        this.selection = selection;
+        repaint();
+    }
+
+    /* (non-Javadoc)
+     * @see org.geotools.gui.swing.event.SelectionChangeListener#selectionChanged(org.geotools.gui.swing.event.SelectionChangedEvent)
+     */
+    public void selectionChanged(SelectionChangedEvent e) {
+
+        try {
+            selection = selectionLayer.getFeatureSource().getFeatures(e.getFilter());
+            repaint();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+    }
+
+    public SelectionManager getSelectionManager() {
+        return selectionManager;
+    }
+
+    public void setSelectionManager(SelectionManager selectionManager) {
+        this.selectionManager = selectionManager;
+        this.selectionManager.addSelectionChangeListener(this);
+
     }
 }
