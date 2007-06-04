@@ -43,18 +43,10 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.JPanel;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 
-import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory2;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.feature.Feature;
+import javax.swing.JPanel;
+
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.gui.swing.event.HighlightChangeListener;
 import org.geotools.gui.swing.event.HighlightChangedEvent;
@@ -78,6 +70,14 @@ import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 public class JMapPane extends JPanel implements MouseListener,
         MouseMotionListener, HighlightChangeListener,SelectionChangeListener, PropertyChangeListener,
@@ -462,6 +462,14 @@ public class JMapPane extends JPanel implements MouseListener,
         Rectangle dr = new Rectangle(r.width, r.height);
 
         if (!r.equals(oldRect) || reset) {
+        	if(!r.equals(oldRect)) {
+        		try {
+					mapArea=context.getLayerBounds();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+        	}
             /* either the viewer size has changed or we've done a reset */
             changed = true; /* note we need to redraw */
             reset = false; /* forget about the reset */
@@ -472,6 +480,10 @@ public class JMapPane extends JPanel implements MouseListener,
         if (!mapArea.equals(oldMapArea)) { /* did the map extent change? */
             changed = true;
             oldMapArea = mapArea;
+//          when we tell the context that the bounds have changed WMSLayers
+            // can refresh them selves
+            context.setAreaOfInterest(mapArea, context
+                    .getCoordinateReferenceSystem());
         }
 
         if (changed) { /* if the map changed then redraw */
@@ -484,10 +496,7 @@ public class JMapPane extends JPanel implements MouseListener,
             renderer.setContext(context);
             labelCache.clear(); // work around anoying labelcache bug
 
-            // when we tell the context that the bounds have changed WMSLayers
-            // can refresh them selves
-            context.setAreaOfInterest(mapArea, context
-                    .getCoordinateReferenceSystem());
+
             // draw the map
             renderer.paint((Graphics2D) ig, dr, mapArea);
         }
