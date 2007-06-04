@@ -20,6 +20,10 @@ import org.opengis.filter.Filter;
 
 
 public class HighlightChangedEvent extends EventObject {
+    /**
+     *
+     */
+    private static final long serialVersionUID = -7958576070524520655L;
     Object source;
     Filter filter;
 
