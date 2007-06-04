@@ -54,7 +54,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * Sample application that may be used to try JMapPane from the command line.
- * 
+ *
  * @author Ian Turton
  */
 public class MapViewer implements ActionListener{
@@ -72,7 +72,7 @@ public class MapViewer implements ActionListener{
         //mp.addZoomChangeListener(this);
         content.setLayout(new BorderLayout());
         jtb = new JToolBar();
-        
+
         JButton load = new JButton("Load file");
         load.addActionListener(this);
         jtb.add(load);
@@ -93,8 +93,8 @@ public class MapViewer implements ActionListener{
         button.setToolTipText("Change map prjection");
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            	
-            	String code = JOptionPane.showInputDialog( button, "Coordinate Reference System:", "EPSG:4326" ); 
+
+            	String code = JOptionPane.showInputDialog( button, "Coordinate Reference System:", "EPSG:4326" );
             	if(code==null)return;
             	try{
              	   CoordinateReferenceSystem crs = CRS.decode( code );
@@ -108,50 +108,51 @@ public class MapViewer implements ActionListener{
             }
         });
         jtb.add(button);
-        
+
         content.add(jtb,BorderLayout.NORTH);
-        
-        
+
+
         //JComponent sp = mp.createScrollPane();
         mp.setSize(400,200);
         content.add(mp,BorderLayout.CENTER);
-         
+
         content.doLayout();
         frame.setVisible(true);
-        
+
     }
-    
+
     /**
      * Method used to set the current map projection.
-     * 
+     *
      * @param crs A new CRS for the mappnae.
      */
     public void setCRS(CoordinateReferenceSystem crs){
     	mp.getContext().setAreaOfInterest(mp.getContext().getAreaOfInterest(),crs);
     	mp.setReset(true);
-    	mp.repaint();    	
+    	mp.repaint();
    }
 
     public void load(URL shape, URL sld)throws Exception{
         ShapefileDataStore ds = new ShapefileDataStore(shape);
-        
+
         FeatureSource fs = ds.getFeatureSource();
         com.vividsolutions.jts.geom.Envelope env = fs.getBounds();
         mp.setMapArea(env);
         StyleFactory factory = CommonFactoryFinder.getStyleFactory(null);
-        
+
         SLDParser stylereader = new SLDParser(factory,sld);
         org.geotools.styling.Style[] style = stylereader.readXML();
-        
+
         CoordinateReferenceSystem crs = fs.getSchema().getDefaultGeometry().getCoordinateSystem();
         if(crs==null)crs=DefaultGeographicCRS.WGS84;
         MapContext context = new DefaultMapContext(crs);
         context.addLayer(fs,style[0]);
         context.getLayerBounds();
         mp.setHighlightLayer(context.getLayer(0));
-        
+        mp.setSelectionLayer(context.getLayer(0));
+
         GTRenderer renderer;
-        if( false ){ 
+        if( false ){
         	renderer = new StreamingRenderer();
         	HashMap hints = new HashMap();
         	hints.put("memoryPreloadingEnabled", Boolean.TRUE);
@@ -165,8 +166,8 @@ public class MapViewer implements ActionListener{
         }
         mp.setRenderer(renderer);
         mp.setContext(context);
-        
-        
+
+
 //        mp.getRenderer().addLayer(new RenderedMapScale());
         frame.repaint();
         frame.doLayout();
@@ -175,7 +176,7 @@ public class MapViewer implements ActionListener{
     	if( new File( target ).exists() ){
         	try {
 				return new File( target ).toURL();
-			} catch (MalformedURLException e) {				
+			} catch (MalformedURLException e) {
 			}
         }
     	try {
@@ -195,7 +196,7 @@ public class MapViewer implements ActionListener{
             	return;
             }
             String filepart = pathname.substring(0, pathname.lastIndexOf("."));
-            URL sld = aquireURL( filepart+".sld" );        
+            URL sld = aquireURL( filepart+".sld" );
             if( sld == null){
             	JOptionPane.showMessageDialog( frame, "could not find SLD file \""+filepart+".sld\"", "Could not find SLD file", JOptionPane.ERROR_MESSAGE );
             	System.err.println("Could not find sld file: "+filepart+".sld");
@@ -208,7 +209,7 @@ public class MapViewer implements ActionListener{
 				e1.printStackTrace();
 			}
 		}
-		
+
 	}
     /**
      * @param args
@@ -228,12 +229,12 @@ public class MapViewer implements ActionListener{
         	System.exit(1);
         }
         String filepart = pathname.substring(0, pathname.lastIndexOf("."));
-        URL sld = aquireURL( filepart+".sld" );        
+        URL sld = aquireURL( filepart+".sld" );
         if( sld == null){
         	System.err.println("Could not find sld file: "+filepart+".sld");
         	System.exit(1);
         }
-                
+
         mapV.load( shape, sld );
         }
     }
