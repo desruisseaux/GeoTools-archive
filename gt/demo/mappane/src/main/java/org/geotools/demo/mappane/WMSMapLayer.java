@@ -32,6 +32,7 @@ import java.util.Set;
 import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
 
+import org.apache.commons.lang.StringUtils;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.data.DataUtilities;
@@ -198,7 +199,7 @@ public class WMSMapLayer extends DefaultMapLayer implements MapLayer, MapBoundsL
             } else {
                 System.out.println("error content type is " + type);
 
-                if (type.contains("text") || type.contains("xml")) {
+                if (StringUtils.contains(type, "text") || StringUtils.contains(type,"xml")) {
                     String line = "";
                     BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
