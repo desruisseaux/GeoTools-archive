@@ -6,7 +6,7 @@ import java.util.Random;
 
 import org.geotools.caching.Generator;
 import org.geotools.caching.HashMapInternalStore;
-import org.geotools.caching.IInternalStore;
+import org.geotools.caching.InternalStore;
 import org.geotools.caching.SimpleHashMapInternalStore;
 import org.geotools.feature.Feature;
 
@@ -31,7 +31,7 @@ public class InternalStoreTest extends TestCase {
 		testStore(hash) ;
 	}
 	
-	protected void testStore(IInternalStore tested) {
+	protected void testStore(InternalStore tested) {
 		Random rand = new Random() ;
 		List features = new ArrayList() ;
 		Generator gen = new Generator(1000, 1000) ;

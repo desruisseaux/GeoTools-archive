@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 import org.geotools.feature.Feature;
 
-public class SimpleHashMapInternalStore implements IInternalStore {
+public class SimpleHashMapInternalStore implements InternalStore {
 	
 	private final HashMap buffer = new HashMap() ;
 

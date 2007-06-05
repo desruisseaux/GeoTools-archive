@@ -26,7 +26,7 @@ import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
-public class SpatialQueryTracker implements IQueryTracker {
+public class SpatialQueryTracker implements QueryTracker {
 
 	private static DataDefinition df = createDataDefinition() ;
 	private RTree tree = createTree() ;

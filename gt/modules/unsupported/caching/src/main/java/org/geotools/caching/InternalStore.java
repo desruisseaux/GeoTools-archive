@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import org.geotools.feature.Feature;
 
-public interface IInternalStore {
+public interface InternalStore {
 
 	public abstract boolean contains(Feature f) ;
 	

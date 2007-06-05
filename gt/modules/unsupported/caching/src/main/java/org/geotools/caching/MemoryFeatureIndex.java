@@ -26,11 +26,11 @@ import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-public class MemoryFeatureIndex implements IFeatureIndex {
+public class MemoryFeatureIndex implements FeatureIndex {
 	
 	private static final DataDefinition df = createDataDefinition() ;
 	private RTree tree = createTree() ;
-	private final IInternalStore internalStore ;
+	private final InternalStore internalStore ;
 	private final long capacity ;
 	private long indexCount = 0 ;
 	private final FeatureType type ;

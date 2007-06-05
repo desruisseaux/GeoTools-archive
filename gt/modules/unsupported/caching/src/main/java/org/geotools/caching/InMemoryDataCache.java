@@ -17,13 +17,13 @@ import org.geotools.feature.SchemaException;
 import org.opengis.filter.Filter;
 
 
-public class DataCache implements IDataCache {
+public class InMemoryDataCache implements IDataCache {
 	
 	private final DataStore source ;
-	private final IQueryTracker tracker ;
-	private final IFeatureIndex index ;
+	private final QueryTracker tracker ;
+	private final FeatureIndex index ;
 	
-	public DataCache(DataStore ds) {
+	public InMemoryDataCache(DataStore ds) {
 		this.source = ds ;
 		this.tracker = new SpatialQueryTracker() ;
 		try {

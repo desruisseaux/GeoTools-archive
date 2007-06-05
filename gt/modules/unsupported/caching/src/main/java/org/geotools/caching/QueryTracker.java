@@ -3,7 +3,7 @@ package org.geotools.caching;
 import org.geotools.data.Query;
 
 
-public interface IQueryTracker {
+public interface QueryTracker {
 
 	public abstract void register(Query q) ;
 	

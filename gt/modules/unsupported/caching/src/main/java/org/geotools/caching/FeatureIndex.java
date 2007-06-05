@@ -6,7 +6,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 
 
-public interface IFeatureIndex extends FeatureSource {
+public interface FeatureIndex extends FeatureSource {
 
 	public abstract void add(Feature f) ;
 	

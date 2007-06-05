@@ -7,15 +7,15 @@ import java.util.Random;
 
 import org.geotools.feature.Feature;
 
-public class HashMapInternalStore implements IInternalStore {
+public class HashMapInternalStore implements InternalStore {
 	
-	private final IInternalStore overflow ;
+	private final InternalStore overflow ;
 	private final int capacity ;
 	private final HashMap buffer ;
 	private int count = 0 ;
 	private final Random rand = new Random() ;
 	
-	public HashMapInternalStore(int capacity, IInternalStore overflow) {
+	public HashMapInternalStore(int capacity, InternalStore overflow) {
 		this.overflow = overflow ;
 		this.capacity = capacity ;
 		this.buffer = new HashMap() ;

@@ -15,15 +15,15 @@ import com.vividsolutions.jts.geom.Envelope;
 
 public class IndexView implements FeatureSource {
 
-	private final IFeatureIndex index ;
+	private final FeatureIndex index ;
 	private final Query view ;
 	
-	public IndexView(IFeatureIndex index, Query q) {
+	public IndexView(FeatureIndex index, Query q) {
 		this.index = index ;
 		this.view = q ;
 	}
 	
-	public IndexView(IFeatureIndex index) {
+	public IndexView(FeatureIndex index) {
 		this(index, Query.ALL) ;
 	}
 	

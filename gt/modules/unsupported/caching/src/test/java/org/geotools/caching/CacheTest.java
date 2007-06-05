@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
-import org.geotools.caching.DataCache;
+import org.geotools.caching.InMemoryDataCache;
 import org.geotools.caching.Generator;
 import org.geotools.caching.SpatialQueryTracker;
 import org.geotools.data.DataStore;
@@ -128,7 +128,7 @@ public class CacheTest extends TestCase {
 		MemoryDataStore ds = new MemoryDataStore() ;
 		ds.createSchema(type) ;
 		ds.addFeatures(data) ;
-		DataCache tested = new DataCache(ds) ;
+		InMemoryDataCache tested = new InMemoryDataCache(ds) ;
 		Iterator iter = querySet.iterator() ;
 		while (iter.hasNext()) {
 			Query q = (Query) iter.next();
@@ -146,7 +146,7 @@ public class CacheTest extends TestCase {
 		MemoryDataStore ds = new MemoryDataStore() ;
 		ds.createSchema(type) ;
 		ds.addFeatures(data) ;
-		DataCache tested = new DataCache(ds) ;
+		InMemoryDataCache tested = new InMemoryDataCache(ds) ;
 		long diff = compareDataStores(tested, control, querySet) ;
 		assertTrue(diff < 0) ;
 	}
@@ -159,7 +159,7 @@ public class CacheTest extends TestCase {
 		MemoryDataStore ds = new MemoryDataStore() ;
 		ds.createSchema(type) ;
 		ds.addFeatures(data) ;
-		DataCache tested = new DataCache(ds) ;
+		InMemoryDataCache tested = new InMemoryDataCache(ds) ;
 		long diff = compareDataStores(tested, control, querySet) ;
 	}
 	
