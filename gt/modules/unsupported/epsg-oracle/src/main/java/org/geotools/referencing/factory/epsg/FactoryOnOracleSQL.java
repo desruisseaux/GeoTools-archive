@@ -31,17 +31,17 @@ import org.geotools.factory.Hints;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 
 /**
- * Connection to the EPSG database in PostgreSQL database engine using JDBC. The EPSG
+ * Connection to the EPSG database in Oracle database engine using JDBC. The EPSG
  * database can be downloaded from <A HREF="http://www.epsg.org">http://www.epsg.org</A>.
- * It should have been imported into a PostgreSQL database, which doesn't need to be on
+ * It should have been imported into an Oracle database, which doesn't need to be on
  * the local machine.
  * <p>
  * <h3>Connection parameters</h3>
  * The preferred way to specify connection parameters is through the JNDI interface.
  * However, this datasource provides the following alternative as a convenience: if a
  * {@value #CONFIGURATION_FILE} file is found in current directory or in the user's home
- * directory, then the following properties are fetch. Note that the default value may change
- * in a future version if a public server become available.
+ * directory, then the following properties are fetched. Note that the default value may change
+ * in a future version if a public server becomes available.
  * <P>
  * <TABLE BORDER="1">
  * <TR>
@@ -53,13 +53,13 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * <TR>
  *   <TD>{@code serverName}</TD>
  *   <TD>String</TD>
- *   <TD>PostgreSQL database server host name</TD>
+ *   <TD>Oracle database server host name</TD>
  *   <TD>{@code localhost}</TD>
  * </TR>
  * <TR>
  *   <TD>{@code databaseName}</TD>
  *   <TD>String</TD>
- *   <TD>PostgreSQL database name</TD>
+ *   <TD>Oracle database name</TD>
  *   <TD>{@code EPSG}</TD>
  * </TR>
  * <TR>
@@ -71,8 +71,8 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * <TR>
  *   <TD>{@code portNumber}</TD>
  *   <TD>int</TD>
- *   <TD>TCP port which the PostgreSQL database server is listening on</TD>
- *   <TD>{@code 5432}</TD>
+ *   <TD>TCP port which the Oracle database server is listening on</TD>
+ *   <TD>{@code 1521}</TD>
  * </TR>
  * <TR>
  *   <TD>{@code user}</TD>
@@ -90,10 +90,10 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * The database version is given in the
  * {@linkplain org.opengis.metadata.citation.Citation#getEdition edition attribute}
  * of the {@linkplain org.opengis.referencing.AuthorityFactory#getAuthority authority}.
- * The postgreSQL database should be read only.
+ * The Oracle database should be read only.
  * <P>
  * Just having this class accessible in the classpath, together with the registration in
- * the {@code META-INF/services/} directory, is suffisient to get a working EPSG authority
+ * the {@code META-INF/services/} directory, is sufficient to get a working EPSG authority
  * factory backed by this database. Vendors can create a copy of this class, modify it and
  * bundle it with their own distribution if they want to connect their users to an other
  * database.
@@ -103,8 +103,7 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * @version $Id$
  * @author Didier Richard
  * @author Martin Desruisseaux
- *
- * @tutorial http://docs.codehaus.org/display/GEOTOOLS/How+to+install+the+EPSG+database+in+PostgreSQL
+ * @author Jody Garnett
  */
 public class FactoryOnOracleSQL extends DefaultFactory {
     /**
@@ -181,20 +180,20 @@ public class FactoryOnOracleSQL extends DefaultFactory {
             Logging.unexpectedException("org.geotools.referencing.factory", "DataSource",
                                         "<init>", exception);
         }
-        String serverName = p.getProperty("serverName",   "localhost");
-        String databaseName =  p.getProperty("databaseName", "EPSG"     );
-        String user  = p.getProperty("user",         "Geotools" );
-        String password =  p.getProperty("password",     "Geotools" );
+        String serverName = p.getProperty("serverName", "localhost");
+        String databaseName =  p.getProperty("databaseName", "EPSG");
+        String user  = p.getProperty("user", "Geotools");
+        String password =  p.getProperty("password", "Geotools");
         schema = p.getProperty("schema", null);
         
         return source;
     }
 
     /**
-     * Returns the backing-store factory for PostgreSQL syntax.
+     * Returns the backing-store factory for Oracle syntax.
      *
      * @param  hints A map of hints, including the low-level factories to use for CRS creation.
-     * @return The EPSG factory using PostgreSQL syntax.
+     * @return The EPSG factory using Oracle syntax.
      * @throws SQLException if connection to the database failed.
      */
     protected AbstractAuthorityFactory createBackingStore(final Hints hints) throws SQLException {
