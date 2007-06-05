@@ -1,0 +1,46 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.geotools</groupId>
+  <artifactId>caching</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>Caching</name>
+  <description>
+  Google Summer of Code 2007 project : Caching data in uDig.
+  This project aims at providing utilities to cache features from remote DataStores in order to leverage subsequent related queries.
+  The other goal is to allow client to get data from place-holder DataStores in the low or no bandwidth scenario. 
+  </description>
+  <developers>
+  	<developer>
+  		<id>chrisr</id>
+  		<name>Christophe ROUSSON</name>
+  		<roles>
+  			<role>Java developer</role>
+  		</roles>
+  		<organization>Université Laval - Département des Sciences géomatiques</organization>
+  		<organizationUrl>http://www.scg.ulaval.ca</organizationUrl>
+  		<email>christophe.rousson@gmail.com</email>
+  		<timezone>EDT</timezone>
+  </developer>
+  </developers>
+  <url>http://maven.apache.org</url>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-main</artifactId>
+      <version>2.4-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-shapefile</artifactId>
+      <version>2.4-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+</project>
