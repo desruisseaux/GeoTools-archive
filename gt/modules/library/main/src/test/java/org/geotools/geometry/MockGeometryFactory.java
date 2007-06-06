@@ -407,8 +407,12 @@ public class MockGeometryFactory implements GeometryFactory, PrimitiveFactory {
             return 0;
         }
 
-        public double getDistance( Geometry geometry ) {
+        public double distance(Geometry geometry) {
             return 0;
+        }
+
+        public double getDistance(Geometry geometry) {
+            return distance(geometry);
         }
 
         public Envelope getEnvelope() {
@@ -614,8 +618,12 @@ public class MockGeometryFactory implements GeometryFactory, PrimitiveFactory {
             return 0;
         }
 
-        public double getDistance( Geometry geometry ) {
+        public double distance(Geometry geometry) {
             return 0;
+        }
+
+        public double getDistance(Geometry geometry) {
+            return distance(geometry);
         }
 
         public Envelope getEnvelope() {

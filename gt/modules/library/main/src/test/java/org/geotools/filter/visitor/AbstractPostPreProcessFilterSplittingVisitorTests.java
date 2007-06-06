@@ -203,6 +203,9 @@ public class AbstractPostPreProcessFilterSplittingVisitorTests extends TestCase 
             return 0;
         }
         public double getDistance(Geometry arg0) {
+            return distance(arg0);
+        }
+        public double distance(Geometry arg0) {
             // TODO Auto-generated method stub
             return 0;
         }

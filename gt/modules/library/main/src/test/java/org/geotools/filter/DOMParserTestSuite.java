@@ -1,5 +1,7 @@
 package org.geotools.filter;
 
+import java.io.File;
+import java.io.FileFilter;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -77,11 +79,12 @@ public class DOMParserTestSuite extends TestSuite {
             Double.class);
     AttributeType stringAttribute = attFactory.newAttributeType("testString",
             String.class);
-
+    AttributeType zeroDoubleAttribute = attFactory.newAttributeType("testZeroDouble",
+            Double.class);
     AttributeType[] types = {
         geometryAttribute, booleanAttribute, charAttribute, byteAttribute,
         shortAttribute, intAttribute, longAttribute, floatAttribute,
-        doubleAttribute, stringAttribute
+        doubleAttribute, stringAttribute, zeroDoubleAttribute 
     };
 
     // Builds the schema
@@ -96,7 +99,7 @@ public class DOMParserTestSuite extends TestSuite {
     coords[2] = new Coordinate(5, 6);
 
     // Builds the test feature
-    Object[] attributes = new Object[10];
+    Object[] attributes = new Object[11];
     attributes[0] = geomFac.createLineString(coords);
     attributes[1] = new Boolean(true);
     attributes[2] = new Character('t');
@@ -107,7 +110,7 @@ public class DOMParserTestSuite extends TestSuite {
     attributes[7] = new Float(10000.4);
     attributes[8] = new Double(100000.5);
     attributes[9] = "test string data";
-
+    attributes[10] = new Double(0.0);
     // Creates the feature itself
     testFeature = testSchema.create(attributes);
     LOGGER.finer("...flat feature created");
@@ -124,13 +127,23 @@ public class DOMParserTestSuite extends TestSuite {
         
         try {
             suite.prepareFeatures();
-            suite.addTest( suite.new DomTestXml("test9.xml"));
+            
+            File dir = TestData.file( DOMParserTestSuite.class,"test9.xml").getParentFile();
+            
+            File tests[] = dir.listFiles( new FileFilter(){
+                public boolean accept(File pathname) {
+                    return pathname.toString().endsWith(".xml");
+                }                
+            });
+            for( int i=0; i<tests.length; i++){
+                File test = tests[i];
+                suite.addTest( suite.new DomTestXml( test.getName() ));
+            }
             // .. etc..
-
-        } catch (SchemaException e) {            
-        } catch (IllegalAttributeException e) {            
+        } catch (Exception e) {
+            e.printStackTrace();
         }          
-        System.out.println( suite.countTestCases() );
+        System.out.println( suite.countTestCases()+" xml filter tests found");
         return suite;
     }
     
@@ -148,7 +161,6 @@ public class DOMParserTestSuite extends TestSuite {
         }
 
         public void run( TestResult result ) {
-            System.out.println( getName() );
             result.startTest( this );            
             Protectable p= new Protectable() {
                 public void protect() throws Throwable {
