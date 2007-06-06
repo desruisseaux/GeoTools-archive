@@ -54,6 +54,7 @@ set _Stereo11_ = PROJCS["Equitorial Stereographic",  GEOGCS["WGS84",  DATUM["WGS
 set _Stereo12_ = PROJCS["Equitorial Stereographic",  GEOGCS["WGS84",  DATUM["WGS84",  SPHEROID["WGS84",  6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Stereographic"],            PARAMETER["central_meridian",   -4.0], PARAMETER["latitude_of_origin",   0.0], PARAMETER["scale_factor", 0.91],                                         PARAMETER["false_easting",       0.0       ], PARAMETER["false_northing",      0.0], UNIT["metre",         1.0],               AXIS["x",EAST], AXIS["y",NORTH]]
 set _Stereo13_ = PROJCS["Oblique Stereographic",     GEOGCS["WGS84",  DATUM["WGS84",  SPHEROID["WGS84",  6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Stereographic"],            PARAMETER["central_meridian",  -55.0], PARAMETER["latitude_of_origin",  51.0], PARAMETER["scale_factor", 0.99],                                         PARAMETER["false_easting",       0.0       ], PARAMETER["false_northing",      0.0], UNIT["metre",         1.0],               AXIS["x",EAST], AXIS["y",NORTH]]
 set _Stereo14_ = PROJCS["Oblique Stereographic",     GEOGCS["WGS84",  DATUM["WGS84",  SPHEROID["WGS84",  6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Stereographic"],            PARAMETER["central_meridian",   64.0], PARAMETER["latitude_of_origin", -32.0], PARAMETER["scale_factor", 1.00],                                         PARAMETER["false_easting",       0.0       ], PARAMETER["false_northing",      0.0], UNIT["metre",         1.0],               AXIS["x",EAST], AXIS["y",NORTH]]
+set _Stereo15_ = PROJCS["North Polar Stereographic", GEOGCS["WGS84",  DATUM["WGS84",  SPHEROID["WGS84",  6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Stereographic_North_Pole"], PARAMETER["central_meridian",  -96.0],                                         PARAMETER["scale_factor", 1.00], PARAMETER["Standard_Parallel_1",  71.0],PARAMETER["false_easting",       0.0       ], PARAMETER["false_northing",      0.0], UNIT["metre",         1.0],               AXIS["x",EAST], AXIS["y",NORTH]]
 
 ////////////////////////////////////////////
 // Spherical North
@@ -787,3 +788,35 @@ test tolerance = (1e-5, 1e-5)
 
 source pt = (-9.85589165790218E-11, -8594587.5216062)
 target pt = (170, -90)
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// From http://www.remotesensing.org/geotiff/proj_list/polar_stereographic.html
+
+source crs = _WGS84_
+target crs = _Stereo15_
+test tolerance = (1e-2, 1e-2)
+
+source pt = (-121.33955, 39.1012523)
+target pt = (-2529570.00, -5341800.00)
+
+
+
+/////////////////////////////////////////////////
+// From http://jira.codehaus.org/browse/GEOS-1037
+
+set _GEOS1037_ = PROJCS["Antarctic Polar Stereographic", GEOGCS["WGS 84", DATUM["WGS_1984", SPHEROID["WGS 84", 6378137, 298.257223563]], PRIMEM["Greenwich", 0], UNIT["degree", 0.0174532925199433], AXIS["Lat",NORTH], AXIS["Long",EAST]], PROJECTION["Polar_Stereographic"], PARAMETER["latitude_of_origin", -90], PARAMETER["central_meridian", 0], PARAMETER["scale_factor", 0.97276901289], PARAMETER["false_easting", 0], PARAMETER["false_northing", 0], UNIT["metre", 1]]
+
+source crs = _GEOS1037_
+target crs = _WGS84_
+test tolerance = (1e-5, 1e-5)
+
+source pt = (-1052066.625, 281900.375)
+target pt = (-75.0000, -80.0000)
+
+source pt = (-2119718.750, 567976.875)
+target pt = (-75.0000, -70.0000)
+
+source pt = (-3219560.250, 862678.563)
+target pt = (-75.0000, -60.0000)

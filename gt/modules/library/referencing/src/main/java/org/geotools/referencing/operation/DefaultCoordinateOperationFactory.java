@@ -1429,11 +1429,13 @@ search: for (int j=0; j<targets.length; j++) {
                 /*
                  * Constructs the pass through transform only if there is at least one ordinate to
                  * pass. Actually, the code below would give an acceptable result even if this check
-                 * was not performed, except that the exception below could be unnecessary thrown.
+                 * was not performed, except for creation of intermediate objects.
                  */
                 if (!(step instanceof Operation)) {
-                    // TODO
-                    throw new OperationNotFoundException("Concatenated operation not supported.");
+                    final MathTransform stepMT = step.getMathTransform();
+                    step = DefaultOperation.create(AbstractIdentifiedObject.getProperties(step),
+                            step.getSourceCRS(), step.getTargetCRS(), stepMT,
+                            new DefaultOperationMethod(stepMT), step.getClass());
                 }
                 mt = getMathTransformFactory().createPassThroughTransform(lower, mt, dimensions-upper);
                 step = new DefaultPassThroughOperation(properties, sourceStepCRS, targetStepCRS,
