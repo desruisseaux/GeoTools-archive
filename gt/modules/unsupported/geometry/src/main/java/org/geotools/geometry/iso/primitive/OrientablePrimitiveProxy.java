@@ -157,6 +157,10 @@ public class OrientablePrimitiveProxy implements OrientablePrimitive {
 	public boolean isCycle() {
 		return primitive.isCycle();
 	}
+	
+	public double distance(Geometry geometry) {
+		return primitive.distance(geometry);
+	}
 
 	public double getDistance(Geometry geometry) {
 		return primitive.getDistance(geometry);

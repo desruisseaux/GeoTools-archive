@@ -38,7 +38,6 @@ package org.geotools.geometry.iso.aggregate;
 
 import java.util.Set;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.opengis.geometry.aggregate.AggregateFactory;
 import org.opengis.geometry.aggregate.MultiCurve;
 import org.opengis.geometry.aggregate.MultiPoint;

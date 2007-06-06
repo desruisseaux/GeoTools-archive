@@ -77,6 +77,7 @@ import org.opengis.geometry.Envelope;
 import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.Precision;
 import org.opengis.geometry.TransfiniteSet;
+import org.opengis.geometry.aggregate.MultiPrimitive;
 import org.opengis.geometry.complex.Complex;
 import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.OrientableSurface;
@@ -264,18 +265,60 @@ public abstract class GeometryImpl implements Geometry {
 		return null;
 	}
 
-	/*
+	/**
 	 * (non-Javadoc)
 	 * 
 	 * @see org.opengis.geometry.coordinate.root.Geometry#getDistance(org.opengis.geometry.coordinate.root.Geometry)
+	 * @deprecated  use distance()
 	 */
 	public final double getDistance(Geometry geometry) {
+		return this.distance(geometry);
+	}
+	
+	   /**
+     * Computes the distance between this and another geometry.  We have
+     * to implement the logic of dealing with multiprimtive geometries separately.
+	 * 
+	 * @see org.opengis.geometry.coordinate.root.Geometry#distance(org.opengis.geometry.coordinate.root.Geometry)
+	 */
+	public final double distance(Geometry geometry) {
 		// TODO semantic JR, SJ
 		// TODO implementation
 		// TODO test
 		// TODO documentation
 		Assert.isTrue(false);
 		return Double.NaN;
+		
+		/*
+        if (geometry instanceof MultiPrimitive) {
+            double minDistance = Double.POSITIVE_INFINITY;
+            MultiPrimitive gc1 = (MultiPrimitive) geometry;
+            int n = gc1.getNumGeometries();
+            for (int i=0; i<n; i++) {
+                double d = distance(gc1.getGeometryN(i), g2);
+                if (d < minDistance)
+                    minDistance = d;
+            }
+            return minDistance;
+        }
+        else if (this instanceof MultiPrimitive) {
+            double minDistance = Double.POSITIVE_INFINITY;
+            MultiPrimitive gc2 = (MultiPrimitive) this;
+            int n = gc2.getNumGeometries();
+            for (int i=0; i<n; i++) {
+                // This call will result in a redundant check of
+                // g1 instanceof GeometryCollection.  Maybe we oughta fix that
+                // somehow.
+                double d = distance(g1, gc2.getGeometryN(i));
+                if (d < minDistance)
+                    minDistance = d;
+            }
+            return minDistance;
+        }
+        else {
+            return g1.distance(g2);
+        }
+        */
 	}
 
 	/*
