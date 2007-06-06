@@ -203,6 +203,20 @@ public class ConvexHull {
 					positions.add(prim);
 				}
 				else {
+					// this is not a point, so get its convexhull and add those
+					// points to this hull
+					Geometry hull = prim.getConvexHull();
+					
+					if (hull instanceof CurveImpl) {
+						CurveImpl curve = (CurveImpl) prim.getConvexHull();
+						positions.addAll( ((CurveImpl)curve).asDirectPositions() );
+					}
+					else if (hull instanceof SurfaceImpl) {
+						SurfaceImpl surface = (SurfaceImpl) prim.getConvexHull();
+						positions.addAll( ((SurfaceImpl)surface).getBoundary().getExterior().asDirectPositions() );
+					}
+					
+					/*
 					// this is not a point, so get its boundary and add its
 					// positions to the list.
 					PrimitiveBoundaryImpl pb = (PrimitiveBoundaryImpl) (prim.getBoundary());
@@ -219,6 +233,7 @@ public class ConvexHull {
 						 SurfaceBoundaryImpl boundary = (SurfaceBoundaryImpl) pb; 
 						 positions.addAll(boundary.getExterior().asDirectPositions());
 					 }
+					 */
 				}
 				
 			}	

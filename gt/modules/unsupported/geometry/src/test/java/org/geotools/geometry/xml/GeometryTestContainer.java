@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import org.geotools.geometry.iso.PrecisionModel;
+
 import junit.framework.TestSuite;
 
 /**
@@ -14,6 +16,7 @@ import junit.framework.TestSuite;
  */
 public class GeometryTestContainer {
     private List<GeometryTestCase> testCases;
+    private PrecisionModel precisionModel;
     
     /**
      * Constructor
@@ -54,5 +57,13 @@ public class GeometryTestContainer {
             }
         }
     }
+
+	protected PrecisionModel getPrecisionModel() {
+		return precisionModel;
+	}
+
+	protected void setPrecisionModel(PrecisionModel precisionModel) {
+		this.precisionModel = precisionModel;
+	}
 
 }

@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.opengis.geometry.Geometry;
+import org.opengis.geometry.PrecisionType;
 import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.geometry.primitive.PrimitiveFactory;
 import org.w3c.dom.Document;
@@ -19,6 +20,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.InputSource;
 import org.geotools.geometry.text.WKTParser;
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.iso.PrecisionModel;
 
 
 /**
@@ -92,8 +94,8 @@ public class GeometryTestParser {
         }
         GeometryTestContainer test = new GeometryTestContainer();
         Node child = node.getFirstChild();
-        //TODO: use the precision model
-        String precisionModel = "FLOATING";
+        // default precision type is float
+        PrecisionType precisionType = PrecisionType.FLOAT;
         while (child != null) {
             if (child.getNodeType() == Node.ELEMENT_NODE) {
                 String name = child.getNodeName();
@@ -101,13 +103,14 @@ public class GeometryTestParser {
                     GeometryTestCase testCase = readTestCase(child);
                     test.addTestCase(testCase);
                 } else if (name.equalsIgnoreCase("precisionmodel")) {
-                    precisionModel = getPrecisionModel(child);
+                    precisionType = getPrecisionModel(child);
                 } else {
                     throw new ParseException("Unexpected: " + name, 0);
                 }
             }
             child = child.getNextSibling();
         }
+        test.setPrecisionModel(new PrecisionModel(precisionType));
         return test;
     }
 
@@ -199,8 +202,18 @@ public class GeometryTestParser {
     }
 
 
-    private String getPrecisionModel(Node child) {
-        return getNodeAttribute(child, "type");
+    private PrecisionType getPrecisionModel(Node child) {
+        String val = getNodeAttribute(child, "type");
+        if (val == "") {
+        	// if scale is 1.0 then set the precision to type FIXED
+        	String scale = getNodeAttribute(child, "scale");
+        	if (scale.equalsIgnoreCase("1.0")) return PrecisionType.FIXED;
+        }
+        else if (val.equalsIgnoreCase("DOUBLE")) {
+        	return PrecisionType.DOUBLE;
+        }
+        // default
+        return PrecisionType.FLOAT;
     }
 
 

@@ -84,6 +84,7 @@ import java.util.List;
 
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
+import org.geotools.geometry.iso.topograph2D.Dimension;
 import org.geotools.geometry.iso.topograph2D.Edge;
 import org.geotools.geometry.iso.topograph2D.EdgeEnd;
 import org.geotools.geometry.iso.topograph2D.EdgeIntersection;
@@ -354,7 +355,13 @@ public class RelateComputer {
 //					.getBoundaryDimension());
 //		}
 		im.set(Location.INTERIOR, Location.EXTERIOR, ga.getDimension(null));
-		im.set(Location.BOUNDARY, Location.EXTERIOR, ga.getBoundary().getDimension(null));
+		if (ga.getBoundary() == null) {
+			im.set(Location.BOUNDARY, Location.EXTERIOR, Dimension.FALSE);
+		}
+		else {
+			im.set(Location.BOUNDARY, Location.EXTERIOR, ga.getBoundary().getDimension(null));
+		}
+		
 		GeometryImpl gb = arg[1].getGeometry();
 //		if (!gb.isEmpty()) {
 //			im.set(Location.EXTERIOR, Location.INTERIOR, gb.getDimension());
@@ -362,7 +369,12 @@ public class RelateComputer {
 //					.getBoundaryDimension());
 //		}
 		im.set(Location.EXTERIOR, Location.INTERIOR, gb.getDimension(null));
-		im.set(Location.EXTERIOR, Location.BOUNDARY, gb.getBoundary().getDimension(null));
+		if (gb.getBoundary() == null) {
+			im.set(Location.EXTERIOR, Location.BOUNDARY, Dimension.FALSE);
+		}
+		else {
+			im.set(Location.EXTERIOR, Location.BOUNDARY, gb.getBoundary().getDimension(null));
+		}
 		
 	}
 

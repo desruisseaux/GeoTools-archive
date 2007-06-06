@@ -81,6 +81,14 @@
         <role>Java developper</role>
       </roles>
     </developer>
+     <developer>
+      <name>Graham Davis</name>
+      <organization>Refractions Research</organization>
+      <organizationUrl>www.refractions.net</organizationUrl>
+      <roles>
+        <role>Java developper</role>
+      </roles>
+    </developer>
   </developers>
 
 

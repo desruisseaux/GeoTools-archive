@@ -572,8 +572,10 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 	 * @see org.opengis.geometry.coordinate.PointArray#getDimension()
 	 */
 	public int getDimension() {
-		return crs.getCoordinateSystem().getDimension();
+		return 0;
+		//return crs.getCoordinateSystem().getDimension();
 	}
+	
 	@Override
 	public int hashCode() {
 		final int PRIME = 31;

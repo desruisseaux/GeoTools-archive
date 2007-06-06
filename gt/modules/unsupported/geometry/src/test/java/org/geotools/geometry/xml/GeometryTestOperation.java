@@ -75,6 +75,7 @@ public class GeometryTestOperation extends Assert {
         operationMap.put("getInteriorPoint", new RepresentativePointOp());
         operationMap.put("intersection", new IntersectionOp());
         operationMap.put("intersects", new IntersectsOp());
+        operationMap.put("within", new IntersectsOp());
         operationMap.put("isSimple", new IsSimpleOp());
         operationMap.put("symdifference", new SymmetricDifferenceOp());
         operationMap.put("union", new UnionOp());
@@ -181,6 +182,25 @@ public class GeometryTestOperation extends Assert {
             Geometry geom1 = setGeomArg(arg1, a, b);
             Geometry geom2 = setGeomArg(arg2, a, b);
             actualResult = geom1.intersects(geom2);
+            return actualResult == expected;
+        }
+    }
+    
+    /**
+     * Class defining the "within" operation
+     */
+    private class WithinOp extends OperationHandler {
+        /**
+         * The actual working method of the operation.
+         * @param a Geometry object
+         * @param b Geometry Object
+         * @return a boolean indicating whether the result matched the expectation
+         */
+        public boolean doOperation(Geometry a, Geometry b) {
+            Boolean expected = (Boolean)expectedResult;
+            GeometryImpl geom1 = (GeometryImpl) setGeomArg(arg1, a, b);
+            GeometryImpl geom2 = (GeometryImpl) setGeomArg(arg2, a, b);
+            actualResult = geom1.within(geom2);
             return actualResult == expected;
         }
     }
@@ -404,7 +424,9 @@ public class GeometryTestOperation extends Assert {
     }
     
     public void runTest(Geometry a, Geometry b) {       
-        boolean test = operationMap.get(operation).doOperation(a, b);
+    	OperationHandler ophand = operationMap.get(operation);
+    	assertNotNull("Test Suite Error: No Operation Handler setup for operation: " + operation, ophand);
+        boolean test = ophand.doOperation(a, b);
         assertTrue(toString() + " but was " + actualResult, test);
     }
 

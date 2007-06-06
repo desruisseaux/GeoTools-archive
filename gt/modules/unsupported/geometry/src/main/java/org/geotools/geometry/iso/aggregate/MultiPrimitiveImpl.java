@@ -88,7 +88,9 @@ public class MultiPrimitiveImpl extends AggregateImpl implements MultiPrimitive 
 				boundary = p.getBoundary();
 			}
 			else {
-				boundary.union(p.getBoundary());
+				if (p.getBoundary() != null) {
+					boundary.union(p.getBoundary());
+				}
 			}
 		}
 		
