@@ -35,7 +35,10 @@ import org.geotools.resources.XArray;
  *       they are subject to rounding errors and there is no efficient way I can see to take
  *       missing values in account.</li>
  *   <li>The {@link EnhanceScaleMissing} methods are available only if the variable is enhanced.
- *       Our variable is not, because we want raw data.</li>
+ *       Our variable is not, because we want raw (packed) data.</li>
+ *   <li>We want minimum, maximum and fill values in packed units (as opposed to the geophysics
+ *       values provided by the UCAR's API), because we check for missing values before to
+ *       convert them.</li>
  * </ul>
  *
  * @source $URL$
@@ -63,11 +66,44 @@ final class VariableMetadata {
     public final double[] missingValues;
 
     /**
-     * Extracts metadata from the specified variable.
+     * The widest type found in attributes scanned by the {@link #attribute} method
+     * since the last time this field was set. This is a temporary variable used by
+     * the constructor only.
      */
-    public VariableMetadata(final Variable variable) {
-        scale   = attribute(variable, "scale_factor");
-        offset  = attribute(variable, "add_offset");
+    private transient DataType widestType;
+
+    /**
+     * Extracts metadata from the specified variable using UCAR's API. This approach suffers
+     * from rounding errors and is unable to get the missing values. Use this constructor
+     * only for checking the result from our own code with result from the UCAR's API.
+     */
+    public VariableMetadata(final EnhanceScaleMissing variable) {
+        offset  =  variable.convertScaleOffsetMissing(0.0);
+        scale   =  variable.convertScaleOffsetMissing(1.0) - offset;
+        minimum = (variable.getValidMin() - offset) / scale;
+        maximum = (variable.getValidMax() - offset) / scale;
+        missingValues = null; // No way to get this information.
+    }
+
+    /**
+     * Extracts metadata from the specified variable using our own method.
+     *
+     * @param variable The variable to extract metadata from.
+     * @param forceRangePacking {@code true} if the valid range is encoded in geophysics units
+     *        (which is a violation of CF convention), or {@code false} in order to autodetect
+     *        using the UCAR heuristic rule.
+     */
+    public VariableMetadata(final Variable variable, final boolean forceRangePacking) {
+        final DataType dataType, scaleType, rangeType;
+        /*
+         * Gets the scale factors, if present. Also remember its type
+         * for the heuristic rule to be applied later on the valid range.
+         */
+        dataType   = widestType = variable.getDataType();
+        scale      = attribute(variable, "scale_factor");
+        offset     = attribute(variable, "add_offset");
+        scaleType  = widestType;
+        widestType = dataType; // Reset before we scan the other attributes.
         /*
          * Gets minimum and maximum. If a "valid_range" attribute is presents, it as precedence
          * over "valid_min" and "valid_max" as specified in UCAR documentation.
@@ -75,10 +111,8 @@ final class VariableMetadata {
         double minimum = Double.NaN;
         double maximum = Double.NaN;
         Attribute attribute = variable.findAttribute("valid_range");
-        final DataType dataType = variable.getDataType();
-        DataType rangeType = dataType;
         if (attribute != null) {
-            rangeType = widest(attribute, rangeType);
+            widestType = widest(attribute.getDataType(), widestType);
             Number value = attribute.getNumericValue(0);
             if (value != null) {
                 minimum = value.doubleValue();
@@ -89,11 +123,27 @@ final class VariableMetadata {
             }
         }
         if (Double.isNaN(minimum)) {
-            // TODO: update 'rangeType'
             minimum = attribute(variable, "valid_min");
         }
         if (Double.isNaN(maximum)) {
             maximum = attribute(variable, "valid_max");
+        }
+        rangeType  = widestType;
+        widestType = dataType; // Reset before we scan the other attributes.
+        if (forceRangePacking ||
+                (rangeType.equals(scaleType) && rangeType.equals(widest(rangeType, dataType))))
+        {
+            // Heuristic rule defined in UCAR documentation (see EnhanceScaleMissing interface)
+            minimum = (minimum - offset) / scale;
+            maximum = (maximum - offset) / scale;
+            if (!isFloatingPoint(rangeType)) {
+                if (!Double.isNaN(minimum) && !Double.isInfinite(minimum)) {
+                    minimum = Math.round(minimum);
+                }
+                if (!Double.isNaN(maximum) && !Double.isInfinite(maximum)) {
+                    maximum = Math.round(maximum);
+                }
+            }
         }
         this.minimum = Double.isNaN(minimum) ? Double.NEGATIVE_INFINITY : minimum;
         this.maximum = Double.isNaN(maximum) ? Double.POSITIVE_INFINITY : maximum;
@@ -104,6 +154,7 @@ final class VariableMetadata {
          * Note that we merge missing and fill values in a single array, without
          * duplicated values.
          */
+        widestType = dataType;
         attribute = variable.findAttribute("missing_value");
         final double fillValue    = attribute(variable, "_FillValue");
         final int    fillCount    = Double.isNaN(fillValue) ? 0 : 1;
@@ -134,9 +185,10 @@ scan:   for (int i=0; i<missingCount; i++) {
     /**
      * Returns the attribute value as a {@code double}.
      */
-    private static double attribute(final Variable variable, final String name) {
+    private double attribute(final Variable variable, final String name) {
         final Attribute attribute = variable.findAttribute(name);
         if (attribute != null) {
+            widestType = widest(attribute.getDataType(), widestType);
             final Number value = attribute.getNumericValue();
             if (value != null) {
                 return value.doubleValue();
@@ -146,19 +198,22 @@ scan:   for (int i=0; i<missingCount; i++) {
     }
 
     /**
-     * Returns the widest of two data type.
+     * Returns the widest of two data types.
      */
-    private static DataType widest(final Attribute attribute, final DataType type2) {
-        final DataType type1 = attribute.getDataType();
+    private static DataType widest(final DataType type1, final DataType type2) {
         if (type1 == null) return type2;
         if (type2 == null) return type1;
         final int size1 = type1.getSize();
         final int size2 = type2.getSize();
         if (size1 > size2) return type1;
         if (size1 < size2) return type2;
-        if (DataType.FLOAT.equals(type2) || DataType.DOUBLE.equals(type2)) {
-            return type2;
-        }
-        return type1;
+        return isFloatingPoint(type2) ? type2 : type1;
+    }
+
+    /**
+     * Returns {@code true} if the specified type is a floating point type.
+     */
+    private static boolean isFloatingPoint(final DataType type) {
+        return DataType.FLOAT.equals(type) || DataType.DOUBLE.equals(type);
     }
 }

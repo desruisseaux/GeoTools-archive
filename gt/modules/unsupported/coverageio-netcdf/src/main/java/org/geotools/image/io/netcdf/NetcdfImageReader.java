@@ -56,7 +56,15 @@ import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
- * Base implementation for NetCDF image reader.
+ * Base implementation for NetCDF image reader. Pixels are assumed organized according the COARDS
+ * convention (a precursor of <A HREF="http://www.cfconventions.org/">CF Metadata conventions</A>),
+ * i.e. in (<var>t</var>,<var>z</var>,<var>y</var>,<var>x</var>) order, where <var>x</var> varies
+ * faster. The image is created from the two last dimensions (<var>x</var>,<var>y</var>) and the
+ * <var>z</var> is taken as the bands. Additional dimensions like <var>t</var> are ignored.
+ * <p>
+ * Users should select the <var>z</var> value using {@link ImageReadParam#setSourceBands}. If no
+ * band is selected, the default selection is the first band (0) only. Note that this is different
+ * than the usual Image I/O default, which is all bands.
  *
  * @since 2.4
  * @source $URL$

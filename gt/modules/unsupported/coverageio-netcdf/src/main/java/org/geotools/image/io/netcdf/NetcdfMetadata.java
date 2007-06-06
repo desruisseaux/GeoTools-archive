@@ -30,6 +30,7 @@ import ucar.nc2.dataset.AxisType;
 import ucar.nc2.dataset.CoordinateAxis;
 import ucar.nc2.dataset.CoordinateAxis1D;
 import ucar.nc2.dataset.CoordinateSystem;
+import ucar.nc2.dataset.EnhanceScaleMissing;
 import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.dataset.VariableDS;
 
@@ -39,16 +40,27 @@ import org.geotools.image.io.metadata.GeographicMetadataFormat;
 
 
 /**
- * Metadata from NetCDF file. This metata object retains only the first
- * {@linkplain CoordinateSystem coordinate system} found in the NetCDF
- * file.
+ * Metadata from NetCDF file. This implementation assumes that the NetCDF file follows the
+ * <A HREF="http://www.cfconventions.org/">CF Metadata conventions</A>.
+ * <p>
+ * <b>Limitation:</b>
+ * Current implementation retains only the first {@linkplain CoordinateSystem coordinate system}
+ * found in the NetCDF file or for a given variable. The {@link org.geotools.coverage.io} package
+ * would not know what to do with the extra coordinate systems anyway.
  *
  * @since 2.4
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class NetcdfMetadata extends GeographicMetadata {
+public class NetcdfMetadata extends GeographicMetadata {
+    /**
+     * Forces usage of UCAR libraries in some places where we use our own code instead.
+     * This may result in rounding errors and absence of information regarding fill values,
+     * but is useful for checking if we are doing the right thing compared to the UCAR way.
+     */
+    private static final boolean USE_UCAR_LIB = false;
+
     /**
      * The mapping between UCAR axis type and ISO axis directions.
      */
@@ -105,7 +117,7 @@ final class NetcdfMetadata extends GeographicMetadata {
      * Adds the specified coordinate system. Current implementation can adds at most one
      * coordinate system, but this limitation may be revisited in a future Geotools version.
      */
-    private void addCoordinateSystem(final CoordinateSystem cs) {
+    protected void addCoordinateSystem(final CoordinateSystem cs) {
         String crsType, csType;
         if (cs.isLatLon()) {
             crsType = cs.hasVerticalAxis() ? GeographicMetadataFormat.GEOGRAPHIC_3D
@@ -123,7 +135,7 @@ final class NetcdfMetadata extends GeographicMetadata {
         setCoordinateSystem(cs.getName(), csType);
         setGridGeometry("center");
         /*
-         * Addes the axis in reverse order, because the NetCDF image reader put the last
+         * Adds the axis in reverse order, because the NetCDF image reader put the last
          * dimensions in the rendered image. Typical NetCDF convention is to put axis in
          * the (time, depth, latitude, longitude) order, which typically maps to
          * (longitude, latitude, depth, time) order in Geotools referencing framework.
@@ -147,9 +159,10 @@ final class NetcdfMetadata extends GeographicMetadata {
     }
 
     /**
-     * Adds the specified coordinate axis.
+     * Adds the specified coordinate axis. This method is invoked recursively
+     * by {@link #addCoordinateSystem}.
      */
-    private void addCoordinateAxis(final CoordinateAxis axis) {
+    protected void addCoordinateAxis(final CoordinateAxis axis) {
         /*
          * Gets the axis direction, taking in account the possible reversal or vertical axis.
          * Note that geographic and projected CRS have the same directions. We can distinguish
@@ -195,15 +208,46 @@ final class NetcdfMetadata extends GeographicMetadata {
     /**
      * Adds sample dimension information for the specified variable.
      */
-    private void addSampleDimension(final VariableDS variable) {
-        variable.setUseNaNs(true);
-        if (variable.isEnhanced()) {
-            final double offset    = variable.convertScaleOffsetMissing(0.0);
-            final double scale     = variable.convertScaleOffsetMissing(1.0) - offset;
-            final double minValue  = variable.getValidMin();
-            final double maxValue  = variable.getValidMax();
-            final double fillValue = Double.NaN;
-            addSampleDimension(getName(variable), scale, offset, minValue, maxValue, fillValue);
+    protected void addSampleDimension(final VariableDS variable) {
+        final VariableMetadata m;
+        if (USE_UCAR_LIB) {
+            m = new VariableMetadata(variable);
+        } else {
+            m = new VariableMetadata(variable, forcePacking("valid_range"));
         }
+        addSampleDimension(getName(variable), m.scale, m.offset, m.minimum, m.maximum, m.missingValues);
+    }
+
+    /**
+     * Returns {@code true} if an attribute (usually the <cite>valid range</cite>) should be
+     * converted from unpacked to packed units. The <A HREF="http://www.cfconventions.org/">CF
+     * Metadata conventions</A> states that valid ranges should be in packed units, but not
+     * every NetCDF files follow this advice in practice. The UCAR NetCDF library applies the
+     * following heuristic rules (quoting from {@link ucar.nc2.dataset.EnhanceScaleMissing}):
+     *
+     * <blockquote>
+     * If {@code valid_range} is the same type as {@code scale_factor} (actually the wider of
+     * {@code scale_factor} and {@code add_offset}) and this is wider than the external data,
+     * then it will be interpreted as being in the units of the internal (unpacked) data.
+     * Otherwise it is in the units of the external (packed) data.
+     * <blockquote>
+     *
+     * However some NetCDF files stores unpacked ranges using the same type than packed data.
+     * The above cited heuristic rule can not resolve those cases.
+     * <p>
+     * If this method returns {@code true}, then the attribute is assumed in unpacked units no
+     * matter what the CF convention and the heuristic rules said. If this method returns
+     * {@code false}, then UCAR's heuristic rules applies.
+     * <p>
+     * The default implementation returns {@code false} in all cases.
+     *
+     * @param  attribute The attribute (usually {@code "valid_range"}).
+     * @return {@code true} if the attribute should be converted from unpacked to packed units
+     *         regardless CF convention and UCAR's heuristic rules.
+     *
+     * @see ucar.nc2.dataset.EnhanceScaleMissing
+     */
+    protected boolean forcePacking(final String attribute) {
+        return false;
     }
 }

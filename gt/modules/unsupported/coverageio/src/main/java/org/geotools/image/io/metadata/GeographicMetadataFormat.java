@@ -45,7 +45,7 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
     /**
      * The metadata format name.
      */
-    public static final String FORMAT_NAME = "org.geotools.GridCoverage";
+    public static final String FORMAT_NAME = "geotools_coverage_1.0";
 
     /**
      * The maximum number of dimension allowed for the image coordinate system. Images must be
@@ -261,8 +261,8 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
         /*
          * root
          *   +-- SampleDimensions (type)
-         *         +-- SampleDimension[0] (name, scale, offset, minValue, maxValue, fillValue)
-         *         +-- SampleDimension[1] (name, scale, offset, minValue, maxValue, fillValue)
+         *         +-- SampleDimension[0] (name, scale, offset, minValue, maxValue, fillValues)
+         *         +-- SampleDimension[1] (name, scale, offset, minValue, maxValue, fillValues)
          *         +-- ...etc...
          */
         addElement  ("SampleDimensions",  rootName,          1, maximumBands);
@@ -273,7 +273,7 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
         addAttribute("SampleDimension",  "offset",           DATATYPE_DOUBLE);
         addAttribute("SampleDimension",  "minValue",         DATATYPE_DOUBLE);
         addAttribute("SampleDimension",  "maxValue",         DATATYPE_DOUBLE);
-        addAttribute("SampleDimension",  "fillValue",        DATATYPE_DOUBLE);
+        addAttribute("SampleDimension",  "fillValues",       DATATYPE_DOUBLE, false, 0, Short.MAX_VALUE);
         /*
          * Allow users to specify fully-constructed GeoAPI objects.
          */

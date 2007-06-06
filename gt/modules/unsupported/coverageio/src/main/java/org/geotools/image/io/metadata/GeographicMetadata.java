@@ -117,7 +117,7 @@ public class GeographicMetadata extends IIOMetadata {
      * @param value The attribute value.
      */
     private static void setAttribute(final Element node, final String name, String value, boolean isCodeList) {
-        if (value == null) {
+        if (value == null || (value=value.trim()).length() == 0) {
             if (node.hasAttribute(name)) {
                 node.removeAttribute(name);
             }
@@ -347,33 +347,39 @@ public class GeographicMetadata extends IIOMetadata {
     /**
      * Adds a sample dimension.
      *
-     * @param name      The sample dimension name, or {@code null} if none.
-     * @param scale     The scale from packed to geophysics values,
-     *                  or {@code 1} if none.
-     * @param offset    The offset from packed to geophysics values,
-     *                  or {@code 0} if none.
-     * @param minValue  The minimal valid <em>packed</em> value,
-     *                  or {@link Double#NEGATIVE_INFINITY} if none.
-     * @param maxValue  The maximal valid <em>packed</em> value,
-     *                  or {@link Double#POSITIVE_INFINITY} if none.
-     * @param fillValue The packed value used for missing data,
-     *                  or {@link Double#NaN} if none.
+     * @param name       The sample dimension name, or {@code null} if none.
+     * @param scale      The scale from packed to geophysics values, or {@code 1} if none.
+     * @param offset     The offset from packed to geophysics values, or {@code 0} if none.
+     * @param minValue   The minimal valid <em>packed</em> value,
+     *                   or {@link Double#NEGATIVE_INFINITY} if none.
+     * @param maxValue   The maximal valid <em>packed</em> value,
+     *                   or {@link Double#POSITIVE_INFINITY} if none.
+     * @param fillValues The packed values used for missing data, or {@code null} if none.
      */
     public void addSampleDimension(final String name,
                                    final double scale,    final double offset,
                                    final double minValue, final double maxValue,
-                                   final double fillValue)
+                                   final double[] fillValues)
     {
         if (sampleDimensions == null) {
             setSampleDimensions(null);
         }
         final IIOMetadataNode band = new IIOMetadataNode("SampleDimension");
-        setAttribute(band, "name",      name, false);
-        setAttribute(band, "scale",     scale    );
-        setAttribute(band, "offset",    offset   );
-        setAttribute(band, "minValue",  minValue );
-        setAttribute(band, "maxValue",  maxValue );
-        setAttribute(band, "fillValue", fillValue);
+        setAttribute(band, "name",     name, false);
+        setAttribute(band, "scale",    scale   );
+        setAttribute(band, "offset",   offset  );
+        setAttribute(band, "minValue", minValue);
+        setAttribute(band, "maxValue", maxValue);
+        if (fillValues != null) {
+            final StringBuffer buffer = new StringBuffer();
+            for (int i=0; i<fillValues.length; i++) {
+                if (i != 0) {
+                    buffer.append(' ');
+                }
+                buffer.append(fillValues[i]);
+            }
+            setAttribute(band, "fillValues", buffer.toString(), false);
+        }
         sampleDimensions.appendChild(band);
     }
 
