@@ -1,43 +1,56 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.caching;
 
 import java.util.Collection;
 import java.util.HashMap;
-
 import org.geotools.feature.Feature;
 
+
 public class SimpleHashMapInternalStore implements InternalStore {
+    private final HashMap buffer = new HashMap();
 
-	private final HashMap buffer = new HashMap() ;
+    public void clear() {
+        buffer.clear();
+    }
 
-	public void clear() {
-		buffer.clear() ;
-	}
+    public boolean contains(final Feature f) {
+        return contains(f.getID());
+    }
 
-	public boolean contains(final Feature f) {
-		return contains(f.getID()) ;
-	}
+    public Feature get(final String featureId) {
+        return (Feature) buffer.get(featureId);
+    }
 
-	public Feature get(final String featureId) {
-		return (Feature) buffer.get(featureId) ;
-	}
+    public Collection getAll() {
+        return buffer.values();
+    }
 
-	public Collection getAll() {
-		return buffer.values() ;
-	}
+    public void put(final Feature f) {
+        buffer.put(f.getID(), f);
+    }
 
-	public void put(final Feature f) {
-		buffer.put(f.getID(), f) ;
-	}
-
-	public void remove(final String featureId) {
-		buffer.remove(featureId) ;
-	}
+    public void remove(final String featureId) {
+        buffer.remove(featureId);
+    }
 
     /* (non-Javadoc)
      * @see org.geotools.caching.InternalStore#contains(java.lang.String)
      */
     public boolean contains(String featureId) {
-        return buffer.containsKey(featureId) ;
+        return buffer.containsKey(featureId);
     }
-
 }
