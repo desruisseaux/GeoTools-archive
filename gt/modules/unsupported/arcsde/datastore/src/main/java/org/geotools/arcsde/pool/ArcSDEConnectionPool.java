@@ -169,7 +169,8 @@ public class ArcSDEConnectionPool {
                 this.pool.returnObject(preload[i]);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.WARNING, "can't connect to " + config, e);
+            throw new DataSourceException(e);
         }
     }
 
