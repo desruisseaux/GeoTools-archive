@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
@@ -36,11 +37,9 @@ import com.esri.sde.sdk.client.SeLayer;
 import com.esri.sde.sdk.client.SeRelease;
 import com.esri.sde.sdk.client.SeTable;
 
-
 /**
  * Maintains <code>SeConnection</code>'s for a single set of connection
- * properties (for instance: by server, port, user and password) in a pooled
- * way
+ * properties (for instance: by server, port, user and password) in a pooled way
  * 
  * <p>
  * Since sde connections are not jdbc connections, I can't use Sean's excellent
@@ -48,14 +47,14 @@ import com.esri.sde.sdk.client.SeTable;
  * </p>
  * 
  * <p>
- * This connection pool is configurable in the sense that some parameters can
- * be passed to establish the pooling policy. To pass parameters to the
- * connection pool, you should set some properties in the parameters Map
- * passed to SdeDataStoreFactory.createDataStore, wich will invoke
+ * This connection pool is configurable in the sense that some parameters can be
+ * passed to establish the pooling policy. To pass parameters to the connection
+ * pool, you should set some properties in the parameters Map passed to
+ * SdeDataStoreFactory.createDataStore, wich will invoke
  * SdeConnectionPoolFactory to get the SDE instance's pool singleton. That
- * instance singleton will be created with the preferences passed the first
- * time createDataStore is called for a given SDE instance/user, if subsecuent
- * calls change that preferences, they will be ignored.
+ * instance singleton will be created with the preferences passed the first time
+ * createDataStore is called for a given SDE instance/user, if subsecuent calls
+ * change that preferences, they will be ignored.
  * </p>
  * 
  * <p>
@@ -63,35 +62,23 @@ import com.esri.sde.sdk.client.SeTable;
  * createDataStore are:
  * 
  * <ul>
- * <li>
- * pool.minConnections Integer, tells the minimun number of open connections
- * the pool will maintain opened
- * </li>
- * <li>
- * pool.maxConnections Integer, tells the maximun number of open connections
- * the pool will create and maintain opened
- * </li>
- * <li>
- * pool.increment Integer, tells how many connections will be created at once
- * every time an available connection is not present and the maximin number of
- * allowed connections has not been reached
- * </li>
- * <li>
- * pool.timeOut Integer, tells how many milliseconds a calling thread is
+ * <li> pool.minConnections Integer, tells the minimun number of open
+ * connections the pool will maintain opened </li>
+ * <li> pool.maxConnections Integer, tells the maximun number of open
+ * connections the pool will create and maintain opened </li>
+ * <li> pool.timeOut Integer, tells how many milliseconds a calling thread is
  * guaranteed to wait before getConnection() throws an
- * UnavailableArcSDEConnectionException
- * </li>
+ * UnavailableArcSDEConnectionException </li>
  * </ul>
  * </p>
- *
+ * 
  * @author Gabriel Roldan, Axios Engineering
  * @version $Id$
  */
 public class ArcSDEConnectionPool {
     /** package's logger */
     protected static final Logger LOGGER = Logger.getLogger(ArcSDEConnectionPool.class.getPackage()
-                                                                                      .getName()
-                                                           );
+            .getName());
 
     /** DOCUMENT ME! */
     protected static final Level INFO_LOG_LEVEL = Level.WARNING;
@@ -103,7 +90,7 @@ public class ArcSDEConnectionPool {
     public static final int DEFAULT_MAX_CONNECTIONS = 2;
 
     public static final int DEFAULT_MAX_WAIT_TIME = 1000;
-    
+
     /** DOCUMENT ME! */
     private SeConnectionFactory seConnectionFactory;
 
@@ -114,10 +101,10 @@ public class ArcSDEConnectionPool {
     private ObjectPool pool;
 
     /**
-     * Holds a cache of tablename/shapeColumn, for all the layers
-     * visible for this pool's connections.
+     * Holds a cache of tablename/shapeColumn, for all the layers visible for
+     * this pool's connections.
      */
-    private HashMap /*<String,String>*/ cachedLayers;
+    private HashMap /* <String,String> */cachedLayers;
 
     /**
      * Indicates that this Connection Pool is closed and it should not return
@@ -128,16 +115,18 @@ public class ArcSDEConnectionPool {
     /**
      * Creates a new SdeConnectionPool object with the connection parameters
      * holded by <code>config</code>
-     *
-     * @param config holds connection options such as server, user and
-     *        password, as well as tuning options as maximun number of
-     *        connections allowed
-     *
-     * @throws DataSourceException DOCUMENT ME!
-     * @throws NullPointerException DOCUMENT ME!
+     * 
+     * @param config
+     *            holds connection options such as server, user and password, as
+     *            well as tuning options as maximun number of connections
+     *            allowed
+     * 
+     * @throws DataSourceException
+     *             DOCUMENT ME!
+     * @throws NullPointerException
+     *             DOCUMENT ME!
      */
-    protected ArcSDEConnectionPool(ArcSDEConnectionConfig config)
-                            throws DataSourceException {
+    protected ArcSDEConnectionPool(ArcSDEConnectionConfig config) throws DataSourceException {
         if (config == null) {
             throw new NullPointerException("parameter config can't be null");
         }
@@ -150,13 +139,13 @@ public class ArcSDEConnectionPool {
 
         int minConnections = config.getMinConnections().intValue();
         int maxConnections = config.getMaxConnections().intValue();
-        //byte exhaustedAction = GenericObjectPool.WHEN_EXHAUSTED_GROW;
-		byte exhaustedAction = GenericObjectPool.WHEN_EXHAUSTED_BLOCK;
+        // byte exhaustedAction = GenericObjectPool.WHEN_EXHAUSTED_GROW;
+        byte exhaustedAction = GenericObjectPool.WHEN_EXHAUSTED_BLOCK;
         long maxWait = config.getConnTimeOut().longValue();
 
-        this.pool = new GenericObjectPool(seConnectionFactory, maxConnections,
-                                          exhaustedAction, maxWait);
-        LOGGER.fine("Created pool " + pool);
+        this.pool = new GenericObjectPool(seConnectionFactory, maxConnections, exhaustedAction,
+                maxWait);
+        LOGGER.info("Created ArcSDE connection pool for " + config);
 
         ArcSDEPooledConnection[] preload = new ArcSDEPooledConnection[minConnections];
 
@@ -177,7 +166,7 @@ public class ArcSDEConnectionPool {
     /**
      * returns the number of actual connections holded by this connection pool.
      * In other words, the sum of used and available connections, regardless
-     *
+     * 
      * @return DOCUMENT ME!
      */
     public int getPoolSize() {
@@ -202,7 +191,7 @@ public class ArcSDEConnectionPool {
 
     /**
      * TODO: Document this method!
-     *
+     * 
      * @return DOCUMENT ME!
      */
     public synchronized int getAvailableCount() {
@@ -211,7 +200,7 @@ public class ArcSDEConnectionPool {
 
     /**
      * TODO: Document this method!
-     *
+     * 
      * @return DOCUMENT ME!
      */
     public synchronized int getInUseCount() {
@@ -220,16 +209,17 @@ public class ArcSDEConnectionPool {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @return DOCUMENT ME!
-     *
-     * @throws DataSourceException DOCUMENT ME!
+     * 
+     * @throws DataSourceException
+     *             DOCUMENT ME!
      * @throws UnavailableArcSDEConnectionException
-     * @throws IllegalStateException DOCUMENT ME!
+     * @throws IllegalStateException
+     *             DOCUMENT ME!
      */
-    public ArcSDEPooledConnection getConnection()
-                               throws DataSourceException, 
-                                      UnavailableArcSDEConnectionException {
+    public ArcSDEPooledConnection getConnection() throws DataSourceException,
+            UnavailableArcSDEConnectionException {
         if (this.closed) {
             throw new IllegalStateException("The ConnectionPool has been closed.");
         }
@@ -238,46 +228,48 @@ public class ArcSDEConnectionPool {
             return (ArcSDEPooledConnection) this.pool.borrowObject();
         } catch (NoSuchElementException e) {
             LOGGER.log(Level.WARNING, "Out of connections: " + e.getMessage(), e);
-            throw new UnavailableArcSDEConnectionException(this.pool.getNumActive(),
-                                                     this.config
-                                                    );
+            throw new UnavailableArcSDEConnectionException(this.pool.getNumActive(), this.config);
         } catch (SeException se) {
-            LOGGER.log(Level.WARNING, "ArcSDE error getting connection: " + se.getSeError().getErrDesc(), se);
-            throw new DataSourceException("ArcSDE Error Message: " + se.getSeError().getErrDesc(), se);
+            LOGGER.log(Level.WARNING, "ArcSDE error getting connection: "
+                    + se.getSeError().getErrDesc(), se);
+            throw new DataSourceException("ArcSDE Error Message: " + se.getSeError().getErrDesc(),
+                    se);
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Unknown problem getting connection: " + e.getMessage(), e);
-            throw new DataSourceException("Unknown problem fetching connection from connection pool", e);
+            throw new DataSourceException(
+                    "Unknown problem fetching connection from connection pool", e);
         }
     }
 
     public SeTable getSdeTable(String tableName) throws DataSourceException {
-    	ArcSDEPooledConnection conn;
-    	try{
-    		conn = getConnection();
-    	}catch(UnavailableArcSDEConnectionException e){
-    		throw new DataSourceException(e.getMessage(),e);
-    	}
+        ArcSDEPooledConnection conn;
+        try {
+            conn = getConnection();
+        } catch (UnavailableArcSDEConnectionException e) {
+            throw new DataSourceException(e.getMessage(), e);
+        }
         try {
             SeTable table = new SeTable(conn, tableName);
 
             return table;
         } catch (SeException ex) {
-            throw new DataSourceException("Can't obtain the table " +
-                                          tableName + ": " + ex.getMessage(), ex
-                                         );
-        }finally{
-        	conn.close();
+            throw new DataSourceException("Can't obtain the table " + tableName + ": "
+                    + ex.getMessage(), ex);
+        } finally {
+            conn.close();
         }
     }
 
     /**
      * DOCUMENT ME!
-     *
-     * @param tableName DOCUMENT ME!
-     *
+     * 
+     * @param tableName
+     *            DOCUMENT ME!
+     * 
      * @return DOCUMENT ME!
-     *
-     * @throws DataSourceException DOCUMENT ME!
+     * 
+     * @throws DataSourceException
+     *             DOCUMENT ME!
      */
     public SeTable getSdeTable(SeConnection conn, String tableName) throws DataSourceException {
         try {
@@ -285,58 +277,60 @@ public class ArcSDEConnectionPool {
 
             return table;
         } catch (SeException ex) {
-            throw new DataSourceException("Can't obtain the table " +
-                                          tableName + ": " + ex.getMessage(), ex
-                                         );
+            throw new DataSourceException("Can't obtain the table " + tableName + ": "
+                    + ex.getMessage(), ex);
         }
     }
 
-    public synchronized SeLayer getSdeLayer(String typeName)
-    throws NoSuchElementException, IOException {
-    	ArcSDEPooledConnection conn;
-    	SeLayer layer;
-    	
-    	try {
-			conn = getConnection();
-		} catch (UnavailableArcSDEConnectionException e) {
-			throw new DataSourceException(e);
-		}
-		try{
-			layer = getSdeLayer(conn, typeName);
-		}finally{
-			conn.close();
-		}
-    	return layer;
+    public synchronized SeLayer getSdeLayer(String typeName) throws NoSuchElementException,
+            IOException {
+        ArcSDEPooledConnection conn;
+        SeLayer layer;
+
+        try {
+            conn = getConnection();
+        } catch (UnavailableArcSDEConnectionException e) {
+            throw new DataSourceException(e);
+        }
+        try {
+            layer = getSdeLayer(conn, typeName);
+        } finally {
+            conn.close();
+        }
+        return layer;
     }
-    
+
     /**
      * DOCUMENT ME!
-     *
-     * @param typeName DOCUMENT ME!
-     *
+     * 
+     * @param typeName
+     *            DOCUMENT ME!
+     * 
      * @return DOCUMENT ME!
-     *
-     * @throws NoSuchElementException DOCUMENT ME!
-     * @throws IOException DOCUMENT ME!
+     * 
+     * @throws NoSuchElementException
+     *             DOCUMENT ME!
+     * @throws IOException
+     *             DOCUMENT ME!
      */
     public synchronized SeLayer getSdeLayer(SeConnection conn, String typeName)
-                        throws NoSuchElementException, IOException {
+            throws NoSuchElementException, IOException {
 
-    	SeLayer layer = null;
+        SeLayer layer = null;
 
-    	if(cachedLayers.containsKey(typeName)){
-    		
-    		String shapeColumn = (String)cachedLayers.get(typeName);
-    		try {
-				layer = new SeLayer(conn, typeName, shapeColumn);
-			} catch (SeException e) {
-				throw new DataSourceException("Getting layer " +  typeName, e);
-			}
-    		
-    	}else{
-    		List layers;
+        if (cachedLayers.containsKey(typeName)) {
+
+            String shapeColumn = (String) cachedLayers.get(typeName);
             try {
-				layers = conn.getLayers();
+                layer = new SeLayer(conn, typeName, shapeColumn);
+            } catch (SeException e) {
+                throw new DataSourceException("Getting layer " + typeName, e);
+            }
+
+        } else {
+            List layers;
+            try {
+                layers = conn.getLayers();
                 for (Iterator it = layers.iterator(); it.hasNext();) {
                     layer = (SeLayer) it.next();
 
@@ -347,7 +341,7 @@ public class ArcSDEConnectionPool {
                     layer = null;
                 }
             } catch (SeException e) {
-				throw new DataSourceException("Getting layer list: " + e.getMessage(), e);
+                throw new DataSourceException("Getting layer list: " + e.getMessage(), e);
             }
 
             if (layer == null) {
@@ -355,38 +349,34 @@ public class ArcSDEConnectionPool {
             }
             // cache the layer.
             this.cachedLayers.put(typeName, layer.getSpatialColumn());
-    	}
+        }
 
-    	return layer;
+        return layer;
     }
 
     /**
      * Gets the list of available layer names on the database
-     *
+     * 
      * @return a <code>List&lt;String&gt;</code> with the registered
      *         featureclasses on the ArcSDE database
-     *
+     * 
      * @throws DataSourceException
      */
-    public List /*<String>*/ getAvailableLayerNames() throws DataSourceException {
+    public List /* <String> */getAvailableLayerNames() throws DataSourceException {
         ArcSDEPooledConnection conn = null;
 
         List layerNames = new LinkedList();
         try {
             conn = getConnection();
-            for(Iterator it =  conn.getLayers().iterator(); it.hasNext();){
-            	layerNames.add(((SeLayer)it.next()).getQualifiedName());
+            for (Iterator it = conn.getLayers().iterator(); it.hasNext();) {
+                layerNames.add(((SeLayer) it.next()).getQualifiedName());
             }
         } catch (SeException ex) {
-            throw new DataSourceException("Error querying the layers list" +
-                                          ex.getSeError().getSdeError() + " (" +
-                                          ex.getSeError().getErrDesc() + ") ",
-                                          ex
-                                         );
+            throw new DataSourceException("Error querying the layers list"
+                    + ex.getSeError().getSdeError() + " (" + ex.getSeError().getErrDesc() + ") ",
+                    ex);
         } catch (UnavailableArcSDEConnectionException ex) {
-            throw new DataSourceException("No free connection found to query the layers list",
-                                          ex
-                                         );
+            throw new DataSourceException("No free connection found to query the layers list", ex);
         } finally {
             if (conn != null)
                 conn.close();
@@ -396,7 +386,7 @@ public class ArcSDEConnectionPool {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @return DOCUMENT ME!
      */
     public boolean isClosed() {
@@ -405,7 +395,7 @@ public class ArcSDEConnectionPool {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @return DOCUMENT ME!
      */
     public ArcSDEConnectionConfig getConfig() {
@@ -413,31 +403,31 @@ public class ArcSDEConnectionPool {
     }
 
     /**
-     * Inner utility class to report the configuration of the ArcSDE service
-     * and the underlying RDBMS pointed by a <code>ArcSDEConnectionConfig</code>
+     * Inner utility class to report the configuration of the ArcSDE service and
+     * the underlying RDBMS pointed by a <code>ArcSDEConnectionConfig</code>
      * object.
-     *
+     * 
      * @author Gabriel Roldan, Axios Engineering
-     * @version $Id$
+     * @version $Id: ArcSDEConnectionPool.java 25767 2007-06-07 10:33:44Z
+     *          groldan $
      */
     private static class SeConfigReport {
         /**
          * Reports the configuration of the ArcSDE version and DBMS information
          * to the logging system, at connection pool's startup, with INFO
          * logging level.
-         *
-         * @param config DOCUMENT ME!
-         *
-         * @throws DataSourceException if a SeException is thrown by the ArcSDE
-         *         Java API while trying to fetch the server information.
+         * 
+         * @param config
+         *            DOCUMENT ME!
+         * 
+         * @throws DataSourceException
+         *             if a SeException is thrown by the ArcSDE Java API while
+         *             trying to fetch the server information.
          */
-        static void reportConfiguration(ArcSDEConnectionConfig config)
-                                 throws DataSourceException {
+        static void reportConfiguration(ArcSDEConnectionConfig config) throws DataSourceException {
             try {
-                SeInstance instanceInfo = new SeInstance(config.getServerName(),
-                                                         config.getPortNumber()
-                                                               .intValue()
-                                                        );
+                SeInstance instanceInfo = new SeInstance(config.getServerName(), config
+                        .getPortNumber().intValue());
 
                 if (!LOGGER.isLoggable(INFO_LOG_LEVEL)) {
                     return;
@@ -478,22 +468,17 @@ public class ArcSDEConnectionPool {
                 sb.append("\nMax. layers: ");
                 sb.append(iconf.getMaxLayers());
                 sb.append("\nMax. streams: ");
-                sb.append(iconf.getMaxStreams() +
-                          " (maximum number of streams allowed by the ArcSde instance)"
-                         );
+                sb.append(iconf.getMaxStreams()
+                        + " (maximum number of streams allowed by the ArcSde instance)");
                 sb.append("\nStream pool size: ");
-                sb.append(iconf.getStreamPoolSize() +
-                          " (maximum number of streams allowed in a native pool.)"
-                         );
+                sb.append(iconf.getStreamPoolSize()
+                        + " (maximum number of streams allowed in a native pool.)");
 
                 sb.append("\n**************************");
                 LOGGER.log(INFO_LOG_LEVEL, sb.toString());
             } catch (SeException e) {
-                throw new DataSourceException("Error fetching information from " +
-                                              " the server " +
-                                              config.getServerName() + ":" +
-                                              config.getPortNumber()
-                                             );
+                throw new DataSourceException("Error fetching information from " + " the server "
+                        + config.getServerName() + ":" + config.getPortNumber());
             }
         }
     }
@@ -501,9 +486,10 @@ public class ArcSDEConnectionPool {
     /**
      * PoolableObjectFactory intended to be used by a Jakarta's commons-pool
      * objects pool, that provides ArcSDE's SeConnections.
-     *
+     * 
      * @author Gabriel Roldan, Axios Engineering
-     * @version $Id$
+     * @version $Id: ArcSDEConnectionPool.java 25767 2007-06-07 10:33:44Z
+     *          groldan $
      */
     class SeConnectionFactory extends BasePoolableObjectFactory {
         /** DOCUMENT ME! */
@@ -511,8 +497,9 @@ public class ArcSDEConnectionPool {
 
         /**
          * Creates a new SeConnectionFactory object.
-         *
-         * @param config DOCUMENT ME!
+         * 
+         * @param config
+         *            DOCUMENT ME!
          */
         public SeConnectionFactory(ArcSDEConnectionConfig config) {
             super();
@@ -521,56 +508,77 @@ public class ArcSDEConnectionPool {
 
         /**
          * Called whenever a new instance is needed.
-         *
+         * 
          * @return a newly created <code>SeConnection</code>
-         *
-         * @throws SeException if the connection can't be created
+         * 
+         * @throws SeException
+         *             if the connection can't be created
          */
         public Object makeObject() throws SeException, DataSourceException {
             NegativeArraySizeException cause = null;
             for (int i = 0; i < 3; i++) {
                 try {
-                    ArcSDEPooledConnection seConn = new ArcSDEPooledConnection(ArcSDEConnectionPool.this.pool, config);
+                    ArcSDEPooledConnection seConn = new ArcSDEPooledConnection(
+                            ArcSDEConnectionPool.this.pool, config);
                     return seConn;
                 } catch (NegativeArraySizeException nase) {
-                    LOGGER.warning("Strange failed ArcSDE connection error.  Trying again (try " + (i+1) + " of 3)");
+                    LOGGER.warning("Strange failed ArcSDE connection error.  Trying again (try "
+                            + (i + 1) + " of 3)");
                     cause = nase;
                 }
             }
-            throw new DataSourceException("Couldn't create ArcSDEPooledConnection because of strange SDE internal exception.  Tried 3 times, giving up.", cause);
+            throw new DataSourceException(
+                    "Couldn't create ArcSDEPooledConnection because of strange SDE internal exception.  Tried 3 times, giving up.",
+                    cause);
         }
 
         /**
          * is invoked on every instance before it is returned from the pool.
-         *
+         * 
          * @param obj
          */
         public void activateObject(Object obj) {
-        	//no-op
-        	LOGGER.finest("activating connection " + obj);
+            // no-op
+            LOGGER.finest("activating connection " + obj);
         }
 
         /**
          * is invoked in an implementation-specific fashion to determine if an
          * instance is still valid to be returned by the pool. It will only be
-         * invoked on an "activated"  instance.
-         *
-         * @param obj DOCUMENT ME!
-         *
-         * @return DOCUMENT ME!
+         * invoked on an "activated" instance.
+         * 
+         * @param an instance of {@link ArcSDEPooledConnection} maintained by
+         *            this pool.
+         * 
+         * @return <code>true</code> if the connection is still alive and
+         *            operative (checked by asking its user name), <code>false</code>
+         *            otherwise.
          */
         public boolean validateObject(Object obj) {
-            boolean valid = (obj instanceof ArcSDEPooledConnection);
-            valid = valid && !((ArcSDEPooledConnection) obj).isClosed();
+            ArcSDEPooledConnection conn = (ArcSDEPooledConnection) obj;
+            boolean valid = !conn.isClosed();
+            // MAKE PROPER VALIDITY CHECK HERE as for GEOT-1273
+            if (valid) {
+                try {
+                    LOGGER.finest("Validating SDE Connection");
+                    String user = conn.getUser();
+                    LOGGER.finer("Connection validated, returned user " + user);
+                } catch (SeException e) {
+                    LOGGER.info("Can't validate SeConnection, discarding it: " + conn);
+                    valid = false;
+                }
+            }
             return valid;
         }
 
         /**
-         * is invoked on every instance when it is being "dropped" from the
-         * pool (whether due to the response from validateObject, or for
-         * reasons specific to the pool implementation.)
-         *
-         * @param obj DOCUMENT ME!
+         * is invoked on every instance when it is being "dropped" from the pool
+         * (whether due to the response from validateObject, or for reasons
+         * specific to the pool implementation.)
+         * 
+         * @param obj
+         *            an instance of {@link ArcSDEPooledConnection} maintained
+         *            by this pool.
          */
         public void destroyObject(Object obj) {
             ArcSDEPooledConnection conn = (ArcSDEPooledConnection) obj;
