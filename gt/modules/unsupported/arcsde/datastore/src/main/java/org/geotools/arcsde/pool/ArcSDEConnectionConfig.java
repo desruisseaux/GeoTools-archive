@@ -29,7 +29,7 @@ import java.util.logging.Logger;
  * for maintaining single <code>SdeConnectionPool</code>'s by each set of
  * connection properties
  * 
- * @author Gabriel Rold?n
+ * @author Gabriel Roldan
  * @source $URL$
  * @version $Id$
  */
@@ -490,8 +490,9 @@ public class ArcSDEConnectionConfig {
 		sb.append(this.databaseName);
 		sb.append(", user=");
 		sb.append(this.userName);
-		sb.append(", password=");
-		sb.append(this.userPassword);
+        //hidding password as the result of this method
+        //is probably going to end up in a stack trace
+        sb.append(", password=*****");
 		sb.append(", minConnections=");
 		sb.append(this.minConnections);
 		sb.append(", maxConnections=");
