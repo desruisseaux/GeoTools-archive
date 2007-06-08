@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
-import org.geotools.referencing.FactoryFinder;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.geometry.coordinate.LineString;

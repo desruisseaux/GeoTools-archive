@@ -519,6 +519,10 @@ public abstract class GeometryImpl
         return JTSUtils.contains(jtsGeom1, jtsGeom2);
     }
 
+    public double distance( Geometry otherGeometry ) {
+        return getDistance( otherGeometry );
+    }
+    
     public TransfiniteSet difference(TransfiniteSet pointSet) {
         com.vividsolutions.jts.geom.Geometry jtsGeom1 = getJTSGeometry();
         com.vividsolutions.jts.geom.Geometry jtsGeom2 =
