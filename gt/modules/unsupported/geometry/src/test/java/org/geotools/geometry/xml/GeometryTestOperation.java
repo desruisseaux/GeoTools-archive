@@ -80,6 +80,8 @@ public class GeometryTestOperation extends Assert {
         operationMap.put("symdifference", new SymmetricDifferenceOp());
         operationMap.put("union", new UnionOp());
         operationMap.put("relate", new RelateOp());
+        operationMap.put("isWithinDistance", new WithinDistanceOp());
+        operationMap.put("distance", new DistanceOp());
     }
 
     protected Object getExpectedResult() {
@@ -396,6 +398,45 @@ public class GeometryTestOperation extends Assert {
 				e.printStackTrace();
 			}
             return result;
+        }
+    }
+    
+    /**
+     * Class defining the distance operation
+     */
+    private class WithinDistanceOp extends OperationHandler {
+        /**
+         * Calculates the relation of objects A and B (A + B)
+         * @param a Geometry object
+         * @param b Geometry object
+         * @return a boolean indicating whether the result matched the expectation
+         */
+        public boolean doOperation(Geometry a, Geometry b) {
+            GeometryImpl geom1 = (GeometryImpl) setGeomArg(arg1, a, b);
+            GeometryImpl geom2 = (GeometryImpl) setGeomArg(arg2, a, b);
+            double result = Double.NaN;
+			result = geom1.distance(geom2);
+			// return if the result is <= the max distance
+            return (result <= Double.parseDouble(arg3));
+        }
+    }
+    
+    /**
+     * Class defining the distance operation
+     */
+    private class DistanceOp extends OperationHandler {
+        /**
+         * Calculates the relation of objects A and B (A + B)
+         * @param a Geometry object
+         * @param b Geometry object
+         * @return a boolean indicating whether the result matched the expectation
+         */
+        public boolean doOperation(Geometry a, Geometry b) {
+            GeometryImpl geom1 = (GeometryImpl) setGeomArg(arg1, a, b);
+            GeometryImpl geom2 = (GeometryImpl) setGeomArg(arg2, a, b);
+            double result = Double.NaN;
+			result = geom1.distance(geom2);
+            return (Double.compare(result, (Double) expectedResult) == 0);
         }
     }
     

@@ -52,6 +52,7 @@ import org.geotools.geometry.iso.aggregate.MultiSurfaceImpl;
 import org.geotools.geometry.iso.complex.ComplexImpl;
 import org.geotools.geometry.iso.complex.CompositeCurveImpl;
 import org.geotools.geometry.iso.complex.CompositeSurfaceImpl;
+import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.geometry.iso.operation.overlay.OverlayOp;
 import org.geotools.geometry.iso.operation.relate.RelateOp;
@@ -62,8 +63,10 @@ import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
+import org.geotools.geometry.iso.topograph2D.Coordinate;
 import org.geotools.geometry.iso.topograph2D.IntersectionMatrix;
 import org.geotools.geometry.iso.util.Assert;
+import org.geotools.geometry.iso.util.algorithm2D.CGAlgorithms;
 import org.geotools.geometry.iso.util.algorithm2D.CentroidArea2D;
 import org.geotools.geometry.iso.util.algorithm2D.ConvexHull;
 import org.geotools.geometry.iso.util.algorithmND.CentroidLine;
@@ -79,6 +82,7 @@ import org.opengis.geometry.Precision;
 import org.opengis.geometry.TransfiniteSet;
 import org.opengis.geometry.aggregate.MultiPrimitive;
 import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.coordinate.LineSegment;
 import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.OrientableSurface;
 import org.opengis.geometry.primitive.Primitive;
@@ -275,7 +279,7 @@ public abstract class GeometryImpl implements Geometry {
 		return this.distance(geometry);
 	}
 	
-	   /**
+	/**
      * Computes the distance between this and another geometry.  We have
      * to implement the logic of dealing with multiprimtive geometries separately.
 	 * 
@@ -286,39 +290,150 @@ public abstract class GeometryImpl implements Geometry {
 		// TODO implementation
 		// TODO test
 		// TODO documentation
-		Assert.isTrue(false);
-		return Double.NaN;
+		//Assert.isTrue(false);
+		//return Double.NaN;
 		
-		/*
+		// first determine if this or the given geom is a multiprimitive, if so, break it
+		// down and loop through each of its geoms and determine the mindistance from
+		// those.
         if (geometry instanceof MultiPrimitive) {
             double minDistance = Double.POSITIVE_INFINITY;
             MultiPrimitive gc1 = (MultiPrimitive) geometry;
-            int n = gc1.getNumGeometries();
-            for (int i=0; i<n; i++) {
-                double d = distance(gc1.getGeometryN(i), g2);
-                if (d < minDistance)
+            Iterator<? extends Geometry> iter = gc1.getElements().iterator();
+            while (iter.hasNext()) {
+            	GeometryImpl prim = (GeometryImpl) iter.next();
+                double d = prim.distance(this);
+                if (d < minDistance) {
                     minDistance = d;
+                    // can't get smaller than 0, so exit now if that is the case
+                    if (minDistance == 0) return 0;
+                }
             }
             return minDistance;
         }
         else if (this instanceof MultiPrimitive) {
             double minDistance = Double.POSITIVE_INFINITY;
-            MultiPrimitive gc2 = (MultiPrimitive) this;
-            int n = gc2.getNumGeometries();
-            for (int i=0; i<n; i++) {
-                // This call will result in a redundant check of
-                // g1 instanceof GeometryCollection.  Maybe we oughta fix that
-                // somehow.
-                double d = distance(g1, gc2.getGeometryN(i));
-                if (d < minDistance)
+            MultiPrimitive gc1 = (MultiPrimitive) this;
+            Iterator<? extends Geometry> iter = gc1.getElements().iterator();
+            while (iter.hasNext()) {
+            	GeometryImpl prim = (GeometryImpl) iter.next();
+                double d = prim.distance(geometry);
+                if (d < minDistance) {
                     minDistance = d;
+                    // can't get smaller than 0, so exit now if that is the case
+                    if (minDistance == 0) return 0;
+                }
             }
             return minDistance;
         }
         else {
-            return g1.distance(g2);
+        	// first check if the geometries intersect (if so the min distance is 0)
+        	if (this.intersects(geometry)) {
+        		return 0;
+        	}
+        	
+        	// ensure both this and the given geometry are either points or 
+        	// linesegments so we can use the CGAlrogrithm calculations.
+        	List<LineSegment> lines1 = null;
+        	List<LineSegment> lines2 = null;
+        	PointImpl point1 = null;
+        	PointImpl point2 = null;
+        	
+        	// convert this geom
+        	if (this instanceof PointImpl) {
+        		point1 = (PointImpl) this;
+        	}
+        	else if (this instanceof CurveImpl) {
+        		lines1 = ((CurveImpl)this).asLineSegments();
+        	}
+        	else if (this instanceof RingImpl) {
+        		lines1 = ((RingImpl)this).asLineString().asLineSegments();
+        	}
+        	else if (this instanceof SurfaceImpl) {
+        		lines1 = ((SurfaceImpl)this).getBoundary().getExterior().asLineString().asLineSegments();
+        	}
+        	
+        	// convert given geom
+        	if (geometry instanceof PointImpl) {
+        		point2 = (PointImpl) geometry;
+        	}
+        	else if (geometry instanceof CurveImpl) {
+        		lines2 = ((CurveImpl)geometry).asLineSegments();
+        	}
+        	else if (geometry instanceof RingImpl) {
+        		lines2 = ((RingImpl)geometry).asLineString().asLineSegments();
+        	}
+        	else if (geometry instanceof SurfaceImpl) {
+        		lines2 = ((SurfaceImpl)geometry).getBoundary().getExterior().asLineString().asLineSegments();
+        	}
+        	
+        	// now determine which algorithm to use for finding the shortest
+        	// distance between the two geometries
+        	if (point1 != null && point2 != null) {
+        		// use directposition.distance()
+        		return point1.getPosition().distance(point2.getPosition());
+        	}
+        	else if (lines1 != null) {
+        		if (point2 != null) {
+        			// loop through each linesegment and check for the min distance
+        			double minDistance = Double.POSITIVE_INFINITY;
+        			for (int i=0; i<lines1.size(); i++) {
+        				Coordinate c1 = new Coordinate(point2.getRepresentativePoint().getCoordinates());
+        				Coordinate cA = new Coordinate(lines1.get(i).getStartPoint().getCoordinates());
+        				Coordinate cB = new Coordinate(lines1.get(i).getEndPoint().getCoordinates());
+        				double d = CGAlgorithms.distancePointLine(c1, cA, cB);
+        				if ( d < minDistance) {
+        					minDistance = 0;
+        					if (minDistance == 0) return 0;
+        				}
+        			}
+        			return minDistance;
+        		}
+        		else if (lines2 != null) {
+        			// loop through each set of linesegments and check for the 
+        			// min distance
+        			double minDistance = Double.POSITIVE_INFINITY;
+        			for (int i=0; i<lines1.size(); i++) {
+        				for (int y=0; y<lines2.size(); y++) {
+	        				Coordinate A = new Coordinate(lines1.get(i).getStartPoint().getCoordinates());
+	        				Coordinate B = new Coordinate(lines1.get(i).getEndPoint().getCoordinates());
+	        				Coordinate C = new Coordinate(lines2.get(y).getStartPoint().getCoordinates());
+	        				Coordinate D = new Coordinate(lines2.get(y).getEndPoint().getCoordinates());
+	        				double d = CGAlgorithms.distanceLineLine(A, B, C, D);
+	        				if ( d < minDistance) {
+	        					minDistance = 0;
+	        					if (minDistance == 0) return 0;
+	        				}
+        				}
+        			}
+        			return minDistance;
+        		}
+        		
+        	}
+        	else if (lines2 != null) {
+        		if (point1 != null) {
+        			// loop through each linesegment and check for the min distance
+        			double minDistance = Double.POSITIVE_INFINITY;
+        			for (int i=0; i<lines2.size(); i++) {
+        				Coordinate c1 = new Coordinate(point1.getRepresentativePoint().getCoordinates());
+        				Coordinate cA = new Coordinate(lines2.get(i).getStartPoint().getCoordinates());
+        				Coordinate cB = new Coordinate(lines2.get(i).getEndPoint().getCoordinates());
+        				double d = CGAlgorithms.distancePointLine(c1, cA, cB);
+        				if ( d < minDistance) {
+        					minDistance = 0;
+        					if (minDistance == 0) return 0;
+        				}
+        			}
+        			return minDistance;
+        		}
+        	}
+       	
         }
-        */
+        
+		// if it is some other type, show an error
+		// TODO: implement code for any missing types
+		Assert.isTrue(false);
+		return Double.NaN;
 	}
 
 	/*

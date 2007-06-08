@@ -303,7 +303,7 @@ public class CompositeCurveImpl extends CompositeImpl<OrientableCurveImpl>
 		// JR error: parameter maxSpacing and maxOffset were not passed
 		LineStringImpl result = ((CurveImpl) primitives.get(0)).asLineString(
 				maxSpacing, maxOffset);
-		for (int i = 0; i < primitives.size(); ++i) {
+		for (int i = 1; i < primitives.size(); ++i) {
 			CurveImpl curve = ((CurveImpl) primitives.get(i));
 			result = result.merge(curve.asLineString(maxSpacing, maxOffset));
 		}

@@ -36,10 +36,13 @@
 
 package org.geotools.geometry.iso.coordinate;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.geotools.geometry.iso.primitive.CurveImpl;
+import org.geotools.geometry.iso.primitive.PointImpl;
 import org.geotools.geometry.iso.util.DoubleOperation;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.LineSegment;
@@ -434,169 +437,157 @@ public class LineStringImpl extends CurveSegmentImpl implements LineString {
         // TODO test
         // TODO documentation
 
-        assert false;
-        return null;
+        //assert false;
+        //return null;
 
         // TO DO the ArrayList<Position> approach must disappear, maybe
         // substituted by controlPoint.clone()
 
-        // /* If parameters of method are zero, return this object itself (with
-        // same controlPòints) */
-        // if (maxSpacing == 0 && maxOffset == 0)
-        // return this;
-        //
-        // /* ArrayList of Positions, which will be used as the controlPoints of
-        // the new LineString */
-        // //ArrayList<Position> positions = new ArrayList<Position>();
-        // List<Position> positions = new ArrayList<Position>();
-        //
-        // /* Add Start Point to collection of LineString Positions */
-        // //positions.add(new Position(this.startPoint()));
-        //		
-        // /* The actualParam represents the actual Position on the LineString
-        // */
-        // double actualParam = this.startParam;
-        //		
-        // /* The newSpacing represents the distance between the Posistion at
-        // the actualParam and the next Position;
-        // * if the maxOffset is small, it will be necessary to define a smaller
-        // distance */
-        // double newSpacing = maxSpacing;
-        //
-        // /* All segments of the actual LineString (this-object) */
-        // List<LineSegmentImpl> segments = this.asLineSegments();
-        //		
-        // /* First Segment after actualParam (>=) and LastSegment before
-        // actualParam+newSpacing (<=)
-        // * Define the area which has to be inspected depending the maxOffset
-        // * In the beginning, the both point at the first Segment */
-        // int firstSegment = 0;
-        // int lastSegment = 0;
-        //		
-        // double maxDistance = 0;
-        //		
-        // CoordinateFactoryImpl cf =
-        // this.getCurve().getGeometryFactory().getCoordinateFactory();
-        //
-        // /* Loop until end of LineString reached */
-        // while (actualParam < this.endParam) {
-        //			
-        // /* If actualParam + newSpacing is greater than the endParam,
-        // * set the newSpacing to that value, that next Position is the at
-        // * the endParam of the original LineString */
-        // if (actualParam + newSpacing > this.endParam) {
-        // newSpacing = this.endParam - actualParam;
+        /* If parameters of method are zero, return this object itself (with
+        same controlPòints) */
+        if (maxSpacing == 0 && maxOffset == 0)
+        return this;
+        
+        /* ArrayList of Positions, which will be used as the controlPoints of
+        the new LineString */
+        //ArrayList<Position> positions = new ArrayList<Position>();
+        List<Position> positions = new ArrayList<Position>();
+        
+        /* Add Start Point to collection of LineString Positions */
+        //positions.add(new Position(this.startPoint()));
+	
+        /* The actualParam represents the actual Position on the LineString
+        */
+        double actualParam = this.startParam;
+        		
+        /* The newSpacing represents the distance between the Posistion at the actualParam and the next Position;
+         * if the maxOffset is small, it will be necessary to define a smaller distance */
+        double newSpacing = maxSpacing;
+
+        /* All segments of the actual LineString (this-object) */
+        List<LineSegment> segments = this.asLineSegments();
+       		
+        /* First Segment after actualParam (>=) and LastSegment before actualParam+newSpacing (<=)
+        * Define the area which has to be inspected depending the maxOffset
+        * In the beginning, the both point at the first Segment */
+        int firstSegment = 0;
+        int lastSegment = 0;
+       	
+        double maxDistance = 0;
+       		
+        //CoordinateFactoryImpl cf = this.getCurve().getGeometryFactory().getCoordinateFactory();
+       
+        /* Loop until end of LineString reached */
+        while (actualParam < this.endParam) {
+        			
+	        /* If actualParam + newSpacing is greater than the endParam,
+	         * set the newSpacing to that value, that next Position is the at
+	         * the endParam of the original LineString */
+	        if (actualParam + newSpacing > this.endParam) {
+	        	newSpacing = this.endParam - actualParam;
+	        }
+        
+	        /* The maximum distance between the the line (actualParam to actualParam+newSpacing) and the Segments (between firstSegment and lastSegment) will be calculated after */
+	        maxDistance = 0;
+        
+	        /* Search first segment after position start in LineString:
+	         * If position is on ControlPoint, gets segment with position as startParam
+	         * If position is on first segment, get first segment
+	         * If position is on last Segment, gets last segment */
+	        int i = firstSegment;
+	        while ((segments.get(i).getStartParam() < actualParam) && (i<segments.size() -1)) {
+	        	i++;
+	        }
+	        firstSegment = i;
+
+	        do {
+ 
+	        	/* If start and end point on same LineSegment, then return a distance of 0.0 */
+	        	// if ((segments[firstSegment].startParam() > actualParam && segments[firstSegment].startParam() < actualParam+newSpacing)
+	        	// || (segments[firstSegment].endParam() > actualParam && segments[firstSegment].endParam() < actualParam+newSpacing)) {
+	        	// TO DO numerical precision
+	        	//assert false;
+	        	double EPSILON = 0.00001;
+	        	if ((segments.get(firstSegment).getStartParam() > actualParam &&
+	        			segments.get(firstSegment).getStartParam() + EPSILON < actualParam +
+	        			newSpacing) ||
+	        			(segments.get(firstSegment).getEndParam() > actualParam &&
+	        					segments.get(firstSegment).getEndParam() + EPSILON < actualParam +
+	        					newSpacing)) {
+
+	        		/* If not, the segments betweens the both positions have to be
+						checked */
+
+	        		/* Search last segment before position start in LineString
+	        		 * If position is on ControlPoint, get segment with position as endParam
+	        		 * If position is on first segment, get first segment
+	        		 * If position is on last segment, get last segment */
+	        		i = firstSegment;
+	        		while ((i<segments.size()) && (segments.get(i).getEndParam() <= actualParam+newSpacing)){
+	        			i++;
+	        		}
+	        		lastSegment = i-1;
+	        		DirectPosition p1 = this.forParam(actualParam);
+	        		DirectPosition p2 = new DirectPositionImpl(this.forParam(actualParam+newSpacing));
+	        		LineSegmentImpl seg = new LineSegmentImpl(p1, p2, 0);
+	        		//(LineSegmentImpl)cf.createLineSegment(cf.createPosition(this.forParam(actualParam)),cf.createPosition(this.forParam(actualParam+newSpacing)));
+
+	        		/* Search maximum of all distances */
+	        		CurveImpl curve = new CurveImpl(seg);
+	        		maxDistance = curve.distance( new PointImpl(segments.get(firstSegment).getStartPoint()) );
+	        		//maxDistance = seg.distance(segments.get(firstSegment).getStartPoint());
+	        		double actDistance = 0;
+	        		for (i=firstSegment; i<lastSegment; i++) {
+	        			actDistance = curve.distance( new PointImpl(segments.get(i).getEndPoint()) );
+	        			//actDistance = seg.distance(segments.get(i).getEndPoint());
+	        			if (actDistance > maxDistance) {
+	        				maxDistance = actDistance;
+	        			}
+	        		}
+					
+	        		/* Test, ob Offset bei Param [actualParam+newSpacing] eingehalten
+						wird */
+	        		if (maxDistance > maxOffset) {
+	        			// System.out.println("Testausgabe: Musste den Abstand verkleinern. Neuer Abstand: " + (newSpacing/2));
+	        			newSpacing /= 2;
+	        		}
+
+	        	} else {
+	        		maxDistance = 0; 
+	        		/* Both positions are located at the same segment;
+						set the maxDistance to 0 to leave loop */
+	        	}
+       
+	        } while (maxDistance > maxOffset); /* Until Offset is accepted */
+
+
+	        /* Add newSpacing to actualParam */
+	        actualParam += newSpacing;
+
+	        /* Reset newSpacing to the original value */
+	        newSpacing = maxSpacing;
+
+	        /* Add Position at constrParam position of actualParam */
+	        positions.add( new DirectPositionImpl(this.forParam(actualParam)) );
+	        //positions.add(cf.createPosition(this.forParam(actualParam)));
+        }
+
+        // /* Transform Arraylist to Array of Position´s */
+        // Position posArray[] = new Position[positions.size()];
+        // for (int i=0; i<positions.size(); i++) {
+        // posArray[i] = (Position)positions.get(i);
         // }
-        //
-        // /* The maximum distance between the the line (actualParam to
-        // actualParam+newSpacing) and the Segments (between firstSegment and
-        // lastSegment) will be calculated after */
-        // maxDistance = 0;
-        //
-        // /* Search first segment after position start in LineString:
-        // * If position is on ControlPoint, gets segment with position as
-        // startParam
-        // * If position is on first segment, get first segment
-        // * If position is on last Segment, gets last segment */
-        // int i = firstSegment;
-        // while ((segments.get(i).getStartParam() < actualParam) &&
-        // (i<segments.size() -1)) {
-        // i++;
-        // }
-        // firstSegment = i;
-        //
-        // do {
-        //
-        // /* If start and end point on same LineSegment, then return a distance
-        // of 0.0 */
-        // // if ((segments[firstSegment].startParam() > actualParam &&
-        // segments[firstSegment].startParam() < actualParam+newSpacing)
-        // // || (segments[firstSegment].endParam() > actualParam &&
-        // segments[firstSegment].endParam() < actualParam+newSpacing)) {
-        // // TO DO numerical precision
-        // assert false;
-        // double EPSILON = 0.00001;
-        // if ((segments.get(firstSegment).getStartParam() > actualParam &&
-        // segments.get(firstSegment).getStartParam() + EPSILON < actualParam +
-        // newSpacing) ||
-        // (segments.get(firstSegment).getEndParam() > actualParam &&
-        // segments.get(firstSegment).getEndParam() + EPSILON < actualParam +
-        // newSpacing)) {
-        //
-        // /* If not, the segments betweens the both positions have to be
-        // checked */
-        //
-        // /* Search last segment before position start in LineString
-        // * If position is on ControlPoint, get segment with position as
-        // endParam
-        // * If position is on first segment, get first segment
-        // * If position is on last segment, get last segment */
-        // i = firstSegment;
-        // while ((i<segments.size()) && (segments.get(i).getEndParam() <=
-        // actualParam+newSpacing)){
-        // i++;
-        // }
-        // lastSegment = i-1;
-        // LineSegmentImpl seg = (LineSegmentImpl)cf.createLineSegment(
-        // cf.createPosition(this.forParam(actualParam)),
-        // cf.createPosition(this.forParam(actualParam+newSpacing))
-        // );
-        //
-        // /* Search maximum of all distances */
-        // maxDistance =
-        // seg.distance(segments.get(firstSegment).getStartPoint());
-        // double actDistance = 0;
-        // for (i=firstSegment; i<lastSegment; i++) {
-        // actDistance = seg.distance(segments.get(i).getEndPoint());
-        // if (actDistance > maxDistance) {
-        // maxDistance = actDistance;
-        // }
-        // }
-        //					
-        // /* Test, ob Offset bei Param [actualParam+newSpacing] eingehalten
-        // wird */
-        // if (maxDistance > maxOffset) {
-        // // System.out.println("Testausgabe: Musste den Abstand verkleinern.
-        // Neuer Abstand: " + (newSpacing/2));
-        // newSpacing /= 2;
-        // }
-        //
-        // } else {
-        // maxDistance = 0; /* Both positions are located at the same segment;
-        // set the maxDistance to 0 to leave loop */
-        // }
-        //
-        // } while (maxDistance > maxOffset); /* Until Offset is accepted */
-        //
-        //
-        // /* Add newSpacing to actualParam */
-        // actualParam += newSpacing;
-        //
-        // /* Reset newSpacing to the original value */
-        // newSpacing = maxSpacing;
-        //
-        // /* Add Position at constrParam position of actualParam */
-        // positions.add(cf.createPosition(this.forParam(actualParam)));
-        // }
-        //
-        // // /* Transform Arraylist to Array of Position´s */
-        // // Position posArray[] = new Position[positions.size()];
-        // // for (int i=0; i<positions.size(); i++) {
-        // // posArray[i] = (Position)positions.get(i);
-        // // }
-        //
-        // /* Construct new LineString, giving the positions, curve and
-        // startParam */
-        // // TO DO JR check: I think there was an error here because the new
-        // LineString
-        // // should not belong to any curve
-        // // LineString rLineString = new LineString (posArray,
-        // this.getCurve(), this.startParam);
-        // LineStringImpl rLineString = cf.createLineString(positions,
-        // this.startParam);
-        // rLineString.setEndParam(this.getEndParam());
-        //
-        // return rLineString;
+        
+        /* Construct new LineString, giving the positions, curve and
+       		startParam */
+        // TO DO JR check: I think there was an error here because the new LineString
+        // should not belong to any curve
+        // LineString rLineString = new LineString (posArray, this.getCurve(), this.startParam);
+        LineStringImpl rLineString = new LineStringImpl(positions);
+        //LineStringImpl rLineString = cf.createLineString(positions, this.startParam);
+        rLineString.setEndParam(this.getEndParam());
+     
+        return rLineString;
     }
 
     public String toString() {
