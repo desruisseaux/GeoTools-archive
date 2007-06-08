@@ -15,22 +15,23 @@
  */
 package org.geotools.caching;
 
-import java.util.Collection;
 import org.geotools.feature.Feature;
 
+import java.util.Collection;
 
-public interface InternalStore {
-    public abstract boolean contains(Feature feature);
+public interface InternalStore
+{
+    public abstract boolean contains( Feature feature );
 
-    public abstract boolean contains(String featureId);
+    public abstract boolean contains( String featureId );
 
-    public abstract void put(Feature f);
+    public abstract void put( Feature f );
 
-    public abstract Feature get(String featureId);
+    public abstract Feature get( String featureId );
 
-    public abstract Collection getAll();
+    public abstract Collection getAll(  );
 
-    public abstract void clear();
+    public abstract void clear(  );
 
-    public abstract void remove(String featureId);
+    public abstract void remove( String featureId );
 }
