@@ -397,6 +397,7 @@ public class GeometryTestOperation extends Assert {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			actualResult = result;
             return result;
         }
     }
@@ -417,7 +418,8 @@ public class GeometryTestOperation extends Assert {
             double result = Double.NaN;
 			result = geom1.distance(geom2);
 			// return if the result is <= the max distance
-            return (result <= Double.parseDouble(arg3));
+			actualResult = (result <= Double.parseDouble(arg3));
+            return (actualResult == expectedResult);
         }
     }
     
@@ -436,6 +438,7 @@ public class GeometryTestOperation extends Assert {
             GeometryImpl geom2 = (GeometryImpl) setGeomArg(arg2, a, b);
             double result = Double.NaN;
 			result = geom1.distance(geom2);
+			actualResult = result;
             return (Double.compare(result, (Double) expectedResult) == 0);
         }
     }

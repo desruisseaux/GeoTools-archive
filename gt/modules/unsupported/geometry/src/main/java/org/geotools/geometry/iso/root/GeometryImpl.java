@@ -383,7 +383,7 @@ public abstract class GeometryImpl implements Geometry {
         				Coordinate cB = new Coordinate(lines1.get(i).getEndPoint().getCoordinates());
         				double d = CGAlgorithms.distancePointLine(c1, cA, cB);
         				if ( d < minDistance) {
-        					minDistance = 0;
+        					minDistance = d;
         					if (minDistance == 0) return 0;
         				}
         			}
@@ -401,7 +401,7 @@ public abstract class GeometryImpl implements Geometry {
 	        				Coordinate D = new Coordinate(lines2.get(y).getEndPoint().getCoordinates());
 	        				double d = CGAlgorithms.distanceLineLine(A, B, C, D);
 	        				if ( d < minDistance) {
-	        					minDistance = 0;
+	        					minDistance = d;
 	        					if (minDistance == 0) return 0;
 	        				}
         				}
@@ -420,7 +420,7 @@ public abstract class GeometryImpl implements Geometry {
         				Coordinate cB = new Coordinate(lines2.get(i).getEndPoint().getCoordinates());
         				double d = CGAlgorithms.distancePointLine(c1, cA, cB);
         				if ( d < minDistance) {
-        					minDistance = 0;
+        					minDistance = d;
         					if (minDistance == 0) return 0;
         				}
         			}
