@@ -50,7 +50,7 @@ import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapBoundsEvent;
 import org.geotools.map.event.MapBoundsListener;
 import org.geotools.map.event.MapLayerEvent;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.CRS;
 import org.geotools.resources.coverage.FeatureUtilities;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.RasterSymbolizer;
@@ -147,8 +147,7 @@ public class WMSMapLayer extends DefaultMapLayer implements MapLayer, MapBoundsL
             CoordinateReferenceSystem coordinateReferenceSystem = null;
 
             try {
-                coordinateReferenceSystem = FactoryFinder.getCRSAuthorityFactory("EPSG", null)
-                                                         .createCoordinateReferenceSystem(crs);
+                coordinateReferenceSystem = CRS.decode(crs);
             } catch (FactoryRegistryException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
