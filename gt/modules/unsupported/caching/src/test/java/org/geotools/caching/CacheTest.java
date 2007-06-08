@@ -168,7 +168,7 @@ public class CacheTest extends TestCase {
             Query q = (Query) iter.next();
             FeatureCollection controlSet = control.getView(q).getFeatures();
             FeatureCollection testedSet = tested.getView(q).getFeatures();
-            assertTrue(compareFeatureCollectionByID(controlSet, testedSet));
+            assertTrue(compareFeatureCollectionByHash(controlSet, testedSet));
         }
     }
 
@@ -341,9 +341,51 @@ public class CacheTest extends TestCase {
 
         return false;
     }
+
+    protected static boolean compareFeatureCollectionByHash(FeatureCollection set1,
+        FeatureCollection set2) {
+        if (set1.size() == set2.size()) {
+            FeatureIterator iter = set1.features();
+            TreeSet ids1 = new TreeSet();
+
+            while (iter.hasNext()) {
+                ids1.add(new Integer(iter.next().hashCode()));
+            }
+
+            set1.close(iter);
+            iter = set2.features();
+
+            TreeSet ids2 = new TreeSet();
+
+            while (iter.hasNext()) {
+                ids2.add(new Integer(iter.next().hashCode()));
+            }
+
+            set2.close(iter);
+
+            Iterator i2 = ids2.iterator();
+
+            for (Iterator i1 = ids1.iterator(); i1.hasNext();) {
+                Integer id1 = (Integer) i1.next();
+                Integer id2 = (Integer) i2.next();
+
+                if (!id1.equals(id2)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
+    }
 }
 
 
+/**
+ * @author crousson
+ *
+ */
 class QueryStatistics {
     private int numberOfFeatures;
     private long executionTime;

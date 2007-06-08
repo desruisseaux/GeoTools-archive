@@ -17,19 +17,17 @@ package org.geotools.caching;
 
 import org.geotools.data.DataStore;
 
-public interface DataCache
-    extends DataStore
-{
+
+public interface DataCache extends DataStore {
     /**
      */
-    public abstract void clear(  );
+    public abstract void clear();
 
     /**
      */
-    public abstract void flush(  )
-                        throws IllegalStateException;
+    public abstract void flush() throws IllegalStateException;
 
     /**
      */
-    public abstract long getHits(  );
+    public abstract long getHits();
 }
