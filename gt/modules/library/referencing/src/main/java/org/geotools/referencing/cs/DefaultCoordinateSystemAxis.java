@@ -1014,6 +1014,30 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
     }
 
     /**
+     * Returns {@code true} if the specified direction is a compass direction.
+     * Compass directions include "<cite>North</cite>", "<cite>North-North-East</cite>",
+     * "<cite>North-East</cite>", <cite>etc.</cite>
+     *
+     * @since 2.4
+     */
+    public static boolean isCompassDirection(final AxisDirection direction) {
+        ensureNonNull("direction", direction);
+        final int n = direction.ordinal() - AxisDirection.NORTH.ordinal();
+        return n >= 0 && n < COMPASS_DIRECTION_COUNT;
+    }
+
+    /*
+     * Returns {@code true} if the specified direction is a direction along a meridian.
+     * Those directions are used in coordinate systems for polar area. Examples:
+     * "<cite>North along 90 deg East</cite>", "<cite>North along 0 deg</cite>".
+     *
+     * We do not provide such method yet. If we want this functionality, maybe we should
+     * consider making DirectionAlongMeridian a public class extending AxisDirection code
+     * list instead.
+     */
+//  public static boolean isDirectionAlongMeridian(final AxisDirection direction);
+
+    /**
      * Returns the arithmetic (counterclockwise) angle from the first direction to the second
      * direction, in decimal <strong>degrees</strong>. This method returns a value between
      * -180° and +180°, or {@link Double#NaN NaN} if no angle can be computed.

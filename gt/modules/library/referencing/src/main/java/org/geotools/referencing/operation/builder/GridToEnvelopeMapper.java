@@ -373,10 +373,10 @@ public class GridToEnvelopeMapper {
      * <ul>
      *   <li>Axis should be reverted if needed in order to point toward their
      *       "{@linkplain AxisDirection#absolute absolute}" direction.</li>
-     *   <li>An exception to the above rule is the {@link AxisDirection#NORTH
-     *       NORTH} direction, which is reversed in order to point
-     *       {@link AxisDirection#SOUTH SOUTH}. This is in order to match
-     *       the <var>y</var> axis direction on screen device.</li>
+     *   <li>An exception to the above rule is the second axis in grid space,
+     *       which is assumed to be the <var>y</var> axis on output device (usually
+     *       the screen). This axis is reversed again in order to match the bottom
+     *       direction often used with such devices.</li>
      * </ul>
      *
      * @return The reversal state of each axis, or {@code null} if unspecified.
@@ -393,9 +393,10 @@ public class GridToEnvelopeMapper {
                         final AxisDirection direction = cs.getAxis(i).getDirection();
                         final AxisDirection absolute  = direction.absolute();
                         reverseAxis[i] = direction.equals(absolute.opposite());
-                        if (AxisDirection.NORTH.equals(absolute)) {
-                            reverseAxis[i] = !reverseAxis[i]; // Reverses the 'row' axis.
-                        }
+                    }
+                    if (dimension >= 2) {
+                        final int i = getSwapXY() ? 0 : 1;
+                        reverseAxis[i] = !reverseAxis[i];
                     }
                 }
             }

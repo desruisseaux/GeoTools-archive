@@ -89,6 +89,11 @@ public class PolarStereographic extends Stereographic {
     final boolean southPole;
 
     /**
+     * {@code true} if {@link #southPole} was forced, or {@code false} if it was auto-detected.
+     */
+    private final boolean poleForced;
+
+    /**
      * Constructs a polar stereographic projection.
      *
      * @param  parameters The group of parameter values.
@@ -137,7 +142,8 @@ public class PolarStereographic extends Stereographic {
          * Forces the "standard_parallel_1" to the appropriate hemisphere,
          * and forces the "latitude_of_origin" to ±90°.
          */
-        if (forceSouthPole != null) {
+        poleForced = (forceSouthPole != null);
+        if (poleForced) {
             southPole = forceSouthPole.booleanValue();
             latitudeTrueScale = Math.abs(latitudeTrueScale);
             if (southPole) {
@@ -234,8 +240,10 @@ public class PolarStereographic extends Stereographic {
      * {@inheritDoc}
      */
     public ParameterValueGroup getParameterValues() {
-        final ParameterDescriptor trueScaleDescriptor = southPole ?
-                ProviderSouth.STANDARD_PARALLEL : ProviderNorth.STANDARD_PARALLEL;
+        final ParameterDescriptor trueScaleDescriptor = poleForced ? (southPole ?
+                ProviderSouth.STANDARD_PARALLEL :  // forced = true,  south = true
+                ProviderNorth.STANDARD_PARALLEL):  // forced = true,  south = false
+                ProviderB    .STANDARD_PARALLEL ;  // forced = false
         final ParameterValueGroup values = super.getParameterValues();
         final Collection expected = getParameterDescriptors().descriptors();
         set(expected, trueScaleDescriptor, values, standardParallel);
