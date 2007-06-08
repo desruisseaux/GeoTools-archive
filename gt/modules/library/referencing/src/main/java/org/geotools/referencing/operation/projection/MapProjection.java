@@ -518,7 +518,9 @@ public abstract class MapProjection extends AbstractMathTransform
      * @param inverse {@code true} for an inverse transform instead of a direct one.
      * @return {@code true} if the two points are close enough.
      */
-    private boolean checkReciprocal(Point2D point, final Point2D target, final boolean inverse) {
+    private boolean checkReciprocal(Point2D point, final Point2D target, final boolean inverse)
+            throws ProjectionException
+    {
         if (!(point instanceof CheckPoint)) try {
             point = new CheckPoint(point);
             final double longitude;
@@ -538,15 +540,21 @@ public abstract class MapProjection extends AbstractMathTransform
                 distance  = point.distance(target);
             }
             if (distance > getToleranceForAssertions(longitude, latitude)) {
-                // Do not fail for NaN values.
-                throw new AssertionError(Errors.format(ErrorKeys.PROJECTION_CHECK_FAILED_$4,
+                /*
+                 * Do not fail for NaN values. For other cases we must throw a ProjectionException,
+                 * not an AssertionError, because some code like CRS.transform(CoordinateOperation,
+                 * ...) will project points that are know to be suspicious by surrounding them in
+                 * "try ... catch" statements. Failure are normal in their case and we want to let
+                 * them handle the exception the way they are used to.
+                 */
+                throw new ProjectionException(Errors.format(ErrorKeys.PROJECTION_CHECK_FAILED_$4,
                           new Double   (distance),
                           new Longitude(longitude - Math.toDegrees(centralMeridian )),
                           new Latitude (latitude  - Math.toDegrees(latitudeOfOrigin)),
                           getParameterDescriptors().getName().getCode()));
             }
         } catch (TransformException exception) {
-            final AssertionError error = new AssertionError(exception.getLocalizedMessage());
+            final ProjectionException error = new ProjectionException(exception.getLocalizedMessage());
             error.initCause(exception);
             throw error;
         }
@@ -1038,8 +1046,8 @@ public abstract class MapProjection extends AbstractMathTransform
      * Maximal error (in metres) tolerated for assertions, if enabled. When assertions are enabled,
      * every direct projection is followed by an inverse projection, and the result is compared to
      * the original coordinate. If a distance greater than the tolerance level is found, then an
-     * {@link AssertionError} will be thrown. Subclasses should override this method if they need
-     * to relax the tolerance level.
+     * {@link ProjectionException} will be thrown. Subclasses should override this method if they
+     * need to relax the tolerance level.
      *
      * @param  longitude The longitude in decimal degrees.
      * @param  latitude The latitude in decimal degrees.

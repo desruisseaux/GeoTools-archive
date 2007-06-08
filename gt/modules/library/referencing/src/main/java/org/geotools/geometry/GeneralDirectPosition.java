@@ -27,9 +27,9 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
+import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.measure.CoordinateFormat;
 
 
 /**
@@ -61,11 +61,6 @@ public class GeneralDirectPosition implements DirectPosition, Serializable {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 9071833698385715524L;
-
-    /**
-     * The format for {@link #toString}. Will be created only when first needed.
-     */
-    private static CoordinateFormat format;
 
     /**
      * The ordinates of the direct position.
@@ -323,11 +318,10 @@ public class GeneralDirectPosition implements DirectPosition, Serializable {
     }
 
     /**
-     * Returns a string representation of this coordinate. The default implementation formats
-     * this coordinate using a shared instance of {@link org.geotools.measure.CoordinateFormat}.
-     * This is okay for occasional formatting (for example for debugging purpose). But if there
-     * is a lot of positions to format, users will get better performance and more control by
-     * using their own instance of {@link org.geotools.measure.CoordinateFormat}.
+     * Returns a string representation of this coordinate. The default implementation is okay
+     * for occasional formatting (for example for debugging purpose). But if there is a lot
+     * of positions to format, users will get more control by using their own instance of
+     * {@link org.geotools.measure.CoordinateFormat}.
      */
     public String toString() {
         return toString(this);
@@ -335,19 +329,22 @@ public class GeneralDirectPosition implements DirectPosition, Serializable {
 
     /**
      * Formats the specified position.
-     * <strong>NOTE:</strong> This convenience method uses a shared instance of
-     * {@link CoordinateFormat}. This is okay for occasional formatting. But if
-     * a lot of position needs to be formatted, it is more efficient to use an
-     * other instance of {@link CoordinateFormat}.
      *
      * @since 2.3
+     *
+     * @deprecated Use {@link org.geotools.measure.CoordinateFormat} instead.
      */
-    public static synchronized String toString(final DirectPosition position) {
-        if (format == null) {
-            format = new CoordinateFormat();
+    // To be made package-private (do not delete)
+    public static String toString(final DirectPosition position) {
+        final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(position)).append('[');
+        final int dimension = position.getDimension();
+        for (int i=0; i<dimension; i++) {
+            if (i != 0) {
+                buffer.append(", ");
+            }
+            buffer.append(position.getOrdinate(i));
         }
-        format.setCoordinateReferenceSystem(position.getCoordinateReferenceSystem());
-        return format.format(position);
+        return buffer.append(']').toString();
     }
 
     /**

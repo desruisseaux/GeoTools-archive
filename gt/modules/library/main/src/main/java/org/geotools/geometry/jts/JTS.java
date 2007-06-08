@@ -114,6 +114,11 @@ public final class JTS {
 
     /**
      * Transforms the envelope using the specified math transform.
+     * Note that this method can not handle the case where the envelope contains the North or
+     * South pole, or when it cross the &plusmn;180° longitude, because {@linkplain MathTransform
+     * math transforms} do not carry suffisient informations. For a more robust envelope
+     * transformation, use {@link ReferencedEnvelope#transform(CoordinateReferenceSystem,
+     * boolean)} instead.
      *
      * @param  envelope  The envelope to transform.
      * @param  transform The transform to use.
@@ -134,6 +139,12 @@ public final class JTS {
      * If an optional target envelope is provided, this envelope will be
      * {@linkplain Envelope#expandToInclude expanded} with the transformation result. It will
      * <strong>not</strong> be {@linkplain Envelope#setToNull nullified} before the expansion.
+     * <p>
+     * Note that this method can not handle the case where the envelope contains the North or
+     * South pole, or when it cross the &plusmn;180° longitude, because {@linkplain MathTransform
+     * math transforms} do not carry suffisient informations. For a more robust envelope
+     * transformation, use {@link ReferencedEnvelope#transform(CoordinateReferenceSystem,
+     * boolean, int)} instead.
      *
      * @param  sourceEnvelope  The envelope to transform.
      * @param  targetEnvelope  An envelope to expand with the transformation result, or {@code null}

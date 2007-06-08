@@ -15,9 +15,11 @@
  */
 package org.geotools.geometry.jts;
 
+import java.awt.geom.Rectangle2D;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -28,6 +30,7 @@ import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.geometry.MismatchedReferenceSystemException;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
@@ -96,6 +99,24 @@ public class ReferencedEnvelope extends Envelope implements
         super(x1, x2, y1, y2);
         this.crs = crs;
         checkCoordinateReferenceSystemDimension();
+    }
+
+    /**
+     * Creates an envelope for a Java2D rectangle.
+     * 
+     * @param rectangle The rectangle.
+     * @param crs The coordinate reference system.
+     *
+     * @throws MismatchedDimensionException if the CRS dimension is not valid.
+     *
+     * @since 2.4
+     */
+    public ReferencedEnvelope(final Rectangle2D rectangle,
+                              final CoordinateReferenceSystem crs) 
+            throws MismatchedDimensionException
+    {
+        this(rectangle.getMinX(), rectangle.getMaxX(),
+             rectangle.getMinY(), rectangle.getMaxY(), crs);
     }
 
     /**
@@ -260,11 +281,7 @@ public class ReferencedEnvelope extends Envelope implements
     /**
      * Returns the coordinate reference system associated with this envelope.
      * 
-     * @deprecated Replaced by {@link #getCoordinateReferenceSystem} for
-     *             consistency with other envelope implementations, and also
-     *             because a future GeoAPI release may provides a
-     *             {@code getCoordinateReferenceSystem()} method in their
-     *             interface.
+     * @deprecated Replaced by {@link #getCoordinateReferenceSystem}.
      */
     public CoordinateReferenceSystem getCRS() {
         return crs;
@@ -500,7 +517,10 @@ public class ReferencedEnvelope extends Envelope implements
 
     /**
      * Transforms the referenced envelope to the specified coordinate reference system.
-     * 
+     * <p>
+     * This method can handle the case where the envelope contains the North or South pole,
+     * or when it cross the &plusmn;180° longitude.
+     *
      * @param targetCRS The target coordinate reference system.
      * @param lenient   {@code true} if datum shift should be applied even if there is
      *                  insuffisient information. Otherwise (if {@code false}), an
@@ -508,9 +528,10 @@ public class ReferencedEnvelope extends Envelope implements
      * @return The transformed envelope.
      * @throws FactoryException if the math transform can't be determined.
      * @throws TransformException if at least one coordinate can't be transformed.
+     *
+     * @see CRS#transform(CoordinateOperation, org.opengis.geometry.Envelope)
      */
-    public ReferencedEnvelope transform(
-            final CoordinateReferenceSystem targetCRS, final boolean lenient)
+    public ReferencedEnvelope transform(CoordinateReferenceSystem targetCRS, boolean lenient)
             throws TransformException, FactoryException 
     {
         return transform(targetCRS, lenient, 5);
@@ -519,7 +540,10 @@ public class ReferencedEnvelope extends Envelope implements
     /**
      * Transforms the referenced envelope to the specified coordinate reference system
      * using the specified amount of points.
-     * 
+     * <p>
+     * This method can handle the case where the envelope contains the North or South pole,
+     * or when it cross the &plusmn;180° longitude.
+     *
      * @param targetCRS The target coordinate reference system.
      * @param lenient   {@code true} if datum shift should be applied even if there is
      *                  insuffisient information. Otherwise (if {@code false}), an
@@ -529,6 +553,8 @@ public class ReferencedEnvelope extends Envelope implements
      * @throws FactoryException if the math transform can't be determined.
      * @throws TransformException if at least one coordinate can't be transformed.
      *
+     * @see CRS#transform(CoordinateOperation, org.opengis.geometry.Envelope)
+     *
      * @since 2.3
      */
     public ReferencedEnvelope transform(final CoordinateReferenceSystem targetCRS,
@@ -536,8 +562,19 @@ public class ReferencedEnvelope extends Envelope implements
                                         final int numPointsForTransformation)
             throws TransformException, FactoryException
     {
-        MathTransform transform = CRS.findMathTransform(crs, targetCRS, lenient);
-        final ReferencedEnvelope target = new ReferencedEnvelope(targetCRS);
+        /*
+         * Gets a first estimation using an algorithm capable to take singularity in account
+         * (North pole, South pole, 180° longitude). We will expand this initial box later.
+         */
+        final CoordinateOperation operation =
+                CRS.getCoordinateOperationFactory(lenient).createOperation(crs, targetCRS);
+        final GeneralEnvelope transformed = CRS.transform(operation, this);
+        transformed.setCoordinateReferenceSystem(targetCRS);
+        /*
+         * Now expands the box using the usual utility methods.
+         */
+        final ReferencedEnvelope target = new ReferencedEnvelope(transformed);
+        final MathTransform transform = operation.getMathTransform();
         JTS.transform(this, target, transform, numPointsForTransformation);
         return target;
     }
@@ -567,22 +604,18 @@ public class ReferencedEnvelope extends Envelope implements
     }
 
     /**
-     * Returns a string representation of this envelope. The default
-     * implementation formats the {@linkplain #getLowerCorner lower} and
-     * {@linkplain #getUpperCorner upper} corners using a shared instance of
-     * {@link org.geotools.measure.CoordinateFormat}. This is okay for
-     * occasional formatting (for example for debugging purpose). But if there
-     * is a lot of positions to format, users will get better performance and
-     * more control by using their own instance of
-     * {@link org.geotools.measure.CoordinateFormat}.
+     * Returns a string representation of this envelope. The default implementation
+     * is okay for occasional formatting (for example for debugging purpose).
      */
     public String toString() {
-        final StringBuffer buffer = new StringBuffer();
-        buffer.append('[');
-        buffer.append(GeneralDirectPosition.toString(getLowerCorner()));
-        buffer.append(" , ");
-        buffer.append(GeneralDirectPosition.toString(getUpperCorner()));
-        buffer.append(']');
-        return buffer.toString();
+        final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(this)).append('[');
+        final int dimension = getDimension();
+        for (int i=0; i<dimension; i++) {
+            if (i != 0) {
+                buffer.append(", ");
+            }
+            buffer.append(getMinimum(i)).append(" : ").append(getMaximum(i));
+        }
+        return buffer.append(']').toString();
     }
 }

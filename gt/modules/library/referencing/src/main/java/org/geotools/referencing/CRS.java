@@ -38,13 +38,14 @@ import org.opengis.referencing.*;
 import org.opengis.referencing.crs.*;
 import org.opengis.referencing.datum.*;
 import org.opengis.referencing.operation.*;
-import org.opengis.referencing.crs.CRSAuthorityFactory;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.cs.CoordinateSystem;
+import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.Envelope;
+import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
@@ -53,8 +54,9 @@ import org.geotools.factory.Hints;
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryNotFoundException;
 import org.geotools.factory.FactoryRegistryException;
-import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
@@ -90,6 +92,11 @@ import org.geotools.util.UnsupportedImplementationException;
  * @tutorial http://docs.codehaus.org/display/GEOTOOLS/Coordinate+Transformation+Services+for+Geotools+2.1
  */
 public final class CRS {
+    /**
+     * The logger name to use for logging messages in this class.
+     */
+    private static final String LOGGER = "org.geotools.referencing";
+
     /**
      * A factory for CRS creation with (<var>latitude</var>, <var>longitude</var>) axis order
      * (unless otherwise specified in system property). Will be created only when first needed.
@@ -190,9 +197,16 @@ public final class CRS {
     }
 
     /**
-     * Returns the coordinate operation factory to use.
+     * Returns the coordinate operation factory used by
+     * {@link #findMathTransform(CoordinateReferenceSystem, CoordinateReferenceSystem)
+     * findMathTransform} convenience methods.
+     *
+     * @param lenient {@code true} if the coordinate operations should be created
+     *        even when there is no information available for a datum shift.
+     *
+     * @since 2.4
      */
-    private static synchronized CoordinateOperationFactory getCoordinateOperationFactory(final boolean lenient) {
+    public static synchronized CoordinateOperationFactory getCoordinateOperationFactory(final boolean lenient) {
         CoordinateOperationFactory factory = (lenient) ? lenientFactory : strictFactory;
         if (factory == null) {
             final Hints hints = GeoTools.getDefaultHints();
@@ -394,7 +408,8 @@ public final class CRS {
     public static CoordinateReferenceSystem decode(String code, final boolean longitudeFirst)
             throws NoSuchAuthorityCodeException, FactoryException
     {
-        // Note: Use upper case mostly for consistency with a previous version of this method.
+        // @deprecated: 'toUpperCase()' is required only for epsg-wkt.
+        // Remove after we deleted the epsg-wkt module.
         code = code.trim().toUpperCase();
         return getAuthorityFactory(longitudeFirst).createCoordinateReferenceSystem(code);
     }
@@ -442,8 +457,7 @@ public final class CRS {
                  * returns null, since it is a legal return value according this method contract.
                  */
                 envelope = null;
-                Logging.unexpectedException("org.geotools.referencing", CRS.class,
-                                            "getEnvelope", exception);
+                unexpectedException("getEnvelope", exception);
             } catch (TransformException exception) {
                 /*
                  * The envelope is probably outside the range of validity for this CRS.
@@ -452,8 +466,7 @@ public final class CRS {
                  * legal return value according this method contract.
                  */
                 envelope = null;
-                Logging.unexpectedException("org.geotools.referencing", CRS.class,
-                                            "getEnvelope", exception);
+                unexpectedException("getEnvelope", exception);
             }        
         }
         return envelope;
@@ -529,8 +542,7 @@ public final class CRS {
              * Should not occurs, since envelopes are usually already in geographic coordinates.
              * If it occurs anyway, returns null since it is allowed by this method contract.
              */
-            Logging.unexpectedException("org.geotools.referencing", CRS.class,
-                                        "getGeographicBoundingBox", exception);
+            unexpectedException("getGeographicBoundingBox", exception);
         }
         return null;
     }
@@ -810,6 +822,8 @@ public final class CRS {
 
     /**
      * Scans the identifiers list looking for an EPSG id
+     *
+     * @deprecated Used by deprecated methods only.
      */
     private static String getSRSFromCRS(final CoordinateReferenceSystem crs, final Set authorities) {
         for (Iterator itAuth = authorities.iterator(); itAuth.hasNext();) {
@@ -893,8 +907,14 @@ public final class CRS {
     }
 
     /**
-     * Transforms an envelope. The transformation is only approximative. Note that the returned
-     * envelope may not have the same number of dimensions than the original envelope.
+     * Transforms an envelope using the given {@linkplain MathTransform math transform}.
+     * The transformation is only approximative. Note that the returned envelope may not
+     * have the same number of dimensions than the original envelope.
+     * <p>
+     * Note that this method can not handle the case where the envelope contains the North or
+     * South pole, or when it cross the &plusmn;180° longitude, because {@linkplain MathTransform
+     * math transforms} do not carry suffisient informations. For a more robust envelope
+     * transformation, use {@link #transform(CoordinateOperation, Envelope)} instead.
      *
      * @param  transform The transform to use.
      * @param  envelope Envelope to transform, or {@code null}. This envelope will not be modified.
@@ -924,12 +944,11 @@ public final class CRS {
         final int sourceDim = transform.getSourceDimensions();
         final int targetDim = transform.getTargetDimensions();
         if (envelope.getDimension() != sourceDim) {
-            throw new MismatchedDimensionException(Errors.format(
-                      ErrorKeys.MISMATCHED_DIMENSION_$2,
+            throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
                       new Integer(sourceDim), new Integer(envelope.getDimension())));
         }
-        int          coordinateNumber = 0;
-        GeneralEnvelope   transformed = null;
+        int coordinateNumber = 0;
+        GeneralEnvelope transformed = null;
         final GeneralDirectPosition sourcePt = new GeneralDirectPosition(sourceDim);
         final GeneralDirectPosition targetPt = new GeneralDirectPosition(targetDim);
         for (int i=sourceDim; --i>=0;) {
@@ -945,11 +964,13 @@ public final class CRS {
             } else {
                 transformed = new GeneralEnvelope(targetPt, targetPt);
             }
-            // Get the next point's coordinate.   The 'coordinateNumber' variable should
-            // be seen as a number in base 3 where the number of digits is equals to the
-            // number of dimensions. For example, a 4-D space would have numbers ranging
-            // from "0000" to "2222". The digits are then translated into minimal, central
-            // or maximal ordinates.
+            /*
+             * Get the next point's coordinates.  The 'coordinateNumber' variable should
+             * be seen as a number in base 3 where the number of digits is equals to the
+             * number of dimensions. For example, a 4-D space would have numbers ranging
+             * from "0000" to "2222" (numbers in base 3). The digits are then translated
+             * into minimal, central or maximal ordinates.
+             */
             int n = ++coordinateNumber;
             for (int i=sourceDim; --i>=0;) {
                 switch (n % 3) {
@@ -963,29 +984,172 @@ public final class CRS {
         }
         return transformed;
     }
-    
+
     /**
-     * Transforms a rectangular envelope. The transformation is only approximative.
-     * Invoking this method is equivalent to invoking the following:
+     * Transforms an envelope using the given {@linkplain CoordinateOperation coordinate pperation}.
+     * The transformation is only approximative. Note that the returned envelope may not have the
+     * same number of dimensions than the original envelope.
      * <p>
-     * <pre>transform(transform, new GeneralEnvelope(source)).toRectangle2D()</pre>
+     * This method can handle the case where the envelope contains the North or South pole,
+     * or when it cross the &plusmn;180° longitude.
      *
-     * @param  transform The transform to use. Source and target dimension must be 2.
-     * @param  source The rectangle to transform (may be {@code null}).
-     * @param  dest The destination rectangle (may be {@code source}).
-     *         If {@code null}, a new rectangle will be created and returned.
-     * @return {@code dest}, or a new rectangle if {@code dest} was non-null
-     *         and {@code source} was null.
+     * @param  operation The operation to use. Source and target dimension must be 2.
+     * @param  envelope Envelope to transform, or {@code null}. This envelope will not be modified.
+     * @return The transformed envelope, or {@code null} if {@code envelope} was null.
      * @throws TransformException if a transform failed.
      *
-     * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
+     * @since 2.4
      */
-    public static Rectangle2D transform(final MathTransform2D transform,
-                                        final Rectangle2D     source,
-                                        final Rectangle2D     dest)
+    public static GeneralEnvelope transform(final CoordinateOperation operation, final Envelope envelope)
             throws TransformException
     {
-        if (source == null) {
+        if (envelope == null) {
+            return null;
+        }
+        MathTransform mt = operation.getMathTransform();
+        final GeneralEnvelope transformed = transform(mt, envelope);
+        final CoordinateReferenceSystem targetCRS = operation.getTargetCRS();
+        if (targetCRS == null) {
+            return transformed;
+        }
+        transformed.setCoordinateReferenceSystem(targetCRS);
+        final CoordinateSystem targetCS = targetCRS.getCoordinateSystem();
+        if (targetCS == null) {
+            // It should be an error, but we keep this method tolerant.
+            return transformed;
+        }
+        /*
+         * Checks for singularity points. For example the south pole is a singularity point in
+         * geographic CRS because we reach the maximal value allowed on one particular geographic
+         * axis, namely latitude. This point is not a singularity in the stereographic projection,
+         * where axis extends toward infinity in all directions (mathematically) and south pole
+         * has nothing special apart being the origin (0,0).
+         *
+         * Algorithm:
+         *
+         * 1) Inspect the target axis, looking if there is any bounds. If bounds are found, get
+         *    the coordinates of singularity points and project them from target to source CRS.
+         *
+         *    Example: if the transformed envelope above is (80°S to 85°S, 10°W to 50°W), and if
+         *             target axis inspection reveal us that the latitude in target CRS is bounded
+         *             at 90°S, then project (90°S,30°W) to source CRS. Note that the longitude is
+         *             set to the the center of the envelope longitude range (more on this later).
+         *
+         * 2) If the singularity point computed above is inside the source envelope, add that
+         *    point to the target (transformed) envelope.
+         *
+         * Note: We could choose to project the (-180, -90), (180, -90), (-180, 90), (180, 90)
+         * points, or the (-180, centerY), (180, centerY), (centerX, -90), (centerX, 90) points
+         * where (centerX, centerY) are relative to the initially transformed envelope. It make
+         * no difference for polar projections because the longitude is irrelevant at pole, but
+         * may make a difference for the 180° longitude bounds.  Consider a Mercator projection
+         * where the transformed envelope is between 20°N and 40°N. If we try to project (-180,90),
+         * we will get a TransformException because the Mercator projection is not supported at
+         * pole. If we try to project (-180, 30) instead, we will get a valid point. If this point
+         * is inside the source envelope because the later overlaps the 180° longitude, then the
+         * transformed envelope will be expanded to the full (-180 to 180) range. This is quite
+         * large, but at least it is correct (while the envelope without expansion is not).
+         */
+        GeneralEnvelope generalEnvelope = null;
+        DirectPosition sourcePt = null;
+        DirectPosition targetPt = null;
+        final int dimension = targetCS.getDimension();
+        for (int i=0; i<dimension; i++) {
+            final CoordinateSystemAxis axis = targetCS.getAxis(i);
+            boolean testMax = false; // Tells if we are testing the minimal or maximal value.
+            do {
+                final double extremum = testMax ? axis.getMaximumValue() : axis.getMinimumValue();
+                if (Double.isInfinite(extremum) || Double.isNaN(extremum)) {
+                    /*
+                     * The axis is unbounded. It should always be the case when the target CRS is
+                     * a map projection, in which case this loop will finish soon and this method
+                     * will do nothing more (no object instantiated, no MathTransform inversed...)
+                     */
+                    continue;
+                }
+                if (targetPt == null) {
+                    try {
+                        mt = mt.inverse();
+                    } catch (NoninvertibleTransformException exception) {
+                        /*
+                         * If the transform is non invertible, this method can't do anything. This
+                         * is not a fatal error because the envelope has already be transformed by
+                         * the caller. We lost the check for singularity points performed by this
+                         * method, but it make no difference in the common case where the source
+                         * envelope didn't contains any of those points.
+                         *
+                         * Note that this exception is normal if target dimension is smaller than
+                         * source dimension, since the math transform can not reconstituate the
+                         * lost dimensions. So we don't log any warning in this case.
+                         */
+                        if (dimension >= mt.getSourceDimensions()) {
+                            unexpectedException("transform", exception);
+                        }
+                        return transformed;
+                    }
+                    targetPt = new GeneralDirectPosition(mt.getSourceDimensions());
+                    for (int j=0; j<dimension; j++) {
+                        targetPt.setOrdinate(j, transformed.getCenter(j));
+                    }
+                    // TODO: avoid the hack below if we provide a contains(DirectPosition)
+                    //       method in GeoAPI Envelope interface.
+                    if (envelope instanceof GeneralEnvelope) {
+                        generalEnvelope = (GeneralEnvelope) envelope;
+                    } else {
+                        generalEnvelope = new GeneralEnvelope(envelope);
+                    }
+                }
+                targetPt.setOrdinate(i, extremum);
+                try {
+                    sourcePt = mt.transform(targetPt, sourcePt);
+                } catch (TransformException e) {
+                    /*
+                     * This exception may be normal. For example we are sure to get this exception
+                     * when trying to project the latitude extremums with a cylindrical Mercator
+                     * projection. Do not log any message and try the other points.
+                     */
+                    continue;
+                }
+                if (generalEnvelope.contains(sourcePt)) {
+                    transformed.add(targetPt);
+                }
+            } while ((testMax = !testMax) == true);
+            if (targetPt != null) {
+                targetPt.setOrdinate(i, transformed.getCenter(i));
+            }
+        }
+        return transformed;
+    }
+    
+    /**
+     * Transforms a rectangular envelope using the given {@linkplain MathTransform math transform}.
+     * The transformation is only approximative. Invoking this method is equivalent to invoking the
+     * following:
+     * <p>
+     * <pre>transform(transform, new GeneralEnvelope(envelope)).toRectangle2D()</pre>
+     * <p>
+     * Note that this method can not handle the case where the rectangle contains the North or
+     * South pole, or when it cross the &plusmn;180° longitude, because {@linkplain MathTransform
+     * math transforms} do not carry suffisient informations. For a more robust rectangle
+     * transformation, use {@link #transform(CoordinateOperation, Rectangle2D, Rectangle2D)}
+     * instead.
+     *
+     * @param  transform   The transform to use. Source and target dimension must be 2.
+     * @param  envelope    The rectangle to transform (may be {@code null}).
+     * @param  destination The destination rectangle (may be {@code envelope}).
+     *         If {@code null}, a new rectangle will be created and returned.
+     * @return {@code destination}, or a new rectangle if {@code destination} was non-null
+     *         and {@code envelope} was null.
+     * @throws TransformException if a transform failed.
+     *
+     * @since 2.4
+     */
+    public static Rectangle2D transform(final MathTransform2D transform,
+                                        final Rectangle2D     envelope,
+                                              Rectangle2D     destination)
+            throws TransformException
+    {
+        if (envelope == null) {
             return null;
         }
         double xmin = Double.POSITIVE_INFINITY;
@@ -993,21 +1157,22 @@ public final class CRS {
         double xmax = Double.NEGATIVE_INFINITY;
         double ymax = Double.NEGATIVE_INFINITY;
         final Point2D.Double point = new Point2D.Double();
-        for (int i=0; i<8; i++) {
+        for (int i=0; i<=8; i++) {
             /*
              *   (0)----(5)----(1)
              *    |             |
-             *   (4)           (7)
+             *   (4)    (8)    (7)
              *    |             |
              *   (2)----(6)----(3)
              */
-            point.x = (i&1)==0 ? source.getMinX() : source.getMaxX();
-            point.y = (i&2)==0 ? source.getMinY() : source.getMaxY();
+            point.x = (i&1)==0 ? envelope.getMinX() : envelope.getMaxX();
+            point.y = (i&2)==0 ? envelope.getMinY() : envelope.getMaxY();
             switch (i) {
-                case 5: // fallthrough
-                case 6: point.x=source.getCenterX(); break;
-                case 7: // fallthrough
-                case 4: point.y=source.getCenterY(); break;
+                case 5: // fall through
+                case 6: point.x=envelope.getCenterX(); break;
+                case 8: point.x=envelope.getCenterX(); // fall through
+                case 7: // fall through
+                case 4: point.y=envelope.getCenterY(); break;
             }
             transform.transform(point, point);
             if (point.x < xmin) xmin = point.x;
@@ -1015,11 +1180,112 @@ public final class CRS {
             if (point.y < ymin) ymin = point.y;
             if (point.y > ymax) ymax = point.y;
         }
-        if (dest != null) {
-            dest.setRect(xmin, ymin, xmax-xmin, ymax-ymin);
-            return dest;
+        if (destination != null) {
+            destination.setRect(xmin, ymin, xmax-xmin, ymax-ymin);
+        } else {
+            destination = XRectangle2D.createFromExtremums(xmin, ymin, xmax, ymax);
         }
-        return XRectangle2D.createFromExtremums(xmin, ymin, xmax, ymax);
+        // Attempt the 'equalsEpsilon' assertion only if source and destination are not same.
+        assert (destination == envelope) || XRectangle2D.equalsEpsilon(destination,
+                transform(transform, new Envelope2D(null, envelope)).toRectangle2D()) : destination;
+        return destination;
+    }
+
+    /**
+     * Transforms a rectangular envelope using the given {@linkplain CoordinateOperation coordinate
+     * operation}. The transformation is only approximative. Invoking this method is equivalent to
+     * invoking the following:
+     * <p>
+     * <pre>transform(operation, new GeneralEnvelope(envelope)).toRectangle2D()</pre>
+     * <p>
+     * This method can handle the case where the rectangle contains the North or South pole,
+     * or when it cross the &plusmn;180° longitude.
+     *
+     * @param  operation The operation to use. Source and target dimension must be 2.
+     * @param  envelope The rectangle to transform (may be {@code null}).
+     * @param  destination The destination rectangle (may be {@code envelope}).
+     *         If {@code null}, a new rectangle will be created and returned.
+     * @return {@code destination}, or a new rectangle if {@code destination} was non-null
+     *         and {@code envelope} was null.
+     * @throws TransformException if a transform failed.
+     *
+     * @since 2.4
+     */
+    public static Rectangle2D transform(final CoordinateOperation operation,
+                                        final Rectangle2D         envelope,
+                                              Rectangle2D         destination)
+            throws TransformException
+    {
+        if (envelope == null) {
+            return null;
+        }
+        final MathTransform transform = operation.getMathTransform();
+        if (!(transform instanceof MathTransform2D)) {
+            throw new MismatchedDimensionException(Errors.format(ErrorKeys.NO_TRANSFORM2D_AVAILABLE));
+        }
+        MathTransform2D mt = (MathTransform2D) transform;
+        destination = transform(mt, envelope, destination);
+        final CoordinateReferenceSystem targetCRS = operation.getTargetCRS();
+        if (targetCRS == null) {
+            return destination;
+        }
+        final CoordinateSystem targetCS = targetCRS.getCoordinateSystem();
+        if (targetCS == null || targetCS.getDimension() != 2) {
+            // It should be an error, but we keep this method tolerant.
+            return destination;
+        }
+        /*
+         * Checks for singularity points. See the transform(CoordinateOperation, Envelope)
+         * method for comments about the algorithm. The code below is the same algorithm
+         * adapted for the 2D case and the related objects (Point2D, Rectangle2D, etc.).
+         */
+        Point2D sourcePt = null;
+        Point2D targetPt = null;
+        for (int flag=0; flag<4; flag++) { // 2 dimensions and 2 extremums compacted in a flag.
+            final int i = flag >> 1; // The dimension index being examined.
+            final CoordinateSystemAxis axis = targetCS.getAxis(i);
+            final double extremum = (flag & 1) == 0 ? axis.getMinimumValue() : axis.getMaximumValue();
+            if (Double.isInfinite(extremum) || Double.isNaN(extremum)) {
+                continue;
+            }
+            if (targetPt == null) {
+                try {
+                    // TODO: remove the cast when we will be allowed to compile for J2SE 1.5.
+                    mt = (MathTransform2D) mt.inverse();
+                } catch (NoninvertibleTransformException exception) {
+                    unexpectedException("transform", exception);
+                    return destination;
+                }
+                targetPt = new Point2D.Double();
+            }
+            switch (i) {
+                case 0: targetPt.setLocation(extremum, destination.getCenterY()); break;
+                case 1: targetPt.setLocation(destination.getCenterX(), extremum); break;
+                default: throw new AssertionError(flag);
+            }
+            try {
+                sourcePt = mt.transform(targetPt, sourcePt);
+            } catch (TransformException e) {
+                // Do not log; this exception is often expected here.
+                continue;
+            }
+            if (envelope.contains(sourcePt)) {
+                destination.add(targetPt);
+            }
+        }
+        // Attempt the 'equalsEpsilon' assertion only if source and destination are not same.
+        assert (destination == envelope) || XRectangle2D.equalsEpsilon(destination,
+                transform(operation, new GeneralEnvelope(envelope)).toRectangle2D()) : destination;
+        return destination;
+    }
+
+    /**
+     * Invoked when an unexpected exception occured. Those exceptions must be non-fatal,
+     * i.e. the caller <strong>must</strong> have a raisonable fallback (otherwise it
+     * should propagate the exception).
+     */
+    static void unexpectedException(final String methodName, final Exception exception) {
+        Logging.unexpectedException(LOGGER, CRS.class, methodName, exception);
     }
 
     /**

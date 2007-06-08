@@ -362,6 +362,28 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
     }
 
     /**
+     * Returns {@code true} if the two rectangles are equals up to an epsilon value.
+     */
+    public static boolean equalsEpsilon(final Rectangle2D rect1, final Rectangle2D rect2) {
+        double dx = 0.5 * Math.abs(rect1.getWidth()  + rect2.getWidth());
+        double dy = 0.5 * Math.abs(rect1.getHeight() + rect2.getHeight());
+        if (dx > 0) dx *= EPS; else dx = EPS;
+        if (dy > 0) dy *= EPS; else dy = EPS;
+        return equalsEpsilon(rect1.getMinX(), rect2.getMinX(), dx) &&
+               equalsEpsilon(rect1.getMinY(), rect2.getMinY(), dy) &&
+               equalsEpsilon(rect1.getMaxX(), rect2.getMaxX(), dx) &&
+               equalsEpsilon(rect1.getMaxY(), rect2.getMaxY(), dy);
+    }
+
+    /**
+     * Compares the specified numbers with the specified tolerance.
+     */
+    private static boolean equalsEpsilon(final double v1, final double v2, final double eps) {
+        return (Math.abs(v1 - v2) < eps) ||
+                (java.lang.Double.doubleToLongBits(v1) == java.lang.Double.doubleToLongBits(v2));
+    }
+
+    /**
      * Tests if the interior of this {@code Rectangle2D} entirely
      * contains the specified set of rectangular coordinates.
      *

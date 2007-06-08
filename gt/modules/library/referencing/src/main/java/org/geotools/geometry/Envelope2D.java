@@ -294,4 +294,16 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
         }
         return true;
     }
+
+    /**
+     * Returns a string representation of this envelope. The default implementation is okay
+     * for occasional formatting (for example for debugging purpose). But if there is a lot
+     * of envelopes to format, users will get more control by using their own instance of
+     * {@link org.geotools.measure.CoordinateFormat}.
+     *
+     * @since 2.4
+     */
+    public String toString() {
+        return GeneralEnvelope.toString(this);
+    }
 }

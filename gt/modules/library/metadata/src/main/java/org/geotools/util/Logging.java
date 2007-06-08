@@ -225,6 +225,9 @@ public final class Logging {
      * @param classe  The class where the error occurred, or {@code null}.
      * @param method  The method where the error occurred, or {@code null}.
      * @param error   The error.
+     *
+     * @deprecated Use {@link #unexpectedException(String, Class, String, Throwable)}
+     *             instead, for type safety.
      */
     public static void unexpectedException(String paquet, String classe, String method,
                                            final Throwable error)

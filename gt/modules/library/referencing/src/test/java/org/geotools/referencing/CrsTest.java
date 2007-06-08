@@ -18,6 +18,7 @@ package org.geotools.referencing;
 
 // J2SE dependencies
 import java.util.Set;
+import java.awt.geom.Rectangle2D;
 
 // JUnit dependencies
 import junit.framework.Test;
@@ -26,12 +27,15 @@ import junit.framework.TestSuite;
 
 // OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.referencing.crs.DefaultProjectedCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.wkt.Parser;
@@ -120,5 +124,52 @@ public final class CrsTest extends TestCase {
 
         assertTrue(oldEnvelope.contains(firstEnvelope, true));
         assertTrue(oldEnvelope.equals  (firstEnvelope, 0.02, true));
+    }
+
+    /**
+     * Tests the transformations of a rectangle using a coordinate operation.
+     * With assertions enabled, this also test the transformation of an envelope.
+     */
+    public void testTransformationOverPole() throws FactoryException, TransformException {
+        String wkt = "PROJCS[\"WGS 84 / Antarctic Polar Stereographic\",\n"     +
+                     "  GEOGCS[\"WGS 84\",\n"                                   +
+                     "    DATUM[\"World Geodetic System 1984\",\n"              +
+                     "      SPHEROID[\"WGS 84\", 6378137.0, 298.257223563]],\n" +
+                     "    PRIMEM[\"Greenwich\", 0.0],\n"                        +
+                     "    UNIT[\"degree\", 0.017453292519943295]],\n"           +
+                     "  PROJECTION[\"Polar Stereographic (variant B)\"],\n"     +
+                     "  PARAMETER[\"standard_parallel_1\", -71.0],\n"           +
+                     "  UNIT[\"m\", 1.0]]";
+        final CoordinateReferenceSystem mapCRS = CRS.parseWKT(wkt);
+        final CoordinateReferenceSystem WGS84  = DefaultGeographicCRS.WGS84;
+        final CoordinateOperation operation =
+                CRS.getCoordinateOperationFactory(false).createOperation(mapCRS, WGS84);
+        final MathTransform transform = operation.getMathTransform();
+        assertTrue(transform instanceof MathTransform2D);
+        /*
+         * The rectangle to test, which contains the South pole.
+         */
+        final Rectangle2D envelope = XRectangle2D.createFromExtremums(
+                -3943612.4042124213, -4078471.954436003,
+                 3729092.5890516187,  4033483.085688618);
+        /*
+         * This is what we get without special handling of singularity point.
+         * Note that is doesn't include the South pole as we would expect.
+         */
+        Rectangle2D expected = XRectangle2D.createFromExtremums(
+                -178.49352310409273, -88.99136583196398,
+                 137.56220967463082, -40.905775004205864);
+        /*
+         * Tests what we actually get.
+         */
+        Rectangle2D actual = CRS.transform((MathTransform2D) transform, envelope, null);
+        assertTrue(XRectangle2D.equalsEpsilon(expected, actual));
+        /*
+         * Using the transform(CoordinateOperation, ...) method,
+         * the singularity at South pole is taken in account.
+         */
+        expected = XRectangle2D.createFromExtremums(-180, -90, 180, -40.905775004205864);
+        actual = CRS.transform(operation, envelope, actual);
+        assertTrue(XRectangle2D.equalsEpsilon(expected, actual));
     }
 }

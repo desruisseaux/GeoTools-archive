@@ -27,7 +27,6 @@ import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
-import org.geotools.util.Logging;
 import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.Citations;
@@ -78,8 +77,7 @@ final class DefaultAuthorityFactory extends BufferedAuthorityFactory implements 
                      * support this operation (UnsupportedOperationException), or any unexpected
                      * reason. No codes from this factory will be added to the set.
                      */
-                    Logging.unexpectedException("org.geotools.referencing",
-                            "org.geotools.referencing.CRS", "getSupportedCodes", exception);
+                    CRS.unexpectedException("getSupportedCodes", exception);
                     continue;
                 }
                 if (codes!=null && !codes.isEmpty()) {
