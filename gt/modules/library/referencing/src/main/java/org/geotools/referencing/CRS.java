@@ -47,6 +47,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.geometry.MismatchedReferenceSystemException;
 
 // Geotools dependencies
 import org.geotools.factory.GeoTools;
@@ -1005,6 +1006,14 @@ public final class CRS {
     {
         if (envelope == null) {
             return null;
+        }
+        final CoordinateReferenceSystem sourceCRS = operation.getSourceCRS();
+        if (sourceCRS != null) {
+            final CoordinateReferenceSystem crs = envelope.getCoordinateReferenceSystem();
+            if (crs != null && !equalsIgnoreMetadata(crs, sourceCRS)) {
+                throw new MismatchedReferenceSystemException(
+                        Errors.format(ErrorKeys.MISMATCHED_COORDINATE_REFERENCE_SYSTEM));
+            }
         }
         MathTransform mt = operation.getMathTransform();
         final GeneralEnvelope transformed = transform(mt, envelope);

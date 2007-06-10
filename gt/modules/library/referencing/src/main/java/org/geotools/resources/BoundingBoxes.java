@@ -90,7 +90,7 @@ public final class BoundingBoxes {
                     throw new TransformPathNotFoundException(Errors.format(
                               ErrorKeys.CANT_TRANSFORM_ENVELOPE, exception));
                 }
-                envelope = CRS.transform(operation.getMathTransform(), envelope);
+                envelope = CRS.transform(operation, envelope);
             }
             box.setWestBoundLongitude(envelope.getMinimum(0));
             box.setEastBoundLongitude(envelope.getMaximum(0));

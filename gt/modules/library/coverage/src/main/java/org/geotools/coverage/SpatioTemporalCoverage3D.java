@@ -267,8 +267,7 @@ control:    for (int p=0; p<=1; p++) {
                 } catch (FactoryException exception) {
                     throw new TransformPathNotFoundException(exception);
                 }
-                geographicArea = CRS.transform((MathTransform2D)transform.getMathTransform(),
-                                               geographicArea, geographicArea);
+                geographicArea = CRS.transform(transform, geographicArea, geographicArea);
             }
             boundingBox = (GeographicBoundingBox) new GeographicBoundingBoxImpl(geographicArea).unmodifiable();
         }

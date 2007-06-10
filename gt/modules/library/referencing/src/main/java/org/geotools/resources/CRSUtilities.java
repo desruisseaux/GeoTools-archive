@@ -437,7 +437,7 @@ public final class CRSUtilities {
             if (!CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, crs)) {
                 final CoordinateOperation op = ReferencingFactoryFinder.getCoordinateOperationFactory(null)
                         .createOperation(crs, DefaultGeographicCRS.WGS84);
-                bounds = CRS.transform((MathTransform2D) op.getMathTransform(), bounds, null);
+                bounds = CRS.transform(op, bounds, null);
             }
             final AngleFormat fmt = new AngleFormat("DD°MM.m'");
             buffer = fmt.format(new  Latitude(bounds.getMinY()), buffer, null); buffer.append('-');
