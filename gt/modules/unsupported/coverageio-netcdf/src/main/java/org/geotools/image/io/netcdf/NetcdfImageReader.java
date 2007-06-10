@@ -289,7 +289,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
         if (streamMetadata == null && !ignoreMetadata) {
             ensureFileOpen();
             ensureMetadataLoaded();
-            streamMetadata = new NetcdfMetadata(file);
+            streamMetadata = createMetadata(file);
         }
         return streamMetadata;
     }
@@ -303,10 +303,30 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
             prepareVariable(imageIndex);
             if (variable instanceof VariableDS) {
                 ensureMetadataLoaded();
-                imageMetadata = new NetcdfMetadata((VariableDS) variable);
+                imageMetadata = createMetadata((VariableDS) variable);
             }
         }
         return imageMetadata;
+    }
+
+    /**
+     * Creates metadata for the specified NetCDF file. This method is invoked automatically
+     * by {@link #getStreamMetadata} when first needed. The default implementation returns an
+     * instance of {@link NetcdfMetadata}. Subclasses can override this method in order to create
+     * a more specific set of metadata.
+     */
+    protected IIOMetadata createMetadata(final NetcdfDataset file) throws IOException {
+        return new NetcdfMetadata(file);
+    }
+
+    /**
+     * Creates metadata for the specified NetCDF variable. This method is invoked automatically
+     * by {@link #getImageMetadata} when first needed. The default implementation returns an
+     * instance of {@link NetcdfMetadata}. Subclasses can override this method in order to create
+     * a more specific set of metadata.
+     */
+    protected IIOMetadata createMetadata(final VariableDS variable) throws IOException {
+        return new NetcdfMetadata(variable);
     }
 
     /**
@@ -680,10 +700,12 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
 
         /**
          * Returns a description for this provider.
+         *
+         * @todo Localize
          */
         //@Override
         public String getDescription(final Locale locale) {
-            return "NetCDF image decoder"; // TODO: localize
+            return "NetCDF image decoder";
         }
 
         /**
@@ -706,6 +728,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
 
         /**
          * If a constant palette was specified to the constructor, returns a type specifier for it.
+         * Otherwise returns {@code null}.
          */
         //@Override
         public ImageTypeSpecifier getForcedImageType(final int imageIndex) throws IOException {
