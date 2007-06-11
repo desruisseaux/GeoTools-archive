@@ -15,6 +15,7 @@
  */
 package org.geotools.caching;
 
+import java.net.URI;
 import java.util.Random;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
@@ -60,9 +61,12 @@ public class Generator {
         builder.addType(geom);
         builder.addType(dummydata);
         builder.setDefaultGeometry(geom);
+        builder.setNamespace(URI.create("testStore"));
 
         try {
-            return builder.getFeatureType();
+            FeatureType type = builder.getFeatureType();
+
+            return type;
         } catch (SchemaException e) {
             throw (RuntimeException) new RuntimeException().initCause(e);
         }

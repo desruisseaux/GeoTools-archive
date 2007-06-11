@@ -18,7 +18,11 @@ package org.geotools.caching;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -30,8 +34,11 @@ import org.geotools.caching.Generator;
 import org.geotools.caching.InMemoryDataCache;
 import org.geotools.caching.SpatialQueryTracker;
 import org.geotools.data.DataStore;
+import org.geotools.data.FeatureLocking;
 import org.geotools.data.Query;
 import org.geotools.data.memory.MemoryDataStore;
+import org.geotools.data.shapefile.ShapefileDataStore;
+import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
@@ -97,6 +104,29 @@ public class CacheTest extends TestCase {
 
     public static Test suite() {
         return new TestSuite(CacheTest.class);
+    }
+
+    public void ztestShapefileStore() throws IOException, MalformedURLException {
+        File f = new File("target/test.shp");
+        ShapefileDataStore sds = new ShapefileDataStore(f.toURL(), URI.create("testStore"));
+
+        if (!f.exists()) {
+            sds.createSchema(type);
+
+            if (sds.getFeatureSource() instanceof FeatureLocking) {
+                FeatureLocking fl = (FeatureLocking) sds.getFeatureSource();
+                FeatureCollection col = new DefaultFeatureCollection("testStore", type);
+                col.addAll(data);
+                fl.addFeatures(col);
+            }
+        } else {
+            if (sds.getSchema().equals(type)) {
+                System.out.println("Schema ok");
+            } else {
+                System.out.println(sds.getSchema());
+                System.out.println(type);
+            }
+        }
     }
 
     public void testTracker() {

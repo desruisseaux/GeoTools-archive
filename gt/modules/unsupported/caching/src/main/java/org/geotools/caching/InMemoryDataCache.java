@@ -31,11 +31,38 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
 
 
+/** Implementation of DataCache that uses in-memory storage,
+ * spatial query tracker and spatial index.
+ *
+ *  IMPORTANT : for the time being, this class provides cache facility only
+ *  when using getView(Query) method. Other methods simply delegate to source DataStore.
+ *
+ * @task use this class to design AbstractDataCache,
+ * which would be the parent of all DataCache implementation.
+ *
+ * @author Christophe Rousson, SoC 2007, CRG-ULAVAL
+ *
+ */
 public class InMemoryDataCache implements DataCache {
+    /**
+     * The source DataStore, from where to get original features
+     */
     private final DataStore source;
+
+    /**
+     * Tracker to keep relationships between queries and features.
+     */
     private final QueryTracker tracker;
+
+    /**
+     * Actual storage for features.
+     */
     private final FeatureIndex index;
 
+    /** Creates a new DataCache on top of DataStore ds.
+     *
+     * @param ds the DataStore to cache.
+     */
     public InMemoryDataCache(DataStore ds) {
         this.source = ds;
         this.tracker = new SpatialQueryTracker();
@@ -104,6 +131,22 @@ public class InMemoryDataCache implements DataCache {
         return source.getTypeNames();
     }
 
+    /* (non-Javadoc)
+     * @see org.geotools.data.DataStore#getView(org.geotools.data.Query)
+     *
+     * This is the important method :
+     *
+     * Sequence proposed to process user query :
+     *
+     * user query
+     *  -> match query in tracker
+     *  -> dowload missing data from source
+     *  -> add new data to cache
+     *  -> register query in tracker
+     *  -> read cache
+     *     -> anwser to query
+     *
+     */
     public FeatureSource getView(Query q) throws IOException, SchemaException {
         Query m = tracker.match(q);
         FeatureSource in = source.getView(m);
@@ -122,6 +165,8 @@ public class InMemoryDataCache implements DataCache {
 
         tracker.register(m);
 
+        // if query q could not be turned into a "smaller" query, ie a query that yield a smaller set of features,
+        // returns directly collection obtained from source, rather than reading the cache.
         if (m.equals(q)) {
             return in;
         } else {

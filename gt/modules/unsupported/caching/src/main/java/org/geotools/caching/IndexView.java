@@ -27,19 +27,48 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 
 
+/** Associates a FeatureIndex with a query.
+ * This is used to get a view from the index,
+ * ie. a subset of the features containes in the index.
+ *
+ * If more features are added to the underlying FeatureIndex,
+ * after instance is created, instance will reflect new set,
+ * as it delegates actual process to the FeatureIndex.
+ *
+ * @task implements private method : Query restrict(Query q)
+ *
+ * @author Christophe Rousson, SoC 2007, CRG-ULAVAL
+ *
+ */
 public class IndexView implements FeatureSource {
     private final FeatureIndex index;
     private final Query view;
 
+    /** Associates FeatureIndex with Query.
+     *
+     * @param index a FeatureIndex
+     * @param q Query
+     */
     public IndexView(FeatureIndex index, Query q) {
         this.index = index;
         this.view = q;
     }
 
+    /** Creates a dummy view with all features,
+     * yielding all features within the FeatureIndex
+     *
+     * @param index FeatureIndex on which to build the view.
+     *
+     */
     public IndexView(FeatureIndex index) {
         this(index, Query.ALL);
     }
 
+    /********************************************************
+     **
+     ** Next methods delegate process to FeatureIndex.
+     **
+     ********************************************************/
     public void addFeatureListener(FeatureListener arg0) {
         // TODO Auto-generated method stub
     }
@@ -64,6 +93,12 @@ public class IndexView implements FeatureSource {
         return index.getDataStore();
     }
 
+    /* (non-Javadoc)
+     * @see org.geotools.data.FeatureSource#getFeatures()
+     *
+     * Get FeatureCollection associated with view from the FeatureIndex.
+     *
+     */
     public FeatureCollection getFeatures() throws IOException {
         // TODO Auto-generated method stub
         return index.getFeatures(view);
@@ -86,6 +121,13 @@ public class IndexView implements FeatureSource {
         // TODO Auto-generated method stub
     }
 
+    /** Actually does nothing,
+     * but ideally would return a new query
+     * defined by ((view query) AND (input query))
+     *
+     * @param q a Query
+     * @return new Query
+     */
     private Query restrict(Query q) {
         // TODO combine view query and new query
         return q;

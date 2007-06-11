@@ -40,21 +40,36 @@ import org.geotools.index.rtree.RTree;
 import org.geotools.index.rtree.memory.MemoryPageStore;
 
 
+/** An implementation of FeatureIndex, that stores every thing needed in memory.
+ *
+ * @task handle size limit properly (currently, we do nothing).
+ *
+ * @author Christophe Rousson, SoC 2007, CRG-ULAVAL
+ *
+ */
 public class MemoryFeatureIndex implements FeatureIndex {
     private static final DataDefinition df = createDataDefinition();
     private RTree tree = createTree();
     private final InternalStore internalStore;
-    private final long capacity;
-    private long indexCount = 0;
+    private final int capacity;
+    private int indexCount = 0;
     private final FeatureType type;
     private Query currentQuery = Query.ALL;
 
-    public MemoryFeatureIndex(FeatureType type, long capacity) {
+    /** Creates a new index that can store features of given type.
+     *
+     * @param type FeatureType of features this index will store
+     * @param capacity maximum number of features we can store.
+     */
+    public MemoryFeatureIndex(FeatureType type, int capacity) {
         this.internalStore = new SimpleHashMapInternalStore();
         this.capacity = capacity;
         this.type = type;
     }
 
+    /* (non-Javadoc)
+     * @see org.geotools.caching.FeatureIndex#add(org.geotools.feature.Feature)
+     */
     public void add(Feature f) {
         if (internalStore.contains(f)) {
             return;
@@ -75,6 +90,9 @@ public class MemoryFeatureIndex implements FeatureIndex {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.geotools.caching.FeatureIndex#clear()
+     */
     public void clear() {
         try {
             tree.close();
@@ -91,6 +109,9 @@ public class MemoryFeatureIndex implements FeatureIndex {
         // TODO Auto-generated method stub
     }
 
+    /* (non-Javadoc)
+     * @see org.geotools.caching.FeatureIndex#get(java.lang.String)
+     */
     public Feature get(String featureID) {
         /*Filter f = FilterFactoryFinder.createFilterFactory().createFidFilter(featureID) ;
            try {
@@ -117,6 +138,9 @@ public class MemoryFeatureIndex implements FeatureIndex {
         return f;
     }
 
+    /* (non-Javadoc)
+     * @see org.geotools.caching.FeatureIndex#getFeatures(org.geotools.data.Query)
+     */
     public FeatureCollection getFeatures(Query q) {
         Filter f = q.getFilter();
         FeatureCollection fc = new DefaultFeatureCollection(null, type);
@@ -133,6 +157,12 @@ public class MemoryFeatureIndex implements FeatureIndex {
         return fc;
     }
 
+    /** Preselects features from the spatial index.
+     * If query is not a BBox query, returns all features in the cache.
+     *
+     * @param q a Query
+     * @return a collection of features within or intersecting query bounds.
+     */
     private Collection getCandidates(Query q) {
         Filter f = q.getFilter();
 
@@ -163,6 +193,9 @@ public class MemoryFeatureIndex implements FeatureIndex {
         return internalStore.getAll();
     }
 
+    /* (non-Javadoc)
+     * @see org.geotools.caching.FeatureIndex#remove(java.lang.String)
+     */
     public void remove(String featureID) {
         Envelope env = ((Feature) internalStore.get(featureID)).getBounds();
 
@@ -180,10 +213,17 @@ public class MemoryFeatureIndex implements FeatureIndex {
         indexCount--;
     }
 
+    /* (non-Javadoc)
+     * @see org.geotools.caching.FeatureIndex#getView(org.geotools.data.Query)
+     */
     public FeatureSource getView(Query q) {
         return new IndexView(this, q);
     }
 
+    /** R-tree to keep envelopes of stored features.
+     *
+     * @return a R-tree, memory mapped.
+     */
     private static RTree createTree() {
         try {
             PageStore ps = new MemoryPageStore(df, 8, 4, PageStore.SPLIT_QUADRATIC);
@@ -195,6 +235,10 @@ public class MemoryFeatureIndex implements FeatureIndex {
         }
     }
 
+    /** Data definition of data we feed into the R-tree.
+     * What we store is the ID of features (we assume ID are less than 256 chars).
+     * @return data definition
+     */
     private static DataDefinition createDataDefinition() {
         DataDefinition df = new DataDefinition("US-ASCII");
         df.addField(256);
@@ -202,10 +246,16 @@ public class MemoryFeatureIndex implements FeatureIndex {
         return df;
     }
 
+    /* (non-Javadoc)
+     * @see org.geotools.data.FeatureSource#addFeatureListener(org.geotools.data.FeatureListener)
+     */
     public void addFeatureListener(FeatureListener arg0) {
         // TODO Auto-generated method stub
     }
 
+    /* (non-Javadoc)
+     * @see org.geotools.data.FeatureSource#getBounds()
+     */
     public Envelope getBounds() throws IOException {
         try {
             return tree.getBounds();
@@ -214,38 +264,59 @@ public class MemoryFeatureIndex implements FeatureIndex {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.geotools.data.FeatureSource#getBounds(org.geotools.data.Query)
+     */
     public Envelope getBounds(Query q) throws IOException {
         FeatureCollection fc = this.getFeatures(q);
 
         return fc.getBounds();
     }
 
+    /* (non-Javadoc)
+     * @see org.geotools.data.FeatureSource#getCount(org.geotools.data.Query)
+     */
     public int getCount(Query q) throws IOException {
         FeatureCollection fc = this.getFeatures(q);
 
         return fc.size();
     }
 
+    /* (non-Javadoc)
+     * @see org.geotools.data.FeatureSource#getDataStore()
+     */
     public DataStore getDataStore() {
         // TODO Auto-generated method stub
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see org.geotools.data.FeatureSource#getFeatures()
+     */
     public FeatureCollection getFeatures() throws IOException {
         // TODO Auto-generated method stub
         return this.getFeatures(Query.ALL);
     }
 
+    /* (non-Javadoc)
+     * @see org.geotools.data.FeatureSource#getFeatures(org.opengis.filter.Filter)
+     */
     public FeatureCollection getFeatures(Filter arg0) throws IOException {
         // TODO Auto-generated method stub
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see org.geotools.data.FeatureSource#getSchema()
+     */
     public FeatureType getSchema() {
         // TODO Auto-generated method stub
         return type;
     }
 
+    /* (non-Javadoc)
+     * @see org.geotools.data.FeatureSource#removeFeatureListener(org.geotools.data.FeatureListener)
+     */
     public void removeFeatureListener(FeatureListener arg0) {
         // TODO Auto-generated method stub
     }

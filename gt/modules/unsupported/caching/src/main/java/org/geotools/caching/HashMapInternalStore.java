@@ -22,6 +22,17 @@ import java.util.Random;
 import org.geotools.feature.Feature;
 
 
+/** In-memory implementation of InternalStore, using a HashMap storage.
+ *
+ * Overflow is directed to another InternalStore, so we can chain InternalStore.
+ * (eg. Memory -> Disk -> ...)
+ *
+ * When maximum capacity is reached, randomly make room for new features,
+ * and write removed features to overflow store.
+ *
+ * @author Christophe Rousson, SoC 2007, CRG-ULAVAL
+ *
+ */
 public class HashMapInternalStore implements InternalStore {
     private final InternalStore overflow;
     private final int capacity;
@@ -29,17 +40,27 @@ public class HashMapInternalStore implements InternalStore {
     private int count = 0;
     private final Random rand = new Random();
 
+    /**
+     * @param capacity
+     * @param overflow
+     */
     public HashMapInternalStore(int capacity, InternalStore overflow) {
         this.overflow = overflow;
         this.capacity = capacity;
         this.buffer = new HashMap();
     }
 
+    /* (non-Javadoc)
+     * @see org.geotools.caching.InternalStore#clear()
+     */
     public void clear() {
         buffer.clear();
         count = 0;
     }
 
+    /* (non-Javadoc)
+     * @see org.geotools.caching.InternalStore#contains(org.geotools.feature.Feature)
+     */
     public boolean contains(final Feature f) {
         return buffer.containsKey(f.getID());
     }
@@ -53,8 +74,13 @@ public class HashMapInternalStore implements InternalStore {
         return buffer.containsKey(featureId);
     }
 
+    /* (non-Javadoc)
+     * @see org.geotools.caching.InternalStore#get(java.lang.String)
+     *
+     * TODO don't return null.
+     *
+     */
     public Feature get(final String featureId) {
-        // TODO Auto-generated method stub
         Feature ret = null;
 
         if (buffer.containsKey(featureId)) {
@@ -72,10 +98,16 @@ public class HashMapInternalStore implements InternalStore {
         return ret;
     }
 
+    /* (non-Javadoc)
+     * @see org.geotools.caching.InternalStore#getAll()
+     */
     public Collection getAll() {
         return buffer.values();
     }
 
+    /* (non-Javadoc)
+     * @see org.geotools.caching.InternalStore#put(org.geotools.feature.Feature)
+     */
     public void put(final Feature f) {
         // assert capacity > count ;
         if (count == capacity) {
@@ -86,11 +118,19 @@ public class HashMapInternalStore implements InternalStore {
         count++;
     }
 
+    /* (non-Javadoc)
+     * @see org.geotools.caching.InternalStore#remove(java.lang.String)
+     */
     public void remove(final String featureId) {
         buffer.remove(featureId);
         count--;
     }
 
+    /** Random eviction strategy.
+     * Remove an arbitrary feature from store,
+     * and put removed in features in overflow InternalStore
+     *
+     */
     protected void evict() {
         int entry = rand.nextInt(buffer.size());
         Iterator it = buffer.keySet().iterator();
@@ -108,15 +148,14 @@ public class HashMapInternalStore implements InternalStore {
         remove(id);
     }
 
-    class Entry {
-        static final short DIRTY = 0;
-        static final short FROM_SOURCE = 1;
-        static final short FROM_CACHE = 2;
-        Feature f;
-        short state = 1;
-
-        public Entry(Feature f) {
-            this.f = f;
-        }
-    }
+    /* class Entry {
+       static final short DIRTY = 0;
+       static final short FROM_SOURCE = 1;
+       static final short FROM_CACHE = 2;
+       Feature f;
+       short state = 1;
+       public Entry(Feature f) {
+           this.f = f;
+       }
+       } */
 }

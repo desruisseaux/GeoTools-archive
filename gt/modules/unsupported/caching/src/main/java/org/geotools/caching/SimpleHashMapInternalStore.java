@@ -20,6 +20,15 @@ import java.util.HashMap;
 import org.geotools.feature.Feature;
 
 
+/** Simplest implementation of InternalStore, using a HashMap as storage.
+ * Does implement cache size limit.
+ * Does not handle oveflow.
+ *
+ * Used only for testing purpose.
+ *
+ * @author Christophe Rousson, SoC 2007, CRG-ULAVAL
+ *
+ */
 public class SimpleHashMapInternalStore implements InternalStore {
     private final HashMap buffer = new HashMap();
 
