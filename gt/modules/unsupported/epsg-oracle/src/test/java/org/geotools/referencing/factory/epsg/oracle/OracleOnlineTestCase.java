@@ -2,27 +2,19 @@ package org.geotools.referencing.factory.epsg.oracle;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
 import oracle.jdbc.pool.OracleDataSource;
-//import oracle.jdbc.pool.OracleDataSourceFactory;
 
-import org.apache.commons.dbcp.BasicDataSourceFactory;
-import org.geotools.factory.GeoTools;
 import org.geotools.factory.JNDI;
-import org.geotools.referencing.factory.epsg.DefaultFactory;
 import org.geotools.test.OnlineTestCase;
 
 /**
@@ -48,7 +40,7 @@ import org.geotools.test.OnlineTestCase;
  *
  */
 public class OracleOnlineTestCase extends OnlineTestCase {
-    DataSource datasource;
+    protected DataSource datasource;
     
     /** Creates PostGIS-specific JDBC driver class. */
     private static final String DRIVER_CLASS = "oracle.jdbc.driver.OracleDriver";
@@ -132,4 +124,7 @@ public class OracleOnlineTestCase extends OnlineTestCase {
         }       
     }
     */
+    
+    public void testEmpty() {
+    }
 }

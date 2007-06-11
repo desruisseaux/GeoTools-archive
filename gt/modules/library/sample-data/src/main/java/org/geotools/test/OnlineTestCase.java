@@ -60,7 +60,7 @@ public abstract class OnlineTestCase extends TestCase {
      * The fixture is obtained via {@link #getFixtureId()}.
      * </p>
      */
-    protected final void setUp() throws Exception {
+    protected void setUp() throws Exception {
         super.setUp();
 
         // load the fixture
