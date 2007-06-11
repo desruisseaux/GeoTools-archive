@@ -171,5 +171,15 @@ public final class CrsTest extends TestCase {
         expected = XRectangle2D.createFromExtremums(-180, -90, 180, -40.905775004205864);
         actual = CRS.transform(operation, envelope, actual);
         assertTrue(XRectangle2D.equalsEpsilon(expected, actual));
+        
+        /*
+         * The rectangle to test, which contains the South pole, but this time the south
+         * pole is almost in a corner of the rectangle
+         */
+        final Rectangle2D envelope2 = XRectangle2D.createFromExtremums(
+                -4000000, -4000000, 300000, 30000);
+        expected = XRectangle2D.createFromExtremums(-180, -90, 180, -41.03163170198091);
+        actual = CRS.transform(operation, envelope2, actual);
+        assertTrue(XRectangle2D.equalsEpsilon(expected, actual));
     }
 }

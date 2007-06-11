@@ -1063,6 +1063,12 @@ public final class CRS {
         DirectPosition sourcePt = null;
         DirectPosition targetPt = null;
         final int dimension = targetCS.getDimension();
+        
+        // compute the center of the source envelope, and project it to the destination CRS
+        GeneralEnvelope source = new GeneralEnvelope(envelope);
+        source.setCoordinateReferenceSystem(operation.getSourceCRS());
+        DirectPosition projectedCenter = operation.getMathTransform().transform(source.getCenter(), null);
+        
         for (int i=0; i<dimension; i++) {
             final CoordinateSystemAxis axis = targetCS.getAxis(i);
             boolean testMax = false; // Tells if we are testing the minimal or maximal value.
@@ -1098,7 +1104,7 @@ public final class CRS {
                     }
                     targetPt = new GeneralDirectPosition(mt.getSourceDimensions());
                     for (int j=0; j<dimension; j++) {
-                        targetPt.setOrdinate(j, transformed.getCenter(j));
+                        targetPt.setOrdinate(j, projectedCenter.getOrdinate(j));
                     }
                     // TODO: avoid the hack below if we provide a contains(DirectPosition)
                     //       method in GeoAPI Envelope interface.
