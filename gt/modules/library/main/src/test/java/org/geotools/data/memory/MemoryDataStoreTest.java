@@ -1253,13 +1253,16 @@ public class MemoryDataStoreTest extends DataTestCase {
         assertFalse(isLocked("road", "road.rd3"));
     }
     public void testGetFeatureLockingExpire() throws Exception {
-        FeatureLock lock = FeatureLockFactory.generate("Timed", 1);
+        FeatureLock lock = FeatureLockFactory.generate("Timed", 1);        
         FeatureLocking road = (FeatureLocking) data.getFeatureSource("road");
         road.setFeatureLock(lock);
         assertFalse(isLocked("road", "road.rd1"));
         road.lockFeatures(rd1Filter);
         assertTrue(isLocked("road", "road.rd1"));
-        Thread.sleep(50);
+        long then = System.currentTimeMillis();
+        do {
+            Thread.sleep( 15 );            
+        } while ( then == System.currentTimeMillis() );     
         assertFalse(isLocked("road", "road.rd1"));
     }
 }
