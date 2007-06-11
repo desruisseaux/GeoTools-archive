@@ -2040,7 +2040,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
                  */
                 final PreparedStatement units = prepareStatement("ParameterUnit",
                                                   "SELECT MIN(UOM_CODE) AS UOM,"
-                                                 +      " MIN(PARAM_VALUE_FILE_REF) AS FILE"
+                                                 +      " MIN(PARAM_VALUE_FILE_REF) AS FILEREF"
                                                  +    " FROM [Coordinate_Operation Parameter Value]"
                                                  +   " WHERE (PARAMETER_CODE = ?)"
                                                  + " GROUP BY UOM_CODE"
