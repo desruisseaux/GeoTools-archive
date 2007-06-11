@@ -474,4 +474,8 @@ public class GeometryTestOperation extends Assert {
         assertTrue(toString() + " but was " + actualResult, test);
     }
 
+	protected Object getActualResult() {
+		return actualResult;
+	}
+
 }

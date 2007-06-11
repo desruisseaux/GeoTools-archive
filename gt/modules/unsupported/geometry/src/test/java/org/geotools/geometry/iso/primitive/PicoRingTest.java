@@ -109,9 +109,9 @@ public class PicoRingTest extends TestCase {
 		
 		RingImpl ring1 = tPrimFactory.createRing(curveList);
 
-		System.out.println(ring1);
+		//System.out.println(ring1);
 
-		System.out.println(ring1.getEnvelope());
+		//System.out.println(ring1.getEnvelope());
 		
 		// Rings should be simple
 		assertTrue(ring1.isSimple());

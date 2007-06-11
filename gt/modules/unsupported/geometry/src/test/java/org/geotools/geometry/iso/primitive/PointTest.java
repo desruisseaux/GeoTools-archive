@@ -66,20 +66,20 @@ public class PointTest extends TestCase {
 		
 		Point p2 = tPrimFactory.createPoint(dp1);
 		
-		System.out.println("P1: " + p1);
-		System.out.println("P2: " + p2);
+		//System.out.println("P1: " + p1);
+		//System.out.println("P2: " + p2);
 		assertTrue(p1.equals(p2));
 		
-		System.out.println("Dimension is " + p1.getDimension(null));
+		//System.out.println("Dimension is " + p1.getDimension(null));
 		assertTrue(p1.getDimension(null) == 0);
 
-		System.out.println("Coordinate dimension is " + p1.getCoordinateDimension());
+		//System.out.println("Coordinate dimension is " + p1.getCoordinateDimension());
 		assertTrue(p1.getCoordinateDimension() == 2);
 		
 		Complex cp1 = p1.getClosure();
-		System.out.println("Class of p1.closure() is " + cp1.getClass());
+		//System.out.println("Class of p1.closure() is " + cp1.getClass());
 		assertTrue(cp1 instanceof CompositePoint);
-		System.out.println("p1.closure() is " + cp1);
+		//System.out.println("p1.closure() is " + cp1);
 		
 		assertTrue(p1.isCycle() == true);
 
@@ -87,8 +87,8 @@ public class PointTest extends TestCase {
 		double[] coord2 = new double[]{5, 20};
 		dp1 = tCoordFactory.createDirectPosition(coord2);
 		p1.setPosition(dp1);
-		System.out.println("P1: " + p1);
-		System.out.println("P2: " + p2);
+		//System.out.println("P1: " + p1);
+		//System.out.println("P2: " + p2);
 		assertTrue(!p1.equals(p2));
 		
 

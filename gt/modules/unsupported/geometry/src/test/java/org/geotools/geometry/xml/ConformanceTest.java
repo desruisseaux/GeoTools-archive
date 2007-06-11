@@ -16,18 +16,16 @@
 package org.geotools.geometry.xml;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
+import java.util.Enumeration;
 import java.util.Properties;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
+import junit.framework.AssertionFailedError;
+import junit.framework.TestCase;
+import junit.framework.TestResult;
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
-import org.geotools.geometry.iso.root.GeometryImpl;
 import org.geotools.geometry.text.WKTParser;
 import org.geotools.test.TestData;
 import org.opengis.geometry.Boundary;
@@ -37,7 +35,7 @@ import org.opengis.geometry.primitive.PrimitiveFactory;
 import org.xml.sax.InputSource;
 
 /**
- * This TestSuite picks up each JTS test and applies it to the provided
+ * This TestCase picks up the file with the same name as the test method, a JTS test, and applies it to the provided
  * Geometry*Factory.
  * 
  * If an accompanying .properties file is found, the following entries may
@@ -59,47 +57,153 @@ import org.xml.sax.InputSource;
  * - spaces must be replaced by "_" in description
  * - "No_description" is the default
  */
-public class GeometryConformanceTest extends TestSuite {
+public class ConformanceTest extends TestCase {
 
-    public static Test suite() {
-        GeometryTestParser parser = new GeometryTestParser();
+	TestResult result;
+	@Override
+	public void run(TestResult result) {
+		this.result = result;
+		super.run(result);
+		result = null;
+	}
+	public void testTestTEST(){
+		assertTrue( true );
+	}
+	public void testLineTests() throws Exception {
+		perform();
+	}
+	public void testPolygonTests() throws Exception {
+		perform();
+	}
+	
+	public void testPolygonWithHoleTests() throws Exception {
+		perform();
+	}
+	public void testSimplePolygonTest() throws Exception {
+		perform();
+	}
+	public void testTestBoundary() throws Exception {
+		perform();
+	}
+	public void testTestBuffer() throws Exception {
+		perform();
+	}
+	public void testTestCentroid() throws Exception {
+		perform();
+	}
+	public void testTestConvexHullbig() throws Exception {
+		setName("testTestConvexHull-big");
+		perform();
+	}
+	public void testTestConvexHull() throws Exception {
+		perform();
+	}
+	public void testTestFunctionAA() throws Exception {
+		perform();
+	}
+	public void testTestFunctionAAPrec() throws Exception {
+		perform();
+	}
+	public void testTestFunctionLA() throws Exception {
+		perform();
+	}
+	public void testTestFunctionLAPrec() throws Exception {
+		perform();
+	}
+	public void testTestFunctionLL() throws Exception {
+		perform();
+	}
+	public void testTestFunctionLLPrec() throws Exception {
+		perform();
+	}
+	public void testTestFunctionPA() throws Exception {
+		perform();
+	}
+	public void testTestFunctionPL() throws Exception {
+		perform();
+	}
+	public void testTestFunctionPLPrec() throws Exception {
+		perform();
+	}
+	public void testTestFunctionPP() throws Exception {
+		perform();
+	}
+	public void testTestInteriorPoint() throws Exception {
+		perform();
+	}
+	public void testTestRectanglePredicate() throws Exception {
+		perform();
+	}
+	public void testTestRelateAA() throws Exception {
+		perform();
+	}
+	public void testTestRelateAC() throws Exception {
+		perform();
+	}
+	public void testTestRelateLA() throws Exception {
+		perform();
+	}
+	public void testTestRelateLC() throws Exception {
+		perform();
+	}
+	public void testTestRelateLL() throws Exception {
+		perform();
+	}
+	public void testTestRelatePA() throws Exception {
+		perform();
+	}
+	public void testTestRelatePL() throws Exception {
+		perform();
+	}
+	public void testTestRelatePP() throws Exception {
+		perform();
+	}
+//	public void testTestSimple() throws Exception {
+//		perform();
+//	}
+//	public void testTestValid() throws Exception {
+//		perform();
+//	}
+//	public void testTestValid2big() throws Exception {
+//		setName("testTestValid2-big");
+//		perform();
+//	}
+//	public void testTestValid2() throws Exception {
+//		perform();
+//	}
+	public void testTestWithinDistance() throws Exception {
+		perform();
+	}
+    private void perform() throws Exception {   	
+		String name = getName();
+		name = name.substring( 4 )+".xml";
+		
+		File file = TestData.file(ConformanceTest.class, name );		
+		//assertTrue( name+" exists", file.exists() );
+		
+		GeometryTestParser parser = new GeometryTestParser();
+		Properties excludes = findExclusions(file);
+		
+		if( isAllExcluded(excludes) ) return;
 
-        GeometryConformanceTest suite = new GeometryConformanceTest();
+		InputStream inputStream = file.toURL().openStream();
+		InputSource inputSource = new InputSource(inputStream);
+        GeometryTestContainer container = parser.parseTestDefinition(inputSource);
+        container.checkTestOverrides(name, excludes);                      
+        
+        TestResult tempResult = new TestResult();
+        container.runAllTestCases( tempResult );
 
-        File dir;
-        try {
-            dir = TestData.file(GeometryConformanceTest.class, "LineTests.xml")
-                    .getParentFile();
-
-            File tests[] = dir.listFiles(new FileFilter() {
-                public boolean accept(File pathname) {
-                    return pathname.toString().endsWith(".xml");
-                }
-            });
-            for (int i = 0; i < tests.length; i++) {
-                File testFile = tests[i];
-                Properties excludes = findExclusions(testFile);
-                if (!isAllExcluded(excludes)) {
-                    InputStream inputStream = testFile.toURL().openStream();
-                    try {
-                        InputSource inputSource = new InputSource(inputStream);
-                        GeometryTestContainer container = parser
-                                .parseTestDefinition(inputSource);
-                        
-                        container.addToTestSuite(testFile.getName(), suite, excludes);
-                    } catch (Exception eek){
-                        //eek.printStackTrace();
-                    } finally {
-                        inputStream.close();
-                    }
-                }
-            }
-        } catch (IOException e) {
-            //e.printStackTrace();
+        // TODO: grab the error and print
+        assertTrue( "failures: "+tempResult.failureCount(), tempResult.wasSuccessful() ); 
+        Enumeration enums = tempResult.failures();
+        while (enums.hasMoreElements()) {
+        	System.out.println("what");
+        	AssertionFailedError failure = (AssertionFailedError) enums.nextElement();
+        	assertTrue("--"+failure.toString(), tempResult.wasSuccessful());
         }
-        return suite;
-    }
-    
+	}
+
     private static Properties findExclusions(File xmlFile) {
         try {
             String excludesPath = xmlFile.getPath();
@@ -163,20 +267,13 @@ public class GeometryConformanceTest extends TestSuite {
                     GeometryTestOperation op = testCase.findTestOperation(operationName);
                     if (op != null) {
                         testCase.removeTestOperation(op);
-                        /*
                         //check for override, rather than just remove
                         if (operationValue.equalsIgnoreCase("skipped")) {
                         	continue;
                         }
-                        */
-                        //remove
-                        if (operationValue.equalsIgnoreCase("skipped")) {
-                        	testCase.removeTestOperation(op);
-                        }
                         else if (operationValue.equalsIgnoreCase("boundary")) {
                         	// post process into a surface boundary
-                        	GeometryImpl curves = (GeometryImpl) op.getExpectedResult();
-                        	//MultiPrimitive curves = (MultiPrimitive) op.getExpectedResult();
+                        	MultiPrimitive curves = (MultiPrimitive) op.getExpectedResult();
                         	Boundary boundary = curves.getBoundary();
                         	op.setExpectedResult( boundary );
                         }

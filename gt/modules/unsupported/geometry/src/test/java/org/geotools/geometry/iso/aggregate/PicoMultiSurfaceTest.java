@@ -84,8 +84,8 @@ public class PicoMultiSurfaceTest extends TestCase {
 		Set<OrientableSurface> surfaces = new HashSet<OrientableSurface>();
 		surfaces.add(surface);
 		MultiSurfaceImpl ms = (MultiSurfaceImpl) agf.createMultiSurface(surfaces);
-		System.out.println(ms);
-		System.out.println(ms.getBoundary());
+		//System.out.println(ms);
+		//System.out.println(ms.getBoundary());
 		//assertNotNull(ms.getBoundary());
 		
 		// test equals

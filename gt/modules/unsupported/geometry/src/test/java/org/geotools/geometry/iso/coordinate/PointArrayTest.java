@@ -59,12 +59,12 @@ public class PointArrayTest extends TestCase {
 
 		// get-method creates new DP instance
 		DirectPosition directPosition = pa.getPosition(0, null);
-		//System.out.println(dp);
+		////System.out.println(dp);
 		assertTrue(directPosition.getOrdinate(0) == -50);
 		assertTrue(directPosition.getOrdinate(1) == 0);
 		
 		DirectPosition directPositionAt4 = pa.getPosition(4, directPosition);
-		//System.out.println(dp);
+		////System.out.println(dp);
 		assertTrue(directPosition.getOrdinate(0) == 50);
 		assertTrue(directPosition.getOrdinate(1) == 0);
 		// get-method uses the same DirectPosition without creating new instance
@@ -92,7 +92,7 @@ public class PointArrayTest extends TestCase {
 		assertEquals( "check if position is independent", 5.0, directPositionAt4mk3.getOrdinate(0) );
 		
 		double[] coord = ((PointArrayImpl)pa).getCoordinate(0);
-		System.out.print(coord[0] + "|" + coord[1]);
+		//System.out.print(coord[0] + "|" + coord[1]);
 		
 		// .isEmpty() and remove(int)
 		assertTrue(!((PointArrayImpl)pa).isEmpty());

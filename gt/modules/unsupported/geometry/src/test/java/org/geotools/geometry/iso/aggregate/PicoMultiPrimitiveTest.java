@@ -101,8 +101,8 @@ public class PicoMultiPrimitiveTest extends TestCase {
 		primitives.add(s);
 		primitives.add(s2);
 		MultiPrimitiveImpl mp = (MultiPrimitiveImpl) agf.createMultiPrimitive(primitives);
-		System.out.println(mp);
-		System.out.println(mp.getBoundary());
+		//System.out.println(mp);
+		//System.out.println(mp.getBoundary());
 		//assertNotNull(mp.getBoundary());
 		
 		// test equals

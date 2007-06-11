@@ -1,6 +1,7 @@
 package org.geotools.geometry.xml;
 
 import junit.framework.TestCase;
+import junit.framework.TestResult;
 
 import org.xml.sax.InputSource;
 
@@ -38,7 +39,7 @@ public class RunStoredTest extends TestCase {
                 FileInputStream inputStream = new FileInputStream(testFile);
                 InputSource inputSource = new InputSource(inputStream);
                 GeometryTestContainer tests = parser.parseTestDefinition(inputSource);
-                assertTrue("Failed test(s) in: " + testFile.getName(), tests.runAllTestCases());
+                assertTrue("Failed test(s) in: " + testFile.getName(), tests.runAllTestCases( new TestResult()));
             }
         }
     }

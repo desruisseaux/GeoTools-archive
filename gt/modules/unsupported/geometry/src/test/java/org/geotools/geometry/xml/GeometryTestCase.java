@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import junit.framework.AssertionFailedError;
 import junit.framework.Protectable;
 import junit.framework.Test;
 import junit.framework.TestResult;
@@ -104,18 +105,21 @@ public class GeometryTestCase implements Test {
 
     /**
      * Run any test operations stored for this test case
+     * @param result2 
      * @return result
      */
-    public boolean runTestCases() {
+    public boolean runTestCases(TestResult result2) {
         boolean result = true;
-        LOG.info("Running test:" + description);
+        result2.startTest( this );
+        //LOG.info("Running test:" + description);
         for (GeometryTestOperation op : operationList) {
-            LOG.info("Running test case:" + op);
             if (!op.run(geomA, geomB)) {
-                LOG.severe(op.toString() + " failed");
+                LOG.severe(this.toString() + " - " + op.toString() + " actual result: " + op.getActualResult() + " failed");
+                result2.addFailure( this, new AssertionFailedError(op.toString() + " failed"));
                 result = false;
             }
         }
+        result2.stop();
         return result;
     }
     public int countTestCases() {

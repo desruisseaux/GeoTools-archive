@@ -7,6 +7,7 @@ import java.util.Properties;
 
 import org.geotools.geometry.iso.PrecisionModel;
 
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 /**
@@ -32,14 +33,14 @@ public class GeometryTestContainer {
     public void addTestCase(GeometryTestCase testCase) {        
         testCases.add(testCase);
     }
-
+    
     /**
      * Runs all tests currently contained. Returns true if all tests pass, false otherwise
      * @return true if all tests pass, false otherwise
      */
-    public boolean runAllTestCases() {
+    public boolean runAllTestCases( TestResult result ) {
         for (GeometryTestCase testCase : testCases) {
-            if (!testCase.runTestCases()) {
+            if (!testCase.runTestCases( result )) {
                 return false;
             }
         }
@@ -54,6 +55,17 @@ public class GeometryTestContainer {
                 //check for overrides on operations
                 testCase = GeometryConformanceTest.overrideOps(testCase, excludes);
                 suite.addTest(testCase);
+            }
+        }
+    }
+    
+    public void checkTestOverrides(String name, Properties excludes) {
+        for (GeometryTestCase testCase : testCases) {
+            //only add the test case if its description is NOT in the excludes list
+            if (!GeometryConformanceTest.isExcluded(excludes, testCase.getDescription())) {
+                testCase.setName(name);
+                //check for overrides on operations
+                testCase = GeometryConformanceTest.overrideOps(testCase, excludes);
             }
         }
     }

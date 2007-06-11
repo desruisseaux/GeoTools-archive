@@ -218,7 +218,7 @@ public class PicoPrimitiveFactoryTest extends TestCase {
 		intrings.add(interior);
 		
 		SurfaceBoundaryImpl sb = new SurfaceBoundaryImpl(crs,exterior,intrings);
-		System.out.println(sb);
+		//System.out.println(sb);
 		
 		
 		// create multiprimitive object
@@ -235,12 +235,12 @@ public class PicoPrimitiveFactoryTest extends TestCase {
 		Curve s2 = new CurveImpl(crs, curves);
 		
 		Set<Primitive> primitives = new HashSet<Primitive>();
-		System.out.println(s.getBoundary());
+		//System.out.println(s.getBoundary());
 		primitives.add(s);
 		primitives.add(s2);
 		MultiPrimitiveImpl mp = new MultiPrimitiveImpl(crs, primitives);
-		System.out.println(mp);
-		System.out.println(mp.getBoundary());
+		//System.out.println(mp);
+		//System.out.println(mp.getBoundary());
 		//assertEquals(sb, mp.getBoundary());
 	}
 }

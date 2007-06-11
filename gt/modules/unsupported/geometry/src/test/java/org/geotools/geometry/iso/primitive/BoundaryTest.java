@@ -45,7 +45,7 @@ public class BoundaryTest extends TestCase {
 		
 		CurveBoundary curveBoundary1 = tPrimitiveFactory.createCurveBoundary(dp1, dp2);
 		
-		System.out.println(curveBoundary1);
+		//System.out.println(curveBoundary1);
 
 		// RepresentativePoint()
 		DirectPosition dp = curveBoundary1.getRepresentativePoint();
@@ -105,13 +105,13 @@ public class BoundaryTest extends TestCase {
 		
 		RingImpl exteriorring1 = tPrimFactory.createRing(curveList);
 
-		System.out.println(exteriorring1);
+		//System.out.println(exteriorring1);
 		
 		List<Ring> interiors = new ArrayList<Ring>();
 		
 		SurfaceBoundary surfaceBoundary1 = tPrimFactory.createSurfaceBoundary(exteriorring1, interiors);
 		
-		System.out.println(surfaceBoundary1);
+		//System.out.println(surfaceBoundary1);
 
 		assertTrue(surfaceBoundary1.isCycle() == true);
 

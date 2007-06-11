@@ -49,13 +49,13 @@ public class LineStringLineSegmentTest extends TestCase {
 		
 		/* Testing constructor of LineString with Array with size of 0 */
 		
-		System.out.println("\n***** TEST: Constructors");
+		//System.out.println("\n***** TEST: Constructors");
 		//PositionImpl arrayOfPoints[] = new PositionImpl[0];
 		ArrayList<Position> positionList = new ArrayList<Position>();
 		try {
 			line1 = tCoordFactory.createLineString(positionList); 
 		} catch (IllegalArgumentException e) {
-			System.out.println("LineStringImpl - Number of Positions in array: 0 - Not accepted");
+			//System.out.println("LineStringImpl - Number of Positions in array: 0 - Not accepted");
 		}
 		assertEquals(line1,null);
 
@@ -65,7 +65,7 @@ public class LineStringLineSegmentTest extends TestCase {
 		try {
 			line1 = tCoordFactory.createLineString(positionList); 
 		} catch (IllegalArgumentException e) {
-			System.out.println("LineStringImpl - Number of Positions in array: 1 - Not accepted");
+			//System.out.println("LineStringImpl - Number of Positions in array: 1 - Not accepted");
 		}
 		assertEquals(line1 , null);
 
@@ -74,9 +74,9 @@ public class LineStringLineSegmentTest extends TestCase {
 		positionList.add(p2);
 		try {
 			line1 = tCoordFactory.createLineString(positionList); 
-			System.out.println("LineStringImpl - Number of Positions in array: 2 - accepted");
+			//System.out.println("LineStringImpl - Number of Positions in array: 2 - accepted");
 		} catch (IllegalArgumentException e) {
-			System.out.println("LineStringImpl - Number of Positions in array: 2 - Not accepted");
+			//System.out.println("LineStringImpl - Number of Positions in array: 2 - Not accepted");
 		}
 		assertNotNull(line1);
 		
@@ -87,27 +87,27 @@ public class LineStringLineSegmentTest extends TestCase {
 		positionList.add(p5);
 		try {
 			line1 = tCoordFactory.createLineString(positionList); 
-			System.out.println("LineStringImpl - Number of Positions in array: 5 - accepted");
-			System.out.println("\n" + line1);
+			//System.out.println("LineStringImpl - Number of Positions in array: 5 - accepted");
+			//System.out.println("\n" + line1);
 
 		} catch (IllegalArgumentException e) {
-			System.out.println("\nLineStringImpl - Number of Positions in array: 5 - Not accepted");
+			//System.out.println("\nLineStringImpl - Number of Positions in array: 5 - Not accepted");
 		}
 		assertNotNull(line1);
 
 		// ***** getEnvelope()
-		System.out.println("\n***** TEST: .envelope()");
-		System.out.println("Envelope of the LineString is " +  line1.getEnvelope());
+		//System.out.println("\n***** TEST: .envelope()");
+		//System.out.println("Envelope of the LineString is " +  line1.getEnvelope());
 
 		// ***** getStartPoint();
-		System.out.println("\n***** TEST: .startPoint()");
-		System.out.println("StartPoint: " + line1.getStartPoint());
+		//System.out.println("\n***** TEST: .startPoint()");
+		//System.out.println("StartPoint: " + line1.getStartPoint());
 		assertEquals(line1.getStartPoint().getOrdinate(0) , -50.0);
 		assertEquals(line1.getStartPoint().getOrdinate(1) , 0.0);
 
 		// ***** getEndPoint();
-		System.out.println("\n***** TEST: .endPoint()");
-		System.out.println("EndPoint: " + line1.getEndPoint());
+		//System.out.println("\n***** TEST: .endPoint()");
+		//System.out.println("EndPoint: " + line1.getEndPoint());
 		assertEquals(line1.getEndPoint().getOrdinate(0) , 50.0);
 		assertEquals(line1.getEndPoint().getOrdinate(1) , 0.0);
 		
@@ -119,28 +119,28 @@ public class LineStringLineSegmentTest extends TestCase {
 		line1.setCurve(curve1);
 		
 		// ***** length()
-		System.out.println("\n***** TEST: .length()");
-		System.out.println("Length of LineString is " + line1.length());
+		//System.out.println("\n***** TEST: .length()");
+		//System.out.println("Length of LineString is " + line1.length());
 		assertEquals(14422, Math.round(line1.length() * 100));
 
 		// ***** getStartParam();
-		System.out.println("\n***** TEST: .startParam()");
-		System.out.println("StartParam: " + line1.getStartParam());
+		//System.out.println("\n***** TEST: .startParam()");
+		//System.out.println("StartParam: " + line1.getStartParam());
 		assertEquals(line1.getStartParam() , 0.0);
 
 		// ***** getEndParam();
-		System.out.println("\n***** TEST: .endParam()");
-		System.out.println("EndParam: " + line1.getEndParam());
+		//System.out.println("\n***** TEST: .endParam()");
+		//System.out.println("EndParam: " + line1.getEndParam());
 		assertEquals(14422, Math.round(line1.getEndParam() * 100));
 
 		// ***** getStartConstructiveParam();
-		System.out.println("\n***** TEST: .startConstrParam()");
-		System.out.println("ConstrStartParam: " + line1.getStartConstructiveParam());
+		//System.out.println("\n***** TEST: .startConstrParam()");
+		//System.out.println("ConstrStartParam: " + line1.getStartConstructiveParam());
 		assertEquals(line1.getStartConstructiveParam() , 0.0);
 		
 		// ***** getEndConstructiveParam();
-		System.out.println("\n***** TEST: .endConstrParam()");
-		System.out.println("ConstrEndParam: " + line1.getEndConstructiveParam());
+		//System.out.println("\n***** TEST: .endConstrParam()");
+		//System.out.println("ConstrEndParam: " + line1.getEndConstructiveParam());
 		assertEquals(line1.getEndConstructiveParam() , 1.0);
 
 		
@@ -154,28 +154,28 @@ public class LineStringLineSegmentTest extends TestCase {
 		LineSegment seg3 = segments.get(2);
 		LineSegment seg4 = segments.get(3);
 
-		System.out.println("LineSegment: " + seg1);	
-		System.out.println("LineSegment: " + seg2);	
+		//System.out.println("LineSegment: " + seg1);	
+		//System.out.println("LineSegment: " + seg2);	
 
 		// ***** LineSegment.getStartParam()
-		System.out.println(seg1.getStartParam());
+		//System.out.println(seg1.getStartParam());
 		assertEquals(seg1.getStartParam() , 0.0);
 		
 		// ***** LineSegment.getEndParam()
-		System.out.println(seg1.getEndParam());
+		//System.out.println(seg1.getEndParam());
 		assertEquals( 36, Math.round(seg1.getEndParam()) );
 
-		System.out.println(seg2.getStartParam());
+		//System.out.println(seg2.getStartParam());
 		assertEquals( 36, Math.round(seg2.getStartParam()) );
 		
-		System.out.println(seg2.getEndParam());
+		//System.out.println(seg2.getEndParam());
 		assertEquals( 72, Math.round(seg2.getEndParam()) );
 		
 		// ***** LineSegment.getStartConstructiveParam()
 		// ***** LineSegment.getEndConstructiveParam()
-		System.out.println(seg1.getStartConstructiveParam());
+		//System.out.println(seg1.getStartConstructiveParam());
 		assertEquals(seg1.getStartConstructiveParam() , 0.0);
-		System.out.println(seg1.getEndConstructiveParam());
+		//System.out.println(seg1.getEndConstructiveParam());
 		assertEquals(seg1.getEndConstructiveParam() , 0.25);
 		assertEquals(segments.get(1).getStartConstructiveParam() , 0.25);
 		assertEquals(segments.get(1).getEndConstructiveParam() , 0.50);
@@ -188,13 +188,13 @@ public class LineStringLineSegmentTest extends TestCase {
 		// ***** LineSegment.forParam(double)
 		// Parameter for forParam() is 0.0 (startparam)
 		DirectPosition resultPos = seg1.forParam(0.0);
-		System.out.println(resultPos);
+		//System.out.println(resultPos);
 		assertEquals(resultPos.getOrdinate(0) , -50.0);
 		assertEquals(resultPos.getOrdinate(1) , 0.0);
 
 		// Parameter for forParam() is endparam
 		resultPos = seg1.forParam(seg1.getEndParam());
-		System.out.println(resultPos);
+		//System.out.println(resultPos);
 		assertEquals(resultPos.getOrdinate(0) , -30.0);
 		assertEquals(resultPos.getOrdinate(1) , 30.0);
 
@@ -205,11 +205,11 @@ public class LineStringLineSegmentTest extends TestCase {
 		} catch(IllegalArgumentException e) {
 			// Shall throw exception
 		}
-		System.out.println(resultPos);
+		//System.out.println(resultPos);
 		assertEquals(resultPos , null);
 
 		resultPos = seg1.forParam(30);
-		System.out.println(resultPos);
+		//System.out.println(resultPos);
 		
 		// ***** LineSegment.getControlPoints()
 		assertEquals(seg1.getControlPoints().length() , 2);
@@ -231,7 +231,7 @@ public class LineStringLineSegmentTest extends TestCase {
 		assertEquals(30.0, dp[1]);
 
 		dp = line1.forParam(50).getCoordinates();
-		//System.out.println("forParam: " + dp[0] + "," + dp[1]);
+		////System.out.println("forParam: " + dp[0] + "," + dp[1]);
 		assertEquals(Math.round(dp[0]*1000) , -18397);
 		assertEquals(Math.round(dp[1]*1000) , 37735);
 
@@ -250,7 +250,7 @@ public class LineStringLineSegmentTest extends TestCase {
 
 		// ***** getTangent(double distance)
 		dp = line1.getTangent(0);
-		//System.out.println("tangent: " + dp[0] + "," + dp[1]);
+		////System.out.println("tangent: " + dp[0] + "," + dp[1]);
         assertEquals(Math.round(dp[0]*1000) , -49445);
         assertEquals(Math.round(dp[1]*1000) , 832);
 
@@ -259,7 +259,7 @@ public class LineStringLineSegmentTest extends TestCase {
         assertEquals(Math.round(dp[1]*100) , 3274);
 
 		dp = line1.getTangent(line1.getEndParam());
-		System.out.println("tangent: " + dp[0] + "," + dp[1]);
+		//System.out.println("tangent: " + dp[0] + "," + dp[1]);
         assertEquals(Math.round(dp[0]*100) , 5055);
         assertEquals(Math.round(dp[1]*100) , -83);
 		
@@ -273,9 +273,9 @@ public class LineStringLineSegmentTest extends TestCase {
 		LineStringImpl line2 = tCoordFactory.createLineString(positionList2);
 		
 		LineStringImpl line3 = line1.merge(line2);
-		System.out.println("Line1: " + line1);
-		System.out.println("Line2: " + line2);
-		System.out.println("MergedLine: " + line3);
+		//System.out.println("Line1: " + line1);
+		//System.out.println("Line2: " + line2);
+		//System.out.println("MergedLine: " + line3);
 		// Lists of line1 and line2 are not modified
 		assertEquals(line1.getControlPoints().size(), 5);
         assertEquals(line2.getControlPoints().size() , 3);
@@ -283,7 +283,7 @@ public class LineStringLineSegmentTest extends TestCase {
         assertEquals(line3.getControlPoints().size() , 7);
 		
 		line3 = line2.merge(line1);
-		System.out.println("MergedLine: " + line3);
+		//System.out.println("MergedLine: " + line3);
 		// Lists of line1 and line2 are not modified
         assertEquals(line1.getControlPoints().size() , 5);
         assertEquals(line2.getControlPoints().size() , 3);
@@ -318,7 +318,7 @@ public class LineStringLineSegmentTest extends TestCase {
 		assertEquals(controlPoints.getPosition(2, null), p3.getPosition());
 		assertEquals(controlPoints.getPosition(3, null), p2.getPosition());
 		assertEquals(controlPoints.getPosition(4, null), p1.getPosition());
-		System.out.println("Reversed. Line1: " + line1);
+		//System.out.println("Reversed. Line1: " + line1);
 
 	}
 
