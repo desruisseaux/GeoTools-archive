@@ -72,7 +72,7 @@ public class XMLSAXHandler extends DefaultHandler {
      */
     protected final static Logger logger = Logger.getLogger(
             "net.refractions.xml.sax");
-    protected static Level level = Level.WARNING;
+    protected static Level level = Level.FINE;
 
     // the stack of handlers
     private Stack handlers = new Stack();
@@ -261,8 +261,7 @@ public class XMLSAXHandler extends DefaultHandler {
         	
             XMLElementHandler handler = (XMLElementHandler) handlers.peek();
             URI uri = new URI(namespaceURI);
-            handler.endElement(uri, localName, hints);
-            handlers.pop();
+            handler.endElement(uri, localName, hints);            
         } catch (Exception e) {
             processException(e);
 
@@ -274,6 +273,9 @@ public class XMLSAXHandler extends DefaultHandler {
                     + locator.getColumnNumber()+" tag is: \n"+qName, e);
             exception.initCause(e);
             throw exception;
+        }
+        finally {
+            handlers.pop(); // we must do this or leak memory
         }
     }
 
