@@ -1255,9 +1255,11 @@ public class MemoryDataAccess_GTAPI_Test extends DataTestCase {
         assertFalse(isLocked("road", "road.rd3"));
     }
 
-    /* This one started to fail and I don't know why, but don't care
+    /**
+     * This one started to fail and I don't know why, but don't care
      * since MemoryDataAccess is just an excercise for feature reading
      * no need for locking.
+     */
     public void testGetFeatureLockingExpire() throws Exception {
         FeatureLock lock = FeatureLockFactory.generate("Timed", 1);
         FeatureLocking road = (FeatureLocking) data.getFeatureSource("road");
@@ -1265,8 +1267,10 @@ public class MemoryDataAccess_GTAPI_Test extends DataTestCase {
         assertFalse(isLocked("road", "road.rd1"));
         road.lockFeatures(rd1Filter);
         assertTrue(isLocked("road", "road.rd1"));
-        Thread.sleep(50);
+        long then = System.currentTimeMillis();
+        do {
+            Thread.sleep( 15 );
+        } while ( then == System.currentTimeMillis() ); 
         assertFalse(isLocked("road", "road.rd1"));
-    }
-    */
+    }  
 }

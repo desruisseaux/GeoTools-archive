@@ -1746,7 +1746,10 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
 
         road.lockFeatures(rd1Filter);
         assertTrue(isLocked("road", "road.rd1"));
-        Thread.sleep(1100);
+        long then = System.currentTimeMillis();
+        do {
+            Thread.sleep( 15 );
+        } while ( then == System.currentTimeMillis() ); 
         assertFalse(isLocked("road", "road.rd1"));
     }
 

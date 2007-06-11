@@ -17,7 +17,11 @@
   <!-- =========================================================== -->
   <!--   Properties and Profiles                                   -->
   <!--       modify the build process in certain conditions.       -->
+  <!--   Available properties are:                                 -->
   <!--                                                             -->
+  <!--    -Djdbc.oracle=true  Indicate that the real oracle driver -->
+  <!--                        has been installed into the local    -->
+  <!--                        repository and should be used.       -->
   <!--   Available profiles are:                                   -->
   <!--     extensive.tests    Performs more extensive tests than   -->
   <!--                        the default. Only a few modules      -->
@@ -40,12 +44,13 @@
   <!--     stress             Profile to active tests which end in -->
   <!--                        "StressTest.java"                    -->
   <!--                                                             -->
-  <!--     oracle.jdbc        Indicates (true or false) if the     -->
-  <!--                        ojdbc14 driver has been installed    -->
+  <!--     pending            Includes modules that are pending    -->
   <!--                                                             -->
-  <!--     Example:           mvn -P extensive.tests install       -->
-  <!--                        mvn -P online,stress install         -->
-  <!--                        mvn -P site.build site               -->
+  <!--   Example:                                                  -->
+  <!--       mvn -P extensive.tests install                        -->
+  <!--       mvn -P online,stress install                          -->
+  <!--       mvn -P site.build site                                -->
+  <!--       mvn eclipse:eclipse -Djdbc.oracle=true -P pending     -->
   <!--                                                             -->
   <!--     While you can specify properties one at a time on the   -->
   <!--     command line, for properties describing your            -->
@@ -670,7 +675,7 @@
       <dependency>
         <groupId>commons-pool</groupId>
         <artifactId>commons-pool</artifactId>
-        <version>1.3</version>
+        <version>20030825.183949</version>
       </dependency>
       <dependency>
         <groupId>commons-logging</groupId>
