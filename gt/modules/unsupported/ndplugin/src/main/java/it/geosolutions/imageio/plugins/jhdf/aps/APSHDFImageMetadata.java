@@ -63,8 +63,6 @@ public class APSHDFImageMetadata extends BaseHDFImageMetadata {
 
 	private String name = "";
 
-	private String fullName = "";
-
 	private String rank = "";
 
 	private String dims = "";
@@ -118,7 +116,6 @@ public class APSHDFImageMetadata extends BaseHDFImageMetadata {
 
 		IIOMetadataNode datasetNode = new IIOMetadataNode("DatasetProperties");
 		datasetNode.setAttribute("Name", name);
-		datasetNode.setAttribute("FullName", fullName);
 		datasetNode.setAttribute("Rank", rank);
 		datasetNode.setAttribute("Dims", dims);
 		datasetNode.setAttribute("ChunkSize", chunkSize);
@@ -225,7 +222,6 @@ public class APSHDFImageMetadata extends BaseHDFImageMetadata {
 			final int rank = dataset.getRank();
 			this.rank = Integer.toString(rank);
 			this.name = dataset.getName();
-			this.fullName = dataset.getFullName();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 

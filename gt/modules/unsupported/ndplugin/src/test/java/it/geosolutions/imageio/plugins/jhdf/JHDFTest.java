@@ -39,45 +39,45 @@ public class JHDFTest extends TestCase {
 		JAI.getDefaultInstance().getTileScheduler().setParallelism(3);
 		JAI.getDefaultInstance().getTileScheduler().setPrefetchPriority(2);
 		JAI.getDefaultInstance().getTileScheduler().setPrefetchParallelism(3);
-		
 	}
 
 	public void testJaiRead() throws IOException {
-		final File file = TestData.file(this, "MODPM2007027122358.L3_000_EAST_MED");
-		
-//		final File file = new File(
-//				"D:/work/Data/HDF/2001017-2001024.s0481pfv50-sst-16b.hdf");
+		final File file = TestData.file(this,
+				"MODPM2007027122358.L3_000_EAST_MED");
+
 		ImageReadParam irp = new ImageReadParam();
 		irp.setSourceSubsampling(1, 1, 0, 0);
-//		irp.setSourceRegion(new Rectangle(0, 512, 1024, 1024));
-		int i=3;
-		for (i=0;i<13;i++){
-			if (i!=2) continue;
-		final ParameterBlockJAI pbjImageRead = new ParameterBlockJAI(
-				"ImageRead");
+		// irp.setSourceRegion(new Rectangle(0, 512, 1024, 1024));
+		int i = 3;
+		for (i = 0; i < 13; i++) {
+			if (i != 2)
+				continue;
+			final ParameterBlockJAI pbjImageRead = new ParameterBlockJAI(
+					"ImageRead");
 
-		pbjImageRead.setParameter("Input", file);
-		pbjImageRead.setParameter("readParam", irp);
-		pbjImageRead.setParameter("imageChoice", Integer.valueOf(i));
-		final RenderedOp image = JAI.create("ImageRead", pbjImageRead);
-		ImageReader reader = (ImageReader)image.getProperty(ImageReadDescriptor.PROPERTY_NAME_IMAGE_READER);
-		visualize(image, "");
-		final IIOMetadata metadata = reader.getImageMetadata(i);
-		Node node = metadata
-				.getAsTree(APSHDFImageMetadata.nativeMetadataFormatName);
+			pbjImageRead.setParameter("Input", file);
+			pbjImageRead.setParameter("readParam", irp);
+			pbjImageRead.setParameter("imageChoice", Integer.valueOf(i));
+			final RenderedOp image = JAI.create("ImageRead", pbjImageRead);
+			ImageReader reader = (ImageReader) image
+					.getProperty(ImageReadDescriptor.PROPERTY_NAME_IMAGE_READER);
+			visualize(image, "");
+			final IIOMetadata metadata = reader.getImageMetadata(i);
+			Node node = metadata
+					.getAsTree(APSHDFImageMetadata.nativeMetadataFormatName);
 		}
 	}
-	
+
 	public void testJaiMultithreadingRead() throws IOException {
-		//SETS JHDFImageReaderSpi as SPI in 
-		//META-INF/services/javax.imageio.spi.ImageReaderSpi
-		
-		final File file = new File(
-				"D:/work/Data/HDF/MISR_AM1_CGLS_WIN_2006_F04_0021.hdf");
+		// SETS JHDFImageReaderSpi as SPI in
+		// META-INF/services/javax.imageio.spi.ImageReaderSpi
+
+		final File file = TestData.file(this,
+				"MODPM2007027122358.L3_000_EAST_MED");
 		ImageReadParam irp = new ImageReadParam();
-		irp.setSourceSubsampling(1,1, 0, 0);
-//		irp.setSourceRegion(new Rectangle(0, 512, 1024, 1024));
-		int i=4;
+		irp.setSourceSubsampling(1, 1, 0, 0);
+		// irp.setSourceRegion(new Rectangle(0, 512, 1024, 1024));
+		int i = 2;
 		final ParameterBlockJAI pbjImageRead = new ParameterBlockJAI(
 				"ImageRead");
 
@@ -89,8 +89,9 @@ public class JHDFTest extends TestCase {
 	}
 
 	public void testManualRead() throws IOException {
-		final File file = TestData.file(this, "MODPM2007027122358.L3_000_EAST_MED");
-		
+		final File file = TestData.file(this,
+				"MODPM2007027122358.L3_000_EAST_MED");
+
 		final JHDFImageReader reader = new JHDFImageReader(
 				new JHDFImageReaderSpi());
 		reader.setInput(file);
@@ -108,7 +109,7 @@ public class JHDFTest extends TestCase {
 			visualize(bi, "");
 		}
 	}
-	
+
 	/**
 	 * Visualization Methods
 	 */
@@ -129,15 +130,12 @@ public class JHDFTest extends TestCase {
 	public static Test suite() {
 		TestSuite suite = new TestSuite();
 
-		 suite.addTest(new JHDFTest("testJaiRead"));
-		 
-//		 suite.addTest(new JHDFTest("testJaiMultithreadingRead"));
+		suite.addTest(new JHDFTest("testJaiRead"));
 
-//		suite.addTest(new JHDFTest("testManualRead"));
+		// suite.addTest(new JHDFTest("testJaiMultithreadingRead"));
 
-		 
-		 
-		 
+		// suite.addTest(new JHDFTest("testManualRead"));
+
 		return suite;
 	}
 

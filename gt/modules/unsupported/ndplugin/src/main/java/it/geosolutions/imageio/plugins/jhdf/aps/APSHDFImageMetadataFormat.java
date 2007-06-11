@@ -34,12 +34,9 @@ public class APSHDFImageMetadataFormat extends IIOMetadataFormatImpl {
         addElement("DatasetProperties",
 				APSHDFImageMetadata.nativeMetadataFormatName, CHILD_POLICY_EMPTY);
         addAttribute("DatasetProperties", "Name", DATATYPE_STRING, true, null);
-        addAttribute("DatasetProperties", "FullName", DATATYPE_STRING, true, null);
         addAttribute("DatasetProperties", "Rank", DATATYPE_STRING, true, null);
         addAttribute("DatasetProperties", "Dims", DATATYPE_STRING, true, null);
         addAttribute("DatasetProperties", "ChunkSize", DATATYPE_STRING, true, null);
-        
-        
 	}
 
 	private static IIOMetadataFormat instance = null;
