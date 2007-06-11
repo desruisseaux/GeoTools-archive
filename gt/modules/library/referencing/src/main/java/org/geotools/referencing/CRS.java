@@ -927,6 +927,19 @@ public final class CRS {
     public static GeneralEnvelope transform(final MathTransform transform, final Envelope envelope)
             throws TransformException
     {
+        return transform(transform, envelope, null);
+    }
+
+    /**
+     * Implementation of {@link #transform(MathTransform, Envelope)} with the opportunity to
+     * save the projected center coordinate. If {@code targetPt} is non-null, then this method
+     * will set it to the center of the source envelope projected to the target CRS.
+     */
+    private static GeneralEnvelope transform(final MathTransform   transform,
+                                             final Envelope        envelope,
+                                             GeneralDirectPosition targetPt)
+            throws TransformException
+    {
         if (envelope == null) {
             return null;
         }
@@ -942,21 +955,32 @@ public final class CRS {
             e.setCoordinateReferenceSystem(null);
             return e;
         }
+        /*
+         * Checks argument validity: envelope and math transform dimensions must be consistent.
+         */
         final int sourceDim = transform.getSourceDimensions();
-        final int targetDim = transform.getTargetDimensions();
         if (envelope.getDimension() != sourceDim) {
             throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
                       new Integer(sourceDim), new Integer(envelope.getDimension())));
         }
         int coordinateNumber = 0;
         GeneralEnvelope transformed = null;
+        if (targetPt == null) {
+            targetPt = new GeneralDirectPosition(transform.getTargetDimensions());
+        }
+        /*
+         * Before to run the loops, we must initialize the coordinates to the minimal values.
+         * This coordinates will be updated in the 'switch' statement inside the 'while' loop.
+         */
         final GeneralDirectPosition sourcePt = new GeneralDirectPosition(sourceDim);
-        final GeneralDirectPosition targetPt = new GeneralDirectPosition(targetDim);
         for (int i=sourceDim; --i>=0;) {
             sourcePt.setOrdinate(i, envelope.getMinimum(i));
         }
   loop: while (true) {
-            // Transform a point and add the transformed point to the destination envelope.
+            /*
+             * Transform a point and add the transformed point to the destination envelope.
+             * Note that the very last point to be projected must be the envelope center.
+             */
             if (targetPt != transform.transform(sourcePt, targetPt)) {
                 throw new UnsupportedImplementationException(transform.getClass());
             }
@@ -976,8 +1000,8 @@ public final class CRS {
             for (int i=sourceDim; --i>=0;) {
                 switch (n % 3) {
                     case 0:  sourcePt.setOrdinate(i, envelope.getMinimum(i)); n/=3; break;
-                    case 1:  sourcePt.setOrdinate(i, envelope.getCenter (i)); continue loop;
-                    case 2:  sourcePt.setOrdinate(i, envelope.getMaximum(i)); continue loop;
+                    case 1:  sourcePt.setOrdinate(i, envelope.getMaximum(i)); continue loop;
+                    case 2:  sourcePt.setOrdinate(i, envelope.getCenter (i)); continue loop;
                     default: throw new AssertionError(n); // Should never happen
                 }
             }
@@ -1016,7 +1040,8 @@ public final class CRS {
             }
         }
         MathTransform mt = operation.getMathTransform();
-        final GeneralEnvelope transformed = transform(mt, envelope);
+        final GeneralDirectPosition centerPt = new GeneralDirectPosition(mt.getTargetDimensions());
+        final GeneralEnvelope transformed = transform(mt, envelope, centerPt);
         final CoordinateReferenceSystem targetCRS = operation.getTargetCRS();
         if (targetCRS == null) {
             return transformed;
@@ -1049,7 +1074,7 @@ public final class CRS {
          *
          * Note: We could choose to project the (-180, -90), (180, -90), (-180, 90), (180, 90)
          * points, or the (-180, centerY), (180, centerY), (centerX, -90), (centerX, 90) points
-         * where (centerX, centerY) are relative to the initially transformed envelope. It make
+         * where (centerX, centerY) are transformed from the source envelope center. It make
          * no difference for polar projections because the longitude is irrelevant at pole, but
          * may make a difference for the 180° longitude bounds.  Consider a Mercator projection
          * where the transformed envelope is between 20°N and 40°N. If we try to project (-180,90),
@@ -1063,12 +1088,6 @@ public final class CRS {
         DirectPosition sourcePt = null;
         DirectPosition targetPt = null;
         final int dimension = targetCS.getDimension();
-        
-        // compute the center of the source envelope, and project it to the destination CRS
-        GeneralEnvelope source = new GeneralEnvelope(envelope);
-        source.setCoordinateReferenceSystem(operation.getSourceCRS());
-        DirectPosition projectedCenter = operation.getMathTransform().transform(source.getCenter(), null);
-        
         for (int i=0; i<dimension; i++) {
             final CoordinateSystemAxis axis = targetCS.getAxis(i);
             boolean testMax = false; // Tells if we are testing the minimal or maximal value.
@@ -1104,7 +1123,7 @@ public final class CRS {
                     }
                     targetPt = new GeneralDirectPosition(mt.getSourceDimensions());
                     for (int j=0; j<dimension; j++) {
-                        targetPt.setOrdinate(j, projectedCenter.getOrdinate(j));
+                        targetPt.setOrdinate(j, centerPt.getOrdinate(j));
                     }
                     // TODO: avoid the hack below if we provide a contains(DirectPosition)
                     //       method in GeoAPI Envelope interface.
@@ -1130,7 +1149,7 @@ public final class CRS {
                 }
             } while ((testMax = !testMax) == true);
             if (targetPt != null) {
-                targetPt.setOrdinate(i, transformed.getCenter(i));
+                targetPt.setOrdinate(i, centerPt.getOrdinate(i));
             }
         }
         return transformed;
@@ -1164,6 +1183,20 @@ public final class CRS {
                                               Rectangle2D     destination)
             throws TransformException
     {
+        return transform(transform, envelope, destination, new Point2D.Double());
+    }
+
+    /**
+     * Implementation of {@link #transform(MathTransform, Rectangle2D, Rectangle2D)} with the
+     * opportunity to save the projected center coordinate. This method sets {@code point} to
+     * the center of the source envelope projected to the target CRS.
+     */
+    private static Rectangle2D transform(final MathTransform2D transform,
+                                         final Rectangle2D     envelope,
+                                               Rectangle2D     destination,
+                                         final Point2D.Double  point)
+            throws TransformException
+    {
         if (envelope == null) {
             return null;
         }
@@ -1171,7 +1204,6 @@ public final class CRS {
         double ymin = Double.POSITIVE_INFINITY;
         double xmax = Double.NEGATIVE_INFINITY;
         double ymax = Double.NEGATIVE_INFINITY;
-        final Point2D.Double point = new Point2D.Double();
         for (int i=0; i<=8; i++) {
             /*
              *   (0)----(5)----(1)
@@ -1179,6 +1211,8 @@ public final class CRS {
              *   (4)    (8)    (7)
              *    |             |
              *   (2)----(6)----(3)
+             *
+             * (note: center must be last)
              */
             point.x = (i&1)==0 ? envelope.getMinX() : envelope.getMaxX();
             point.y = (i&2)==0 ? envelope.getMinY() : envelope.getMaxY();
@@ -1189,7 +1223,9 @@ public final class CRS {
                 case 7: // fall through
                 case 4: point.y=envelope.getCenterY(); break;
             }
-            transform.transform(point, point);
+            if (point != transform.transform(point, point)) {
+                throw new UnsupportedImplementationException(transform.getClass());
+            }
             if (point.x < xmin) xmin = point.x;
             if (point.x > xmax) xmax = point.x;
             if (point.y < ymin) ymin = point.y;
@@ -1239,7 +1275,8 @@ public final class CRS {
             throw new MismatchedDimensionException(Errors.format(ErrorKeys.NO_TRANSFORM2D_AVAILABLE));
         }
         MathTransform2D mt = (MathTransform2D) transform;
-        destination = transform(mt, envelope, destination);
+        final Point2D.Double center = new Point2D.Double();
+        destination = transform(mt, envelope, destination, center);
         final CoordinateReferenceSystem targetCRS = operation.getTargetCRS();
         if (targetCRS == null) {
             return destination;
@@ -1274,8 +1311,8 @@ public final class CRS {
                 targetPt = new Point2D.Double();
             }
             switch (i) {
-                case 0: targetPt.setLocation(extremum, destination.getCenterY()); break;
-                case 1: targetPt.setLocation(destination.getCenterX(), extremum); break;
+                case 0: targetPt.setLocation(extremum, center.y); break;
+                case 1: targetPt.setLocation(center.x, extremum); break;
                 default: throw new AssertionError(flag);
             }
             try {
