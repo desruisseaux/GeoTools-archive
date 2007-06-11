@@ -764,7 +764,6 @@ public final class StreamingRenderer implements GTRenderer {
 		FeatureCollection results = null;
 		DefaultQuery query = new DefaultQuery(DefaultQuery.ALL);
 		Query definitionQuery;
-		MathTransform transform = null;
 		String[] attributes;
 		AttributeType[] ats;
 		final int length;
@@ -804,28 +803,12 @@ public final class StreamingRenderer implements GTRenderer {
 				// default geometric ones
 				if (mapCRS != null && featCrs != null
 						&& !CRS.equalsIgnoreMetadata(featCrs, mapCRS)) {
-					// get an unprojected envelope since the feature source is
-					// operating on
-					// unprojected geometries
-
-					transform = StreamingRenderer.getMathTransform(mapCRS,
-							featCrs);
-
-					if (transform != null && !transform.isIdentity()) {
-						// Envelope eee= JTS.transform(envelope, transform);//
-						// this is the old way
-						// 10 = make 10 points on each side of the bbox &
-						// transform the polygon
-
-						envelope = new ReferencedEnvelope(JTS.transform(
-								mapArea, null, transform, 10), featCrs);
-
-						// will usually be a "bigger" bbox
-					} else
-						transform = null; // reset transform
+					envelope = envelope.transform(featCrs, true, 10);
 				}
 
 				if (!isMemoryPreloadingEnabled()) {
+                    if(LOGGER.isLoggable(Level.FINE))
+                        LOGGER.fine("Querying layer " + schema.getTypeName() +  " with bbox: " + envelope);
 					filter = createBBoxFilters(schema, attributes, envelope);
 				} else {
 					filter = Filter.INCLUDE;
