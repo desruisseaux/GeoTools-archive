@@ -1262,7 +1262,7 @@ public class ShapefileRenderer implements GTRenderer {
             }
             labelCache.startLayer(""+i);
 
-            Envelope bbox = envelope;
+            ReferencedEnvelope bbox = envelope;
 
             try {
                 ShapefileDataStore ds = (ShapefileDataStore) currLayer.getFeatureSource()
@@ -1279,7 +1279,7 @@ public class ShapefileRenderer implements GTRenderer {
 
                 try {
                     mt = CRS.findMathTransform (dataCRS, destinationCrs, true);
-                    bbox = JTS.transform(bbox, null, mt.inverse(), 10);
+                    bbox = bbox.transform(dataCRS, true, 10);
                 } catch (Exception e) {
                     mt = null;
                 }
@@ -1367,8 +1367,7 @@ public class ShapefileRenderer implements GTRenderer {
 		StreamingRenderer renderer=new StreamingRenderer();
 		renderer.setContext(context);
 		renderer.setJava2DHints(getJava2DHints());
-		Map rendererHints2 = new HashMap();
-		rendererHints2.put(LABEL_CACHE_KEY, labelCache);
+		Map rendererHints2 = new HashMap(getRendererHints() != null ? getRendererHints() : Collections.EMPTY_MAP);
 		renderer.setRendererHints(rendererHints2);
 		renderer.paint(graphics, paintArea, envelope, transform);
 	}
