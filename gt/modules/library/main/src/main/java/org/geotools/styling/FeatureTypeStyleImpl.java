@@ -263,7 +263,7 @@ public class FeatureTypeStyleImpl extends AbstractGTComponent
     }
     public String toString() {
     	StringBuffer buf = new StringBuffer();
-    	buf.append( "FeatureTyleStyleImpl<" );
+    	buf.append( "FeatureTypeStyleImpl<" );
     	buf.append( notification );
     	buf.append(">");
         buf.append( "[");
