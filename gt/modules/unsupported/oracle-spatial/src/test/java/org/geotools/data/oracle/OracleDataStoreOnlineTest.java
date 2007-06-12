@@ -70,7 +70,7 @@ import com.vividsolutions.jts.geom.Point;
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  * @source $URL$
  */
-public class OracleDataStoreTest extends TestCase {
+public class OracleDataStoreOnlineTest extends TestCase {
     private ConnectionPool cPool;
     private FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
     private Properties properties;

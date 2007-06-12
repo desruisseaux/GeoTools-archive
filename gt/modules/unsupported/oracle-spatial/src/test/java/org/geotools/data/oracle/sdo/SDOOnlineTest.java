@@ -37,7 +37,7 @@ import junit.framework.TestCase;
  * Window - Preferences - Java - Code Style - Code Templates
  * @source $URL$
  */
-public class SDOTest extends TestCase {
+public class SDOOnlineTest extends TestCase {
     GeometryFixture fixture;
     OracleTestFixture oracle;
 	GeometryConverter converter;
@@ -46,7 +46,7 @@ public class SDOTest extends TestCase {
      * Constructor for GeometryToJTSTest.
      * @param arg0
      */
-    public SDOTest(String arg0) {
+    public SDOOnlineTest(String arg0) {
         super(arg0);
     }    
     /*

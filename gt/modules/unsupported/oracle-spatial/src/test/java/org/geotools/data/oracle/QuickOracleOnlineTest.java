@@ -55,7 +55,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author Jody Garnett, Refractions Research
  * @source $URL$
  */
-public class QuickOracleTest extends DataTestCase {
+public class QuickOracleOnlineTest extends DataTestCase {
     
     /** The logger for the filter module. */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.data.postgis");
@@ -72,7 +72,7 @@ public class QuickOracleTest extends DataTestCase {
      *
      * @throws AssertionError DOCUMENT ME!
      */
-    public QuickOracleTest(String test) {
+    public QuickOracleOnlineTest(String test) {
         super(test);
     }
 

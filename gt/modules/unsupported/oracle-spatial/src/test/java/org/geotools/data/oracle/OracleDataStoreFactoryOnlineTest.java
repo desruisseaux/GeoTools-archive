@@ -20,7 +20,7 @@ import org.geotools.data.jdbc.ConnectionPoolManager;
  * 
  * @author Andrea Aime
  */
-public class OracleDataStoreFactoryTest extends TestCase {
+public class OracleDataStoreFactoryOnlineTest extends TestCase {
     /** The Oracle driver class name */
     private static final String JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
     private Properties properties;
@@ -30,7 +30,7 @@ public class OracleDataStoreFactoryTest extends TestCase {
      * 
      * @throws ClassNotFoundException If the driver cannot be found
      */
-    public OracleDataStoreFactoryTest() throws ClassNotFoundException {
+    public OracleDataStoreFactoryOnlineTest() throws ClassNotFoundException {
         super();
         try {
         	Class.forName(JDBC_DRIVER);
@@ -47,7 +47,7 @@ public class OracleDataStoreFactoryTest extends TestCase {
      * @param arg0 name of the test
      * @throws ClassNotFoundException If the Oracle Driver cannot be found
      */
-    public OracleDataStoreFactoryTest( String arg0 ) throws ClassNotFoundException {
+    public OracleDataStoreFactoryOnlineTest( String arg0 ) throws ClassNotFoundException {
         super(arg0);
         try {
         	Class.forName(JDBC_DRIVER);

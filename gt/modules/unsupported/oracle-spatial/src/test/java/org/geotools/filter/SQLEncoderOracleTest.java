@@ -121,7 +121,7 @@ public class SQLEncoderOracleTest extends TestCase {
         LikeFilter filter = filterFactory.createLikeFilter();
         filter.setValue(filterFactory.createAttributeExpression("name"));
         filter.setPattern("Cory%", "%", "?", "\\");
-        System.out.println(encoder.encode(filter));
+//        System.out.println(encoder.encode(filter));
         assertEquals("WHERE UPPER(\"name\") LIKE UPPER('Cory%')", encoder.encode(filter));
     }
 }

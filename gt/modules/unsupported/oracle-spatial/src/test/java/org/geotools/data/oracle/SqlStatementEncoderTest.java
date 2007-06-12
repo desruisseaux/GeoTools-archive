@@ -41,7 +41,7 @@ public class SqlStatementEncoderTest extends TestCase {
 		FeatureType schema = DataUtilities.createType("ignore",
 				"name:String, line:MultiLineString, measure:Integer");
 		String create = sql.makeCreateTableSQL(schema);
-		System.out.println(create);
+//		System.out.println(create);
 		String expected = "CREATE TABLE table(fid NUMBER,name VARCHAR, line MDSYS.SDO_GEOMETRY, measure INTEGER)";
 		assertEquals(expected, create);
 	}
