@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,12 +33,12 @@ import javax.xml.namespace.QName;
 
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.Query;
-import org.geotools.data.complex.filter.FilterAttributeExtractor;
 import org.geotools.data.complex.filter.XPath;
 import org.geotools.data.complex.filter.XPath.Step;
 import org.geotools.data.complex.filter.XPath.StepList;
 import org.geotools.feature.iso.AttributeFactoryImpl;
 import org.geotools.feature.iso.Types;
+import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.FilterFactoryImplNamespaceAware;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
@@ -574,7 +575,7 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
             }
 
             source.accept(attExtractor, null);
-            Set sourceAttNames = attExtractor.getAttributeNameSet();
+            Set sourceAttNames = new HashSet(attExtractor.getAttributeNameSet());
             // if at least one of the attributes used by the expression is not
             // a grouping attribute, the expression addresses a multivalued
             // target property
@@ -624,25 +625,6 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
         }
     }
 
-    /**
-     * Analyses if the xpath correspond to a leaf node of a complex attribute
-     * other than the top level attribute.
-     * 
-     * @param xpathAttrDefinition
-     * @param targetFeatureNode
-     * 
-     * @return true if it is a Leaf of Complex Type, false in other case
-     */
-    private final boolean isLeafOfNestedComplexType(final StepList xpathAttrDefinition,
-            final AttributeDescriptor targetFeatureNode) {
-
-        if (xpathAttributeBuilder.isComplexType(xpathAttrDefinition, targetFeatureNode)) {
-            return false;
-        }
-
-        return xpathAttrDefinition.size() > 2;
-    }
-
     private final StepList setIndexOfLastStep(final Attribute root,
             final StepList xpathAttrDefinition, int index) {
 
@@ -651,29 +633,6 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
         StepList indexXpath = insertIndexInXpath(root, xpathAttrDefinition, index, insertPosition);
 
         return indexXpath;
-    }
-
-    /**
-     * Sets the given index to the leaf node of an xpath expression
-     * 
-     * @param featureType
-     * @param attrXpath
-     * @param xpathIndex
-     * 
-     * @return String xPath with index
-     */
-    private final StepList setLeafInexInXPathExpression(final Attribute root,
-            final StepList attrXpath, final int xpathIndex) {
-
-        StepList stepList = (StepList) attrXpath.clone();
-
-        int leafIndex = stepList.size() - 1;
-
-        XPath.Step lastStep = (XPath.Step) stepList.get(leafIndex);
-        lastStep = new Step(lastStep.getName(), xpathIndex);
-        stepList.set(leafIndex, lastStep);
-
-        return stepList;
     }
 
     /**

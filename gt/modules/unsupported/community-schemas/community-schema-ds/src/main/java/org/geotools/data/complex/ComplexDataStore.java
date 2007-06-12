@@ -1,7 +1,7 @@
 /*
- *    Geotools2 - OpenSource mapping toolkit
+ *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,7 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 
 package org.geotools.data.complex;
@@ -41,7 +40,6 @@ import org.geotools.data.Query;
 import org.geotools.data.SchemaNotFoundException;
 import org.geotools.data.Source;
 import org.geotools.data.Transaction;
-import org.geotools.data.complex.filter.FilterAttributeExtractor;
 import org.geotools.data.complex.filter.UnmappingFilterVisitor;
 import org.geotools.data.complex.filter.XPath;
 import org.geotools.data.complex.filter.XPath.StepList;
@@ -50,6 +48,7 @@ import org.geotools.data.feature.FeatureSource2;
 import org.geotools.data.feature.adapter.GTComlexFeatureTypeAdapter;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.SchemaException;
+import org.geotools.filter.FilterAttributeExtractor;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
@@ -282,7 +281,7 @@ public class ComplexDataStore /* extends AbstractDataStore */implements FeatureA
      *         else the list of needed surrogate attributes to satisfy the
      *         mapping of prorperties in <code>mappingProperties</code>
      */
-    public List getSurrogatePropertyNames(String[] mappingProperties, FeatureTypeMapping mapping) {
+    private List getSurrogatePropertyNames(String[] mappingProperties, FeatureTypeMapping mapping) {
         List propNames = null;
 
         final FeatureType mappedType;
