@@ -227,8 +227,6 @@ public class SQLEncoderPostgisTest extends TestCase {
 
         String out = encoder.encode((AbstractFilter) fidFilter);
         LOGGER.fine("Resulting SQL filter is \n" + out);
-        System.out.println(out + "|" + "WHERE (gid = '345')");
-
         assertEquals(out, "WHERE (\"gid\" = '345')");
     }
 

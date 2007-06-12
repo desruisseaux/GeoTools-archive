@@ -222,7 +222,6 @@ public void testFid() throws Exception {
 
     String out = encoder.encode((AbstractFilterImpl) fidFilter);
     LOGGER.fine("Resulting SQL filter is \n" + out);
-    System.out.println(out + "|" + "WHERE (gid = '345')");
     assertEquals(out, "WHERE (\"gid\" = '345')");
 }
 

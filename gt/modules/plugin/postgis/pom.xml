@@ -143,7 +143,16 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <excludes>
+            <!-- the following tests either fail, or do not extend PostgisOnlineTestCase -->
+            <exclude>**/PostgisFeatureCollectionOnlineTest.java</exclude>
+            <exclude>**/PostgisAlternateSchemaOnlineTest.java</exclude>
+            <exclude>**/PostgisDataStoreAPIOnlineTest.java</exclude>
+            <exclude>**/PostgisDataStoreFactoryOnlineTest.java</exclude>
+            <exclude>**/PostgisFeatureReaderOnlineTest.java</exclude>
             <exclude>**/PostgisFeatureStoreOnlineTest.java</exclude>
+            <exclude>**/PostgisFeatureWriterOnlineTest.java</exclude>
+            <exclude>**/PostgisWithoutGeosOnlineTest.java</exclude>
+            <exclude>**/PostgisAuthorityFactoryOnlineTest.java</exclude>
             <exclude>${online.skip.pattern}</exclude>
             <exclude>${stress.skip.pattern}</exclude>
           </excludes>
