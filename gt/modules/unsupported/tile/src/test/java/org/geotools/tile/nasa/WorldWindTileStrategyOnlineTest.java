@@ -2,7 +2,6 @@ package org.geotools.tile.nasa;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
@@ -10,15 +9,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.widget.ScrollingImagePanel;
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
 
 import junit.framework.TestCase;
 
@@ -26,7 +21,6 @@ import org.geotools.catalog.GeoResource;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.test.TestData;
 import org.geotools.tile.TileMap;
 import org.geotools.tile.TileMapInfo;
 import org.geotools.tile.TileResource;
@@ -39,14 +33,14 @@ import org.geotools.tile.cache.TileRange;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-public class WorldWindTileStratagyOnlineTest extends TestCase {
-    WorldWindTileStratagy ww;
+public class WorldWindTileStrategyOnlineTest extends TestCase {
+    WorldWindTileStrategy ww;
     private URL url;
 
     protected void setUp() throws Exception {
         super.setUp();                
-        url = WorldWindTileStratagy.class.getResource("earthimages.xml");
-        ww = new WorldWindTileStratagy( url );
+        url = WorldWindTileStrategy.class.getResource("earthimages.xml");
+        ww = new WorldWindTileStrategy( url );
     }
     
     public void testServiceInfo() throws Exception {
@@ -94,7 +88,7 @@ public class WorldWindTileStratagyOnlineTest extends TestCase {
         assertNotNull( quadInfo );
     }
  
-    public void testStratagy(){
+    public void testStrategy(){
         TileServiceInfo info = ww.getInfo( null );
         
         List ids = ww.getTileMapIds(info, null);

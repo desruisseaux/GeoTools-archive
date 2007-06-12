@@ -24,11 +24,11 @@ import org.opengis.util.ProgressListener;
  * @author jgarnett
  * @since 1.1.0
  */
-public class WorldWindTileStratagy extends TileStratagy {
+public class WorldWindTileStrategy extends TileStratagy {
     
     private URL server;
         
-    public WorldWindTileStratagy( URL url ) {
+    public WorldWindTileStrategy( URL url ) {
         server = url;
     }
 

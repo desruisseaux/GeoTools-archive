@@ -123,10 +123,18 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <!-- Set this to 'true' to bypass unit tests entirely.   -->
-          <skip>true</skip>  
-          <!-- Surefire 2.1.2 fails for a mysterious reason before -->
-          <!-- it runs any test!                                   -->
+          <excludes>
+            <!-- The following tests are skipped because they do not extend OnlineTestCase -->
+            <exclude>**/WMSReaderOnlineTest.java</exclude>
+            <exclude>**/WebMapServerOnlineTest.java</exclude>
+            <exclude>**/WMS1_0_0_OnlineTest.java</exclude>
+            <exclude>**/WMS1_1_0_OnlineTest.java</exclude>
+            <exclude>**/WMS1_1_1_OnlineTest.java</exclude>
+            <exclude>**/WMS1_3_0_OnlineTest.java</exclude>
+            <!-- The following tests fail -->
+            <exclude>**/Geot553Test.java</exclude>
+            <exclude>**/WMSSchemaTest.java</exclude>
+          </excludes>
         </configuration>
       </plugin>
     </plugins>

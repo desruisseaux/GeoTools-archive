@@ -12,7 +12,7 @@ import java.util.Map;
 import org.geotools.catalog.AbstractService;
 import org.geotools.catalog.Catalog;
 import org.geotools.catalog.ServiceInfo;
-import org.geotools.tile.nasa.WorldWindTileStratagy;
+import org.geotools.tile.nasa.WorldWindTileStrategy;
 import org.geotools.util.ProgressListener;
 
 /**
@@ -42,12 +42,12 @@ public class TileService extends AbstractService {
         // should process available stratagies...
         Object connect =getConnectionParams().get("url");
         if( connect instanceof URL){
-            TileStratagy stratagy = new WorldWindTileStratagy( (URL) getConnectionParams().get("url") );
+            TileStratagy stratagy = new WorldWindTileStrategy( (URL) getConnectionParams().get("url") );
             info = stratagy.getInfo( monitor );
         }
         else if( connect instanceof String){
             System.out.println("Udig did not preserve my URL");
-            TileStratagy stratagy = new WorldWindTileStratagy( new URL( (String) connect) );
+            TileStratagy stratagy = new WorldWindTileStrategy( new URL( (String) connect) );
             info = stratagy.getInfo( monitor );            
         }
         else {

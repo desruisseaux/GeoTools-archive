@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.geotools.tile.cache.SimpleTileCache;
 import org.geotools.tile.cache.TileCache;
-import org.geotools.tile.nasa.WorldWindTileStratagy;
+import org.geotools.tile.nasa.WorldWindTileStrategy;
 import org.opengis.util.ProgressListener;
 
 /**
@@ -42,7 +42,7 @@ public final class TileServer {
     TileCache cache;
     
     public TileServer( URL server, ProgressListener monitor ){
-        stratagy = new WorldWindTileStratagy( server );
+        stratagy = new WorldWindTileStrategy( server );
         info = stratagy.getInfo( monitor );        
         cache = new SimpleTileCache();
     }

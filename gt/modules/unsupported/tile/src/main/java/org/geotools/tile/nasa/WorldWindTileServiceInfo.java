@@ -39,7 +39,7 @@ final class WorldWindTileServiceInfo implements TileServiceInfo {
     private final URI SOURCE;
     
     private Document dom;
-    private WorldWindTileStratagy stratagy;
+    private WorldWindTileStrategy stratagy;
     
     static {
         try {
@@ -73,7 +73,7 @@ final class WorldWindTileServiceInfo implements TileServiceInfo {
         } catch (URISyntaxException e) {
             throw (RuntimeException) new RuntimeException( ).initCause( e );
         }
-        stratagy = new WorldWindTileStratagy( url );
+        stratagy = new WorldWindTileStrategy( url );
     }
     
     public String getAbstract() {
