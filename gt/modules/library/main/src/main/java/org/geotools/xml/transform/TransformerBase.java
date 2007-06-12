@@ -303,7 +303,7 @@ public abstract class TransformerBase {
      * Filter output from a ContentHandler and insert Namespace declarations in
      * the first element.
      */
-    private static class ContentHandlerFilter implements ContentHandler {
+    private static class ContentHandlerFilter implements ContentHandler, LexicalHandler {
         private final ContentHandler original;
         private AttributesImpl namespaceDecls;
 
@@ -375,6 +375,48 @@ public abstract class TransformerBase {
         public void startPrefixMapping(String prefix, String uri)
             throws SAXException {
             original.startPrefixMapping(prefix, uri);
+        }
+
+        public void comment(char[] ch, int start, int length) throws SAXException {
+            if ( original instanceof LexicalHandler ) {
+                ((LexicalHandler)original).comment(ch, start, length);
+            }
+        }
+
+        public void startCDATA() throws SAXException {
+            if ( original instanceof LexicalHandler ) {
+                ((LexicalHandler)original).startCDATA();
+            }
+        }
+        
+        public void endCDATA() throws SAXException {
+            if ( original instanceof LexicalHandler ) {
+                ((LexicalHandler)original).endCDATA();
+            }
+        }
+
+        public void startDTD(String name, String publicId, String systemId) throws SAXException {
+            if ( original instanceof LexicalHandler ) {
+                ((LexicalHandler)original).startDTD(name, publicId, systemId);
+            }
+        }
+        
+        public void endDTD() throws SAXException {
+            if ( original instanceof LexicalHandler ) {
+                ((LexicalHandler)original).endDTD();
+            }
+        }
+
+        public void startEntity(String name) throws SAXException {
+            if ( original instanceof LexicalHandler ) {
+                ((LexicalHandler)original).startEntity(name);
+            }
+        }
+        
+        public void endEntity(String name) throws SAXException {
+            if ( original instanceof LexicalHandler ) {
+                ((LexicalHandler)original).endEntity(name);
+            }
         }
     }
 
@@ -572,10 +614,20 @@ public abstract class TransformerBase {
                 ContentHandlerFilter filter = new ContentHandlerFilter(handler,
                         atts);
                 translator = base.createTranslator(filter);
-                atts.addAttribute(null, null,
-                    "xmlns:" + translator.getDefaultPrefix(), null,
-                    translator.getDefaultNamespace());
-
+                
+                if ( translator.getDefaultNamespace() != null ) {
+                    //declare the default mapping
+                    atts.addAttribute(null, null,
+                            "xmlns", null, translator.getDefaultNamespace());
+                    
+                    //if prefix non-null, declare the mapping
+                    if( translator.getDefaultPrefix() != null ) {
+                        atts.addAttribute(null, null,
+                                "xmlns:" + translator.getDefaultPrefix(), null,
+                                translator.getDefaultNamespace());    
+                    }
+                }
+                
                 NamespaceSupport ns = translator.getNamespaceSupport();
                 java.util.Enumeration e = ns.getPrefixes();
 
