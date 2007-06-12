@@ -34,7 +34,7 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class WeakHashSetTest extends TestCase {
+public final class CanonicalSetTest extends TestCase {
     /**
      * Run the suit from the command line.
      */
@@ -47,13 +47,13 @@ public final class WeakHashSetTest extends TestCase {
      * Returns the test suite.
      */
     public static Test suite() {
-        return new TestSuite(WeakHashSetTest.class);
+        return new TestSuite(CanonicalSetTest.class);
     }
 
     /**
      * Constructs a test case with the given name.
      */
-    public WeakHashSetTest(final String name) {
+    public CanonicalSetTest(final String name) {
         super(name);
     }
 

@@ -58,7 +58,7 @@ public final class AllTests {
         suite.addTest(org.geotools.util     .RangeSetTest               .suite());
         suite.addTest(org.geotools.util     .DisjointSetTest            .suite());
         suite.addTest(org.geotools.util     .KeySortedListTest          .suite());
-        suite.addTest(org.geotools.util     .WeakHashSetTest            .suite());
+        suite.addTest(org.geotools.util     .CanonicalSetTest            .suite());
         suite.addTest(org.geotools.util     .WeakValueHashMapTest       .suite());
         suite.addTest(org.geotools.util     .SoftValueHashMapTest       .suite());
         suite.addTest(org.geotools.math     .GeometryTest               .suite());
