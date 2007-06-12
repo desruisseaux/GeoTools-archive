@@ -39,6 +39,13 @@ import org.opengis.filter.capability.FilterCapabilities;
 
 import com.vividsolutions.jts.geom.Envelope;
 
+/**
+ * 
+ * @author Gabriel Roldan, Axios Engineering
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
+ */
 public class MemorySource implements FeatureSource2 {
 
     private FeatureType type;

@@ -40,6 +40,13 @@ import org.opengis.feature.type.GeometryType;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
+/**
+ * 
+ * @author Gabriel Roldan, Axios Engineering
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
+ */
 public class EmfAppSchemaReaderTest extends TestCase {
 
     /**

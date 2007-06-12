@@ -56,6 +56,9 @@ import org.opengis.filter.expression.Expression;
  * </p>
  * 
  * @author Gabriel Roldan, Axios Engineering
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
  */
 abstract class AbstractMappingFeatureIterator implements Iterator/* <Feature> */{
 

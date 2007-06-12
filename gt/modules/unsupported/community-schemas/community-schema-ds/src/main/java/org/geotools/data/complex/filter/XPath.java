@@ -50,17 +50,18 @@ import org.xml.sax.helpers.NamespaceSupport;
  * Utility class to evaluate XPath expressions against an Attribute instance,
  * which may be any Attribute, wether it is simple, complex, a feature, etc.
  * <p>
- * At the difference of the Filter subsistem, which works against Attribute
- * contents (for example to evaluate a coparison filter), the XPath subsistem,
+ * At the difference of the Filter subsystem, which works against Attribute
+ * contents (for example to evaluate a comparison filter), the XPath subsystem,
  * for which this class is the single entry point, works against Attribute
  * instances. That is, the result of an XPath expression, if a single value, is
  * an Attribtue, not the attribute content, or a List of Attributes, for
  * instance.
  * </p>
  * 
- * @author Gabriel Roldan
- * 
- * TODO: register namespaces in JXPathContext
+ * @author Gabriel Roldan, Axios Engineering
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
  */
 public class XPath {
     private static final Logger LOGGER = Logger.getLogger(XPath.class.getPackage().getName());

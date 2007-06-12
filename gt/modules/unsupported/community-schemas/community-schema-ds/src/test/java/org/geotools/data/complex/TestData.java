@@ -47,6 +47,13 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
+/**
+ * 
+ * @author Gabriel Roldan, Axios Engineering
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
+ */
 public class TestData {
 
     public final static TypeName WATERSAMPLE_TYPENAME = new org.geotools.feature.type.TypeName(

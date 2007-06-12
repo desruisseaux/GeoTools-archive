@@ -29,6 +29,13 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.TypeName;
 
+/**
+ * 
+ * @author Gabriel Roldan, Axios Engineering
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
+ */
 public class FeatureCollectionAdapter extends AbstractCollection {
 
 	private FeatureCollection gtFeatures;

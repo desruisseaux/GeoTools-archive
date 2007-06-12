@@ -9,6 +9,13 @@ import org.geotools.data.complex.filter.UnmappingFilterVisitorTest;
 import org.geotools.data.feature.memory.MemoryDataAccessTest;
 import org.geotools.filter.IDFunctionExpressionTest;
 
+/**
+ * 
+ * @author Gabriel Roldan, Axios Engineering
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
+ */
 public class AllTests {
 
 	public static Test suite() {

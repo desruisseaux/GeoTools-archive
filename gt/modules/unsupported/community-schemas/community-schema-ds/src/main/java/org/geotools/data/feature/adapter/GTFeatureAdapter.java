@@ -38,7 +38,9 @@ import com.vividsolutions.jts.geom.Geometry;
  * Adapter from ISO SimpleFeature to GeoTools Feature
  * 
  * @author Gabriel Roldan, Axios Engineering
- * 
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
  */
 public class GTFeatureAdapter implements org.geotools.feature.SimpleFeature {
 

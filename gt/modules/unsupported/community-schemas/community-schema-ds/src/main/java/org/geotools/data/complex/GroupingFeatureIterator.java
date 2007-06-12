@@ -137,6 +137,9 @@ import org.xml.sax.helpers.NamespaceSupport;
  * 
  * @author Mauricio Pazos, Axios Engineering
  * @author Gabriel Roldan, Axios Engineering
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
  */
 class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
     private static final Logger LOGGER = Logger.getLogger(GroupingFeatureIterator.class

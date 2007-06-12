@@ -43,7 +43,10 @@ import org.opengis.feature.type.GeometryType;
  * not allowed to merge Feature implementations
  * </p>
  * 
- * @author gabriel
+ * @author Gabriel Roldan, Axios Engineering
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
  */
 public class GTComlexFeatureTypeAdapter implements FeatureType {
 

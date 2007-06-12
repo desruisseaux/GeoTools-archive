@@ -23,6 +23,13 @@ import java.util.Map;
 
 import org.geotools.util.CheckedHashMap;
 
+/**
+ * 
+ * @author Gabriel Roldan, Axios Engineering
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
+ */
 public class SourceDataStore implements Serializable{
 	private static final long serialVersionUID = 8540617713675342340L;
 	private String id;

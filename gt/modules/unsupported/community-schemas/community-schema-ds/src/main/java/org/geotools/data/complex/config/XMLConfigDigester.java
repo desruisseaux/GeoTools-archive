@@ -33,6 +33,9 @@ import org.xml.sax.SAXException;
  * DOCUMENT ME!
  *
  * @author Gabriel Roldan, Axios Engineering
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
  */
 public class XMLConfigDigester {
     /** DOCUMENT ME!  */

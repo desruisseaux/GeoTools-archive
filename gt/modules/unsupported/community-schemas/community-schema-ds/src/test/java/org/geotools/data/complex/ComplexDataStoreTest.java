@@ -65,6 +65,13 @@ import org.xml.sax.helpers.NamespaceSupport;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Point;
 
+/**
+ * 
+ * @author Gabriel Roldan, Axios Engineering
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
+ */
 public class ComplexDataStoreTest extends TestCase {
 
     private final static Logger LOGGER = Logger.getLogger(ComplexDataStoreTest.class.getPackage()

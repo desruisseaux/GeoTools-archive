@@ -62,12 +62,9 @@ import org.xml.sax.helpers.NamespaceSupport;
  * org.geotools.data.complex.config.ComplexDataStoreDTO}).
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: ComplexDataStoreConfigurator.java 24255 2007-02-07 14:12:24Z
- *          groldan $
- * 
- * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/community-schemas/community-schema-ds/src/main/java/org/geotools/data/complex/config/ComplexDataStoreConfigurator.java $
- * @since 2.3.x
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
  */
 public class ComplexDataStoreConfigurator {
     /** DOCUMENT ME! */

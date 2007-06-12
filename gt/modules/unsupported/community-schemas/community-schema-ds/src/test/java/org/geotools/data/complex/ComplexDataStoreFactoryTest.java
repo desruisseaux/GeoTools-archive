@@ -34,6 +34,13 @@ import org.geotools.feature.iso.Types;
 import org.geotools.util.Logging;
 import org.opengis.feature.type.Name;
 
+/**
+ * 
+ * @author Gabriel Roldan, Axios Engineering
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
+ */
 public class ComplexDataStoreFactoryTest extends TestCase {
 
     ComplexDataStoreFactory factory;

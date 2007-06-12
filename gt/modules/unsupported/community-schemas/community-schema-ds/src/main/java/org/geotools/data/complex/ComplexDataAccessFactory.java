@@ -29,6 +29,9 @@ import org.opengis.util.InternationalString;
  * {@link DataAccessFactory} for the ComplexDataStore implementation.
  * 
  * @author Gabriel Roldan, Axios Engineering
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
  */
 public class ComplexDataAccessFactory extends ComplexDataStoreFactory implements DataAccessFactory {
 

@@ -22,6 +22,13 @@ import java.util.Map;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.TypeName;
 
+/**
+ * 
+ * @author Gabriel Roldan, Axios Engineering
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
+ */
 public class ComplexTypeProxy extends AttributeTypeProxy implements ComplexType {
 
 	public ComplexTypeProxy(TypeName typeName, Map registry) {

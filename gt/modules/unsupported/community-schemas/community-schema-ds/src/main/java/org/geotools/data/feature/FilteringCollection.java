@@ -23,6 +23,13 @@ import java.util.List;
 
 import org.opengis.filter.Filter;
 
+/**
+ * 
+ * @author Gabriel Roldan, Axios Engineering
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
+ */
 public class FilteringCollection implements Collection {
 
 	private Collection collection;

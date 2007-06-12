@@ -60,6 +60,13 @@ import org.xml.sax.helpers.NamespaceSupport;
 
 import com.vividsolutions.jts.geom.Envelope;
 
+/**
+ * 
+ * @author Gabriel Roldan, Axios Engineering
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
+ */
 public class ComplexDataStore /* extends AbstractDataStore */implements FeatureAccess {
 
     private static final boolean IS_WRITABLE = false;

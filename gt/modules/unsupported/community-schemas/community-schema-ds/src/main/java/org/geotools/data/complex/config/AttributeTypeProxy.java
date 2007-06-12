@@ -24,6 +24,13 @@ import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.TypeName;
 import org.opengis.util.InternationalString;
 
+/**
+ * 
+ * @author Gabriel Roldan, Axios Engineering
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
+ */
 public class AttributeTypeProxy implements AttributeType {
 
     private TypeName typeName;
@@ -87,12 +94,12 @@ public class AttributeTypeProxy implements AttributeType {
         getSubject().putUserData(key, value);
     }
 
-    public boolean equals(Object o){
+    public boolean equals(Object o) {
         AttributeType subject = getSubject();
         return subject.equals(o);
     }
 
-    public int hashCode(){
+    public int hashCode() {
         AttributeType subject = getSubject();
         return subject.hashCode();
     }

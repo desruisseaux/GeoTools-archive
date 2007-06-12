@@ -29,8 +29,10 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 /**
  * Adapts an ISO simple AttributeType to a GeoTools AttributeType
  * 
- * @author gabriel
- * 
+ * @author Gabriel Roldan, Axios Engineering
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
  */
 public class GTAttributeTypeAdapter implements org.geotools.feature.AttributeType {
 

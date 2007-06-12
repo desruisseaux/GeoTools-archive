@@ -51,6 +51,9 @@ import org.xml.sax.helpers.NamespaceSupport;
  * </p>
  * 
  * @author Gabriel Roldan, Axios Engineering
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
  */
 class DefaultMappingFeatureIterator extends AbstractMappingFeatureIterator {
 

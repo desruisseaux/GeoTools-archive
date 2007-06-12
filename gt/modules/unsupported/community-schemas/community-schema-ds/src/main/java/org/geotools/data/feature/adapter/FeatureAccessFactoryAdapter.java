@@ -37,7 +37,9 @@ import org.opengis.util.InternationalString;
  * {@link DataStore} to the {@link FeatureAccess} interface.
  * 
  * @author Gabriel Roldan, Axios Engineering
- * 
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
  */
 public class FeatureAccessFactoryAdapter implements DataAccessFactory {
 

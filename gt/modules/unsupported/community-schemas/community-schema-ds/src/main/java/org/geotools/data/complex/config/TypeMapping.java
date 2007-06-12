@@ -23,6 +23,13 @@ import java.util.List;
 
 import org.geotools.util.CheckedArrayList;
 
+/**
+ * 
+ * @author Gabriel Roldan, Axios Engineering
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
+ */
 public class TypeMapping implements Serializable{
 
 	private static final long serialVersionUID = 1444252634598922057L;

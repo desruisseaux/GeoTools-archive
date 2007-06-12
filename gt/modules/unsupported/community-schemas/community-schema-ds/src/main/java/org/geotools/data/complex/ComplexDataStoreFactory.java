@@ -35,6 +35,9 @@ import org.geotools.data.complex.config.XMLConfigDigester;
  * directly using DataAccessFactory
  * 
  * @author Gabriel Roldan, Axios Engineering
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
  */
 public class ComplexDataStoreFactory implements DataStoreFactorySpi {
 

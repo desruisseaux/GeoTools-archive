@@ -26,9 +26,8 @@ import java.util.Map;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @version $Id$
- * 
  * @source $URL$
- * @since 2.3.x
+ * @since 2.4
  */
 public class AttributeMapping implements Serializable {
     private static final long serialVersionUID = 3624951889528331592L;

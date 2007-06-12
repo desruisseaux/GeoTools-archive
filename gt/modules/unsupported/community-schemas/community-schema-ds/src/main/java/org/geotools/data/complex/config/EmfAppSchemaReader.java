@@ -76,6 +76,13 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
+/**
+ * 
+ * @author Gabriel Roldan, Axios Engineering
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
+ */
 public class EmfAppSchemaReader {
     private static final Logger LOGGER = Logger.getLogger(EmfAppSchemaReader.class.getPackage()
             .getName());

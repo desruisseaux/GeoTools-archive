@@ -77,8 +77,10 @@ import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * 
- * 
  * @author Gabriel Roldan, Axios Engineering
+ * @version $Id$
+ * @source $URL$
+ * @since 2.4
  */
 public class UnmappingFilterVisitorTest extends TestCase {
 
