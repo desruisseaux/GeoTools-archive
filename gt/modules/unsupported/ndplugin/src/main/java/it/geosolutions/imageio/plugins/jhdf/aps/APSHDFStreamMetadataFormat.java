@@ -8,13 +8,13 @@ public class APSHDFStreamMetadataFormat extends IIOMetadataFormatImpl {
 	private static IIOMetadataFormat instance = null;
 	
 	public APSHDFStreamMetadataFormat() {
-		super(APSHDFStreamMetadata.nativeMetadataFormatName,
+		super(APSStreamMetadata.nativeMetadataFormatName,
 				IIOMetadataFormatImpl.CHILD_POLICY_ALL);
-		addElement("StandardAPSFileAttributes",
-	            APSHDFStreamMetadata.nativeMetadataFormatName, CHILD_POLICY_ALL);
+		addElement("StandardAPSAttributes",
+				APSStreamMetadata.nativeMetadataFormatName, CHILD_POLICY_ALL);
 		
 		addElement("FileAttributes",
-				"StandardAPSFileAttributes", CHILD_POLICY_EMPTY);
+				"StandardAPSAttributes", CHILD_POLICY_EMPTY);
         addAttribute("FileAttributes", APSAttributes.STD_FA_FILE, DATATYPE_STRING, false, null);
         addAttribute("FileAttributes", APSAttributes.STD_FA_FILECLASSIFICATION, DATATYPE_STRING, true, null);
         addAttribute("FileAttributes", APSAttributes.STD_FA_FILESTATUS, DATATYPE_STRING, false, null);
@@ -27,7 +27,7 @@ public class APSHDFStreamMetadataFormat extends IIOMetadataFormatImpl {
         addAttribute("FileAttributes", APSAttributes.STD_FA_CREATEUSER, DATATYPE_STRING, false, null);
                 
         addElement("TimeAttributes",
-				"StandardAPSFileAttributes", CHILD_POLICY_EMPTY);
+				"StandardAPSAttributes", CHILD_POLICY_EMPTY);
         addAttribute("TimeAttributes", APSAttributes.STD_TA_TIMESTART, DATATYPE_STRING, true, null);
         addAttribute("TimeAttributes", APSAttributes.STD_TA_TIMESTARTYEAR, DATATYPE_INTEGER, true, null);
         addAttribute("TimeAttributes", APSAttributes.STD_TA_TIMESTARTDAY, DATATYPE_INTEGER, true, null);
@@ -39,7 +39,7 @@ public class APSHDFStreamMetadataFormat extends IIOMetadataFormatImpl {
         addAttribute("TimeAttributes", APSAttributes.STD_TA_TIMEDAYNIGHT, DATATYPE_STRING, true, null);
             
         addElement("SensorAttributes",
-            		"StandardAPSFileAttributes", CHILD_POLICY_EMPTY);
+            		"StandardAPSAttributes", CHILD_POLICY_EMPTY);
         addAttribute("SensorAttributes", APSAttributes.STD_SA_SENSOR, DATATYPE_STRING, true, null);
         addAttribute("SensorAttributes", APSAttributes.STD_SA_SENSORPLATFORM, DATATYPE_INTEGER, true, null);
         addAttribute("SensorAttributes", APSAttributes.STD_SA_SENSORAGENCY, DATATYPE_INTEGER, true, null);
@@ -54,10 +54,10 @@ public class APSHDFStreamMetadataFormat extends IIOMetadataFormatImpl {
         addAttribute("SensorAttributes", APSAttributes.STD_SA_SENSORRESOLUTIONINKM, DATATYPE_STRING, true, null);
         addAttribute("SensorAttributes", APSAttributes.STD_SA_SENSORPLATFORMTYPE, DATATYPE_STRING, true, null);
                 
-        addElement("FileAttributes",
-        	            APSHDFStreamMetadata.nativeMetadataFormatName, CHILD_POLICY_SOME);
+        addElement("FileProductsAttributes",
+        		APSStreamMetadata.nativeMetadataFormatName, CHILD_POLICY_SOME);
         addElement("InputParameterAttributes",
-        		"FileAttributes", CHILD_POLICY_EMPTY);
+        		"FileProductsAttributes", CHILD_POLICY_EMPTY);
         addAttribute("InputParameterAttributes", APSAttributes.PFA_IPA_INPUTCALIBRATIONFILE, DATATYPE_STRING, false, null);
         addAttribute("InputParameterAttributes", APSAttributes.PFA_IPA_INPUTPARAMETER, DATATYPE_STRING, false, null);
         addAttribute("InputParameterAttributes", APSAttributes.PFA_IPA_INPUTMASKSINT, DATATYPE_STRING, false, null);
@@ -66,7 +66,7 @@ public class APSHDFStreamMetadataFormat extends IIOMetadataFormatImpl {
         addAttribute("InputParameterAttributes", APSAttributes.PFA_IPA_PROCESSINGVERSION, DATATYPE_STRING, false, null);
         
         addElement("NavigationAttributes",
-        		"FileAttributes", CHILD_POLICY_EMPTY);
+        		"FileProductsAttributes", CHILD_POLICY_EMPTY);
         addAttribute("NavigationAttributes", APSAttributes.PFA_NA_NAVTYPE, DATATYPE_STRING, false, null);
         addAttribute("NavigationAttributes", APSAttributes.PFA_NA_MAPPROJECTIONSYSTEM , DATATYPE_STRING, false, null);
         addAttribute("NavigationAttributes", APSAttributes.PFA_NA_MAPPROJECTION, DATATYPE_STRING, false, null);
@@ -76,7 +76,7 @@ public class APSHDFStreamMetadataFormat extends IIOMetadataFormatImpl {
         addAttribute("NavigationAttributes", APSAttributes.PFA_NA_MAPPEDLOWERRIGHT, DATATYPE_STRING, false, null);
         
         addElement("InputGeographicalCoverageAttributes",
-        		"FileAttributes", CHILD_POLICY_EMPTY);
+        		"FileProductsAttributes", CHILD_POLICY_EMPTY);
         addAttribute("InputGeographicalCoverageAttributes", APSAttributes.PFA_IGCA_LOCALEUPPERLEFT, DATATYPE_STRING, false, null);
         addAttribute("InputGeographicalCoverageAttributes", APSAttributes.PFA_IGCA_LOCALEUPPERRIGHT, DATATYPE_STRING, false, null);
         addAttribute("InputGeographicalCoverageAttributes", APSAttributes.PFA_IGCA_LOCALELOWERLEFT, DATATYPE_STRING, false, null);
@@ -87,7 +87,7 @@ public class APSHDFStreamMetadataFormat extends IIOMetadataFormatImpl {
         addAttribute("InputGeographicalCoverageAttributes", APSAttributes.PFA_IGCA_LOCALESECORNER, DATATYPE_STRING, false, null);
         
         addElement("Projection",
-        		APSHDFStreamMetadata.nativeMetadataFormatName, CHILD_POLICY_EMPTY);
+        		APSStreamMetadata.nativeMetadataFormatName, CHILD_POLICY_EMPTY);
         addAttribute("Projection", "Name", DATATYPE_STRING, true, null);
         addAttribute("Projection", "FullName", DATATYPE_STRING, true, null);
         addAttribute("Projection", "Code", DATATYPE_STRING, true, null);
@@ -123,7 +123,7 @@ public class APSHDFStreamMetadataFormat extends IIOMetadataFormatImpl {
         addAttribute("Projection", "Aspect", DATATYPE_FLOAT, true, null);
         
         addElement("Products",
-        		APSHDFStreamMetadata.nativeMetadataFormatName, CHILD_POLICY_SEQUENCE);
+        		APSStreamMetadata.nativeMetadataFormatName, CHILD_POLICY_SEQUENCE);
         addElement("Product","Products", CHILD_POLICY_ALL);
         
         

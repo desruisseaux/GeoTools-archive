@@ -7,18 +7,18 @@ import javax.imageio.metadata.IIOMetadataFormatImpl;
 public class APSHDFImageMetadataFormat extends IIOMetadataFormatImpl {
 
 	public APSHDFImageMetadataFormat() {
-		super(APSHDFImageMetadata.nativeMetadataFormatName,
+		super(APSImageMetadata.nativeMetadataFormatName,
 				IIOMetadataFormatImpl.CHILD_POLICY_ALL);
 		
 		addElement("DatasetProperties",
-					APSHDFImageMetadata.nativeMetadataFormatName, CHILD_POLICY_EMPTY);
+					APSImageMetadata.nativeMetadataFormatName, CHILD_POLICY_EMPTY);
 		addAttribute("DatasetProperties", "Name", DATATYPE_STRING, true, null);
 		addAttribute("DatasetProperties", "Rank", DATATYPE_STRING, true, null);
 		addAttribute("DatasetProperties", "Dims", DATATYPE_STRING, true, null);
 		addAttribute("DatasetProperties", "ChunkSize", DATATYPE_STRING, true, null);
 
 		addElement("ProductDataSetAttributes",
-				APSHDFImageMetadata.nativeMetadataFormatName, CHILD_POLICY_EMPTY);
+				APSImageMetadata.nativeMetadataFormatName, CHILD_POLICY_EMPTY);
 		//TODO: Should Set to false attributes required?
         addAttribute("ProductDataSetAttributes", APSAttributes.PDSA_CREATESOFTWARE, DATATYPE_STRING, true, null);
         addAttribute("ProductDataSetAttributes", APSAttributes.PDSA_CREATETIME , DATATYPE_STRING, true, null);
@@ -39,7 +39,7 @@ public class APSHDFImageMetadataFormat extends IIOMetadataFormatImpl {
         addAttribute("ProductDataSetAttributes", APSAttributes.PDSA_BROWSERANGES , DATATYPE_STRING, true, null);
 
         addElement("AdditionalAttributes",
-				APSHDFImageMetadata.nativeMetadataFormatName, CHILD_POLICY_EMPTY);
+        		APSImageMetadata.nativeMetadataFormatName, CHILD_POLICY_EMPTY);
         addAttribute("AdditionalAttributes", "additionals" , DATATYPE_STRING, false, null);
 	}
 
