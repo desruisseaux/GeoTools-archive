@@ -36,8 +36,6 @@ public abstract class SliceImageReader extends ImageReader implements IndexManag
 	public abstract BufferedImage read(int imageIndex, ImageReadParam param)
 			throws IOException;
 
-	public abstract int getDatasetNum();
-
 	/**
 	 * return imageMetadata related to a specific product or subdataset.
 	 */
@@ -49,10 +47,5 @@ public abstract class SliceImageReader extends ImageReader implements IndexManag
 	public abstract IIOMetadata getStreamMetadata() throws IOException;
 	
 	public abstract Iterator getImageTypes(int imageIndex) throws IOException;
-
-	public int getNumImages(boolean allowSearch) throws IOException {
-		// TODO provide some implementation for this
-		return getDatasetNum();
-	}
 
 }

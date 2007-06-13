@@ -19,6 +19,7 @@ public class APSHDFImageMetadataFormat extends IIOMetadataFormatImpl {
 
 		addElement("ProductDataSetAttributes",
 				APSImageMetadata.nativeMetadataFormatName, CHILD_POLICY_EMPTY);
+		
 		//TODO: Should Set to false attributes required?
         addAttribute("ProductDataSetAttributes", APSAttributes.PDSA_CREATESOFTWARE, DATATYPE_STRING, true, null);
         addAttribute("ProductDataSetAttributes", APSAttributes.PDSA_CREATETIME , DATATYPE_STRING, true, null);

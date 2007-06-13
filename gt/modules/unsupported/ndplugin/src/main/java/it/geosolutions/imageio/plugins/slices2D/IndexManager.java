@@ -24,7 +24,7 @@ public interface IndexManager {
 
 	
 	/**
-	 * Given a specified index, returns a <code>int[]</code> containing indexing
+	 * Given a specified index, returns a <code>long[]</code> containing indexing
 	 * information such as coverageIndex, Nth dimension, (N-1)th-dimension, until
 	 * (N-2)th-dimension. In case of 2D subDatasets, it simply returns the index
 	 * of the coverage in the source. In case of source having a single 2D dataset,
@@ -35,5 +35,5 @@ public interface IndexManager {
 	 * @return
 	 * 			
 	 */
-	public int[] buildIndexesStructure(final int specifiedIndex);
+	public long[] buildIndexesStructure(final int specifiedIndex);
 }

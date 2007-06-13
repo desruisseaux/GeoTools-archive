@@ -20,6 +20,7 @@ import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
+import java.nio.channels.FileChannel.MapMode;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -41,6 +42,8 @@ import com.sun.media.jai.codecimpl.util.RasterFactory;
 
 public abstract class BaseHDFImageReader extends SliceImageReader {
 
+	protected abstract Dataset retrieveDataset(int imageIndex);
+	
 	// TODO: should be moved in the aboveLayer?
 	protected class SourceStructure {
 		protected int nSubdatasets;
@@ -59,6 +62,10 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 
 		public long getSubDatasetSize(int index) {
 			return subDatasetSizes[index];
+		}
+		
+		public void setSubDatasetSize(int index, long size) {
+			subDatasetSizes[index]=size;
 		}
 
 		public int getNSubdatasets() {
@@ -131,7 +138,10 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 			throws IOException {
 		if (!isInitialized)
 			initialize();
-		final Dataset dataset = retrieveDataset(imageIndex);
+		final long[] indexStructure = buildIndexesStructure(imageIndex);
+		
+		final int subDatasetIndex = (int)indexStructure[0]; 
+		final Dataset dataset = retrieveDataset(subDatasetIndex);
 
 		BufferedImage bimage = null;
 		dataset.init();
@@ -224,6 +234,9 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 
 		start[0] = srcRegionYOffset;
 		start[1] = srcRegionXOffset;
+		if (start.length>2){
+			long[] startDims;
+		}
 		sizes[0] = dstHeight;
 		sizes[1] = dstWidth;
 		stride[0] = ySubsamplingFactor;
@@ -338,38 +351,7 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 		return bimage;
 	}
 
-	protected Dataset retrieveDataset(int imageIndex) throws IOException {
-		checkImageIndex(imageIndex);
-		// TODO: Change this logic
-		return (Dataset) ((Group) root).getMemberList().get(
-				imageIndex + subDatasetsOffset);
-	}
-
-	private void checkImageIndex(int imageIndex) {
-		// if (imageIndex < 0
-		// || (!hasSubDatasets && imageIndex > 0)
-		// || (hasSubDatasets && ((nSubdatasets == 0 && imageIndex > 0) ||
-		// (nSubdatasets != 0 && (imageIndex > nSubdatasets))))) {
-		//
-		// // The specified imageIndex is not valid.
-		// // Retrieving the valid image index range.
-		// final int validImageIndex = hasSubDatasets ? nSubdatasets
-		// : 0;
-		// StringBuffer sb = new StringBuffer(
-		// "Illegal imageIndex specified = ").append(imageIndex)
-		// .append(", while the valid imageIndex");
-		// if (validImageIndex > 0)
-		// // There are N Subdatasets.
-		// sb.append(" range should be (0,").append(validImageIndex - 1)
-		// .append(")!!");
-		// else
-		// // Only the imageIndex 0 is valid.
-		// sb.append(" should be only 0!");
-		// throw new IndexOutOfBoundsException(sb.toString());
-		// }
-
-	}
-
+	
 	public void setInput(Object input, boolean seekForwardOnly,
 			boolean ignoreMetadata) {
 		this.setInput(input);
@@ -613,10 +595,39 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 		}
 		return subIndexOffset+displacement;
 	}
-
-	public int[] buildIndexesStructure(int specifiedIndex) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
+	
+	public long[] buildIndexesStructure(int specifiedIndex) {
+		final int nTotalDataset=sourceStructure.getNSubdatasets();
+		final long [] subDatasetSizes = sourceStructure.getSubDatasetSizes();
+		int iCoverage=0;
+		for (;iCoverage<nTotalDataset;iCoverage++){
+			int subDatasetSize = (int)subDatasetSizes[iCoverage];
+			if (specifiedIndex>=subDatasetSize)
+				specifiedIndex-=subDatasetSize;
+			else
+				break;
+		}
+		SubDatasetInfo sInfo = sourceStructure.getSubDatasetInfo(iCoverage);
+		final int rank = sInfo.getRank();
+		final long[] indexStructure = new long[rank-1];
+		final long[] dims=sInfo.getDims();
+		
+		final long[] multipliers = new long[rank-2];
+		for (int i=0;i<rank-2;i++){
+			//Multipliers factor need to be stored in reversed order.
+			multipliers[i]=dims[rank-i];
+		}
+		for (int i=0;i<rank-2;i++){
+			//TODO: End this computations
+			
+			
+		}
+		indexStructure[0]=iCoverage;
+		
+		
+		
+		return indexStructure;
+	}
+
 }

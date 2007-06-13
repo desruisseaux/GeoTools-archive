@@ -6,7 +6,9 @@ import it.geosolutions.imageio.plugins.jhdf.SubDatasetInfo;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.spi.ImageReaderSpi;
@@ -33,10 +35,59 @@ public class APSImageReader extends BaseHDFImageReader {
 
 	private String[] productList;
 
-	private HashMap subDatasets;
+	private LinkedHashMap subDatasets;
 
 	private APSImageMetadata imageMetadata;
 	private APSStreamMetadata streamMetadata;
+	
+	/**
+	 * Given a specified imageIndex, returns the proper Dataset.
+	 * 
+	 * @param datasetIndex
+	 * 		an index specifying required coverage(subDataset).  
+	 * 
+	 */
+	protected Dataset retrieveDataset(int datasetIndex)  {
+		checkImageIndex(datasetIndex);
+		return getDataset(datasetIndex);
+		
+	}
+
+	private Dataset getDataset(int datasetIndex){
+		Set set = subDatasets.keySet(); 
+		Iterator it = set.iterator();
+		for(int j=0;j<datasetIndex;j++)
+			it.next();
+		return (Dataset)subDatasets.get((String)it.next());
+	}
+	
+	private void checkImageIndex(int imageIndex) {
+		// if (imageIndex < 0
+		// || (!hasSubDatasets && imageIndex > 0)
+		// || (hasSubDatasets && ((nSubdatasets == 0 && imageIndex > 0) ||
+		// (nSubdatasets != 0 && (imageIndex > nSubdatasets))))) {
+		//
+		// // The specified imageIndex is not valid.
+		// // Retrieving the valid image index range.
+		// final int validImageIndex = hasSubDatasets ? nSubdatasets
+		// : 0;
+		// StringBuffer sb = new StringBuffer(
+		// "Illegal imageIndex specified = ").append(imageIndex)
+		// .append(", while the valid imageIndex");
+		// if (validImageIndex > 0)
+		// // There are N Subdatasets.
+		// sb.append(" range should be (0,").append(validImageIndex - 1)
+		// .append(")!!");
+		// else
+		// // Only the imageIndex 0 is valid.
+		// sb.append(" should be only 0!");
+		// throw new IndexOutOfBoundsException(sb.toString());
+		// }
+
+	}
+
+
+	
 	
 	
 	/**
@@ -63,7 +114,7 @@ public class APSImageReader extends BaseHDFImageReader {
 				final String products[] = values[0].split(",");
 				productList = products;
 				subdatasetsNum = products.length;
-				subDatasets = new HashMap(subdatasetsNum);
+				subDatasets = new LinkedHashMap(subdatasetsNum);
 				break;
 			}
 		}
@@ -94,6 +145,7 @@ public class APSImageReader extends BaseHDFImageReader {
 						}
 						SubDatasetInfo dsInfo= new SubDatasetInfo(name,rank,subDatasetDims,subDatasetChunkSize);
 						//TODO: Need to set Bands!
+						sourceStructure.setSubDatasetSize(j, datasetSize);
 						sourceStructure.setSubDatasetInfo(j, dsInfo);
 					}
 				}

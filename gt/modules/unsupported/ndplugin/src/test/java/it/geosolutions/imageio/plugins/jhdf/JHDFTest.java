@@ -69,7 +69,7 @@ public class JHDFTest extends TestCase {
 			final IIOMetadata streamMetadata = reader.getStreamMetadata();
 			IIOMetadataNode streamNode = (IIOMetadataNode)streamMetadata.getAsTree(APSStreamMetadata.nativeMetadataFormatName);
 			System.out.println(MetadataDisplay.buildMetadataFromNode(streamNode));
-//			visualize(image, "");
+			visualize(image, "");
 	}
 
 	public void testJaiMultithreadingRead() throws IOException {
