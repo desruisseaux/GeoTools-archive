@@ -16,13 +16,11 @@ import javax.imageio.spi.ImageReaderSpi;
  * 
  * @author Romagnoli Daniele
  */
-public abstract class SliceImageReader extends ImageReader {
+public abstract class SliceImageReader extends ImageReader implements IndexManager{
 
 	protected boolean isInitialized = false;
 
 	protected File originatingFile = null;
-
-	protected boolean hasSubDatasets = false;
 
 	protected SliceImageReader(ImageReaderSpi originatingProvider) {
 		super(originatingProvider);
@@ -40,15 +38,21 @@ public abstract class SliceImageReader extends ImageReader {
 
 	public abstract int getDatasetNum();
 
+	/**
+	 * return imageMetadata related to a specific product or subdataset.
+	 */
 	public abstract IIOMetadata getImageMetadata(int imageIndex) throws IOException;
 
+	/**
+	 * return streamMetadata related the whole source.
+	 */
+	public abstract IIOMetadata getStreamMetadata() throws IOException;
+	
 	public abstract Iterator getImageTypes(int imageIndex) throws IOException;
 
 	public int getNumImages(boolean allowSearch) throws IOException {
 		// TODO provide some implementation for this
 		return getDatasetNum();
 	}
-
-	public abstract IIOMetadata getStreamMetadata() throws IOException;
 
 }

@@ -6,7 +6,8 @@ import ncsa.hdf.object.Datatype;
 public class APSAttributes {
 
 	/**
-	 * ------------------------- Standard: File Attributes
+	 * -------------------------
+	 * Standard: File Attributes
 	 * -------------------------
 	 */
 
@@ -46,7 +47,8 @@ public class APSAttributes {
 			STD_FA_CREATEPLATFORM, STD_FA_CREATETIME, STD_FA_CREATEUSER };
 
 	/**
-	 * ------------------------- Standard: Time Attributes
+	 * ------------------------- 
+	 * Standard: Time Attributes
 	 * -------------------------
 	 */
 
@@ -86,7 +88,8 @@ public class APSAttributes {
 			STD_TA_TIMEENDTIME, STD_TA_TIMEDAYNIGHT };
 
 	/**
-	 * --------------------------- Standard: Sensor Attributes
+	 * --------------------------- 
+	 * Standard: Sensor Attributes
 	 * ---------------------------
 	 */
 
@@ -138,8 +141,9 @@ public class APSAttributes {
 			STD_SA_SENSORPLATFORMTYPE };
 
 	/**
-	 * ----------------------------------------- Product file: Input Parameters
-	 * Attributes -----------------------------------------
+	 * ----------------------------------------- 
+	 * Product file: Input Parameters Attributes 
+	 * -----------------------------------------
 	 */
 
 	/** Name of the calibration file used. SeaWiFS/MOS specific. */
@@ -169,7 +173,8 @@ public class APSAttributes {
 			PFA_IPA_PROCESSINGVERSION };
 
 	/**
-	 * ----------------------------------- Product file: Navigation Attributes
+	 * ----------------------------------- 
+	 * Product file: Navigation Attributes
 	 * -----------------------------------
 	 */
 
@@ -203,8 +208,8 @@ public class APSAttributes {
 			PFA_NA_MAPPEDLOWERLEFT, PFA_NA_MAPPEDLOWERRIGHT };
 
 	/**
-	 * ---------------------------------------------------- Product file: Input
-	 * Geographical Coverage Attributes
+	 * ---------------------------------------------------- 
+	 * Product file: Input Geographical Coverage Attributes
 	 * ----------------------------------------------------
 	 */
 
@@ -248,7 +253,8 @@ public class APSAttributes {
 			PFA_IGCA_LOCALESWCORNER, PFA_IGCA_LOCALESECORNER };
 
 	/**
-	 * -------------------------- Product Dataset Attributes
+	 * -------------------------- 
+	 * Product Dataset Attributes
 	 * --------------------------
 	 */
 
@@ -347,90 +353,5 @@ public class APSAttributes {
 			PDSA_VALIDRANGE, PDSA_INVALID, PDSA_PRODUCTSCALING,
 			PDSA_SCALINGSLOPE, PDSA_SCALINGINTERCEPT, PDSA_BROWSEFUNC,
 			PDSA_BROWSERANGES };
-
-	public static String buildAttributeString(Attribute att) {
-
-		//TODO: Add more type handler
-		final Datatype dataType = att.getType();
-		final int attribTypeClass = dataType.getDatatypeClass();
-		final int attribTypeSize = dataType.getDatatypeSize();
-		Object valuesList = att.getValue();
-		String attribValue = "";
-		if (valuesList != null) {
-
-			int i = 0;
-			final StringBuffer sb = new StringBuffer();
-			switch (attribTypeClass) {
-			case Datatype.CLASS_ARRAY:
-
-				break;
-			case Datatype.CLASS_BITFIELD:
-
-				break;
-			case Datatype.CLASS_CHAR:
-				final String[] strValues = (String[]) valuesList;
-				final int numValues = strValues.length;
-				for (; i < numValues - 1; i++) {
-					sb.append(strValues[i]).append(",");
-				}
-				sb.append(strValues[i]);
-				break;
-			case Datatype.CLASS_FLOAT:
-				switch (attribTypeSize){
-				case 4://32 bit floating point
-					final float[] fValues = (float[]) valuesList;
-					final int fNumValues = fValues.length;
-					for (; i < fNumValues - 1; i++) {
-						sb.append(fValues[i]).append(",");
-					}
-					sb.append(fValues[i]);
-					break;
-				case 8://64 bit floating point
-					final double[] dValues = (double[]) valuesList;
-					final int dNumValues = dValues.length;
-					for (; i < dNumValues - 1; i++) {
-						sb.append(dValues[i]).append(",");
-					}
-					sb.append(dValues[i]);
-					break;
-				}
-				break;
-			case Datatype.CLASS_INTEGER:
-				switch (attribTypeSize){
-				case 2://16 bit integers 
-					final short[] sValues = (short[]) valuesList;
-					final int sNumValues = sValues.length;
-					for (; i < sNumValues - 1; i++) {
-						sb.append(sValues[i]).append(",");
-					}
-					sb.append(sValues[i]);
-					break;
-				case 4://32 bit integers 
-					final int[] iValues = (int[]) valuesList;
-					final int iNumValues = iValues.length;
-					for (; i < iNumValues - 1; i++) {
-						sb.append(iValues[i]).append(",");
-					}
-					sb.append(iValues[i]);
-					break;
-				case 8://64 bit integers
-					final long[] lValues = (long[]) valuesList;
-					final int lNumValues = lValues.length;
-					for (; i < lNumValues - 1; i++) {
-						sb.append(lValues[i]).append(",");
-					}
-					sb.append(lValues[i]);
-					break;
-				}
-				break;
-			case Datatype.CLASS_STRING:
-
-				break;
-			}
-			attribValue=sb.toString();
-		}
-		return attribValue;
-
-	}
 
 }

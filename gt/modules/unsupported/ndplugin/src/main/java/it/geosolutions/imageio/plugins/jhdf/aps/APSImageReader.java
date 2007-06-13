@@ -1,6 +1,7 @@
 package it.geosolutions.imageio.plugins.jhdf.aps;
 
 import it.geosolutions.imageio.plugins.jhdf.BaseHDFImageReader;
+import it.geosolutions.imageio.plugins.jhdf.SubDatasetInfo;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.spi.ImageReaderSpi;
 
 import ncsa.hdf.object.Attribute;
+import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Group;
 import ncsa.hdf.object.HObject;
 import ncsa.hdf.object.ScalarDS;
@@ -48,8 +50,8 @@ public class APSImageReader extends BaseHDFImageReader {
 		// Getting the Member List from the provided root
 		final List membersList = ((Group) root).getMemberList();
 		final Iterator metadataIt = root.getMetadata().iterator();
-		int initialized = 0;
-		String mapProjectionName = "";
+
+		int subdatasetsNum=0;
 		while (metadataIt.hasNext()) {
 			// get the attribute
 			final Attribute att = (Attribute) metadataIt.next();
@@ -60,59 +62,45 @@ public class APSImageReader extends BaseHDFImageReader {
 				final String[] values = (String[]) valuesList;
 				final String products[] = values[0].split(",");
 				productList = products;
-				nSubdatasets = products.length;
-				subDatasets = new HashMap(nSubdatasets);
-				initialized++;
-			}
-
-			// Checking if the attribute is related to the Map Projection
-			if (att.getName().equalsIgnoreCase("mapProjection")) {
-				Object value = att.getValue();
-				final String[] values = (String[]) value;
-				mapProjectionName = values[0];
-				initialized++;
-			}
-
-			if (initialized == 2)
+				subdatasetsNum = products.length;
+				subDatasets = new HashMap(subdatasetsNum);
 				break;
+			}
 		}
 
 		final int listSize = membersList.size();
-//		structure = new SourceStructure(nSubdatasets);
+		sourceStructure = new SourceStructure(subdatasetsNum);
 		
 		// Scanning all the datasets
 		for (int i = 0; i < listSize; i++) {
 			final HObject member = (HObject) membersList.get(i);
 			if (member instanceof ScalarDS) {
 				final String name = member.getName();
-//				if (name.equals(mapProjectionName)) {
-//					mapProjectionHObject = member;
-//					continue;
-//
-//				}
-				for (int j = 0; j < nSubdatasets; j++) {
+				for (int j = 0; j < subdatasetsNum; j++) {
 					if (name.equals(productList[j])) {
-//						DatasetInfo dsInfo= new DatasetInfo(name);
-//						final int dims=((Dataset)member).getRank();
-//						final long dimSizes[] = ((Dataset)member).getDims();
 						subDatasets.put(name, member);
-						List metadata = member.getMetadata();
-						int k=0;
-						k++;
+						final int rank = ((Dataset)member).getRank();
+						final long[] dims = ((Dataset)member).getDims();
+						final long[] chunkSize = ((Dataset)member).getChunkSize();
 						
+						final long[] subDatasetDims = new long[rank];
+						final long[] subDatasetChunkSize = new long[rank];
+						long datasetSize = 1;
+						for (int k = 0; k < rank; k++) {
+							subDatasetDims[k]=dims[k];
+							subDatasetChunkSize[k]=chunkSize[k];
+							if(k>=2)
+								datasetSize *= dims[k];
+						}
+						SubDatasetInfo dsInfo= new SubDatasetInfo(name,rank,subDatasetDims,subDatasetChunkSize);
 						//TODO: Need to set Bands!
-//						dsInfo.setDims(dims);
-//						dsInfo.setDimSizes(dimSizes);
-//						structure.setDatasetInfo(j, dsInfo);
-						
+						sourceStructure.setSubDatasetInfo(j, dsInfo);
 					}
 				}
 			}
 		}
-
-		if (nSubdatasets > 1)
-			hasSubDatasets = true;
-
+		if (subdatasetsNum > 1)
+			sourceStructure.setHasSubDatasets(true);
 	}
 
 	protected void initialize() throws IOException {
@@ -136,8 +124,7 @@ public class APSImageReader extends BaseHDFImageReader {
 	}
 
 	public int getNumImages(boolean allowSearch) throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		return sourceStructure.getNSubdatasets();
 	}
 
 	public IIOMetadata getStreamMetadata() throws IOException {
@@ -145,4 +132,5 @@ public class APSImageReader extends BaseHDFImageReader {
 			streamMetadata = new APSStreamMetadata(root);
 		return streamMetadata;
 	}
+
 }

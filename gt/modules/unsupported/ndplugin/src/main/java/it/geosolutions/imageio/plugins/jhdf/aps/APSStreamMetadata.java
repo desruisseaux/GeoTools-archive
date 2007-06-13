@@ -1,6 +1,7 @@
 package it.geosolutions.imageio.plugins.jhdf.aps;
 
 import it.geosolutions.imageio.plugins.jhdf.BaseHDFStreamMetadata;
+import it.geosolutions.imageio.plugins.jhdf.HDFUtilities;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -206,7 +207,7 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 					
 					// get Attribute Name
 					final String attribName = att.getName();
-					final String attribValue = APSAttributes.buildAttributeString(att);
+					final String attribValue = HDFUtilities.buildAttributeString(att);
 
 					// checks if the attribute name matches one of the supported
 					// attributes
@@ -325,7 +326,7 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 									final String attribName = att.getName();
 									
 									// get Attribute Value
-									final String attribValue = APSAttributes.buildAttributeString(att);
+									final String attribValue = HDFUtilities.buildAttributeString(att);
 										boolean attributeFound = false;
 										for (int k = 0; k < nPdsAttrib && !attributeFound; k++) {
 											// if matched

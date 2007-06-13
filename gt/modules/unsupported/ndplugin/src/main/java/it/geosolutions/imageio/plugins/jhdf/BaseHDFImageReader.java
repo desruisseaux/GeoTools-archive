@@ -39,9 +39,60 @@ import ncsa.hdf.object.HObject;
 import com.sun.media.imageioimpl.common.ImageUtil;
 import com.sun.media.jai.codecimpl.util.RasterFactory;
 
-public class BaseHDFImageReader extends SliceImageReader {
-	
-	
+public abstract class BaseHDFImageReader extends SliceImageReader {
+
+	// TODO: should be moved in the aboveLayer?
+	protected class SourceStructure {
+		protected int nSubdatasets;
+
+		protected SubDatasetInfo[] subDatasetInfo;
+
+		protected boolean hasSubDatasets;
+
+		protected long[] subDatasetSizes;
+
+		public SourceStructure(int subdatasetsNum) {
+			nSubdatasets = subdatasetsNum;
+			subDatasetInfo = new SubDatasetInfo[subdatasetsNum];
+			subDatasetSizes = new long[subdatasetsNum];
+		}
+
+		public long getSubDatasetSize(int index) {
+			return subDatasetSizes[index];
+		}
+
+		public int getNSubdatasets() {
+			return nSubdatasets;
+		}
+
+		public void setNSubdatasets(int subdatasets) {
+			nSubdatasets = subdatasets;
+		}
+
+		public long[] getSubDatasetSizes() {
+			return subDatasetSizes;
+		}
+
+		public void setSubDatasetInfo(int j, SubDatasetInfo dsInfo) {
+			subDatasetInfo[j] = dsInfo;
+		}
+
+		public SubDatasetInfo getSubDatasetInfo(int j) {
+			if (j <= nSubdatasets)
+				return subDatasetInfo[j];
+			else
+				return null;
+		}
+
+		public boolean isHasSubDatasets() {
+			return hasSubDatasets;
+		}
+
+		public void setHasSubDatasets(boolean hasSubDatasets) {
+			this.hasSubDatasets = hasSubDatasets;
+		}
+	}
+
 	/** The originating FileFormat */
 	protected FileFormat fileFormat = null;
 
@@ -50,15 +101,15 @@ public class BaseHDFImageReader extends SliceImageReader {
 
 	protected ImageTypeSpecifier imageType = null;
 
-	protected int dataBitCount = 8;
+	protected SourceStructure sourceStructure;
 
-	protected int nSubdatasets;
+	// protected int subDatasetsOffset = -1;
 
-	protected int subDatasetsOffset = -1;
-
-	/** root of the FileFormat related the provided input source*/
+	/** root of the FileFormat related the provided input source */
 	protected HObject root;
-	
+
+	private int subDatasetsOffset;
+
 	protected BaseHDFImageReader(ImageReaderSpi originatingProvider) {
 		super(originatingProvider);
 	}
@@ -81,8 +132,7 @@ public class BaseHDFImageReader extends SliceImageReader {
 		if (!isInitialized)
 			initialize();
 		final Dataset dataset = retrieveDataset(imageIndex);
-		
-		
+
 		BufferedImage bimage = null;
 		dataset.init();
 		final int width = dataset.getWidth();
@@ -290,32 +340,33 @@ public class BaseHDFImageReader extends SliceImageReader {
 
 	protected Dataset retrieveDataset(int imageIndex) throws IOException {
 		checkImageIndex(imageIndex);
-		//TODO: Change this logic
+		// TODO: Change this logic
 		return (Dataset) ((Group) root).getMemberList().get(
 				imageIndex + subDatasetsOffset);
 	}
 
 	private void checkImageIndex(int imageIndex) {
-		if (imageIndex < 0
-				|| (!hasSubDatasets && imageIndex > 0)
-				|| (hasSubDatasets && ((nSubdatasets == 0 && imageIndex > 0) || (nSubdatasets != 0 && (imageIndex > nSubdatasets))))) {
-
-			// The specified imageIndex is not valid.
-			// Retrieving the valid image index range.
-			final int validImageIndex = hasSubDatasets ? nSubdatasets
-					: 0;
-			StringBuffer sb = new StringBuffer(
-					"Illegal imageIndex specified = ").append(imageIndex)
-					.append(", while the valid imageIndex");
-			if (validImageIndex > 0)
-				// There are N Subdatasets.
-				sb.append(" range should be (0,").append(validImageIndex - 1)
-						.append(")!!");
-			else
-				// Only the imageIndex 0 is valid.
-				sb.append(" should be only 0!");
-			throw new IndexOutOfBoundsException(sb.toString());
-		}
+		// if (imageIndex < 0
+		// || (!hasSubDatasets && imageIndex > 0)
+		// || (hasSubDatasets && ((nSubdatasets == 0 && imageIndex > 0) ||
+		// (nSubdatasets != 0 && (imageIndex > nSubdatasets))))) {
+		//
+		// // The specified imageIndex is not valid.
+		// // Retrieving the valid image index range.
+		// final int validImageIndex = hasSubDatasets ? nSubdatasets
+		// : 0;
+		// StringBuffer sb = new StringBuffer(
+		// "Illegal imageIndex specified = ").append(imageIndex)
+		// .append(", while the valid imageIndex");
+		// if (validImageIndex > 0)
+		// // There are N Subdatasets.
+		// sb.append(" range should be (0,").append(validImageIndex - 1)
+		// .append(")!!");
+		// else
+		// // Only the imageIndex 0 is valid.
+		// sb.append(" should be only 0!");
+		// throw new IndexOutOfBoundsException(sb.toString());
+		// }
 
 	}
 
@@ -366,45 +417,6 @@ public class BaseHDFImageReader extends SliceImageReader {
 			fileFormat = FileFormat.getInstance(fileName);
 			fileFormat = fileFormat.open(fileName, FileFormat.READ);
 			root = fileFormat.get("/");
-			
-//			final List membersList = ((Group) root).getMemberList();
-//			final int listSize = membersList.size();
-//			int subdatasets = 0;
-//			for (int i = 0; i < listSize; i++) {
-//				final HObject member = (HObject) membersList.get(i);
-//				if (member instanceof ScalarDS) {
-//					if (subDatasetsOffset == -1)
-//						subDatasetsOffset = i;
-//					subdatasets++;
-//				}
-//			}
-
-//			subdatasetInfo = new SubDatasetsInfo();
-//			subdatasetInfo.datasetSizes = new long[subdatasets];
-//			subdatasetInfo.datasetDims = new long[subdatasets][];
-//
-//			for (int i = subDatasetsOffset; i < subdatasets + subDatasetsOffset; i++) {
-//				// TODO: Check the selectedIndex (is always 0,1,2,..??)
-//				final int k = i - subDatasetsOffset;
-//				final ScalarDS member = (ScalarDS) membersList.get(i);
-//				final int rank = member.getRank();
-//				final long[] dims = member.getDims();
-//				subdatasetInfo.datasetDims[k] = new long[rank];
-//				long datasetSize = 1;
-//				for (int j = 0; j < rank; j++) {
-//						final long dim = dims[j];
-//						subdatasetInfo.datasetDims[k][j] = dim;
-//						if(j>=2)
-//						datasetSize *= dim;
-//					}
-//				subdatasetInfo.datasetSizes[k] = datasetSize;
-//
-//			}
-			
-			
-//			nSubdatasets = subdatasets;
-//			if (nSubdatasets > 0)
-//				hasSubDatasets = true;
 
 		} catch (Exception e) {
 			IOException ioe = new IOException(
@@ -433,7 +445,7 @@ public class BaseHDFImageReader extends SliceImageReader {
 		final int height = dataset.getHeight();
 		final boolean isUnsigned = dt.isUnsigned();
 
-		//TODO: retrieve Band Number
+		// TODO: retrieve Band Number
 		final int nBands = 1;
 
 		// bands variables
@@ -508,24 +520,24 @@ public class BaseHDFImageReader extends SliceImageReader {
 	public int getTileHeight(int imageIndex) throws IOException {
 		if (!isInitialized)
 			initialize();
-		long [] chunkSize = retrieveDataset(imageIndex).getChunkSize();
-		
-		//TODO: Change this behavior
-		if (chunkSize!=null)
-			return (int)chunkSize[1];
-		else 
+		long[] chunkSize = retrieveDataset(imageIndex).getChunkSize();
+
+		// TODO: Change this behavior
+		if (chunkSize != null)
+			return (int) chunkSize[1];
+		else
 			return 512;
 	}
 
 	public int getTileWidth(int imageIndex) throws IOException {
 		if (!isInitialized)
 			initialize();
-		long [] chunkSize = retrieveDataset(imageIndex).getChunkSize();
-		
-		//TODO: Change this behavior
-		if (chunkSize!=null)
-			return (int)chunkSize[0];
-		else 
+		long[] chunkSize = retrieveDataset(imageIndex).getChunkSize();
+
+		// TODO: Change this behavior
+		if (chunkSize != null)
+			return (int) chunkSize[0];
+		else
 			return 512;
 	}
 
@@ -562,25 +574,49 @@ public class BaseHDFImageReader extends SliceImageReader {
 		return ~0;
 	}
 
-	public int getDatasetNum() {
-		return nSubdatasets;
+	public int retrieveSubIndex(int imageIndex, int[] selectedDims) {
+		int subIndexOffset=0;
+		final SubDatasetInfo sdInfo = sourceStructure.getSubDatasetInfo(imageIndex); 
+		for (int i=0;i<imageIndex;i++)
+			subIndexOffset+=(sourceStructure.getSubDatasetSize(i));
+
+		// X and Y dims are not taken in account
+		final int selectedDimsLenght = selectedDims.length;
+		final long[] subDatasetDims = sdInfo.getDims();
+		final int rank = sdInfo.getRank();
+
+		// supposing specifying all required subDimensions.
+		// as an instance, if rank=5, I need to specify 3 dimensions-index
+		// TODO: maybe I can assume some default behavior. 
+		// as an instance, using 0 as dimension-index when not specified.
+		if (selectedDimsLenght!=(rank-2)){
+			throw new IndexOutOfBoundsException("The selected dims array can't be" +
+					"greater than the rank of the subDataset");
+		}
+		final long[] multipliers = new long[rank-2];
+		for (int i=0;i<selectedDimsLenght;i++){
+			if (selectedDims[i]>subDatasetDims[i]){
+				final StringBuffer sb = new StringBuffer();
+				sb.append("At least one of the specified indexes is greater than the max allowed index in that dimension\n")
+				.append("dimension=").append(i).append(" index=").append(selectedDims[i])
+				.append(" while the maximum index available for this dimension is ").append(subDatasetDims[i]);
+				throw new IndexOutOfBoundsException(sb.toString());
+			}
+		}
+		for (int i=0;i<rank-2;i++){
+			//Multipliers factor need to be stored in reversed order.
+			multipliers[i]=subDatasetDims[rank-i];
+		}
+		int displacement = 0;
+		for (int i=0;i<rank-2;i++){
+			displacement+=(multipliers[i]*selectedDims[i]);
+		}
+		return subIndexOffset+displacement;
 	}
 
+	public int[] buildIndexesStructure(int specifiedIndex) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
-
-	public IIOMetadata getImageMetadata(int imageIndex) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public int getNumImages(boolean allowSearch) throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public IIOMetadata getStreamMetadata() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }
