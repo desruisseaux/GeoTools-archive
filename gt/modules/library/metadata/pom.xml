@@ -1,47 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<!-- =======================================================================    
+        Maven Project Configuration File                                        
+                                                                                
+        The Geotools Project                                                    
+            http://www.geotools.org/                                            
+                                                                                
+        Version: $Id$              
+     ======================================================================= -->
+  <project xmlns="http://maven.apache.org/POM/4.0.0" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
   <parent>
-    <artifactId>gt2-library</artifactId>
     <groupId>org.geotools</groupId>
+    <artifactId>gt2-library</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
+  
+
+  <!-- =========================================================== -->
+  <!--     Module Description                                      -->
+  <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
   <artifactId>gt2-metadata</artifactId>
+  <packaging>jar</packaging>
   <name>Metadata</name>
-  <description>Contains implementations of metadata and some core utilities classes.</description>
-  <developers>
-    <developer>
-      <id>desruisseaux</id>
-      <name>Martin Desruisseaux</name>
-      <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
-      <roles>
-        <role>Module Maintainer</role>
-        <role>Java Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
-      <id>jive</id>
-      <name>Jody Garnett</name>
-      <email>jive@users.sourceforge.net</email>
-      <organization>Refractions Research</organization>
-      <roles>
-        <role>Java Developer</role>
-      </roles>
-    </developer>
-  </developers>
-  <contributors>
-    <contributor>
-      <name>Toura??vane</name>
-      <organization>Institut de Recherche pour le D??veloppement (IRD)</organization>
-      <roles>
-        <role>Java developper</role>
-      </roles>
-    </contributor>
-  </contributors>
+  
+  <description>
+    Contains implementations of metadata and some core utilities classes.
+  </description>
+
   <licenses>
     <license>
       <name>Lesser General Public License (LGPL)</name>
@@ -49,29 +39,83 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+
+
+  <!-- =========================================================== -->
+  <!--     Developers and Contributors                             -->
+  <!-- =========================================================== -->
+  <developers>
+    <developer>
+      <name>Martin Desruisseaux</name>
+      <id>desruisseaux</id>
+      <email>desruisseaux@users.sourceforge.net</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Jody Garnett</name>
+      <id>jive</id>
+      <email>jive@users.sourceforge.net</email>
+      <organization>Refractions Research</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+
+  <contributors>
+    <contributor>
+      <name>Touraïvane</name>
+      <organization>
+        Institut de Recherche pour le Développement (IRD)
+      </organization>
+      <roles>
+        <role>Java developper</role>
+      </roles>
+    </contributor>
+  </contributors>
+
+
+  <!-- =========================================================== -->
+  <!--     Dependency Management                                   -->
+  <!-- =========================================================== -->
   <dependencies>
+    <!-- NOTE: The metadata module does not depends on JTS. -->
+
     <dependency>
       <groupId>java3d</groupId>
       <artifactId>vecmath</artifactId>
+      <!-- The version number is specified in the parent POM. -->
     </dependency>
     <dependency>
       <groupId>org.opengis</groupId>
       <artifactId>geoapi-nogenerics</artifactId>
+      <!-- The version number is specified in the parent POM. -->
     </dependency>
     <dependency>
       <groupId>javax.units</groupId>
       <artifactId>jsr108</artifactId>
+      <!-- The version number is specified in the parent POM. -->      
     </dependency>
+        
+    <!--
+      The following is required only for compilation.  It should not be included
+      in distribution, unless the user really want to use Apache commons logging
+      (in which case he should put this dependency explicitly on the classpath).
+    -->
     <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
-      <scope>provided</scope>
+      <!-- The version number is specified in the parent POM. -->
+      <scope>provided</scope>  <!-- Not required for default execution. -->
       <optional>true</optional>
     </dependency>
-    <dependency>
-      <groupId>commons-pool</groupId>
-      <artifactId>commons-pool</artifactId>
-    </dependency>
   </dependencies>
-</project>
 
+
+</project>
