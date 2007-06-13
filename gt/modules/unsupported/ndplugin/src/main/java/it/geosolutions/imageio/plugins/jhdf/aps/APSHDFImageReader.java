@@ -10,6 +10,8 @@ import java.util.List;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.spi.ImageReaderSpi;
 
+import jj2000.j2k.util.StreamMsgLogger;
+
 import ncsa.hdf.object.Attribute;
 import ncsa.hdf.object.Group;
 import ncsa.hdf.object.HObject;
@@ -33,9 +35,8 @@ public class APSHDFImageReader extends BaseHDFImageReader {
 
 	private HashMap subDatasets;
 
-	private HObject mapProjectionHObject;
-
-	private APSHDFImageMetadata imageMetadata;
+	private APSImageMetadata imageMetadata;
+	private APSStreamMetadata streamMetadata;
 	
 	
 	/**
@@ -86,11 +87,11 @@ public class APSHDFImageReader extends BaseHDFImageReader {
 			final HObject member = (HObject) membersList.get(i);
 			if (member instanceof ScalarDS) {
 				final String name = member.getName();
-				if (name.equals(mapProjectionName)) {
-					mapProjectionHObject = member;
-					continue;
-
-				}
+//				if (name.equals(mapProjectionName)) {
+//					mapProjectionHObject = member;
+//					continue;
+//
+//				}
 				for (int j = 0; j < nSubdatasets; j++) {
 					if (name.equals(productList[j])) {
 //						DatasetInfo dsInfo= new DatasetInfo(name);
@@ -132,7 +133,7 @@ public class APSHDFImageReader extends BaseHDFImageReader {
 	
 	public IIOMetadata getImageMetadata(int imageIndex) throws IOException {
 		if (imageMetadata == null)
-			imageMetadata = new APSHDFImageMetadata(retrieveDataset(imageIndex));
+			imageMetadata = new APSImageMetadata(retrieveDataset(imageIndex));
 		return imageMetadata;
 	}
 
@@ -142,7 +143,8 @@ public class APSHDFImageReader extends BaseHDFImageReader {
 	}
 
 	public IIOMetadata getStreamMetadata() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		if (streamMetadata == null)
+			streamMetadata = new APSStreamMetadata(root);
+		return streamMetadata;
 	}
 }

@@ -39,7 +39,6 @@ public class APSHDFStreamMetadata extends BaseHDFStreamMetadata {
 	}
 
 	private void initializeFromRoot(HObject root) {
-
 		
 	}
 

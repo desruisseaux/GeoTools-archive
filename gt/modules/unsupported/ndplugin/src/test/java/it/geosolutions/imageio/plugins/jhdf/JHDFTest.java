@@ -1,6 +1,7 @@
 package it.geosolutions.imageio.plugins.jhdf;
 
-import it.geosolutions.imageio.plugins.jhdf.aps.APSHDFImageMetadata;
+import it.geosolutions.imageio.plugins.jhdf.aps.APSImageMetadata;
+import it.geosolutions.imageio.plugins.jhdf.aps.APSStreamMetadata;
 import it.geosolutions.resources.TestData;
 
 import java.awt.image.BufferedImage;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.metadata.IIOMetadataNode;
 import javax.media.jai.JAI;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.RenderedOp;
@@ -36,9 +38,9 @@ public class JHDFTest extends TestCase {
 		JAI.getDefaultInstance().getTileCache().setMemoryCapacity(
 				64 * 1024 * 1024);
 		JAI.getDefaultInstance().getTileCache().setMemoryThreshold(1.0f);
-		JAI.getDefaultInstance().getTileScheduler().setParallelism(3);
+		JAI.getDefaultInstance().getTileScheduler().setParallelism(1);
 		JAI.getDefaultInstance().getTileScheduler().setPrefetchPriority(2);
-		JAI.getDefaultInstance().getTileScheduler().setPrefetchParallelism(3);
+		JAI.getDefaultInstance().getTileScheduler().setPrefetchParallelism(1);
 	}
 
 	public void testJaiRead() throws IOException {
@@ -48,10 +50,7 @@ public class JHDFTest extends TestCase {
 		ImageReadParam irp = new ImageReadParam();
 		irp.setSourceSubsampling(1, 1, 0, 0);
 		// irp.setSourceRegion(new Rectangle(0, 512, 1024, 1024));
-		int i = 3;
-		for (i = 0; i < 13; i++) {
-			if (i != 2)
-				continue;
+		int i = 2;
 			final ParameterBlockJAI pbjImageRead = new ParameterBlockJAI(
 					"ImageRead");
 
@@ -61,11 +60,16 @@ public class JHDFTest extends TestCase {
 			final RenderedOp image = JAI.create("ImageRead", pbjImageRead);
 			ImageReader reader = (ImageReader) image
 					.getProperty(ImageReadDescriptor.PROPERTY_NAME_IMAGE_READER);
-			visualize(image, "");
 			final IIOMetadata metadata = reader.getImageMetadata(i);
-			Node node = metadata
-					.getAsTree(APSHDFImageMetadata.nativeMetadataFormatName);
-		}
+			IIOMetadataNode imageNode = (IIOMetadataNode)metadata
+					.getAsTree(APSImageMetadata.nativeMetadataFormatName);
+			System.out.println(MetadataDisplay.buildMetadataFromNode(imageNode));
+			
+			
+			final IIOMetadata streamMetadata = reader.getStreamMetadata();
+			IIOMetadataNode streamNode = (IIOMetadataNode)streamMetadata.getAsTree(APSStreamMetadata.nativeMetadataFormatName);
+			System.out.println(MetadataDisplay.buildMetadataFromNode(streamNode));
+//			visualize(image, "");
 	}
 
 	public void testJaiMultithreadingRead() throws IOException {

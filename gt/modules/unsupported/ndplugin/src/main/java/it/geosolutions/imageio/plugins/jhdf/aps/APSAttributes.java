@@ -1,13 +1,15 @@
 package it.geosolutions.imageio.plugins.jhdf.aps;
 
+import ncsa.hdf.object.Attribute;
+import ncsa.hdf.object.Datatype;
+
 public class APSAttributes {
 
 	/**
-	 * -------------------------
-	 * Standard: File Attributes
+	 * ------------------------- Standard: File Attributes
 	 * -------------------------
 	 */
-	
+
 	/** The name of the product */
 	final static String STD_FA_FILE = "file";
 
@@ -38,12 +40,16 @@ public class APSAttributes {
 	/** The name of the user that created this file */
 	final static String STD_FA_CREATEUSER = "createUser";
 
+	final static String[] STD_FA_ATTRIB = new String[] { STD_FA_FILE,
+			STD_FA_FILECLASSIFICATION, STD_FA_FILESTATUS, STD_FA_FILETITLE,
+			STD_FA_FILEVERSION, STD_FA_CREATEAGENCY, STD_FA_CREATESOFTWARE,
+			STD_FA_CREATEPLATFORM, STD_FA_CREATETIME, STD_FA_CREATEUSER };
+
 	/**
-	 * -------------------------
-	 * Standard: Time Attributes
+	 * ------------------------- Standard: Time Attributes
 	 * -------------------------
 	 */
-	
+
 	/** UTC start time as an ASCII string */
 	final static String STD_TA_TIMESTART = "timeStart";
 
@@ -68,12 +74,19 @@ public class APSAttributes {
 	/** UTC milliseconds-of-day of data end (1-86400000) */
 	final static String STD_TA_TIMEENDTIME = "timeEndTime";
 
-	/** Flag indicating if data collected during day or night. May be one of Day, Night, Day/Night */
+	/**
+	 * Flag indicating if data collected during day or night. May be one of Day,
+	 * Night, Day/Night
+	 */
 	final static String STD_TA_TIMEDAYNIGHT = "timeDayNight";
 
+	final static String[] STD_TA_ATTRIB = new String[] { STD_TA_TIMESTART,
+			STD_TA_TIMESTARTYEAR, STD_TA_TIMESTARTDAY, STD_TA_TIMESTARTTIME,
+			STD_TA_TIMEEND, STD_TA_TIMEENDYEAR, STD_TA_TIMEENDDAY,
+			STD_TA_TIMEENDTIME, STD_TA_TIMEDAYNIGHT };
+
 	/**
-	 * ---------------------------
-	 * Standard: Sensor Attributes
+	 * --------------------------- Standard: Sensor Attributes
 	 * ---------------------------
 	 */
 
@@ -116,10 +129,17 @@ public class APSAttributes {
 	/** Type of platform */
 	final static String STD_SA_SENSORPLATFORMTYPE = "sensorPlatformType";
 
+	final static String[] STD_SA_ATTRIB = new String[] { STD_SA_SENSOR,
+			STD_SA_SENSORPLATFORM, STD_SA_SENSORAGENCY, STD_SA_SENSORTYPE,
+			STD_SA_SENSORSPECTRUM, STD_SA_SENSORNUMBEROFBANDS,
+			STD_SA_SENSORBANDUNITS, STD_SA_SENSORBANDS,
+			STD_SA_SENSORBANDWIDTHS, STD_SA_SENSORNOMINALALTITUDEINKM,
+			STD_SA_SENSORSCANWIDTHINKM, STD_SA_SENSORRESOLUTIONINKM,
+			STD_SA_SENSORPLATFORMTYPE };
+
 	/**
-	 * -----------------------------------------
-	 * Product file: Input Parameters Attributes
-	 * -----------------------------------------
+	 * ----------------------------------------- Product file: Input Parameters
+	 * Attributes -----------------------------------------
 	 */
 
 	/** Name of the calibration file used. SeaWiFS/MOS specific. */
@@ -131,7 +151,10 @@ public class APSAttributes {
 	/** The mask defined as an integer */
 	final static String PFA_IPA_INPUTMASKSINT = "inputMasksInt";
 
-	/** A comma seperated list of flags that were used as masks during processing. */
+	/**
+	 * A comma seperated list of flags that were used as masks during
+	 * processing.
+	 */
 	final static String PFA_IPA_INPUTMASKS = "inputMasks";
 
 	/** A comma seperated list of products stored in this file. */
@@ -140,10 +163,13 @@ public class APSAttributes {
 	/** Version of processing */
 	final static String PFA_IPA_PROCESSINGVERSION = "processingVersion";
 
-	
+	final static String[] PFA_IPA_ATTRIB = new String[] {
+			PFA_IPA_INPUTCALIBRATIONFILE, PFA_IPA_INPUTPARAMETER,
+			PFA_IPA_INPUTMASKSINT, PFA_IPA_INPUTMASKS, PFA_IPA_PRODLIST,
+			PFA_IPA_PROCESSINGVERSION };
+
 	/**
-	 * -----------------------------------
-	 * Product file: Navigation Attributes
+	 * ----------------------------------- Product file: Navigation Attributes
 	 * -----------------------------------
 	 */
 
@@ -153,8 +179,10 @@ public class APSAttributes {
 	/** Map projection system used. Always set to NRL(USGS) */
 	final static String PFA_NA_MAPPROJECTIONSYSTEM = "mapProjectionSystem";
 
-	/** Name of the SDS included in the file that contains the map projection 
-	 * parameter values. */
+	/**
+	 * Name of the SDS included in the file that contains the map projection
+	 * parameter values.
+	 */
 	final static String PFA_NA_MAPPROJECTION = "mapProjection";
 
 	/** Latitude and longitude of upper left (1,1) point of each product. */
@@ -166,34 +194,38 @@ public class APSAttributes {
 	/** Latitude and longitude of lower left (m,1) point of each product. */
 	final static String PFA_NA_MAPPEDLOWERLEFT = "mappedLowerLeft";
 
-	/** Latitude and longitude of lower right (m,n) point of each product. */	
+	/** Latitude and longitude of lower right (m,n) point of each product. */
 	final static String PFA_NA_MAPPEDLOWERRIGHT = "mappedLowerRight";
 
-	final static String PFA_NA_ATTRIB[] = new String[] { PFA_NA_NAVTYPE,
-		PFA_NA_MAPPROJECTIONSYSTEM, PFA_NA_MAPPROJECTION, PFA_NA_MAPPEDUPERLEFT, 
-		PFA_NA_MAPPEDUPPERRIGHT, PFA_NA_MAPPEDLOWERLEFT, PFA_NA_MAPPEDLOWERRIGHT
-	};
-	
+	final static String[] PFA_NA_ATTRIB = new String[] { PFA_NA_NAVTYPE,
+			PFA_NA_MAPPROJECTIONSYSTEM, PFA_NA_MAPPROJECTION,
+			PFA_NA_MAPPEDUPERLEFT, PFA_NA_MAPPEDUPPERRIGHT,
+			PFA_NA_MAPPEDLOWERLEFT, PFA_NA_MAPPEDLOWERRIGHT };
+
 	/**
-	 * ----------------------------------------------------
-	 * Product file: Input Geographical Coverage Attributes
+	 * ---------------------------------------------------- Product file: Input
+	 * Geographical Coverage Attributes
 	 * ----------------------------------------------------
 	 */
 
-	/** latitude and longitude of upper left (1,1) point of original 
-	 * input data. */
+	/**
+	 * latitude and longitude of upper left (1,1) point of original input data.
+	 */
 	final static String PFA_IGCA_LOCALEUPPERLEFT = "localeUpperLeft";
 
-	/** latitude and longitude of upper right (1,n) point of original 
-	 * input data. */
+	/**
+	 * latitude and longitude of upper right (1,n) point of original input data.
+	 */
 	final static String PFA_IGCA_LOCALEUPPERRIGHT = "localeUpperRight";
 
-	/** latitude and longitude of lower left (m,1) point of original 
-	 * input data. */
+	/**
+	 * latitude and longitude of lower left (m,1) point of original input data.
+	 */
 	final static String PFA_IGCA_LOCALELOWERLEFT = "localeLowerLeft";
 
-	/** latitude and longitude of lower right (m,n) point of original 
-	 * input data. */
+	/**
+	 * latitude and longitude of lower right (m,n) point of original input data.
+	 */
 	final static String PFA_IGCA_LOCALELOWERRIGHT = "localeLowerRight";
 
 	/** latitude and longitude of NorthWestern point of original input data. */
@@ -209,27 +241,30 @@ public class APSAttributes {
 	final static String PFA_IGCA_LOCALESECORNER = "localeSECorner";
 
 	/**  */
-	final static String PFA_IGCA_ATTRIB[] = new String[] { PFA_IGCA_LOCALEUPPERLEFT,
-		PFA_IGCA_LOCALEUPPERRIGHT, PFA_IGCA_LOCALELOWERLEFT, PFA_IGCA_LOCALELOWERRIGHT,
-		PFA_IGCA_LOCALENWCORNER, PFA_IGCA_LOCALENECORNER, PFA_IGCA_LOCALESWCORNER,
-		PFA_IGCA_LOCALESECORNER
-	};
-	
+	final static String[] PFA_IGCA_ATTRIB = new String[] {
+			PFA_IGCA_LOCALEUPPERLEFT, PFA_IGCA_LOCALEUPPERRIGHT,
+			PFA_IGCA_LOCALELOWERLEFT, PFA_IGCA_LOCALELOWERRIGHT,
+			PFA_IGCA_LOCALENWCORNER, PFA_IGCA_LOCALENECORNER,
+			PFA_IGCA_LOCALESWCORNER, PFA_IGCA_LOCALESECORNER };
+
 	/**
-	 * --------------------------
-	 * Product Dataset Attributes
+	 * -------------------------- Product Dataset Attributes
 	 * --------------------------
 	 */
 
-	/** This string contains the version of the software which created the
-	 *  product. */
+	/**
+	 * This string contains the version of the software which created the
+	 * product.
+	 */
 	final static String PDSA_CREATESOFTWARE = "createSoftware";
 
 	/** This string contains the date and time when the product was created */
 	final static String PDSA_CREATETIME = "createTime";
 
-	/** This string contains a triple describing the cpu-machine-os which
-	 *  created the scientific data set */
+	/**
+	 * This string contains a triple describing the cpu-machine-os which created
+	 * the scientific data set
+	 */
 	final static String PDSA_CREATEPLATFORM = "createPlatform";
 
 	/** This is a description of the product. */
@@ -241,26 +276,41 @@ public class APSAttributes {
 	/** This is a description of the units of the product. */
 	final static String PDSA_PRODUCTUNITS = "productUnits";
 
-	/** This is a version number of the product used to indicate changes 
-	 * in the algorithm. */
+	/**
+	 * This is a version number of the product used to indicate changes in the
+	 * algorithm.
+	 */
 	final static String PDSA_PRODUCTVERSION = "productVersion";
 
-	/** This is a type of product. For example, 'chl_oc4v4' and 'chl_oc3m'
-	 *  would both set this to 'chl'. */
+	/**
+	 * This is a type of product. For example, 'chl_oc4v4' and 'chl_oc3m' would
+	 * both set this to 'chl'.
+	 */
 	final static String PDSA_PRODUCTTYPE = "productType";
 
-	/** This is a space delimetered string of additional units available 
-	 * for this product. For example, an sst product may set this string
-	 *  to "Kelvin Fahrenheit" */
-	final static String PDSA_ADDITIONALUNITS = "additionalUnits";
+	/**
+	 * This is a space delimetered string of additional units available for this
+	 * product. For example, an sst product may set this string to "Kelvin
+	 * Fahrenheit"
+	 */
+	// final static String PDSA_ADDITIONALUNITS = "additionalUnits";
+	// The test file in the test-data folder has "otherUnits" as attribute
+	// instead of "additionalUnits"
+	final static String PDSA_ADDITIONALUNITS = "otherUnits";
 
-	/** This new SDS attribute will give an indication of the status this product. */
+	/**
+	 * This new SDS attribute will give an indication of the status this
+	 * product.
+	 */
 	final static String PDSA_PRODUCTSTATUS = "productStatus";
 
 	/** This is a suggested range of valid data. */
 	final static String PDSA_VALIDRANGE = "validRange";
 
-	/** This is the geophysical value which will represent invalid data for the given product. */
+	/**
+	 * This is the geophysical value which will represent invalid data for the
+	 * given product.
+	 */
 	final static String PDSA_INVALID = "invalid";
 
 	/** The type of scaling of the product. Currently, always Linear */
@@ -272,27 +322,115 @@ public class APSAttributes {
 	/** The intercept for product scaling. */
 	final static String PDSA_SCALINGINTERCEPT = "scalingIntercept";
 
-	/** This is a suggested function to apply to convert the data in the SDS 
-	 * into an image. A value of 1 indicates linear scaling; a value of 2 
-	 * indicates log10 scaling. */
+	/**
+	 * This is a suggested function to apply to convert the data in the SDS into
+	 * an image. A value of 1 indicates linear scaling; a value of 2 indicates
+	 * log10 scaling.
+	 */
 	final static String PDSA_BROWSEFUNC = "browseFunc";
 
-	/** This is a suggested display range when converting the data in the SDS 
-	 * into an image. This may or may not be the same as validRange because in 
-	 * some cases (e.g. rrs_412), the data has been known to fall outside the 
-	 * range, but we wish to display the invalid data. This attribute is used 
-	 * by the APS program imgBrowse when creating quick-look browse images of
-	 *  different products. */
+	/**
+	 * This is a suggested display range when converting the data in the SDS
+	 * into an image. This may or may not be the same as validRange because in
+	 * some cases (e.g. rrs_412), the data has been known to fall outside the
+	 * range, but we wish to display the invalid data. This attribute is used by
+	 * the APS program imgBrowse when creating quick-look browse images of
+	 * different products.
+	 */
 	final static String PDSA_BROWSERANGES = "browseRange";
 
 	/**  */
-	final static String PDSA_ATTRIB[] = new String[] { PDSA_CREATESOFTWARE,
+	final static String[] PDSA_ATTRIB = new String[] { PDSA_CREATESOFTWARE,
 			PDSA_CREATETIME, PDSA_CREATEPLATFORM, PDSA_PRODUCTNAME,
 			PDSA_PRODUCTALGORITHM, PDSA_PRODUCTUNITS, PDSA_PRODUCTVERSION,
 			PDSA_PRODUCTTYPE, PDSA_ADDITIONALUNITS, PDSA_PRODUCTSTATUS,
 			PDSA_VALIDRANGE, PDSA_INVALID, PDSA_PRODUCTSCALING,
 			PDSA_SCALINGSLOPE, PDSA_SCALINGINTERCEPT, PDSA_BROWSEFUNC,
-			PDSA_BROWSERANGES
-	};
+			PDSA_BROWSERANGES };
+
+	public static String buildAttributeString(Attribute att) {
+
+		//TODO: Add more type handler
+		final Datatype dataType = att.getType();
+		final int attribTypeClass = dataType.getDatatypeClass();
+		final int attribTypeSize = dataType.getDatatypeSize();
+		Object valuesList = att.getValue();
+		String attribValue = "";
+		if (valuesList != null) {
+
+			int i = 0;
+			final StringBuffer sb = new StringBuffer();
+			switch (attribTypeClass) {
+			case Datatype.CLASS_ARRAY:
+
+				break;
+			case Datatype.CLASS_BITFIELD:
+
+				break;
+			case Datatype.CLASS_CHAR:
+				final String[] strValues = (String[]) valuesList;
+				final int numValues = strValues.length;
+				for (; i < numValues - 1; i++) {
+					sb.append(strValues[i]).append(",");
+				}
+				sb.append(strValues[i]);
+				break;
+			case Datatype.CLASS_FLOAT:
+				switch (attribTypeSize){
+				case 4://32 bit floating point
+					final float[] fValues = (float[]) valuesList;
+					final int fNumValues = fValues.length;
+					for (; i < fNumValues - 1; i++) {
+						sb.append(fValues[i]).append(",");
+					}
+					sb.append(fValues[i]);
+					break;
+				case 8://64 bit floating point
+					final double[] dValues = (double[]) valuesList;
+					final int dNumValues = dValues.length;
+					for (; i < dNumValues - 1; i++) {
+						sb.append(dValues[i]).append(",");
+					}
+					sb.append(dValues[i]);
+					break;
+				}
+				break;
+			case Datatype.CLASS_INTEGER:
+				switch (attribTypeSize){
+				case 2://16 bit integers 
+					final short[] sValues = (short[]) valuesList;
+					final int sNumValues = sValues.length;
+					for (; i < sNumValues - 1; i++) {
+						sb.append(sValues[i]).append(",");
+					}
+					sb.append(sValues[i]);
+					break;
+				case 4://32 bit integers 
+					final int[] iValues = (int[]) valuesList;
+					final int iNumValues = iValues.length;
+					for (; i < iNumValues - 1; i++) {
+						sb.append(iValues[i]).append(",");
+					}
+					sb.append(iValues[i]);
+					break;
+				case 8://64 bit integers
+					final long[] lValues = (long[]) valuesList;
+					final int lNumValues = lValues.length;
+					for (; i < lNumValues - 1; i++) {
+						sb.append(lValues[i]).append(",");
+					}
+					sb.append(lValues[i]);
+					break;
+				}
+				break;
+			case Datatype.CLASS_STRING:
+
+				break;
+			}
+			attribValue=sb.toString();
+		}
+		return attribValue;
+
+	}
 
 }
