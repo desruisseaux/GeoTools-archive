@@ -20,6 +20,7 @@ package org.geotools.util;
 import java.util.Set;
 import java.util.WeakHashMap;
 
+
 /**
  * A canonical set of objects, used to optimize memory use.
  * <p>
@@ -28,7 +29,7 @@ import java.util.WeakHashMap;
  * internal pool of immutable objects.<pre><code>
  * public Foo create( String definition ){
  *      Foo created = new Foo( definition );
- *      return (Foo) canionicalSet.toUnqiue( created );
+ *      return (Foo) canionicalSet.toUnique( created );
  * }
  * </code></pre>
  * As shown above the {@code CanonicalSet} has a  {@link #get}  method that is not part
@@ -47,15 +48,12 @@ import java.util.WeakHashMap;
  * <p>
  * The {@code CanonicalSet} class is thread-safe.
  *
- * @since 2.1
+ * @since 2.4
  * @source $URL$
  * @version $Id$
- * @author Martin Desruisseaux
- *
- * @see WeakHashMap
+ * @author Jody Garnett
  */
 public class CanonicalSet extends WeakHashSet {
-
     /**
      * Construct a {@code CanonicalSet}.
      */
@@ -65,10 +63,9 @@ public class CanonicalSet extends WeakHashSet {
     /**
      * Returns an object equals to {@code object} if such an object already exist in this
      * {@code CanonicalSet}. Otherwise, adds {@code object} to this {@code CanonicalSet}.
-     * This method is equivalents to the following code:
      */
-    public synchronized Object toUnqiue(final Object object) {
-        return intern(object, INTERN);
+    public Object toUnique(final Object object) {
+        return canonicalize(object);
     }
 
 }

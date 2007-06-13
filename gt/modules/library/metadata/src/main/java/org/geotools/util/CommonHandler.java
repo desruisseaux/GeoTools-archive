@@ -87,12 +87,20 @@ final class CommonHandler extends Handler {
      * <p>
      * If this method determines that <cite>commons-logging</cite> would redirect all log events
      * to the java logging system, then this method do nothing and return {@code false}.
+     * <p>
+     * Note that this method throws an {@linkplain java.lang.Error error} if the Apache
+     * commons-logging package is not found on the classpath. For a safer alternative,
+     * consider invoking {@link Logging#redirectToCommonsLogging} instead.
      *
      * @param  name The logger name, usually {@code ""} or {@code "org.geotools"}.
      * @return {@code true} if the adapter has been installed or re-installed, or
      *         {@code false} if this method did nothing.
+     * @throws NoClassDefFoundError if the Apache commons-logging package was not found on the
+     *         classpath.
+     *
+     * @see Logging#redirectToCommonsLogging
      */
-    public static synchronized boolean install(final String name) {
+    public static synchronized boolean install(final String name) throws NoClassDefFoundError {
         final Log log = LogFactory.getLog(name);
         if (log instanceof Jdk14Logger) {
             return false;

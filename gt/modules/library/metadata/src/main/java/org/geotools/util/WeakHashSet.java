@@ -38,10 +38,14 @@ import org.geotools.resources.XArray;
  * garbage collector, that is, made finalizable, finalized, and then reclaimed.
  * When an entry has been discarded it is effectively removed from the set, so
  * this class behaves somewhat differently than other {@link Set} implementations.
- * <br><br>
- * If you would like to use {@code WeakHashSet} as inside a factory to prevent
- * creating duplicate immutable objects please look at CanonicalSet.
- * <br><br>
+ * <p>
+ * {@code WeakHashSet} has a {@link #get} method that is not part of the {@link Set} interface.
+ * This {@code get} method fetch an entry from this set that is equals to the supplied object.
+ * This is a convenient way to use {@code WeakHashSet} as a pool of immutable objects.
+ * <p>
+ * If you would like to use {@code WeakHashSet} as inside a factory to prevent creating
+ * duplicate immutable objects, please look at the {@link #canonicalize(Object)} method.
+ * <p>
  * The {@code WeakHashSet} class is thread-safe.
  *
  * @since 2.0
@@ -306,10 +310,10 @@ public class WeakHashSet extends AbstractSet {
     }
 
     // Arguments for the {@link #intern} method.
-    /** The "remove" operation.  */  protected static final int REMOVE = -1;
-    /** The "get"    operation.  */  protected static final int GET    =  0;
-    /** The "add"    operation.  */  protected static final int ADD    = +1;
-    /** The "intern" operation.  */  protected static final int INTERN = +2;
+    /** The "remove" operation.  */  private static final int REMOVE = -1;
+    /** The "get"    operation.  */  private static final int GET    =  0;
+    /** The "add"    operation.  */  private static final int ADD    = +1;
+    /** The "intern" operation.  */  private static final int INTERN = +2;
 
     /**
      * Returns an object equals to {@code obj} if such an object already
@@ -329,7 +333,7 @@ public class WeakHashSet extends AbstractSet {
      * &nbsp;  return object;
      * </pre></blockquote>
      */
-    protected Object intern(final Object obj, final int operation) {
+    private Object intern(final Object obj, final int operation) {
         assert Thread.holdsLock(this);
         assert WeakCollectionCleaner.DEFAULT.isAlive();
         assert valid() : count;
@@ -386,7 +390,6 @@ public class WeakHashSet extends AbstractSet {
      * &nbsp;  }
      * &nbsp;  return object;
      * </pre></blockquote>
-     * @see CanonicalSet.toUnique
      */
     public synchronized Object canonicalize(final Object object) {
         return intern(object, INTERN);

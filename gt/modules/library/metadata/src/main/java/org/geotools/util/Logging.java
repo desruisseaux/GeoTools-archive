@@ -133,7 +133,8 @@ public final class Logging {
             }
         } catch (NoClassDefFoundError error) {
             // May occurs if commons-logging is not in the classpath.
-            unexpectedException("org.geotools.util", Logging.class, "redirectToCommonsLogging", error);
+            Utilities.recoverableException("org.geotools.util", Logging.class,
+                    "redirectToCommonsLogging", error);
         }
         return false;
     }

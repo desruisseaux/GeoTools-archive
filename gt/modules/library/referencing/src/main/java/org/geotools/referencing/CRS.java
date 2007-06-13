@@ -994,7 +994,10 @@ public final class CRS {
              * be seen as a number in base 3 where the number of digits is equals to the
              * number of dimensions. For example, a 4-D space would have numbers ranging
              * from "0000" to "2222" (numbers in base 3). The digits are then translated
-             * into minimal, central or maximal ordinates.
+             * into minimal, central or maximal ordinates. The outer loop stops when the
+             * counter roll back to "0000".  Note that 'targetPt' must keep the value of
+             * the last projected point, which must be the envelope center identified by
+             * "2222" in the 4-D case.
              */
             int n = ++coordinateNumber;
             for (int i=sourceDim; --i>=0;) {
