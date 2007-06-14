@@ -635,10 +635,10 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 		final int rank = sdInfo.getRank();
 
 		// index initialization
-		final int[] indexStructure = new int[rank - 1];// subDatasetIndex+(rank-2)
+		final int[] slice2DIndexCoordinates = new int[rank - 1];// subDatasetIndex+(rank-2)
 		for (int i = 0; i < rank - 1; i++)
-			indexStructure[i] = 0;
-		indexStructure[0] = iSubdataset;
+			slice2DIndexCoordinates[i] = 0;
+		slice2DIndexCoordinates[0] = iSubdataset;
 
 		if (rank > 2) {
 			final long[] subDatasetDims = sdInfo.getDims();
@@ -653,13 +653,13 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 						factor *= multipliers[j];
 					while (requiredSlice2DIndex >= factor) {
 						requiredSlice2DIndex -= factor;
-						indexStructure[i + 1]++;
+						slice2DIndexCoordinates[i + 1]++;
 					}
 				}
 			}
-			indexStructure[rank - 2] = requiredSlice2DIndex;
+			slice2DIndexCoordinates[rank - 2] = requiredSlice2DIndex;
 		}
-		return indexStructure;
+		return slice2DIndexCoordinates;
 	}
 
 }
