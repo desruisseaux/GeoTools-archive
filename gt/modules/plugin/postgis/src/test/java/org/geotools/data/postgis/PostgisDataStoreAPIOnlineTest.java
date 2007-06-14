@@ -1748,8 +1748,8 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         assertTrue(isLocked("road", "road.rd1"));
         long then = System.currentTimeMillis();
         do {
-            Thread.sleep( 15 );
-        } while ( then == System.currentTimeMillis() ); 
+            Thread.sleep( 1000 );
+        } while ( System.currentTimeMillis() - then < 1000 ); 
         assertFalse(isLocked("road", "road.rd1"));
     }
 
