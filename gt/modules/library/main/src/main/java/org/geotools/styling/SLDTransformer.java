@@ -400,9 +400,9 @@ public class SLDTransformer extends TransformerBase {
 
         public void visit(Rule rule) {
             start("Rule");
-            element("Name", rule.getName());
-            element("Title", rule.getTitle());
-            element("Abstract", rule.getAbstract());
+            if (rule.getName() != null) element("Name", rule.getName());
+            if (rule.getTitle() != null) element("Title", rule.getTitle());
+            if (rule.getAbstract() != null) element("Abstract", rule.getAbstract());
 
             Graphic[] gr = rule.getLegendGraphic();
             for (int i = 0; i < gr.length; i++) {

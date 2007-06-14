@@ -37,9 +37,9 @@ import java.util.List;
 public class RuleImpl extends AbstractGTComponent implements Rule, Cloneable {
     private List symbolizers = new GTList(this, "symbolizers");
     private List graphics = new GTList(this, "graphics");
-    private String name = "name";
-    private String title = "title";
-    private String abstractStr = "Abstract";
+    private String name;
+    private String title;
+    private String abstractStr;
     private Filter filter = null;
     private boolean hasElseFilter = false;
     private double maxScaleDenominator = Double.POSITIVE_INFINITY;
