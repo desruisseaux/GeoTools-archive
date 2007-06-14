@@ -361,9 +361,7 @@ public class DefaultMapLayer implements MapLayer {
 	 * @see org.geotools.map.MapLayer#getQuery()
 	 */
 	public Query getQuery() {
-		return (query == Query.ALL) ? query : new DefaultQuery(query
-				.getTypeName(), query.getFilter(), query.getMaxFeatures(),
-				query.getPropertyNames(), query.getHandle());
+		return (query == Query.ALL) ? query : new DefaultQuery(query);
 	}
 
 	/**
@@ -395,9 +393,7 @@ public class DefaultMapLayer implements MapLayer {
 		}
 
 		// be prudent
-		this.query = new DefaultQuery(query.getTypeName(), query.getFilter(),
-				query.getMaxFeatures(), query.getPropertyNames(), query
-						.getHandle());
+		this.query = new DefaultQuery(query);
 		fireMapLayerListenerLayerChanged(new MapLayerEvent(this,
 				MapLayerEvent.FILTER_CHANGED));
 	}

@@ -1300,6 +1300,17 @@ public class DataUtilities {
                 throw new IllegalArgumentException(msg);
             }
         }
+        
+        // mix versions, if possible
+        String version;
+        if(firstQuery.getVersion() != null) {
+            if(secondQuery.getVersion() != null && !secondQuery.getVersion().equals(firstQuery.getVersion()))
+                throw new IllegalArgumentException("First and second query refer different versions");
+            version = firstQuery.getVersion();
+        } else {
+            version = secondQuery.getVersion();
+        }
+            
 
         //none of the queries equals Query.ALL, mix them
         //use the more restrictive max features field
@@ -1324,7 +1335,9 @@ public class DataUtilities {
         String typeName = firstQuery.getTypeName() != null? 
         		firstQuery.getTypeName() : secondQuery.getTypeName();
 
-        return new DefaultQuery(typeName, filter, maxFeatures, propNames, handle);
+        DefaultQuery mixed = new DefaultQuery(typeName, filter, maxFeatures, propNames, handle);
+        mixed.setVersion(version);
+        return mixed;
     }
 
     /**
