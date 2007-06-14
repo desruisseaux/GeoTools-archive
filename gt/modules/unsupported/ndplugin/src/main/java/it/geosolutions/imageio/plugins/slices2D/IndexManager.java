@@ -3,7 +3,7 @@ package it.geosolutions.imageio.plugins.slices2D;
 public interface IndexManager {
 
 	/**
-	 * Retrieve a specific index, from an imageIndex and a vector of
+	 * Retrieve a slice2D index, from an imageIndex and a vector of
 	 * selectedDims. This method should be used to access (sub)datasets having
 	 * more then 2D.
 	 * 
@@ -11,7 +11,7 @@ public interface IndexManager {
 	 *            Related to a Specific Product contained within a sourceFile or
 	 *            a subDataset
 	 * 
-	 * @param selectedDims
+	 * @param selectedIndexOfEachDim
 	 *            An <code>int</code> array containing the required index in
 	 *            the proper dimension. As an instance, suppose having a
 	 *            products with rank=4 and dimensions = [1024,768,10,20] that is
@@ -20,11 +20,11 @@ public interface IndexManager {
 	 *            to access to the 3rd z-level of the 7th instant, you should 
 	 *            specify a dimensionIndex of [2,6] (starting from zero). 
 	 */
-	public int retrieveSubIndex(final int imageIndex, int[] dimensionIndex);
+	public int retrieveSlice2DIndex(final int imageIndex, int[] selectedIndexOfEachDim);
 
 	
 	/**
-	 * Given a specified index, returns a <code>long[]</code> containing indexing
+	 * Given a specified index, returns a <code>int[]</code> containing indexing
 	 * information such as coverageIndex, Nth dimension, (N-1)th-dimension, until
 	 * (N-2)th-dimension. In case of 2D subDatasets, it simply returns the index
 	 * of the coverage in the source. In case of source having a single 2D dataset,
@@ -35,5 +35,5 @@ public interface IndexManager {
 	 * @return
 	 * 			
 	 */
-	public long[] buildIndexesStructure(final int specifiedIndex);
+	public int[] getSlice2DIndexCoordinates(final int requiredSlice2DIndex);
 }

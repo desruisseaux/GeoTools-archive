@@ -2,6 +2,7 @@ package it.geosolutions.imageio.plugins.jhdf;
 
 import it.geosolutions.imageio.plugins.jhdf.aps.APSImageMetadata;
 import it.geosolutions.imageio.plugins.jhdf.aps.APSStreamMetadata;
+import it.geosolutions.imageio.stream.output.FileImageOutputStreamExtImpl;
 import it.geosolutions.resources.TestData;
 
 import java.awt.image.BufferedImage;
@@ -11,6 +12,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
+import javax.imageio.ImageWriter;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.metadata.IIOMetadataNode;
 import javax.media.jai.JAI;
@@ -24,8 +26,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.w3c.dom.Node;
-
+import com.sun.media.imageioimpl.plugins.tiff.TIFFImageWriterSpi;
 import com.sun.media.jai.operator.ImageReadDescriptor;
 
 public class JHDFTest extends TestCase {
@@ -43,33 +44,57 @@ public class JHDFTest extends TestCase {
 		JAI.getDefaultInstance().getTileScheduler().setPrefetchParallelism(1);
 	}
 
-	public void testJaiRead() throws IOException {
-		final File file = TestData.file(this,
-				"MODPM2007027122358.L3_000_EAST_MED");
+	public void testMetadata() throws IOException {
+		final File file = TestData.file(this,"MODPM2007027121858.L3_000_EAST_MED");
+		final ParameterBlockJAI pbjImageRead = new ParameterBlockJAI(
+		"ImageRead");
+		pbjImageRead.setParameter("Input", file);
+		final RenderedOp image = JAI.create("ImageRead", pbjImageRead);
+		ImageReader reader = (ImageReader) image
+				.getProperty(ImageReadDescriptor.PROPERTY_NAME_IMAGE_READER);
+	
+		final IIOMetadata metadata = reader.getImageMetadata(2);
+		IIOMetadataNode imageNode = (IIOMetadataNode) metadata
+				.getAsTree(APSImageMetadata.nativeMetadataFormatName);
+		System.out
+				.println(MetadataDisplay.buildMetadataFromNode(imageNode));
 
-		ImageReadParam irp = new ImageReadParam();
-		irp.setSourceSubsampling(1, 1, 0, 0);
-		// irp.setSourceRegion(new Rectangle(0, 512, 1024, 1024));
-		int i = 2;
+		final IIOMetadata streamMetadata = reader.getStreamMetadata();
+		IIOMetadataNode streamNode = (IIOMetadataNode) streamMetadata
+				.getAsTree(APSStreamMetadata.nativeMetadataFormatName);
+		System.out.println(MetadataDisplay
+				.buildMetadataFromNode(streamNode));
+	}
+	
+	public void testJaiRead() throws IOException {
+		final File file = TestData.file(this,"MODPM2007027121858.L3_000_EAST_MED");
+		for (int i = 3; i < 4; i++) {
 			final ParameterBlockJAI pbjImageRead = new ParameterBlockJAI(
 					"ImageRead");
-
+			ImageReadParam irp = new ImageReadParam();
+			irp.setSourceSubsampling(2, 2, 0, 0);
 			pbjImageRead.setParameter("Input", file);
 			pbjImageRead.setParameter("readParam", irp);
 			pbjImageRead.setParameter("imageChoice", Integer.valueOf(i));
+			
 			final RenderedOp image = JAI.create("ImageRead", pbjImageRead);
-			ImageReader reader = (ImageReader) image
-					.getProperty(ImageReadDescriptor.PROPERTY_NAME_IMAGE_READER);
-			final IIOMetadata metadata = reader.getImageMetadata(i);
-			IIOMetadataNode imageNode = (IIOMetadataNode)metadata
-					.getAsTree(APSImageMetadata.nativeMetadataFormatName);
-			System.out.println(MetadataDisplay.buildMetadataFromNode(imageNode));
 			
-			
-			final IIOMetadata streamMetadata = reader.getStreamMetadata();
-			IIOMetadataNode streamNode = (IIOMetadataNode)streamMetadata.getAsTree(APSStreamMetadata.nativeMetadataFormatName);
-			System.out.println(MetadataDisplay.buildMetadataFromNode(streamNode));
-			visualize(image, "");
+			final File outputFile = TestData.temp(this, "WriteHDFData"+i, false);
+			final ParameterBlockJAI pbjImageWrite = new ParameterBlockJAI(
+					"ImageWrite");
+			pbjImageWrite.setParameter("Output",
+					new FileImageOutputStreamExtImpl(outputFile));
+			ImageWriter writer = new TIFFImageWriterSpi()
+					.createWriterInstance();
+			pbjImageWrite.setParameter("Writer", writer);
+
+			// Specifying image source to write
+			pbjImageWrite.addSource(image);
+
+			// Writing
+			final RenderedOp op = JAI.create("ImageWrite", pbjImageWrite);
+		}
+
 	}
 
 	public void testJaiMultithreadingRead() throws IOException {
@@ -135,6 +160,8 @@ public class JHDFTest extends TestCase {
 		TestSuite suite = new TestSuite();
 
 		suite.addTest(new JHDFTest("testJaiRead"));
+		
+		suite.addTest(new JHDFTest("testMetadata"));
 
 		// suite.addTest(new JHDFTest("testJaiMultithreadingRead"));
 

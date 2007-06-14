@@ -1,5 +1,7 @@
 package it.geosolutions.imageio.plugins.jhdf;
 
+import java.awt.image.DataBuffer;
+
 import ncsa.hdf.object.Attribute;
 import ncsa.hdf.object.Datatype;
 
@@ -98,5 +100,29 @@ public class HDFUtilities {
 			attribValue=sb.toString();
 		}
 		return attribValue;
+	}
+	
+	
+	public static int getBufferTypeFromDataType(Datatype dt) {
+		int buffer_type=0;
+		final int dataTypeClass = dt.getDatatypeClass();
+		final int dataTypeSize = dt.getDatatypeSize();
+		final boolean isUnsigned = dt.isUnsigned();
+		if (dataTypeClass == Datatype.CLASS_INTEGER) {
+			if (dataTypeSize == 1)
+				buffer_type = DataBuffer.TYPE_BYTE;
+			else if (dataTypeSize == 2) {
+				if (isUnsigned)
+					buffer_type = DataBuffer.TYPE_USHORT;
+				else
+					buffer_type = DataBuffer.TYPE_SHORT;
+			} else if (dataTypeSize == 4)
+				buffer_type = DataBuffer.TYPE_INT;
+		} else if (dataTypeClass == Datatype.CLASS_FLOAT)
+			if (dataTypeSize == 4)
+				buffer_type = DataBuffer.TYPE_FLOAT;
+			else if (dataTypeSize == 8)
+				buffer_type = DataBuffer.TYPE_DOUBLE;
+		return buffer_type;
 	}
 }

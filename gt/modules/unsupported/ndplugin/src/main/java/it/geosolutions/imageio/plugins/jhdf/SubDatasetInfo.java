@@ -6,9 +6,11 @@ public class SubDatasetInfo {
 		private long [] dims;
 		private long [] chunkSize;
 		public SubDatasetInfo(String name, int rank, long[] subDatasetDims, long[] subDatasetChunkSize) {
+			if (subDatasetDims.length!=rank)
+				throw new RuntimeException("Wrong SubDatasetInfo initialization. subDatasetDims length != rank");
 			this.name=name;
-			this.rank=rank;
 			this.dims = subDatasetDims;
+			this.rank = rank; 
 			this.chunkSize = subDatasetChunkSize;
 		}
 		public long[] getChunkSize() {

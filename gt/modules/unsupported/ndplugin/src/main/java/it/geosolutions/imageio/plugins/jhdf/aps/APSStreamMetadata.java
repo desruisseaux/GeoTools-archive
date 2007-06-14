@@ -201,7 +201,6 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 
 			synchronized (mapMutex) {
 				while (metadataIt.hasNext()) {
-
 					// get Attributes
 					final Attribute att = (Attribute) metadataIt.next();
 					
@@ -424,4 +423,5 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 		}
 		return projMap;
 	}
+	
 }

@@ -12,6 +12,7 @@ import java.awt.image.ColorModel;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferDouble;
 import java.awt.image.DataBufferFloat;
 import java.awt.image.DataBufferInt;
 import java.awt.image.DataBufferShort;
@@ -20,7 +21,6 @@ import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
-import java.nio.channels.FileChannel.MapMode;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -28,13 +28,11 @@ import java.util.logging.Logger;
 import javax.imageio.IIOException;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageTypeSpecifier;
-import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.spi.ImageReaderSpi;
 
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Datatype;
 import ncsa.hdf.object.FileFormat;
-import ncsa.hdf.object.Group;
 import ncsa.hdf.object.HObject;
 
 import com.sun.media.imageioimpl.common.ImageUtil;
@@ -43,7 +41,7 @@ import com.sun.media.jai.codecimpl.util.RasterFactory;
 public abstract class BaseHDFImageReader extends SliceImageReader {
 
 	protected abstract Dataset retrieveDataset(int imageIndex);
-	
+
 	// TODO: should be moved in the aboveLayer?
 	protected class SourceStructure {
 		protected int nSubdatasets;
@@ -63,9 +61,9 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 		public long getSubDatasetSize(int index) {
 			return subDatasetSizes[index];
 		}
-		
+
 		public void setSubDatasetSize(int index, long size) {
-			subDatasetSizes[index]=size;
+			subDatasetSizes[index] = size;
 		}
 
 		public int getNSubdatasets() {
@@ -110,12 +108,8 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 
 	protected SourceStructure sourceStructure;
 
-	// protected int subDatasetsOffset = -1;
-
-	/** root of the FileFormat related the provided input source */
+	/** root of the FileFormat related to the provided input source */
 	protected HObject root;
-
-	private int subDatasetsOffset;
 
 	protected BaseHDFImageReader(ImageReaderSpi originatingProvider) {
 		super(originatingProvider);
@@ -138,15 +132,16 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 			throws IOException {
 		if (!isInitialized)
 			initialize();
-		final long[] indexStructure = buildIndexesStructure(imageIndex);
+		final int[] slice2DindexCoordinates = getSlice2DIndexCoordinates(imageIndex);
 		
-		final int subDatasetIndex = (int)indexStructure[0]; 
+		final int subDatasetIndex = slice2DindexCoordinates[0]; 
 		final Dataset dataset = retrieveDataset(subDatasetIndex);
 
 		BufferedImage bimage = null;
 		dataset.init();
 		final int width = dataset.getWidth();
 		final int height = dataset.getHeight();
+		final int rank = dataset.getRank();
 
 		if (param == null)
 			param = getDefaultReadParam();
@@ -228,25 +223,29 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 		dstWidth = ((dstWidth - 1) / xSubsamplingFactor) + 1;
 		dstHeight = ((dstHeight - 1) / ySubsamplingFactor) + 1;
 
+		// getting dataset properties.
 		final long[] start = dataset.getStartDims();
 		final long[] stride = dataset.getStride();
 		final long[] sizes = dataset.getSelectedDims();
 
 		start[0] = srcRegionYOffset;
 		start[1] = srcRegionXOffset;
-		if (start.length>2){
-			long[] startDims;
-		}
 		sizes[0] = dstHeight;
 		sizes[1] = dstWidth;
 		stride[0] = ySubsamplingFactor;
 		stride[1] = xSubsamplingFactor;
+		
+		
+		//Setting indexes of dimensions > 2. 
+		if (rank>2)
+			for (int i=2;i<rank;i++){
+				//TODO: Need to change indexing logic
+				start[i]=slice2DindexCoordinates[rank-i];
+				sizes[i]=1;
+				stride[i]=1;
+			}
 
 		final Datatype dt = dataset.getDatatype();
-		final int dataTypeClass = dt.getDatatypeClass();
-		final int dataTypeSize = dt.getDatatypeSize();
-		final boolean isUnsigned = dt.isUnsigned();
-
 		final int nBands = 1;
 
 		// bands variables
@@ -260,86 +259,40 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 
 		// Variable used to specify the data type for the storing samples
 		// of the SampleModel
-		int buffer_type = 0;
-		if (dataTypeClass == Datatype.CLASS_INTEGER) {
-			if (dataTypeSize == 1)
-				buffer_type = DataBuffer.TYPE_BYTE;
-			else if (dataTypeSize == 2) {
-				if (isUnsigned)
-					buffer_type = DataBuffer.TYPE_USHORT;
-				else
-					buffer_type = DataBuffer.TYPE_SHORT;
-			} else if (dataTypeSize == 4)
-				buffer_type = DataBuffer.TYPE_INT;
-		} else if (dataTypeClass == Datatype.CLASS_FLOAT)
-			if (dataTypeSize == 4)
-				buffer_type = DataBuffer.TYPE_FLOAT;
+		int buffer_type = HDFUtilities.getBufferTypeFromDataType(dt);
+		
 
 		SampleModel sm = new BandedSampleModel(buffer_type, dstWidth,
 				dstHeight, dstWidth, banks, offsets);
-		ColorModel cm = null;
-
-		ColorSpace cs = null;
-		if (nBands > 1) {
-			// Number of Bands > 1.
-			// ImageUtil.createColorModel provides to Creates a
-			// ColorModel that may be used with the specified
-			// SampleModel
-			cm = ImageUtil.createColorModel(sm);
-			if (cm == null)
-				LOGGER.info("There are no ColorModels found");
-
-		} else if ((buffer_type == DataBuffer.TYPE_BYTE)
-				|| (buffer_type == DataBuffer.TYPE_USHORT)
-				|| (buffer_type == DataBuffer.TYPE_INT)
-				|| (buffer_type == DataBuffer.TYPE_FLOAT)
-				|| (buffer_type == DataBuffer.TYPE_DOUBLE)) {
-
-			// Just one band. Using the built-in Gray Scale Color Space
-			cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);
-			cm = RasterFactory.createComponentColorModel(buffer_type, // dataType
-					cs, // color space
-					false, // has alpha
-					false, // is alphaPremultiplied
-					Transparency.OPAQUE); // transparency
-		} else {
-			if (buffer_type == DataBuffer.TYPE_SHORT) {
-				// Just one band. Using the built-in Gray Scale Color
-				// Space
-				cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);
-				cm = new ComponentColorModel(cs, false, false,
-						Transparency.OPAQUE, DataBuffer.TYPE_SHORT);
-			}
-		}
+		ColorModel cm = setColorModel(nBands, buffer_type, sm);
 
 		WritableRaster wr = null;
 		final Object data;
 		try {
 			data = dataset.read();
 			final int size = dstWidth * dstHeight;
-
-			// DataBuffer db = new
-			// DataBufferInt((int[])data,dstHeight*dstWidth);
-
-			DataBuffer db = null;
+			DataBuffer dataBuffer = null;
 
 			switch (buffer_type) {
 			case DataBuffer.TYPE_BYTE:
-				db = new DataBufferByte((byte[]) data, size);
+				dataBuffer = new DataBufferByte((byte[]) data, size);
 				break;
 			case DataBuffer.TYPE_SHORT:
 			case DataBuffer.TYPE_USHORT:
-				db = new DataBufferShort((short[]) data, size);
+				dataBuffer = new DataBufferShort((short[]) data, size);
 				break;
 			case DataBuffer.TYPE_INT:
-				db = new DataBufferInt((int[]) data, size);
+				dataBuffer = new DataBufferInt((int[]) data, size);
 				break;
 			case DataBuffer.TYPE_FLOAT:
-				db = new DataBufferFloat((float[]) data, size);
+				dataBuffer = new DataBufferFloat((float[]) data, size);
+				break;
+			case DataBuffer.TYPE_DOUBLE:
+				dataBuffer = new DataBufferDouble((double[]) data, size);
 				break;
 			}
-
-			wr = Raster.createWritableRaster(sm, db, null);
+			
+			wr = Raster.createWritableRaster(sm, dataBuffer, null);
 			bimage = new BufferedImage(cm, wr, false, null);
 
 		} catch (OutOfMemoryError e) {
@@ -351,7 +304,6 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 		return bimage;
 	}
 
-	
 	public void setInput(Object input, boolean seekForwardOnly,
 			boolean ignoreMetadata) {
 		this.setInput(input);
@@ -390,6 +342,9 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 
 	}
 
+	/**
+	 * Simple initialization method
+	 */
 	protected void initialize() throws IOException {
 		if (originatingFile == null)
 			throw new IOException(
@@ -419,14 +374,9 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 		dataset.init();
 
 		final Datatype dt = dataset.getDatatype();
-
-		final int nRank = dataset.getRank();
-		final int dataTypeClass = dt.getDatatypeClass();
-		final int dataTypeSize = dt.getDatatypeSize();
 		final int width = dataset.getWidth();
 		final int height = dataset.getHeight();
-		final boolean isUnsigned = dt.isUnsigned();
-
+		
 		// TODO: retrieve Band Number
 		final int nBands = 1;
 
@@ -441,25 +391,20 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 
 		// Variable used to specify the data type for the storing samples
 		// of the SampleModel
-		int buffer_type = 0;
-		if (dataTypeClass == Datatype.CLASS_INTEGER) {
-			if (dataTypeSize == 1)
-				buffer_type = DataBuffer.TYPE_BYTE;
-			else if (dataTypeSize == 2) {
-				if (isUnsigned)
-					buffer_type = DataBuffer.TYPE_USHORT;
-				else
-					buffer_type = DataBuffer.TYPE_SHORT;
-			} else if (dataTypeSize == 4)
-				buffer_type = DataBuffer.TYPE_INT;
-		} else if (dataTypeClass == Datatype.CLASS_FLOAT)
-			if (dataTypeSize == 4)
-				buffer_type = DataBuffer.TYPE_FLOAT;
+		int buffer_type = HDFUtilities.getBufferTypeFromDataType(dt);
+		final SampleModel sm = new BandedSampleModel(buffer_type, width,
+				height, width, banks, offsets);
+		
+		ColorModel cm = setColorModel(nBands, buffer_type, sm);
 
-		SampleModel sm = new BandedSampleModel(buffer_type, width, height,
-				width, banks, offsets);
+		imageType = new ImageTypeSpecifier(cm, sm);
+		l.add(imageType);
+		return l.iterator();
+
+	}
+
+	private ColorModel setColorModel(final int nBands, final int buffer_type, final SampleModel sm) {
 		ColorModel cm = null;
-
 		ColorSpace cs = null;
 		if (nBands > 1) {
 			// Number of Bands > 1.
@@ -492,11 +437,7 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 						Transparency.OPAQUE, DataBuffer.TYPE_SHORT);
 			}
 		}
-
-		imageType = new ImageTypeSpecifier(cm, sm);
-		l.add(imageType);
-		return l.iterator();
-
+		return cm;
 	}
 
 	public int getTileHeight(int imageIndex) throws IOException {
@@ -524,109 +465,168 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 	}
 
 	public void dispose() {
-		// TODO: NEED TO BE IMPLEMENTED
 		super.dispose();
+		try {
+			fileFormat.close();
+		} catch (Exception e) {
+			// TODO Nothing to do.
+		}
 	}
 
 	public void reset() {
-		// TODO: NEED TO BE IMPLEMENTED
 		super.reset();
+		root = null;
+	}
+
+	// /**
+	// * returns a mask needed to prevent Java transformation of integer
+	// unsigned
+	// * values.
+	// */
+	// private static int getMask(final Datatype type) throws IIOException {
+	// final int size = type.getDatatypeSize() * Byte.SIZE;
+	// if (size < 1 || size > Integer.SIZE) {
+	// throw new IIOException("Integers having " + size
+	// + " bits are not supported.");
+	// }
+	// if (size == Integer.SIZE) {
+	// throw new IIOException("Unsigned Integers having " + size
+	// + " bits are not supported.");
+	// }
+	// return (1 << size) - 1;
+	// }
+
+	private int retrieveSlice2DIndex(int imageIndex) {
+		return retrieveSlice2DIndex(imageIndex, null);
 	}
 
 	/**
-	 * returns a mask needed to prevent Java transformation of integer unsigned
-	 * values.
+	 * returns a proper subindex needed to access a specific 2D slice of a
+	 * specified coverage/subdataset.
+	 * 
+	 * @param imageIndex
+	 *            the specified coverage/subDataset
+	 * @param selectedIndexOfEachDim
+	 *            the required index of each dimension
+	 * 
+	 * TODO: Should I use a single long[] input parameter containing also the
+	 * subdataset index?
 	 */
-	private static int getMask(final Dataset dataset) throws IIOException {
-		if (dataset != null) {
-			final Datatype type = dataset.getDatatype();
-			final int size = type.getDatatypeSize() * Byte.SIZE;
-			if (size < 1 || size > Integer.SIZE) {
-				throw new IIOException("Integers having " + size
-						+ " bits are not supported.");
+	public int retrieveSlice2DIndex(int imageIndex, int[] selectedIndexOfEachDim) {
+		int subIndexOffset = 0;
+		final SubDatasetInfo sdInfo = sourceStructure
+				.getSubDatasetInfo(imageIndex);
+		for (int i = 0; i < imageIndex; i++)
+			subIndexOffset += (sourceStructure.getSubDatasetSize(i));
+
+		if (selectedIndexOfEachDim != null) {
+			// X and Y dims are not taken in account
+			final int selectedDimsLenght = selectedIndexOfEachDim.length;
+			final long[] subDatasetDims = sdInfo.getDims();
+			final int rank = sdInfo.getRank();
+
+			// supposing specifying all required subDimensions.
+			// as an instance, if rank=5, I need to specify 3 dimensions-index
+			// TODO: maybe I can assume some default behavior.
+			// as an instance, using 0 as dimension-index when not specified.
+			if (selectedDimsLenght != (rank - 2)) {
+				throw new IndexOutOfBoundsException(
+						"The selected dims array can't be"
+								+ "greater than the rank of the subDataset");
 			}
-			if (type.isUnsigned()) {
-				if (size == Integer.SIZE) {
-					throw new IIOException("Unsigned Integers having " + size
-							+ " bits are not supported.");
+			for (int i = 0; i < selectedDimsLenght; i++) {
+				if (selectedIndexOfEachDim[i] > subDatasetDims[i]) {
+					final StringBuffer sb = new StringBuffer();
+					sb
+							.append(
+									"At least one of the specified indexes is greater than the max allowed index in that dimension\n")
+							.append("dimension=")
+							.append(i)
+							.append(" index=")
+							.append(selectedIndexOfEachDim[i])
+							.append(
+									" while the maximum index available for this dimension is ")
+							.append(subDatasetDims[i]);
+					throw new IndexOutOfBoundsException(sb.toString());
 				}
-				return (1 << size) - 1;
 			}
+			long displacement = 0;
+			if (rank > 2) {
+				// The least significant dimension is used as offset
+				long finalOffset = selectedIndexOfEachDim[rank - 3];
+				if (rank > 3) {
+					final long[] multipliers = new long[rank - 3];
+					for (int i = 0; i < rank - 3; i++)
+						multipliers[i] = subDatasetDims[i + 2];
+					for (int i = 0; i < rank - 3; i++) {
+						int factor = 1;
+						for (int j = 0; j < rank - 3 - i; j++)
+							factor *= multipliers[j];
+						displacement += (factor * selectedIndexOfEachDim[i]);
+					}
+				}
+				displacement += finalOffset;
+			}
+			subIndexOffset += displacement;
 		}
-		return ~0;
+		return (int) subIndexOffset;
 	}
 
-	public int retrieveSubIndex(int imageIndex, int[] selectedDims) {
-		int subIndexOffset=0;
-		final SubDatasetInfo sdInfo = sourceStructure.getSubDatasetInfo(imageIndex); 
-		for (int i=0;i<imageIndex;i++)
-			subIndexOffset+=(sourceStructure.getSubDatasetSize(i));
-
-		// X and Y dims are not taken in account
-		final int selectedDimsLenght = selectedDims.length;
-		final long[] subDatasetDims = sdInfo.getDims();
-		final int rank = sdInfo.getRank();
-
-		// supposing specifying all required subDimensions.
-		// as an instance, if rank=5, I need to specify 3 dimensions-index
-		// TODO: maybe I can assume some default behavior. 
-		// as an instance, using 0 as dimension-index when not specified.
-		if (selectedDimsLenght!=(rank-2)){
-			throw new IndexOutOfBoundsException("The selected dims array can't be" +
-					"greater than the rank of the subDataset");
-		}
-		final long[] multipliers = new long[rank-2];
-		for (int i=0;i<selectedDimsLenght;i++){
-			if (selectedDims[i]>subDatasetDims[i]){
-				final StringBuffer sb = new StringBuffer();
-				sb.append("At least one of the specified indexes is greater than the max allowed index in that dimension\n")
-				.append("dimension=").append(i).append(" index=").append(selectedDims[i])
-				.append(" while the maximum index available for this dimension is ").append(subDatasetDims[i]);
-				throw new IndexOutOfBoundsException(sb.toString());
-			}
-		}
-		for (int i=0;i<rank-2;i++){
-			//Multipliers factor need to be stored in reversed order.
-			multipliers[i]=subDatasetDims[rank-i];
-		}
-		int displacement = 0;
-		for (int i=0;i<rank-2;i++){
-			displacement+=(multipliers[i]*selectedDims[i]);
-		}
-		return subIndexOffset+displacement;
-	}
-	
-	
-	public long[] buildIndexesStructure(int specifiedIndex) {
-		final int nTotalDataset=sourceStructure.getNSubdatasets();
-		final long [] subDatasetSizes = sourceStructure.getSubDatasetSizes();
-		int iCoverage=0;
-		for (;iCoverage<nTotalDataset;iCoverage++){
-			int subDatasetSize = (int)subDatasetSizes[iCoverage];
-			if (specifiedIndex>=subDatasetSize)
-				specifiedIndex-=subDatasetSize;
+	/**
+	 * Given a specifiedIndex as an input, returns a <code>long[]</code>
+	 * having the subDataset/coverage index at the first position of the array.
+	 * Then, the indexes (of the other dimensions) needed to retrieve a proper
+	 * 2D Slice.
+	 * 
+	 * As an instance, suppose a HDF source contains a 4D SubDataset with the
+	 * form (X,Y,Z,T). if returnedIndex[]={2,3,1}, the required Slice2D is
+	 * available at the subDataset with index=2, timeIndex=3, zIndex=1.
+	 * 
+	 * TODO: Now, we are supposing order is 5thDim -> T -> Z -> (X,Y)
+	 * 
+	 */
+	public int[] getSlice2DIndexCoordinates(int requiredSlice2DIndex) {
+		final int nTotalDataset = sourceStructure.getNSubdatasets();
+		final long[] subDatasetSizes = sourceStructure.getSubDatasetSizes();
+		int iSubdataset = 0;
+		for (; iSubdataset < nTotalDataset; iSubdataset++) {
+			int subDatasetSize = (int) subDatasetSizes[iSubdataset];
+			if (requiredSlice2DIndex >= subDatasetSize)
+				requiredSlice2DIndex -= subDatasetSize;
 			else
 				break;
 		}
-		SubDatasetInfo sInfo = sourceStructure.getSubDatasetInfo(iCoverage);
-		final int rank = sInfo.getRank();
-		final long[] indexStructure = new long[rank-1];
-		final long[] dims=sInfo.getDims();
-		
-		final long[] multipliers = new long[rank-2];
-		for (int i=0;i<rank-2;i++){
-			//Multipliers factor need to be stored in reversed order.
-			multipliers[i]=dims[rank-i];
+
+		// Getting the SubDatasetInfo related to the specified subDataset.
+		final SubDatasetInfo sdInfo = sourceStructure
+				.getSubDatasetInfo(iSubdataset);
+		final int rank = sdInfo.getRank();
+
+		// index initialization
+		final int[] indexStructure = new int[rank - 1];// subDatasetIndex+(rank-2)
+		for (int i = 0; i < rank - 1; i++)
+			indexStructure[i] = 0;
+		indexStructure[0] = iSubdataset;
+
+		if (rank > 2) {
+			final long[] subDatasetDims = sdInfo.getDims();
+			if (rank > 3) {
+				final long[] multipliers = new long[rank - 3];
+				for (int i = 0; i < rank - 3; i++)
+					multipliers[i] = subDatasetDims[i + 2];
+
+				for (int i = 0; i < rank - 3; i++) {
+					int factor = 1;
+					for (int j = 0; j < rank - 3 - i; j++)
+						factor *= multipliers[j];
+					while (requiredSlice2DIndex >= factor) {
+						requiredSlice2DIndex -= factor;
+						indexStructure[i + 1]++;
+					}
+				}
+			}
+			indexStructure[rank - 2] = requiredSlice2DIndex;
 		}
-		for (int i=0;i<rank-2;i++){
-			//TODO: End this computations
-			
-			
-		}
-		indexStructure[0]=iCoverage;
-		
-		
-		
 		return indexStructure;
 	}
 
