@@ -25,7 +25,7 @@ to rearchitect your database to conform to that schema! And indeed you probably 
 do that without the assistance of some kind of object-relational mapping layer.
 Now you can better figure out what this ComplexDataStore is about if you think on it as a kind
 of object-relational mapping layer, but targeted to GIS data. Though not exact, this pseudo 
-definition can help you understanding it if its your first time reading this document.
+definition can help you understand it if its your first time reading this document.
 </p>
 <p>
 Of course it has nothing to do with relational databases directly, but with mapping an existing
@@ -42,14 +42,14 @@ You need:
 	to specify the DataStore's connection parameters and the source FeatureType name.
 	<li>The attribute and attribute id mapping definitions. They consists of a series of couples of XPath and 
 	OGC Filter 1.0 Expressions. The former addresses the output schema properties and the later defines how
-	the value of that properties are derivated from the source Feature instances.
+	the value of that properties are derived from the source Feature instances.
 </ul>
-All this information is holded by a <b>FeatureTypeMapping</b> object, and a ComplexDataStore, in turn,
-may hold an arbitrary number of that objects, each one defining one (derivated) FeatureType the DataStore
+All this information is held by a <b>FeatureTypeMapping</b> object, and a ComplexDataStore, in turn,
+may hold an arbitrary number of that objects, each one defining one (derived) FeatureType the DataStore
 exposes.
 </p>
 <p>
-To persist this information, use use a XML file which contains this definitions, and whose location 
+To persist this information, use a XML file which contains this definitions, and whose location 
 in the form of an URL must be used to create a DataStore instance through the GeoTools DataStoreFinder
 lookup system.
 </p>

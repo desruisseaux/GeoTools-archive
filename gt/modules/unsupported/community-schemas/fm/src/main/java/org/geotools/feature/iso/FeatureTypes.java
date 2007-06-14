@@ -21,10 +21,7 @@ import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Filter;
 import org.geotools.filter.LengthFunction;
-import org.geotools.filter.LiteralExpression;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.resources.Utilities;
 import org.geotools.util.GTContainer;
@@ -43,8 +40,11 @@ import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.feature.type.TypeFactory;
 import org.opengis.feature.type.TypeName;
+import org.opengis.filter.BinaryComparisonOperator;
+import org.opengis.filter.Filter;
 import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
 import org.opengis.filter.PropertyIsLessThan;
+import org.opengis.filter.expression.Literal;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -184,12 +184,12 @@ public class FeatureTypes {
 	        if (f instanceof PropertyIsLessThan ||
             	f instanceof PropertyIsGreaterThanOrEqualTo) {
 	            try {
-	                CompareFilter cf = (CompareFilter) f;
+	                BinaryComparisonOperator cf = (BinaryComparisonOperator) f;
 	                if (cf.getExpression1() instanceof LengthFunction) {
-	                    return Integer.parseInt(((LiteralExpression) cf.getExpression2()).getLiteral()
+	                    return Integer.parseInt(((Literal) cf.getExpression2()).getValue()
 	                            .toString());
 	                } else if (cf.getExpression2() instanceof LengthFunction) {
-	                    return Integer.parseInt(((LiteralExpression) cf.getLeftValue()).getLiteral()
+	                    return Integer.parseInt(((Literal) cf.getExpression1()).getValue()
 	                            .toString());
 	                } else {
 	                    return ANY_LENGTH;

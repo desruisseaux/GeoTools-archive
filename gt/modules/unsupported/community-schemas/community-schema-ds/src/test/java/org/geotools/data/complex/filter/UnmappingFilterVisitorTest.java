@@ -43,7 +43,6 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.iso.TypeBuilder;
 import org.geotools.feature.iso.Types;
 import org.geotools.filter.FilterFactoryImplNamespaceAware;
-import org.geotools.filter.FilterType;
 import org.geotools.gml3.bindings.GML;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
@@ -490,11 +489,11 @@ public class UnmappingFilterVisitorTest extends TestCase {
     }
 
     public void testLogicFilter() throws Exception {
-        testLogicFilter(FilterType.LOGIC_AND);
-        testLogicFilter(FilterType.LOGIC_OR);
+        testLogicFilter(And.class);
+        testLogicFilter(Or.class);
     }
 
-    private void testLogicFilter(short filterType) throws Exception {
+    private void testLogicFilter(Class filterType) throws Exception {
         BinaryLogicOperator complexLogicFilter;
         PropertyIsGreaterThan resultFilter = ff.greater(ff.property("measurement/result"), ff
                 .literal(new Integer(5)));
@@ -503,14 +502,11 @@ public class UnmappingFilterVisitorTest extends TestCase {
                 .property("measurement/determinand_description"), ff
                 .literal("determinand_description_1_1"), ff.literal("determinand_description_3_3"));
 
-        switch (filterType) {
-        case FilterType.LOGIC_AND:
+        if(And.class.equals(filterType)) {
             complexLogicFilter = ff.and(resultFilter, determFilter);
-            break;
-        case FilterType.LOGIC_OR:
+        }else if(Or.class.equals(filterType)){
             complexLogicFilter = ff.or(resultFilter, determFilter);
-            break;
-        default:
+        }else{
             throw new IllegalArgumentException();
         }
 

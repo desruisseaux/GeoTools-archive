@@ -50,13 +50,13 @@ public class SubFeatureCollection extends AbstractResourceCollection implements
 
     public SubFeatureCollection(FeatureCollection collection, Filter filter,
             FilterFactory factory) {
-        if (filter.equals(org.geotools.filter.Filter.ALL)) {
+        if (filter.equals(Filter.EXCLUDE)) {
             throw new IllegalArgumentException(
-                    "A subcollection with Filter.ALL is a null operation");
+                    "A subcollection with Filter.EXCLUDE is a null operation");
         }
-        if (filter.equals(org.geotools.filter.Filter.NONE)) {
+        if (filter.equals(Filter.INCLUDE)) {
             throw new IllegalArgumentException(
-                    "A subcollection with Filter.NONE should be a FeatureCollectionEmpty");
+                    "A subcollection with Filter.INCLUDE should be a FeatureCollectionEmpty");
         }
         if (collection instanceof SubFeatureCollection) {
             SubFeatureCollection sub = (SubFeatureCollection) collection;

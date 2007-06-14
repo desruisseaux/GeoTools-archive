@@ -2,8 +2,8 @@ package org.geotools.feature.iso;
 
 import java.util.Set;
 
-import org.geotools.filter.Filter;
 import org.opengis.feature.type.Name;
+import org.opengis.filter.Filter;
 
 /**
  * Helper methods for dealing with Type restrictions represented by Filters

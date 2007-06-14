@@ -12,7 +12,6 @@ import javax.xml.namespace.QName;
 
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.iso.type.AttributeTypeImpl;
-import org.geotools.filter.Filter;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -25,6 +24,7 @@ import org.opengis.feature.xml.Choice;
 import org.opengis.feature.xml.ChoiceType;
 import org.opengis.feature.xml.Sequence;
 import org.opengis.feature.xml.SequenceType;
+import org.opengis.filter.Filter;
 
 /**
  * This is a set of utility methods used when <b>implementing</b> types.
