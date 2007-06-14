@@ -339,7 +339,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
 
     }
 
-    public FeatureCollection getLog(String fromVersion, String toVersion, Filter filter)
+    public FeatureCollection getLog(String fromVersion, String toVersion, Filter filter, String[] userIds)
             throws IOException {
         if(filter == null)
             filter = Filter.INCLUDE;
@@ -360,7 +360,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         // sql lentgh limitations. Yet, if would be a lot better if we could encode this
         // as a single sql query with subqueries... (but not all filters are encodable...)
         ModifiedFeatureIds mfids = store.getModifiedFeatureFIDs(schema.getTypeName(), fromVersion,
-                toVersion, filter, null, getTransaction());
+                toVersion, filter, userIds, getTransaction());
         Set ids = new HashSet(mfids.getCreated());
         ids.addAll(mfids.getDeleted());
         ids.addAll(mfids.getModified());
@@ -428,7 +428,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         return changesets.getFeatures(sq);
     }
 
-    public FeatureDiffReader getDifferences(String fromVersion, String toVersion, Filter filter)
+    public FeatureDiffReader getDifferences(String fromVersion, String toVersion, Filter filter, String[] userIds)
             throws IOException {
         if(filter == null)
             filter = Filter.INCLUDE;
@@ -438,7 +438,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
 
         // gather modified ids
         ModifiedFeatureIds mfids = store.getModifiedFeatureFIDs(schema.getTypeName(), fromVersion,
-                toVersion, filter, null, getTransaction());
+                toVersion, filter, userIds, getTransaction());
 
         // build all the filters to gather created, deleted and modified features at the appropriate
         // revisions, depending also on wheter creation/deletion should be swapped or not

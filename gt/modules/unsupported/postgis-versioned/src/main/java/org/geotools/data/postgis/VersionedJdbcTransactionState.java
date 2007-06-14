@@ -261,7 +261,7 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
             // since we cannot work with a null geometry in commits to
             // changesets, let's return a very small envelope...
             // an empty envelope gets turned into a point
-            if (envelope == null)
+            if (envelope == null || envelope.isEmpty())
                 envelope = new ReferencedEnvelope(new Envelope(0, 1, 0, 1),
                         DefaultGeographicCRS.WGS84);
             else

@@ -877,7 +877,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
 
         // get log only for newly created features
         Filter newIdFilter = ff.id(Collections.singleton(ff.featureId(newId)));
-        FeatureCollection fc = fs.getLog("1", "5", newIdFilter);
+        FeatureCollection fc = fs.getLog("1", "5", newIdFilter, null);
         assertEquals(1, fc.size());
         FeatureIterator it = fc.features();
         Feature f = it.next();
@@ -888,7 +888,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
 
         // get log for rv2 (most modified)
         Filter rv2IdFilter = ff.id(Collections.singleton(ff.featureId("river.rv2")));
-        fc = fs.getLog("1", "5", rv2IdFilter);
+        fc = fs.getLog("1", "5", rv2IdFilter, null);
         assertEquals(3, fc.size());
         it = fc.features();
         f = it.next();
@@ -907,7 +907,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
 
         // get log for rv1
         Filter rv1IdFilter = ff.id(Collections.singleton(ff.featureId("river.rv1")));
-        fc = fs.getLog("1", "5", rv1IdFilter);
+        fc = fs.getLog("1", "5", rv1IdFilter, null);
         assertEquals(1, fc.size());
         it = fc.features();
         f = it.next();
@@ -924,7 +924,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
                 .getFeatureSource("river");
 
         // forward, deletion changeset
-        FeatureDiffReader fdr = fs.getDifferences("4", "5", Filter.INCLUDE);
+        FeatureDiffReader fdr = fs.getDifferences("4", "5", Filter.INCLUDE, null);
         assertEquals(fs.getSchema(), fdr.getSchema());
         assertTrue(fdr.hasNext());
         FeatureDiff diff = fdr.next();
@@ -934,7 +934,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         fdr.close();
 
         // same changeset, but backwards
-        fdr = fs.getDifferences("5", "4", Filter.INCLUDE);
+        fdr = fs.getDifferences("5", "4", Filter.INCLUDE, null);
         assertEquals(fs.getSchema(), fdr.getSchema());
         assertTrue(fdr.hasNext());
         diff = fdr.next();
@@ -951,7 +951,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
 
         // forward diff, two modifications on changeset 1-2, and check reader reset while
         // you're at it
-        fdr = fs.getDifferences("1", "2", Filter.INCLUDE);
+        fdr = fs.getDifferences("1", "2", Filter.INCLUDE, null);
         for (int i = 0; i < 2; i++) {
             fdr.reset();
             assertEquals(fs.getSchema(), fdr.getSchema());
@@ -980,7 +980,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         fdr.close();
 
         // forward diff on creation
-        fdr = fs.getDifferences("3", "4", Filter.INCLUDE);
+        fdr = fs.getDifferences("3", "4", Filter.INCLUDE, null);
         assertEquals(fs.getSchema(), fdr.getSchema());
         assertTrue(fdr.hasNext());
         diff = fdr.next();
@@ -1008,7 +1008,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         t.commit();
 
         // now extract a diff between current revision and the last one
-        FeatureDiffReader reader = fs.getDifferences("1",null, null);
+        FeatureDiffReader reader = fs.getDifferences("1",null, null, null);
         assertFalse(reader.hasNext());
         reader.close();
         t.close();

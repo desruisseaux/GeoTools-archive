@@ -30,9 +30,8 @@ import org.opengis.filter.Filter;
  * that a VersioningFeatureSource gets returned, for instance, because of
  * limited authorizations from the caller code.
  * 
- * @author Andrea Aime, TOPP
- * TODO: this shall be moved in a more generic module (api?) once the interfaces
- * are good
+ * @author Andrea Aime, TOPP TODO: this shall be moved in a more generic module
+ *         (api?) once the interfaces are good
  */
 public interface VersioningFeatureSource extends FeatureSource {
 
@@ -51,12 +50,16 @@ public interface VersioningFeatureSource extends FeatureSource {
      * @param toVersion
      *            the end revision, may be null to imply the latest one
      * @param filter
-     *            will match features whose log will be reported
+     *            will match features whose log will be reported *
+     * @param users
+     *            limits the features whose log will be returned, by
+     *            catching only those that have been modified by at least one of
+     *            the specified users. May be null to avoid user filtering.
      * @return a feature collection of the logs, sorted on revision, descending
      * @throws IOException
      */
-    public FeatureCollection getLog(String fromVersion, String toVersion,
-            Filter filter) throws IOException;
+    public FeatureCollection getLog(String fromVersion, String toVersion, Filter filter,
+            String[] userIds) throws IOException;
 
     /**
      * Returns a feature difference reader providing the changes occurred on
@@ -67,10 +70,14 @@ public interface VersioningFeatureSource extends FeatureSource {
      * @param toVersion
      *            the end version, may be null to imply the latest one
      * @param filter
-     *            matches features whose differences will be reported
+     *            matches features whose differences will be reported *
+     * @param users
+     *            limits the features whose diff will be returned, by
+     *            catching only those that have been modified by at least one of
+     *            the specified users. May be null to avoid user filtering.
      * @return a difference reader
      * @throws IOException
      */
-    public FeatureDiffReader getDifferences(String fromVersion,
-            String toVersion, Filter filter) throws IOException;
+    public FeatureDiffReader getDifferences(String fromVersion, String toVersion, Filter filter,
+            String[] userIds) throws IOException;
 }
