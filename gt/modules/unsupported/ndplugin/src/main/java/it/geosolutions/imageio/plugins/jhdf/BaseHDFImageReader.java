@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.imageio.IIOException;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.spi.ImageReaderSpi;
@@ -39,11 +38,29 @@ import com.sun.media.imageioimpl.common.ImageUtil;
 import com.sun.media.jai.codecimpl.util.RasterFactory;
 
 public abstract class BaseHDFImageReader extends SliceImageReader {
+	private static final Logger LOGGER = Logger
+			.getLogger("it.geosolutions.imageio.plugins.jhdf.");
 
+	protected final int[] mutex = new int[] { 0 };
+	
+	/**
+	 * Implement this method in order to retrieve a SubDataset
+	 * 
+	 * @param imageIndex
+	 *            The index of the required SubDataset
+	 * @return the required SubDataset
+	 */
 	protected abstract Dataset retrieveDataset(int imageIndex);
 
 	// TODO: should be moved in the aboveLayer?
+
+	/**
+	 * Class used to store basic source structure properties. number of
+	 * subdatasets and basic properties of each SubDataset, such as, rank,
+	 * dimensions size, chunk size.
+	 */
 	protected class SourceStructure {
+
 		protected int nSubdatasets;
 
 		protected SubDatasetInfo[] subDatasetInfo;
@@ -101,11 +118,12 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 	/** The originating FileFormat */
 	protected FileFormat fileFormat = null;
 
-	private static final Logger LOGGER = Logger
-			.getLogger("it.geosolutions.imageio.plugins.jhdf.");
-
 	protected ImageTypeSpecifier imageType = null;
 
+	/**
+	 * a <code>SourceStructure</code>'s instance needed to get main
+	 * SubDatasets info and hierarchy
+	 */
 	protected SourceStructure sourceStructure;
 
 	/** root of the FileFormat related to the provided input source */
@@ -130,11 +148,18 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 
 	public BufferedImage read(final int imageIndex, ImageReadParam param)
 			throws IOException {
+
+		// ////////////////////////////////////////////////////////////////////
+		//
+		// INITIALIZATIONS
+		//
+		// ////////////////////////////////////////////////////////////////////
+
 		if (!isInitialized)
 			initialize();
 		final int[] slice2DindexCoordinates = getSlice2DIndexCoordinates(imageIndex);
-		
-		final int subDatasetIndex = slice2DindexCoordinates[0]; 
+
+		final int subDatasetIndex = slice2DindexCoordinates[0];
 		final Dataset dataset = retrieveDataset(subDatasetIndex);
 
 		BufferedImage bimage = null;
@@ -228,43 +253,48 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 		final long[] stride = dataset.getStride();
 		final long[] sizes = dataset.getSelectedDims();
 
+		// Setting variables needed to execute read operation.
 		start[0] = srcRegionYOffset;
 		start[1] = srcRegionXOffset;
 		sizes[0] = dstHeight;
 		sizes[1] = dstWidth;
 		stride[0] = ySubsamplingFactor;
 		stride[1] = xSubsamplingFactor;
-		
-		
-		//Setting indexes of dimensions > 2. 
-		if (rank>2)
-			for (int i=2;i<rank;i++){
-				//TODO: Need to change indexing logic
-				start[i]=slice2DindexCoordinates[rank-i];
-				sizes[i]=1;
-				stride[i]=1;
+
+		if (rank > 2)
+			// Setting indexes of dimensions > 2.
+			for (int i = 2; i < rank; i++) {
+				// TODO: Need to change indexing logic
+				start[i] = slice2DindexCoordinates[rank - i];
+				sizes[i] = 1;
+				stride[i] = 1;
 			}
 
 		final Datatype dt = dataset.getDatatype();
+
+		// TODO: add a method returning the Band Numbers of the dataset.
+		// APS has only single bands subdatasets.
 		final int nBands = 1;
 
 		// bands variables
 		final int[] banks = new int[nBands];
 		final int[] offsets = new int[nBands];
 		for (int band = 0; band < nBands; band++) {
-			/* Bands are not 0-base indexed, so we must add 1 */
 			banks[band] = band;
 			offsets[band] = 0;
 		}
 
-		// Variable used to specify the data type for the storing samples
-		// of the SampleModel
+		// Setting SampleModel and ColorModel
 		int buffer_type = HDFUtilities.getBufferTypeFromDataType(dt);
-		
-
 		SampleModel sm = new BandedSampleModel(buffer_type, dstWidth,
 				dstHeight, dstWidth, banks, offsets);
 		ColorModel cm = setColorModel(nBands, buffer_type, sm);
+
+		// ////////////////////////////////////////////////////////////////////
+		//
+		// DATA READ
+		//
+		// ////////////////////////////////////////////////////////////////////
 
 		WritableRaster wr = null;
 		final Object data;
@@ -291,14 +321,15 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 				dataBuffer = new DataBufferDouble((double[]) data, size);
 				break;
 			}
-			
+
 			wr = Raster.createWritableRaster(sm, dataBuffer, null);
 			bimage = new BufferedImage(cm, wr, false, null);
 
-		} catch (OutOfMemoryError e) {
-			// TODO Auto-generated catch block
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			RuntimeException rte = new RuntimeException(
+					"Exception occurred while data Reading" + e);
+			rte.initCause(e);
+			throw rte;
 		}
 
 		return bimage;
@@ -376,7 +407,7 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 		final Datatype dt = dataset.getDatatype();
 		final int width = dataset.getWidth();
 		final int height = dataset.getHeight();
-		
+
 		// TODO: retrieve Band Number
 		final int nBands = 1;
 
@@ -394,7 +425,7 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 		int buffer_type = HDFUtilities.getBufferTypeFromDataType(dt);
 		final SampleModel sm = new BandedSampleModel(buffer_type, width,
 				height, width, banks, offsets);
-		
+
 		ColorModel cm = setColorModel(nBands, buffer_type, sm);
 
 		imageType = new ImageTypeSpecifier(cm, sm);
@@ -403,7 +434,8 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 
 	}
 
-	private ColorModel setColorModel(final int nBands, final int buffer_type, final SampleModel sm) {
+	private ColorModel setColorModel(final int nBands, final int buffer_type,
+			final SampleModel sm) {
 		ColorModel cm = null;
 		ColorSpace cs = null;
 		if (nBands > 1) {

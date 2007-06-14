@@ -53,14 +53,18 @@ public class APSImageReader extends BaseHDFImageReader {
 	}
 
 	private Dataset getDataset(int datasetIndex) {
-		Set set = subDatasetsMap.keySet();
-		Iterator it = set.iterator();
-		for (int j = 0; j < datasetIndex; j++)
-			it.next();
-		return (Dataset) subDatasetsMap.get((String) it.next());
+		synchronized (mutex) {
+			Set set = subDatasetsMap.keySet();
+			Iterator it = set.iterator();
+			for (int j = 0; j < datasetIndex; j++)
+				it.next();
+			return (Dataset) subDatasetsMap.get((String) it.next());
+		}
 	}
 
 	private void checkImageIndex(int imageIndex) {
+		//TODO: Implements the imageIndex coherency check
+		
 		// if (imageIndex < 0
 		// || (!hasSubDatasets && imageIndex > 0)
 		// || (hasSubDatasets && ((nSubdatasets == 0 && imageIndex > 0) ||
@@ -92,6 +96,7 @@ public class APSImageReader extends BaseHDFImageReader {
 	 * @throws Exception
 	 */
 	private void initializeAPS(HObject root) throws Exception {
+		//TODO: Add synchronization
 
 		// Getting the Member List from the provided root
 		final List membersList = ((Group) root).getMemberList();
