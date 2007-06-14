@@ -16,56 +16,88 @@
  */
 package org.geotools.util;
 
-// Collections and references
 import java.util.Set;
-import java.util.WeakHashMap;
 
 
 /**
  * A canonical set of objects, used to optimize memory use.
- * <p>
- * The operation of this set is similar in spirit to the {@link String.intern} method.
+ * The operation of this set is similar in spirit to the {@link String#intern} method.
  * The following example shows a convenient way to use {@code CanonicalSet} as an
- * internal pool of immutable objects.<pre><code>
- * public Foo create( String definition ){
- *      Foo created = new Foo( definition );
- *      return (Foo) canionicalSet.toUnique( created );
+ * internal pool of immutable objects.
+ * 
+ * <blockquote><pre>
+ * public Foo create(String definition) {
+ *      Foo created = new Foo(definition);
+ *      return (Foo) canonicalSet.unique(created);
  * }
- * </code></pre>
- * As shown above the {@code CanonicalSet} has a  {@link #get}  method that is not part
- * of the {@link Set} interface. This {@code get} method retrieves an entry from this
- * set that is equals to the supplied object.
- * </p>
+ * </pre></blockquote>
+ *
+ * The {@code CanonicalSet} has a {@link #get} method that is not part of the {@link Set}
+ * interface. This {@code get} method retrieves an entry from this set that is equals to
+ * the supplied object. The {@link #unique} method combines a {@code get} followed by a
+ * {@code put} operation if the specified object was not in the set.
  * <p>
- * The set of objects is held by weak references. An entry in a {@code CanonicalSet}
- * will automatically be removed when it is no longer in ordinary use. More precisely,
- * the presence of a entry will not prevent the entry from being discarded by the
- * garbage collector, that is, made finalizable, finalized, and then reclaimed.
- * When an entry has been discarded it is effectively removed from the set, so
- * this class behaves somewhat differently than other {@link Set} implementations.
- * </p>
- *  
- * <p>
+ * The set of objects is held by weak references as explained in {@link WeakHashSet}.
  * The {@code CanonicalSet} class is thread-safe.
  *
  * @since 2.4
  * @source $URL$
  * @version $Id$
+ * @author Martin Desruisseaux
  * @author Jody Garnett
  */
 public class CanonicalSet extends WeakHashSet {
     /**
-     * Construct a {@code CanonicalSet}.
+     * Constructs a {@code CanonicalSet}.
      */
     public CanonicalSet() {
     }
 
     /**
-     * Returns an object equals to {@code object} if such an object already exist in this
-     * {@code CanonicalSet}. Otherwise, adds {@code object} to this {@code CanonicalSet}.
+     * Returns an object equals to the specified object, if present. If
+     * this set doesn't contains any object equals to {@code object},
+     * then this method returns {@code null}.
+     *
+     * @see #unique(Object)
      */
-    public Object toUnique(final Object object) {
-        return canonicalize(object);
+    public synchronized Object get(final Object object) {
+        return intern(object, GET);
     }
 
+    /**
+     * Returns an object equals to {@code object} if such an object already exist in this
+     * {@code CanonicalSet}. Otherwise, adds {@code object} to this {@code CanonicalSet}.
+     * This method is equivalents to the following code:
+     *
+     * <blockquote><pre>
+     * if (object != null) {
+     *     Object current = get(object);
+     *     if (current != null) {
+     *         return current;
+     *     } else {
+     *         add(object);
+     *     }
+     * }
+     * return object;
+     * </pre></blockquote>
+     */
+    public synchronized Object unique(final Object object) {
+        return intern(object, INTERN);
+    }
+
+    /**
+     * Iteratively call {@link #unique(Object)} for an array of objects.
+     * This method is equivalents to the following code:
+     *
+     * <blockquote><pre>
+     * for (int i=0; i<objects.length; i++) {
+     *     objects[i] = unique(objects[i]);
+     * }
+     * </pre></blockquote>
+     */
+    public synchronized void uniques(final Object[] objects) {
+        for (int i=0; i<objects.length; i++) {
+            objects[i] = intern(objects[i], INTERN);
+        }
+    }
 }
