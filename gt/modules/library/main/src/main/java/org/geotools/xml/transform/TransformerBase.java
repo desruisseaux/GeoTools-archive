@@ -468,6 +468,29 @@ public abstract class TransformerBase {
             }
         }
 
+        /**
+         * Utility method for creating attributes from an array of name value 
+         * pairs.
+         * <p>
+         * The <tt>nameValuePairs</tt> array should be of the form:
+         * <pre>{name1,value1,name2,value2,...,nameN,valueN}</pre>
+         * </p>
+         * @param nameValuePairs The attribute names/values.
+         * 
+         */
+        protected AttributesImpl createAttributes( String[] nameValuePairs) {
+            AttributesImpl attributes = new AttributesImpl();
+
+            for (int i = 0; i < nameValuePairs.length; i += 2) {
+                String name = nameValuePairs[i];
+                String value = nameValuePairs[i + 1];
+
+                attributes.addAttribute("", name, name, "", value);
+            }
+
+            return attributes;
+        }
+        
         protected void element(String element, String content) {
             element(element, content, NULL_ATTS);
         }
