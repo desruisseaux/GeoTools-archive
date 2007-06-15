@@ -67,7 +67,7 @@ public class TimeSeriesTest extends TestCase {
 
     private static final String CVNS = "http://www.opengis.net/cv/0.0";
 
-    private static final String SANS = "http://www.seegrid.csiro.au/xml/sampling";
+    private static final String SANS = "http://www.opengis.net/sampling/0.0";
 
     private static final String OMNS = "http://www.opengis.net/om";
 
@@ -172,7 +172,24 @@ public class TimeSeriesTest extends TestCase {
         samplingProperties.put(name(GMLNS, "name"), typeName(GMLNS, "CodeType"));
         samplingProperties.put(name(GMLNS, "boundedBy"), typeName(GMLNS, "BoundingShapeType"));
         samplingProperties.put(name(GMLNS, "location"), typeName(GMLNS, "LocationPropertyType"));
+
+        // aw:SamplingSiteType
+        samplingProperties.put(name(AWNS, "samplingRegimeType"), typeName(AWNS, "NRSamplingTypeCodeType"));
+        samplingProperties.put(name(AWNS, "waterBodyType"), typeName(GMLNS, "CodeType"));
+        samplingProperties.put(name(AWNS, "accessTypeCode"), typeName(GMLNS, "CodeType"));
+        
+        // sa:SamplingPointType
+        samplingProperties.put(name(SANS, "position"), typeName(GMLNS, "PointPropertyType"));
+        samplingProperties.put(name(SANS, "elevation"), typeName(GMLNS, "DirectPositionType"));
+        samplingProperties.put(name(SANS, "timeVaryingProperty"), typeName(SANS, "CV_Coverage_PropertyType"));
+        
         // sa:SamplingFeatureType
+        samplingProperties.put(name(SANS, "relatedObservation"), typeName(OMNS, "AbstractObservationPropertyType"));
+        samplingProperties.put(name(SANS, "relatedSamplingFeature"), typeName(SANS, "SamplingFeatureRelationPropertyType"));
+        samplingProperties.put(name(SANS, "sampledFeature"), typeName(GMLNS, "FeaturePropertyType"));
+        samplingProperties.put(name(SANS, "surveyDetails"), typeName(SANS, "SurveyProcedurePropertyType"));
+        
+        // sa:SiteSinglePhenomTimeSeriesType
         samplingProperties.put(name(AWNS, "relatedObservation"), typeName(AWNS,
                 "PhenomenonTimeSeriesPropertyType"));
 
@@ -353,6 +370,7 @@ public class TimeSeriesTest extends TestCase {
         namespaces.declarePrefix("om", OMNS);
         namespaces.declarePrefix("swe", SWENS);
         namespaces.declarePrefix("gml", GMLNS);
+        namespaces.declarePrefix("sa", SANS);
         // TODO: use commonfactoryfinder or the mechanism choosed
         // to pass namespace context to filter factory
         FilterFactory ffac = new FilterFactoryImplNamespaceAware(namespaces);
