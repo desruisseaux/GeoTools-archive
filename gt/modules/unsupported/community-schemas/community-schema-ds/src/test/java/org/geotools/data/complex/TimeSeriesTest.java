@@ -39,7 +39,10 @@ import org.geotools.data.complex.config.XMLConfigDigester;
 import org.geotools.data.feature.FeatureAccess;
 import org.geotools.data.feature.FeatureSource2;
 import org.geotools.feature.iso.Types;
+import org.geotools.filter.AttributeExpressionImpl;
 import org.geotools.filter.FilterFactoryImplNamespaceAware;
+import org.geotools.xlink.bindings.XLINK;
+import org.opengis.feature.Attribute;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
@@ -48,7 +51,9 @@ import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.TypeName;
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.PropertyName;
+import org.xml.sax.Attributes;
 import org.xml.sax.helpers.NamespaceSupport;
 
 /**
@@ -314,16 +319,35 @@ public class TimeSeriesTest extends TestCase {
         assertNotNull(attMapping);
         assertEquals("aw:SiteSinglePhenomTimeSeries", attMapping.getTargetXPath().toString());
 
-        // now test the use of specific subtype overriding a general node type
+        attMapping = (AttributeMapping) attributeMappings.get(1);
+        assertNotNull(attMapping);
+        //note the mapping says SiteSinglePhenomTimeSeries/gml:name[1] but
+        //attMapping.getTargetXPath().toString() results in a simplyfied form
+        assertEquals("gml:name", attMapping.getTargetXPath().toString());
+        
         attMapping = (AttributeMapping) attributeMappings.get(2);
+        assertNotNull(attMapping);
+        assertEquals("sa:sampledFeature", attMapping.getTargetXPath().toString());
+        //this mapping has no source expression, just client properties
+        assertSame(Expression.NIL, attMapping.getSourceExpression());
+        assertSame(Expression.NIL, attMapping.getIdentifierExpression());
+        Map clientProperties = attMapping.getClientProperties();
+        assertEquals(2, clientProperties.size());
+
+        Name clientPropName = name(XLINK.NAMESPACE, "title");
+        assertTrue("client property " + clientPropName + " not found", clientProperties
+                .containsKey(clientPropName));
+        clientPropName = name(XLINK.NAMESPACE, "href");
+        assertTrue("client property " + clientPropName + " not found", clientProperties
+                .containsKey(clientPropName));
+
+        
+        // now test the use of specific subtype overriding a general node type
+        attMapping = (AttributeMapping) attributeMappings.get(3);
         assertNotNull(attMapping);
         String expected = "aw:relatedObservation/aw:PhenomenonTimeSeries/om:observedProperty/swe:Phenomenon/gml:name";
         String actual = attMapping.getTargetXPath().toString();
         assertEquals(expected, actual);
-
-        // AttributeType tNode = attMapping.getTargetNodeInstance();
-        // assertEquals("SiteSinglePhenomTimeSeries",
-        // tNode.getName().getLocalPart());
     }
 
     public void testDataStore() throws Exception {
@@ -388,6 +412,20 @@ public class TimeSeriesTest extends TestCase {
 
             Object phenomNameVal = phenomName.evaluate(feature, String.class);
             assertNotNull(phenomNamePath + " evaluated to null", phenomNameVal);
+
+            PropertyName sampledFeatureName = ffac.property("sa:sampledFeature");
+            Attribute sampledFeatureVal = (Attribute) sampledFeatureName.evaluate(feature);
+            assertNotNull("sa:sampledFeature evaluated to null", sampledFeatureVal);
+            assertNull(sampledFeatureVal.get());
+            Map attributes = (Map) sampledFeatureVal.getDescriptor().getUserData(Attributes.class);
+            assertNotNull(attributes);
+            Name xlinkTitle = name(XLINK.NAMESPACE, "title");
+            assertTrue(attributes.containsKey(xlinkTitle));
+            assertNotNull(attributes.get(xlinkTitle));
+
+            Name xlinkHref = name(XLINK.NAMESPACE, "href");
+            assertTrue(attributes.containsKey(xlinkHref));
+            assertNotNull(attributes.get(xlinkHref));
         }
 
         assertEquals(EXPECTED_RESULT_COUNT, count);
