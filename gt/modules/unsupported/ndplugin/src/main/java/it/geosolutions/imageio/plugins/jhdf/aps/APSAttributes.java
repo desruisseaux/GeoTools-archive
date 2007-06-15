@@ -1,7 +1,5 @@
 package it.geosolutions.imageio.plugins.jhdf.aps;
 
-import ncsa.hdf.object.Attribute;
-import ncsa.hdf.object.Datatype;
 
 public class APSAttributes {
 

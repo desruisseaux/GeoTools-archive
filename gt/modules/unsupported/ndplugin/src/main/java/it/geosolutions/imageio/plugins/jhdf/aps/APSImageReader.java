@@ -26,7 +26,7 @@ import ncsa.hdf.object.ScalarDS;
  */
 public class APSImageReader extends BaseHDFImageReader {
 
-	protected APSImageReader(ImageReaderSpi originatingProvider) {
+	public APSImageReader(ImageReaderSpi originatingProvider) {
 		super(originatingProvider);
 	}
 
@@ -63,8 +63,8 @@ public class APSImageReader extends BaseHDFImageReader {
 	}
 
 	private void checkImageIndex(int imageIndex) {
-		//TODO: Implements the imageIndex coherency check
-		
+		// TODO: Implements the imageIndex coherency check
+
 		// if (imageIndex < 0
 		// || (!hasSubDatasets && imageIndex > 0)
 		// || (hasSubDatasets && ((nSubdatasets == 0 && imageIndex > 0) ||
@@ -95,8 +95,8 @@ public class APSImageReader extends BaseHDFImageReader {
 	 * 
 	 * @throws Exception
 	 */
-	private void initializeAPS(HObject root) throws Exception {
-		//TODO: Add synchronization
+	private void initializeAPS() throws Exception {
+		// TODO: Add synchronization
 
 		// Getting the Member List from the provided root
 		final List membersList = ((Group) root).getMemberList();
@@ -115,56 +115,59 @@ public class APSImageReader extends BaseHDFImageReader {
 				products = refineProductList(products);
 				productList = products;
 				subdatasetsNum = products.length;
-				subDatasetsMap = new LinkedHashMap(subdatasetsNum);
 				break;
 			}
 		}
-
 		final int listSize = membersList.size();
-		sourceStructure = new SourceStructure(subdatasetsNum);
+		
+		// Mutex on the subDatasetMap and sourceStructure initialization
+		synchronized (mutex) {
+			subDatasetsMap = new LinkedHashMap(subdatasetsNum);
+			sourceStructure = new SourceStructure(subdatasetsNum);
 
-		// Scanning all the datasets
-		for (int i = 0; i < listSize; i++) {
-			final HObject member = (HObject) membersList.get(i);
-			if (member instanceof ScalarDS) {
-				final String name = member.getName();
-				for (int j = 0; j < subdatasetsNum; j++) {
-
-					// Checking if the actual dataset is a product.
-					if (name.equals(productList[j])) {
-						// Updating the subDatasetsMap map
-						subDatasetsMap.put(name, member);
-
-						// retrieving subDataset main properties
-						// (Rank, dims, chunkSize)
-						final int rank = ((Dataset) member).getRank();
-						final long[] dims = ((Dataset) member).getDims();
-						final long[] chunkSize = ((Dataset) member)
-								.getChunkSize();
-
-						final long[] subDatasetDims = new long[rank];
-						final long[] subDatasetChunkSize = new long[rank];
-						long datasetSize = 1;
-
-						// copying values.
-						for (int k = 0; k < rank; k++) {
-							subDatasetDims[k] = dims[k];
-							subDatasetChunkSize[k] = chunkSize[k];
-							if (k >= 2)
-								datasetSize *= dims[k];
+			// Scanning all the datasets
+			for (int i = 0; i < listSize; i++) {
+				final HObject member = (HObject) membersList.get(i);
+				if (member instanceof ScalarDS) {
+					final String name = member.getName();
+					for (int j = 0; j < subdatasetsNum; j++) {
+	
+						// Checking if the actual dataset is a product.
+						if (name.equals(productList[j])) {
+							// Updating the subDatasetsMap map
+							subDatasetsMap.put(name, member);
+	
+							// retrieving subDataset main properties
+							// (Rank, dims, chunkSize)
+							final int rank = ((Dataset) member).getRank();
+							final long[] dims = ((Dataset) member).getDims();
+							final long[] chunkSize = ((Dataset) member)
+									.getChunkSize();
+	
+							final long[] subDatasetDims = new long[rank];
+							final long[] subDatasetChunkSize = new long[rank];
+							long datasetSize = 1;
+	
+							// copying values to avoid altering dataset fields.
+							for (int k = 0; k < rank; k++) {
+								subDatasetDims[k] = dims[k];
+								subDatasetChunkSize[k] = chunkSize[k];
+								if (k >= 2)
+									datasetSize *= dims[k];
+							}
+	
+							// instantiating a SubDatasetInfo
+							SubDatasetInfo dsInfo = new SubDatasetInfo(name, rank,
+									subDatasetDims, subDatasetChunkSize);
+							sourceStructure.setSubDatasetSize(j, datasetSize);
+							sourceStructure.setSubDatasetInfo(j, dsInfo);
 						}
-
-						// instantiating a SubDatasetInfo
-						SubDatasetInfo dsInfo = new SubDatasetInfo(name, rank,
-								subDatasetDims, subDatasetChunkSize);
-						sourceStructure.setSubDatasetSize(j, datasetSize);
-						sourceStructure.setSubDatasetInfo(j, dsInfo);
 					}
 				}
 			}
+			if (subdatasetsNum > 1)
+				sourceStructure.setHasSubDatasets(true);
 		}
-		if (subdatasetsNum > 1)
-			sourceStructure.setHasSubDatasets(true);
 	}
 
 	/**
@@ -177,27 +180,30 @@ public class APSImageReader extends BaseHDFImageReader {
 	 */
 	private String[] refineProductList(String[] products) {
 		final int productsNum = products.length;
-		int i =0, j=0;
-		for (;i<productsNum;i++)
+		int i = 0, j = 0;
+
+		// First scan to find _flags related datasets
+		for (; i < productsNum; i++)
 			if (!products[i].endsWith("_flags"))
 				j++;
-		if (j==productsNum)
+		// if no item found, simply return
+		if (j == productsNum)
 			return products;
-		else{
+		else {
+			// Building a new String array containing only the required ones
 			final String[] refinedList = new String[j];
-			for (i=0,j=0;i<productsNum;i++)
-				if(!products[i].endsWith("_flags"))
-					refinedList[j++]=products[i];
+			for (i = 0, j = 0; i < productsNum; i++)
+				if (!products[i].endsWith("_flags"))
+					refinedList[j++] = products[i];
 			return refinedList;
 		}
-		
 	}
-	
 
 	protected void initialize() throws IOException {
 		super.initialize();
 		try {
-			initializeAPS(root);
+			if (root != null)
+				initializeAPS();
 		} catch (Exception e) {
 			IOException ioe = new IOException(
 					"Unable to Initialize data. Provided Input is not valid"
@@ -225,14 +231,18 @@ public class APSImageReader extends BaseHDFImageReader {
 
 	public void dispose() {
 		super.dispose();
-		final Set set = subDatasetsMap.keySet();
-		final Iterator setIt = set.iterator();
-		// Cleaning HashMap
-		while (setIt.hasNext()) {
-			Dataset ds = (Dataset) subDatasetsMap.get(setIt.next());
-			// TODO:Restore original properties?
+		synchronized (mutex) {
+			final Set set = subDatasetsMap.keySet();
+			final Iterator setIt = set.iterator();
+
+			// Cleaning HashMap
+			while (setIt.hasNext()) {
+				Dataset ds = (Dataset) subDatasetsMap.get(setIt.next());
+				// TODO:Restore original properties?
+				// TODO: Close datasets
+			}
+			subDatasetsMap.clear();
 		}
-		subDatasetsMap.clear();
 	}
 
 	public void reset() {

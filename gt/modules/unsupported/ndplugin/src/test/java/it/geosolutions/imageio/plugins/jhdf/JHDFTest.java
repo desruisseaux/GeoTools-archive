@@ -1,7 +1,10 @@
 package it.geosolutions.imageio.plugins.jhdf;
 
 import it.geosolutions.imageio.plugins.jhdf.aps.APSImageMetadata;
+import it.geosolutions.imageio.plugins.jhdf.aps.APSImageReader;
+import it.geosolutions.imageio.plugins.jhdf.aps.APSImageReaderSpi;
 import it.geosolutions.imageio.plugins.jhdf.aps.APSStreamMetadata;
+import it.geosolutions.imageio.plugins.slices2D.SliceImageReader;
 import it.geosolutions.imageio.stream.output.FileImageOutputStreamExtImpl;
 import it.geosolutions.resources.TestData;
 
@@ -26,7 +29,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import com.sun.media.imageioimpl.plugins.tiff.TIFFImageWriterSpi;
+import com.sun.media.imageioimpl.plugins.jpeg2000.J2KImageWriterSpi;
 import com.sun.media.jai.operator.ImageReadDescriptor;
 
 public class JHDFTest extends TestCase {
@@ -68,23 +71,29 @@ public class JHDFTest extends TestCase {
 	
 	public void testJaiRead() throws IOException {
 		final File file = TestData.file(this,"MODPM2007027121858.L3_000_EAST_MED");
-		for (int i = 3; i < 4; i++) {
+		for (int i = 0; i < 3; i++) {
+			ImageReader reader = new APSImageReader(new APSImageReaderSpi());
+			reader.setInput(file);
+			final int imageIndex = ((SliceImageReader)reader).retrieveSlice2DIndex(i, null);
+						
 			final ParameterBlockJAI pbjImageRead = new ParameterBlockJAI(
 					"ImageRead");
 			ImageReadParam irp = new ImageReadParam();
-			irp.setSourceSubsampling(2, 2, 0, 0);
+			irp.setSourceSubsampling(1, 1, 0, 0);
 			pbjImageRead.setParameter("Input", file);
+			pbjImageRead.setParameter("reader", reader);
 			pbjImageRead.setParameter("readParam", irp);
-			pbjImageRead.setParameter("imageChoice", Integer.valueOf(i));
+			pbjImageRead.setParameter("imageChoice", Integer.valueOf(imageIndex));
 			
 			final RenderedOp image = JAI.create("ImageRead", pbjImageRead);
 			
 			final File outputFile = TestData.temp(this, "WriteHDFData"+i, false);
 			final ParameterBlockJAI pbjImageWrite = new ParameterBlockJAI(
 					"ImageWrite");
-			pbjImageWrite.setParameter("Output",
-					new FileImageOutputStreamExtImpl(outputFile));
-			ImageWriter writer = new TIFFImageWriterSpi()
+			pbjImageWrite.setParameter("Transcode",false);
+			pbjImageWrite.setParameter("UseProperties",false);
+			pbjImageWrite.setParameter("Output",outputFile);
+			ImageWriter writer = new J2KImageWriterSpi()
 					.createWriterInstance();
 			pbjImageWrite.setParameter("Writer", writer);
 
@@ -92,7 +101,9 @@ public class JHDFTest extends TestCase {
 			pbjImageWrite.addSource(image);
 
 			// Writing
-			final RenderedOp op = JAI.create("ImageWrite", pbjImageWrite);
+			final RenderedOp writeOp = JAI.create("ImageWrite", pbjImageWrite);
+			//USE AN EXTERNAL JP2K VIEWER TO VIEW WRITTEN IMAGE
+			//The data of this test contains negative numbers.
 		}
 
 	}

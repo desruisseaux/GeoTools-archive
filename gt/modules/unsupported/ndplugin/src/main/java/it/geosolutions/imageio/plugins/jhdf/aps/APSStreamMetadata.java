@@ -137,7 +137,6 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 			IIOMetadataNode productsNode = new IIOMetadataNode ("Products");
 			productsNode.setAttribute("numberOfProducts", Integer.toString(prodListNum));
 			
-//			synchronized (productsMap) {
 				final Set set = productsMap.keySet();
 				final Iterator productsIt = set.iterator();
 			
@@ -157,8 +156,7 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 					
 					productsNode.appendChild(productNode);
 				}
-//			}
-			
+		
 			root.appendChild(productsNode);
 			IIOMetadataNode referencingNode = new IIOMetadataNode("Referencing");
 			IIOMetadataNode projectionNode = buildAttributesNodeFromMap(projectionMap, "Projection"); 
@@ -215,10 +213,8 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 					for (int k = 0; k < nStdFileAttribMap && !found; k++) {
 						// if matched
 						if (attribName.equals(APSAttributes.STD_FA_ATTRIB[k])) {
-//							synchronized (stdFileAttribMap){
 							stdFileAttribMap.put((String) attribName,
 									attribValue);
-//							}
 							found = true;
 						}
 					}
@@ -226,10 +222,8 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 					for (int k = 0; k < nStdTimeAttribMap && !found; k++) {
 						// if matched
 						if (attribName.equals(APSAttributes.STD_TA_ATTRIB[k])) {
-//							synchronized (stdTimeAttribMap){
 								stdTimeAttribMap.put((String) attribName,
 										attribValue);
-//							}
 							found = true;
 						}
 					}
@@ -237,10 +231,8 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 					for (int k = 0; k < nStdSensorAttribMap && !found; k++) {
 						// if matched
 						if (attribName.equals(APSAttributes.STD_SA_ATTRIB[k])) {
-//							synchronized (stdSensorAttribMap){
 								stdSensorAttribMap.put((String) attribName,
 										attribValue);
-//							}
 							found = true;
 						}
 					}
@@ -248,12 +240,10 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 					for (int k = 0; k < nFileInputParamAttribMap && !found; k++) {
 						// if matched
 						if (attribName.equals(APSAttributes.PFA_IPA_ATTRIB[k])) {
-//							synchronized (fileInputParamAttribMap){
 								fileInputParamAttribMap.put((String) attribName,
 										attribValue);
 								if (attribName.equals(APSAttributes.PFA_IPA_PRODLIST))
 									prodList = attribValue.split(",");
-//							}
 							found = true;
 						}
 					}
@@ -261,12 +251,10 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 					for (int k = 0; k < nFileNavAttribMap && !found; k++) {
 						// if matched
 						if (attribName.equals(APSAttributes.PFA_NA_ATTRIB[k])) {
-//							synchronized (fileNavAttribMap){
 								fileNavAttribMap.put((String) attribName,
 										attribValue);
 								if (attribName.equals(APSAttributes.PFA_NA_MAPPROJECTION))
 									projectionDatasetName = attribValue;
-//							}
 							found = true;
 						}
 					}
@@ -274,20 +262,14 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 					for (int k = 0; k < nFileInGeoCovAttribMap && !found; k++) {
 						// if matched
 						if (attribName.equals(APSAttributes.PFA_IGCA_ATTRIB[k])) {
-//							synchronized (fileInGeoCovAttribMap){
 								fileInGeoCovAttribMap.put((String) attribName,
 										attribValue);
-//							}
 							found = true;
 						}
 					}
 
-					if (!found) {
-//						synchronized (genericAttribMap){
-							genericAttribMap.put((String) attribName,
-									attribValue);
-//						}
-					}
+					if (!found) 
+						genericAttribMap.put((String) attribName,attribValue);
 				}
 			
 			// //////////////////////////////////
@@ -330,24 +312,20 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 										for (int k = 0; k < nPdsAttrib && !attributeFound; k++) {
 											// if matched
 											if (attribName.equals(APSAttributes.PDSA_ATTRIB[k])) {
-//												synchronized (pdsAttribMap){
 													// putting the <attribut Name, attribute value>
 													// couple in the map
 													pdsAttribMap.put((String) attribName,
 															attribValue);
-//													}
 												
 												attributeFound = true;
 											}
 										}
 		
 										if (!attributeFound) {
-//											synchronized (pdsGenericAttribMap){
 												// putting the <attribut Name, attribute value>
 												// couple in the map
 												pdsGenericAttribMap.put((String) attribName,
 														attribValue);
-//												}
 											
 										}
 								
@@ -357,9 +335,7 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 								// in the arrayList
 								productAttribs.add(pdsAttribMap);
 								productAttribs.add(pdsGenericAttribMap);
-//								synchronized(productsMap){
 									productsMap.put(name, productAttribs);
-//								}
 							}
 						}
 						
@@ -387,7 +363,6 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 		
 		if (datatypeClass == Datatype.CLASS_FLOAT && datatypeSize == 8){
 			double[] values = (double[])data;
-//			synchronized (projMap) {
 				//TODO: I need to build a parser or a formatter to properly interprete
 				// these settings
 				projMap.put("Code", Double.toString(values[0]));
@@ -419,7 +394,6 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 				projMap.put("Latitude_2", Double.toString(values[26]));
 				projMap.put("Delta", Double.toString(values[27]));
 				projMap.put("Aspect", Double.toString(values[28]));
-//			}
 		}
 		return projMap;
 	}

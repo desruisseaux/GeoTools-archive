@@ -21,6 +21,7 @@ import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
+import java.nio.ShortBuffer;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -38,8 +39,7 @@ import com.sun.media.imageioimpl.common.ImageUtil;
 import com.sun.media.jai.codecimpl.util.RasterFactory;
 
 public abstract class BaseHDFImageReader extends SliceImageReader {
-	private static final Logger LOGGER = Logger
-			.getLogger("it.geosolutions.imageio.plugins.jhdf.");
+	
 
 	protected final int[] mutex = new int[] { 0 };
 	
@@ -285,10 +285,10 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 		}
 
 		// Setting SampleModel and ColorModel
-		int buffer_type = HDFUtilities.getBufferTypeFromDataType(dt);
-		SampleModel sm = new BandedSampleModel(buffer_type, dstWidth,
+		final int bufferType = HDFUtilities.getBufferTypeFromDataType(dt);
+		SampleModel sm = new BandedSampleModel(bufferType, dstWidth,
 				dstHeight, dstWidth, banks, offsets);
-		ColorModel cm = setColorModel(nBands, buffer_type, sm);
+		ColorModel cm = retrieveColorModel(sm);
 
 		// ////////////////////////////////////////////////////////////////////
 		//
@@ -302,8 +302,8 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 			data = dataset.read();
 			final int size = dstWidth * dstHeight;
 			DataBuffer dataBuffer = null;
-
-			switch (buffer_type) {
+			
+			switch (bufferType) {
 			case DataBuffer.TYPE_BYTE:
 				dataBuffer = new DataBufferByte((byte[]) data, size);
 				break;
@@ -355,6 +355,8 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 		// Prior to set a new input, I need to do a pre-emptive reset in order
 		// to clear any value-object related to the previous input.
 		// ////////////////////////////////////////////////////////////////////
+		if (originatingFile!=null)
+			reset();
 		if (input instanceof File) {
 			file = (File) input;
 			originatingFile = file;
@@ -422,11 +424,11 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 
 		// Variable used to specify the data type for the storing samples
 		// of the SampleModel
-		int buffer_type = HDFUtilities.getBufferTypeFromDataType(dt);
-		final SampleModel sm = new BandedSampleModel(buffer_type, width,
+		int bufferType = HDFUtilities.getBufferTypeFromDataType(dt);
+		final SampleModel sm = new BandedSampleModel(bufferType, width,
 				height, width, banks, offsets);
 
-		ColorModel cm = setColorModel(nBands, buffer_type, sm);
+		final ColorModel cm = retrieveColorModel(sm);
 
 		imageType = new ImageTypeSpecifier(cm, sm);
 		l.add(imageType);
@@ -434,43 +436,7 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 
 	}
 
-	private ColorModel setColorModel(final int nBands, final int buffer_type,
-			final SampleModel sm) {
-		ColorModel cm = null;
-		ColorSpace cs = null;
-		if (nBands > 1) {
-			// Number of Bands > 1.
-			// ImageUtil.createColorModel provides to Creates a
-			// ColorModel that may be used with the specified
-			// SampleModel
-			cm = ImageUtil.createColorModel(sm);
-			if (cm == null)
-				LOGGER.info("There are no ColorModels found");
-
-		} else if ((buffer_type == DataBuffer.TYPE_BYTE)
-				|| (buffer_type == DataBuffer.TYPE_USHORT)
-				|| (buffer_type == DataBuffer.TYPE_INT)
-				|| (buffer_type == DataBuffer.TYPE_FLOAT)
-				|| (buffer_type == DataBuffer.TYPE_DOUBLE)) {
-
-			// Just one band. Using the built-in Gray Scale Color Space
-			cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);
-			cm = RasterFactory.createComponentColorModel(buffer_type, // dataType
-					cs, // color space
-					false, // has alpha
-					false, // is alphaPremultiplied
-					Transparency.OPAQUE); // transparency
-		} else {
-			if (buffer_type == DataBuffer.TYPE_SHORT) {
-				// Just one band. Using the built-in Gray Scale Color
-				// Space
-				cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);
-				cm = new ComponentColorModel(cs, false, false,
-						Transparency.OPAQUE, DataBuffer.TYPE_SHORT);
-			}
-		}
-		return cm;
-	}
+	
 
 	public int getTileHeight(int imageIndex) throws IOException {
 		if (!isInitialized)
@@ -506,8 +472,8 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 	}
 
 	public void reset() {
-		super.reset();
 		root = null;
+		originatingFile=null;
 	}
 
 	// /**
