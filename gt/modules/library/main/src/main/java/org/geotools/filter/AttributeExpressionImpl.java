@@ -17,9 +17,11 @@ package org.geotools.filter;
 
 import java.util.logging.Logger;
 
+import org.geotools.factory.Hints;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.expression.PropertyAccessor;
+import org.geotools.filter.expression.PropertyAccessorFactory;
 import org.geotools.filter.expression.PropertyAccessors;
 import org.geotools.filter.expression.Value;
 import org.opengis.filter.expression.ExpressionVisitor;
@@ -44,6 +46,9 @@ public class AttributeExpressionImpl extends DefaultExpression
 
     /** Holds all sub filters of this filter. */
     protected FeatureType schema = null;
+    
+    /** Holds hints for the property accessor factory */
+    private Hints hints;
 
     /**
      * Constructor with the schema for this attribute.
@@ -61,10 +66,24 @@ public class AttributeExpressionImpl extends DefaultExpression
      * @param xpath the String xpath to the attribute.
      */
     public AttributeExpressionImpl( String xpath ){
+        this(xpath, null);
+    }    
+    
+    /**
+     * Constructor with schema and path to the attribute.
+     * 
+     * @param xpath the String xpath to the attribute.
+     * @param propertyAccessorHints hints to be passed to 
+     *        {@link PropertyAccessorFactory#createPropertyAccessor(Class, String, Class, Hints)}
+     *        at evaluation time.
+     */
+    public AttributeExpressionImpl( String xpath, Hints propertyAccessorHints ){
     	attPath = xpath;
     	schema = null;
+        hints = propertyAccessorHints;
     	this.expressionType = ATTRIBUTE;    	
     }    
+    
     /**
      * Constructor with schema and path to the attribute.
      *
@@ -180,9 +199,9 @@ public class AttributeExpressionImpl extends DefaultExpression
    private PropertyAccessor lastAccessor;
    private PropertyAccessor getPropertyAccessor(Object obj, Class target) {
        if(lastAccessor == null)
-           lastAccessor = PropertyAccessors.findPropertyAccessor( obj, attPath, target, null );
+           lastAccessor = PropertyAccessors.findPropertyAccessor( obj, attPath, target, hints );
        else if(!lastAccessor.canHandle(obj, attPath, target))
-           lastAccessor = PropertyAccessors.findPropertyAccessor( obj, attPath, target, null );
+           lastAccessor = PropertyAccessors.findPropertyAccessor( obj, attPath, target, hints );
        
        return lastAccessor;
    }

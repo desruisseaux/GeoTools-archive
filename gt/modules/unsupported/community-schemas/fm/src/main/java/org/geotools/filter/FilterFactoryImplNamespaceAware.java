@@ -1,7 +1,7 @@
 package org.geotools.filter;
 
 import org.geotools.factory.Hints;
-import org.geotools.filter.expression.PropertyAccessorFactory;
+import org.geotools.filter.expression.FeaturePropertyAccessorFactory;
 import org.opengis.filter.expression.PropertyName;
 import org.xml.sax.helpers.NamespaceSupport;
 
@@ -27,7 +27,7 @@ public class FilterFactoryImplNamespaceAware extends FilterFactoryImpl {
     }
     
     public void setNamepaceContext(NamespaceSupport namespaces){
-        namespaceHints = new Hints(PropertyAccessorFactory.FILTER_FACTORY_NAMESPACE_AWARE,
+        namespaceHints = new Hints(FeaturePropertyAccessorFactory.NAMESPACE_CONTEXT,
                 namespaces);
     }
 }

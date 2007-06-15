@@ -6,6 +6,7 @@ import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathIntrospector;
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
 import org.geotools.factory.Hints;
+import org.geotools.factory.Hints.Key;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.iso.AttributeImpl;
 import org.geotools.feature.iso.ComplexAttributeImpl;
@@ -34,7 +35,7 @@ import org.xml.sax.helpers.NamespaceSupport;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
- * Creates a property accessor for ISO Features.
+ * Creates a namespace aware property accessor for ISO Features.
  * <p>
  * The created accessor handles a small subset of xpath expressions, a
  * non-nested "name" which corresponds to a feature attribute, and "@id",
@@ -52,6 +53,15 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  */
 public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
+
+    /**
+     * {@link Hints} key used to pass namespace context to
+     * {@link #createPropertyAccessor(Class, String, Class, Hints)} in the form
+     * of a {@link NamespaceSupport} instance with the prefix/namespaceURI
+     * mappings
+     */
+    public static final Key NAMESPACE_CONTEXT = new Hints.Key(
+            org.xml.sax.helpers.NamespaceSupport.class);
 
     static {
         // unfortunatley, jxpath only works against concreate classes
@@ -89,7 +99,8 @@ public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
         // if (xpath.matches("(\\w+:)?(\\w+)")) {
         NamespaceSupport namespaces = null;
         if (hints != null) {
-            namespaces = (NamespaceSupport) hints.get(PropertyAccessorFactory.FILTER_FACTORY_NAMESPACE_AWARE);
+            namespaces = (NamespaceSupport) hints
+                    .get(FeaturePropertyAccessorFactory.NAMESPACE_CONTEXT);
         }
         if (namespaces == null) {
             return ATTRIBUTE_ACCESS;
