@@ -4,17 +4,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
-import org.apache.commons.dbcp.BasicDataSource;
-import org.geotools.factory.JNDI;
-import org.mockejb.jndi.MockContext;
-
-import com.mockrunner.mock.ejb.EJBMockObjectFactory;
-import com.mockrunner.mock.jdbc.MockDataSource;
-
 import junit.framework.TestCase;
+
+import org.apache.commons.dbcp.BasicDataSource;
 
 public class DataSourceFinderTest extends TestCase {
     public void testDbcpFactory() throws IOException {
