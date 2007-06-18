@@ -1,4 +1,4 @@
-package it.geosolutions.imageio.plugins.jhdf.aps;
+package it.geosolutions.imageio.plugins.jhdf.tovs;
 
 import it.geosolutions.imageio.plugins.jhdf.BaseHDFImageReaderSpi;
 import it.geosolutions.imageio.stream.input.FileImageInputStreamExtImpl;
@@ -14,18 +14,7 @@ import ncsa.hdf.object.Attribute;
 import ncsa.hdf.object.FileFormat;
 import ncsa.hdf.object.HObject;
 
-public class APSImageReaderSpi extends BaseHDFImageReaderSpi {
-
-	/**
-	 * The list of the required attributes was built in compliance with the
-	 * information available at:
-	 * http://www7333.nrlssc.navy.mil/docs/aps_v3.4/user/aps/ch06.html
-	 * 
-	 */
-	private final static String[] requiredAPSAttributes = { "file",
-			"fileClassification", "fileStatus", "fileTitle", "fileVersion",
-			"createAgency", "createSoftware", "createPlatform", "createTime",
-	/* "createUser" */}; // TODO: Add more attributes??
+public class TOVSImageReaderSpi extends BaseHDFImageReaderSpi {
 
 	static final String[] suffixes = { "hdf" };
 
@@ -35,7 +24,7 @@ public class APSImageReaderSpi extends BaseHDFImageReaderSpi {
 
 	static final String version = "1.0";
 
-	static final String readerCN = "it.geosolutions.imageio.plugins.jhdf.aps.APSImageReader";
+	static final String readerCN = "it.geosolutions.imageio.plugins.jhdf.tovs.TOVSImageReader";
 
 	static final String vendorName = "GeoSolutions";
 
@@ -45,7 +34,7 @@ public class APSImageReaderSpi extends BaseHDFImageReaderSpi {
 	// StreamMetadataFormatNames and StreamMetadataFormatClassNames
 	static final boolean supportsStandardStreamMetadataFormat = false;
 
-	static final String nativeStreamMetadataFormatName = "it.geosolutions.imageio.plugins.jhdf.aps.APSHDFStreamMetadata_1.0";
+	static final String nativeStreamMetadataFormatName = "it.geosolutions.imageio.plugins.jhdf.tovs.TOVSStreamMetadata_1.0";
 
 	static final String nativeStreamMetadataFormatClassName = null;
 
@@ -56,7 +45,7 @@ public class APSImageReaderSpi extends BaseHDFImageReaderSpi {
 	// ImageMetadataFormatNames and ImageMetadataFormatClassNames
 	static final boolean supportsStandardImageMetadataFormat = false;
 
-	static final String nativeImageMetadataFormatName = "it.geosolutions.imageio.plugins.jhdf.aps.APSHDFImageMetadata_1.0";
+	static final String nativeImageMetadataFormatName = "it.geosolutions.imageio.plugins.jhdf.tovs.TOVSImageMetadata_1.0";
 
 	static final String nativeImageMetadataFormatClassName = null;
 
@@ -64,7 +53,7 @@ public class APSImageReaderSpi extends BaseHDFImageReaderSpi {
 
 	static final String[] extraImageMetadataFormatClassNames = { null };
 
-	public APSImageReaderSpi() {
+	public TOVSImageReaderSpi() {
 		super(
 				vendorName,
 				version,
@@ -86,75 +75,8 @@ public class APSImageReaderSpi extends BaseHDFImageReaderSpi {
 				extraImageMetadataFormatClassNames);
 	}
 
-	//
-	// This version of the canDecodeInput checks if all required attributes are
-	// present
-	// in the APS source.
-	//
-	private boolean OldcanDecodeInput(Object input) throws IOException {
-		if (input instanceof FileImageInputStreamExtImpl) {
-			input = ((FileImageInputStreamExtImpl) input).getFile();
-		}
-
-		if (input instanceof File) {
-			final String filepath = ((File) input).getPath();
-
-			// TODO: Improve to add HDF5 support.
-			final FileFormat fileFormat = FileFormat
-					.getFileFormat(FileFormat.FILE_TYPE_HDF4);
-			if (fileFormat != null && fileFormat.isThisType(filepath))
-				try {
-					final FileFormat testFile = fileFormat.open(filepath,
-							FileFormat.READ);
-					if (testFile != null) {
-						if (testFile.open() >= 0) {
-
-							// CHECKS IF APS REQUIRED ATTRIBUTES ARE PRESENT
-							final int requiredAttributes = requiredAPSAttributes.length;
-							int foundAttributes = 0;
-							HObject root = testFile.get("/");
-							final Iterator metadataIt = root.getMetadata()
-									.iterator();
-
-							while (metadataIt.hasNext()) {
-								// get the attribute
-								final Attribute att = (Attribute) metadataIt
-										.next();
-								final String attName = att.getName();
-								for (int i = 0; i < requiredAttributes; i++) {
-									if (attName
-											.equals(requiredAPSAttributes[i])) {
-										foundAttributes++;
-										if (foundAttributes == requiredAttributes) {
-											// Avoid to scan the whole
-											// attributes
-											// list if I already found the
-											// required ones
-											testFile.close();
-											return true;
-										}
-										break;
-									}
-								}
-							}
-
-							testFile.close();
-							if (foundAttributes == requiredAttributes)
-								return true;
-							return false;
-						}
-					}
-				} catch (IOException e) {
-					throw e;
-				} catch (Exception e) {
-				}
-		}
-		return false;
-	}
-
 	public boolean canDecodeInput(Object input) throws IOException {
 		synchronized (spiMutex) {
-
 			if (input instanceof FileImageInputStreamExtImpl) {
 				input = ((FileImageInputStreamExtImpl) input).getFile();
 			}
@@ -182,11 +104,10 @@ public class APSImageReaderSpi extends BaseHDFImageReaderSpi {
 											.next();
 									final String attName = att.getName();
 
-									if (attName
-											.equals(APSProperties.STD_FA_CREATESOFTWARE)) {
+									if (attName.startsWith("File Description")) {
 										final Object attValue = att.getValue();
-										final String value[] = ((String[]) attValue);
-										if (value[0].startsWith("APS")) {
+										final String value = (String) attValue;
+										if (value.contains("TOVS PATHFINDER")) {
 											found = true;
 											break;
 										}
@@ -204,24 +125,16 @@ public class APSImageReaderSpi extends BaseHDFImageReaderSpi {
 						// TODO
 					}
 			}
-			return false;
 		}
+		return false;
 	}
 
-	/**
-	 * Returns an instance of the APSImageReader
-	 * 
-	 * @see javax.imageio.spi.ImageReaderSpi#createReaderInstance(java.lang.Object)
-	 */
 	public ImageReader createReaderInstance(Object source) throws IOException {
-		return new APSImageReader(this);
+		return new TOVSImageReader(this);
 	}
 
-	/**
-	 * @see javax.imageio.spi.IIOServiceProvider#getDescription(java.util.Locale)
-	 */
 	public String getDescription(Locale locale) {
-		return new StringBuffer("APS Compliant HDF Image Reader, version ")
+		return new StringBuffer("TOVS Compliant HDF Image Reader, version ")
 				.append(version).toString();
 	}
 

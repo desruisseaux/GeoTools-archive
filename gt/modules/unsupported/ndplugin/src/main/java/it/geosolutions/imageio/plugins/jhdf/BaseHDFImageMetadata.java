@@ -42,6 +42,13 @@ public abstract class BaseHDFImageMetadata extends IIOMetadata {
 	 * @return the <code>IIOMetadataNode</code> common to each HDF metadata.
 	 */
 	protected IIOMetadataNode getCommonDatasetNode() {
+		//The generated Node is common to each HDF metadata structure.
+		
+		 /*
+         * root
+         *   +-- datasetProperties (Name, Rank, Dims, ChunkSize)
+         */
+		
 		final IIOMetadataNode datasetNode = new IIOMetadataNode(
 				"DatasetProperties");
 		datasetNode.setAttribute("Name", name);
@@ -73,7 +80,34 @@ public abstract class BaseHDFImageMetadata extends IIOMetadata {
 		}
 		
 		datasetNode.setAttribute("ChunkSize", sChunkSize);
+		//TODO: Should I add envelope?
 		return datasetNode;
+	}
+	
+	protected void initializeCommonDatasetProperties(SubDatasetInfo sdInfo) {
+		//	 setting dims (array copy)
+		final long dims[] = sdInfo.getDims();
+		if (dims!=null){
+			final int dimsLength=dims.length;
+			this.dims=new long[dimsLength];
+			for (int i=0;i<dimsLength;i++)
+				this.dims[i]=dims[i];
+		}
+		
+		// setting chunkSize (array copy)
+		final long chunkSize[] = sdInfo.getChunkSize();
+		if (chunkSize!=null){
+			final int chunkSizeLength=chunkSize.length;
+			this.chunkSize=new long[chunkSizeLength];
+			for (int i=0;i<chunkSizeLength;i++)
+				this.chunkSize[i]=chunkSize[i];
+		}
+
+		// setting rank
+		this.rank = sdInfo.getRank();
+		
+		// setting name
+		this.name = sdInfo.getName();
 	}
 	
 	/**

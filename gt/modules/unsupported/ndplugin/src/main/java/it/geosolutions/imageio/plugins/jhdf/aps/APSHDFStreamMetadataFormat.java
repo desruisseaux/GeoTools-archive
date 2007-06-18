@@ -1,12 +1,10 @@
 package it.geosolutions.imageio.plugins.jhdf.aps;
 
 import javax.imageio.ImageTypeSpecifier;
-import javax.imageio.metadata.IIOMetadataFormat;
 import javax.imageio.metadata.IIOMetadataFormatImpl;
 
 public class APSHDFStreamMetadataFormat extends IIOMetadataFormatImpl {
-	private static IIOMetadataFormat instance = null;
-	
+		
 	public APSHDFStreamMetadataFormat() {
 		super(APSStreamMetadata.nativeMetadataFormatName,
 				IIOMetadataFormatImpl.CHILD_POLICY_ALL);
@@ -15,76 +13,76 @@ public class APSHDFStreamMetadataFormat extends IIOMetadataFormatImpl {
 		
 		addElement("FileAttributes",
 				"StandardAPSAttributes", CHILD_POLICY_EMPTY);
-        addAttribute("FileAttributes", APSAttributes.STD_FA_FILE, DATATYPE_STRING, false, null);
-        addAttribute("FileAttributes", APSAttributes.STD_FA_FILECLASSIFICATION, DATATYPE_STRING, true, null);
-        addAttribute("FileAttributes", APSAttributes.STD_FA_FILESTATUS, DATATYPE_STRING, false, null);
-        addAttribute("FileAttributes", APSAttributes.STD_FA_FILETITLE, DATATYPE_STRING, false, null);
-        addAttribute("FileAttributes", APSAttributes.STD_FA_FILEVERSION, DATATYPE_STRING, false, null);
-        addAttribute("FileAttributes", APSAttributes.STD_FA_CREATEAGENCY, DATATYPE_STRING, false, null);
-        addAttribute("FileAttributes", APSAttributes.STD_FA_CREATESOFTWARE, DATATYPE_STRING, false, null);
-        addAttribute("FileAttributes", APSAttributes.STD_FA_CREATEPLATFORM, DATATYPE_STRING, false, null);
-        addAttribute("FileAttributes", APSAttributes.STD_FA_CREATETIME, DATATYPE_STRING, false, null);
-        addAttribute("FileAttributes", APSAttributes.STD_FA_CREATEUSER, DATATYPE_STRING, false, null);
+        addAttribute("FileAttributes", APSProperties.STD_FA_FILE, DATATYPE_STRING, false, null);
+        addAttribute("FileAttributes", APSProperties.STD_FA_FILECLASSIFICATION, DATATYPE_STRING, true, null);
+        addAttribute("FileAttributes", APSProperties.STD_FA_FILESTATUS, DATATYPE_STRING, false, null);
+        addAttribute("FileAttributes", APSProperties.STD_FA_FILETITLE, DATATYPE_STRING, false, null);
+        addAttribute("FileAttributes", APSProperties.STD_FA_FILEVERSION, DATATYPE_STRING, false, null);
+        addAttribute("FileAttributes", APSProperties.STD_FA_CREATEAGENCY, DATATYPE_STRING, false, null);
+        addAttribute("FileAttributes", APSProperties.STD_FA_CREATESOFTWARE, DATATYPE_STRING, false, null);
+        addAttribute("FileAttributes", APSProperties.STD_FA_CREATEPLATFORM, DATATYPE_STRING, false, null);
+        addAttribute("FileAttributes", APSProperties.STD_FA_CREATETIME, DATATYPE_STRING, false, null);
+        addAttribute("FileAttributes", APSProperties.STD_FA_CREATEUSER, DATATYPE_STRING, false, null);
                 
         addElement("TimeAttributes",
-				"StandardAPSAttributes", CHILD_POLICY_EMPTY);
-        addAttribute("TimeAttributes", APSAttributes.STD_TA_TIMESTART, DATATYPE_STRING, true, null);
-        addAttribute("TimeAttributes", APSAttributes.STD_TA_TIMESTARTYEAR, DATATYPE_INTEGER, true, null);
-        addAttribute("TimeAttributes", APSAttributes.STD_TA_TIMESTARTDAY, DATATYPE_INTEGER, true, null);
-        addAttribute("TimeAttributes", APSAttributes.STD_TA_TIMESTARTTIME, DATATYPE_INTEGER, true, null);
-        addAttribute("TimeAttributes", APSAttributes.STD_TA_TIMEEND, DATATYPE_STRING, true, null);
-        addAttribute("TimeAttributes", APSAttributes.STD_TA_TIMEENDYEAR, DATATYPE_INTEGER, true, null);
-        addAttribute("TimeAttributes", APSAttributes.STD_TA_TIMEENDDAY, DATATYPE_INTEGER, true, null);
-        addAttribute("TimeAttributes", APSAttributes.STD_TA_TIMEENDTIME, DATATYPE_INTEGER, true, null);
-        addAttribute("TimeAttributes", APSAttributes.STD_TA_TIMEDAYNIGHT, DATATYPE_STRING, true, null);
+				"StandardAPSProperties", CHILD_POLICY_EMPTY);
+        addAttribute("TimeAttributes", APSProperties.STD_TA_TIMESTART, DATATYPE_STRING, true, null);
+        addAttribute("TimeAttributes", APSProperties.STD_TA_TIMESTARTYEAR, DATATYPE_INTEGER, true, null);
+        addAttribute("TimeAttributes", APSProperties.STD_TA_TIMESTARTDAY, DATATYPE_INTEGER, true, null);
+        addAttribute("TimeAttributes", APSProperties.STD_TA_TIMESTARTTIME, DATATYPE_INTEGER, true, null);
+        addAttribute("TimeAttributes", APSProperties.STD_TA_TIMEEND, DATATYPE_STRING, true, null);
+        addAttribute("TimeAttributes", APSProperties.STD_TA_TIMEENDYEAR, DATATYPE_INTEGER, true, null);
+        addAttribute("TimeAttributes", APSProperties.STD_TA_TIMEENDDAY, DATATYPE_INTEGER, true, null);
+        addAttribute("TimeAttributes", APSProperties.STD_TA_TIMEENDTIME, DATATYPE_INTEGER, true, null);
+        addAttribute("TimeAttributes", APSProperties.STD_TA_TIMEDAYNIGHT, DATATYPE_STRING, true, null);
             
         addElement("SensorAttributes",
-            		"StandardAPSAttributes", CHILD_POLICY_EMPTY);
-        addAttribute("SensorAttributes", APSAttributes.STD_SA_SENSOR, DATATYPE_STRING, true, null);
-        addAttribute("SensorAttributes", APSAttributes.STD_SA_SENSORPLATFORM, DATATYPE_INTEGER, true, null);
-        addAttribute("SensorAttributes", APSAttributes.STD_SA_SENSORAGENCY, DATATYPE_INTEGER, true, null);
-        addAttribute("SensorAttributes", APSAttributes.STD_SA_SENSORTYPE, DATATYPE_INTEGER, true, null);
-        addAttribute("SensorAttributes", APSAttributes.STD_SA_SENSORSPECTRUM, DATATYPE_STRING, true, null);
-        addAttribute("SensorAttributes", APSAttributes.STD_SA_SENSORNUMBEROFBANDS, DATATYPE_INTEGER, true, null);
-        addAttribute("SensorAttributes", APSAttributes.STD_SA_SENSORBANDUNITS, DATATYPE_INTEGER, true, null);
-        addAttribute("SensorAttributes", APSAttributes.STD_SA_SENSORBANDS, DATATYPE_INTEGER, true, null);
-        addAttribute("SensorAttributes", APSAttributes.STD_SA_SENSORBANDWIDTHS, DATATYPE_STRING, true, null);
-        addAttribute("SensorAttributes", APSAttributes.STD_SA_SENSORNOMINALALTITUDEINKM, DATATYPE_STRING, true, null);
-        addAttribute("SensorAttributes", APSAttributes.STD_SA_SENSORSCANWIDTHINKM, DATATYPE_STRING, true, null);
-        addAttribute("SensorAttributes", APSAttributes.STD_SA_SENSORRESOLUTIONINKM, DATATYPE_STRING, true, null);
-        addAttribute("SensorAttributes", APSAttributes.STD_SA_SENSORPLATFORMTYPE, DATATYPE_STRING, true, null);
+            		"StandardAPSProperties", CHILD_POLICY_EMPTY);
+        addAttribute("SensorAttributes", APSProperties.STD_SA_SENSOR, DATATYPE_STRING, true, null);
+        addAttribute("SensorAttributes", APSProperties.STD_SA_SENSORPLATFORM, DATATYPE_INTEGER, true, null);
+        addAttribute("SensorAttributes", APSProperties.STD_SA_SENSORAGENCY, DATATYPE_INTEGER, true, null);
+        addAttribute("SensorAttributes", APSProperties.STD_SA_SENSORTYPE, DATATYPE_INTEGER, true, null);
+        addAttribute("SensorAttributes", APSProperties.STD_SA_SENSORSPECTRUM, DATATYPE_STRING, true, null);
+        addAttribute("SensorAttributes", APSProperties.STD_SA_SENSORNUMBEROFBANDS, DATATYPE_INTEGER, true, null);
+        addAttribute("SensorAttributes", APSProperties.STD_SA_SENSORBANDUNITS, DATATYPE_INTEGER, true, null);
+        addAttribute("SensorAttributes", APSProperties.STD_SA_SENSORBANDS, DATATYPE_INTEGER, true, null);
+        addAttribute("SensorAttributes", APSProperties.STD_SA_SENSORBANDWIDTHS, DATATYPE_STRING, true, null);
+        addAttribute("SensorAttributes", APSProperties.STD_SA_SENSORNOMINALALTITUDEINKM, DATATYPE_STRING, true, null);
+        addAttribute("SensorAttributes", APSProperties.STD_SA_SENSORSCANWIDTHINKM, DATATYPE_STRING, true, null);
+        addAttribute("SensorAttributes", APSProperties.STD_SA_SENSORRESOLUTIONINKM, DATATYPE_STRING, true, null);
+        addAttribute("SensorAttributes", APSProperties.STD_SA_SENSORPLATFORMTYPE, DATATYPE_STRING, true, null);
                 
         addElement("FileProductsAttributes",
         		APSStreamMetadata.nativeMetadataFormatName, CHILD_POLICY_SOME);
         addElement("InputParameterAttributes",
         		"FileProductsAttributes", CHILD_POLICY_EMPTY);
-        addAttribute("InputParameterAttributes", APSAttributes.PFA_IPA_INPUTCALIBRATIONFILE, DATATYPE_STRING, false, null);
-        addAttribute("InputParameterAttributes", APSAttributes.PFA_IPA_INPUTPARAMETER, DATATYPE_STRING, false, null);
-        addAttribute("InputParameterAttributes", APSAttributes.PFA_IPA_INPUTMASKSINT, DATATYPE_STRING, false, null);
-        addAttribute("InputParameterAttributes", APSAttributes.PFA_IPA_INPUTMASKS, DATATYPE_STRING, false, null);
-        addAttribute("InputParameterAttributes", APSAttributes.PFA_IPA_PRODLIST, DATATYPE_STRING, false, null);
-        addAttribute("InputParameterAttributes", APSAttributes.PFA_IPA_PROCESSINGVERSION, DATATYPE_STRING, false, null);
+        addAttribute("InputParameterAttributes", APSProperties.PFA_IPA_INPUTCALIBRATIONFILE, DATATYPE_STRING, false, null);
+        addAttribute("InputParameterAttributes", APSProperties.PFA_IPA_INPUTPARAMETER, DATATYPE_STRING, false, null);
+        addAttribute("InputParameterAttributes", APSProperties.PFA_IPA_INPUTMASKSINT, DATATYPE_STRING, false, null);
+        addAttribute("InputParameterAttributes", APSProperties.PFA_IPA_INPUTMASKS, DATATYPE_STRING, false, null);
+        addAttribute("InputParameterAttributes", APSProperties.PFA_IPA_PRODLIST, DATATYPE_STRING, false, null);
+        addAttribute("InputParameterAttributes", APSProperties.PFA_IPA_PROCESSINGVERSION, DATATYPE_STRING, false, null);
         
         addElement("NavigationAttributes",
         		"FileProductsAttributes", CHILD_POLICY_EMPTY);
-        addAttribute("NavigationAttributes", APSAttributes.PFA_NA_NAVTYPE, DATATYPE_STRING, false, null);
-        addAttribute("NavigationAttributes", APSAttributes.PFA_NA_MAPPROJECTIONSYSTEM , DATATYPE_STRING, false, null);
-        addAttribute("NavigationAttributes", APSAttributes.PFA_NA_MAPPROJECTION, DATATYPE_STRING, false, null);
-        addAttribute("NavigationAttributes", APSAttributes.PFA_NA_MAPPEDUPERLEFT, DATATYPE_STRING, false, null);
-        addAttribute("NavigationAttributes", APSAttributes.PFA_NA_MAPPEDUPPERRIGHT, DATATYPE_STRING, false, null);
-        addAttribute("NavigationAttributes", APSAttributes.PFA_NA_MAPPEDLOWERLEFT, DATATYPE_STRING, false, null);
-        addAttribute("NavigationAttributes", APSAttributes.PFA_NA_MAPPEDLOWERRIGHT, DATATYPE_STRING, false, null);
+        addAttribute("NavigationAttributes", APSProperties.PFA_NA_NAVTYPE, DATATYPE_STRING, false, null);
+        addAttribute("NavigationAttributes", APSProperties.PFA_NA_MAPPROJECTIONSYSTEM , DATATYPE_STRING, false, null);
+        addAttribute("NavigationAttributes", APSProperties.PFA_NA_MAPPROJECTION, DATATYPE_STRING, false, null);
+        addAttribute("NavigationAttributes", APSProperties.PFA_NA_MAPPEDUPERLEFT, DATATYPE_STRING, false, null);
+        addAttribute("NavigationAttributes", APSProperties.PFA_NA_MAPPEDUPPERRIGHT, DATATYPE_STRING, false, null);
+        addAttribute("NavigationAttributes", APSProperties.PFA_NA_MAPPEDLOWERLEFT, DATATYPE_STRING, false, null);
+        addAttribute("NavigationAttributes", APSProperties.PFA_NA_MAPPEDLOWERRIGHT, DATATYPE_STRING, false, null);
         
         addElement("InputGeographicalCoverageAttributes",
         		"FileProductsAttributes", CHILD_POLICY_EMPTY);
-        addAttribute("InputGeographicalCoverageAttributes", APSAttributes.PFA_IGCA_LOCALEUPPERLEFT, DATATYPE_STRING, false, null);
-        addAttribute("InputGeographicalCoverageAttributes", APSAttributes.PFA_IGCA_LOCALEUPPERRIGHT, DATATYPE_STRING, false, null);
-        addAttribute("InputGeographicalCoverageAttributes", APSAttributes.PFA_IGCA_LOCALELOWERLEFT, DATATYPE_STRING, false, null);
-        addAttribute("InputGeographicalCoverageAttributes", APSAttributes.PFA_IGCA_LOCALELOWERRIGHT, DATATYPE_STRING, false, null);
-        addAttribute("InputGeographicalCoverageAttributes", APSAttributes.PFA_IGCA_LOCALENWCORNER, DATATYPE_STRING, false, null);
-        addAttribute("InputGeographicalCoverageAttributes", APSAttributes.PFA_IGCA_LOCALENECORNER, DATATYPE_STRING, false, null);
-        addAttribute("InputGeographicalCoverageAttributes", APSAttributes.PFA_IGCA_LOCALESWCORNER, DATATYPE_STRING, false, null);
-        addAttribute("InputGeographicalCoverageAttributes", APSAttributes.PFA_IGCA_LOCALESECORNER, DATATYPE_STRING, false, null);
+        addAttribute("InputGeographicalCoverageAttributes", APSProperties.PFA_IGCA_LOCALEUPPERLEFT, DATATYPE_STRING, false, null);
+        addAttribute("InputGeographicalCoverageAttributes", APSProperties.PFA_IGCA_LOCALEUPPERRIGHT, DATATYPE_STRING, false, null);
+        addAttribute("InputGeographicalCoverageAttributes", APSProperties.PFA_IGCA_LOCALELOWERLEFT, DATATYPE_STRING, false, null);
+        addAttribute("InputGeographicalCoverageAttributes", APSProperties.PFA_IGCA_LOCALELOWERRIGHT, DATATYPE_STRING, false, null);
+        addAttribute("InputGeographicalCoverageAttributes", APSProperties.PFA_IGCA_LOCALENWCORNER, DATATYPE_STRING, false, null);
+        addAttribute("InputGeographicalCoverageAttributes", APSProperties.PFA_IGCA_LOCALENECORNER, DATATYPE_STRING, false, null);
+        addAttribute("InputGeographicalCoverageAttributes", APSProperties.PFA_IGCA_LOCALESWCORNER, DATATYPE_STRING, false, null);
+        addAttribute("InputGeographicalCoverageAttributes", APSProperties.PFA_IGCA_LOCALESECORNER, DATATYPE_STRING, false, null);
         
         addElement("Projection",
         		APSStreamMetadata.nativeMetadataFormatName, CHILD_POLICY_EMPTY);

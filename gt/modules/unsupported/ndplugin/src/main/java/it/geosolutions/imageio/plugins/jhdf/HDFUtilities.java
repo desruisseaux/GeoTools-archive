@@ -102,12 +102,19 @@ public class HDFUtilities {
 		return attribValue;
 	}
 	
-	
-	public static int getBufferTypeFromDataType(Datatype dt) {
+	/**
+	 * Given a HDF datatype, returns a proper DataBuffer type depending on 
+	 * the datatype size and the datatype class.
+	 * 
+	 * @param datatype
+	 * 			the input datatype 
+	 * @return the proper buffer type
+	 */
+	public static int getBufferTypeFromDataType(Datatype datatype) {
 		int buffer_type=0;
-		final int dataTypeClass = dt.getDatatypeClass();
-		final int dataTypeSize = dt.getDatatypeSize();
-		final boolean isUnsigned = dt.isUnsigned();
+		final int dataTypeClass = datatype.getDatatypeClass();
+		final int dataTypeSize = datatype.getDatatypeSize();
+		final boolean isUnsigned = datatype.isUnsigned();
 		if (dataTypeClass == Datatype.CLASS_INTEGER) {
 			if (dataTypeSize == 1)
 				buffer_type = DataBuffer.TYPE_BYTE;

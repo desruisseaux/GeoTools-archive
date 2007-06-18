@@ -1,36 +1,18 @@
 package it.geosolutions.imageio.plugins.jhdf;
 
-import it.geosolutions.imageio.plugins.jhdf.aps.APSImageMetadata;
-import it.geosolutions.imageio.plugins.jhdf.aps.APSImageReader;
-import it.geosolutions.imageio.plugins.jhdf.aps.APSImageReaderSpi;
-import it.geosolutions.imageio.plugins.jhdf.aps.APSStreamMetadata;
-import it.geosolutions.imageio.plugins.slices2D.SliceImageReader;
-import it.geosolutions.imageio.stream.output.FileImageOutputStreamExtImpl;
-import it.geosolutions.resources.TestData;
-
-import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
 import java.awt.image.RenderedImage;
-import java.io.File;
-import java.io.IOException;
+import java.awt.image.renderable.ParameterBlock;
 
-import javax.imageio.ImageReadParam;
-import javax.imageio.ImageReader;
-import javax.imageio.ImageWriter;
-import javax.imageio.metadata.IIOMetadata;
-import javax.imageio.metadata.IIOMetadataNode;
 import javax.media.jai.JAI;
-import javax.media.jai.ParameterBlockJAI;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.ROI;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.widget.ScrollingImagePanel;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-import com.sun.media.imageioimpl.plugins.jpeg2000.J2KImageWriterSpi;
-import com.sun.media.jai.operator.ImageReadDescriptor;
 
 public class JHDFTest extends TestCase {
 	public JHDFTest(String name) {
@@ -42,120 +24,77 @@ public class JHDFTest extends TestCase {
 		JAI.getDefaultInstance().getTileCache().setMemoryCapacity(
 				64 * 1024 * 1024);
 		JAI.getDefaultInstance().getTileCache().setMemoryThreshold(1.0f);
-		JAI.getDefaultInstance().getTileScheduler().setParallelism(1);
-		JAI.getDefaultInstance().getTileScheduler().setPrefetchPriority(2);
-		JAI.getDefaultInstance().getTileScheduler().setPrefetchParallelism(1);
-	}
-
-	public void testMetadata() throws IOException {
-		final File file = TestData.file(this,"MODPM2007027121858.L3_000_EAST_MED");
-		final ParameterBlockJAI pbjImageRead = new ParameterBlockJAI(
-		"ImageRead");
-		pbjImageRead.setParameter("Input", file);
-		final RenderedOp image = JAI.create("ImageRead", pbjImageRead);
-		ImageReader reader = (ImageReader) image
-				.getProperty(ImageReadDescriptor.PROPERTY_NAME_IMAGE_READER);
-	
-		final IIOMetadata metadata = reader.getImageMetadata(2);
-		IIOMetadataNode imageNode = (IIOMetadataNode) metadata
-				.getAsTree(APSImageMetadata.nativeMetadataFormatName);
-		System.out
-				.println(MetadataDisplay.buildMetadataFromNode(imageNode));
-
-		final IIOMetadata streamMetadata = reader.getStreamMetadata();
-		IIOMetadataNode streamNode = (IIOMetadataNode) streamMetadata
-				.getAsTree(APSStreamMetadata.nativeMetadataFormatName);
-		System.out.println(MetadataDisplay
-				.buildMetadataFromNode(streamNode));
-	}
-	
-	public void testJaiRead() throws IOException {
-		final File file = TestData.file(this,"MODPM2007027121858.L3_000_EAST_MED");
-		for (int i = 0; i < 3; i++) {
-			ImageReader reader = new APSImageReader(new APSImageReaderSpi());
-			reader.setInput(file);
-			final int imageIndex = ((SliceImageReader)reader).retrieveSlice2DIndex(i, null);
-						
-			final ParameterBlockJAI pbjImageRead = new ParameterBlockJAI(
-					"ImageRead");
-			ImageReadParam irp = new ImageReadParam();
-			irp.setSourceSubsampling(1, 1, 0, 0);
-			pbjImageRead.setParameter("Input", file);
-			pbjImageRead.setParameter("reader", reader);
-			pbjImageRead.setParameter("readParam", irp);
-			pbjImageRead.setParameter("imageChoice", Integer.valueOf(imageIndex));
-			
-			final RenderedOp image = JAI.create("ImageRead", pbjImageRead);
-			
-			final File outputFile = TestData.temp(this, "WriteHDFData"+i, false);
-			final ParameterBlockJAI pbjImageWrite = new ParameterBlockJAI(
-					"ImageWrite");
-			pbjImageWrite.setParameter("Transcode",false);
-			pbjImageWrite.setParameter("UseProperties",false);
-			pbjImageWrite.setParameter("Output",outputFile);
-			ImageWriter writer = new J2KImageWriterSpi()
-					.createWriterInstance();
-			pbjImageWrite.setParameter("Writer", writer);
-
-			// Specifying image source to write
-			pbjImageWrite.addSource(image);
-
-			// Writing
-			final RenderedOp writeOp = JAI.create("ImageWrite", pbjImageWrite);
-			//USE AN EXTERNAL JP2K VIEWER TO VIEW WRITTEN IMAGE
-			//The data of this test contains negative numbers.
-		}
 
 	}
 
-	public void testJaiMultithreadingRead() throws IOException {
-		// SETS JHDFImageReaderSpi as SPI in
-		// META-INF/services/javax.imageio.spi.ImageReaderSpi
+	//
+	// public void testJaiMultithreadingRead() throws IOException {
+	// // SETS JHDFImageReaderSpi as SPI in
+	// // META-INF/services/javax.imageio.spi.ImageReaderSpi
+	//
+	// final File file = TestData.file(this,
+	// "MODPM2007027122358.L3_000_EAST_MED");
+	// ImageReadParam irp = new ImageReadParam();
+	// irp.setSourceSubsampling(1, 1, 0, 0);
+	// // irp.setSourceRegion(new Rectangle(0, 512, 1024, 1024));
+	// int i = 2;
+	// final ParameterBlockJAI pbjImageRead = new ParameterBlockJAI(
+	// "ImageRead");
+	//
+	// pbjImageRead.setParameter("Input", file);
+	// pbjImageRead.setParameter("readParam", irp);
+	// pbjImageRead.setParameter("imageChoice", Integer.valueOf(i));
+	// final RenderedOp image = JAI.create("ImageRead", pbjImageRead);
+	// visualize(image, "");
+	// }
 
-		final File file = TestData.file(this,
-				"MODPM2007027122358.L3_000_EAST_MED");
-		ImageReadParam irp = new ImageReadParam();
-		irp.setSourceSubsampling(1, 1, 0, 0);
-		// irp.setSourceRegion(new Rectangle(0, 512, 1024, 1024));
-		int i = 2;
-		final ParameterBlockJAI pbjImageRead = new ParameterBlockJAI(
-				"ImageRead");
-
-		pbjImageRead.setParameter("Input", file);
-		pbjImageRead.setParameter("readParam", irp);
-		pbjImageRead.setParameter("imageChoice", Integer.valueOf(i));
-		final RenderedOp image = JAI.create("ImageRead", pbjImageRead);
-		visualize(image, "");
-	}
-
-	public void testManualRead() throws IOException {
-		final File file = TestData.file(this,
-				"MODPM2007027122358.L3_000_EAST_MED");
-
-		final JHDFImageReader reader = new JHDFImageReader(
-				new JHDFImageReaderSpi());
-		reader.setInput(file);
-
-		for (int i = 0; i < 5; i++) {
-			ImageReadParam irp2 = new ImageReadParam();
-			irp2.setSourceSubsampling(1, 2, 0, 0);
-			BufferedImage bi = null;
-			try {
-				bi = reader.read(i, irp2);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			visualize(bi, "");
-		}
+	/**
+	 * Visualization Methods
+	 */
+	protected static void visualize(final RenderedImage bi, String test) {
+		visualize(bi, test, false);
 	}
 
 	/**
 	 * Visualization Methods
 	 */
-	private static void visualize(final RenderedImage bi, String test) {
+	protected static void visualize(final RenderedImage bi, String test,
+			boolean rescaleImage) {
 		final JFrame frame = new JFrame(test);
-		frame.getContentPane().add(new ScrollingImagePanel(bi, 800, 600));
+
+		if (rescaleImage) {
+			ROI roi = new ROI(bi, -999);
+
+			ParameterBlock pb = new ParameterBlock();
+			pb.addSource(bi); // The source image
+			pb.add(roi); // The region of the image to scan
+
+			// Perform the extrema operation on the source image
+			RenderedOp op = JAI.create("extrema", pb);
+
+			// Retrieve both the maximum and minimum pixel value
+			double[][] extrema = (double[][]) op.getProperty("extrema");
+
+			final double[] scale = new double[] { (255) / (extrema[1][0] - extrema[0][0]) };
+			final double[] offset = new double[] { ((255) * extrema[0][0])
+					/ (extrema[0][0] - extrema[1][0]) };
+
+			ParameterBlock pbRescale = new ParameterBlock();
+			pbRescale.add(scale);
+			pbRescale.add(offset);
+			pbRescale.addSource(bi);
+			PlanarImage rescaledImage = (PlanarImage) JAI.create("Rescale",
+					pbRescale);
+
+			ParameterBlock pbConvert = new ParameterBlock();
+			pbConvert.addSource(rescaledImage);
+			pbConvert.add(DataBuffer.TYPE_BYTE);
+			PlanarImage convertedImage = JAI.create("format", pbConvert);
+			frame.getContentPane().add(
+					new ScrollingImagePanel(convertedImage, 800, 600));
+		} else
+			frame.getContentPane().add(new ScrollingImagePanel(bi, 800, 600));
+
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setTitle(test);
 		SwingUtilities.invokeLater(new Runnable() {
@@ -167,21 +106,4 @@ public class JHDFTest extends TestCase {
 		});
 	}
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite();
-
-		suite.addTest(new JHDFTest("testJaiRead"));
-		
-		suite.addTest(new JHDFTest("testMetadata"));
-
-		// suite.addTest(new JHDFTest("testJaiMultithreadingRead"));
-
-		// suite.addTest(new JHDFTest("testManualRead"));
-
-		return suite;
-	}
-
-	public static void main(java.lang.String[] args) {
-		junit.textui.TestRunner.run(suite());
-	}
 }

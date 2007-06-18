@@ -1,10 +1,7 @@
 package it.geosolutions.imageio.plugins.jhdf.aps;
 
 import it.geosolutions.imageio.plugins.jhdf.BaseHDFImageMetadata;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import it.geosolutions.imageio.plugins.jhdf.SubDatasetInfo;
 
 import javax.imageio.metadata.IIOInvalidTreeException;
 import javax.imageio.metadata.IIOMetadataNode;
@@ -24,7 +21,7 @@ public class APSImageMetadata extends BaseHDFImageMetadata{
 	 * private fields for metadata node building
 	 */
 
-	protected Map attributesMap = Collections.synchronizedMap(new HashMap(19));
+//	protected Map attributesMap = Collections.synchronizedMap(new HashMap(19));
 
 	public Node getAsTree(String formatName) {
 		if (formatName.equals(nativeMetadataFormatName)) {
@@ -44,18 +41,28 @@ public class APSImageMetadata extends BaseHDFImageMetadata{
 		root.appendChild(getCommonDatasetNode());
 		return root;
 	}
+	
+	public APSImageMetadata(){
+		super(
+				false,
+				nativeMetadataFormatName,
+				null,
+				null, null);
+	}
 
 	public APSImageMetadata(Dataset dataset) {
 		this();
 		initializeFromDataset(dataset);
 	}
 
-	public APSImageMetadata() {
-		super(
-				false,
-				nativeMetadataFormatName,
-				null,
-				null, null);
+	public APSImageMetadata(SubDatasetInfo sdInfo) {
+		this();
+		initializeFromDataset(sdInfo);
+	}
+
+	private void initializeFromDataset(SubDatasetInfo sdInfo) {
+		initializeCommonDatasetProperties(sdInfo);
+		//TODO: Add further initializations APS specific?
 	}
 
 	/**
@@ -67,11 +74,9 @@ public class APSImageMetadata extends BaseHDFImageMetadata{
 	 *            the imageIndex relying the required subdataset
 	 */
 	private void initializeFromDataset(final Dataset dataset) {
-		if (dataset == null)
-			return;
-
 		//Initializing common properties to each HDF dataset.
 		initializeCommonDatasetProperties(dataset);
+		//TODO: Add further initializations APS specific?
 	}
 
 	public boolean isReadOnly() {

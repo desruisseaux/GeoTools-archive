@@ -25,6 +25,8 @@ import org.w3c.dom.Node;
 public class APSStreamMetadata extends BaseHDFStreamMetadata {
 	public static final String nativeMetadataFormatName = "it.geosolutions.imageio.plugins.jhdf.aps.APSStreamMetadata_1.0";
 
+	//TODO: Provides to build a proper structure to get CP_Pixels, CP_Lines, CP_Latitudes, CP_Longitudes information
+	
 	protected Map stdFileAttribMap = Collections
 			.synchronizedMap(new LinkedHashMap(11));
 
@@ -190,12 +192,12 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 			metadataIt = root.getMetadata().iterator();
 
 			// number of supported attributes
-			final int nStdFileAttribMap = APSAttributes.STD_FA_ATTRIB.length;
-			final int nStdTimeAttribMap = APSAttributes.STD_TA_ATTRIB.length;
-			final int nStdSensorAttribMap = APSAttributes.STD_SA_ATTRIB.length;
-			final int nFileInputParamAttribMap = APSAttributes.PFA_IPA_ATTRIB.length;
-			final int nFileNavAttribMap = APSAttributes.PFA_NA_ATTRIB.length;
-			final int nFileInGeoCovAttribMap = APSAttributes.PFA_IGCA_ATTRIB.length;
+			final int nStdFileAttribMap = APSProperties.STD_FA_ATTRIB.length;
+			final int nStdTimeAttribMap = APSProperties.STD_TA_ATTRIB.length;
+			final int nStdSensorAttribMap = APSProperties.STD_SA_ATTRIB.length;
+			final int nFileInputParamAttribMap = APSProperties.PFA_IPA_ATTRIB.length;
+			final int nFileNavAttribMap = APSProperties.PFA_NA_ATTRIB.length;
+			final int nFileInGeoCovAttribMap = APSProperties.PFA_IGCA_ATTRIB.length;
 
 			synchronized (mapMutex) {
 				while (metadataIt.hasNext()) {
@@ -212,7 +214,7 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 					boolean found = false;
 					for (int k = 0; k < nStdFileAttribMap && !found; k++) {
 						// if matched
-						if (attribName.equals(APSAttributes.STD_FA_ATTRIB[k])) {
+						if (attribName.equals(APSProperties.STD_FA_ATTRIB[k])) {
 							stdFileAttribMap.put((String) attribName,
 									attribValue);
 							found = true;
@@ -221,7 +223,7 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 
 					for (int k = 0; k < nStdTimeAttribMap && !found; k++) {
 						// if matched
-						if (attribName.equals(APSAttributes.STD_TA_ATTRIB[k])) {
+						if (attribName.equals(APSProperties.STD_TA_ATTRIB[k])) {
 								stdTimeAttribMap.put((String) attribName,
 										attribValue);
 							found = true;
@@ -230,7 +232,7 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 
 					for (int k = 0; k < nStdSensorAttribMap && !found; k++) {
 						// if matched
-						if (attribName.equals(APSAttributes.STD_SA_ATTRIB[k])) {
+						if (attribName.equals(APSProperties.STD_SA_ATTRIB[k])) {
 								stdSensorAttribMap.put((String) attribName,
 										attribValue);
 							found = true;
@@ -239,10 +241,10 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 
 					for (int k = 0; k < nFileInputParamAttribMap && !found; k++) {
 						// if matched
-						if (attribName.equals(APSAttributes.PFA_IPA_ATTRIB[k])) {
+						if (attribName.equals(APSProperties.PFA_IPA_ATTRIB[k])) {
 								fileInputParamAttribMap.put((String) attribName,
 										attribValue);
-								if (attribName.equals(APSAttributes.PFA_IPA_PRODLIST))
+								if (attribName.equals(APSProperties.PFA_IPA_PRODLIST))
 									prodList = attribValue.split(",");
 							found = true;
 						}
@@ -250,10 +252,10 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 
 					for (int k = 0; k < nFileNavAttribMap && !found; k++) {
 						// if matched
-						if (attribName.equals(APSAttributes.PFA_NA_ATTRIB[k])) {
+						if (attribName.equals(APSProperties.PFA_NA_ATTRIB[k])) {
 								fileNavAttribMap.put((String) attribName,
 										attribValue);
-								if (attribName.equals(APSAttributes.PFA_NA_MAPPROJECTION))
+								if (attribName.equals(APSProperties.PFA_NA_MAPPROJECTION))
 									projectionDatasetName = attribValue;
 							found = true;
 						}
@@ -261,7 +263,7 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 
 					for (int k = 0; k < nFileInGeoCovAttribMap && !found; k++) {
 						// if matched
-						if (attribName.equals(APSAttributes.PFA_IGCA_ATTRIB[k])) {
+						if (attribName.equals(APSProperties.PFA_IGCA_ATTRIB[k])) {
 								fileInGeoCovAttribMap.put((String) attribName,
 										attribValue);
 							found = true;
@@ -294,7 +296,7 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 								//get dataset metadata
 								Iterator metadataDsIt = memberDS.getMetadata().iterator();
 								
-								final int nPdsAttrib = APSAttributes.PDSA_ATTRIB.length;
+								final int nPdsAttrib = APSProperties.PDSA_ATTRIB.length;
 								final LinkedHashMap pdsAttribMap = new LinkedHashMap(nPdsAttrib);
 								final LinkedHashMap pdsGenericAttribMap = new LinkedHashMap(10);
 								
@@ -311,7 +313,7 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 										boolean attributeFound = false;
 										for (int k = 0; k < nPdsAttrib && !attributeFound; k++) {
 											// if matched
-											if (attribName.equals(APSAttributes.PDSA_ATTRIB[k])) {
+											if (attribName.equals(APSProperties.PDSA_ATTRIB[k])) {
 													// putting the <attribut Name, attribute value>
 													// couple in the map
 													pdsAttribMap.put((String) attribName,
@@ -363,6 +365,7 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 		
 		if (datatypeClass == Datatype.CLASS_FLOAT && datatypeSize == 8){
 			double[] values = (double[])data;
+//			synchronized (projMap) {
 				//TODO: I need to build a parser or a formatter to properly interprete
 				// these settings
 				projMap.put("Code", Double.toString(values[0]));
@@ -394,6 +397,7 @@ public class APSStreamMetadata extends BaseHDFStreamMetadata {
 				projMap.put("Latitude_2", Double.toString(values[26]));
 				projMap.put("Delta", Double.toString(values[27]));
 				projMap.put("Aspect", Double.toString(values[28]));
+//			}
 		}
 		return projMap;
 	}

@@ -1,8 +1,28 @@
 package it.geosolutions.imageio.plugins.jhdf.aps;
 
+import it.geosolutions.imageio.plugins.jhdf.HDFProducts;
 
-public class APSAttributes {
 
+public abstract class APSProperties {
+	
+	public static class APSProducts extends HDFProducts{
+		public APSProducts(){
+			super(3);
+			HDFProduct sst = new HDFProduct("sst",1);
+			setHDFProduct(0, sst);
+			
+			HDFProduct chl_oc3 = new HDFProduct("chl_oc3",1);
+			setHDFProduct(1, chl_oc3);
+			
+			HDFProduct k_490 = new HDFProduct("K_490",1);
+			setHDFProduct(2, k_490);
+			
+			//TODO: Add more APS supported products
+		}
+	}
+
+	public final static APSProperties.APSProducts apsProducts = new APSProperties.APSProducts();
+	
 	/**
 	 * -------------------------
 	 * Standard: File Attributes

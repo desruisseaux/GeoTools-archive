@@ -8,6 +8,8 @@ import javax.imageio.spi.ImageReaderSpi;
 
 public abstract class BaseHDFImageReaderSpi extends ImageReaderSpi {
 
+	protected final static int[] spiMutex = new int[] { 0 };
+	
 	public BaseHDFImageReaderSpi(final String vendorName, String version,
 			String[] formatNames, String[] suffixes, String[] mimeTypes,
 			String readerCN, Class[] standard_input_type, String[] wsn,

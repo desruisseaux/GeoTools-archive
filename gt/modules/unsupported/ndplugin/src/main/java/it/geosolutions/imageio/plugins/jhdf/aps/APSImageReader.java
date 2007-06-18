@@ -14,6 +14,7 @@ import javax.imageio.spi.ImageReaderSpi;
 
 import ncsa.hdf.object.Attribute;
 import ncsa.hdf.object.Dataset;
+import ncsa.hdf.object.Datatype;
 import ncsa.hdf.object.Group;
 import ncsa.hdf.object.HObject;
 import ncsa.hdf.object.ScalarDS;
@@ -33,34 +34,9 @@ public class APSImageReader extends BaseHDFImageReader {
 	/** The Products Dataset List contained within the APS File */
 	private String[] productList;
 
-	private LinkedHashMap subDatasetsMap;
-
 	private APSImageMetadata imageMetadata;
 
 	private APSStreamMetadata streamMetadata;
-
-	/**
-	 * Given a specified datasetIndex, returns the proper Dataset.
-	 * 
-	 * @param datasetIndex
-	 *            an index specifying required coverage(subDataset).
-	 * 
-	 */
-	protected Dataset retrieveDataset(int datasetIndex) {
-		checkImageIndex(datasetIndex);
-		return getDataset(datasetIndex);
-
-	}
-
-	private Dataset getDataset(int datasetIndex) {
-		synchronized (mutex) {
-			Set set = subDatasetsMap.keySet();
-			Iterator it = set.iterator();
-			for (int j = 0; j < datasetIndex; j++)
-				it.next();
-			return (Dataset) subDatasetsMap.get((String) it.next());
-		}
-	}
 
 	private void checkImageIndex(int imageIndex) {
 		// TODO: Implements the imageIndex coherency check
@@ -95,9 +71,7 @@ public class APSImageReader extends BaseHDFImageReader {
 	 * 
 	 * @throws Exception
 	 */
-	private void initializeAPS() throws Exception {
-		// TODO: Add synchronization
-
+	protected void initializeProfile() throws Exception {
 		// Getting the Member List from the provided root
 		final List membersList = ((Group) root).getMemberList();
 		final Iterator metadataIt = root.getMetadata().iterator();
@@ -106,116 +80,123 @@ public class APSImageReader extends BaseHDFImageReader {
 		while (metadataIt.hasNext()) {
 			// get the attribute
 			final Attribute attrib = (Attribute) metadataIt.next();
-
+			final String attribName = attrib.getName();
 			// Checking if the attribute is related to the products list
-			if (attrib.getName().equalsIgnoreCase("prodList")) {
+			if (attribName.equalsIgnoreCase("prodList")) {
 				Object valuesList = attrib.getValue();
 				final String[] values = (String[]) valuesList;
 				String products[] = values[0].split(",");
-				products = refineProductList(products);
-				productList = products;
-				subdatasetsNum = products.length;
+				productList = refineProductList(products);
+				subdatasetsNum = productList.length;
 				break;
 			}
 		}
 		final int listSize = membersList.size();
-		
-		// Mutex on the subDatasetMap and sourceStructure initialization
-		synchronized (mutex) {
-			subDatasetsMap = new LinkedHashMap(subdatasetsNum);
-			sourceStructure = new SourceStructure(subdatasetsNum);
 
-			// Scanning all the datasets
-			for (int i = 0; i < listSize; i++) {
-				final HObject member = (HObject) membersList.get(i);
-				if (member instanceof ScalarDS) {
-					final String name = member.getName();
-					for (int j = 0; j < subdatasetsNum; j++) {
-	
-						// Checking if the actual dataset is a product.
-						if (name.equals(productList[j])) {
-							// Updating the subDatasetsMap map
-							subDatasetsMap.put(name, member);
-	
-							// retrieving subDataset main properties
-							// (Rank, dims, chunkSize)
-							final int rank = ((Dataset) member).getRank();
-							final long[] dims = ((Dataset) member).getDims();
-							final long[] chunkSize = ((Dataset) member)
-									.getChunkSize();
-	
-							final long[] subDatasetDims = new long[rank];
-							final long[] subDatasetChunkSize = new long[rank];
-							long datasetSize = 1;
-	
-							// copying values to avoid altering dataset fields.
-							for (int k = 0; k < rank; k++) {
-								subDatasetDims[k] = dims[k];
-								subDatasetChunkSize[k] = chunkSize[k];
-								if (k >= 2)
-									datasetSize *= dims[k];
-							}
-	
-							// instantiating a SubDatasetInfo
-							SubDatasetInfo dsInfo = new SubDatasetInfo(name, rank,
-									subDatasetDims, subDatasetChunkSize);
-							sourceStructure.setSubDatasetSize(j, datasetSize);
-							sourceStructure.setSubDatasetInfo(j, dsInfo);
+		subDatasetsMap = new LinkedHashMap(subdatasetsNum);
+		sourceStructure = new SourceStructure(subdatasetsNum);
+
+		// Scanning all the datasets
+		for (int i = 0; i < listSize; i++) {
+			final HObject member = (HObject) membersList.get(i);
+			if (member instanceof ScalarDS) {
+				final String name = member.getName();
+				for (int j = 0; j < subdatasetsNum; j++) {
+
+					// Checking if the actual dataset is a product.
+					if (name.equals(productList[j])) {
+						// Updating the subDatasetsMap map
+						subDatasetsMap.put(name, member);
+
+						// retrieving subDataset main properties
+						// (Rank, dims, chunkSize)
+						final int rank = ((Dataset) member).getRank();
+						final long[] dims = ((Dataset) member).getDims();
+
+						final long[] chunkSize = ((Dataset) member)
+								.getChunkSize();
+
+						final long[] subDatasetDims = new long[rank];
+						final long[] subDatasetChunkSize;
+						long datasetSize = 1;
+
+						// copying values to avoid altering dataset
+						// fields.
+						for (int k = 0; k < rank; k++) {
+							subDatasetDims[k] = dims[k];
+
+							// when rank > 2, X and Y are the last
+							// 2 coordinates. As an instance, for a
+							// 3D subdatasets, 3rd dimension has
+							// index 0.
+							if (k < rank - 2)
+								datasetSize *= dims[k];
 						}
+						if (chunkSize != null) {
+							subDatasetChunkSize = new long[rank];
+							for (int k = 0; k < rank; k++)
+								subDatasetChunkSize[k] = chunkSize[k];
+						} else
+							subDatasetChunkSize = null;
+
+						final Datatype dt = ((Dataset) member).getDatatype();
+						// instantiating a SubDatasetInfo
+						SubDatasetInfo dsInfo = new SubDatasetInfo(name, rank,
+								subDatasetDims, subDatasetChunkSize, dt);
+						sourceStructure.setSubDatasetSize(j, datasetSize);
+						sourceStructure.setSubDatasetInfo(j, dsInfo);
 					}
 				}
 			}
-			if (subdatasetsNum > 1)
-				sourceStructure.setHasSubDatasets(true);
 		}
 	}
 
 	/**
-	 * Delete unrequired products.
+	 * Reduces the product's list by removing not interesting ones. As an
+	 * instance the dataset containing l2_flags will be not presented.
 	 * 
 	 * @param products
-	 *            <code>String</code>'s array containing products within the
-	 *            APS source.
-	 * @return
+	 *            The originating <code>String</code> array containing the
+	 *            list of products to be checked.
+	 * @return A <code>String</code> array containing a refined list of
+	 *         products
 	 */
 	private String[] refineProductList(String[] products) {
-		final int productsNum = products.length;
-		int i = 0, j = 0;
+		final int inputProducts = products.length;
+		int j = 0;
+		final boolean[] accepted = new boolean[inputProducts];
 
-		// First scan to find _flags related datasets
-		for (; i < productsNum; i++)
-			if (!products[i].endsWith("_flags"))
+		for (int i = 0; i < inputProducts; i++)
+			if (isAcceptedItem(products[i])) {
+				accepted[i] = true;
 				j++;
-		// if no item found, simply return
-		if (j == productsNum)
+			} else
+				accepted[i] = false;
+		if (j == inputProducts)
 			return products;
-		else {
-			// Building a new String array containing only the required ones
-			final String[] refinedList = new String[j];
-			for (i = 0, j = 0; i < productsNum; i++)
-				if (!products[i].endsWith("_flags"))
-					refinedList[j++] = products[i];
-			return refinedList;
+		final String[] returnedProductsList = new String[j];
+		j = 0;
+		for (int i = 0; i < inputProducts; i++) {
+			if (accepted[i])
+				returnedProductsList[j++] = products[i];
 		}
+		return returnedProductsList;
 	}
 
-	protected void initialize() throws IOException {
-		super.initialize();
-		try {
-			if (root != null)
-				initializeAPS();
-		} catch (Exception e) {
-			IOException ioe = new IOException(
-					"Unable to Initialize data. Provided Input is not valid"
-							+ e);
-			ioe.initCause(e);
-			throw ioe;
-		}
+	protected boolean isAcceptedItem(String productName) {
+		// if (attribName.endsWith("_flags"))
+		// return false;
+		if (APSProperties.apsProducts.getHDFProduct(productName) != null)
+			return true;
+		return false;
 	}
 
 	public IIOMetadata getImageMetadata(int imageIndex) throws IOException {
+		checkImageIndex(imageIndex);
+		SubDatasetInfo sdInfo = sourceStructure
+				.getSubDatasetInfo(retrieveSubDatasetIndex(imageIndex));
 		if (imageMetadata == null)
-			imageMetadata = new APSImageMetadata(retrieveDataset(imageIndex));
+			imageMetadata = new APSImageMetadata(sdInfo);
 		return imageMetadata;
 	}
 
@@ -250,6 +231,10 @@ public class APSImageReader extends BaseHDFImageReader {
 		streamMetadata = null;
 		imageMetadata = null;
 		productList = null;
+	}
+
+	protected int getBandNumberFromProduct(String productName) {
+		return APSProperties.apsProducts.getHDFProduct(productName).getNBands();
 	}
 
 }
