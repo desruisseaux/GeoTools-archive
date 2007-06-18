@@ -40,6 +40,7 @@ import org.geotools.data.feature.FeatureAccess;
 import org.geotools.data.feature.FeatureSource2;
 import org.geotools.feature.iso.Types;
 import org.opengis.feature.Feature;
+import org.opengis.feature.FeatureCollection;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
@@ -296,7 +297,7 @@ public class BoreholeTest extends TestCase {
         // of results I get from a sql select on min_time_d = 'carnian'
         final int EXPECTED_RESULT_COUNT = 10;
 
-        Collection features = fSource.content();
+        FeatureCollection features = (FeatureCollection) fSource.content();
 
         int resultCount = features.size();
         String msg = "be sure difference in result count is not due to different dataset."
@@ -305,10 +306,12 @@ public class BoreholeTest extends TestCase {
 
         Feature feature;
         int count = 0;
-        for (Iterator it = features.iterator(); it.hasNext();) {
+        Iterator it = features.iterator();
+        for (; it.hasNext();) {
             feature = (Feature) it.next();
             count++;
         }
+        features.close(it);
         assertEquals(EXPECTED_RESULT_COUNT, count);
 
         /*

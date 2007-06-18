@@ -30,6 +30,10 @@ import org.geotools.data.Transaction;
 import org.geotools.data.feature.FeatureSource2;
 import org.geotools.data.feature.adapter.GTFeatureTypeAdapter;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.iso.collection.AbstractFeatureCollection;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.FeatureCollectionType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
@@ -153,23 +157,11 @@ class MappingFeatureSource implements FeatureSource2 {
         return content(filter, Integer.MAX_VALUE);
     }
     
+    /**
+     * @return {@link org.opengis.feature.FeatureCollection}
+     */
     public Collection content(final Filter filter, final int countLimit) {
-        Collection collection = new AbstractCollection() {
-            public Iterator iterator() {
-                Iterator iterator;
-                Query query = namedQuery(filter, countLimit);
-                try {
-                    if (0 == mappings.getGroupByAttNames().size()) {
-                        iterator = new DefaultMappingFeatureIterator(store, mappings, query);
-                    } else {
-                        iterator = new GroupingFeatureIterator(store, mappings, query);
-                    }
-                } catch (IOException e) {
-                    throw (RuntimeException) new RuntimeException().initCause(e);
-                }
-                return iterator;
-            }
-
+        Collection collection = new AbstractFeatureCollection(null, (FeatureCollectionType)null, null) {
             public int size() {
                 int count;
                 try {
@@ -192,6 +184,32 @@ class MappingFeatureSource implements FeatureSource2 {
                     count = -1;
                 }
                 return count;
+            }
+
+            /**
+             * @param close AbstractMappingFeatureIterator as returned by openIterator()
+             */
+            protected void closeIterator(Iterator close) throws IOException {
+                AbstractMappingFeatureIterator iterator = (AbstractMappingFeatureIterator) close;
+                iterator.close();
+            }
+
+            /**
+             * @return an AbstractMappingFeatureIterator
+             */
+            protected Iterator openIterator() throws IOException {
+                AbstractMappingFeatureIterator iterator;
+                Query query = namedQuery(filter, countLimit);
+                try {
+                    if (0 == mappings.getGroupByAttNames().size()) {
+                        iterator = new DefaultMappingFeatureIterator(store, mappings, query);
+                    } else {
+                        iterator = new GroupingFeatureIterator(store, mappings, query);
+                    }
+                } catch (IOException e) {
+                    throw (RuntimeException) new RuntimeException().initCause(e);
+                }
+                return iterator;
             }
         };
         return collection;

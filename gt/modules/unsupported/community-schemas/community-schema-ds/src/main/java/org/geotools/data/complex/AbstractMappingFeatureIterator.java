@@ -34,6 +34,7 @@ import org.geotools.feature.iso.AttributeFactoryImpl;
 import org.geotools.feature.iso.Types;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
+import org.opengis.feature.FeatureCollection;
 import org.opengis.feature.FeatureFactory;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
@@ -81,7 +82,7 @@ abstract class AbstractMappingFeatureIterator implements Iterator/* <Feature> */
      */
     protected FeatureFactory attf;
 
-    protected Collection features;
+    protected FeatureCollection features;
 
     protected Iterator sourceFeatures;
 
@@ -136,7 +137,7 @@ abstract class AbstractMappingFeatureIterator implements Iterator/* <Feature> */
 
         FeatureSource2 mappedSource = mapping.getSource();
 
-        features = mappedSource.content(filter);
+        features = (FeatureCollection) mappedSource.content(filter);
 
         this.sourceFeatures = features.iterator();
     }
@@ -163,8 +164,8 @@ abstract class AbstractMappingFeatureIterator implements Iterator/* <Feature> */
      * Closes the underlying FeatureIterator
      */
     public void close() {
-        AbstractMappingFeatureIterator.LOGGER.info("remember to propagate close()!!!");
-        // features.close(this.sourceFeatures);
+        //LOGGER.info("Closing surrogate iterator");
+        features.close(sourceFeatures);
     }
 
     /**

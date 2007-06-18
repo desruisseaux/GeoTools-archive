@@ -44,6 +44,7 @@ import org.geotools.filter.FilterFactoryImplNamespaceAware;
 import org.geotools.xlink.bindings.XLINK;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.Feature;
+import org.opengis.feature.FeatureCollection;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
@@ -380,7 +381,7 @@ public class TimeSeriesTest extends TestCase {
         // note that the expected result count is 6 - 3 sites x 2 phenomena
         final int EXPECTED_RESULT_COUNT = 6;
 
-        Collection features = fSource.content();
+        FeatureCollection features = (FeatureCollection) fSource.content();
 
         int resultCount = features.size();
         String msg = "be sure difference in result count is not due to different dataset.";
@@ -400,7 +401,8 @@ public class TimeSeriesTest extends TestCase {
         FilterFactory ffac = new FilterFactoryImplNamespaceAware(namespaces);
 
         final String phenomNamePath = "aw:relatedObservation/aw:PhenomenonTimeSeries/om:observedProperty/swe:Phenomenon/gml:name";
-        for (Iterator it = features.iterator(); it.hasNext();) {
+        Iterator it = features.iterator();
+        for (; it.hasNext();) {
             feature = (Feature) it.next();
             count++;
 
@@ -427,6 +429,7 @@ public class TimeSeriesTest extends TestCase {
             assertTrue(attributes.containsKey(xlinkHref));
             assertNotNull(attributes.get(xlinkHref));
         }
+        features.close(it);
 
         assertEquals(EXPECTED_RESULT_COUNT, count);
     }

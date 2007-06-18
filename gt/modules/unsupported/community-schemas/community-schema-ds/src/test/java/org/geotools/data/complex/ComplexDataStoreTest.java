@@ -44,6 +44,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.Feature;
+import org.opengis.feature.FeatureCollection;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureFactory;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -167,13 +168,18 @@ public class ComplexDataStoreTest extends TestCase {
 
     private ReferencedEnvelope getBounds(FeatureSource2 source) {
         ReferencedEnvelope boundingBox = new ReferencedEnvelope(DefaultGeographicCRS.WGS84);
-        Collection features = source.content();
+        FeatureCollection features = (FeatureCollection) source.content();
         Iterator iterator = features.iterator();
-        while (iterator.hasNext()) {
-            Feature f = (Feature) iterator.next();
-            BoundingBox bounds = f.getBounds();
-            boundingBox.include(bounds);
+        try {
+            while (iterator.hasNext()) {
+                Feature f = (Feature) iterator.next();
+                BoundingBox bounds = f.getBounds();
+                boundingBox.include(bounds);
+            }
+        } finally {
+            features.close(iterator);
         }
+        
         return boundingBox;
     }
 
@@ -187,7 +193,7 @@ public class ComplexDataStoreTest extends TestCase {
         assertTrue(describe instanceof AttributeDescriptor);
         assertEquals(targetType, ((AttributeDescriptor) describe).getType());
 
-        Collection reader = access.content();
+        FeatureCollection reader = (FeatureCollection) access.content();
         assertNotNull(reader);
 
         Iterator features = reader.iterator();
@@ -196,6 +202,8 @@ public class ComplexDataStoreTest extends TestCase {
         Feature complexFeature = (Feature) features.next();
         assertNotNull(complexFeature);
         assertEquals(targetType, complexFeature.getType());
+        
+        reader.close(features);
 
         org.opengis.filter.FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
         PropertyName expr;
@@ -262,7 +270,7 @@ public class ComplexDataStoreTest extends TestCase {
         Filter filter = ff.and(filterParameter, filterValue);
 
         Source complexSource = dataStore.access(targetName);
-        Collection features = complexSource.content(filter);
+        FeatureCollection features = (FeatureCollection) complexSource.content(filter);
 
         Iterator reader = features.iterator();
 
@@ -283,6 +291,7 @@ public class ComplexDataStoreTest extends TestCase {
             assertFalse(badFilter.evaluate(f));
             count++;
         }
+        features.close(reader);
         assertEquals(expectedCount, count);
     }
 
@@ -320,7 +329,7 @@ public class ComplexDataStoreTest extends TestCase {
         targetType = (FeatureType) sourceDescriptor.getType();
         assertNotNull(targetType);
 
-        Collection complexFeatures = complexSource.content();
+        FeatureCollection complexFeatures = (FeatureCollection) complexSource.content();
         assertNotNull(complexFeatures);
 
         final int EXPECTED_FEATURE_COUNT = 10;// as results from applying the
@@ -361,6 +370,7 @@ public class ComplexDataStoreTest extends TestCase {
             }
 
         }
+        complexFeatures.close(it);
         assertEquals(EXPECTED_FEATURE_COUNT, featureCount);
     }
 
@@ -382,17 +392,17 @@ public class ComplexDataStoreTest extends TestCase {
 
         FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
         Filter filter = ff.equals(ff.property("anzlic_no"), ff.literal("anzlic_no1"));
-        Collection complexFeatures = complexSource.content(filter);
+        FeatureCollection complexFeatures = (FeatureCollection) complexSource.content(filter);
         assertNotNull(complexFeatures);
 
         Iterator it = complexFeatures.iterator();
-        Name measurementName = Types.attributeName("measurement");
 
         while (it.hasNext()) {
             assertTrue(it.hasNext());
             Feature currFeature = (Feature) it.next();
             assertNotNull(currFeature);
         }
+        complexFeatures.close(it);
     }
 
 
@@ -452,7 +462,8 @@ public class ComplexDataStoreTest extends TestCase {
         assertEquals(Point.class, fromNode.getType().getBinding());
         assertEquals(Point.class, toNode.getType().getBinding());
 
-        Iterator features = source.content().iterator();
+        FeatureCollection content = (FeatureCollection) source.content();
+        Iterator features = content.iterator();
         int count = 0;
         final int expectedCount = 5;
         try {
@@ -464,6 +475,8 @@ public class ComplexDataStoreTest extends TestCase {
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
+        }finally{
+            content.close(features);
         }
         assertEquals("feature count", expectedCount, count);
     }

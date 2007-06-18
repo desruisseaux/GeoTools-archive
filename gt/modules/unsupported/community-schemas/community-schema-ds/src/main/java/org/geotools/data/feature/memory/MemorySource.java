@@ -17,9 +17,7 @@
 package org.geotools.data.feature.memory;
 
 import java.io.IOException;
-import java.util.AbstractCollection;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 
 import org.geotools.catalog.GeoResourceInfo;
@@ -28,10 +26,12 @@ import org.geotools.data.FeatureListener;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.feature.FeatureSource2;
-import org.geotools.data.feature.FilteringCollection;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.iso.collection.AbstractFeatureCollection;
+import org.geotools.feature.iso.collection.MemorySimpleFeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.Feature;
+import org.opengis.feature.type.FeatureCollectionType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
@@ -61,7 +61,9 @@ public class MemorySource implements FeatureSource2 {
     }
 
     public Collection content() {
-        return Collections.unmodifiableCollection(content);
+        MemorySimpleFeatureCollection collection = new MemorySimpleFeatureCollection(null, null);
+        collection.addAll(content);
+        return collection;
     }
 
     public Collection content(String query, String queryLanguage) {
@@ -72,39 +74,74 @@ public class MemorySource implements FeatureSource2 {
         return content(filter, Integer.MAX_VALUE);
     }
 
+    private class LimitingFeatureCollection extends AbstractFeatureCollection {
+
+        private final org.opengis.feature.FeatureCollection contents;
+
+        private final int maxFeatures;
+
+        private int cachedSize = Integer.MIN_VALUE;
+
+        public LimitingFeatureCollection(org.opengis.feature.FeatureCollection contents,
+                int maxFeatures) {
+            super(null, (FeatureCollectionType) null, null);
+            this.contents = contents;
+            this.maxFeatures = maxFeatures;
+        }
+
+        protected Iterator openIterator() throws IOException {
+            return new LimitingIterator();
+        }
+
+        protected void closeIterator(Iterator close) throws IOException {
+            LimitingIterator iterator = (LimitingIterator) close;
+            iterator.close();
+        }
+
+        public int size() {
+            if (cachedSize == Integer.MIN_VALUE) {
+                int contentSize = contents.size();
+                cachedSize = Math.min(contentSize, maxFeatures);
+            }
+            return cachedSize;
+        }
+
+        /**
+         * Iterator wraper that limits the number of features to maxFeatures
+         */
+        class LimitingIterator implements Iterator {
+            private int count = 0;
+
+            Iterator subject = LimitingFeatureCollection.this.contents.iterator();
+
+            public boolean hasNext() {
+                boolean hasNext = subject.hasNext();
+                return hasNext && count <= LimitingFeatureCollection.this.maxFeatures;
+            }
+
+            public Object next() {
+                Object next = subject.next();
+                count++;
+                return next;
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+
+            public void close() {
+                LimitingFeatureCollection.this.contents.close(subject);
+            }
+        }
+    }
+
     public Collection content(Filter filter, final int countLimit) {
-        final Collection content = new FilteringCollection(content(), filter);
-        Collection collection = content;
-        if (countLimit >= 0 && countLimit < Integer.MAX_VALUE) {
-            collection = new AbstractCollection() {
-                public Iterator iterator() {
-                    return new Iterator() {
-                        int count = 0;
-
-                        Iterator subject = content.iterator();
-
-                        public boolean hasNext() {
-                            boolean hasNext = subject.hasNext();
-                            return hasNext && count <= countLimit;
-                        }
-
-                        public Object next() {
-                            Object next = subject.next();
-                            count++;
-                            return next;
-                        }
-
-                        public void remove() {
-                            throw new UnsupportedOperationException();
-                        }
-                    };
-                }
-
-                public int size() {
-                    int contentSize = content.size();
-                    return Math.min(contentSize, countLimit);
-                }
-            };
+        org.opengis.feature.FeatureCollection collection = (org.opengis.feature.FeatureCollection) content();
+        if(!Filter.INCLUDE.equals(filter)){
+            collection = collection.subCollection(filter);
+        }
+        if(countLimit < Integer.MAX_VALUE){
+            collection = new LimitingFeatureCollection(collection, countLimit);
         }
         return collection;
     }
@@ -145,23 +182,28 @@ public class MemorySource implements FeatureSource2 {
     }
 
     private Envelope getBounds(Filter filter) throws IOException {
-        Collection collection = content(filter);
+        org.opengis.feature.FeatureCollection collection = (org.opengis.feature.FeatureCollection) content(filter);
         Feature f;
         ReferencedEnvelope env = new ReferencedEnvelope(this.type.getCRS());
-        for (Iterator it = collection.iterator(); it.hasNext();) {
+        Iterator it = collection.iterator();
+        for (; it.hasNext();) {
             f = (Feature) it.next();
             env.include(f.getBounds());
         }
+        collection.close(it);
         return env;
     }
 
     public int getCount(Query query) throws IOException {
-        Collection collection = content(query.getFilter());
+        org.opengis.feature.FeatureCollection collection;
+        collection = (org.opengis.feature.FeatureCollection) content(query.getFilter());
         int count = 0;
-        for (Iterator it = collection.iterator(); it.hasNext();) {
+        Iterator it = collection.iterator();
+        for (; it.hasNext();) {
             it.next();
             count++;
         }
+        collection.close(it);
         return count;
     }
 

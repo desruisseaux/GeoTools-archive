@@ -40,6 +40,7 @@ import org.geotools.filter.IllegalFilterException;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.Feature;
+import org.opengis.feature.FeatureCollection;
 import org.opengis.feature.FeatureFactory;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -141,15 +142,17 @@ public class MemoryDataAccessTest extends TestCase {
         TypeName typeName = wq_plusType.getName();
         FeatureSource2 source = (FeatureSource2) dataStore.access(typeName);
 
-        Collection features = source.content();
+        FeatureCollection features = (FeatureCollection) source.content();
         assertNotNull(features);
 
         int count = 0;
-        for (Iterator reader = features.iterator(); reader.hasNext();) {
+        Iterator reader = features.iterator();
+        for (; reader.hasNext();) {
             Feature object = (Feature) reader.next();
             assertNotNull(object);
             count++;
         }
+        features.close(reader);
         assertEquals(NUM_FEATURES, count);
     }
 
@@ -195,7 +198,7 @@ public class MemoryDataAccessTest extends TestCase {
         Filter filter = ff.or(determinand, project_no);
 
         Source source = dataStore.access(wq_plusType.getName());
-        Collection result = source.content(filter);
+        FeatureCollection result = (FeatureCollection) source.content(filter);
 
         assertNotNull(result);
 

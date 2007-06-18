@@ -16,12 +16,15 @@
  */
 package org.geotools.data.feature.adapter;
 
-import java.util.AbstractCollection;
+import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.iso.Types;
+import org.geotools.feature.iso.collection.AbstractSimpleFeatureCollection;
 import org.geotools.feature.iso.type.AttributeDescriptorImpl;
 import org.opengis.feature.simple.SimpleFeatureFactory;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -36,7 +39,7 @@ import org.opengis.feature.type.TypeName;
  * @source $URL$
  * @since 2.4
  */
-public class FeatureCollectionAdapter extends AbstractCollection {
+public class FeatureCollectionAdapter extends AbstractSimpleFeatureCollection {
 
 	private FeatureCollection gtFeatures;
 
@@ -49,6 +52,7 @@ public class FeatureCollectionAdapter extends AbstractCollection {
     private AttributeDescriptor featureDescriptor;
     
     public FeatureCollectionAdapter(SimpleFeatureType isoType, FeatureCollection features, SimpleFeatureFactory attributeFactory) {
+        super(null, null);
 		this.isoType = isoType;
 		this.gtFeatures = features;
 		
@@ -57,30 +61,30 @@ public class FeatureCollectionAdapter extends AbstractCollection {
         featureDescriptor = new AttributeDescriptorImpl(isoType, name, 0, Integer.MAX_VALUE, true);
     }
 
-	public Iterator iterator() {
-		final Iterator gtFeatureIterator = gtFeatures.iterator();
-
-		Iterator isoFeatures = new Iterator() {
-            int featureCount = 0;
-			public boolean hasNext() {
-				return featureCount <= maxFeatures && gtFeatureIterator.hasNext();
-			}
-
-			public Object next() {
-                featureCount++;
-				Feature gtFeature = (Feature) gtFeatureIterator.next();
-				org.opengis.feature.Feature isoFeature;
-				isoFeature = new ISOFeatureAdapter(gtFeature, isoType, attributeFactory, featureDescriptor);
-				return isoFeature;
-			}
-
-			public void remove() {
-				gtFeatureIterator.remove();
-			}
-
-		};
-		return isoFeatures;
-	}
+//	public Iterator iterator() {
+//		final Iterator gtFeatureIterator = gtFeatures.iterator();
+//
+//		Iterator isoFeatures = new Iterator() {
+//            int featureCount = 0;
+//			public boolean hasNext() {
+//				return featureCount <= maxFeatures && gtFeatureIterator.hasNext();
+//			}
+//
+//			public Object next() {
+//                featureCount++;
+//				Feature gtFeature = (Feature) gtFeatureIterator.next();
+//				org.opengis.feature.Feature isoFeature;
+//				isoFeature = new ISOFeatureAdapter(gtFeature, isoType, attributeFactory, featureDescriptor);
+//				return isoFeature;
+//			}
+//
+//			public void remove() {
+//				gtFeatureIterator.remove();
+//			}
+//
+//		};
+//		return isoFeatures;
+//	}
 
 	public int size() {
 		return gtFeatures.size();
@@ -92,5 +96,51 @@ public class FeatureCollectionAdapter extends AbstractCollection {
 
     public void setMaxFeatures(int maxFeatures) {
         this.maxFeatures = maxFeatures;
+    }
+
+    protected void closeIterator(Iterator close) throws IOException {
+        FeatureIteratorWrapper wrapper = (FeatureIteratorWrapper) close;
+        wrapper.close();
+    }
+
+    protected Iterator openIterator() throws IOException {
+        final FeatureIterator gtFeatureIterator = gtFeatures.features();
+        final FeatureIteratorWrapper wrapper = new FeatureIteratorWrapper(gtFeatureIterator);
+        return wrapper;
+    }
+
+    public Object operation(Name arg0, List arg1) {
+        return null;
+    }
+
+    private class FeatureIteratorWrapper implements Iterator{
+        final FeatureIterator gtFeatureIterator;
+        int featureCount = 0;
+    
+        public FeatureIteratorWrapper(FeatureIterator gtFeatureIterator){
+            this.gtFeatureIterator = gtFeatureIterator;
+        }
+
+        public boolean hasNext() {
+            return featureCount <= maxFeatures && gtFeatureIterator.hasNext();
+        }
+
+        public Object next() {
+            featureCount++;
+            Feature gtFeature = (Feature) gtFeatureIterator.next();
+            org.opengis.feature.Feature isoFeature;
+            isoFeature = new ISOFeatureAdapter(gtFeature, isoType, attributeFactory,
+                    featureDescriptor);
+            return isoFeature;
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+        
+        public void close(){
+            this.gtFeatureIterator.close();
+        }
+
     }
 }

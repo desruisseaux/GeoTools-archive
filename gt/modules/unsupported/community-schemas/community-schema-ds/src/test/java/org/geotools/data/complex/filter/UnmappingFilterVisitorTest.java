@@ -45,6 +45,7 @@ import org.geotools.feature.iso.Types;
 import org.geotools.filter.FilterFactoryImplNamespaceAware;
 import org.geotools.gml3.bindings.GML;
 import org.opengis.feature.Feature;
+import org.opengis.feature.FeatureCollection;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
@@ -167,10 +168,11 @@ public class UnmappingFilterVisitorTest extends TestCase {
         Filter unrolled = (Filter) fidFilter.accept(visitor, null);
         assertNotNull(unrolled);
 
-        Collection results = mapping.getSource().content(unrolled);
+        FeatureCollection results = (FeatureCollection) mapping.getSource().content(unrolled);
         assertEquals(1, results.size());
         Iterator features = results.iterator();
         SimpleFeature unmappedFeature = (SimpleFeature) features.next();
+        results.close(features);
         assertNotNull(unmappedFeature);
         Object object = unmappedFeature.get("station_no");
         assertEquals(fid, object);
@@ -204,7 +206,10 @@ public class UnmappingFilterVisitorTest extends TestCase {
 
         this.visitor = new UnmappingFilterVisitor(this.mapping);
 
-        Feature sourceFeature = (Feature) mapping.getSource().content().iterator().next();
+        FeatureCollection content = (FeatureCollection) mapping.getSource().content();
+        Iterator iterator = content.iterator();
+        Feature sourceFeature = (Feature) iterator.next();
+        content.close(iterator);
 
         String fid = sourceFeature.getID();
 
@@ -214,9 +219,11 @@ public class UnmappingFilterVisitorTest extends TestCase {
         assertNotNull(unrolled);
         assertTrue(unrolled instanceof Id);
 
-        Collection results = mapping.getSource().content(unrolled);
+        FeatureCollection results = (FeatureCollection) mapping.getSource().content(unrolled);
         assertEquals(1, results.size());
-        SimpleFeature unmappedFeature = (SimpleFeature) results.iterator().next();
+        iterator = results.iterator();
+        SimpleFeature unmappedFeature = (SimpleFeature) iterator.next();
+        results.close(iterator);
         assertEquals(fid, unmappedFeature.getID());
     }
 
