@@ -406,6 +406,8 @@ public class MemoryDataAccess_GTAPI_Test extends DataTestCase {
 
         reader = data.getFeatureReader(new DefaultQuery("road", rd1Filter), t);
         assertEquals(1, count(reader));
+        
+        t.close();
     }
 
     void assertCovered(Feature[] features, FeatureReader reader)
@@ -806,6 +808,9 @@ public class MemoryDataAccess_GTAPI_Test extends DataTestCase {
         assertTrue(coversLax(reader, FINAL));
         reader = data.getFeatureReader(new DefaultQuery("road"), t2);
         assertTrue(coversLax(reader, FINAL));
+        
+        t1.close();
+        t2.close();
     }
 
     /**
@@ -872,6 +877,8 @@ public class MemoryDataAccess_GTAPI_Test extends DataTestCase {
         reader.close();
         assertEquals(new Coordinate(30, 0), geom1.getCoordinates()[0]);
         assertEquals(new Coordinate(30, 1), geom1.getCoordinates()[1]);
+        
+        t1.close();
     }
 
     // Feature Source Testing
@@ -1068,6 +1075,9 @@ public class MemoryDataAccess_GTAPI_Test extends DataTestCase {
         assertTrue(coversLax(road.getFeatures().features(), FINAL));
         assertTrue(coversLax(road1.getFeatures().features(), FINAL));
         assertTrue(coversLax(road2.getFeatures().features(), FINAL));
+        
+        t1.close();
+        t2.close();
     }
 
     boolean isLocked(String typeName, String fid) {
@@ -1083,7 +1093,8 @@ public class MemoryDataAccess_GTAPI_Test extends DataTestCase {
         FeatureStore store2 = (FeatureStore) data
                 .getFeatureSource(roadFeatures[0].getFeatureType()
                         .getTypeName());
-        store1.setTransaction(new DefaultTransaction());
+        Transaction t1 = new DefaultTransaction();
+        store1.setTransaction(t1);
         class Listener implements FeatureListener {
 
             String name;
@@ -1168,6 +1179,8 @@ public class MemoryDataAccess_GTAPI_Test extends DataTestCase {
         assertEquals(feature.getBounds(), event.getBounds());
         assertEquals(FeatureEvent.FEATURES_ADDED, event.getEventType());
         assertEquals(0, listener2.events.size());
+        
+        t1.close();
     }
 
     //
@@ -1206,6 +1219,7 @@ public class MemoryDataAccess_GTAPI_Test extends DataTestCase {
         }
         t.addAuthorization(lock.getAuthorization());
         road.unLockFeatures();
+        t.close();
     }
 
     public void testLockFeatureInteraction() throws IOException {
@@ -1255,6 +1269,9 @@ public class MemoryDataAccess_GTAPI_Test extends DataTestCase {
         assertFalse(isLocked("road", "road.rd1"));
         assertFalse(isLocked("road", "road.rd2"));
         assertFalse(isLocked("road", "road.rd3"));
+        
+        t1.close();
+        t2.close();
     }
 
     /**
