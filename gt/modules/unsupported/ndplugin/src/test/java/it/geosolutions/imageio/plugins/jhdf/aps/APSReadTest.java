@@ -33,7 +33,13 @@ public class APSReadTest extends JHDFTest {
 		 * @throws IOException
 		 */
 		public void testMetadata() throws IOException {
-			final File file = TestData.file(this,"MODPM2007027121858.L3_000_EAST_MED");
+			//this Test File is available at 
+			//ftp://ftp.geo-solutions.it/incoming/MODPM2007027121858.L3_000_EAST_MED.zip
+			//as anonymous ftp access.
+			
+			//TODO: build an utility to auto-download and unzip this file in 
+			//the setUp method.
+			final File file = TestData.file(this,"MODPM2007027121858.L3_000_EAST_MED.HDF");
 			final ParameterBlockJAI pbjImageRead = new ParameterBlockJAI(
 			"ImageRead");
 			pbjImageRead.setParameter("Input", file);
@@ -59,7 +65,13 @@ public class APSReadTest extends JHDFTest {
 		 * @throws IOException
 		 */
 		public void testJaiRead() throws IOException {
-			final File file = TestData.file(this,"MODPM2007027121858.L3_000_EAST_MED");
+//			this Test File is available at 
+			//ftp://ftp.geo-solutions.it/incoming/MODPM2007027121858.L3_000_EAST_MED.zip
+			//as anonymous ftp access.
+			
+			//TODO: build an utility to auto-download and unzip this file in 
+			//the setUp method.
+			final File file = TestData.file(this,"MODPM2007027121858.L3_000_EAST_MED.HDF");
 			for (int i = 0; i < 3; i++) {
 				ImageReader reader = new APSImageReader(new APSImageReaderSpi());
 				reader.setInput(file);

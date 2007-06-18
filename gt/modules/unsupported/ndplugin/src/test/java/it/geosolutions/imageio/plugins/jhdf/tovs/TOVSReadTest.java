@@ -4,13 +4,8 @@ import it.geosolutions.imageio.plugins.jhdf.JHDFTest;
 import it.geosolutions.imageio.plugins.slices2D.SliceImageReader;
 import it.geosolutions.resources.TestData;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
@@ -30,63 +25,22 @@ public class TOVSReadTest extends JHDFTest {
 		super(name);
 	}
 
-	protected void setUp() throws Exception {
-		super.setUp();
-		try{
-			final File file = TestData.file(this,"TOVS_5DAYS_AM_B870511.E870515_NG.HDF");
-		}
-		catch (FileNotFoundException ioe){
-			final File tempFile;
-			final URL url = new URL("ftp://anonymous:pass@ftp.geo-solutions.it/incoming/config.php;type=i");
-			
-			tempFile = File.createTempFile("cached", ".tmp", null);
-
-			// //
-			//
-			// getting an InputStream from the connection to the
-			// object referred to by the URL
-			//
-			// //
-			final InputStream is = url.openConnection().getInputStream();
-
-			// //
-			//
-			// Preparing a FileOutputStream where to write all data
-			// we will read by the InputStream
-			//
-			// //
-			final BufferedOutputStream os = new BufferedOutputStream(
-					new FileOutputStream(tempFile));
-			final byte b[] = new byte[65536];
-			int num = 0;
-
-			// "read from InputStream -> write to FileOutputStream"
-			// operation
-			while ((num = is.read(b)) > 0) {
-				os.write(b, 0, num);
-			}
-
-			// closing streams and flushing the outputStream
-			os.flush();
-			is.close();
-			os.close();
-		}
-	}
-	
 	/**
 	 * 
 	 * @throws IOException
 	 */
 
 	public void testJaiTOVSRead() throws IOException {
-		for (int i = 0; i < 41; i++) {
+		for (int i = 0; i < 45; i++) {
 			//this Test File is available at 
-			//ftp://ftp.geo-solutions.it/incoming/TOVS_5DAYS_AM_B870511.E870515_NG.HDF.zip
+			//ftp://ftp.geo-solutions.it/incoming/TOVS_5DAYS_PM_B790625.E790629_TN.zip
 			//as anonymous ftp access.
-			//TODO: building an utility to auto-download and unzip this file.
+			
+			//TODO: build an utility to auto-download and unzip this file in 
+			//the setUp method.
 			
 			final File file = TestData.file(this,
-					"TOVS_5DAYS_AM_B870511.E870515_NG.HDF");
+					"TOVS_5DAYS_PM_B790625.E790629_TN.HDF");
 			final ImageReader reader = new TOVSImageReader(
 					new TOVSImageReaderSpi());
 			reader.setInput(file);
