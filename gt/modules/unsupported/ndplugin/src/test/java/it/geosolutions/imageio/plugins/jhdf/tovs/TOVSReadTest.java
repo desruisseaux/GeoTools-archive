@@ -7,7 +7,6 @@ import it.geosolutions.resources.TestData;
 import java.io.File;
 import java.io.IOException;
 
-import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
 import javax.media.jai.JAI;
@@ -57,10 +56,7 @@ public class TOVSReadTest extends JHDFTest {
 
 			final ParameterBlockJAI pbjImageRead = new ParameterBlockJAI(
 					"ImageRead");
-			ImageReadParam irp = new ImageReadParam();
-			irp.setSourceSubsampling(1, 1, 0, 0);
 			pbjImageRead.setParameter("reader", reader);
-			pbjImageRead.setParameter("readParam", irp);
 			pbjImageRead.setParameter("imageChoice", Integer.valueOf(i));
 
 			final RenderedOp image = JAI.create("ImageRead", pbjImageRead);

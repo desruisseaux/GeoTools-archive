@@ -35,39 +35,32 @@ import ncsa.hdf.object.HObject;
 
 public abstract class BaseHDFImageReader extends SliceImageReader {
 
+	/** A <code>LinkedHashMap</code> having all the <code>Dataset</code>s 
+	 * contained within the source */
 	protected LinkedHashMap subDatasetsMap;
 
+	/** A mutex used to synchronize operations */
 	protected final int[] mutex = new int[] { 0 };
 	
 	/**
-	 * returns a subDataset given a datasetIndex
+	 * Returns a subDataset given a subDatasetIndex
 	 * 
-	 * @param imageIndex
-	 *            The index of the required SubDataset
-	 * @return the required SubDataset
+	 * @param subDatasetIndex
+	 *            The index of the required subDataset
+	 * @return the required subDataset
 	 */
-	protected Dataset getDataset(int datasetIndex) {
+	protected Dataset retrieveDataset(int subDatasetIndex) {
 		synchronized (mutex) {
 			Set set = subDatasetsMap.keySet();
 			Iterator it = set.iterator();
-			for (int j = 0; j < datasetIndex; j++)
+			for (int j = 0; j < subDatasetIndex; j++)
 				it.next();
 			return (Dataset) subDatasetsMap.get((String) it.next());
 		}
 	}
 	
-	/**
-	 * Given a specified datasetIndex, returns the proper subDataset.
-	 * 
-	 * @param datasetIndex
-	 *            an index specifying required coverage(subDataset).
-	 * 
-	 */
-	protected Dataset retrieveDataset(int datasetIndex) {
-		// TODO: implement checkImageIndex
-//		checkImageIndex(datasetIndex);
-		return getDataset(datasetIndex);
-
+	private void checkImageIndex(int imageIndex) {
+		//TODO: implements this to handle supported indexes
 	}
 
 	// TODO: should be moved in the aboveLayer?
@@ -193,7 +186,6 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 	 */
 	protected abstract void initializeProfile() throws Exception;
 	
-	
 	protected abstract int getBandNumberFromProduct(final String productName);
 
 	/** The originating FileFormat */
@@ -225,9 +217,7 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 	public int getWidth(final int imageIndex) throws IOException {
 		if (!isInitialized)
 			initialize();
-		SubDatasetInfo sdInfo = sourceStructure
-				.getSubDatasetInfo(retrieveSubDatasetIndex(imageIndex));
-		return sdInfo.getWidth();
+		return sourceStructure.getSubDatasetInfo(retrieveSubDatasetIndex(imageIndex)).getWidth();
 	}
 
 	/**
@@ -241,9 +231,8 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 	public int getHeight(final int imageIndex) throws IOException {
 		if (!isInitialized)
 			initialize();
-		SubDatasetInfo sdInfo = sourceStructure
-				.getSubDatasetInfo(retrieveSubDatasetIndex(imageIndex));
-		return sdInfo.getHeight();
+		return sourceStructure
+				.getSubDatasetInfo(retrieveSubDatasetIndex(imageIndex)).getHeight();
 	}
 
 	/**
@@ -538,7 +527,7 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 		if (!isInitialized)
 			initialize();
 
-		SubDatasetInfo sdInfo = sourceStructure
+		final SubDatasetInfo sdInfo = sourceStructure
 				.getSubDatasetInfo(retrieveSubDatasetIndex(imageIndex));
 
 		final Datatype dt = sdInfo.getDatatype();
@@ -556,7 +545,7 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 
 		// Variable used to specify the data type for the storing samples
 		// of the SampleModel
-		int bufferType = HDFUtilities.getBufferTypeFromDataType(dt);
+		final int bufferType = HDFUtilities.getBufferTypeFromDataType(dt);
 		final SampleModel sm = new BandedSampleModel(bufferType, width, height,
 				width, banks, offsets);
 
@@ -567,12 +556,20 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 		return l.iterator();
 	}
 
+	/**
+     * Returns the height of a tile in the given image.
+     * 
+     * @param imageIndex the index of the image to be queried.
+     *
+     * @return the height of a tile.
+     *
+     * @exception IOException if an error occurs during reading.
+     */
 	public int getTileHeight(final int imageIndex) throws IOException {
 		if (!isInitialized)
 			initialize();
-		final int subDatasetIndex = retrieveSubDatasetIndex(imageIndex);
-		SubDatasetInfo sdInfo = sourceStructure
-				.getSubDatasetInfo(subDatasetIndex);
+		final SubDatasetInfo sdInfo = sourceStructure
+				.getSubDatasetInfo(retrieveSubDatasetIndex(imageIndex));
 		final long[] chunkSize = sdInfo.getChunkSize();
 
 		// TODO: Change this behavior
@@ -583,12 +580,20 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 			return Math.min(512, sdInfo.getHeight());
 	}
 
+	/**
+     * Returns the width of a tile in the given image.
+     * 
+     * @param imageIndex the index of the image to be queried.
+     *
+     * @return the width of a tile.
+     *
+     * @exception IOException if an error occurs during reading.
+     */
 	public int getTileWidth(final int imageIndex) throws IOException {
 		if (!isInitialized)
 			initialize();
-		final int subDatasetIndex = retrieveSubDatasetIndex(imageIndex);
-		SubDatasetInfo sdInfo = sourceStructure
-				.getSubDatasetInfo(subDatasetIndex);
+		final SubDatasetInfo sdInfo = sourceStructure
+		.getSubDatasetInfo(retrieveSubDatasetIndex(imageIndex));
 		final long[] chunkSize = sdInfo.getChunkSize();
 
 		// TODO: Change this behavior
@@ -818,6 +823,7 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 	 * @return the index of the subDataset containing that image.
 	 */
 	protected int retrieveSubDatasetIndex(int imageIndex) {
+		checkImageIndex(imageIndex);
 		final int nTotalDataset = sourceStructure.getNSubdatasets();
 		final long[] subDatasetSizes = sourceStructure.getSubDatasetSizes();
 		int iSubdataset = 0;
