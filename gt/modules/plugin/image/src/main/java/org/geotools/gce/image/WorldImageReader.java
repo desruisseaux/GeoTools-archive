@@ -149,8 +149,12 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 				// URL that point to a file
 				final URL sourceURL = ((URL) input);
 				if (sourceURL.getProtocol().compareToIgnoreCase("file") == 0) {
-					this.source = input = new File(URLDecoder.decode(sourceURL
-							.getFile(), "UTF-8"));
+					String auth = sourceURL.getAuthority();
+					String path = sourceURL.getPath();
+					if (auth == null && !auth.equals("")) {
+						path = "//"+auth+path;
+					}
+					this.source = input = new File(URLDecoder.decode(path, "UTF-8"));
 				} else if (sourceURL.getProtocol().equalsIgnoreCase("http")) {
 					// // getting a stream to the reader
 					// this.source = sourceURL.openStream();
@@ -161,10 +165,9 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 					//
 					// /////////////////////////////////////////////////////////////////////
 					wmsRequest = WMSRequest(input);
-
 				}
-
 			}
+
 			// //
 			//
 			// Name, path, etc...
@@ -552,11 +555,17 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 			// getting name for the prj file
 			final String sourceAsString;
 
-			if (source instanceof File) {
-				sourceAsString = ((File) source).getAbsolutePath();
-			} else {
-				sourceAsString = ((URL) source).getFile();
-			}
+            if (source instanceof File) {
+                sourceAsString = ((File) source).getAbsolutePath();
+            } else {
+            	String auth = ((URL) source).getAuthority();
+            	String path = ((URL) source).getPath();
+            	if (auth != null && !auth.equals("")) {
+            		sourceAsString = "//"+auth+path;
+            	} else {
+            		sourceAsString = path;
+            	}
+            }
 
 			final int index = sourceAsString.lastIndexOf(".");
 			final StringBuffer base = new StringBuffer(sourceAsString

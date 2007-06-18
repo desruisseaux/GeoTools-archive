@@ -106,11 +106,18 @@ public final class WorldImageWriter extends AbstractGridCoverageWriter
 			destination = new File((String) destination);
 		} else if (this.destination instanceof URL) {
 			final URL url = ((URL) destination);
-			if (url.getProtocol().equalsIgnoreCase("file"))
-				destination = new File(url.getPath());
-			else
+			if (url.getProtocol().equalsIgnoreCase("file")) {
+				String auth = url.getAuthority();
+				String path = url.getPath();
+				if (auth != null && !auth.equals("")) {
+					path = "//"+auth+path;
+				}
+			
+				destination = new File(path);
+			} else {
 				throw new RuntimeException(
 						"WorldImageWriter::write:It is not possible writing to an URL!");
+			}
 		} /*
 			 * else if (!(destination instanceof ImageOutputStream) &&
 			 * !(destination instanceof File)) throw new RuntimeException(

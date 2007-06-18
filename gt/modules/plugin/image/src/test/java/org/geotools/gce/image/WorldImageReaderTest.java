@@ -16,9 +16,11 @@
  */
 package org.geotools.gce.image;
 
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import java.util.logging.Logger;
 
 import junit.textui.TestRunner;
@@ -50,6 +52,28 @@ public class WorldImageReaderTest extends WorldImageBaseTestCase {
 	public WorldImageReaderTest(String arg0) {
 		super(arg0);
 	}
+    
+	/*
+	 * Can't test this, as these files aren't actually expected to exist.
+	 * The constructor tries to create an inputStream and then throws
+	 * an exception. Re-enable this if that behaviour changes, or if you
+	 * feel like writing a windows-only test.
+	 */
+//    public void testSource() throws Exception {
+//    	URL altDrive = new URL("file://E:/somedir/foo.tif");
+//    	WorldImageReader r = new WorldImageReader(altDrive);
+//    	File result = (File) r.getSource();
+//    	String s1 = result.getAbsolutePath();
+//    	String s2 = "E:\\somedir\\foo.tif";
+//    	assertTrue(s1.equals(s2));
+//    	
+//    	URL networkShare = new URL("file://borkServer/somedir/foo.tif");
+//    	r = new WorldImageReader(networkShare);
+//    	result = (File) r.getSource();
+//    	s1 = result.getAbsolutePath();
+//    	s2 = "\\\\borkServer\\somedir\\foo.tif";
+//    	assertTrue(s1.equals(s2));
+//    }
 
 	/*
 	 * @see TestCase#setUp()
