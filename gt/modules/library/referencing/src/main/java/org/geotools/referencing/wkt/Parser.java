@@ -66,6 +66,8 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.OperationMethod;
 
 // Geotools dependencies
+import org.geotools.factory.GeoTools;
+import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.NamedIdentifier;
@@ -75,7 +77,7 @@ import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.datum.DefaultVerticalDatum;
 import org.geotools.referencing.cs.AbstractCS;
 import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
-import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.referencing.factory.ReferencingFactoryContainer;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -130,7 +132,7 @@ public class Parser extends MathTransformParser {
      * Set of helper methods working on factories. Will be constructed
      * only the first time it is needed.
      */
-    private transient FactoryGroup factories;
+    private transient ReferencingFactoryContainer factories;
 
     /**
      * The list of {@linkplain AxisDirection axis directions} from their name.
@@ -153,10 +155,10 @@ public class Parser extends MathTransformParser {
      */
     public Parser(final Symbols symbols) {
         this(symbols,
-             ReferencingFactoryFinder.getDatumFactory        (null),
-             ReferencingFactoryFinder.getCSFactory           (null),
-             ReferencingFactoryFinder.getCRSFactory          (null),
-             ReferencingFactoryFinder.getMathTransformFactory(null));
+             ReferencingFactoryFinder.getDatumFactory        (GeoTools.getDefaultHints()),
+             ReferencingFactoryFinder.getCSFactory           (GeoTools.getDefaultHints()),
+             ReferencingFactoryFinder.getCRSFactory          (GeoTools.getDefaultHints()),
+             ReferencingFactoryFinder.getMathTransformFactory(GeoTools.getDefaultHints()));
     }
     
     /**
@@ -165,7 +167,7 @@ public class Parser extends MathTransformParser {
      * @param symbols   The symbols for parsing and formatting numbers.
      * @param factories The factories to use.
      */
-    public Parser(final Symbols symbols, final FactoryGroup factories) {
+    public Parser(final Symbols symbols, final ReferencingFactoryContainer factories) {
         this(symbols,
              factories.getDatumFactory(),
              factories.getCSFactory(),
@@ -885,7 +887,13 @@ public class Parser extends MathTransformParser {
             }
             element.close();
             if (factories == null) {
-                factories = new FactoryGroup(datumFactory, csFactory, crsFactory, mtFactory);
+                Map hints = new HashMap();
+                hints.put( Hints.DATUM_FACTORY, datumFactory );
+                hints.put( Hints.CS_FACTORY, csFactory );
+                hints.put( Hints.CRS_FACTORY, crsFactory );
+                hints.put( Hints.MATH_TRANSFORM_FACTORY, mtFactory );
+                
+                factories = new ReferencingFactoryContainer( new Hints(hints));
             }
             return factories.createProjectedCRS(properties, geoCRS, null, projection,
                     csFactory.createCartesianCS(properties, axis0, axis1));

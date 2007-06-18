@@ -21,6 +21,7 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import javax.units.NonSI;
@@ -56,9 +57,11 @@ import org.opengis.util.GenericName;
 import org.opengis.util.ScopedName;
 
 // Geotools dependencies
+import org.geotools.factory.Hints;
 import org.geotools.referencing.factory.DatumAliases;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.factory.GeotoolsFactory;
+import org.geotools.referencing.factory.ReferencingFactoryContainer;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.cs.DefaultEllipsoidalCS;
 import org.geotools.referencing.datum.DefaultEllipsoid;
@@ -182,8 +185,16 @@ public final class FactoriesTest extends TestCase {
         out.println(cartCS); // No WKT for coordinate systems
             
         final ProjectedCRS projCRS;
-        projCRS = new FactoryGroup(datumFactory, csFactory, crsFactory, mtFactory).
-             createProjectedCRS(name("Great_Britian_National_Grid"), geogCRS, null, param, cartCS);
+        
+        Map hints = new HashMap();
+        hints.put( Hints.DATUM_FACTORY, datumFactory );
+        hints.put( Hints.CS_FACTORY, csFactory );
+        hints.put( Hints.CRS_FACTORY, crsFactory );
+        hints.put( Hints.MATH_TRANSFORM_FACTORY, mtFactory );
+        
+        ReferencingFactoryContainer container = new ReferencingFactoryContainer( new Hints(hints));        
+        projCRS = container.createProjectedCRS(name("Great_Britian_National_Grid"), geogCRS, null, param, cartCS);
+        
         out.println();
         out.println("create Coodinate System....9: ");
         out.println(projCRS.toWKT());
