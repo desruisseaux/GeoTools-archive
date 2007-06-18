@@ -1,21 +1,10 @@
 package org.geotools.referencing.factory.epsg.oracle;
 
 import java.sql.Connection;
-import java.util.HashMap;
 
-import javax.naming.Context;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
-import javax.sql.rowset.CachedRowSet;
 
-import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
-import org.geotools.factory.JNDI;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.datum.DefaultGeodeticDatum;
-import org.geotools.referencing.factory.epsg.FactoryOnOracleSQL;
 import org.geotools.referencing.factory.epsg.FactoryUsingOracleSQL;
-import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.datum.GeodeticDatum;
 
