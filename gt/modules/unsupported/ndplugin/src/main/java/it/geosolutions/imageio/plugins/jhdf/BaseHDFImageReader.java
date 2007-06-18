@@ -237,8 +237,7 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 
 	/**
 	 * Reads the image indexed by <code>imageIndex</code> and returns it as a
-	 * complete <code>BufferedImage</code>, using a supplied
-	 * <code>ImageReadParam</code>.
+	 * <code>BufferedImage</code>, using a supplied <code>ImageReadParam</code>
 	 * 
 	 * @param imageIndex
 	 *            the index of the image to be retrieved.
@@ -259,13 +258,13 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 
 		if (!isInitialized)
 			initialize();
+		
+		//Getting indexing information
 		final int[] slice2DindexCoordinates = getSlice2DIndexCoordinates(imageIndex);
 		final int subDatasetIndex = slice2DindexCoordinates[0];
 		final Dataset dataset = retrieveDataset(subDatasetIndex);
 
 		BufferedImage bimage = null;
-		dataset.init();
-
 		SubDatasetInfo sdInfo = sourceStructure
 				.getSubDatasetInfo(subDatasetIndex);
 
@@ -355,6 +354,7 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 		dstHeight = ((dstHeight - 1) / ySubsamplingFactor) + 1;
 
 		// getting dataset properties.
+		dataset.init();
 		final long[] start = dataset.getStartDims();
 		final long[] stride = dataset.getStride();
 		final long[] sizes = dataset.getSelectedDims();
@@ -370,7 +370,7 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 		if (rank > 2) {
 			// Setting indexes of dimensions > 2.
 			for (int i = 0; i < rank - 2; i++) {
-				// TODO: Need to change indexing logic
+				// TODO: Need to change indexing logic?
 				start[i] = slice2DindexCoordinates[i + 1];
 				sizes[i] = 1;
 				stride[i] = 1;
@@ -448,8 +448,6 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 	}
 
 	public void setInput(Object input) {
-		File file = null;
-
 		// ////////////////////////////////////////////////////////////////////
 		//
 		// Reset the state of this reader
@@ -457,16 +455,17 @@ public abstract class BaseHDFImageReader extends SliceImageReader {
 		// Prior to set a new input, I need to do a pre-emptive reset in order
 		// to clear any value-object related to the previous input.
 		// ////////////////////////////////////////////////////////////////////
+		
+		//TODO: Add URL & String support.
 		if (originatingFile != null)
-			reset();
+			reset(); //TODO: Need to reset also sourceStructure 
 		if (input instanceof File) {
-			file = (File) input;
-			originatingFile = file;
+			originatingFile = (File) input;
 		}
 
 		if (input instanceof FileImageInputStreamExtImpl) {
-			file = ((FileImageInputStreamExtImpl) input).getFile();
-			originatingFile = file;
+			//retrieving File
+			originatingFile = ((FileImageInputStreamExtImpl) input).getFile();
 		}
 
 		try {
