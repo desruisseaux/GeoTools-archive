@@ -47,11 +47,15 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * <P>
  * <UL>
  *   <LI>{@linkplain AuthorityFactory Authority factories} creates objects from
- *       a compact string defined by an authority.</LI>
+ *       a compact string defined by an authority.
+ *   <br><i>These classes are working as "builders" they hold the definition or recipie
+ *       used to construct an objet.</i></LI>
  *   <LI>{@linkplain ObjectFactory Object factories} allows applications
  *       to make objects that cannot be created by an authority factory.
  *       This factory is very flexible, whereas the authority factory is
- *       easier to use.</LI>
+ *       easier to use.
+ *   <br><i>These classes are working as "Factories" they provide a series of create
+ *       statements that can be used like a constructor.</i></LI>
  * </UL>
  *
  * @since 2.1
