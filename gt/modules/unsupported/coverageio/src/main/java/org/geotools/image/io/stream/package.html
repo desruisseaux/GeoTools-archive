@@ -5,8 +5,11 @@
     <TITLE>package org.geotools.image.io.stream</TITLE>
   </HEAD>
   <BODY>
-    Services provider for {@linkplain javax.imageio.stream.ImageInputStream
-    image input streams}. This package should not be used directly, since
-    providers are declared in the {@code META-INF/services/} directory.
+    Services provider for {@linkplain javax.imageio.stream.ImageInputStream image input streams}.
+    This package adds a service provider for creating input stream from URL. The default service
+    provider assumes no {@linkplain java.net.Proxy proxy}.
+
+    <P>This package should not be used directly, since providers are declared in the
+    {@code META-INF/services/} directory.</P>
   </BODY>
 </HTML>

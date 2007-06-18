@@ -201,7 +201,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
     /**
      * Returns the range of values. The default implementation scans the file content.
      */
-    public javax.media.jai.util.Range getExpectedRange(final int imageIndex, final int bandIndex) throws IOException {
+    public NumberRange getExpectedRange(final int imageIndex, final int bandIndex) throws IOException {
         checkImageIndex(imageIndex);
         if (ranges == null) {
             ranges = new NumberRange[imageIndex + 1];

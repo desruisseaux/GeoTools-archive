@@ -36,7 +36,6 @@ import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.spi.ImageReaderSpi;
-import javax.media.jai.util.Range;
 
 // Geotools dependencies
 import org.geotools.io.LineFormat;
@@ -375,7 +374,7 @@ public class TextRecordImageReader extends TextImageReader {
      * @return The expected range of values, or {@code null} if unknow.
      * @throws IOException If an error occurs reading the data information from the input source.
      */
-    public Range getExpectedRange(final int imageIndex, final int band) throws IOException {
+    public NumberRange getExpectedRange(final int imageIndex, final int band) throws IOException {
         final int         column = getColumn(imageIndex, band);
         final RecordList records = getRecords(imageIndex);
         return new NumberRange(records.getMinimum(column), records.getMaximum(column));

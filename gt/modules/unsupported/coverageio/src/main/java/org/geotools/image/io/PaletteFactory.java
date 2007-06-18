@@ -624,13 +624,6 @@ public class PaletteFactory {
     }
 
     /**
-     * Ensures that the specified palette is unique.
-     */
-    private Palette canonicalize(final Palette palette) {
-        return (Palette) palettes.canonicalize(palette);
-    }
-
-    /**
      * Returns the palette of the specified name and size. The palette's name doesn't need
      * to contains a directory path or an extension. Path and extension are set according
      * values specified at construction time.
@@ -642,7 +635,7 @@ public class PaletteFactory {
      * @since 2.4
      */
     public Palette getPalette(final String name, final int size) {
-        return canonicalize(new Palette(this, name, 0, size, size));
+        return getPalette(name, 0, size, size);
     }
 
     /**
@@ -655,7 +648,7 @@ public class PaletteFactory {
      * @since 2.4
      */
     public Palette getPalettePadValueFirst(final String name, final int size) {
-        return canonicalize(new Palette(this, name, 1, size, size));
+        return getPalette(name, 1, size, size);
     }
 
     /**
@@ -668,6 +661,31 @@ public class PaletteFactory {
      * @since 2.4
      */
     public Palette getPalettePadValueLast(final String name, final int size) {
-        return canonicalize(new Palette(this, name, 0, size-1, size));
+        return getPalette(name, 0, size-1, size);
+    }
+
+    /**
+     * Returns the palette of the specified name and size. The RGB colors will be distributed
+     * in the range {@code lower} inclusive to {@code upper} exclusive. Remaining pixel values
+     * (if any) will be left to a black or transparent color by default.
+     * <p>
+     * The palette's name doesn't need to contains a directory path or an extension.
+     * Path and extension are set according values specified at construction time.
+     *
+     * @param  name The palette's name to load.
+     * @param lower Index of the first valid element (inclusive) in the
+     *              {@linkplain IndexColorModel index color model} to be created.
+     * @param upper Index of the last valid element (exclusive) in the
+     *              {@linkplain IndexColorModel index color model} to be created.
+     * @param size  The size of the {@linkplain IndexColorModel index color model} to be created.
+     *              This is the value to be returned by {@link IndexColorModel#getMapSize}.
+     * @return The palette.
+     *
+     * @since 2.4
+     */
+    public Palette getPalette(final String name, final int lower, final int upper, final int size) {
+        Palette palette = new Palette(this, name, lower, upper, size);
+        palette = (Palette) palettes.canonicalize(palette);
+        return palette;
     }
 }

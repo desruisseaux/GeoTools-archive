@@ -37,26 +37,55 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.ComponentSampleModelJAI;
-import javax.media.jai.util.Range;
 
 import org.geotools.util.Logging;
+import org.geotools.util.NumberRange;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ComponentColorModelJAI;
+import org.geotools.image.io.metadata.MetadataAccessor;
 
 
 /**
- * Base class for simple image decoders. "Simple" images are usually flat binary
- * or ASCII files with no meta-data and no color information. There pixel values
- * may be floating point values instead of integers.
+ * Base class for simple image decoders. The main simplification provided by this class is to
+ * assume that only one {@linkplain ImageTypeSpecifier image type} is supported (as opposed to
+ * the arbitrary number allowed by the standard {@link ImageReader}) and to provide a default
+ * image type built automatically from a color palette and a range of valid values.
  * <p>
- * This base class makes it easier to construct images from floating point values.
- * It provides default implementations for most {@link ImageReader} methods. Since
- * {@code SimpleImageReader} does not expect to know anything about image's color,
- * it uses a grayscale color space scaled to fit the range of values. Displaying
- * such an image may be very slow. Consequently, users who want to display image
- * are encouraged to change data type and color space with
+ * More specifically, this class provides the following conveniences to implementors:
+ *
+ * <ul>
+ *   <li><p>Provides a {@link #getInputStream} method, which returns the {@linkplain #input input}
+ *       as an {@link InputStream} for convenience. Different kinds of input like {@linkplain File}
+ *       or {@linkplain URL} are automatically handled.</p></li>
+ *
+ *   <li><p>Provides default {@link #getNumImages} and {@link #getNumBands} implementations,
+ *       which return 1. This default behavior matches simple image formats like flat binary
+ *       files or ASCII files. Those methods need to be overrided for more complex image
+ *       formats.</p></li>
+ *
+ *   <li><p>Provides {@link #checkImageIndex} and {@link #checkBandIndex} convenience methods.
+ *       Those methods are invoked by most implementation of public methods. They perform their
+ *       checks based on the informations provided by the above-cited {@link #getNumImages} and
+ *       {@link #getNumBands} methods.</p></li>
+ *
+ *   <li><p>Provides default implementations of {@link #getImageTypes} and {@link #getRawImageType},
+ *       which assume that only one {@linkplain ImageTypeSpecifier image type} is supported. The
+ *       default image type is created from the informations provided by {@link #getRawDataType}
+ *       and {@link #getImageMetadata}.</p></li>
+ *
+ *   <li><p>Provides {@link #getStreamMetadata} and {@link #getImageMetadata} default
+ *       implementations, which return {@code null} as authorized by the specification.
+ *       Note that subclasses should consider returning
+ *       {@link org.geotools.image.io.metadata.GeographicMetadata}.</p></li>
+ * </ul>
+ * 
+ * Images may be flat binary or ASCII files with no meta-data and no color information.
+ * Their pixel values may be floating point values instead of integers. The default
+ * implementation assumes floating point values and uses a grayscale color space scaled
+ * to fit the range of values. Displaying such an image may be very slow. Consequently,
+ * users who want to display image are encouraged to change data type and color space with
  * <a href="http://java.sun.com/products/java-media/jai/">Java Advanced Imaging</a>
  * operators after reading.
  *
@@ -121,6 +150,11 @@ public abstract class SimpleImageReader extends ImageReader {
      * The stream position when {@link #setInput} is invoked.
      */
     private long streamOrigin;
+
+    /**
+     * The valid ranges obtained from {@link #getImageMetadata}.
+     */
+    private transient NumberRange[] validRanges;
 
     /**
      * Constructs a new image reader.
@@ -303,11 +337,12 @@ public abstract class SimpleImageReader extends ImageReader {
      * </ul>
      *
      * @param imageIndex The index of the image to be queried.
-     * @param numDstBand The number of bands, usually equals to {@link #getNumBands}
-     *                   but not always. It can also be the number of destination bands
-     *                   during a {@linkplain #read(int,ImageReadParam)} operation.
+     * @param numDstBand The number of bands, usually equals to {@link #getNumBands} but not always.
+     *        It may be a smaller number if the user requested only a subset of available bands
+     *        during a {@link #read(int,ImageReadParam)} operation.
      * @return The image type (never {@code null}).
-     * @throws IOException If an error occurs reading the format information from the input source.
+     * @throws IOException If an error occurs while reading the format information from the input
+     *         source.
      *
      * @see SimpleImageReader.Spi#getForcedImageType
      *
@@ -323,25 +358,10 @@ public abstract class SimpleImageReader extends ImageReader {
                 return candidate;
             }
         }
-        /*
-         * Creates a default image type specifier.
-         */
+        final int bandIndex = 0; // TODO
         final int dataType = getRawDataType(imageIndex);
-        final int[] bankIndices = new int[numDstBand];
-        final int[] bandOffsets = new int[numDstBand];
-        for (int i=numDstBand; --i>=0;) {
-            bankIndices[i] = i;
-        }
-        final ColorSpace colorSpace = getColorSpace(imageIndex, 0, numDstBand);
-        if (USE_JAI_MODEL) {
-            final ColorModel cm = new ComponentColorModelJAI(
-                    colorSpace, null, false, false, Transparency.OPAQUE, dataType);
-            return new ImageTypeSpecifier(cm, new ComponentSampleModelJAI(
-                    dataType, 1, 1, 1, 1, bankIndices, bandOffsets));
-        } else {
-            return ImageTypeSpecifier.createBanded(
-                    colorSpace, bankIndices, bandOffsets, dataType, false, false);
-        }
+        final NumberRange range = getExpectedRange(imageIndex, bandIndex);
+        return SimpleImageReadParam.getImageTypeSpecifier(dataType, range, numDstBand);
     }
 
     /**
@@ -363,7 +383,9 @@ public abstract class SimpleImageReader extends ImageReader {
 
     /**
      * Returns the expected range of values for a band. Implementation
-     * may read image data, or just returns some raisonable range.
+     * may read image data, or just returns some raisonable range. The
+     * default implementation try to get this informations from image
+     * metadata.
      *
      * @param  imageIndex The image index.
      * @param  bandIndex The band index. Valid index goes from {@code 0} inclusive
@@ -372,96 +394,17 @@ public abstract class SimpleImageReader extends ImageReader {
      * @return The expected range of values, or {@code null} if unknow.
      * @throws IOException If an error occurs reading the data information from the input source.
      */
-    public abstract Range getExpectedRange(final int imageIndex, final int bandIndex)
-            throws IOException;
-
-    /**
-     * Returns a default color space. Default implementation returns a
-     * grayscale color space scaled to fit {@link #getExpectedRange}.
-     *
-     * @param  imageIndex The image index.
-     * @param  bandIndex  The band index.
-     * @param  numBands   The number of bands.
-     * @return A default color space scaled to fit data.
-     * @throws IOException if an input operation failed.
-     */
-    private ColorSpace getColorSpace(final int imageIndex,
-                                     final int bandIndex,
-                                     final int numBands)
+    public NumberRange getExpectedRange(final int imageIndex, final int bandIndex)
             throws IOException
     {
-        final int dataType = getRawDataType(imageIndex);
-        if (dataType != DataBuffer.TYPE_BYTE) {
-            final Range range = getExpectedRange(imageIndex, bandIndex);
-            if (range!=null && Number.class.isAssignableFrom(range.getElementClass())) {
-                final Number minimum = (Number) range.getMinValue();
-                final Number maximum = (Number) range.getMaxValue();
-                if (minimum != null && maximum != null) {
-                    final float minValue = minimum.floatValue();
-                    final float maxValue = maximum.floatValue();
-                    if (minValue < maxValue && !Float.isInfinite(minValue) &&
-                                               !Float.isInfinite(maxValue))
-                    {
-                        return new ScaledColorSpace(numBands, minValue, maxValue);
-                    }
-                }
+        if (validRanges == null) {
+            final IIOMetadata metadata = getImageMetadata(imageIndex);
+            if (metadata != null) {
+                final MetadataAccessor accessor = new MetadataAccessor(metadata);
+                validRanges = accessor.getValidRanges();
             }
         }
-        return ColorSpace.getInstance(ColorSpace.CS_GRAY);
-    }
-
-    /**
-     * Convenience method returning the destination band for the specified source band.
-     * If the specified source band is not to be read, then this method returns -1.
-     *
-     * @param sourceBands The {@linkplain ImageReadParam#getSourceBands source bands}
-     *        to be read from the image file.
-     * @param destinationBands The {@linkplain ImageReadParam#getDestinationBands destination bands}
-     *        in which to store the values in the {@linkplain RenderedImage rendered image}.
-     * @param band The source band number to be converted into a destination band number.
-     * @return The destination band number, or -1 if none.
-     */
-    protected static int sourceToDestBand(final int[] sourceBands,
-                                          final int[] destinationBands,
-                                          final int   band)
-    {
-        if (sourceBands == null) {
-            return (destinationBands != null) ? destinationBands[band] : band;
-        }
-        for (int i=0; i<sourceBands.length; i++) {
-            if (sourceBands[i] == band) {
-                return (destinationBands != null) ? destinationBands[i] : i;
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * Convenience method returning the source band for the specified destination band.
-     *
-     * @param sourceBands The {@linkplain ImageReadParam#getSourceBands source bands}
-     *        to be read from the image file.
-     * @param destinationBands The {@linkplain ImageReadParam#getDestinationBands destination bands}
-     *        in which to store the values in the {@linkplain RenderedImage rendered image}.
-     * @param band The destination band number to be converted into a source band number.
-     * @return The destination band number.
-     * @throws IllegalArgumentException if no destination band was found for the given source band.
-     */
-    protected static int destToSourceBand(final int[] sourceBands,
-                                          final int[] destinationBands,
-                                          final int   band)
-            throws IllegalArgumentException
-    {
-        if (destinationBands == null) {
-            return (sourceBands != null) ? sourceBands[band] : band;
-        }
-        for (int i=0; i<destinationBands.length; i++) {
-            if (destinationBands[i] == band) {
-                return (sourceBands != null) ? sourceBands[i] : i;
-            }
-        }
-        throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                "band", new Integer(band)));
+        return validRanges[bandIndex];
     }
 
     /**
@@ -581,7 +524,8 @@ public abstract class SimpleImageReader extends ImageReader {
             }
         }
         closeOnReset = null;
-        stream = null;
+        stream       = null;
+        validRanges  = null;
     }
 
     /**

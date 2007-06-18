@@ -43,7 +43,6 @@ import javax.imageio.stream.ImageOutputStream;
 
 // Geotools dependencies
 import org.geotools.resources.Arguments;
-import org.geotools.resources.Utilities;
 
 
 /**
@@ -54,11 +53,11 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class Console {
+public final class Utilities {
     /**
      * Do not allows instantiation of this class.
      */
-    private Console() {
+    private Utilities() {
     }
 
     /**
@@ -211,7 +210,7 @@ public final class Console {
             final String name = (String) names.get(format.getKey());
             out.print("  ");
             out.print(name);
-            out.print(Utilities.spaces(length - name.length()));
+            out.print(org.geotools.resources.Utilities.spaces(length - name.length()));
             out.print(" (");
             out.print(format.getValue());
             out.println(')');

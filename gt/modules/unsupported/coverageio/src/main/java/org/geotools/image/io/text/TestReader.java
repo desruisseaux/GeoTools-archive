@@ -21,7 +21,6 @@ import java.awt.image.BufferedImage;
 import java.io.*; // Many imports, including some for javadoc only.
 import java.text.ParseException;
 import javax.imageio.ImageReadParam;
-import javax.media.jai.util.Range;
 
 // Geotools dependencies
 import org.geotools.io.LineFormat;
@@ -69,7 +68,7 @@ final class TestReader extends TextImageReader {
     /**
      * Returns an infinite range of values.
      */
-    public Range getExpectedRange(final int imageIndex, final int bandIndex) {
+    public NumberRange getExpectedRange(final int imageIndex, final int bandIndex) {
         return new NumberRange(Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY);
     }
 

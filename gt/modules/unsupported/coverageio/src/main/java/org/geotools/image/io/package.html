@@ -15,14 +15,14 @@
     in metres, etc.) better represented as floating point numbers than integers.</P>
 
     <P ALIGN="justify">By default, {@link org.geotools.image.io.SimpleImageReader}
-    store decoded image using data type {@link java.awt.image.DataBuffer#TYPE_FLOAT}
-    and a grayscale color space. This politic produce image matching closely the
+    stores decoded image using data type {@link java.awt.image.DataBuffer#TYPE_FLOAT}
+    and a grayscale color space. This politic produce images matching closely the
     original data, i.e. it involves as few transformations as possible. But
-    displaying floating-point image is usually very slow. User are strongly
-    encourages to use <A HREF="http://java.sun.com/products/java-media/jai/">Java
+    displaying floating-point images is usually very slow. Users are strongly
+    encouraged to use <A HREF="http://java.sun.com/products/java-media/jai/">Java
     Advanced Imaging</A>'s operations after reading in order to scale data as
-    they see fit. The example below reformat the {@link java.awt.image.DataBuffer#TYPE_FLOAT}
-    data into {@link java.awt.image.DataBuffer#TYPE_BYTE} and change the grayscale
+    they see fit. The example below reformats the {@link java.awt.image.DataBuffer#TYPE_FLOAT}
+    data into {@link java.awt.image.DataBuffer#TYPE_BYTE} and changes the grayscale
     colors to an indexed color model.</P>
 
     <P>&nbsp;</P>

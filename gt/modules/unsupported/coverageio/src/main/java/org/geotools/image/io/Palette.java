@@ -25,6 +25,7 @@ import java.awt.Dimension;
 import java.awt.image.*;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.IIOException;
+import javax.swing.JFrame;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -52,6 +53,12 @@ import org.geotools.resources.image.ColorUtilities;
  */
 public class Palette {
     /**
+     * The maximal palette size, corresponding to the maximum value for unsigned 16 bits integer.
+     * DO NOT EDIT: this value <strong>MUST</strong> be {@code 0xFFFF}.
+     */
+    private static final int MAX_SIZE = 0xFFFF;
+
+    /**
      * The originating factory.
      */
     final PaletteFactory factory;
@@ -65,19 +72,28 @@ public class Palette {
      * Index of the first valid element (inclusive) in the {@linkplain IndexColorModel
      * index color model} to be created. Pixels in the range 0 inclusive to {@code lower}
      * exclusive will be reserved for "no data" values.
+     * <p>
+     * Strictly speaking, this index should be non-negative because {@link IndexColorModel}
+     * do not supports negative index. However this {@code Palette} implementation accepts
+     * negative values provided that {@link #upper} is not greater than {@value Short#MAX_VALUE}.
+     * If this condition holds, then {@code Palette} will transpose negative values as positive
+     * values in the range {@code 0x80000} to {@code 0xFFFF} inclusive. Be aware that such
+     * approach consume the maximal amount of memory, i.e. 256 kilobytes for each color model.
      */
     protected final int lower;
 
     /**
      * Index of the last valid element (exclusive) in the {@linkplain IndexColorModel
      * index color model} to be created. Pixels in the range {@code upper} inclusive
-     * to {@link #size} exclusive will be reserved for "no data" values.
+     * to {@link #size} exclusive will be reserved for "no data" values. This value
+     * is always greater than {@link #lower} (note that it may be negative).
      */
     protected final int upper;
 
     /**
      * The size of the {@linkplain IndexColorModel index color model} to be created.
-     * This is the value to be returned by {@link IndexColorModel#getMapSize}.
+     * This is the value to be returned by {@link IndexColorModel#getMapSize}. This
+     * value is always positive.
      */
     private final int size;
 
@@ -117,20 +133,43 @@ public class Palette {
      *                This is the value to be returned by {@link IndexColorModel#getMapSize}.
      */
     protected Palette(final PaletteFactory factory, final String name,
-                      final int lower, final int upper, final int size)
+                      final int lower, final int upper, int size)
     {
+        final int minAllowed, maxAllowed;
+        if (lower < 0) {
+            minAllowed = Short.MIN_VALUE;
+            maxAllowed = Short.MAX_VALUE;
+            size       = (size <= 0xFF) ? 0xFF : MAX_SIZE;
+            // 'size' must be FF or FFFF in order to rool negative values.
+        } else {
+            minAllowed = 0;
+            maxAllowed = MAX_SIZE;
+        }
+        ensureInsideBounds(lower, minAllowed, maxAllowed);
+        ensureInsideBounds(upper, minAllowed, maxAllowed);
+        ensureInsideBounds(size,  upper,      MAX_SIZE  );
+        if (lower >= upper) {
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2,
+                    new Integer(lower), new Integer(upper)));
+        }
         this.factory = factory;
         this.name    = name;
         this.lower   = lower;
         this.upper   = upper;
         this.size    = size;
-        if (lower < 0 || lower >= upper) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2,
-                    new Integer(lower), new Integer(upper)));
-        }
-        if (upper > size) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                    "size", new Integer(size)));
+    }
+
+    /**
+     * Ensure that the specified values in inside the expected bounds (inclusives).
+     *
+     * @throws IllegalArgumentException if the specified values are outside the bounds.
+     */
+    private static void ensureInsideBounds(final int value, final int min, final int max)
+            throws IllegalArgumentException
+    {
+        if (value < min || value > max) {
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.VALUE_OUT_OF_BOUNDS_$3,
+                    new Integer(value), new Integer(min), new Integer(max)));
         }
     }
 
@@ -150,7 +189,17 @@ public class Palette {
             throw new FileNotFoundException(Errors.format(ErrorKeys.FILE_DOES_NOT_EXIST_$1, name));
         }
         final int[] ARGB = new int[size];
-        ColorUtilities.expand(colors, ARGB, lower, upper);
+        if (lower >= 0) {
+            ColorUtilities.expand(colors, ARGB, lower, upper);
+        } else {
+            ColorUtilities.expand(colors, ARGB, 0, upper - lower);
+            final int negativeStart = size + lower;
+            final int negativeCount = -lower;
+            final int[] negatives = new int[negativeCount];
+            System.arraycopy(ARGB, 0, negatives, 0, negativeCount);
+            System.arraycopy(ARGB, negativeCount, ARGB, 0, negativeStart);
+            System.arraycopy(negatives, 0, ARGB, negativeStart, negativeCount);
+        }
         return ARGB;
     }
 
@@ -252,14 +301,16 @@ public class Palette {
      * @param size The image size. The palette will be vertical if
      *        <code>size.{@linkplain Dimension#height height}</code> &gt;
      *        <code>size.{@linkplain Dimension#width  width }</code>
+     *
+     * @throws IOException if the color values can't be read.
      */
     public RenderedImage getImage(final Dimension size) throws IOException {
         final IndexColorModel colors;
         final BufferedImage   image;
         final WritableRaster  raster;
         colors = (IndexColorModel) getColorModel();
-        image  = new BufferedImage(size.width, size.height, BufferedImage.TYPE_BYTE_INDEXED, colors);
-        raster = image.getRaster();
+        raster = colors.createCompatibleWritableRaster(size.width, size.height);
+        image  = new BufferedImage(colors, raster, false, null);
         int xmin   = raster.getMinX();
         int ymin   = raster.getMinY();
         int width  = raster.getWidth();
@@ -274,9 +325,9 @@ public class Palette {
         }
         final int xmax = xmin + width;
         final int ymax = ymin + height;
-        final double scale = (double)colors.getMapSize() / (double)width;
+        final double scale = (double)(upper - lower) / (double)width;
         for (int x=xmin; x<xmax; x++) {
-            final int value = (int) Math.round(scale * (x-xmin));
+            final int value = lower + (int) Math.round(scale * (x-xmin));
             for (int y=ymin; y<ymax; y++) {
                 if (horizontal) {
                     raster.setSample(x, y, 0, value);
@@ -286,6 +337,19 @@ public class Palette {
             }
         }
         return image;
+    }
+
+    /**
+     * Shows the palette in a windows. This is mostly for debugging purpose.
+     *
+     * @throws IOException if the color values can't be read.
+     */
+    public void show() throws IOException {
+        final JFrame frame = new JFrame(toString());
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.add(new javax.media.jai.widget.ImageCanvas(getImage(new Dimension(256, 32))));
+        frame.pack();
+        frame.setVisible(true);
     }
 
     /**
@@ -319,6 +383,6 @@ public class Palette {
      */
     //@Override
     public String toString() {
-        return Utilities.getShortClassName(this) + '[' + name + ' ' + size + " colors]";
+        return name + " [" + lower + "..." + (upper-1) + "] size=" + size;
     }
 }
