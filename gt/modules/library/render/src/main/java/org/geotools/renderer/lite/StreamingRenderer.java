@@ -181,9 +181,6 @@ public final class StreamingRenderer implements GTRenderer {
     private final static PropertyName defaultGeometryPropertyName= filterFactory.property("");
 	
 
-	private final static CoordinateOperationFactory operationFactory = new BufferedCoordinateOperationFactory(
-			new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE));
-
 	/**
 	 * Context which contains the layers and the bouning box which needs to be
 	 * rendered.
@@ -2281,10 +2278,7 @@ public final class StreamingRenderer implements GTRenderer {
 			CoordinateReferenceSystem sourceCRS,
 			CoordinateReferenceSystem destCRS) {
 		try {
-			CoordinateOperation op = operationFactory.createOperation(
-					sourceCRS, destCRS);
-			if (op != null)
-				return op.getMathTransform();
+			return CRS.findMathTransform(sourceCRS, destCRS, true);
 		} catch (OperationNotFoundException e) {
 			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 
