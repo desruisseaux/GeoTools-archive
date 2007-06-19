@@ -16,8 +16,18 @@
  */
 package org.geotools.arcsde.filter;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.SelectExpressionItem;
+import net.sf.jsqlparser.statement.select.SelectItem;
 
 import org.geotools.arcsde.data.ArcSDEAdapter;
 import org.geotools.data.jdbc.FilterToSQL;
@@ -32,10 +42,7 @@ import org.opengis.filter.IncludeFilter;
 import org.opengis.filter.PropertyIsBetween;
 import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.PropertyIsNull;
-import org.opengis.filter.expression.Expression;
-
-import com.esri.sde.sdk.client.SeException;
-import com.esri.sde.sdk.client.SeLayer;
+import org.opengis.filter.expression.PropertyName;
 
 
 /**
@@ -50,8 +57,8 @@ import com.esri.sde.sdk.client.SeLayer;
  * easy programing
  * </p>
  *
- * @author Chris Holmes, TOPP
- * @author Gabriel Rold?n
+ * @author Saul Farber
+ * @author Gabriel Roldan
  *
  * @see org.geotools.data.sde.GeometryEncoderSDE
  * @source $URL$
@@ -61,42 +68,90 @@ public class FilterToSQLSDE extends FilterToSQL
     /** Standard java logger */
     private static Logger LOGGER = Logger.getLogger("org.geotools.filter");
 
+    private String layerQualifiedName;
+    
+    private String layerFidFieldName;
+
     /** DOCUMENT ME! */
-    private SeLayer sdeLayer;
+    private PlainSelect definitionQuery;
 
     /**
-     * Creates a new FilterToSQLSDE object.
+     * If definitionQuery != null, holds alias/unaliased attribute names from
+     * the sql query
      */
-    public FilterToSQLSDE() {
-//    	intentionally blank
-    }
+    private Map attributeNames = Collections.EMPTY_MAP;
 
     /**
-     */
-    public FilterToSQLSDE(SeLayer layer, FeatureType ft) {
-        this.sdeLayer = layer;
-        this.featureType = ft;
-    }
-
-    /**
-     * Called directly before visiting an appropriate expression, this
-     * method adds the SDE qualified name before the expression's DB
-     * name gets written.
      * 
-     * So the filter [ MYFIELD = MYVALUE ] gets written as
-     * MYUSER.MYTABLE.MYFIELD = ... instead.
+     * @param layerQName full qualified name of the ArcSDE layer
+     * @param layerFidColName name of the column that holds fids
+     * @param ft
+     * @param definitionQuery
      */
-    private void qualifyExpression(Expression expression) throws RuntimeException {
-        try {
-        	this.out.write(this.sdeLayer.getQualifiedName());
-        	this.out.write('.');
-        } catch (java.io.IOException ioe) {
-            throw new RuntimeException("IO problems writing attribute exp", ioe);
-        } catch (SeException see) {
-            throw new RuntimeException("SDE problems writing attribute exp", see);
+    public FilterToSQLSDE(String layerQName, String layerFidColName, FeatureType ft,
+            PlainSelect definitionQuery) {
+        this.layerQualifiedName = layerQName;
+        this.layerFidFieldName = layerFidColName;
+        this.featureType = ft;
+        this.definitionQuery = definitionQuery;
+        
+        if (definitionQuery != null) {
+            attributeNames = new HashMap();
+
+            List selectItems = definitionQuery.getSelectItems();
+            SelectItem item;
+
+            for (Iterator it = selectItems.iterator(); it.hasNext();) {
+                item = (SelectItem) it.next();
+
+                if (!(item instanceof SelectExpressionItem)) {
+                    String msg = "for item '" + item
+                        + "': only SelectExpressionItems should be in query at this stage."
+                        + " AllColumns and AllTableColumns instances should be resolved to their list "
+                        + " of column names at view registration time.";
+                    LOGGER.severe(msg);
+                    throw new IllegalStateException(msg);
+                }
+                SelectExpressionItem colDef = (SelectExpressionItem)item;
+                String alias = colDef.getAlias();
+                if(alias == null){
+                    if(!(colDef.getExpression() instanceof Column)){
+                        throw new RuntimeException(
+                                "if select item is not a plain column an alias should be provided: " +
+                                colDef);
+                    }
+                    Column column = (Column)colDef.getExpression();
+                    alias = column.getColumnName();
+                }
+                
+                attributeNames.put(alias, colDef);
+            }
         }
     }
-
+    
+    /**
+     * Returns the full qualifed name of sql expression that is registered as the 
+     * source of the attribute named <code>alias</code>.
+     * 
+     * @param alias
+     * @return
+     */
+    public String getColumnDefinition(String alias){
+        final String encodedColumnDefinition;
+        if(this.definitionQuery != null){
+            //its an inprocess view
+            SelectExpressionItem colDef = (SelectExpressionItem)attributeNames.get(alias);
+            //String alias = colDef.getAlias();
+            String sqlExpression = String.valueOf(colDef);
+            
+            //encodedColumnDefinition = sqlExpression + " AS " + alias;
+            encodedColumnDefinition = sqlExpression;
+        }else{
+            encodedColumnDefinition = layerQualifiedName + "." + alias;
+        }
+        return encodedColumnDefinition;
+    }
+    
     /**
      * Overrides the superclass implementation to indicate that we support
      * pushing FeatureId filters down into the data store.
@@ -116,17 +171,6 @@ public class FilterToSQLSDE extends FilterToSQL
         capabilities.addType(PropertyIsLike.class);
 
         return capabilities;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param layer DOCUMENT ME!
-     *
-     * @deprecated remove when the old data api dissapear
-     */
-    public void setLayer(SeLayer layer) {
-        this.sdeLayer = layer;
     }
 
     /**
@@ -161,10 +205,7 @@ public class FilterToSQLSDE extends FilterToSQL
             return unused;
         }
 
-        String fidField = ArcSDEAdapter.getRowIdColumn(featureType);
-        if (fidField == null) { 
-            fidField = this.sdeLayer.getSpatialColumn();
-        }
+        String fidField = layerFidFieldName;
 
         try {
             StringBuffer sb = new StringBuffer();
@@ -195,4 +236,33 @@ public class FilterToSQLSDE extends FilterToSQL
         }
         return unused;
     }
+    
+    
+    /**
+     * Writes the SQL for the attribute Expression.
+     * 
+     * NOTE: If the feature type is the product of an in process sql query, the
+     * attribute name encoded will be the actual one, not the alias (if any)
+     * used in the sql query.
+     * 
+     * @param expression
+     *            the attribute to turn to SQL.
+     * 
+     * @throws RuntimeException
+     *             for io exception with writer
+     */
+    public Object visit(PropertyName expression, Object extraData) throws RuntimeException {
+        LOGGER.finer("exporting PropertyName");
+        final String attName = expression.getPropertyName();
+        
+        final String encodedColumnDefinition = getColumnDefinition(attName); 
+        
+        try {
+            out.write(encodedColumnDefinition);            
+        } catch (java.io.IOException ioe) {
+            throw new RuntimeException("IO problems writing attribute exp", ioe);
+        }
+        
+        return extraData;
+    }    
 }
