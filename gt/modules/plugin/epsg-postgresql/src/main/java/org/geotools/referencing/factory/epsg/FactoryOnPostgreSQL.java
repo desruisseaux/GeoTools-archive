@@ -111,7 +111,7 @@ import org.postgresql.jdbc3.Jdbc3SimpleDataSource;
  *
  * @tutorial http://docs.codehaus.org/display/GEOTOOLS/How+to+install+the+EPSG+database+in+PostgreSQL
  */
-public class FactoryOnPostgreSQL extends DefaultFactory {
+public class FactoryOnPostgreSQL extends ThreadedEpsgFactory {
     /**
      * The user configuration file. This class search first for the first file found in the
      * following directories:

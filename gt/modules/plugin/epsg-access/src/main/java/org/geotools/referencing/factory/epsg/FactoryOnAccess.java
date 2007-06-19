@@ -44,7 +44,7 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class FactoryOnAccess extends DefaultFactory {
+public class FactoryOnAccess extends ThreadedEpsgFactory {
     /**
      * Creates a new instance of this factory.
      */

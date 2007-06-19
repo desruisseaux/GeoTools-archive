@@ -105,7 +105,7 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * @author Martin Desruisseaux
  * @author Jody Garnett
  */
-public class FactoryOnOracleSQL extends DefaultFactory {
+public class FactoryOnOracleSQL extends ThreadedEpsgFactory {
     /**
      * The user configuration file. This class search first for the first file found in the
      * following directories:

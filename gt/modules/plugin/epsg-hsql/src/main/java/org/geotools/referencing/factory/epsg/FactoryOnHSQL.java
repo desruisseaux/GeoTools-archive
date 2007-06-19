@@ -72,7 +72,7 @@ import org.hsqldb.jdbc.jdbcDataSource;
  * @author Martin Desruisseaux
  * @author Didier Richard
  */
-public class FactoryOnHSQL extends DefaultFactory {
+public class FactoryOnHSQL extends ThreadedEpsgFactory {
     /**
      * Current version of EPSG-HSQL plugin. This is usually the same version number than the
      * one in the EPSG database bundled in this plugin. However this field may contains
