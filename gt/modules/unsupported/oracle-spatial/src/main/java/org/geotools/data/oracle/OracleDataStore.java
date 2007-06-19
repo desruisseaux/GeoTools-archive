@@ -44,6 +44,7 @@ import org.geotools.data.jdbc.QueryData;
 import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.oracle.attributeio.SDOAttributeIO;
+import org.geotools.data.oracle.referencing.OracleAuthorityFactory;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
@@ -63,6 +64,7 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class OracleDataStore extends JDBCDataStore {
      private static final Logger LOGGER = Logger.getLogger("org.geotools.data.oracle");
+     private OracleAuthorityFactory af;
 
     /**
      * @param connectionPool
@@ -181,41 +183,25 @@ public class OracleDataStore extends JDBCDataStore {
      * @param isNillable 
      */
     private AttributeType getSDOGeometryAttribute(String tableName, String columnName, boolean isNullable ) {
-	    // HACK! Assume SRID matches EPSG number? No but it will do something for now ...
-	    // research required (p89) b10826.pdf above
-    	
     	int srid = 0; // aka NULL
 		try {
 			srid = determineSRID( tableName, columnName );
-			CoordinateReferenceSystem crs = determineCRS( srid );
+//			CoordinateReferenceSystem crs = determineCRS( srid );
+            CoordinateReferenceSystem crs = CRS.decode("EPSG:" + srid);
 			if( crs != null ){
 				return AttributeTypeFactory.newAttributeType(columnName, Geometry.class,isNullable, 0, null, crs );
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			LOGGER.warning( "Could not map SRID "+srid+" to CRS:"+e );
 		}
     	return AttributeTypeFactory.newAttributeType(columnName, Geometry.class,isNullable);		
 	}
-    protected CoordinateReferenceSystem determineCRS(int srid ) throws IOException {
-    	Connection conn = getConnection(Transaction.AUTO_COMMIT);;
-    	String wkt=null;
-    	try {
-    		Statement st = conn.createStatement();
-    		st.execute("select wktext from cs_srs where srid = "+srid );
-    		
-    		ResultSet set = st.getResultSet();
-    		if( !set.next() ) return null;
-    		wkt = set.getString(1);    	
-    		return CRS.parseWKT( wkt );
-    	}
-    	catch( FactoryException parse){
-    		throw (IOException) new IOException( "Unabled to parse WKTEXT into a CRS:"+wkt ).initCause( parse );
-    	}    	
-    	catch( SQLException sql ){
-    		throw (IOException) new IOException( "No CRS for srid "+srid ).initCause( sql );
-    	} finally {
-             JDBCUtils.close(conn, Transaction.AUTO_COMMIT, null);
-      }
+    protected CoordinateReferenceSystem determineCRS(int srid) throws IOException {
+        try {
+            return getOracleAuthorityFactory().createCRS(srid);
+        } catch(FactoryException e) {
+            return null;
+        }
     }
         
 	/**
@@ -223,14 +209,8 @@ public class OracleDataStore extends JDBCDataStore {
      */
     protected int determineSRID(String tableName, String geometryColumnName) throws IOException {
         Connection conn = null;        
-        //try {        
-	    //  conn = (OracleConnection) getConnection(Transaction.AUTO_COMMIT);
-           //GeometryMetaData gMetaData = OraSpatialManager.getGeometryMetaData(conn, tableName, geometryColumnName);
-         //return gMetaData.getSpatialReferenceID();
-	//   return -1;            
-       //}
 	 try {
-            String sqlStatement = "SELECT SRID FROM ALL_SDO_GEOM_METADATA "
+            String sqlStatement = "SELECT SRID FROM MDSYS.USER_SDO_GEOM_METADATA "
                 + "WHERE TABLE_NAME='" + tableName + "' AND COLUMN_NAME='"
                 + geometryColumnName + "'";
             conn = getConnection(Transaction.AUTO_COMMIT);
@@ -256,6 +236,14 @@ public class OracleDataStore extends JDBCDataStore {
         } finally {
             JDBCUtils.close(conn, Transaction.AUTO_COMMIT, null);            
         }        
+    }
+    
+    private OracleAuthorityFactory getOracleAuthorityFactory() {
+        if (af == null) {
+            af = new OracleAuthorityFactory(connectionPool);
+        }
+
+        return af;
     }
     
     /**
@@ -308,7 +296,8 @@ public class OracleDataStore extends JDBCDataStore {
 	    	set.next();
 	    	
 	    	int srid = set.getInt( 1 );
-	    	CoordinateReferenceSystem crs = determineCRS( srid );
+//	    	CoordinateReferenceSystem crs = determineCRS( srid );
+            CoordinateReferenceSystem crs = CRS.decode("EPSG:" + srid);
 	    	ARRAY array= (ARRAY) set.getObject(2);    	
 	    	Datum data[] = array.getOracleArray();
 	    	
