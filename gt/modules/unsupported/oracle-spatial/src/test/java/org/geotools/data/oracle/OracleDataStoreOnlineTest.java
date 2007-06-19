@@ -145,8 +145,8 @@ public class OracleDataStoreOnlineTest extends TestCase {
 		    	st.execute("INSERT INTO user_sdo_geom_metadata (TABLE_NAME, COLUMN_NAME, DIMINFO, SRID )"+
 					    "VALUES('ORA_TEST_POINTS','SHAPE',"+
 					        "MDSYS.SDO_DIM_ARRAY(MDSYS.SDO_DIM_ELEMENT('X',0,-20,0.5),MDSYS.SDO_DIM_ELEMENT('Y',0,10,0.5)),"+
-					    "NULL)");
-//		    	 st.execute("DROP INDEX GEOTOOLS.ORA_TEST_POINTS_SHAPE_IDX");		    	
+					    "4326)");
+	    	
 		    	st.execute("CREATE INDEX ORA_TEST_POINTS_SHAPE_IDX "+
 		    				"ON ORA_TEST_POINTS (SHAPE) INDEXTYPE IS " +
 		    				"MDSYS.SPATIAL_INDEX PARAMETERS (' SDO_INDX_DIMS=2 LAYER_GTYPE=\"COLLECTION\"') ");		    			    	
@@ -160,23 +160,23 @@ public class OracleDataStoreOnlineTest extends TestCase {
     	//  +(20,10)         +(10,10)   + (20,10)   +(30,10)
     	//        
     	st.execute("INSERT INTO ORA_TEST_POINTS VALUES ('point 1',10,1," +
-                "MDSYS.SDO_GEOMETRY(2001,NULL," +
+                "MDSYS.SDO_GEOMETRY(2001,4326," +
                 "MDSYS.SDO_POINT_TYPE(10.0, 10.0, NULL),"+
                 "NULL,NULL))");
     	st.execute("INSERT INTO ORA_TEST_POINTS VALUES ('point 2',20,2," +
-                        "MDSYS.SDO_GEOMETRY(2001,NULL," +
+                        "MDSYS.SDO_GEOMETRY(2001,4326," +
                         "MDSYS.SDO_POINT_TYPE(20.0, 10.0, NULL),"+
                         "NULL,NULL))");
     	st.execute("INSERT INTO ORA_TEST_POINTS VALUES ('point 3',30,3," +
-                        "MDSYS.SDO_GEOMETRY(2001,NULL," +
+                        "MDSYS.SDO_GEOMETRY(2001,4326," +
                         "SDO_POINT_TYPE(20.0, 30.0, NULL),"+
                         "NULL,NULL))");
     	st.execute("INSERT INTO ORA_TEST_POINTS VALUES ('point 4',40,4," +
-                        "MDSYS.SDO_GEOMETRY(2001,NULL," +
+                        "MDSYS.SDO_GEOMETRY(2001,4326," +
                         "SDO_POINT_TYPE(30.0, 10.0, NULL),"+
                         "NULL,NULL))");
     	st.execute("INSERT INTO ORA_TEST_POINTS VALUES ('point 5',50,5," +
-                        "MDSYS.SDO_GEOMETRY(2001,NULL," +
+                        "MDSYS.SDO_GEOMETRY(2001,4326," +
                         "SDO_POINT_TYPE(-20.0, 10.0, NULL),"+
                         "NULL,NULL))");
 
@@ -291,7 +291,8 @@ public class OracleDataStoreOnlineTest extends TestCase {
     public void testBBoxFilter() throws Exception {
     	if( conn == null ) return;    	
         GeometryFilter filter = filterFactory.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
-        Expression right = filterFactory.createBBoxExpression(new Envelope(-180, 180, -90, 90));
+        // had to reduce the envelope a little, Oracle has trobles with bbox that span the whole earth
+        Expression right = filterFactory.createBBoxExpression(new Envelope(-170, 170, -80, 80));
         Expression left = filterFactory.createAttributeExpression(dstore.getSchema("ORA_TEST_POINTS"), "SHAPE");
         filter.addLeftGeometry(left);
         filter.addRightGeometry(right);

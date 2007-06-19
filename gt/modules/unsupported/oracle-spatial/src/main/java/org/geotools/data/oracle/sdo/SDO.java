@@ -240,7 +240,7 @@ public final class SDO {
      * @return <code>SRID</code> for provided geom
      */
     public static int SRID(Geometry geom) {
-        return geom.getFactory().getSRID();
+        return geom.getSRID();
     }
 
     /**

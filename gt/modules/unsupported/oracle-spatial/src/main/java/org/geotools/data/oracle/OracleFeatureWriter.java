@@ -106,13 +106,12 @@ public class OracleFeatureWriter extends JDBCTextFeatureWriter {
                 if (type instanceof GeometricAttributeType && !DataUtilities.attributesEqual(current.getAttribute(i), live.getAttribute(i))) {
                     Geometry geometry = (Geometry) current.getAttribute(i);
 
-                    if (geometry == null) {
-                        geometry = current.getDefaultGeometry();
-                    }
-
                     LOGGER.fine("ORACLE SPATIAL: geometry to be written:"
                         + geometry);
-
+                    
+                    int srid = queryData.getFeatureTypeInfo().getSRID(type.getName());
+                    geometry.setSRID(srid);
+                    
                     STRUCT struct = converter.toSDO(geometry);
                     statement.setObject(position, struct);
                     LOGGER.fine(
@@ -168,6 +167,12 @@ public class OracleFeatureWriter extends JDBCTextFeatureWriter {
             	AttributeType type = schema.getAttributeType( i );
             	if( type instanceof GeometricAttributeType ){
             		Geometry geometry = (Geometry) current.getAttribute( i );
+                    
+                    // set the proper SRID, otherwise insertion will fail due to issues
+                    // with the spatial index
+                    int srid = queryData.getFeatureTypeInfo().getSRID(type.getName());
+                    geometry.setSRID(srid);
+                    
             		STRUCT struct = converter.toSDO( geometry );
             		statement.setObject( position, struct );
             		position++;
