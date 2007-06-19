@@ -94,6 +94,7 @@
      <profile>
        <id>archive</id>
        <modules>
+         <module>arcsde</module>
          <module>hsql</module>
          <module>jpox</module>
        </modules>
@@ -102,7 +103,6 @@
   </profiles>
 
   <modules>
-    <module>arcsde</module>
     <module>coverageio</module>
     <module>db2</module>
     <module>directory</module>
