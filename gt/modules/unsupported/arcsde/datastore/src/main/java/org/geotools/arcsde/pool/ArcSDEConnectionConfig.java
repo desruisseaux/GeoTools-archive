@@ -92,7 +92,7 @@ public class ArcSDEConnectionConfig {
 	protected static final String TABLE_NAME_PARAM = "table";
 
 	/** namespace URI assigned to datastore */
-	URI namespaceUri;
+	String namespaceUri;
 	
 	/** name or IP of the ArcSDE server to connect to */
 	String serverName;
@@ -208,13 +208,7 @@ public class ArcSDEConnectionConfig {
 		String exceptionMsg = null;
 		Object ns = params.get(NAMESPACE_PARAM);
 
-		if(ns != null){
-			try{
-				this.namespaceUri  = new URI(ns.toString());
-			}catch(URISyntaxException e){
-				throw new IllegalArgumentException("invalid namespace: " + ns);
-			}
-		}
+		this.namespaceUri = ns == null ? null : String.valueOf(ns);
 		
 		this.minConnections = getInt(params.get(MIN_CONNECTIONS_PARAM),
 				ArcSDEConnectionPool.DEFAULT_CONNECTIONS);
@@ -358,7 +352,7 @@ public class ArcSDEConnectionConfig {
 	}
 
 	
-	public URI getNamespaceUri(){
+	public String getNamespaceUri(){
 		return namespaceUri;
 	}
 	

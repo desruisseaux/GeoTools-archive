@@ -50,7 +50,14 @@ public class ArcSDEQueryTest extends TestCase {
 
     private TestData testData;
 
+    /**
+     * do not access it directly, use {@link #getQueryAll()}
+     */
     private ArcSDEQuery queryAll;
+
+    /**
+     * do not access it directly, use {@link #getQueryFiltered()}
+     */
     private ArcSDEQuery queryFiltered;
     
     private ArcSDEDataStore dstore;
@@ -60,6 +67,8 @@ public class ArcSDEQueryTest extends TestCase {
     private Query filteringQuery;
     
     private FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+
+    private FeatureType ftype;
     
     private static final int FILTERING_COUNT = 3;
 	/**
@@ -83,8 +92,7 @@ public class ArcSDEQueryTest extends TestCase {
         this.testData.setUp();
         dstore = testData.getDataStore();
         typeName = testData.getLine_table();
-        FeatureType ftype = dstore.getSchema(typeName);
-        this.queryAll = ArcSDEQuery.createQuery(dstore, ftype, Query.ALL);
+        this.ftype = dstore.getSchema(typeName);
         
         //grab some fids
         FeatureReader reader = dstore.getFeatureReader(typeName);
@@ -95,7 +103,16 @@ public class ArcSDEQueryTest extends TestCase {
         reader.close();
         Id filter = ff.id(new HashSet(fids));
         filteringQuery = new DefaultQuery(typeName, filter);
+    }
+
+    private ArcSDEQuery getQueryAll() throws IOException{
+        this.queryAll = ArcSDEQuery.createQuery(dstore, ftype, Query.ALL);
+        return this.queryAll;
+    }
+    
+    private ArcSDEQuery getQueryFiltered() throws IOException{
         this.queryFiltered = ArcSDEQuery.createQuery(dstore, filteringQuery);
+        return this.queryFiltered;
     }
 
     /**
@@ -125,21 +142,19 @@ public class ArcSDEQueryTest extends TestCase {
      * DOCUMENT ME!
      */
     public void testClose()throws IOException {
-    	assertNotNull(queryAll.connectionPool);
-    	assertNull(queryAll.connection);
+        ArcSDEQuery queryAll = getQueryAll();
+    	assertNotNull(queryAll.connection);
     	
-    	this.queryAll.execute();
+    	queryAll.execute();
     	
-    	assertNotNull(queryAll.connectionPool);
     	assertNotNull(queryAll.connection);
     	
     	//should nevel do this, just to assert it is 
     	//not closed by returned to the pool
     	SeConnection conn = queryAll.connection;
     	
-    	this.queryAll.close();
+    	queryAll.close();
 
-    	assertNull(queryAll.connectionPool);
     	assertNull(queryAll.connection);
     	assertFalse(conn.isClosed());
     }
@@ -148,10 +163,11 @@ public class ArcSDEQueryTest extends TestCase {
      * DOCUMENT ME!
      */
     public void testFetch()throws IOException {
+        ArcSDEQuery queryAll = getQueryAll();
     	try {
     		queryAll.fetch();
     		fail("fetch without calling execute");
-    	}catch(IOException e){
+    	}catch(IllegalStateException e){
     		//ok
     	}
     	
@@ -178,10 +194,10 @@ public class ArcSDEQueryTest extends TestCase {
     		readed++;
     	}
     	
-    	int calculated = queryAll.calculateResultCount();
+    	int calculated = getQueryAll().calculateResultCount();
     	assertEquals(readed, calculated);
     	
-    	calculated = queryFiltered.calculateResultCount();
+    	calculated = getQueryFiltered().calculateResultCount();
     	assertEquals(FILTERING_COUNT, calculated);
     }
 
@@ -195,7 +211,7 @@ public class ArcSDEQueryTest extends TestCase {
     		real.expandToInclude(reader.next().getBounds());
     	}
     	
-    	Envelope e = queryAll.calculateQueryExtent();
+    	Envelope e = getQueryAll().calculateQueryExtent();
     	assertNotNull(e);
     	assertEquals(real, e);
     	
@@ -207,7 +223,7 @@ public class ArcSDEQueryTest extends TestCase {
     		real.expandToInclude(reader.next().getBounds());
     	}
     	
-    	e = queryFiltered.calculateQueryExtent();
+    	e = getQueryFiltered().calculateQueryExtent();
     	assertNotNull(e);
     	assertEquals(real, e);
     	reader.close();

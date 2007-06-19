@@ -63,6 +63,8 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 			.getLogger(ArcSDEFeatureWriter.class.getPackage().getName());
 
 	private ArcSDEDataStore dataStore;
+    
+    private FIDReader fidStrategy;
 
 	private ArcTransactionState transactionState;
 
@@ -106,9 +108,10 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 	 * @param layer
 	 * @param features
 	 */
-	public ArcSDEFeatureWriter(ArcSDEDataStore store,
+	public ArcSDEFeatureWriter(ArcSDEDataStore store, FIDReader fidStrategy,
 			ArcTransactionState state, SeLayer layer, List features) throws DataSourceException {
 		transactionState = state;
+        this.fidStrategy = fidStrategy;
 
 		if (features != null) {
 			this.features = features;
@@ -118,19 +121,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 
 		this.dataStore = store;
 		this.layer = layer;
-
-		
-            try {
-                this.rowIdColumnName = ArcSDEAdapter.getRowIdColumn(store.getSchema(layer.getQualifiedName()));
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "", e);
-                throw new DataSourceException(e);
-            } catch (SeException e) {
-                LOGGER.log(Level.SEVERE, "", e);
-                throw new DataSourceException(e);
-            }
-        
-        
+        this.rowIdColumnName = fidStrategy.getFidColumn();
 		this.currentIndex = -1;
 	}
 
@@ -144,9 +135,9 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 	 * @param layer
 	 *            DOCUMENT ME!
 	 */
-	public ArcSDEFeatureWriter(ArcSDEDataStore store,
+	public ArcSDEFeatureWriter(ArcSDEDataStore store, FIDReader fidStrategy,
 			ArcTransactionState state, SeLayer layer) throws DataSourceException {
-		this(store, state, layer, null);
+		this(store, fidStrategy, state, layer, null);
 	}
 
 	/**

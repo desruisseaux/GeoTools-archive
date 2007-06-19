@@ -29,7 +29,6 @@ import javax.xml.parsers.SAXParserFactory;
 
 import junit.framework.TestCase;
 
-import org.geotools.arcsde.data.ArcSDEDataStore;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
@@ -45,7 +44,6 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.BBoxExpression;
 import org.geotools.filter.FilterFilter;
 import org.geotools.gml.GMLFilterDocument;
 import org.geotools.gml.GMLFilterGeometry;
@@ -132,7 +130,7 @@ public class ArcSDEDataStoreTest extends TestCase {
 
         DataStoreFinder.scanForPlugins();
         sdeDs = DataStoreFinder.getDataStore(this.testData.getConProps());
-
+        assertNotNull(sdeDs);
         String failMsg = sdeDs + " is not an ArcSDEDataStore";
         assertTrue(failMsg, (sdeDs instanceof ArcSDEDataStore));
         LOGGER.fine("testFinder OK :" + sdeDs.getClass().getName());

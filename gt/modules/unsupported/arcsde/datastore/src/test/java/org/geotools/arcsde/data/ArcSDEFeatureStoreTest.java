@@ -26,7 +26,6 @@ import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.SimpleFeature;
 import org.geotools.feature.type.GeometricAttributeType;
-import org.geotools.referencing.CRS;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Or;
@@ -358,8 +357,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         }
         
         
-        atts[0] = new ArcSDEAttributeType(AttributeTypeFactory.newAttributeType("OBJECTID", Integer.class, false));
-        ((ArcSDEAttributeType)atts[0]).setFeatureIDAttribute(true);
+        atts[0] = AttributeTypeFactory.newAttributeType("OBJECTID", Integer.class, false);
         atts[1] = AttributeTypeFactory.newAttributeType("SHAPE", MultiLineString.class, true);
         
         type = FeatureTypeBuilder.newFeatureType(atts, typeName);
@@ -379,10 +377,8 @@ public class ArcSDEFeatureStoreTest extends TestCase {
             LOGGER.fine("Unqualifying type name to create schema.");
             typeName = typeName.substring(typeName.lastIndexOf('.') + 1);
         }
-        
-        
-        atts[0] = new ArcSDEAttributeType(AttributeTypeFactory.newAttributeType("OBJECTID", Integer.class, false));
-        ((ArcSDEAttributeType)atts[0]).setFeatureIDAttribute(true);
+                
+        atts[0] = AttributeTypeFactory.newAttributeType("OBJECTID", Integer.class, false);
         try {
             atts[1] = new GeometricAttributeType("SHAPE", MultiLineString.class, true, null, null, null);
         } catch (Exception ie) {

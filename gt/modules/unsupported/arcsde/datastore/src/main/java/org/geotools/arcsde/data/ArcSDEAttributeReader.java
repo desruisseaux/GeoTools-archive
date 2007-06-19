@@ -26,7 +26,6 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 
 import com.esri.sde.sdk.client.SeException;
-import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeShape;
 
 /**
@@ -47,10 +46,10 @@ class ArcSDEAttributeReader implements AttributeReader {
 	/** schema of the features this attribute reader iterates over */
 	private FeatureType schema;
 
-	/** the current values being read */
-	private Object[] currentValues;
+    /** current sde java api row being read */
+    private SdeRow currentRow;
 
-	/**
+    /**
 	 * the unique id of the current feature. -1 means the feature id was not
 	 * retrieved
 	 */
@@ -76,18 +75,16 @@ class ArcSDEAttributeReader implements AttributeReader {
 	 */
 	private int fidPrefixLen;
 
-	/**
+    /**
+     * Strategy to read FIDs
+     */
+    private FIDReader fidReader;
+    
+    /**
 	 * flag to avoid the processing done in <code>hasNext()</code> if next()
 	 * was not called between calls to hasNext()
 	 */
 	private boolean hasNextAlreadyCalled = false;
-	
-	/**
-	 * the AttributeType.getName() value of the attribute which is an SDE-managed
-	 * RowID for this featureType.  If it's null, there's no such SDE-managed RowID in this
-	 * SeTable
-	 */
-	private String featureIDAttributeName; 
 
 	/**
 	 * The query that defines this readers interaction with an ArcSDE instance.
@@ -98,38 +95,23 @@ class ArcSDEAttributeReader implements AttributeReader {
 	 *             DOCUMENT ME!
 	 */
 	public ArcSDEAttributeReader(ArcSDEQuery query) throws IOException {
-		this.query = query;
-		this.schema = query.getSchema();
-		this.currentValues = new Object[this.schema.getAttributeCount()];
-		for (int i = 0; i < schema.getAttributeCount(); i++) {
-			if (schema.getAttributeType(i) instanceof ArcSDEAttributeType) {
-				ArcSDEAttributeType t = (ArcSDEAttributeType)schema.getAttributeType(i);
-				if (t.isFeatureIDAttribute()) {
-					this.featureIDAttributeName = t.getName();
-					break;
-				}
-			}
-		}
-		
-		this.fidPrefix = new StringBuffer(this.schema.getTypeName())
-				.append(".");
-		this.fidPrefixLen = this.fidPrefix.length();
+        this.query = query;
+        this.fidReader = query.getFidReader();
+        this.schema = query.getSchema();
 
-		final GeometryAttributeType geomType = this.schema.getDefaultGeometry();
+        String typeName = schema.getTypeName();
+        
+        this.fidPrefix = new StringBuffer(typeName).append('.');
+        this.fidPrefixLen = this.fidPrefix.length();
 
-		if (geomType != null) {
-			Class geometryClass = geomType.getType();
-			this.geometryBuilder = ArcSDEGeometryBuilder.builderFor(geometryClass);
-		}
+        final GeometryAttributeType geomType = schema.getDefaultGeometry();
+
+        if (geomType != null) {
+            Class geometryClass = geomType.getType();
+            this.geometryBuilder = ArcSDEGeometryBuilder.builderFor(geometryClass);
+        }
 	}
 	
-	/**
-	 * 
-	 */
-	/*public void setFeatureIDAttributeName(String s) {
-		featureIDAttributeName = s;
-	}*/
-
 	/**
 	 * 
 	 */
@@ -159,73 +141,28 @@ class ArcSDEAttributeReader implements AttributeReader {
 	 * 
 	 */
 	public boolean hasNext() throws IOException {
-		if (!this.hasNextAlreadyCalled) {
-			try {
-				SeRow currentRow;
-				currentRow = this.query.fetch();
-				this.hasNextAlreadyCalled = true;
+        if (!this.hasNextAlreadyCalled) {
+            try {
+                currentRow = query.fetch();
+                if (currentRow == null) {
+                    this.query.close();
+                } else {
+                    this.currentFid = fidReader.readFid(currentRow);
+                }
+                hasNextAlreadyCalled = true;
+            } catch (IOException dse) {
+                this.hasNextAlreadyCalled = true;
+                this.query.close();
+                LOGGER.log(Level.SEVERE, dse.getLocalizedMessage(), dse);
+                throw dse;
+            } catch (RuntimeException ex) {
+                this.hasNextAlreadyCalled = true;
+                this.query.close();
+                throw new DataSourceException("Fetching row:" + ex.getMessage(), ex);
+            }
+        }
 
-				// ensure closing the query to release the connection, may be
-				// the
-				// user is not so smart to doing it itself
-				if (currentRow == null) {
-					this.query.close();
-					this.currentValues = null;
-				} else {
-					// actual number of columns returned. Can be 1 more then
-					// attCount. In this case, it means the discovered FID column
-					// wasn't included in the query and was added as the final column.
-					int columns = currentRow.getColumns().length;
-					Object value;
-
-					for (int i = 0; i < columns; i++) {
-						value = currentRow.getObject(i);
-						//LOGGER.warning("Fetched '" + value +"' from row '" + query.getSchema().getAttributeType(i).getName());
-						
-						// if there's an SDE-maintained RowID column on this table, let's use that for the
-						// featureID.
-						if (featureIDAttributeName != null) {
-							if (schema.getAttributeType(i).getName().equalsIgnoreCase(featureIDAttributeName)) {
-								if (value == null) {
-									// This means that the FID field for this table has returned us a null value.  There's no way
-									// to reliably obtain an FID for this feature, so we'll either have to leave it blank, or
-									// cause an error here.  Leaving an FID blank is bad, I guess.  So we'll throw an error.
-									throw new DataSourceException("Unable to reliably determine an FID column for this table, so we defaulted to using the '" + featureIDAttributeName +"' column.  But it was null, leaving us no FID for this feature.");
-								} else {
-									this.currentFid = Long.parseLong(value.toString());
-									if (LOGGER.isLoggable(Level.FINER))
-										LOGGER.finer("Fetched fid " + this.currentFid + " from column " + featureIDAttributeName);
-									continue;
-								}
-							}
-						}
-
-                        if (schema.getAttributeType(i) instanceof GeometryAttributeType) {
-                            SeShape shape = (SeShape) value;
-                            value = this.geometryBuilder.construct(shape);
-                            this.currentValues[i] = value;
-                        } else {
-                            this.currentValues[i] = value;
-                        }
-					}
-				}
-			} catch (SeException ex) {
-				this.currentValues = null;
-				this.hasNextAlreadyCalled = true;
-				this.query.close();
-				LOGGER.log(Level.SEVERE, ex.getSeError().getErrDesc(), ex);
-				throw new DataSourceException("Fetching row:"
-						+ ex.getSeError().getErrDesc(), ex);
-			} catch (DataSourceException dse) {
-				this.currentValues = null;
-				this.hasNextAlreadyCalled = true;
-				this.query.close();
-				LOGGER.log(Level.SEVERE, dse.getLocalizedMessage(), dse);
-				throw dse;
-			}
-		}
-
-		return this.currentValues != null;
+        return this.currentRow != null;
 	}
 
 	/**
@@ -238,11 +175,11 @@ class ArcSDEAttributeReader implements AttributeReader {
 	 *             DOCUMENT ME!
 	 */
 	public void next() throws IOException {
-		if (this.currentValues == null) {
-			throw new DataSourceException("There are no more rows");
-		}
+        if (this.currentRow == null) {
+            throw new DataSourceException("There are no more rows");
+        }
 
-		this.hasNextAlreadyCalled = false;
+        this.hasNextAlreadyCalled = false;
 	}
 
 	/**
@@ -262,23 +199,43 @@ class ArcSDEAttributeReader implements AttributeReader {
 	 */
 	public Object read(int index) throws IOException,
 			ArrayIndexOutOfBoundsException {
-		return this.currentValues[index];
+        Object value = currentRow.getObject(index);
+        
+        if (value instanceof SeShape) {
+            try{
+                SeShape shape = (SeShape) value;
+                /**
+                Class geomClass = ArcSDEAdapter.getGeometryType(shape.getType());
+                geometryBuilder = GeometryBuilder.builderFor(geomClass);
+                */
+                value = geometryBuilder.construct(shape);
+            }catch(SeException e){
+                throw new DataSourceException(e);
+            }
+        } 
+
+        return value;
 	}
 
-	public Object[] readAll() {
-		return this.currentValues;
+	public Object[] readAll() throws ArrayIndexOutOfBoundsException, IOException {
+        int size = schema.getAttributeCount();
+        Object []all = new Object[size];
+        for(int i = 0; i < size; i++){
+            all[i] = read(i);
+        }
+        return all;
 	}
 
 	/**
 	 * 
 	 */
 	public String readFID() throws IOException {
-		if (this.currentFid == -1) {
-			throw new DataSourceException("The feature id was not fetched");
-		}
-		this.fidPrefix.setLength(this.fidPrefixLen);
-		this.fidPrefix.append(this.currentFid);
+        if (this.currentFid == -1) {
+            throw new DataSourceException("The feature id was not fetched");
+        }
+        this.fidPrefix.setLength(this.fidPrefixLen);
+        this.fidPrefix.append(this.currentFid);
 
-		return this.fidPrefix.toString();
+        return this.fidPrefix.toString();
 	}
 }

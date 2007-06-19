@@ -16,6 +16,8 @@
  */
 package org.geotools.arcsde.pool;
 
+import java.io.IOException;
+
 /**
  * Exception thrown when a free SDE connection can't be obtained after the
  * calling thread was waiting an available connection for
@@ -25,7 +27,7 @@ package org.geotools.arcsde.pool;
  * @source $URL$
  * @version $Id$
  */
-public class UnavailableArcSDEConnectionException extends Exception {
+public class UnavailableArcSDEConnectionException extends IOException {
 	/**
 	 * Creates a new UnavailableArcSDEConnectionException object.
 	 * 
