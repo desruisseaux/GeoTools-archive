@@ -136,6 +136,13 @@ public class DataUtilities {
      */
     public static String[] attributeNames(FeatureType featureType) {
         String[] names = new String[featureType.getAttributeCount()];
+        final int count = featureType.getAttributeCount();
+        for (int i = 0; i < count; i++) {
+        	names[i] = featureType.getAttributeType(i).getName();
+        }
+        
+        return names;
+    }
     
     /**
      * Takes a URL and converts it to a File. The attempts to deal with 
@@ -166,13 +173,6 @@ public class DataUtilities {
 		return f;
     }
 
-		final int count = featureType.getAttributeCount();
-		for (int i = 0; i < count; i++) {
-			names[i] = featureType.getAttributeType(i).getName();
-		}
-
-        return names;
-    }
 
     /**
      * Traverses the filter and returns any encoutered property names.
