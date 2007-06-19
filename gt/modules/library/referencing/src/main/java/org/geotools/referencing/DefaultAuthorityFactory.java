@@ -32,6 +32,7 @@ import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.factory.ManyAuthoritiesFactory;
 import org.geotools.referencing.factory.BufferedAuthorityFactory;
+import org.geotools.referencing.factory.ThreadedAuthorityFactory;
 
 
 /**
@@ -49,7 +50,7 @@ import org.geotools.referencing.factory.BufferedAuthorityFactory;
  * @author Martin Desruisseaux
  * @author Andrea Aime
  */
-final class DefaultAuthorityFactory extends BufferedAuthorityFactory implements CRSAuthorityFactory {
+final class DefaultAuthorityFactory extends ThreadedAuthorityFactory implements CRSAuthorityFactory {
     /**
      * Creates a new authority factory with the specified hints.
      */

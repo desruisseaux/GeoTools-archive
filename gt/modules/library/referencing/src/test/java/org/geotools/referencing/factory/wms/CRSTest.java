@@ -38,6 +38,7 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.IdentifiedObjectFinder;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.BufferedAuthorityFactory;
+import org.geotools.referencing.factory.ThreadedAuthorityFactory;
 
 
 /**
@@ -220,7 +221,7 @@ public final class CRSTest extends TestCase {
     /**
      * For {@link #testBufferedFind}.
      */
-    private static final class Buffered extends BufferedAuthorityFactory implements CRSAuthorityFactory {
+    private static final class Buffered extends ThreadedAuthorityFactory implements CRSAuthorityFactory {
         Buffered(final AbstractAuthorityFactory factory) {
             super(factory);
         }
