@@ -252,7 +252,10 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
         String retString;
 
         if (value != null) {
-            retString = "'" + doubleQuote(value) + "'";
+            if(value instanceof Number)
+                retString = value.toString();
+            else
+                retString = "'" + doubleQuote(value) + "'";
         } else {
             retString = "null";
         }
