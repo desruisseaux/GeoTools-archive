@@ -53,7 +53,7 @@ import org.geotools.resources.i18n.LoggingKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public abstract class DeferredAuthorityFactory extends ThreadedAuthorityFactory
+public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
                                             implements OptionalFactory
 {
     /**
