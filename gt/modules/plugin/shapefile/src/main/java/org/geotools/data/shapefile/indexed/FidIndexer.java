@@ -26,6 +26,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.logging.Logger;
 
+import org.geotools.data.DataUtilities;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.shp.IndexFile;
 
@@ -63,10 +64,10 @@ public class FidIndexer {
             URL fixURL = new URL(filename + ".fix");
             URL indexURL = new URL(filename + ".shx");
             
-            if( new File(fixURL.getFile()).exists() )
+            if( DataUtilities.urlToFile(fixURL).exists() )
             	return fixURL;
             
-            if( !(new File(indexURL.getFile()).exists()) )
+            if( !(DataUtilities.urlToFile(indexURL).exists()) )
             	return null;
             
 			indexFile = new IndexFile(getReadChannel(indexURL));
@@ -112,15 +113,7 @@ public class FidIndexer {
 
         if (url.getProtocol().equals("file")) { // && useMemoryMappedBuffer) {
 
-            File file = null;
-
-            if ((url.getHost() != null) && !url.getHost().equals("")) {
-                // win
-                file = new File(url.getHost() + ":" + url.getFile());
-            } else {
-                // linux
-                file = new File(url.getFile());
-            }
+            File file = DataUtilities.urlToFile(url);
 
             if (!file.exists()) {
                 throw new IOException("File doesn't exist: " + file);
@@ -158,15 +151,7 @@ public class FidIndexer {
 
         if (url.getProtocol().equals("file")) { // && useMemoryMappedBuffer) {
 
-            File file = null;
-
-            if ((url.getHost() != null) && !url.getHost().equals("")) {
-                // win
-                file = new File(url.getHost() + ":" + url.getFile());
-            } else {
-                // linux
-                file = new File(url.getFile());
-            }
+            File file = DataUtilities.urlToFile(url);
 
             RandomAccessFile raf = new RandomAccessFile(file, "rw");
             channel = raf.getChannel();

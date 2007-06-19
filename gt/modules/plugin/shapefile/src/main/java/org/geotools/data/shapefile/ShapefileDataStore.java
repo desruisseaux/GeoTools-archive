@@ -264,7 +264,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      * @param u DOCUMENT ME!
      */
     private void delete(URL u) {
-        File f = new File(u.getFile());
+        File f = DataUtilities.urlToFile(u);
         f.delete();
     }
 
@@ -287,13 +287,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
 
             File file = null;
 
-            if ((url.getHost() != null) && !url.getHost().equals("")) {
-                // win
-                file = new File(url.getHost() + ":" + url.getFile());
-            } else {
-                // linux
-                file = new File(url.getFile());
-            }
+            file = DataUtilities.urlToFile(url);
 
             if ( !file.exists() ) {
             	throw new FileNotFoundException( file.toString() );
@@ -331,15 +325,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         
         if (url.getProtocol().equals("file")) { // && useMemoryMappedBuffer) {
 
-            File file = null;
-
-            if ((url.getHost() != null) && !url.getHost().equals("")) {
-                // win
-                file = new File(url.getHost() + ":" + url.getFile());
-            } else {
-                // linux
-                file = new File(url.getFile());
-            }
+            File file = DataUtilities.urlToFile(url);
 
             RandomAccessFile raf = new RandomAccessFile(file, "rw");
             channel = raf.getChannel();
@@ -1172,7 +1158,8 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      */
     protected void copyAndDelete(URL src, long temp) throws IOException {
         File storage = getStorageFile(src, temp);
-        File dest = new File(src.getFile());
+        
+        File dest = DataUtilities.urlToFile(src);
         FileChannel in = null;
         FileChannel out = null;
         

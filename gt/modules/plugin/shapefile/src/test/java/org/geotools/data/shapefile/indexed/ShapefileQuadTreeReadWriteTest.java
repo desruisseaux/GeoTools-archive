@@ -134,7 +134,7 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
    
     void test(String f) throws Exception {
         File file=copyShapefiles(f); // Work on File rather than URL from JAR.
-        DataStore s = createDataStore(new IndexedShapefileDataStoreFactory(), new URL("file://"+file.getPath()), true);
+        DataStore s = createDataStore(new IndexedShapefileDataStoreFactory(),file.toURL(), true);
         String typeName = s.getTypeNames()[0];
         FeatureSource source = s.getFeatureSource(typeName);
         FeatureType type = source.getSchema();
@@ -231,7 +231,7 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
         IndexedShapefileDataStoreFactory fac=new IndexedShapefileDataStoreFactory();
         
         Map params=new HashMap();
-        params.put( IndexedShapefileDataStoreFactory.URLP.key,  new URL("file://"+file.getPath()));
+        params.put( IndexedShapefileDataStoreFactory.URLP.key,  file.toURL());
         params.put( IndexedShapefileDataStoreFactory.CREATE_SPATIAL_INDEX.key, new Boolean(true));
         IndexedShapefileDataStore ds = (IndexedShapefileDataStore) fac.createDataStore(params);
         
