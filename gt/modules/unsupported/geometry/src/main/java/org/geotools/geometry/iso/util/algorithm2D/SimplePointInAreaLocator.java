@@ -74,6 +74,7 @@
  */
 package org.geotools.geometry.iso.util.algorithm2D;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.geotools.geometry.iso.primitive.RingImpl;
@@ -83,6 +84,7 @@ import org.geotools.geometry.iso.topograph2D.Coordinate;
 import org.geotools.geometry.iso.topograph2D.Location;
 import org.geotools.geometry.iso.topograph2D.util.CoordinateArrays;
 import org.opengis.geometry.Geometry;
+import org.opengis.geometry.aggregate.MultiPrimitive;
 
 /**
  * Computes whether a point lies in the interior of an area {@link Geometry}.
@@ -116,17 +118,15 @@ public class SimplePointInAreaLocator {
 		if (geom instanceof SurfaceImpl) {
 			return containsPointInPolygon(p, (SurfaceImpl) geom);
 		}
-		// TODO auskommentiert; checken!
-		// else if (geom instanceof GeometryCollection) {
-		// Iterator geomi = new GeometryCollectionIterator(
-		// (GeometryCollection) geom);
-		// while (geomi.hasNext()) {
-		// GeometryImpl g2 = (GeometryImpl) geomi.next();
-		// if (g2 != geom)
-		// if (containsPoint(p, g2))
-		// return true;
-		// }
-		// }
+		else if (geom instanceof MultiPrimitive) {
+			Iterator geomi = ((MultiPrimitive) geom).getElements().iterator();
+			while (geomi.hasNext()) {
+				GeometryImpl g2 = (GeometryImpl) geomi.next();
+				if (g2 != geom)
+					if (containsPoint(p, g2))
+						return true;
+			}
+		}
 		return false;
 
 		// OLD CODE:

@@ -57,7 +57,7 @@ import org.xml.sax.InputSource;
  * - spaces must be replaced by "_" in description
  * - "No_description" is the default
  */
-public class ConformanceTest extends TestCase {
+public class GeometryConformanceTestCases extends TestCase {
 
 	TestResult result;
 	@Override
@@ -66,98 +66,97 @@ public class ConformanceTest extends TestCase {
 		super.run(result);
 		result = null;
 	}
-	public void testTestTEST(){
-		assertTrue( true );
-	}
-	public void testLineTests() throws Exception {
-		perform();
-	}
-	public void testPolygonTests() throws Exception {
-		perform();
-	}
-	
-	public void testPolygonWithHoleTests() throws Exception {
-		perform();
-	}
-	public void testSimplePolygonTest() throws Exception {
-		perform();
-	}
-	public void testTestBoundary() throws Exception {
-		perform();
-	}
-	public void testTestBuffer() throws Exception {
-		perform();
-	}
-	public void testTestCentroid() throws Exception {
-		perform();
-	}
-	public void testTestConvexHullbig() throws Exception {
-		setName("testTestConvexHull-big");
-		perform();
-	}
-	public void testTestConvexHull() throws Exception {
-		perform();
-	}
-	public void testTestFunctionAA() throws Exception {
-		perform();
-	}
-	public void testTestFunctionAAPrec() throws Exception {
-		perform();
-	}
-	public void testTestFunctionLA() throws Exception {
-		perform();
-	}
-	public void testTestFunctionLAPrec() throws Exception {
-		perform();
-	}
-	public void testTestFunctionLL() throws Exception {
-		perform();
-	}
-	public void testTestFunctionLLPrec() throws Exception {
-		perform();
-	}
-	public void testTestFunctionPA() throws Exception {
-		perform();
-	}
-	public void testTestFunctionPL() throws Exception {
-		perform();
-	}
-	public void testTestFunctionPLPrec() throws Exception {
-		perform();
-	}
-	public void testTestFunctionPP() throws Exception {
-		perform();
-	}
-	public void testTestInteriorPoint() throws Exception {
-		perform();
-	}
-	public void testTestRectanglePredicate() throws Exception {
-		perform();
-	}
-	public void testTestRelateAA() throws Exception {
-		perform();
-	}
-	public void testTestRelateAC() throws Exception {
-		perform();
-	}
-	public void testTestRelateLA() throws Exception {
-		perform();
-	}
-	public void testTestRelateLC() throws Exception {
-		perform();
-	}
+
+//	public void testLineTests() throws Exception {
+//		perform();
+//	}
+//	public void testPolygonTests() throws Exception {
+//		perform();
+//	}
+//	
+//	public void testPolygonWithHoleTests() throws Exception {
+//		perform();
+//	}
+//	public void testSimplePolygonTest() throws Exception {
+//		perform();
+//	}
+//	public void testTestBoundary() throws Exception {
+//		perform();
+//	}
+//	public void testTestBuffer() throws Exception {
+//		perform();
+//	}
+//	public void testTestCentroid() throws Exception {
+//		perform();
+//	}
+//	public void testTestConvexHullbig() throws Exception {
+//		setName("testTestConvexHull-big");
+//		perform();
+//	}
+//	public void testTestConvexHull() throws Exception {
+//		perform();
+//	}
+//	public void testTestFunctionAA() throws Exception {
+//		perform();
+//	}
+//	public void testTestFunctionAAPrec() throws Exception {
+//		perform();
+//	}
+//	public void testTestFunctionLA() throws Exception {
+//		perform();
+//	}
+//	public void testTestFunctionLAPrec() throws Exception {
+//		perform();
+//	}
+//	public void testTestFunctionLL() throws Exception {
+//		perform();
+//	}
+//	public void testTestFunctionLLPrec() throws Exception {
+//		perform();
+//	}
+//	public void testTestFunctionPA() throws Exception {
+//		perform();
+//	}
+//	public void testTestFunctionPL() throws Exception {
+//		perform();
+//	}
+//	public void testTestFunctionPLPrec() throws Exception {
+//		perform();
+//	}
+//	public void testTestFunctionPP() throws Exception {
+//		perform();
+//	}
+//	public void testTestInteriorPoint() throws Exception {
+//		perform();
+//	}
+//	public void testTestRectanglePredicate() throws Exception {
+//		perform();
+//	}
+//	public void testTestRelateAA() throws Exception {
+//		perform();
+//	}
+//	public void testTestRelateAC() throws Exception {
+//		perform();
+//	}
+//	public void testTestRelateLA() throws Exception {
+//		perform();
+//	}
+//	public void testTestRelateLC() throws Exception {
+//		perform();
+//	}
 	public void testTestRelateLL() throws Exception {
 		perform();
 	}
-	public void testTestRelatePA() throws Exception {
-		perform();
-	}
-	public void testTestRelatePL() throws Exception {
-		perform();
-	}
-	public void testTestRelatePP() throws Exception {
-		perform();
-	}
+//	public void testTestRelatePA() throws Exception {
+//		perform();
+//	}
+//	public void testTestRelatePL() throws Exception {
+//		perform();
+//	}
+//	public void testTestRelatePP() throws Exception {
+//		perform();
+//	}
+	
 //	public void testTestSimple() throws Exception {
 //		perform();
 //	}
@@ -171,14 +170,17 @@ public class ConformanceTest extends TestCase {
 //	public void testTestValid2() throws Exception {
 //		perform();
 //	}
-	public void testTestWithinDistance() throws Exception {
-		perform();
-	}
+	
+//	public void testTestWithinDistance() throws Exception {
+//		perform();
+//	}
+	
+	
     private void perform() throws Exception {   	
 		String name = getName();
 		name = name.substring( 4 )+".xml";
 		
-		File file = TestData.file(ConformanceTest.class, name );		
+		File file = TestData.file(GeometryConformanceTestCases.class, name );		
 		//assertTrue( name+" exists", file.exists() );
 		
 		GeometryTestParser parser = new GeometryTestParser();

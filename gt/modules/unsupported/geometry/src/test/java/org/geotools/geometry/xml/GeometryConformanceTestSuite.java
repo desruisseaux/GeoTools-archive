@@ -59,16 +59,16 @@ import org.xml.sax.InputSource;
  * - spaces must be replaced by "_" in description
  * - "No_description" is the default
  */
-public class GeometryConformanceTest extends TestSuite {
+public class GeometryConformanceTestSuite extends TestSuite {
 
     public static Test suite() {
         GeometryTestParser parser = new GeometryTestParser();
 
-        GeometryConformanceTest suite = new GeometryConformanceTest();
+        GeometryConformanceTestSuite suite = new GeometryConformanceTestSuite();
 
         File dir;
         try {
-            dir = TestData.file(GeometryConformanceTest.class, "LineTests.xml")
+            dir = TestData.file(GeometryConformanceTestSuite.class, "LineTests.xml")
                     .getParentFile();
 
             File tests[] = dir.listFiles(new FileFilter() {
@@ -163,15 +163,9 @@ public class GeometryConformanceTest extends TestSuite {
                     GeometryTestOperation op = testCase.findTestOperation(operationName);
                     if (op != null) {
                         testCase.removeTestOperation(op);
-                        /*
                         //check for override, rather than just remove
                         if (operationValue.equalsIgnoreCase("skipped")) {
                         	continue;
-                        }
-                        */
-                        //remove
-                        if (operationValue.equalsIgnoreCase("skipped")) {
-                        	testCase.removeTestOperation(op);
                         }
                         else if (operationValue.equalsIgnoreCase("boundary")) {
                         	// post process into a surface boundary

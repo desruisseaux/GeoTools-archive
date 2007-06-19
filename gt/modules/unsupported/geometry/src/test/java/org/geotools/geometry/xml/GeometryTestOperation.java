@@ -398,7 +398,7 @@ public class GeometryTestOperation extends Assert {
 				e.printStackTrace();
 			}
 			actualResult = result;
-            return result;
+            return (actualResult == expectedResult);
         }
     }
     

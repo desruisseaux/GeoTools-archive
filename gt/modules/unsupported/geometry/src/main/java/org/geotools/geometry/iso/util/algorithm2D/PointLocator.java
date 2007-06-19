@@ -74,9 +74,12 @@
  */ 
 package org.geotools.geometry.iso.util.algorithm2D;
 
+import java.util.Iterator;
 import java.util.List;
 
+import org.geotools.geometry.iso.aggregate.MultiPrimitiveImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
+import org.geotools.geometry.iso.primitive.PrimitiveImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
@@ -85,6 +88,8 @@ import org.geotools.geometry.iso.topograph2D.GeometryGraph;
 import org.geotools.geometry.iso.topograph2D.Location;
 import org.geotools.geometry.iso.topograph2D.util.CoordinateArrays;
 import org.opengis.geometry.Geometry;
+import org.opengis.geometry.aggregate.MultiPrimitive;
+import org.opengis.geometry.primitive.Primitive;
 
 /**
  * Computes the topological relationship ({@link Location}) of a single point
@@ -160,7 +165,14 @@ public class PointLocator {
 			updateLocationInfo(locate(p, (CurveImpl) geom));
 		} else if (geom instanceof SurfaceImpl) {
 			updateLocationInfo(locate(p, (SurfaceImpl) geom));
+		} else if (geom instanceof MultiPrimitiveImpl) {
+			Iterator<Primitive> iterator = ((MultiPrimitiveImpl)geom).getElements().iterator();
+			while (iterator.hasNext()) {
+				PrimitiveImpl prim = ((PrimitiveImpl)iterator.next());
+				updateLocationInfo(locate(p, prim));
+			}
 		}
+		
 		// else if (geom instanceof MultiLineString) {
 		// MultiLineString ml = (MultiLineString) geom;
 		// for (int i = 0; i < ml.getNumGeometries(); i++) {

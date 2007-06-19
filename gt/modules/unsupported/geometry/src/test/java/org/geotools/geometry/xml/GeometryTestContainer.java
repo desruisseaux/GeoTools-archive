@@ -50,10 +50,10 @@ public class GeometryTestContainer {
     public void addToTestSuite(String name, TestSuite suite, Properties excludes) {
         for (GeometryTestCase testCase : testCases) {
             //only add the test case if its description is NOT in the excludes list
-            if (!GeometryConformanceTest.isExcluded(excludes, testCase.getDescription())) {
+            if (!GeometryConformanceTestSuite.isExcluded(excludes, testCase.getDescription())) {
                 testCase.setName(name);
                 //check for overrides on operations
-                testCase = GeometryConformanceTest.overrideOps(testCase, excludes);
+                testCase = GeometryConformanceTestSuite.overrideOps(testCase, excludes);
                 suite.addTest(testCase);
             }
         }
@@ -62,10 +62,10 @@ public class GeometryTestContainer {
     public void checkTestOverrides(String name, Properties excludes) {
         for (GeometryTestCase testCase : testCases) {
             //only add the test case if its description is NOT in the excludes list
-            if (!GeometryConformanceTest.isExcluded(excludes, testCase.getDescription())) {
+            if (!GeometryConformanceTestSuite.isExcluded(excludes, testCase.getDescription())) {
                 testCase.setName(name);
                 //check for overrides on operations
-                testCase = GeometryConformanceTest.overrideOps(testCase, excludes);
+                testCase = GeometryConformanceTestSuite.overrideOps(testCase, excludes);
             }
         }
     }

@@ -102,8 +102,12 @@ import org.geotools.geometry.iso.topograph2D.index.SimpleMonotoneChainSweepLineI
 import org.geotools.geometry.iso.topograph2D.util.CoordinateArrays;
 import org.geotools.geometry.iso.util.Assert;
 import org.geotools.geometry.iso.util.algorithm2D.LineIntersector;
+import org.opengis.geometry.aggregate.MultiPrimitive;
+import org.opengis.geometry.aggregate.MultiSurface;
+import org.opengis.geometry.primitive.Curve;
 import org.opengis.geometry.primitive.Primitive;
 import org.opengis.geometry.primitive.Ring;
+import org.opengis.geometry.primitive.Surface;
 
 /**
  * A GeometryGraph is a graph that models a given Geometry
@@ -146,7 +150,7 @@ public class GeometryGraph extends PlanarGraph {
 	 * If this flag is true, the Boundary Determination Rule will used when
 	 * deciding whether nodes are in the boundary or not
 	 */
-	private boolean useBoundaryDeterminationRule = false;
+	private boolean useBoundaryDeterminationRule = true;
 
 	private int argIndex; // the index of this geometry as an argument to a
 
@@ -242,10 +246,9 @@ public class GeometryGraph extends PlanarGraph {
 
 		// TODO auskommentiert; checken!
 		// check if this Geometry should obey the Boundary Determination Rule
-		// all collections except MultiPolygons obey the rule
-		// if (g instanceof GeometryCollection
-		// && ! (g instanceof MultiPolygon))
-		// useBoundaryDeterminationRule = true;
+		// all collections except MultiSurfaces obey the rule
+		if (g instanceof MultiSurface)
+			useBoundaryDeterminationRule = false;
 
 		/*
 		 * The following classes shall be considered for building a geometry graph in 2d/2.5d:
@@ -555,11 +558,13 @@ public class GeometryGraph extends PlanarGraph {
 
 		// optimized test for Polygons and Rings
 		if (!computeRingSelfNodes
+			&& (parentGeom instanceof Curve
+			|| parentGeom instanceof Surface
+		  	|| parentGeom instanceof MultiPrimitive)) {
 		// TODO auskommentiert; checken!
 		// && (parentGeom instanceof LinearRing
 		// || parentGeom instanceof Polygon
 		// || parentGeom instanceof MultiPolygon)
-		) {
 			// Compute Intersections without self-intersections
 			esi.computeIntersections(edges, si, false);
 		} else {

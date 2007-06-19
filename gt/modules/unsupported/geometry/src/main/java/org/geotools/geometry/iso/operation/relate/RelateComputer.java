@@ -399,6 +399,7 @@ public class RelateComputer {
 
 		for (Iterator ni = nodes.iterator(); ni.hasNext();) {
 			RelateNode node = (RelateNode) ni.next();
+			//System.out.println(node.getCoordinate());
 			node.updateIM(im);
 			node.updateIMFromEdges(im);
 		}
