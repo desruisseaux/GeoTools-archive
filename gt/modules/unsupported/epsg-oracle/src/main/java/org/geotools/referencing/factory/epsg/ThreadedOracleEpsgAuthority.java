@@ -31,7 +31,7 @@ import org.geotools.factory.Hints;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 
 /**
- * Connection to the EPSG database in Oracle database engine using JDBC. The EPSG
+ * Connection to the EPSG database in Oracle database engine using a JDBC datasource. The EPSG
  * database can be downloaded from <A HREF="http://www.epsg.org">http://www.epsg.org</A>.
  * It should have been imported into an Oracle database, which doesn't need to be on
  * the local machine.
@@ -105,7 +105,7 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * @author Martin Desruisseaux
  * @author Jody Garnett
  */
-public class FactoryOnOracleSQL extends ThreadedEpsgFactory {
+public class ThreadedOracleEpsgAuthority extends ThreadedEpsgFactory {
     /**
      * The user configuration file. This class search first for the first file found in the
      * following directories:
@@ -124,7 +124,7 @@ public class FactoryOnOracleSQL extends ThreadedEpsgFactory {
     /**
      * Creates a new instance of this factory.
      */
-    public FactoryOnOracleSQL() {
+    public ThreadedOracleEpsgAuthority() {
         this(null);
     }
 
@@ -134,7 +134,7 @@ public class FactoryOnOracleSQL extends ThreadedEpsgFactory {
      * in order to give the priority to any "official" database installed locally by the
      * user, when available.
      */
-    public FactoryOnOracleSQL(final Hints hints) {
+    public ThreadedOracleEpsgAuthority(final Hints hints) {
         super(hints, PRIORITY + 5);
     }
 
