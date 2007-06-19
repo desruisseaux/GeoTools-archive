@@ -24,7 +24,7 @@ import javax.naming.NamingException;
  * Provides {@linkplain InitialContext initial context} for <cite>Java Naming and Directory
  * Interfaces</cite> (JNDI) in Geotools. This classes provides a central place where initial
  * context can been found for the Geotools library. This context is used for example by the
- * {@linkplain org.geotools.referencing.factory.epsg.DefaultFactory EPSG factory} in order to
+ * {@linkplain org.geotools.referencing.factory.epsg.ThreadedEpsgFactory EPSG factory} in order to
  * find connection parameters to an EPSG database. Using JNDI, such connection parameters can
  * be set in a J2EE environment.
  *

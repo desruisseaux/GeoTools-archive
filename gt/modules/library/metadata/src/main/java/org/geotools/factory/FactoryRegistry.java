@@ -302,8 +302,8 @@ public class FactoryRegistry extends ServiceRegistry {
                      * this class).
                      *
                      * Use case: DefaultDataSourceTest invokes indirectly 'getServiceProvider'
-                     * with a "CRS_AUTHORITY_FACTORY = DefaultFactory.class" hint. However
-                     * DefaultFactory (in the org.geotools.referencing.factory.epsg package)
+                     * with a "CRS_AUTHORITY_FACTORY = ThreadedEpsgFactory.class" hint. However
+                     * ThreadedEpsgFactory (in the org.geotools.referencing.factory.epsg package)
                      * is a wrapper around FactoryUsingSQL, and defines this dependency through
                      * a "CRS_AUTHORITY_FACTORY = FactoryUsingSQL.class" hint. There is no way
                      * to match this hint for both factories in same time. Since we must choose
@@ -585,7 +585,7 @@ public class FactoryRegistry extends ServiceRegistry {
              * This is because the same hint may appears in the "parent" factory and a "child"
              * dependency with different value. For example the FORCE_LONGITUDE_FIRST_AXIS_ORDER
              * hint has the value TRUE in OrderedAxisAuthorityFactory, but the later is basically
-             * a wrapper around the EPSG DefaultFactory (typically), which has the value FALSE
+             * a wrapper around the EPSG ThreadedEpsgFactory (typically), which has the value FALSE
              * for the same hint.
              *
              * Additional note: The 'alreadyDone' set is a safety against cyclic dependencies,

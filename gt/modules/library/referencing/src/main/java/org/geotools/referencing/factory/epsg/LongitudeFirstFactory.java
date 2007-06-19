@@ -37,7 +37,7 @@ import org.geotools.metadata.iso.citation.Citations;
 
 /**
  * An EPSG authority factory using (<var>longitude</var>, <var>latitude</var>) axis order.
- * This factory wraps a {@link DefaultFactory} into an {@link OrderedAxisAuthorityFactory}
+ * This factory wraps a {@link ThreadedEpsgFactory} into an {@link OrderedAxisAuthorityFactory}
  * when first needed.
  * <p>
  * Users don't need to create explicitly an instance of this class. Instead, one can get
@@ -108,7 +108,7 @@ public class LongitudeFirstFactory extends DeferredAuthorityFactory implements C
      * @param userHints An optional set of hints, or {@code null} for the default values.
      */
     public LongitudeFirstFactory(final Hints userHints) {
-        super(userHints, DefaultFactory.PRIORITY + relativePriority());
+        super(userHints, ThreadedEpsgFactory.PRIORITY + relativePriority());
         // See comment in createBackingStore() method body.
         hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
         put(userHints, Hints.FORCE_STANDARD_AXIS_DIRECTIONS);
@@ -130,7 +130,7 @@ public class LongitudeFirstFactory extends DeferredAuthorityFactory implements C
     }
 
     /**
-     * Returns the priority to use relative to the {@link DefaultFactory} priority. The default
+     * Returns the priority to use relative to the {@link ThreadedEpsgFactory} priority. The default
      * priority should be lower, except if the <code>{@value #SYSTEM_DEFAULT_KEY}</code> system
      * property is set to {@code true}.
      *
@@ -158,7 +158,7 @@ public class LongitudeFirstFactory extends DeferredAuthorityFactory implements C
     }
 
     /**
-     * Returns the factory instance (usually {@link DefaultFactory})
+     * Returns the factory instance (usually {@link ThreadedEpsgFactory})
      * to be used as the backing store.
      *
      * @throws FactoryException If no suitable factory instance was found.
@@ -166,7 +166,7 @@ public class LongitudeFirstFactory extends DeferredAuthorityFactory implements C
     protected AbstractAuthorityFactory createBackingStore() throws FactoryException {
         /*
          * Set the hints for the backing store to fetch. I'm not sure that we should request a
-         * org.geotools.referencing.factory.epsg.DefaultFactory implementation; for now we are
+         * org.geotools.referencing.factory.epsg.ThreadedEpsgFactory implementation; for now we are
          * making this requirement mostly as a safety in order to get an implementation that is
          * known to work, but we could relax that in a future version. AbstractAuthorityFactory
          * is the minimal class required with current OrderedAxisAuthorityFactory API.
@@ -179,7 +179,7 @@ public class LongitudeFirstFactory extends DeferredAuthorityFactory implements C
          * and we don't want the backing store to interfer with that.
          */
         final Hints backingStoreHints;
-        backingStoreHints = new Hints(Hints.CRS_AUTHORITY_FACTORY, DefaultFactory.class);
+        backingStoreHints = new Hints(Hints.CRS_AUTHORITY_FACTORY, ThreadedEpsgFactory.class);
         backingStoreHints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE);
         backingStoreHints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS,   Boolean.FALSE);
         backingStoreHints.put(Hints.FORCE_STANDARD_AXIS_UNITS,        Boolean.FALSE);

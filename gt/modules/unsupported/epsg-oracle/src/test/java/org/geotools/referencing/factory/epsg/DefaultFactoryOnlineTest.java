@@ -85,7 +85,7 @@ public class DefaultFactoryOnlineTest extends OracleOnlineTestCase {
     /**
      * The EPSG factory to test. Will be setup only when first needed.
      */
-    private DefaultFactory factory;
+    private ThreadedEpsgFactory factory;
 
     /**
      * Sets up the authority factory.
@@ -99,15 +99,15 @@ public class DefaultFactoryOnlineTest extends OracleOnlineTestCase {
         }
         
         if (factory == null) {
-            factory = (DefaultFactory) ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG",
-                        new Hints(Hints.CRS_AUTHORITY_FACTORY, DefaultFactory.class));
+            factory = (ThreadedEpsgFactory) ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG",
+                        new Hints(Hints.CRS_AUTHORITY_FACTORY, ThreadedEpsgFactory.class));
             extensive |= TestData.isExtensiveTest();
             if (verbose) {
                 System.out.print("Database version: ");
                 System.out.println(factory.getImplementationHints().get(Hints.VERSION));
             }
         }
-        // No 'tearDown()' method: we rely on the DefaultFactory shutdown hook.
+        // No 'tearDown()' method: we rely on the ThreadedEpsgFactory shutdown hook.
     }
 
     /**
@@ -116,7 +116,7 @@ public class DefaultFactoryOnlineTest extends OracleOnlineTestCase {
      */
     public void testRegistry() {
         final Object candidate = ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG", null);
-        if (candidate instanceof DefaultFactory) {
+        if (candidate instanceof ThreadedEpsgFactory) {
             assertSame(factory, candidate);
         }
     }
@@ -732,7 +732,7 @@ public class DefaultFactoryOnlineTest extends OracleOnlineTestCase {
     }
 
     /**
-     * Tests {@link DefaultFactory#find} method.
+     * Tests {@link ThreadedEpsgFactory#find} method.
      */
     public void testFind() throws FactoryException {
         final IdentifiedObjectFinder finder = factory.getIdentifiedObjectFinder(

@@ -197,7 +197,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 		this.hints = (Hints) tempHints.clone();
 		allAuthoritiesFactory = new AllAuthoritiesFactory(this.hints);
 
-		// factory = new DefaultFactory(hints);
+		// factory = new ThreadedEpsgFactory(hints);
 		datumObjFactory = ReferencingFactoryFinder.getDatumFactory(this.hints);
 		crsFactory = ReferencingFactoryFinder.getCRSFactory(this.hints);
 		csFactory = ReferencingFactoryFinder.getCSFactory(this.hints);

@@ -72,7 +72,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * This factory can also be used to provide custom extensions or overrides to a main EPSG factory.
  * In order to provide a custom extension file, override the {@link #getDefinitionsURL()} method.
  * In order to make the factory be an override, change the default priority by using the 
- * two arguments constructor (this factory defaults to {@link DefaultFactory#PRIORITY} - 10,
+ * two arguments constructor (this factory defaults to {@link ThreadedEpsgFactory#PRIORITY} - 10,
  * so it's used as an extension).
  *
  * @since 2.1
@@ -133,7 +133,7 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
      * @deprecated We will try to replace the priority mechanism by a better
      *             one in a future Geotools version.
      */
-    protected static final int DEFAULT_PRIORITY = DefaultFactory.PRIORITY - 10;
+    protected static final int DEFAULT_PRIORITY = ThreadedEpsgFactory.PRIORITY - 10;
 
     /**
      * Directory scanned for extra definitions.
@@ -298,7 +298,7 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
     }
 
     /**
-     * Prints a list of codes that duplicate the ones provided by {@link DefaultFactory}.
+     * Prints a list of codes that duplicate the ones provided by {@link ThreadedEpsgFactory}.
      * This is used for implementation of {@linkplain #main main method} in order to check
      * the content of the {@value #FILENAME} file (or whatever property file used as backing
      * store for this factory) from the command line.
@@ -310,7 +310,7 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
      * @since 2.4
      */
     protected Set reportDuplicatedCodes(final PrintWriter out) throws FactoryException {
-        final AbstractAuthorityFactory sqlFactory = getFactory(DefaultFactory.class);
+        final AbstractAuthorityFactory sqlFactory = getFactory(ThreadedEpsgFactory.class);
         final Vocabulary resources = Vocabulary.getResources(null);
         out.println(resources.getLabel(VocabularyKeys.COMPARE_WITH));
         try {
@@ -396,7 +396,7 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
     }
 
     /**
-     * Prints a list of codes that duplicate the ones provided in the {@link DefaultFactory}.
+     * Prints a list of codes that duplicate the ones provided in the {@link ThreadedEpsgFactory}.
      * The factory tested is the one registered in {@link ReferencingFactoryFinder}. By default,
      * this is this {@code FactoryUsingWKT} class backed by the {@value #FILENAME} property file.
      * This method can be invoked from the command line in order to check the content of the

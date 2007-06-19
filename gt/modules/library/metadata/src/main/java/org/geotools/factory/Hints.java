@@ -301,7 +301,7 @@ public final class Hints extends RenderingHints {
      *       there is no {@linkplain javax.naming.InitialContext JNDI initial context} setup.</li>
      *   <li>{@linkplain javax.sql.DataSource} - used as is.</li>
      *   <li>missing - default to
-     *       {@value org.geotools.referencing.factory.epsg.DefaultFactory#DATASOURCE_NAME}.</li>
+     *       {@value org.geotools.referencing.factory.epsg.ThreadedEpsgFactory#DATASOURCE_NAME}.</li>
      * </ul>
      * <p>
      * To set on the command line:
@@ -368,7 +368,7 @@ public final class Hints extends RenderingHints {
      * one exception: If the <code>{@value
      * org.geotools.referencing.factory.epsg.LongitudeFirstFactory#SYSTEM_DEFAULT_KEY}</code>
      * system property is set to {@code true}, then the default value is {@code true} at least
-     * for the {@linkplain org.geotools.referencing.factory.epsg.DefaultFactory default EPSG
+     * for the {@linkplain org.geotools.referencing.factory.epsg.ThreadedEpsgFactory default EPSG
      * factory}.
      * <p>
      * If both the above-cited system property and this hint are provided, then

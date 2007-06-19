@@ -98,7 +98,7 @@ import org.geotools.util.Version;
  * <p>
  * This factory doesn't cache any result. Any call to a {@code createFoo} method will send a new
  * query to the EPSG database. For caching, this factory should be wrapped in some buffered factory
- * like {@link DefaultFactory}.
+ * like {@link ThreadedEpsgFactory}.
  * <p>
  * This factory accepts names as well as numerical identifiers. For example
  * "<cite>NTF (Paris) / France I</cite>" and {@code "27581"} both fetchs the same object.
@@ -300,7 +300,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
 
     /**
      * The name of the thread to execute at JVM shutdown. This thread will be created
-     * by {@link DefaultFactory} on registration. It will be checked by {@link #dispose}
+     * by {@link ThreadedEpsgFactory} on registration. It will be checked by {@link #dispose}
      * in order to determine if we are in the process for shutting down the database engine.
      */
     static final String SHUTDOWN_THREAD = "EPSG factory shutdown";
@@ -358,7 +358,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
      * the sets. The {@link AuthorityCodes} reference in this map is then cleared by the garbage
      * collector. The {@link #canDispose} method checks if there is any remaining live reference
      * in this map, and returns {@code false} if some are found (thus blocking the call to
-     * {@link #dispose} by the {@link DefaultFactory} timer).
+     * {@link #dispose} by the {@link ThreadedEpsgFactory} timer).
      */
     private final Map/*<Class,Reference<AuthorityCodes>>*/ authorityCodes = new HashMap();
 
@@ -409,7 +409,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
 
     /**
      * The buffered authority factory, or {@code this} if none. This field is set
-     * to a different value by {@link DefaultFactory} only, which will point toward a
+     * to a different value by {@link ThreadedEpsgFactory} only, which will point toward a
      * buffered factory wrapping this {@code FactoryUsingSQL} for efficienty.
      */
     AbstractAuthorityFactory buffered = this;
@@ -2914,7 +2914,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
 
     /**
      * Returns {@code true} if it is safe to dispose this factory. This method is invoked indirectly
-     * by {@link DefaultFactory} after some timeout in order to release resources. This method will
+     * by {@link ThreadedEpsgFactory} after some timeout in order to release resources. This method will
      * block the disposal if some {@linkplain #getAuthorityCodes set of authority codes} are still
      * in use.
      */
@@ -2999,7 +2999,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
     }
 
     /**
-     * Shutdown the database engine. This method is invoked twice by {@link DefaultFactory}
+     * Shutdown the database engine. This method is invoked twice by {@link ThreadedEpsgFactory}
      * at JVM shutdown: one time before the {@linkplain #connection} is closed, and a second
      * time after. This shutdown hook is usefull for <cite>embedded</cite> database engine
      * starting a server process in addition to the client process. Just closing the connection

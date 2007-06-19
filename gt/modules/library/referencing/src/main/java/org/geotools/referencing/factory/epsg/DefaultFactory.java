@@ -67,7 +67,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class DefaultFactory extends ThreadedEpsgFactory {
+public class DefaultFactory extends ThreadedEpsgFactory {
 
     /**
      * Constructs an authority factory using the default set of factories.

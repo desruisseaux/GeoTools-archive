@@ -87,7 +87,7 @@ public class DefaultFactoryTest extends TestCase {
     /**
      * The EPSG factory to test. Will be setup only when first needed.
      */
-    private DefaultFactory factory;
+    private ThreadedEpsgFactory factory;
 
     /**
      * Run the suite from the command line. Optional command-line arguments:
@@ -126,8 +126,8 @@ public class DefaultFactoryTest extends TestCase {
      */
     protected void setUp() throws SQLException {
         if (factory == null) {
-            factory = (DefaultFactory) ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG",
-                        new Hints(Hints.CRS_AUTHORITY_FACTORY, DefaultFactory.class));
+            factory = (ThreadedEpsgFactory) ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG",
+                        new Hints(Hints.CRS_AUTHORITY_FACTORY, ThreadedEpsgFactory.class));
             extensive |= TestData.isExtensiveTest();
             if (verbose) {
                 System.out.print("Database version: ");
@@ -143,7 +143,7 @@ public class DefaultFactoryTest extends TestCase {
      */
     public void testRegistry() {
         final Object candidate = ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG", null);
-        if (candidate instanceof DefaultFactory) {
+        if (candidate instanceof ThreadedEpsgFactory) {
             assertSame(factory, candidate);
         }
     }

@@ -316,7 +316,7 @@ public class OrderedAxisAuthorityFactoryOnlineTest extends OracleOnlineTestCase 
                 getIdentifiedObjectFinder(CoordinateReferenceSystem.class);
         /*
          * We tested in DefaultFactoryTest that WGS84 is not found when searching
-         * directly in DefaultFactory. Now we perform the same search through the
+         * directly in ThreadedEpsgFactory. Now we perform the same search through the
          * ordered axis authority factory.
          */
         finder.setFullScanAllowed(false);

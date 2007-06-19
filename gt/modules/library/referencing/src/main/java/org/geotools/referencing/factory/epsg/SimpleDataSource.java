@@ -97,7 +97,7 @@ import org.geotools.resources.JDBC;
  * @author Martin Desruisseaux
  *
  * @deprecated Experience suggests that subclassing {@code javax.sql.DataSource} is a cause of
- *             troubles in JEE environments. Subclass directly {@link DefaultFactory} instead.
+ *             troubles in JEE environments. Subclass directly {@link ThreadedEpsgFactory} instead.
  */
 public class SimpleDataSource implements DataSource {
     /**

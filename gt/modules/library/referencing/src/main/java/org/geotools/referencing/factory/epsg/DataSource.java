@@ -39,15 +39,15 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * EPSG data sources.
  * <p>
  * <h3>How EPSG factory are found</h3>
- * By default, only one {@link DefaultFactory} is registered and returned by {@link ReferencingFactoryFinder}.
+ * By default, only one {@link ThreadedEpsgFactory} is registered and returned by {@link ReferencingFactoryFinder}.
  * We don't need to register any other implementation for an EPSG factory backed by a SQL database.
- * However, {@code DefaultFactory} alone is not suffisient for querying the database. It needs one
+ * However, {@code ThreadedEpsgFactory} alone is not suffisient for querying the database. It needs one
  * more "plugable" information: the <cite>connection</cite> to the EPSG database. This
- * {@code DataSource} interface is there for providing such connection to {@code DefaultFactory}.
+ * {@code DataSource} interface is there for providing such connection to {@code ThreadedEpsgFactory}.
  * <p>
- * Some time after {@code DefaultFactory} is registered as an EPSG factory, it looks for a
+ * Some time after {@code ThreadedEpsgFactory} is registered as an EPSG factory, it looks for a
  * {@code DataSource} using the same plugins mechanism than for factories. In other words,
- * {@code DataSource} is a second level of plugins used internally by {@link DefaultFactory}.
+ * {@code DataSource} is a second level of plugins used internally by {@link ThreadedEpsgFactory}.
  *
  * @since 2.1
  * @source $URL$
@@ -55,9 +55,9 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * @author Martin Desruisseaux
  *
  * @deprecated Experience suggests that subclassing {@code javax.sql.DataSource} is a cause of
- *             troubles in JEE environments. Subclass directly {@link DefaultFactory} instead.
+ *             troubles in JEE environments. Subclass directly {@link ThreadedEpsgFactory} instead.
  *             NOTE: After the removal of this interface, we will need to unregister
- *             {@link DefaultFactory} from {@code META-INF/services}.
+ *             {@link ThreadedEpsgFactory} from {@code META-INF/services}.
  */
 public interface DataSource extends javax.sql.DataSource {
     /**
