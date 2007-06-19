@@ -16,9 +16,11 @@
 package org.geotools.data;
 
 import java.awt.geom.Rectangle2D;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -134,6 +136,35 @@ public class DataUtilities {
      */
     public static String[] attributeNames(FeatureType featureType) {
         String[] names = new String[featureType.getAttributeCount()];
+    
+    /**
+     * Takes a URL and converts it to a File. The attempts to deal with 
+     * Windows UNC format specific problems, specifically files located
+     * on network shares and different drives.
+     * 
+     * If the URL.getAuthority() returns null or is empty, then only the
+     * url's path property is used to construct the file. Otherwise, the
+     * authority is prefixed before the path.
+     * 
+     * It is assumed that url.getProtocol returns "file".
+     * 
+     * Authority is the drive or network share the file is located on.
+     * Such as "C:", "E:", "\\fooServer"
+     * 
+     * @param url a URL object that uses protocol "file"
+     * @return a File that corresponds to the URL's location
+     */
+    public static File urlToFile (URL url) {
+    	String auth = url.getAuthority();
+    	String path = url.getPath();
+		File f = null;
+		if (auth != null && !auth.equals("")) {
+			f = new File("//"+auth+path);
+		} else {
+			f = new File(path);
+		}
+		return f;
+    }
 
 		final int count = featureType.getAttributeCount();
 		for (int i = 0; i < count; i++) {
