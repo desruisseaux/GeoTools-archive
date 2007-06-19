@@ -18,6 +18,7 @@ package org.geotools.referencing.factory;
 
 // J2SE dependencies
 import java.util.*;
+
 import javax.units.Unit;
 import javax.units.ConversionException;
 
@@ -58,12 +59,12 @@ import org.geotools.resources.XArray;
  * one factory. Consequently, they can't be a method in a single factory. Furthermore, since
  * they are helper methods and somewhat implementation-dependent, they are not part of GeoAPI.
  *
- * @since 2.1
+ * @since 2.4
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class FactoryGroup extends ReferencingFactory {
+public class ReferencingFactoryContainer extends ReferencingFactory {
     /**
      * A factory registry used as a cache for factory groups created up to date.
      */
@@ -121,7 +122,7 @@ public final class FactoryGroup extends ReferencingFactory {
      *             incertain. It may be removed in Geotools 2.4, or refactored as a new
      *             {@code createInstance} convenience method.
      */
-    public FactoryGroup(final DatumFactory      datumFactory,
+    public ReferencingFactoryContainer(final DatumFactory      datumFactory,
                         final CSFactory            csFactory,
                         final CRSFactory          crsFactory,
                         final MathTransformFactory mtFactory)
@@ -144,7 +145,7 @@ public final class FactoryGroup extends ReferencingFactory {
      *
      * @since 2.2
      */
-    public FactoryGroup(final Hints userHints) {
+    public ReferencingFactoryContainer(final Hints userHints) {
         final Hints reduced = new Hints(userHints);
         /*
          * If hints are provided, we will fetch factory immediately (instead of storing the hints
@@ -191,9 +192,9 @@ public final class FactoryGroup extends ReferencingFactory {
      * @param  hints The hints, or {@code null} if none.
      * @return A factory group created from the specified set of hints.
      *
-     * @since 2.2
+     * @since 2.4
      */
-    public static FactoryGroup createInstance(final Hints hints) {
+    public static ReferencingFactoryContainer instance(final Hints hints) {
         /*
          * Use the same synchronization lock than FactoryFinder (instead of FactoryGroup) in
          * order to reduce the risk of dead lock. This is because FactoryGroup creation may
@@ -202,11 +203,11 @@ public final class FactoryGroup extends ReferencingFactory {
          */
         synchronized (ReferencingFactoryFinder.class) {
             if (cache == null) {
-                cache = new FactoryCreator(Arrays.asList(new Class[] {FactoryGroup.class}));
+                cache = new FactoryCreator(Arrays.asList(new Class[] {FactoryGroup.class}));                 
                 cache.registerServiceProvider(new FactoryGroup(null), FactoryGroup.class);
             }
             return (FactoryGroup) cache.getServiceProvider(FactoryGroup.class, null, hints, null);
-        }
+        }        
     }
 
     /**

@@ -75,7 +75,7 @@ import org.geotools.resources.i18n.LoggingKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class BufferedAuthorityFactory extends AbstractAuthorityFactory implements BufferedFactory {
+public class ThreadedAuthorityFactory extends AbstractAuthorityFactory implements BufferedFactory {
     /**
      * The default value for {@link #maxStrongReferences}.
      */
@@ -119,7 +119,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
      *
      * @param factory The factory to cache. Can not be {@code null}.
      */
-    protected BufferedAuthorityFactory(final AbstractAuthorityFactory factory) {
+    protected ThreadedAuthorityFactory(final AbstractAuthorityFactory factory) {
         this(factory, DEFAULT_MAX);
     }
 
@@ -136,12 +136,12 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
      * @param factory The factory to cache. Can not be {@code null}.
      * @param maxStrongReferences The maximum number of objects to keep by strong reference.
      */
-    protected BufferedAuthorityFactory(AbstractAuthorityFactory factory,
+    protected ThreadedAuthorityFactory(AbstractAuthorityFactory factory,
                                        final int maxStrongReferences)
     {
         super(factory.getPriority());
-        while (factory instanceof BufferedAuthorityFactory) {
-            factory = ((BufferedAuthorityFactory) factory).backingStore;
+        while (factory instanceof ThreadedAuthorityFactory) {
+            factory = ((ThreadedAuthorityFactory) factory).backingStore;
         }
         this.backingStore        = factory;
         this.maxStrongReferences = maxStrongReferences;
@@ -160,7 +160,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
      *
      * @see DeferredAuthorityFactory#createBackingStore
      */
-    BufferedAuthorityFactory(final int priority, final int maxStrongReferences) {
+    ThreadedAuthorityFactory(final int priority, final int maxStrongReferences) {
         super(priority);
         this.maxStrongReferences = maxStrongReferences;
         // completeHints() will be invoked by DeferredAuthorityFactory.getBackingStore()
