@@ -15,11 +15,6 @@
  */
 package org.geotools.filter;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.opengis.filter.sort.SortBy;
-import org.opengis.util.CodeList;
-
 
 /**
  * Captures the SortBy order, ASC or DESC.

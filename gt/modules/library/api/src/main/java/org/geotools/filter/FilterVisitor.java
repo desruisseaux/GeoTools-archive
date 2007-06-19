@@ -15,13 +15,10 @@
  */
 package org.geotools.filter;
 
-import org.opengis.filter.ExcludeFilter;
-import org.opengis.filter.IncludeFilter;
-
 
 /**
  * An interface for classes that want to perform operations on a Filter
- * hiarachy. It forms part of a GoF Visitor Patern implementation. A call to
+ * hierarchy. It forms part of a GoF Visitor Patern implementation. A call to
  * filter.accept(FilterVisitor) will result in a call to one of the methods in
  * this interface. The responsibility for traversing sub filters is intended
  * to lie with the visitor (this is unusual, but permited under the Visitor
