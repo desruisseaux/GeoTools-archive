@@ -11,7 +11,7 @@ public class SeShape {
 	public void generatePolygon(int i, int j, int[] k, SDEPoint[] p) throws SeException {}
 	public void generateRectangle(SeExtent x) throws SeException {}
 	public int getType() { return 0; }
-	public Long getFeatureId() { return null; }
+	public Long getFeatureId() throws SeException { return null; }
 	public int getNumOfPoints(){return 0;}
 	public void generateSimpleLine(int numPts, int numParts, int[] partOffsets, SDEPoint[] ptArray){}
 

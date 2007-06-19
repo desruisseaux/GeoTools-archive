@@ -4,11 +4,13 @@ import com.esri.sde.sdk.client.SeTable.SeTableStats;
 
 public class SeQuery {
 	
+	public SeQuery(SeConnection c) {}
 	public SeQuery(SeConnection c, String[] s, SeSqlConstruct y) {}
 	
 	public static /* GEOT-947 final*/ int SE_OPTIMIZE = 0;
 	
 	public void prepareQuery() {}
+	public void prepareQueryInfo(SeQueryInfo i) {}
 	public SeExtent calculateLayerExtent(SeQueryInfo i) { return null; }
 	public void close() throws SeException {}
 	public void execute()throws SeException {}
@@ -18,6 +20,7 @@ public class SeQuery {
 	public SeRow fetch() { return null; }
 	public void setSpatialConstraints(int i, boolean b, SeFilter[] f) {}
 	public SeTableStats calculateTableStatistics(String s, int i, SeQueryInfo q, int j) { return null; }
-    public void queryRasterTile(SeRasterConstraint c) {}
+	public void queryRasterTile(SeRasterConstraint c) {}
+	public void prepareSql(String s) {}
 
 }
