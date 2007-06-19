@@ -1317,7 +1317,9 @@ public abstract class DateUtil {
      */
     public static String serializeDate(Date date)
         throws IllegalArgumentException {
-        return serializeDate(date.getTime());
+        long time = date.getTime();       
+        time += TimeZone.getDefault().getOffset(time);
+        return serializeDate(time);
     }
 
     /**
@@ -1333,11 +1335,7 @@ public abstract class DateUtil {
      */
     public static String serializeSqlDate(java.sql.Date date)
         throws IllegalArgumentException {
-        // convert time assuming maximum daylight time difference of two hours
-        long time = date.getTime();
-        time -= (TimeZone.getDefault().getRawOffset() - (MSPERHOUR * 2));
-
-        return serializeDate(time);
+        return serializeDate(date);
     }
 
     /**
@@ -1439,7 +1437,9 @@ public abstract class DateUtil {
      */
     public static String serializeDateTime(Date date)
         throws IllegalArgumentException {
-        return serializeDateTime(date.getTime(), false);
+        long time = date.getTime();       
+        time += TimeZone.getDefault().getOffset(time);
+        return serializeDateTime(time, false);
     }
 
     /**
@@ -1509,7 +1509,11 @@ public abstract class DateUtil {
     public static String serializeSqlTime(Time time)
         throws IllegalArgumentException {
         StringBuffer buff = new StringBuffer(12);
-        serializeTime((int) time.getTime(), buff);
+        long t = time.getTime();       
+        t += TimeZone.getDefault().getOffset(t);
+        int extra = formatYearMonthDay(t + TIME_BASE, buff);
+        buff.delete(0, buff.length());
+        serializeTime(extra, buff);
 
         return buff.toString();
     }
