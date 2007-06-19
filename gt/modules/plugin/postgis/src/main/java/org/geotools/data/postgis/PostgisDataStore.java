@@ -180,6 +180,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     /** OPTIMIZE_MODE constants */
     public static final int OPTIMIZE_SAFE = 0;
     public static final int OPTIMIZE_SQL = 1;
+
+    /** Maximum string size for postgres */
+    private static final int MAX_ALLOWED_VALUE = 10485760;
     
     //JD: GEOT-723, keeping this reference static allows the authority factory
     // to hold onto a stale connection pool when a new datastore is created.
@@ -1509,7 +1512,10 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 		LOGGER.warning("FeatureType did not specify string length; defaulted to 256");
                 		length = 256;
                 	}
-                		
+                    else if (length > MAX_ALLOWED_VALUE)
+                    {
+                        length = MAX_ALLOWED_VALUE;
+                    }
                     typeName = typeName + "(" + length + ")";
                 }
 
