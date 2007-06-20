@@ -83,7 +83,7 @@ public class SQLEncoderOracle extends SQLEncoder {
         SDO_RELATE_MASK_MAP.put(new Short(AbstractFilter.GEOMETRY_WITHIN),
             "inside");
         SDO_RELATE_MASK_MAP.put(new Short(AbstractFilter.GEOMETRY_DISJOINT),
-            "disjoint");
+            "anyinteract");
         
         //Ok, back to using these, as the not disjoint turned out to be a big
         //performance hit.  I would really like to see some solid testing on 
@@ -263,7 +263,13 @@ public class SQLEncoderOracle extends SQLEncoder {
 
             out.write(",");
             geomExpr.accept(this);
-            out.write(",'mask=" + mask + " querytype=WINDOW') = 'TRUE' ");
+            // for disjoint we ask for no interaction, anyinteract == false
+            if(geomFilter.getFilterType() == AbstractFilter.GEOMETRY_DISJOINT) {
+                out.write(",'mask=" + mask + " querytype=WINDOW') <> 'TRUE' ");
+            } else {
+                out.write(",'mask=" + mask + " querytype=WINDOW') = 'TRUE' ");
+            }
+            
             inGeomFilter = false;
         } else {
             LOGGER.warning("Invalid filter. Cannot have a Geometry filter "

@@ -62,6 +62,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @author geoghegs
@@ -315,6 +316,35 @@ public class OracleDataStoreOnlineTest extends TestCase {
         filter.addRightGeometry(left);
         fr = fs.getFeatures(filter);        
         assertEquals(2, fr.size()); // we pass this!
+    }
+    
+    public void testDisjointFilter() throws Exception {
+        if( conn == null ) return;
+        
+        //                   + (20,30)
+        //                            +----------------------+
+        //  +(20,10)         +(10,10) | + (20,10)   +(30,10) |
+        //                            +----------------------+
+        GeometryFactory gf = new GeometryFactory();
+        Polygon p = gf.createPolygon(gf.createLinearRing(new Coordinate[] { new Coordinate(15, 0),
+                new Coordinate(35, 0), new Coordinate(35, 15), new Coordinate(15, 15),
+                new Coordinate(15, 0) }), null);
+        GeometryFilter filter = filterFactory.createGeometryFilter(AbstractFilter.GEOMETRY_DISJOINT);
+        // had to reduce the envelope a little, Oracle has trobles with bbox that span the whole earth
+        Expression right = filterFactory.createLiteralExpression(p);
+        Expression left = filterFactory.createAttributeExpression(dstore.getSchema("ORA_TEST_POINTS"), "SHAPE");
+        filter.addLeftGeometry(left);
+        filter.addRightGeometry(right);
+        
+        FeatureSource fs = dstore.getFeatureSource("ORA_TEST_POINTS");
+        FeatureCollection fr = fs.getFeatures(filter);
+        assertEquals(3, fr.size()); // we have 4!
+        
+        // check a filter built changing operands order works the same
+        filter.addLeftGeometry(right);
+        filter.addRightGeometry(left);
+        fr = fs.getFeatures(filter);        
+        assertEquals(3, fr.size()); // we pass this!
     }
     
     public void testPointGeometryConversion() throws Exception {
