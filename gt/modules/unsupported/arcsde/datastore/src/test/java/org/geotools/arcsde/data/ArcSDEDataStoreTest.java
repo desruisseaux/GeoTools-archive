@@ -47,14 +47,23 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.FilterFilter;
 import org.geotools.gml.GMLFilterDocument;
 import org.geotools.gml.GMLFilterGeometry;
+import org.geotools.referencing.CRS;
 import org.opengis.filter.And;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Id;
 import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.spatial.BBOX;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.helpers.ParserAdapter;
 
+import com.esri.sde.sdk.client.SeLayer;
+import com.esri.sde.sdk.pe.PeFactory;
+import com.esri.sde.sdk.pe.PeParameters;
+import com.esri.sde.sdk.pe.PeProjectedCS;
+import com.esri.sde.sdk.pe.PeProjectionException;
+import com.esri.sde.sdk.pe.PeUnit;
+import com.esri.sde.sdk.pe.PeUnitsDefs;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -134,6 +143,47 @@ public class ArcSDEDataStoreTest extends TestCase {
         String failMsg = sdeDs + " is not an ArcSDEDataStore";
         assertTrue(failMsg, (sdeDs instanceof ArcSDEDataStore));
         LOGGER.fine("testFinder OK :" + sdeDs.getClass().getName());
+    }
+    
+    public void testAutoFillSRS() throws Throwable {
+        
+        ArcSDEDataStore ds = this.testData.getDataStore();
+        CoordinateReferenceSystem sdeCRS = ds.getSchema("GISDATA.TOWNS_POLY").getDefaultGeometry().getCoordinateSystem();
+        
+        LOGGER.info(sdeCRS.toWKT().replaceAll(" ","").replaceAll("\n", "").replace("\"", "\\\""));
+        
+        //CoordinateReferenceSystem epsgCRS = CRS.decode("EPSG:26986");
+        
+        //LOGGER.info("are these two CRS's equal? " + CRS.equalsIgnoreMetadata(sdeCRS, epsgCRS));
+        
+        
+        
+        if (1==1) return;
+        
+        int epsgCode = -1;
+        int[] projcs = PeFactory.projcsCodelist();
+        LOGGER.info(projcs.length + " projections available.");
+        for (int i = 0; i < projcs.length; i++) {
+            try {
+                PeProjectedCS candidate = PeFactory.projcs(projcs[i]);
+                //in ArcSDE 9.2, if the PeFactory doesn't support a projection it claimed
+                //to support, it returns 'null'.  So check for it.
+                if (candidate != null && candidate.getName().indexOf("Massachusetts") != -1) {
+                    //LOGGER.info("\n\n" + projcs[i] + " has name " + candidate.getName() + "\ntried to match " + wktName + "\n\n");
+                    epsgCode = projcs[i];
+                } else if (candidate == null) { 
+                    //LOGGER.info(projcs[i] + " was null");
+                } else if (candidate != null) {
+                    //LOGGER.info(projcs[i] + " wasn't null");
+                }
+            } catch (PeProjectionException pe) {
+                // Strangely SDE includes codes in the projcsCodeList() that
+                // it doesn't actually support.
+                // Catch the exception and skip them here.
+            }
+        }
+        
+        
     }
 
     /**

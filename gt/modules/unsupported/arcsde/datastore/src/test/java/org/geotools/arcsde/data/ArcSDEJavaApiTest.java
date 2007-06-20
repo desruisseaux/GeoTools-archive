@@ -631,7 +631,7 @@ public class ArcSDEJavaApiTest extends TestCase {
             if (LOGGER.isLoggable(Level.FINE)) {
         		System.out.println("\n--> Creating a table using DBMS Default Keyword");
             }                
-			table.create(colDefs, "DEFAULTS");
+			table.create(colDefs, testData.getConfigKeyword());
             if (LOGGER.isLoggable(Level.FINE)) {
     			System.out.println(" - Done.");
             }
@@ -670,6 +670,7 @@ public class ArcSDEJavaApiTest extends TestCase {
             if (LOGGER.isLoggable(Level.FINE)) {
         		System.out.println("\n--> Adding spatial column \"SHAPE\"...");
             }
+            layer.setCreationKeyword(testData.getConfigKeyword());
 			layer.create(3, 4);
             if (LOGGER.isLoggable(Level.FINE)) {
         		System.out.println(" - Done.");
@@ -727,7 +728,7 @@ public class ArcSDEJavaApiTest extends TestCase {
             }
 			SeColumnDefinition[] tmpCols = new SeColumnDefinition[] { new SeColumnDefinition(
 					"tmp", SeColumnDefinition.TYPE_STRING, 5, 0, true) };
-			table.create(tmpCols, "DEFAULTS");
+			table.create(tmpCols, testData.getConfigKeyword());
             if (LOGGER.isLoggable(Level.FINE)) {
         		System.out.println(" - Done.");
             }
@@ -796,6 +797,8 @@ public class ArcSDEJavaApiTest extends TestCase {
             if (LOGGER.isLoggable(Level.FINE)) {
         		System.out.println("\n--> Adding spatial column \"SHAPE\"...");
             }
+            layer.setCreationKeyword(testData.getConfigKeyword());
+            
 			layer.create(3, 4);
             if (LOGGER.isLoggable(Level.FINE)) {
         		System.out.println(" - Done.");

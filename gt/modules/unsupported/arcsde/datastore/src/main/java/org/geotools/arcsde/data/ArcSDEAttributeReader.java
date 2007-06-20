@@ -24,6 +24,7 @@ import org.geotools.data.DataSourceException;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
+import org.geotools.feature.type.GeometricAttributeType;
 
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeShape;
@@ -161,7 +162,7 @@ class ArcSDEAttributeReader implements AttributeReader {
                 throw new DataSourceException("Fetching row:" + ex.getMessage(), ex);
             }
         }
-
+        
         return this.currentRow != null;
 	}
 
@@ -201,7 +202,7 @@ class ArcSDEAttributeReader implements AttributeReader {
 			ArrayIndexOutOfBoundsException {
         Object value = currentRow.getObject(index);
         
-        if (value instanceof SeShape) {
+        if (schema.getAttributeType(index) instanceof GeometricAttributeType) {
             try{
                 SeShape shape = (SeShape) value;
                 /**

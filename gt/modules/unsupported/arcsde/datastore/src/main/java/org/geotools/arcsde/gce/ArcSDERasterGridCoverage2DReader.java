@@ -509,7 +509,7 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
                 try {
                     PeProjectedCS candidate = PeFactory.projcs(projcs[i]);
                     //in ArcSDE 9.2, if the PeFactory doesn't support a projection it claimed
-                    //to support, it return 'null'.  So check for it.
+                    //to support, it returns 'null'.  So check for it.
                     if (candidate != null && candidate.getName().trim().equals(pcs.getName()))
                         epsgCode = projcs[i];
                 } catch (PeProjectionException pe) {

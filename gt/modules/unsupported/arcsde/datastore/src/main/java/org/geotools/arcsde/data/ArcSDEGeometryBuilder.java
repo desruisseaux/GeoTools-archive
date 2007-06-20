@@ -523,8 +523,7 @@ public abstract class ArcSDEGeometryBuilder {
 		 */
 		public Geometry construct(SeShape shape) throws SeException,
 				DataSourceException {
-			int seShapeType = shape.getType();
-			Class realGeomClass = ArcSDEAdapter.getGeometryType(seShapeType);
+			Class realGeomClass = ArcSDEAdapter.getGeometryTypeFromSeShape(shape);
 			ArcSDEGeometryBuilder realBuilder = builderFor(realGeomClass);
 
 			return realBuilder.construct(shape);

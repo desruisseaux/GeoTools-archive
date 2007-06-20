@@ -51,6 +51,7 @@ import com.esri.sde.sdk.client.SeLayer;
 import com.esri.sde.sdk.client.SeQuery;
 import com.esri.sde.sdk.client.SeQueryInfo;
 import com.esri.sde.sdk.client.SeRow;
+import com.esri.sde.sdk.client.SeShape;
 import com.esri.sde.sdk.client.SeTable;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -73,8 +74,7 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class ArcSDEAdapter {
     /** Logger for ths class' package */
-    private static final Logger LOGGER = Logger.getLogger(ArcSDEAdapter.class.getPackage()
-            .getName());
+    private static final Logger LOGGER = Logger.getLogger(ArcSDEAdapter.class.getPackage().getName());
 
     /** mappings of SDE attribute's types to Java ones */
     private static final Map sde2JavaTypes = new HashMap();
@@ -173,8 +173,7 @@ public class ArcSDEAdapter {
                 shapeTypes |= SeLayer.SE_AREA_TYPE_MASK;
             } else if (geometryClass == Geometry.class) {
                 LOGGER.fine("Creating SeShape types for all types of geometries.");
-                shapeTypes |= (SeLayer.SE_MULTIPART_TYPE_MASK | SeLayer.SE_POINT_TYPE_MASK
-                        | SeLayer.SE_LINE_TYPE_MASK | SeLayer.SE_AREA_TYPE_MASK);
+                shapeTypes |= (SeLayer.SE_MULTIPART_TYPE_MASK | SeLayer.SE_POINT_TYPE_MASK | SeLayer.SE_LINE_TYPE_MASK | SeLayer.SE_AREA_TYPE_MASK);
             } else {
                 throw new IllegalArgumentException("no SDE geometry mapping for " + geometryClass);
             }
@@ -197,8 +196,7 @@ public class ArcSDEAdapter {
      *             if the SeColumnDefinition constructor throws it due to some
      *             invalid parameter
      */
-    public static SeColumnDefinition createSeColumnDefinition(AttributeType type)
-            throws SeException {
+    public static SeColumnDefinition createSeColumnDefinition(AttributeType type) throws SeException {
         SeColumnDefinition colDef = null;
         String colName = type.getName();
         boolean nillable = type.isNillable();
@@ -250,14 +248,12 @@ public class ArcSDEAdapter {
      * @throws DataSourceException
      *             DOCUMENT ME!
      */
-    public static FeatureType fetchSchema(ArcSDEConnectionPool connPool, String typeName,
-            String namespace) throws IOException {
+    public static FeatureType fetchSchema(ArcSDEConnectionPool connPool, String typeName, String namespace) throws IOException {
         SeLayer sdeLayer = connPool.getSdeLayer(typeName);
         SeTable sdeTable = connPool.getSdeTable(typeName);
         // List/*<AttributeDescriptor>*/properties =
         // createAttributeDescriptors(connPool, sdeLayer, sdeTable, namespace);
-        List/* <AttributeType> */properties = createAttributeDescriptors(connPool, sdeLayer,
-                sdeTable, namespace);
+        List/* <AttributeType> */properties = createAttributeDescriptors(connPool, sdeLayer, sdeTable, namespace);
         FeatureType type = createSchema(typeName, namespace, properties);
         return type;
     }
@@ -271,8 +267,7 @@ public class ArcSDEAdapter {
      * @return
      * @throws IOException
      */
-    public static FeatureType fetchSchema(ArcSDEConnectionPool connPool, String typeName,
-            String namespace, SeQueryInfo queryInfo) throws IOException {
+    public static FeatureType fetchSchema(ArcSDEConnectionPool connPool, String typeName, String namespace, SeQueryInfo queryInfo) throws IOException {
 
         List attributeDescriptors;
 
@@ -333,8 +328,7 @@ public class ArcSDEAdapter {
      *             metadata
      * 
      */
-    private static List createAttributeDescriptors(ArcSDEConnectionPool connPool, SeLayer sdeLayer,
-            SeTable table, String namespace) throws DataSourceException {
+    private static List createAttributeDescriptors(ArcSDEConnectionPool connPool, SeLayer sdeLayer, SeTable table, String namespace) throws DataSourceException {
         SeColumnDefinition[] seColumns = null;
         try {
             seColumns = table.describe();
@@ -345,8 +339,7 @@ public class ArcSDEAdapter {
         return createAttributeDescriptors(sdeLayer, namespace, seColumns);
     }
 
-    private static List createAttributeDescriptors(SeLayer sdeLayer, String namespace,
-            SeColumnDefinition[] seColumns) throws DataSourceException {
+    private static List createAttributeDescriptors(SeLayer sdeLayer, String namespace, SeColumnDefinition[] seColumns) throws DataSourceException {
         String attName;
         boolean isNilable;
         int fieldLen;
@@ -378,7 +371,7 @@ public class ArcSDEAdapter {
                 metadata = crs;
 
                 int seShapeType = sdeLayer.getShapeTypes();
-                typeClass = getGeometryType(seShapeType);
+                typeClass = getGeometryTypeFromLayerMask(seShapeType);
                 isNilable = (seShapeType & SeLayer.SE_NIL_TYPE_MASK) == SeLayer.SE_NIL_TYPE_MASK;
                 defValue = ArcSDEGeometryBuilder.defaultValueFor(typeClass);
 
@@ -391,9 +384,7 @@ public class ArcSDEAdapter {
                 // Set restrictions = Restrictions.createLength(name, typeClass,
                 // fieldLen);
             }
-            attributeType = AttributeTypeFactory.newAttributeType(attName, typeClass, isNilable,
-                    fieldLen, defValue, metadata);
-
+            attributeType = AttributeTypeFactory.newAttributeType(attName, typeClass, isNilable, fieldLen, defValue, metadata);
             attDescriptors.add(attributeType);
         }
 
@@ -438,7 +429,7 @@ public class ArcSDEAdapter {
         SeCoordinateReference seCRS = sdeLayer.getCoordRef();
         String WKT = seCRS.getProjectionDescription();
         LOGGER.finer("About to parse CRS for layer " + sdeLayer.getName() + ": " + WKT);
-
+        
         try {
             LOGGER.info(sdeLayer.getName() + " has CRS envelope: " + seCRS.getXYEnvelope());
         } catch (SeException e1) {
@@ -446,16 +437,14 @@ public class ArcSDEAdapter {
         }
 
         if ("UNKNOWN".equalsIgnoreCase(WKT)) {
-            LOGGER.warning("ArcSDE layer " + sdeLayer.getName()
-                    + " does not provides a Coordinate Reference System");
+            LOGGER.warning("ArcSDE layer " + sdeLayer.getName() + " does not provides a Coordinate Reference System");
         } else {
             try {
                 CRSFactory crsFactory = ReferencingFactoryFinder.getCRSFactory(null);
                 crs = crsFactory.createFromWKT(WKT);
                 LOGGER.fine("ArcSDE CRS correctly parsed from layer " + sdeLayer.getName());
             } catch (FactoryException e) {
-                String msg = "CRS factory does not knows how to parse the " + "CRS for layer "
-                        + sdeLayer.getName() + ": " + WKT;
+                String msg = "CRS factory does not knows how to parse the " + "CRS for layer " + sdeLayer.getName() + ": " + WKT;
                 LOGGER.log(Level.CONFIG, msg, e);
                 // throw new DataSourceException(msg, e);
             }
@@ -492,7 +481,7 @@ public class ArcSDEAdapter {
      * @throws IllegalArgumentException
      *             DOCUMENT ME!
      */
-    public static Class getGeometryType(int seShapeType) {
+    public static Class getGeometryTypeFromLayerMask(int seShapeType) {
         Class clazz = com.vividsolutions.jts.geom.Geometry.class;
         final int MULTIPART_MASK = SeLayer.SE_MULTIPART_TYPE_MASK;
         final int POINT_MASK = SeLayer.SE_POINT_TYPE_MASK;
@@ -500,90 +489,87 @@ public class ArcSDEAdapter {
         final int LINESTRING_MASK = SeLayer.SE_LINE_TYPE_MASK;
         final int AREA_MASK = SeLayer.SE_AREA_TYPE_MASK;
 
-        if (seShapeType == SeLayer.TYPE_NIL) {
+        // in all this assignments, 1 means true and 0 false
+        final int isCollection = ((seShapeType & MULTIPART_MASK) == MULTIPART_MASK) ? 1 : 0;
+
+        final int isPoint = ((seShapeType & POINT_MASK) == POINT_MASK) ? 1 : 0;
+
+        final int isLineString = (((seShapeType & SIMPLE_LINE_MASK) == SIMPLE_LINE_MASK) || ((seShapeType & LINESTRING_MASK) == LINESTRING_MASK)) ? 1 : 0;
+
+        final int isPolygon = ((seShapeType & AREA_MASK) == AREA_MASK) ? 1 : 0;
+
+        boolean isError = false;
+
+        // first check if the shape type supports more than one geometry
+        // type.
+        // In that case, it is *highly* recomended that it support all the
+        // geometry types, so we can safely return Geometry.class. If this
+        // is
+        // not
+        // the case and the shape type supports just a few geometry types,
+        // then
+        // we give it a chance and return Geometry.class anyway, but be
+        // aware
+        // that transactions over that layer could fail if a Geometry that
+        // is
+        // not supported is tried for insertion.
+        if ((isPoint + isLineString + isPolygon) > 1) {
+            clazz = Geometry.class;
+
+            if (4 < (isCollection + isPoint + isLineString + isPolygon)) {
+                LOGGER.warning("Be careful!! we're mapping an ArcSDE Shape type " + "to the generic Geometry class, but the shape type " + "does not really allows all geometry types!: " + "isCollection=" + isCollection + ", isPoint=" + isPoint + ", isLineString=" + isLineString + ", isPolygon=" + isPolygon);
+            } else {
+                LOGGER.fine("safely mapping SeShapeType to abstract Geometry");
+            }
+        } else if (isCollection == 1) {
+            if (isPoint == 1) {
+                clazz = MultiPoint.class;
+            } else if (isLineString == 1) {
+                clazz = MultiLineString.class;
+            } else if (isPolygon == 1) {
+                clazz = MultiPolygon.class;
+            } else {
+                isError = true;
+            }
+        } else {
+            if (isPoint == 1) {
+                clazz = Point.class;
+            } else if (isLineString == 1) {
+                clazz = LineString.class;
+            } else if (isPolygon == 1) {
+                clazz = Polygon.class;
+            } else {
+                isError = true;
+            }
+        }
+
+        if (isError) {
+            throw new IllegalArgumentException("Cannot map the shape type '" + seShapeType + "' to " + "a Geometry class: isCollection=" + isCollection + ", isPoint=" + isPoint + ", isLineString=" + isLineString + ", isPolygon=" + isPolygon);
+        }
+        return clazz;
+    }
+    
+    public static Class getGeometryTypeFromSeShape(SeShape shape) throws SeException {
+        Class clazz = com.vividsolutions.jts.geom.Geometry.class;
+        
+        int seShapeType = shape.getType();
+        
+        if (seShapeType == SeShape.TYPE_NIL) {
             // do nothing
-        } else if (seShapeType == SeLayer.TYPE_MULTI_MASK) {
-            clazz = GeometryCollection.class;
-        } else if (seShapeType == SeLayer.TYPE_LINE || seShapeType == SeLayer.TYPE_SIMPLE_LINE) {
+        } else if (seShapeType == SeShape.TYPE_LINE || seShapeType == SeShape.TYPE_SIMPLE_LINE) {
             clazz = LineString.class;
-        } else if (seShapeType == SeLayer.TYPE_MULTI_LINE
-                || seShapeType == SeLayer.TYPE_MULTI_SIMPLE_LINE) {
+        } else if (seShapeType == SeShape.TYPE_MULTI_LINE || seShapeType == SeShape.TYPE_MULTI_SIMPLE_LINE) {
             clazz = MultiLineString.class;
-        } else if (seShapeType == SeLayer.TYPE_MULTI_POINT) {
+        } else if (seShapeType == SeShape.TYPE_MULTI_POINT) {
             clazz = MultiPoint.class;
-        } else if (seShapeType == SeLayer.TYPE_MULTI_POLYGON) {
+        } else if (seShapeType == SeShape.TYPE_MULTI_POLYGON) {
             clazz = MultiPolygon.class;
-        } else if (seShapeType == SeLayer.TYPE_POINT) {
+        } else if (seShapeType == SeShape.TYPE_POINT) {
             clazz = Point.class;
-        } else if (seShapeType == SeLayer.TYPE_POLYGON) {
+        } else if (seShapeType == SeShape.TYPE_POLYGON) {
             clazz = Polygon.class;
         } else {
-
-            // in all this assignments, 1 means true and 0 false
-            final int isCollection = ((seShapeType & MULTIPART_MASK) == MULTIPART_MASK) ? 1 : 0;
-
-            final int isPoint = ((seShapeType & POINT_MASK) == POINT_MASK) ? 1 : 0;
-
-            final int isLineString = (((seShapeType & SIMPLE_LINE_MASK) == SIMPLE_LINE_MASK) || ((seShapeType & LINESTRING_MASK) == LINESTRING_MASK)) ? 1
-                    : 0;
-
-            final int isPolygon = ((seShapeType & AREA_MASK) == AREA_MASK) ? 1 : 0;
-
-            boolean isError = false;
-
-            // first check if the shape type supports more than one geometry
-            // type.
-            // In that case, it is *highly* recomended that it support all the
-            // geometry types, so we can safely return Geometry.class. If this
-            // is
-            // not
-            // the case and the shape type supports just a few geometry types,
-            // then
-            // we give it a chance and return Geometry.class anyway, but be
-            // aware
-            // that transactions over that layer could fail if a Geometry that
-            // is
-            // not supported is tried for insertion.
-            if ((isPoint + isLineString + isPolygon) > 1) {
-                clazz = Geometry.class;
-
-                if (4 < (isCollection + isPoint + isLineString + isPolygon)) {
-                    LOGGER.warning("Be careful!! we're mapping an ArcSDE Shape type "
-                            + "to the generic Geometry class, but the shape type "
-                            + "does not really allows all geometry types!: " + "isCollection="
-                            + isCollection + ", isPoint=" + isPoint + ", isLineString="
-                            + isLineString + ", isPolygon=" + isPolygon);
-                } else {
-                    LOGGER.fine("safely mapping SeShapeType to abstract Geometry");
-                }
-            } else if (isCollection == 1) {
-                if (isPoint == 1) {
-                    clazz = MultiPoint.class;
-                } else if (isLineString == 1) {
-                    clazz = MultiLineString.class;
-                } else if (isPolygon == 1) {
-                    clazz = MultiPolygon.class;
-                } else {
-                    isError = true;
-                }
-            } else {
-                if (isPoint == 1) {
-                    clazz = Point.class;
-                } else if (isLineString == 1) {
-                    clazz = LineString.class;
-                } else if (isPolygon == 1) {
-                    clazz = Polygon.class;
-                } else {
-                    isError = true;
-                }
-            }
-
-            if (isError) {
-                throw new IllegalArgumentException("Cannot map the shape type to "
-                        + "a Geometry class: isCollection=" + isCollection + ", isPoint=" + isPoint
-                        + ", isLineString=" + isLineString + ", isPolygon=" + isPolygon);
-            }
-
+            throw new IllegalArgumentException("Cannot map the shape type '" + seShapeType + "' to any known SeShape.TYPE_*");
         }
         return clazz;
     }
@@ -604,17 +590,14 @@ public class ArcSDEAdapter {
      */
     public static long getNumericFid(Identifier id) throws IllegalArgumentException {
         if (!(id instanceof FeatureId))
-            throw new IllegalArgumentException(
-                    "Only FeatureIds are supported when encoding id filters to SDE.  Not "
-                            + id.getClass());
+            throw new IllegalArgumentException("Only FeatureIds are supported when encoding id filters to SDE.  Not " + id.getClass());
 
         String fid = ((FeatureId) id).getID();
         int dotIndex = fid.lastIndexOf('.');
         try {
             return Long.decode(fid.substring(++dotIndex)).longValue();
         } catch (Exception ex) {
-            throw new IllegalArgumentException("FeatureID " + fid
-                    + " does not seems as a valid ArcSDE FID");
+            throw new IllegalArgumentException("FeatureID " + fid + " does not seems as a valid ArcSDE FID");
         }
     }
 
@@ -684,8 +667,7 @@ public class ArcSDEAdapter {
          * @return DOCUMENT ME!
          */
         public String toString() {
-            return "SdeTypeDef[colDefType=" + this.colDefType + ", size=" + this.size + ", scale="
-                    + this.scale + "]";
+            return "SdeTypeDef[colDefType=" + this.colDefType + ", size=" + this.size + ", scale=" + this.scale + "]";
         }
     }
 }

@@ -2,7 +2,9 @@ package org.geotools.arcsde.data;
 
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import junit.framework.TestCase;
@@ -212,7 +214,9 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         DataStore ds = this.testData.getDataStore();
 
         this.testData.deleteTempTable(((ArcSDEDataStore) ds).getConnectionPool());
-        ds.createSchema(type);
+        Map hints = new HashMap();
+        hints.put("configuration.keyword", testData.getConfigKeyword());
+        ((ArcSDEDataStore) ds).createSchema(type, hints);
         this.testData.deleteTempTable(((ArcSDEDataStore) ds).getConnectionPool());
     }
 
@@ -365,7 +369,9 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         ArcSDEDataStore ds = this.testData.getDataStore();
         
         this.testData.deleteTempTable(ds.getConnectionPool());
-        ds.createSchema(type, this.testData.getConfigKeyword());
+        Map hints = new HashMap();
+        hints.put("configuration.keyword",this.testData.getConfigKeyword());
+        ds.createSchema(type, hints);
         this.testData.deleteTempTable(ds.getConnectionPool());
     }
     
@@ -379,18 +385,20 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         }
                 
         atts[0] = AttributeTypeFactory.newAttributeType("OBJECTID", Integer.class, false);
-        try {
-            atts[1] = new GeometricAttributeType("SHAPE", MultiLineString.class, true, null, null, null);
-        } catch (Exception ie) {
-            throw new RuntimeException(ie);
-        }
+        atts[1] = new GeometricAttributeType("SHAPE", MultiLineString.class, true, null, null, null);
         
         type = FeatureTypeBuilder.newFeatureType(atts, typeName);
         
         DataStore ds = this.testData.getDataStore();
         
         this.testData.deleteTempTable(((ArcSDEDataStore)ds).getConnectionPool());
-        ((ArcSDEDataStore)ds).createSchema(type, this.testData.getConfigKeyword());
+        
+        Map hints = new HashMap();
+        hints.put("configuration.keyword",this.testData.getConfigKeyword());
+        hints.put("rowid.column.type", "SDE");
+        hints.put("rowid.column.name", "OBJECTID");
+        
+        ((ArcSDEDataStore)ds).createSchema(type, hints);
         LOGGER.info("Created null-geom sde layer");
         
         try {

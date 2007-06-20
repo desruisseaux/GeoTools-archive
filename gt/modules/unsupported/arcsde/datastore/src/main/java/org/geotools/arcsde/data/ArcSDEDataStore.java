@@ -42,6 +42,7 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
@@ -57,6 +58,7 @@ import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeExtent;
 import com.esri.sde.sdk.client.SeLayer;
 import com.esri.sde.sdk.client.SeQueryInfo;
+import com.esri.sde.sdk.client.SeRegistration;
 import com.esri.sde.sdk.client.SeTable;
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -240,11 +242,11 @@ public class ArcSDEDataStore extends AbstractDataStore {
 
     /**
      * Pass-through to the createSchema method with a config keyword. This
-     * method calls createSchema(schema, "DEFAULTS");
+     * method calls createSchema(schema, null);
      * 
      */
     public void createSchema(FeatureType schema) throws IOException, IllegalArgumentException {
-        createSchema(schema, "DEFAULTS");
+        createSchema(schema, null);
     }
 
     /**
@@ -269,13 +271,56 @@ public class ArcSDEDataStore extends AbstractDataStore {
      * that the current AttributeType is geometric, instead of adding the column
      * we just create the SeLayer object. This way, the geometric attribute is
      * inserted at the end, and then we keep iterating and adding the rest of
-     * the columns. Finally, the first column is removed, since it was temporal
+     * the columns. Finally, the first column is removed, since it was temporary
      * (note that I advertise it, it is a _workaround_).
+     * </p>
+     * 
+     * <p>
+     * Sometimes some 'extra' information is required to correctly create the
+     * underlying ArcSDE SeLayer.  For instance, a specific configuration keyword
+     * might be required to be used (instead of "DEFAULTS"), or a particular
+     * column might need to be marked as the rowid column for the featuretype.
+     * 
+     * A non-null <code>hints</code> parameter contains a mapping from a list
+     * of well-known {@link java.lang.String} keys to values.  The possible
+     * keys are listed in the table below.  keys with any other values
+     * are ignored.
+     * 
+     * <table>
+     * <tr>
+     * <td>key name</td>
+     * <td>key value type</td>
+     * <td>default value (if applicable)</td>
+     * </tr>
+     * 
+     * <tr>
+     * <td>configuration.keyword</td>
+     * <td>{@link java.lang.String}</td>
+     * <td>"DEFAULTS"</td>
+     * </tr>
+     * 
+     * <tr>
+     * <td>rowid.column.type</td>
+     * <td>{@link java.lang.String} - "NONE", "USER" and "SDE" are the only valid values</td>
+     * <td>"NONE"</td>
+     * </tr>
+     * 
+     * <tr>
+     * <td>rowid.column.name</td>
+     * <td>{@link java.lang.String}</td>
+     * <td>null</td>
+     * </tr>
+     * 
      * </p>
      * 
      * @param featureType
      *            the feature type containing the name, attributes and
      *            coordinate reference system of the new ArcSDE layer.
+     * 
+     * @param hints
+     *              A map containing extra ArcSDE-specific hints about
+     *              how to create the underlying ArcSDE SeLayer and
+     *              SeTable objects from this FeatureType.
      * 
      * @throws IOException
      *             see <code>throws DataSourceException</code> bellow
@@ -292,7 +337,7 @@ public class ArcSDEDataStore extends AbstractDataStore {
      *             type at the ArcSDE instance (e.g. a table with that name
      *             already exists).
      */
-    public void createSchema(FeatureType featureType, String configKeyword) throws IOException,
+    public void createSchema(FeatureType featureType, Map hints) throws IOException,
             IllegalArgumentException {
         if (featureType == null) {
             throw new NullPointerException("You have to provide a FeatureType instance");
@@ -323,6 +368,31 @@ public class ArcSDEDataStore extends AbstractDataStore {
         // flag to know if the table was created by us when catching an
         // exception.
         boolean tableCreated = false;
+        
+        //table/layer creation hints information
+        int rowIdType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE;
+        String rowIdColumn = null;
+        String configKeyword = "DEFAULTS";
+        if (hints != null) {
+            if (hints.get("configuration.keyword") instanceof String) {
+                configKeyword = (String)hints.get("configuration.keyword");
+            }
+            if (hints.get("rowid.column.type") instanceof String) {
+                String rowIdStr = (String)hints.get("rowid.column.type");
+                if (rowIdStr.equalsIgnoreCase("NONE")) {
+                    rowIdType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE;
+                } else if (rowIdStr.equalsIgnoreCase("USER")) {
+                    rowIdType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_USER;
+                } else if (rowIdStr.equalsIgnoreCase("SDE")) {
+                    rowIdType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE;
+                } else {
+                    throw new DataSourceException("createSchema hint 'rowid.column.type' must be one of 'NONE', 'USER' or 'SDE'");
+                }
+            }
+            if (hints.get("rowid.column.name") instanceof String) {
+                rowIdColumn = (String)hints.get("rowid.column.name");
+            }
+        }
 
         // placeholder to a catched exception to know in the finally block
         // if we should cleanup the crap we left in the database
@@ -344,13 +414,12 @@ public class ArcSDEDataStore extends AbstractDataStore {
 
             layer = new SeLayer(connection);
             layer.setTableName(qualifiedName);
-            if (configKeyword != null)
-                layer.setCreationKeyword(configKeyword);
-            else
-                layer.setCreationKeyword("DEFAULTS");
+            layer.setCreationKeyword(configKeyword);
+            
 
             final String HACK_COL_NAME = "gt_workaround_col_";
-            table = createSeTable(connection, qualifiedName, HACK_COL_NAME);
+            
+            table = createSeTable(connection, qualifiedName, HACK_COL_NAME, configKeyword);
             tableCreated = true;
 
             List atts = Arrays.asList(featureType.getAttributeTypes());
@@ -389,7 +458,19 @@ public class ArcSDEDataStore extends AbstractDataStore {
 
             LOGGER.fine("deleting the 'workaround' column...");
             table.dropColumn(HACK_COL_NAME);
+            
+            LOGGER.fine("setting up table registration with ArcSDE...");
+            SeRegistration reg = new SeRegistration(connection, table.getName());
+            if (rowIdColumn != null) {
+                LOGGER.fine("setting rowIdColumnName to " + rowIdColumn + " in table " + reg.getTableName());
+                reg.setRowIdColumnName(rowIdColumn);
+                reg.setRowIdColumnType(rowIdType);
+                reg.alter();
+                reg = null;
+            }
+            
             LOGGER.fine("Schema correctly created: " + featureType);
+            
         } catch (SeException e) {
             LOGGER.log(Level.WARNING, e.getSeError().getErrDesc(), e);
             throw new DataSourceException(e.getMessage(), e);
@@ -416,7 +497,7 @@ public class ArcSDEDataStore extends AbstractDataStore {
      * @throws SeException
      */
     private SeTable createSeTable(ArcSDEPooledConnection connection, String qualifiedName,
-            String hackColName) throws SeException {
+            String hackColName, String configKeyword) throws SeException {
         SeTable table;
         final SeColumnDefinition[] tmpCol = { new SeColumnDefinition(hackColName,
                 SeColumnDefinition.TYPE_STRING, 4, 0, true) };
@@ -433,7 +514,7 @@ public class ArcSDEDataStore extends AbstractDataStore {
 
         // create the table using DBMS default configuration keyword.
         // valid keywords are defined in the dbtune table.
-        table.create(tmpCol, "DEFAULTS");
+        table.create(tmpCol, configKeyword);
         LOGGER.info("table " + qualifiedName + " created...");
 
         return table;
