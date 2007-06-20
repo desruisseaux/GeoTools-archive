@@ -5,7 +5,7 @@ import javax.sql.DataSource;
 
 import org.geotools.factory.JNDI;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.factory.epsg.ThreadedOracleEpsgAuthority;
+import org.geotools.referencing.factory.epsg.ThreadedOracleEpsgFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.datum.GeodeticDatum;
 
@@ -34,7 +34,7 @@ public class ThreadedOracleEpsgAuthorityOnlineTest extends OracleOnlineTestCase 
      * @throws Exception
      */
     public void testCRSCreation() throws Exception {
-        ThreadedOracleEpsgAuthority oracle = new ThreadedOracleEpsgAuthority();
+        ThreadedOracleEpsgFactory oracle = new ThreadedOracleEpsgFactory();
 
         
         CoordinateReferenceSystem crs = oracle.createCoordinateReferenceSystem("4326");
@@ -42,7 +42,7 @@ public class ThreadedOracleEpsgAuthorityOnlineTest extends OracleOnlineTestCase 
     }
     
     public void testDatumCreation() throws Exception {
-        ThreadedOracleEpsgAuthority oracle = new ThreadedOracleEpsgAuthority();
+        ThreadedOracleEpsgFactory oracle = new ThreadedOracleEpsgFactory();
                 
         GeodeticDatum datum = oracle.createGeodeticDatum("6326");
         assertNotNull( datum );

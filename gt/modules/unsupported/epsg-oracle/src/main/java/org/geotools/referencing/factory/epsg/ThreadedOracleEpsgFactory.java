@@ -105,7 +105,7 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * @author Martin Desruisseaux
  * @author Jody Garnett
  */
-public class ThreadedOracleEpsgAuthority extends ThreadedEpsgFactory {
+public class ThreadedOracleEpsgFactory extends ThreadedEpsgFactory {
     /**
      * The user configuration file. This class search first for the first file found in the
      * following directories:
@@ -124,7 +124,7 @@ public class ThreadedOracleEpsgAuthority extends ThreadedEpsgFactory {
     /**
      * Creates a new instance of this factory.
      */
-    public ThreadedOracleEpsgAuthority() {
+    public ThreadedOracleEpsgFactory() {
         this(null);
     }
 
@@ -134,7 +134,7 @@ public class ThreadedOracleEpsgAuthority extends ThreadedEpsgFactory {
      * in order to give the priority to any "official" database installed locally by the
      * user, when available.
      */
-    public ThreadedOracleEpsgAuthority(final Hints hints) {
+    public ThreadedOracleEpsgFactory(final Hints hints) {
         super(hints, PRIORITY + 5);
     }
 
