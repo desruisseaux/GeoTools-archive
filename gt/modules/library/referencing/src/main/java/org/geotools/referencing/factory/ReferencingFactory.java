@@ -44,19 +44,20 @@ import org.geotools.resources.i18n.VocabularyKeys;
 /**
  * Base class for all factories in the referencing module.
  * Factories can be grouped in two categories:
- * <P>
- * <UL>
- *   <LI>{@linkplain AuthorityFactory Authority factories} creates objects from
+ *
+ * <ul>
+ *   <li><p>{@linkplain AuthorityFactory Authority factories} creates objects from
  *       a compact string defined by an authority.
- *   <br><i>These classes are working as "builders" they hold the definition or recipie
- *       used to construct an objet.</i></LI>
- *   <LI>{@linkplain ObjectFactory Object factories} allows applications
+ *   <br><em>These classes are working as "builders": they hold the definition or recipie
+ *       used to construct an objet.</em></p></li>
+ *
+ *   <li><p>{@linkplain ObjectFactory Object factories} allows applications
  *       to make objects that cannot be created by an authority factory.
  *       This factory is very flexible, whereas the authority factory is
  *       easier to use.
- *   <br><i>These classes are working as "Factories" they provide a series of create
- *       statements that can be used like a constructor.</i></LI>
- * </UL>
+ *   <br><em>These classes are working as "Factories": they provide a series of
+ *       {@code create} methods that can be used like a constructor.</em></p></li>
+ * </ul>
  *
  * @since 2.1
  * @source $URL$

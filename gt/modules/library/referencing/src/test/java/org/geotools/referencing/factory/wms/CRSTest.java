@@ -37,7 +37,6 @@ import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.IdentifiedObjectFinder;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
-import org.geotools.referencing.factory.BufferedAuthorityFactory;
 import org.geotools.referencing.factory.ThreadedAuthorityFactory;
 
 

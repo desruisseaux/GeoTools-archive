@@ -17,7 +17,6 @@ package org.geotools.referencing.operation;
 
 // J2SE dependencies and extensions
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import javax.units.NonSI;
 
@@ -39,7 +38,6 @@ import org.opengis.parameter.ParameterValueGroup;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.referencing.ReferencingFactoryFinder;
-import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.factory.ReferencingFactoryContainer;
 
 
@@ -97,15 +95,13 @@ public final class Transform3DTest extends TestCase {
         final MathTransformFactory       mtFactory = ReferencingFactoryFinder.getMathTransformFactory      (hints);
         final CoordinateOperationFactory opFactory = ReferencingFactoryFinder.getCoordinateOperationFactory(hints);
         final ReferencingFactoryContainer helper;
-        {
-            Map prep = new HashMap();
-            prep.put( Hints.DATUM_FACTORY, datumFactory );
-            prep.put( Hints.CS_FACTORY, csFactory );
-            prep.put( Hints.CRS_FACTORY, crsFactory );
-            prep.put( Hints.MATH_TRANSFORM_FACTORY, mtFactory );
-            
-            helper = new ReferencingFactoryContainer( new Hints(prep));                    
-        }
+
+        hints.clear();
+        hints.put(Hints.DATUM_FACTORY,          datumFactory);
+        hints.put(Hints.CS_FACTORY,             csFactory);
+        hints.put(Hints.CRS_FACTORY,            crsFactory);
+        hints.put(Hints.MATH_TRANSFORM_FACTORY, mtFactory);
+        helper = new ReferencingFactoryContainer(hints);
 
         // ----------------------------------------------------------
         // Creates datum

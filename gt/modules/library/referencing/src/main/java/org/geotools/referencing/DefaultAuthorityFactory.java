@@ -31,7 +31,6 @@ import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.factory.ManyAuthoritiesFactory;
-import org.geotools.referencing.factory.BufferedAuthorityFactory;
 import org.geotools.referencing.factory.ThreadedAuthorityFactory;
 
 

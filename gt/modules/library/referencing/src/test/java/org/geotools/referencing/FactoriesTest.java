@@ -21,7 +21,6 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import javax.units.NonSI;
@@ -59,7 +58,6 @@ import org.opengis.util.ScopedName;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.referencing.factory.DatumAliases;
-import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.factory.GeotoolsFactory;
 import org.geotools.referencing.factory.ReferencingFactoryContainer;
 import org.geotools.referencing.cs.DefaultCartesianCS;
@@ -184,17 +182,20 @@ public final class FactoriesTest extends TestCase {
         out.println("create Coodinate Reference System....8: ");
         out.println(cartCS); // No WKT for coordinate systems
             
-        final ProjectedCRS projCRS;
+        final Hints hints = new Hints(null);
+        hints.put(Hints.DATUM_FACTORY,          datumFactory);
+        hints.put(Hints.CS_FACTORY,             csFactory);
+        hints.put(Hints.CRS_FACTORY,            crsFactory);
+        hints.put(Hints.MATH_TRANSFORM_FACTORY, mtFactory);
         
-        Map hints = new HashMap();
-        hints.put( Hints.DATUM_FACTORY, datumFactory );
-        hints.put( Hints.CS_FACTORY, csFactory );
-        hints.put( Hints.CRS_FACTORY, crsFactory );
-        hints.put( Hints.MATH_TRANSFORM_FACTORY, mtFactory );
-        
-        ReferencingFactoryContainer container = new ReferencingFactoryContainer( new Hints(hints));        
-        projCRS = container.createProjectedCRS(name("Great_Britian_National_Grid"), geogCRS, null, param, cartCS);
-        
+        final ReferencingFactoryContainer container = new ReferencingFactoryContainer(hints);
+        assertSame(datumFactory, container.getDatumFactory());
+        assertSame(csFactory,    container.getCSFactory());
+        assertSame(crsFactory,   container.getCRSFactory());
+        assertSame(mtFactory,    container.getMathTransformFactory());
+
+        final ProjectedCRS projCRS = container.createProjectedCRS(
+                name("Great_Britian_National_Grid"), geogCRS, null, param, cartCS);
         out.println();
         out.println("create Coodinate System....9: ");
         out.println(projCRS.toWKT());

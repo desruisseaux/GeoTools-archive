@@ -66,7 +66,6 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.OperationMethod;
 
 // Geotools dependencies
-import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.ReferencingFactoryFinder;
@@ -131,6 +130,9 @@ public class Parser extends MathTransformParser {
     /**
      * Set of helper methods working on factories. Will be constructed
      * only the first time it is needed.
+     *
+     * @todo This field is a workaround for a limitation in current {@link CRSFactory}
+     *       interface. We should remove this field if the limitation is fixed in GeoAPI.
      */
     private transient ReferencingFactoryContainer factories;
 
@@ -155,10 +157,10 @@ public class Parser extends MathTransformParser {
      */
     public Parser(final Symbols symbols) {
         this(symbols,
-             ReferencingFactoryFinder.getDatumFactory        (GeoTools.getDefaultHints()),
-             ReferencingFactoryFinder.getCSFactory           (GeoTools.getDefaultHints()),
-             ReferencingFactoryFinder.getCRSFactory          (GeoTools.getDefaultHints()),
-             ReferencingFactoryFinder.getMathTransformFactory(GeoTools.getDefaultHints()));
+             ReferencingFactoryFinder.getDatumFactory        (null),
+             ReferencingFactoryFinder.getCSFactory           (null),
+             ReferencingFactoryFinder.getCRSFactory          (null),
+             ReferencingFactoryFinder.getMathTransformFactory(null));
     }
     
     /**
@@ -887,13 +889,12 @@ public class Parser extends MathTransformParser {
             }
             element.close();
             if (factories == null) {
-                Map hints = new HashMap();
-                hints.put( Hints.DATUM_FACTORY, datumFactory );
-                hints.put( Hints.CS_FACTORY, csFactory );
-                hints.put( Hints.CRS_FACTORY, crsFactory );
-                hints.put( Hints.MATH_TRANSFORM_FACTORY, mtFactory );
-                
-                factories = new ReferencingFactoryContainer( new Hints(hints));
+                final Hints hints = new Hints(null);
+                hints.put(Hints.DATUM_FACTORY,          datumFactory);
+                hints.put(Hints.CS_FACTORY,             csFactory);
+                hints.put(Hints.CRS_FACTORY,            crsFactory);
+                hints.put(Hints.MATH_TRANSFORM_FACTORY, mtFactory);
+                factories = ReferencingFactoryContainer.instance(hints);
             }
             return factories.createProjectedCRS(properties, geoCRS, null, projection,
                     csFactory.createCartesianCS(properties, axis0, axis1));
