@@ -65,24 +65,24 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * <p>
  * This class has the following responsibilities:
  * <ul>
- * <li>aquire a DataSource (using JNDI or otherwise)
- * <li>specify a worker class that will talk to the database in
+ *   <li>aquire a DataSource (using JNDI or otherwise)</li>
+ *   <li>specify a worker class that will talk to the database in
  *     the event of a cache miss. The class will be specific to the delect of SQL
- *     used by the database hosting the EPSG tables.
+ *     used by the database hosting the EPSG tables.</li>
  * </ul>
  * Please note we are working with <b>the same</b> tables as defined by EPSG. The only
  * thing that changes is the database used to host these tables.
  * <p>
  * Subclasses should override the following methods:
  * <ul>
- * <li>{@linkplain #createDataSource} used to aquire a DataSource
- * <li>{@link #createBackingStore} instance capable to speak that database syntax
+ *   <li>{@linkplain #createDataSource} used to aquire a DataSource</li>
+ *   <li>{@link #createBackingStore} instance capable to speak that database syntax</li>
  * </ul>
  * <p>
  * Users should not creates instance of this class directly. They should invoke one of
  * <code>{@linkplain ReferencingFactoryFinder}.getFooAuthorityFactory("EPSG")</code> methods instead.
  *
- * @since 2.1
+ * @since 2.4
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
@@ -174,8 +174,6 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
      * @param priority The priority for this factory, as a number between
      *        {@link #MINIMUM_PRIORITY MINIMUM_PRIORITY} and
      *        {@link #MAXIMUM_PRIORITY MAXIMUM_PRIORITY} inclusive.
-     *
-     * @since 2.4
      */
     public ThreadedEpsgFactory(final Hints userHints, final int priority) {
         super(userHints, priority);
@@ -310,8 +308,6 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
      *
      * @return The EPSG data source, or {@code null} if none where found.
      * @throws SQLException if an error occured while creating the data source.
-     *
-     * @since 2.4
      */
     protected DataSource createDataSource() throws SQLException {
         InitialContext context = null;
@@ -350,8 +346,6 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
      * @return The {@linkplain FactoryUsingSQL EPSG factory} using SQL queries appropriate
      *         for this data source.
      * @throws SQLException if connection to the database failed.
-     *
-     * @since 2.4
      */
     protected AbstractAuthorityFactory createBackingStore(final Hints hints) throws SQLException {
         final DataSource source = getDataSource();

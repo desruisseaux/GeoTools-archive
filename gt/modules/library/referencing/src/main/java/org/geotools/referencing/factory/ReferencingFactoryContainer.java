@@ -236,8 +236,6 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      * Returns all factories in this group. The returned map contains values for the
      * {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS}, {@link Hints#DATUM_FACTORY DATUM}
      * and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM} {@code FACTORY} hints.
-     *
-     * @since 2.3
      */
     public Map getImplementationHints() {
         synchronized (hints) {
@@ -322,8 +320,6 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      *         specified name.
      *
      * @see DefaultMathTransformFactory#getOperationMethod
-     *
-     * @since 2.2
      */
     public OperationMethod getOperationMethod(final String name)
             throws NoSuchIdentifierException

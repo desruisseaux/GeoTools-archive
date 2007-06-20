@@ -102,20 +102,19 @@ import org.geotools.util.Version;
  * <p>
  * This class is abstract - please see the subclasses for dialect specific implementations:
  * <ul>
- * <li>{@link AccessDialectEpsgFactory}
- * <li>{@link OracleDialectEpsgFactory}
- * <li>{@link OracleDialectEpsgFactory}
- * <li>{@link PostgreSQLDialectEpsgFactory}
+ *   <li>{@link AccessDialectEpsgFactory}</li>
+ *   <li>{@link AnsiDialectEpsgFactory}</li>
+ *   <li>{@link OracleDialectEpsgFactory}</li>
  * </ul>
+ *
  * These factories accepts names as well as numerical identifiers. For example
  * "<cite>NTF (Paris) / France I</cite>" and {@code "27581"} both fetchs the same object.
  * However, names may be ambiguous since the same name may be used for more than one object.
  * This is the case of "WGS 84" for example. If such an ambiguity is found, an exception
  * will be thrown. If names are not wanted as a legal EPSG code, subclasses can override the
  * {@link #isPrimaryKey} method.
- * <p>
  *
- * @since 2.1
+ * @since 2.4
  * @source $URL$
  * @version $Id$
  * @author Yann Cézard
@@ -428,8 +427,6 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      *
      * @param userHints The underlying factories used for objects creation.
      * @param connection The connection to the underlying EPSG database.
-     *
-     * @since 2.2
      */
     public DirectEpsgFactory(final Hints userHints, final Connection connection) {
         super(userHints, MAXIMUM_PRIORITY-20);
@@ -555,8 +552,6 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      *         If this factory doesn't contains any object of the given type, then this method
      *         returns an {@linkplain java.util.Collections#EMPTY_SET empty set}.
      * @throws FactoryException if access to the underlying database failed.
-     *
-     * @since 2.2
      */
     public Set/*<String>*/ getAuthorityCodes(final Class type) throws FactoryException {
         return getAuthorityCodes0(type);
@@ -643,8 +638,6 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      *         corresponding to the specified {@code code} has no description.
      * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the query failed for some other reason.
-     *
-     * @since 2.2
      */
     public InternationalString getDescriptionText(final String code) throws FactoryException {
         final String primaryKey = trimAuthority(code);
@@ -2010,8 +2003,6 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * @throws NoSuchAuthorityCodeException if this method can't find the requested code.
      * @throws FactoryException if some other kind of failure occured in the backing
      *         store. This exception usually have {@link SQLException} as its cause.
-     *
-     * @since 2.2
      */
     public synchronized ParameterDescriptor createParameterDescriptor(final String code)
             throws FactoryException
@@ -2204,8 +2195,6 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * @throws NoSuchAuthorityCodeException if this method can't find the requested code.
      * @throws FactoryException if some other kind of failure occured in the backing
      *         store. This exception usually have {@link SQLException} as its cause.
-     *
-     * @since 2.2
      */
     public synchronized OperationMethod createOperationMethod(final String code)
             throws FactoryException
@@ -2362,8 +2351,6 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * @throws NoSuchAuthorityCodeException if this method can't find the requested code.
      * @throws FactoryException if some other kind of failure occured in the backing
      *         store. This exception usually have {@link SQLException} as its cause.
-     *
-     * @since 2.2
      */
     public synchronized CoordinateOperation createCoordinateOperation(final String code)
             throws FactoryException
@@ -2636,8 +2623,6 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * @param targetCode Coded value of target coordinate reference system.
      * @throws FactoryException if the object creation failed.
      *
-     * @since 2.2
-     *
      * @todo The ordering is not consistent among all database software, because the "accuracy"
      *       column may contains null values. When used in an "ORDER BY" clause, PostgreSQL put
      *       null values last, while Access and HSQL put them first. The PostgreSQL's behavior is
@@ -2768,8 +2753,6 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * @param  type The type of objects to look for.
      * @return A finder to use for looking up unidentified objects.
      * @throws FactoryException if the finder can not be created.
-     *
-     * @since 2.4
      */
     //@Override
     public IdentifiedObjectFinder getIdentifiedObjectFinder(
@@ -2876,11 +2859,11 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * <p>
      * For example a subclass connecting to a <cite>PostgreSQL</cite> database could replace
      * all spaces ("&nbsp;") between watching braces ("[" and "]") by underscore ("_").
-     * </p>
+     *
      * @param  statement The statement in MS-Access syntax.
      * @return The SQL statement to use. The default implementation returns the string unchanged.
      */
-    abstract protected String adaptSQL(final String statement);
+    protected abstract String adaptSQL(final String statement);
 
     /**
      * Returns {@code true} if the specified code may be a primary key in some table. This method
@@ -2901,8 +2884,6 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * @param  code The code the inspect.
      * @return {@code true} if the code is probably a primary key.
      * @throws FactoryException if an unexpected error occured while inspecting the code.
-     *
-     * @since 2.2
      */
     protected boolean isPrimaryKey(final String code) throws FactoryException {
         final int length = code.length();

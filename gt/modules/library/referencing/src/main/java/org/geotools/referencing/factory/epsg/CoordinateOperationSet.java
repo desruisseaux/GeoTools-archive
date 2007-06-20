@@ -43,6 +43,9 @@ import org.geotools.referencing.factory.IdentifiedObjectSet;
  * @author Martin Desruisseaux
  */
 final class CoordinateOperationSet extends IdentifiedObjectSet {
+    /**
+     * For compatibility with previous versions.
+     */
     private static final long serialVersionUID = -2421669857023064667L;
     
     /**

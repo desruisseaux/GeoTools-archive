@@ -24,15 +24,18 @@ import org.geotools.factory.Hints;
 
 
 /**
- * Please use {@link AccessDialectEpsgAuthority}.
- * @deprecated Please use AccessDialectEpsgAuthority 
- * @since 2.4
+ * Please use {@link AccessDialectEpsgFactory}.
+ *
+ * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Jody Garnett
+ *
+ * @deprecated Please use {@link AccessDialectEpsgFactory}.
+ * @todo Remind to move {@link AccessDialectEpsgFactory} to the {@code epsg-access} module
+ *       after we removed this class.
  */
-public final class FactoryUsingSQL extends AccessDialectEpsgFactory
-{
+public final class FactoryUsingSQL extends AccessDialectEpsgFactory {
     /**
      * Constructs an authority factory using the specified connection.
      *

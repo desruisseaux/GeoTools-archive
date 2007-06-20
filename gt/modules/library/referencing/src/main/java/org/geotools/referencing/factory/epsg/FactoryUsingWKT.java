@@ -41,7 +41,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.referencing.ReferencingFactoryFinder;
-import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
 import org.geotools.referencing.factory.FactoryNotFoundException;
@@ -215,8 +214,8 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
     /**
      * Returns the set of authorities to use as {@linkplain CoordinateReferenceSystem#getIdentifiers
      * identifiers} for the CRS to be created. This set is given to the
-     * {@linkplain PropertyAuthorityFactory#PropertyAuthorityFactory(FactoryGroup, Citation[], URL)
-     * properties-backed factory constructor}.
+     * {@linkplain PropertyAuthorityFactory#PropertyAuthorityFactory(ReferencingFactoryContainer,
+     * Citation[], URL) properties-backed factory constructor}.
      * <p>
      * The default implementation returns a singleton containing only {@linkplain Citations#EPSG
      * EPSG}. Subclasses should override this method in order to enumerate all relevant authorities,

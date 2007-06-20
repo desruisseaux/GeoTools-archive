@@ -55,6 +55,9 @@ import org.geotools.resources.i18n.LoggingKeys;
  * @author Martin Desruisseaux
  */
 final class AuthorityCodes extends AbstractSet implements Serializable {
+    /**
+     * For compatibility with different versions.
+     */
     private static final long serialVersionUID = 7105664579449680562L;
 
     /**

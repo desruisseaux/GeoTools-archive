@@ -25,7 +25,6 @@ import org.geotools.factory.Hints;
 /**
  * An EPSG factory suitable for Oracle SQL syntax.
  *
- * @deprecated Please use OracleDialectEpsgFactory
  * @since 2.1
  * @source $URL$
  * @version $Id$
@@ -35,9 +34,10 @@ import org.geotools.factory.Hints;
  *       instantiated by the user, we need some way to pass the schema information to this class.
  *       one possible approach is to set the schema in preferences. Maybe a better was is to look
  *       for a place in the Oracle {@link javax.sql.DataSource} for that.
+ *
+ * @deprecated Please use {@link OracleDialectEpsgFactory}.
  */
 public class FactoryUsingOracleSQL extends OracleDialectEpsgFactory {
-
     /**
      * Constructs an authority factory using the specified connection.
      *

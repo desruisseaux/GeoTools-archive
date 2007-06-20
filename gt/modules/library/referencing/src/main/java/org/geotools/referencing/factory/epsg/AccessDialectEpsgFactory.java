@@ -23,6 +23,7 @@ import java.sql.PreparedStatement;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 
+
 /**
  * This factory uses the MS-Access dialect of SQL. Because the primary distribution format for the
  * EPSG database is MS-Access there is very little work to do in our {@link #adaptSQL} method.
@@ -31,19 +32,19 @@ import org.geotools.factory.Hints;
  * @source $URL$
  * @version $Id$
  * @author Jody Garnett
+ *
+ * @todo This class need to move in the {@code epsg-access} module. We can do that only
+ *       after we removed the deprecated {@link FactoryUsingSQL} class in Geotools 2.5.
  */
-public class AccessDialectEpsgFactory extends DirectEpsgFactory
-{
+public class AccessDialectEpsgFactory extends DirectEpsgFactory {
     /**
      * Constructs an authority factory using the specified connection.
      *
      * @param userHints The underlying factories used for objects creation.
      * @param connection The connection to the underlying EPSG database.
-     *
-     * @since 2.4
      */
     public AccessDialectEpsgFactory(final Hints userHints, final Connection connection) {
-        super(userHints, connection );
+        super(userHints, connection);
     }
 
     /**
@@ -58,5 +59,4 @@ public class AccessDialectEpsgFactory extends DirectEpsgFactory
     protected String adaptSQL(final String statement) {
         return statement;
     }
-
 }

@@ -39,7 +39,7 @@ import org.geotools.factory.Hints;
  *   </li>
  * </ul>
  *
- * @since 2.1
+ * @since 2.4
  * @source $URL$
  * @version $Id$
  * @author Rueben Schulz
@@ -118,11 +118,9 @@ public class AnsiDialectEpsgFactory extends DirectEpsgFactory {
      *
      * @param userHints  The underlying factories used for objects creation.
      * @param connection The connection to the underlying EPSG database.
-     *
-     * @since 2.2
      */
     public AnsiDialectEpsgFactory(final Hints      userHints,
-                               final Connection connection)
+                                  final Connection connection)
     {
         super(userHints, connection);
         for (int i=0; i<ANSI.length; i++) {
@@ -137,8 +135,6 @@ public class AnsiDialectEpsgFactory extends DirectEpsgFactory {
      * time only.
      *
      * @param schema The database schema in which the epsg tables are stored.
-     *
-     * @since 2.2
      */
     protected void setSchema(String schema) {
         schema = schema.trim();

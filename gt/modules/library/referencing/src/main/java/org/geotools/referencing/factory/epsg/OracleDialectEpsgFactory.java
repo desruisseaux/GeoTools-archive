@@ -23,13 +23,12 @@ import java.util.regex.Pattern;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
-import org.geotools.referencing.factory.FactoryGroup;
 
 
 /**
  * An EPSG factory suitable for Oracle SQL syntax.
  *
- * @since 2.1
+ * @since 2.4
  * @source $URL$
  * @version $Id$
  * @author John Grange
@@ -38,6 +37,8 @@ import org.geotools.referencing.factory.FactoryGroup;
  *       instantiated by the user, we need some way to pass the schema information to this class.
  *       one possible approach is to set the schema in preferences. Maybe a better was is to look
  *       for a place in the Oracle {@link javax.sql.DataSource} for that.
+ *
+ * @todo This class need to move in the {@code epsg-oracle} module.
  */
 public class OracleDialectEpsgFactory extends AnsiDialectEpsgFactory {
     /**
@@ -50,11 +51,9 @@ public class OracleDialectEpsgFactory extends AnsiDialectEpsgFactory {
      *
      * @param userHints  The underlying factories used for objects creation.
      * @param connection The connection to the underlying EPSG database.
-     *
-     * @since 2.2
      */
     public OracleDialectEpsgFactory(final Hints      userHints,
-                                 final Connection connection)
+                                    final Connection connection)
     {
         super(userHints, connection);
     }
@@ -70,11 +69,10 @@ public class OracleDialectEpsgFactory extends AnsiDialectEpsgFactory {
      * @param userHints  The underlying factories used for objects creation.
      * @param connection The connection to the underlying EPSG database.
      * @param epsgSchema The database schema in which the epsg tables are stored (optional).
-     * @since 2.2
      */
     public OracleDialectEpsgFactory(final Hints      userHints,
-                                 final Connection connection,
-                                 final String     epsgSchema)
+                                    final Connection connection,
+                                    final String     epsgSchema)
     {
         super(userHints, connection);
         adaptTableNames(epsgSchema);

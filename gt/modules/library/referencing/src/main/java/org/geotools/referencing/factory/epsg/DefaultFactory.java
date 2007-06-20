@@ -23,14 +23,15 @@ import org.geotools.factory.Hints;
 /**
  * Base class for EPSG factories to be registered in {@link ReferencingFactoryFinder}.
  * 
- * @deprecated Please use ThreadedEpsgFactory instead, the name DefaultFactory was viewed as confusing
  * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Please use {@link ThreadedEpsgFactory} instead,
+ *             the name {@code DefaultFactory} was viewed as confusing
  */
 public class DefaultFactory extends ThreadedEpsgFactory {
-
     /**
      * Constructs an authority factory using the default set of factories.
      */
@@ -52,5 +53,4 @@ public class DefaultFactory extends ThreadedEpsgFactory {
     public DefaultFactory(final Hints userHints, final int priority) {
         super(userHints, priority);
     }
-
 }

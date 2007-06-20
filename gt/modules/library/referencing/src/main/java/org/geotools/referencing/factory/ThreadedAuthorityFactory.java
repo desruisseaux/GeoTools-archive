@@ -66,7 +66,7 @@ import org.geotools.resources.i18n.LoggingKeys;
  * they are in use somewhere else in the Java virtual machine, but will be discarted
  * (and recreated on the fly if needed) otherwise.
  *
- * @since 2.1
+ * @since 2.4
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
@@ -872,8 +872,6 @@ public class ThreadedAuthorityFactory extends AbstractAuthorityFactory implement
 
     /**
      * Returns a parameter descriptor from a code. 
-     *
-     * @since 2.2
      */
     public synchronized ParameterDescriptor createParameterDescriptor(final String code)
             throws FactoryException
@@ -892,8 +890,6 @@ public class ThreadedAuthorityFactory extends AbstractAuthorityFactory implement
 
     /**
      * Returns an operation method from a code. 
-     *
-     * @since 2.2
      */
     public synchronized OperationMethod createOperationMethod(final String code)
             throws FactoryException
@@ -912,8 +908,6 @@ public class ThreadedAuthorityFactory extends AbstractAuthorityFactory implement
 
     /**
      * Returns an operation from a single operation code. 
-     *
-     * @since 2.2
      */
     public synchronized CoordinateOperation createCoordinateOperation(final String code)
             throws FactoryException
@@ -932,8 +926,6 @@ public class ThreadedAuthorityFactory extends AbstractAuthorityFactory implement
 
     /**
      * Returns an operation from coordinate reference system codes.
-     *
-     * @since 2.2
      */
     public synchronized Set/*<CoordinateOperation>*/ createFromCoordinateReferenceSystemCodes(
                         final String sourceCode, final String targetCode)
@@ -989,8 +981,6 @@ public class ThreadedAuthorityFactory extends AbstractAuthorityFactory implement
      * Returns a finder which can be used for looking up unidentified objects.
      * The default implementation delegates lookup to the underlying backing
      * store and caches the result.
-     *
-     * @since 2.4
      */
     //@Override
     public synchronized IdentifiedObjectFinder getIdentifiedObjectFinder(
