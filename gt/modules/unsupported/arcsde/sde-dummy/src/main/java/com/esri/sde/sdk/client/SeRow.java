@@ -4,10 +4,10 @@ import java.util.Calendar;
 
 public class SeRow {
 	
-	public static final int SE_IS_NULL_VALUE = 0;
-	public static final int SE_IS_REPEATED_FEATURE = 1;
-	public static final int SE_IS_ALREADY_FETCHED = 2;
-	public static final int SE_IS_NOT_NULL_VALUE = 3;
+	public static /* GEOT-947 final*/ int SE_IS_NULL_VALUE = 0;
+	public static /* GEOT-947 final*/ int SE_IS_REPEATED_FEATURE = 1;
+	public static /* GEOT-947 final*/ int SE_IS_ALREADY_FETCHED = 2;
+	public static /* GEOT-947 final*/ int SE_IS_NOT_NULL_VALUE = 3;
 	
 	public SeColumnDefinition[] getColumns() { return null; }
 	public Object getObject(int i) throws SeException { return null; }

@@ -74,22 +74,13 @@ class SdeRow {
             for (i = 0; i < nCols; i++) {
                 statusIndicator = row.getIndicator(i);
 
-                switch (statusIndicator) {
-                case SeRow.SE_IS_ALREADY_FETCHED:
-                case SeRow.SE_IS_REPEATED_FEATURE:
+                if (statusIndicator == SeRow.SE_IS_ALREADY_FETCHED
+                        || statusIndicator == SeRow.SE_IS_REPEATED_FEATURE) {
                     values[i] = previousValues[i];
-
-                    break;
-
-                case SeRow.SE_IS_NULL_VALUE:
+                } else if (statusIndicator == SeRow.SE_IS_NULL_VALUE) {
                     values[i] = null;
-
-                    break;
-
-                default:
+                } else {
                     values[i] = row.getObject(i);
-
-                    break;
                 }
             }
         } catch (SeException e) {

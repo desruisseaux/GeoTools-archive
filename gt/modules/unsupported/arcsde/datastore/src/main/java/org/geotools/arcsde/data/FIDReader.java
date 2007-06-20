@@ -153,26 +153,18 @@ public abstract class FIDReader {
             final int rowIdColumnType = reg.getRowIdColumnType();
             final String rowIdColumnName = reg.getRowIdColumnName();
 
-            switch (rowIdColumnType) {
-            case SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE:
+            if(rowIdColumnType == SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE){
                 // use column name, value maintained by sde
                 fidReader = new SdeManagedFidReader(tableName, rowIdColumnName);
-                break;
-
-            case SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_USER:
+            }else if(rowIdColumnType == SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_USER){
                 // use column name, value maintained by user
                 fidReader = new UserManagedFidReader(tableName, rowIdColumnName);
-                break;
-
-            case SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE:
+            }else if(rowIdColumnType == SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE){
                 // use geometry id
                 String shapeColName = layer.getSpatialColumn();
                 String shapeIdColName = layer.getShapeAttributeName(SeLayer.SE_SHAPE_ATTRIBUTE_FID);
                 fidReader = new ShapeFidReader(tableName, shapeColName, shapeIdColName);
-                break;
-
-            default:
-
+            }else{
                 // may have been returned 0, meaning there is no registered
                 // column id
                 throw new IllegalStateException("Unkown ArcSDE row ID registration type: "
