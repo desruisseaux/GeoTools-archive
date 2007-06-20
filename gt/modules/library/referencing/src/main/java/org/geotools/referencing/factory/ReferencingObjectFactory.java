@@ -818,8 +818,8 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * <strong>NOTE:</strong>
      * It is the user's responsability to ensure that the {@code baseToDerived} transform performs
      * all required steps, including {@linkplain AbstractCS#swapAndScaleAxis unit conversions and
-     * change of axis order}, if needed. The {@link FactoryGroup} class provides conveniences
-     * methods for this task.
+     * change of axis order}, if needed. The {@link ReferencingFactoryContainer} class provides
+     * conveniences methods for this task.
      *
      * @param  properties Name and other properties to give to the new object.
      * @param  method A description of the {@linkplain Conversion#getMethod method for the
@@ -851,8 +851,8 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * <strong>NOTE:</strong>
      * It is the user's responsability to ensure that the {@code baseToDerived} transform performs
      * all required steps, including {@linkplain AbstractCS#swapAndScaleAxis unit conversions and
-     * change of axis order}, if needed. The {@link FactoryGroup} class provides conveniences
-     * methods for this task.
+     * change of axis order}, if needed. The {@link ReferencingFactoryContainer} class provides
+     * conveniences methods for this task.
      * 
      * @param  properties Name and other properties to give to the new object.
      * @param  method A description of the {@linkplain Conversion#getMethod method for the

@@ -35,7 +35,6 @@ import org.opengis.referencing.FactoryException;
 import org.geotools.factory.Hints;
 import org.geotools.factory.Factory;
 import org.geotools.factory.OptionalFactory;
-import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Logging;

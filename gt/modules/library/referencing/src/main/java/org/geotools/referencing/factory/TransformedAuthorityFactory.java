@@ -219,7 +219,7 @@ public class TransformedAuthorityFactory extends AuthorityFactoryAdapter {
             }
         }
         if (directionChanged || !oldUnits.equals(newUnits)) {
-            final ReferencingFactoryContainer factories = getFactoryGroup(false);
+            final ReferencingFactoryContainer factories = getFactoryContainer(false);
             final CSFactory csFactory = factories.getCSFactory();
             final Map properties = getProperties(axis);
             axis = csFactory.createCoordinateSystemAxis(properties,
@@ -243,7 +243,6 @@ public class TransformedAuthorityFactory extends AuthorityFactoryAdapter {
     protected CoordinateSystem replace(final CoordinateSystem cs) throws FactoryException {
         final int dimension = cs.getDimension();
         final CoordinateSystemAxis[] orderedAxis = new CoordinateSystemAxis[dimension];
-        FactoryGroup factories = null;
         for (int i=0; i<dimension; i++) {
             orderedAxis[i] = replace(cs.getAxis(i));
         }
@@ -318,7 +317,7 @@ public class TransformedAuthorityFactory extends AuthorityFactoryAdapter {
                 return crs;
             }
             final Map properties = getProperties(crs);
-            final ReferencingFactoryContainer factories = getFactoryGroup(true);
+            final ReferencingFactoryContainer factories = getFactoryContainer(true);
             final CRSFactory crsFactory = factories.getCRSFactory();
             Conversion fromBase = derivedCRS.getConversionFromBase();
             fromBase = new DefiningConversion(getProperties(fromBase),
@@ -335,7 +334,7 @@ public class TransformedAuthorityFactory extends AuthorityFactoryAdapter {
             return crs;
         } else {
             final Map properties = getProperties(crs);
-            final ReferencingFactoryContainer factories = getFactoryGroup(true);
+            final ReferencingFactoryContainer factories = getFactoryContainer(true);
             final CRSFactory crsFactory = factories.getCRSFactory();
             if (crs instanceof GeographicCRS) {
                 modified = crsFactory.createGeographicCRS(properties,
@@ -425,7 +424,7 @@ public class TransformedAuthorityFactory extends AuthorityFactoryAdapter {
             throws FactoryException
     {
         final int dimension = axis.length;
-        final ReferencingFactoryContainer factories = getFactoryGroup(false);
+        final ReferencingFactoryContainer factories = getFactoryContainer(false);
         final CSFactory csFactory = factories.getCSFactory();
         if (CartesianCS.class.isAssignableFrom(type)) {
             switch (dimension) {

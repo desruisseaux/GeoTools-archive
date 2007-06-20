@@ -585,7 +585,7 @@ public class FactoryRegistry extends ServiceRegistry {
              * This is because the same hint may appears in the "parent" factory and a "child"
              * dependency with different value. For example the FORCE_LONGITUDE_FIRST_AXIS_ORDER
              * hint has the value TRUE in OrderedAxisAuthorityFactory, but the later is basically
-             * a wrapper around the EPSG ThreadedEpsgFactory (typically), which has the value FALSE
+             * a wrapper around the ThreadedEpsgFactory (typically), which has the value FALSE
              * for the same hint.
              *
              * Additional note: The 'alreadyDone' set is a safety against cyclic dependencies,

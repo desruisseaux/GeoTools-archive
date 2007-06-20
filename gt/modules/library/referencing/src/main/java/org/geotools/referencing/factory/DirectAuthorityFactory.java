@@ -46,7 +46,7 @@ import org.geotools.factory.Hints;
 public abstract class DirectAuthorityFactory extends AbstractAuthorityFactory {
 
     // IMPLEMENTATION NOTE:  The reason why this class exist is that we don't want "indirect"
-    // factories like BufferedAuthorityFactory to inherit a FactoryGroup field. If this field
+    // factories like BufferedAuthorityFactory to inherit the factories field.  If this field
     // existed in their super-class, then the super-class constructor could try to initialize
     // it while in fact BufferedAuthorityFactory don't need it.  Experience with Geotools 2.2
     // suggest that it can lead to tricky recursivity problems in FactoryFinder, because most
@@ -58,9 +58,9 @@ public abstract class DirectAuthorityFactory extends AbstractAuthorityFactory {
     protected final ReferencingFactoryContainer factories;
 
     /**
-     * Tells if {@link FactoryGroup#hints} has been invoked. It must be invoked exactly once,
-     * but can't be invoked in the constructor because it causes a {@link StackOverflowError}
-     * in some situations.
+     * Tells if {@link ReferencingFactoryContainer#hints} has been invoked. It must be
+     * invoked exactly once, but can't be invoked in the constructor because it causes
+     * a {@link StackOverflowError} in some situations.
      */
     private boolean hintsInitialized;
 

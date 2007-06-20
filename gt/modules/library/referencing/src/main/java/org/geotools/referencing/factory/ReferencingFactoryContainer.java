@@ -94,7 +94,7 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      */
     private MathTransformFactory mtFactory;
 
-    // WARNING: Do NOT put a CoordinateOperationFactory field in FactoryGroup. We tried that in
+    // WARNING: Do NOT put a CoordinateOperationFactory field in this class. We tried that in
     // Geotools 2.2, and removed it in Geotools 2.3 because it leads to very tricky recursivity
     // problems when we try to initialize it with FactoryFinder.getCoordinateOperationFactory.
     // The Datum, CS, CRS and MathTransform factories above are standalone, while the Geotools
@@ -192,10 +192,10 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      */
     public static ReferencingFactoryContainer instance(final Hints hints) {
         /*
-         * Use the same synchronization lock than FactoryFinder (instead of FactoryGroup) in
-         * order to reduce the risk of dead lock. This is because FactoryGroup creation may
-         * queries FactoryFinder, and some implementations managed by FactoryFinder may ask
-         * for a FactoryGroup in turn.
+         * Use the same synchronization lock than ReferencingFactoryFinder (instead of this class)
+         * in order to reduce the risk of dead lock. This is because ReferencingFactoryContainer
+         * creation may queries ReferencingFactoryFinder, and some implementations managed by
+         * ReferencingFactoryFinder may ask for a ReferencingFactoryContainer in turn.
          */
         synchronized (ReferencingFactoryFinder.class) {
             if (cache == null) {
@@ -835,7 +835,7 @@ search:     for (final Iterator it=sources.iterator(); it.hasNext();) {
         /*
          * TODO: Implement other cases here (3D-GeographicCRS, etc.).
          *       It may requires the creation of new CoordinateSystem objects,
-         *       which is why this method live in 'FactoryGroup'.
+         *       which is why this method live in ReferencingFactoryContainer.
          */
         throw new FactoryException(Errors.format(ErrorKeys.CANT_SEPARATE_CRS_$1,
                                    crs.getName().getCode()));

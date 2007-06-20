@@ -388,8 +388,8 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
 
     /**
      * Trims the authority scope, if present. If more than one authority were given at
-     * {@linkplain #PropertyAuthorityFactory(FactoryGroup, Citation[], URL) construction time},
-     * then any of them may appears as the scope in the supplied code.
+     * {@linkplain #PropertyAuthorityFactory(ReferencingFactoryContainer, Citation[], URL)
+     * construction time}, then any of them may appears as the scope in the supplied code.
      *
      * @param  code The code to trim.
      * @return The code without the authority scope.

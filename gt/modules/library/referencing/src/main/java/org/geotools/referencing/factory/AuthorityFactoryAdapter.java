@@ -123,7 +123,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      * {@link #csFactory}, {@link #crsFactory} or {@link #operationFactory}. Will be created
      * only when first needed.
      *
-     * @see #getFactoryGroup
+     * @see #getFactoryContainer
      */
     private transient ReferencingFactoryContainer factories;
 
@@ -1118,7 +1118,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      * {@link TransformedAuthorityFactory} that need low-level access to factories. Do not change
      * this method into a public one; we would need a better API before to do such thing.
      */
-    final ReferencingFactoryContainer getFactoryGroup(final boolean crs) {
+    final ReferencingFactoryContainer getFactoryContainer(final boolean crs) {
         final AuthorityFactory factory;
         if (crs) {
             factory = crsFactory;
