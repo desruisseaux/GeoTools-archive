@@ -46,6 +46,7 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
 import org.geotools.referencing.factory.FactoryNotFoundException;
 import org.geotools.referencing.factory.PropertyAuthorityFactory;
+import org.geotools.referencing.factory.ReferencingFactoryContainer;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.io.TableWriter;
@@ -124,7 +125,7 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
     /**
      * The factories to be given to the backing store.
      */
-    private final FactoryGroup factories;
+    private final ReferencingFactoryContainer factories;
 
     /**
      * Default priority for this factory.
@@ -162,7 +163,7 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
      */
     protected FactoryUsingWKT(final Hints userHints, final int priority) {
         super(userHints, priority);
-        factories = FactoryGroup.createInstance(userHints);
+        factories = ReferencingFactoryContainer.instance(userHints);
         Object hint = null;
         if (userHints != null) {
             hint = userHints.get(Hints.CRS_AUTHORITY_EXTRA_DIRECTORY);

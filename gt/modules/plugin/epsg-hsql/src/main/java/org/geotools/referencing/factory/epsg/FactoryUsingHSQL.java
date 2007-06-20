@@ -37,7 +37,7 @@ import org.geotools.factory.Hints;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class FactoryUsingHSQL extends FactoryUsingAnsiSQL {
+final class FactoryUsingHSQL extends AnsiDialectEpsgFactory {
     /**
      * The regular expression pattern for searching the "FROM (" clause.
      * This is the pattern for the opening parenthesis.

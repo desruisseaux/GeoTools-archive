@@ -122,9 +122,9 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
      * @param  definitions URL to the definition file.
      * @throws IOException if the definitions can't be read.
      */
-    public PropertyAuthorityFactory(final FactoryGroup factories,
-                                    final Citation     authority,
-                                    final URL          definitions)
+    public PropertyAuthorityFactory(final ReferencingFactoryContainer factories,
+                                    final Citation                    authority,
+                                    final URL                         definitions)
             throws IOException
     {
         this(factories, new Citation[] {authority}, definitions);
@@ -149,9 +149,9 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
      *
      * @since 2.4
      */
-    public PropertyAuthorityFactory(final FactoryGroup factories,
-                                    final Citation[]   authorities,
-                                    final URL          definitions)
+    public PropertyAuthorityFactory(final ReferencingFactoryContainer factories,
+                                    final Citation[]                  authorities,
+                                    final URL                         definitions)
             throws IOException
     {
         super(factories, MINIMUM_PRIORITY + 10);

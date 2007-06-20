@@ -25,7 +25,7 @@ import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.crs.ProjectedCRS;
 
 // Geotools dependencies
-import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.referencing.factory.ReferencingFactoryContainer;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 
@@ -62,7 +62,7 @@ abstract class Factlet {
      * for the {@linkplain #getClassification projection classification}, and then
      * invokes {@link #setProjectionParameters} in order to fill the parameter values.
      */
-    public final ProjectedCRS create(final Code code, final FactoryGroup factories)
+    public final ProjectedCRS create(final Code code, final ReferencingFactoryContainer factories)
             throws FactoryException
     {
         final String classification = getClassification();

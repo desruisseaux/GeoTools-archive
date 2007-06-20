@@ -16,46 +16,8 @@
  */
 package org.geotools.referencing.factory.epsg;
 
-// J2SE dependencies
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
-import javax.sql.DataSource;
-import java.util.Iterator;
-import java.util.Comparator;
-import java.util.Collections;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import javax.imageio.spi.ServiceRegistry;
-import javax.naming.InitialContext;
-import javax.naming.NameNotFoundException;
-import javax.naming.NamingException;
-import javax.naming.NoInitialContextException;
-
-// OpenGIS dependencies
-import org.opengis.metadata.citation.Citation;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.cs.CSAuthorityFactory;
-import org.opengis.referencing.crs.CRSAuthorityFactory;
-import org.opengis.referencing.datum.DatumAuthorityFactory;
-import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
-
 // Geotools dependencies
-import org.geotools.factory.JNDI;
 import org.geotools.factory.Hints;
-import org.geotools.factory.FactoryRegistry;
-import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.referencing.ReferencingFactoryFinder;
-import org.geotools.referencing.factory.FactoryGroup;
-import org.geotools.referencing.factory.AbstractAuthorityFactory;
-import org.geotools.referencing.factory.DeferredAuthorityFactory;
-import org.geotools.referencing.factory.FactoryNotFoundException;
-import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Logging;
-import org.geotools.resources.i18n.LoggingKeys;
-import org.geotools.resources.i18n.Vocabulary;
-import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**

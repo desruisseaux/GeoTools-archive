@@ -219,7 +219,7 @@ public class TransformedAuthorityFactory extends AuthorityFactoryAdapter {
             }
         }
         if (directionChanged || !oldUnits.equals(newUnits)) {
-            final FactoryGroup factories = getFactoryGroup(false);
+            final ReferencingFactoryContainer factories = getFactoryGroup(false);
             final CSFactory csFactory = factories.getCSFactory();
             final Map properties = getProperties(axis);
             axis = csFactory.createCoordinateSystemAxis(properties,
@@ -318,7 +318,7 @@ public class TransformedAuthorityFactory extends AuthorityFactoryAdapter {
                 return crs;
             }
             final Map properties = getProperties(crs);
-            final FactoryGroup factories = getFactoryGroup(true);
+            final ReferencingFactoryContainer factories = getFactoryGroup(true);
             final CRSFactory crsFactory = factories.getCRSFactory();
             Conversion fromBase = derivedCRS.getConversionFromBase();
             fromBase = new DefiningConversion(getProperties(fromBase),
@@ -335,7 +335,7 @@ public class TransformedAuthorityFactory extends AuthorityFactoryAdapter {
             return crs;
         } else {
             final Map properties = getProperties(crs);
-            final FactoryGroup factories = getFactoryGroup(true);
+            final ReferencingFactoryContainer factories = getFactoryGroup(true);
             final CRSFactory crsFactory = factories.getCRSFactory();
             if (crs instanceof GeographicCRS) {
                 modified = crsFactory.createGeographicCRS(properties,
@@ -425,7 +425,7 @@ public class TransformedAuthorityFactory extends AuthorityFactoryAdapter {
             throws FactoryException
     {
         final int dimension = axis.length;
-        final FactoryGroup factories = getFactoryGroup(false);
+        final ReferencingFactoryContainer factories = getFactoryGroup(false);
         final CSFactory csFactory = factories.getCSFactory();
         if (CartesianCS.class.isAssignableFrom(type)) {
             switch (dimension) {

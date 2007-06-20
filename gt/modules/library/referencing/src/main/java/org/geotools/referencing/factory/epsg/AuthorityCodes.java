@@ -55,6 +55,8 @@ import org.geotools.resources.i18n.LoggingKeys;
  * @author Martin Desruisseaux
  */
 final class AuthorityCodes extends AbstractSet implements Serializable {
+    private static final long serialVersionUID = 7105664579449680562L;
+
     /**
      * The logger name.
      */
@@ -66,7 +68,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
      * set is in use. This is required because {@link FactoryUsingSQL#finalize} closes the JDBC
      * connections.
      */
-    private final FactoryUsingSQL factory;
+    private final DirectEpsgFactory factory;
 
     /**
      * The type for this code set. This is translated to the most appropriate
@@ -130,10 +132,10 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
      * @param  type       The type to query.
      * @param  factory    The factory originator.
      */
-    public AuthorityCodes(final Connection      connection,
-                          final TableInfo       table,
-                          final Class           type,
-                          final FactoryUsingSQL factory)
+    public AuthorityCodes(final Connection        connection,
+                          final TableInfo         table,
+                          final Class             type,
+                          final DirectEpsgFactory factory)
     {
         this.factory    = factory;
         this.connection = connection;

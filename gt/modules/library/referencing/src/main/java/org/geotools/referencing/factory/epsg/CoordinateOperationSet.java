@@ -43,6 +43,8 @@ import org.geotools.referencing.factory.IdentifiedObjectSet;
  * @author Martin Desruisseaux
  */
 final class CoordinateOperationSet extends IdentifiedObjectSet {
+    private static final long serialVersionUID = -2421669857023064667L;
+    
     /**
      * The codes of {@link ProjectedCRS} objects for the specified {@link Conversion} codes,
      * or {@code null} if none.

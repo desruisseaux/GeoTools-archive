@@ -24,11 +24,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.LinkedHashSet;
 import java.util.Collection;
-import java.util.Collections;
 
 // OpenGIS dependencies
 import org.opengis.referencing.*;
-import org.opengis.referencing.crs.*;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
@@ -57,7 +55,7 @@ public abstract class DirectAuthorityFactory extends AbstractAuthorityFactory {
     /**
      * The underlying factories used for objects creation.
      */
-    protected final FactoryGroup factories;
+    protected final ReferencingFactoryContainer factories;
 
     /**
      * Tells if {@link FactoryGroup#hints} has been invoked. It must be invoked exactly once,
@@ -74,7 +72,7 @@ public abstract class DirectAuthorityFactory extends AbstractAuthorityFactory {
      *        {@link #MINIMUM_PRIORITY MINIMUM_PRIORITY} and
      *        {@link #MAXIMUM_PRIORITY MAXIMUM_PRIORITY} inclusive.
      */
-    protected DirectAuthorityFactory(final FactoryGroup factories, final int priority) {
+    protected DirectAuthorityFactory(final ReferencingFactoryContainer factories, final int priority) {
         super(priority);
         this.factories = factories;
         ensureNonNull("factories", factories);
@@ -92,7 +90,7 @@ public abstract class DirectAuthorityFactory extends AbstractAuthorityFactory {
      */
     protected DirectAuthorityFactory(final Hints hints, final int priority) {
         super(priority);
-        factories = FactoryGroup.createInstance(hints);
+        factories = ReferencingFactoryContainer.instance(hints);
         // Do not copies the user-provided hints to this.hints, because
         // this is up to sub-classes to decide which hints are relevant.
     }

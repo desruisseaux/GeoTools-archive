@@ -125,7 +125,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      *
      * @see #getFactoryGroup
      */
-    private transient FactoryGroup factories;
+    private transient ReferencingFactoryContainer factories;
 
     /**
      * Creates a wrapper around no factory. This constructor should never be used except by
@@ -1118,7 +1118,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      * {@link TransformedAuthorityFactory} that need low-level access to factories. Do not change
      * this method into a public one; we would need a better API before to do such thing.
      */
-    final FactoryGroup getFactoryGroup(final boolean crs) {
+    final ReferencingFactoryContainer getFactoryGroup(final boolean crs) {
         final AuthorityFactory factory;
         if (crs) {
             factory = crsFactory;
@@ -1130,7 +1130,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
         }
         // No predefined factory group. Create one.
         if (factories == null) {
-            factories = FactoryGroup.createInstance(hints());
+            factories = ReferencingFactoryContainer.instance(hints());
         }
         return factories;
     }

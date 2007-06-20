@@ -198,7 +198,7 @@ public class ThreadedOracleEpsgFactory extends ThreadedEpsgFactory {
      */
     protected AbstractAuthorityFactory createBackingStore(final Hints hints) throws SQLException {
         final Connection connection = getDataSource().getConnection();
-        final FactoryUsingAnsiSQL factory = new FactoryUsingOracleSQL(hints, connection);
+        final AnsiDialectEpsgFactory factory = new FactoryUsingOracleSQL(hints, connection);
         if (schema != null) {
             factory.setSchema(schema);
         }
