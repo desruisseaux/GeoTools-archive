@@ -29,7 +29,7 @@ import org.geotools.referencing.factory.epsg.oracle.OracleOnlineTestCase;
 /**
  * Tests the {@link org.geotools.referencing.factory.URN_AuthorityFactory} with EPSG codes.
  *
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/plugin/epsg-oracle/src/test/java/org/geotools/referencing/factory/URN_EPSG_Test.java $
+ * @source $URL$
  * @version $Id$
  * @author Justin Deoliveira
  * @author Martin Desruisseaux
