@@ -770,7 +770,9 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
 				}
 				//else if ( literal instanceof String ) {
 				else if ( String.class.isAssignableFrom( target ) ) {
-					out.write( "'" + literal.toString() + "'" );
+                    // sigle quotes must be escaped to have a valid sql string
+                    String escaped = literal.toString().replaceAll("'", "''");
+					out.write( "'" + escaped + "'" );
 				}
 			}
 			else {
@@ -781,7 +783,10 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
 						encoding = expression.getValue().toString();
 					}
 					
-					out.write( "'" + encoding + "'");
+
+                // sigle quotes must be escaped to have a valid sql string
+                    String escaped = encoding.replaceAll("'", "''");
+					out.write( "'" + escaped + "'");
 				}
 			
 		} catch (IOException e) {

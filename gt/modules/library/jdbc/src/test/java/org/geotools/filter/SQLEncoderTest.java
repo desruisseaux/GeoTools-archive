@@ -15,9 +15,14 @@
  */
 package org.geotools.filter;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 
+import org.geotools.factory.CommonFactoryFinder;
 import org.opengis.filter.IncludeFilter;
+import org.opengis.filter.PropertyIsEqualTo;
 
 
 
@@ -200,4 +205,14 @@ public class SQLEncoderTest extends SQLFilterTestSupport {
 //
 //        return filter;
 //    }
+    
+    public void testEscapeQuote() throws SQLEncoderException {
+        org.opengis.filter.FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+        PropertyIsEqualTo equals = ff.equals(ff.property("attribute"), ff.literal("A'A"));
+        SQLEncoder encoder = new SQLEncoder();
+        String result = encoder.encode(equals);
+        assertEquals("WHERE attribute = 'A''A'", result);
+    }
+    
+   
 }

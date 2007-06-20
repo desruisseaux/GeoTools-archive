@@ -637,7 +637,9 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor2 {
 				}
 				//else if ( literal instanceof String ) {
 				else if ( String.class.isAssignableFrom( target ) ) {
-					out.write( "'" + literal.toString() + "'" );
+                    // sigle quotes must be escaped to have a valid sql string
+                    String escaped = literal.toString().replaceAll("'", "''");
+					out.write( "'" + escaped + "'" );
 					return;
 				}
 				else {
@@ -648,7 +650,8 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor2 {
 						encoding = expression.getLiteral().toString();
 					}
 					
-					out.write( "'" + encoding + "'");
+					// sigle quotes must be escaped to have a valid sql string
+					out.write( "'" + encoding.replaceAll("'", "''") + "'");
 				}
 			}
 		} catch (IOException e) {

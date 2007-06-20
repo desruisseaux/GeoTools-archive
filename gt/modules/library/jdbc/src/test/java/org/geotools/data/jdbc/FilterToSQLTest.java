@@ -29,6 +29,8 @@ import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.simple.SimpleFeatureFactoryImpl;
 import org.geotools.feature.simple.SimpleTypeBuilder;
 import org.geotools.feature.simple.SimpleTypeFactoryImpl;
+import org.geotools.filter.SQLEncoder;
+import org.geotools.filter.SQLEncoderException;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.IncludeFilter;
@@ -130,5 +132,30 @@ public class FilterToSQLTest extends TestCase {
         // SOMEONE NEEDS TO WRITE AN ID FILTER!
         // SDE doesn't use the FIDMapper classes, so 
         // I'm not sure how a real-world encoder would want them encoded
+    }
+    
+    public void testEscapeQuote() throws FilterToSQLException {
+        org.opengis.filter.FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+        PropertyIsEqualTo equals = ff.equals(ff.property("attribute"), ff.literal("A'A"));
+        StringWriter output = new StringWriter();
+        FilterToSQL encoder = new FilterToSQL(output);
+        encoder.encode(equals);
+        assertEquals("WHERE attribute = 'A''A'", output.toString());
+    }
+    
+    public void testEscapeQuoteFancy() throws FilterToSQLException  {
+        org.opengis.filter.FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+        Object fancyLiteral = new Object() {
+        
+            public String toString() {
+                return "A'A";
+            }
+        
+        };
+        PropertyIsEqualTo equals = ff.equals(ff.property("attribute"), ff.literal(fancyLiteral));
+        StringWriter output = new StringWriter();
+        FilterToSQL encoder = new FilterToSQL(output);
+        encoder.encode(equals);
+        assertEquals("WHERE attribute = 'A''A'", output.toString());
     }
 }
