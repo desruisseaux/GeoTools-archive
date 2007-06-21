@@ -104,7 +104,7 @@
   <modules>
     <module>arcsde</module>
     <module>coverageio</module>
-    <module>coverageio-netcdf</module>
+<!--    <module>coverageio-netcdf</module> -->
     <module>db2</module>
     <module>directory</module>
     <module>epsg-oracle</module>    
