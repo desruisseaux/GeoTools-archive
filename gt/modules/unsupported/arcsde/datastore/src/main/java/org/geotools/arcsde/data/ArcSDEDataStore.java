@@ -17,19 +17,27 @@
 package org.geotools.arcsde.data;
 
 import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.jsqlparser.parser.CCJSqlParserManager;
+import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectBody;
 import net.sf.jsqlparser.statement.select.Union;
 
+import org.geotools.arcsde.data.view.QueryInfoParser;
+import org.geotools.arcsde.data.view.SelectQualifier;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
@@ -165,7 +173,8 @@ public class ArcSDEDataStore extends AbstractDataStore {
      *             the full qualified name of one of them
      */
     public String[] getTypeNames() throws IOException {
-        List layerNames = connectionPool.getAvailableLayerNames();
+        List layerNames = new ArrayList(connectionPool.getAvailableLayerNames());
+        layerNames.addAll(viewSchemasCache.keySet());
         return (String[]) layerNames.toArray(new String[layerNames.size()]);
     }
 
@@ -202,39 +211,44 @@ public class ArcSDEDataStore extends AbstractDataStore {
             throw new NullPointerException("typeName is null");
         }
 
-        // connection used to retrieve the user name if a non qualified type
-        // name was passed in
-        ArcSDEPooledConnection conn = null;
-
-        // check if it is not qualified and prepend it with "instance.user."
-        if (typeName.indexOf('.') == -1) {
-            try {
-                conn = getConnectionPool().getConnection();
-                LOGGER.warning("A non qualified type name was given, qualifying it...");
-                if (conn.getDatabaseName() != null && conn.getDatabaseName().length() != 0) {
-                    typeName = conn.getDatabaseName() + "." + conn.getUser() + "." + typeName;
-                } else {
-                    typeName = conn.getUser() + "." + typeName;
-                }
-                LOGGER.info("full qualified name is " + typeName);
-            } catch (DataSourceException e) {
-                throw e;
-            } catch (UnavailableArcSDEConnectionException e) {
-                throw new DataSourceException("A non qualified type name (" + typeName
-                        + ") was passed and a connection to retrieve the user name "
-                        + " is not available.", e);
-            } catch (SeException e) {
-                throw new DataSourceException("error obtaining the user name from a connection", e);
-            } finally {
-                conn.close();
-            }
-        }
-
-        FeatureType schema = (FeatureType) schemasCache.get(typeName);
-
+        FeatureType schema = (FeatureType) viewSchemasCache.get(typeName);
+        
         if (schema == null) {
-            schema = ArcSDEAdapter.fetchSchema(getConnectionPool(), typeName, this.namespace);
-            schemasCache.put(typeName, schema);
+            // connection used to retrieve the user name if a non qualified type
+            // name was passed in
+            ArcSDEPooledConnection conn = null;
+
+            // check if it is not qualified and prepend it with "instance.user."
+            if (typeName.indexOf('.') == -1) {
+                try {
+                    conn = getConnectionPool().getConnection();
+                    LOGGER.warning("A non qualified type name was given, qualifying it...");
+                    if (conn.getDatabaseName() != null && conn.getDatabaseName().length() != 0) {
+                        typeName = conn.getDatabaseName() + "." + conn.getUser() + "." + typeName;
+                    } else {
+                        typeName = conn.getUser() + "." + typeName;
+                    }
+                    LOGGER.info("full qualified name is " + typeName);
+                } catch (DataSourceException e) {
+                    throw e;
+                } catch (UnavailableArcSDEConnectionException e) {
+                    throw new DataSourceException("A non qualified type name (" + typeName
+                            + ") was passed and a connection to retrieve the user name "
+                            + " is not available.", e);
+                } catch (SeException e) {
+                    throw new DataSourceException(
+                            "error obtaining the user name from a connection", e);
+                } finally {
+                    conn.close();
+                }
+            }
+
+            schema = (FeatureType) schemasCache.get(typeName);
+
+            if (schema == null) {
+                schema = ArcSDEAdapter.fetchSchema(getConnectionPool(), typeName, this.namespace);
+                schemasCache.put(typeName, schema);
+            }
         }
 
         return schema;
@@ -681,20 +695,24 @@ public class ArcSDEDataStore extends AbstractDataStore {
                 }
             };
         } catch (SchemaException ex) {
+            if (sdeQuery != null) {
+                sdeQuery.close();
+            }
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new DataSourceException("Types do not match: " + ex.getMessage(), ex);
         } catch (IOException e) {
+            if (sdeQuery != null) {
+                sdeQuery.close();
+            }
             throw e;
         } catch (Exception t) {
+            if (sdeQuery != null) {
+                sdeQuery.close();
+            }
             LOGGER.log(Level.SEVERE, t.getMessage(), t);
             if (LOGGER.isLoggable(Level.FINE)) {
                 t.printStackTrace();
             }
-
-            if (sdeQuery != null) {
-                sdeQuery.close();
-            }
-
             throw new DataSourceException("Problem with feature reader: " + t.getMessage(), t);
         }
 
@@ -1053,9 +1071,26 @@ public class ArcSDEDataStore extends AbstractDataStore {
      * @throws IOException
      */
     public void registerView(String typeName, String sqlQuery) throws IOException {
-//        LOGGER.fine("about to register view " + typeName + "=" + sqlQuery);
-//        SelectBody select = SqlParser.parse(sqlQuery);
-//        registerView(typeName, select);
+        LOGGER.fine("about to register view " + typeName + "=" + sqlQuery);
+        SelectBody select = parseSqlQuery(sqlQuery);
+        registerView(typeName, select);
+    }
+
+    private static SelectBody parseSqlQuery(String selectStatement) throws IOException {
+        CCJSqlParserManager pm = new CCJSqlParserManager();
+        Reader reader = new StringReader(selectStatement);
+        Statement statement;
+        try {
+            statement = pm.parse(reader);
+        } catch (Exception e) {
+            throw new DataSourceException("parsing select statement: " + e.getCause().getMessage(),
+                    e);
+        }
+        if (!(statement instanceof Select)) { // either PlainSelect or Union
+            throw new IllegalArgumentException("expected select or union statement: " + statement);
+        }
+        SelectBody selectBody = ((Select) statement).getSelectBody();
+        return selectBody;
     }
 
     /**
@@ -1073,11 +1108,11 @@ public class ArcSDEDataStore extends AbstractDataStore {
      */
     public void registerView(String typeName, SelectBody select) throws IOException,
             UnsupportedOperationException {
-//        if (!(select instanceof PlainSelect)) {
-//            throw new UnsupportedOperationException("ArcSDE supports only a limited"
-//                    + " set of PlainSelect construct: " + select);
-//        }
-//        registerView(typeName, (PlainSelect) select);
+        if (!(select instanceof PlainSelect)) {
+            throw new UnsupportedOperationException("ArcSDE supports only a limited"
+                    + " set of PlainSelect construct: " + select);
+        }
+        registerView(typeName, (PlainSelect) select);
     }
 
     /**
@@ -1093,38 +1128,38 @@ public class ArcSDEDataStore extends AbstractDataStore {
      * @param select
      * @throws IOException
      */
-//    private void registerView(final String typeName, final PlainSelect select) throws IOException {
-//
-//        if (typeName == null)
-//            throw new NullPointerException("typeName");
-//        if (select == null)
-//            throw new NullPointerException("select");
-//
-//        verifyQueryIsSupported(select);
-//
-//        ArcSDEPooledConnection conn = connectionPool.getConnection();
-//
-//        PlainSelect qualifiedSelect = SelectQualifier.qualify(conn, select);
-//        System.out.println(qualifiedSelect);
-//
-//        SeQueryInfo queryInfo;
-//        LOGGER.fine("creating definition query info");
-//        try {
-//            queryInfo = QueryInfoParser.parse(conn, qualifiedSelect);
-//        } catch (SeException e) {
-//            throw new DataSourceException("Parsing select: " + e.getMessage(), e);
-//        } finally {
-//            conn.close();
-//        }
-//
-//        FeatureType viewSchema = ArcSDEAdapter.fetchSchema(connectionPool, typeName, namespace,
-//                queryInfo);
-//        LOGGER.fine("view schema: " + viewSchema);
-//
-//        this.viewQueryInfos.put(typeName, queryInfo);
-//        this.viewSchemasCache.put(typeName, viewSchema);
-//        this.viewSelectStatements.put(typeName, qualifiedSelect);
-//    }
+    private void registerView(final String typeName, final PlainSelect select) throws IOException {
+
+        if (typeName == null)
+            throw new NullPointerException("typeName");
+        if (select == null)
+            throw new NullPointerException("select");
+
+        verifyQueryIsSupported(select);
+
+        ArcSDEPooledConnection conn = connectionPool.getConnection();
+
+        PlainSelect qualifiedSelect = SelectQualifier.qualify(conn, select);
+        //System.out.println(qualifiedSelect);
+
+        SeQueryInfo queryInfo;
+        LOGGER.fine("creating definition query info");
+        try {
+            queryInfo = QueryInfoParser.parse(conn, qualifiedSelect);
+        } catch (SeException e) {
+            throw new DataSourceException("Parsing select: " + e.getMessage(), e);
+        } finally {
+            conn.close();
+        }
+
+        FeatureType viewSchema = ArcSDEAdapter.fetchSchema(connectionPool, typeName, namespace,
+                queryInfo);
+        LOGGER.fine("view schema: " + viewSchema);
+
+        this.viewQueryInfos.put(typeName, queryInfo);
+        this.viewSchemasCache.put(typeName, viewSchema);
+        this.viewSelectStatements.put(typeName, qualifiedSelect);
+    }
 
     /**
      * Unsupported constructs:
@@ -1146,19 +1181,19 @@ public class ArcSDEDataStore extends AbstractDataStore {
      *             if any of the unsupported constructs are found on
      *             <code>select</code>
      */
-//    private void verifyQueryIsSupported(PlainSelect select) throws UnsupportedOperationException {
-//        List errors = new LinkedList();
-//        // @TODO errors.add(select.getDistinct());
-//        // @TODO errors.add(select.getHaving());
-//        verifyUnsupportedSqlConstruct(errors, select.getGroupByColumnReferences());
-//        verifyUnsupportedSqlConstruct(errors, select.getInto());
-//        verifyUnsupportedSqlConstruct(errors, select.getJoins());
-//        verifyUnsupportedSqlConstruct(errors, select.getLimit());
-//        if (errors.size() > 0) {
-//            throw new UnsupportedOperationException("The following constructs are not supported: "
-//                    + errors);
-//        }
-//    }
+    private void verifyQueryIsSupported(PlainSelect select) throws UnsupportedOperationException {
+        List errors = new LinkedList();
+        // @TODO errors.add(select.getDistinct());
+        // @TODO errors.add(select.getHaving());
+        verifyUnsupportedSqlConstruct(errors, select.getGroupByColumnReferences());
+        verifyUnsupportedSqlConstruct(errors, select.getInto());
+        verifyUnsupportedSqlConstruct(errors, select.getJoins());
+        verifyUnsupportedSqlConstruct(errors, select.getLimit());
+        if (errors.size() > 0) {
+            throw new UnsupportedOperationException("The following constructs are not supported: "
+                    + errors);
+        }
+    }
 
     /**
      * If construct is not null or an empty list, adds it to the list of errors.
@@ -1166,15 +1201,15 @@ public class ArcSDEDataStore extends AbstractDataStore {
      * @param errors
      * @param construct
      */
-//    private void verifyUnsupportedSqlConstruct(List errors, Object construct) {
-//        if (construct instanceof List) {
-//            List constructsList = (List) construct;
-//            if (constructsList.size() > 0) {
-//                errors.add(constructsList);
-//            }
-//        } else if (construct != null) {
-//            errors.add(construct);
-//        }
-//    }
+    private void verifyUnsupportedSqlConstruct(List errors, Object construct) {
+        if (construct instanceof List) {
+            List constructsList = (List) construct;
+            if (constructsList.size() > 0) {
+                errors.add(constructsList);
+            }
+        } else if (construct != null) {
+            errors.add(construct);
+        }
+    }
 
 }

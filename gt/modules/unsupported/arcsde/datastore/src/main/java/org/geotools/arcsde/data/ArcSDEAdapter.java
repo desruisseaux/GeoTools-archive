@@ -431,13 +431,13 @@ public class ArcSDEAdapter {
         LOGGER.finer("About to parse CRS for layer " + sdeLayer.getName() + ": " + WKT);
         
         try {
-            LOGGER.info(sdeLayer.getName() + " has CRS envelope: " + seCRS.getXYEnvelope());
+            LOGGER.fine(sdeLayer.getName() + " has CRS envelope: " + seCRS.getXYEnvelope());
         } catch (SeException e1) {
             // intentionally blank
         }
 
         if ("UNKNOWN".equalsIgnoreCase(WKT)) {
-            LOGGER.warning("ArcSDE layer " + sdeLayer.getName() + " does not provides a Coordinate Reference System");
+            LOGGER.fine("ArcSDE layer " + sdeLayer.getName() + " does not provides a Coordinate Reference System");
         } else {
             try {
                 CRSFactory crsFactory = ReferencingFactoryFinder.getCRSFactory(null);
@@ -489,6 +489,24 @@ public class ArcSDEAdapter {
         final int LINESTRING_MASK = SeLayer.SE_LINE_TYPE_MASK;
         final int AREA_MASK = SeLayer.SE_AREA_TYPE_MASK;
 
+//        if (seShapeType == SeLayer.TYPE_NIL) {
+//            // do nothing
+//        } else if (seShapeType == SeLayer.TYPE_MULTI_MASK) {
+//            clazz = GeometryCollection.class;
+//        } else if (seShapeType == SeLayer.TYPE_LINE || seShapeType == SeLayer.TYPE_SIMPLE_LINE) {
+//            clazz = LineString.class;
+//        } else if (seShapeType == SeLayer.TYPE_MULTI_LINE
+//                || seShapeType == SeLayer.TYPE_MULTI_SIMPLE_LINE) {
+//            clazz = MultiLineString.class;
+//        } else if (seShapeType == SeLayer.TYPE_MULTI_POINT) {
+//            clazz = MultiPoint.class;
+//        } else if (seShapeType == SeLayer.TYPE_MULTI_POLYGON) {
+//            clazz = MultiPolygon.class;
+//        } else if (seShapeType == SeLayer.TYPE_POINT) {
+//            clazz = Point.class;
+//        } else if (seShapeType == SeLayer.TYPE_POLYGON) {
+//            clazz = Polygon.class;
+//        } else {
         // in all this assignments, 1 means true and 0 false
         final int isCollection = ((seShapeType & MULTIPART_MASK) == MULTIPART_MASK) ? 1 : 0;
 
@@ -543,12 +561,26 @@ public class ArcSDEAdapter {
             }
         }
 
-        if (isError) {
-            throw new IllegalArgumentException("Cannot map the shape type '" + seShapeType + "' to " + "a Geometry class: isCollection=" + isCollection + ", isPoint=" + isPoint + ", isLineString=" + isLineString + ", isPolygon=" + isPolygon);
-        }
+//        }
         return clazz;
     }
     
+    /**
+     * Returns the most appropriate {@link Geometry} class that matches the
+     * shape's type.
+     * 
+     * @param shape
+     *            non <code>null</code> SeShape instance for which to infer
+     *            the matching geometry class
+     * @return the Geometry subclass corresponding to the shape type
+     * @throws SeException
+     *             propagated if thrown by {@link SeShape#getType()}
+     * @throws IllegalArgumentException
+     *             if none of the JTS geometry classes can be matched to the
+     *             shape type (shouldnt happen as for the
+     *             {@link SeShape#getType() types} defined in the esri arcsde
+     *             java api 9.0)
+     */
     public static Class getGeometryTypeFromSeShape(SeShape shape) throws SeException {
         Class clazz = com.vividsolutions.jts.geom.Geometry.class;
         

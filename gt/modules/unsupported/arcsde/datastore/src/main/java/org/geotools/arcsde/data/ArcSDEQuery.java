@@ -138,7 +138,9 @@ class ArcSDEQuery {
      */
     public static ArcSDEQuery createQuery(ArcSDEDataStore store, Query query)
         throws IOException {
-        return createQuery(store, store.getSchema(query.getTypeName()), query);
+        String typeName = query.getTypeName();
+        FeatureType schema = store.getSchema(typeName);
+        return createQuery(store, schema, query);
     }
 
     /**
@@ -365,12 +367,30 @@ class ArcSDEQuery {
                 + this.filters.getSeSqlConstruct().getWhere() + "'");
         }
 
-        SeQuery query = new SeQuery(connection, propertyNames,
-                this.filters.getSeSqlConstruct());
-        SeFilter[] spatialConstraints = this.filters.getSpatialFilters();
+        SeQuery query = new SeQuery(connection);
 
-        query.prepareQuery();
-        
+        SeQueryInfo qInfo = filters.getQueryInfo(propertyNames);
+        if(LOGGER.isLoggable(Level.FINER)){
+            String msg = "ArcSDE query is: " + toString(qInfo);
+            LOGGER.finer(msg);
+        }
+        try{
+            query.prepareQueryInfo(qInfo);
+        }catch(SeException e){
+            // HACK: a DATABASE LEVEL ERROR (code -51) occurs when using
+            // prepareQueryInfo but the geometry att is not required in the list
+            // of properties to retrieve, and thus propertyNames contains
+            // SHAPE.fid as a last resort to get a fid
+            if (-51 == e.getSeError().getSdeError()) {
+                query.close();
+                query = new SeQuery(connection, propertyNames, filters.getSeSqlConstruct());
+                query.prepareQuery();
+            } else {
+                throw e;
+            }
+        }
+
+        SeFilter[] spatialConstraints = this.filters.getSpatialFilters();
         if (spatialConstraints.length > 0) {
             final boolean setReturnGeometryMasks = false;
             query.setSpatialConstraints(SeQuery.SE_OPTIMIZE,
@@ -378,6 +398,41 @@ class ArcSDEQuery {
         }
 
         return query;
+    }
+    
+    private String toString(SeQueryInfo qInfo){
+        StringBuffer sb = new StringBuffer("SeQueryInfo[\n\tcolumns=");
+        try{
+            SeSqlConstruct sql = qInfo.getConstruct();
+            String [] tables = sql.getTables();
+            String []cols = qInfo.getColumns();
+            String by = null;
+            try{
+                by = qInfo.getByClause();
+            }catch(NullPointerException npe){
+                //no-op
+            }
+            String where =sql.getWhere();
+            for(int i = 0; cols != null && i < cols.length; i++){
+                sb.append(cols[i]);
+                if(i < cols.length - 1)
+                    sb.append(", ");
+            }
+            sb.append("\n\tTables=");
+            for(int i = 0; i < tables.length; i++){
+                sb.append(tables[i]);
+                if(i < tables.length - 1)
+                    sb.append(", ");
+            }
+            sb.append("\n\tWhere=");
+            sb.append(where);
+            sb.append("\n\tOrderBy=");
+            sb.append(by);
+        }catch(SeException e){
+            sb.append("Exception retrieving query info properties: " + e.getMessage());
+        }
+        sb.append("]");
+        return sb.toString();
     }
     
     /**
@@ -403,18 +458,11 @@ class ArcSDEQuery {
      *         SeQuery or setting it the spatial constraints.
      * @throws DataSourceException DOCUMENT ME!
      */
-    private SeQuery createSeQueryForQueryInfo(ArcSDEPooledConnection connection,
-        String[] propertyNames)
+    private SeQuery createSeQueryForQueryInfo(ArcSDEPooledConnection connection)
         throws SeException, DataSourceException {
-        if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine("constructing new sql query with connection: "
-                + connection + ", propnames: "
-                + java.util.Arrays.asList(propertyNames) + " sqlConstruct: "
-                + this.filters.getSeSqlConstruct());
-        }
 
-        SeQuery query = new SeQuery(connection, propertyNames,
-                this.filters.getSeSqlConstruct());
+        SeQuery query = new SeQuery(connection);
+
         SeFilter[] spatialConstraints = this.filters.getSpatialFilters();
         
         if (spatialConstraints.length > 0) {
@@ -513,10 +561,8 @@ class ArcSDEQuery {
             SeQuery countQuery = null;
 
             try {
-                countQuery = createSeQueryForQueryInfo(connection, columns);
-
-                SeQueryInfo qInfo = new SeQueryInfo();
-                qInfo.setConstruct(this.filters.getSeSqlConstruct());
+                countQuery = createSeQueryForQueryInfo(connection);
+                SeQueryInfo qInfo = filters.getQueryInfo(columns);
 
                 SeTable.SeTableStats tableStats = countQuery
                     .calculateTableStatistics(aFieldName,
@@ -552,17 +598,12 @@ class ArcSDEQuery {
 
         try {
             SeExtent extent = null;
-            //final SeLayer layer = this.connectionPool.getSdeLayer(this.schema
-            //        .getTypeName());
-            final SeLayer layer = this.filters.sdeLayer;
             
-            String[] spatialCol = { layer.getSpatialColumn() };
+            String[] spatialCol = { schema.getDefaultGeometry().getName() };
 
-            extentQuery = createSeQueryForQueryInfo(connection, spatialCol);
+            extentQuery = createSeQueryForQueryInfo(connection);
 
-            SeQueryInfo sdeQueryInfo = new SeQueryInfo();
-            sdeQueryInfo.setColumns(spatialCol);
-            sdeQueryInfo.setConstruct(this.filters.getSeSqlConstruct());
+            SeQueryInfo sdeQueryInfo = filters.getQueryInfo(spatialCol);
 
             extent = extentQuery.calculateLayerExtent(sdeQueryInfo);
 
@@ -581,12 +622,12 @@ class ArcSDEQuery {
 
             // ///////////////////////
             ex.printStackTrace();
-	    /*
-	     * temporary work around until we found the source of the problem
-	     * for which Brock is getting a DATABASE LEVEL ERROR OCCURED
+        /*
+         * temporary work around until we found the source of the problem
+         * for which Brock is getting a DATABASE LEVEL ERROR OCCURED
             throw new DataSourceException("Can't consult the query extent: "
                 + ex.getSeError().getErrDesc(), ex);
-	    */
+        */
         } finally {
             close(extentQuery);
         }
@@ -946,7 +987,7 @@ class ArcSDEQuery {
             this.sqlFilter = unpacker.getFilterPre();
             
             if (LOGGER.isLoggable(Level.FINE) && sqlFilter != null)
-            	LOGGER.fine("SQL portion of SDE Query: '" + sqlFilter + "'");
+                LOGGER.fine("SQL portion of SDE Query: '" + sqlFilter + "'");
 
             Filter remainingFilter = unpacker.getFilterPost();
 
@@ -955,11 +996,11 @@ class ArcSDEQuery {
 
             this.geometryFilter = unpacker.getFilterPre();
             if (LOGGER.isLoggable(Level.FINE) && geometryFilter != null)
-            	LOGGER.fine("Spatial-Filter portion of SDE Query: '" + geometryFilter + "'");
+                LOGGER.fine("Spatial-Filter portion of SDE Query: '" + geometryFilter + "'");
             
             this.unsupportedFilter = unpacker.getFilterPost();
             if (LOGGER.isLoggable(Level.FINE) && unsupportedFilter != null)
-            	LOGGER.fine("Unsupported (and therefore ignored) portion of SDE Query: '" + unsupportedFilter + "'");
+                LOGGER.fine("Unsupported (and therefore ignored) portion of SDE Query: '" + unsupportedFilter + "'");
         }
 
         /**
@@ -969,6 +1010,7 @@ class ArcSDEQuery {
          * call setColumns(String []) on the returned object to specify which properties
          * to fetch.
          * 
+         * @param unqualifiedPropertyNames
          * @return
          * @throws SeException
          * @throws DataSourceException
@@ -1005,7 +1047,8 @@ class ArcSDEQuery {
                 sqlConstruct.setWhere(where);
             }
             
-            final int queriedAttCount = unqualifiedPropertyNames == null? 0 : unqualifiedPropertyNames.length;
+            final int queriedAttCount = unqualifiedPropertyNames == null ? 0
+                    : unqualifiedPropertyNames.length;
             
             if(queriedAttCount > 0){
                 String []sdeAttNames = new String[queriedAttCount];
