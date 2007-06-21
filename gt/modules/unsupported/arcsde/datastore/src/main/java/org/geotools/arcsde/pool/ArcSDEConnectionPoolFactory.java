@@ -104,7 +104,7 @@ public class ArcSDEConnectionPoolFactory {
     /**
      * loses all the available connection pools
      */
-    public void closeAll() {
+    private void closeAll() {
         for (Iterator it = this.currentPools.values().iterator(); it.hasNext();) {
             ((ArcSDEConnectionPool) it.next()).close();
         }

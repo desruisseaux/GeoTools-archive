@@ -107,12 +107,6 @@ public class ArcSDEConnectionPool {
     private HashMap /* <String,String> */cachedLayers;
 
     /**
-     * Indicates that this Connection Pool is closed and it should not return
-     * connections on calls to getConnection()
-     */
-    private boolean closed = false;
-
-    /**
      * Creates a new SdeConnectionPool object with the connection parameters
      * holded by <code>config</code>
      * 
@@ -179,14 +173,23 @@ public class ArcSDEConnectionPool {
      * closes all connections in this pool
      */
     public void close() {
-        try {
-            this.pool.close();
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Closing pool: " + e.getMessage(), e);
+        if (pool != null) {
+            try {
+                this.pool.close();
+                pool = null;
+                LOGGER.fine("SDE connection pool closed. ");
+            } catch (Exception e) {
+                LOGGER.log(Level.WARNING, "Closing pool: " + e.getMessage(), e);
+            }
         }
-
-        this.closed = true;
-        LOGGER.fine("SDE connection pool closed. ");
+    }
+    
+    /**
+     * Ensures proper closure of connection pool at this object's finalization
+     * stage.
+     */
+    public void finalize() {
+        close();
     }
 
     /**
@@ -220,7 +223,7 @@ public class ArcSDEConnectionPool {
      */
     public ArcSDEPooledConnection getConnection() throws DataSourceException,
             UnavailableArcSDEConnectionException {
-        if (this.closed) {
+        if (pool == null) {
             throw new IllegalStateException("The ConnectionPool has been closed.");
         }
 
@@ -382,15 +385,6 @@ public class ArcSDEConnectionPool {
                 conn.close();
         }
         return layerNames;
-    }
-
-    /**
-     * DOCUMENT ME!
-     * 
-     * @return DOCUMENT ME!
-     */
-    public boolean isClosed() {
-        return this.closed;
     }
 
     /**
