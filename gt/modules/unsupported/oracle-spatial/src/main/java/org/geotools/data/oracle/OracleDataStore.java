@@ -45,6 +45,7 @@ import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.oracle.attributeio.SDOAttributeIO;
 import org.geotools.data.oracle.referencing.OracleAuthorityFactory;
+import org.geotools.data.oracle.sdo.TT;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
@@ -188,14 +189,54 @@ public class OracleDataStore extends JDBCDataStore {
 			srid = determineSRID( tableName, columnName );
 //			CoordinateReferenceSystem crs = determineCRS( srid );
             CoordinateReferenceSystem crs = CRS.decode("EPSG:" + srid);
+            Class geomClass = determineGeometryClass(tableName, columnName);
 			if( crs != null ){
-				return AttributeTypeFactory.newAttributeType(columnName, Geometry.class,isNullable, 0, null, crs );
+				return AttributeTypeFactory.newAttributeType(columnName, geomClass,isNullable, 0, null, crs );
 			}
 		} catch (Exception e) {
 			LOGGER.warning( "Could not map SRID "+srid+" to CRS:"+e );
 		}
     	return AttributeTypeFactory.newAttributeType(columnName, Geometry.class,isNullable);		
 	}
+    private Class determineGeometryClass(String tableName, String columnName) throws IOException {
+        Connection conn = null;
+        Statement statement = null;
+        ResultSet result = null;
+        try {
+            String sqlStatement = //
+            "select meta.sdo_layer_gtype \n" + "from mdsys.USER_SDO_INDEX_INFO info \n"
+                    + " inner join mdsys.user_sdo_index_metadata meta \n"
+                    + " on info.index_name = meta.sdo_index_name \n" //
+                    + "where info.table_name = '" + tableName + "' \n" //
+                    + "and info.column_name = '" + columnName + "'";
+            conn = getConnection(Transaction.AUTO_COMMIT);
+            LOGGER.finer("the sql statement for geometry type check is " + sqlStatement);
+            statement = conn.createStatement();
+            result = statement.executeQuery(sqlStatement);
+
+            if (result.next()) {
+                String gType = result.getString(1);
+                Class geometryClass = (Class) TT.GEOM_CLASSES.get(gType);
+                if(geometryClass == null)
+                    geometryClass = Geometry.class;
+
+                return geometryClass;
+            } else {
+                return Geometry.class;
+            }
+        } catch (SQLException sqle) {
+            String message = sqle.getMessage();
+            LOGGER.fine("Could not determine geometry class due to an error_: "  + sqle);
+
+            throw new DataSourceException(message, sqle);
+        } finally {
+            JDBCUtils.close(result);
+            JDBCUtils.close(statement);
+            JDBCUtils.close(conn, Transaction.AUTO_COMMIT, null);
+        }
+
+    }
+
     protected CoordinateReferenceSystem determineCRS(int srid) throws IOException {
         try {
             return getOracleAuthorityFactory().createCRS(srid);

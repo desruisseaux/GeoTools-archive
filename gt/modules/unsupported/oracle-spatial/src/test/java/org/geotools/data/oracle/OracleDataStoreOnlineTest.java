@@ -150,12 +150,44 @@ public class OracleDataStoreOnlineTest extends TestCase {
 	    	
 		    	st.execute("CREATE INDEX ORA_TEST_POINTS_SHAPE_IDX "+
 		    				"ON ORA_TEST_POINTS (SHAPE) INDEXTYPE IS " +
-		    				"MDSYS.SPATIAL_INDEX PARAMETERS (' SDO_INDX_DIMS=2 LAYER_GTYPE=\"COLLECTION\"') ");		    			    	
+		    				"MDSYS.SPATIAL_INDEX PARAMETERS (' SDO_INDX_DIMS=2 LAYER_GTYPE=\"POINT\"') ");		    			    	
 			}
     	}
     	catch (SQLException fine){
     		fine.printStackTrace();
     	}  	
+        
+        if( st.executeQuery("SELECT TABLE_NAME FROM USER_TABLES WHERE TABLE_NAME = 'ORA_TEST_LINES'").next()){          
+            try {
+                st.execute("DROP TABLE ORA_TEST_LINES");
+                st.executeUpdate("DELETE FROM user_sdo_geom_metadata WHERE TABLE_NAME='ORA_TEST_LINES'");                               
+            }
+            catch( SQLException noPrevRun){ 
+                noPrevRun.printStackTrace();
+            }
+        }       
+        try {
+            st.execute( "CREATE TABLE ORA_TEST_LINES ("+
+                        "    name    VARCHAR(255),"+
+                        "    intval  NUMBER,"+
+                        "    id      NUMBER  PRIMARY KEY,"+
+                        "    shape   MDSYS.SDO_GEOMETRY"+
+                        ")");               
+            st.execute( "INSERT INTO USER_SDO_GEOM_METADATA VALUES ("+
+                        "    'ORA_TEST_LINES',"+
+                        "    'SHAPE',"+
+                        "    MDSYS.SDO_DIM_ARRAY("+
+                        "        MDSYS.SDO_DIM_ELEMENT('X',-180,180,0.005),"+
+                        "        MDSYS.SDO_DIM_ELEMENT('Y',-90,90,0.005)"+
+                        "    ),"+
+                        "    82465"+
+                        ")");
+            st.execute("create index test_line_index on ORA_TEST_LINES(SHAPE) INDEXTYPE IS MDSYS.SPATIAL_INDEX");
+        }
+        catch (SQLException fine){
+            fine.printStackTrace();
+        }
+        
     	//                   + (20,30)
     	//         
     	//  +(20,10)         +(10,10)   + (20,10)   +(30,10)
@@ -413,6 +445,7 @@ public class OracleDataStoreOnlineTest extends TestCase {
         assertEquals(1, ft.getAttributeCount());
         assertEquals("NAME", ft.getAttributeType(0).getName());        
     }
+    
     public void testBounds(){
     	if( conn == null ) return;    	    	
     	Envelope extent = dstore.getEnvelope("ORA_TEST_POINTS");
@@ -420,5 +453,16 @@ public class OracleDataStoreOnlineTest extends TestCase {
     	assertTrue( extent instanceof ReferencedEnvelope );
     	ReferencedEnvelope envelope = (ReferencedEnvelope) extent;
     	assertFalse( envelope.isNull() );
+    }
+    
+    public void testGeometryType() throws IOException {
+        FeatureType ft = dstore.getSchema("ORA_TEST_POINTS");
+        assertEquals(Point.class, ft.getDefaultGeometry().getType());
+    }
+    
+    public void testGeometryType2() throws IOException {
+        // here we did not declare a type
+        FeatureType ft = dstore.getSchema("ORA_TEST_LINES");
+        assertEquals(Geometry.class, ft.getDefaultGeometry().getType());
     }
 }

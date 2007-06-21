@@ -21,6 +21,18 @@
  */
 package org.geotools.data.oracle.sdo;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
+
 /**
  * @author bowens
  *
@@ -59,5 +71,30 @@ public interface TT
 
 	/** <code>TT</code> code representing MULTIPOLYGON */
 	public static final int MULTIPOLYGON  = 07;
+    
+    /**
+     * A map from geomery type, as a string, to JTS Geometry. See Oracle Spatial documentation,
+     * Table 2-1, Valid SDO_GTYPE values.
+     */
+    public static final Map GEOM_CLASSES = Collections.unmodifiableMap(new GeomClasses());
+        
+        
+    static final class GeomClasses extends HashMap {
+        private static final long serialVersionUID = -3359664692996608331L;
+
+        public GeomClasses() {
+            super();
+            put("UNKNOWN", Geometry.class);
+            put("POINT", Point.class);
+            put("LINE", LineString.class);
+            put("CURVE", LineString.class);
+            put("POLYGON", Polygon.class);
+            put("COLLECTION", Geometry.class);
+            put("MULTIPOINT", MultiPoint.class);
+            put("MULTILINE", MultiLineString.class);
+            put("MULTICURVE", MultiLineString.class);
+            put("MULTIPOLYGON", MultiPolygon.class);
+        }
+    }
 
 }
