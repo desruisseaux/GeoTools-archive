@@ -67,6 +67,8 @@ import org.geotools.resources.Arguments;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Vadim Semenov
+ *
+ * @todo Rename as {@code ThreadedEpsgFactoryTest}.
  */
 public class DefaultFactoryTest extends TestCase {
     /**

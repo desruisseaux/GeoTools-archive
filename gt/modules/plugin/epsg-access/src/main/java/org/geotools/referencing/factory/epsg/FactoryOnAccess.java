@@ -28,11 +28,13 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
 
 /**
  * Connection to the EPSG database in MS-Access format using JDBC-ODBC bridge.
- * @deprecated Please use ThreadedAccessEpsgFactory
+ *
  * @since 2.4
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Please use {@link ThreadedAccessEpsgFactory}.
  */
 public class FactoryOnAccess extends ThreadedAccessEpsgFactory {
     /**
@@ -48,5 +50,4 @@ public class FactoryOnAccess extends ThreadedAccessEpsgFactory {
     public FactoryOnAccess(final Hints hints) {
         super(hints );
     }
-
 }

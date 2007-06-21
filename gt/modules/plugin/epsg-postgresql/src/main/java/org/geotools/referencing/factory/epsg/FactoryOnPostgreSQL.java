@@ -15,30 +15,12 @@
  */
 package org.geotools.referencing.factory.epsg;
 
-// J2SE dependencies
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.FileInputStream;
-import java.util.Properties;
-import java.sql.Connection;
-import java.sql.SQLException;
-import javax.sql.DataSource;
-
-// Geotools dependencies
-import org.geotools.util.Logging;
 import org.geotools.factory.Hints;
-import org.geotools.referencing.factory.AbstractAuthorityFactory;
-
-// PostgreSQL dependencies
-import org.postgresql.ds.common.BaseDataSource;
-import org.postgresql.jdbc3.Jdbc3SimpleDataSource;
 
 
 /**
  * Connection to the EPSG database in PostgreSQL database engine using JDBC
  *
- * @deprecated Please use ThreadedPostgreSQLEpsgFactory
  * @since 2.4
  * @source $URL$
  * @version $Id$
@@ -46,9 +28,10 @@ import org.postgresql.jdbc3.Jdbc3SimpleDataSource;
  * @author Martin Desruisseaux
  *
  * @tutorial http://docs.codehaus.org/display/GEOTOOLS/How+to+install+the+EPSG+database+in+PostgreSQL
+ *
+ * @deprecated Please use {@link ThreadedPostgreSQLEpsgFactory}.
  */
 public class FactoryOnPostgreSQL extends ThreadedPostgreSQLEpsgFactory {
-    public static final String CONFIGURATION_FILE = "EPSG-DataSource.properties";
     /**
      * Creates a new instance of this factory.
      */
