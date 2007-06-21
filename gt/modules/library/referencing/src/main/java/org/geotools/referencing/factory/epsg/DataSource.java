@@ -85,11 +85,11 @@ public interface DataSource extends javax.sql.DataSource {
 
     /**
      * Opens a connection and creates an EPSG factory for it. This method may returns a
-     * sub-class of {@link FactoryUsingSQL} if it wants to use slightly different SQL queries.
+     * sub-class of {@link DirectEpsgFactory} if it wants to use slightly different SQL queries.
      *
      * @param  hints A map of hints, including the low-level factories to use for CRS creation.
-     *         This argument should be given unchanged to {@code FactoryUsingSQL} constructor.
-     * @return The {@linkplain FactoryUsingSQL EPSG factory} using SQL queries appropriate
+     *         This argument should be given unchanged to {@code DirectEpsgFactory} constructor.
+     * @return The {@linkplain DirectEpsgFactory EPSG factory} using SQL queries appropriate
      *         for this data source.
      * @throws SQLException if connection to the database failed.
      */

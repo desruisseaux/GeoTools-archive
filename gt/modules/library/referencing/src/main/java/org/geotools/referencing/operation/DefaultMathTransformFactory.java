@@ -60,7 +60,7 @@ import org.geotools.resources.Arguments;
 import org.geotools.resources.LazySet;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.util.WeakHashSet;
+import org.geotools.util.CanonicalSet;
 
 
 /**
@@ -132,7 +132,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
      * A pool of math transform. This pool is used in order to
      * returns instance of existing math transforms when possible.
      */
-    private final WeakHashSet pool = new WeakHashSet();
+    private final CanonicalSet pool = new CanonicalSet();
 
     /**
      * The service registry for finding {@link MathTransformProvider} implementations.
@@ -349,7 +349,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
             method    = delegate.method;
             transform = delegate.transform;
         }
-        transform = (MathTransform) pool.canonicalize(transform);
+        transform = (MathTransform) pool.unique(transform);
         lastMethod.set(method);
         return transform;
     }
@@ -400,7 +400,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
             throws FactoryException
     {
 //        lastMethod.remove(); // TODO: uncomment when we will be allowed to target J2SE 1.5.
-        return (MathTransform) pool.canonicalize(ProjectiveTransform.create(matrix));
+        return (MathTransform) pool.unique(ProjectiveTransform.create(matrix));
     }
     
     /**
@@ -429,7 +429,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        tr = (MathTransform) pool.canonicalize(tr);
+        tr = (MathTransform) pool.unique(tr);
         return tr;
     }
 
@@ -465,7 +465,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        tr = (MathTransform) pool.canonicalize(tr);
+        tr = (MathTransform) pool.unique(tr);
         return tr;
     }
 

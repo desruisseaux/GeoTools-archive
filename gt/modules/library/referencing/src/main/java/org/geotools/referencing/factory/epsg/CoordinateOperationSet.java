@@ -34,7 +34,7 @@ import org.geotools.referencing.factory.IdentifiedObjectSet;
 
 /**
  * A lazy set of {@link CoordinateOperation} objects to be returned by the
- * {@link FactoryUsingSQL#createFromCoordinateReferenceSystemCodes
+ * {@link DirectEpsgFactory#createFromCoordinateReferenceSystemCodes
  * createFromCoordinateReferenceSystemCodes} method. 
  *
  * @since 2.2

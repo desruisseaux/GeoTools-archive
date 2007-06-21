@@ -36,7 +36,7 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ColorUtilities;
 import org.geotools.util.Logging;
-import org.geotools.util.WeakHashSet;
+import org.geotools.util.CanonicalSet;
 
 
 /**
@@ -127,7 +127,7 @@ public class PaletteFactory {
     /**
      * The set of palettes already created.
      */
-    private final WeakHashSet palettes = new WeakHashSet();
+    private final CanonicalSet palettes = new CanonicalSet();
 
     /**
      * The set of palettes protected from garbage collection. We protect a palette as long as it
@@ -685,7 +685,7 @@ public class PaletteFactory {
      */
     public Palette getPalette(final String name, final int lower, final int upper, final int size) {
         Palette palette = new Palette(this, name, lower, upper, size);
-        palette = (Palette) palettes.canonicalize(palette);
+        palette = (Palette) palettes.unique(palette);
         return palette;
     }
 }

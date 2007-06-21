@@ -47,7 +47,7 @@ import org.geotools.referencing.cs.*;
 import org.geotools.referencing.crs.*;
 import org.geotools.referencing.datum.*;
 import org.geotools.referencing.operation.DefaultOperationMethod;
-import org.geotools.util.WeakHashSet;
+import org.geotools.util.CanonicalSet;
 
 
 
@@ -76,7 +76,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * This set is used in order to return a pre-existing object instead of creating a
      * new one.
      */
-    private final WeakHashSet pool = new WeakHashSet();
+    private final CanonicalSet pool = new CanonicalSet();
 
     /**
      * Constructs a default factory. This method is public in order to allows instantiations
@@ -121,7 +121,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        ellipsoid = (Ellipsoid) pool.canonicalize(ellipsoid);
+        ellipsoid = (Ellipsoid) pool.unique(ellipsoid);
         return ellipsoid;
     }
 
@@ -146,7 +146,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        ellipsoid = (Ellipsoid) pool.canonicalize(ellipsoid);
+        ellipsoid = (Ellipsoid) pool.unique(ellipsoid);
         return ellipsoid;
     }
 
@@ -168,7 +168,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        meridian = (PrimeMeridian) pool.canonicalize(meridian);
+        meridian = (PrimeMeridian) pool.unique(meridian);
         return meridian;
     }
 
@@ -190,7 +190,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        datum = (GeodeticDatum) pool.canonicalize(datum);
+        datum = (GeodeticDatum) pool.unique(datum);
         return datum;
     }
 
@@ -210,7 +210,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        datum = (VerticalDatum) pool.canonicalize(datum);
+        datum = (VerticalDatum) pool.unique(datum);
         return datum;
     }
 
@@ -230,7 +230,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        datum = (TemporalDatum) pool.canonicalize(datum);
+        datum = (TemporalDatum) pool.unique(datum);
         return datum;
     }
 
@@ -248,7 +248,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        datum = (EngineeringDatum) pool.canonicalize(datum);
+        datum = (EngineeringDatum) pool.unique(datum);
         return datum;
     }
 
@@ -269,7 +269,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        datum = (ImageDatum) pool.canonicalize(datum);
+        datum = (ImageDatum) pool.unique(datum);
         return datum;
     }
 
@@ -301,7 +301,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        axis = (CoordinateSystemAxis) pool.canonicalize(axis);
+        axis = (CoordinateSystemAxis) pool.unique(axis);
         return axis;
     }
 
@@ -323,7 +323,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (CartesianCS) pool.canonicalize(cs);
+        cs = (CartesianCS) pool.unique(cs);
         return cs;
     }
 
@@ -347,7 +347,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (CartesianCS) pool.canonicalize(cs);
+        cs = (CartesianCS) pool.unique(cs);
         return cs;
     }
 
@@ -369,7 +369,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (AffineCS) pool.canonicalize(cs);
+        cs = (AffineCS) pool.unique(cs);
         return cs;
     }
 
@@ -393,7 +393,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (AffineCS) pool.canonicalize(cs);
+        cs = (AffineCS) pool.unique(cs);
         return cs;
     }
 
@@ -415,7 +415,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (PolarCS) pool.canonicalize(cs);
+        cs = (PolarCS) pool.unique(cs);
         return cs;
     }
 
@@ -439,7 +439,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (CylindricalCS) pool.canonicalize(cs);
+        cs = (CylindricalCS) pool.unique(cs);
         return cs;
     }
 
@@ -463,7 +463,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (SphericalCS) pool.canonicalize(cs);
+        cs = (SphericalCS) pool.unique(cs);
         return cs;
     }
 
@@ -485,7 +485,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (EllipsoidalCS) pool.canonicalize(cs);
+        cs = (EllipsoidalCS) pool.unique(cs);
         return cs;
     }
 
@@ -509,7 +509,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (EllipsoidalCS) pool.canonicalize(cs);
+        cs = (EllipsoidalCS) pool.unique(cs);
         return cs;
     }
 
@@ -529,7 +529,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (VerticalCS) pool.canonicalize(cs);
+        cs = (VerticalCS) pool.unique(cs);
         return cs;
     }
 
@@ -549,7 +549,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (TimeCS) pool.canonicalize(cs);
+        cs = (TimeCS) pool.unique(cs);
         return cs;
     }
 
@@ -569,7 +569,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (LinearCS) pool.canonicalize(cs);
+        cs = (LinearCS) pool.unique(cs);
         return cs;
     }
 
@@ -591,7 +591,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (UserDefinedCS) pool.canonicalize(cs);
+        cs = (UserDefinedCS) pool.unique(cs);
         return cs;
     }
 
@@ -615,7 +615,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (UserDefinedCS) pool.canonicalize(cs);
+        cs = (UserDefinedCS) pool.unique(cs);
         return cs;
     }
 
@@ -645,7 +645,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (CompoundCRS) pool.canonicalize(crs);
+        crs = (CompoundCRS) pool.unique(crs);
         return crs;
     }
 
@@ -667,7 +667,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (EngineeringCRS) pool.canonicalize(crs);
+        crs = (EngineeringCRS) pool.unique(crs);
         return crs;
     }
     
@@ -689,7 +689,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (ImageCRS) pool.canonicalize(crs);
+        crs = (ImageCRS) pool.unique(crs);
         return crs;
     }
 
@@ -711,7 +711,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (TemporalCRS) pool.canonicalize(crs);
+        crs = (TemporalCRS) pool.unique(crs);
         return crs;
     }
 
@@ -733,7 +733,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (VerticalCRS) pool.canonicalize(crs);
+        crs = (VerticalCRS) pool.unique(crs);
         return crs;
     }
 
@@ -756,7 +756,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (GeocentricCRS) pool.canonicalize(crs);
+        crs = (GeocentricCRS) pool.unique(crs);
         return crs;
     }
 
@@ -779,7 +779,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (GeocentricCRS) pool.canonicalize(crs);
+        crs = (GeocentricCRS) pool.unique(crs);
         return crs;
     }
 
@@ -803,7 +803,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (GeographicCRS) pool.canonicalize(crs);
+        crs = (GeographicCRS) pool.unique(crs);
         return crs;
     }
 
@@ -841,7 +841,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (DerivedCRS) pool.canonicalize(crs);
+        crs = (DerivedCRS) pool.unique(crs);
         return crs;
     }
     
@@ -874,7 +874,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (ProjectedCRS) pool.canonicalize(crs);
+        crs = (ProjectedCRS) pool.unique(crs);
         return crs;
     }
 

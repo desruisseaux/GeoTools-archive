@@ -573,10 +573,7 @@ public class DefaultFactoryTest extends TestCase {
         assertNotNull(projection.getTargetCRS());
         assertNotNull(projection.getMathTransform());
         assertNotSame(projection, operation);
-        assertEquals(((Conversion) operation).getMethod(), ((Conversion) projection).getMethod());
-        
-        // FIXME We have lost track of our interning pool
-        //assertSame(((Conversion) operation).getMethod(), ((Conversion) projection).getMethod());
+        assertSame(((Conversion) operation).getMethod(), ((Conversion) projection).getMethod());
         /*
          * WGS 72BE / UTM zone 10N
          */

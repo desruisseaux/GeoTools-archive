@@ -1,22 +1,54 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2007, GeoTools Project Managment Committee (PMC)
+ *   
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.referencing.factory;
 
 import java.lang.ref.Reference;
 import java.util.Map;
 
+
+/**
+ * A cache for referencing objects.
+ *
+ * @since 2.4
+ * @version $Id$
+ * @source $URL$
+ *
+ * @todo {@link #findPool} should not be defined in this object.
+ *
+ * @todo Consider renaming as {@code ObjectCache} or {@code Cache} and move to
+ *       the {@code org.geotools.util} package.
+ */
 public interface ReferencingObjectCache {
+    /**
+     * @todo This method should not be defined there.
+     */
+    Map/*<IdentifiedObject,IdentifiedObject>*/ findPool();
 
-    public abstract Map findPool();
-
-    public abstract void dispose();
+    /**
+     * Removes all entries from this cache.
+     */
+    void clear();
 
     /**
      * Returns an object from the pool for the specified code. If the object was retained as a
      * {@linkplain Reference weak reference}, the {@link Reference#get referent} is returned.
-     * @param key TODO
      *
-     * @todo Consider logging a message here to the finer or finest level.
+     * @param key The authority code.
      */
-    public abstract Object get(final Object key);
+    Object get(Object key);
 
     /**
      * Put an element in the pool. This method is invoked everytime a {@code createFoo(...)}
@@ -24,9 +56,9 @@ public interface ReferencingObjectCache {
      * the following reasons: 1) Replaces weak reference by strong reference (if applicable)
      * and 2) Alters the linked hash set order, so that this object is declared as the last
      * one used.
-     * @param key TODO
-     * @param object TODO
+     *
+     * @param key the authority code.
+     * @param object The referencing object to add in the pool.
      */
-    public abstract void put(final Object key, final Object object);
-
+    void put(Object key, Object object);
 }

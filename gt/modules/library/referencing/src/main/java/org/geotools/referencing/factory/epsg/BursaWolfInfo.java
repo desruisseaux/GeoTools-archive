@@ -18,7 +18,7 @@ package org.geotools.referencing.factory.epsg;
 
 
 /**
- * Private structure for {@link FactoryUsingSQL#createBursaWolfParameters} usage.
+ * Private structure for {@link DirectEpsgFactory#createBursaWolfParameters} usage.
  * 
  * @source $URL$
  * @version $Id$
@@ -37,7 +37,7 @@ final class BursaWolfInfo {
     }
 
     /**
-     * MUST returns the operation code. This is required by {@link FactoryUsingSQL#sort}.
+     * MUST returns the operation code. This is required by {@link DirectEpsgFactory#sort}.
      */
     public String toString() {
         return operation;

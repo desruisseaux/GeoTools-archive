@@ -19,7 +19,7 @@ package org.geotools.referencing.factory.epsg;
 /**
  * Information about a specific table. This class also provides some utility methods
  * for the creation of SQL queries. The MS-Access dialect of SQL is assumed (it will
- * be translated into ANSI SQL later by {@link FactoryUsingSQL#adaptSQL} if needed).
+ * be translated into ANSI SQL later by {@link DirectEpsgFactory#adaptSQL} if needed).
  *
  * @since 2.2
  * @source $URL$

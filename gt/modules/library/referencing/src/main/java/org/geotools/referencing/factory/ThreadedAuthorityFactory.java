@@ -21,6 +21,7 @@ package org.geotools.referencing.factory;
 
 // J2SE dependencies and extensions
 import java.lang.ref.WeakReference;
+import java.util.Map;
 import java.util.Set;
 import java.util.Iterator;
 import java.util.Collection;
@@ -79,7 +80,7 @@ public class ThreadedAuthorityFactory extends AbstractAuthorityFactory implement
 
     /**
      * The underlying authority factory. This field may be {@code null} if this object was
-     * created by the {@linkplain #BufferedAuthorityFactory(AbstractAuthorityFactory,int)
+     * created by the {@linkplain #ThreadedAuthorityFactory(AbstractAuthorityFactory,int)
      * package protected constructor}. In this case, the subclass is responsible for creating
      * the backing store when {@link DeferredAuthorityFactory#createBackingStore} is invoked.
      *
@@ -88,14 +89,10 @@ public class ThreadedAuthorityFactory extends AbstractAuthorityFactory implement
      */
     AbstractAuthorityFactory backingStore;
 
-    ReferencingObjectCache objectCache;
-
     /**
-     * The maximum number of objects to keep by strong reference. If a greater amount of
-     * objects are created, then the strong references for the oldest ones are replaced by
-     * weak references.
+     * The cache for referencing objects.
      */
-    private final int maxStrongReferences;
+    private final ReferencingObjectCache objectCache;
 
     /**
      * Constructs an instance wrapping the specified factory with a default number
@@ -131,8 +128,7 @@ public class ThreadedAuthorityFactory extends AbstractAuthorityFactory implement
         while (factory instanceof ThreadedAuthorityFactory) {
             factory = ((ThreadedAuthorityFactory) factory).backingStore;
         }
-        this.backingStore        = factory;
-        this.maxStrongReferences = maxStrongReferences;
+        this.backingStore = factory;
         this.objectCache = new DefaultReferencingObjectCache(maxStrongReferences);
         completeHints();
     }
@@ -151,7 +147,6 @@ public class ThreadedAuthorityFactory extends AbstractAuthorityFactory implement
      */
     ThreadedAuthorityFactory(final int priority, final int maxStrongReferences) {
         super(priority);
-        this.maxStrongReferences = maxStrongReferences;
         this.objectCache = new DefaultReferencingObjectCache(maxStrongReferences);
         // completeHints() will be invoked by DeferredAuthorityFactory.getBackingStore()
     }
@@ -1023,16 +1018,17 @@ public class ThreadedAuthorityFactory extends AbstractAuthorityFactory implement
              *       waste of CPU.
              */
             IdentifiedObject candidate;
-            synchronized (objectCache.findPool()) {
-                candidate = (IdentifiedObject) objectCache.findPool().get(object);
+            final Map findPool = objectCache.findPool();
+            synchronized (findPool) {
+                candidate = (IdentifiedObject) findPool.get(object);
             }
             if (candidate == null) {
                 // Must delegates to 'finder' (not to 'super') in order to take
                 // advantage of the method overriden by AllAuthoritiesFactory.
                 candidate = finder.find(object);
                 if (candidate != null) {
-                    synchronized (objectCache.findPool()) {
-                        objectCache.findPool().put(object, candidate);
+                    synchronized (findPool) {
+                        findPool.put(object, candidate);
                     }
                 }
             }
@@ -1045,8 +1041,9 @@ public class ThreadedAuthorityFactory extends AbstractAuthorityFactory implement
         //@Override
         public String findIdentifier(final IdentifiedObject object) throws FactoryException {
             IdentifiedObject candidate;
-            synchronized (objectCache.findPool()) {
-                candidate = (IdentifiedObject) objectCache.findPool().get(object);
+            final Map findPool = objectCache.findPool();
+            synchronized (findPool) {
+                candidate = (IdentifiedObject) findPool.get(object);
             }
             if (candidate != null) {
                 return getIdentifier(candidate);
@@ -1065,7 +1062,7 @@ public class ThreadedAuthorityFactory extends AbstractAuthorityFactory implement
             backingStore.dispose();
             backingStore = null;
         }
-        objectCache.dispose();
+        objectCache.clear();
         super.dispose();
     }
 }

@@ -85,7 +85,7 @@ public final class JTS {
      * Geodetic calculators already created for a given coordinate reference system.
      * For use in {@link #orthodromicDistance}.
      *
-     * Note: We would like to use {@link java.util.WeakHashSet}, but we can't because
+     * Note: We would like to use {@link org.geotools.util.CanonicalSet}, but we can't because
      *       {@link GeodeticCalculator} keep a reference to the CRS which is used as the key.
      */
     private static final Map/*<CoordinateReferenceSystem,GeodeticCalculator>*/ CALCULATORS =

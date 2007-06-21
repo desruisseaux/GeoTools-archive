@@ -352,7 +352,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * {@link #getAuthorityCodes} method as a cache for returning the set created
      * in a previous call.
      * <p>
-     * Note that this {@code FactoryUsingSQL} can not be disposed as long as this map is not
+     * Note that this {@code DirectEpsgFactory} can not be disposed as long as this map is not
      * empty, sinces {@link AuthorityCodes} cache some SQL statements and concequently require
      * the {@linkplain #connection} to be open. This is why we use soft references rather than
      * hard ones, in order to know when no {@link AuthorityCodes} are still in use.
@@ -413,7 +413,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
     /**
      * The buffered authority factory, or {@code this} if none. This field is set
      * to a different value by {@link ThreadedEpsgFactory} only, which will point toward a
-     * buffered factory wrapping this {@code FactoryUsingSQL} for efficienty.
+     * buffered factory wrapping this {@code DirectEpsgFactory} for efficienty.
      */
     AbstractAuthorityFactory buffered = this;
 

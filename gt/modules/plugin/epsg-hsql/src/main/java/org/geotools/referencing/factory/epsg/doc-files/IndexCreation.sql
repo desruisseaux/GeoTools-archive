@@ -1,6 +1,6 @@
 --
 -- The EPSG database is shipped with no index except primary keys. This file creates
--- some index appropriate for the queries performed by Geotools FactoryUsingAnsiSQL.
+-- some index appropriate for the queries performed by Geotools DirectEpsgFactory.
 --
 -- Authors: Andrea Aimes
 --          Martin Desruisseaux
@@ -9,7 +9,7 @@
 --
 
 --------------------------------------------------------------------------------
--- Index for queries used by FactoryUsingAnsiSQL.createFoo(epsgCode) methods. --
+-- Index for queries used by DirectEpsgFactory.createFoo(epsgCode) methods.   --
 -- Indexed fields are numeric values used mainly in equality comparaisons.    --
 --------------------------------------------------------------------------------
 CREATE INDEX ALIAS_OBJECT_CODE                ON EPSG_ALIAS                     (OBJECT_CODE);
@@ -27,7 +27,7 @@ CREATE INDEX SUPERSESSION_OBJECT_CODE         ON EPSG_SUPERSESSION              
 
 
 --------------------------------------------------------------------------------
--- Index for queries used by FactoryUsingAnsiSQL.createFoo(epsgCode) methods. --
+-- Index for queries used by DirectEpsgFactory.createFoo(epsgCode) methods.   --
 -- Indexed fields are numeric values used in ORDER BY clauses.  I'm not sure  --
 -- that their impact on HSQL database is significant, so it is probably safe  --
 -- to ignore them.                                                            --

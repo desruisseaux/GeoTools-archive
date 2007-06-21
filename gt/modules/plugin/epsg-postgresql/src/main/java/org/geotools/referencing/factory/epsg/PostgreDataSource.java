@@ -205,14 +205,14 @@ public class PostgreDataSource extends Jdbc3SimpleDataSource implements DataSour
     }
 
     /**
-     * Open a connection and creates an {@linkplain FactoryUsingSQL EPSG factory} for it.
+     * Open a connection and creates an {@linkplain DirectEpsgFactory EPSG factory} for it.
      *
      * @param  hints A map of hints, including the low-level factories to use for CRS creation.
      * @return The EPSG factory using PostgreSQL syntax.
      * @throws SQLException if connection to the database failed.
      */
     public AbstractAuthorityFactory createFactory(final Hints hints) throws SQLException {
-        final FactoryUsingAnsiSQL factory = new FactoryUsingAnsiSQL(hints, getConnection());
+        final AnsiDialectEpsgFactory factory = new AnsiDialectEpsgFactory(hints, getConnection());
         if (schema != null) {
             factory.setSchema(schema);
         }

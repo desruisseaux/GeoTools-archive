@@ -87,7 +87,7 @@ import org.geotools.resources.JDBC;
  * <TR>
  *   <TD>{@code factory}</TD>
  *   <TD>The EPSG factory to instantiate</TD>
- *   <TD>{@code org.geotools.referencing.factory.epsg.FactoryUsingSQL}</TD>
+ *   <TD>{@code org.geotools.referencing.factory.epsg.DirectEpsgFactory}</TD>
  * </TR>
  * </TABLE>
  *
@@ -218,14 +218,14 @@ public class SimpleDataSource implements DataSource {
         final Connection connection = getConnection();
         String classname = properties.getProperty("factory");
         if (classname == null) {
-            classname = "org.geotools.referencing.factory.epsg.FactoryUsingSQL";
+            classname = "org.geotools.referencing.factory.epsg.DirectEpsgFactory";
             final String driver = properties.getProperty("driver");
             if (driver != null) {
                 // TODO: 'contains' instead of 'indexOf' when we will be allowed to target J2SE 1.5.
                 if (driver.indexOf(".postgresql.")>=0 || driver.indexOf(".mysql.")>=0) {
-                    classname = "org.geotools.referencing.factory.epsg.FactoryUsingAnsiSQL";
+                    classname = "org.geotools.referencing.factory.epsg.AnsiDialectEpsgFactory";
                 } else if (driver.startsWith("oracle.")) {
-                    classname = "org.geotools.referencing.factory.epsg.FactoryUsingOracleSQL";
+                    classname = "org.geotools.referencing.factory.epsg.OracleDialectEpsgFactory";
                 } else if (driver.indexOf(".hsqldb.") >= 0) {
                     classname = "org.geotools.referencing.factory.epsg.FactoryUsingHSQL";
                 }
@@ -244,8 +244,8 @@ public class SimpleDataSource implements DataSource {
         }
         final String schema = properties.getProperty("schema");
         if (schema != null) {
-            if (factory instanceof FactoryUsingAnsiSQL) {
-                ((FactoryUsingAnsiSQL) factory).setSchema(schema);
+            if (factory instanceof AnsiDialectEpsgFactory) {
+                ((AnsiDialectEpsgFactory) factory).setSchema(schema);
             }
         }
         return factory;

@@ -1,3 +1,18 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2007, GeoTools Project Managment Committee (PMC)
+ *   
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.referencing.factory;
 
 import java.lang.ref.Reference;
@@ -7,15 +22,17 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+
 /**
  * Caching implementation for ReferencingObjectCache. This instance is used when
  * actual caching is desired.
  * 
- * @author Cory Horner, Refractions Research
- * 
+ * @since 2.4
+ * @version $Id$
+ * @source $URL$
+ * @author Cory Horner (Refractions Research)
  */
-class DefaultReferencingObjectCache implements ReferencingObjectCache {
-
+final class DefaultReferencingObjectCache implements ReferencingObjectCache {
     /**
      * The pool of cached objects.
      * <p>
@@ -28,30 +45,52 @@ class DefaultReferencingObjectCache implements ReferencingObjectCache {
     private final LinkedHashMap pool = new LinkedHashMap(32, 0.75f, true);
 
     /**
-     * The pool of objects identified by  {@link #find} .
+     * The pool of objects identified by {@link ThreadedAuthorityFactory#find}.
      */
     private final Map findPool = new WeakHashMap();
 
+    /**
+     * The maximum number of objects to keep by strong reference. If a greater amount of
+     * objects are created, then the strong references for the oldest ones are replaced by
+     * weak references.
+     */
     private final int maxStrongReferences;
-    
-    public DefaultReferencingObjectCache(int maxStrongReferences) {
+
+    /**
+     * Creates a new cache which will hold the specified amount of object by strong references.
+     * Any additional object will be help by weak references.
+     */
+    public DefaultReferencingObjectCache(final int maxStrongReferences) {
         this.maxStrongReferences = maxStrongReferences;
     }
-    
+
+    /**
+     * @todo This method should not be defined there.
+     */
     public Map findPool() {
         return findPool;
     }
 
-    public synchronized void dispose() {
+    /**
+     * Removes all entries from this map.
+     */
+    public synchronized void clear() {
         if (pool != null) {
             pool.clear();
         }
         if (findPool != null) {
             findPool.clear();
         }
-        //super.dispose();
     }
-    
+
+    /**
+     * Returns an object from the pool for the specified code. If the object was retained as a
+     * {@linkplain Reference weak reference}, the {@link Reference#get referent} is returned.
+     *
+     * @param key The authority code.
+     *
+     * @todo Consider logging a message here to the finer or finest level.
+     */
     public Object get(final Object key) {
         //assert Thread.holdsLock(factory);
         Object object = pool.get(key);
@@ -61,6 +100,16 @@ class DefaultReferencingObjectCache implements ReferencingObjectCache {
         return object;
     }
 
+    /**
+     * Put an element in the pool. This method is invoked everytime a {@code createFoo(...)}
+     * method is invoked, even if an object was already in the pool for the given code, for
+     * the following reasons: 1) Replaces weak reference by strong reference (if applicable)
+     * and 2) Alters the linked hash set order, so that this object is declared as the last
+     * one used.
+     *
+     * @param key the authority code.
+     * @param object The referencing object to add in the pool.
+     */
     public void put(final Object key, final Object object) {
         //assert Thread.holdsLock(factory);
         pool.put(key, object);
@@ -82,5 +131,4 @@ class DefaultReferencingObjectCache implements ReferencingObjectCache {
             }
         }
     }
-
 }

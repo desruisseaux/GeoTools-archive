@@ -11,7 +11,7 @@ import org.opengis.referencing.datum.GeodeticDatum;
 
 /**
  * This one tests Factory<b>On</b>OracleSQL - ie it has a buffer and delegates to a
- * FactoryUsingOracleSQL when the buffer needs to be fed.
+ * OracleDialectEpsgFactory when the buffer needs to be fed.
  * 
  * @author Jody
  */

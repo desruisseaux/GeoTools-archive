@@ -37,7 +37,7 @@ import org.opengis.referencing.datum.*;
 import org.opengis.referencing.operation.*;
 
 // Geotools dependencies
-import org.geotools.util.WeakHashSet;
+import org.geotools.util.CanonicalSet;
 import org.geotools.factory.Hints;
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryRegistryException;
@@ -92,7 +92,7 @@ public class TransformedAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * A pool of modified objects created up to date.
      */
-    private final WeakHashSet pool = new WeakHashSet();
+    private final CanonicalSet pool = new CanonicalSet();
 
     /**
      * Creates a wrapper around the specified factory.
@@ -224,7 +224,7 @@ public class TransformedAuthorityFactory extends AuthorityFactoryAdapter {
             final Map properties = getProperties(axis);
             axis = csFactory.createCoordinateSystemAxis(properties,
                     axis.getAbbreviation(), newDirection, newUnits);
-            axis = (CoordinateSystemAxis) pool.canonicalize(axis);
+            axis = (CoordinateSystemAxis) pool.unique(axis);
         }
         return axis;
     }
@@ -253,7 +253,7 @@ public class TransformedAuthorityFactory extends AuthorityFactoryAdapter {
             if (!orderedAxis[i].equals(cs.getAxis(i))) {
                 CoordinateSystem modified = createCS(cs.getClass(), getProperties(cs), orderedAxis);
                 assert Utilities.sameInterfaces(cs.getClass(), modified.getClass(), CoordinateSystem.class);
-                modified = (CoordinateSystem) pool.canonicalize(modified);
+                modified = (CoordinateSystem) pool.unique(modified);
                 return modified;
             }
         }
@@ -371,7 +371,7 @@ public class TransformedAuthorityFactory extends AuthorityFactoryAdapter {
                         ErrorKeys.UNSUPPORTED_CRS_$1, crs.getName().getCode()));
             }
         }
-        modified = (CoordinateReferenceSystem) pool.canonicalize(modified);
+        modified = (CoordinateReferenceSystem) pool.unique(modified);
         return modified;
     }
 
@@ -402,7 +402,7 @@ public class TransformedAuthorityFactory extends AuthorityFactoryAdapter {
         }
         CoordinateOperation modified;
         modified = opFactory.createOperation(sourceCRS, targetCRS);
-        modified = (CoordinateOperation) pool.canonicalize(modified);
+        modified = (CoordinateOperation) pool.unique(modified);
         return modified;
     }
 

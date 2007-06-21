@@ -68,7 +68,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
     /**
      * The factory which is the owner of this set. One purpose of this field (even if it were not
      * used directly by this class) is to avoid garbage collection of the factory as long as this
-     * set is in use. This is required because {@link FactoryUsingSQL#finalize} closes the JDBC
+     * set is in use. This is required because {@link DirectEpsgFactory#finalize} closes the JDBC
      * connections.
      */
     private final DirectEpsgFactory factory;
@@ -116,7 +116,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
 
     /**
      * The connection to the underlying database. This set should never close
-     * this connection. Closing it is {@link FactoryUsingSQL}'s job.
+     * this connection. Closing it is {@link DirectEpsgFactory}'s job.
      */
     private final Connection connection;
 
@@ -339,7 +339,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
 
     /**
      * Closes the underlying statements. Note: this method is also invoked directly
-     * by {@link FactoryUsingSQL#dispose}, which is okay in this particular case since
+     * by {@link DirectEpsgFactory#dispose}, which is okay in this particular case since
      * the implementation of this method can be executed an arbitrary amount of times.
      */
     protected synchronized void finalize() throws SQLException {

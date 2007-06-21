@@ -43,7 +43,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * {@link AuthorityFactory#createObject createObject} method instead of this class,
  * but some factory implementations are more efficient when we use the most specific
  * {@code create} method. For example when using a
- * {@linkplain org.geotools.referencing.factory.epsg.FactoryUsingSQL EPSG factory backed
+ * {@linkplain org.geotools.referencing.factory.epsg.DirectEpsgFactory EPSG factory backed
  * by a SQL database}, invoking {@link CRSAuthorityFactory#createCoordinateReferenceSystem
  * createCoordinateReferenceSystem} instead of {@link AuthorityFactory#createObject createObject}
  * method will reduce the amount of tables to be queried.

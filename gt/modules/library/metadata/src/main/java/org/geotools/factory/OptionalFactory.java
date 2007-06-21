@@ -23,8 +23,8 @@ import javax.imageio.spi.ServiceRegistry; // For javadoc
  * An optional factory that may not be available in all configurations.
  * <p>
  * Such factories often need some external resources. For example the default
- * {@linkplain org.geotools.referencing.factory.epsg.FactoryUsingSQL EPSG factory} need a
- * MS-Access database installed on the client machine. This database is not bundle in
+ * {@linkplain org.geotools.referencing.factory.epsg.AccessDialectEpsgFactory EPSG factory}
+ * need a MS-Access database installed on the client machine. This database is not bundle in
  * Geotools distribution; if the user have not installed it, the factory can't work.
  * <p>
  * This interface is <strong>not</strong> a manager for automatic download of external resources.

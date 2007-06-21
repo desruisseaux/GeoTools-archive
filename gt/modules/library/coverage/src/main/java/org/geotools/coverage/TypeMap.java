@@ -176,9 +176,9 @@ public final class TypeMap {
                 upper = new Long(max);
                 one   = new Long(1L);
             }
-            lower = canonicalize(pool, lower);
-            upper = canonicalize(pool, upper);
-            one   = canonicalize(pool, one);
+            lower = unique(pool, lower);
+            upper = unique(pool, upper);
+            one   = unique(pool, one);
             assert lower.longValue() == min;
             assert upper.longValue() == max;
         }
@@ -200,7 +200,7 @@ public final class TypeMap {
     /**
      * Returns a single instance of the specified number.
      */
-    private static Number canonicalize(final Map pool, final Number n) {
+    private static Number unique(final Map pool, final Number n) {
         final Number candidate = (Number) pool.put(n, n);
         if (candidate == null) {
             return n;

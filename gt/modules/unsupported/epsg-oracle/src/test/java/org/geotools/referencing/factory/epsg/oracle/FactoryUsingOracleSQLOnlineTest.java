@@ -4,7 +4,7 @@ import java.sql.Connection;
 
 
 import org.geotools.factory.Hints;
-import org.geotools.referencing.factory.epsg.FactoryUsingOracleSQL;
+import org.geotools.referencing.factory.epsg.OracleDialectEpsgFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.datum.GeodeticDatum;
 
@@ -22,7 +22,7 @@ public class FactoryUsingOracleSQLOnlineTest extends OracleOnlineTestCase {
         try{
             Hints hints = new Hints(Hints.EPSG_DATA_SOURCE, "jdbc/EPSG");
         
-            FactoryUsingOracleSQL oracle = new FactoryUsingOracleSQL(hints, connection);
+            OracleDialectEpsgFactory oracle = new OracleDialectEpsgFactory(hints, connection);
     
             GeodeticDatum datum = oracle.createGeodeticDatum("6326");
             assertNotNull(datum);
@@ -36,7 +36,7 @@ public class FactoryUsingOracleSQLOnlineTest extends OracleOnlineTestCase {
         Connection connection = datasource.getConnection();
         try{
             Hints hints = new Hints(Hints.EPSG_DATA_SOURCE, "jdbc/EPSG");
-            FactoryUsingOracleSQL oracle = new FactoryUsingOracleSQL(hints, connection );
+            OracleDialectEpsgFactory oracle = new OracleDialectEpsgFactory(hints, connection );
             
             CoordinateReferenceSystem crs = oracle.createCoordinateReferenceSystem("4326");
             assertNotNull(crs);

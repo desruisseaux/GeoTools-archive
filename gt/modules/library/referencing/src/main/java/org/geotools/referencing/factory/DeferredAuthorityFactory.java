@@ -51,8 +51,11 @@ import org.geotools.resources.i18n.LoggingKeys;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @todo Extends {@link BufferedAuthorityFactory} for now in order to improve the trunk stability
+ *       during GEOT-1286 development, but we may revisit that after GEOT-1286 completion.
  */
-public abstract class DeferredAuthorityFactory extends ThreadedAuthorityFactory
+public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
                                             implements OptionalFactory
 {
     /**

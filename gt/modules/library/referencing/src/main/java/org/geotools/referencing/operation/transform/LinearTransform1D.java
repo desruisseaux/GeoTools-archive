@@ -278,7 +278,7 @@ public class LinearTransform1D extends AbstractMathTransform
             /*
              * NOTE: 'LinearTransform1D' and 'ConstantTransform1D' are heavily used by 'Category'
              *       from 'org.geotools.cv' package. It is essential for Cateory to differenciate
-             *       various NaN values. Because 'equals' is used by WeakHashSet.canonicalize(..)
+             *       various NaN values. Because 'equals' is used by CanonicalSet.unique(Object)
              *       (which is used by 'DefaultMathTransformFactory'), test for equality can't use
              *       the doubleToLongBits method because it collapse all NaN into a single canonical
              *       value. The 'doubleToRawLongBits' instead provided the needed functionality.

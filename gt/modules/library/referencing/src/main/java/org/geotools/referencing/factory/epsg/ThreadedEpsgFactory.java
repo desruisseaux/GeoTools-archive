@@ -330,20 +330,20 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
     }
 
     /**
-     * Creates the backing store for the specified data source. This method usually
-     * returns a new instance of {@link FactoryUsingSQL} or {@link FactoryUsingAnsiSQL}.
+     * Creates the backing store for the specified data source. This method usually returns
+     * a new instance of {@link AccessDialectEpsgFactory} or {@link AnsiDialectEpsgFactory}.
      * Subclasses may override this method in order to returns an instance tuned for the
      * SQL syntax of the underlying database. Example for a PostgreSQL data source:
      *
      * <blockquote><pre>
      * protected AbstractAuthorityFactory createBackingStore(Hints hints) throws SQLException {
-     *     return new FactoryUsingAnsiSQL(hints, getDataSource().getConnection());
+     *     return new AnsiDialectEpsgFactory(hints, getDataSource().getConnection());
      * }
      * </pre></blockquote>
      *
      * @param  hints A map of hints, including the low-level factories to use for CRS creation.
-     *         This argument should be given unchanged to {@code FactoryUsingSQL} constructor.
-     * @return The {@linkplain FactoryUsingSQL EPSG factory} using SQL queries appropriate
+     *         This argument should be given unchanged to {@code DirectEpsgFactory} constructor.
+     * @return The {@linkplain DirectEpsgFactory EPSG factory} using SQL queries appropriate
      *         for this data source.
      * @throws SQLException if connection to the database failed.
      */
@@ -362,9 +362,9 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
              * a way to distinguish the two cases. However I'm not sure that it is a robust
              * criterion. Subclasses should always override as a safety.
              */
-            return new FactoryUsingAnsiSQL(hints, connection);
+            return new AnsiDialectEpsgFactory(hints, connection);
         }
-        return new FactoryUsingSQL(hints, connection);
+        return new AccessDialectEpsgFactory(hints, connection);
     }
 
     /**
@@ -485,8 +485,8 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
         String url     = product;
         try {
             factory = createBackingStore0();
-            if (factory instanceof FactoryUsingSQL) {
-                final DatabaseMetaData info = ((FactoryUsingSQL) factory).connection.getMetaData();
+            if (factory instanceof DirectEpsgFactory) {
+                final DatabaseMetaData info = ((DirectEpsgFactory) factory).connection.getMetaData();
                 product = info.getDatabaseProductName();
                 url     = info.getURL();
             }
@@ -495,8 +495,8 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
                                        exception);
         }
         log(Logging.format(Level.CONFIG, LoggingKeys.CONNECTED_EPSG_DATABASE_$2, url, product));
-        if (factory instanceof FactoryUsingSQL) {
-            ((FactoryUsingSQL) factory).buffered = this;
+        if (factory instanceof DirectEpsgFactory) {
+            ((DirectEpsgFactory) factory).buffered = this;
         }
         return factory;
     }
@@ -518,8 +518,8 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
      * @param backingStore The backing store in process of being disposed.
      */
     protected boolean canDisposeBackingStore(final AbstractAuthorityFactory backingStore) {
-        if (backingStore instanceof FactoryUsingSQL) {
-            return ((FactoryUsingSQL) backingStore).canDispose();
+        if (backingStore instanceof DirectEpsgFactory) {
+            return ((DirectEpsgFactory) backingStore).canDispose();
         }
         return super.canDisposeBackingStore(backingStore);
     }
@@ -532,7 +532,7 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
      */
     private final class ShutdownHook extends Thread {
         public ShutdownHook() {
-            super(FactoryUsingSQL.SHUTDOWN_THREAD);
+            super(DirectEpsgFactory.SHUTDOWN_THREAD);
         }
 
         public void run() {

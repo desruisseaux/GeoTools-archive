@@ -64,7 +64,7 @@ public class AccessDataSource extends sun.jdbc.odbc.ee.DataSource implements Dat
     }
 
     /**
-     * Open a connection and creates an {@linkplain FactoryUsingSQL EPSG factory} for it.
+     * Open a connection and creates an {@linkplain DirectEpsgFactory EPSG factory} for it.
      *
      * @param  hints A map of hints, including the low-level factories to use for CRS creation.
      * @return The EPSG factory using MS-Access SQL syntax.
@@ -84,6 +84,6 @@ public class AccessDataSource extends sun.jdbc.odbc.ee.DataSource implements Dat
             e.initCause(exception);
             throw e;
         }
-        return new FactoryUsingSQL(hints, connection);
+        return new DirectEpsgFactory(hints, connection);
     }
 }

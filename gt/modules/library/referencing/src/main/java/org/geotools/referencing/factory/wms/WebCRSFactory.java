@@ -143,7 +143,7 @@ public class WebCRSFactory extends DirectAuthorityFactory implements CRSAuthorit
      * Provides a complete set of the known codes provided by this authority. The returned set
      * contains only numeric identifiers like {@code "84"}, {@code "27"}, <cite>etc</cite>.
      * The authority name ({@code "CRS"}) is not included. This is consistent with the
-     * {@linkplain org.geotools.referencing.factory.epsg.FactoryUsingSQL#getAuthorityCodes
+     * {@linkplain org.geotools.referencing.factory.epsg.DirectEpsgFactory#getAuthorityCodes
      * codes returned by the EPSG factory} and avoid duplication, since the authority is the
      * same for every codes returned by this factory. It also make it easier for clients to
      * prepend whatever authority name they wish, as for example in the

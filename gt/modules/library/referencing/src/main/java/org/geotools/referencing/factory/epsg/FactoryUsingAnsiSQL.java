@@ -38,7 +38,7 @@ import org.geotools.factory.Hints;
  *
  * @deprecated Please use {@link AnsiDialectEpsgFactory}.
  */
-public final class FactoryUsingAnsiSQL extends AnsiDialectEpsgFactory {
+public class FactoryUsingAnsiSQL extends AnsiDialectEpsgFactory {
     /**
      * Constructs an authority factory using the specified connection.
      *

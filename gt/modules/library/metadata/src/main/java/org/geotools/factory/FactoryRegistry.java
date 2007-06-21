@@ -304,8 +304,8 @@ public class FactoryRegistry extends ServiceRegistry {
                      * Use case: DefaultDataSourceTest invokes indirectly 'getServiceProvider'
                      * with a "CRS_AUTHORITY_FACTORY = ThreadedEpsgFactory.class" hint. However
                      * ThreadedEpsgFactory (in the org.geotools.referencing.factory.epsg package)
-                     * is a wrapper around FactoryUsingSQL, and defines this dependency through
-                     * a "CRS_AUTHORITY_FACTORY = FactoryUsingSQL.class" hint. There is no way
+                     * is a wrapper around DirectEpsgFactory, and defines this dependency through
+                     * a "CRS_AUTHORITY_FACTORY = DirectEpsgFactory.class" hint. There is no way
                      * to match this hint for both factories in same time. Since we must choose
                      * one, we assume that the user is interrested in the most top level one and
                      * discart this particular hint for the dependencies.

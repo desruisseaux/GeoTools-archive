@@ -65,7 +65,7 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
-import org.geotools.util.WeakHashSet;
+import org.geotools.util.CanonicalSet;
 
 
 /**
@@ -160,7 +160,7 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
      * A pool of coordinate operation. This pool is used in order
      * to returns instance of existing operations when possible.
      */
-    private final WeakHashSet pool = new WeakHashSet();
+    private final CanonicalSet pool = new CanonicalSet();
 
     /**
      * Tells if {@link FactoryGroup#hints} has been invoked. It must be invoked exactly once,
@@ -445,7 +445,7 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
             }
         }
         operation = DefaultOperation.create(properties, sourceCRS, targetCRS, transform, method, type);
-        operation = (CoordinateOperation) pool.canonicalize(operation);
+        operation = (CoordinateOperation) pool.unique(operation);
         return operation;
     }
 
@@ -463,7 +463,7 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
     {
         CoordinateOperation operation;
         operation = new DefaultConcatenatedOperation(properties, operations, mtFactory);
-        operation = (CoordinateOperation) pool.canonicalize(operation);
+        operation = (CoordinateOperation) pool.unique(operation);
         return operation;
     }
 

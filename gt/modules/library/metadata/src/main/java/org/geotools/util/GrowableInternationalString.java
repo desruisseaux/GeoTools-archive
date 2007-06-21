@@ -60,7 +60,7 @@ public class GrowableInternationalString extends AbstractInternationalString imp
 
     /**
      * The set of locales created in this virtual machine through methods of this class.
-     * Used in order to {@linkplain #canonicalize canonicalize} the {@link Locale} objects.
+     * Used in order to get a {@linkplain #unique unique} instance of {@link Locale} objects.
      */
     private static final Map LOCALES = new HashMap();
 
@@ -174,9 +174,9 @@ public class GrowableInternationalString extends AbstractInternationalString imp
         for (int i=0; /*break condition inside*/; i++) {
             if (position == length) {
                 final Locale locale = (i==0) ? (Locale)null :
-                       canonicalize(new Locale(parts[0] /* language */,
-                                               parts[1] /* country  */,
-                                               parts[2] /* variant  */));
+                       unique(new Locale(parts[0] /* language */,
+                                         parts[1] /* country  */,
+                                         parts[2] /* variant  */));
                 add(locale, string);
                 return true;
             }
@@ -203,7 +203,7 @@ public class GrowableInternationalString extends AbstractInternationalString imp
      * @param  locale The locale to canonicalize.
      * @return The canonical instance of {@code locale}.
      */
-    private static synchronized Locale canonicalize(final Locale locale) {
+    private static synchronized Locale unique(final Locale locale) {
         /**
          * Initialize the LOCALES map with the set of locales defined in the Locale class.
          * This operation is done only once.
@@ -225,7 +225,7 @@ public class GrowableInternationalString extends AbstractInternationalString imp
              * optimization for reducing memory usage). Log a warning and continue.
              */
             Logging.unexpectedException("org.geotools.util", GrowableInternationalString.class,
-                                        "canonicalize", exception);
+                                        "unique", exception);
         }
         /*
          * Now canonicalize the locale.
@@ -377,13 +377,12 @@ public class GrowableInternationalString extends AbstractInternationalString imp
         entries = (Map.Entry[]) localMap.entrySet().toArray(new Map.Entry[size]);
         if (size == 1) {
             final Map.Entry entry = entries[0];
-            localMap = Collections.singletonMap(canonicalize((Locale)entry.getKey()),
-                                                                     entry.getValue());
+            localMap = Collections.singletonMap(unique((Locale)entry.getKey()), entry.getValue());
         } else {
             localMap.clear();
             for (int i=0; i<entries.length; i++) {
                 final Map.Entry entry = entries[i];
-                localMap.put(canonicalize((Locale)entry.getKey()), entry.getValue());
+                localMap.put(unique((Locale)entry.getKey()), entry.getValue());
             }
         }
     }    

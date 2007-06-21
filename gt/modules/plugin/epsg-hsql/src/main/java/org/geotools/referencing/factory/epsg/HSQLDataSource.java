@@ -302,7 +302,7 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
     }
 
     /**
-     * Opens a connection and creates an {@linkplain FactoryUsingSQL EPSG factory} for it.
+     * Opens a connection and creates an {@linkplain DirectEpsgFactory EPSG factory} for it.
      *
      * @param  hints A map of hints, including the low-level factories to use for CRS creation.
      * @return The EPSG factory using HSQLDB SQL syntax.

@@ -32,9 +32,6 @@ import org.geotools.factory.Hints;
  * @source $URL$
  * @version $Id$
  * @author Jody Garnett
- *
- * @todo This class need to move in the {@code epsg-access} module. We can do that only
- *       after we removed the deprecated {@link FactoryUsingSQL} class in Geotools 2.5.
  */
 public class AccessDialectEpsgFactory extends DirectEpsgFactory {
     /**
@@ -54,7 +51,7 @@ public class AccessDialectEpsgFactory extends DirectEpsgFactory {
      * format, and this is the target of our super class, we have no work to do here.
      *
      * @param  statement The statement in MS-Access syntax.
-     * @return The SQL statement to use, this implementation returns the string unchanged.
+     * @return The SQL statement to use. This implementation returns the string unchanged.
      */
     protected String adaptSQL(final String statement) {
         return statement;
