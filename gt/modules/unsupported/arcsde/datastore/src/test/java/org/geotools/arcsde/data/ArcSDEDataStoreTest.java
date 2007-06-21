@@ -150,7 +150,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         ArcSDEDataStore ds = this.testData.getDataStore();
         CoordinateReferenceSystem sdeCRS = ds.getSchema("GISDATA.TOWNS_POLY").getDefaultGeometry().getCoordinateSystem();
         
-        LOGGER.info(sdeCRS.toWKT().replaceAll(" ","").replaceAll("\n", "").replace("\"", "\\\""));
+        LOGGER.info(sdeCRS.toWKT().replaceAll(" ","").replaceAll("\n", "").replaceAll("\"", "\\\""));
         
         //CoordinateReferenceSystem epsgCRS = CRS.decode("EPSG:26986");
         
@@ -961,20 +961,21 @@ public class ArcSDEDataStoreTest extends TestCase {
      */
     private void testFilter(Filter filter, FeatureSource fsource, int expected)
         throws IOException {
-        FeatureCollection results = fsource.getFeatures(filter);
-        FeatureCollection fc = results;
-        int resCount = results.size();
+        FeatureCollection fc = fsource.getFeatures(filter);
         int fCount = fc.size();
-        LOGGER.fine("results count: " + resCount + " collection size: "
+        LOGGER.info("collection size: "
             + fCount);
 
         FeatureIterator fi = fc.features();
-        Feature f = fi.next();
-        LOGGER.fine("first feature is: " + f);
+        int numFeat = 0;
+        while (fi.hasNext()) {
+            fi.next();
+            numFeat++;
+        }
+        
 
-        String failMsg = "Expected and returned result count does not match";
-        assertEquals(failMsg, expected, fCount);
-        assertEquals(failMsg, expected, resCount);
+        String failMsg = "Fully fetched features size and estimated num features count does not match";
+        assertEquals(failMsg, fCount, numFeat);
         fc.close(fi);
     }
 
