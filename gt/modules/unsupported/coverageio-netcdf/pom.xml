@@ -97,6 +97,12 @@
       <groupId>edu.ucar</groupId>
       <artifactId>netcdf</artifactId>
       <!-- The version number is specified in the parent POM. -->
+      <exclusions>
+        <exclusion>
+          <groupId>xerces</groupId>
+          <artifactId>xercesImpl</artifactId> <!-- Not required with J2SE 1.5 -->
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
