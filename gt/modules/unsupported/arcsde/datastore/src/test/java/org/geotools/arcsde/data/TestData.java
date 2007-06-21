@@ -16,15 +16,12 @@
  */
 package org.geotools.arcsde.data;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.Calendar;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import org.geotools.arcsde.data.ArcSDEDataStore;
 import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEConnectionPoolFactory;
@@ -283,7 +280,7 @@ public class TestData {
                 pool = getDataStore().getConnectionPool();
                 deleteTempTable(pool);
             } catch (Exception e) {
-                LOGGER.warning(e.getMessage());
+                LOGGER.fine(e.getMessage());
             }
         }
     }
@@ -302,7 +299,7 @@ public class TestData {
             SeTable table = new SeTable(conn, getTemp_table());
             table.delete();
         } catch (Exception e) {
-            LOGGER.warning(e.getMessage());
+            LOGGER.fine(e.getMessage());
         } finally {
         	conn.close();
         }

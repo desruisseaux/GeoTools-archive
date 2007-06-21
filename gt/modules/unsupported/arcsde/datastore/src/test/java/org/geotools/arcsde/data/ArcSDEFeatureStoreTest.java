@@ -562,7 +562,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
 
         writer.close();
 
-        //was the features really inserted?
+        //were the features really inserted?
         int fcount = fsource.getCount(Query.ALL);
         assertEquals(features.size() + initialCount, fcount);
     }

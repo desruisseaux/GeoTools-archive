@@ -26,15 +26,17 @@ import junit.framework.TestCase;
 
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
+import org.geotools.data.DataSourceException;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.feature.AttributeType;
+import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.ExpressionBuilder;
+import org.geotools.filter.text.cql2.CQL;
 import org.geotools.referencing.CRS;
-import org.opengis.feature.Feature;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -272,7 +274,19 @@ public class SDEJavaApiJoinTest extends TestCase {
         }
     }
 
-    public void testRegisterView() throws IOException {
+    public void testRegisterViewListedInGetTypeNames() throws IOException {
+        final String plainSQL = "SELECT " + MASTER_UNQUALIFIED + ".*, " + CHILD_UNQUALIFIED
+                + ".DESCRIPTION FROM " + MASTER_UNQUALIFIED + ", " + CHILD_UNQUALIFIED + " WHERE "
+                + CHILD_UNQUALIFIED + ".MASTER_ID = " + MASTER_UNQUALIFIED + ".ID";
+
+        final String viewName = "MasterChildTest";
+        store.registerView(viewName, plainSQL);
+
+        List publishedTypeNames = Arrays.asList(store.getTypeNames());
+        assertTrue(publishedTypeNames.contains(viewName));
+    }
+
+    public void testRegisterViewBuildsCorrectFeatureType() throws IOException {
         final String plainSQL = "SELECT " + MASTER_UNQUALIFIED + ".*, " + CHILD_UNQUALIFIED
                 + ".DESCRIPTION FROM " + MASTER_UNQUALIFIED + ", " + CHILD_UNQUALIFIED + " WHERE "
                 + CHILD_UNQUALIFIED + ".MASTER_ID = " + MASTER_UNQUALIFIED + ".ID";
@@ -326,7 +340,7 @@ public class SDEJavaApiJoinTest extends TestCase {
         assertNotNull(fs);
 
         String cqlQuery = "NAME='name2' OR DESCRIPTION='description4'";
-        Filter filter = (Filter) ExpressionBuilder.parse(cqlQuery);
+        Filter filter = (Filter) CQL.toFilter(cqlQuery);
         DefaultQuery query = new DefaultQuery(typeName, filter);
 
         Envelope bounds = fs.getBounds(query);
@@ -357,7 +371,7 @@ public class SDEJavaApiJoinTest extends TestCase {
         assertNotNull(fs);
 
         String cqlQuery = "NAME='name2' OR DESCRIPTION='description4'";
-        Filter filter = (Filter) ExpressionBuilder.parse(cqlQuery);
+        Filter filter = (Filter) CQL.toFilter(cqlQuery);
         DefaultQuery query = new DefaultQuery(typeName, filter);
 
         int count = fs.getCount(query);
@@ -392,7 +406,7 @@ public class SDEJavaApiJoinTest extends TestCase {
         store.registerView(typeName, masterChildSql);
 
         String cqlQuery = "NAME='name2' OR DESCRIPTION='description6'";
-        Filter filter = (Filter) ExpressionBuilder.parse(cqlQuery);
+        Filter filter = (Filter) CQL.toFilter(cqlQuery);
         DefaultQuery query = new DefaultQuery(typeName, filter);
 
         FeatureSource fs = store.getFeatureSource(typeName);
@@ -638,71 +652,81 @@ public class SDEJavaApiJoinTest extends TestCase {
         }
     }
 
-    private void createMasterTable() throws Exception {
+    private void createMasterTable() throws SeException, DataSourceException,
+            UnavailableArcSDEConnectionException {
         ArcSDEConnectionPool connPool = store.getConnectionPool();
         ArcSDEPooledConnection conn = connPool.getConnection();
-
         SeTable table = new SeTable(conn, MASTER);
-
+        SeLayer layer = null;
         try {
-            table.delete();
-        } catch (SeException e) {
-            // no-op, table didn't existed
+
+            try {
+                table.delete();
+            } catch (SeException e) {
+                // no-op, table didn't existed
+            }
+
+            SeColumnDefinition[] colDefs = new SeColumnDefinition[2];
+
+            layer = new SeLayer(conn);
+            layer.setTableName(MASTER);
+
+            colDefs[0] = new SeColumnDefinition("ID", SeColumnDefinition.TYPE_INT32, 10, 0, false);
+            colDefs[1] = new SeColumnDefinition("NAME", SeColumnDefinition.TYPE_STRING, 255, 0,
+                    false);
+
+            table.create(colDefs, "DEFAULTS");
+
+            layer.setSpatialColumnName("SHAPE");
+            layer.setShapeTypes(SeLayer.SE_POINT_TYPE_MASK);
+            layer.setGridSizes(1100.0, 0.0, 0.0);
+            layer.setDescription("Geotools sde pluing join support testing master table");
+            SeCoordinateReference coordref = new SeCoordinateReference();
+            coordref.setCoordSysByDescription(testCrs.toWKT());
+            layer.create(3, 4);
+
+            insertMasterData(conn, layer);
+        } finally {
+            conn.close();
         }
-
-        SeColumnDefinition[] colDefs = new SeColumnDefinition[2];
-
-        SeLayer layer = new SeLayer(conn);
-        layer.setTableName(MASTER);
-
-        colDefs[0] = new SeColumnDefinition("ID", SeColumnDefinition.TYPE_INTEGER, 10, 0, false);
-        colDefs[1] = new SeColumnDefinition("NAME", SeColumnDefinition.TYPE_STRING, 255, 0, false);
-
-        table.create(colDefs, "DEFAULTS");
-
-        layer.setSpatialColumnName("SHAPE");
-        layer.setShapeTypes(SeLayer.SE_POINT_TYPE_MASK);
-        layer.setGridSizes(1100.0, 0.0, 0.0);
-        layer.setDescription("Geotools sde pluing join support testing master table");
-        SeCoordinateReference coordref = new SeCoordinateReference();
-        coordref.setCoordSysByDescription(testCrs.toWKT());
-        layer.create(3, 4);
-
-        insertMasterData(conn, layer);
-        conn.close();
         LOGGER.info("successfully created master table " + layer.getQualifiedName());
     }
 
-    private void createChildTable() throws Exception {
+    private void createChildTable() throws DataSourceException,
+            UnavailableArcSDEConnectionException, SeException {
         ArcSDEConnectionPool connPool = store.getConnectionPool();
         ArcSDEPooledConnection conn = connPool.getConnection();
-
         SeTable table = new SeTable(conn, CHILD);
         try {
-            table.delete();
-        } catch (SeException e) {
-            // no-op, table didn't existed
+            try {
+                table.delete();
+            } catch (SeException e) {
+                // no-op, table didn't existed
+            }
+
+            SeColumnDefinition[] colDefs = new SeColumnDefinition[4];
+
+            colDefs[0] = new SeColumnDefinition("ID", SeColumnDefinition.TYPE_INTEGER, 10, 0, false);
+            colDefs[1] = new SeColumnDefinition("MASTER_ID", SeColumnDefinition.TYPE_INTEGER, 10,
+                    0, false);
+            colDefs[2] = new SeColumnDefinition("NAME", SeColumnDefinition.TYPE_STRING, 255, 0,
+                    false);
+            colDefs[3] = new SeColumnDefinition("DESCRIPTION", SeColumnDefinition.TYPE_STRING, 255,
+                    0, false);
+
+            table.create(colDefs, "DEFAULTS");
+
+            /*
+             * SeRegistration tableRegistration = new SeRegistration(conn,
+             * CHILD);
+             * tableRegistration.setRowIdColumnType(SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_USER);
+             * tableRegistration.setRowIdColumnName("ID");
+             * tableRegistration.alter();
+             */
+            insertChildData(conn, table);
+        } finally {
+            conn.close();
         }
-
-        SeColumnDefinition[] colDefs = new SeColumnDefinition[4];
-
-        colDefs[0] = new SeColumnDefinition("ID", SeColumnDefinition.TYPE_INTEGER, 10, 0, false);
-        colDefs[1] = new SeColumnDefinition("MASTER_ID", SeColumnDefinition.TYPE_INTEGER, 10, 0,
-                false);
-        colDefs[2] = new SeColumnDefinition("NAME", SeColumnDefinition.TYPE_STRING, 255, 0, false);
-        colDefs[3] = new SeColumnDefinition("DESCRIPTION", SeColumnDefinition.TYPE_STRING, 255, 0,
-                false);
-
-        table.create(colDefs, "DEFAULTS");
-
-        /*
-         * SeRegistration tableRegistration = new SeRegistration(conn, CHILD);
-         * tableRegistration.setRowIdColumnType(SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_USER);
-         * tableRegistration.setRowIdColumnName("ID");
-         * tableRegistration.alter();
-         */
-        insertChildData(conn, table);
-        conn.close();
 
         LOGGER.info("successfully created child table " + CHILD);
     }
@@ -725,9 +749,10 @@ public class SDEJavaApiJoinTest extends TestCase {
      * </pre>
      * 
      * @param conn
+     * @throws SeException 
      * @throws Exception
      */
-    private void insertMasterData(ArcSDEPooledConnection conn, SeLayer layer) throws Exception {
+    private void insertMasterData(ArcSDEPooledConnection conn, SeLayer layer) throws SeException{
         SeInsert insert = null;
 
         SeCoordinateReference coordref = layer.getCoordRef();
@@ -780,9 +805,10 @@ public class SDEJavaApiJoinTest extends TestCase {
      * 
      * @param conn
      * @param table
+     * @throws SeException 
      * @throws Exception
      */
-    private void insertChildData(ArcSDEPooledConnection conn, SeTable table) throws Exception {
+    private void insertChildData(ArcSDEPooledConnection conn, SeTable table) throws SeException{
         SeInsert insert = null;
 
         final String[] columns = { "ID", "MASTER_ID", "NAME", "DESCRIPTION" };

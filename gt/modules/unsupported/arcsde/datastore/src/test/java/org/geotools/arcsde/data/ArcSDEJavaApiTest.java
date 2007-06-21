@@ -20,10 +20,10 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import junit.framework.TestCase;
+
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
-
-import junit.framework.TestCase;
 
 import com.esri.sde.sdk.client.SDEPoint;
 import com.esri.sde.sdk.client.SeColumnDefinition;

@@ -47,7 +47,6 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.FilterFilter;
 import org.geotools.gml.GMLFilterDocument;
 import org.geotools.gml.GMLFilterGeometry;
-import org.geotools.referencing.CRS;
 import org.opengis.filter.And;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
@@ -57,13 +56,9 @@ import org.opengis.filter.spatial.BBOX;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.helpers.ParserAdapter;
 
-import com.esri.sde.sdk.client.SeLayer;
 import com.esri.sde.sdk.pe.PeFactory;
-import com.esri.sde.sdk.pe.PeParameters;
 import com.esri.sde.sdk.pe.PeProjectedCS;
 import com.esri.sde.sdk.pe.PeProjectionException;
-import com.esri.sde.sdk.pe.PeUnit;
-import com.esri.sde.sdk.pe.PeUnitsDefs;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -145,7 +140,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         LOGGER.fine("testFinder OK :" + sdeDs.getClass().getName());
     }
     
-    public void testAutoFillSRS() throws Throwable {
+    public void _testAutoFillSRS() throws Throwable {
         
         ArcSDEDataStore ds = this.testData.getDataStore();
         CoordinateReferenceSystem sdeCRS = ds.getSchema("GISDATA.TOWNS_POLY").getDefaultGeometry().getCoordinateSystem();

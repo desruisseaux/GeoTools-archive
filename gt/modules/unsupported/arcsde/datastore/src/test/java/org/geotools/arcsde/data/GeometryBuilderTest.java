@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
-import org.geotools.arcsde.data.ArcSDEGeometryBuilder;
 import org.geotools.data.DataSourceException;
 
 import com.esri.sde.sdk.client.SDEPoint;

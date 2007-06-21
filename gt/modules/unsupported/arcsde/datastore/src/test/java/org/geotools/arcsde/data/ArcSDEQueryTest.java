@@ -21,9 +21,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import org.geotools.arcsde.data.ArcSDEDataStore;
-import org.geotools.arcsde.data.ArcSDEQuery;
-import org.geotools.data.DataStore;
+import junit.framework.TestCase;
+
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
@@ -33,10 +32,7 @@ import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Id;
 
 import com.esri.sde.sdk.client.SeConnection;
-import com.esri.sde.sdk.client.SeException;
 import com.vividsolutions.jts.geom.Envelope;
-
-import junit.framework.TestCase;
 
 
 /**
