@@ -453,11 +453,8 @@ public class CompositeCurveImpl extends CompositeImpl<OrientableCurveImpl>
 	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getDimension(org.opengis.geometry.coordinate.DirectPosition)
 	 */
 	public int getDimension(DirectPosition point) {
-		// TODO semantic SJ, JR
-		// TODO implementation
-		// TODO test
 		// TODO documentation
-		return 0;
+		return 1;
 	}
 
 	/* (non-Javadoc)

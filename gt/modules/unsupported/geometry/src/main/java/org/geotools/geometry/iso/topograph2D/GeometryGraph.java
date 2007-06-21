@@ -271,8 +271,10 @@ public class GeometryGraph extends PlanarGraph {
 			this.addCurve((CurveImpl) g);
 		else if (g instanceof CurveBoundaryImpl)
 			this.addCurveBoundary((CurveBoundaryImpl) g);
-		else if (g instanceof RingImpl)
+		else if (g instanceof RingImpl) {
+			System.out.println("ring called");
 			this.addRing((RingImpl) g);
+		}
 		else if (g instanceof SurfaceImpl)
 			this.addSurface((SurfaceImpl) g);
 		else if (g instanceof SurfaceBoundaryImpl)
@@ -558,7 +560,7 @@ public class GeometryGraph extends PlanarGraph {
 
 		// optimized test for Polygons and Rings
 		if (!computeRingSelfNodes
-			&& (parentGeom instanceof Curve
+			&& (parentGeom instanceof Ring
 			|| parentGeom instanceof Surface
 		  	|| parentGeom instanceof MultiPrimitive)) {
 		// TODO auskommentiert; checken!

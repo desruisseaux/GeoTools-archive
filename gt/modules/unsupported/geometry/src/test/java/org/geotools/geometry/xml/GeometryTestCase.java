@@ -74,6 +74,10 @@ public class GeometryTestCase implements Test {
         operationList.remove(op);
     }
     
+    public int getOperationCount() {
+        return operationList.size();
+    }
+    
     public GeometryTestOperation findTestOperation(String name) {
         Iterator<GeometryTestOperation> operations = operationList.iterator();
         while (operations.hasNext()) {

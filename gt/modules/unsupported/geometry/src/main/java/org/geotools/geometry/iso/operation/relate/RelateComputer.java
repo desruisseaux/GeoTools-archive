@@ -140,6 +140,11 @@ public class RelateComputer {
 	 */
 	public IntersectionMatrix computeIM() {
 		
+		Iterator edgeIterator = arg[0].getEdgeIterator();
+		while (edgeIterator.hasNext()) {
+			Edge e = (Edge) edgeIterator.next();
+		}
+		
 		IntersectionMatrix tIM = new IntersectionMatrix();
 		
 		// since Geometries are finite and embedded in a 2-D space, the EE
