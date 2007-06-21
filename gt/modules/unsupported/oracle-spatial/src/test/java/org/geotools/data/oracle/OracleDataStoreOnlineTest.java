@@ -456,11 +456,13 @@ public class OracleDataStoreOnlineTest extends TestCase {
     }
     
     public void testGeometryType() throws IOException {
+        if( conn == null ) return; 
         FeatureType ft = dstore.getSchema("ORA_TEST_POINTS");
         assertEquals(Point.class, ft.getDefaultGeometry().getType());
     }
     
     public void testGeometryType2() throws IOException {
+        if( conn == null ) return; 
         // here we did not declare a type
         FeatureType ft = dstore.getSchema("ORA_TEST_LINES");
         assertEquals(Geometry.class, ft.getDefaultGeometry().getType());
