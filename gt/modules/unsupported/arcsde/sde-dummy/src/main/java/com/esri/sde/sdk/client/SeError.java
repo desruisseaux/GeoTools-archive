@@ -3,7 +3,7 @@ package com.esri.sde.sdk.client;
 public class SeError {
 
 	public String getErrDesc() { return null; }
-	public String getSdeError() { return null; }
+	public int getSdeError() { return -1; }
 	public String getSdeErrMsg() { return null; }
 	public int getExtError(){return 0;}
 }

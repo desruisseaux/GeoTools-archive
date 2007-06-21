@@ -10,7 +10,7 @@ public class SeQuery {
 	public static /* GEOT-947 final*/ int SE_OPTIMIZE = 0;
 	
 	public void prepareQuery() {}
-	public void prepareQueryInfo(SeQueryInfo i) {}
+	public void prepareQueryInfo(SeQueryInfo i)throws SeException {}
 	public SeExtent calculateLayerExtent(SeQueryInfo i) { return null; }
 	public void close() throws SeException {}
 	public void execute()throws SeException {}

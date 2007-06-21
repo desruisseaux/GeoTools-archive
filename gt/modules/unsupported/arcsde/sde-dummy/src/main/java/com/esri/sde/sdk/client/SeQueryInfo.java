@@ -7,5 +7,6 @@ public class SeQueryInfo {
 	public void setByClause(String s) {}
 	public String getByClause() { return null; }
 	public SeSqlConstruct getConstruct() throws SeException { return null; }
+    public String[] getColumns() { return null; }
 
 }
