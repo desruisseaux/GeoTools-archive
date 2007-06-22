@@ -101,6 +101,19 @@ public class EqualIntervalFunctionTest extends FunctionTestSupport {
         //try again with foo        
     }
 
+    /** FIXME: Please for the love on binpop */
+    public void XtestEvaulateWithStrings() throws Exception {
+        org.opengis.filter.expression.Expression function = ff.function("EqualInterval", ff.property("group"), ff.literal(5)  );
+        Classifier classifier = (Classifier) function.evaluate( featureCollection );
+        assertNotNull( classifier );
+
+        Classifier classifier2 = (Classifier) function.evaluate( featureCollection, Classifier.class );
+        assertNotNull( classifier2 );
+        
+        Integer number = (Integer) function.evaluate( featureCollection, Integer.class );
+        assertNull( number );
+    }
+    
     public void testUpgradeExample(){
         Function function = ff.function("equalInterval", ff.property("foo"), ff.literal(12));        
         Object value = function.evaluate(featureCollection);

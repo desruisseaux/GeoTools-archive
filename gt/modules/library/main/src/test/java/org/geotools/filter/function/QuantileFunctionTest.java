@@ -96,7 +96,17 @@ public class QuantileFunctionTest extends FunctionTestSupport {
         assertEquals("4..20", ranged.getTitle(0));
         assertEquals("20..90", ranged.getTitle(1));
     }
-    
+    public void testEvaluateWithStrings() throws Exception {
+        org.opengis.filter.expression.Expression function = ff.function("Quantile", ff.property("group"), ff.literal(2)  );
+        Classifier classifier = (Classifier) function.evaluate( featureCollection );
+        assertNotNull( classifier );
+
+        Classifier classifier2 = (Classifier) function.evaluate( featureCollection, Classifier.class );
+        assertNotNull( classifier2 );
+        
+        Integer number = (Integer) function.evaluate( featureCollection, Integer.class );
+        assertNull( number );
+    }
     public void xtestNullNaNHandling() throws Exception {
     	//setup
     	FunctionExpression func = fac.createFunctionExpression("Quantile");

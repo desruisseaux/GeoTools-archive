@@ -115,7 +115,9 @@ public class EqualIntervalFunction extends ClassificationFunction {
         List result = uniqueVisit.getResult().toList();
         //sort the results and put them in an array
         Collections.sort(result);
-        Comparable[] values = (Comparable[]) result.toArray();
+        
+        Comparable[] values = (Comparable[]) result.toArray( new Comparable[ result.size()]);
+        
         //size arrays
         Comparable[] localMin = new Comparable[classNum];
         Comparable[] localMax = new Comparable[classNum];
@@ -137,19 +139,19 @@ public class EqualIntervalFunction extends ClassificationFunction {
         //for each bin
         for (int binIndex = 0; binIndex < classNum; binIndex++) {
             //store min
-            localMin[binIndex] = (Comparable) values[itemIndex];
+            localMin[binIndex] = values[itemIndex];
             itemIndex+=binPop;
             //store max
             if (binIndex == classNum - 1) {
-                localMax[binIndex] = (Comparable) values[itemIndex];
+                localMax[binIndex] = values[itemIndex];                
             } else {
-                localMax[binIndex] = (Comparable) values[itemIndex+1];
+                localMax[binIndex] = values[itemIndex+1];                
             }
             if (lastBigBin == binIndex)
                 binPop--; // decrease the number of items in a bin for the
                             // next iteration
         }
-        return null;
+        return new RangedClassifier(localMin, localMax);
     }
 
     public Object evaluate( Object object ) {

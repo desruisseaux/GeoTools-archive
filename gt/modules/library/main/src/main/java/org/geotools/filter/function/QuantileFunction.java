@@ -16,6 +16,7 @@
 package org.geotools.filter.function;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -121,8 +122,9 @@ public class QuantileFunction extends ClassificationFunction {
     private Object calculateNonNumerical(List[] bin) {
         int classNum = bin.length;
         //it's a string.. leave it be (just copy the values)
-        Set[] values = new Set[classNum];
+        Set[] values = new Set[classNum];        
         for (int i = 0; i < classNum; i++) {
+            values[i] = new HashSet();
             Iterator iterator = bin[i].iterator();
             while (iterator.hasNext()) {
                 values[i].add(iterator.next());

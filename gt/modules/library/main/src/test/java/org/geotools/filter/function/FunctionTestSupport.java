@@ -19,6 +19,8 @@ package org.geotools.filter.function;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.data.memory.MemoryDataStore;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
 import org.geotools.feature.Feature;
 import junit.framework.TestCase;
 import org.geotools.feature.FeatureCollection;
@@ -26,6 +28,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.filter.ExpressionBuilder;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
+import org.opengis.filter.FilterFactory2;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -39,6 +42,7 @@ public class FunctionTestSupport extends TestCase {
     
     protected FeatureCollection featureCollection;
     protected FilterFactory fac = FilterFactoryFinder.createFilterFactory();
+    protected FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(GeoTools.getDefaultHints());
     protected ExpressionBuilder builder = new ExpressionBuilder();
     protected FeatureType dataType;
     protected Feature[] testFeatures;
@@ -51,7 +55,7 @@ public class FunctionTestSupport extends TestCase {
     
     protected void setUp() throws java.lang.Exception {
         dataType = DataUtilities.createType("classification.test1",
-                "id:0,foo:int,bar:double,geom:Point");
+                "id:0,foo:int,bar:double,geom:Point,group:String");
         
         int iVal[] = new int[]{4,90,20,43,29,61,8,12};
         double dVal[] = new double[]{2.5,80.433,24.5,9.75,18,53,43.2,16};
@@ -60,11 +64,12 @@ public class FunctionTestSupport extends TestCase {
         GeometryFactory fac=new GeometryFactory();
         
         for(int i=0; i< iVal.length; i++){
-            testFeatures[i] = dataType.create(new Object[] {
-                new Integer(i+1),
+            testFeatures[i] = dataType.create( new Object[] {
+                        new Integer(i+1),
                         new Integer(iVal[i]),
                         new Double(dVal[i]),
-                        fac.createPoint(new Coordinate( iVal[i], iVal[i]))
+                        fac.createPoint(new Coordinate( iVal[i], iVal[i])),
+                        "Group"+(i%4)
             },"classification.t"+(i+1));
         }
         
