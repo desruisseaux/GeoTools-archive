@@ -17,19 +17,25 @@
 package org.geotools.image.io.metadata;
 
 // J2SE dependencies
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Locale;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import javax.imageio.metadata.IIOMetadata;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Errors;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 // Geotools dependencies
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.util.LoggedFormat;
 import org.geotools.util.NumberRange;
 
 
@@ -86,7 +92,7 @@ public class MetadataAccessor {
     }
 
     /**
-     * Returns child nodes at the given path. This method is for {@link #getChild(String)}
+     * Returns child nodes at the given path. This method is for {@link #getElements(String)}
      * implementation only, and invokes itself recursively.
      */
     private static void getElements(final Node parent, final String path, final int base,
@@ -134,7 +140,7 @@ public class MetadataAccessor {
      *   <li>{@code "GridGeometry/Envelope"}</li>
      * </ul>
      */
-    private Element getElement(final String path) {
+    protected Element getElement(final String path) {
         final List elements = getElements(path);
         final int count = elements.size();
         switch (count) {
@@ -171,10 +177,10 @@ public class MetadataAccessor {
 
     /**
      * Returns a node attribute as an integer, or {@code null} if none. If the attribute can't
-     * be parsed as an integer, then this method log a warning and returns {@code null}.
+     * be parsed as an integer, then this method logs a warning and returns {@code null}.
      *
      * @param  node The node, usually obtained by a call to {@link #getElement}.
-     * @param  attribute The attribute to fetch from the above node (e.g. {@code "name"}).
+     * @param  attribute The attribute to fetch from the above node (e.g. {@code "minimum"}).
      * @return The attribute value, or {@code null} if none or unparseable.
      */
     protected Integer getInteger(final Element node, final String attribute) {
@@ -182,18 +188,71 @@ public class MetadataAccessor {
         if (value != null) try {
             return Integer.valueOf(value);
         } catch (NumberFormatException e) {
-            log("getInteger", ErrorKeys.NOT_AN_INTEGER_$1, value);
+            log("getInteger", ErrorKeys.UNPARSABLE_NUMBER_$1, value);
         }
         return null;
     }
 
     /**
-     * Convenience method for logging a warning.
+     * Returns a node attribute as a floating point, or {@code null} if none. If the attribute
+     * can't be parsed as a floating point, then this method logs a warning and returns {@code null}.
+     *
+     * @param  node The node, usually obtained by a call to {@link #getElement}.
+     * @param  attribute The attribute to fetch from the above node (e.g. {@code "minimum"}).
+     * @return The attribute value, or {@code null} if none or unparseable.
+     */
+    protected Double getDouble(final Element node, final String attribute) {
+        final String value = getString(node, attribute);
+        if (value != null) try {
+            return Double.valueOf(value);
+        } catch (NumberFormatException e) {
+            log("getDouble", ErrorKeys.UNPARSABLE_NUMBER_$1, value);
+        }
+        return null;
+    }
+
+    /**
+     * Returns a node attribute as a date, or {@code null} if none. If the attribute can't
+     * be parsed as a date, then this method logs a warning and returns {@code null}.
+     *
+     * @param  node The node, usually obtained by a call to {@link #getElement}.
+     * @param  attribute The attribute to fetch from the above node (e.g. {@code "origin"}).
+     * @return The attribute value, or {@code null} if none or unparseable.
+     */
+    protected Date getDate(final Element node, final String attribute) {
+        final String value = getString(node, attribute);
+        if (value != null) {
+            final LoggedFormat format = (LoggedFormat) dateFormat.get();
+            return (Date) format.parse(value);
+        }
+        return null;
+    }
+
+    /**
+     * A parser and formatter for {@link Date} objects. We use one instance per thread in order
+     * to avoid synchronization issues. The parser is used by {@link GeographicMetadata} and by
+     * {@link MetadataAccessor}. It is part of the {@link GeographicMetadataFormat} definition.
+     */
+    static final ThreadLocal/*<LoggedFormat<Date>>*/ dateFormat = new ThreadLocal() {
+        //@Override
+        protected Object initialValue() {
+            final DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+            format.setTimeZone(TimeZone.getTimeZone("UTC"));
+            final LoggedFormat logged = LoggedFormat.getInstance(format, Date.class);
+            logged.setLogger("org.geotools.image.io.metadata");
+            logged.setCaller(MetadataAccessor.class, "getDate");
+            return logged;
+        }
+    };
+
+    /**
+     * Convenience method for logging a warning. Do not allow overriding, because
+     * it would not work for warnings emitted by the {@link #getDate} method.
      */
     private static void log(final String method, final int key, final Object value) {
         final LogRecord record = Errors.getResources(null).getLogRecord(Level.WARNING, key, value);
         record.setSourceClassName(MetadataAccessor.class.getName());
         record.setSourceMethodName(method);
-        Logger.getLogger("org.geotools.image.io").log(record);
+        Logger.getLogger("org.geotools.image.io.metadata").log(record);
     }
 }

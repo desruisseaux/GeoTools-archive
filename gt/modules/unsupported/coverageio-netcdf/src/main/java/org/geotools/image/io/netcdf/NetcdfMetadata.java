@@ -17,26 +17,34 @@
 package org.geotools.image.io.netcdf;
 
 // J2SE dependencies
+import java.text.DateFormat;
+import java.text.Format;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 // OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection;
 
 // NetCDF dependencies
 import ucar.nc2.Variable;
+import ucar.nc2.Attribute;
 import ucar.nc2.dataset.AxisType;
 import ucar.nc2.dataset.CoordinateAxis;
 import ucar.nc2.dataset.CoordinateAxis1D;
 import ucar.nc2.dataset.CoordinateSystem;
-import ucar.nc2.dataset.EnhanceScaleMissing;
 import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.dataset.VariableDS;
 
 // Geotools dependencies
 import org.geotools.image.io.metadata.GeographicMetadata;
 import org.geotools.image.io.metadata.GeographicMetadataFormat;
+import org.geotools.util.LoggedFormat;
 
 
 /**
@@ -64,7 +72,7 @@ public class NetcdfMetadata extends GeographicMetadata {
     /**
      * The mapping between UCAR axis type and ISO axis directions.
      */
-    private static final Map/*<AxisType,AxisDirection>*/ DIRECTIONS = new HashMap();
+    private static final Map/*<AxisType,AxisDirection>*/ DIRECTIONS = new HashMap(16);
     static {
         add(AxisType.Time,     AxisDirection.FUTURE);
         add(AxisType.GeoX,     AxisDirection.EAST);
@@ -116,8 +124,10 @@ public class NetcdfMetadata extends GeographicMetadata {
     /**
      * Adds the specified coordinate system. Current implementation can adds at most one
      * coordinate system, but this limitation may be revisited in a future Geotools version.
+     *
+     * @param cs The coordinate system to add.
      */
-    protected void addCoordinateSystem(final CoordinateSystem cs) {
+    public void addCoordinateSystem(final CoordinateSystem cs) {
         String crsType, csType;
         if (cs.isLatLon()) {
             crsType = cs.hasVerticalAxis() ? GeographicMetadataFormat.GEOGRAPHIC_3D
@@ -161,8 +171,12 @@ public class NetcdfMetadata extends GeographicMetadata {
     /**
      * Adds the specified coordinate axis. This method is invoked recursively
      * by {@link #addCoordinateSystem}.
+     *
+     * @param axis The axis to add.
      */
-    protected void addCoordinateAxis(final CoordinateAxis axis) {
+    public void addCoordinateAxis(final CoordinateAxis axis) {
+        final String name = getName(axis);
+        final AxisType type = axis.getAxisType();
         /*
          * Gets the axis direction, taking in account the possible reversal or vertical axis.
          * Note that geographic and projected CRS have the same directions. We can distinguish
@@ -170,18 +184,39 @@ public class NetcdfMetadata extends GeographicMetadata {
          * ("ellipsoidal" or "cartesian") or the units ("degrees" or "m").
          */
         String direction = null;
-        AxisDirection dir = (AxisDirection) DIRECTIONS.get(axis.getAxisType());
-        if (dir != null) {
+        AxisDirection directionCode = (AxisDirection) DIRECTIONS.get(type);
+        if (directionCode != null) {
             if (CoordinateAxis.POSITIVE_DOWN.equalsIgnoreCase(axis.getPositive())) {
-                dir = dir.opposite();
+                directionCode = directionCode.opposite();
             }
-            direction = dir.name();
+            direction = directionCode.name();
         }
         /*
-         * Gets the axis units and add to the coordinate system.
+         * Gets the axis units and origin. In the particular case of time axis, units are typically
+         * written in the form "days since 1990-01-01 00:00:00". We extract the part before "since"
+         * as the units and the part after "since" as the date.
          */
-        final String units = axis.getUnitsString();
-        addAxis(getName(axis), direction, units);
+        String units = axis.getUnitsString();
+        if (AxisType.Time.equals(type)) {
+            String origin = null;
+            final String[] unitsParts = units.split("(?i)\\s+since\\s+");
+            if (unitsParts.length == 2) {
+                units  = unitsParts[0].trim();
+                origin = unitsParts[1].trim();
+            } else {
+                final Attribute attribute = axis.findAttribute("time_origin");
+                if (attribute != null) {
+                    origin = attribute.getStringValue();
+                }
+            }
+            Date epoch = null;
+            if (origin != null) {
+                epoch = (Date) parse(type, origin, Date.class, "addCoordinateAxis");
+            }
+            addTimeAxis(name, direction, units, epoch);
+        } else {
+            addAxis(name, direction, units);
+        }
         /*
          * If the axis is not numeric, we can't process any further.
          * If it is, then adds the coordinate and index ranges.
@@ -207,8 +242,10 @@ public class NetcdfMetadata extends GeographicMetadata {
 
     /**
      * Adds sample dimension information for the specified variable.
+     *
+     * @param variable The variable to add as a sample dimension.
      */
-    protected void addSampleDimension(final VariableDS variable) {
+    public void addSampleDimension(final VariableDS variable) {
         final VariableMetadata m;
         if (USE_UCAR_LIB) {
             m = new VariableMetadata(variable);
@@ -216,6 +253,49 @@ public class NetcdfMetadata extends GeographicMetadata {
             m = new VariableMetadata(variable, forcePacking("valid_range"));
         }
         addSampleDimension(getName(variable), m.scale, m.offset, m.minimum, m.maximum, m.missingValues);
+    }
+
+    /**
+     * Parses the given string as a value along the specified axis.
+     * 
+     * @param  type     The type of the axis.
+     * @param  value    The value along that axis.
+     * @param  expected The expected type.
+     * @return The value after parsing.
+     */
+    private Object /*<T>*/ parse(final AxisType type, String value,
+                                 final Class/*<T>*/ expected, final String caller)
+    {
+        final LoggedFormat format = LoggedFormat.getInstance(getAxisFormat(type), expected);
+        format.setLogger("org.geotools.image.io.netcdf");
+        format.setCaller(NetcdfMetadata.class, caller);
+        return format.parse(value);
+    }
+
+    /**
+     * Returns a format to use for parsing values along the specified axis type. This method
+     * is invoked when parsing the date part of axis units like "<cite>days since 1990-01-01
+     * 00:00:00</cite>". Subclasses should override this method if the date part is formatted
+     * in a different way. The default implementation returns the following formats:
+     * <p>
+     * <ul>
+     *   <li>For {@linkplain AxisType#Time time axis}, a {@link DateFormat} using the
+     *       {@code "yyyy-MM-dd HH:mm:ss"} pattern in UTC {@linkplain TimeZone timezone}.</li>
+     *   <li>For all other kind of axis, a {@link NumberFormat} for
+     *       {@linkplain Locale#US US locale}.</li>
+     * </ul>
+     * 
+     * @param  type The type of the axis.
+     * @return The format for parsing values along the axis.
+     */
+    protected Format getAxisFormat(final AxisType type) {
+        if (type.equals(AxisType.Time)) {
+            final DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+            format.setTimeZone(TimeZone.getTimeZone("UTC"));
+            return format;
+        } else {
+            return NumberFormat.getNumberInstance(Locale.US);
+        }
     }
 
     /**

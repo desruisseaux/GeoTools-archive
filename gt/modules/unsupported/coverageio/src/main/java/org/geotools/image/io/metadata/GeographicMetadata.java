@@ -17,6 +17,8 @@
 package org.geotools.image.io.metadata;
 
 // J2SE dependencies
+import java.text.Format;
+import java.util.Date;
 import javax.imageio.metadata.IIOInvalidTreeException;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.metadata.IIOMetadataNode;
@@ -89,8 +91,8 @@ public class GeographicMetadata extends IIOMetadata {
      * Creates a default metadata instance. This constructor defines no standard or native format.
      * The only format defined is the {@linkplain GeographicMetadataFormat geographic} one.
      */
-    public GeographicMetadata() {
-        super(false, // Can not return or accept a DOM tree using the standard metadata format.
+    protected GeographicMetadata() {
+        this(false, // Can not return or accept a DOM tree using the standard metadata format.
               null,  // There is no native metadata format.
               null,  // There is no native metadata format.
               new String[] {
@@ -99,6 +101,34 @@ public class GeographicMetadata extends IIOMetadata {
               new String[] {
                   "org.geotools.image.io.metadata.GeographicMetadataFormat"
               });
+    }
+
+    /**
+     * Constructs a geographic metadata instance with the given format names and format class names.
+     * This constructor passes the arguments to the {@linkplain IIOMetadata#IIOMetadata(boolean,
+     * String, String, String[], String[]) super-class constructor} unchanged.
+     *
+     * @param standardMetadataFormatSupported {@code true} if this object can return or accept
+     *        a DOM tree using the standard metadata format.
+     * @param nativeMetadataFormatName The name of the native metadata, or {@code null} if none.
+     * @param nativeMetadataFormatClassName The name of the class of the native metadata format,
+     *        or {@code null} if none.
+     * @param extraMetadataFormatNames Additional formats supported by this object,
+     *        or {@code null} if none.
+     * @param extraMetadataFormatClassNames The class names of any additional formats
+     *        supported by this object, or {@code null} if none.
+     */
+    protected GeographicMetadata(final boolean  standardMetadataFormatSupported,
+                                 final String   nativeMetadataFormatName,
+                                 final String   nativeMetadataFormatClassName,
+                                 final String[] extraMetadataFormatNames,
+                                 final String[] extraMetadataFormatClassNames)
+    {
+        super(standardMetadataFormatSupported,
+              nativeMetadataFormatName,
+              nativeMetadataFormatClassName,
+              extraMetadataFormatNames,
+              extraMetadataFormatClassNames);
         reset();
     }
 
@@ -110,11 +140,35 @@ public class GeographicMetadata extends IIOMetadata {
     }
 
     /**
+     * Set the attribute to the specified enumeration value,
+     * or remove the attribute if the value is null.
+     *
+     * @param node  The node on which to set the attribute.
+     * @param name  The attribute name.
+     * @param value The attribute value.
+     */
+    private static void setEnum(final Element node, final String name, final String value) {
+        setAttribute(node, name, value, true);
+    }
+
+    /**
      * Set the attribute to the specified value, or remove the attribute if the value is null.
      *
      * @param node  The node on which to set the attribute.
      * @param name  The attribute name.
      * @param value The attribute value.
+     */
+    private static void setAttribute(final Element node, final String name, final String value) {
+        setAttribute(node, name, value, false);
+    }
+
+    /**
+     * Set the attribute to the specified value, or remove the attribute if the value is null.
+     *
+     * @param node       The node on which to set the attribute.
+     * @param name       The attribute name.
+     * @param value      The attribute value.
+     * @param isCodeList Reformat the value if it is a code list.
      */
     private static void setAttribute(final Element node, final String name, String value, boolean isCodeList) {
         if (value == null || (value=value.trim()).length() == 0) {
@@ -147,6 +201,24 @@ public class GeographicMetadata extends IIOMetadata {
     }
 
     /**
+     * Set the attribute to the specified value, or remove the attribute if the value is NaN.
+     *
+     * @param node  The node on which to set the attribute.
+     * @param name  The attribute name.
+     * @param value The attribute value.
+     */
+    private static void setAttribute(final Element node, final String name, final Date value) {
+        if (value == null) {
+            if (node.hasAttribute(name)) {
+                node.removeAttribute(name);
+            }
+        } else {
+            final Format format = (Format) MetadataAccessor.dateFormat.get();
+            node.setAttribute(name, format.format(value));
+        }
+    }
+
+    /**
      * Set the coordinate reference system to the specified value.
      *
      * @param name The coordinate reference system name, or {@code null} if unknown.
@@ -159,8 +231,8 @@ public class GeographicMetadata extends IIOMetadata {
             crs = new IIOMetadataNode("CoordinateReferenceSystem");
             root.appendChild(crs);
         }
-        setAttribute(crs, "name", name, false);
-        setAttribute(crs, "type", type, false);
+        setAttribute(crs, "name", name);
+        setAttribute(crs, "type", type);
     }
 
     /**
@@ -176,7 +248,7 @@ public class GeographicMetadata extends IIOMetadata {
             datum = new IIOMetadataNode("Datum");
             crs.appendChild(datum);
         }
-        setAttribute(datum, "name", name, false);
+        setAttribute(datum, "name", name);
     }
 
     /**
@@ -195,12 +267,12 @@ public class GeographicMetadata extends IIOMetadata {
             cs = new IIOMetadataNode("CoordinateSystem");
             crs.appendChild(cs);
         }
-        setAttribute(cs, "name", name, false);
-        setAttribute(cs, "type", type, false);
+        setAttribute(cs, "name", name);
+        setAttribute(cs, "type", type);
     }
 
     /**
-     * Add an axis to the the coordinate system.
+     * Adds an axis to the the coordinate system.
      *
      * @param name The axis name, or {@code null} if unknown.
      * @param direction The axis direction (usually {@code "east"}, {@code "weast"},
@@ -210,14 +282,43 @@ public class GeographicMetadata extends IIOMetadata {
      *
      * @see org.opengis.referencing.cs.AxisDirection
      */
-    public void addAxis(final String name, final String direction, final String units) {
+    public void addAxis(final String name,  final String direction, final String units) {
+        addAxis(name, direction, units, null);        
+    }
+
+    /**
+     * Adds a time axis to the the coordinate system.
+     *
+     * @param name The axis name, or {@code null} if unknown.
+     * @param direction The axis direction, or {@code null} if unknown.
+     * @param units The axis units symbol, or {@code null} if unknown.
+     * @param origin The {@linkplain org.opengis.referencing.datum.TemporalDatum#getOrigin epoch},
+     *        or {@code null} if unknown.
+     *
+     * @see org.opengis.referencing.cs.AxisDirection
+     */
+    public void addTimeAxis(final String name,  final String direction,
+                            final String units, final Date   origin)
+    {
+        addAxis(name, direction, units, origin);
+    }
+
+    /**
+     * Implementation of {@link #addAxis} and {@link #addTimeAxis}. Provided as a separated private
+     * method in order to not have the {@link #addAxis} method invoking {@link #addTimeAxis}, which
+     * would be unexpected.
+     */
+    private void addAxis(final String name,  final String direction,
+                         final String units, final Date   origin)
+    {
         if (cs == null) {
             setCoordinateSystem(null, null);
         }
         final IIOMetadataNode axis = new IIOMetadataNode("Axis");
-        setAttribute(axis, "name",      name,      false);
-        setAttribute(axis, "direction", direction, true);
-        setAttribute(axis, "units",     units,     false);
+        setAttribute(axis, "name",      name);
+        setEnum     (axis, "direction", direction);
+        setAttribute(axis, "units",     units);
+        setAttribute(axis, "origin",    origin);
         cs.appendChild(axis);
     }
 
@@ -239,7 +340,7 @@ public class GeographicMetadata extends IIOMetadata {
             gridGeometry = new IIOMetadataNode("GridGeometry");
             root.appendChild(gridGeometry);
         }
-        setAttribute(gridGeometry, "pixelOrientation", pixelOrientation, true);
+        setEnum(gridGeometry, "pixelOrientation", pixelOrientation);
     }
 
     /**
@@ -341,7 +442,7 @@ public class GeographicMetadata extends IIOMetadata {
             sampleDimensions = new IIOMetadataNode("SampleDimensions");
             root.appendChild(sampleDimensions);
         }
-        setAttribute(sampleDimensions, "type", type, true);
+        setEnum(sampleDimensions, "type", type);
     }
 
     /**
@@ -365,7 +466,7 @@ public class GeographicMetadata extends IIOMetadata {
             setSampleDimensions(null);
         }
         final IIOMetadataNode band = new IIOMetadataNode("SampleDimension");
-        setAttribute(band, "name",     name, false);
+        setAttribute(band, "name",     name    );
         setAttribute(band, "scale",    scale   );
         setAttribute(band, "offset",   offset  );
         setAttribute(band, "minValue", minValue);
@@ -378,7 +479,7 @@ public class GeographicMetadata extends IIOMetadata {
                 }
                 buffer.append(fillValues[i]);
             }
-            setAttribute(band, "fillValues", buffer.toString(), false);
+            setAttribute(band, "fillValues", buffer.toString());
         }
         sampleDimensions.appendChild(band);
     }

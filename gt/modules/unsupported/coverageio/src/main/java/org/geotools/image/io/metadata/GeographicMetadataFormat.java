@@ -35,6 +35,14 @@ import org.opengis.referencing.operation.MathTransform;
 
 /**
  * Describes the structure of {@linkplain GeographicMetadata geographic metadata}.
+ * The following formatting rules apply:
+ * <p>
+ * <ul>
+ *   <li>Numbers must be formatted as in the {@linkplain Locale#US US locale}, i.e.
+ *       as {@link Integer#toString(int)} or {@link Double#toString(double)}.</li>
+ *   <li>Dates must be formatted with the {@code "yyyy-MM-dd HH:mm:ss"}
+ *       {@linkplain SimpleDateFormat pattern} in UTC {@linkplain TimeZone timezone}.</li>
+ * </ul>
  *
  * @since 2.4
  * @source $URL$
@@ -221,8 +229,8 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
          *   +-- CoordinateReferenceSystem (name, type)
          *   |     +-- Datum (name)
          *   |     +-- CoordinateSystem (name, type)
-         *   |           +-- Axis[0] (name, direction, units)
-         *   |           +-- Axis[1] (name, direction, units)
+         *   |           +-- Axis[0] (name, direction, units, origin)
+         *   |           +-- Axis[1] (name, direction, units, origin)
          *   |           +-- ...etc...
          *   +-- GridGeometry (pixelOrientation)
          *         +-- Envelope
@@ -244,6 +252,7 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
         addAttribute("Axis",              "name",              DATATYPE_STRING);
         addAttribute("Axis",              "direction",         DATATYPE_STRING, false, null, DIRECTIONS);
         addAttribute("Axis",              "units",             DATATYPE_STRING);
+        addAttribute("Axis",              "origin",            DATATYPE_STRING);
         addElement  ("GridGeometry",       rootName,           CHILD_POLICY_SOME);
         addAttribute("GridGeometry",      "pixelOrientation",  DATATYPE_STRING, false, "center", PIXEL_ORIENTATIONS);
         addElement  ("GridRange",         "GridGeometry",      CHILD_POLICY_SEQUENCE);

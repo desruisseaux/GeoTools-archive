@@ -17,6 +17,8 @@
 package org.geotools.image.io.netcdf;
 
 // J2SE dependencies
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.awt.Rectangle;
@@ -26,6 +28,7 @@ import java.awt.image.DataBuffer;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileNotFoundException;
+//import java.lang.reflect.Array;
 import javax.imageio.IIOException;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageReadParam;
@@ -113,7 +116,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
      * The first name is assigned to image index 0, the second name to image index 1,
      * <cite>etc.</cite>.
      */
-    private final String[] variableNames;
+    private String[] variableNames;
 
     /**
      * The image index of the current {@linkplain #variable variable}.
@@ -165,7 +168,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
      */
     public NetcdfImageReader(final Spi spi) {
         super(spi);
-        this.variableNames = spi.variables;
+        this.variableNames = null;
         this.converter     = spi.converter;
     }
 
@@ -175,7 +178,6 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
      * @throws IllegalStateException if the input source has not been set.
      * @throws IOException if an error occurs reading the information from the input source.
      */
-    //@Override
     public int getNumImages(final boolean allowSearch) throws IllegalStateException, IOException {
         ensureFileOpen();
         // TODO: consider returning the actual number of images in the file.
@@ -284,7 +286,6 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
     /**
      * Returns the metadata associated with the input source as a whole.
      */
-    //@Override
     public IIOMetadata getStreamMetadata() throws IOException {
         if (streamMetadata == null && !ignoreMetadata) {
             ensureFileOpen();
@@ -297,7 +298,6 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
     /**
      * Returns the metadata associated with the image at the specified index.
      */
-    //@Override
     public IIOMetadata getImageMetadata(final int imageIndex) throws IOException {
         if (imageMetadata == null && !ignoreMetadata) {
             prepareVariable(imageIndex);
@@ -336,7 +336,6 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
      * @return The data type.
      * @throws IOException If an error occurs reading the format information from the input source.
      */
-    //@Override
     public int getRawDataType(final int imageIndex) throws IOException {
         prepareVariable(imageIndex);
         final DataType type = variable.getDataType();
@@ -367,14 +366,40 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
      * @return Parameters which may be used to control the decoding process using a set
      *         of default settings.
      */
-    //@Override
     public ImageReadParam getDefaultReadParam() {
         final ImageReadParam param = super.getDefaultReadParam();
         param.setSourceBands     (DEFAULT_BANDS);
         param.setDestinationBands(DEFAULT_BANDS);
         return param;
     }
-
+    
+    /**
+     * Test if the current variable in the list is a dimension of an other variable in the list.
+     * If it the case, this variable will be omitted and this function will return true.
+     * If not, the current variable is a {@code sample dimension} and the function will return
+     * false.
+     *
+     * @param index The index in the list for the variable to test.
+     * @param listVar The list of variables.
+     * @return True if the selected variables is a dimension for an other variable in the list. 
+     * False otherwise.
+     */
+    private boolean isPresentInOtherVarDimension(final int index, final List listVar) {
+        final VariableDS reference = (VariableDS) listVar.get(index);
+        for (int i=0; i<listVar.size(); i++) {
+            // One does not compare the same element in the list.
+            if (i != index) {
+                final VariableDS var = (VariableDS) listVar.get(i);
+                for (int j=0; j<var.getDimensions().size(); j++) {
+                    if (var.getDimension(j).getName().equals(reference.getName())) {
+                        return true;
+                    }
+                }                
+            }            
+        }
+        return false;
+    }
+    
     /**
      * Ensures that the NetCDF file is open, but do not load any variable yet.
      */
@@ -392,6 +417,32 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
             if (file == null) {
                 throw new FileNotFoundException(Errors.format(
                         ErrorKeys.FILE_DOES_NOT_EXIST_$1, inputFile));
+            }
+            if (variableNames == null) {
+                /*
+                 * ListVar is a list that contains all the variables found in the NetcdfDataset.
+                 * The list result is composed by variables that are not a {@code dimension} for an 
+                 * other variable in the list of variables.
+                 * For example, "longitude" may be a variable found in the NetcdfDataset. But it
+                 * also is a {@code Dimension} for the variable "temperature". So we don't keep this
+                 * variable. On the other hand, "temperature" is not a {@code Dimension} for any other
+                 * variables, we keep it as a good value.
+                 */
+                List listVar = file.getVariables();
+                List result = new ArrayList();
+                for (int i=0; i<listVar.size(); i++) {
+                    if (!isPresentInOtherVarDimension(i, listVar)) {
+                        result.add(((VariableDS)listVar.get(i)).getName());
+                    }
+                }
+                /*
+                 * The method java.util.List.toArray(<T> a) takes an array in parameter that has to
+                 * be not null, because it will test the length of this array to determine if it has
+                 * to create a new array or use the specified one.
+                 * So we have to instanciate it, giving the right length for this array. 
+                 */
+                variableNames = new String[result.size()];
+                result.toArray(variableNames);
             }
         }
     }
@@ -596,9 +647,15 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
     }
     
     /**
+     *
+     */
+    public void setVariables(final String[] var) {
+        variableNames = var;
+    }
+    
+    /**
      * Closes the NetCDF file.
      */
-    //@Override
     protected void close() throws IOException {
         metadataLoaded = false;
         streamMetadata = null;
@@ -612,7 +669,6 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
         }
         super.close();
     }
-
 
 
 
@@ -641,11 +697,6 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
         private static final String[] SUFFIXES = new String[] {"nc", "NC"};
 
         /**
-         * The names of the {@linkplain Variable variable} to be read in a NetCDF file.
-         */
-        private final String[] variables;
-
-        /**
          * The sample converter. Default to {@linkplain SampleConverter#IDENTITY identity}.
          */
         protected SampleConverter converter = SampleConverter.IDENTITY;
@@ -664,23 +715,19 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
         /**
          * Constructs a service provider for the specified variable names. The first name
          * is assigned to image index 0, the second name to image index 1, <cite>etc.</cite>.
-         *
-         * @param variable The names of the {@linkplain Variable variables} to be read.
          */
-        public Spi(final String[] variables) {
+        public Spi() {
             super("NetCDF", "image/x-netcdf");
             names            = NAMES;
             suffixes         = SUFFIXES;
             vendorName       = "Geotools";
             version          = "2.4";
             pluginClassName  = "org.geotools.image.io.netcdf.NetcdfImageReader";
-            this.variables   = (String[]) variables.clone();
         }
 
         /**
          * Constructs a service provider for the specified variable name and color palette.
          *
-         * @param variable The names of the {@linkplain Variable variables} to be read.
          * @param palette  The name of a color palette to fetch from the
          *                 {@linkplain PaletteFactory#getDefault default palette factory}.
          * @param lower    The lowest sample value, inclusive.
@@ -689,10 +736,10 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
          *
          * @todo The pad value may be available in variable properties instead.
          */
-        public Spi(final String[] variables, final String palette,
-                   final int lower, final int upper, final int padValue)
+        public Spi(final String palette, final int lower, 
+                   final int upper, final int padValue)
         {
-            this(variables);
+            this();
             paletteName = palette;
             paletteSize = upper - lower;
             converter   = new IntegerConverter(padValue, 1-lower);
@@ -703,7 +750,6 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
          *
          * @todo Localize
          */
-        //@Override
         public String getDescription(final Locale locale) {
             return "NetCDF image decoder";
         }
@@ -730,7 +776,6 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
          * If a constant palette was specified to the constructor, returns a type specifier for it.
          * Otherwise returns {@code null}.
          */
-        //@Override
         public ImageTypeSpecifier getForcedImageType(final int imageIndex) throws IOException {
             if (paletteName == null) {
                 return super.getForcedImageType(imageIndex);
