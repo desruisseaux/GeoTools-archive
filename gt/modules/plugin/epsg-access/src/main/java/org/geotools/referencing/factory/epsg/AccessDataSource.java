@@ -84,6 +84,6 @@ public class AccessDataSource extends sun.jdbc.odbc.ee.DataSource implements Dat
             e.initCause(exception);
             throw e;
         }
-        return new DirectEpsgFactory(hints, connection);
+        return new AccessDialectEpsgFactory(hints, connection);
     }
 }
