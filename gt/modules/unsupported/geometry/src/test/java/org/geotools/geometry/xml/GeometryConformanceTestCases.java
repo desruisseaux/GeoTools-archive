@@ -132,30 +132,58 @@ public class GeometryConformanceTestCases extends TestCase {
 //	public void testTestRectanglePredicate() throws Exception {
 //		perform();
 //	}
-//	public void testTestRelateAA() throws Exception {
+//	public void testTestRelateAA_general() throws Exception {
 //		perform();
 //	}
+//	public void testTestRelateAA() throws Exception {
+//		perform();
+//}
+//	public void testTestRelateAAbig() throws Exception {
+//		setName("testTestRelateAA-big");
+//		perform();
+//}
 //	public void testTestRelateAC() throws Exception {
 //		perform();
 //	}
+//	public void testTestRelateAC_general() throws Exception {
+//		perform();
+//}
 //	public void testTestRelateLA() throws Exception {
 //		perform();
 //	}
+//	public void testTestRelateLA_general() throws Exception {
+//		perform();
+//}
 //	public void testTestRelateLC() throws Exception {
 //		perform();
 //	}
-	public void testTestRelateLL() throws Exception {
-		perform();
-	}
-//	public void testTestRelatePA() throws Exception {
+//	public void testTestRelateLC_general() throws Exception {
+//		perform();
+//}
+//	public void testTestRelateLL() throws Exception {
 //		perform();
 //	}
+	public void testTestRelateLL_general() throws Exception {
+		perform();
+	}
+	public void testTestRelatePA() throws Exception {
+		perform();
+	}
+//	public void testTestRelatePA_general() throws Exception {
+//		perform();
+//}
 //	public void testTestRelatePL() throws Exception {
 //		perform();
 //	}
+//	public void testTestRelatePL_general() throws Exception {
+//		perform();
+//}
 //	public void testTestRelatePP() throws Exception {
 //		perform();
 //	}
+//	public void testTestRelatePP_general() throws Exception {
+//		perform();
+//}
 	
 //	public void testTestSimple() throws Exception {
 //		perform();

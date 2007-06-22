@@ -1,8 +1,8 @@
 <run>
-<precisionModel type="FLOATING"/>
+  <precisionModel scale="1.0" offsetx="0.0" offsety="0.0"/>
 
 <case>
-<desc>AC A-shells overlapping B-shell at A-vertex</desc>
+  <desc>AC A-shells overlapping B-shell at A-vertex</desc>
   <a>
     POLYGON(
       (100 60, 140 100, 100 140, 60 100, 100 60))
@@ -18,9 +18,11 @@
       (
         (40 80, 80 80, 80 120, 40 120, 40 80)))
   </b>
-  <test>
-    <op name="relate" arg1="A" arg2="B" arg3="21210F212">true</op>
-  </test>
+<test>
+  <op name="relate" arg3="21210F212" arg1="A" arg2="B">
+    true
+  </op>
+</test>
 </case>
 
 </run>
