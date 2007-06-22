@@ -378,6 +378,8 @@ public class JDBCDataStore extends org.geotools.data.jdbc.JDBCDataStore implemen
         ResultSetMetaData rsmd;
         try {
             Statement st = conn.createStatement();
+            st.setMaxRows(1);
+            
             ResultSet rs = st.executeQuery(sqlQuery);
             rsmd = rs.getMetaData();
 
