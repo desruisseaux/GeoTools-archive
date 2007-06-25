@@ -272,7 +272,6 @@ public class GeometryGraph extends PlanarGraph {
 		else if (g instanceof CurveBoundaryImpl)
 			this.addCurveBoundary((CurveBoundaryImpl) g);
 		else if (g instanceof RingImpl) {
-			System.out.println("ring called");
 			this.addRing((RingImpl) g);
 		}
 		else if (g instanceof SurfaceImpl)

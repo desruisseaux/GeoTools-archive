@@ -469,25 +469,26 @@ public class WKTParser {
     }
 
     /**
-     * Creates a <code>Ring</code> using the next token in the stream.
+     * Creates a <code>Curve</code> using the next token in the stream.
      *
      * @param tokenizer tokenizer over a stream of text in Well-known Text
      *                  format. The next tokens must form a &lt;LineString Text&gt;.
-     * @return a <code>Ring</code> specified by the next
+     * @return a <code>Curve</code> specified by the next
      *         token in the stream
      * @throws IOException    if an I/O error occurs
-     * @throws ParseException if the coordinates used to create the <code>Ring</code>
+     * @throws ParseException if the coordinates used to create the <code>Curve</code>
      *                        do not form a closed linestring, or if an unexpected token was
      *                        encountered
      */
-    private Ring readLinearRingText(StreamTokenizer tokenizer)
+    private Curve readLinearRingText(StreamTokenizer tokenizer)
             throws IOException, ParseException {
         List coordList = getCoordinates(tokenizer);
         LineString lineString = geometryFactory.createLineString(coordList);
         List curveSegmentList = Collections.singletonList(lineString);
         Curve curve = primitiveFactory.createCurve(curveSegmentList);
-        List curveList = Collections.singletonList(curve);
-        return primitiveFactory.createRing(curveList);
+        return curve;
+        //List curveList = Collections.singletonList(curve);
+        //return primitiveFactory.createRing(curveList);
     }
 
     /**
@@ -522,11 +523,17 @@ public class WKTParser {
         if (nextToken.equals(EMPTY)) {
             return null;
         }
-        Ring shell = readLinearRingText(tokenizer);
+        Curve curve = readLinearRingText(tokenizer);
+        List curveList = Collections.singletonList(curve);
+        Ring shell = primitiveFactory.createRing(curveList);
+        //Ring shell = readLinearRingText(tokenizer);
         List holes = new ArrayList();
         nextToken = getNextCloserOrComma(tokenizer);
         while (nextToken.equals(COMMA)) {
-            Ring hole = readLinearRingText(tokenizer);
+        	Curve holecurve = readLinearRingText(tokenizer);
+            List holeList = Collections.singletonList(holecurve);
+            Ring hole = primitiveFactory.createRing(holeList);
+            //Ring hole = readLinearRingText(tokenizer);
             holes.add(hole);
             nextToken = getNextCloserOrComma(tokenizer);
         }
