@@ -16,6 +16,7 @@
  */
 package org.geotools.image.io;
 
+import java.awt.Rectangle;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
 import java.awt.image.BandedSampleModel;
@@ -405,6 +406,30 @@ public abstract class SimpleImageReader extends ImageReader {
             }
         }
         return validRanges[bandIndex];
+    }
+
+    /**
+     * Flips the source region vertically. This method should be invoked straight after
+     * {@link #computeRegions computeRegions} when the image to be read will be flipped
+     * vertically. Example:
+     *
+     * <blockquote><pre>
+     * computeRegions(param, width, height, image, srcRegion, destRegion);
+     * flipVertically(param, height, srcRegion);
+     * </pre></blockquote>
+     *
+     * @param param     The {@code param}     argument given to {@code computeRegions}.
+     * @param height    The {@code srcHeight} argument given to {@code computeRegions}.
+     * @param srcRegion The {@code srcRegion} argument given to {@code computeRegions}.
+     */
+    protected static void flipVertically(final ImageReadParam param, final int height,
+                                         final Rectangle srcRegion)
+    {
+        srcRegion.y = height - (srcRegion.y + srcRegion.height);
+        if (param != null) {
+            int offset = height % param.getSourceYSubsampling();
+            srcRegion.y = Math.min(srcRegion.y + offset, height - srcRegion.height);
+        }
     }
 
     /**

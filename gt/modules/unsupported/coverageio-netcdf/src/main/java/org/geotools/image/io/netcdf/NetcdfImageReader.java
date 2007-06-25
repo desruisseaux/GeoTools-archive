@@ -28,7 +28,6 @@ import java.awt.image.DataBuffer;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileNotFoundException;
-//import java.lang.reflect.Array;
 import javax.imageio.IIOException;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageReadParam;
@@ -528,6 +527,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
         final Rectangle  srcRegion = new Rectangle();
         final Rectangle destRegion = new Rectangle();
         computeRegions(param, width, height, image, srcRegion, destRegion);
+        flipVertically(param, height, srcRegion);
         final Range[] ranges = new Range[rank];
         for (int i=0; i<ranges.length; i++) {
             final int first, length, stride;
