@@ -129,7 +129,7 @@ public class ThreadedAuthorityFactory extends AbstractAuthorityFactory implement
             factory = ((ThreadedAuthorityFactory) factory).backingStore;
         }
         this.backingStore = factory;
-        this.objectCache = new DefaultReferencingObjectCache(maxStrongReferences);
+        this.objectCache = new OldReferencingObjectCache(maxStrongReferences);
         completeHints();
     }
 
@@ -147,7 +147,7 @@ public class ThreadedAuthorityFactory extends AbstractAuthorityFactory implement
      */
     ThreadedAuthorityFactory(final int priority, final int maxStrongReferences) {
         super(priority);
-        this.objectCache = new DefaultReferencingObjectCache(maxStrongReferences);
+        this.objectCache = new OldReferencingObjectCache(maxStrongReferences);
         // completeHints() will be invoked by DeferredAuthorityFactory.getBackingStore()
     }
 
