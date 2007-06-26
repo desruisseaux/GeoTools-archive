@@ -16,7 +16,6 @@
 package org.geotools.referencing.factory;
 
 import java.lang.ref.Reference;
-import java.util.Map;
 
 
 /**
@@ -26,16 +25,10 @@ import java.util.Map;
  * @version $Id$
  * @source $URL$
  *
- * @todo {@link #findPool} should not be defined in this object.
- *
  * @todo Consider renaming as {@code ObjectCache} or {@code Cache} and move to
  *       the {@code org.geotools.util} package.
  */
 public interface ReferencingObjectCache {
-    /**
-     * @todo This method should not be defined there.
-     */
-    Map/*<IdentifiedObject,IdentifiedObject>*/ findPool();
 
     /**
      * Removes all entries from this cache.
@@ -61,4 +54,14 @@ public interface ReferencingObjectCache {
      * @param object The referencing object to add in the pool.
      */
     void put(Object key, Object object);
+    
+    void writeLock(Object key);
+    
+    void writeUnLock(Object key);
+    
+    /**
+     * Non-blocking indicator if an entry exists in the cache.
+     */
+    public boolean containsKey(final Object key);
+
 }

@@ -20,7 +20,6 @@ import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 
 /**
@@ -48,11 +47,6 @@ final class OldReferencingObjectCache implements ReferencingObjectCache {
     private final LinkedHashMap pool = new LinkedHashMap(32, 0.75f, true);
 
     /**
-     * The pool of objects identified by {@link ThreadedAuthorityFactory#find}.
-     */
-    private final Map findPool = new WeakHashMap();
-
-    /**
      * The maximum number of objects to keep by strong reference. If a greater amount of
      * objects are created, then the strong references for the oldest ones are replaced by
      * weak references.
@@ -68,21 +62,11 @@ final class OldReferencingObjectCache implements ReferencingObjectCache {
     }
 
     /**
-     * @todo This method should not be defined there.
-     */
-    public Map findPool() {
-        return findPool;
-    }
-
-    /**
      * Removes all entries from this map.
      */
     public synchronized void clear() {
         if (pool != null) {
             pool.clear();
-        }
-        if (findPool != null) {
-            findPool.clear();
         }
     }
 
@@ -133,5 +117,20 @@ final class OldReferencingObjectCache implements ReferencingObjectCache {
                 }
             }
         }
+    }
+
+    public void writeLock(Object key) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void writeUnLock(Object key) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public boolean containsKey(Object key) {
+        // TODO Auto-generated method stub
+        return false;
     }
 }

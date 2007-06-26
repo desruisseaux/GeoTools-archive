@@ -15,8 +15,6 @@
  */
 package org.geotools.referencing.factory;
 
-import java.util.Map;
-
 
 /**
  * Null implementation for the ReferencingObjectCache. Used for cases where
@@ -35,13 +33,6 @@ final class NullReferencingObjectCache implements ReferencingObjectCache {
     }
 
     /**
-     * @todo This method should not be defined there.
-     */
-    public Map findPool() {
-        return null;
-    }
-
-    /**
      * Returns {@code null} since this map is empty.
      */
     public Object get(Object key) {
@@ -49,8 +40,27 @@ final class NullReferencingObjectCache implements ReferencingObjectCache {
     }
 
     /**
-     * Do nothing since this map do not cache anything.
+     * Do nothing since this map does not cache anything.
      */
     public void put(Object key, Object object) {
+    }
+
+    /**
+     * There is no cache, therefore a cache miss is a safe assumption.
+     */
+    public boolean containsKey(Object key) {
+        return false;
+    }
+
+    /**
+     * Do nothing since there is no write lock.
+     */
+    public void writeLock(Object key) {
+    }
+
+    /**
+     * Do nothing since there is no write lock.
+     */
+    public void writeUnLock(Object key) {
     }
 }

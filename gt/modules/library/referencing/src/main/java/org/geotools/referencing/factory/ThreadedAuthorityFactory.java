@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.Iterator;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.WeakHashMap;
 import java.util.logging.LogRecord;
 import java.util.logging.Level;
 import javax.units.Unit;
@@ -94,6 +95,12 @@ public class ThreadedAuthorityFactory extends AbstractAuthorityFactory implement
      */
     private final ReferencingObjectCache objectCache;
 
+    /**
+     * The pool of objects identified by {@link find}.
+     */
+    private final Map findPool = new WeakHashMap();
+
+    
     /**
      * Constructs an instance wrapping the specified factory with a default number
      * of entries to keep by strong reference.
@@ -1018,7 +1025,6 @@ public class ThreadedAuthorityFactory extends AbstractAuthorityFactory implement
              *       waste of CPU.
              */
             IdentifiedObject candidate;
-            final Map findPool = objectCache.findPool();
             synchronized (findPool) {
                 candidate = (IdentifiedObject) findPool.get(object);
             }
@@ -1041,7 +1047,6 @@ public class ThreadedAuthorityFactory extends AbstractAuthorityFactory implement
         //@Override
         public String findIdentifier(final IdentifiedObject object) throws FactoryException {
             IdentifiedObject candidate;
-            final Map findPool = objectCache.findPool();
             synchronized (findPool) {
                 candidate = (IdentifiedObject) findPool.get(object);
             }

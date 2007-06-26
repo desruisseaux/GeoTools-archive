@@ -162,6 +162,11 @@
       <!-- The version number is specified in the parent POM. -->
     </dependency>
     <dependency>
+      <groupId>edu.oswego</groupId>
+      <artifactId>concurrent</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+    </dependency>
+    <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-metadata</artifactId>
       <version>${project.version}</version>

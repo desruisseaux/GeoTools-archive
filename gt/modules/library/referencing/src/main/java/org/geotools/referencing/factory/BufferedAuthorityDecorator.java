@@ -195,18 +195,21 @@ public final class BufferedAuthorityDecorator extends ReferencingFactory
     // AuthorityFactory
     //    
     public IdentifiedObject createObject( String code ) throws FactoryException {
-        IdentifiedObject value;        
-        synchronized( cache ){
-            value = (IdentifiedObject) cache.get(code);
-        }
-        if( value == null ){
-            // todo lock the code *only*
-            value = authority.createObject( code );
-            synchronized( cache ){
-                if( cache.get(code) == null ){
-                    cache.put( code, value );
+        IdentifiedObject value = null;      
+        final String key = trimAuthority(code);
+        if (!cache.containsKey(key)) {
+            try {
+                cache.writeLock(key);
+                if (!cache.containsKey(key)) {
+                    value = authority.createObject(code);
+                    cache.put(key, value);
                 }
-            }    
+            } finally {
+                cache.writeUnLock(key);
+            }            
+        }
+        if (value == null) {
+            value = (IdentifiedObject) cache.get(key);
         }
         return value;
     }
@@ -227,65 +230,202 @@ public final class BufferedAuthorityDecorator extends ReferencingFactory
     //
     public synchronized CompoundCRS createCompoundCRS( final String code ) throws FactoryException {
         final String key = trimAuthority(code);
-        CompoundCRS crs;        
-        synchronized( cache ){
-            crs = (CompoundCRS) cache.get(key);
-        }
-        if( crs == null ){
-            // todo lock the code *only*
-            crs = crsAuthority.createCompoundCRS( code );
-            synchronized( cache ){
-                if( cache.get(key) == null ){
-                    cache.put( code, crs );
+        CompoundCRS crs=null;
+        if (!cache.containsKey(key)) {
+            try {
+                cache.writeLock(key);
+                if (!cache.containsKey(key)) {
+                    crs = crsAuthority.createCompoundCRS(code);
+                    cache.put(key, crs);
                 }
-            }    
+            } finally {
+                cache.writeUnLock(key);
+            }            
+        }
+        if (crs == null) {
+            crs = (CompoundCRS) cache.get(key);
         }
         return crs;
     }
     
     public CoordinateReferenceSystem createCoordinateReferenceSystem( String code ) throws FactoryException {
-        // TODO Auto-generated method stub
-        return null;
+        final String key = trimAuthority(code);
+        CoordinateReferenceSystem crs=null;
+        if (!cache.containsKey(key)) {
+            try {
+                cache.writeLock(key);
+                if (!cache.containsKey(key)) {
+                    crs = crsAuthority.createCoordinateReferenceSystem(code);
+                    cache.put(key, crs);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }            
+        }
+        if (crs == null) {
+            crs = (CoordinateReferenceSystem) cache.get(key);
+        }
+        return crs;
     }
 
     public DerivedCRS createDerivedCRS( String code ) throws FactoryException {
-        // TODO Auto-generated method stub
-        return null;
+        final String key = trimAuthority(code);
+        DerivedCRS crs=null;
+        if (!cache.containsKey(key)) {
+            try {
+                cache.writeLock(key);
+                if (!cache.containsKey(key)) {
+                    crs = crsAuthority.createDerivedCRS(code);
+                    cache.put(key, crs);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }            
+        }
+        if (crs == null) {
+            crs = (DerivedCRS) cache.get(key);
+        }
+        return crs;
     }
 
     public EngineeringCRS createEngineeringCRS( String code ) throws FactoryException {
-        // TODO Auto-generated method stub
-        return null;
+        final String key = trimAuthority(code);
+        EngineeringCRS crs=null;
+        if (!cache.containsKey(key)) {
+            try {
+                cache.writeLock(key);
+                if (!cache.containsKey(key)) {
+                    crs = crsAuthority.createEngineeringCRS(code);
+                    cache.put(key, crs);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }            
+        }
+        if (crs == null) {
+            crs = (EngineeringCRS) cache.get(key);
+        }
+        return crs;
     }
 
     public GeocentricCRS createGeocentricCRS( String code ) throws FactoryException {
-        // TODO Auto-generated method stub
-        return null;
+        final String key = trimAuthority(code);
+        GeocentricCRS crs=null;
+        if (!cache.containsKey(key)) {
+            try {
+                cache.writeLock(key);
+                if (!cache.containsKey(key)) {
+                    crs = crsAuthority.createGeocentricCRS(code);
+                    cache.put(key, crs);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }            
+        }
+        if (crs == null) {
+            crs = (GeocentricCRS) cache.get(key);
+        }
+        return crs;
     }
 
     public GeographicCRS createGeographicCRS( String code ) throws FactoryException {
-        // TODO Auto-generated method stub
-        return null;
+        final String key = trimAuthority(code);
+        GeographicCRS crs=null;
+        if (!cache.containsKey(key)) {
+            try {
+                cache.writeLock(key);
+                if (!cache.containsKey(key)) {
+                    crs = crsAuthority.createGeographicCRS(code);
+                    cache.put(key, crs);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }            
+        }
+        if (crs == null) {
+            crs = (GeographicCRS) cache.get(key);
+        }
+        return crs;
     }
 
     public ImageCRS createImageCRS( String code ) throws FactoryException {
-        // TODO Auto-generated method stub
-        return null;
+        final String key = trimAuthority(code);
+        ImageCRS crs=null;
+        if (!cache.containsKey(key)) {
+            try {
+                cache.writeLock(key);
+                if (!cache.containsKey(key)) {
+                    crs = crsAuthority.createImageCRS(code);
+                    cache.put(key, crs);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }            
+        }
+        if (crs == null) {
+            crs = (ImageCRS) cache.get(key);
+        }
+        return crs;
     }
 
     public ProjectedCRS createProjectedCRS( String code ) throws FactoryException {
-        // TODO Auto-generated method stub
-        return null;
+        final String key = trimAuthority(code);
+        ProjectedCRS crs=null;
+        if (!cache.containsKey(key)) {
+            try {
+                cache.writeLock(key);
+                if (!cache.containsKey(key)) {
+                    crs = crsAuthority.createProjectedCRS(code);
+                    cache.put(key, crs);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }            
+        }
+        if (crs == null) {
+            crs = (ProjectedCRS) cache.get(key);
+        }
+        return crs;
     }
 
     public TemporalCRS createTemporalCRS( String code ) throws FactoryException {
-        // TODO Auto-generated method stub
-        return null;
+        final String key = trimAuthority(code);
+        TemporalCRS crs=null;
+        if (!cache.containsKey(key)) {
+            try {
+                cache.writeLock(key);
+                if (!cache.containsKey(key)) {
+                    crs = crsAuthority.createTemporalCRS(code);
+                    cache.put(key, crs);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }            
+        }
+        if (crs == null) {
+            crs = (TemporalCRS) cache.get(key);
+        }
+        return crs;
     }
 
     public VerticalCRS createVerticalCRS( String code ) throws FactoryException {
-        // TODO Auto-generated method stub
-        return null;
+        final String key = trimAuthority(code);
+        VerticalCRS crs=null;
+        if (!cache.containsKey(key)) {
+            try {
+                cache.writeLock(key);
+                if (!cache.containsKey(key)) {
+                    crs = crsAuthority.createVerticalCRS(code);
+                    cache.put(key, crs);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }            
+        }
+        if (crs == null) {
+            crs = (VerticalCRS) cache.get(key);
+        }
+        return crs;
     }
     
 
