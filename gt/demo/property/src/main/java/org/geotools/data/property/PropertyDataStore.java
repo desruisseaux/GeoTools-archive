@@ -40,11 +40,22 @@ import org.geotools.feature.SchemaException;
  */
 public class PropertyDataStore extends AbstractDataStore {
     protected File directory;
+    protected String namespaceURI;
     public PropertyDataStore(File dir) {
+        this( dir, null );
+    }
+    public PropertyDataStore(File dir, String namespaceURI) {
         if( !dir.isDirectory()){
             throw new IllegalArgumentException( dir +" is not a directory");
         }
+        if ( namespaceURI == null ) {
+            namespaceURI = dir.getName();
+        }
         directory = dir;
+        this.namespaceURI = namespaceURI;
+    }
+    public void setNamespaceURI(String namespaceURI) {
+        this.namespaceURI = namespaceURI;
     }
     public String[] getTypeNames() {
         String list[] = directory.list( new FilenameFilter(){
@@ -59,17 +70,10 @@ public class PropertyDataStore extends AbstractDataStore {
     }
     // START SNIPPET: getSchema
     public FeatureType getSchema(String typeName) throws IOException {
-        
-    		//look for a defined namespace	
-    		String namespace = property( typeName, "namespace" );
-    		if ( namespace == null ) {
-    			namespace = directory.getName();
-    		}
-    		
-    		//look for type name
-    		String typeSpec = property( typeName, "_");
+        //look for type name
+	String typeSpec = property( typeName, "_");
         try {
-        		return DataUtilities.createType( namespace+"."+typeName,typeSpec );
+        		return DataUtilities.createType( namespaceURI+"."+typeName,typeSpec );
         } catch (SchemaException e) {
             e.printStackTrace();
             throw new DataSourceException( typeName+" schema not available", e);

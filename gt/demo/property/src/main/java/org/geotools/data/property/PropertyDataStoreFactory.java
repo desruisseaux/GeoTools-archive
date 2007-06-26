@@ -64,8 +64,9 @@ public class PropertyDataStoreFactory implements DataStoreFactorySpi {
      */
     public DataStore createDataStore(Map params) throws IOException {
     	File dir = directoryLookup(params);
+        String namespaceURI = (String) NAMESPACE.lookUp( params );
         if (dir.exists() && dir.isDirectory()) {
-            return new PropertyDataStore(dir);
+            return new PropertyDataStore(dir,namespaceURI);
         } else {
             throw new IOException("Directory is required");
         }
@@ -95,7 +96,8 @@ public class PropertyDataStoreFactory implements DataStoreFactorySpi {
             throw new IOException("Could not create the directory" + dir);
         }
 
-        return new PropertyDataStore(dir);
+        String namespaceURI = (String) NAMESPACE.lookUp(params);
+        return new PropertyDataStore(dir,namespaceURI);
     }
 
     /**
