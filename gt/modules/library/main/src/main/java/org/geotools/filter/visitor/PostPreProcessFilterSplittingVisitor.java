@@ -770,8 +770,8 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Expr
 	    public Object visit(PropertyName expression, Object notUsed) {
 	    	//JD: use an expression to get at the attribute type intead of accessing directly
 	    	if (parent != null  && expression.evaluate( parent ) == null )  {
-	        	postStack.push(expression);
-	        	return null;
+	        	throw new IllegalArgumentException("Property '" + expression.getPropertyName() 
+                        + "' could not be found in " + parent.getTypeName());
 	        }
 	        if(transactionAccessor!=null){
 	        	Filter updateFilter= (Filter) transactionAccessor.getUpdateFilter(expression.getPropertyName());
