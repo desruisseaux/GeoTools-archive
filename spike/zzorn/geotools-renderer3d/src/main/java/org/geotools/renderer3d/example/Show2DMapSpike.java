@@ -24,6 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 
+
 /**
  * Copied and edited from geotools examples.
  */
@@ -54,10 +55,10 @@ public class Show2DMapSpike
         Show2DMapSpike mapViewer = new Show2DMapSpike();
         if ( args.length == 0 || !args[ 0 ].toLowerCase().endsWith( ".shp" ) )
         {
-            System.out.println("java org.geotools.gui.swing.MapViewer shapefile.shp");
-            System.out.println("Notes:");
-            System.out.println(" Any provided shapefile.prj file or shapefile.sld will be used");
-            System.exit(0);
+            System.out.println( "java org.geotools.gui.swing.MapViewer shapefile.shp" );
+            System.out.println( "Notes:" );
+            System.out.println( " Any provided shapefile.prj file or shapefile.sld will be used" );
+            System.exit( 0 );
         }
         else
         {

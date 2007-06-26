@@ -2,7 +2,7 @@ package org.geotools.renderer3d;
 
 import org.geotools.map.MapContext;
 
-import javax.swing.*;
+import java.awt.Component;
 
 /**
  * A 3D map renderer.
@@ -25,5 +25,5 @@ public interface Renderer3D
     /**
      * @return the 3D view UI component.
      */
-    JComponent get3DView();
+    Component get3DView();
 }
