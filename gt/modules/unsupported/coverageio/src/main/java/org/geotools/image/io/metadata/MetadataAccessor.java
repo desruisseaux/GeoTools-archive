@@ -22,6 +22,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.StringTokenizer;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.logging.Level;
@@ -62,6 +66,12 @@ public class MetadataAccessor {
     protected final Node metadata;
 
     /**
+     * The elements for the {@code "SampleDimensions/SampleDimension"} node.
+     * Will be fetch only when first needed.
+     */
+    private transient List/*<Element>*/ sampleDimensions;
+
+    /**
      * Creates an accessor for the specified metadata.
      *
      * @throws IllegalArgumentException if the specified metadata doesn't support
@@ -72,23 +82,57 @@ public class MetadataAccessor {
     }
 
     /**
-     * Returns the ranges of valid values for each sample dimensions. The length of the returned
-     * array is the same than the number of {@code "SampleDimensions/SampleDimension"} elements.
-     * The ranges use {@link Integer} type. Note that range {@linkplain NumberRange#getMinValue
-     * minimum value}, {@linkplain NumberRange#getMaxValue maximum value} or both may be null if
-     * no {@code "minValue"} or {@code "maxValue"} attribute were found for a node.
+     * Returns the element for the {@code "SampleDimensions/SampleDimension"} node at the
+     * specified band.
+     *
+     * @param  band The sample dimension number.
+     * @return The node for the specified sample dimension.
+     * @throws IndexOutOfBoundsException if the specified sample dimension is out of range.
      */
-    public NumberRange[] getValidRanges() {
-        final List/*<Element>*/ elements = getElements("SampleDimensions/SampleDimension");
-        final NumberRange[] ranges = new NumberRange[elements.size()];
-        for (int i=0; i<ranges.length; i++) {
-            final Element element = (Element) elements.get(i);
-            final Integer minimum = getInteger(element, "minValue");
-            final Integer maximum = getInteger(element, "maxValue");
-            // Note: minimum and/or maximum may be null, in which case the range in unbounded.
-            ranges[i] = new NumberRange(Integer.class, minimum, true, maximum, true);
+    private Element getSampleDimension(final int band) throws IndexOutOfBoundsException {
+        if (sampleDimensions == null) {
+            sampleDimensions = getElements("SampleDimensions/SampleDimension");
         }
-        return ranges;
+        return (Element) sampleDimensions.get(band);
+    }
+
+    /**
+     * Returns the range of valid values for the specified sample dimension. The range use the
+     * {@link Integer} type if possible, or the {@link Double} type otherwise. Note that range
+     * {@linkplain NumberRange#getMinValue minimum value}, {@linkplain NumberRange#getMaxValue
+     * maximum value} or both may be null if no {@code "minValue"} or {@code "maxValue"}
+     * attribute were found for the {@code "SampleDimensions/SampleDimension"} node.
+     *
+     * @param  band The sample dimension number.
+     * @return The range of valid values for the specified sample dimension.
+     * @throws IndexOutOfBoundsException if the specified sample dimension is out of range.
+     */
+    public NumberRange getValidRange(final int band) throws IndexOutOfBoundsException {
+        final Element element = getSampleDimension(band);
+        Number minimum = getInteger(element, "minValue");
+        Number maximum = getInteger(element, "maxValue");
+        final Class type;
+        if (minimum == null || maximum == null) {
+            minimum = getDouble(element, "minValue");
+            maximum = getDouble(element, "maxValue");
+            type = Double.class;
+        } else {
+            type = Integer.class;
+        }
+        // Note: minimum and/or maximum may be null, in which case the range in unbounded.
+        return new NumberRange(type, minimum, true, maximum, true);
+    }
+
+    /**
+     * Returns the fill values for the specified sample dimension.
+     *
+     * @param  band The sample dimension number.
+     * @return The fill values for the specified sample dimension.
+     * @throws IndexOutOfBoundsException if the specified sample dimension is out of range.
+     */
+    public double[] getFillValue(final int band) throws IndexOutOfBoundsException {
+        final Element element = getSampleDimension(band);
+        return getDoubles(element, "fillValues", true);
     }
 
     /**
@@ -184,11 +228,22 @@ public class MetadataAccessor {
      * @return The attribute value, or {@code null} if none or unparseable.
      */
     protected Integer getInteger(final Element node, final String attribute) {
-        final String value = getString(node, attribute);
-        if (value != null) try {
-            return Integer.valueOf(value);
-        } catch (NumberFormatException e) {
-            log("getInteger", ErrorKeys.UNPARSABLE_NUMBER_$1, value);
+        String value = getString(node, attribute);
+        if (value != null) {
+            // Remove the trailing ".0", if any.
+            for (int i=value.length(); --i>=0;) {
+                switch (value.charAt(i)) {
+                    case '0': continue;
+                    case '.': value = value.substring(0, i); break;
+                    default : break;
+                }
+                break;
+            }
+            try {
+                return Integer.valueOf(value);
+            } catch (NumberFormatException e) {
+                log("getInteger", ErrorKeys.UNPARSABLE_NUMBER_$1, value);
+            }
         }
         return null;
     }
@@ -209,6 +264,51 @@ public class MetadataAccessor {
             log("getDouble", ErrorKeys.UNPARSABLE_NUMBER_$1, value);
         }
         return null;
+    }
+
+    /**
+     * Returns a node attribute as an array of floating point, or {@code null} if none. If an
+     * element can't be parsed as a floating point, then this method logs a warning and returns
+     * {@code null}.
+     *
+     * @param  node The node, usually obtained by a call to {@link #getElement}.
+     * @param  attribute The attribute to fetch from the above node (e.g. {@code "minimum"}).
+     * @param  unique {@code true} if duplicated values should be collapsed into unique values,
+     *         or {@code false} for preserving duplicated values.
+     * @return The attribute values, or {@code null} if none.
+     */
+    protected double[] getDoubles(final Element node, final String attribute, final boolean unique) {
+        final String sequence = getString(node, attribute);
+        if (sequence == null) {
+            return null;
+        }
+        final Collection/*<Double>*/ numbers;
+        if (unique) {
+            numbers = new LinkedHashSet();
+        } else {
+            numbers = new ArrayList();
+        }
+        final StringTokenizer tokens = new StringTokenizer(sequence);
+        while (tokens.hasMoreTokens()) {
+            final String token = tokens.nextToken();
+            final Double number;
+            try {
+                number = Double.valueOf(sequence);
+            } catch (NumberFormatException e) {
+                log("getDoubles", ErrorKeys.UNPARSABLE_NUMBER_$1, token);
+                continue;
+            }
+            numbers.add(number);
+        }
+        int count = 0;
+        final double[] values = new double[numbers.size()];
+        for (final Iterator it=numbers.iterator(); it.hasNext();) {
+            values[count++] = ((Double) it.next()).doubleValue();
+        }
+        if (count != values.length) {
+            throw new AssertionError(); // Should never happen.
+        }
+        return values;
     }
 
     /**

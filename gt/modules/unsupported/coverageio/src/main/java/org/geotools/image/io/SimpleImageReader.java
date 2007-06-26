@@ -41,6 +41,7 @@ import javax.media.jai.ComponentSampleModelJAI;
 
 import org.geotools.util.Logging;
 import org.geotools.util.NumberRange;
+import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -153,9 +154,9 @@ public abstract class SimpleImageReader extends ImageReader {
     private long streamOrigin;
 
     /**
-     * The valid ranges obtained from {@link #getImageMetadata}.
+     * Metadata for each images, or {@code null} if not yet created.
      */
-    private transient NumberRange[] validRanges;
+    private transient MetadataAccessor[] metadata;
 
     /**
      * Constructs a new image reader.
@@ -274,9 +275,21 @@ public abstract class SimpleImageReader extends ImageReader {
     }
 
     /**
+     * Returns metadata associated with the input source as a whole. Since many raw images
+     * can't store metadata, the default implementation returns {@code null}.
+     *
+     * @throws IOException if an error occurs during reading.
+     */
+    public IIOMetadata getStreamMetadata() throws IOException {
+        return null;
+    }
+
+    /**
      * Returns metadata associated with the given image. Since many raw images
      * can't store metadata, the default implementation returns {@code null}.
      *
+     * @param  imageIndex The image index.
+     * @return The metadata, or {@code null} if none.
      * @throws IOException if an error occurs during reading.
      */
     public IIOMetadata getImageMetadata(int imageIndex) throws IOException {
@@ -285,13 +298,39 @@ public abstract class SimpleImageReader extends ImageReader {
     }
 
     /**
-     * Returns metadata associated with the input source as a whole. Since many raw images
-     * can't store metadata, the default implementation returns {@code null}.
+     * Returns a helper accessor for metadata associated with the given image. This implementation
+     * invokes <code>{@linkplain #getImageMetadata getImageMetadata}(imageIndex)</code>, wraps the
+     * result in a {@link MetadataAccessor} object if non-null and caches the result.
      *
+     * @param  imageIndex The image index.
+     * @return The metadata, or {@code null} if none.
      * @throws IOException if an error occurs during reading.
      */
-    public IIOMetadata getStreamMetadata() throws IOException {
-        return null;
+    private MetadataAccessor getMetadataAccessor(final int imageIndex) throws IOException {
+        // Checks if a cached instance is available.
+        if (metadata != null && imageIndex >= 0 && imageIndex < metadata.length) {
+            final MetadataAccessor accessor = metadata[imageIndex];
+            if (accessor != null) {
+                return accessor;
+            }
+        }
+        // Checks if metadata are availables. If the user set 'ignoreMetadata' to 'true',
+        // we override his setting since we really need metadata for creating a ColorModel.
+        ignoreMetadata = false;
+        final IIOMetadata candidate = getImageMetadata(imageIndex);
+        if (candidate == null) {
+            return null;
+        }
+        // Creates a new accessor and caches it.
+        final MetadataAccessor accessor = new MetadataAccessor(candidate);
+        if (metadata == null) {
+            metadata = new MetadataAccessor[Math.max(imageIndex+1, 4)];
+        }
+        if (imageIndex >= metadata.length) {
+            metadata = (MetadataAccessor[]) XArray.resize(metadata, Math.max(imageIndex+1, metadata.length*2));
+        }
+        metadata[imageIndex] = accessor;
+        return accessor;
     }
 
     /**
@@ -394,18 +433,17 @@ public abstract class SimpleImageReader extends ImageReader {
      *         of any {@link ImageReadParam#setSourceBands} setting.
      * @return The expected range of values, or {@code null} if unknow.
      * @throws IOException If an error occurs reading the data information from the input source.
+     *
+     * @todo Consider removing this method.
      */
     public NumberRange getExpectedRange(final int imageIndex, final int bandIndex)
             throws IOException
     {
-        if (validRanges == null) {
-            final IIOMetadata metadata = getImageMetadata(imageIndex);
-            if (metadata != null) {
-                final MetadataAccessor accessor = new MetadataAccessor(metadata);
-                validRanges = accessor.getValidRanges();
-            }
+        final MetadataAccessor accessor = getMetadataAccessor(imageIndex);
+        if (accessor != null) {
+            return accessor.getValidRange(bandIndex);
         }
-        return validRanges[bandIndex];
+        return null;
     }
 
     /**
@@ -575,7 +613,7 @@ public abstract class SimpleImageReader extends ImageReader {
         }
         closeOnReset = null;
         stream       = null;
-        validRanges  = null;
+        metadata     = null;
     }
 
     /**

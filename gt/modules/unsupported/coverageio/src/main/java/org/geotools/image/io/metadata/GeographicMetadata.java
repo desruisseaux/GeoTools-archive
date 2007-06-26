@@ -17,6 +17,7 @@
 package org.geotools.image.io.metadata;
 
 // J2SE dependencies
+import java.lang.reflect.Array;
 import java.text.Format;
 import java.util.Date;
 import javax.imageio.metadata.IIOInvalidTreeException;
@@ -137,85 +138,6 @@ public class GeographicMetadata extends IIOMetadata {
      */
     public boolean isReadOnly() {
         return false;
-    }
-
-    /**
-     * Set the attribute to the specified enumeration value,
-     * or remove the attribute if the value is null.
-     *
-     * @param node  The node on which to set the attribute.
-     * @param name  The attribute name.
-     * @param value The attribute value.
-     */
-    private static void setEnum(final Element node, final String name, final String value) {
-        setAttribute(node, name, value, true);
-    }
-
-    /**
-     * Set the attribute to the specified value, or remove the attribute if the value is null.
-     *
-     * @param node  The node on which to set the attribute.
-     * @param name  The attribute name.
-     * @param value The attribute value.
-     */
-    private static void setAttribute(final Element node, final String name, final String value) {
-        setAttribute(node, name, value, false);
-    }
-
-    /**
-     * Set the attribute to the specified value, or remove the attribute if the value is null.
-     *
-     * @param node       The node on which to set the attribute.
-     * @param name       The attribute name.
-     * @param value      The attribute value.
-     * @param isCodeList Reformat the value if it is a code list.
-     */
-    private static void setAttribute(final Element node, final String name, String value, boolean isCodeList) {
-        if (value == null || (value=value.trim()).length() == 0) {
-            if (node.hasAttribute(name)) {
-                node.removeAttribute(name);
-            }
-        } else {
-            if (isCodeList) {
-                value = value.replace('_', ' ').trim().toLowerCase();
-            }
-            node.setAttribute(name, value);
-        }
-    }
-
-    /**
-     * Set the attribute to the specified value, or remove the attribute if the value is NaN.
-     *
-     * @param node  The node on which to set the attribute.
-     * @param name  The attribute name.
-     * @param value The attribute value.
-     */
-    private static void setAttribute(final Element node, final String name, final double value) {
-        if (Double.isNaN(value) || Double.isInfinite(value)) {
-            if (node.hasAttribute(name)) {
-                node.removeAttribute(name);
-            }
-        } else {
-            node.setAttribute(name, Double.toString(value));
-        }
-    }
-
-    /**
-     * Set the attribute to the specified value, or remove the attribute if the value is NaN.
-     *
-     * @param node  The node on which to set the attribute.
-     * @param name  The attribute name.
-     * @param value The attribute value.
-     */
-    private static void setAttribute(final Element node, final String name, final Date value) {
-        if (value == null) {
-            if (node.hasAttribute(name)) {
-                node.removeAttribute(name);
-            }
-        } else {
-            final Format format = (Format) MetadataAccessor.dateFormat.get();
-            node.setAttribute(name, format.format(value));
-        }
     }
 
     /**
@@ -377,16 +299,16 @@ public class GeographicMetadata extends IIOMetadata {
      * Adds the range of index along a dimension. The ranges
      * should be added in the same order than {@linkplain #addAxis axis}.
      *
-     * @param indexMin The minimal index value, inclusive. This is usually 0.
-     * @param indexMax The maximal index value, <strong>inclusive</strong>.
+     * @param minIndex The minimal index value, inclusive. This is usually 0.
+     * @param maxIndex The maximal index value, <strong>inclusive</strong>.
      */
-    private void addGridRange(final int indexMin, final int indexMax) {
+    private void addGridRange(final int minIndex, final int maxIndex) {
         if (gridRange == null) {
             setGridRange();
         }
         final IIOMetadataNode range = new IIOMetadataNode("IndexRange");
-        range.setAttribute("minimum", Integer.toString(indexMin));
-        range.setAttribute("maximum", Integer.toString(indexMax));
+        setAttribute(range, "minimum", minIndex);
+        setAttribute(range, "maximum", maxIndex);
         gridRange.appendChild(range);
     }
 
@@ -394,21 +316,21 @@ public class GeographicMetadata extends IIOMetadata {
      * Adds the range of values for an envelope along a dimension. The ranges
      * should be added in the same order than {@linkplain #addAxis axis}.
      *
-     * @param indexMin The minimal index value, inclusive. This is usually 0.
-     * @param indexMax The maximal index value, <strong>inclusive</strong>.
-     * @param valueMin The minimal coordinate value, inclusive.
-     * @param valueMax The maximal coordinate value, <strong>inclusive</strong>.
+     * @param minIndex The minimal index value, inclusive. This is usually 0.
+     * @param maxIndex The maximal index value, <strong>inclusive</strong>.
+     * @param minValue The minimal coordinate value, inclusive.
+     * @param maxValue The maximal coordinate value, <strong>inclusive</strong>.
      */
-    public void addCoordinateRange(final int    indexMin, final int    indexMax,
-                                   final double valueMin, final double valueMax)
+    public void addCoordinateRange(final int    minIndex, final int    maxIndex,
+                                   final double minValue, final double maxValue)
     {
-        addGridRange(indexMin, indexMax);
+        addGridRange(minIndex, maxIndex);
         if (envelope == null) {
             setEnvelope();
         }
         final IIOMetadataNode range = new IIOMetadataNode("CoordinateRange");
-        setAttribute(range, "minimum", valueMin);
-        setAttribute(range, "maximum", valueMax);
+        setAttribute(range, "minimum", minValue);
+        setAttribute(range, "maximum", maxValue);
         envelope.appendChild(range);
     }
 
@@ -417,11 +339,11 @@ public class GeographicMetadata extends IIOMetadata {
      * in replacement of {@link #addCoordinateRange} when every cell coordinates need to be
      * specified explicitly.
      *
-     * @param indexMin The minimal index value, inclusive. This is usually 0.
+     * @param minIndex The minimal index value, inclusive. This is usually 0.
      * @param values The coordinate values.
      */
-    public void addCoordinateValues(final int indexMin, final double[] values) {
-        addGridRange(indexMin, indexMin + values.length);
+    public void addCoordinateValues(final int minIndex, final double[] values) {
+        addGridRange(minIndex, minIndex + values.length);
         if (envelope == null) {
             setEnvelope();
         }
@@ -466,22 +388,177 @@ public class GeographicMetadata extends IIOMetadata {
             setSampleDimensions(null);
         }
         final IIOMetadataNode band = new IIOMetadataNode("SampleDimension");
-        setAttribute(band, "name",     name    );
-        setAttribute(band, "scale",    scale   );
-        setAttribute(band, "offset",   offset  );
-        setAttribute(band, "minValue", minValue);
-        setAttribute(band, "maxValue", maxValue);
+        setAttribute(band, "name",     name  );
+        setAttribute(band, "scale",    scale );
+        setAttribute(band, "offset",   offset);
+        final int minIndex = (int) minValue;
+        final int maxIndex = (int) maxValue;
+        if (minIndex == minValue && maxIndex == maxValue) {
+            /*
+             * Values should be integers most of the time since they are packed values
+             * (often index in a color palette). But we will allow floating point values
+             * in the 'else' section if they are not.
+             */
+            setAttribute(band, "minValue", minIndex);
+            setAttribute(band, "maxValue", maxIndex);
+        } else {
+            setAttribute(band, "minValue", minValue);
+            setAttribute(band, "maxValue", maxValue);
+        }
+        /*
+         * Formats all fill values as integers, or all as floating points. We expect integer
+         * values for the same reason than "minValue" and "maxValue" above, but are tolerant
+         * to floating point values. We apply a "all or nothing" rule for consistency.
+         */
         if (fillValues != null) {
-            final StringBuffer buffer = new StringBuffer();
+            int[] asIntegers = new int[fillValues.length];
             for (int i=0; i<fillValues.length; i++) {
-                if (i != 0) {
-                    buffer.append(' ');
+                final double value = fillValues[i];
+                if ((asIntegers[i] = (int) value) != value) {
+                    asIntegers = null; // Not integers; stop the check.
+                    break;
                 }
-                buffer.append(fillValues[i]);
             }
-            setAttribute(band, "fillValues", buffer.toString());
+            if (asIntegers != null) {
+                setAttribute(band, "fillValues", asIntegers);
+            } else {
+                setAttribute(band, "fillValues", fillValues);
+            }
         }
         sampleDimensions.appendChild(band);
+    }
+
+    /**
+     * Set the attribute to the specified enumeration value,
+     * or remove the attribute if the value is null.
+     *
+     * @param node  The node on which to set the attribute.
+     * @param name  The attribute name.
+     * @param value The attribute value.
+     */
+    protected static void setEnum(final Element node, final String name, final String value) {
+        setAttribute(node, name, value, true);
+    }
+
+    /**
+     * Set the attribute to the specified value,
+     * or remove the attribute if the value is null.
+     *
+     * @param node  The node on which to set the attribute.
+     * @param name  The attribute name.
+     * @param value The attribute value.
+     */
+    protected static void setAttribute(final Element node, final String name, final String value) {
+        setAttribute(node, name, value, false);
+    }
+
+    /**
+     * Set the attribute to the specified value,
+     * or remove the attribute if the value is null.
+     *
+     * @param node       The node on which to set the attribute.
+     * @param name       The attribute name.
+     * @param value      The attribute value.
+     * @param isCodeList Reformat the value if it is a code list.
+     */
+    private static void setAttribute(final Element node, final String name, String value, boolean isCodeList) {
+        if (value == null || (value=value.trim()).length() == 0) {
+            if (node.hasAttribute(name)) {
+                node.removeAttribute(name);
+            }
+        } else {
+            if (isCodeList) {
+                value = value.replace('_', ' ').trim().toLowerCase();
+            }
+            node.setAttribute(name, value);
+        }
+    }
+
+    /**
+     * Set the attribute to the specified integer value.
+     *
+     * @param node  The node on which to set the attribute.
+     * @param name  The attribute name.
+     * @param value The attribute value.
+     */
+    protected static void setAttribute(final Element node, final String name, final int value) {
+        node.setAttribute(name, Integer.toString(value));
+    }
+
+    /**
+     * Set the attribute to the specified array of values,
+     * or remove the attribute if the array is {@code null}.
+     *
+     * @param node  The node on which to set the attributes.
+     * @param name  The attribute name.
+     * @param value The attribute values.
+     */
+    protected static void setAttribute(final Element node, final String name, final int[] values) {
+        setAttribute(node, name, toSequence(values));
+    }
+
+    /**
+     * Set the attribute to the specified floating point value,
+     * or remove the attribute if the value is NaN.
+     *
+     * @param node  The node on which to set the attribute.
+     * @param name  The attribute name.
+     * @param value The attribute value.
+     */
+    protected static void setAttribute(final Element node, final String name, final double value) {
+        if (Double.isNaN(value) || Double.isInfinite(value)) {
+            if (node.hasAttribute(name)) {
+                node.removeAttribute(name);
+            }
+        } else {
+            node.setAttribute(name, Double.toString(value));
+        }
+    }
+
+    /**
+     * Set the attribute to the specified array of values,
+     * or remove the attribute if the array is {@code null}.
+     *
+     * @param node  The node on which to set the attributes.
+     * @param name  The attribute name.
+     * @param value The attribute values.
+     */
+    protected static void setAttribute(final Element node, final String name, final double[] values) {
+        setAttribute(node, name, toSequence(values));
+    }
+
+    /**
+     * Set the attribute to the specified value, or remove the attribute if the value is NaN.
+     *
+     * @param node  The node on which to set the attribute.
+     * @param name  The attribute name.
+     * @param value The attribute value.
+     */
+    protected static void setAttribute(final Element node, final String name, final Date value) {
+        String asText = null;
+        if (value != null) {
+            final Format format = (Format) MetadataAccessor.dateFormat.get();
+            asText = format.format(value);
+        }
+        setAttribute(node, name, asText);
+    }
+
+    /**
+     * Returns the specified array as a sequence.
+     */
+    private static String toSequence(final Object array) {
+        if (array == null) {
+            return null;
+        }
+        final StringBuffer buffer = new StringBuffer();
+        final int length = Array.getLength(array);
+        for (int i=0; i<length; i++) {
+            if (i != 0) {
+                buffer.append(' ');
+            }
+            buffer.append(Array.get(array, i));
+        }
+        return buffer.toString();
     }
 
     /**
