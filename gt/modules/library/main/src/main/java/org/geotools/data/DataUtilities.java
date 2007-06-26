@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.Map.Entry;
 
 import org.geotools.data.collection.CollectionDataStore;
@@ -65,10 +66,13 @@ import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.LogicFilter;
 import org.geotools.filter.MathExpression;
 import org.geotools.filter.NullFilter;
+import org.geotools.referencing.CRS;
 import org.geotools.resources.CRSUtilities;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
@@ -1436,7 +1440,12 @@ public class DataUtilities {
      * </ul>
      * 
      * <p>
-     * Where <i>hint</i> is "nilable".
+     * Where <i>hint</i> is "hint1;hint2;...;hintN", in which "hintN" is one 
+     * of:
+     * <ul>
+     *  <li><code>nillable</code></li>
+     *  <li><code>srid=<#></code></li>
+     * </ul>
      * </p>
      *
      * @param typeSpec
@@ -1469,12 +1478,37 @@ public class DataUtilities {
         }
 
         try {
-            if ((hint != null) && (hint.indexOf("nillable") != -1)) {
-                return AttributeTypeFactory.newAttributeType(name, type(type),
-                    true);
+            boolean nillable = true;
+            CoordinateReferenceSystem crs = null;
+            
+            if ( hint != null ) {
+                StringTokenizer st = new StringTokenizer( hint, ";" );
+                while ( st.hasMoreTokens() ) {
+                    String h = st.nextToken();
+                    h = h.trim();
+                    
+                    //nillable?
+                    //JD: i am pretty sure this hint is useless since the 
+                    // default is to make attributes nillable
+                    if ( h.equals( "nillable" )) {
+                        nillable = true;
+                    }
+                    //spatial reference identieger?
+                    if ( h.startsWith("srid=" )) {
+                        String srid = h.split("=")[1];
+                        Integer.parseInt( srid );
+                        try {
+                            crs = CRS.decode( "EPSG:" + srid );
+                        } 
+                        catch( Exception e ) {
+                            String msg = "Error decoding srs: " + srid;
+                            throw new SchemaException( msg, e );
+                        }
+                    }
+                }
             }
-
-            return AttributeTypeFactory.newAttributeType(name, type(type));
+            
+            return AttributeTypeFactory.newAttributeType(name, type(type), nillable, Integer.MAX_VALUE, null, crs );
         } catch (ClassNotFoundException e) {
             throw new SchemaException("Could not type " + name + " as:" + type);
         }
