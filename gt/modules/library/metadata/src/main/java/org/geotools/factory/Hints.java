@@ -167,16 +167,6 @@ public final class Hints extends RenderingHints {
             "org.opengis.referencing.datum.DatumFactory");
 
     /**
-     * The maximum number of referencing objects to hold in a
-     * {@linkplain org.opengis.referencing.AuthorityFactory authority factory}.
-     *
-     * @since 2.4
-     *
-     * @deprecated Seems redundant with {@link #BUFFER_LIMIT}?
-     */
-    public static final Key REFERENCING_CACHE_MAX = new IntegerKey(50);
-
-    /**
      * The {@link org.opengis.referencing.operation.CoordinateOperationFactory} instance to use.
      * 
      * @see org.geotools.referencing.FactoryFinder#getCoordinateOperationFactory

@@ -44,107 +44,249 @@ import org.opengis.referencing.cs.*;
 import org.opengis.referencing.crs.*;
 import org.opengis.referencing.datum.*;
 import org.opengis.referencing.operation.*;
+import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
+import org.geotools.factory.FactoryRegistryException;
+import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.factory.BufferedFactory;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
+import org.geotools.util.NameFactory;
 
 
 /**
- * A decorator that wraps an existing AuthorityFactory and caches all objects created.
- * <p>
- * All {@code createFoo(String)} methods first looks if a previously created object
- * exists for the given code. If such an object exists, it is returned. Otherwise,
- * the object creation is delegated to the {@linkplain AbstractAuthorityFactory authority factory}
- * specified at creation time, and the result is cached in this buffered factory. 
- * <p>
- * The kind of cache used internally can be specified at construction time.
- * <p>
- * For the default implementation: Objects are cached by strong references, up to the
- * amount of objects specified at construction time. If a greater amount of objects are
- * cached, the oldest ones will be retained through a {@linkplain WeakReference weak reference}
- * instead of a strong one. This means that this buffered factory will continue to returns
- * them as long as they are in use somewhere else in the Java virtual machine, but will be
- * discarted (and recreated on the fly if needed) otherwise.
+ * An authority factory that caches all objects created by delegate factories. This class is set up
+ * to cache the full complement of referencing objects:
+ * <ul>
+ * <li>AuthorityFactory from getAuthorityFactory()
+ * <li>CRSAuthorityFactory from getCRSAuthorityFactory()
+ * <li>CSAuthorityFactory from getCSAuthorityFactory()
+ * <li>DatumAuthorityFactory from getDatumAuthorityFactory()
+ * <li>CoordinateOperationAuthorityFactory from getCoordinateOperationAuthorityFactory()
+ * </ul>
+ * In many cases a single implementation will support several of the above interfaces.
  * </p>
+ * The behaviour of the {@code createFoo(String)} methods first looks if a previously created object
+ * exists for the given code. If such an object exists, it is returned directly. The testing of the
+ * cache is synchronized and may block if the referencing object is under construction.
+ * <p>
+ * If the object is not yet created, the definition is delegated to the appropratie the
+ * {@linkplain an AuthorityFactory authority factory} and the result is cached for next time.
+ * <p>
+ * This object is responsible for owning a {{ReferencingObjectCache}}; there are several
+ * implementations to choose from on construction.
+ * </p>
+ * 
  * @since 2.4
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/library/referencing/src/main/java/org/geotools/referencing/factory/AbstractBufferedAuthorityFactory.java $
  * @version $Id$
  * @author Jody Garnett
  */
-public class BufferedAuthorityDecorator extends AbstractBufferedAuthorityFactory {
+public final class BufferedAuthorityDecorator extends ReferencingFactory
+        implements
+            AuthorityFactory,
+            CRSAuthorityFactory
+// CSAuthorityFactory,
+// DatumAuthorityFactory,
+// CoordinateOperationAuthorityFactory,
+// BufferedFactory
+            {
 
-    /**
-     * The underlying authority factory. This field may be {@code null} if this object was
-     * created by the {@linkplain #BufferedAuthorityFactory(AbstractAuthorityFactory,int)
-     * package protected constructor}. In this case, the subclass is responsible for creating
-     * the backing store when {@link DeferredAuthorityFactory#createBackingStore} is invoked.
-     *
-     * @see #getBackingStore
-     * @see DeferredAuthorityFactory#createBackingStore
-     */
-    AuthorityFactory backingStore;
+    /** Cache to be used for referencing objects. */ 
+    ReferencingObjectCache cache;
+
+    /** The delegate authority. */
+    private AuthorityFactory authority; 
     
+    /** The delegate authority for coordinate reference systems. */
+    private CRSAuthorityFactory crsAuthority;
 
+    /** The delegate authority for coordinate sytems. */
+    private CSAuthorityFactory csAuthority;
+
+    /** The delegate authority for datums. */
+    private DatumAuthorityFactory datumAuthority;
+    
+    /** The delegate authority for coordinate operations. */
+    private CoordinateOperationAuthorityFactory operationAuthority;
     /**
-     * Constructs an instance wrapping the specified factory with a default number
-     * of entries to keep by strong reference.
+     * Constructs an instance wrapping the specified factory with a default cache.
      * <p>
-     * This constructor is protected because subclasses must declare which of the
-     * {@link DatumAuthorityFactory}, {@link CSAuthorityFactory}, {@link CRSAuthorityFactory}
-     * and {@link CoordinateOperationAuthorityFactory} interfaces they choose to implement.
-     *
+     * The provided authority factory must implement {@link DatumAuthorityFactory},
+     * {@link CSAuthorityFactory}, {@link CRSAuthorityFactory} and
+     * {@link CoordinateOperationAuthorityFactory} .
+     * 
      * @param factory The factory to cache. Can not be {@code null}.
      */
-    protected BufferedAuthorityDecorator(final AuthorityFactory factory) {
-        super( new DefaultReferencingObjectCache( DEFAULT_MAX ) );
-        backingStore = factory;
+    public BufferedAuthorityDecorator(final AuthorityFactory factory) {
+        this( factory, createCache( GeoTools.getDefaultHints()) );
     }
 
     /**
      * Constructs an instance wrapping the specified factory. The {@code maxStrongReferences}
      * argument specify the maximum number of objects to keep by strong reference. If a greater
-     * amount of objects are created, then the strong references for the oldest ones are replaced
-     * by weak references.
+     * amount of objects are created, then the strong references for the oldest ones are replaced by
+     * weak references.
      * <p>
      * This constructor is protected because subclasses must declare which of the
-     * {@link DatumAuthorityFactory}, {@link CSAuthorityFactory}, {@link CRSAuthorityFactory}
-     * and {@link CoordinateOperationAuthorityFactory} interfaces they choose to implement.
-     *
+     * {@link DatumAuthorityFactory}, {@link CSAuthorityFactory}, {@link CRSAuthorityFactory} and
+     * {@link CoordinateOperationAuthorityFactory} interfaces they choose to implement.
+     * 
      * @param factory The factory to cache. Can not be {@code null}.
      * @param maxStrongReferences The maximum number of objects to keep by strong reference.
      */
-    protected BufferedAuthorityDecorator(AbstractAuthorityFactory factory,
-                                       final int maxStrongReferences)
+    protected BufferedAuthorityDecorator(AuthorityFactory factory, ReferencingObjectCache cache)
     {
-        super( new DefaultReferencingObjectCache( maxStrongReferences ) );
-        backingStore = factory;
+        this.cache = cache;
+        authority = factory;
+        crsAuthority = (CRSAuthorityFactory) factory;
+        csAuthority = (CSAuthorityFactory) factory;
+        datumAuthority = (DatumAuthorityFactory) factory;
+        operationAuthority = (CoordinateOperationAuthorityFactory) factory;
+    }
+    
+    /** Utility method used to produce cache based on hint */
+    protected static ReferencingObjectCache createCache(final Hints hints) throws FactoryRegistryException {
+        String policy = (String) hints.get( Hints.BUFFER_POLICY );
+        int limit = Hints.BUFFER_LIMIT.toValue( hints );
+        
+        if( "weak".equalsIgnoreCase(policy) ){
+            return new DefaultReferencingObjectCache( 0 );
+        }
+        else if ( "all".equalsIgnoreCase(policy) ){
+            return new DefaultReferencingObjectCache( limit );
+        }
+        else if ( "none".equalsIgnoreCase(policy )){        
+            return new NullReferencingObjectCache();
+        }
+        else {
+            return new DefaultReferencingObjectCache( limit );
+        }
+    }
+    //
+    // Utility Methods and Cache Care and Feeding
+    //
+    protected String trimAuthority(String code) {
+        /*
+         * IMPLEMENTATION NOTE: This method is overrided in PropertyAuthorityFactory. If
+         * implementation below is modified, it is probably worth to revisit the overrided method as
+         * well.
+         */
+        code = code.trim();
+        final GenericName name  = NameFactory.create(code);
+        final GenericName scope = name.getScope();
+        if (scope == null) {
+            return code;
+        }
+        if (Citations.identifierMatches(getAuthority(), scope.toString())) {
+            return name.asLocalName().toString().trim();
+        }
+        return code;
+    }
+    //
+    // AuthorityFactory
+    //    
+    public IdentifiedObject createObject( String code ) throws FactoryException {
+        IdentifiedObject value;        
+        synchronized( cache ){
+            value = (IdentifiedObject) cache.get(code);
+        }
+        if( value == null ){
+            // todo lock the code *only*
+            value = authority.createObject( code );
+            synchronized( cache ){
+                if( cache.get(code) == null ){
+                    cache.put( code, value );
+                }
+            }    
+        }
+        return value;
     }
 
-    /**
-     * Constructs an instance without initial backing store. This constructor is for subclass
-     * constructors only. Subclasses are responsible for creating an appropriate backing store
-     * when the {@link DeferredAuthorityFactory#createBackingStore} method is invoked.
-     *
-     * @param priority The priority for this factory, as a number between
-     *        {@link #MINIMUM_PRIORITY MINIMUM_PRIORITY} and
-     *        {@link #MAXIMUM_PRIORITY MAXIMUM_PRIORITY} inclusive.
-     * @param maxStrongReferences The maximum number of objects to keep by strong reference.
-     *
-     * @see DeferredAuthorityFactory#createBackingStore
-     */
-    BufferedAuthorityDecorator(final int priority, final int maxStrongReferences) {
-        super( priority, new DefaultReferencingObjectCache( maxStrongReferences ));
-        // completeHints() will be invoked by DeferredAuthorityFactory.getBackingStore()
+    public Citation getAuthority() {
+        return authority.getAuthority();
     }
 
-    protected AuthorityFactory getBackingStore() {
-        return backingStore;
+    public Set getAuthorityCodes( Class type ) throws FactoryException {
+        return authority.getAuthorityCodes( type );
     }
+
+    public InternationalString getDescriptionText( String code ) throws FactoryException {
+        return authority.getDescriptionText( code );
+    }
+    //
+    // CRSAuthority
+    //
+    public synchronized CompoundCRS createCompoundCRS( final String code ) throws FactoryException {
+        final String key = trimAuthority(code);
+        CompoundCRS crs;        
+        synchronized( cache ){
+            crs = (CompoundCRS) cache.get(key);
+        }
+        if( crs == null ){
+            // todo lock the code *only*
+            crs = crsAuthority.createCompoundCRS( code );
+            synchronized( cache ){
+                if( cache.get(key) == null ){
+                    cache.put( code, crs );
+                }
+            }    
+        }
+        return crs;
+    }
+    
+    public CoordinateReferenceSystem createCoordinateReferenceSystem( String code ) throws FactoryException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public DerivedCRS createDerivedCRS( String code ) throws FactoryException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public EngineeringCRS createEngineeringCRS( String code ) throws FactoryException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public GeocentricCRS createGeocentricCRS( String code ) throws FactoryException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public GeographicCRS createGeographicCRS( String code ) throws FactoryException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public ImageCRS createImageCRS( String code ) throws FactoryException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public ProjectedCRS createProjectedCRS( String code ) throws FactoryException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public TemporalCRS createTemporalCRS( String code ) throws FactoryException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public VerticalCRS createVerticalCRS( String code ) throws FactoryException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+
 }

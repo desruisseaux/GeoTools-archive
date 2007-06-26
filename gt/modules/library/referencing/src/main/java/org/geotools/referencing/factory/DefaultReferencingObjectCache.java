@@ -22,6 +22,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import org.geotools.factory.Hints;
+
 
 /**
  * Caching implementation for ReferencingObjectCache. This instance is used when
@@ -56,6 +58,9 @@ final class DefaultReferencingObjectCache implements ReferencingObjectCache {
      */
     private final int maxStrongReferences;
 
+    public DefaultReferencingObjectCache() {
+        this( Hints.BUFFER_LIMIT.getDefault() );
+    }
     /**
      * Creates a new cache which will hold the specified amount of object by strong references.
      * Any additional object will be help by weak references.
