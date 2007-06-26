@@ -17,10 +17,13 @@ package org.geotools.factory;
 
 // J2SE dependencies
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.TreeSet;
 import java.awt.RenderingHints;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -158,6 +161,14 @@ public final class Hints extends RenderingHints {
      */
     public static final Key DATUM_FACTORY = new ClassKey(
             "org.opengis.referencing.datum.DatumFactory");
+    
+    /**
+     * The {@link org.opengis.referencing.datum.DatumFactory} instance to use.
+     * 
+     * @see org.geotools.referencing.FactoryFinder#getDatumFactory
+     */
+    public static final Key REFERENCING_CACHE_MAX = new ClassKey(
+            "org.opengis.referencing.cache.max");
 
     /**
      * The {@link org.opengis.referencing.operation.CoordinateOperationFactory} instance to use.
@@ -261,6 +272,12 @@ public final class Hints extends RenderingHints {
     ////////                                                        ////////
     ////////////////////////////////////////////////////////////////////////
 
+    /** Policy to use for caching referencing objects */
+    public static final OptionKey BUFFER_POLICY = new OptionKey( "weak", "all", "none");
+    
+    /** Recommended buffer limit. */
+    public static final IntegerKey BUFFER_LIMIT = new IntegerKey( 50 );
+    
     /**
      * The default {@link org.opengis.referencing.crs.CoordinateReferenceSystem}
      * to use. This is used by some factories capable to provide a default CRS
@@ -322,7 +339,7 @@ public final class Hints extends RenderingHints {
      * 
      * @see org.geotools.referencing.FactoryFinder#getCoordinateOperationFactory
      */
-    public static final Key DATUM_SHIFT_METHOD = new Key(String.class);
+    public static final OptionKey DATUM_SHIFT_METHOD = new OptionKey("Molodenski","Abridged_Molodenski","Geocentric","*");
 
     /**
      * Tells if {@linkplain org.opengis.referencing.operation.CoordinateOperation coordinate
@@ -984,7 +1001,101 @@ public final class Hints extends RenderingHints {
             return parent!=null && parent.canWrite();
         }
     }
+    
+    /**
+     * A hint used to capture a configuration setting.
+     * <p>
+     * A default is provided and may be checked with getDefault()
+     * <p>
+     * @author Jody
+     */
+    public static final class IntegerKey extends Key {
+        private int number;
+        public IntegerKey( int number ) {
+            super( Integer.class );
+            this.number = number;
+        }
+        public int getDefault(){
+            return number;
+        }
+        public int toValue( Hints hints ){
+            Object value = hints.get( this );
+            if( value == null ){
+                return number;
+            }
+            else if( value instanceof Integer ){
+                return ((Integer)value).intValue();
+            }
+            else if( value instanceof String){
+                return Integer.parseInt( (String) value );
+            }
+            else {
+                return number;    
+            }            
+        }
+        public boolean isCompatibleValue( Object value ) {
+            return value instanceof Integer || value instanceof String;
+        }        
+    }
+    /**
+     * Key that allows the choice of several options.
+     * You can use "*" as a wild card to indicate that undocumented options
+     * may be supported (but there is no assurances - {@link #DATUM_SHIFT_METHOD}.
+     */
+    public static final class OptionKey extends Key {
+        private Set options;        
+        /**
+         * Creates a new key for a configuration option.
+         */
+        public OptionKey( String option1, String option2 ) {
+            super(String.class);
+            options = new TreeSet();
+            options.add( option1 );
+            options.add( option2 );
+        }
+        /**
+         * Creates a new key for a configuration option.
+         */
+        public OptionKey( String option1, String option2, String option3 ) {
+            super(String.class);
+            options = new TreeSet();
+            options.add( option1 );
+            options.add( option2 );
+            options.add( option3 );
+        }
+        /**
+         * Creates a new key for a configuration option.
+         */
+        public OptionKey( String option1, String option2, String option3, String option4 ) {
+            super(String.class);
+            options = new TreeSet();
+            options.add( option1 );
+            options.add( option2 );
+            options.add( option3 );
+            options.add( option4 );
+        }
+        /**
+         * Creates a new key for a configuration option.
+         */
+        public OptionKey( String alternatives[]) {
+            super(String.class);
+            this.options = new TreeSet( Arrays.asList( alternatives ) );
+        }
 
+        /**
+         * Returns {@code true} if the specified object is a data source or data source name.
+         */
+        //@Override
+        public boolean isCompatibleValue(final Object value) {
+            return value instanceof String && (options.contains( value ) || options.contains(null) );
+        }
+        
+        /** List of available options */
+        public Set getOptions(){
+            return Collections.unmodifiableSet( options );
+        }
+    }
+    
     /**
      * Key for hints to be specified as a {@link javax.sql.DataSource}.
      * The file may also be specified as a {@link String} object.
