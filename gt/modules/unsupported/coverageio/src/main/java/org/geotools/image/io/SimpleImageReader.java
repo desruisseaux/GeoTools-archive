@@ -411,24 +411,49 @@ public abstract class SimpleImageReader extends ImageReader {
     /**
      * Flips the source region vertically. This method should be invoked straight after
      * {@link #computeRegions computeRegions} when the image to be read will be flipped
-     * vertically. Example:
+     * vertically, for example when the {@linkplain java.awt.image.Raster raster} sample
+     * values are filled in a "{@code for (y=ymax-1; y>=ymin; y--)}" loop instead of
+     * "{@code for (y=ymin; y<ymax; y++)}".
+     * <p>
+     * This method should be invoked as in the example below:
      *
      * <blockquote><pre>
-     * computeRegions(param, width, height, image, srcRegion, destRegion);
-     * flipVertically(param, height, srcRegion);
+     * computeRegions(param, srcWidth, srcHeight, image, srcRegion, destRegion);
+     * flipVertically(param, srcHeight, srcRegion);
      * </pre></blockquote>
      *
      * @param param     The {@code param}     argument given to {@code computeRegions}.
-     * @param height    The {@code srcHeight} argument given to {@code computeRegions}.
+     * @param srcHeight The {@code srcHeight} argument given to {@code computeRegions}.
      * @param srcRegion The {@code srcRegion} argument given to {@code computeRegions}.
+     *
+     * @since 2.4
      */
-    protected static void flipVertically(final ImageReadParam param, final int height,
+    protected static void flipVertically(final ImageReadParam param, final int srcHeight,
                                          final Rectangle srcRegion)
     {
-        srcRegion.y = height - (srcRegion.y + srcRegion.height);
+        final int spaceLeft = srcRegion.y;
+        srcRegion.y = srcHeight - (srcRegion.y + srcRegion.height);
+        /*
+         * After the flip performed by the above line, we still have 'spaceLeft' pixels left for
+         * a downward translation.  We usually don't need to care about if, except if the source
+         * region is very close to the bottom of the source image,  in which case the correction
+         * computed below may be greater than the space left.
+         *
+         * We are done if there is no vertical subsampling. But if there is subsampling, then we
+         * need an adjustment. The flipping performed above must be computed as if the source
+         * region had exactly the size needed for reading nothing more than the last line, i.e.
+         * 'srcRegion.height' must be a multiple of 'sourceYSubsampling' plus 1. The "offset"
+         * correction is computed below accordingly.
+         */
         if (param != null) {
-            int offset = height % param.getSourceYSubsampling();
-            srcRegion.y = Math.min(srcRegion.y + offset, height - srcRegion.height);
+            int offset = (srcRegion.height - 1) % param.getSourceYSubsampling();
+            srcRegion.y += offset;
+            offset -= spaceLeft;
+            if (offset > 0) {
+                // Happen only if we are very close to image border and
+                // the above translation bring us outside the image area.
+                srcRegion.height -= offset;
+            }
         }
     }
 

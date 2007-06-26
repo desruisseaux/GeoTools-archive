@@ -219,7 +219,7 @@ public abstract class XAffineTransform extends AffineTransform {
      *
      * <blockquote><pre>
      * [ 1.0000000000000000001  0.0                      0.0 ]
-     * [ 0.0                    0.999999999999999999999	 0.0 ]
+     * [ 0.0                    0.999999999999999999999  0.0 ]
      * [ 0.0                    0.0                      1.0 ]
      * </pre></blockquote>
      *   

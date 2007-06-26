@@ -57,12 +57,13 @@ final class WeakCollectionCleaner extends Thread {
     final ReferenceQueue referenceQueue = new ReferenceQueue();
 
     /**
-     * Construct and start a new thread as a daemon. This thread will be stoped
+     * Constructs and starts a new thread as a daemon. This thread will be sleeping
      * most of the time.  It will run only some few nanoseconds each time a new
      * {@link WeakReference} is enqueded.
      */
     private WeakCollectionCleaner() {
         super("WeakCollectionCleaner");
+        setPriority(MAX_PRIORITY - 2);
         setDaemon(true);
         start();
     }
@@ -77,8 +78,6 @@ final class WeakCollectionCleaner extends Thread {
         while (referenceQueue != null) {
             try {
                 // Block until a reference is enqueded.
-                // Note: To be usefull, the clear() method must have
-                //       been overridden in Reference subclasses.
                 final Reference ref = referenceQueue.remove();
                 if (ref == null) {
                     /*
@@ -94,6 +93,8 @@ final class WeakCollectionCleaner extends Thread {
                     break;
                 }
                 ref.clear();
+                // Note: To be usefull, the clear() method must have been overridden in Reference
+                //       subclasses. This is what WeakHashSet.Entry and WeakHashMap.Entry do.
             } catch (InterruptedException exception) {
                 // Somebody doesn't want to lets us sleep... Go back to work.
             } catch (Exception exception) {

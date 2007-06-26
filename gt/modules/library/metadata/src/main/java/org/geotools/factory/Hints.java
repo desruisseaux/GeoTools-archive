@@ -16,6 +16,7 @@
 package org.geotools.factory;
 
 // J2SE dependencies
+import java.awt.RenderingHints;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
@@ -24,10 +25,13 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
-import java.awt.RenderingHints;
+import java.util.logging.Logger;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import javax.sql.DataSource;
+
+// OpenGIS dependencies
+import org.opengis.util.InternationalString;
 
 // Geotools Dependencies
 import org.geotools.util.Logging;
@@ -88,7 +92,7 @@ public final class Hints extends RenderingHints {
      * 
      * @see org.geotools.geometry.jts.FactoryFinder#getGeometryFactory
      */
-    public static final Key JTS_GEOMETRY_FACTORY = new ClassKey(
+    public static final ClassKey JTS_GEOMETRY_FACTORY = new ClassKey(
             "com.vividsolutions.jts.geom.GeometryFactory");
 
     /**
@@ -96,7 +100,7 @@ public final class Hints extends RenderingHints {
      * 
      * @see org.geotools.geometry.jts.FactoryFinder#getCoordinateSequenceFactory
      */
-    public static final Key JTS_COORDINATE_SEQUENCE_FACTORY = new ClassKey(
+    public static final ClassKey JTS_COORDINATE_SEQUENCE_FACTORY = new ClassKey(
             "com.vividsolutions.jts.geom.CoordinateSequenceFactory");
 
     /**
@@ -104,7 +108,7 @@ public final class Hints extends RenderingHints {
      * 
      * @see org.geotools.geometry.jts.FactoryFinder#getPrecisionModel
      */
-    public static final Key JTS_PRECISION_MODEL = new ClassKey(
+    public static final Key JTS_PRECISION_MODEL = new Key(
             "com.vividsolutions.jts.geom.PrecisionModel");
 
     /**
@@ -119,7 +123,7 @@ public final class Hints extends RenderingHints {
      * 
      * @see org.geotools.referencing.FactoryFinder#getCRSAuthorityFactory
      */
-    public static final Key CRS_AUTHORITY_FACTORY = new ClassKey(
+    public static final ClassKey CRS_AUTHORITY_FACTORY = new ClassKey(
             "org.opengis.referencing.crs.CRSAuthorityFactory");
 
     /**
@@ -127,7 +131,7 @@ public final class Hints extends RenderingHints {
      * 
      * @see org.geotools.referencing.FactoryFinder#getCSAuthorityFactory
      */
-    public static final Key CS_AUTHORITY_FACTORY = new ClassKey(
+    public static final ClassKey CS_AUTHORITY_FACTORY = new ClassKey(
             "org.opengis.referencing.cs.CSAuthorityFactory");
 
     /**
@@ -135,7 +139,7 @@ public final class Hints extends RenderingHints {
      * 
      * @see org.geotools.referencing.FactoryFinder#getDatumAuthorityFactory
      */
-    public static final Key DATUM_AUTHORITY_FACTORY = new ClassKey(
+    public static final ClassKey DATUM_AUTHORITY_FACTORY = new ClassKey(
             "org.opengis.referencing.datum.DatumAuthorityFactory");
 
     /**
@@ -143,7 +147,7 @@ public final class Hints extends RenderingHints {
      * 
      * @see org.geotools.referencing.FactoryFinder#getCRSFactory
      */
-    public static final Key CRS_FACTORY = new ClassKey(
+    public static final ClassKey CRS_FACTORY = new ClassKey(
             "org.opengis.referencing.crs.CRSFactory");
 
     /**
@@ -151,7 +155,7 @@ public final class Hints extends RenderingHints {
      * 
      * @see org.geotools.referencing.FactoryFinder#getCSFactory
      */
-    public static final Key CS_FACTORY = new ClassKey(
+    public static final ClassKey CS_FACTORY = new ClassKey(
             "org.opengis.referencing.cs.CSFactory");
 
     /**
@@ -159,23 +163,25 @@ public final class Hints extends RenderingHints {
      * 
      * @see org.geotools.referencing.FactoryFinder#getDatumFactory
      */
-    public static final Key DATUM_FACTORY = new ClassKey(
+    public static final ClassKey DATUM_FACTORY = new ClassKey(
             "org.opengis.referencing.datum.DatumFactory");
-    
+
     /**
-     * The {@link org.opengis.referencing.datum.DatumFactory} instance to use.
-     * 
-     * @see org.geotools.referencing.FactoryFinder#getDatumFactory
+     * The maximum number of referencing objects to hold in a
+     * {@linkplain org.opengis.referencing.AuthorityFactory authority factory}.
+     *
+     * @since 2.4
+     *
+     * @deprecated Seems redundant with {@link #BUFFER_LIMIT}?
      */
-    public static final Key REFERENCING_CACHE_MAX = new ClassKey(
-            "org.opengis.referencing.cache.max");
+    public static final Key REFERENCING_CACHE_MAX = new IntegerKey(50);
 
     /**
      * The {@link org.opengis.referencing.operation.CoordinateOperationFactory} instance to use.
      * 
      * @see org.geotools.referencing.FactoryFinder#getCoordinateOperationFactory
      */
-    public static final Key COORDINATE_OPERATION_FACTORY = new ClassKey(
+    public static final ClassKey COORDINATE_OPERATION_FACTORY = new ClassKey(
             "org.opengis.referencing.operation.CoordinateOperationFactory");
 
     /**
@@ -184,7 +190,7 @@ public final class Hints extends RenderingHints {
      * 
      * @see org.geotools.referencing.FactoryFinder#getCoordinateOperationAuthorityFactory
      */
-    public static final Key COORDINATE_OPERATION_AUTHORITY_FACTORY = new ClassKey(
+    public static final ClassKey COORDINATE_OPERATION_AUTHORITY_FACTORY = new ClassKey(
             "org.opengis.referencing.operation.CoordinateOperationAuthorityFactory");
 
     /**
@@ -192,7 +198,7 @@ public final class Hints extends RenderingHints {
      * 
      * @see org.geotools.referencing.FactoryFinder#getMathTransformFactory
      */
-    public static final Key MATH_TRANSFORM_FACTORY = new ClassKey(
+    public static final ClassKey MATH_TRANSFORM_FACTORY = new ClassKey(
             "org.opengis.referencing.operation.MathTransformFactory");
 
     /**
@@ -202,7 +208,7 @@ public final class Hints extends RenderingHints {
      *
      * @since 2.4
      */
-    public static final Key FEATURE_LOCK_FACTORY = new ClassKey(
+    public static final ClassKey FEATURE_LOCK_FACTORY = new ClassKey(
             "org.geotools.data.FeatureLockFactory");
 
     /**
@@ -212,7 +218,7 @@ public final class Hints extends RenderingHints {
      *
      * @since 2.4
      */
-    public static final Key FEATURE_COLLECTIONS = new ClassKey(
+    public static final ClassKey FEATURE_COLLECTIONS = new ClassKey(
             "org.geotools.feature.FeatureCollections");
 
     /**
@@ -222,7 +228,7 @@ public final class Hints extends RenderingHints {
      *
      * @since 2.4
      */
-    public static final Key FEATURE_TYPE_FACTORY = new ClassKey(
+    public static final ClassKey FEATURE_TYPE_FACTORY = new ClassKey(
             "org.geotools.feature.FeatureTypeFactory");
 
     /**
@@ -241,7 +247,7 @@ public final class Hints extends RenderingHints {
      *
      * @since 2.4
      */
-    public static final Key STYLE_FACTORY = new ClassKey(
+    public static final ClassKey STYLE_FACTORY = new ClassKey(
             "org.geotools.styling.StyleFactory");
 
     /**
@@ -251,7 +257,7 @@ public final class Hints extends RenderingHints {
      *
      * @since 2.4
      */
-    public static final Key ATTRIBUTE_TYPE_FACTORY = new ClassKey(
+    public static final ClassKey ATTRIBUTE_TYPE_FACTORY = new ClassKey(
             "org.geotools.feature.AttributeTypeFactory");
 
     /**
@@ -261,7 +267,7 @@ public final class Hints extends RenderingHints {
      *
      * @since 2.4
      */
-    public static final Key FILTER_FACTORY = new ClassKey(
+    public static final ClassKey FILTER_FACTORY = new ClassKey(
             "org.opengis.filter.FilterFactory");
 
 
@@ -271,12 +277,6 @@ public final class Hints extends RenderingHints {
     ////////              Coordinate Reference Systems              ////////
     ////////                                                        ////////
     ////////////////////////////////////////////////////////////////////////
-
-    /** Policy to use for caching referencing objects */
-    public static final OptionKey BUFFER_POLICY = new OptionKey( "weak", "all", "none");
-    
-    /** Recommended buffer limit. */
-    public static final IntegerKey BUFFER_LIMIT = new IntegerKey( 50 );
     
     /**
      * The default {@link org.opengis.referencing.crs.CoordinateReferenceSystem}
@@ -285,7 +285,7 @@ public final class Hints extends RenderingHints {
      * 
      * @since 2.2
      */
-    public static final Key DEFAULT_COORDINATE_REFERENCE_SYSTEM = new ClassKey(
+    public static final Key DEFAULT_COORDINATE_REFERENCE_SYSTEM = new Key(
             "org.opengis.referencing.crs.CoordinateReferenceSystem");
 
     /**
@@ -307,7 +307,7 @@ public final class Hints extends RenderingHints {
      *
      * @since 2.4
      */
-    public static final Key CRS_AUTHORITY_EXTRA_DIRECTORY = new FileKey(false);
+    public static final FileKey CRS_AUTHORITY_EXTRA_DIRECTORY = new FileKey(false);
 
     /**
      * The {@linkplain javax.sql.DataSource data source} name to lookup from JNDI when
@@ -454,6 +454,30 @@ public final class Hints extends RenderingHints {
     public static final Key FORCE_STANDARD_AXIS_UNITS = new Key(Boolean.class);
 
     /**
+     * Policy to use for caching referencing objects. Valid values are:
+     * <p>
+     * <ul>
+     *   <li>{@code "weak"} for holding values through {@linkplain java.lang.ref.WeakReference
+     *       weak references}. This option do not actually cache the objects since the garbage
+     *       collector cleans weak references agressively, but it allows sharing the instances
+     *       already created and still in use.</li>
+     *   <li>{@code "all"} for holding values through strong references.</li>
+     *   <li>{@code "none"} for disabling the cache.</li>
+     * </ul>
+     *
+     * @since 2.4
+     */
+    public static final OptionKey BUFFER_POLICY = new OptionKey("weak", "all", "none");
+
+    /**
+     * The recommended maximum number of referencing objects to hold in a
+     * {@linkplain org.opengis.referencing.AuthorityFactory authority factory}.
+     *
+     * @since 2.4
+     */
+    public static final IntegerKey BUFFER_LIMIT = new IntegerKey(50);
+
+    /**
      * Version number of the requested service. This hint is used for example in order to get
      * a {@linkplain org.opengis.referencing.crs.CRSAuthorityFactory CRS authority factory}
      * backed by a particular version of EPSG database. The value should be an instance of
@@ -477,7 +501,7 @@ public final class Hints extends RenderingHints {
      * @deprecated The {@code GridCoverageProcessor} interface is not yet
      *             stable. Avoid dependencies if possible.
      */
-    public static final Key GRID_COVERAGE_PROCESSOR = new ClassKey(Object.class);
+    public static final Key GRID_COVERAGE_PROCESSOR = new Key(Object.class);
     // TODO new Key("org.opengis.coverage.processing.GridCoverageProcessor");
 
     /**
@@ -533,7 +557,7 @@ public final class Hints extends RenderingHints {
     /**
      * The {@link javax.media.jai.JAI} instance to use.
      */
-    public static final Key JAI_INSTANCE = new ClassKey("javax.media.jai.JAI");
+    public static final Key JAI_INSTANCE = new Key("javax.media.jai.JAI");
 
     /**
      * The {@link org.opengis.coverage.SampleDimensionType} to use.
@@ -849,6 +873,11 @@ public final class Hints extends RenderingHints {
          * @param value
          *            The object to test for validity.
          * @return {@code true} if the value is valid; {@code false} otherwise.
+         *
+         * @see Hints.ClassKey#isCompatibleValue
+         * @see Hints.FileKey#isCompatibleValue
+         * @see Hints.IntegerKey#isCompatibleValue
+         * @see Hints.OptionKey#isCompatibleValue
          */
         public boolean isCompatibleValue(final Object value) {
             return getValueClass().isInstance(value);
@@ -896,7 +925,7 @@ public final class Hints extends RenderingHints {
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    static final class ClassKey/*<T>*/ extends Key/*<T>*/ {
+    public static final class ClassKey/*<T>*/ extends Key/*<T>*/ {
         /**
          * Constructs a new key for values of the given class.
          * 
@@ -964,7 +993,7 @@ public final class Hints extends RenderingHints {
      * @author Jody Garnett
      * @author Martin Desruisseaux
      */
-    static final class FileKey extends Key {
+    public static final class FileKey extends Key {
         /**
          * {@code true} if write operations need to be allowed.
          */
@@ -1001,101 +1030,154 @@ public final class Hints extends RenderingHints {
             return parent!=null && parent.canWrite();
         }
     }
-    
+
     /**
-     * A hint used to capture a configuration setting.
-     * <p>
-     * A default is provided and may be checked with getDefault()
-     * <p>
-     * @author Jody
+     * A hint used to capture a configuration setting as an integer.
+     * A default value is provided and may be checked with {@link #getDefault()}.
+     *
+     * @since 2.4
+     * @source $URL$
+     * @version $Id$
+     * @author Jody Garnett
      */
     public static final class IntegerKey extends Key {
-        private int number;
-        public IntegerKey( int number ) {
-            super( Integer.class );
+        /**
+         * The default value.
+         */
+        private final int number;
+
+        /**
+         * Creates a new key with the specified default value.
+         */
+        public IntegerKey(final int number) {
+            super(Integer.class);
             this.number = number;
-        }
-        public int getDefault(){
-            return number;
-        }
-        public int toValue( Hints hints ){
-            Object value = hints.get( this );
-            if( value == null ){
-                return number;
-            }
-            else if( value instanceof Integer ){
-                return ((Integer)value).intValue();
-            }
-            else if( value instanceof String){
-                return Integer.parseInt( (String) value );
-            }
-            else {
-                return number;    
-            }            
-        }
-        public boolean isCompatibleValue( Object value ) {
-            return value instanceof Integer || value instanceof String;
-        }        
-    }
-    /**
-     * Key that allows the choice of several options.
-     * You can use "*" as a wild card to indicate that undocumented options
-     * may be supported (but there is no assurances - {@link #DATUM_SHIFT_METHOD}.
-     */
-    public static final class OptionKey extends Key {
-        private Set options;        
-        /**
-         * Creates a new key for a configuration option.
-         */
-        public OptionKey( String option1, String option2 ) {
-            super(String.class);
-            options = new TreeSet();
-            options.add( option1 );
-            options.add( option2 );
-        }
-        /**
-         * Creates a new key for a configuration option.
-         */
-        public OptionKey( String option1, String option2, String option3 ) {
-            super(String.class);
-            options = new TreeSet();
-            options.add( option1 );
-            options.add( option2 );
-            options.add( option3 );
-        }
-        /**
-         * Creates a new key for a configuration option.
-         */
-        public OptionKey( String option1, String option2, String option3, String option4 ) {
-            super(String.class);
-            options = new TreeSet();
-            options.add( option1 );
-            options.add( option2 );
-            options.add( option3 );
-            options.add( option4 );
-        }
-        /**
-         * Creates a new key for a configuration option.
-         */
-        public OptionKey( String alternatives[]) {
-            super(String.class);
-            this.options = new TreeSet( Arrays.asList( alternatives ) );
         }
 
         /**
-         * Returns {@code true} if the specified object is a data source or data source name.
+         * Returns the default value.
+         */
+        public int getDefault(){
+            return number;
+        }
+
+        /**
+         * Returns the value from the specified hints as an integer. If no value were found
+         * for this key, then this method returns the {@linkplain #getDefault default value}.
+         *
+         * @param  hints The map where to fetch the hint value, or {@code null}.
+         * @return The hint value as an integer, or the default value if not hint
+         *         was explicitly set.
+         */
+        public int toValue(final Hints hints) {
+            if (hints != null) {
+                final Object value = hints.get(this);
+                if (value instanceof Number) {
+                    return ((Number) value).intValue();
+                } else if (value instanceof CharSequence) {
+                    return Integer.parseInt(value.toString());
+                }
+            }            
+            return number;    
+        }
+
+        /**
+         * Returns {@code true} if the specified object is a valid integer.
          */
         //@Override
         public boolean isCompatibleValue(final Object value) {
-            return value instanceof String && (options.contains( value ) || options.contains(null) );
+            if (value instanceof Short || value instanceof Integer) {
+                return true;
+            }
+            if (value instanceof String || value instanceof InternationalString) {
+                try {
+                    Integer.parseInt(value.toString());
+                } catch (NumberFormatException e) {
+                    Logger.getLogger("org.geotools.factory").finer(e.toString());
+                }
+            }
+            return false;
+        }        
+    }
+
+    /**
+     * Key that allows the choice of several options.
+     * You can use {@code "*"} as a wild card to indicate that undocumented options
+     * may be supported (but there is no assurances - {@link Hints#DATUM_SHIFT_METHOD}).
+     *
+     * @since 2.4
+     * @source $URL$
+     * @version $Id$
+     * @author Jody Garnett
+     */
+    public static final class OptionKey extends Key {
+        /**
+         * The set of options allowed.
+         */
+        private final Set options;
+
+        /**
+         * {@code true} if the {@code "*"} wildcard was given in the set of options.
+         */
+        private final boolean wildcard;
+
+        /**
+         * Creates a new key for a configuration option.
+         *
+         * @todo Replace by variable arguments length when we will be allowed to compile for J2SE 1.5.
+         */
+        public OptionKey(String option1, String option2) {
+            this(new String[] {option1, option2});
         }
-        
-        /** List of available options */
-        public Set getOptions(){
-            return Collections.unmodifiableSet( options );
+
+        /**
+         * Creates a new key for a configuration option.
+         *
+         * @todo Replace by variable arguments length when we will be allowed to compile for J2SE 1.5.
+         */
+        public OptionKey(String option1, String option2, String option3) {
+            this(new String[] {option1, option2, option3});
+        }
+
+        /**
+         * Creates a new key for a configuration option.
+         *
+         * @todo Replace by variable arguments length when we will be allowed to compile for J2SE 1.5.
+         */
+        public OptionKey(String option1, String option2, String option3, String option4) {
+            this(new String[] {option1, option2, option4});
+        }
+
+        /**
+         * Creates a new key for a configuration option.
+         *
+         * @todo Replace by variable arguments length when we will be allowed to compile for J2SE 1.5.
+         */
+        public OptionKey(final String[] alternatives) {
+            super(String.class);
+            final Set options = new TreeSet(Arrays.asList(alternatives));
+            this.wildcard = options.remove("*");
+            this.options  = Collections.unmodifiableSet(options);
+        }
+
+        /**
+         * Returns the set of available options.
+         */
+        public Set getOptions() {
+            return options;
+        }
+
+        /**
+         * Returns {@code true} if the specified object is one of the valid options. If the
+         * options specified at construction time contains the {@code "*"} wildcard, then
+         * this method returns {@code true} for every {@link String} object.
+         */
+        //@Override
+        public boolean isCompatibleValue(final Object value) {
+            return wildcard ? (value instanceof String) : options.contains(value);
         }
     }
-    
+
     /**
      * Key for hints to be specified as a {@link javax.sql.DataSource}.
      * The file may also be specified as a {@link String} object.

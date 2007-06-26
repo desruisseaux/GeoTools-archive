@@ -49,7 +49,7 @@ import org.opengis.util.InternationalString;
  * @since 2.4
  * @source $URL$
  * @version $Id$
- * @author Martin Desruisseaux
+ * @author Jody Garnett
  */
 public abstract class AbstractBufferedAuthorityFactory extends ReferencingFactory implements AuthorityFactory, BufferedFactory {
     /**

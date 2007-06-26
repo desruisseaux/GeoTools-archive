@@ -76,7 +76,7 @@ import org.geotools.resources.i18n.LoggingKeys;
  * @since 2.4
  * @source $URL$
  * @version $Id$
- * @author Martin Desruisseaux
+ * @author Jody Garnett
  */
 public class BufferedAuthorityDecorator extends AbstractBufferedAuthorityFactory {
 
