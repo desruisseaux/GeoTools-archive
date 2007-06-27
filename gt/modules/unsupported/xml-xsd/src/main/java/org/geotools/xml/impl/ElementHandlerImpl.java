@@ -120,7 +120,9 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
 
             if ( decl == null ) {
             	//check wether unknown attributes should be parsed
-            	if ( parent.getContext().getComponentInstance( Parser.Properties.PARSE_UNKNOWN_ATTRIBUTES ) != null ) {
+            	if ( !parser.isStrict() ) {
+            		parser.getLogger().fine( "Parsing unknown attribute: " + attQName);
+            		
             		//create a mock attribute and continue
             		decl = XSDFactory.eINSTANCE.createXSDAttributeDeclaration();
             		decl.setName( attQName.getLocalPart() );
