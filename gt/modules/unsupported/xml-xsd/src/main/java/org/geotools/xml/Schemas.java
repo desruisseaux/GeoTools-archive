@@ -49,6 +49,7 @@ import org.eclipse.xsd.XSDAttributeGroupDefinition;
 import org.eclipse.xsd.XSDAttributeUse;
 import org.eclipse.xsd.XSDComplexTypeDefinition;
 import org.eclipse.xsd.XSDElementDeclaration;
+import org.eclipse.xsd.XSDImport;
 import org.eclipse.xsd.XSDInclude;
 import org.eclipse.xsd.XSDModelGroup;
 import org.eclipse.xsd.XSDModelGroupDefinition;
@@ -793,6 +794,49 @@ public class Schemas {
         return null;
     }
 
+    /**
+     * Returns a flat list of imports from the specified schema.
+     * <p>
+     * The method recurses into imported schemas. The list returned is filtered so that
+     * duplicate includes are removed. Two includes are considered equal if they have the same
+     * target namespace.
+     * </p>
+     *
+     * @param schema The top-level schema.
+     *
+     * @return A list containing objects of type {@link XSDImport}.
+     */
+    public static final List getImports(XSDSchema schema) {
+        LinkedList queue = new LinkedList();
+        ArrayList imports = new ArrayList();
+        HashSet added = new HashSet();
+
+        queue.addLast(schema);
+
+        while (!queue.isEmpty()) {
+            schema = (XSDSchema) queue.removeFirst();
+
+            List contents = schema.getContents();
+
+            for (Iterator itr = contents.iterator(); itr.hasNext();) {
+                XSDSchemaContent content = (XSDSchemaContent) itr.next();
+
+                if (content instanceof XSDImport) {
+                    XSDImport imprt = (XSDImport) content;
+
+                    if (!added.contains(imprt.getNamespace())) {
+                        imports.add(imprt);
+                        added.add(imprt.getNamespace());
+
+                        queue.addLast(imprt.getResolvedSchema());
+                    }
+                }
+            }
+        }
+
+        return imports;
+    }
+    
     /**
      * Returns a flat list of includes from the specified schema.
      * <p>
