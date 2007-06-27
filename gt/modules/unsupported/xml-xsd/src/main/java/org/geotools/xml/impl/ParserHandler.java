@@ -27,6 +27,7 @@ import javax.xml.namespace.QName;
 
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDFactory;
+import org.eclipse.xsd.XSDImport;
 import org.eclipse.xsd.XSDParticle;
 import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.XSDSimpleTypeDefinition;
@@ -102,6 +103,9 @@ public class ParserHandler extends DefaultHandler {
     /** flag to indicate if the parser should validate or not */
     boolean validating;
     
+    /** wether the parser is strict or not */
+    boolean strict = false;
+    
     /** list of "errors" that occur while parsing */
     List errors;
 
@@ -114,6 +118,14 @@ public class ParserHandler extends DefaultHandler {
     public Configuration getConfiguration() {
 		return config;
 	}
+    
+    public void setStrict( boolean strict ) {
+        this.strict = strict;
+    }
+    
+    public boolean isStrict() {
+        return strict;
+    }
     
     public boolean isValidating() {
 		return validating;
@@ -210,25 +222,31 @@ public class ParserHandler extends DefaultHandler {
             //TODO: this processing is too loose, do some validation will ya!
             String[] locations = null;
 
-            if ( context.getComponentInstance( Parser.Properties.IGNORE_SCHEMA_LOCATION ) != null ) {
-            	//use the configuration
-            	locations = new String[] {
-            		config.getNamespaceURI(), config.getSchemaFileURL()	
-            	};
-            }
-            else {
-            	for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i);
+//            if ( context.getComponentInstance( Parser.Properties.IGNORE_SCHEMA_LOCATION ) != null ) {
+//            	//use the configuration
+//            	locations = new String[] {
+//            		config.getNamespaceURI(), config.getSchemaFileURL()	
+//            	};
+//            }
+//            else {
+            for (int i = 0; i < attributes.getLength(); i++) {
+                String name = attributes.getQName(i);
 
-                    if (name.endsWith("schemaLocation")) {
-                        //create an array of alternating namespace, location pairs
-                        locations = attributes.getValue(i).split(" +");
-                        
-                        break;
-                    }
+                if (name.endsWith("schemaLocation")) {
+                    //create an array of alternating namespace, location pairs
+                    locations = attributes.getValue(i).split(" +");
+                    
+                    break;
                 }
             }
+//            }
             
+            if ( !isStrict() && locations == null ) {
+                //use the configuration
+                locations = new String[] {
+                        config.getNamespaceURI(), config.getSchemaFileURL()     
+                };
+            }
 
             //look up schema overrides
             XSDSchemaLocator[] locators = findSchemaLocators();
@@ -299,6 +317,37 @@ public class ParserHandler extends DefaultHandler {
                 throw new SAXException(msg);
             }
 
+            //check to make sure that the schemas that were created include
+            // the schema for the parser configuration
+            boolean found = false;
+         O: for ( int i = 0; i < schemas.length; i++ ) {
+                List imports = Schemas.getImports(schemas[i]);
+                for ( Iterator im = imports.iterator(); im.hasNext(); ) {
+                    XSDImport imprt = (XSDImport) im.next();
+                    if ( config.getNamespaceURI().equals( imprt.getNamespace() ) ) {
+                        found = true;
+                        break O;
+                    }
+                }
+            }
+            if ( !found ) {
+                //add it if not operating in strict mode
+                if ( !isStrict() ) {
+                    String msg = "schema specified by parser configuration not found, supplementing...";
+                    logger.fine( msg );
+                    
+                    XSDSchema[] copy = new XSDSchema[schemas.length+1];
+                    System.arraycopy(schemas, 0, copy, 0, schemas.length);
+                    copy[schemas.length] = config.schema();
+                    schemas = copy;
+                }
+                else {
+                    String msg = "parser configuration specified schema: '" + config.getNamespaceURI() + 
+                        "', but instance document does not reference this schema.";
+                    logger.info(msg);
+                }
+            }
+            
             index = new SchemaIndexImpl(schemas);
             
             //if no default prefix is set in this namespace context, then 
@@ -343,35 +392,45 @@ public class ParserHandler extends DefaultHandler {
         }
         
         if ( handler == null ) {
-        	//if the type only contains a type of element, just assume the 
+        	//if the type only contains one type of element, just assume the 
         	// the element is of that type
-        	if( context.getComponentInstance( Parser.Properties.PARSE_UNKNOWN_ELEMENTS ) != null) {
-        		if ( parent.getComponent() instanceof ElementInstance ) {
-            		ElementInstance parentElement = (ElementInstance) parent.getComponent();
-            		List childParticles = 
-            			index.getChildElementParticles( parentElement.getElementDeclaration()  );
-            		if ( childParticles.size() == 1 ) {
-            			XSDParticle particle = 
-            				(XSDParticle) childParticles.iterator().next();
-            			XSDElementDeclaration child = 
-            				(XSDElementDeclaration) particle.getContent();
-            			if ( child.isElementDeclarationReference() ) {
-            				child = child.getResolvedElementDeclaration();
-            			}
-            			
-            			handler = handlerFactory.createElementHandler( 
-        					new QName( child.getTargetNamespace(), child.getName() ), 
-        					parent, this
-            			);
-            		}
-            	}		
+        	//if( context.getComponentInstance( Parser.Properties.PARSE_UNKNOWN_ELEMENTS ) != null) {
+                if (!isStrict() ) {
+                    String msg = "Could not find declaration for: " + qualifiedName 
+                        + ". Checking if containing type declares a single particle.";
+                    logger.fine( msg );
+                    
+                    if ( parent.getComponent() instanceof ElementInstance ) {
+                		ElementInstance parentElement = (ElementInstance) parent.getComponent();
+                		List childParticles = 
+                			index.getChildElementParticles( parentElement.getElementDeclaration()  );
+                		if ( childParticles.size() == 1 ) {
+                			XSDParticle particle = 
+                				(XSDParticle) childParticles.iterator().next();
+                			XSDElementDeclaration child = 
+                				(XSDElementDeclaration) particle.getContent();
+                			if ( child.isElementDeclarationReference() ) {
+                				child = child.getResolvedElementDeclaration();
+                			}
+                			
+                			handler = handlerFactory.createElementHandler( 
+            					new QName( child.getTargetNamespace(), child.getName() ), 
+            					parent, this
+                			);
+                		}
+                	}		
         	}
         }
         
         if ( handler == null ) {
         	//check the parser flag, and just parse it anyways
-        	if( context.getComponentInstance( Parser.Properties.PARSE_UNKNOWN_ELEMENTS ) != null) {
-        		//create a mock element declaration
+        	//if( context.getComponentInstance( Parser.Properties.PARSE_UNKNOWN_ELEMENTS ) != null) {
+                if (!isStrict() ) {
+                        String msg = "Could not find declaration for: " + qualifiedName 
+                            + ". Creating a mock element declaration and parsing anyways...";
+                        logger.info( msg );
+        	
+                        //create a mock element declaration
         		XSDElementDeclaration decl = XSDFactory.eINSTANCE.createXSDElementDeclaration();
         		decl.setName( qualifiedName.getLocalPart() );
         		decl.setTargetNamespace( qualifiedName.getNamespaceURI() );
