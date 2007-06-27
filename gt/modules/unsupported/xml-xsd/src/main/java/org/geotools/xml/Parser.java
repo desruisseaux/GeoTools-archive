@@ -187,6 +187,27 @@ public class Parser {
     }
     
     /**
+     * Sets the strict parsing flag.
+     * <p>
+     * When set to <code>true</code>, this will cause the parser to operate in 
+     * a strict mode, which means that xml being parsed must be exactly correct
+     * with respect to the schema it references.
+     * </p>
+     * <p>
+     * Some examples of cases in which the parser will throw an exception while
+     * operating in strict mode:
+     * <ul>
+     *  <li>no 'schemaLocation' specified, or specified incorrectly
+     *  <li>element found which is not declared in the schema
+     * </ul>
+     * </p>
+     * @param strict The strict flag.
+     */
+    public void setStrict(boolean strict) {
+        handler.setStrict( strict );
+    }
+    
+    /**
      * Sets the flag controlling wether the parser should validate or not.
      * 
      * @param validating Validation flag, <code>true</code> to validate, otherwise <code>false</code>
@@ -281,13 +302,15 @@ public class Parser {
      * </pre>
      * </p>
      * @author Justin Deoliveira, The Open Planning Project
-     *
+     * @deprecated
      */
     public static interface Properties {
     	
     	/**
     	 * If set, the parser will continue to parse when it finds an element 
     	 * and cannot determine its type.
+         * 
+         * @deprecated use {@link Parser#setStrict(boolean)}
     	 */
     	QName PARSE_UNKNOWN_ELEMENTS = 
     		new QName( "http://www.geotools.org", "parseUnknownElements" ); 
@@ -295,6 +318,8 @@ public class Parser {
     	/**
     	 * If set, the parser will continue to parse when it finds an attribute
     	 * and cannot determine its type.
+    	 * 
+    	 * @deprecated use {@link Parser#setStrict(boolean)}
     	 */
     	QName PARSE_UNKNOWN_ATTRIBUTES = 
     		new QName( "http://www.geotools.org", "parseUnknownAttributes" );
@@ -302,6 +327,8 @@ public class Parser {
     	/**
     	 * If set, the parser will ignore the schemaLocation attribute of an 
     	 * instance document.
+    	 * 
+    	 * @deprecated use {@link Parser#setStrict(boolean)}
     	 */
     	QName IGNORE_SCHEMA_LOCATION = 
     		new QName( "http://www.geotools.org", "ignoreSchemaLocation" );
