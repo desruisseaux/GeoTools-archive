@@ -49,7 +49,7 @@ public final class DefaultObjectCache implements ObjectCache {
      * Creates a new cache using the indicated initialSize.
      */
     public DefaultObjectCache(final int initialSize) {
-        cache = Collections.synchronizedMap(new HashMap( initialSize ));        
+        cache = Collections.synchronizedMap(new HashMap(initialSize));
     }
 
     /**
@@ -68,7 +68,7 @@ public final class DefaultObjectCache implements ObjectCache {
      * @return boolean
      */
     public boolean containsKey(final Object key) {
-        return cache.containsKey( key );
+        return cache.containsKey(key);
     }
     
     /**
@@ -86,47 +86,48 @@ public final class DefaultObjectCache implements ObjectCache {
      * @todo Consider logging a message here to the finer or finest level.
      */
     public Object get(final Object key) {
-        
-        return getEntry( key ).get();
+        return getEntry(key).get();
     }
 
     public Object test(final Object key) {
-        if( !cache.containsKey(key)) {
+        if (!cache.containsKey(key)) {
             // no entry for this key - so no value
             return null;
         }
-        ObjectCacheEntry entry = getEntry(key);        
+        ObjectCacheEntry entry = getEntry(key);
         try {
-            entry.writeLock();        
+            entry.writeLock();
             return entry.get();
-        }
-        finally {
+        } finally {
             entry.writeUnLock();
         }
     }
+
     public void writeLock(final Object key) {
         getEntry(key).writeLock();
     }
 
     public void writeUnLock(final Object key) {
-        if( !cache.containsKey(key)) {
-            throw new IllegalStateException("Cannot unlock prior to locking"); 
+        if (!cache.containsKey(key)) {
+            throw new IllegalStateException("Cannot unlock prior to locking");
         }
-        getEntry( key ).writeUnLock();
-    }
-
-
-    public void put(final Object key, final Object object) {
-        getEntry( key ).set( object );        
+        getEntry(key).writeUnLock();
     }
 
     /**
-     * Retrive cache entry, will create one if needed.
+     * Stores a value
+     */
+    public void put(final Object key, final Object object) {
+        getEntry(key).set(object);        
+    }
+
+    /**
+     * Retrieve cache entry, will create one if needed.
      * 
      * @param key
      * @return ObjectCacheEntry
      */
-    protected ObjectCacheEntry getEntry( Object key ){
+    protected ObjectCacheEntry getEntry(Object key) {
         synchronized (cache) {
             if (!cache.containsKey(key)) {
                 ObjectCacheEntry newEntry = new ObjectCacheEntry();
@@ -135,19 +136,4 @@ public final class DefaultObjectCache implements ObjectCache {
             return (ObjectCacheEntry) cache.get(key);
         }
     }
-    /**
-     * Checks the map for a missing entry. If one does not exist, a new entry is
-     * created.
-     * 
-     * @param key
-     *            referencing object identifier
-     *
-    private void checkCache(Object key) {
-        synchronized (cache) {
-            if (!cache.containsKey(key)) {
-                ObjectCacheEntry newEntry = new ObjectCacheEntry();
-                cache.put(key, newEntry);
-            }
-        }
-    }*/
 }
