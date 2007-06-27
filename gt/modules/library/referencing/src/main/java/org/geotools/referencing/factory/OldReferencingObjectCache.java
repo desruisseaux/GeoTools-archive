@@ -133,4 +133,9 @@ final class OldReferencingObjectCache implements ReferencingObjectCache {
         // TODO Auto-generated method stub
         return false;
     }
+
+    public Object test( Object key ) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

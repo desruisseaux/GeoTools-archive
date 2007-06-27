@@ -36,19 +36,20 @@ final class DefaultReferencingObjectCache implements ReferencingObjectCache {
      * 
      * <Object, Entry>
      */
-    private volatile Map cache = Collections.synchronizedMap(new HashMap());
+    private volatile Map cache;
     
     /**
      * Creates a new cache.
      */
     public DefaultReferencingObjectCache() {
+        cache = Collections.synchronizedMap(new HashMap());
     }
     
     /**
-     * Creates a new cache which will hold the specified amount of object by strong references.
-     * Any additional object will be help by weak references.
+     * Creates a new cache using the indicated initialSize.
      */
-    public DefaultReferencingObjectCache(final int maxStrongReferences) {
+    public DefaultReferencingObjectCache(final int initialSize) {
+        cache = Collections.synchronizedMap(new HashMap( initialSize ));        
     }
 
     /**
@@ -61,21 +62,23 @@ final class DefaultReferencingObjectCache implements ReferencingObjectCache {
     }
 
     /**
-     * Non-blocking indicator if an entry exists in the cache.
+     * Check if an entry exists in the cache.
      * 
      * @param key
      * @return boolean
      */
     public boolean containsKey(final Object key) {
-        if (!cache.containsKey(key)) {
-            return false;
-        }
-        ObjectCacheEntry entry = (ObjectCacheEntry) cache.get(key);
-        return entry.containsValue();
+        return cache.containsKey( key );
     }
     
     /**
-     * Returns the object from the cache. The contents may be null.
+     * Returns the object from the cache.
+     * <p>
+     * Please note that a read lock is maintained on the cache contents; you 
+     * may be stuck waiting for a writer to produce the result over the
+     * course of calling this method.
+     * </p>
+     * The contents (of course) may be null.
      * 
      * @param key
      *            The authority code.
@@ -83,42 +86,62 @@ final class DefaultReferencingObjectCache implements ReferencingObjectCache {
      * @todo Consider logging a message here to the finer or finest level.
      */
     public Object get(final Object key) {
-        checkCache(key);
-        ObjectCacheEntry entry = (ObjectCacheEntry) cache.get(key);
-        return entry.get();
+        
+        return getEntry( key ).get();
     }
 
+    public Object test(final Object key) {
+        if( !cache.containsKey(key)) {
+            // no entry for this key - so no value
+            return null;
+        }
+        ObjectCacheEntry entry = getEntry(key);        
+        try {
+            entry.writeLock();        
+            return entry.get();
+        }
+        finally {
+            entry.writeUnLock();
+        }
+    }
     public void writeLock(final Object key) {
-        checkCache(key);
-        ObjectCacheEntry entry = (ObjectCacheEntry) cache.get(key);
-        entry.writeLock();
+        getEntry(key).writeLock();
     }
 
     public void writeUnLock(final Object key) {
-        checkCache(key);
-        ObjectCacheEntry entry = (ObjectCacheEntry) cache.get(key);
-        entry.writeUnLock();
+        if( !cache.containsKey(key)) {
+            throw new IllegalStateException("Cannot unlock prior to locking"); 
+        }
+        getEntry( key ).writeUnLock();
+    }
+
+
+    public void put(final Object key, final Object object) {
+        getEntry( key ).set( object );        
     }
 
     /**
-     * Puts an element into the cache.
-     *
-     * @param key the authority code.
-     * @param object The referencing object to add in the pool.
+     * Retrive cache entry, will create one if needed.
+     * 
+     * @param key
+     * @return ObjectCacheEntry
      */
-    public void put(final Object key, final Object object) {
-        checkCache(key);
-        ObjectCacheEntry entry = (ObjectCacheEntry) cache.get(key);
-        entry.set(object);
+    protected ObjectCacheEntry getEntry( Object key ){
+        synchronized (cache) {
+            if (!cache.containsKey(key)) {
+                ObjectCacheEntry newEntry = new ObjectCacheEntry();
+                cache.put(key, newEntry);
+            }
+            return (ObjectCacheEntry) cache.get(key);
+        }
     }
-
     /**
      * Checks the map for a missing entry. If one does not exist, a new entry is
      * created.
      * 
      * @param key
      *            referencing object identifier
-     */
+     *
     private void checkCache(Object key) {
         synchronized (cache) {
             if (!cache.containsKey(key)) {
@@ -126,5 +149,5 @@ final class DefaultReferencingObjectCache implements ReferencingObjectCache {
                 cache.put(key, newEntry);
             }
         }
-    }
+    }*/
 }

@@ -8,18 +8,20 @@ import EDU.oswego.cs.dl.util.concurrent.ReentrantWriterPreferenceReadWriteLock;
  * An entry in the ReferencingObjectCache.
  * 
  * To use as a reader:
- * 
  * <pre><code>
  * entry.get();
  * </code></pre>
  * 
  * To use as a writer:
- * 
  * <pre><code>
- * entry.lock();
- * //determine value
- * entry.set(newValue);
+ * try {
+ *    entry.writeLock();
+ *    entry. set( value );
+ * } finally {
+ *    entry.writeUnLock();
+ * }
  * </code></pre>
+ * Tip: The use of try/finally is more than just a good idea - it is the law
  * 
  * @since 2.4
  * @author Cory Horner (Refractions Research)
@@ -28,7 +30,14 @@ import EDU.oswego.cs.dl.util.concurrent.ReentrantWriterPreferenceReadWriteLock;
  */
 public class ObjectCacheEntry {
     
+    /**
+     * Value of this cache entry; managed by <code>lock</code>
+     */
     private volatile Object value;
+    
+    /**
+     * This lock is used to manage value.
+     */
     private volatile ReadWriteLock lock = new ReentrantWriterPreferenceReadWriteLock();
 
     public ObjectCacheEntry() {
@@ -40,16 +49,44 @@ public class ObjectCacheEntry {
     }
 
     /**
-     * Non-blocking determination if a value exists in this entry.
+     * Used by a writer to test the contents of the entry.
+     * <p>
+     * This method is similar to {@link get} (except it will not DEADLOCK):<pre></code>
+     * try {
+     *    entry.writeLock();
+     *    value = entry.test();
+     * }
+     * finally {
+     *    entry.writeUnLock();
+     * }
+     * </code></pre>
      */
-    public boolean containsValue() {
-        return (value == null) ? false : true;
+    public Object test() {
+        try {
+            lock.writeLock().acquire();
+            return value;
+        } catch (InterruptedException e) {
+            return null;
+        }
+        finally {
+            lock.writeLock().release();
+        }
     }
     
     /**
      * Acquires a read lock, obtains the value, unlocks, and returns the value.
      * If another thread already has the read lock or the write lock, this
      * method will block.
+     * <p>
+     * COMMON DEADLOCK:<pre></code>
+     * try {
+     *    entry.writeLock();
+     *    value = entry.get(); // DEADLOCK as we wait for the writeLock to be released
+     * }
+     * finally {
+     *    entry.writeUnLock();
+     * }
+     * </code></pre>
      * 
      * @return cached value or null if empty
      */
@@ -66,13 +103,22 @@ public class ObjectCacheEntry {
     }
     
     /**
-     * Stores the value in the entry.  This method expects writeLock to be called before it.
+     * Stores the value in the entry, using the write lock. 
+     * It is common to use this method while already holding the writeLock (since writeLock
+     * is re-enterant).
      * 
      * @param value
      */
     public void set(Object value) {
-        this.value = value;
-        lock.writeLock().release();
+        try {
+           lock.writeLock().acquire();
+           this.value = value;
+        } catch (InterruptedException e) {
+            
+        }
+        finally {
+            lock.writeLock().release();
+        }
     }
     
     /**

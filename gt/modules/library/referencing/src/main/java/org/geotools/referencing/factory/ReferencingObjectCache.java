@@ -17,16 +17,65 @@ package org.geotools.referencing.factory;
 
 import java.lang.ref.Reference;
 
-
 /**
- * A cache for referencing objects.
- *
+ * A cache used by the referencing subsystem.
+ * <p>
+ * To use as a reader:
+ * 
+ * <pre><code>
+ * CoordinateReferenceSystem crs = cache.get(key);
+ * </code></pre>
+ * 
+ * To overwrite:
+ * 
+ * <pre><code>
+ * cache.put(&quot;EPSG:4326&quot;, crs);
+ * </code></pre>
+ * 
+ * To reserve the entry while figuring out what to write:
+ * 
+ * <pre><code>
+ *  try {
+ *      cache.writeLock( key ); // may block if another writer is working on this code
+ *      value = cache.test( key );
+ *      if( value == null ){
+ *         // another writer got here first
+ *      }
+ *      else { 
+ *         value = figuringOutWhatToWrite(....);
+ *         cache.put( key, value );
+ *      }
+ *  }
+ *  finally {
+ *      cache.writeUnLock(&quot;EPSG:4326&quot;);
+ *  }
+ * </code></pre>
+ * 
+ * To use as a proper cache:
+ * 
+ * <pre><code>
+ * CylindricalCS cs = (CylindricalCS) cache.get(key);
+ * if (cs == null) {
+ *     try {
+ *         cache.writeLock(key);
+ *         cs = (CylindricalCS) cache.test(key);
+ *         if (cs == null) {
+ *             cs = csAuthority.createCylindricalCS(code);
+ *             cache.put(key, cs);
+ *         }
+ *     } finally {
+ *         cache.writeUnLock(key);
+ *     }
+ * }
+ * return cs;
+ * </code></pre>
+ * 
  * @since 2.4
  * @version $Id$
- * @source $URL$
- *
- * @todo Consider renaming as {@code ObjectCache} or {@code Cache} and move to
- *       the {@code org.geotools.util} package.
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/library/referencing/src/main/java/org/geotools/referencing/factory/ReferencingObjectCache.java $
+ * @todo Consider renaming as {@code ObjectCache} or {@code Cache} and move to the
+ *       {@code org.geotools.util} package.
  */
 public interface ReferencingObjectCache {
 
@@ -38,30 +87,61 @@ public interface ReferencingObjectCache {
     /**
      * Returns an object from the pool for the specified code. If the object was retained as a
      * {@linkplain Reference weak reference}, the {@link Reference#get referent} is returned.
-     *
+     * 
      * @param key The authority code.
      */
-    Object get(Object key);
+    Object get( Object key );
 
     /**
-     * Put an element in the pool. This method is invoked everytime a {@code createFoo(...)}
-     * method is invoked, even if an object was already in the pool for the given code, for
-     * the following reasons: 1) Replaces weak reference by strong reference (if applicable)
-     * and 2) Alters the linked hash set order, so that this object is declared as the last
-     * one used.
-     *
+     * Use the write lock to test the value for the provided key.
+     * <p>
+     * This method is used by a writer to test if someone (ie another writer) has provided the value
+     * for us (while we were blocked waiting for them).
+     * </p>
+     * 
+     * @param key
+     * @return The value, may be <code>null</code>
+     */
+    Object test( Object key );
+
+    /**
+     * Puts an element into the cache.
+     * <p>
+     * You may simply use this method - it is threadsafe:
+     * 
+     * <pre></code>
+     * cache.put(&quot;4326&quot;, crs);
+     * </code></pre>
+     * 
+     * You may also consider reserving the entry while you work on the answer:
+     * 
+     * <pre></code>
+     *  try {
+     *     cache.writeLock( &quot;fred&quot; );
+     *     ...find fred
+     *     cache.put( &quot;fred&quot;, fred );
+     *  }
+     *  finally {
+     *     cache.writeUnLock();
+     *  }
+     * </code></pre>
+     * 
      * @param key the authority code.
      * @param object The referencing object to add in the pool.
      */
-    void put(Object key, Object object);
-    
-    void writeLock(Object key);
-    
-    void writeUnLock(Object key);
-    
-    /**
-     * Non-blocking indicator if an entry exists in the cache.
-     */
-    public boolean containsKey(final Object key);
+    void put( Object key, Object object );
 
+    /**
+     * Aquire a write lock on the indicated key.
+     * 
+     * @param key
+     */
+    void writeLock( Object key ); // TODO: how to indicate lock was not aquired?
+
+    /**
+     * Release write lock on the indicated key.
+     * 
+     * @param key
+     */
+    void writeUnLock( Object key );
 }

@@ -63,4 +63,8 @@ final class NullReferencingObjectCache implements ReferencingObjectCache {
      */
     public void writeUnLock(Object key) {
     }
+
+    public Object test( Object key ) {
+        return null;
+    }
 }

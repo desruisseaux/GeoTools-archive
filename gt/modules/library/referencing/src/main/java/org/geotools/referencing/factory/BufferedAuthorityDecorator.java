@@ -20,46 +20,53 @@
 package org.geotools.referencing.factory;
 
 // J2SE dependencies and extensions
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
-import java.util.Map;
 import java.util.Set;
-import java.util.Iterator;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.WeakHashMap;
-import java.util.LinkedHashMap;
-import java.util.logging.LogRecord;
-import java.util.logging.Level;
+
 import javax.units.Unit;
 
-// OpenGIS dependencies
-import org.opengis.metadata.extent.Extent;
-import org.opengis.metadata.citation.Citation;
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.referencing.AuthorityFactory;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.IdentifiedObject;
-import org.opengis.referencing.cs.*;
-import org.opengis.referencing.crs.*;
-import org.opengis.referencing.datum.*;
-import org.opengis.referencing.operation.*;
-import org.opengis.util.GenericName;
-import org.opengis.util.InternationalString;
-
-// Geotools dependencies
+import org.geotools.factory.BufferedFactory;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
-import org.geotools.factory.BufferedFactory;
 import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Logging;
-import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.util.NameFactory;
-
+import org.opengis.metadata.citation.Citation;
+import org.opengis.referencing.AuthorityFactory;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.IdentifiedObject;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
+import org.opengis.referencing.crs.CompoundCRS;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.DerivedCRS;
+import org.opengis.referencing.crs.EngineeringCRS;
+import org.opengis.referencing.crs.GeocentricCRS;
+import org.opengis.referencing.crs.GeographicCRS;
+import org.opengis.referencing.crs.ImageCRS;
+import org.opengis.referencing.crs.ProjectedCRS;
+import org.opengis.referencing.crs.TemporalCRS;
+import org.opengis.referencing.crs.VerticalCRS;
+import org.opengis.referencing.cs.CSAuthorityFactory;
+import org.opengis.referencing.cs.CartesianCS;
+import org.opengis.referencing.cs.CoordinateSystem;
+import org.opengis.referencing.cs.CoordinateSystemAxis;
+import org.opengis.referencing.cs.CylindricalCS;
+import org.opengis.referencing.cs.EllipsoidalCS;
+import org.opengis.referencing.cs.PolarCS;
+import org.opengis.referencing.cs.SphericalCS;
+import org.opengis.referencing.cs.TimeCS;
+import org.opengis.referencing.cs.VerticalCS;
+import org.opengis.referencing.datum.Datum;
+import org.opengis.referencing.datum.DatumAuthorityFactory;
+import org.opengis.referencing.datum.Ellipsoid;
+import org.opengis.referencing.datum.EngineeringDatum;
+import org.opengis.referencing.datum.GeodeticDatum;
+import org.opengis.referencing.datum.ImageDatum;
+import org.opengis.referencing.datum.PrimeMeridian;
+import org.opengis.referencing.datum.TemporalDatum;
+import org.opengis.referencing.datum.VerticalDatum;
+import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
+import org.opengis.util.GenericName;
+import org.opengis.util.InternationalString;
 
 /**
  * An authority factory that caches all objects created by delegate factories. This class is set up
@@ -93,19 +100,19 @@ import org.geotools.util.NameFactory;
 public final class BufferedAuthorityDecorator extends ReferencingFactory
         implements
             AuthorityFactory,
-            CRSAuthorityFactory
-// CSAuthorityFactory,
-// DatumAuthorityFactory,
+            CRSAuthorityFactory,
+            CSAuthorityFactory,
+            DatumAuthorityFactory,
 // CoordinateOperationAuthorityFactory,
-// BufferedFactory
-            {
+            BufferedFactory
+{
 
-    /** Cache to be used for referencing objects. */ 
+    /** Cache to be used for referencing objects. */
     ReferencingObjectCache cache;
 
     /** The delegate authority. */
-    private AuthorityFactory authority; 
-    
+    private AuthorityFactory authority;
+
     /** The delegate authority for coordinate reference systems. */
     private CRSAuthorityFactory crsAuthority;
 
@@ -114,7 +121,7 @@ public final class BufferedAuthorityDecorator extends ReferencingFactory
 
     /** The delegate authority for datums. */
     private DatumAuthorityFactory datumAuthority;
-    
+
     /** The delegate authority for coordinate operations. */
     private CoordinateOperationAuthorityFactory operationAuthority;
     /**
@@ -126,8 +133,8 @@ public final class BufferedAuthorityDecorator extends ReferencingFactory
      * 
      * @param factory The factory to cache. Can not be {@code null}.
      */
-    public BufferedAuthorityDecorator(final AuthorityFactory factory) {
-        this( factory, createCache( GeoTools.getDefaultHints()) );
+    public BufferedAuthorityDecorator( final AuthorityFactory factory ) {
+        this(factory, createCache(GeoTools.getDefaultHints()));
     }
 
     /**
@@ -143,8 +150,7 @@ public final class BufferedAuthorityDecorator extends ReferencingFactory
      * @param factory The factory to cache. Can not be {@code null}.
      * @param maxStrongReferences The maximum number of objects to keep by strong reference.
      */
-    protected BufferedAuthorityDecorator(AuthorityFactory factory, ReferencingObjectCache cache)
-    {
+    protected BufferedAuthorityDecorator( AuthorityFactory factory, ReferencingObjectCache cache ) {
         this.cache = cache;
         authority = factory;
         crsAuthority = (CRSAuthorityFactory) factory;
@@ -152,36 +158,29 @@ public final class BufferedAuthorityDecorator extends ReferencingFactory
         datumAuthority = (DatumAuthorityFactory) factory;
         operationAuthority = (CoordinateOperationAuthorityFactory) factory;
     }
-    
+
     /** Utility method used to produce cache based on hint */
-    protected static ReferencingObjectCache createCache(final Hints hints) throws FactoryRegistryException {
-        String policy = (String) hints.get( Hints.BUFFER_POLICY );
-        int limit = Hints.BUFFER_LIMIT.toValue( hints );
-        
-        if( "weak".equalsIgnoreCase(policy) ){
-            return new DefaultReferencingObjectCache( 0 );
-        }
-        else if ( "all".equalsIgnoreCase(policy) ){
-            return new DefaultReferencingObjectCache( limit );
-        }
-        else if ( "none".equalsIgnoreCase(policy )){        
+    protected static ReferencingObjectCache createCache( final Hints hints )
+            throws FactoryRegistryException {
+        String policy = (String) hints.get(Hints.BUFFER_POLICY);
+        int limit = Hints.BUFFER_LIMIT.toValue(hints);
+
+        if ("weak".equalsIgnoreCase(policy)) {
+            return new DefaultReferencingObjectCache(0);
+        } else if ("all".equalsIgnoreCase(policy)) {
+            return new DefaultReferencingObjectCache(limit);
+        } else if ("none".equalsIgnoreCase(policy)) {
             return new NullReferencingObjectCache();
-        }
-        else {
-            return new DefaultReferencingObjectCache( limit );
+        } else {
+            return new DefaultReferencingObjectCache(limit);
         }
     }
     //
     // Utility Methods and Cache Care and Feeding
     //
-    protected String trimAuthority(String code) {
-        /*
-         * IMPLEMENTATION NOTE: This method is overrided in PropertyAuthorityFactory. If
-         * implementation below is modified, it is probably worth to revisit the overrided method as
-         * well.
-         */
+    protected String toKey( String code ) {
         code = code.trim();
-        final GenericName name  = NameFactory.create(code);
+        final GenericName name = NameFactory.create(code);
         final GenericName scope = name.getScope();
         if (scope == null) {
             return code;
@@ -195,23 +194,21 @@ public final class BufferedAuthorityDecorator extends ReferencingFactory
     // AuthorityFactory
     //    
     public IdentifiedObject createObject( String code ) throws FactoryException {
-        IdentifiedObject value = null;      
-        final String key = trimAuthority(code);
-        if (!cache.containsKey(key)) {
+        final String key = toKey(code);
+        IdentifiedObject obj = (IdentifiedObject) cache.get(key);
+        if (obj == null) {
             try {
                 cache.writeLock(key);
-                if (!cache.containsKey(key)) {
-                    value = authority.createObject(code);
-                    cache.put(key, value);
+                obj = (IdentifiedObject) cache.test(key);
+                if (obj == null) {
+                    obj = authority.createObject(code);
+                    cache.put(key, obj);
                 }
             } finally {
                 cache.writeUnLock(key);
-            }            
+            }
         }
-        if (value == null) {
-            value = (IdentifiedObject) cache.get(key);
-        }
-        return value;
+        return obj;
     }
 
     public Citation getAuthority() {
@@ -219,214 +216,523 @@ public final class BufferedAuthorityDecorator extends ReferencingFactory
     }
 
     public Set getAuthorityCodes( Class type ) throws FactoryException {
-        return authority.getAuthorityCodes( type );
+        return authority.getAuthorityCodes(type);
     }
 
     public InternationalString getDescriptionText( String code ) throws FactoryException {
-        return authority.getDescriptionText( code );
+        return authority.getDescriptionText(code);
     }
     //
     // CRSAuthority
     //
     public synchronized CompoundCRS createCompoundCRS( final String code ) throws FactoryException {
-        final String key = trimAuthority(code);
-        CompoundCRS crs=null;
-        if (!cache.containsKey(key)) {
+        final String key = toKey(code);
+        CompoundCRS crs = (CompoundCRS) cache.get(key);
+        if (crs == null) {
             try {
                 cache.writeLock(key);
-                if (!cache.containsKey(key)) {
+                crs = (CompoundCRS) cache.test(key);
+                if (crs == null) {
                     crs = crsAuthority.createCompoundCRS(code);
                     cache.put(key, crs);
                 }
             } finally {
                 cache.writeUnLock(key);
-            }            
-        }
-        if (crs == null) {
-            crs = (CompoundCRS) cache.get(key);
+            }
         }
         return crs;
     }
-    
-    public CoordinateReferenceSystem createCoordinateReferenceSystem( String code ) throws FactoryException {
-        final String key = trimAuthority(code);
-        CoordinateReferenceSystem crs=null;
-        if (!cache.containsKey(key)) {
+
+    public CoordinateReferenceSystem createCoordinateReferenceSystem( String code )
+            throws FactoryException {
+        final String key = toKey(code);
+        CoordinateReferenceSystem crs = (CoordinateReferenceSystem) cache.get(key);
+        if (crs == null) {
             try {
                 cache.writeLock(key);
-                if (!cache.containsKey(key)) {
+                crs = (CoordinateReferenceSystem) cache.test(key);
+                if (crs == null) {
                     crs = crsAuthority.createCoordinateReferenceSystem(code);
                     cache.put(key, crs);
                 }
             } finally {
                 cache.writeUnLock(key);
-            }            
-        }
-        if (crs == null) {
-            crs = (CoordinateReferenceSystem) cache.get(key);
+            }
         }
         return crs;
     }
 
     public DerivedCRS createDerivedCRS( String code ) throws FactoryException {
-        final String key = trimAuthority(code);
-        DerivedCRS crs=null;
-        if (!cache.containsKey(key)) {
+        final String key = toKey(code);
+        DerivedCRS crs = (DerivedCRS) cache.get(key);
+        if (crs == null) {
             try {
                 cache.writeLock(key);
-                if (!cache.containsKey(key)) {
+                crs = (DerivedCRS) cache.test(key);
+                if (crs == null) {
                     crs = crsAuthority.createDerivedCRS(code);
                     cache.put(key, crs);
                 }
             } finally {
                 cache.writeUnLock(key);
-            }            
-        }
-        if (crs == null) {
-            crs = (DerivedCRS) cache.get(key);
+            }
         }
         return crs;
     }
 
     public EngineeringCRS createEngineeringCRS( String code ) throws FactoryException {
-        final String key = trimAuthority(code);
-        EngineeringCRS crs=null;
-        if (!cache.containsKey(key)) {
+        final String key = toKey(code);
+        EngineeringCRS crs = (EngineeringCRS) cache.get(key);
+        if (crs == null) {
             try {
                 cache.writeLock(key);
-                if (!cache.containsKey(key)) {
+                crs = (EngineeringCRS) cache.test(key);
+                if (crs == null) {
                     crs = crsAuthority.createEngineeringCRS(code);
                     cache.put(key, crs);
                 }
             } finally {
                 cache.writeUnLock(key);
-            }            
-        }
-        if (crs == null) {
-            crs = (EngineeringCRS) cache.get(key);
+            }
         }
         return crs;
     }
 
     public GeocentricCRS createGeocentricCRS( String code ) throws FactoryException {
-        final String key = trimAuthority(code);
-        GeocentricCRS crs=null;
-        if (!cache.containsKey(key)) {
+        final String key = toKey(code);
+        GeocentricCRS crs = (GeocentricCRS) cache.get(key);
+        if (crs == null) {
             try {
                 cache.writeLock(key);
-                if (!cache.containsKey(key)) {
+                crs = (GeocentricCRS) cache.test(key);
+                if (crs == null) {
                     crs = crsAuthority.createGeocentricCRS(code);
                     cache.put(key, crs);
                 }
             } finally {
                 cache.writeUnLock(key);
-            }            
-        }
-        if (crs == null) {
-            crs = (GeocentricCRS) cache.get(key);
+            }
         }
         return crs;
     }
 
     public GeographicCRS createGeographicCRS( String code ) throws FactoryException {
-        final String key = trimAuthority(code);
-        GeographicCRS crs=null;
-        if (!cache.containsKey(key)) {
+        final String key = toKey(code);
+        GeographicCRS crs = (GeographicCRS) cache.get(key);
+        if (crs == null) {
             try {
                 cache.writeLock(key);
-                if (!cache.containsKey(key)) {
+                crs = (GeographicCRS) cache.test(key);
+                if (crs == null) {
                     crs = crsAuthority.createGeographicCRS(code);
                     cache.put(key, crs);
                 }
             } finally {
                 cache.writeUnLock(key);
-            }            
-        }
-        if (crs == null) {
-            crs = (GeographicCRS) cache.get(key);
+            }
         }
         return crs;
     }
 
     public ImageCRS createImageCRS( String code ) throws FactoryException {
-        final String key = trimAuthority(code);
-        ImageCRS crs=null;
-        if (!cache.containsKey(key)) {
+        final String key = toKey(code);
+        ImageCRS crs = (ImageCRS) cache.get(key);
+        if (crs == null) {
             try {
                 cache.writeLock(key);
-                if (!cache.containsKey(key)) {
+                crs = (ImageCRS) cache.test(key);
+                if (crs == null) {
                     crs = crsAuthority.createImageCRS(code);
                     cache.put(key, crs);
                 }
             } finally {
                 cache.writeUnLock(key);
-            }            
-        }
-        if (crs == null) {
-            crs = (ImageCRS) cache.get(key);
+            }
         }
         return crs;
     }
 
     public ProjectedCRS createProjectedCRS( String code ) throws FactoryException {
-        final String key = trimAuthority(code);
-        ProjectedCRS crs=null;
-        if (!cache.containsKey(key)) {
+        final String key = toKey(code);
+        ProjectedCRS crs = (ProjectedCRS) cache.get(key);
+        if (crs == null) {
             try {
                 cache.writeLock(key);
-                if (!cache.containsKey(key)) {
+                crs = (ProjectedCRS) cache.test(key);
+                if (crs == null) {
                     crs = crsAuthority.createProjectedCRS(code);
                     cache.put(key, crs);
                 }
             } finally {
                 cache.writeUnLock(key);
-            }            
-        }
-        if (crs == null) {
-            crs = (ProjectedCRS) cache.get(key);
+            }
         }
         return crs;
     }
 
     public TemporalCRS createTemporalCRS( String code ) throws FactoryException {
-        final String key = trimAuthority(code);
-        TemporalCRS crs=null;
-        if (!cache.containsKey(key)) {
+        final String key = toKey(code);
+        TemporalCRS crs = (TemporalCRS) cache.get(key);
+        if (crs == null) {
             try {
                 cache.writeLock(key);
-                if (!cache.containsKey(key)) {
+                crs = (TemporalCRS) cache.test(key);
+                if (crs == null) {
                     crs = crsAuthority.createTemporalCRS(code);
                     cache.put(key, crs);
                 }
             } finally {
                 cache.writeUnLock(key);
-            }            
-        }
-        if (crs == null) {
-            crs = (TemporalCRS) cache.get(key);
+            }
         }
         return crs;
     }
 
     public VerticalCRS createVerticalCRS( String code ) throws FactoryException {
-        final String key = trimAuthority(code);
-        VerticalCRS crs=null;
-        if (!cache.containsKey(key)) {
+        final String key = toKey(code);
+        VerticalCRS crs = (VerticalCRS) cache.get(key);
+        if (crs == null) {
             try {
                 cache.writeLock(key);
-                if (!cache.containsKey(key)) {
+                crs = (VerticalCRS) cache.test(key);
+                if (crs == null) {
                     crs = crsAuthority.createVerticalCRS(code);
                     cache.put(key, crs);
                 }
             } finally {
                 cache.writeUnLock(key);
-            }            
-        }
-        if (crs == null) {
-            crs = (VerticalCRS) cache.get(key);
+            }
         }
         return crs;
     }
-    
+    //
+    // CSAuthority
+    //
+    public CartesianCS createCartesianCS( String code ) throws FactoryException {
+        final String key = toKey(code);
+        CartesianCS cs = (CartesianCS) cache.get(key);
+        if (cs == null) {
+            try {
+                cache.writeLock(key);
+                cs = (CartesianCS) cache.test(key);
+                if (cs == null) {
+                    cs = csAuthority.createCartesianCS(code);
+                    cache.put(key, cs);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }
+        }
+        return cs;
+    }
+
+    public CoordinateSystem createCoordinateSystem( String code ) throws FactoryException {
+        final String key = toKey(code);
+        CoordinateSystem cs = (CoordinateSystem) cache.get(key);
+        if (cs == null) {
+            try {
+                cache.writeLock(key);
+                cs = (CoordinateSystem) cache.test(key);
+                if (cs == null) {
+                    cs = csAuthority.createCoordinateSystem(code);
+                    cache.put(key, cs);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }
+        }
+        return cs;
+    }
+
+    // sample implemenation with get/test
+    public CoordinateSystemAxis createCoordinateSystemAxis( String code ) throws FactoryException {
+        final String key = toKey(code);
+        CoordinateSystemAxis axis = (CoordinateSystemAxis) cache.get(key);
+        if (axis == null) {
+            try {
+                cache.writeLock(key);
+                axis = (CoordinateSystemAxis) cache.test(key);
+                if (axis == null) {
+                    axis = csAuthority.createCoordinateSystemAxis(code);
+                    cache.put(key, axis);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }
+        }
+        return axis;
+    }
+
+    public CylindricalCS createCylindricalCS( String code ) throws FactoryException {
+        final String key = toKey(code);
+        CylindricalCS cs = (CylindricalCS) cache.get(key);
+        if (cs == null) {
+            try {
+                cache.writeLock(key);
+                cs = (CylindricalCS) cache.test(key);
+                if (cs == null) {
+                    cs = csAuthority.createCylindricalCS(code);
+                    cache.put(key, cs);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }
+        }
+        return cs;
+    }
+
+    public EllipsoidalCS createEllipsoidalCS( String code ) throws FactoryException {
+        final String key = toKey(code);
+        EllipsoidalCS cs = (EllipsoidalCS) cache.get(key);
+        if (cs == null) {
+            try {
+                cache.writeLock(key);
+                cs = (EllipsoidalCS) cache.test(key);
+                if (cs == null) {
+                    cs = csAuthority.createEllipsoidalCS(code);
+                    cache.put(key, cs);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }
+        }
+        return cs;
+    }
+
+    public PolarCS createPolarCS( String code ) throws FactoryException {
+        final String key = toKey(code);
+        PolarCS cs = (PolarCS) cache.get(key);
+        if (cs == null) {
+            try {
+                cache.writeLock(key);
+                cs = (PolarCS) cache.test(key);
+                if (cs == null) {
+                    cs = csAuthority.createPolarCS(code);
+                    cache.put(key, cs);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }
+        }
+        return cs;
+    }
+
+    public SphericalCS createSphericalCS( String code ) throws FactoryException {
+        final String key = toKey(code);
+        SphericalCS cs = (SphericalCS) cache.get(key);
+        if (cs == null) {
+            try {
+                cache.writeLock(key);
+                cs = (SphericalCS) cache.test(key);
+                if (cs == null) {
+                    cs = csAuthority.createSphericalCS(code);
+                    cache.put(key, cs);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }
+        }
+        return cs;
+    }
+
+    public TimeCS createTimeCS( String code ) throws FactoryException {
+        final String key = toKey(code);
+        TimeCS cs = (TimeCS) cache.get(key);
+        if (cs == null) {
+            try {
+                cache.writeLock(key);
+                cs = (TimeCS) cache.test(key);
+                if (cs == null) {
+                    cs = csAuthority.createTimeCS(code);
+                    cache.put(key, cs);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }
+        }
+        return cs;
+    }
+
+    public Unit createUnit( String code ) throws FactoryException {
+        final String key = toKey(code);
+        Unit unit = (Unit) cache.get(key);
+        if (unit == null) {
+            try {
+                cache.writeLock(key);
+                unit = (Unit) cache.test(key);
+                if (unit == null) {
+                    unit = csAuthority.createUnit(code);
+                    cache.put(key, unit);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }
+        }
+        return unit;
+    }
+
+    public VerticalCS createVerticalCS( String code ) throws FactoryException {
+        final String key = toKey(code);
+        VerticalCS cs = (VerticalCS) cache.get(key);
+        if (cs == null) {
+            try {
+                cache.writeLock(key);
+                cs = (VerticalCS) cache.test(key);
+                if (cs == null) {
+                    cs = csAuthority.createVerticalCS(code);
+                    cache.put(key, cs);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }
+        }
+        return cs;
+    }
+    //
+    // DatumAuthorityFactory
+    //
+    public Datum createDatum( String code ) throws FactoryException {
+        final String key = toKey(code);
+        Datum datum = (Datum) cache.get(key);
+        if (datum == null) {
+            try {
+                cache.writeLock(key);
+                datum = (Datum) cache.test(key);
+                if (datum == null) {
+                    datum = datumAuthority.createDatum(code);
+                    cache.put(key, datum);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }
+        }
+        return datum;
+    }
+
+    public Ellipsoid createEllipsoid( String code ) throws FactoryException {
+        final String key = toKey(code);
+        Ellipsoid ellipsoid = (Ellipsoid) cache.get(key);
+        if (ellipsoid == null) {
+            try {
+                cache.writeLock(key);
+                ellipsoid = (Ellipsoid) cache.test(key);
+                if (ellipsoid == null) {
+                    ellipsoid = datumAuthority.createEllipsoid(code);
+                    cache.put(key, ellipsoid);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }
+        }
+        return ellipsoid;
+    }
+
+    public EngineeringDatum createEngineeringDatum( String code ) throws FactoryException {
+        final String key = toKey(code);
+        EngineeringDatum datum = (EngineeringDatum) cache.get(key);
+        if (datum == null) {
+            try {
+                cache.writeLock(key);
+                datum = (EngineeringDatum) cache.test(key);
+                if (datum == null) {
+                    datum = datumAuthority.createEngineeringDatum(code);
+                    cache.put(key, datum);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }
+        }
+        return datum;
+    }
+
+    public GeodeticDatum createGeodeticDatum( String code ) throws FactoryException {
+        final String key = toKey(code);
+        GeodeticDatum datum = (GeodeticDatum) cache.get(key);
+        if (datum == null) {
+            try {
+                cache.writeLock(key);
+                datum = (GeodeticDatum) cache.test(key);
+                if (datum == null) {
+                    datum = datumAuthority.createGeodeticDatum(code);
+                    cache.put(key, datum);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }
+        }
+        return datum;
+    }
+
+    public ImageDatum createImageDatum( String code ) throws FactoryException {
+        final String key = toKey(code);
+        ImageDatum datum = (ImageDatum) cache.get(key);
+        if (datum == null) {
+            try {
+                cache.writeLock(key);
+                datum = (ImageDatum) cache.test(key);
+                if (datum == null) {
+                    datum = datumAuthority.createImageDatum(code);
+                    cache.put(key, datum);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }
+        }
+        return datum;
+    }
+
+    public PrimeMeridian createPrimeMeridian( String code ) throws FactoryException {
+        final String key = toKey(code);
+        PrimeMeridian datum = (PrimeMeridian) cache.get(key);
+        if (datum == null) {
+            try {
+                cache.writeLock(key);
+                datum = (PrimeMeridian) cache.test(key);
+                if (datum == null) {
+                    datum = datumAuthority.createPrimeMeridian(code);
+                    cache.put(key, datum);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }
+        }
+        return datum;
+    }
+
+    public TemporalDatum createTemporalDatum( String code ) throws FactoryException {
+        final String key = toKey(code);
+        TemporalDatum datum = (TemporalDatum) cache.get(key);
+        if (datum == null) {
+            try {
+                cache.writeLock(key);
+                datum = (TemporalDatum) cache.test(key);
+                if (datum == null) {
+                    datum = datumAuthority.createTemporalDatum(code);
+                    cache.put(key, datum);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }
+        }
+        return datum;
+    }
+
+    public VerticalDatum createVerticalDatum( String code ) throws FactoryException {
+        final String key = toKey(code);
+        VerticalDatum datum = (VerticalDatum) cache.get(key);
+        if (datum == null) {
+            try {
+                cache.writeLock(key);
+                datum = (VerticalDatum) cache.test(key);
+                if (datum == null) {
+                    datum = datumAuthority.createVerticalDatum(code);
+                    cache.put(key, datum);
+                }
+            } finally {
+                cache.writeUnLock(key);
+            }
+        }
+        return datum;
+    }
 
 }
