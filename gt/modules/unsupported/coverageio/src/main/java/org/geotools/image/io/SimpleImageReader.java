@@ -46,7 +46,7 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ComponentColorModelJAI;
-import org.geotools.image.io.metadata.MetadataAccessor;
+import org.geotools.image.io.metadata.GeographicMetadataParser;
 
 
 /**
@@ -156,7 +156,7 @@ public abstract class SimpleImageReader extends ImageReader {
     /**
      * Metadata for each images, or {@code null} if not yet created.
      */
-    private transient MetadataAccessor[] metadata;
+    private transient GeographicMetadataParser[] metadata;
 
     /**
      * Constructs a new image reader.
@@ -298,20 +298,20 @@ public abstract class SimpleImageReader extends ImageReader {
     }
 
     /**
-     * Returns a helper accessor for metadata associated with the given image. This implementation
-     * invokes <code>{@linkplain #getImageMetadata getImageMetadata}(imageIndex)</code>, wraps the
-     * result in a {@link MetadataAccessor} object if non-null and caches the result.
+     * Returns a helper parser for metadata associated with the given image. This implementation
+     * invokes  <code>{@linkplain #getImageMetadata getImageMetadata}(imageIndex)</code>,  wraps
+     * the result in a {@link GeographicMetadataParser} object if non-null and caches the result.
      *
      * @param  imageIndex The image index.
      * @return The metadata, or {@code null} if none.
      * @throws IOException if an error occurs during reading.
      */
-    private MetadataAccessor getMetadataAccessor(final int imageIndex) throws IOException {
+    private GeographicMetadataParser getMetadataParser(final int imageIndex) throws IOException {
         // Checks if a cached instance is available.
         if (metadata != null && imageIndex >= 0 && imageIndex < metadata.length) {
-            final MetadataAccessor accessor = metadata[imageIndex];
-            if (accessor != null) {
-                return accessor;
+            final GeographicMetadataParser parser = metadata[imageIndex];
+            if (parser != null) {
+                return parser;
             }
         }
         // Checks if metadata are availables. If the user set 'ignoreMetadata' to 'true',
@@ -321,16 +321,16 @@ public abstract class SimpleImageReader extends ImageReader {
         if (candidate == null) {
             return null;
         }
-        // Creates a new accessor and caches it.
-        final MetadataAccessor accessor = new MetadataAccessor(candidate);
+        // Creates a new parser and caches it.
+        final GeographicMetadataParser parser = new GeographicMetadataParser(candidate);
         if (metadata == null) {
-            metadata = new MetadataAccessor[Math.max(imageIndex+1, 4)];
+            metadata = new GeographicMetadataParser[Math.max(imageIndex+1, 4)];
         }
         if (imageIndex >= metadata.length) {
-            metadata = (MetadataAccessor[]) XArray.resize(metadata, Math.max(imageIndex+1, metadata.length*2));
+            metadata = (GeographicMetadataParser[]) XArray.resize(metadata, Math.max(imageIndex+1, metadata.length*2));
         }
-        metadata[imageIndex] = accessor;
-        return accessor;
+        metadata[imageIndex] = parser;
+        return parser;
     }
 
     /**
@@ -439,9 +439,9 @@ public abstract class SimpleImageReader extends ImageReader {
     public NumberRange getExpectedRange(final int imageIndex, final int bandIndex)
             throws IOException
     {
-        final MetadataAccessor accessor = getMetadataAccessor(imageIndex);
-        if (accessor != null) {
-            return accessor.getValidRange(bandIndex);
+        final GeographicMetadataParser parser = getMetadataParser(imageIndex);
+        if (parser != null) {
+            return parser.getSampleDimensions().getValidRange(bandIndex);
         }
         return null;
     }

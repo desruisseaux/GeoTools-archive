@@ -537,7 +537,7 @@ public class GeographicMetadata extends IIOMetadata {
     protected static void setAttribute(final Element node, final String name, final Date value) {
         String asText = null;
         if (value != null) {
-            final Format format = (Format) MetadataAccessor.dateFormat.get();
+            final Format format = (Format) GeographicMetadataParser.dateFormat.get();
             asText = format.format(value);
         }
         setAttribute(node, name, asText);

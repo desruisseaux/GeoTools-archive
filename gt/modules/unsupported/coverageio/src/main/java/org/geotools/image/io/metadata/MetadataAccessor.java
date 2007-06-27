@@ -44,10 +44,9 @@ import org.geotools.util.NumberRange;
 
 
 /**
- * Provides convenience methods for decoding metadata information. The metadata object is
- * typically an instance of {@link GeographicMetadata}, but doesn't have to. However the
- * metadata must be organized in nodes following the {@linkplain GeographicMetadataFormat
- * geographic metadata format} defined in this package.
+ * Base class for {@linkplain GeographicMetadata geographic metadata} parsers.
+ * This class provides convenience methods for encoding and decoding metadata
+ * information.
  *
  * @since 2.4
  * @source $URL$
@@ -56,146 +55,9 @@ import org.geotools.util.NumberRange;
  */
 public class MetadataAccessor {
     /**
-     * The separator between names in a node path.
+     * Creates a default accessor.
      */
-    private static final char SEPARATOR = '/';
-
-    /**
-     * The metadata to decode as a XML tree.
-     */
-    protected final Node metadata;
-
-    /**
-     * The elements for the {@code "SampleDimensions/SampleDimension"} node.
-     * Will be fetch only when first needed.
-     */
-    private transient List/*<Element>*/ sampleDimensions;
-
-    /**
-     * Creates an accessor for the specified metadata.
-     *
-     * @throws IllegalArgumentException if the specified metadata doesn't support
-     *         the {@value GeographicMetadataFormat#FORMAT_NAME} format.
-     */
-    public MetadataAccessor(final IIOMetadata metadata) throws IllegalArgumentException {
-        this.metadata = metadata.getAsTree(GeographicMetadataFormat.FORMAT_NAME);
-    }
-
-    /**
-     * Returns the element for the {@code "SampleDimensions/SampleDimension"} node at the
-     * specified band.
-     *
-     * @param  band The sample dimension number.
-     * @return The node for the specified sample dimension.
-     * @throws IndexOutOfBoundsException if the specified sample dimension is out of range.
-     */
-    private Element getSampleDimension(final int band) throws IndexOutOfBoundsException {
-        if (sampleDimensions == null) {
-            sampleDimensions = getElements("SampleDimensions/SampleDimension");
-        }
-        return (Element) sampleDimensions.get(band);
-    }
-
-    /**
-     * Returns the range of valid values for the specified sample dimension. The range use the
-     * {@link Integer} type if possible, or the {@link Double} type otherwise. Note that range
-     * {@linkplain NumberRange#getMinValue minimum value}, {@linkplain NumberRange#getMaxValue
-     * maximum value} or both may be null if no {@code "minValue"} or {@code "maxValue"}
-     * attribute were found for the {@code "SampleDimensions/SampleDimension"} node.
-     *
-     * @param  band The sample dimension number.
-     * @return The range of valid values for the specified sample dimension.
-     * @throws IndexOutOfBoundsException if the specified sample dimension is out of range.
-     */
-    public NumberRange getValidRange(final int band) throws IndexOutOfBoundsException {
-        final Element element = getSampleDimension(band);
-        Number minimum = getInteger(element, "minValue");
-        Number maximum = getInteger(element, "maxValue");
-        final Class type;
-        if (minimum == null || maximum == null) {
-            minimum = getDouble(element, "minValue");
-            maximum = getDouble(element, "maxValue");
-            type = Double.class;
-        } else {
-            type = Integer.class;
-        }
-        // Note: minimum and/or maximum may be null, in which case the range in unbounded.
-        return new NumberRange(type, minimum, true, maximum, true);
-    }
-
-    /**
-     * Returns the fill values for the specified sample dimension.
-     *
-     * @param  band The sample dimension number.
-     * @return The fill values for the specified sample dimension.
-     * @throws IndexOutOfBoundsException if the specified sample dimension is out of range.
-     */
-    public double[] getFillValue(final int band) throws IndexOutOfBoundsException {
-        final Element element = getSampleDimension(band);
-        return getDoubles(element, "fillValues", true);
-    }
-
-    /**
-     * Returns child nodes at the given path. This method is for {@link #getElements(String)}
-     * implementation only, and invokes itself recursively.
-     */
-    private static void getElements(final Node parent, final String path, final int base,
-            final List/*<Element>*/ elements)
-    {
-        final int upper = path.indexOf(SEPARATOR, base);
-        final String name = ((upper >= 0) ? path.substring(base, upper) : path.substring(base)).trim();
-        final NodeList list = parent.getChildNodes();
-        final int length = list.getLength();
-        for (int i=0; i<length; i++) {
-            Node candidate = list.item(i);
-            if (name.equals(candidate.getNodeName())) {
-                if (upper >= 0) {
-                    getElements(candidate, path, upper+1, elements);
-                } else if (candidate instanceof Element) {
-                    // For the very last node, we require an element.
-                    elements.add((Element) candidate);
-                }
-            }
-        }
-    }
-
-    /**
-     * Returns child nodes at the given path, or an empty list if none. Paths are separated
-     * by the {@code '/'} character. Examples of valid paths that may have many elements are:
-     * <ul>
-     *   <li>{@code "CoordinateReferenceSystem/CoordinateSystem/Axis"}</li>
-     *   <li>{@code "GridGeometry/Envelope/CoordinateValues"}</li>
-     *   <li>{@code "SampleDimensions/SampleDimension"}</li>
-     * </ul>
-     */
-    protected List/*<Element>*/ getElements(final String path) {
-        final List elements = new ArrayList();
-        getElements(metadata, path, 0, elements);
-        return elements;
-    }
-
-    /**
-     * Returns a child node of the given path, or {@code null} if none. If more than one node exist
-     * for the given name, the first one is returned and a warning is logged. Examples of valid
-     * paths that usually have only one element are:
-     * <ul>
-     *   <li>{@code "CoordinateReferenceSystem/Datum"}</li>
-     *   <li>{@code "CoordinateReferenceSystem/CoordinateSystem"}</li>
-     *   <li>{@code "GridGeometry/Envelope"}</li>
-     * </ul>
-     */
-    protected Element getElement(final String path) {
-        final List elements = getElements(path);
-        final int count = elements.size();
-        switch (count) {
-            default: {
-                log("getElement", ErrorKeys.TOO_MANY_OCCURENCES_$2,
-                        new Object[] {path, new Integer(count)});
-                // Fall through
-            }
-            case 1: return (Element) elements.get(0);
-            case 0: return null;
-        }
+    protected MetadataAccessor() {
     }
 
     /**
@@ -206,7 +68,7 @@ public class MetadataAccessor {
      * @param  attribute The attribute to fetch from the above node (e.g. {@code "name"}).
      * @return The attribute value (never an empty string), or {@code null} if none.
      */
-    protected String getString(final Element element, final String attribute) {
+    protected static String getString(final Element element, final String attribute) {
         if (element != null) {
             String candidate = element.getAttribute(attribute);
             if (candidate != null) {
@@ -227,7 +89,7 @@ public class MetadataAccessor {
      * @param  attribute The attribute to fetch from the above node (e.g. {@code "minimum"}).
      * @return The attribute value, or {@code null} if none or unparseable.
      */
-    protected Integer getInteger(final Element node, final String attribute) {
+    protected static Integer getInteger(final Element node, final String attribute) {
         String value = getString(node, attribute);
         if (value != null) {
             // Remove the trailing ".0", if any.
@@ -256,7 +118,7 @@ public class MetadataAccessor {
      * @param  attribute The attribute to fetch from the above node (e.g. {@code "minimum"}).
      * @return The attribute value, or {@code null} if none or unparseable.
      */
-    protected Double getDouble(final Element node, final String attribute) {
+    protected static Double getDouble(final Element node, final String attribute) {
         final String value = getString(node, attribute);
         if (value != null) try {
             return Double.valueOf(value);
@@ -277,7 +139,7 @@ public class MetadataAccessor {
      *         or {@code false} for preserving duplicated values.
      * @return The attribute values, or {@code null} if none.
      */
-    protected double[] getDoubles(final Element node, final String attribute, final boolean unique) {
+    protected static double[] getDoubles(final Element node, final String attribute, final boolean unique) {
         final String sequence = getString(node, attribute);
         if (sequence == null) {
             return null;
@@ -319,7 +181,7 @@ public class MetadataAccessor {
      * @param  attribute The attribute to fetch from the above node (e.g. {@code "origin"}).
      * @return The attribute value, or {@code null} if none or unparseable.
      */
-    protected Date getDate(final Element node, final String attribute) {
+    protected static Date getDate(final Element node, final String attribute) {
         final String value = getString(node, attribute);
         if (value != null) {
             final LoggedFormat format = (LoggedFormat) dateFormat.get();
@@ -331,7 +193,8 @@ public class MetadataAccessor {
     /**
      * A parser and formatter for {@link Date} objects. We use one instance per thread in order
      * to avoid synchronization issues. The parser is used by {@link GeographicMetadata} and by
-     * {@link MetadataAccessor}. It is part of the {@link GeographicMetadataFormat} definition.
+     * {@link MetadataAccessor}. It is part of the {@link GeographicMetadataFormat}
+     * definition.
      */
     static final ThreadLocal/*<LoggedFormat<Date>>*/ dateFormat = new ThreadLocal() {
         //@Override
@@ -349,7 +212,7 @@ public class MetadataAccessor {
      * Convenience method for logging a warning. Do not allow overriding, because
      * it would not work for warnings emitted by the {@link #getDate} method.
      */
-    private static void log(final String method, final int key, final Object value) {
+    static void log(final String method, final int key, final Object value) {
         final LogRecord record = Errors.getResources(null).getLogRecord(Level.WARNING, key, value);
         record.setSourceClassName(MetadataAccessor.class.getName());
         record.setSourceMethodName(method);
