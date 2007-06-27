@@ -1,7 +1,5 @@
 package org.geotools.xs;
 
-import org.eclipse.xsd.util.XSDSchemaLocationResolver;
-import org.eclipse.xsd.util.XSDSchemaLocator;
 import org.geotools.xml.BindingConfiguration;
 import org.geotools.xml.Configuration;
 import org.geotools.xs.bindings.XS;
@@ -20,19 +18,10 @@ public class XSConfiguration extends Configuration {
 	}
 
 	public String getSchemaFileURL() {
-		//special case, this is the bootstrap
-		return null;
+		return getClass().getResource("XMLSchema.xsd").toString();
 	}
 	
 	public BindingConfiguration getBindingConfiguration() {
 		return new XSBindingConfiguration();
-	}
-
-	public XSDSchemaLocationResolver getSchemaLocationResolver() {
-		return null;
-	}
-	
-	public XSDSchemaLocator getSchemaLocator() {
-		return null;
 	}
 }
