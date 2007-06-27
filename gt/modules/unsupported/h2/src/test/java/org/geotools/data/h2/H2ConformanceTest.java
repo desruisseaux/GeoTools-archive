@@ -25,7 +25,7 @@ public class H2ConformanceTest extends JDBCConformanceTestSupport {
 	}
 
 	protected JDBCDataStore createDataStore() {
-		return new JDBCDataStore();
+		return new H2DataStore();
 	}
 
 }

@@ -9,12 +9,17 @@ import javax.sql.DataSource;
 import junit.framework.TestCase;
 
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.feature.DefaultFeatureCollection;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureFactoryImpl;
 import org.geotools.feature.simple.SimpleTypeBuilder;
 import org.geotools.feature.simple.SimpleTypeFactoryImpl;
 import org.geotools.util.CommonsConverterFactory;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
@@ -39,6 +44,7 @@ public abstract class JDBCConformanceTestSupport extends TestCase {
 	 * feature types 
 	 */
 	FeatureType point,line,polygon;
+	FeatureCollection points,lines,polygons;
 	
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -76,6 +82,45 @@ public abstract class JDBCConformanceTestSupport extends TestCase {
 		tb.attribute( "geometry", Polygon.class );
 		tb.attribute( "stringProperty", String.class );
 		polygon = tb.feature();
+	
+		SimpleFeatureBuilder fb = new SimpleFeatureBuilder( new SimpleFeatureFactoryImpl() );
+		GeometryFactory gf = new GeometryFactory();
+
+		points = new DefaultFeatureCollection(null,null){};
+
+		fb.setType( point );
+		fb.add( gf.createPoint( new Coordinate( 0, 0 ) )  );
+		fb.add( new Integer( 0 ) );
+		points.add( fb.build("fid.0"));
+		
+		fb.init();
+		fb.add( gf.createPoint( new Coordinate( 1, 1 ) )  );
+		fb.add( new Integer( 1 ) );
+		points.add( fb.build("fid.1"));
+		
+		fb.init();
+		fb.add( gf.createPoint( new Coordinate( 2,2 ) )  );
+		fb.add( new Integer( 2 ) );
+		points.add( fb.build("fid.2"));
+		
+		lines = new DefaultFeatureCollection(null,null){};
+		
+		fb.setType( line );
+		
+		fb.init();
+		fb.add( gf.createLineString(new Coordinate[]{ new Coordinate(0,0),new Coordinate(1,1)}));
+		fb.add( new Double( 0.0 ) );
+		lines.add( fb.build("fid.0"));
+		
+		fb.init();
+		fb.add( gf.createLineString(new Coordinate[]{ new Coordinate(1,1),new Coordinate(2,2)}));
+		fb.add( new Double( 1.1 ) );
+		lines.add( fb.build("fid.1"));
+		
+		fb.init();
+		fb.add( gf.createLineString(new Coordinate[]{ new Coordinate(2,2),new Coordinate(3,3)}));
+		fb.add( new Double( 2.2 ) );
+		lines.add( fb.build("fid.2"));
 		
 		//create the tables
 		SQLBuilder sql = dataStore.createSQLBuilder();
@@ -102,8 +147,6 @@ public abstract class JDBCConformanceTestSupport extends TestCase {
 	
 	protected void tearDown() throws Exception {
 		super.tearDown();
-	
-		
 	}
 	
 	/**
@@ -119,5 +162,4 @@ public abstract class JDBCConformanceTestSupport extends TestCase {
 	public void test() {
 		
 	}
-	
 }
