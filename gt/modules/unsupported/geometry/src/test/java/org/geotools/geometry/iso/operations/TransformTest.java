@@ -36,18 +36,18 @@ public class TransformTest extends TestCase {
 		this.crs3 = CRS.decode( "EPSG:3005");
 	}
 
-	public void _testPoint() throws Exception {
+	public void testPoint() throws Exception {
 
-		PositionFactory positionFactory = new PositionFactoryImpl(crs1, new PrecisionModel());
-		PrimitiveFactory primitiveFactory = new PrimitiveFactoryImpl(crs1, positionFactory);
-		
-		Point point1 = primitiveFactory.createPoint( new double[]{1.5,1.5} );
-		Point point2 = (Point) point1.transform(crs2);
-		Point point3 = (Point) point1.transform(crs3);
-		
-		System.out.println(point1);
-		System.out.println(point2);
-		System.out.println(point3);
+//		PositionFactory positionFactory = new PositionFactoryImpl(crs1, new PrecisionModel());
+//		PrimitiveFactory primitiveFactory = new PrimitiveFactoryImpl(crs1, positionFactory);
+//		
+//		Point point1 = primitiveFactory.createPoint( new double[]{1.5,1.5} );
+//		Point point2 = (Point) point1.transform(crs2);
+//		Point point3 = (Point) point1.transform(crs3);
+//		
+//		System.out.println(point1);
+//		System.out.println(point2);
+//		System.out.println(point3);
 	}
 	
 	public void _testCurve() throws Exception {
