@@ -16,11 +16,14 @@
 package org.geotools.filter.v1_0;
 
 import junit.framework.TestCase;
+import java.io.ByteArrayInputStream;
+import org.opengis.filter.Filter;
 import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.Parser;
+import org.geotools.xml.Parser.Properties;
 
 
 public class OGCFilterTest extends TestCase {
@@ -47,5 +50,17 @@ public class OGCFilterTest extends TestCase {
 
         Literal literal = (Literal) equal.getExpression2();
         assertEquals("2", literal.toString());
+    }
+
+    public void testLax() throws Exception {
+        String xml = "<Filter>" + "  <PropertyIsEqualTo>" + "    <PropertyName>foo</PropertyName>"
+            + "    <Literal>bar</Literal>" + "  </PropertyIsEqualTo>" + "</Filter>";
+
+        OGCConfiguration configuration = new OGCConfiguration();
+        configuration.getProperties().add(Properties.IGNORE_SCHEMA_LOCATION);
+
+        Parser parser = new Parser(configuration);
+        Filter filter = (Filter) parser.parse(new ByteArrayInputStream(xml.getBytes()));
+        assertNotNull(filter);
     }
 }
