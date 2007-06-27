@@ -300,12 +300,21 @@ public class ParserHandler extends DefaultHandler {
             }
 
             index = new SchemaIndexImpl(schemas);
+            
+            //if no default prefix is set in this namespace context, then 
+            // set it to be the namesapce of the configuration
+            if (namespaces.getURI("") == null) {
+                namespaces.declarePrefix("", config.getNamespaceURI());
+            }
         }
 
         //set up a new namespace context
         namespaces.pushContext();
 
         //create a qName object from the string
+        if ( uri == null || uri.equals( "" ) ) {
+            uri = namespaces.getURI("");
+        }
         QName qualifiedName = new QName(uri, localName);
 
         //get the handler at top of the stack and lookup child
