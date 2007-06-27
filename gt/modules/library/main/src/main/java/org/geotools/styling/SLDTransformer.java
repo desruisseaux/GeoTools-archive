@@ -362,7 +362,7 @@ public class SLDTransformer extends TransformerBase {
 
             AttributesImpl atts = new AttributesImpl();
             try {
-            	atts.addAttribute("", "xlink", "xmlns:xlink", "", XLINK_NAMESPACE);
+            	atts.addAttribute(XMLNS_NAMESPACE, "xlink", "xmlns:xlink", "", XLINK_NAMESPACE);
                 atts.addAttribute(XLINK_NAMESPACE, "type", "xlink:type", "", "simple");
                 atts.addAttribute(XLINK_NAMESPACE, "xlink", "xlink:href","", exgr.getLocation().toString());
             } catch (java.net.MalformedURLException murle) {

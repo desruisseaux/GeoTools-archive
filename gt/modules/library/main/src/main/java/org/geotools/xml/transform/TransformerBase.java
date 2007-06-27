@@ -56,6 +56,8 @@ public abstract class TransformerBase {
     private boolean xmlDecl = false;
     private boolean nsDecl = true;
     private Charset charset = Charset.forName("UTF-8");
+    
+    public static final String XMLNS_NAMESPACE = "http://www.w3.org/2000/xmlns/";
 
     /**
      * Create a Translator to issue SAXEvents to a ContentHandler.
@@ -640,13 +642,13 @@ public abstract class TransformerBase {
                 
                 if ( translator.getDefaultNamespace() != null ) {
                     //declare the default mapping
-                    atts.addAttribute(null, null,
-                            "xmlns", null, translator.getDefaultNamespace());
+                    atts.addAttribute(XMLNS_NAMESPACE, null,
+                            "xmlns", "CDATA", translator.getDefaultNamespace());
                     
                     //if prefix non-null, declare the mapping
                     if( translator.getDefaultPrefix() != null ) {
-                        atts.addAttribute(null, null,
-                                "xmlns:" + translator.getDefaultPrefix(), null,
+                        atts.addAttribute(XMLNS_NAMESPACE, null,
+                                "xmlns:" + translator.getDefaultPrefix(), "CDATA",
                                 translator.getDefaultNamespace());    
                     }
                 }
@@ -667,7 +669,7 @@ public abstract class TransformerBase {
                     String xmlns = "xmlns:" + prefix;
 
                     if (atts.getValue(xmlns) == null) {
-                        atts.addAttribute(null, null, xmlns, null,
+                        atts.addAttribute(XMLNS_NAMESPACE, null, xmlns, "CDATA",
                             ns.getURI(prefix));
 
                         //namespaces.add(ns.getURI(prefix));
@@ -677,7 +679,7 @@ public abstract class TransformerBase {
                 String defaultNS = ns.getURI("");
 
                 if ((defaultNS != null) && (atts.getValue("xmlns:") == null)) {
-                    atts.addAttribute(null, null, "xmlns:", null, defaultNS);
+                    atts.addAttribute(XMLNS_NAMESPACE, null, "xmlns:", "CDATA", defaultNS);
 
                     //namespaces.add(defaultNS);
                 }
@@ -687,7 +689,7 @@ public abstract class TransformerBase {
 
                 if ((schemaLocSup != null)
                         && !schemaLocSup.getSchemaLocation().equals("")) {
-                    atts.addAttribute(null, null, "xmlns:xsi", null,
+                    atts.addAttribute(XMLNS_NAMESPACE, null, "xmlns:xsi", "CDATA",
                         "http://www.w3.org/2001/XMLSchema-instance");
                     atts.addAttribute(null, null, "xsi:schemaLocation", null,
                         schemaLocSup.getSchemaLocation());
