@@ -110,11 +110,12 @@ import com.vividsolutions.jts.geom.Point;
  * styling and projection information.
  * 
  * The data model is managed by demoData, an instance of the DemoData class, 
- * which holds all the Feature data (the 
- * geospatial data maintained by the application). The instance holds several 
- * List objects which show how an application can manage data itself. The 
- * instance also holds a Catalog object which shows how to use that system of 
- * the Geotools Library to manage contents.
+ * which holds all the Feature data (the geospatial data maintained by the 
+ * application). 
+ * The demoData instance holds several List objects which show how an 
+ * application can manage data access itself. 
+ * The instance also holds a single Catalog object which shows how an 
+ * application can use the Geotools library Catalog system to manage data 
  * 
  * 
  * 
@@ -238,6 +239,9 @@ public class DemoBase {
         FeatureCollection londonCollection = makeLondonFeatureCollection(london);
         loadLondonFeatureCollectionIntoList(londonCollection);
         demoGUI.textArea.append(" Done: Created London from scratch.\n");
+        
+        /* TODO: Load a shapefile with the given name into the List of DataStores.*/
+        /* NB: then close it so we can load it into the catalog instead. */
         
         /* Load a shapefile with the given name into the local catalog. */
         loadShapefileIntoCatalog(SHAPEFILENAME);
