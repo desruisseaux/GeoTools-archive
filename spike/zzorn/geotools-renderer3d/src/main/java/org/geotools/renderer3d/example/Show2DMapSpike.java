@@ -1,5 +1,6 @@
 package org.geotools.renderer3d.example;
 
+import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.factory.CommonFactoryFinder;
@@ -20,6 +21,7 @@ import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -52,7 +54,20 @@ public class Show2DMapSpike
      */
     public static void main( String[] args ) throws Exception
     {
-        Show2DMapSpike mapViewer = new Show2DMapSpike();
+        final Show2DMapSpike mapViewer = new Show2DMapSpike();
+
+        //MapContext context = loadMapContextFromCommandLine( args, mapViewer );
+
+        final ExampleDataGenerator exampleDataGenerator = new ExampleDataGenerator();
+        final MapContext context = exampleDataGenerator.createExampleMap();
+
+        mapViewer.setMapContext( context );
+    }
+
+    private static MapContext loadMapContextFromCommandLine( final String[] args, final Show2DMapSpike mapViewer )
+            throws Exception
+    {
+        MapContext context = null;
         if ( args.length == 0 || !args[ 0 ].toLowerCase().endsWith( ".shp" ) )
         {
             System.out.println( "java org.geotools.gui.swing.MapViewer shapefile.shp" );
@@ -77,14 +92,17 @@ public class Show2DMapSpike
                 System.exit( 1 );
             }
 
-            mapViewer.load( shape, sldFile );
+            context = mapViewer.load( shape, sldFile );
+
+
         }
+        return context;
     }
 
     //----------------------------------------------------------------------
     // Constructors
 
-    public void MapViewer()
+    public Show2DMapSpike()
     {
         frame = new JFrame( "My Map Viewer" );
         frame.setBounds( 20, 20, 450, 200 );
@@ -209,7 +227,7 @@ public class Show2DMapSpike
             }
             try
             {
-                this.load( shape, sld );
+                setMapContext( load( shape, sld ) );
             }
             catch ( Exception e1 )
             {
@@ -217,6 +235,19 @@ public class Show2DMapSpike
                 e1.printStackTrace();
             }
         }
+    }
+
+    private void setMapContext( final MapContext context )
+    {
+        //        myMapPane.setHighlightLayer( context.getLayer( 0 ) );
+
+        myMapPane.setMapArea( new Envelope( 0, 0, 100, 100 ) );
+        myMapPane.setRenderer( createRenderer() );
+        myMapPane.setContext( context );
+
+//        myMapPane.getRenderer().addLayer(new RenderedMapScale());
+        frame.repaint();
+        frame.doLayout();
     }
 
     //----------------------------------------------------------------------
@@ -235,7 +266,7 @@ public class Show2DMapSpike
     }
 
 
-    public void load( URL shape, URL sld ) throws Exception
+    public MapContext load( URL shape, URL sld ) throws Exception
     {
         ShapefileDataStore ds = new ShapefileDataStore( shape );
 
@@ -254,9 +285,39 @@ public class Show2DMapSpike
         }
         MapContext context = new DefaultMapContext( crs );
         context.addLayer( fs, style[ 0 ] );
-        context.getLayerBounds();
-        myMapPane.setHighlightLayer( context.getLayer( 0 ) );
 
+        context.getLayerBounds();
+        return context;
+
+    }
+
+    private MapContext createContextFromShapefile( final URL shape, final URL sld )
+            throws IOException
+    {
+        ShapefileDataStore ds = new ShapefileDataStore( shape );
+
+        FeatureSource fs = ds.getFeatureSource();
+        com.vividsolutions.jts.geom.Envelope env = fs.getBounds();
+        myMapPane.setMapArea( env );
+        StyleFactory factory = CommonFactoryFinder.getStyleFactory( null );
+
+        SLDParser stylereader = new SLDParser( factory, sld );
+        org.geotools.styling.Style[] style = stylereader.readXML();
+
+        CoordinateReferenceSystem crs = fs.getSchema().getDefaultGeometry().getCoordinateSystem();
+        if ( crs == null )
+        {
+            crs = DefaultGeographicCRS.WGS84;
+        }
+        MapContext context = new DefaultMapContext( crs );
+        context.addLayer( fs, style[ 0 ] );
+
+        context.getLayerBounds();
+        return context;
+    }
+
+    private GTRenderer createRenderer()
+    {
         GTRenderer renderer;
         if ( false )
         {
@@ -272,12 +333,7 @@ public class Show2DMapSpike
             hints.put( "memoryPreloadingEnabled", Boolean.FALSE );
             renderer.setRendererHints( hints );
         }
-        myMapPane.setRenderer( renderer );
-        myMapPane.setContext( context );
-
-//        myMapPane.getRenderer().addLayer(new RenderedMapScale());
-        frame.repaint();
-        frame.doLayout();
+        return renderer;
     }
 
 }

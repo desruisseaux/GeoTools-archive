@@ -1,13 +1,13 @@
 package org.geotools.renderer3d.example;
 
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.io.WKTReader;
 import org.geotools.feature.*;
-import org.geotools.feature.type.NumericAttributeType;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
 import org.geotools.styling.BasicLineStyle;
-
-import java.util.Collections;
 
 /**
  * A simple test data generator.
@@ -41,30 +41,40 @@ public class ExampleDataGenerator
         // Some random coverage color (population density?)
         // TODO
 
-        // A simple initial shape
-        final AttributeType roadWidth = new NumericAttributeType( "roadWidth",
-                                                                  Double.class,
-                                                                  false,
-                                                                  0,
-                                                                  100,
-                                                                  new Double( 5 ),
-                                                                  null );
         try
         {
-            final DefaultFeatureType featureType = new DefaultFeatureType( "road",
-                                                                           "renderer3d_example",
-                                                                           Collections.singletonList( roadWidth ),
-                                                                           Collections.EMPTY_LIST,
-                                                                           null );
-            final FeatureCollection featureCollection = new DefaultFeatureCollection( "test", featureType );
+            //AttributeType geom = AttributeTypeFactory.newAttributeType("the_geom", Point.class);
+            AttributeType geom = AttributeTypeFactory.newAttributeType( "the_geom", LineString.class );
+            AttributeType roadWidth = AttributeTypeFactory.newAttributeType( "width", Float.class );
+            FeatureType ftRoad = FeatureTypes.newFeatureType( new AttributeType[]{ geom, roadWidth }, "road" );
 
-//            featureCollection.add( )
+            WKTReader wktReader = new WKTReader();
+            //Point geometry = (Point) wktReader.read("POINT (" + lat + " " + lon + ")");
+            LineString geometry = (LineString) wktReader.read( "LINESTRING (0 0, 10 10, 10 20, 20 30, 10 40, 15 50)" );
+            Float width = new Float( 10 );
+            Feature theRoad = ftRoad.create( new Object[]{ geometry, width }, "myRoad" );
+
+            System.out.println( theRoad );
+
+            final FeatureCollection featureCollection = new DefaultFeatureCollection( "roads", ftRoad );
+
+            featureCollection.add( theRoad );
 
             exampleMap.addLayer( new DefaultMapLayer( featureCollection, new BasicLineStyle() ) );
+
+            System.out.println( "exampleMap = " + exampleMap );
         }
         catch ( SchemaException e )
         {
-            e.printStackTrace();
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        catch ( ParseException e )
+        {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        catch ( IllegalAttributeException e )
+        {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
         return exampleMap;

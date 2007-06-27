@@ -25,6 +25,7 @@ import org.geotools.renderer3d.utils.quadtree.QuadTreeImpl;
 
 import java.awt.Canvas;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
@@ -139,6 +140,7 @@ public class Renderer3DImpl
 
         // make the canvas:
         final Canvas canvas = DisplaySystem.getDisplaySystem( "lwjgl" ).createCanvas( width, height );
+        canvas.setMinimumSize( new Dimension( 0, 0 ) );
 
         // add a listener... if window is resized, we can do something about it.
         canvas.addComponentListener( new ComponentAdapter()
