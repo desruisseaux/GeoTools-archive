@@ -38,16 +38,7 @@ public class JDBCDataStore extends ContentDataStore {
     public String getDatabaseSchema() {
         return databaseSchema;
     }
-    
-//    public void setConnectionPoolDataSource(
-//            ConnectionPoolDataSource connectionPoolDataSource) {
-//        this.connectionPoolDataSource = connectionPoolDataSource;
-//    }
-//    
-//    public ConnectionPoolDataSource getConnectionPoolDataSource() {
-//        return connectionPoolDataSource;
-//    }
-    
+
     public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
@@ -83,6 +74,19 @@ public class JDBCDataStore extends ContentDataStore {
 		);
     }
     
+    public PrimaryKey getPrimaryKey( ContentEntry entry ) throws IOException {
+	    try {
+	    	return JDBCUtils.primaryKey( entry.getName(), this );
+	    } 
+		catch (Exception e) {
+			throw (IOException) new IOException().initCause( e );
+		}
+    }
+    
+    public PrimaryKey getPrimaryKey( FeatureType featureType ) throws IOException {
+    	return getPrimaryKey( ensureEntry( ( name( featureType.getTypeName() ) ) ) );
+	}
+    
     /**
      * @return A type builder for building feature types.
      */
@@ -102,14 +106,6 @@ public class JDBCDataStore extends ContentDataStore {
      */
     protected SQLBuilder createSQLBuilder() {
     	return new SQLBuilder( this );
-    }
-    
-    /**
-     * @return A sql builder for encoding sql statements for a particular 
-     * feature source.
-     */
-    protected SQLBuilder createSQLBuilder( JDBCFeatureSource featureSource ) {
-    	return new SQLBuilder( this, featureSource );
     }
     
     /**

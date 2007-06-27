@@ -17,14 +17,8 @@ public class JDBCFeatureSource extends ContentFeatureSource {
     public JDBCFeatureSource(ContentEntry entry) throws IOException {
         super(entry);
         
-        //figure out the primary key
-    	try {
-			primaryKey = JDBCUtils.primaryKey( entry.getName(), (JDBCDataStore) entry.getDataStore() );
-		} 
-    	catch (Exception e) {
-    		throw (IOException) new IOException().initCause( e );
-		}
-	}
+        primaryKey =  ((JDBCDataStore) entry.getDataStore()).getPrimaryKey(entry);
+    }
 
     public PrimaryKey getPrimaryKey() {
 		return primaryKey;

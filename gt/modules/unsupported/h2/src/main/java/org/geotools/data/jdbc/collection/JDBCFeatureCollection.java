@@ -181,10 +181,10 @@ public class JDBCFeatureCollection implements FeatureCollection {
 	}
 
     protected FeatureIterator createFeatureIterator() throws Exception {
-    	SQLBuilder sql = new SQLBuilder( (JDBCDataStore) source.getDataStore(), source );
+    	SQLBuilder sql = new SQLBuilder( (JDBCDataStore) source.getDataStore() );
     	
     	Statement st = state.getConnection().createStatement();
-    	st.execute( sql.select( filter ) );
+    	st.execute( sql.select( source.getSchema(), filter ) );
     	
     	return new JDBCFeatureIterator( st, this );
     }
@@ -249,8 +249,8 @@ public class JDBCFeatureCollection implements FeatureCollection {
 				Envelope bounds = new Envelope();
 				
 				SQLBuilder sql = 
-					new SQLBuilder( (JDBCDataStore) source.getDataStore(), source );
-				ResultSet rs = statement.executeQuery( sql.bounds( filter ) );
+					new SQLBuilder( (JDBCDataStore) source.getDataStore() );
+				ResultSet rs = statement.executeQuery( sql.bounds( source.getSchema(), filter ) );
 				
 				if ( rs.next() ) {
 					bounds.init( (Envelope) rs.getObject( 1 ) );
@@ -282,9 +282,9 @@ public class JDBCFeatureCollection implements FeatureCollection {
 
 			public Object run(Statement statement) throws IOException, SQLException {
 				SQLBuilder sql = 
-					new SQLBuilder( (JDBCDataStore) source.getDataStore(), source );
+					new SQLBuilder( (JDBCDataStore) source.getDataStore() );
 				
-				ResultSet rs = statement.executeQuery( sql.count( filter ) );
+				ResultSet rs = statement.executeQuery( sql.count( source.getSchema(),filter ) );
 				rs.next();
 				
 				Integer count = new Integer( rs.getInt( 1 ) );

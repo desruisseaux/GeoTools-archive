@@ -1,5 +1,6 @@
 package org.geotools.data.jdbc;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -62,47 +63,45 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTWriter;
 
+/**
+ * Builds raw sql statements.
+ * <p>
+ * This class should be subclasses to accomodate different dialects of sql. 
+ * </p>
+ * <p>
+ * This class maintains state and is <b>not thread safe</b>. 
+ * </p>
+ * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
+ *
+ */
 public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
 	/**
 	 * The data store
 	 */
 	JDBCDataStore dataStore;
-	/**
-     * The feature source which sql is being encoded against. 
-     */
-    JDBCFeatureSource featureSource;
     
 	/**
      * Filter factory used to create filters
      */
     FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory( null );
 
+    //internal state
     /**
      * SQL statement buffer
      */
     StringBuffer sql;
-    
+    /**
+     * Feature type being worked on
+     */
+    FeatureType featureType;
     /**
      * Post-processing filter
      */
     Filter postFilter;
     
     public SQLBuilder( JDBCDataStore dataStore ) {
-    	this( dataStore, null );
-    }
-    
-    public SQLBuilder( JDBCDataStore dataStore, JDBCFeatureSource featureSource ) {
     	this.dataStore = dataStore;
-    	this.featureSource = featureSource;
     }
-	
-    public void setFeatureSource(JDBCFeatureSource featureSource) {
-		this.featureSource = featureSource;
-	}
-    
-    public JDBCFeatureSource getFeatureSource() {
-		return featureSource;
-	}
     
     public void setFilterFactory(FilterFactory filterFactory) {
 		this.filterFactory = filterFactory;
@@ -113,18 +112,22 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
 	}
     
     /**
-     * Helper method for getting the feature type being worked against.
-     */
-	protected FeatureType featureType() {
-		return featureSource.getSchema();
-	}
-    
-	/**
      * Initializes the state of the builder.
      */
     protected void init() {
         sql = new StringBuffer();
         postFilter = null;
+        featureType = null;
+    }
+    
+    /**
+     * Initializes the state of the builder setting the feature type being
+     * worked on.
+     * 
+     */
+    protected void init(FeatureType featureType) {
+    	init();
+    	this.featureType = featureType;
     }
     
     //
@@ -134,12 +137,11 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
      * <p>
      * 
      * </p>
-     * @param featureType The feature type to create the table from.
      *
      * @return A statement of the form "CREATE TABLE ...".
      */
 	public String createTable( FeatureType featureType ) {
-		init();
+		init(featureType);
 
 	    sql.append("CREATE TABLE ");
 
@@ -178,15 +180,11 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
 	
 	/**
      * Builds a "DROP TABLE" statement.
-     * <p>
-     * 
-     * </p>
-     * @param featureType The feature type to create the table from.
      *
      * @return A statement of the form "DROP TABLE ...".
      */
 	public String dropTable( FeatureType featureType ) {
-		init();
+		init(featureType);
 		
 		sql.append("DROP TABLE ");
 
@@ -199,11 +197,14 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
 	/**
      * Builds a query which selects the envelope or bounding box of every 
      * feature / row in a table. 
-     *
+     * <p>
+     * Convenience for <code>bounds(featureType,null)</code>.
+     * </p>
+     * 
      * @return A statement of the form "SELECT envelope(...) FROM ..."
      */
-	public String bounds() {
-		return bounds( null );
+	public String bounds(FeatureType featureType) {
+		return bounds( featureType, null );
 	}
 	
 	/**
@@ -213,19 +214,19 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
      * The <tt>filter</tt> argument can be used to filter those rows / features
      * returned or can be <code>null</code> to return all rows.
      * </p>
-     *
+     * 
      * @return A statement of the form "SELECT envelope(...) FROM ... WHERE ..."
      */
-	public String bounds( Filter filter ) {
-		init();
+	public String bounds( FeatureType featureType, Filter filter ) {
+		init(featureType);
 		
 		//select
 		sql.append("SELECT envelope(");
-		geometry();
+		geometry(featureType);
 		sql.append( ")");
 		
 		//from
-		from();
+		from(featureType);
 		
 		//where
 		if ( filter != null && filter != Filter.INCLUDE ) {
@@ -237,11 +238,13 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
 	
 	/**
      * Builds a query which selects the bound of all rows / features in a table.
-     *
+     * <p>
+     * Convenience for <code>count(null)</code>
+     * </p>
      * @return A statement of the form "SELECT count(*) FROM ..."
      */
-	public String count() {
-		return count( null );
+	public String count(FeatureType featureType) {
+		return count( featureType, null );
 	}
 	
 	/**
@@ -254,14 +257,14 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
      *
      * @return A statement of the form "SELECT count(*) FROM ... WHERE ..."
      */
-	public String count( Filter filter ) {
-		init();
+	public String count( FeatureType featureType, Filter filter ) {
+		init(featureType);
 		
 		//select
 		sql.append("SELECT count(*)");
 		
 		//from
-		from();
+		from(featureType);
 		
 		//where
 		if ( filter != null && filter != Filter.INCLUDE ) {
@@ -278,11 +281,17 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
 	 * </p>
 	 * 
 	 */
-	public String select( Filter filter ) {
-		init();
+	public String select( FeatureType featureType, Filter filter ) {
+		init(featureType);
 		
-		FeatureType featureType = featureType();
-		PrimaryKey pkey = featureSource.getPrimaryKey();
+		PrimaryKey pkey;
+		try {
+			pkey = dataStore.getPrimaryKey(featureType);
+		} 
+		catch (IOException e) {
+			String msg = "Unable to obtain primary key";
+			throw new RuntimeException( msg, e );
+		}
 		
 		//select
 		int n = pkey.columns.length;
@@ -297,10 +306,10 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
 		for ( int i = n; i < propertyNames.length; i++ ) {
 			propertyNames[i] = featureType.getAttributeType( i - n ).getName();
 		}
-		select( propertyNames );
+		select( featureType, propertyNames );
 		
 		//from
-		from();
+		from(featureType);
 		
 		//where
 		if ( filter != null && filter != Filter.INCLUDE ) {
@@ -317,14 +326,14 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
 	 * </p>
 	 * 
 	 */
-	public void delete( Filter filter ) {
-		init();
+	public void delete( FeatureType featureType, Filter filter ) {
+		init(featureType);
 		
 		//delete
 		sql.append( "DELETE ");
 		
 		//from
-		from();
+		from( featureType );
 		
 		//where
 		if ( filter != null && filter != Filter.INCLUDE ) {
@@ -366,16 +375,13 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
      * </p>
      * @param propertyNames The array of properties / columns in the select.
      */
-    protected void select(String[] propertyNames) {
+    protected void select(FeatureType featureType, String[] propertyNames) {
         sql.append("SELECT ");
 
         if ((propertyNames == null) || (propertyNames.length == 0)) {
             sql.append("*");
         } else {
-        	//get the feature type
-            FeatureType featureType = featureType();
-            
-            for (int i = 0; i < propertyNames.length; i++) {
+        	for (int i = 0; i < propertyNames.length; i++) {
                 PropertyName propertyName = filterFactory.property(propertyNames[i]);
                 
                 //get the attribute type
@@ -402,20 +408,9 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
      * Encodes "FROM <table>".
      *
      */
-    protected void from() {
+    protected void from( FeatureType featureType ) {
     	sql.append( " FROM " );
-    	table();
-    }
-    
-    /**
-     * Encodes the table name in a statment qualifying it with the database schema
-     * name if set.
-     * <p>
-     * The table name is derived from the feature source of the builder.
-     * </p>
-     */
-    protected void table() {
-    	table( featureSource.getSchema().getTypeName() );
+    	table( featureType.getTypeName() );
     }
     
     /**
@@ -450,17 +445,16 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
     /**
      * Encodes the name of the default geometry in a statement.
      * <p>
-     * The default geometry is derived from the feautre source of the builder.
      * </p>
      *
      */
-    protected void geometry() {
-    	if ( featureSource.getSchema().getDefaultGeometry() == null ) {
+    protected void geometry(FeatureType featureType) {
+    	if ( featureType.getDefaultGeometry() == null ) {
     		String msg = "No geometry column to encode";
     		throw new IllegalStateException( msg );
     	}
     	
-    	name( featureSource.getSchema().getDefaultGeometry().getName() );
+    	name( featureType.getDefaultGeometry().getName() );
     }
     
     /**
@@ -549,9 +543,7 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
     public Object visit(PropertyName propertyName, Object data) {
         try {
             //1. evaluate against the type to get the AttributeType
-            FeatureType featureType = featureType();
-
-            AttributeType attributeType = (AttributeType) propertyName.evaluate(featureType);
+        	AttributeType attributeType = (AttributeType) propertyName.evaluate(featureType);
 
             if (attributeType != null) {
                 //encode the name of the attribute, not the property name itself
@@ -562,7 +554,7 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
             }
 
             //2. not in type, could it be a primary key?
-            PrimaryKey key = featureSource.getPrimaryKey();
+            PrimaryKey key = dataStore.getPrimaryKey(featureType);
 
             //serach for the property in the primary key, encode it and return its type
             for (int i = 0; i < key.columns.length; i++) {
@@ -643,8 +635,6 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
 
             return data;
         }
-
-        FeatureType featureType = featureType();
 
         //check for geometry
         if (value instanceof Geometry) {
@@ -783,7 +773,7 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
     public Object visit(Id id, Object data) {
         try {
             //get the primary key
-            PrimaryKey key = featureSource.getPrimaryKey();
+            PrimaryKey key = dataStore.getPrimaryKey(featureType);
 
             //prepare each column as a property name
             PropertyName[] columnNames = new PropertyName[key.columns.length];
@@ -919,7 +909,7 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
                 crs = CRS.decode(bbox.getSRS());
                 data = crs;
             } catch (Exception ex) {
-                featureSource.getLogger().log(Level.WARNING, ex.getLocalizedMessage(), ex);
+                dataStore.getLogger().log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
         }
 
