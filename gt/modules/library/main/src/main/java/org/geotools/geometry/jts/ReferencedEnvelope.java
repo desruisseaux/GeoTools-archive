@@ -269,26 +269,6 @@ public class ReferencedEnvelope extends Envelope implements
 
     /**
      * Returns the coordinate reference system associated with this envelope.
-     * 
-     * @deprecated Use {@link #getCoordinateReferenceSystem}.
-     *
-     * @since 2.4
-     */
-    public CoordinateReferenceSystem crs() {
-        return getCoordinateReferenceSystem();
-    }
-
-    /**
-     * Returns the coordinate reference system associated with this envelope.
-     * 
-     * @deprecated Replaced by {@link #getCoordinateReferenceSystem}.
-     */
-    public CoordinateReferenceSystem getCRS() {
-        return crs;
-    }
-
-    /**
-     * Returns the coordinate reference system associated with this envelope.
      */
     public CoordinateReferenceSystem getCoordinateReferenceSystem() {
         return crs;
@@ -363,66 +343,6 @@ public class ReferencedEnvelope extends Envelope implements
     }
 
     /**
-     * Provides the minimium easting ordinate.
-     * This is a helper method for <code>{@linkplain #getMinimum getMinimum}(i)</code>
-     * where <var>i</var> is the ordinate used to represent easting.
-     *
-     * @deprecated This implementation do not obeys the above contract, since it doesn't try
-     *       to locate which axis is the easting. We don't know yet if we will change the
-     *       implementation or the specification in a future Geotools version.
-     *
-     * @since 2.4
-     */
-    public double minX() {
-        return super.getMinX();
-    }
-
-    /**
-     * Provides the maximum easting ordinate.
-     * This is a helper method for <code>{@linkplain #getMaximum getMaximum}(i)</code>
-     * where <var>i</var> is the ordinate used to represent easting.
-     *
-     * @deprecated This implementation do not obeys the above contract, since it doesn't try
-     *       to locate which axis is the easting. We don't know yet if we will change the
-     *       implementation or the specification in a future Geotools version.
-     *
-     * @since 2.4
-     */
-    public double maxX() {
-        return super.getMaxX();
-    }
-
-    /**
-     * Provides the minimium northing ordinate.
-     * This is a helper method for <code>{@linkplain #getMinimum getMinimum}(i)</code>
-     * where <var>i</var> is the ordinate used to represent northing.
-     *
-     * @deprecated This implementation do not obeys the above contract, since it doesn't try
-     *       to locate which axis is the northing. We don't know yet if we will change the
-     *       implementation or the specification in a future Geotools version.
-     *
-     * @since 2.4
-     */
-    public double minY() {
-        return super.getMinY();
-    }
-
-    /**
-     * Provides the northing easting ordinate.
-     * This is a helper method for <code>{@linkplain #getMaximum getMaximum}(i)</code>
-     * where <var>i</var> is the ordinate used to represent northing.
-     *
-     * @deprecated This implementation do not obeys the above contract, since it doesn't try
-     *       to locate which axis is the northing. We don't know yet if we will change the
-     *       implementation or the specification in a future Geotools version.
-     *
-     * @since 2.4
-     */
-    public double maxY() {
-        return super.getMaxY();
-    }
-
-    /**
      * Returns {@code true} if lengths along all dimension are zero.
      *
      * @since 2.4
@@ -477,17 +397,6 @@ public class ReferencedEnvelope extends Envelope implements
      */
     public void include(double x, double y) {
         super.expandToInclude(x, y);
-    }
-
-    /**
-     * Initialize the bounding box with another bounding box.
-     *
-     * @since 2.4
-     *
-     * @deprecated Renamed {@link #setBounds}.
-     */
-    public void init(final BoundingBox bbox) {
-        setBounds(bbox);
     }
 
     /**

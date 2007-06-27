@@ -133,7 +133,7 @@ public class Rendering2DTest extends TestCase {
 
         ReferencedEnvelope env = map.getLayerBounds();
         env = new ReferencedEnvelope(env.getMinX() - 20, env.getMaxX() + 20,
-                env.getMinY() - 20, env.getMaxY() + 20, env.crs());
+                env.getMinY() - 20, env.getMaxY() + 20, env.getCoordinateReferenceSystem());
         map.setAreaOfInterest(env);
         TestUtilites.showRender("testSimpleLineRender", renderer, 3000, env);
     }
@@ -152,7 +152,7 @@ public class Rendering2DTest extends TestCase {
 
         ReferencedEnvelope env = map.getLayerBounds();
         env = new ReferencedEnvelope(env.getMinX() - 20, env.getMaxX() + 20,
-                env.getMinY() - 20, env.getMaxY() + 20, env.crs());
+                env.getMinY() - 20, env.getMaxY() + 20, env.getCoordinateReferenceSystem());
         map.setAreaOfInterest(env);
         TestUtilites.showRender("testSimpleLineRender", renderer, 3000, env);
     }
@@ -171,7 +171,7 @@ public class Rendering2DTest extends TestCase {
 
         ReferencedEnvelope env = map.getLayerBounds();
         env = new ReferencedEnvelope(env.getMinX() - 200000, env.getMaxX() + 200000,
-                env.getMinY() - 200000, env.getMaxY() + 200000, env.crs());
+                env.getMinY() - 200000, env.getMaxY() + 200000, env.getCoordinateReferenceSystem());
         map.setAreaOfInterest(env);
         TestUtilites.showRender("testSimpleLineRender", renderer, 3000, env);
     }
@@ -191,7 +191,7 @@ public class Rendering2DTest extends TestCase {
         env = new ReferencedEnvelope(env.getMinX() - env.getWidth(),
                 env.getMaxX() + env.getWidth(),
                 env.getMinY() - env.getHeight(), env.getMaxY()
-                + env.getHeight(), env.crs());
+                + env.getHeight(), env.getCoordinateReferenceSystem());
         map.setAreaOfInterest(env);
         TestUtilites.showRender("testSimpleLineRender", renderer, 3000, env);
     }
@@ -210,7 +210,7 @@ public class Rendering2DTest extends TestCase {
         ShapefileRenderer renderer = new ShapefileRenderer(map);
         ReferencedEnvelope env = map.getLayerBounds();
         env = new ReferencedEnvelope(env.getMinX() - 20, env.getMaxX() + 20,
-                env.getMinY() - 20, env.getMaxY() + 20, env.crs());
+                env.getMinY() - 20, env.getMaxY() + 20, env.getCoordinateReferenceSystem());
         TestUtilites.showRender("testSimplePointRender", renderer, 1000, env);
     }
 
@@ -262,7 +262,7 @@ public class Rendering2DTest extends TestCase {
 
         //        renderer.setOptimizedDataLoadingEnabled(true);
         env = new ReferencedEnvelope(env.getMinX() - 1, env.getMaxX() + 1,
-                env.getMinY() - 1, env.getMaxY() + 1, env.crs());
+                env.getMinY() - 1, env.getMaxY() + 1, env.getCoordinateReferenceSystem());
         TestUtilites.showRender("testReprojection", renderer, 1000, env);
 
         // System.in.read();
@@ -299,7 +299,7 @@ public class Rendering2DTest extends TestCase {
         ReferencedEnvelope old = context.getAreaOfInterest();
         double w = old.getWidth()/4;
         double h = old.getHeight()/4;
-        ReferencedEnvelope env = new ReferencedEnvelope( old.getCenter(0)-w, old.getCenter(0)+w,old.getCenter(1)-h, old.getCenter(1)+h, old.crs());
+        ReferencedEnvelope env = new ReferencedEnvelope( old.getCenter(0)-w, old.getCenter(0)+w,old.getCenter(1)-h, old.getCenter(1)+h, old.getCoordinateReferenceSystem());
         renderer.paint(image.createGraphics(), new Rectangle(300, 300), env);
         assertTrue(l1.count > l2.count);
     }
@@ -323,7 +323,7 @@ public class Rendering2DTest extends TestCase {
 
         ShapefileRenderer renderer = new ShapefileRenderer(map);
         ReferencedEnvelope env = map.getLayerBounds();
-        if( env.crs()==null )
+        if( env.getCoordinateReferenceSystem()==null )
             env=new ReferencedEnvelope((Envelope)env, DefaultEngineeringCRS.GENERIC_2D );
         map.setAreaOfInterest(env);
 

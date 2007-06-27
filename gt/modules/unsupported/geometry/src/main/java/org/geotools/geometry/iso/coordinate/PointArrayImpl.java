@@ -103,7 +103,7 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
         
 		//CoordinateFactoryImpl coordFactory = this.getFeatGeomFactory().getCoordinateFactory();		
 		for (int i = 0; i < aPointArray.size(); i++) {
-            Position copy = new PositionImpl( aPointArray.getPosition(i, null) );
+            Position copy = new PositionImpl( aPointArray.getDirectPosition(i, null) );
 			add( copy );
 		}
         crs = getPosition(0).getPosition().getCoordinateReferenceSystem();
@@ -205,7 +205,7 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 //	 * @param index
 //	 * @param position
 //	 */
-//	public void setPosition(int index, PositionImpl position) {
+//	public void setDirectPosition(int index, PositionImpl position) {
 //		assert ((index < this.column.size()) && (position != null));
 //		this.column.set(index, position);
 //	}
@@ -334,7 +334,7 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 	/* (non-Javadoc)
 	 * @see org.opengis.geometry.coordinate.PointArray#get(int, org.opengis.geometry.coordinate.DirectPosition)
 	 */
-	public DirectPositionImpl getPosition(int col, DirectPosition dest)
+	public DirectPositionImpl getDirectPosition(int col, DirectPosition dest)
 			throws IndexOutOfBoundsException {
 		// Test ok (SJ)
 		Position pos = get(col);
@@ -360,7 +360,7 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 	/* (non-Javadoc)
 	 * @see org.opengis.geometry.coordinate.PointArray#set(int, org.opengis.geometry.coordinate.DirectPosition)
 	 */
-	public void setPosition(int index, DirectPosition position)
+	public void setDirectPosition(int index, DirectPosition position)
 			throws IndexOutOfBoundsException, UnsupportedOperationException {
 		// Test ok
 		// Set copy of the coordinates of the given DirectPosition
@@ -508,7 +508,7 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 		 */
 		public DirectPositionImpl getStartDirectPositionCoordinate(int arg0,
 				DirectPosition dp) {
-			return this.pointArray.getPosition(arg0, dp);
+			return this.pointArray.getDirectPosition(arg0, dp);
 		}
 
 		/**
@@ -518,7 +518,7 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 		 */
 		public DirectPositionImpl getEndDirectPositionCoordinate(int arg0,
 				DirectPosition dp) {
-			return this.pointArray.getPosition(arg0 + 1, dp);
+			return this.pointArray.getDirectPosition(arg0 + 1, dp);
 		}
 
 		/**

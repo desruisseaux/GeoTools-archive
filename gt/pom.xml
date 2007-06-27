@@ -1011,7 +1011,9 @@
           <testFailureIgnore>
             ${allow.test.failure.ignore}
           </testFailureIgnore>
-          <!-- Redirect the unit test standard output to a file -->
+          <!-- Option to print summary of test suites or just print the test cases that has errors. -->
+          <printSummary>false</printSummary>
+          <!-- Redirect the unit test standard output to a file. -->
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
         </configuration>
       </plugin>
