@@ -28,10 +28,6 @@ import org.geotools.factory.BufferedFactory;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
-import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.util.DefaultObjectCache;
-import org.geotools.util.NameFactory;
-import org.geotools.util.NullObjectCache;
 import org.geotools.util.ObjectCache;
 import org.geotools.util.ObjectCaches;
 import org.opengis.metadata.citation.Citation;
@@ -70,7 +66,6 @@ import org.opengis.referencing.datum.TemporalDatum;
 import org.opengis.referencing.datum.VerticalDatum;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
-import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 
 /**
@@ -107,7 +102,7 @@ import org.opengis.util.InternationalString;
  *          jgarnett $
  * @author Jody Garnett
  */
-public final class BufferedAuthorityDecorator extends ReferencingFactory
+public final class CachedAuthorityDecorator extends ReferencingFactory
 		implements AuthorityFactory, CRSAuthorityFactory, CSAuthorityFactory,
 		DatumAuthorityFactory, CoordinateOperationAuthorityFactory,
 		BufferedFactory {
@@ -142,7 +137,7 @@ public final class BufferedAuthorityDecorator extends ReferencingFactory
 	 * @param factory
 	 *            The factory to cache. Can not be {@code null}.
 	 */
-	public BufferedAuthorityDecorator(final AuthorityFactory factory) {
+	public CachedAuthorityDecorator(final AuthorityFactory factory) {
 		this(factory, createCache(GeoTools.getDefaultHints()));
 	}
 
@@ -164,7 +159,7 @@ public final class BufferedAuthorityDecorator extends ReferencingFactory
 	 * @param maxStrongReferences
 	 *            The maximum number of objects to keep by strong reference.
 	 */
-	protected BufferedAuthorityDecorator(AuthorityFactory factory,
+	protected CachedAuthorityDecorator(AuthorityFactory factory,
 			ObjectCache cache) {
 		this.cache = cache;
 		authority = factory;
@@ -177,34 +172,14 @@ public final class BufferedAuthorityDecorator extends ReferencingFactory
 	/** Utility method used to produce cache based on hint */
 	protected static ObjectCache createCache(final Hints hints)
 			throws FactoryRegistryException {
-		String policy = (String) hints.get(Hints.BUFFER_POLICY);
-		int limit = Hints.BUFFER_LIMIT.toValue(hints);
-
-		if ("weak".equalsIgnoreCase(policy)) {
-			return new DefaultObjectCache(0);
-		} else if ("all".equalsIgnoreCase(policy)) {
-			return new DefaultObjectCache(limit);
-		} else if ("none".equalsIgnoreCase(policy)) {
-			return new NullObjectCache();
-		} else {
-			return new DefaultObjectCache(limit);
-		}
+		return ObjectCaches.create(hints);
 	}
 
 	//
 	// Utility Methods and Cache Care and Feeding
 	//
 	protected String toKey(String code) {
-		code = code.trim();
-		final GenericName name = NameFactory.create(code);
-		final GenericName scope = name.getScope();
-		if (scope == null) {
-			return code;
-		}
-		if (Citations.identifierMatches(getAuthority(), scope.toString())) {
-			return name.asLocalName().toString().trim();
-		}
-		return code;
+		return ObjectCaches.toKey( getAuthority(), code);
 	}
 
 	//
@@ -794,7 +769,7 @@ public final class BufferedAuthorityDecorator extends ReferencingFactory
 			final String sourceCode, final String targetCode)
 			throws FactoryException {
 		
-		final ObjectCaches.Pair key = new ObjectCaches.Pair( toKey( sourceCode ), toKey( targetCode ) );
+		final Object key = ObjectCaches.toKey( getAuthority(),  sourceCode, targetCode );
 		Set operations = (Set) cache.get(key);			
 		if (operations == null) {
 			try {

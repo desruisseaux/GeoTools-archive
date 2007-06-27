@@ -2,7 +2,10 @@ package org.geotools.util;
 
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.factory.Hints;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.resources.Utilities;
+import org.opengis.metadata.citation.Citation;
+import org.opengis.util.GenericName;
 
 /**
  * This is facade around several constructs used by GeoTools for internal caching.
@@ -17,7 +20,7 @@ import org.geotools.resources.Utilities;
  * @author Jody Garnett
  * @author Cory Horner
  */
-public class ObjectCaches {
+public final class ObjectCaches {
 	
     /**
      * A pair of Codes for {@link ObjectCache) to work with.
@@ -36,7 +39,7 @@ public class ObjectCaches {
      * 
      * {@link #createFromCoordinateReferenceSystemCodes}.
      */
-    public static final class Pair {
+    private static final class Pair {
         private final String source, target;
 
         public Pair(String source, String target) {
@@ -75,7 +78,8 @@ public class ObjectCaches {
         return create( policy, limit );
     }
     /**
-     * Utility method used to produce an Object cache.
+     * Utility method used to produce an ObjectCache.
+     * 
      * @param policy One of "weak", "all", "none"
      * @param size Used to indicate requested size, exact use depends on policy 
      * @return A new ObjectCache
@@ -83,16 +87,46 @@ public class ObjectCaches {
      */
     public static ObjectCache create( String policy, int size ){
         if ("weak".equalsIgnoreCase(policy)) {
-            //return new DefaultReferencingObjectCache(0);
+            return new DefaultObjectCache(0);
         } else if ("all".equalsIgnoreCase(policy)) {
-            //return new DefaultReferencingObjectCache(limit);
+            return new DefaultObjectCache(size);
         } else if ("none".equalsIgnoreCase(policy)) {
-            //return new NullReferencingObjectCache();
+            return new NullObjectCache();
         } else {
-            //return new DefaultReferencingObjectCache(limit);
+            return new DefaultObjectCache(size);
         }
-        return null;
     }
     
-    
+    /**
+     * Produce a good key based on the privided citaiton and code.
+     * You can think of the citation as being "here" and the code being the "what".
+     * 
+     * @param code Code
+     * @return A good key for use with ObjectCache
+     */
+    public static String toKey( Citation citation, String code ){
+		code = code.trim();
+		final GenericName name = NameFactory.create(code);
+		final GenericName scope = name.getScope();
+		if (scope == null) {
+			return code;
+		}
+		if (citation != null && Citations.identifierMatches( citation, scope.toString())) {
+			return name.asLocalName().toString().trim();
+		}
+		return code;
+    }
+    /**
+     * Produce a good key based on a pair of codes.
+     * 
+     * @param code1
+     * @param code2
+     * @return A object to use as a key
+     */
+    public static Object toKey( Citation citation, String code1, String code2 ){
+    	String key1 = toKey( citation, code1 );
+    	String key2 = toKey( citation, code2 );
+    	
+    	return new Pair( key1, key2 );
+    }
 }
