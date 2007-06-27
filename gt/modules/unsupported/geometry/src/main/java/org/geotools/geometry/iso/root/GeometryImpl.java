@@ -290,13 +290,14 @@ public abstract class GeometryImpl implements Geometry {
 				return primitiveFactory.createPoint( transform.transform(((PointImpl)this).getPosition(), dp1) );
 			}
 			else if (this instanceof CurveImpl) {
-				CurveImpl curve = (CurveImpl) this;
-				curve.asDirectPositions();
-				transform.transfo
-				
-				PrimitiveFactory primitiveFactory = new PrimitiveFactoryImpl(newCRS, positionFactory);
-				DirectPosition dp1 = new DirectPositionImpl(newCRS);
-				return primitiveFactory.createPoint( transform.transform(((PointImpl)this).getPosition(), dp1) );
+				return null;
+//				CurveImpl curve = (CurveImpl) this;
+//				curve.asDirectPositions();
+//				transform.transfo
+//				
+//				PrimitiveFactory primitiveFactory = new PrimitiveFactoryImpl(newCRS, positionFactory);
+//				DirectPosition dp1 = new DirectPositionImpl(newCRS);
+//				return primitiveFactory.createPoint( transform.transform(((PointImpl)this).getPosition(), dp1) );
 			}
 			
 			return null;
