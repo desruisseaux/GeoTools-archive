@@ -71,6 +71,9 @@ import org.geotools.geometry.iso.util.algorithm2D.CentroidArea2D;
 import org.geotools.geometry.iso.util.algorithm2D.ConvexHull;
 import org.geotools.geometry.iso.util.algorithmND.CentroidLine;
 import org.geotools.geometry.iso.util.algorithmND.CentroidPoint;
+import org.geotools.geometry.jts.GeometryCoordinateSequenceTransformer;
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -83,11 +86,22 @@ import org.opengis.geometry.TransfiniteSet;
 import org.opengis.geometry.aggregate.MultiPrimitive;
 import org.opengis.geometry.complex.Complex;
 import org.opengis.geometry.coordinate.LineSegment;
+import org.opengis.geometry.primitive.Curve;
 import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.OrientableSurface;
 import org.opengis.geometry.primitive.Primitive;
+import org.opengis.geometry.primitive.PrimitiveFactory;
 import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.Geometry;
+
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * 
@@ -247,11 +261,15 @@ public abstract class GeometryImpl implements Geometry {
 	 */
 	public Geometry transform(CoordinateReferenceSystem newCRS)
 			throws TransformException {
-		// TODO semantic JR, SJ
-		// TODO implementation
-		// TODO test
-		// TODO documentation
-		return null;
+		// create the appropriate math transform and do the transform
+		MathTransform transform = null;
+		try {
+			transform = CRS.findMathTransform(this.getCoordinateReferenceSystem(), newCRS);
+		} catch (FactoryException e) {
+			Assert.isTrue(false, "Could not find math transform for given CRS objects.");
+			//e.printStackTrace();
+		}
+		return transform(newCRS, transform);
 	}
 
 	/*
@@ -262,11 +280,26 @@ public abstract class GeometryImpl implements Geometry {
 	 */
 	public Geometry transform(CoordinateReferenceSystem newCRS,
 			MathTransform transform) throws TransformException {
-		// TODO semantic JR, SJ
-		// TODO implementation
-		// TODO test
-		// TODO documentation
-		return null;
+
+			// go through the possible geometry types and transform its coordinates
+			// within a new geometry of that type
+			PositionFactory positionFactory = new PositionFactoryImpl(newCRS, this.getPrecision());
+			if (this instanceof PointImpl) {
+				PrimitiveFactory primitiveFactory = new PrimitiveFactoryImpl(newCRS, positionFactory);
+				DirectPosition dp1 = new DirectPositionImpl(newCRS);
+				return primitiveFactory.createPoint( transform.transform(((PointImpl)this).getPosition(), dp1) );
+			}
+			else if (this instanceof CurveImpl) {
+				CurveImpl curve = (CurveImpl) this;
+				curve.asDirectPositions();
+				transform.transfo
+				
+				PrimitiveFactory primitiveFactory = new PrimitiveFactoryImpl(newCRS, positionFactory);
+				DirectPosition dp1 = new DirectPositionImpl(newCRS);
+				return primitiveFactory.createPoint( transform.transform(((PointImpl)this).getPosition(), dp1) );
+			}
+			
+			return null;
 	}
 
 	/**
@@ -286,13 +319,6 @@ public abstract class GeometryImpl implements Geometry {
 	 * @see org.opengis.geometry.coordinate.root.Geometry#distance(org.opengis.geometry.coordinate.root.Geometry)
 	 */
 	public final double distance(Geometry geometry) {
-		// TODO semantic JR, SJ
-		// TODO implementation
-		// TODO test
-		// TODO documentation
-		//Assert.isTrue(false);
-		//return Double.NaN;
-		
 		// first determine if this or the given geom is a multiprimitive, if so, break it
 		// down and loop through each of its geoms and determine the mindistance from
 		// those.

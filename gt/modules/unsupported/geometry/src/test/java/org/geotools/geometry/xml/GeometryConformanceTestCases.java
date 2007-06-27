@@ -135,9 +135,9 @@ public class GeometryConformanceTestCases extends TestCase {
 	public void testTestRelateAA_general() throws Exception {
 		perform();
 	}
-	public void testTestRelateAA() throws Exception {
-		perform();
-}
+//	public void testTestRelateAA() throws Exception {
+//		perform();
+//}
 	public void testTestRelateAAbig() throws Exception {
 		setName("testTestRelateAA-big");
 		perform();
@@ -166,9 +166,9 @@ public class GeometryConformanceTestCases extends TestCase {
 	public void testTestRelateLL_general() throws Exception {
 		perform();
 	}
-	public void testTestRelatePA() throws Exception {
-		perform();
-	}
+//	public void testTestRelatePA() throws Exception {
+//		perform();
+//	}
 	public void testTestRelatePA_general() throws Exception {
 		perform();
 }
