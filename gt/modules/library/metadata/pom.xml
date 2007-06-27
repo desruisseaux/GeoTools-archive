@@ -85,7 +85,7 @@
   <!--     Dependency Management                                   -->
   <!-- =========================================================== -->
   <dependencies>
-    <!-- NOTE: The metadata module does not depends on JTS. -->
+    <!-- NOTE: The metadata module does not depend on JTS. -->
 
     <dependency>
       <groupId>java3d</groupId>
@@ -101,6 +101,19 @@
       <groupId>javax.units</groupId>
       <artifactId>jsr108</artifactId>
       <!-- The version number is specified in the parent POM. -->      
+    </dependency>
+    <dependency>
+      <groupId>edu.oswego</groupId>
+      <artifactId>concurrent</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+    </dependency>
+
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>net.sourceforge.groboutils</groupId>
+      <artifactId>groboutils-core</artifactId>
+      <version>5</version>
+      <scope>test</scope>
     </dependency>
         
     <!--

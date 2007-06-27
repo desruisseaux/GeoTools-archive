@@ -24,8 +24,7 @@ import java.util.Map;
 
 /**
  * Caching implementation for ReferencingObjectCache. This instance is used when
- * actual caching is desired. This is a temporary class, to be removed when the
- * DefaultReferencingObjectCache is ready for action.
+ * actual caching is desired. This is a temporary class.
  * 
  * @since 2.4
  * @version $Id: DefaultReferencingObjectCache.java 25972 2007-06-21 13:38:35Z
@@ -34,7 +33,7 @@ import java.util.Map;
  *         http://svn.geotools.org/geotools/trunk/gt/modules/library/referencing/src/main/java/org/geotools/referencing/factory/DefaultReferencingObjectCache.java $
  * @author Cory Horner (Refractions Research)
  */
-final class OldReferencingObjectCache implements ReferencingObjectCache {
+final class OldReferencingObjectCache {
     /**
      * The pool of cached objects.
      * <p>
@@ -120,22 +119,16 @@ final class OldReferencingObjectCache implements ReferencingObjectCache {
     }
 
     public void writeLock(Object key) {
-        // TODO Auto-generated method stub
-        
     }
 
     public void writeUnLock(Object key) {
-        // TODO Auto-generated method stub
-        
     }
 
     public boolean containsKey(Object key) {
-        // TODO Auto-generated method stub
         return false;
     }
 
     public Object test( Object key ) {
-        // TODO Auto-generated method stub
         return null;
     }
 }

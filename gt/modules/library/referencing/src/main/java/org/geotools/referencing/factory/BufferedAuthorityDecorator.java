@@ -29,7 +29,10 @@ import org.geotools.factory.FactoryRegistryException;
 import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.Citations;
+import org.geotools.util.DefaultObjectCache;
 import org.geotools.util.NameFactory;
+import org.geotools.util.NullObjectCache;
+import org.geotools.util.ObjectCache;
 import org.geotools.util.ObjectCaches;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.AuthorityFactory;
@@ -110,7 +113,7 @@ public final class BufferedAuthorityDecorator extends ReferencingFactory
 		BufferedFactory {
 
 	/** Cache to be used for referencing objects. */
-	ReferencingObjectCache cache;
+	ObjectCache cache;
 
 	/** The delegate authority. */
 	private AuthorityFactory authority;
@@ -162,7 +165,7 @@ public final class BufferedAuthorityDecorator extends ReferencingFactory
 	 *            The maximum number of objects to keep by strong reference.
 	 */
 	protected BufferedAuthorityDecorator(AuthorityFactory factory,
-			ReferencingObjectCache cache) {
+			ObjectCache cache) {
 		this.cache = cache;
 		authority = factory;
 		crsAuthority = (CRSAuthorityFactory) factory;
@@ -172,19 +175,19 @@ public final class BufferedAuthorityDecorator extends ReferencingFactory
 	}
 
 	/** Utility method used to produce cache based on hint */
-	protected static ReferencingObjectCache createCache(final Hints hints)
+	protected static ObjectCache createCache(final Hints hints)
 			throws FactoryRegistryException {
 		String policy = (String) hints.get(Hints.BUFFER_POLICY);
 		int limit = Hints.BUFFER_LIMIT.toValue(hints);
 
 		if ("weak".equalsIgnoreCase(policy)) {
-			return new DefaultReferencingObjectCache(0);
+			return new DefaultObjectCache(0);
 		} else if ("all".equalsIgnoreCase(policy)) {
-			return new DefaultReferencingObjectCache(limit);
+			return new DefaultObjectCache(limit);
 		} else if ("none".equalsIgnoreCase(policy)) {
-			return new NullReferencingObjectCache();
+			return new NullObjectCache();
 		} else {
-			return new DefaultReferencingObjectCache(limit);
+			return new DefaultObjectCache(limit);
 		}
 	}
 

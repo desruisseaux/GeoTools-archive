@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.referencing.factory;
+package org.geotools.util;
 
 
 /**
@@ -25,7 +25,7 @@ package org.geotools.referencing.factory;
  * @source $URL$
  * @author Cory Horner (Refractions Research)
  */
-final class NullReferencingObjectCache implements ReferencingObjectCache {
+public final class NullObjectCache implements ObjectCache {
     /**
      * Do nothing since this map is already empty.
      */

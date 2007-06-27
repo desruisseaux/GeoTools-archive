@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.referencing.factory;
+package org.geotools.util;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,7 +29,7 @@ import java.util.Map;
  * @source $URL$
  * @author Cory Horner (Refractions Research)
  */
-final class DefaultReferencingObjectCache implements ReferencingObjectCache {
+public final class DefaultObjectCache implements ObjectCache {
 
     /**
      * A cheap cache map implementation (not scalable).
@@ -41,14 +41,14 @@ final class DefaultReferencingObjectCache implements ReferencingObjectCache {
     /**
      * Creates a new cache.
      */
-    public DefaultReferencingObjectCache() {
+    public DefaultObjectCache() {
         cache = Collections.synchronizedMap(new HashMap());
     }
     
     /**
      * Creates a new cache using the indicated initialSize.
      */
-    public DefaultReferencingObjectCache(final int initialSize) {
+    public DefaultObjectCache(final int initialSize) {
         cache = Collections.synchronizedMap(new HashMap( initialSize ));        
     }
 

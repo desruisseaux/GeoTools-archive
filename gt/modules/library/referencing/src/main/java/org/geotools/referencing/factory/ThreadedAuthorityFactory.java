@@ -93,7 +93,7 @@ public class ThreadedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * The cache for referencing objects.
      */
-    private final ReferencingObjectCache objectCache;
+    private final OldReferencingObjectCache objectCache;
 
     /**
      * The pool of objects identified by {@link find}.

@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.referencing.factory;
+package org.geotools.util;
 
 import java.lang.ref.Reference;
 
@@ -77,7 +77,7 @@ import java.lang.ref.Reference;
  * @todo Consider renaming as {@code ObjectCache} or {@code Cache} and move to the
  *       {@code org.geotools.util} package.
  */
-public interface ReferencingObjectCache {
+public interface ObjectCache {
 
     /**
      * Removes all entries from this cache.

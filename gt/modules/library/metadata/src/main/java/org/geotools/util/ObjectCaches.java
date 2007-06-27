@@ -11,7 +11,7 @@ import org.geotools.resources.Utilities;
  * <ul>
  * <li>Access to an implementation of "weak", "all" and "none" implementations of {@link ObjectCache}
  * <li>The ability to turn a "code" into a good "key" for use with an ObjectCache
- * <li>A Pair data object (think of C STRUCT) for use as a key when storing a value against two oobjects.
+ * <li>A Pair data object (think of C STRUCT) for use as a key when storing a value against two objects.
  * </ul>
  * 
  * @author Jody Garnett
@@ -19,9 +19,6 @@ import org.geotools.resources.Utilities;
  */
 public class ObjectCaches {
 	
-	public static interface ObjectCache {
-		
-	}
     /**
      * A pair of Codes for {@link ObjectCache) to work with.
      * <p>

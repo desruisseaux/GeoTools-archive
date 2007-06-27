@@ -1,11 +1,11 @@
-package org.geotools.referencing.factory;
+package org.geotools.util;
 
 import EDU.oswego.cs.dl.util.concurrent.ReadWriteLock;
 import EDU.oswego.cs.dl.util.concurrent.ReentrantWriterPreferenceReadWriteLock;
 
 
 /**
- * An entry in the ReferencingObjectCache.
+ * An entry in the ObjectCache.
  * 
  * To use as a reader:
  * <pre><code>
