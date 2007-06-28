@@ -15,45 +15,47 @@
  */
 package org.geotools.util;
 
-import java.lang.ref.Reference;
+import java.lang.ref.Reference;  // For javadoc
+
 
 /**
- * A cache used by the referencing subsystem.
+ * A cache for arbitrary objects. Cache implementations are thread-safe and support concurrency.
+ * A cache entry can be locked when an object is in process of being created, but the locking /
+ * unlocking <strong>must</strong> be protected in a {@code try} ... {@code finally} block.
  * <p>
  * To use as a reader:
- * 
- * <pre><code>
+ *
+ * <blockquote><pre>
+ * key = &quot;EPSG:4326&quot;;
  * CoordinateReferenceSystem crs = cache.get(key);
- * </code></pre>
+ * </pre></blockquote>
  * 
  * To overwrite:
  * 
- * <pre><code>
- * cache.put(&quot;EPSG:4326&quot;, crs);
- * </code></pre>
+ * <blockquote><pre>
+ * cache.put(key, crs);
+ * </pre></blockquote>
  * 
  * To reserve the entry while figuring out what to write:
  * 
- * <pre><code>
+ * <blockquote><pre>
  *  try {
- *      cache.writeLock( key ); // may block if another writer is working on this code
- *      value = cache.test( key );
- *      if( value == null ){
+ *      cache.writeLock(key); // may block if another writer is working on this code
+ *      value = cache.test(key);
+ *      if (value == null) {
  *         // another writer got here first
- *      }
- *      else { 
+ *      } else { 
  *         value = figuringOutWhatToWrite(....);
- *         cache.put( key, value );
+ *         cache.put(key, value);
  *      }
+ *  } finally {
+ *      cache.writeUnLock(key);
  *  }
- *  finally {
- *      cache.writeUnLock(&quot;EPSG:4326&quot;);
- *  }
- * </code></pre>
+ * </pre></blockquote>
  * 
  * To use as a proper cache:
  * 
- * <pre><code>
+ * <blockquote><pre>
  * CylindricalCS cs = (CylindricalCS) cache.get(key);
  * if (cs == null) {
  *     try {
@@ -68,17 +70,16 @@ import java.lang.ref.Reference;
  *     }
  * }
  * return cs;
- * </code></pre>
+ * </pre></blockquote>
  * 
  * @since 2.4
  * @version $Id$
- * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/library/referencing/src/main/java/org/geotools/referencing/factory/ReferencingObjectCache.java $
- * @todo Consider renaming as {@code ObjectCache} or {@code Cache} and move to the
- *       {@code org.geotools.util} package.
+ * @source $URL$
+ * @author Cory Horner (Refractions Research)
+ *
+ * @see https://jsr-107-interest.dev.java.net/javadoc/javax/cache/package-summary.html
  */
 public interface ObjectCache {
-
     /**
      * Removes all entries from this cache.
      */
@@ -88,21 +89,22 @@ public interface ObjectCache {
      * Returns an object from the pool for the specified code. If the object was retained as a
      * {@linkplain Reference weak reference}, the {@link Reference#get referent} is returned.
      * 
-     * @param key The authority code.
+     * @param   key The key whose associated value is to be returned.
+     * @returns The value to which the specified key is mapped, or {@code null} if this cache
+     *          contains no mapping for the key.
      */
-    Object get( Object key );
+    Object get(Object key);
 
     /**
      * Use the write lock to test the value for the provided key.
      * <p>
      * This method is used by a writer to test if someone (ie another writer) has provided the value
      * for us (while we were blocked waiting for them).
-     * </p>
      * 
      * @param key
      * @return The value, may be <code>null</code>
      */
-    Object test( Object key );
+    Object test(Object key);
 
     /**
      * Puts an element into the cache.

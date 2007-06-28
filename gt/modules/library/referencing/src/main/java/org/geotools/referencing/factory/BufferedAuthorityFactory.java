@@ -952,7 +952,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
         final Set/*<CoordinateOperation>*/ operations;
         final CodePair key = new CodePair(trimAuthority(sourceCode), trimAuthority(targetCode));
         final Object cached = get(key);
-        if (cached instanceof CoordinateOperation) {
+        if (cached instanceof Set/*<CoordinateOperation>*/) {
             operations = (Set/*<CoordinateOperation>*/) cached;
         } else {
             operations = Collections.unmodifiableSet(getBackingStore()
