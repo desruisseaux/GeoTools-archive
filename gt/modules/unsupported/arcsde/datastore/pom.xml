@@ -91,11 +91,15 @@
       <artifactId>gt2-jdbc</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!--
+    This dependency was being used by FilterTest, which anyway
+    is not being executed as it relies in non available data.
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-jts-wrapper</artifactId>
       <version>${project.version}</version>
     </dependency>
+     -->
     <dependency>
       <groupId>commons-pool</groupId>
       <artifactId>commons-pool</artifactId>
