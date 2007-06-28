@@ -20,7 +20,7 @@ public class ObjectCacheEntryTest extends TestCase {
         
         public void run() {
             try {
-                values = new Object[] {entry.get()};
+                values = new Object[] {entry.getValue()};
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -41,9 +41,9 @@ public class ObjectCacheEntryTest extends TestCase {
         public void run() {
             try {
                 entry.writeLock();
-                entry.set(new Integer(1));
+                entry.setValue(new Integer(1));
                 entry.writeUnLock();
-                values = new Object[] {entry.get()};
+                values = new Object[] {entry.getValue()};
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -66,7 +66,7 @@ public class ObjectCacheEntryTest extends TestCase {
         Thread.yield();
 
         //write
-        entry.set(new Integer(1));
+        entry.setValue(new Integer(1));
         
         //check that the read thread was blocked
         Object[] values = ((EntryReaderThread) thread1).getValue();
@@ -82,13 +82,13 @@ public class ObjectCacheEntryTest extends TestCase {
         assertEquals(new Integer(1), values[0]);
     }
 
-    public void testWriteWriteDeadlock() {
+    public void testWriteWriteDeadlock() throws InterruptedException {
         //lock the entry as if we were writing
         entry = new ObjectCacheEntry();
         entry.writeLock();
 
         //write the value 2
-        entry.set(new Integer(2));
+        entry.setValue(new Integer(2));
         
         //create another thread which starts writing
         Runnable thread1 = new EntryWriterThread();
@@ -99,13 +99,13 @@ public class ObjectCacheEntryTest extends TestCase {
         //check that the write thread was blocked
         Object[] values = ((EntryWriterThread) thread1).getValue();
         assertNull(values);
-        assertEquals(new Integer(2), entry.get());
+        assertEquals(new Integer(2), entry.getValue());
         
         //unlock
         entry.writeUnLock();
 
         //check that the write thread is unblocked
-        Thread.yield();
+        t1.join();
         values = ((EntryWriterThread) thread1).getValue();
         assertNotNull(values);
         assertEquals(new Integer(1), values[0]);

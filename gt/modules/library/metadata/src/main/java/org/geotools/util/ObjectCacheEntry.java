@@ -16,7 +16,7 @@ import EDU.oswego.cs.dl.util.concurrent.ReentrantWriterPreferenceReadWriteLock;
  * <pre><code>
  * try {
  *    entry.writeLock();
- *    entry. set( value );
+ *    entry.set(value);
  * } finally {
  *    entry.writeUnLock();
  * }
@@ -61,14 +61,13 @@ public class ObjectCacheEntry {
      * }
      * </code></pre>
      */
-    public Object test() {
+    public Object peek() {
         try {
             lock.writeLock().acquire();
             return value;
         } catch (InterruptedException e) {
             return null;
-        }
-        finally {
+        } finally {
             lock.writeLock().release();
         }
     }
@@ -90,7 +89,7 @@ public class ObjectCacheEntry {
      * 
      * @return cached value or null if empty
      */
-    public Object get() {
+    public Object getValue() {
         try {
             lock.readLock().acquire();
             return value;
@@ -105,18 +104,17 @@ public class ObjectCacheEntry {
     /**
      * Stores the value in the entry, using the write lock. 
      * It is common to use this method while already holding the writeLock (since writeLock
-     * is re-enterant).
+     * is re-entrant).
      * 
      * @param value
      */
-    public void set(Object value) {
+    public void setValue(Object value) {
         try {
            lock.writeLock().acquire();
            this.value = value;
         } catch (InterruptedException e) {
-            
-        }
-        finally {
+
+        } finally {
             lock.writeLock().release();
         }
     }
@@ -124,7 +122,8 @@ public class ObjectCacheEntry {
     /**
      * Acquires a write lock. This will block other readers and writers (on this
      * entry only), and other readers and writers will need to be cleared before
-     * the write lock can be acquired.
+     * the write lock can be acquired, unless it is the same thread attempting
+     * to read or write.
      */
     public boolean writeLock() {
         try {
@@ -135,6 +134,9 @@ public class ObjectCacheEntry {
         return true;
     }
 
+    /**
+     * Releases a write lock.  
+     */
     public void writeUnLock() {
         lock.writeLock().release();
     }

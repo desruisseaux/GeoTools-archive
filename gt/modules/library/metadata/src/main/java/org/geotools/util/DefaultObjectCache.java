@@ -86,21 +86,15 @@ public final class DefaultObjectCache implements ObjectCache {
      * @todo Consider logging a message here to the finer or finest level.
      */
     public Object get(final Object key) {
-        return getEntry(key).get();
+        return getEntry(key).getValue();
     }
 
-    public Object test(final Object key) {
+    public Object peek(final Object key) {
         if (!cache.containsKey(key)) {
             // no entry for this key - so no value
             return null;
         }
-        ObjectCacheEntry entry = getEntry(key);
-        try {
-            entry.writeLock();
-            return entry.get();
-        } finally {
-            entry.writeUnLock();
-        }
+        return getEntry(key).peek();
     }
 
     public void writeLock(final Object key) {
@@ -118,7 +112,7 @@ public final class DefaultObjectCache implements ObjectCache {
      * Stores a value
      */
     public void put(final Object key, final Object object) {
-        getEntry(key).set(object);        
+        getEntry(key).setValue(object);        
     }
 
     /**

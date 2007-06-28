@@ -104,7 +104,7 @@ public interface ObjectCache {
      * @param key
      * @return The value, may be <code>null</code>
      */
-    Object test(Object key);
+    Object peek(Object key);
 
     /**
      * Puts an element into the cache.
@@ -131,19 +131,19 @@ public interface ObjectCache {
      * @param key the authority code.
      * @param object The referencing object to add in the pool.
      */
-    void put( Object key, Object object );
+    void put(Object key, Object object);
 
     /**
-     * Aquire a write lock on the indicated key.
+     * Acquire a write lock on the indicated key.
      * 
      * @param key
      */
-    void writeLock( Object key ); // TODO: how to indicate lock was not aquired?
+    void writeLock(Object key); // TODO: how to indicate lock was not acquired?
 
     /**
      * Release write lock on the indicated key.
      * 
      * @param key
      */
-    void writeUnLock( Object key );
+    void writeUnLock(Object key);
 }

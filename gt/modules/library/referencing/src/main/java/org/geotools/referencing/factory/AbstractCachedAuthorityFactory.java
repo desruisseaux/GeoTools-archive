@@ -154,7 +154,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (obj == null) {
 			try {
 				cache.writeLock(key);
-				obj = (IdentifiedObject) cache.test(key);
+				obj = (IdentifiedObject) cache.peek(key);
 				if (obj == null) {
 					obj = generateObject(code);
 					cache.put(key, obj);
@@ -177,7 +177,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (crs == null) {
 			try {
 				cache.writeLock(key);
-				crs = (CompoundCRS) cache.test(key);
+				crs = (CompoundCRS) cache.peek(key);
 				if (crs == null) {
 					crs = generateCompoundCRS(code);
 					cache.put(key, crs);
@@ -198,7 +198,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (crs == null) {
 			try {
 				cache.writeLock(key);
-				crs = (CoordinateReferenceSystem) cache.test(key);
+				crs = (CoordinateReferenceSystem) cache.peek(key);
 				if (crs == null) {
 					crs = generateCoordinateReferenceSystem(code);
 					cache.put(key, crs);
@@ -217,7 +217,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (crs == null) {
 			try {
 				cache.writeLock(key);
-				crs = (DerivedCRS) cache.test(key);
+				crs = (DerivedCRS) cache.peek(key);
 				if (crs == null) {
 					crs = generateDerivedCRS(code);
 					cache.put(key, crs);
@@ -238,7 +238,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (crs == null) {
 			try {
 				cache.writeLock(key);
-				crs = (EngineeringCRS) cache.test(key);
+				crs = (EngineeringCRS) cache.peek(key);
 				if (crs == null) {
 					crs = generateEngineeringCRS(code);
 					cache.put(key, crs);
@@ -258,7 +258,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (crs == null) {
 			try {
 				cache.writeLock(key);
-				crs = (GeocentricCRS) cache.test(key);
+				crs = (GeocentricCRS) cache.peek(key);
 				if (crs == null) {
 					crs = generateGeocentricCRS(code);
 					cache.put(key, crs);
@@ -278,7 +278,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (crs == null) {
 			try {
 				cache.writeLock(key);
-				crs = (GeographicCRS) cache.test(key);
+				crs = (GeographicCRS) cache.peek(key);
 				if (crs == null) {
 					crs = generateGeographicCRS(code);
 					cache.put(key, crs);
@@ -298,7 +298,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (crs == null) {
 			try {
 				cache.writeLock(key);
-				crs = (ImageCRS) cache.test(key);
+				crs = (ImageCRS) cache.peek(key);
 				if (crs == null) {
 					crs = generateImageCRS(code);
 					cache.put(key, crs);
@@ -317,7 +317,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (crs == null) {
 			try {
 				cache.writeLock(key);
-				crs = (ProjectedCRS) cache.test(key);
+				crs = (ProjectedCRS) cache.peek(key);
 				if (crs == null) {
 					crs = generateProjectedCRS(code);
 					cache.put(key, crs);
@@ -336,7 +336,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (crs == null) {
 			try {
 				cache.writeLock(key);
-				crs = (TemporalCRS) cache.test(key);
+				crs = (TemporalCRS) cache.peek(key);
 				if (crs == null) {
 					crs = generateTemporalCRS(code);
 					cache.put(key, crs);
@@ -355,7 +355,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (crs == null) {
 			try {
 				cache.writeLock(key);
-				crs = (VerticalCRS) cache.test(key);
+				crs = (VerticalCRS) cache.peek(key);
 				if (crs == null) {
 					crs = generateVerticalCRS(code);
 					cache.put(key, crs);
@@ -377,7 +377,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (cs == null) {
 			try {
 				cache.writeLock(key);
-				cs = (CartesianCS) cache.test(key);
+				cs = (CartesianCS) cache.peek(key);
 				if (cs == null) {
 					cs = generateCartesianCS(code);
 					cache.put(key, cs);
@@ -398,7 +398,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (cs == null) {
 			try {
 				cache.writeLock(key);
-				cs = (CoordinateSystem) cache.test(key);
+				cs = (CoordinateSystem) cache.peek(key);
 				if (cs == null) {
 					cs = generateCoordinateSystem(code);
 					cache.put(key, cs);
@@ -420,7 +420,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (axis == null) {
 			try {
 				cache.writeLock(key);
-				axis = (CoordinateSystemAxis) cache.test(key);
+				axis = (CoordinateSystemAxis) cache.peek(key);
 				if (axis == null) {
 					axis = generateCoordinateSystemAxis(code);
 					cache.put(key, axis);
@@ -441,7 +441,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (cs == null) {
 			try {
 				cache.writeLock(key);
-				cs = (CylindricalCS) cache.test(key);
+				cs = (CylindricalCS) cache.peek(key);
 				if (cs == null) {
 					cs = generateCylindricalCS(code);
 					cache.put(key, cs);
@@ -462,7 +462,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (cs == null) {
 			try {
 				cache.writeLock(key);
-				cs = (EllipsoidalCS) cache.test(key);
+				cs = (EllipsoidalCS) cache.peek(key);
 				if (cs == null) {
 					cs = generateEllipsoidalCS(code);
 					cache.put(key, cs);
@@ -482,7 +482,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (cs == null) {
 			try {
 				cache.writeLock(key);
-				cs = (PolarCS) cache.test(key);
+				cs = (PolarCS) cache.peek(key);
 				if (cs == null) {
 					cs = generatePolarCS(code);
 					cache.put(key, cs);
@@ -502,7 +502,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (cs == null) {
 			try {
 				cache.writeLock(key);
-				cs = (SphericalCS) cache.test(key);
+				cs = (SphericalCS) cache.peek(key);
 				if (cs == null) {
 					cs = generateSphericalCS(code);
 					cache.put(key, cs);
@@ -522,7 +522,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (cs == null) {
 			try {
 				cache.writeLock(key);
-				cs = (TimeCS) cache.test(key);
+				cs = (TimeCS) cache.peek(key);
 				if (cs == null) {
 					cs = generateTimeCS(code);
 					cache.put(key, cs);
@@ -542,7 +542,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (unit == null) {
 			try {
 				cache.writeLock(key);
-				unit = (Unit) cache.test(key);
+				unit = (Unit) cache.peek(key);
 				if (unit == null) {
 					unit = generateUnit(code);
 					cache.put(key, unit);
@@ -562,7 +562,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (cs == null) {
 			try {
 				cache.writeLock(key);
-				cs = (VerticalCS) cache.test(key);
+				cs = (VerticalCS) cache.peek(key);
 				if (cs == null) {
 					cs = generateVerticalCS(code);
 					cache.put(key, cs);
@@ -585,7 +585,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (datum == null) {
 			try {
 				cache.writeLock(key);
-				datum = (Datum) cache.test(key);
+				datum = (Datum) cache.peek(key);
 				if (datum == null) {
 					datum = generateDatum(code);
 					cache.put(key, datum);
@@ -605,7 +605,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (ellipsoid == null) {
 			try {
 				cache.writeLock(key);
-				ellipsoid = (Ellipsoid) cache.test(key);
+				ellipsoid = (Ellipsoid) cache.peek(key);
 				if (ellipsoid == null) {
 					ellipsoid = generateEllipsoid(code);
 					cache.put(key, ellipsoid);
@@ -626,7 +626,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (datum == null) {
 			try {
 				cache.writeLock(key);
-				datum = (EngineeringDatum) cache.test(key);
+				datum = (EngineeringDatum) cache.peek(key);
 				if (datum == null) {
 					datum = generateEngineeringDatum(code);
 					cache.put(key, datum);
@@ -647,7 +647,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (datum == null) {
 			try {
 				cache.writeLock(key);
-				datum = (GeodeticDatum) cache.test(key);
+				datum = (GeodeticDatum) cache.peek(key);
 				if (datum == null) {
 					datum = generateGeodeticDatum(code);
 					cache.put(key, datum);
@@ -667,7 +667,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (datum == null) {
 			try {
 				cache.writeLock(key);
-				datum = (ImageDatum) cache.test(key);
+				datum = (ImageDatum) cache.peek(key);
 				if (datum == null) {
 					datum = generateImageDatum(code);
 					cache.put(key, datum);
@@ -688,7 +688,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (datum == null) {
 			try {
 				cache.writeLock(key);
-				datum = (PrimeMeridian) cache.test(key);
+				datum = (PrimeMeridian) cache.peek(key);
 				if (datum == null) {
 					datum = generatePrimeMeridian(code);
 					cache.put(key, datum);
@@ -709,7 +709,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (datum == null) {
 			try {
 				cache.writeLock(key);
-				datum = (TemporalDatum) cache.test(key);
+				datum = (TemporalDatum) cache.peek(key);
 				if (datum == null) {
 					datum = generateTemporalDatum(code);
 					cache.put(key, datum);
@@ -730,7 +730,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (datum == null) {
 			try {
 				cache.writeLock(key);
-				datum = (VerticalDatum) cache.test(key);
+				datum = (VerticalDatum) cache.peek(key);
 				if (datum == null) {
 					datum = generateVerticalDatum(code);
 					cache.put(key, datum);
@@ -751,7 +751,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (operation == null) {
 			try {
 				cache.writeLock(key);
-				operation = (CoordinateOperation) cache.test(key);
+				operation = (CoordinateOperation) cache.peek(key);
 				if (operation == null) {
 					operation = generateCoordinateOperation(code);
 					cache.put(key, operation);
@@ -774,7 +774,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		if (operations == null) {
 			try {
 				cache.writeLock(key);
-				operations = (Set) cache.test(key);
+				operations = (Set) cache.peek(key);
 				if (operations == null) {
 					operations = generateFromCoordinateReferenceSystemCodes( sourceCode, targetCode );				
 					// can we not trust operationAuthority to return us an unmodifiableSet ?

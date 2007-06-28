@@ -64,7 +64,7 @@ public final class NullObjectCache implements ObjectCache {
     public void writeUnLock(Object key) {
     }
 
-    public Object test( Object key ) {
+    public Object peek( Object key ) {
         return null;
     }
 }
