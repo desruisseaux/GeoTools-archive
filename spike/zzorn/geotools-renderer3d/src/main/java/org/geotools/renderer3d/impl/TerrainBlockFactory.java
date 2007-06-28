@@ -9,11 +9,18 @@ import org.geotools.renderer3d.utils.quadtree.QuadTreeNode;
  * @author Hans Häggström
  */
 public class TerrainBlockFactory
-    implements NodeDataFactory
+        implements NodeDataFactory
 {
+
+    //======================================================================
+    // Public Methods
+
+    //----------------------------------------------------------------------
+    // NodeDataFactory Implementation
 
     public Object createNodeDataObject( final QuadTreeNode node )
     {
         return new TerrainBlockImpl( node );
     }
+
 }

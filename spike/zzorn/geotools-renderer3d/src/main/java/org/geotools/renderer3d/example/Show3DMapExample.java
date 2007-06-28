@@ -40,13 +40,13 @@ public class Show3DMapExample
 
         // Create a 2D renderer with the same data for comparsion
         final StreamingRenderer streamingRenderer = new StreamingRenderer();
-        final JMapPane view2D = new JMapPane( streamingRenderer, exampleMap );
-        view2D.setMapArea( exampleMap.getLayerBounds() );
-        view2D.setState( JMapPane.Pan );
-        view2D.setCursor( new Cursor( Cursor.MOVE_CURSOR ) );
+        final JMapPane mapView2D = new JMapPane( streamingRenderer, exampleMap );
+        mapView2D.setMapArea( exampleMap.getLayerBounds() );
+        mapView2D.setState( JMapPane.Pan );
+        mapView2D.setCursor( new Cursor( Cursor.MOVE_CURSOR ) );
 
         // Build and show the rest of the UI
-        createUi( mapView3D, view2D );
+        createUi( mapView3D, mapView2D );
     }
 
     //======================================================================
