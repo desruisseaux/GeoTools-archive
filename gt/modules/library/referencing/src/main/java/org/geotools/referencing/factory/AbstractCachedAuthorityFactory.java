@@ -25,14 +25,20 @@ import java.util.Set;
 import javax.units.Unit;
 
 import org.geotools.factory.BufferedFactory;
-import org.geotools.factory.FactoryRegistryException;
 import org.geotools.factory.Hints;
+import org.geotools.metadata.iso.citation.Citations;
+import org.geotools.referencing.ReferencingFactoryFinder;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.util.NameFactory;
 import org.geotools.util.ObjectCache;
 import org.geotools.util.ObjectCaches;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CompoundCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -65,6 +71,7 @@ import org.opengis.referencing.datum.TemporalDatum;
 import org.opengis.referencing.datum.VerticalDatum;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
+import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 
 /**
@@ -96,10 +103,26 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		BufferedFactory {
 
 	/**
-	 * Cache to be used for referencing objects.
+	 * Cache to be used for referencing objects defined by this authority.
 	 * Please note that this cache may be shared!
 	 */
 	ObjectCache cache;
+	
+	/**
+	 * A container of the "real factories" actually used to construct objects.
+	 */
+    protected final ReferencingFactoryContainer factories;
+
+	
+	/**
+	 * Constructs an instance making use of the default cache.
+	 *
+	 * @param factory
+	 *            The factory to cache. Can not be {@code null}.
+	 */
+	protected AbstractCachedAuthorityFactory( int priority ) {
+		this( priority, ObjectCaches.create("weak", 50 ), ReferencingFactoryContainer.instance( null ) );
+	}
 
 	/**
 	 * Constructs an instance making use of the default cache.
@@ -107,8 +130,8 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 	 * @param factory
 	 *            The factory to cache. Can not be {@code null}.
 	 */
-	public AbstractCachedAuthorityFactory( int priority) {
-		this( priority, ObjectCaches.create("weak", 50 ) );
+	protected AbstractCachedAuthorityFactory( int priority, Hints hints ) {
+		this( priority, ObjectCaches.create( hints ), ReferencingFactoryContainer.instance( hints ) );
 	}
 
 	/**
@@ -125,14 +148,10 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 	 * @param maxStrongReferences
 	 *            The maximum number of objects to keep by strong reference.
 	 */
-	protected AbstractCachedAuthorityFactory(int priority, ObjectCache cache) {
+	protected AbstractCachedAuthorityFactory(int priority, ObjectCache cache, ReferencingFactoryContainer container) {
+		super( priority );
+		this.factories = container;
 		this.cache = cache;
-	}
-
-	/** Utility method used to produce cache based on hint */
-	protected static ObjectCache createCache(final Hints hints)
-			throws FactoryRegistryException {
-		return ObjectCaches.create(hints);
 	}
 
 	//
@@ -142,12 +161,55 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		return ObjectCaches.toKey( getAuthority(), code);
 	}
 
+    /**
+     * Trims the authority scope, if present. For example if this factory is an EPSG authority
+     * factory and the specified code start with the "EPSG:" prefix, then the prefix is removed.
+     * Otherwise, the string is returned unchanged (except for leading and trailing spaces).
+     *
+     * @param  code The code to trim.
+     * @return The code without the authority scope.
+     */
+    protected String trimAuthority(String code) {
+        /*
+         * IMPLEMENTATION NOTE: This method is overrided in PropertyAuthorityFactory. If
+         * implementation below is modified, it is probably worth to revisit the overrided
+         * method as well.
+         */
+        code = code.trim();
+        final GenericName name  = NameFactory.create(code);
+        final GenericName scope = name.getScope();
+        if (scope == null) {
+            return code;
+        }
+        if (Citations.identifierMatches(getAuthority(), scope.toString())) {
+            return name.asLocalName().toString().trim();
+        }
+        return code;
+    }
+    
+    /**
+     * Creates an exception for an unknow authority code. This convenience method is provided
+     * for implementation of {@code createXXX} methods.
+     *
+     * @param  type  The GeoAPI interface that was to be created
+     *               (e.g. {@code CoordinateReferenceSystem.class}).
+     * @param  code  The unknow authority code.
+     * @return An exception initialized with an error message built
+     *         from the specified informations.
+     */
+    protected final NoSuchAuthorityCodeException noSuchAuthorityCode(final Class  type,
+                                                                     final String code)
+    {
+        final InternationalString authority = getAuthority().getTitle();
+        return new NoSuchAuthorityCodeException(Errors.format(ErrorKeys.NO_SUCH_AUTHORITY_CODE_$3,
+                   code, authority, Utilities.getShortName(type)), authority.toString(), code);
+    }
 	//
 	// AuthorityFactory
 	//    
 	public abstract Citation getAuthority();
 	public abstract Set getAuthorityCodes(Class type) throws FactoryException;
-	public abstract InternationalString getDescriptionText(String code);
+	public abstract InternationalString getDescriptionText(String code)  throws FactoryException;
 	public IdentifiedObject createObject(String code) throws FactoryException {
 		final String key = toKey(code);
 		IdentifiedObject obj = (IdentifiedObject) cache.get(key);
@@ -209,7 +271,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		}
 		return crs;
 	}
-	protected abstract CoordinateReferenceSystem generateCoordinateReferenceSystem(String code);
+	protected abstract CoordinateReferenceSystem generateCoordinateReferenceSystem(String code) throws FactoryException;
 
 	public DerivedCRS createDerivedCRS(String code) throws FactoryException {
 		final String key = toKey(code);
@@ -410,7 +472,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		return cs;
 	}
 
-	protected abstract CoordinateSystem generateCoordinateSystem(String code);
+	protected abstract CoordinateSystem generateCoordinateSystem(String code) throws FactoryException;
 
 	// sample implemenation with get/test
 	public CoordinateSystemAxis createCoordinateSystemAxis(String code)
@@ -432,7 +494,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		return axis;
 	}
 
-	protected abstract CoordinateSystemAxis generateCoordinateSystemAxis(String code);
+	protected abstract CoordinateSystemAxis generateCoordinateSystemAxis(String code)  throws FactoryException;
 
 	public CylindricalCS createCylindricalCS(String code)
 			throws FactoryException {
@@ -453,7 +515,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		return cs;
 	}
 
-	protected abstract CylindricalCS generateCylindricalCS(String code);
+	protected abstract CylindricalCS generateCylindricalCS(String code)  throws FactoryException;
 
 	public EllipsoidalCS createEllipsoidalCS(String code)
 			throws FactoryException {
@@ -474,7 +536,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		return cs;
 	}
 
-	protected abstract EllipsoidalCS generateEllipsoidalCS(String code);
+	protected abstract EllipsoidalCS generateEllipsoidalCS(String code)  throws FactoryException;
 
 	public PolarCS createPolarCS(String code) throws FactoryException {
 		final String key = toKey(code);
@@ -494,7 +556,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		return cs;
 	}
 
-	protected abstract PolarCS generatePolarCS(String code);
+	protected abstract PolarCS generatePolarCS(String code)  throws FactoryException;
 
 	public SphericalCS createSphericalCS(String code) throws FactoryException {
 		final String key = toKey(code);
@@ -514,7 +576,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		return cs;
 	}
 
-	protected abstract SphericalCS generateSphericalCS(String code);
+	protected abstract SphericalCS generateSphericalCS(String code) throws FactoryException;
 
 	public TimeCS createTimeCS(String code) throws FactoryException {
 		final String key = toKey(code);
@@ -534,7 +596,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		return cs;
 	}
 
-	protected abstract TimeCS generateTimeCS(String code);
+	protected abstract TimeCS generateTimeCS(String code) throws FactoryException;
 
 	public Unit createUnit(String code) throws FactoryException {
 		final String key = toKey(code);
@@ -554,7 +616,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		return unit;
 	}
 
-	protected abstract Unit generateUnit(String code);
+	protected abstract Unit generateUnit(String code) throws FactoryException;
 
 	public VerticalCS createVerticalCS(String code) throws FactoryException {
 		final String key = toKey(code);
@@ -574,7 +636,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		return cs;
 	}
 
-	protected abstract VerticalCS generateVerticalCS(String code);
+	protected abstract VerticalCS generateVerticalCS(String code) throws FactoryException;
 
 	//
 	// DatumAuthorityFactory
@@ -597,7 +659,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		return datum;
 	}
 
-	protected abstract Datum generateDatum(String code);
+	protected abstract Datum generateDatum(String code) throws FactoryException;
 
 	public Ellipsoid createEllipsoid(String code) throws FactoryException {
 		final String key = toKey(code);
@@ -617,7 +679,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		return ellipsoid;
 	}
 
-	protected abstract Ellipsoid generateEllipsoid(String code);
+	protected abstract Ellipsoid generateEllipsoid(String code) throws FactoryException;
 
 	public EngineeringDatum createEngineeringDatum(String code)
 			throws FactoryException {
@@ -638,7 +700,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		return datum;
 	}
 
-	protected abstract EngineeringDatum generateEngineeringDatum(String code);
+	protected abstract EngineeringDatum generateEngineeringDatum(String code)  throws FactoryException;
 
 	public GeodeticDatum createGeodeticDatum(String code)
 			throws FactoryException {
@@ -659,7 +721,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		return datum;
 	}
 
-	protected abstract GeodeticDatum generateGeodeticDatum(String code);
+	protected abstract GeodeticDatum generateGeodeticDatum(String code)  throws FactoryException;
 
 	public ImageDatum createImageDatum(String code) throws FactoryException {
 		final String key = toKey(code);
@@ -679,7 +741,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		return datum;
 	}
 
-	protected abstract ImageDatum generateImageDatum(String code);
+	protected abstract ImageDatum generateImageDatum(String code)  throws FactoryException;
 
 	public PrimeMeridian createPrimeMeridian(String code)
 			throws FactoryException {
@@ -700,7 +762,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		return datum;
 	}
 
-	protected abstract PrimeMeridian generatePrimeMeridian(String code);
+	protected abstract PrimeMeridian generatePrimeMeridian(String code) throws FactoryException;
 
 	public TemporalDatum createTemporalDatum(String code)
 			throws FactoryException {
@@ -721,7 +783,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		return datum;
 	}
 
-	protected abstract TemporalDatum generateTemporalDatum(String code);
+	protected abstract TemporalDatum generateTemporalDatum(String code)  throws FactoryException;
 
 	public VerticalDatum createVerticalDatum(String code)
 			throws FactoryException {
@@ -742,7 +804,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		return datum;
 	}
 
-	protected abstract VerticalDatum generateVerticalDatum(String code);
+	protected abstract VerticalDatum generateVerticalDatum(String code)  throws FactoryException;
 
 	public CoordinateOperation createCoordinateOperation(String code)
 			throws FactoryException {
@@ -763,7 +825,7 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		return operation;
 	}
 
-	protected abstract CoordinateOperation generateCoordinateOperation(String code);
+	protected abstract CoordinateOperation generateCoordinateOperation(String code)  throws FactoryException;
 
 	public synchronized Set/*<CoordinateOperation>*/ createFromCoordinateReferenceSystemCodes(
 			final String sourceCode, final String targetCode)
@@ -790,5 +852,5 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 		return operations;
 	}
 
-	protected abstract Set generateFromCoordinateReferenceSystemCodes(String sourceCode, String targetCode);
+	protected abstract Set generateFromCoordinateReferenceSystemCodes(String sourceCode, String targetCode)  throws FactoryException;
 }

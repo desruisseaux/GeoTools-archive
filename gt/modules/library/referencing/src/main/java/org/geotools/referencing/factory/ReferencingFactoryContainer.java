@@ -34,6 +34,7 @@ import org.opengis.referencing.datum.*;
 import org.opengis.referencing.operation.*;
 
 // Geotools dependencies
+import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryCreator;
@@ -190,7 +191,9 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      * @param  hints The hints, or {@code null} if none.
      * @return A factory group created from the specified set of hints.
      */
-    public static ReferencingFactoryContainer instance(final Hints hints) {
+    public static ReferencingFactoryContainer instance(Hints hints) {
+    	if( hints == null ) hints = GeoTools.getDefaultHints();
+    	
         /*
          * Use the same synchronization lock than ReferencingFactoryFinder (instead of this class)
          * in order to reduce the risk of dead lock. This is because ReferencingFactoryContainer
