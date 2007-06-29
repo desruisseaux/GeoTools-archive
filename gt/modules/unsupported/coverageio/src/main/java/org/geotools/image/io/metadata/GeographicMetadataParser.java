@@ -55,17 +55,7 @@ import org.geotools.util.LoggedFormat;
  */
 public class GeographicMetadataParser extends MetadataAccessor {
     /**
-     * The separator between names in a node path.
-     */
-    private static final char SEPARATOR = '/';
-
-    /**
-     * The metadata to decode as a XML tree.
-     */
-    protected final Node metadata;
-
-    /**
-     * The sample dimensions. Will be created only when first needed.
+     * Sample dimensions. Will be created when first needed.
      */
     private transient SampleDimensions sampleDimensions;
 
@@ -76,7 +66,7 @@ public class GeographicMetadataParser extends MetadataAccessor {
      *         the {@value GeographicMetadataFormat#FORMAT_NAME} format.
      */
     public GeographicMetadataParser(final IIOMetadata metadata) throws IllegalArgumentException {
-        this.metadata = metadata.getAsTree(GeographicMetadataFormat.FORMAT_NAME);
+        super(metadata.getAsTree(GeographicMetadataFormat.FORMAT_NAME), null, null);
     }
 
     /**
@@ -84,74 +74,8 @@ public class GeographicMetadataParser extends MetadataAccessor {
      */
     public SampleDimensions getSampleDimensions() {
         if (sampleDimensions == null) {
-            sampleDimensions = new SampleDimensions(this);
+            sampleDimensions = new SampleDimensions(parent);
         }
         return sampleDimensions;
-    }
-
-    /**
-     * Returns child nodes at the given path. This method is for {@link #getElements(String)}
-     * implementation only, and invokes itself recursively.
-     */
-    private static void getElements(final Node parent, final String path, final int base,
-            final List/*<Element>*/ elements)
-    {
-        final int upper = path.indexOf(SEPARATOR, base);
-        final String name = ((upper >= 0) ? path.substring(base, upper) : path.substring(base)).trim();
-        final NodeList list = parent.getChildNodes();
-        final int length = list.getLength();
-        for (int i=0; i<length; i++) {
-            Node candidate = list.item(i);
-            if (name.equals(candidate.getNodeName())) {
-                if (upper >= 0) {
-                    getElements(candidate, path, upper+1, elements);
-                } else if (candidate instanceof Element) {
-                    // For the very last node, we require an element.
-                    elements.add((Element) candidate);
-                }
-            }
-        }
-    }
-
-    /**
-     * Returns child nodes at the given path, or an empty list if none. Paths are separated
-     * by the {@code '/'} character. Examples of valid paths that may have many elements are:
-     * <ul>
-     *   <li>{@code "CoordinateReferenceSystem/CoordinateSystem/Axis"}</li>
-     *   <li>{@code "GridGeometry/Envelope/CoordinateValues"}</li>
-     *   <li>{@code "SampleDimensions/SampleDimension"}</li>
-     * </ul>
-     *
-     * @param  path The path of the elements to search.
-     * @return The list of elements. May be empty but never null.
-     */
-    protected List/*<Element>*/ getElements(final String path) {
-        final List elements = new ArrayList();
-        getElements(metadata, path, 0, elements);
-        return elements;
-    }
-
-    /**
-     * Returns a child node of the given path, or {@code null} if none. If more than one node exist
-     * for the given name, the first one is returned and a warning is logged. Examples of valid
-     * paths that usually have only one element are:
-     * <ul>
-     *   <li>{@code "CoordinateReferenceSystem/Datum"}</li>
-     *   <li>{@code "CoordinateReferenceSystem/CoordinateSystem"}</li>
-     *   <li>{@code "GridGeometry/Envelope"}</li>
-     * </ul>
-     */
-    protected Element getElement(final String path) {
-        final List elements = getElements(path);
-        final int count = elements.size();
-        switch (count) {
-            default: {
-                log("getElement", ErrorKeys.TOO_MANY_OCCURENCES_$2,
-                        new Object[] {path, new Integer(count)});
-                // Fall through
-            }
-            case 1: return (Element) elements.get(0);
-            case 0: return null;
-        }
     }
 }

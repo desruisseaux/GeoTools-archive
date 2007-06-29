@@ -368,64 +368,13 @@ public class GeographicMetadata extends IIOMetadata {
     }
 
     /**
-     * Adds a sample dimension.
-     *
-     * @param name       The sample dimension name, or {@code null} if none.
-     * @param scale      The scale from packed to geophysics values, or {@code 1} if none.
-     * @param offset     The offset from packed to geophysics values, or {@code 0} if none.
-     * @param minValue   The minimal valid <em>packed</em> value,
-     *                   or {@link Double#NEGATIVE_INFINITY} if none.
-     * @param maxValue   The maximal valid <em>packed</em> value,
-     *                   or {@link Double#POSITIVE_INFINITY} if none.
-     * @param fillValues The packed values used for missing data, or {@code null} if none.
+     * @deprecated Moved to {@link SampleDimensions}.
      */
     public void addSampleDimension(final String name,
                                    final double scale,    final double offset,
                                    final double minValue, final double maxValue,
                                    final double[] fillValues)
     {
-        if (sampleDimensions == null) {
-            setSampleDimensions(null);
-        }
-        final IIOMetadataNode band = new IIOMetadataNode("SampleDimension");
-        setAttribute(band, "name",     name  );
-        setAttribute(band, "scale",    scale );
-        setAttribute(band, "offset",   offset);
-        final int minIndex = (int) minValue;
-        final int maxIndex = (int) maxValue;
-        if (minIndex == minValue && maxIndex == maxValue) {
-            /*
-             * Values should be integers most of the time since they are packed values
-             * (often index in a color palette). But we will allow floating point values
-             * in the 'else' section if they are not.
-             */
-            setAttribute(band, "minValue", minIndex);
-            setAttribute(band, "maxValue", maxIndex);
-        } else {
-            setAttribute(band, "minValue", minValue);
-            setAttribute(band, "maxValue", maxValue);
-        }
-        /*
-         * Formats all fill values as integers, or all as floating points. We expect integer
-         * values for the same reason than "minValue" and "maxValue" above, but are tolerant
-         * to floating point values. We apply a "all or nothing" rule for consistency.
-         */
-        if (fillValues != null) {
-            int[] asIntegers = new int[fillValues.length];
-            for (int i=0; i<fillValues.length; i++) {
-                final double value = fillValues[i];
-                if ((asIntegers[i] = (int) value) != value) {
-                    asIntegers = null; // Not integers; stop the check.
-                    break;
-                }
-            }
-            if (asIntegers != null) {
-                setAttribute(band, "fillValues", asIntegers);
-            } else {
-                setAttribute(band, "fillValues", fillValues);
-            }
-        }
-        sampleDimensions.appendChild(band);
     }
 
     /**
@@ -516,31 +465,9 @@ public class GeographicMetadata extends IIOMetadata {
     }
 
     /**
-     * Set the attribute to the specified array of values,
-     * or remove the attribute if the array is {@code null}.
-     *
-     * @param node  The node on which to set the attributes.
-     * @param name  The attribute name.
-     * @param value The attribute values.
-     */
-    protected static void setAttribute(final Element node, final String name, final double[] values) {
-        setAttribute(node, name, toSequence(values));
-    }
-
-    /**
-     * Set the attribute to the specified value, or remove the attribute if the value is NaN.
-     *
-     * @param node  The node on which to set the attribute.
-     * @param name  The attribute name.
-     * @param value The attribute value.
+     * @deprecated Moved to {@link MetadataAccessor}.
      */
     protected static void setAttribute(final Element node, final String name, final Date value) {
-        String asText = null;
-        if (value != null) {
-            final Format format = (Format) GeographicMetadataParser.dateFormat.get();
-            asText = format.format(value);
-        }
-        setAttribute(node, name, asText);
     }
 
     /**

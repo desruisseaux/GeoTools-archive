@@ -16,13 +16,15 @@
  */
 package org.geotools.image.io.metadata;
 
-import java.util.List;
-import org.w3c.dom.Element;
 import org.geotools.util.NumberRange;
+import org.w3c.dom.Node;
 
 
 /**
- * Provides convenience methods for decoding sample dimension information.
+ * Provides convenience methods for encoding and decoding information about sample dimensions.
+ * A sample dimension should be {@linkplain #select selected} before any {@code get} or {@code
+ * set} method is invoked. Valid sample dimension index range from 0 inclusive to
+ * {@link #elementCount elementCount()} exclusive.
  *
  * @since 2.4
  * @source $URL$
@@ -31,79 +33,46 @@ import org.geotools.util.NumberRange;
  */
 public class SampleDimensions extends MetadataAccessor {
     /**
-     * The elements for the {@code "SampleDimensions/SampleDimension"} node.
-     */
-    private final List/*<Element>*/ sampleDimensions;
-
-    /**
      * Creates a parser for sample dimensions.
      *
-     * @param parent The parent metadata parser.
+     * @param  metadata The metadata node.
      */
-    public SampleDimensions(final GeographicMetadataParser parent) {
-        sampleDimensions = parent.getElements("SampleDimensions/SampleDimension");
+    public SampleDimensions(final Node metadata) {
+        super(metadata, "SampleDimensions", "SampleDimension");
     }
 
     /**
-     * Returns the number of {@code "SampleDimensions/SampleDimension"} nodes.
+     * Returns the name for {@linkplain #select selected} sample dimension,
+     * or {@code null} if none.
      */
-    public int getCount() {
-        return sampleDimensions.size();
+    public String getName() {
+        return getString("name");
     }
 
     /**
-     * Returns the element for the {@code "SampleDimensions/SampleDimension"} node at the
-     * specified band.
+     * Sets the name for the {@linkplain #select selected} sample dimension.
      *
-     * @param  band The sample dimension number.
-     * @return The node for the specified sample dimension.
-     * @throws IndexOutOfBoundsException if the specified sample dimension is out of range.
+     * @param name The sample dimension name, or {@code null} if none.
      */
-    private Element getSampleDimension(final int band) throws IndexOutOfBoundsException {
-        return (Element) sampleDimensions.get(band);
+    public void setName(final String name) {
+        setString("name", name);
     }
 
     /**
-     * Returns the name for the specified sample dimension.
-     *
-     * @param  band The sample dimension number.
-     * @return The sample dimension name, or {@code null} if none.
-     * @throws IndexOutOfBoundsException if the specified sample dimension is out of range.
+     * Returns the range of valid values for the {@linkplain #select selected} sample dimension.
+     * The range use the {@link Integer} type if possible, or the {@link Double} type otherwise.
+     * Note that range {@linkplain NumberRange#getMinValue minimum value},
+     * {@linkplain NumberRange#getMaxValue maximum value} or both may be null if no
+     * {@code "minValue"} or {@code "maxValue"} attribute were found for the
+     * {@code "SampleDimensions/SampleDimension"} element.
      */
-    public String getName(final int band) throws IndexOutOfBoundsException {
-        return getString(getSampleDimension(band), "name");
-    }
-
-    /**
-     * Sets the name for the specified sample dimension.
-     *
-     * @param  band The sample dimension number.
-     * @param  name The sample dimension name, or {@code null} if none.
-     * @throws IndexOutOfBoundsException if the specified sample dimension is out of range.
-     */
-    public void setName(final int band, final String name) throws IndexOutOfBoundsException {
-        GeographicMetadata.setAttribute(getSampleDimension(band), "name", name);
-    }
-
-    /**
-     * Returns the range of valid values for the specified sample dimension. The range use the
-     * {@link Integer} type if possible, or the {@link Double} type otherwise. Note that range
-     * {@linkplain NumberRange#getMinValue minimum value}, {@linkplain NumberRange#getMaxValue
-     * maximum value} or both may be null if no {@code "minValue"} or {@code "maxValue"}
-     * attribute were found for the {@code "SampleDimensions/SampleDimension"} node.
-     *
-     * @param  band The sample dimension number.
-     * @return The range of valid values for the specified sample dimension.
-     * @throws IndexOutOfBoundsException if the specified sample dimension is out of range.
-     */
-    public NumberRange getValidRange(final int band) throws IndexOutOfBoundsException {
-        final Element element = getSampleDimension(band);
-        Number minimum = getInteger(element, "minValue");
-        Number maximum = getInteger(element, "maxValue");
+    public NumberRange getValidRange() {
+        Number minimum = getInteger("minValue");
+        Number maximum = getInteger("maxValue");
         final Class type;
         if (minimum == null || maximum == null) {
-            minimum = getDouble(element, "minValue");
-            maximum = getDouble(element, "maxValue");
+            minimum = getDouble("minValue");
+            maximum = getDouble("maxValue");
             type = Double.class;
         } else {
             type = Integer.class;
@@ -113,68 +82,89 @@ public class SampleDimensions extends MetadataAccessor {
     }
 
     /**
-     * Returns the fill values for the specified sample dimension.
+     * Set the range of valid values. The values should be integers most of the time since
+     * they are packed values (often index in a color palette). But floating point values
+     * are allowed too.
      *
-     * @param  band The sample dimension number.
-     * @return The fill values for the specified sample dimension, or {@code null} if none.
-     * @throws IndexOutOfBoundsException if the specified sample dimension is out of range.
+     * @param minValue  The minimal valid <em>packed</em> value,
+     *                  or {@link Double#NEGATIVE_INFINITY} if none.
+     * @param maxValue  The maximal valid <em>packed</em> value,
+     *                  or {@link Double#POSITIVE_INFINITY} if none.
      */
-    public double[] getFillValues(final int band) throws IndexOutOfBoundsException {
-        return getDoubles(getSampleDimension(band), "fillValues", true);
+    public void setValidRange(final double minValue, final double maxValue) {
+        final int minIndex = (int) minValue;
+        final int maxIndex = (int) maxValue;
+        if (minIndex == minValue && maxIndex == maxValue) {
+            setInteger("minValue", minIndex);
+            setInteger("maxValue", maxIndex);
+        } else {
+            setDouble("minValue", minValue);
+            setDouble("maxValue", maxValue);
+        }
     }
 
     /**
-     * Sets the fill values for the specified sample dimension.
-     *
-     * @param  band The sample dimension number.
-     * @param  fillValues The fill values for the specified sample dimension, or {@code null} if none.
-     * @throws IndexOutOfBoundsException if the specified sample dimension is out of range.
+     * Returns the fill values for the {@linkplain #select selected} sample dimension,
+     * or {@code null} if none.
      */
-    public void setFillValues(final int band, final double[] fillValues) throws IndexOutOfBoundsException {
-        GeographicMetadata.setAttribute(getSampleDimension(band), "fillValues", fillValues);
+    public double[] getFillValues() {
+        return getDoubles("fillValues", true);
     }
 
     /**
-     * Returns the scale factor for the specified sample dimension.
+     * Sets the fill values for the {@linkplain #select selected} sample dimension.
+     * This method formats all fill values as integers if possible, or all values as
+     * floating points otherwise. We apply a "all or nothing" rule for consistency.
      *
-     * @param  band The sample dimension number.
-     * @return The scale factor for the specified sample dimension, or {@code null} if none.
-     * @throws IndexOutOfBoundsException if the specified sample dimension is out of range.
+     * @param fillValues The packed values used for missing data, or {@code null} if none.
      */
-    public Double getScale(final int band) throws IndexOutOfBoundsException {
-        return getDouble(getSampleDimension(band), "scale");
+    public void setFillValues(final double[] fillValues) {
+        if (fillValues != null) {
+            int[] asIntegers = new int[fillValues.length];
+            for (int i=0; i<fillValues.length; i++) {
+                final double value = fillValues[i];
+                if ((asIntegers[i] = (int) value) != value) {
+                    asIntegers = null; // Not integers; stop the check.
+                    break;
+                }
+            }
+            if (asIntegers != null) {
+                setIntegers("fillValues", asIntegers);
+                return;
+            }
+        }
+        setDoubles("fillValues", fillValues);
     }
 
     /**
-     * Sets the scale factor for the specified sample dimension.
-     *
-     * @param  band The sample dimension number.
-     * @param  scale The scale factor for the specified sample dimension, or {@code NaN} if none.
-     * @throws IndexOutOfBoundsException if the specified sample dimension is out of range.
+     * Returns the scale factor for the {@linkplain #select selected} sample dimension.
      */
-    public void setScale(final int band, final double scale) throws IndexOutOfBoundsException {
-        GeographicMetadata.setAttribute(getSampleDimension(band), "scale", scale);
+    public Double getScale() {
+        return getDouble("scale");
     }
 
     /**
-     * Returns the offset for the specified sample dimension.
+     * Sets the scale factor for the {@linkplain #select selected} sample dimension.
      *
-     * @param  band The sample dimension number.
-     * @return The offset for the specified sample dimension, or {@code null} if none.
-     * @throws IndexOutOfBoundsException if the specified sample dimension is out of range.
+     * @param scale The scale from packed to geophysics values, or {@code 1} if none.
      */
-    public Double getOffset(final int band) throws IndexOutOfBoundsException {
-        return getDouble(getSampleDimension(band), "offset");
+    public void setScale(final double scale) {
+        setDouble("scale", scale);
     }
 
     /**
-     * Sets the offset for the specified sample dimension.
-     *
-     * @param  band The sample dimension number.
-     * @param  offset The offset for the specified sample dimension, or {@code NaN} if none.
-     * @throws IndexOutOfBoundsException if the specified sample dimension is out of range.
+     * Returns the offset for the {@linkplain #select selected} sample dimension.
      */
-    public void setOffset(final int band, final double offset) throws IndexOutOfBoundsException {
-        GeographicMetadata.setAttribute(getSampleDimension(band), "offset", offset);
+    public Double getOffset() {
+        return getDouble("offset");
+    }
+
+    /**
+     * Sets the offset for the {@linkplain #select selected} sample dimension.
+     *
+     * @param offset The offset from packed to geophysics values, or {@code 0} if none.
+     */
+    public void setOffset(final double offset) {
+        setDouble("offset", offset);
     }
 }

@@ -47,6 +47,7 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ComponentColorModelJAI;
 import org.geotools.image.io.metadata.GeographicMetadataParser;
+import org.geotools.image.io.metadata.SampleDimensions;
 
 
 /**
@@ -441,7 +442,9 @@ public abstract class SimpleImageReader extends ImageReader {
     {
         final GeographicMetadataParser parser = getMetadataParser(imageIndex);
         if (parser != null) {
-            return parser.getSampleDimensions().getValidRange(bandIndex);
+            final SampleDimensions sd = parser.getSampleDimensions();
+            sd.selectChild(bandIndex);
+            return sd.getValidRange();
         }
         return null;
     }
