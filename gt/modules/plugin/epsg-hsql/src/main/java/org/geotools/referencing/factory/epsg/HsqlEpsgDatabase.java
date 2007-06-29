@@ -1,9 +1,19 @@
 package org.geotools.referencing.factory.epsg;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Properties;
+import java.util.logging.Logger;
 
 import org.hsqldb.jdbc.jdbcDataSource;
 
@@ -27,19 +37,20 @@ import org.hsqldb.jdbc.jdbcDataSource;
 public class HsqlEpsgDatabase {
 
 	/**
-	 * The key for fetching the database directory from {@linkplain System#getProperty(String)
-	 * system properties}.
-	 *
+	 * The key for fetching the database directory from
+	 * {@linkplain System#getProperty(String) system properties}.
+	 * 
 	 * @since 2.3
 	 */
 	public static final String DIRECTORY_KEY = "EPSG-HSQL.directory";
+
 	/**
 	 * The database name.
-	 *
+	 * 
 	 * @since 2.3
 	 */
-	public static final String DATABASE_NAME = "EPSG";	
-	
+	public static final String DATABASE_NAME = "EPSG";
+
 	/**
 	 * Creates a DataSource that is set up and ready to go.
 	 * <p>
@@ -48,21 +59,19 @@ public class HsqlEpsgDatabase {
 	 * </p>
 	 * 
 	 * @return
+	 * @throws SQLException
 	 */
-	public static javax.sql.DataSource createDataSource(){
-		return createDataSource( getDirectory() );
+	public static javax.sql.DataSource createDataSource() throws SQLException {
+		return createDataSource(getDirectory());
 	}
-	
-	public static javax.sql.DataSource createDataSource( File directory ){
-		if (directory == null) {
-			return null; // not available
-		}
+
+	public static javax.sql.DataSource createDataSource( File directory ) throws SQLException{
 		jdbcDataSource dataSource = new jdbcDataSource();
         /*
-         * Constructs the full path to the HSQL database. Note: we do not use
-         * File.toURI() because HSQL doesn't seem to expect an encoded URL
-         * (e.g. "%20" instead of spaces).
-         */
+		 * Constructs the full path to the HSQL database. Note: we do not use
+		 * File.toURI() because HSQL doesn't seem to expect an encoded URL (e.g.
+		 * "%20" instead of spaces).
+		 */
         final StringBuffer url = new StringBuffer("jdbc:hsqldb:file:");
         final String path = directory.getAbsolutePath().replace(File.separatorChar, '/');
         if (path.length()==0 || path.charAt(0)!='/') {
@@ -76,16 +85,103 @@ public class HsqlEpsgDatabase {
         dataSource.setDatabase(url.toString());
         
         /*
-         * If the temporary directory do not exists or can't be created,
-         * lets the 'database' attribute unset. If the user do not set it
-         * explicitly (for example through JNDI), an exception will be thrown
-         * when 'getConnection()' will be invoked.
-         */
+		 * If the temporary directory do not exists or can't be created, lets
+		 * the 'database' attribute unset. If the user do not set it explicitly
+		 * (for example through JNDI), an exception will be thrown when
+		 * 'getConnection()' will be invoked.
+		 */
         dataSource.setUser("SA"); // System administrator. No password.
-        
+        if( !dataExists(dataSource)){
+        	generateData(dataSource);
+        	try {
+        		forceReadOnly(directory);
+        	}
+            catch (IOException file){
+            	throw (SQLException) new SQLException("Can't read the SQL script.").initCause(file);
+            }
+        }
         return dataSource;
 	}
-	
+
+	/**
+	 * HSQL has created automatically an empty database. We need to populate it.
+	 * Executes the SQL scripts bundled in the JAR. In theory, each line
+	 * contains a full SQL statement. For this plugin however, we have
+	 * compressed "INSERT INTO" statements using Compactor class in this
+	 * package.
+	 */
+	private static void generateData(javax.sql.DataSource dataSource)
+			throws SQLException {
+		Connection connection = dataSource.getConnection();
+		Logger.getLogger("org.geotools.referencing.factory").config(
+				"Creating cached EPSG database."); // TODO: localize
+		final Statement statement = connection.createStatement();
+		try {
+			final BufferedReader in = new BufferedReader(new InputStreamReader(
+					HsqlEpsgDatabase.class.getResourceAsStream("EPSG.sql"),
+					"ISO-8859-1"));
+			StringBuffer insertStatement = null;
+			String line;
+			while ((line = in.readLine()) != null) {
+				line = line.trim();
+				final int length = line.length();
+				if (length != 0) {
+					if (line.startsWith("INSERT INTO")) {
+						/*
+						 * We are about to insert many rows into a single table.
+						 * The row values appear in next lines; the current line
+						 * should stop right after the VALUES keyword.
+						 */
+						insertStatement = new StringBuffer(line);
+						continue;
+					}
+					if (insertStatement != null) {
+						/*
+						 * We are about to insert a row. Prepend the "INSERT
+						 * INTO" statement and check if we will have more rows
+						 * to insert after this one.
+						 */
+						final int values = insertStatement.length();
+						insertStatement.append(line);
+						final boolean hasMore = (line.charAt(length - 1) == ',');
+						if (hasMore) {
+							insertStatement
+									.setLength(insertStatement.length() - 1);
+						}
+						line = insertStatement.toString();
+						insertStatement.setLength(values);
+						if (!hasMore) {
+							insertStatement = null;
+						}
+					}
+					statement.execute(line);
+				}
+			}
+			in.close();
+		} catch (IOException exception) {
+			SQLException e = new SQLException("Can't read the SQL script."); // TODO:
+																				// localize
+			e.initCause(exception);
+			throw e;
+		} finally {
+			statement.close();
+			connection.close();
+		}
+	}
+
+	private static void forceReadOnly(File directory) throws IOException {
+		final File file = new File(directory, HsqlEpsgDatabase.DATABASE_NAME
+				+ ".properties");
+		final InputStream propertyIn = new FileInputStream(file);
+		final Properties properties = new Properties();
+		properties.load(propertyIn);
+		propertyIn.close();
+		properties.put("readonly", "true");
+		final OutputStream out = new FileOutputStream(file);
+		properties.store(out, "EPSG database on HSQL");
+		out.close();
+	}
+
 	/**
 	 * Returns the default directory for the EPSG database. If the
 	 * {@value #DIRECTORY_KEY}
@@ -94,8 +190,10 @@ public class HsqlEpsgDatabase {
 	 * {@linkplain File#getParent parent}, then the {@value #DATABASE_NAME}
 	 * database will be saved in that directory. Otherwise, a temporary
 	 * directory will be used.
+	 * 
+	 * @throws SQLException
 	 */
-	static File getDirectory() {
+	static File getDirectory() throws SQLException {
 		try {
 			final String property = System
 					.getProperty(HsqlEpsgDatabase.DIRECTORY_KEY);
@@ -128,19 +226,30 @@ public class HsqlEpsgDatabase {
 				return directory;
 			}
 		}
-		return null;
+		throw new SQLException("Can't write to the database directory.");
+	}
+
+	static boolean dataExists(javax.sql.DataSource dataSource)
+			throws SQLException {
+		Connection connection = dataSource.getConnection();
+		try {
+			return dataExists(connection);
+		} finally {
+			connection.close();
+		}
 	}
 
 	/**
-	 * Returns {@code true} if the database contains data. This method returns {@code false}
-	 * if an empty EPSG database has been automatically created by HSQL and not yet populated.
+	 * Returns {@code true} if the database contains data. This method returns
+	 * {@code false} if an empty EPSG database has been automatically created by
+	 * HSQL and not yet populated.
 	 */
 	static boolean dataExists(final Connection connection) throws SQLException {
-	    final ResultSet tables = connection.getMetaData().getTables(
-	            null, null, "EPSG_%", new String[] {"TABLE"});
-	    final boolean exists = tables.next();
-	    tables.close();
-	    return exists;
+		final ResultSet tables = connection.getMetaData().getTables(null, null,
+				"EPSG_%", new String[] { "TABLE" });
+		final boolean exists = tables.next();
+		tables.close();
+		return exists;
 	}
 
 }

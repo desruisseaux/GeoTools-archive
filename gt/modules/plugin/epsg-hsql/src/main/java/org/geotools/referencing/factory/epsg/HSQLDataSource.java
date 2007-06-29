@@ -100,7 +100,14 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
      * temporary directory will be used.
      */
     public HSQLDataSource() {
-        this(HsqlEpsgDatabase.getDirectory());
+        this(getDirectoryOrNull());
+    }
+    private static File getDirectoryOrNull(){
+		try {
+			return HsqlEpsgDatabase.getDirectory();
+		} catch (SQLException e) {
+			return null; // report problem later
+		}
     }
 
     /**
