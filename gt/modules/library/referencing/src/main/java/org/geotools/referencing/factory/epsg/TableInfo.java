@@ -87,21 +87,23 @@ final class TableInfo {
         this.typeNames  = typeNames;
     }
 
-	/**
-     * We test 'isTypeOf' by checking isAssignableFrom both ways, which may seems strange but try
+    /**
+     * Checks {@link Class#isAssignableFrom} both ways. It may seems strange but try
      * to catch the following use cases:
+     *
      * <ul>
-     * <li>table.type.isAssignableFrom(kind)
-     *    is for the case where a table is for CoordinateReferenceSystem while the user
-     *    type is some subtype like GeographicCRS. The GeographicCRS need to be queried
-     *    into the CoordinateReferenceSystem table. An additional filter will be applied
-     *    inside the AuthorityCodes class implementation.
-     * <ul>kind.isAssignableFrom(table.type)
-     *    is for the case where the user type is IdentifiedObject or Object, in which
-     *    case we basically want to iterate through every tables.
+     *   <li><p>{@code table.type.isAssignableFrom(kind)}<br>
+     *       is for the case where a table is for {@code CoordinateReferenceSystem} while the user
+     *       type is some subtype like {@code GeographicCRS}. The {@code GeographicCRS} need to be
+     *       queried into the {@code CoordinateReferenceSystem} table. An additional filter will be
+     *       applied inside the {@link AuthorityCodes} class implementation.</p></li>
+     *
+     *   <li><p>{@code kind.isAssignableFrom(table.type)}<br>
+     *       is for the case where the user type is {@code IdentifiedObject} or {@code Object},
+     *       in which case we basically want to iterate through every tables.</p></li>
      * </ul>
      */
-    public boolean isTypeOf( Class kind ){
-        return (type.isAssignableFrom(kind) || kind.isAssignableFrom(type));
+    public boolean isTypeOf(final Class kind) {
+        return type.isAssignableFrom(kind) || kind.isAssignableFrom(type);
     }
 }

@@ -191,9 +191,11 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      * @param  hints The hints, or {@code null} if none.
      * @return A factory group created from the specified set of hints.
      */
-    public static ReferencingFactoryContainer instance(Hints hints) {
-    	if( hints == null ) hints = GeoTools.getDefaultHints();
-    	
+    public static ReferencingFactoryContainer instance(final Hints hints) {
+        final Hints completed = GeoTools.getDefaultHints();
+        if (hints != null) {
+            completed.add(hints);
+        }
         /*
          * Use the same synchronization lock than ReferencingFactoryFinder (instead of this class)
          * in order to reduce the risk of dead lock. This is because ReferencingFactoryContainer
@@ -209,7 +211,7 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
                         ReferencingFactoryContainer.class);
             }
             return (ReferencingFactoryContainer) cache.getServiceProvider(
-                    ReferencingFactoryContainer.class, null, hints, null);
+                    ReferencingFactoryContainer.class, null, completed, null);
         }
     }
 
