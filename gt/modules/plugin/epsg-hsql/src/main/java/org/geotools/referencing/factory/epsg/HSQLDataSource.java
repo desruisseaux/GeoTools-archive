@@ -24,7 +24,6 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
-import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -74,22 +73,21 @@ import org.hsqldb.jdbc.jdbcDataSource;
  * @deprecated Replaced by {@link FactoryOnHSQL}.
  */
 public class HSQLDataSource extends jdbcDataSource implements DataSource {
-    /**
-     * The key for fetching the database directory from {@linkplain System#getProperty(String)
-     * system properties}.
-     *
-     * @since 2.3
-     */
-    public static final String DIRECTORY_KEY = "EPSG-HSQL.directory";
+	/**
+	 * The key for fetching the database directory from {@linkplain System#getProperty(String)
+	 * system properties}.
+	 *
+	 * @since 2.3
+	 */
+	public static final String DIRECTORY_KEY = "EPSG-HSQL.directory";
+	/**
+	 * The database name.
+	 *
+	 * @since 2.3
+	 */
+	public static final String DATABASE_NAME = "EPSG";	
 
-    /**
-     * The database name.
-     *
-     * @since 2.3
-     */
-    public static final String DATABASE_NAME = "EPSG";
-
-    /**
+	/**
      * The directory where the database is stored.
      */
     private File directory;
@@ -102,7 +100,7 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
      * temporary directory will be used.
      */
     public HSQLDataSource() {
-        this(getDirectory());
+        this(HsqlEpsgDatabase.getDirectory());
     }
 
     /**
@@ -132,7 +130,7 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
             if (url.charAt(url.length()-1) != '/') {
                 url.append('/');
             }
-            url.append(DATABASE_NAME);
+            url.append(HsqlEpsgDatabase.DATABASE_NAME);
             setDatabase(url.toString());
             this.directory = directory;
         }
@@ -159,57 +157,6 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
     }
 
     /**
-     * Returns the default directory for the EPSG database. If the {@value #DIRECTORY_KEY}
-     * {@linkplain System#getProperty(String) system property} is defined and contains the
-     * name of a directory with a valid {@linkplain File#getParent parent}, then the
-     * {@value #DATABASE_NAME} database will be saved in that directory. Otherwise,
-     * a temporary directory will be used.
-     */
-    private static File getDirectory() {
-        try {
-            final String property = System.getProperty(DIRECTORY_KEY);
-            if (property != null) {
-                final File directory = new File(property);
-                /*
-                 * Creates the directory if needed (mkdir), but NOT the parent directories (mkdirs)
-                 * because a missing parent directory may be a symptom of an installation problem.
-                 * For example if 'directory' is a subdirectory in the temporary directory (~/tmp/),
-                 * this temporary directory should already exists. If it doesn't, an administrator
-                 * should probably looks at this problem.
-                 */
-                if (directory.isDirectory() || directory.mkdir()) {
-                    return directory;
-                }
-            }
-        } catch (SecurityException e) {
-            /*
-             * Can't fetch the base directory from system properties.
-             * Fallback on the default temporary directory.
-             */
-        }
-        File directory = new File(System.getProperty("java.io.tmpdir", "."), "Geotools");
-        if (directory.isDirectory() || directory.mkdir()) {
-            directory = new File(directory, "Databases/HSQL");
-            if (directory.isDirectory() || directory.mkdirs()) {
-                return directory;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns {@code true} if the database contains data. This method returns {@code false}
-     * if an empty EPSG database has been automatically created by HSQL and not yet populated.
-     */
-    private static boolean dataExists(final Connection connection) throws SQLException {
-        final ResultSet tables = connection.getMetaData().getTables(
-                null, null, "EPSG_%", new String[] {"TABLE"});
-        final boolean exists = tables.next();
-        tables.close();
-        return exists;
-    }
-
-    /**
      * Opens a connection to the database. If the cached tables are not available,
      * they will be created now from the SQL scripts bundled in this plugin.
      */
@@ -224,7 +171,7 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
             throw new SQLException("Can't write to the database directory.");
         }
         Connection connection = super.getConnection();
-        if (!dataExists(connection)) {
+        if (!HsqlEpsgDatabase.dataExists(connection)) {
             /*
              * HSQL has created automatically an empty database. We need to populate it.
              * Executes the SQL scripts bundled in the JAR. In theory, each line contains
@@ -277,7 +224,7 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
                  * The database has been fully created. Now, make it read-only.
                  */
                 if (directory != null) {
-                    final File file = new File(directory, DATABASE_NAME + ".properties");
+                    final File file = new File(directory, HsqlEpsgDatabase.DATABASE_NAME + ".properties");
                     final InputStream propertyIn = new FileInputStream(file);
                     final Properties properties  = new Properties();
                     properties.load(propertyIn);
@@ -296,7 +243,7 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
             statement.close();
             connection.close();
             connection = super.getConnection();
-            assert dataExists(connection);
+            assert HsqlEpsgDatabase.dataExists(connection);
         }
         return connection;
     }

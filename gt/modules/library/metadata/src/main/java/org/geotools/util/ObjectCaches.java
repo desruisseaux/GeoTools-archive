@@ -1,6 +1,7 @@
 package org.geotools.util;
 
 import org.geotools.factory.FactoryRegistryException;
+import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.resources.Utilities;
@@ -71,8 +72,9 @@ public final class ObjectCaches {
     /**
      * Utility method used to produce cache based on provide Hint
      */
-    public static ObjectCache create( final Hints hints )
+    public static ObjectCache create( Hints hints )
             throws FactoryRegistryException {
+    	if( hints == null ) hints = GeoTools.getDefaultHints();
         String policy = (String) hints.get(Hints.BUFFER_POLICY);
         int limit = Hints.BUFFER_LIMIT.toValue(hints);
         return create( policy, limit );
