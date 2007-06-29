@@ -54,7 +54,7 @@ public class ObjectCacheEntryTest extends TestCase {
         }
     }
 
-    public void testWriteReadDeadlock() {
+    public void testWriteReadDeadlock() throws InterruptedException {
         //lock the entry as if we were writing
         entry = new ObjectCacheEntry();
         entry.writeLock();
@@ -76,14 +76,10 @@ public class ObjectCacheEntryTest extends TestCase {
         entry.writeUnLock();
 
         //check that the read thread is unblocked
-        Thread.yield();
+        t1.join();
         values = ((EntryReaderThread) thread1).getValue();
-        // The following fails on Continuum. May be a platform specific issue
-        // since it seems to work on some machines.
-        if (false) {
-            assertNotNull(values);
-            assertEquals(new Integer(1), values[0]);
-        }
+        assertNotNull(values);
+        assertEquals(new Integer(1), values[0]);
     }
 
     public void testWriteWriteDeadlock() throws InterruptedException {
