@@ -163,7 +163,7 @@
     </connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/</url>
   </scm>
-  
+
   <description>
     Welcome to the homepage of the GeoTools build process
     In the left side bar you should see a list of active modules,
@@ -888,7 +888,16 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.3</version>
+          <version>2.2</version>
+          <!-- Current version is 2.3, but it cause the following exception:
+
+                Running org.geotools.gce.imagepyramid.ImagePyramidReaderTest
+                Error: Could not find mediaLib accelerator wrapper classes. Continuing in pure Java mode.
+                Occurs in: com.sun.media.jai.mlib.MediaLibAccessor
+                java.lang.NoClassDefFoundError: com/sun/medialib/mlib/Image
+                    at com.sun.media.jai.mlib.MediaLibAccessor.setUseMlib(MediaLibAccessor.java:245)
+                    at com.sun.media.jai.mlib.MlibAffineRIF.create(MlibAffineRIF.java:71)
+          -->
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
