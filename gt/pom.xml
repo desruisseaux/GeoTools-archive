@@ -888,10 +888,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.2</version>
-          <!-- Current version is 2.3, but it seems to be rough with
-               class loaders; JAI is not found anymore, and we have
-               some additional test failures. -->
+          <version>2.3</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -1001,20 +998,22 @@
             <exclude>${online.skip.pattern}</exclude>
             <exclude>${stress.skip.pattern}</exclude>
           </excludes>
-          <!-- todo: remove forkMode when we will use Surefire 2.3, since "once" is the default. -->
-          <forkMode>once</forkMode>
-          <!-- todo: remove -enableassertions when we will use Surefire 2.3, since it is enabled by default. -->
-          <argLine>-Xmx${test.maxHeapSize} -enableassertions -Dorg.geotools.test.extensive=${extensive.tests} -Dorg.geotools.test.interactive=${interactive.tests} -Djava.awt.headless=${java.awt.headless}</argLine>
+          <argLine>-Xmx${test.maxHeapSize} -Dorg.geotools.test.extensive=${extensive.tests} -Dorg.geotools.test.interactive=${interactive.tests} -Djava.awt.headless=${java.awt.headless}</argLine>
           <!-- Ignores test failure only if we are generating a       -->
           <!-- report for publication on the web site. See the        -->
           <!-- profiles section at the begining of this pom.xml file. -->
           <testFailureIgnore>
             ${allow.test.failure.ignore}
           </testFailureIgnore>
+
+          <!-- The two following options have the opposite value of what we would
+               like. They are that way because they don't seem to work as expected
+               with Surefire 2.3. TODO: Try again when Surefire 2.4 will be available. -->
+
           <!-- Option to print summary of test suites or just print the test cases that has errors. -->
-          <printSummary>false</printSummary>
+          <printSummary>true</printSummary>
           <!-- Redirect the unit test standard output to a file. -->
-          <redirectTestOutputToFile>true</redirectTestOutputToFile>
+          <redirectTestOutputToFile>false</redirectTestOutputToFile>
         </configuration>
       </plugin>
 
