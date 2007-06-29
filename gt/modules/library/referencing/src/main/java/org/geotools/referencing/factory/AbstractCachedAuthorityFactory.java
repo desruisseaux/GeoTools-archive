@@ -204,11 +204,48 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
         return new NoSuchAuthorityCodeException(Errors.format(ErrorKeys.NO_SUCH_AUTHORITY_CODE_$3,
                    code, authority, Utilities.getShortName(type)), authority.toString(), code);
     }
+    
+    /**
+     * Creates an exception for an unknow authority code. This convenience method is provided
+     * for implementation of {@code createXXX} methods.
+     *
+     * @param  type  The GeoAPI interface that was to be created
+     *               (e.g. {@code CoordinateReferenceSystem.class}).
+     * @param  code  The unknow authority code.
+     * @param  cause The cause of this error, or {@code null}.
+     * @return An exception initialized with an error message built
+     *         from the specified informations.
+     */
+    protected NoSuchAuthorityCodeException noSuchAuthorityCode(final Class              type,
+                                                             final String             code,
+                                                             final ClassCastException cause)
+    {
+        final NoSuchAuthorityCodeException exception = noSuchAuthorityCode(type, code);
+        exception.initCause(cause);
+        return exception;
+    }
 	//
 	// AuthorityFactory
 	//    
 	public abstract Citation getAuthority();
-	public abstract Set getAuthorityCodes(Class type) throws FactoryException;
+	public Set getAuthorityCodes(Class type) throws FactoryException{
+		Set codes = (Set) cache.get(type);
+		if (codes == null) {
+			try {
+				cache.writeLock(type);
+				codes = (Set) cache.peek(type);
+				if (codes == null) {
+					codes = generateAuthorityCodes(type);
+					cache.put(type, codes);
+				}
+			} finally {
+				cache.writeUnLock(type);
+			}
+		}
+		return codes;
+	}
+	protected abstract Set generateAuthorityCodes( Class type ) throws FactoryException;
+
 	public abstract InternationalString getDescriptionText(String code)  throws FactoryException;
 	public IdentifiedObject createObject(String code) throws FactoryException {
 		final String key = toKey(code);
@@ -232,25 +269,21 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 	//
 	// CRSAuthority
 	//
-	public synchronized CompoundCRS createCompoundCRS(final String code)
-			throws FactoryException {
-		final String key = toKey(code);
-		CompoundCRS crs = (CompoundCRS) cache.get(key);
-		if (crs == null) {
-			try {
-				cache.writeLock(key);
-				crs = (CompoundCRS) cache.peek(key);
-				if (crs == null) {
-					crs = generateCompoundCRS(code);
-					cache.put(key, crs);
-				}
-			} finally {
-				cache.writeUnLock(key);
-			}
-		}
-		return crs;
-	}
-    protected abstract CompoundCRS generateCompoundCRS(String code);
+    /**
+     * Creates a 3D coordinate reference system from a code.
+     *
+     * @param code Value allocated by authority.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
+     * @throws FactoryException if the object creation failed for some other reason.
+     */
+    public CompoundCRS createCompoundCRS(final String code) throws FactoryException {
+        final CoordinateReferenceSystem crs = createCoordinateReferenceSystem(code);
+        try {
+            return (CompoundCRS) crs;
+        } catch (ClassCastException exception) {
+            throw noSuchAuthorityCode(CompoundCRS.class, code, exception);
+        }
+    }
 
 	public CoordinateReferenceSystem createCoordinateReferenceSystem(String code)
 			throws FactoryException {
@@ -273,185 +306,98 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 	}
 	protected abstract CoordinateReferenceSystem generateCoordinateReferenceSystem(String code) throws FactoryException;
 
-	public DerivedCRS createDerivedCRS(String code) throws FactoryException {
-		final String key = toKey(code);
-		DerivedCRS crs = (DerivedCRS) cache.get(key);
-		if (crs == null) {
-			try {
-				cache.writeLock(key);
-				crs = (DerivedCRS) cache.peek(key);
-				if (crs == null) {
-					crs = generateDerivedCRS(code);
-					cache.put(key, crs);
-				}
-			} finally {
-				cache.writeUnLock(key);
-			}
-		}
-		return crs;
-	}
+    public DerivedCRS createDerivedCRS(final String code) throws FactoryException {
+        final CoordinateReferenceSystem crs = createCoordinateReferenceSystem(code);
+        try {
+            return (DerivedCRS) crs;
+        } catch (ClassCastException exception) {
+            throw noSuchAuthorityCode(DerivedCRS.class, code, exception);
+        }
+    }
 
-	protected abstract DerivedCRS generateDerivedCRS(String code);
-
-	public EngineeringCRS createEngineeringCRS(String code)
-			throws FactoryException {
-		final String key = toKey(code);
-		EngineeringCRS crs = (EngineeringCRS) cache.get(key);
-		if (crs == null) {
-			try {
-				cache.writeLock(key);
-				crs = (EngineeringCRS) cache.peek(key);
-				if (crs == null) {
-					crs = generateEngineeringCRS(code);
-					cache.put(key, crs);
-				}
-			} finally {
-				cache.writeUnLock(key);
-			}
-		}
-		return crs;
-	}
-	protected abstract EngineeringCRS generateEngineeringCRS(String code);
-
-	public GeocentricCRS createGeocentricCRS(String code)
-			throws FactoryException {
-		final String key = toKey(code);
-		GeocentricCRS crs = (GeocentricCRS) cache.get(key);
-		if (crs == null) {
-			try {
-				cache.writeLock(key);
-				crs = (GeocentricCRS) cache.peek(key);
-				if (crs == null) {
-					crs = generateGeocentricCRS(code);
-					cache.put(key, crs);
-				}
-			} finally {
-				cache.writeUnLock(key);
-			}
-		}
-		return crs;
-	}
-	protected abstract GeocentricCRS generateGeocentricCRS(String code);
-
-	public GeographicCRS createGeographicCRS(String code)
-			throws FactoryException {
-		final String key = toKey(code);
-		GeographicCRS crs = (GeographicCRS) cache.get(key);
-		if (crs == null) {
-			try {
-				cache.writeLock(key);
-				crs = (GeographicCRS) cache.peek(key);
-				if (crs == null) {
-					crs = generateGeographicCRS(code);
-					cache.put(key, crs);
-				}
-			} finally {
-				cache.writeUnLock(key);
-			}
-		}
-		return crs;
-	}
-
-	protected abstract GeographicCRS generateGeographicCRS(String code);
-
-	public ImageCRS createImageCRS(String code) throws FactoryException {
-		final String key = toKey(code);
-		ImageCRS crs = (ImageCRS) cache.get(key);
-		if (crs == null) {
-			try {
-				cache.writeLock(key);
-				crs = (ImageCRS) cache.peek(key);
-				if (crs == null) {
-					crs = generateImageCRS(code);
-					cache.put(key, crs);
-				}
-			} finally {
-				cache.writeUnLock(key);
-			}
-		}
-		return crs;
-	}
-	protected abstract ImageCRS generateImageCRS(String code);
-
-	public ProjectedCRS createProjectedCRS(String code) throws FactoryException {
-		final String key = toKey(code);
-		ProjectedCRS crs = (ProjectedCRS) cache.get(key);
-		if (crs == null) {
-			try {
-				cache.writeLock(key);
-				crs = (ProjectedCRS) cache.peek(key);
-				if (crs == null) {
-					crs = generateProjectedCRS(code);
-					cache.put(key, crs);
-				}
-			} finally {
-				cache.writeUnLock(key);
-			}
-		}
-		return crs;
-	}
-	protected abstract ProjectedCRS generateProjectedCRS(String code);
-
-	public TemporalCRS createTemporalCRS(String code) throws FactoryException {
-		final String key = toKey(code);
-		TemporalCRS crs = (TemporalCRS) cache.get(key);
-		if (crs == null) {
-			try {
-				cache.writeLock(key);
-				crs = (TemporalCRS) cache.peek(key);
-				if (crs == null) {
-					crs = generateTemporalCRS(code);
-					cache.put(key, crs);
-				}
-			} finally {
-				cache.writeUnLock(key);
-			}
-		}
-		return crs;
-	}
-	protected abstract TemporalCRS generateTemporalCRS(String code);
-
-	public VerticalCRS createVerticalCRS(String code) throws FactoryException {
-		final String key = toKey(code);
-		VerticalCRS crs = (VerticalCRS) cache.get(key);
-		if (crs == null) {
-			try {
-				cache.writeLock(key);
-				crs = (VerticalCRS) cache.peek(key);
-				if (crs == null) {
-					crs = generateVerticalCRS(code);
-					cache.put(key, crs);
-				}
-			} finally {
-				cache.writeUnLock(key);
-			}
-		}
-		return crs;
-	}
-	protected abstract VerticalCRS generateVerticalCRS(String code);
-
+    public EngineeringCRS createEngineeringCRS(final String code) throws FactoryException {
+        final CoordinateReferenceSystem crs = createCoordinateReferenceSystem(code);
+        try {
+            return (EngineeringCRS) crs;
+        } catch (ClassCastException exception) {
+            throw noSuchAuthorityCode(EngineeringCRS.class, code, exception);
+        }
+    }
+    
+    public GeocentricCRS createGeocentricCRS(final String code) throws FactoryException {
+        final CoordinateReferenceSystem crs = createCoordinateReferenceSystem(code);
+        try {
+            return (GeocentricCRS) crs;
+        } catch (ClassCastException exception) {
+            throw noSuchAuthorityCode(GeocentricCRS.class, code, exception);
+        }
+    }
+    
+    public GeographicCRS createGeographicCRS(final String code) throws FactoryException {
+        final CoordinateReferenceSystem crs = createCoordinateReferenceSystem(code);
+        try {
+            return (GeographicCRS) crs;
+        } catch (ClassCastException exception) {
+            throw noSuchAuthorityCode(GeographicCRS.class, code, exception);
+        }
+    }
+    
+    public ImageCRS createImageCRS(final String code) throws FactoryException {
+        final CoordinateReferenceSystem crs = createCoordinateReferenceSystem(code);
+        try {
+            return (ImageCRS) crs;
+        } catch (ClassCastException exception) {
+            throw noSuchAuthorityCode(ImageCRS.class, code, exception);
+        }
+    }
+    
+    public ProjectedCRS createProjectedCRS(final String code) throws FactoryException {
+        final CoordinateReferenceSystem crs = createCoordinateReferenceSystem(code);
+        try {
+            return (ProjectedCRS) crs;
+        } catch (ClassCastException exception) {
+            throw noSuchAuthorityCode(ProjectedCRS.class, code, exception);
+        }
+    }
+    
+    public TemporalCRS createTemporalCRS(final String code) throws FactoryException {
+        final CoordinateReferenceSystem crs = createCoordinateReferenceSystem(code);
+        try {
+            return (TemporalCRS) crs;
+        } catch (ClassCastException exception) {
+            throw noSuchAuthorityCode(TemporalCRS.class, code, exception);
+        }
+    }
+    
+    public VerticalCRS createVerticalCRS(final String code) throws FactoryException {
+        final CoordinateReferenceSystem crs = createCoordinateReferenceSystem(code);
+        try {
+            return (VerticalCRS) crs;
+        } catch (ClassCastException exception) {
+            throw noSuchAuthorityCode(VerticalCRS.class, code, exception);
+        }
+    }
 	//
 	// CSAuthority
 	//
-	public CartesianCS createCartesianCS(String code) throws FactoryException {
-		final String key = toKey(code);
-		CartesianCS cs = (CartesianCS) cache.get(key);
-		if (cs == null) {
-			try {
-				cache.writeLock(key);
-				cs = (CartesianCS) cache.peek(key);
-				if (cs == null) {
-					cs = generateCartesianCS(code);
-					cache.put(key, cs);
-				}
-			} finally {
-				cache.writeUnLock(key);
-			}
-		}
-		return cs;
-	}
-
-	protected abstract CartesianCS generateCartesianCS(String code);
+	
+    /**
+     * Creates a cartesian coordinate system from a code.
+     * The default implementation invokes
+     * <code>{@linkplain #createCoordinateSystem createCoordinateSystem}(code)</code>.
+     *
+     * @param  code Value allocated by authority.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
+     * @throws FactoryException if the object creation failed for some other reason.
+     */
+    public CartesianCS createCartesianCS(final String code) throws FactoryException {
+        final CoordinateSystem cs = createCoordinateSystem(code);
+        try {
+            return (CartesianCS) cs;
+        } catch (ClassCastException exception) {
+            throw noSuchAuthorityCode(CartesianCS.class, code, exception);
+        }
+    }
 
 	public CoordinateSystem createCoordinateSystem(String code)
 			throws FactoryException {
@@ -496,108 +442,59 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 
 	protected abstract CoordinateSystemAxis generateCoordinateSystemAxis(String code)  throws FactoryException;
 
-	public CylindricalCS createCylindricalCS(String code)
-			throws FactoryException {
-		final String key = toKey(code);
-		CylindricalCS cs = (CylindricalCS) cache.get(key);
-		if (cs == null) {
-			try {
-				cache.writeLock(key);
-				cs = (CylindricalCS) cache.peek(key);
-				if (cs == null) {
-					cs = generateCylindricalCS(code);
-					cache.put(key, cs);
-				}
-			} finally {
-				cache.writeUnLock(key);
-			}
-		}
-		return cs;
-	}
+    /**
+     * The default implementation invokes
+     * <code>{@linkplain #createCoordinateSystem createCoordinateSystem}(code)</code>.
+     *
+     * @param  code Value allocated by authority.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
+     * @throws FactoryException if the object creation failed for some other reason.
+     */
+    public CylindricalCS createCylindricalCS(final String code) throws FactoryException {
+        final CoordinateSystem cs = createCoordinateSystem(code);
+        try {
+            return (CylindricalCS) cs;
+        } catch (ClassCastException exception) {
+            throw noSuchAuthorityCode(CylindricalCS.class, code, exception);
+        }
+    }
 
-	protected abstract CylindricalCS generateCylindricalCS(String code)  throws FactoryException;
+    public EllipsoidalCS createEllipsoidalCS(final String code) throws FactoryException {
+        final CoordinateSystem cs = createCoordinateSystem(code);
+        try {
+            return (EllipsoidalCS) cs;
+        } catch (ClassCastException exception) {
+            throw noSuchAuthorityCode(EllipsoidalCS.class, code, exception);
+        }
+    }
 
-	public EllipsoidalCS createEllipsoidalCS(String code)
-			throws FactoryException {
-		final String key = toKey(code);
-		EllipsoidalCS cs = (EllipsoidalCS) cache.get(key);
-		if (cs == null) {
-			try {
-				cache.writeLock(key);
-				cs = (EllipsoidalCS) cache.peek(key);
-				if (cs == null) {
-					cs = generateEllipsoidalCS(code);
-					cache.put(key, cs);
-				}
-			} finally {
-				cache.writeUnLock(key);
-			}
-		}
-		return cs;
-	}
-
-	protected abstract EllipsoidalCS generateEllipsoidalCS(String code)  throws FactoryException;
-
-	public PolarCS createPolarCS(String code) throws FactoryException {
-		final String key = toKey(code);
-		PolarCS cs = (PolarCS) cache.get(key);
-		if (cs == null) {
-			try {
-				cache.writeLock(key);
-				cs = (PolarCS) cache.peek(key);
-				if (cs == null) {
-					cs = generatePolarCS(code);
-					cache.put(key, cs);
-				}
-			} finally {
-				cache.writeUnLock(key);
-			}
-		}
-		return cs;
-	}
-
-	protected abstract PolarCS generatePolarCS(String code)  throws FactoryException;
-
-	public SphericalCS createSphericalCS(String code) throws FactoryException {
-		final String key = toKey(code);
-		SphericalCS cs = (SphericalCS) cache.get(key);
-		if (cs == null) {
-			try {
-				cache.writeLock(key);
-				cs = (SphericalCS) cache.peek(key);
-				if (cs == null) {
-					cs = generateSphericalCS(code);
-					cache.put(key, cs);
-				}
-			} finally {
-				cache.writeUnLock(key);
-			}
-		}
-		return cs;
-	}
-
-	protected abstract SphericalCS generateSphericalCS(String code) throws FactoryException;
-
-	public TimeCS createTimeCS(String code) throws FactoryException {
-		final String key = toKey(code);
-		TimeCS cs = (TimeCS) cache.get(key);
-		if (cs == null) {
-			try {
-				cache.writeLock(key);
-				cs = (TimeCS) cache.peek(key);
-				if (cs == null) {
-					cs = generateTimeCS(code);
-					cache.put(key, cs);
-				}
-			} finally {
-				cache.writeUnLock(key);
-			}
-		}
-		return cs;
-	}
-
-	protected abstract TimeCS generateTimeCS(String code) throws FactoryException;
-
+    public PolarCS createPolarCS(final String code) throws FactoryException {
+        final CoordinateSystem cs = createCoordinateSystem(code);
+        try {
+            return (PolarCS) cs;
+        } catch (ClassCastException exception) {
+            throw noSuchAuthorityCode(PolarCS.class, code, exception);
+        }
+    }
+    
+    public SphericalCS createSphericalCS(final String code) throws FactoryException {
+        final CoordinateSystem cs = createCoordinateSystem(code);
+        try {
+            return (SphericalCS) cs;
+        } catch (ClassCastException exception) {
+            throw noSuchAuthorityCode(SphericalCS.class, code, exception);
+        }
+    }
+    
+    public TimeCS createTimeCS(final String code) throws FactoryException {
+        final CoordinateSystem cs = createCoordinateSystem(code);
+        try {
+            return (TimeCS) cs;
+        } catch (ClassCastException exception) {
+            throw noSuchAuthorityCode(TimeCS.class, code, exception);
+        }
+    }
+    
 	public Unit createUnit(String code) throws FactoryException {
 		final String key = toKey(code);
 		Unit unit = (Unit) cache.get(key);
@@ -618,26 +515,15 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 
 	protected abstract Unit generateUnit(String code) throws FactoryException;
 
-	public VerticalCS createVerticalCS(String code) throws FactoryException {
-		final String key = toKey(code);
-		VerticalCS cs = (VerticalCS) cache.get(key);
-		if (cs == null) {
-			try {
-				cache.writeLock(key);
-				cs = (VerticalCS) cache.peek(key);
-				if (cs == null) {
-					cs = generateVerticalCS(code);
-					cache.put(key, cs);
-				}
-			} finally {
-				cache.writeUnLock(key);
-			}
-		}
-		return cs;
-	}
-
-	protected abstract VerticalCS generateVerticalCS(String code) throws FactoryException;
-
+    public VerticalCS createVerticalCS(final String code) throws FactoryException {
+        final CoordinateSystem cs = createCoordinateSystem(code);
+        try {
+            return (VerticalCS) cs;
+        } catch (ClassCastException exception) {
+            throw noSuchAuthorityCode(VerticalCS.class, code, exception);
+        }
+    }
+    
 	//
 	// DatumAuthorityFactory
 	//
@@ -681,68 +567,33 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 
 	protected abstract Ellipsoid generateEllipsoid(String code) throws FactoryException;
 
-	public EngineeringDatum createEngineeringDatum(String code)
-			throws FactoryException {
-		final String key = toKey(code);
-		EngineeringDatum datum = (EngineeringDatum) cache.get(key);
-		if (datum == null) {
-			try {
-				cache.writeLock(key);
-				datum = (EngineeringDatum) cache.peek(key);
-				if (datum == null) {
-					datum = generateEngineeringDatum(code);
-					cache.put(key, datum);
-				}
-			} finally {
-				cache.writeUnLock(key);
-			}
-		}
-		return datum;
-	}
-
-	protected abstract EngineeringDatum generateEngineeringDatum(String code)  throws FactoryException;
-
-	public GeodeticDatum createGeodeticDatum(String code)
-			throws FactoryException {
-		final String key = toKey(code);
-		GeodeticDatum datum = (GeodeticDatum) cache.get(key);
-		if (datum == null) {
-			try {
-				cache.writeLock(key);
-				datum = (GeodeticDatum) cache.peek(key);
-				if (datum == null) {
-					datum = generateGeodeticDatum(code);
-					cache.put(key, datum);
-				}
-			} finally {
-				cache.writeUnLock(key);
-			}
-		}
-		return datum;
-	}
-
-	protected abstract GeodeticDatum generateGeodeticDatum(String code)  throws FactoryException;
-
-	public ImageDatum createImageDatum(String code) throws FactoryException {
-		final String key = toKey(code);
-		ImageDatum datum = (ImageDatum) cache.get(key);
-		if (datum == null) {
-			try {
-				cache.writeLock(key);
-				datum = (ImageDatum) cache.peek(key);
-				if (datum == null) {
-					datum = generateImageDatum(code);
-					cache.put(key, datum);
-				}
-			} finally {
-				cache.writeUnLock(key);
-			}
-		}
-		return datum;
-	}
-
-	protected abstract ImageDatum generateImageDatum(String code)  throws FactoryException;
-
+    public EngineeringDatum createEngineeringDatum(final String code) throws FactoryException {
+        final Datum datum = createDatum(code);
+        try {
+            return (EngineeringDatum) datum;
+        } catch (ClassCastException exception) {
+            throw noSuchAuthorityCode(EngineeringDatum.class, code, exception);
+        }
+    }
+    
+    public GeodeticDatum createGeodeticDatum(final String code) throws FactoryException {
+        final Datum datum = createDatum(code);
+        try {
+            return (GeodeticDatum) datum;
+        } catch (ClassCastException exception) {
+            throw noSuchAuthorityCode(GeodeticDatum.class, code, exception);
+        }
+    }
+    
+    public ImageDatum createImageDatum(final String code) throws FactoryException {
+        final Datum datum = createDatum(code);
+        try {
+            return (ImageDatum) datum;
+        } catch (ClassCastException exception) {
+            throw noSuchAuthorityCode(ImageDatum.class, code, exception);
+        }
+    }
+    
 	public PrimeMeridian createPrimeMeridian(String code)
 			throws FactoryException {
 		final String key = toKey(code);
@@ -764,47 +615,23 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 
 	protected abstract PrimeMeridian generatePrimeMeridian(String code) throws FactoryException;
 
-	public TemporalDatum createTemporalDatum(String code)
-			throws FactoryException {
-		final String key = toKey(code);
-		TemporalDatum datum = (TemporalDatum) cache.get(key);
-		if (datum == null) {
-			try {
-				cache.writeLock(key);
-				datum = (TemporalDatum) cache.peek(key);
-				if (datum == null) {
-					datum = generateTemporalDatum(code);
-					cache.put(key, datum);
-				}
-			} finally {
-				cache.writeUnLock(key);
-			}
-		}
-		return datum;
-	}
-
-	protected abstract TemporalDatum generateTemporalDatum(String code)  throws FactoryException;
-
-	public VerticalDatum createVerticalDatum(String code)
-			throws FactoryException {
-		final String key = toKey(code);
-		VerticalDatum datum = (VerticalDatum) cache.get(key);
-		if (datum == null) {
-			try {
-				cache.writeLock(key);
-				datum = (VerticalDatum) cache.peek(key);
-				if (datum == null) {
-					datum = generateVerticalDatum(code);
-					cache.put(key, datum);
-				}
-			} finally {
-				cache.writeUnLock(key);
-			}
-		}
-		return datum;
-	}
-
-	protected abstract VerticalDatum generateVerticalDatum(String code)  throws FactoryException;
+    public TemporalDatum createTemporalDatum(final String code) throws FactoryException {
+        final Datum datum = createDatum(code);
+        try {
+            return (TemporalDatum) datum;
+        } catch (ClassCastException exception) {
+            throw noSuchAuthorityCode(TemporalDatum.class, code, exception);
+        }
+    }
+    
+    public VerticalDatum createVerticalDatum(final String code) throws FactoryException {
+        final Datum datum = createDatum(code);
+        try {
+            return (VerticalDatum) datum;
+        } catch (ClassCastException exception) {
+            throw noSuchAuthorityCode(VerticalDatum.class, code, exception);
+        }
+    }
 
 	public CoordinateOperation createCoordinateOperation(String code)
 			throws FactoryException {
