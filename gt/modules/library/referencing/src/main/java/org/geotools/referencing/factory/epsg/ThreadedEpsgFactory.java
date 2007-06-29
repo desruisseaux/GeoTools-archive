@@ -362,9 +362,9 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
              * a way to distinguish the two cases. However I'm not sure that it is a robust
              * criterion. Subclasses should always override as a safety.
              */
-            return new AnsiDialectEpsgFactory(hints, connection);
+            return new FactoryUsingAnsiSQL(hints, connection);
         }
-        return new AccessDialectEpsgFactory(hints, connection);
+        return new FactoryUsingSQL(hints, connection);
     }
 
     /**

@@ -212,7 +212,7 @@ public class PostgreDataSource extends Jdbc3SimpleDataSource implements DataSour
      * @throws SQLException if connection to the database failed.
      */
     public AbstractAuthorityFactory createFactory(final Hints hints) throws SQLException {
-        final AnsiDialectEpsgFactory factory = new AnsiDialectEpsgFactory(hints, getConnection());
+        final FactoryUsingAnsiSQL factory = new FactoryUsingAnsiSQL(hints, getConnection());
         if (schema != null) {
             factory.setSchema(schema);
         }

@@ -95,6 +95,6 @@ public class ThreadedAccessEpsgFactory extends ThreadedEpsgFactory {
             e.initCause(exception);
             throw e;
         }
-        return new AccessDialectEpsgFactory(hints, connection);
+        return new FactoryUsingSQL(hints, connection);
     }
 }

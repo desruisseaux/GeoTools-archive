@@ -206,7 +206,7 @@ public class ThreadedPostgreSQLEpsgFactory extends ThreadedEpsgFactory {
      */
     protected AbstractAuthorityFactory createBackingStore(final Hints hints) throws SQLException {
         final Connection connection = getDataSource().getConnection();
-        final AnsiDialectEpsgFactory factory = new AnsiDialectEpsgFactory(hints, connection);
+        final FactoryUsingAnsiSQL factory = new FactoryUsingAnsiSQL(hints, connection);
         if (schema != null) {
             factory.setSchema(schema);
         }

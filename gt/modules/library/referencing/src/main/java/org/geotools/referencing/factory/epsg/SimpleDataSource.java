@@ -244,8 +244,8 @@ public class SimpleDataSource implements DataSource {
         }
         final String schema = properties.getProperty("schema");
         if (schema != null) {
-            if (factory instanceof AnsiDialectEpsgFactory) {
-                ((AnsiDialectEpsgFactory) factory).setSchema(schema);
+            if (factory instanceof FactoryUsingAnsiSQL) {
+                ((FactoryUsingAnsiSQL) factory).setSchema(schema);
             }
         }
         return factory;

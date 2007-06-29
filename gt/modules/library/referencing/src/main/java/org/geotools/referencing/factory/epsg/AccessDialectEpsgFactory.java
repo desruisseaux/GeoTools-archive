@@ -33,7 +33,7 @@ import org.geotools.factory.Hints;
  * @version $Id$
  * @author Jody Garnett
  */
-public class AccessDialectEpsgFactory extends DirectEpsgFactory {
+public class AccessDialectEpsgFactory extends AbstractEpsgFactory {
     /**
      * Constructs an authority factory using the specified connection.
      *

@@ -47,7 +47,7 @@ import org.geotools.factory.Hints;
  * @author Didier Richard
  * @author John Grange
  */
-public class AnsiDialectEpsgFactory extends DirectEpsgFactory {
+public class AnsiDialectEpsgFactory extends AbstractEpsgFactory {
     /**
      * The default map using ANSI names.
      */

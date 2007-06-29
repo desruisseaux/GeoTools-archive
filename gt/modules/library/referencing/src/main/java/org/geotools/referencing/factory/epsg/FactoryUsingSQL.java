@@ -18,6 +18,7 @@ package org.geotools.referencing.factory.epsg;
 
 // J2SE dependencies and extensions
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
@@ -33,7 +34,7 @@ import org.geotools.factory.Hints;
  *
  * @deprecated Please use {@link AccessDialectEpsgFactory}.
  */
-public class FactoryUsingSQL extends AccessDialectEpsgFactory {
+public class FactoryUsingSQL extends DirectEpsgFactory {
     /**
      * Constructs an authority factory using the specified connection.
      *
@@ -44,5 +45,17 @@ public class FactoryUsingSQL extends AccessDialectEpsgFactory {
      */
     public FactoryUsingSQL(final Hints userHints, final Connection connection) {
         super(userHints, connection );
+    }
+    /**
+     * Invoked when a new {@link PreparedStatement} is about to be created from a SQL string.
+     * 
+     * Since the <A HREF="http://www.epsg.org">EPSG database</A> is available mainly in MS-Access
+     * format, and this is the target of our super class, we have no work to do here.
+     *
+     * @param  statement The statement in MS-Access syntax.
+     * @return The SQL statement to use. This implementation returns the string unchanged.
+     */
+    protected String adaptSQL(final String statement) {
+        return statement;
     }
 }
