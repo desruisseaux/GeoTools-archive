@@ -151,7 +151,7 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 				if (sourceURL.getProtocol().compareToIgnoreCase("file") == 0) {
 					String auth = sourceURL.getAuthority();
 					String path = sourceURL.getPath();
-					if (auth == null && !auth.equals("")) {
+					if (auth != null && !auth.equals("")) {
 						path = "//"+auth+path;
 					}
 					this.source = input = new File(URLDecoder.decode(path, "UTF-8"));
