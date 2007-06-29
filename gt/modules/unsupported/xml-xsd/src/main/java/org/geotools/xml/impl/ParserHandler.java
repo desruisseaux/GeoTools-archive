@@ -423,6 +423,22 @@ public class ParserHandler extends DefaultHandler {
         }
         
         if ( handler == null ) {
+            //check the case of where the namespace is wrong, do a lookup from 
+            // the parent just on local name
+            if ( !isStrict() ) {
+                String msg = "Could not find declaration for: " + qualifiedName 
+                + ". Performing lookup by ignoring namespace";
+                logger.fine( msg );
+                
+                // * = match any namespace
+                handler = (ElementHandler) parent.createChildHandler(
+                    new QName("*",qualifiedName.getLocalPart())
+                );
+                
+            }
+        }
+        
+        if ( handler == null ) {
         	//check the parser flag, and just parse it anyways
         	//if( context.getComponentInstance( Parser.Properties.PARSE_UNKNOWN_ELEMENTS ) != null) {
                 if (!isStrict() ) {
@@ -443,7 +459,17 @@ public class ParserHandler extends DefaultHandler {
         }
         
         if (handler != null) {
-        	//signal the handler to start the element, and place it on the stack
+            
+            //we may have actually matched an element whose namespace does 
+            // not match the one passed in, update the context if so
+            if ( handler.getElementDeclaration().getTargetNamespace() != null && 
+                !handler.getElementDeclaration().getTargetNamespace().equals( uri ) ) {
+                
+                namespaces.declarePrefix("", handler.getElementDeclaration().getTargetNamespace() );
+                qualifiedName = new QName( handler.getElementDeclaration().getTargetNamespace(), qualifiedName.getLocalPart() );
+            }
+           
+            //signal the handler to start the element, and place it on the stack
             handler.startElement(qualifiedName, attributes);
             handlers.push(handler);
         } 

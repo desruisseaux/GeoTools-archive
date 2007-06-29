@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 
@@ -35,6 +36,7 @@ import org.eclipse.xsd.XSDComplexTypeDefinition;
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDImport;
 import org.eclipse.xsd.XSDInclude;
+import org.eclipse.xsd.XSDNamedComponent;
 import org.eclipse.xsd.XSDPackage;
 import org.eclipse.xsd.XSDParticle;
 import org.eclipse.xsd.XSDSchema;
@@ -100,23 +102,28 @@ public class SchemaIndexImpl implements SchemaIndex {
     }
 
     public XSDElementDeclaration getElementDeclaration(QName qName) {
-        return (XSDElementDeclaration) getElementIndex().get(qName);
+        return (XSDElementDeclaration) lookup(getElementIndex(),qName); 
+        //return (XSDElementDeclaration) getElementIndex().get(qName);
     }
 
     public XSDAttributeDeclaration getAttributeDeclaration(QName qName) {
-        return (XSDAttributeDeclaration) getAttributeIndex().get(qName);
+        return (XSDAttributeDeclaration) lookup(getAttributeIndex(),qName);
+        //return (XSDAttributeDeclaration) getAttributeIndex().get(qName);
     }
 
     public XSDAttributeGroupDefinition getAttributeGroupDefinition(QName qName) {
-        return (XSDAttributeGroupDefinition) getAttributeGroupIndex().get(qName);
+        return (XSDAttributeGroupDefinition) lookup(getAttributeGroupIndex(),qName);
+        //return (XSDAttributeGroupDefinition) getAttributeGroupIndex().get(qName);
     }
 
     public XSDComplexTypeDefinition getComplexTypeDefinition(QName qName) {
-        return (XSDComplexTypeDefinition) getComplexTypeIndex().get(qName);
+        return (XSDComplexTypeDefinition) lookup(getComplexTypeIndex(),qName);
+        //return (XSDComplexTypeDefinition) getComplexTypeIndex().get(qName);
     }
 
     public XSDSimpleTypeDefinition getSimpleTypeDefinition(QName qName) {
-        return (XSDSimpleTypeDefinition) getSimpleTypeIndex().get(qName);
+        return (XSDSimpleTypeDefinition) lookup(getSimpleTypeIndex(),qName);
+        //return (XSDSimpleTypeDefinition) getSimpleTypeIndex().get(qName);
     }
 
     public XSDTypeDefinition getTypeDefinition(QName qName) {
@@ -127,6 +134,32 @@ public class SchemaIndexImpl implements SchemaIndex {
         }
 
         return type;
+    }
+    
+    protected XSDNamedComponent lookup( Map index, QName qName ) {
+        XSDNamedComponent component = (XSDNamedComponent) index.get( qName );
+        if ( component != null ) {
+            return component;
+        }
+        
+        //check for namespace wildcard
+        if ( "*".equals( qName.getNamespaceURI() ) ) {
+            ArrayList matches = new ArrayList();
+            for ( Iterator e = index.entrySet().iterator(); e.hasNext(); ) {
+                Map.Entry entry = (Map.Entry) e.next();
+                QName name = (QName) entry.getKey();
+                
+                if ( name.getLocalPart().equals( qName.getLocalPart() ) ) {
+                    matches.add( entry.getValue() );
+                }
+            }
+            
+            if ( matches.size() == 1 ) {
+                return (XSDNamedComponent) matches.get( 0 );
+            }
+        }
+        
+        return null;
     }
 
     protected OrderedMap children( XSDElementDeclaration parent ) {
@@ -178,6 +211,29 @@ public class SchemaIndexImpl implements SchemaIndex {
     		
     		return child;
     	}
+        
+        if ("*".equals( childName.getNamespaceURI() ) ) {
+            //do a check just on local name
+            ArrayList matches = new ArrayList();
+            for ( Iterator e = children.entrySet().iterator(); e.hasNext(); ) {
+                Map.Entry entry = (Map.Entry) e.next();
+                QName name = (QName) entry.getKey();
+                
+                if ( name.getLocalPart().equals( childName.getLocalPart() ) ) {
+                    matches.add( entry.getValue() );
+                }
+            }
+            
+            if ( matches.size() == 1 ) {
+                particle = (XSDParticle) matches.get( 0 ); 
+                XSDElementDeclaration child = (XSDElementDeclaration) particle.getContent();
+                if ( child.isElementDeclarationReference() ) {
+                        child = child.getResolvedElementDeclaration();
+                }
+                
+                return child;
+            }
+        }
     	
     	return null;
     }
