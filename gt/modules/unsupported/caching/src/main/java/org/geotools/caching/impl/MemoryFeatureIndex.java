@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.caching;
+package org.geotools.caching.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,14 +22,20 @@ import java.util.Iterator;
 import java.util.List;
 import com.vividsolutions.jts.geom.Envelope;
 import org.opengis.filter.Filter;
+import org.geotools.caching.DataCache;
+import org.geotools.caching.FeatureIndex;
+import org.geotools.caching.InternalStore;
 import org.geotools.data.DataStore;
+import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
+import org.geotools.data.view.DefaultView;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.SchemaException;
 import org.geotools.filter.spatial.BBOXImpl;
 import org.geotools.index.Data;
 import org.geotools.index.DataDefinition;
@@ -49,6 +55,7 @@ import org.geotools.index.rtree.memory.MemoryPageStore;
  */
 public class MemoryFeatureIndex implements FeatureIndex {
     private static final DataDefinition df = createDataDefinition();
+    private final DataCache parent;
     private RTree tree = createTree();
     private final InternalStore internalStore;
     private final int capacity;
@@ -61,7 +68,8 @@ public class MemoryFeatureIndex implements FeatureIndex {
      * @param type FeatureType of features this index will store
      * @param capacity maximum number of features we can store.
      */
-    public MemoryFeatureIndex(FeatureType type, int capacity) {
+    public MemoryFeatureIndex(DataCache parent, FeatureType type, int capacity) {
+        this.parent = parent;
         this.internalStore = new SimpleHashMapInternalStore();
         this.capacity = capacity;
         this.type = type;
@@ -141,20 +149,10 @@ public class MemoryFeatureIndex implements FeatureIndex {
     /* (non-Javadoc)
      * @see org.geotools.caching.FeatureIndex#getFeatures(org.geotools.data.Query)
      */
-    public FeatureCollection getFeatures(Query q) {
+    public FeatureCollection getFeatures(Query q) throws IOException {
         Filter f = q.getFilter();
-        FeatureCollection fc = new DefaultFeatureCollection(null, type);
-        boolean refine = (f instanceof BBOXImpl);
 
-        for (Iterator i = getCandidates(q).iterator(); i.hasNext();) {
-            Feature next = (Feature) i.next();
-
-            if (refine || f.evaluate(next)) {
-                fc.add(next);
-            }
-        }
-
-        return fc;
+        return getFeatures(f);
     }
 
     /** Preselects features from the spatial index.
@@ -163,9 +161,7 @@ public class MemoryFeatureIndex implements FeatureIndex {
      * @param q a Query
      * @return a collection of features within or intersecting query bounds.
      */
-    private Collection getCandidates(Query q) {
-        Filter f = q.getFilter();
-
+    private Collection getCandidates(Filter f) {
         if (f instanceof BBOXImpl) {
             List candidates = new ArrayList();
             BBOXImpl bb = (BBOXImpl) f;
@@ -216,8 +212,8 @@ public class MemoryFeatureIndex implements FeatureIndex {
     /* (non-Javadoc)
      * @see org.geotools.caching.FeatureIndex#getView(org.geotools.data.Query)
      */
-    public FeatureSource getView(Query q) {
-        return new IndexView(this, q);
+    public FeatureSource getView(Query q) throws SchemaException {
+        return new DefaultView(this, q);
     }
 
     /** R-tree to keep envelopes of stored features.
@@ -257,11 +253,12 @@ public class MemoryFeatureIndex implements FeatureIndex {
      * @see org.geotools.data.FeatureSource#getBounds()
      */
     public Envelope getBounds() throws IOException {
-        try {
-            return tree.getBounds();
-        } catch (TreeException e) {
-            throw (IOException) new IOException().initCause(e);
-        }
+        /*try {
+           return tree.getBounds();
+           } catch (TreeException e) {
+               throw (IOException) new IOException().initCause(e);
+           }*/
+        return parent.getFeatureSource(type.getTypeName()).getBounds();
     }
 
     /* (non-Javadoc)
@@ -277,7 +274,15 @@ public class MemoryFeatureIndex implements FeatureIndex {
      * @see org.geotools.data.FeatureSource#getCount(org.geotools.data.Query)
      */
     public int getCount(Query q) throws IOException {
-        FeatureCollection fc = this.getFeatures(q);
+        Query qprime = adapt(q);
+
+        try {
+            this.parent.getView(qprime);
+        } catch (SchemaException e) {
+            throw (IOException) new IOException().initCause(e);
+        }
+
+        FeatureCollection fc = this.getFeatures(qprime);
 
         return fc.size();
     }
@@ -287,7 +292,7 @@ public class MemoryFeatureIndex implements FeatureIndex {
      */
     public DataStore getDataStore() {
         // TODO Auto-generated method stub
-        return null;
+        return this.parent;
     }
 
     /* (non-Javadoc)
@@ -301,9 +306,19 @@ public class MemoryFeatureIndex implements FeatureIndex {
     /* (non-Javadoc)
      * @see org.geotools.data.FeatureSource#getFeatures(org.opengis.filter.Filter)
      */
-    public FeatureCollection getFeatures(Filter arg0) throws IOException {
-        // TODO Auto-generated method stub
-        return null;
+    public FeatureCollection getFeatures(Filter f) throws IOException {
+        FeatureCollection fc = new DefaultFeatureCollection(null, type);
+        boolean refine = (f instanceof BBOXImpl);
+
+        for (Iterator i = getCandidates(f).iterator(); i.hasNext();) {
+            Feature next = (Feature) i.next();
+
+            if (refine || f.evaluate(next)) {
+                fc.add(next);
+            }
+        }
+
+        return fc;
     }
 
     /* (non-Javadoc)
@@ -319,5 +334,16 @@ public class MemoryFeatureIndex implements FeatureIndex {
      */
     public void removeFeatureListener(FeatureListener arg0) {
         // TODO Auto-generated method stub
+    }
+
+    private Query adapt(Query q) {
+        if (q.getTypeName() == null) {
+            DefaultQuery r = new DefaultQuery(q);
+            r.setTypeName(this.type.getTypeName());
+
+            return r;
+        } else {
+            return q;
+        }
     }
 }

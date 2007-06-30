@@ -13,11 +13,12 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.caching;
+package org.geotools.caching.impl;
 
 import java.io.IOException;
 import com.vividsolutions.jts.geom.Envelope;
 import org.opengis.filter.Filter;
+import org.geotools.caching.FeatureIndex;
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;

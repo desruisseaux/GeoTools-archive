@@ -13,10 +13,11 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.caching;
+package org.geotools.caching.impl;
 
 import java.util.Collection;
 import java.util.HashMap;
+import org.geotools.caching.InternalStore;
 import org.geotools.feature.Feature;
 
 

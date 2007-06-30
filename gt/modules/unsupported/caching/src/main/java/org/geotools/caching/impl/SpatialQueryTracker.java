@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.caching;
+package org.geotools.caching.impl;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -27,6 +27,7 @@ import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
+import org.geotools.caching.QueryTracker;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.Query;
 import org.geotools.filter.FilterFactoryImpl;
@@ -95,15 +96,19 @@ public class SpatialQueryTracker implements QueryTracker {
         }
     }
 
+    public Query match(Query q) {
+        return new DefaultQuery(q.getTypeName(), match(q.getFilter()));
+    }
+
     /* (non-Javadoc)
      * @see org.geotools.caching.QueryTracker#match(org.geotools.data.Query)
      */
-    public Query match(Query q) {
-        if (!accepts(q)) {
-            return q;
+    public Filter match(Filter f) {
+        if (!accepts(f)) {
+            return f;
         }
 
-        BBOXImpl bb = (BBOXImpl) q.getFilter();
+        BBOXImpl bb = (BBOXImpl) f;
 
         try {
             Envelope env = new Envelope(bb.getMinX(), bb.getMaxX(), bb.getMinY(), bb.getMaxY());
@@ -114,7 +119,7 @@ public class SpatialQueryTracker implements QueryTracker {
 
             // seems we know nothing about the requested area ... we have to process the whole query.
             if (results.size() == 0) {
-                return q;
+                return f;
             }
 
             // at least part of the requeted area falls within the "known world"
@@ -126,7 +131,7 @@ public class SpatialQueryTracker implements QueryTracker {
                 // searchArea within the "known world".
                 // We actually don't need any other data.
                 if (rect.contains(searchArea)) {
-                    return new DefaultQuery(q.getTypeName(), Filter.EXCLUDE);
+                    return Filter.EXCLUDE;
                 }
 
                 // remove known area from search area ...
@@ -139,7 +144,7 @@ public class SpatialQueryTracker implements QueryTracker {
             Filter newbb = filterFactory.bbox(bb.getPropertyName(), se.getMinX(), se.getMinY(),
                     se.getMaxX(), se.getMaxY(), bb.getSRS());
 
-            return new DefaultQuery(q.getTypeName(), newbb);
+            return newbb;
         } catch (TreeException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -148,15 +153,19 @@ public class SpatialQueryTracker implements QueryTracker {
             e.printStackTrace();
         }
 
-        return q;
+        return f;
+    }
+
+    public void register(Query q) {
+        register(q.getFilter());
     }
 
     /* (non-Javadoc)
      * @see org.geotools.caching.QueryTracker#register(org.geotools.data.Query)
      */
-    public void register(Query q) {
-        if (accepts(q)) {
-            BBOXImpl bb = (BBOXImpl) q.getFilter();
+    public void register(Filter f) {
+        if (accepts(f)) {
+            BBOXImpl bb = (BBOXImpl) f;
 
             try {
                 Envelope env = new Envelope(bb.getMinX(), bb.getMaxX(), bb.getMinY(), bb.getMaxY());
@@ -175,12 +184,16 @@ public class SpatialQueryTracker implements QueryTracker {
         }
     }
 
+    public void unregister(Query q) {
+        unregister(q.getFilter());
+    }
+
     /* (non-Javadoc)
      * @see org.geotools.caching.QueryTracker#unregister(org.geotools.data.Query)
      */
-    public void unregister(Query q) {
-        if (accepts(q)) {
-            BBOXImpl bb = (BBOXImpl) q.getFilter();
+    public void unregister(Filter f) {
+        if (accepts(f)) {
+            BBOXImpl bb = (BBOXImpl) f;
             Envelope env = new Envelope(bb.getMinX(), bb.getMaxX(), bb.getMinY(), bb.getMaxY());
 
             try {
@@ -206,8 +219,8 @@ public class SpatialQueryTracker implements QueryTracker {
      * @param q
      * @return
      */
-    private boolean accepts(Query q) {
-        if (q.getFilter() instanceof BBOXImpl) {
+    private boolean accepts(Filter f) {
+        if (f instanceof BBOXImpl) {
             return true;
         } else {
             return false;

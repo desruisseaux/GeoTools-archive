@@ -15,10 +15,12 @@
  */
 package org.geotools.caching;
 
+import java.io.IOException;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.SchemaException;
 
 
 /** Provides an indexed store where to keep features
@@ -59,12 +61,13 @@ public interface FeatureIndex extends FeatureSource {
     /* (non-Javadoc)
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.data.Query)
      */
-    public abstract FeatureCollection getFeatures(Query q);
+    public abstract FeatureCollection getFeatures(Query q)
+        throws IOException;
 
     /** Return a FeatureSource from where to get the features yielded by query q.
      *
      * @param q the query defining the view, ie a selection of the features in the index.
      * @return
      */
-    public abstract FeatureSource getView(Query q);
+    public abstract FeatureSource getView(Query q) throws SchemaException;
 }

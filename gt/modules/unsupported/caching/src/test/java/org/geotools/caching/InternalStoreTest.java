@@ -22,9 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import org.geotools.caching.Generator;
-import org.geotools.caching.HashMapInternalStore;
 import org.geotools.caching.InternalStore;
-import org.geotools.caching.SimpleHashMapInternalStore;
+import org.geotools.caching.impl.HashMapInternalStore;
+import org.geotools.caching.impl.SimpleHashMapInternalStore;
 import org.geotools.feature.Feature;
 
 

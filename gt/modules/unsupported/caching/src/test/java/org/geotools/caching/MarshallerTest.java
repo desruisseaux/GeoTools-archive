@@ -25,6 +25,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import org.geotools.caching.util.FeatureMarshaller;
 import org.geotools.feature.DefaultFeature;
 import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;

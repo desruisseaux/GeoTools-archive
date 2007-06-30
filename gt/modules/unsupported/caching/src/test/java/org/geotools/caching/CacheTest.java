@@ -31,8 +31,8 @@ import java.util.TreeSet;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.caching.Generator;
-import org.geotools.caching.InMemoryDataCache;
-import org.geotools.caching.SpatialQueryTracker;
+import org.geotools.caching.impl.InMemoryDataCache;
+import org.geotools.caching.impl.SpatialQueryTracker;
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureLocking;
 import org.geotools.data.Query;
@@ -408,47 +408,5 @@ public class CacheTest extends TestCase {
         }
 
         return false;
-    }
-}
-
-
-/**
- * @author crousson
- *
- */
-class QueryStatistics {
-    private int numberOfFeatures;
-    private long executionTime;
-
-    /**
-     * @return  the executionTime
-     * @uml.property  name="executionTime"
-     */
-    public long getExecutionTime() {
-        return executionTime;
-    }
-
-    /**
-     * @param executionTime  the executionTime to set
-     * @uml.property  name="executionTime"
-     */
-    public void setExecutionTime(long executionTime) {
-        this.executionTime = executionTime;
-    }
-
-    /**
-     * @return  the numberOfFeatures
-     * @uml.property  name="numberOfFeatures"
-     */
-    public int getNumberOfFeatures() {
-        return numberOfFeatures;
-    }
-
-    /**
-     * @param numberOfFeatures  the numberOfFeatures to set
-     * @uml.property  name="numberOfFeatures"
-     */
-    public void setNumberOfFeatures(int numberOfFeatures) {
-        this.numberOfFeatures = numberOfFeatures;
     }
 }

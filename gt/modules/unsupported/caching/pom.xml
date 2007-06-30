@@ -77,12 +77,32 @@
       <artifactId>gt2-hsql</artifactId>
       <version>2.4-SNAPSHOT</version>
     </dependency> -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-shapefile-renderer</artifactId>
+      <version>2.4-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-mappane</artifactId>
+      <version>2.4-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 
   <!-- =========================================================== -->
   <!--     Build Configuration                                     -->
   <!-- =========================================================== -->
   <build>
+    <resources>
+      <resource>
+        <targetPath>META-INF/lib</targetPath>
+        <filtering>false</filtering>
+        <directory>${basedir}/lib</directory>
+        <includes>
+          <include>spatialindex.jar</include>
+        </includes>
+      </resource>
+    </resources>
     <plugins>
       <!-- ====    Code Formatting  ============================== -->
       <plugin>

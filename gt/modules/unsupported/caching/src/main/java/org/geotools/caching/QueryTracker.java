@@ -15,6 +15,7 @@
  */
 package org.geotools.caching;
 
+import org.opengis.filter.Filter;
 import org.geotools.data.Query;
 
 
@@ -35,6 +36,23 @@ public interface QueryTracker {
      */
     public abstract void register(Query q);
 
+    /** Take notice that the data for the Filter f have been retrieved once.
+     * So they should be in the cache.
+     *
+     * @param f the Filter to register
+     */
+    public abstract void register(Filter f);
+
+    /** Restrict the Filter f to a new filter
+     * that will yield only the complementary set of data the cache doesn't hold.
+     * If all data are known, implementation should return
+     * Filter.EXCLUDE which is a filter that yields nothing.
+     *
+     * @param f the filter to restrict
+     * @return a restricted filter, or otherwise the input filter
+     */
+    public abstract Filter match(Filter f);
+
     /** Restrict the Query q to a new query
      * that will yield only the complementary set of data the cache doesn't hold.
      * If all data are known, implementation should return
@@ -54,6 +72,16 @@ public interface QueryTracker {
      * @param q the query to forget about.
      */
     public abstract void unregister(Query q);
+
+    /** Forget about the filter f.
+     * When this filter will be used again, or a related query, the cache will have to get data from the source DataStore.
+     * This is used when the cache has reached its maximum capacity,
+     * and needs to make room for new features.
+     * For example, the input filter can be the extent (bbox) of the deleted feature in the cache.
+     *
+     * @param q the query to forget about.
+     */
+    public abstract void unregister(Filter f);
 
     /** Forget every query ever registered.
      * Blank mind for new days !
