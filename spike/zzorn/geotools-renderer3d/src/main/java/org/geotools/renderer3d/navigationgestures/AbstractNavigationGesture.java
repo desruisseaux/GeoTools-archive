@@ -1,9 +1,10 @@
-package org.geotools.renderer3d.impl;
+package org.geotools.renderer3d.navigationgestures;
 
 import com.jme.renderer.Camera;
 
 import javax.swing.event.MouseInputAdapter;
 import java.awt.event.MouseWheelEvent;
+
 
 /**
  * Contains common functionality for navigationGestureListeners.
@@ -18,7 +19,7 @@ public abstract class AbstractNavigationGesture
     //======================================================================
     // Private Fields
 
-    private CanvasRenderer myCanvasRenderer = null;
+    private CameraAccessor myCameraAccessor = null;
 
     //======================================================================
     // Public Methods
@@ -34,9 +35,9 @@ public abstract class AbstractNavigationGesture
     //----------------------------------------------------------------------
     // NavigationGesture Implementation
 
-    public void setCanvasRenderer( final CanvasRenderer canvasRenderer )
+    public final void setCameraAccessor( final CameraAccessor cameraAccessor )
     {
-        myCanvasRenderer = canvasRenderer;
+        myCameraAccessor = cameraAccessor;
     }
 
     //======================================================================
@@ -47,9 +48,9 @@ public abstract class AbstractNavigationGesture
      */
     protected Camera getCamera()
     {
-        if ( myCanvasRenderer != null )
+        if ( myCameraAccessor != null )
         {
-            return myCanvasRenderer.getCamera();
+            return myCameraAccessor.getCamera();
         }
         else
         {

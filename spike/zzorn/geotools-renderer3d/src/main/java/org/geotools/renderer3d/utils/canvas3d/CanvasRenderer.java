@@ -1,4 +1,4 @@
-package org.geotools.renderer3d.impl;
+package org.geotools.renderer3d.utils.canvas3d;
 
 import com.jme.renderer.Camera;
 import com.jme.renderer.Renderer;
@@ -12,18 +12,21 @@ import java.awt.event.ComponentEvent;
 
 /**
  * A renderer that renders a 3D object in a 3D Canvas.
+ * <p/>
+ * REFACTOR: Change to an inner class of Canvas3D?
  *
  * @author Hans Häggström
  */
-public final class CanvasRenderer
+final class CanvasRenderer
         extends SimpleCanvasImpl
 {
 
     //======================================================================
     // Private Fields
 
-    private final Spatial myCanvasRootNode;
     private final Canvas myCanvas;
+
+    private Spatial myCanvasRootNode;
 
     private long startTime = 0;
     private long fps = 0;
@@ -46,7 +49,8 @@ public final class CanvasRenderer
      *
      * @param width          initial size of the canvas.  Should be larger than 0.
      * @param height         initial size of the canvas.  Should be larger than 0.
-     * @param canvasRootNode the 3D object to render.  Should not be null.
+     * @param canvasRootNode the 3D object to render.
+     *                       May be null, in which case nothing is rendered (black area)
      * @param canvas         the canvas we are rendering to.  Needed for listening to resize events.
      */
     public CanvasRenderer( final int width,
@@ -58,7 +62,6 @@ public final class CanvasRenderer
 
         ParameterChecker.checkPositiveNonZeroInteger( width, "width" );
         ParameterChecker.checkPositiveNonZeroInteger( height, "height" );
-        ParameterChecker.checkNotNull( canvasRootNode, "canvasRootNode" );
         ParameterChecker.checkNotNull( canvas, "canvas" );
 
         myCanvasRootNode = canvasRootNode;
@@ -80,13 +83,37 @@ public final class CanvasRenderer
     //----------------------------------------------------------------------
     // Other Public Methods
 
-    @Override
-    public void simpleSetup()
+    /**
+     * @param canvasRootNode the spatial to render with this CanvasRenderer.
+     *                       May be null, in which case nothing is rendered (black area)
+     */
+    public void setCanvasRootNode( final Spatial canvasRootNode )
     {
-        rootNode.attachChild( myCanvasRootNode );
+        if ( rootNode != null && myCanvasRootNode != null )
+        {
+            rootNode.detachChild( myCanvasRootNode );
+        }
+
+        myCanvasRootNode = canvasRootNode;
+
+        if ( rootNode != null && myCanvasRootNode != null )
+        {
+            rootNode.attachChild( myCanvasRootNode );
+        }
     }
 
 
+    @Override
+    public void simpleSetup()
+    {
+        if ( myCanvasRootNode != null )
+        {
+            rootNode.attachChild( myCanvasRootNode );
+        }
+    }
+
+
+    @Override
     public void simpleUpdate()
     {
         // Frames per second counter

@@ -2,7 +2,7 @@ package org.geotools.renderer3d;
 
 import com.jme.scene.Spatial;
 import org.geotools.map.MapContext;
-import org.geotools.renderer3d.impl.NavigationGesture;
+import org.geotools.renderer3d.navigationgestures.NavigationGesture;
 
 import java.awt.Component;
 

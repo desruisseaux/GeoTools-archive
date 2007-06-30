@@ -1,4 +1,5 @@
-package org.geotools.renderer3d.impl;
+package org.geotools.renderer3d.navigationgestures;
+
 
 import javax.swing.event.MouseInputListener;
 import java.awt.event.MouseWheelListener;
@@ -12,8 +13,7 @@ public interface NavigationGesture
         extends MouseInputListener, MouseWheelListener
 {
     /**
-     * @param canvasRenderer the 3D renderer used.
-     *                       Can be asked for the camera that the navigation gesture listener should modify when gestures happen.
+     * @param cameraAccessor Can be asked for the camera that the navigation gesture listener should modify when gestures happen.
      */
-    void setCanvasRenderer( CanvasRenderer canvasRenderer );
+    void setCameraAccessor( CameraAccessor cameraAccessor );
 }
