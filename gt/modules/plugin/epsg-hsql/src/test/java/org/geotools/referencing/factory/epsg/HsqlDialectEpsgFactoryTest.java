@@ -2,6 +2,7 @@ package org.geotools.referencing.factory.epsg;
 
 import java.sql.Connection;
 
+import org.geotools.factory.Hints;
 import org.hsqldb.jdbc.jdbcDataSource;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import javax.sql.DataSource;
@@ -14,7 +15,8 @@ public class HsqlDialectEpsgFactoryTest extends TestCase {
 		super.setUp();
 		DataSource datasource = HsqlEpsgDatabase.createDataSource();
 		Connection connection = datasource.getConnection();
-		factory = new HsqlDialectEpsgFactory( null, connection );
+		Hints hints = new Hints( Hints.BUFFER_POLICY, "none" );		
+		factory = new HsqlDialectEpsgFactory( hints, connection );
 	}
 	
 	public void testCreation() throws Exception {
@@ -25,4 +27,6 @@ public class HsqlDialectEpsgFactoryTest extends TestCase {
 		assertEquals( "4326 equals EPSG:4326", code4326, epsg4326);
 		assertSame( "4326 == EPSG:4326", code4326, epsg4326);		
 	}
+	
+	
 }
