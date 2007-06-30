@@ -1,4 +1,4 @@
-package org.geotools.renderer3d.impl;
+package org.geotools.renderer3d.terrainblock;
 
 import org.geotools.renderer3d.utils.quadtree.NodeDataFactory;
 import org.geotools.renderer3d.utils.quadtree.QuadTreeNode;

@@ -1,10 +1,11 @@
-package org.geotools.renderer3d.impl;
+package org.geotools.renderer3d;
 
 import com.jme.scene.Node;
 import com.jme.scene.Spatial;
 import org.geotools.map.MapContext;
-import org.geotools.renderer3d.Renderer3D;
 import org.geotools.renderer3d.navigationgestures.NavigationGesture;
+import org.geotools.renderer3d.terrainblock.TerrainBlock;
+import org.geotools.renderer3d.terrainblock.TerrainBlockFactory;
 import org.geotools.renderer3d.utils.canvas3d.Canvas3D;
 import org.geotools.renderer3d.utils.quadtree.QuadTree;
 import org.geotools.renderer3d.utils.quadtree.QuadTreeImpl;

@@ -1,4 +1,4 @@
-package org.geotools.renderer3d.impl;
+package org.geotools.renderer3d.terrainblock;
 
 import com.jme.math.Vector3f;
 import com.jme.scene.Spatial;

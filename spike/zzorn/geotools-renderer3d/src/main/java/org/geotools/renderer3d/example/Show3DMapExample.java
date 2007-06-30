@@ -4,7 +4,7 @@ import org.geotools.gui.swing.JMapPane;
 import org.geotools.map.MapContext;
 import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.renderer3d.Renderer3D;
-import org.geotools.renderer3d.impl.Renderer3DImpl;
+import org.geotools.renderer3d.Renderer3DImpl;
 
 import javax.swing.*;
 import java.awt.BorderLayout;
