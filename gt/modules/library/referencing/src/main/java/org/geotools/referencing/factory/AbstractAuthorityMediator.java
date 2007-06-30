@@ -99,7 +99,7 @@ import org.opengis.util.InternationalString;
  * @author Jody Garnett (Refractions Research)
  * @author Cory Horner (Refractions Research)
  */
-public abstract class AbstractCachedAuthorityMediator extends
+public abstract class AbstractAuthorityMediator extends
         ReferencingFactory implements AuthorityFactory, CRSAuthorityFactory,
         CSAuthorityFactory, DatumAuthorityFactory,
         CoordinateOperationAuthorityFactory, BufferedFactory {
@@ -117,6 +117,12 @@ public abstract class AbstractCachedAuthorityMediator extends
     private ObjectPool pool;
     
     /**
+     * Configuration object for the object pool. The constructor reads its hints
+     * and sets the pool configuration in this object;
+     */
+    Config poolConfig = new Config();
+    
+    /**
      * A container of the "real factories" actually used to construct objects.
      */
     protected final ReferencingFactoryContainer factories;
@@ -127,7 +133,7 @@ public abstract class AbstractCachedAuthorityMediator extends
      * @param factory
      *            The factory to cache. Can not be {@code null}.
      */
-    protected AbstractCachedAuthorityMediator(int priority) {
+    protected AbstractAuthorityMediator(int priority) {
         this(priority, ObjectCaches.create("weak", 50),
                 ReferencingFactoryContainer.instance(null));
     }
@@ -138,9 +144,11 @@ public abstract class AbstractCachedAuthorityMediator extends
      * @param factory
      *            The factory to cache. Can not be {@code null}.
      */
-    protected AbstractCachedAuthorityMediator(int priority, Hints hints) {
+    protected AbstractAuthorityMediator(int priority, Hints hints) {
         this(priority, ObjectCaches.create(hints), ReferencingFactoryContainer
                 .instance(hints));
+        //TODO: add hints to improve pool configuration
+        //poolConfig
     }
 
     /**
@@ -157,7 +165,7 @@ public abstract class AbstractCachedAuthorityMediator extends
      * @param maxStrongReferences
      *            The maximum number of objects to keep by strong reference.
      */
-    protected AbstractCachedAuthorityMediator(int priority, ObjectCache cache,
+    protected AbstractAuthorityMediator(int priority, ObjectCache cache,
             ReferencingFactoryContainer container) {
         super(priority);
         this.factories = container;
@@ -168,7 +176,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         if (pool == null) {
             //create pool
             PoolableObjectFactory objectFactory = new AuthorityPoolableObjectFactory();
-            Config poolConfig = getPoolConfig();
             ObjectPoolFactory poolFactory = new GenericObjectPoolFactory(objectFactory, poolConfig);
             this.setPool(poolFactory.createPool());
         }
@@ -178,12 +185,6 @@ public abstract class AbstractCachedAuthorityMediator extends
     void setPool(ObjectPool pool) {
         this.pool = pool;
     }
-
-    /**
-     * 
-     * @return org.apache.commons.pool.impl.GenericObjectPool.Config
-     */
-    protected abstract Config getPoolConfig();
 
     //
     // Utility Methods and Cache Care and Feeding
@@ -231,7 +232,25 @@ public abstract class AbstractCachedAuthorityMediator extends
     //    
     public abstract Citation getAuthority();
 
-    public abstract Set getAuthorityCodes(Class type) throws FactoryException;
+    public Set getAuthorityCodes(Class type) throws FactoryException {
+        Set codes = (Set) cache.get(type);
+        if (codes == null) {
+            try {
+                AbstractCachedAuthorityFactory worker = null;
+                try {
+                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
+                    codes = worker.getAuthorityCodes(type);
+                } finally {
+                    getPool().returnObject(worker);
+                }
+            } catch (FactoryException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new FactoryException(e);
+            }
+        }
+        return codes;
+    }
 
     public abstract InternationalString getDescriptionText(String code)
             throws FactoryException;
@@ -256,9 +275,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         }
         return obj;
     }
-
-    protected abstract IdentifiedObject generateObject(String code)
-            throws FactoryException;
 
     //
     // CRSAuthority
@@ -285,8 +301,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         return crs;
     }
 
-    protected abstract CompoundCRS generateCompoundCRS(String code);
-
     public CoordinateReferenceSystem createCoordinateReferenceSystem(String code)
             throws FactoryException {
         final String key = toKey(code);
@@ -310,9 +324,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         return crs;
     }
 
-    protected abstract CoordinateReferenceSystem generateCoordinateReferenceSystem(
-            String code) throws FactoryException;
-
     public DerivedCRS createDerivedCRS(String code) throws FactoryException {
         final String key = toKey(code);
         DerivedCRS crs = (DerivedCRS) cache.get(key);
@@ -333,8 +344,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         }
         return crs;
     }
-
-    protected abstract DerivedCRS generateDerivedCRS(String code);
 
     public EngineeringCRS createEngineeringCRS(String code)
             throws FactoryException {
@@ -358,8 +367,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         return crs;
     }
 
-    protected abstract EngineeringCRS generateEngineeringCRS(String code);
-
     public GeocentricCRS createGeocentricCRS(String code)
             throws FactoryException {
         final String key = toKey(code);
@@ -381,8 +388,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         }
         return crs;
     }
-
-    protected abstract GeocentricCRS generateGeocentricCRS(String code);
 
     public GeographicCRS createGeographicCRS(String code)
             throws FactoryException {
@@ -406,8 +411,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         return crs;
     }
 
-    protected abstract GeographicCRS generateGeographicCRS(String code);
-
     public ImageCRS createImageCRS(String code) throws FactoryException {
         final String key = toKey(code);
         ImageCRS crs = (ImageCRS) cache.get(key);
@@ -428,8 +431,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         }
         return crs;
     }
-
-    protected abstract ImageCRS generateImageCRS(String code);
 
     public ProjectedCRS createProjectedCRS(String code) throws FactoryException {
         final String key = toKey(code);
@@ -452,8 +453,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         return crs;
     }
 
-    protected abstract ProjectedCRS generateProjectedCRS(String code);
-
     public TemporalCRS createTemporalCRS(String code) throws FactoryException {
         final String key = toKey(code);
         TemporalCRS crs = (TemporalCRS) cache.get(key);
@@ -475,8 +474,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         return crs;
     }
 
-    protected abstract TemporalCRS generateTemporalCRS(String code);
-
     public VerticalCRS createVerticalCRS(String code) throws FactoryException {
         final String key = toKey(code);
         VerticalCRS crs = (VerticalCRS) cache.get(key);
@@ -497,8 +494,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         }
         return crs;
     }
-
-    protected abstract VerticalCRS generateVerticalCRS(String code);
 
     //
     // CSAuthority
@@ -524,8 +519,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         return cs;
     }
 
-    protected abstract CartesianCS generateCartesianCS(String code);
-
     public CoordinateSystem createCoordinateSystem(String code)
             throws FactoryException {
         final String key = toKey(code);
@@ -547,9 +540,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         }
         return cs;
     }
-
-    protected abstract CoordinateSystem generateCoordinateSystem(String code)
-            throws FactoryException;
 
     // sample implemenation with get/test
     public CoordinateSystemAxis createCoordinateSystemAxis(String code)
@@ -574,9 +564,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         return axis;
     }
 
-    protected abstract CoordinateSystemAxis generateCoordinateSystemAxis(
-            String code) throws FactoryException;
-
     public CylindricalCS createCylindricalCS(String code)
             throws FactoryException {
         final String key = toKey(code);
@@ -598,9 +585,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         }
         return cs;
     }
-
-    protected abstract CylindricalCS generateCylindricalCS(String code)
-            throws FactoryException;
 
     public EllipsoidalCS createEllipsoidalCS(String code)
             throws FactoryException {
@@ -624,9 +608,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         return cs;
     }
 
-    protected abstract EllipsoidalCS generateEllipsoidalCS(String code)
-            throws FactoryException;
-
     public PolarCS createPolarCS(String code) throws FactoryException {
         final String key = toKey(code);
         PolarCS cs = (PolarCS) cache.get(key);
@@ -647,9 +628,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         }
         return cs;
     }
-
-    protected abstract PolarCS generatePolarCS(String code)
-            throws FactoryException;
 
     public SphericalCS createSphericalCS(String code) throws FactoryException {
         final String key = toKey(code);
@@ -672,9 +650,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         return cs;
     }
 
-    protected abstract SphericalCS generateSphericalCS(String code)
-            throws FactoryException;
-
     public TimeCS createTimeCS(String code) throws FactoryException {
         final String key = toKey(code);
         TimeCS cs = (TimeCS) cache.get(key);
@@ -695,9 +670,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         }
         return cs;
     }
-
-    protected abstract TimeCS generateTimeCS(String code)
-            throws FactoryException;
 
     public Unit createUnit(String code) throws FactoryException {
         final String key = toKey(code);
@@ -720,8 +692,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         return unit;
     }
 
-    protected abstract Unit generateUnit(String code) throws FactoryException;
-
     public VerticalCS createVerticalCS(String code) throws FactoryException {
         final String key = toKey(code);
         VerticalCS cs = (VerticalCS) cache.get(key);
@@ -742,9 +712,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         }
         return cs;
     }
-
-    protected abstract VerticalCS generateVerticalCS(String code)
-            throws FactoryException;
 
     //
     // DatumAuthorityFactory
@@ -770,8 +737,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         return datum;
     }
 
-    protected abstract Datum generateDatum(String code) throws FactoryException;
-
     public Ellipsoid createEllipsoid(String code) throws FactoryException {
         final String key = toKey(code);
         Ellipsoid ellipsoid = (Ellipsoid) cache.get(key);
@@ -792,9 +757,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         }
         return ellipsoid;
     }
-
-    protected abstract Ellipsoid generateEllipsoid(String code)
-            throws FactoryException;
 
     public EngineeringDatum createEngineeringDatum(String code)
             throws FactoryException {
@@ -818,9 +780,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         return datum;
     }
 
-    protected abstract EngineeringDatum generateEngineeringDatum(String code)
-            throws FactoryException;
-
     public GeodeticDatum createGeodeticDatum(String code)
             throws FactoryException {
         final String key = toKey(code);
@@ -843,9 +802,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         return datum;
     }
 
-    protected abstract GeodeticDatum generateGeodeticDatum(String code)
-            throws FactoryException;
-
     public ImageDatum createImageDatum(String code) throws FactoryException {
         final String key = toKey(code);
         ImageDatum datum = (ImageDatum) cache.get(key);
@@ -866,9 +822,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         }
         return datum;
     }
-
-    protected abstract ImageDatum generateImageDatum(String code)
-            throws FactoryException;
 
     public PrimeMeridian createPrimeMeridian(String code)
             throws FactoryException {
@@ -892,9 +845,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         return datum;
     }
 
-    protected abstract PrimeMeridian generatePrimeMeridian(String code)
-            throws FactoryException;
-
     public TemporalDatum createTemporalDatum(String code)
             throws FactoryException {
         final String key = toKey(code);
@@ -916,9 +866,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         }
         return datum;
     }
-
-    protected abstract TemporalDatum generateTemporalDatum(String code)
-            throws FactoryException;
 
     public VerticalDatum createVerticalDatum(String code)
             throws FactoryException {
@@ -942,9 +889,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         return datum;
     }
 
-    protected abstract VerticalDatum generateVerticalDatum(String code)
-            throws FactoryException;
-
     public CoordinateOperation createCoordinateOperation(String code)
             throws FactoryException {
         final String key = toKey(code);
@@ -966,9 +910,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         }
         return operation;
     }
-
-    protected abstract CoordinateOperation generateCoordinateOperation(
-            String code) throws FactoryException;
 
     public synchronized Set/* <CoordinateOperation> */createFromCoordinateReferenceSystemCodes(
             final String sourceCode, final String targetCode)
@@ -995,9 +936,6 @@ public abstract class AbstractCachedAuthorityMediator extends
         return operations;
     }
 
-    protected abstract Set generateFromCoordinateReferenceSystemCodes(
-            String sourceCode, String targetCode) throws FactoryException;
-        
     /**
      * Creates the objects, subclasses of AbstractCachedAuthorityFactory, which
      * are held by the ObjectPool.  This implementation simply delegates each
