@@ -1,27 +1,25 @@
 package org.geotools.renderer3d.impl;
 
-import com.jme.input.InputSystem;
-import com.jme.input.KeyInput;
 import com.jme.scene.Node;
 import com.jme.scene.Spatial;
 import com.jme.system.DisplaySystem;
 import com.jmex.awt.JMECanvas;
-import com.jmex.awt.input.AWTMouseInput;
 import org.geotools.map.MapContext;
 import org.geotools.renderer3d.Renderer3D;
+import org.geotools.renderer3d.utils.ParameterChecker;
 import org.geotools.renderer3d.utils.quadtree.QuadTree;
 import org.geotools.renderer3d.utils.quadtree.QuadTreeImpl;
 
 import java.awt.Canvas;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Hans Häggström
  */
-public class Renderer3DImpl
+public final class Renderer3DImpl
         implements Renderer3D
 {
 
@@ -31,13 +29,18 @@ public class Renderer3DImpl
     private MapContext myMapContext = null;
     private QuadTree myQuadTree;
     private Component myView3D = null;
-    private Node myTerrainNode;
+    private Node myTerrainNode = null;
+    private Set<NavigationGesture> myNavigationGestures = new HashSet<NavigationGesture>();
+    private Canvas myCanvas = null;
+    private CanvasRenderer myCanvasRenderer = null;
 
     //======================================================================
     // Private Constants
 
-    private static final int DEFAULT_START_RADIUS_M = 1000;
+    private static final int DEFAULT_START_RADIUS_M = 10;
     private static final TerrainBlockFactory TERRAIN_BLOCK_FACTORY = new TerrainBlockFactory();
+    private static final int DEFAULT_WIDTH = 800;
+    private static final int DEFAULT_HEIGHT = 600;
 
     //======================================================================
     // Public Methods
@@ -87,6 +90,9 @@ public class Renderer3DImpl
     {
         myQuadTree = new QuadTreeImpl( startRadius_m, TERRAIN_BLOCK_FACTORY );
         myMapContext = mapContextToRender;
+
+        // Add default navigation gestures
+        addNavigationGesture( new PanGesture() );
     }
 
     //----------------------------------------------------------------------
@@ -131,27 +137,45 @@ public class Renderer3DImpl
         return myTerrainNode;
     }
 
-    //======================================================================
-    // Private Methods
 
-    /**
-     * Set up a canvas to fire mouse events via the input system.
-     *
-     * @param glCanvas canvas that should be listened to
-     * @param dragOnly true to enable mouse input to jME only when the mouse is dragged
-     */
-    private static void setupMouse( Canvas glCanvas, boolean dragOnly )
+    public void addNavigationGesture( NavigationGesture addedNavigationGesture )
     {
-        AWTMouseInput.setProvider( InputSystem.INPUT_SYSTEM_AWT );
-        AWTMouseInput awtMouseInput = ( (AWTMouseInput) AWTMouseInput.get() );
-        awtMouseInput.setEnabled( !dragOnly );
-        awtMouseInput.setDragOnly( dragOnly );
-        awtMouseInput.setRelativeDelta( glCanvas );
-        glCanvas.addMouseListener( awtMouseInput );
-        glCanvas.addMouseWheelListener( awtMouseInput );
-        glCanvas.addMouseMotionListener( awtMouseInput );
+        ParameterChecker.checkNotNull( addedNavigationGesture, "addedNavigationGesture" );
+        ParameterChecker.checkNotAlreadyContained( addedNavigationGesture,
+                                                   myNavigationGestures,
+                                                   "myNavigationGestures" );
+
+        myNavigationGestures.add( addedNavigationGesture );
+
+        registerNavigationGestureListener( addedNavigationGesture );
     }
 
+
+    public void removeNavigationGesture( NavigationGesture removedNavigationGesture )
+    {
+        ParameterChecker.checkNotNull( removedNavigationGesture, "removedNavigationGesture" );
+        ParameterChecker.checkContained( removedNavigationGesture,
+                                         myNavigationGestures,
+                                         "myNavigationGestures" );
+
+        myNavigationGestures.remove( removedNavigationGesture );
+
+        unRegisterNavigationGestureListener( removedNavigationGesture );
+    }
+
+
+    public void removeAllNavigationGestures()
+    {
+        myNavigationGestures.clear();
+
+        for ( NavigationGesture navigationGesture : myNavigationGestures )
+        {
+            unRegisterNavigationGestureListener( navigationGesture );
+        }
+    }
+
+    //======================================================================
+    // Private Methods
 
     private Node createTerrainNode()
     {
@@ -166,59 +190,102 @@ public class Renderer3DImpl
 
     private Component createView3D()
     {
-        final int width = 800;
-        final int height = 600;
+        final int width = DEFAULT_WIDTH;
+        final int height = DEFAULT_HEIGHT;
 
-        // make the canvas:
-        final Canvas canvas = DisplaySystem.getDisplaySystem( "lwjgl" ).createCanvas( width, height );
-        canvas.setMinimumSize( new Dimension( 0, 0 ) );
+        // REFACTOR: Package the whole 3D canvas into one class, with a awt canvas as output,
+        //           and a Spatial node and gesture listeners as input.  Then this class can concentrate on the map integration.
 
-        // add a listener... if window is resized, we can do something about it.
-        canvas.addComponentListener( new ComponentAdapter()
+        // Create the 3D canvas
+        myCanvas = DisplaySystem.getDisplaySystem( "lwjgl" ).createCanvas( width, height );
+        myCanvas.setMinimumSize( new Dimension( 0, 0 ) ); // Make sure it is shrinkable
+        final JMECanvas jmeCanvas = ( (JMECanvas) myCanvas );
+
+        // Set the renderer that renders the canvas contents
+        myCanvasRenderer = new CanvasRenderer( width, height, get3DNode(), myCanvas );
+        jmeCanvas.setImplementor( myCanvasRenderer );
+
+        // Add navigation gesture listeners to the created 3D canvas
+        for ( NavigationGesture navigationGesture : myNavigationGestures )
         {
+            registerNavigationGestureListener( navigationGesture );
+        }
 
-            public void componentResized( ComponentEvent ce )
-            {
-                //doResize();
-            }
+        // We need to repaint the component to see the updates, so we create a repaint calling thread
+        final Thread repaintThread = new Thread( new Repainter( myCanvas ) );
+        repaintThread.setDaemon( true ); // Do not keep the JVM alive if only the repaint thread is left running
+        repaintThread.start();
 
-        } );
+        return myCanvas;
+    }
 
-        KeyInput.setProvider( KeyInput.INPUT_AWT );
 
-        setupMouse( canvas, false );
-
-        // Important!  Here is where we add the guts to the panel:
-        final JMECanvas jmeCanvas = ( (JMECanvas) canvas );
-        jmeCanvas.setImplementor( new CanvasRenderer( width, height, get3DNode() ) );
-        //jmeCanvas.setBackground( Color.GRAY );
-        jmeCanvas.setUpdateInput( true );
-
-        // We need to repaint the component to see the updates.
-        new Thread()
+    private void registerNavigationGestureListener( final NavigationGesture navigationGesture )
+    {
+        if ( myCanvas != null )
         {
-            {
-                setDaemon( true );
-            }
+            myCanvas.addMouseMotionListener( navigationGesture );
+            myCanvas.addMouseListener( navigationGesture );
+            myCanvas.addMouseWheelListener( navigationGesture );
+            navigationGesture.setCanvasRenderer( myCanvasRenderer );
+        }
+    }
 
-            public void run()
+
+    private void unRegisterNavigationGestureListener( final NavigationGesture navigationGesture )
+    {
+        if ( myCanvas != null )
+        {
+            myCanvas.removeMouseMotionListener( navigationGesture );
+            myCanvas.removeMouseListener( navigationGesture );
+            myCanvas.removeMouseWheelListener( navigationGesture );
+            navigationGesture.setCanvasRenderer( null );
+        }
+    }
+
+    //======================================================================
+    // Inner Classes
+
+    private static final class Repainter
+            implements Runnable
+    {
+
+        //======================================================================
+        // Private Fields
+
+        private final Canvas myCanvas;
+
+        //======================================================================
+        // Public Methods
+
+        //----------------------------------------------------------------------
+        // Constructors
+
+        public Repainter( final Canvas canvas )
+        {
+            myCanvas = canvas;
+        }
+
+        //----------------------------------------------------------------------
+        // Runnable Implementation
+
+        public void run()
+        {
+            while ( true )
             {
-                while ( true )
+                myCanvas.repaint();
+
+                try
                 {
-                    canvas.repaint();
-                    try
-                    {
-                        Thread.sleep( 10 );
-                    }
-                    catch ( InterruptedException e )
-                    {
-                    }
-                    yield();
+                    Thread.sleep( 10 );
+                }
+                catch ( InterruptedException e )
+                {
+                    // Ignore
                 }
             }
-        }.start();
+        }
 
-        return canvas;
     }
 
 }

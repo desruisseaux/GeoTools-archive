@@ -1,13 +1,18 @@
 package org.geotools.renderer3d.impl;
 
-import com.jme.input.InputHandler;
-import com.jme.input.action.InputAction;
-import com.jme.input.action.InputActionEvent;
+import com.jme.renderer.Camera;
+import com.jme.renderer.Renderer;
 import com.jme.scene.Spatial;
 import com.jmex.awt.SimpleCanvasImpl;
 import org.geotools.renderer3d.utils.ParameterChecker;
 
+import java.awt.Canvas;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+
 /**
+ * A renderer that renders a 3D object in a 3D Canvas.
+ *
  * @author Hans Häggström
  */
 public final class CanvasRenderer
@@ -18,10 +23,17 @@ public final class CanvasRenderer
     // Private Fields
 
     private final Spatial myCanvasRootNode;
+    private final Canvas myCanvas;
 
-    private InputHandler input;
     private long startTime = 0;
     private long fps = 0;
+
+    private boolean myAspectRatioNeedsCorrecting = true;
+
+    //======================================================================
+    // Private Constants
+
+    private static final float DEFAULT_VIEWLD_OF_VIEW_DEGREES = 45;
 
     //======================================================================
     // Public Methods
@@ -29,13 +41,40 @@ public final class CanvasRenderer
     //----------------------------------------------------------------------
     // Constructors
 
-    public CanvasRenderer( int width, int height, Spatial canvasRootNode )
+    /**
+     * Creates a new renderer that renders the specified spatial in a 3D canvas.
+     *
+     * @param width          initial size of the canvas.  Should be larger than 0.
+     * @param height         initial size of the canvas.  Should be larger than 0.
+     * @param canvasRootNode the 3D object to render.  Should not be null.
+     * @param canvas         the canvas we are rendering to.  Needed for listening to resize events.
+     */
+    public CanvasRenderer( final int width,
+                           final int height,
+                           final Spatial canvasRootNode,
+                           final Canvas canvas )
     {
         super( width, height );
 
+        ParameterChecker.checkPositiveNonZeroInteger( width, "width" );
+        ParameterChecker.checkPositiveNonZeroInteger( height, "height" );
         ParameterChecker.checkNotNull( canvasRootNode, "canvasRootNode" );
+        ParameterChecker.checkNotNull( canvas, "canvas" );
 
         myCanvasRootNode = canvasRootNode;
+        myCanvas = canvas;
+
+        // When the component is resized, adjust the size of the 3D viewport too.
+        myCanvas.addComponentListener( new ComponentAdapter()
+        {
+
+            public void componentResized( ComponentEvent ce )
+            {
+                resizeCanvas( myCanvas.getWidth(), myCanvas.getHeight() );
+                myAspectRatioNeedsCorrecting = true;
+            }
+
+        } );
     }
 
     //----------------------------------------------------------------------
@@ -45,28 +84,13 @@ public final class CanvasRenderer
     public void simpleSetup()
     {
         rootNode.attachChild( myCanvasRootNode );
-
-        // Mouse input
-        input = new InputHandler();
-        input.addAction( new InputAction()
-        {
-
-            public void performAction( InputActionEvent evt )
-            {
-                // DEBUG
-                System.out.println( evt.getTriggerName() );
-            }
-
-        }, InputHandler.DEVICE_MOUSE, InputHandler.BUTTON_ALL, InputHandler.AXIS_NONE, false );
     }
 
 
     public void simpleUpdate()
     {
-        input.update( tpf );
-
         // Frames per second counter
-        // DEBUG
+        // DEBUG: To be removed in production code
         if ( startTime > System.currentTimeMillis() )
         {
             fps++;
@@ -78,6 +102,50 @@ public final class CanvasRenderer
             System.out.println( fps + " frames in " + ( timeUsed / 1000f ) + " seconds = "
                                 + ( fps / ( timeUsed / 1000f ) ) + " FPS (average)" );
             fps = 0;
+        }
+    }
+
+
+    public void simpleRender()
+    {
+        // Setup aspect ratio for camera on the first frame (the camera is not created before the rendering starts)
+        if ( myAspectRatioNeedsCorrecting )
+        {
+            correctCameraAspectRatio();
+
+            myAspectRatioNeedsCorrecting = false;
+        }
+    }
+
+    //======================================================================
+    // Private Methods
+
+    /**
+     * Sets the aspect ratio of the camera to the aspect ratio of the viewport size.
+     */
+    private void correctCameraAspectRatio()
+    {
+        final Renderer renderer = getRenderer();
+
+        if ( renderer != null )
+        {
+            // Get size on screen
+            final float height = renderer.getHeight();
+            final float width = renderer.getWidth();
+
+            // Calculate aspect ratio
+            float aspectRatio = 1;
+            if ( height > 0 )
+            {
+                aspectRatio = width / height;
+            }
+
+            // Set aspect ratio and field of view to camera
+            final Camera camera = getCamera();
+            camera.setFrustumPerspective( DEFAULT_VIEWLD_OF_VIEW_DEGREES,
+                                          aspectRatio,
+                                          camera.getFrustumNear(),
+                                          camera.getFrustumFar() );
         }
     }
 
