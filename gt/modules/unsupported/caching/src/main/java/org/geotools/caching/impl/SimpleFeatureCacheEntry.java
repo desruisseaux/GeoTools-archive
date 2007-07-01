@@ -15,11 +15,11 @@
  */
 package org.geotools.caching.impl;
 
-import org.geotools.caching.FeatureCacheEntry;
+import org.geotools.caching.CacheEntry;
 import org.geotools.feature.Feature;
 
 
-public class SimpleFeatureCacheEntry implements FeatureCacheEntry {
+public class SimpleFeatureCacheEntry implements CacheEntry {
     final private Feature feature;
     private int hits;
     private long creationTime;

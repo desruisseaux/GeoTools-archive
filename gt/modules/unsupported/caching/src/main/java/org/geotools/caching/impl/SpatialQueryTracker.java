@@ -195,23 +195,26 @@ public class SpatialQueryTracker implements QueryTracker {
         if (accepts(f)) {
             BBOXImpl bb = (BBOXImpl) f;
             Envelope env = new Envelope(bb.getMinX(), bb.getMaxX(), bb.getMinY(), bb.getMaxY());
+            unregister(env) ;
+        }
+    }
+    
+    public void unregister(Envelope env) {
+        try {
+            List results = tree.search(env);
 
-            try {
-                List results = tree.search(env);
-
-                for (Iterator i = results.iterator(); i.hasNext();) {
-                    Data d = (Data) i.next();
-                    Envelope e = (Envelope) map.get(d.getValue(0));
-                    tree.delete(e);
-                    map.remove(d.getValue(0));
-                }
-            } catch (TreeException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (LockTimeoutException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            for (Iterator i = results.iterator(); i.hasNext();) {
+                Data d = (Data) i.next();
+                Envelope e = (Envelope) map.get(d.getValue(0));
+                tree.delete(e);
+                map.remove(d.getValue(0));
             }
+        } catch (TreeException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (LockTimeoutException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 

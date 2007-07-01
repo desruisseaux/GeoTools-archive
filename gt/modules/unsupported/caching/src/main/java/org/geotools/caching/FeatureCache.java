@@ -36,7 +36,7 @@ public interface FeatureCache extends FeatureStore {
 
     public void put(Feature f);
 
-    public void putAll(FeatureCollection fc);
+    public void putAll(FeatureCollection fc, Filter f);
 
     public int size();
 

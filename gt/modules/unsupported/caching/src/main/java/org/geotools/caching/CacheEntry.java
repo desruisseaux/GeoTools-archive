@@ -25,7 +25,7 @@ import java.util.Map;
  * @author Christophe Rousson, SoC 2007, CRG-ULAVAL
  *
  */
-public interface FeatureCacheEntry extends Map.Entry {
+public interface CacheEntry extends Map.Entry {
     long getCost();
 
     long getCreationTime();

@@ -18,6 +18,8 @@ package org.geotools.caching.impl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import com.vividsolutions.jts.geom.Envelope;
@@ -25,11 +27,14 @@ import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.geotools.caching.FeatureCache;
 import org.geotools.caching.FeatureCacheException;
-import org.geotools.caching.QueryTracker;
+import org.geotools.caching.spatialindex.rtree.Index;
+import org.geotools.caching.spatialindex.rtree.Leaf;
 import org.geotools.caching.spatialindex.rtree.RTree;
 import org.geotools.caching.spatialindex.spatialindex.IData;
+import org.geotools.caching.spatialindex.spatialindex.IEntry;
 import org.geotools.caching.spatialindex.spatialindex.INode;
-import org.geotools.caching.spatialindex.spatialindex.ISpatialIndex;
+import org.geotools.caching.spatialindex.spatialindex.INodeCommand;
+import org.geotools.caching.spatialindex.spatialindex.IQueryStrategy;
 import org.geotools.caching.spatialindex.spatialindex.IVisitor;
 import org.geotools.caching.spatialindex.spatialindex.Region;
 import org.geotools.caching.spatialindex.spatialindex.SpatialIndex;
@@ -38,7 +43,6 @@ import org.geotools.caching.spatialindex.storagemanager.PropertySet;
 import org.geotools.caching.util.FilterSplitter;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
-import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
@@ -73,9 +77,14 @@ public class InMemoryFeatureCache implements FeatureCache {
     protected Transaction transaction = Transaction.AUTO_COMMIT;
     protected final DataStore ds;
     protected final HashMap store;
+    protected final Hashtable nodes ;
     protected final FeatureType type;
-    protected final QueryTracker tracker;
-    protected final ISpatialIndex index;
+    protected final SpatialQueryTracker tracker;
+    protected final RTree index;
+    protected int capacity ;
+    protected int cacheReads = 0 ;
+    protected int storeReads = 0 ;
+    protected int evictions = 0 ;
 
     /** Create a new InMemoryFeatureCache
      *
@@ -83,7 +92,7 @@ public class InMemoryFeatureCache implements FeatureCache {
      * @param t FeatureType to cache
      * @throws FeatureCacheException if DataStore does not have type t, or if IOException occurs
      */
-    public InMemoryFeatureCache(DataStore ds, FeatureType t)
+    public InMemoryFeatureCache(DataStore ds, FeatureType t, int capacity)
         throws FeatureCacheException {
         FeatureType dstype = null;
 
@@ -101,13 +110,43 @@ public class InMemoryFeatureCache implements FeatureCache {
         this.ds = ds;
         this.type = t;
         this.store = new HashMap();
+        this.nodes = new Hashtable();
         this.tracker = new SpatialQueryTracker();
+        this.capacity = capacity ;
 
         PropertySet ps = new PropertySet();
         ps.setProperty("TreeVariant", new Integer(SpatialIndex.RtreeVariantLinear));
+        ps.setProperty("LeafCapacity", new Integer(capacity/10)) ;
 
         MemoryStorageManager sm = new MemoryStorageManager();
         this.index = new RTree(ps, sm);
+        this.index.addDeleteNodeCommand(new INodeCommand() {
+
+			public void execute(INode n) {
+				nodes.remove(new Integer(n.getIdentifier())) ;
+			}
+        	
+        }) ;
+        this.index.addReadNodeCommand(new INodeCommand() {
+
+			public void execute(INode n) {
+				NodeCacheEntry entry = (NodeCacheEntry) nodes.get(new Integer(n.getIdentifier())) ;
+				if (entry == null) {
+					entry = new NodeCacheEntry(n) ;
+					nodes.put(new Integer(n.getIdentifier()), entry) ;
+				}
+				entry.hit() ;
+			}
+        	
+        }) ;
+        this.index.addWriteNodeCommand(new INodeCommand() {
+
+			public void execute(INode n) {
+				NodeCacheEntry entry = new NodeCacheEntry(n) ;
+				nodes.put(new Integer(n.getIdentifier()), entry) ;
+			}
+        	
+        }) ;
     }
 
     public void clear() {
@@ -115,7 +154,14 @@ public class InMemoryFeatureCache implements FeatureCache {
     }
 
     public void evict() {
-        throw new UnsupportedOperationException();
+    	//System.out.println("before = " + store.size()) ;
+    	//System.out.println(index.getStatistics()) ;
+        EvictionQueryStrategy strategy = new EvictionQueryStrategy() ;
+        index.queryStrategy(strategy) ;
+        strategy.doDelete() ;
+        //System.out.println("after = " + store.size()) ;
+        //System.out.println(index.getStatistics()) ;
+        //System.out.println("======================") ;
     }
 
     /* (non-Javadoc)
@@ -185,10 +231,17 @@ public class InMemoryFeatureCache implements FeatureCache {
         index.insertData(f.getID().getBytes(), r, f.getID().hashCode());
     }
 
-    public void putAll(FeatureCollection fc) {
+    public void putAll(FeatureCollection fc, Filter f) {
+    	if (fc.size() > capacity) {
+    		return ;
+    	}
+    	tracker.register(f) ;
         FeatureIterator it = fc.features();
 
         while (it.hasNext()) {
+        	if (store.size() >= capacity) {
+        		evict() ;
+        	}
             put(it.next());
         }
 
@@ -213,7 +266,6 @@ public class InMemoryFeatureCache implements FeatureCache {
     }
 
     public Filter[] splitFilter(Filter f) {
-        // TODO really do split filter
         Filter[] filters = new Filter[3];
         FilterSplitter splitter = new FilterSplitter();
         f.accept(splitter, null);
@@ -334,15 +386,17 @@ public class InMemoryFeatureCache implements FeatureCache {
         //System.out.println("from cache = " + fromCache.size()) ;
         //fromCache.subCollection(filters[OTHER_RESTRICTIONS]) ;
         //System.out.println("from cache = " + fromCache.size()) ;
+        cacheReads += fromCache.size() ;
         FilterFactory ff = new FilterFactoryImpl();
         Filter missing = filters[SPATIAL_RESTRICTION_MISSING];
 
-        //System.out.println("from store = " + fromStore.size()) ;
         if (missing != Filter.EXCLUDE) {
             FeatureCollection fromStore = loadFromStore(ff.and(missing, filters[OTHER_RESTRICTIONS]));
-            tracker.register(missing);
+            //tracker.register(missing);
+            putAll(fromStore, missing) ;
+            //System.out.println("from store = " + fromStore.size()) ;
+            storeReads += fromStore.size() ;
             fromCache.addAll(fromStore);
-
             //System.out.println("Added data to cache") ;
         }
 
@@ -352,7 +406,6 @@ public class InMemoryFeatureCache implements FeatureCache {
     protected FeatureCollection loadFromStore(Filter f)
         throws IOException {
         FeatureCollection c = ds.getFeatureSource(type.getTypeName()).getFeatures(f);
-        putAll(c);
 
         //System.out.println(index.getStatistics()) ;
         return c;
@@ -376,7 +429,14 @@ public class InMemoryFeatureCache implements FeatureCache {
                     }
 
                     public void visitNode(final INode n) {
-                        //System.out.println("Node = " + n.getIdentifier()) ;
+                        NodeCacheEntry e = (NodeCacheEntry) nodes.get(new Integer(n.getIdentifier())) ;
+                        if (e == null) {
+                        	e = new NodeCacheEntry(n) ;
+                        	nodes.put(new Integer(n.getIdentifier()), e) ;
+                        	//System.out.println("created node " + n.getIdentifier()) ;
+                        }
+                        e.hit() ;
+                        //System.out.println("hitted node " + n.getIdentifier()) ;
                     }
                 });
 
@@ -390,5 +450,73 @@ public class InMemoryFeatureCache implements FeatureCache {
 
     public void removeFeatureListener(FeatureListener listener) {
         throw new UnsupportedOperationException();
+    }
+    
+    public int getCacheReads() {
+    	return cacheReads ;
+    }
+    
+    public int getStoreReads() {
+    	return storeReads ;
+    }
+    
+    public int getEvictions() {
+    	return evictions ;
+    }
+    
+    class EvictionQueryStrategy implements IQueryStrategy {
+
+    	Leaf leaf = null ;
+
+    	public void getNextEntry(IEntry e, int[] nextEntry, boolean[] hasNext) {
+    		if (e instanceof Index) {
+    			// TODO handle case there is no child
+    			Index n = (Index) e ;
+    			NodeCacheEntry entry = (NodeCacheEntry) nodes.get(new Integer(n.getChildIdentifier(0))) ;
+    			long accessTime ;
+    			if (entry == null) {
+    				accessTime = System.currentTimeMillis() ;
+    			} else {
+    				accessTime = entry.getLastAccessTime() ;
+    			}
+    			for (int i = 1; i < n.getChildrenCount(); i++) {
+    				NodeCacheEntry next = (NodeCacheEntry) nodes.get(new Integer(n.getChildIdentifier(i))) ;
+    				if (next != null && next.getLastAccessTime() < accessTime) {
+    					accessTime = next.getLastAccessTime() ;
+    					entry = next ;
+    				}
+    			}
+    			assert (entry != null) ;
+    			nextEntry[0] = ((INode) entry.getValue()).getIdentifier() ;
+    			hasNext[0] = true ;
+    			return ;
+    		} else if (e instanceof Leaf) {
+    			leaf = (Leaf) e ;
+    			/*for (int i = 0 ; i < leaf.getChildrenCount() ; i++ ) {
+				// can't do that cause read lock !
+				//index.deleteData(leaf.getChildShape(i), leaf.getChildIdentifier(i)) ;
+				System.out.println("Should delete data " + leaf.getChildIdentifier(i)) ;
+			}*/
+    			hasNext[0] = false ;
+    		}
+    	}
+
+    	public void doDelete() {
+    		if (leaf != null) {
+    			//System.out.println("deleting") ;
+    			//index.deleteLeaf(leaf) ;
+    			//index.deleteLeaf(node, leafIndex) ;
+    			List ids = index.readLeaf(leaf) ;
+    			for (Iterator it = ids.iterator() ; it.hasNext() ; ) {
+    				String id = (String) it.next() ;
+    				remove(id) ;
+    				evictions++ ;
+    			}
+    			Region r = (Region) leaf.getShape() ;
+    			Envelope e = new Envelope(r.getLow(0), r.getHigh(0), r.getLow(1), r.getHigh(1)) ;
+    			tracker.unregister(e) ;
+    		}
+    	}
+
     }
 }

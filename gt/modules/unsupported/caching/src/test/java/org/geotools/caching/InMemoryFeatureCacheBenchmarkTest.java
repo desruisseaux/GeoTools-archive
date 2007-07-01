@@ -45,6 +45,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
+import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.filter.spatial.BBOXImpl;
 
 
@@ -143,7 +144,7 @@ public class InMemoryFeatureCacheBenchmarkTest extends TestCase {
         ds.createSchema(type);
         ds.addFeatures(data);
 
-        InMemoryFeatureCache tested = new InMemoryFeatureCache(ds, type);
+        InMemoryFeatureCache tested = new InMemoryFeatureCache(ds, type, 1000);
         Iterator iter = querySet.iterator();
 
         while (iter.hasNext()) {
@@ -152,6 +153,10 @@ public class InMemoryFeatureCacheBenchmarkTest extends TestCase {
             FeatureCollection testedSet = tested.getFeatures(q);
             assertTrue(compareFeatureCollectionByHash(controlSet, testedSet));
         }
+        
+        System.out.println("Cache reads = " + tested.getCacheReads()) ;
+        System.out.println("Store reads = " + tested.getStoreReads()) ;
+        System.out.println("Evictions = " + tested.getEvictions()) ;
     }
 
     public void testDataCachePerformance() throws IOException, FeatureCacheException {
@@ -165,13 +170,18 @@ public class InMemoryFeatureCacheBenchmarkTest extends TestCase {
         ds.createSchema(type);
         ds.addFeatures(data);
 
-        InMemoryFeatureCache tested = new InMemoryFeatureCache(ds, type);
+        InMemoryFeatureCache tested = new InMemoryFeatureCache(ds, type, 2500);
+        tested.getFeatures(new FilterFactoryImpl().bbox("",0, 0, 1000, 1000,"")) ;
         long diff = compareDataStores(tested, control.getFeatureSource(type.getTypeName()), querySet);
 
         //assertTrue(diff < 0);
+        
+        System.out.println("Cache reads = " + tested.getCacheReads()) ;
+        System.out.println("Store reads = " + tested.getStoreReads()) ;
+        System.out.println("Evictions = " + tested.getEvictions()) ;
     }
 
-    public void testDataCachePerformanceRandomQueries()
+    public void ztestDataCachePerformanceRandomQueries()
         throws IOException, FeatureCacheException {
         createRandomQuerySet(50);
 
@@ -183,8 +193,12 @@ public class InMemoryFeatureCacheBenchmarkTest extends TestCase {
         ds.createSchema(type);
         ds.addFeatures(data);
 
-        InMemoryFeatureCache tested = new InMemoryFeatureCache(ds, type);
+        InMemoryFeatureCache tested = new InMemoryFeatureCache(ds, type, 1000);
         long diff = compareDataStores(tested, control.getFeatureSource(type.getTypeName()), querySet);
+        
+        System.out.println("Cache reads = " + tested.getCacheReads()) ;
+        System.out.println("Store reads = " + tested.getStoreReads()) ;
+        System.out.println("Evictions = " + tested.getEvictions()) ;
     }
 
     private short compareQuery(Query q1, Query q2) {
@@ -268,10 +282,10 @@ public class InMemoryFeatureCacheBenchmarkTest extends TestCase {
                 }
             }
 
-            System.out.println("Test: " + ds_stats[i].getNumberOfFeatures() + " features ; "
+            /*System.out.println("Test: " + ds_stats[i].getNumberOfFeatures() + " features ; "
                 + ds_stats[i].getExecutionTime() + " ms ; " + "Control: "
                 + control_stats[i].getNumberOfFeatures() + " features ; "
-                + control_stats[i].getExecutionTime() + " ms ; ");
+                + control_stats[i].getExecutionTime() + " ms ; "); */
         }
 
         meanDifference = ((querySet.size() - 2) > 0) ? (meanDifference / (querySet.size() - 2)) : 0;

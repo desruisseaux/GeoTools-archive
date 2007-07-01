@@ -71,14 +71,14 @@ public class InMemoryFeatureCacheTest extends TestCase {
         MemoryDataStore ds = new MemoryDataStore();
         ds.createSchema(type);
         ds.addFeatures(data);
-        cache = new InMemoryFeatureCache(ds, type);
+        cache = new InMemoryFeatureCache(ds, type, 150);
     }
 
     public void testInvalidTypeException() throws SchemaException {
         try {
             FeatureType t = DataUtilities.createType("test.notype",
                     "id:0,*geom:Geometry,dummy:java.lang.String");
-            cache = new InMemoryFeatureCache(cache.getDataStore(), t);
+            cache = new InMemoryFeatureCache(cache.getDataStore(), t, 150);
         } catch (FeatureCacheException e) {
             return;
         }
@@ -167,5 +167,21 @@ public class InMemoryFeatureCacheTest extends TestCase {
         assertEquals(ds.getFeatureSource(type.getTypeName()).getBounds(), cache.getBounds());
         assertEquals(ds.getFeatureSource(type.getTypeName()).getBounds(Query.ALL),
             cache.getBounds(Query.ALL));
+    }
+    
+    public void testEviction() throws IOException {
+    	FilterFactory ff = new FilterFactoryImpl() ;
+    	Filter all = ff.bbox(type.getDefaultGeometry().getName(), 0, 0, 1000, 1000, "srs") ;
+    	FeatureCollection fc = cache.getFeatures(all) ;
+    	assertEquals(data.size(), fc.size()) ;
+    	fc = cache.getFeatures(all) ;
+    	assertEquals(data.size(), fc.size()) ;
+    	cache.evict() ;
+    	fc = cache.getFeatures(all) ;
+    	assertEquals(data.size(), fc.size()) ;
+    	cache.evict() ;
+    	cache.evict() ;
+    	fc = cache.getFeatures(all) ;
+    	assertEquals(data.size(), fc.size()) ;
     }
 }
