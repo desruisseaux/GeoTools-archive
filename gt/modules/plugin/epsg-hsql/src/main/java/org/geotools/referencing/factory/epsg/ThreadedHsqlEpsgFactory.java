@@ -78,8 +78,6 @@ public class ThreadedHsqlEpsgFactory extends ThreadedEpsgFactory {
      * one in the EPSG database bundled in this plugin. However this field may contains
      * additional minor version number if there is some changes related to the EPSG-HSQL
      * plugin rather then the EPSG database itself (for example additional database index).
-     *
-     * @since 2.4
      */
     public static final Version VERSION = new Version("6.12.0");
 

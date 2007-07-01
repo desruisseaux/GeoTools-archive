@@ -17,15 +17,26 @@ package org.geotools.util;
 
 
 /**
- * Null implementation for the ReferencingObjectCache. Used for cases where
- * caching is *not* desired.
+ * Null implementation for the {@link ObjectCache}. Used for cases where
+ * caching is <strong>not</strong> desired.
  * 
  * @since 2.4
  * @version $Id$
  * @source $URL$
  * @author Cory Horner (Refractions Research)
  */
-public final class NullObjectCache implements ObjectCache {
+final class NullObjectCache implements ObjectCache {
+    /**
+     * The singleton instance.
+     */
+    public static final NullObjectCache INSTANCE = new NullObjectCache();
+
+    /**
+     * Do not allow instantiation of this class, since a singleton is enough.
+     */
+    private NullObjectCache() {
+    }
+
     /**
      * Do nothing since this map is already empty.
      */
@@ -36,6 +47,13 @@ public final class NullObjectCache implements ObjectCache {
      * Returns {@code null} since this map is empty.
      */
     public Object get(Object key) {
+        return null;
+    }
+
+    /**
+     * Returns {@code null} since this map is empty.
+     */
+    public Object peek( Object key ) {
         return null;
     }
 
@@ -62,9 +80,5 @@ public final class NullObjectCache implements ObjectCache {
      * Do nothing since there is no write lock.
      */
     public void writeUnLock(Object key) {
-    }
-
-    public Object peek( Object key ) {
-        return null;
     }
 }

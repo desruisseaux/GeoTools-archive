@@ -73,21 +73,22 @@ import org.hsqldb.jdbc.jdbcDataSource;
  * @deprecated Replaced by {@link FactoryOnHSQL}.
  */
 public class HSQLDataSource extends jdbcDataSource implements DataSource {
-	/**
-	 * The key for fetching the database directory from {@linkplain System#getProperty(String)
-	 * system properties}.
-	 *
-	 * @since 2.3
-	 */
-	public static final String DIRECTORY_KEY = "EPSG-HSQL.directory";
-	/**
-	 * The database name.
-	 *
-	 * @since 2.3
-	 */
-	public static final String DATABASE_NAME = "EPSG";	
+    /**
+     * The key for fetching the database directory from {@linkplain System#getProperty(String)
+     * system properties}.
+     *
+     * @since 2.3
+     */
+    public static final String DIRECTORY_KEY = "EPSG-HSQL.directory";
 
-	/**
+    /**
+     * The database name.
+     *
+     * @since 2.3
+     */
+    public static final String DATABASE_NAME = "EPSG";	
+
+    /**
      * The directory where the database is stored.
      */
     private File directory;
@@ -102,12 +103,13 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
     public HSQLDataSource() {
         this(getDirectoryOrNull());
     }
+
     private static File getDirectoryOrNull(){
-		try {
-			return HsqlEpsgDatabase.getDirectory();
-		} catch (SQLException e) {
-			return null; // report problem later
-		}
+        try {
+            return HsqlEpsgDatabase.getDirectory();
+        } catch (SQLException e) {
+            return null; // report problem later
+        }
     }
 
     /**

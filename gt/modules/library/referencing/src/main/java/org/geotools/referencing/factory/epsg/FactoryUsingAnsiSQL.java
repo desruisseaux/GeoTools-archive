@@ -109,9 +109,11 @@ public class FactoryUsingAnsiSQL extends FactoryUsingSQL {
      *
      * @param userHints  The underlying factories used for objects creation.
      * @param connection The connection to the underlying EPSG database.
+     *
+     * @since 2.2
      */
     public FactoryUsingAnsiSQL(final Hints      userHints,
-                                  final Connection connection)
+                               final Connection connection)
     {
         super(userHints, connection);
         for (int i=0; i<ANSI.length; i++) {
@@ -126,6 +128,8 @@ public class FactoryUsingAnsiSQL extends FactoryUsingSQL {
      * time only.
      *
      * @param schema The database schema in which the epsg tables are stored.
+     *
+     * @since 2.2
      */
     protected void setSchema(String schema) {
         schema = schema.trim();

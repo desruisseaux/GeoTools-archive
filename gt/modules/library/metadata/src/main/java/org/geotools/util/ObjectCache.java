@@ -29,32 +29,32 @@ import java.lang.ref.Reference;  // For javadoc
  * key = &quot;EPSG:4326&quot;;
  * CoordinateReferenceSystem crs = cache.get(key);
  * </pre></blockquote>
- * 
+ *
  * To overwrite:
- * 
+ *
  * <blockquote><pre>
  * cache.put(key, crs);
  * </pre></blockquote>
- * 
+ *
  * To reserve the entry while figuring out what to write:
- * 
+ *
  * <blockquote><pre>
- *  try {
- *      cache.writeLock(key); // may block if another writer is working on this code
- *      value = cache.test(key);
- *      if (value == null) {
- *         // another writer got here first
- *      } else { 
- *         value = figuringOutWhatToWrite(....);
- *         cache.put(key, value);
- *      }
- *  } finally {
- *      cache.writeUnLock(key);
- *  }
+ * try {
+ *     cache.writeLock(key); // may block if another writer is working on this code.
+ *     value = cache.test(key);
+ *     if (value == null) {
+ *        // another writer got here first
+ *     } else { 
+ *        value = figuringOutWhatToWrite(....);
+ *        cache.put(key, value);
+ *     }
+ * } finally {
+ *     cache.writeUnLock(key);
+ * }
  * </pre></blockquote>
- * 
+ *
  * To use as a proper cache:
- * 
+ *
  * <blockquote><pre>
  * CylindricalCS cs = (CylindricalCS) cache.get(key);
  * if (cs == null) {
@@ -71,7 +71,7 @@ import java.lang.ref.Reference;  // For javadoc
  * }
  * return cs;
  * </pre></blockquote>
- * 
+ *
  * @since 2.4
  * @version $Id$
  * @source $URL$

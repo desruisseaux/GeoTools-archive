@@ -15,13 +15,12 @@
  */
 package org.geotools.util;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 
 /**
- * Caching implementation for ReferencingObjectCache. This instance is used when
+ * Caching implementation for {@link ObjectCache}. This instance is used when
  * actual caching is desired.
  * 
  * @since 2.4
@@ -29,34 +28,31 @@ import java.util.Map;
  * @source $URL$
  * @author Cory Horner (Refractions Research)
  */
-public final class DefaultObjectCache implements ObjectCache {
-
+final class DefaultObjectCache implements ObjectCache {
     /**
-     * A cheap cache map implementation (not scalable).
-     * 
-     * <Object, Entry>
+     * The cached values for each key.
      */
-    private volatile Map cache;
-    
+    private final Map/*<Object,ObjectCacheEntry>*/ cache;
+
     /**
      * Creates a new cache.
      */
     public DefaultObjectCache() {
-        cache = Collections.synchronizedMap(new HashMap());
+        cache = new HashMap();
     }
     
     /**
      * Creates a new cache using the indicated initialSize.
      */
     public DefaultObjectCache(final int initialSize) {
-        cache = Collections.synchronizedMap(new HashMap(initialSize));
+        cache = new HashMap(initialSize);
     }
 
     /**
      * Removes all entries from this map.
      */
-    public synchronized void clear() {
-        if (cache != null) {
+    public void clear() {
+        synchronized (cache) {
             cache.clear();
         }
     }
@@ -90,11 +86,13 @@ public final class DefaultObjectCache implements ObjectCache {
     }
 
     public Object peek(final Object key) {
-        if (!cache.containsKey(key)) {
-            // no entry for this key - so no value
-            return null;
+        synchronized (cache) {
+            if (!cache.containsKey(key)) {
+                // no entry for this key - so no value
+                return null;
+            }
+            return getEntry(key).peek();
         }
-        return getEntry(key).peek();
     }
 
     public void writeLock(final Object key) {
@@ -102,17 +100,19 @@ public final class DefaultObjectCache implements ObjectCache {
     }
 
     public void writeUnLock(final Object key) {
-        if (!cache.containsKey(key)) {
-            throw new IllegalStateException("Cannot unlock prior to locking");
+        synchronized (cache) {
+            if (!cache.containsKey(key)) {
+                throw new IllegalStateException("Cannot unlock prior to locking");
+            }
+            getEntry(key).writeUnLock();
         }
-        getEntry(key).writeUnLock();
     }
 
     /**
      * Stores a value
      */
     public void put(final Object key, final Object object) {
-        getEntry(key).setValue(object);        
+        getEntry(key).setValue(object);
     }
 
     /**
@@ -121,13 +121,14 @@ public final class DefaultObjectCache implements ObjectCache {
      * @param key
      * @return ObjectCacheEntry
      */
-    protected ObjectCacheEntry getEntry(Object key) {
+    private ObjectCacheEntry getEntry(Object key) {
         synchronized (cache) {
-            if (!cache.containsKey(key)) {
-                ObjectCacheEntry newEntry = new ObjectCacheEntry();
-                cache.put(key, newEntry);
+            ObjectCacheEntry entry = (ObjectCacheEntry) cache.get(key);
+            if (entry == null) {
+                entry = new ObjectCacheEntry();
+                cache.put(key, entry);
             }
-            return (ObjectCacheEntry) cache.get(key);
+            return entry;
         }
     }
 }

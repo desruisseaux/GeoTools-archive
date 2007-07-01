@@ -46,6 +46,7 @@ public class FactoryUsingSQL extends DirectEpsgFactory {
     public FactoryUsingSQL(final Hints userHints, final Connection connection) {
         super(userHints, connection );
     }
+
     /**
      * Invoked when a new {@link PreparedStatement} is about to be created from a SQL string.
      * 

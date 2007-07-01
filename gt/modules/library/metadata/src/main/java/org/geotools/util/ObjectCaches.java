@@ -1,3 +1,18 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2007, GeoTools Project Managment Committee (PMC)
+ *   
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.util;
 
 import org.geotools.factory.FactoryRegistryException;
@@ -8,35 +23,44 @@ import org.geotools.resources.Utilities;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.util.GenericName;
 
+
 /**
  * This is facade around several constructs used by GeoTools for internal caching.
  * <p>
  * This class provides the following services:
  * <ul>
- * <li>Access to an implementation of "weak", "all" and "none" implementations of {@link ObjectCache}
- * <li>The ability to turn a "code" into a good "key" for use with an ObjectCache
- * <li>A Pair data object (think of C STRUCT) for use as a key when storing a value against two objects.
+ *   <li>Access to an implementation of "weak", "all" and "none" implementations of {@link ObjectCache}.</li>
+ *   <li>The ability to turn a "code" into a good "key" for use with an ObjectCache.</li>
+ *   <li>A Pair data object (think of C STRUCT) for use as a key when storing a value against two objects.</li>
  * </ul>
  * 
  * @author Jody Garnett
  * @author Cory Horner
  */
 public final class ObjectCaches {
-	
+    /**
+     * Do not allow instantiation of this class.
+     */
+    private ObjectCaches() {
+    }
+
     /**
      * A pair of Codes for {@link ObjectCache) to work with.
-     * <p>
      * Please be advised that this is a data object:
+     *
      * <ul>
-     * <li>equals - is dependent on both source and target being equal
-     * <li>hashcode - is dependent on the hashCode of source and target
+     *   <li>equals - is dependent on both source and target being equal.</li>
+     *   <li>hashcode - is dependent on the hashCode of source and target.</li>
      * </ul>
-     * A Pair is considered ordered:<pre><code>
+     *
+     * A Pair is considered ordered:
+     * 
+     * <blockquote><pre>
      * Pair pair1 = new Pair("a","b");
      * Pair pair2 = new Pair("b","a");
      * 
      * System.out.println( pair1.equals( pair2 ) ); // prints false
-     * </code></pre>
+     * </pre></blockquote>
      * 
      * {@link #createFromCoordinateReferenceSystemCodes}.
      */
@@ -68,13 +92,13 @@ public final class ObjectCaches {
             return source + " \u21E8 " + target;
         }
     }
-    
+
     /**
      * Utility method used to produce cache based on provide Hint
      */
     public static ObjectCache create( Hints hints )
             throws FactoryRegistryException {
-    	if( hints == null ) hints = GeoTools.getDefaultHints();
+        if( hints == null ) hints = GeoTools.getDefaultHints();
         String policy = (String) hints.get(Hints.BUFFER_POLICY);
         int limit = Hints.BUFFER_LIMIT.toValue(hints);
         return create( policy, limit );
@@ -93,12 +117,12 @@ public final class ObjectCaches {
         } else if ("all".equalsIgnoreCase(policy)) {
             return new DefaultObjectCache(size);
         } else if ("none".equalsIgnoreCase(policy)) {
-            return new NullObjectCache();
+            return NullObjectCache.INSTANCE;
         } else {
             return new DefaultObjectCache(size);
         }
     }
-    
+
     /**
      * Produce a good key based on the privided citaiton and code.
      * You can think of the citation as being "here" and the code being the "what".
@@ -107,17 +131,18 @@ public final class ObjectCaches {
      * @return A good key for use with ObjectCache
      */
     public static String toKey( Citation citation, String code ){
-		code = code.trim();
-		final GenericName name = NameFactory.create(code);
-		final GenericName scope = name.getScope();
-		if (scope == null) {
-			return code;
-		}
-		if (citation != null && Citations.identifierMatches( citation, scope.toString())) {
-			return name.asLocalName().toString().trim();
-		}
-		return code;
+        code = code.trim();
+        final GenericName name = NameFactory.create(code);
+        final GenericName scope = name.getScope();
+        if (scope == null) {
+            return code;
+        }
+        if (citation != null && Citations.identifierMatches( citation, scope.toString())) {
+            return name.asLocalName().toString().trim();
+        }
+        return code;
     }
+
     /**
      * Produce a good key based on a pair of codes.
      * 
@@ -126,9 +151,9 @@ public final class ObjectCaches {
      * @return A object to use as a key
      */
     public static Object toKey( Citation citation, String code1, String code2 ){
-    	String key1 = toKey( citation, code1 );
-    	String key2 = toKey( citation, code2 );
-    	
-    	return new Pair( key1, key2 );
+        String key1 = toKey( citation, code1 );
+        String key2 = toKey( citation, code2 );
+
+        return new Pair( key1, key2 );
     }
 }
