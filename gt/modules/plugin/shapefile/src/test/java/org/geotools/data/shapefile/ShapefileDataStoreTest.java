@@ -24,6 +24,7 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -76,6 +77,8 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     
     final static String STATE_POP = "shapes/statepop.shp";
     final static String STREAM    = "shapes/stream.shp";
+    final static String DANISH    = "shapes/danish_point.shp";
+    final static String CHINESE   = "shapes/chinese_poly.shp";
     
     public ShapefileDataStoreTest(String testName) throws IOException {
         super(testName);
@@ -96,12 +99,34 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         FeatureSource fs = s.getFeatureSource(s.getTypeNames()[0]);
         return fs.getFeatures();
     }
+    protected FeatureCollection loadFeatures(String resource, Charset charset, Query q) throws Exception {
+        if (q == null) q = new DefaultQuery();
+        URL url = TestData.url(resource);
+        ShapefileDataStore s = new ShapefileDataStore(url, false, charset);
+        FeatureSource fs = s.getFeatureSource(s.getTypeNames()[0]);
+        return fs.getFeatures(q);
+    }
+    
     protected FeatureCollection loadFeatures(ShapefileDataStore s) throws Exception {
         return s.getFeatureSource(s.getTypeNames()[0]).getFeatures();
     }
     
     public void testLoad() throws Exception {
         loadFeatures(STATE_POP, Query.ALL );
+    }
+    
+    public void testLoadDanishChars() throws Exception {
+        FeatureCollection fc = loadFeatures(DANISH, Query.ALL);
+        Feature first = fc.features().next();
+        // Charløtte, if you can read it with your OS charset
+        assertEquals("Charl\u00F8tte", first.getAttribute("TEKST1"));
+    }
+    
+    public void testLoadChineseChars() throws Exception {
+        FeatureCollection fc = loadFeatures(CHINESE, Charset.forName("GB18030"), null);
+        Feature first = fc.features().next();
+        String s = (String) first.getAttribute("NAME");
+        assertEquals("\u9ed1\u9f99\u6c5f\u7701", first.getAttribute("NAME"));
     }
     
     public void testNamespace() throws Exception {
@@ -592,4 +617,27 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         assertEquals(s.getSchema(), reader.getFeatureType());
     }
 
+    
+     /**
+      * This is useful to dump a UTF16 character to an UT16 escape sequence, basically
+      * the only way to represent the chars we don't have on the keyboard (such as chinese ones :))
+      * @param c
+      * @return
+      */
+     static public String charToHex(char c) {
+        // Returns hex String representation of char c
+        byte hi = (byte) (c >>> 8);
+        byte lo = (byte) (c & 0xff);
+        return byteToHex(hi) + byteToHex(lo);
+     }
+     
+     static public String byteToHex(byte b) {
+         // Returns hex String representation of byte b
+         char[] hexDigit = {
+            '0', '1', '2', '3', '4', '5', '6', '7',
+            '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+         };
+         char[] array = { hexDigit[(b >> 4) & 0x0f], hexDigit[b & 0x0f] };
+         return new String(array);
+      }
 }

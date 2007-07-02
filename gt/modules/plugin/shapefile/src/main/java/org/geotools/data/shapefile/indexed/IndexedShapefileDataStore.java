@@ -22,6 +22,7 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -200,6 +201,29 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 			boolean createIndex) throws java.net.MalformedURLException {
 		this(url, null, useMemoryMappedBuffer, createIndex, TREE_QIX);
 	}
+	
+	/**
+     * Creates a new instance of ShapefileDataStore.
+     *
+     * @param url
+     *            The URL of the shp file to use for this DataSource.
+     * @param namespace
+     *            DOCUMENT ME!
+     * @param useMemoryMappedBuffer
+     *            enable/disable memory mapping of files
+     * @param createIndex
+     *            enable/disable automatic index creation if needed
+     * @param treeType
+     *            DOCUMENT ME!
+     *
+     * @throws NullPointerException
+     *             DOCUMENT ME!
+     * @throws .
+     */
+    public IndexedShapefileDataStore(URL url, URI namespace,
+            boolean useMemoryMappedBuffer, boolean createIndex, byte treeType) throws MalformedURLException {
+        this(url, namespace, useMemoryMappedBuffer, createIndex, treeType, DEFAULT_STRING_CHARSET);
+    }
 
 	/**
 	 * Creates a new instance of ShapefileDataStore.
@@ -214,15 +238,16 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 *            enable/disable automatic index creation if needed
 	 * @param treeType
 	 *            DOCUMENT ME!
+	 * @param dbfCharset {@link Charset} used to decode strings from the DBF
 	 *
 	 * @throws NullPointerException
 	 *             DOCUMENT ME!
 	 * @throws .
 	 */
 	public IndexedShapefileDataStore(URL url, URI namespace,
-			boolean useMemoryMappedBuffer, boolean createIndex, byte treeType)
+			boolean useMemoryMappedBuffer, boolean createIndex, byte treeType, Charset dbfCharset)
 			throws java.net.MalformedURLException {
-		super(url, namespace);
+		super(url, namespace, true, dbfCharset);
 
 		String filename = null;
 
@@ -694,7 +719,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 			return null;
 		}
 
-		return new IndexedDbaseFileReader(rbc, false);
+		return new IndexedDbaseFileReader(rbc, false, dbfCharset);
 	}
 
 	/**

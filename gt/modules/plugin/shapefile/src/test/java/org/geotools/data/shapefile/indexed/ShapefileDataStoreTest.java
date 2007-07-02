@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -34,6 +35,7 @@ import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
@@ -69,6 +71,11 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 	final static String STATE_POP = "shapes/statepop.shp";
 
 	final static String STREAM = "shapes/stream.shp";
+	
+    final static String DANISH    = "shapes/danish_point.shp";
+    
+    final static String CHINESE   = "shapes/chinese_poly.shp";
+
 
 	public ShapefileDataStoreTest(String testName) throws IOException {
 		super(testName);
@@ -86,6 +93,15 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 
 		return fs.getFeatures(q);
 	}
+	
+	protected FeatureCollection loadFeatures(String resource, Charset charset, Query q) throws Exception {
+        if (q == null) q = new DefaultQuery();
+        URL url = TestData.url(resource);
+        ShapefileDataStore s = new IndexedShapefileDataStore(url, null,  false, true, 
+                IndexedShapefileDataStore.TREE_QIX, charset);
+        FeatureSource fs = s.getFeatureSource(s.getTypeNames()[0]);
+        return fs.getFeatures(q);
+    }
 
 	protected FeatureCollection loadFeatures(IndexedShapefileDataStore s)
 			throws Exception {
@@ -95,6 +111,20 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 	public void testLoad() throws Exception {
 		loadFeatures(STATE_POP, null);
 	}
+	
+	public void testLoadDanishChars() throws Exception {
+        FeatureCollection fc = loadFeatures(DANISH, null);
+        Feature first = fc.features().next();
+        // Charløtte, if you can read it with your OS charset
+        assertEquals("Charl\u00F8tte", first.getAttribute("TEKST1"));
+    }
+    
+    public void testLoadChineseChars() throws Exception {
+        FeatureCollection fc = loadFeatures(CHINESE, Charset.forName("GB18030"), null);
+        Feature first = fc.features().next();
+        String s = (String) first.getAttribute("NAME");
+        assertEquals("\u9ed1\u9f99\u6c5f\u7701", first.getAttribute("NAME"));
+    }
 
 	public void testSchema() throws Exception {
 		URL url = TestData.url(STATE_POP);

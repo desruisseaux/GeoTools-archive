@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.Charset;
 
 
 /** A DbaseFileReader is used to read a dbase III format file.
@@ -116,6 +117,13 @@ public class IndexedDbaseFileReader extends DbaseFileReader{
   throws IOException
   {
 	  super( channel, useMemoryMappedBuffer);
+  }
+  
+  public IndexedDbaseFileReader(ReadableByteChannel channel,
+          boolean useMemoryMappedBuffer, Charset stringCharset)
+  throws IOException
+  {
+    super( channel, useMemoryMappedBuffer, stringCharset);
   }
 
   public boolean IsRandomAccessEnabled(){

@@ -20,11 +20,13 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFactorySpi.Param;
 import org.geotools.data.shapefile.ShapefileDataStore;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -47,6 +49,16 @@ public class IndexedShapefileDataStoreFactory
     public static final Param CREATE_SPATIAL_INDEX = new Param("create spatial index",
             Boolean.class,
             "enable/disable the automatic creation of spatial index", false);
+    static final Param DBFCHARSET = new Param("charset", Charset.class,
+            "character used to decode strings from the DBF file", false, Charset.forName("ISO-8859-1")) {
+            public Object parse(String text) throws IOException {
+                return Charset.forName(text);
+            }
+
+            public String text(Object value) {
+                return ((Charset) value).name();
+            }
+        };
   
     private final static Map HINTS = new HashMap();
 
@@ -128,9 +140,13 @@ public class IndexedShapefileDataStoreFactory
             }
 
             URI namespace = (URI) NAMESPACEP.lookUp(params);
+            
+            Charset dbfCharset = (Charset) DBFCHARSET.lookUp(params);
+            if (dbfCharset == null)
+                dbfCharset = Charset.forName("ISO-8859-1");
 
             ds = new IndexedShapefileDataStore(url, namespace,
-                    false, idx.booleanValue(), IndexedShapefileDataStore.TREE_QIX);
+                    false, idx.booleanValue(), IndexedShapefileDataStore.TREE_QIX, dbfCharset);
             liveStores.put(params, ds);
         } catch (MalformedURLException mue) {
             throw new DataSourceException("Unable to attatch datastore to "
@@ -206,7 +222,7 @@ public class IndexedShapefileDataStoreFactory
      */
     public Param[] getParametersInfo() {
         return new Param[] {
-            URLP, NAMESPACEP, CREATE_SPATIAL_INDEX
+            URLP, NAMESPACEP, CREATE_SPATIAL_INDEX, DBFCHARSET
         };
     }
 

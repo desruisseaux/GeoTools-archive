@@ -92,6 +92,8 @@ public class DbaseFileReader {
 	ReadableByteChannel channel;
 
 	CharBuffer charBuffer;
+    
+    Charset charset;
 
 	CharsetDecoder decoder;
 
@@ -110,6 +112,21 @@ public class DbaseFileReader {
 	protected int currentOffset = 0;
 	private StreamLogging streamLogger=new StreamLogging("Dbase File Reader");
 
+    private Charset stringCharset;
+    
+    /**
+     * Creates a new instance of DBaseFileReader
+     * 
+     * @param channel
+     *            The readable channel to use.
+     * @throws IOException
+     *             If an error occurs while initializing.
+     */
+    public DbaseFileReader(ReadableByteChannel channel,
+            boolean useMemoryMappedBuffer) throws IOException {
+        this(channel, useMemoryMappedBuffer, Charset.forName("ISO-8859-1"));
+    }
+
 	/**
 	 * Creates a new instance of DBaseFileReader
 	 * 
@@ -119,8 +136,10 @@ public class DbaseFileReader {
 	 *             If an error occurs while initializing.
 	 */
 	public DbaseFileReader(ReadableByteChannel channel,
-			boolean useMemoryMappedBuffer) throws IOException {
+			boolean useMemoryMappedBuffer, Charset charset) throws IOException {
 		this.channel = channel;
+		this.stringCharset = charset;
+        this.charset = Charset.forName("ISO-8859-1"); // charset;
 
 		this.useMemoryMappedBuffer = useMemoryMappedBuffer;
 		this.randomAccessEnabled = (channel instanceof FileChannel);
@@ -203,8 +222,7 @@ public class DbaseFileReader {
 		}
 
 		charBuffer = CharBuffer.allocate(header.getRecordLength() - 1);
-		Charset chars = Charset.forName("ISO-8859-1");
-		decoder = chars.newDecoder();
+		decoder = charset.newDecoder();
 
 		row = new Row();
 	}
@@ -443,6 +461,10 @@ public class DbaseFileReader {
 				// set up the new indexes for start and end
 				charBuffer.position(start).limit(end + 1);
 				String s = charBuffer.toString();
+                // to support some foreign languages, such as Chinese, we have to convert
+				// from ISO-8859-1 to a user provided charset
+				if(!stringCharset.displayName().equals("ISO-8859-1"))
+				    s = new String(s.getBytes("ISO-8859-1"), stringCharset.displayName());
 				// this resets the limit...
 				charBuffer.clear();
 				object = s;
@@ -539,7 +561,7 @@ public class DbaseFileReader {
 
 	public static void main(String[] args) throws Exception {
 		FileChannel channel = new FileInputStream(args[0]).getChannel();
-		DbaseFileReader reader = new DbaseFileReader(channel,false);
+		DbaseFileReader reader = new DbaseFileReader(channel,false, Charset.forName("ISO-8859-1"));
 		System.out.println(reader.getHeader());
 		int r = 0;
 		while (reader.hasNext()) {

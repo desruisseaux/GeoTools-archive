@@ -35,7 +35,7 @@ import java.nio.channels.WritableByteChannel;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.nio.charset.Charset;
 import org.geotools.data.AbstractAttributeIO;
 import org.geotools.data.AbstractFeatureLocking;
 import org.geotools.data.AbstractFeatureSource;
@@ -112,6 +112,8 @@ import com.vividsolutions.jts.geom.Polygon;
  * @source $URL$
  */
 public class ShapefileDataStore extends AbstractFileDataStore {
+    public static final Charset DEFAULT_STRING_CHARSET = Charset.forName("ISO-8859-1");
+    
     protected final URL shpURL;
     protected final URL dbfURL;
     protected final URL shxURL;
@@ -121,6 +123,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     protected URI namespace = null; // namespace provided by the constructor's map
     protected FeatureType schema; // read only
     protected boolean useMemoryMappedBuffer = true;
+    protected Charset dbfCharset;
 
     /**
      * Creates a new instance of ShapefileDataStore.
@@ -131,6 +134,14 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      * @throws . If computation of related URLs (dbf,shx) fails.
      */
     public ShapefileDataStore(URL url) throws java.net.MalformedURLException {
+        this(url,true);
+    }
+
+    public ShapefileDataStore(URL url,boolean useMemoryMappedBuffer) throws java.net.MalformedURLException {
+        this(url, useMemoryMappedBuffer, DEFAULT_STRING_CHARSET);
+    }
+    
+    public ShapefileDataStore(URL url,boolean useMemoryMappedBuffer, Charset dbfCharset) throws java.net.MalformedURLException {
         String filename = null;
 
         if (url == null) {
@@ -168,6 +179,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         shxURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + shxext);
         prjURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + prjext);
         xmlURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + xmlext);
+        this.dbfCharset = dbfCharset; 
     }
 
     /**
@@ -192,12 +204,47 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      * @param url
      * @param namespace
      * @param useMemoryMapped
+     * @param dbfCharset
+     */
+    public ShapefileDataStore(URL url, URI namespace, boolean useMemoryMapped, Charset dbfCharset)
+        throws java.net.MalformedURLException {
+        this(url);
+        this.namespace = namespace;
+        this.useMemoryMappedBuffer = useMemoryMapped;
+        this.dbfCharset = dbfCharset;
+    }
+    
+    /**
+     * this sets the datastore's namespace during construction (so the schema -
+     * FeatureType - will have the correct value) You can call this with
+     * namespace = null, but I suggest you give it an actual namespace.
+     *
+     * @param url
+     * @param namespace
+     * @param useMemoryMapped
      */
     public ShapefileDataStore(URL url, URI namespace, boolean useMemoryMapped)
         throws java.net.MalformedURLException {
         this(url);
         this.namespace = namespace;
         this.useMemoryMappedBuffer = useMemoryMapped;
+    }
+    
+    /**
+     * Set this if you need BDF strings to be decoded in a {@link Charset} other than ISO-8859-1
+     * @param stringCharset
+     * @since 2.3.3
+     */
+    public void setStringCharset(Charset stringCharset) {
+        this.dbfCharset = stringCharset;
+    }
+    
+    /**
+     * Returns the {@link Charset} used to decode strings in the DBF file
+     * @return
+     */
+    public Charset getStringCharset() {
+        return dbfCharset;
     }
 
     /**
@@ -472,7 +519,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             return null;
         }
 
-        return new DbaseFileReader(rbc, useMemoryMappedBuffer);
+        return new DbaseFileReader(rbc, useMemoryMappedBuffer, dbfCharset);
     }
     
 

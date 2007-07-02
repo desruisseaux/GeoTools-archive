@@ -16,6 +16,7 @@
 package org.geotools.data.shapefile;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -46,8 +47,35 @@ public class ShapefileDataStoreFactory
     public static final Param MEMORY_MAPPED =
         new Param("memory mapped buffer", Boolean.class,
                   "enable/disable the use of memory-mapped io", false);
+    
+    /**
+     * Param, package visibiity for JUnit tests.
+     * 
+     * <p>
+     * Example of a non simple Param type where custom parse method is
+     * required.
+     * </p>
+     * 
+     * <p>
+     * When we convert to BeanInfo custom PropertyEditors will be required for
+     * this Param.
+     * </p>
+     */
+    static final Param DBFCHARSET = new Param("charset", Charset.class,
+            "character used to decode strings from the DBF file", false, Charset.forName("ISO-8859-1")) {
+            public Object parse(String text) throws IOException {
+                return Charset.forName(text);
+            }
+
+            public String text(Object value) {
+                return ((Charset) value).name();
+            }
+        };
+    
 
 	private Map liveStores=new HashMap();
+    
+
     /**
      * Takes a list of params which describes how to access a restore and
      * determins if it can be read by the Shapefile Datastore.
@@ -121,10 +149,13 @@ public class ShapefileDataStoreFactory
             url = (URL) URLP.lookUp(params);
             Boolean mm = (Boolean) MEMORY_MAPPED.lookUp(params);
             URI namespace = (URI) NAMESPACEP.lookUp(params);  
+            Charset dbfCharset = (Charset) DBFCHARSET.lookUp(params);
+            if (dbfCharset == null) {
+                dbfCharset = Charset.forName("ISO-8859-1");
+	    }
             if (mm == null)
                 mm = Boolean.FALSE;
-            ds = new ShapefileDataStore(url, namespace, 
-                                        mm.booleanValue());
+            ds = new ShapefileDataStore(url, namespace, mm.booleanValue(), dbfCharset);
         } catch (MalformedURLException mue) {
             throw new DataSourceException("Unable to attatch datastore to "
                 + url, mue);
@@ -188,7 +219,7 @@ public class ShapefileDataStoreFactory
      * @see org.geotools.data.DataStoreFactorySpi#getParametersInfo()
      */
     public Param[] getParametersInfo() {
-        return new Param[] { URLP};
+        return new Param[] { URLP, DBFCHARSET };
     }
 
     /**
