@@ -98,7 +98,7 @@ public class ShapefileRendererUtil {
     }
 
     public static IndexedDbaseFileReader getDBFReader( ShapefileDataStore ds ) throws IOException {
-        return new IndexedDbaseFileReader(ds.getReadChannel(ds.dbfURL));
+        return new IndexedDbaseFileReader(ds.getReadChannel(ds.dbfURL), true, ds.getStringCharset());
     }
 
     public static ReadableByteChannel getShpReadChannel( ShapefileDataStore ds ) throws IOException {
