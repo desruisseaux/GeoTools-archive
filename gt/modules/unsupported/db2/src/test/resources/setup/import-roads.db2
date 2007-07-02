@@ -2,6 +2,13 @@
 !erase roadsimp*;
 connect to geotools;
 drop table "Test"."Roads";
+create table "Test"."Roads"
+   (
+    "ID"       int not null primary key
+  , "Name"     varchar(30)
+  , "Length"   double
+  , "Geom"     db2gse.st_linestring)
+    ;
 -- create SRS for New York  state-plane zone 3101 data
 !db2se create_srs geotools
   -srsName      NY3101
@@ -18,7 +25,10 @@ drop table "Test"."Roads";
   -tableSchema \"Test\"
   -tableName   \"Roads\"
   -spatialColumn \"Geom\"
+  -typeSchema db2gse
+  -typeName   st_linestring
   -client 1
+  -createTableFlag 0
   -messagesFile roadsimp.msg
   -exceptionFile roadsimperr
   -commitScope 100

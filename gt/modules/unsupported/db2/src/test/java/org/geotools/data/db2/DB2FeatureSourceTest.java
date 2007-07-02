@@ -66,7 +66,7 @@ public class DB2FeatureSourceTest extends DB2TestCase {
         featureSource = new DB2FeatureSource(dataStore,dataStore.getSchema("Places"));
         env = featureSource.getBounds();
         assertEquals("all places bounds",
-            "[74°09.6'W 41°59.6'N , 74°04.1'W 42°03.6'N]",
+            "ReferencedEnvelope[-74.160507 : -74.067637, 41.993695 : 42.05990399999999]",
             env.toString());
 
         env = featureSource.getBounds(Query.ALL);
