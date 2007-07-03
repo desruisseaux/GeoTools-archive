@@ -54,18 +54,25 @@ public class Show3DMapExample
 
     private static void createUi( final Component view3D, final JMapPane view2D )
     {
-        // Add some JComponents also to demonstrate that the 3D view runs inside swing.
         final JPanel mainPanel = new JPanel( new BorderLayout() );
-        mainPanel.add( new JTree(), BorderLayout.WEST );
+
+        // Add a menu also to demonstrate that the 3D view runs inside swing / awt.
+        // TODO: The menu must be converted to a heavyweight awt component to overdraw the 3D awt canvas...  
+        // That requires using an AWT Frame, and that makes it hard to add Swing components.
         mainPanel.add( createMenuBar(), BorderLayout.NORTH );
 
+        // Show that menu renders on top of swing component but not awt canvas
+        mainPanel.add( new JLabel( "         " ), BorderLayout.WEST );
+
+        // TODO: Do this already at the Renderer3D level if not otherwise solvable.
+        // Wrap the 3D canvas in another JPanel, as it seems to have redraw problems otherwise?
         final JPanel view3DHolder = new JPanel( new BorderLayout() );
         view3DHolder.add( view3D, BorderLayout.CENTER );
 
+        // Put 2D and 3D view in a split pane.
         final JSplitPane splitPane = new JSplitPane( JSplitPane.HORIZONTAL_SPLIT, view3DHolder, view2D );
         splitPane.setDividerLocation( 500 );
         splitPane.setOneTouchExpandable( true );
-
         mainPanel.add( splitPane, BorderLayout.CENTER );
 
         showInFrame( mainPanel, "3D Map Demo" );
@@ -90,7 +97,7 @@ public class Show3DMapExample
     {
         final JMenuBar menuBar = new JMenuBar();
 
-        final JMenu menu = new JMenu( "3D View Demo" );
+        final JMenu menu = new JMenu( "Demo" );
         menuBar.add( menu );
 
         menu.add( new AbstractAction( "Exit" )

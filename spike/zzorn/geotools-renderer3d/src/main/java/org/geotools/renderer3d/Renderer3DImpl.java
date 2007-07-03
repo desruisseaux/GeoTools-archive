@@ -6,6 +6,7 @@ import org.geotools.map.MapContext;
 import org.geotools.renderer3d.navigationgestures.NavigationGesture;
 import org.geotools.renderer3d.terrainblock.TerrainBlock;
 import org.geotools.renderer3d.terrainblock.TerrainBlockFactory;
+import org.geotools.renderer3d.utils.ParameterChecker;
 import org.geotools.renderer3d.utils.canvas3d.Canvas3D;
 import org.geotools.renderer3d.utils.quadtree.QuadTree;
 import org.geotools.renderer3d.utils.quadtree.QuadTreeImpl;
@@ -23,6 +24,7 @@ public final class Renderer3DImpl
     // Private Fields
 
     private final Canvas3D myCanvas3D = new Canvas3D();
+    private final TerrainBlockFactory myTerrainBlockFactory;
 
     private MapContext myMapContext = null;
     private QuadTree myQuadTree;
@@ -31,8 +33,8 @@ public final class Renderer3DImpl
     //======================================================================
     // Private Constants
 
-    private static final int DEFAULT_START_RADIUS_M = 10;
-    private static final TerrainBlockFactory TERRAIN_BLOCK_FACTORY = new TerrainBlockFactory();
+    private static final int DEFAULT_START_RADIUS_M = 100;
+    private static final int DEFAULT_TERRAIN_BLOCK_SIZE_IN_GRIDS = 32;
 
     //======================================================================
     // Public Methods
@@ -76,12 +78,34 @@ public final class Renderer3DImpl
      *
      * @param mapContextToRender the map context that is used to get the layers to render in the 3D view.
      * @param startRadius_m      the length of each side in the first quad tree nodes created.
+     *                           number of grid cells along the side of a TerrainBlock.
      */
     public Renderer3DImpl( final MapContext mapContextToRender,
                            final double startRadius_m )
     {
-        myQuadTree = new QuadTreeImpl( startRadius_m, TERRAIN_BLOCK_FACTORY );
+        this( mapContextToRender, startRadius_m, DEFAULT_TERRAIN_BLOCK_SIZE_IN_GRIDS );
+    }
+
+
+    /**
+     * Creates a new Renderer3D.
+     *
+     * @param mapContextToRender      the map context that is used to get the layers to render in the 3D view.
+     * @param startRadius_m           the length of each side in the first quad tree nodes created.
+     * @param terrainBlockSizeInGrids number of grid cells along the side of a TerrainBlock.
+     */
+    public Renderer3DImpl( final MapContext mapContextToRender,
+                           final double startRadius_m,
+                           final int terrainBlockSizeInGrids )
+    {
+        ParameterChecker.checkNotNull( mapContextToRender, "mapContextToRender" );
+        ParameterChecker.checkPositiveNonZeroNormalNumber( startRadius_m, "startRadius_m" );
+        ParameterChecker.checkPositiveNonZeroInteger( terrainBlockSizeInGrids, "terrainBlockSizeInGrids" );
+
         myMapContext = mapContextToRender;
+
+        myTerrainBlockFactory = new TerrainBlockFactory( terrainBlockSizeInGrids );
+        myQuadTree = new QuadTreeImpl( startRadius_m, myTerrainBlockFactory );
     }
 
     //----------------------------------------------------------------------
@@ -100,7 +124,7 @@ public final class Renderer3DImpl
             myMapContext = mapContext;
 
             // Clear the old quadtree and start building a new one, with the data from the new context.
-            myQuadTree = new QuadTreeImpl( DEFAULT_START_RADIUS_M, TERRAIN_BLOCK_FACTORY );
+            myQuadTree = new QuadTreeImpl( DEFAULT_START_RADIUS_M, myTerrainBlockFactory );
         }
     }
 

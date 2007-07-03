@@ -1,8 +1,6 @@
 package org.geotools.renderer3d.terrainblock;
 
-import com.jme.math.Vector3f;
 import com.jme.scene.Spatial;
-import com.jme.scene.shape.Box;
 import org.geotools.renderer3d.utils.quadtree.QuadTreeNode;
 
 /**
@@ -16,7 +14,9 @@ public class TerrainBlockImpl
     // Private Fields
 
     private final QuadTreeNode myQuadTreeNode;
-    private Box mySpatial;
+    private final int myNumberOfGridsPerSide;
+
+    private Spatial mySpatial = null;
 
     //======================================================================
     // Public Methods
@@ -24,14 +24,18 @@ public class TerrainBlockImpl
     //----------------------------------------------------------------------
     // Constructors
 
-    public TerrainBlockImpl( final QuadTreeNode quadTreeNode )
+    /**
+     * @param quadTreeNode
+     * @param numberOfGridsPerSide number of grid cells along the side of the TerrainBlock.
+     */
+    public TerrainBlockImpl( final QuadTreeNode quadTreeNode, final int numberOfGridsPerSide )
     {
         myQuadTreeNode = quadTreeNode;
+        myNumberOfGridsPerSide = numberOfGridsPerSide;
     }
 
     //----------------------------------------------------------------------
     // TerrainBlock Implementation
-
 
     public Spatial getSpatial()
     {
@@ -43,17 +47,21 @@ public class TerrainBlockImpl
         return mySpatial;
     }
 
-    private Box createSpatial()
+    //======================================================================
+    // Private Methods
+
+    private Spatial createSpatial()
     {
-        final Box box = new Box( toString(),
-                                 new Vector3f( (float) myQuadTreeNode.getX1(),
-                                               (float) myQuadTreeNode.getY1(),
-                                               10 ),
-                                 new Vector3f( (float) myQuadTreeNode.getX2(),
-                                               (float) myQuadTreeNode.getY2(),
-                                               11 ) );
-        box.setRandomColors();
-        return box;
+        final TerrainMesh terrainMesh = new TerrainMesh( myNumberOfGridsPerSide,
+                                                         myNumberOfGridsPerSide,
+                                                         myQuadTreeNode.getX1(),
+                                                         myQuadTreeNode.getY1(),
+                                                         myQuadTreeNode.getX2(),
+                                                         myQuadTreeNode.getY2(),
+                                                         0 );
+
+        terrainMesh.setRandomColors();
+        return terrainMesh;
     }
 
 }

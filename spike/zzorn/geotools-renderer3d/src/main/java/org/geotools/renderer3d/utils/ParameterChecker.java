@@ -205,6 +205,20 @@ public final class ParameterChecker
     }
 
 
+    public static void checkLargerThan( final double parameter,
+                                        String parameterName,
+                                        double minimumValueExclusive,
+                                        String thresholdName )
+    {
+        if ( parameter <= minimumValueExclusive )
+        {
+            throwIllegalArgumentException( parameterName,
+                                           parameter,
+                                           "be larger than " + thresholdName + " (" + minimumValueExclusive + ")" );
+        }
+    }
+
+
     public static void checkNotAlreadyContained( final Object element,
                                                  final Collection collection,
                                                  final String listName )
@@ -235,8 +249,6 @@ public final class ParameterChecker
                     element ) );
         }
     }
-
-
 
 
     public static void checkIsInstanceOf( final Object parameter,
@@ -297,7 +309,7 @@ public final class ParameterChecker
                                                        final double parameter,
                                                        final String expectedCondition )
     {
-        throwIllegalArgumentException( parameterName, new Double(parameter), expectedCondition );
+        throwIllegalArgumentException( parameterName, new Double( parameter ), expectedCondition );
     }
 
 

@@ -13,14 +13,33 @@ public class TerrainBlockFactory
 {
 
     //======================================================================
+    // Private Fields
+
+    private final int myNumberOfGridsPerSide;
+
+    //======================================================================
     // Public Methods
+
+    //----------------------------------------------------------------------
+    // Constructors
+
+    /**
+     * @param numberOfGridsPerSide number of grid cells along the side of a TerrainBlock.
+     */
+    public TerrainBlockFactory( final int numberOfGridsPerSide )
+    {
+        myNumberOfGridsPerSide = numberOfGridsPerSide;
+    }
 
     //----------------------------------------------------------------------
     // NodeDataFactory Implementation
 
+    //======================================================================
+    // Public Methods
+
     public Object createNodeDataObject( final QuadTreeNode node )
     {
-        return new TerrainBlockImpl( node );
+        return new TerrainBlockImpl( node, myNumberOfGridsPerSide );
     }
 
 }

@@ -40,7 +40,6 @@ public final class PanGesture
     //----------------------------------------------------------------------
     // MouseMotionListener Implementation
 
-
     public void mouseDragged( final MouseEvent e )
     {
         final Camera camera = getCamera();
