@@ -64,30 +64,6 @@ public class RTree implements ISpatialIndex {
     ArrayList m_writeNodeCommands = new ArrayList();
     ArrayList m_readNodeCommands = new ArrayList();
     ArrayList m_deleteNodeCommands = new ArrayList();
-    
-    // added by CR
-    //
-    public void deleteLeaf(Leaf l) {
-    	Stack pathBuffer = new Stack() ;
-    	for (int i = 0 ; i < l.getChildrenCount() ; i++) {
-    		//l.deleteEntry(i) ;
-    		//this.deleteData(l.getChildShape(i), l.getChildIdentifier(i)) ;
-    		l.deleteData(l.getChildIdentifier(i), pathBuffer) ;
-    		m_stats.m_data-- ;
-    	}
-    }
-    
-    public void deleteLeaf(Index node, int leafIndex) {
-    	node.deleteEntry(leafIndex) ;
-    }
-    
-    public List readLeaf(Leaf leaf) {
-    	List ret = new ArrayList() ;
-    	for (int i = 0; i < leaf.getChildrenCount() ; i++) {
-    		ret.add(new String(leaf.m_pData[i])) ;
-    	}
-    	return ret ;
-    }
 
     public RTree(PropertySet ps, IStorageManager sm) {
         m_rwLock = new RWLock();
@@ -132,6 +108,33 @@ public class RTree implements ISpatialIndex {
             Integer i = new Integer(m_headerID);
             ps.setProperty("IndexIdentifier", i);
         }
+    }
+
+    // added by CR
+    //
+    public void deleteLeaf(Leaf l) {
+        Stack pathBuffer = new Stack();
+
+        for (int i = 0; i < l.getChildrenCount(); i++) {
+            //l.deleteEntry(i) ;
+            //this.deleteData(l.getChildShape(i), l.getChildIdentifier(i)) ;
+            l.deleteData(l.getChildIdentifier(i), pathBuffer);
+            m_stats.m_data--;
+        }
+    }
+
+    public void deleteLeaf(Index node, int leafIndex) {
+        node.deleteEntry(leafIndex);
+    }
+
+    public List readLeaf(Leaf leaf) {
+        List ret = new ArrayList();
+
+        for (int i = 0; i < leaf.getChildrenCount(); i++) {
+            ret.add(new String(leaf.m_pData[i]));
+        }
+
+        return ret;
     }
 
     //

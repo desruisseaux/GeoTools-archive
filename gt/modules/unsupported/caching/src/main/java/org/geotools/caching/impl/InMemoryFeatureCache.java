@@ -77,14 +77,14 @@ public class InMemoryFeatureCache implements FeatureCache {
     protected Transaction transaction = Transaction.AUTO_COMMIT;
     protected final DataStore ds;
     protected final HashMap store;
-    protected final Hashtable nodes ;
+    protected final Hashtable nodes;
     protected final FeatureType type;
     protected final SpatialQueryTracker tracker;
     protected final RTree index;
-    protected int capacity ;
-    protected int cacheReads = 0 ;
-    protected int storeReads = 0 ;
-    protected int evictions = 0 ;
+    protected int capacity;
+    protected int cacheReads = 0;
+    protected int storeReads = 0;
+    protected int evictions = 0;
 
     /** Create a new InMemoryFeatureCache
      *
@@ -112,41 +112,37 @@ public class InMemoryFeatureCache implements FeatureCache {
         this.store = new HashMap();
         this.nodes = new Hashtable();
         this.tracker = new SpatialQueryTracker();
-        this.capacity = capacity ;
+        this.capacity = capacity;
 
         PropertySet ps = new PropertySet();
         ps.setProperty("TreeVariant", new Integer(SpatialIndex.RtreeVariantLinear));
-        ps.setProperty("LeafCapacity", new Integer(capacity/10)) ;
+        ps.setProperty("LeafCapacity", new Integer(capacity / 10));
 
         MemoryStorageManager sm = new MemoryStorageManager();
         this.index = new RTree(ps, sm);
         this.index.addDeleteNodeCommand(new INodeCommand() {
-
-			public void execute(INode n) {
-				nodes.remove(new Integer(n.getIdentifier())) ;
-			}
-        	
-        }) ;
+                public void execute(INode n) {
+                    nodes.remove(new Integer(n.getIdentifier()));
+                }
+            });
         this.index.addReadNodeCommand(new INodeCommand() {
+                public void execute(INode n) {
+                    NodeCacheEntry entry = (NodeCacheEntry) nodes.get(new Integer(n.getIdentifier()));
 
-			public void execute(INode n) {
-				NodeCacheEntry entry = (NodeCacheEntry) nodes.get(new Integer(n.getIdentifier())) ;
-				if (entry == null) {
-					entry = new NodeCacheEntry(n) ;
-					nodes.put(new Integer(n.getIdentifier()), entry) ;
-				}
-				entry.hit() ;
-			}
-        	
-        }) ;
+                    if (entry == null) {
+                        entry = new NodeCacheEntry(n);
+                        nodes.put(new Integer(n.getIdentifier()), entry);
+                    }
+
+                    entry.hit();
+                }
+            });
         this.index.addWriteNodeCommand(new INodeCommand() {
-
-			public void execute(INode n) {
-				NodeCacheEntry entry = new NodeCacheEntry(n) ;
-				nodes.put(new Integer(n.getIdentifier()), entry) ;
-			}
-        	
-        }) ;
+                public void execute(INode n) {
+                    NodeCacheEntry entry = new NodeCacheEntry(n);
+                    nodes.put(new Integer(n.getIdentifier()), entry);
+                }
+            });
     }
 
     public void clear() {
@@ -154,11 +150,12 @@ public class InMemoryFeatureCache implements FeatureCache {
     }
 
     public void evict() {
-    	//System.out.println("before = " + store.size()) ;
-    	//System.out.println(index.getStatistics()) ;
-        EvictionQueryStrategy strategy = new EvictionQueryStrategy() ;
-        index.queryStrategy(strategy) ;
-        strategy.doDelete() ;
+        //System.out.println("before = " + store.size()) ;
+        //System.out.println(index.getStatistics()) ;
+        EvictionQueryStrategy strategy = new EvictionQueryStrategy();
+        index.queryStrategy(strategy);
+        strategy.doDelete();
+
         //System.out.println("after = " + store.size()) ;
         //System.out.println(index.getStatistics()) ;
         //System.out.println("======================") ;
@@ -232,16 +229,19 @@ public class InMemoryFeatureCache implements FeatureCache {
     }
 
     public void putAll(FeatureCollection fc, Filter f) {
-    	if (fc.size() > capacity) {
-    		return ;
-    	}
-    	tracker.register(f) ;
+        if (fc.size() > capacity) {
+            return;
+        }
+
+        tracker.register(f);
+
         FeatureIterator it = fc.features();
 
         while (it.hasNext()) {
-        	if (store.size() >= capacity) {
-        		evict() ;
-        	}
+            if (store.size() >= capacity) {
+                evict();
+            }
+
             put(it.next());
         }
 
@@ -288,9 +288,9 @@ public class InMemoryFeatureCache implements FeatureCache {
                filters[SPATIAL_RESTRICTION_MISSING] = f;
                filters[OTHER_RESTRICTIONS] = Filter.INCLUDE;
            }*/
-        assert (sr == Filter.INCLUDE || sr instanceof BBOXImpl);
-        //System.out.println(sr.getClass()) ;
+        assert ((sr == Filter.INCLUDE) || sr instanceof BBOXImpl);
 
+        //System.out.println(sr.getClass()) ;
         Filter missing = tracker.match(sr);
         Filter cached;
 
@@ -386,17 +386,19 @@ public class InMemoryFeatureCache implements FeatureCache {
         //System.out.println("from cache = " + fromCache.size()) ;
         //fromCache.subCollection(filters[OTHER_RESTRICTIONS]) ;
         //System.out.println("from cache = " + fromCache.size()) ;
-        cacheReads += fromCache.size() ;
+        cacheReads += fromCache.size();
+
         FilterFactory ff = new FilterFactoryImpl();
         Filter missing = filters[SPATIAL_RESTRICTION_MISSING];
 
         if (missing != Filter.EXCLUDE) {
             FeatureCollection fromStore = loadFromStore(ff.and(missing, filters[OTHER_RESTRICTIONS]));
             //tracker.register(missing);
-            putAll(fromStore, missing) ;
+            putAll(fromStore, missing);
             //System.out.println("from store = " + fromStore.size()) ;
-            storeReads += fromStore.size() ;
+            storeReads += fromStore.size();
             fromCache.addAll(fromStore);
+
             //System.out.println("Added data to cache") ;
         }
 
@@ -429,13 +431,17 @@ public class InMemoryFeatureCache implements FeatureCache {
                     }
 
                     public void visitNode(final INode n) {
-                        NodeCacheEntry e = (NodeCacheEntry) nodes.get(new Integer(n.getIdentifier())) ;
+                        NodeCacheEntry e = (NodeCacheEntry) nodes.get(new Integer(n.getIdentifier()));
+
                         if (e == null) {
-                        	e = new NodeCacheEntry(n) ;
-                        	nodes.put(new Integer(n.getIdentifier()), e) ;
-                        	//System.out.println("created node " + n.getIdentifier()) ;
+                            e = new NodeCacheEntry(n);
+                            nodes.put(new Integer(n.getIdentifier()), e);
+
+                            //System.out.println("created node " + n.getIdentifier()) ;
                         }
-                        e.hit() ;
+
+                        e.hit();
+
                         //System.out.println("hitted node " + n.getIdentifier()) ;
                     }
                 });
@@ -451,72 +457,78 @@ public class InMemoryFeatureCache implements FeatureCache {
     public void removeFeatureListener(FeatureListener listener) {
         throw new UnsupportedOperationException();
     }
-    
+
     public int getCacheReads() {
-    	return cacheReads ;
+        return cacheReads;
     }
-    
+
     public int getStoreReads() {
-    	return storeReads ;
+        return storeReads;
     }
-    
+
     public int getEvictions() {
-    	return evictions ;
+        return evictions;
     }
-    
+
     class EvictionQueryStrategy implements IQueryStrategy {
+        Leaf leaf = null;
 
-    	Leaf leaf = null ;
+        public void getNextEntry(IEntry e, int[] nextEntry, boolean[] hasNext) {
+            if (e instanceof Index) {
+                // TODO handle case there is no child
+                Index n = (Index) e;
+                NodeCacheEntry entry = (NodeCacheEntry) nodes.get(new Integer(n.getChildIdentifier(
+                                0)));
+                long accessTime;
 
-    	public void getNextEntry(IEntry e, int[] nextEntry, boolean[] hasNext) {
-    		if (e instanceof Index) {
-    			// TODO handle case there is no child
-    			Index n = (Index) e ;
-    			NodeCacheEntry entry = (NodeCacheEntry) nodes.get(new Integer(n.getChildIdentifier(0))) ;
-    			long accessTime ;
-    			if (entry == null) {
-    				accessTime = System.currentTimeMillis() ;
-    			} else {
-    				accessTime = entry.getLastAccessTime() ;
-    			}
-    			for (int i = 1; i < n.getChildrenCount(); i++) {
-    				NodeCacheEntry next = (NodeCacheEntry) nodes.get(new Integer(n.getChildIdentifier(i))) ;
-    				if (next != null && next.getLastAccessTime() < accessTime) {
-    					accessTime = next.getLastAccessTime() ;
-    					entry = next ;
-    				}
-    			}
-    			assert (entry != null) ;
-    			nextEntry[0] = ((INode) entry.getValue()).getIdentifier() ;
-    			hasNext[0] = true ;
-    			return ;
-    		} else if (e instanceof Leaf) {
-    			leaf = (Leaf) e ;
-    			/*for (int i = 0 ; i < leaf.getChildrenCount() ; i++ ) {
-				// can't do that cause read lock !
-				//index.deleteData(leaf.getChildShape(i), leaf.getChildIdentifier(i)) ;
-				System.out.println("Should delete data " + leaf.getChildIdentifier(i)) ;
-			}*/
-    			hasNext[0] = false ;
-    		}
-    	}
+                if (entry == null) {
+                    accessTime = System.currentTimeMillis();
+                } else {
+                    accessTime = entry.getLastAccessTime();
+                }
 
-    	public void doDelete() {
-    		if (leaf != null) {
-    			//System.out.println("deleting") ;
-    			//index.deleteLeaf(leaf) ;
-    			//index.deleteLeaf(node, leafIndex) ;
-    			List ids = index.readLeaf(leaf) ;
-    			for (Iterator it = ids.iterator() ; it.hasNext() ; ) {
-    				String id = (String) it.next() ;
-    				remove(id) ;
-    				evictions++ ;
-    			}
-    			Region r = (Region) leaf.getShape() ;
-    			Envelope e = new Envelope(r.getLow(0), r.getHigh(0), r.getLow(1), r.getHigh(1)) ;
-    			tracker.unregister(e) ;
-    		}
-    	}
+                for (int i = 1; i < n.getChildrenCount(); i++) {
+                    NodeCacheEntry next = (NodeCacheEntry) nodes.get(new Integer(
+                                n.getChildIdentifier(i)));
 
+                    if ((next != null) && (next.getLastAccessTime() < accessTime)) {
+                        accessTime = next.getLastAccessTime();
+                        entry = next;
+                    }
+                }
+                assert (entry != null);
+                nextEntry[0] = ((INode) entry.getValue()).getIdentifier();
+                hasNext[0] = true;
+
+                return;
+            } else if (e instanceof Leaf) {
+                leaf = (Leaf) e;
+                /*for (int i = 0 ; i < leaf.getChildrenCount() ; i++ ) {
+                   // can't do that cause read lock !
+                   //index.deleteData(leaf.getChildShape(i), leaf.getChildIdentifier(i)) ;
+                   System.out.println("Should delete data " + leaf.getChildIdentifier(i)) ;
+                   }*/
+                hasNext[0] = false;
+            }
+        }
+
+        public void doDelete() {
+            if (leaf != null) {
+                //System.out.println("deleting") ;
+                //index.deleteLeaf(leaf) ;
+                //index.deleteLeaf(node, leafIndex) ;
+                List ids = index.readLeaf(leaf);
+
+                for (Iterator it = ids.iterator(); it.hasNext();) {
+                    String id = (String) it.next();
+                    remove(id);
+                    evictions++;
+                }
+
+                Region r = (Region) leaf.getShape();
+                Envelope e = new Envelope(r.getLow(0), r.getHigh(0), r.getLow(1), r.getHigh(1));
+                tracker.unregister(e);
+            }
+        }
     }
 }

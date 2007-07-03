@@ -407,5 +407,5 @@ public class InMemoryDataCache extends AbstractDataStore implements DataCache {
 
     /*protected FeatureWriter getFeatureWriter(String typeName) throws IOException {
     
-                      }*/
+                                    }*/
 }

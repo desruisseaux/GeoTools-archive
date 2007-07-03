@@ -195,10 +195,10 @@ public class SpatialQueryTracker implements QueryTracker {
         if (accepts(f)) {
             BBOXImpl bb = (BBOXImpl) f;
             Envelope env = new Envelope(bb.getMinX(), bb.getMaxX(), bb.getMinY(), bb.getMaxY());
-            unregister(env) ;
+            unregister(env);
         }
     }
-    
+
     public void unregister(Envelope env) {
         try {
             List results = tree.search(env);

@@ -153,10 +153,10 @@ public class InMemoryFeatureCacheBenchmarkTest extends TestCase {
             FeatureCollection testedSet = tested.getFeatures(q);
             assertTrue(compareFeatureCollectionByHash(controlSet, testedSet));
         }
-        
-        System.out.println("Cache reads = " + tested.getCacheReads()) ;
-        System.out.println("Store reads = " + tested.getStoreReads()) ;
-        System.out.println("Evictions = " + tested.getEvictions()) ;
+
+        System.out.println("Cache reads = " + tested.getCacheReads());
+        System.out.println("Store reads = " + tested.getStoreReads());
+        System.out.println("Evictions = " + tested.getEvictions());
     }
 
     public void testDataCachePerformance() throws IOException, FeatureCacheException {
@@ -171,14 +171,14 @@ public class InMemoryFeatureCacheBenchmarkTest extends TestCase {
         ds.addFeatures(data);
 
         InMemoryFeatureCache tested = new InMemoryFeatureCache(ds, type, 2500);
-        tested.getFeatures(new FilterFactoryImpl().bbox("",0, 0, 1000, 1000,"")) ;
+        tested.getFeatures(new FilterFactoryImpl().bbox("", 0, 0, 1000, 1000, ""));
+
         long diff = compareDataStores(tested, control.getFeatureSource(type.getTypeName()), querySet);
 
         //assertTrue(diff < 0);
-        
-        System.out.println("Cache reads = " + tested.getCacheReads()) ;
-        System.out.println("Store reads = " + tested.getStoreReads()) ;
-        System.out.println("Evictions = " + tested.getEvictions()) ;
+        System.out.println("Cache reads = " + tested.getCacheReads());
+        System.out.println("Store reads = " + tested.getStoreReads());
+        System.out.println("Evictions = " + tested.getEvictions());
     }
 
     public void ztestDataCachePerformanceRandomQueries()
@@ -195,10 +195,10 @@ public class InMemoryFeatureCacheBenchmarkTest extends TestCase {
 
         InMemoryFeatureCache tested = new InMemoryFeatureCache(ds, type, 1000);
         long diff = compareDataStores(tested, control.getFeatureSource(type.getTypeName()), querySet);
-        
-        System.out.println("Cache reads = " + tested.getCacheReads()) ;
-        System.out.println("Store reads = " + tested.getStoreReads()) ;
-        System.out.println("Evictions = " + tested.getEvictions()) ;
+
+        System.out.println("Cache reads = " + tested.getCacheReads());
+        System.out.println("Store reads = " + tested.getStoreReads());
+        System.out.println("Evictions = " + tested.getEvictions());
     }
 
     private short compareQuery(Query q1, Query q2) {
@@ -283,9 +283,9 @@ public class InMemoryFeatureCacheBenchmarkTest extends TestCase {
             }
 
             /*System.out.println("Test: " + ds_stats[i].getNumberOfFeatures() + " features ; "
-                + ds_stats[i].getExecutionTime() + " ms ; " + "Control: "
-                + control_stats[i].getNumberOfFeatures() + " features ; "
-                + control_stats[i].getExecutionTime() + " ms ; "); */
+               + ds_stats[i].getExecutionTime() + " ms ; " + "Control: "
+               + control_stats[i].getNumberOfFeatures() + " features ; "
+               + control_stats[i].getExecutionTime() + " ms ; "); */
         }
 
         meanDifference = ((querySet.size() - 2) > 0) ? (meanDifference / (querySet.size() - 2)) : 0;
