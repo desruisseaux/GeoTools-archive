@@ -1,14 +1,21 @@
 package org.geotools.renderer3d.terrainblock;
 
 import com.jme.bounding.BoundingBox;
+import com.jme.image.Texture;
 import com.jme.math.Vector2f;
 import com.jme.math.Vector3f;
 import com.jme.renderer.ColorRGBA;
+import com.jme.renderer.Renderer;
 import com.jme.scene.TriMesh;
+import com.jme.scene.state.TextureState;
+import com.jme.util.TextureManager;
 import com.jme.util.geom.BufferUtils;
+import org.geotools.renderer3d.utils.ImageUtils;
 import org.geotools.renderer3d.utils.MathUtils;
 import org.geotools.renderer3d.utils.ParameterChecker;
 
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -45,10 +52,18 @@ public final class TerrainMesh
     private final int mySizeY_vertices;
     private final int mySizeX_vertices;
 
+    private Image myTextureImage;
+
+    private boolean myTextureUpdateNeeded = false;
+
     //======================================================================
     // Private Constants
 
     private static final double SKIRT_SIZE_FACTOR = 0.1;
+
+    private static final BufferedImage PLACEHOLDER_PICTURE = ImageUtils.createPlaceholderPicture( 128, 128 );
+    private static final float DEFAULT_ANISO_LEVEL = 1.0f;
+    private static final int DEFAULT_TEXTURE_IMAGE_FORMAT = com.jme.image.Image.GUESS_FORMAT_NO_S3TC;
 
     //======================================================================
     // Public Methods
@@ -132,6 +147,34 @@ public final class TerrainMesh
         updateModelBound();
     }
 
+    //----------------------------------------------------------------------
+    // Other Public Methods
+
+    public void draw( final Renderer r )
+    {
+        if ( myTextureUpdateNeeded )
+        {
+            initTexture( myTextureImage, r );
+        }
+
+        super.draw( r );
+    }
+
+
+    /**
+     * Creates a texture from the specified image and applies it to this Terrainmesh.
+     *
+     * @param textureImage the image to create a texture from.  If null, a placeholder texture is created.
+     */
+    public void setTextureImage( Image textureImage )
+    {
+        if ( myTextureImage != textureImage )
+        {
+            myTextureImage = textureImage;
+            myTextureUpdateNeeded = true;
+        }
+    }
+
     //======================================================================
     // Private Methods
 
@@ -139,7 +182,7 @@ public final class TerrainMesh
     {
         final double cellSizeX = ( myX2 - myX1 ) / mySizeX_cells;
         final double cellSizeY = ( myY2 - myY1 ) / mySizeY_cells;
-        return ( cellSizeX + cellSizeY ) * 0.5 * SKIRT_SIZE_FACTOR;
+        return Math.max( cellSizeX, cellSizeY ) * SKIRT_SIZE_FACTOR;
     }
 
     /* *
@@ -413,7 +456,8 @@ public final class TerrainMesh
 
         final Vector3f position = new Vector3f( xPos, yPos, zPos );
         final Vector3f normal = new Vector3f( 0, 0, 1 );
-        final ColorRGBA color = new ColorRGBA( 1.0f, 1.0f, 1.0f, 1.0f );
+        final ColorRGBA color = new ColorRGBA( DEFAULT_ANISO_LEVEL,
+                                               DEFAULT_ANISO_LEVEL, DEFAULT_ANISO_LEVEL, DEFAULT_ANISO_LEVEL );
         final Vector2f textureCoordinate = new Vector2f( textureXPos, textureYPos );
 
         BufferUtils.setInBuffer( position, myVertexes, index );
@@ -462,5 +506,39 @@ public final class TerrainMesh
             }
         }
     }
+
+
+    private void initTexture( Image textureImage, final Renderer renderer )
+    {
+        if ( textureImage == null )
+        {
+            textureImage = PLACEHOLDER_PICTURE;
+        }
+
+        final TextureState myTextureState = renderer.createTextureState();
+
+        final Texture texture = TextureManager.loadTexture( textureImage,
+                                                            Texture.MM_LINEAR,
+                                                            Texture.FM_NEAREST,
+                                                            DEFAULT_ANISO_LEVEL,
+                                                            DEFAULT_TEXTURE_IMAGE_FORMAT,
+                                                            true );
+
+/*
+        // Activate mip-mapping
+        texture.setMipmapState( Texture.MM_NEAREST_LINEAR );
+*/
+
+        // Clamp texture at edges (no wrapping)
+        texture.setWrap( Texture.WM_ECLAMP_S_ECLAMP_T );
+
+        myTextureState.setTexture( texture, 0 );
+
+        setRenderState( myTextureState );
+        updateRenderState();
+
+        myTextureUpdateNeeded = false;
+    }
+
 
 }

@@ -8,7 +8,7 @@ import java.util.Random;
  *
  * @author Hans Häggström
  */
-public class MathUtils
+public final class MathUtils
 {
 
     //======================================================================

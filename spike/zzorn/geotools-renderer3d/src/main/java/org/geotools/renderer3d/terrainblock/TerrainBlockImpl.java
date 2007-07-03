@@ -3,10 +3,12 @@ package org.geotools.renderer3d.terrainblock;
 import com.jme.scene.Spatial;
 import org.geotools.renderer3d.utils.quadtree.QuadTreeNode;
 
+import java.awt.Image;
+
 /**
  * @author Hans Häggström
  */
-public class TerrainBlockImpl
+public final class TerrainBlockImpl
         implements TerrainBlock
 {
 
@@ -16,7 +18,8 @@ public class TerrainBlockImpl
     private final QuadTreeNode myQuadTreeNode;
     private final int myNumberOfGridsPerSide;
 
-    private Spatial mySpatial = null;
+    private TerrainMesh myTerrainMesh = null;
+    private Image myMapImage = null;
 
     //======================================================================
     // Public Methods
@@ -39,18 +42,33 @@ public class TerrainBlockImpl
 
     public Spatial getSpatial()
     {
-        if ( mySpatial == null )
+        if ( myTerrainMesh == null )
         {
-            mySpatial = createSpatial();
+            myTerrainMesh = createTerrainMesh();
         }
 
-        return mySpatial;
+        return myTerrainMesh;
+    }
+
+    public Image getMapImage()
+    {
+        return myMapImage;
+    }
+
+    public void setMapImage( final Image mapImage )
+    {
+        myMapImage = mapImage;
+
+        if ( myTerrainMesh != null )
+        {
+            myTerrainMesh.setTextureImage( mapImage );
+        }
     }
 
     //======================================================================
     // Private Methods
 
-    private Spatial createSpatial()
+    private TerrainMesh createTerrainMesh()
     {
         final TerrainMesh terrainMesh = new TerrainMesh( myNumberOfGridsPerSide,
                                                          myNumberOfGridsPerSide,
@@ -60,7 +78,12 @@ public class TerrainBlockImpl
                                                          myQuadTreeNode.getY2(),
                                                          0 );
 
+        terrainMesh.setTextureImage( myMapImage );
+
+/* // DEBUG
         terrainMesh.setRandomColors();
+*/
+
         return terrainMesh;
     }
 

@@ -14,7 +14,7 @@ import org.geotools.styling.BasicLineStyle;
  *
  * @author Hans Häggström
  */
-public class ExampleDataGenerator
+public final class ExampleDataGenerator
 {
 
 
