@@ -38,27 +38,41 @@
 package org.geotools.geometry.iso.primitive;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import org.geotools.geometry.iso.aggregate.MultiSurfaceImpl;
+import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
+import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.coordinate.PolygonImpl;
 import org.geotools.geometry.iso.coordinate.SurfacePatchImpl;
 import org.geotools.geometry.iso.io.GeometryToString;
 import org.geotools.geometry.iso.operation.IsSimpleOp;
+import org.geotools.geometry.iso.util.Assert;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
+import org.opengis.geometry.Geometry;
+import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.geometry.TransfiniteSet;
 import org.opengis.geometry.aggregate.MultiSurface;
 import org.opengis.geometry.complex.CompositeSurface;
+import org.opengis.geometry.coordinate.GeometryFactory;
+import org.opengis.geometry.coordinate.LineString;
+import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.OrientableSurface;
+import org.opengis.geometry.primitive.PrimitiveFactory;
+import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.primitive.Surface;
 import org.opengis.geometry.primitive.SurfaceBoundary;
 import org.opengis.geometry.primitive.SurfacePatch;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
 /**
  * 
@@ -467,6 +481,54 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 		} else if (!envelope.equals(other.envelope))
 			return false;
 		return true;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.geometry.coordinate.root.Geometry#transform(org.opengis.referencing.crs.CoordinateReferenceSystem,
+	 *      org.opengis.referencing.operation.MathTransform)
+	 */
+	public Geometry transform(CoordinateReferenceSystem newCRS,
+			MathTransform transform) {
+
+		// loop through each ring in this Surface and transform it to the new CRS, then
+		// use the new rings to build a new Surface and return that.
+		PrimitiveFactory primitiveFactory = new PrimitiveFactoryImpl(newCRS, positionFactory);
+		
+		List<RingImpl> currentRings = this.getBoundaryRings();
+		Iterator<RingImpl> iter = currentRings.iterator();
+		RingImpl newExterior = null;
+		List<Ring> newInteriors = new ArrayList<Ring>();
+		while (iter.hasNext()) {
+			RingImpl thisRing = (RingImpl) iter.next();
+			
+			// exterior Ring should be first element in the list
+			if (newExterior == null) {
+				try {
+					newExterior = (RingImpl) thisRing.transform(newCRS);
+				} catch (TransformException e) {
+					Assert.isTrue(false, "Transform error for exterioir ring.");
+					return null;
+					//e.printStackTrace();
+				}
+			}
+			else {
+				try {
+					newInteriors.add((RingImpl) thisRing.transform(newCRS));
+				} catch (TransformException e) {
+					Assert.isTrue(false, "Transform error for interior ring.");
+					return null;
+					//e.printStackTrace();
+				}
+			}
+		}
+		
+		// use the new Ring list to build a new Surface and return it
+		SurfaceBoundaryImpl surfaceBoundary = (SurfaceBoundaryImpl) primitiveFactory.createSurfaceBoundary(newExterior, newInteriors);
+		SurfaceImpl newSurface = (SurfaceImpl) primitiveFactory.createSurface(surfaceBoundary);
+		return newSurface;
+			
 	}
 
 }

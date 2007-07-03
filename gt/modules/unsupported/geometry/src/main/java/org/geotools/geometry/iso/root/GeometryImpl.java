@@ -279,28 +279,11 @@ public abstract class GeometryImpl implements Geometry {
 	 *      org.opengis.referencing.operation.MathTransform)
 	 */
 	public Geometry transform(CoordinateReferenceSystem newCRS,
-			MathTransform transform) throws TransformException {
+			MathTransform transform) {
 
-			// go through the possible geometry types and transform its coordinates
-			// within a new geometry of that type
-			PositionFactory positionFactory = new PositionFactoryImpl(newCRS, this.getPrecision());
-			if (this instanceof PointImpl) {
-				PrimitiveFactory primitiveFactory = new PrimitiveFactoryImpl(newCRS, positionFactory);
-				DirectPosition dp1 = new DirectPositionImpl(newCRS);
-				return primitiveFactory.createPoint( transform.transform(((PointImpl)this).getPosition(), dp1) );
-			}
-			else if (this instanceof CurveImpl) {
-				return null;
-//				CurveImpl curve = (CurveImpl) this;
-//				curve.asDirectPositions();
-//				transform.transfo
-//				
-//				PrimitiveFactory primitiveFactory = new PrimitiveFactoryImpl(newCRS, positionFactory);
-//				DirectPosition dp1 = new DirectPositionImpl(newCRS);
-//				return primitiveFactory.createPoint( transform.transform(((PointImpl)this).getPosition(), dp1) );
-			}
-			
-			return null;
+			// this should be handled in each of the individual geometry classes (ie:
+			// PointImpl, CurveImpl, etc), if not it will fall through to here
+			throw new UnsupportedOperationException("Transform not implemented for this geometry type yet.");
 	}
 
 	/**
@@ -317,6 +300,14 @@ public abstract class GeometryImpl implements Geometry {
      * Computes the distance between this and another geometry.  We have
      * to implement the logic of dealing with multiprimtive geometries separately.
 	 * 
+	 * gdavis - This method should really be broken out into 1 of 2 things:
+	 * 		1.  an operator class that figures out the geometry type 
+	 * 			and does the operation based on that, or
+	 * 		2.  a double dispatch command pattern system that returns a command to perform
+	 * 			based on the geometry type and the command of "distance".
+	 * 		Currently this implementation works for our needs, but we should 
+	 * 		consider re-designing it with one of the above approaches for better
+	 * 		scalability.
 	 * @see org.opengis.geometry.coordinate.root.Geometry#distance(org.opengis.geometry.coordinate.root.Geometry)
 	 */
 	public final double distance(Geometry geometry) {

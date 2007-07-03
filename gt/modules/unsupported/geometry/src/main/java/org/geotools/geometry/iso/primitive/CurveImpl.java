@@ -46,16 +46,21 @@ import java.util.List;
 import org.geotools.geometry.iso.coordinate.CurveSegmentImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
+import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.coordinate.LineStringImpl;
 import org.geotools.geometry.iso.coordinate.PointArrayImpl;
 import org.geotools.geometry.iso.coordinate.PositionImpl;
 import org.geotools.geometry.iso.io.GeometryToString;
 import org.geotools.geometry.iso.operation.IsSimpleOp;
 import org.geotools.geometry.iso.operation.Merger;
+import org.geotools.geometry.iso.util.Assert;
 import org.geotools.geometry.iso.util.DoubleOperation;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
+import org.opengis.geometry.Geometry;
+import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.geometry.complex.CompositeCurve;
+import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.geometry.coordinate.LineSegment;
 import org.opengis.geometry.coordinate.LineString;
 import org.opengis.geometry.coordinate.ParamForPoint;
@@ -65,7 +70,10 @@ import org.opengis.geometry.primitive.CurveBoundary;
 import org.opengis.geometry.primitive.CurveSegment;
 import org.opengis.geometry.primitive.OrientablePrimitive;
 import org.opengis.geometry.primitive.Point;
+import org.opengis.geometry.primitive.PrimitiveFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
 /**
  * Curve (Figure 11 of the ISO 19107 v5) is a descendent subtype of Primitive
@@ -945,7 +953,48 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.geometry.coordinate.root.Geometry#transform(org.opengis.referencing.crs.CoordinateReferenceSystem,
+	 *      org.opengis.referencing.operation.MathTransform)
+	 */
+	public Geometry transform(CoordinateReferenceSystem newCRS,
+			MathTransform transform) {
 
+		// loop through each point in this curve and transform it to the new CRS, then
+		// use the new points to build a new curve and return that.
+		PrimitiveFactory primitiveFactory = new PrimitiveFactoryImpl(newCRS, positionFactory);
+		GeometryFactory geometryFactory = new GeometryFactoryImpl(newCRS, positionFactory);
+		
+		DirectPositionImpl dp1 = null;
+		List<DirectPositionImpl> currentpositions = this.asDirectPositions();
+		Iterator<DirectPositionImpl> iter = currentpositions.iterator();
+		List<Position> newpositions = new ArrayList<Position>();
+		while (iter.hasNext()) {
+			DirectPositionImpl thispos = (DirectPositionImpl) iter.next();
+			try {
+				dp1 = new DirectPositionImpl(newCRS);
+				dp1 = (DirectPositionImpl) transform.transform(thispos, dp1);
+				newpositions.add(dp1);
+			} catch (MismatchedDimensionException e) {
+				Assert.isTrue(false, "Mismatched CRS dimension error for position: "+thispos);
+				return null;
+				//e.printStackTrace();
+			} catch (TransformException e) {
+				Assert.isTrue(false, "Transform error for position: "+thispos);
+				return null;
+				//e.printStackTrace();
+			}
+		}
+		
+		// use the new positions list to build a new curve and return it
+		LineString lineString = geometryFactory.createLineString(newpositions);
+		List curveSegmentList = Collections.singletonList(lineString);
+		CurveImpl newCurve = (CurveImpl) primitiveFactory.createCurve(curveSegmentList);
+		return newCurve;
+			
+	}
 
 
 }

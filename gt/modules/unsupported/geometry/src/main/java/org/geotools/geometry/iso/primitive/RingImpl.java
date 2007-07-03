@@ -38,24 +38,36 @@
 package org.geotools.geometry.iso.primitive;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import org.geotools.geometry.iso.complex.CompositeCurveImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
+import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.coordinate.LineStringImpl;
 import org.geotools.geometry.iso.io.GeometryToString;
 import org.geotools.geometry.iso.operation.IsSimpleOp;
+import org.geotools.geometry.iso.util.Assert;
 import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Geometry;
+import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.geometry.coordinate.LineSegment;
+import org.opengis.geometry.coordinate.LineString;
+import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.primitive.Curve;
 import org.opengis.geometry.primitive.CurveBoundary;
 import org.opengis.geometry.primitive.CurveSegment;
 import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.Primitive;
+import org.opengis.geometry.primitive.PrimitiveFactory;
 import org.opengis.geometry.primitive.Ring;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
 /**
  * 
@@ -271,5 +283,49 @@ public class RingImpl extends CompositeCurveImpl implements Ring {
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.geometry.coordinate.root.Geometry#transform(org.opengis.referencing.crs.CoordinateReferenceSystem,
+	 *      org.opengis.referencing.operation.MathTransform)
+	 */
+	public Geometry transform(CoordinateReferenceSystem newCRS,
+			MathTransform transform) {
 
+		// loop through each point in this Ring and transform it to the new CRS, then
+		// use the new points to build a new Ring and return that.
+		PrimitiveFactory primitiveFactory = new PrimitiveFactoryImpl(newCRS, positionFactory);
+		GeometryFactory geometryFactory = new GeometryFactoryImpl(newCRS, positionFactory);
+		
+		DirectPositionImpl dp1 = null;
+		List<DirectPositionImpl> currentpositions = this.asDirectPositions();
+		Iterator<DirectPositionImpl> iter = currentpositions.iterator();
+		List<Position> newpositions = new ArrayList<Position>();
+		while (iter.hasNext()) {
+			DirectPositionImpl thispos = (DirectPositionImpl) iter.next();
+			try {
+				dp1 = new DirectPositionImpl(newCRS);
+				dp1 = (DirectPositionImpl) transform.transform(thispos, dp1);
+				newpositions.add(dp1);
+			} catch (MismatchedDimensionException e) {
+				Assert.isTrue(false, "Mismatched CRS dimension error for position: "+thispos);
+				return null;
+				//e.printStackTrace();
+			} catch (TransformException e) {
+				Assert.isTrue(false, "Transform error for position: "+thispos);
+				return null;
+				//e.printStackTrace();
+			}
+		}
+		
+		// use the new positions list to build a new Ring and return it
+		LineString lineString = geometryFactory.createLineString(newpositions);
+		List curveSegmentList = Collections.singletonList(lineString);
+		CurveImpl newCurve = (CurveImpl) primitiveFactory.createCurve(curveSegmentList);
+		ArrayList<OrientableCurve> curveList = new ArrayList<OrientableCurve>();
+		curveList.add(newCurve);
+		RingImpl newRing = (RingImpl) primitiveFactory.createRing(curveList);
+		return newRing;
+			
+	}
 }

@@ -36,12 +36,20 @@
 
 package org.geotools.geometry.iso.primitive;
 
+import org.geotools.geometry.iso.PositionFactoryImpl;
+import org.geotools.geometry.iso.PrecisionModel;
 import org.geotools.geometry.iso.complex.CompositePointImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.geometry.iso.io.GeometryToString;
+import org.geotools.geometry.iso.util.Assert;
+import org.geotools.referencing.CRS;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
+import org.opengis.geometry.Geometry;
+import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.geometry.MismatchedReferenceSystemException;
+import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.TransfiniteSet;
 import org.opengis.geometry.complex.Complex;
 import org.opengis.geometry.coordinate.Position;
@@ -49,7 +57,11 @@ import org.opengis.geometry.primitive.Bearing;
 import org.opengis.geometry.primitive.OrientablePrimitive;
 import org.opengis.geometry.primitive.Point;
 import org.opengis.geometry.primitive.PrimitiveBoundary;
+import org.opengis.geometry.primitive.PrimitiveFactory;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
 /**
  * 
@@ -303,5 +315,32 @@ public class PointImpl extends PrimitiveImpl implements Point {
 	public Complex getClosure() {
 		return new CompositePointImpl( this );
 		// return complexFactory.createCompositePoint( this );
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.geometry.coordinate.root.Geometry#transform(org.opengis.referencing.crs.CoordinateReferenceSystem,
+	 *      org.opengis.referencing.operation.MathTransform)
+	 */
+	public Geometry transform(CoordinateReferenceSystem newCRS,
+			MathTransform transform) {
+
+		PositionFactory newPositionFactory = new PositionFactoryImpl(newCRS, positionFactory.getPrecision());
+		PrimitiveFactory newPrimitiveFactory = new PrimitiveFactoryImpl(newCRS, newPositionFactory);
+		DirectPosition dp1 = new DirectPositionImpl(newCRS);
+		try {
+			dp1 = transform.transform(((PointImpl)this).getPosition(), dp1);
+			return newPrimitiveFactory.createPoint( dp1 );
+		} catch (MismatchedDimensionException e) {
+			Assert.isTrue(false, "Mismatched CRS dimension error.");
+			//e.printStackTrace();
+		} catch (TransformException e) {
+			Assert.isTrue(false, "Transform error.");
+			//e.printStackTrace();
+		}
+		
+		return null;
+			
 	}
 }

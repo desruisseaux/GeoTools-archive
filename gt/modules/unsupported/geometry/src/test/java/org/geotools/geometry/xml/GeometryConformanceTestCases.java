@@ -137,7 +137,7 @@ public class GeometryConformanceTestCases extends TestCase {
 	}
 //	public void testTestRelateAA() throws Exception {
 //		perform();
-//}
+//	}
 	public void testTestRelateAAbig() throws Exception {
 		setName("testTestRelateAA-big");
 		perform();
