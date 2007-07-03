@@ -68,7 +68,7 @@ public class DefaultCartesianCS extends DefaultAffineCS implements CartesianCS {
 
     /**
      * A two-dimensional cartesian CS with
-     * <var>{@linkplain DefaultCoordinateSystemAxis#EASTING Easting,}</var>,
+     * <var>{@linkplain DefaultCoordinateSystemAxis#EASTING Easting}</var>,
      * <var>{@linkplain DefaultCoordinateSystemAxis#NORTHING Northing}</var>
      * axis in metres.
      */

@@ -49,6 +49,10 @@ import org.opengis.geometry.MismatchedDimensionException;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @see DirectPosition1D
+ * @see GeneralPosition
+ * @see java.awt.geom.Point2D
  */
 public class DirectPosition2D extends Point2D.Double implements DirectPosition, Serializable {
     /**
@@ -144,7 +148,7 @@ public class DirectPosition2D extends Point2D.Double implements DirectPosition, 
      * @param crs The new coordinate reference system, or {@code null}.
      */
     public void setCoordinateReferenceSystem(final CoordinateReferenceSystem crs) {
-        GeneralDirectPosition.checkCoordinateReferenceSystemDimension(crs, 2);
+        AbstractDirectPosition.checkCoordinateReferenceSystemDimension(crs, 2);
         this.crs = crs;
     }
 
@@ -211,7 +215,7 @@ public class DirectPosition2D extends Point2D.Double implements DirectPosition, 
      * @throws MismatchedDimensionException if this point doesn't have the expected dimension.
      */
     public void setLocation(final DirectPosition position) throws MismatchedDimensionException {
-        GeneralDirectPosition.ensureDimensionMatch("position", position.getDimension(), 2);
+        AbstractDirectPosition.ensureDimensionMatch("position", position.getDimension(), 2);
         setCoordinateReferenceSystem(position.getCoordinateReferenceSystem());
         x = position.getOrdinate(0);
         y = position.getOrdinate(1);
@@ -232,7 +236,7 @@ public class DirectPosition2D extends Point2D.Double implements DirectPosition, 
      * using their own instance of {@link org.geotools.measure.CoordinateFormat}.
      */
     public String toString() {
-        return GeneralDirectPosition.toString(this);
+        return AbstractDirectPosition.toString(this);
     }
     
     /**

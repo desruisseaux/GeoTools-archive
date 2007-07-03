@@ -59,7 +59,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * Wraps an arbitrary {@link Warp} object as a {@linkplain MathTransform2D two-dimensional transform}.
  * Calls to {@linkplain #transform(float[],int,float[],int,int) transform} methods are forwarded to
  * the {@link Warp#warpPoint(int,int,float[]) warpPoint} method, or something equivalent. This
- * implies that source coordinates may be rounded to nearest integers before to the transformation
+ * implies that source coordinates may be rounded to nearest integers before the transformation
  * is applied.
  * <p>
  * This transform is typically used with {@linkplain org.geotools.coverage.processing.operation.Resample

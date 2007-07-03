@@ -42,6 +42,9 @@ import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.dataset.VariableDS;
 
 // Geotools dependencies
+import org.geotools.image.io.metadata.Axis;
+import org.geotools.image.io.metadata.ImageGeometry;
+import org.geotools.image.io.metadata.ImageReferencing;
 import org.geotools.image.io.metadata.GeographicMetadata;
 import org.geotools.image.io.metadata.GeographicMetadataFormat;
 import org.geotools.util.LoggedFormat;
@@ -117,7 +120,7 @@ public class NetcdfMetadata extends GeographicMetadata {
         if (!systems.isEmpty()) {
             addCoordinateSystem((CoordinateSystem) systems.get(0));
         }
-        setSampleDimensions(GeographicMetadataFormat.PACKED);
+        setSampleType(GeographicMetadataFormat.PACKED);
         addSampleDimension(variable);
     }
 
@@ -141,9 +144,11 @@ public class NetcdfMetadata extends GeographicMetadata {
             crsType = null;
             csType  = null;
         }
-        setCoordinateReferenceSystem(null, crsType);
-        setCoordinateSystem(cs.getName(), csType);
-        setGridGeometry("center");
+        final ImageReferencing referencing = getReferencing();
+        referencing.setCoordinateReferenceSystem(null, crsType);
+        referencing.setCoordinateSystem(cs.getName(), csType);
+        final ImageGeometry geometry = getGeometry();
+        geometry.setPixelOrientation("center");
         /*
          * Adds the axis in reverse order, because the NetCDF image reader put the last
          * dimensions in the rendered image. Typical NetCDF convention is to put axis in
@@ -197,6 +202,7 @@ public class NetcdfMetadata extends GeographicMetadata {
          * as the units and the part after "since" as the date.
          */
         String units = axis.getUnitsString();
+        final Axis axisNode = getReferencing().addAxis(name, direction, units);
         if (AxisType.Time.equals(type)) {
             String origin = null;
             final String[] unitsParts = units.split("(?i)\\s+since\\s+");
@@ -213,9 +219,7 @@ public class NetcdfMetadata extends GeographicMetadata {
             if (origin != null) {
                 epoch = (Date) parse(type, origin, Date.class, "addCoordinateAxis");
             }
-            addTimeAxis(name, direction, units, epoch);
-        } else {
-            addAxis(name, direction, units);
+            axisNode.setTimeOrigin(epoch);
         }
         /*
          * If the axis is not numeric, we can't process any further.
@@ -226,16 +230,17 @@ public class NetcdfMetadata extends GeographicMetadata {
         }
         if (axis instanceof CoordinateAxis1D) {
             final CoordinateAxis1D axis1D = (CoordinateAxis1D) axis;
+            final ImageGeometry geometry = getGeometry();
             if (axis1D.isRegular()) {
                 // Reminder: pixel orientation is "center", maximum value is inclusive.
                 final double increment = axis1D.getIncrement();
                 final double start     = axis1D.getStart();
                 final int    length    = axis1D.getDimension(0).getLength() - 1;
                 final double end       = start + increment * length;
-                addCoordinateRange(0, length, start, end);
+                geometry.addCoordinateRange(0, length, start, end);
             } else {
                 final double[] values = axis1D.getCoordValues();
-                addCoordinateValues(0, values);
+                geometry.addCoordinateValues(0, values);
             }
         }
     }
@@ -252,7 +257,7 @@ public class NetcdfMetadata extends GeographicMetadata {
         } else {
             m = new VariableMetadata(variable, forcePacking("valid_range"));
         }
-        addSampleDimension(getName(variable), m.scale, m.offset, m.minimum, m.maximum, m.missingValues);
+        m.copyTo(addBand(getName(variable)));
     }
 
     /**

@@ -21,13 +21,13 @@ import java.awt.geom.Point2D;
 import java.io.Serializable;
 
 // OpenGIS dependencies
+import org.opengis.util.Cloneable;
 import org.opengis.referencing.cs.AxisDirection; // For javadoc
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
-import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -54,9 +54,11 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  *
+ * @see DirectPosition1D
+ * @see DirectPosition2D
  * @see java.awt.geom.Point2D
  */
-public class GeneralDirectPosition implements DirectPosition, Serializable {
+public class GeneralDirectPosition extends AbstractDirectPosition implements Serializable, Cloneable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -139,14 +141,6 @@ public class GeneralDirectPosition implements DirectPosition, Serializable {
     }
 
     /**
-     * Returns always {@code this}, the direct position for this
-     * {@linkplain org.opengis.geometry.coordinate.Position position}.
-     */
-    public DirectPosition getPosition() {
-        return this;
-    }
-
-    /**
      * Returns the coordinate reference system in which the coordinate is given.
      * May be {@code null} if this particular {@code DirectPosition} is included
      * in a larger object with such a reference to a {@linkplain CoordinateReferenceSystem
@@ -170,46 +164,6 @@ public class GeneralDirectPosition implements DirectPosition, Serializable {
     {
         checkCoordinateReferenceSystemDimension(crs, getDimension());
         this.crs = crs;
-    }
-
-    /**
-     * Convenience method for checking coordinate reference system validity.
-     *
-     * @param  crs The coordinate reference system to check.
-     * @param  expected the dimension expected.
-     * @throws MismatchedDimensionException if the CRS dimension is not valid.
-     */
-    static void checkCoordinateReferenceSystemDimension(final CoordinateReferenceSystem crs,
-                                                        final int expected)
-            throws MismatchedDimensionException
-    {
-        if (crs != null) {
-            final int dimension = crs.getCoordinateSystem().getDimension();
-            if (dimension != expected) {
-                throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3,
-                          crs.getName().getCode(), new Integer(dimension), new Integer(expected)));
-            }
-        }
-    }
-
-    /**
-     * Convenience method for checking object dimension validity.
-     * This method is usually invoked for argument checking.
-     *
-     * @param  name The name of the argument to check.
-     * @param  dimension The object dimension.
-     * @param  expectedDimension The Expected dimension for the object.
-     * @throws MismatchedDimensionException if the object doesn't have the expected dimension.
-     */
-    static void ensureDimensionMatch(final String name,
-                                     final int dimension,
-                                     final int expectedDimension)
-            throws MismatchedDimensionException
-    {
-        if (dimension != expectedDimension) {
-            throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3,
-                        name, new Integer(dimension), new Integer(expectedDimension)));
-        }
     }
 
     /**
@@ -318,44 +272,25 @@ public class GeneralDirectPosition implements DirectPosition, Serializable {
     }
 
     /**
-     * Returns a string representation of this coordinate. The default implementation is okay
-     * for occasional formatting (for example for debugging purpose). But if there is a lot
-     * of positions to format, users will get more control by using their own instance of
-     * {@link org.geotools.measure.CoordinateFormat}.
-     */
-    public String toString() {
-        return toString(this);
-    }
-
-    /**
      * Formats the specified position.
      *
      * @since 2.3
      *
      * @deprecated Use {@link org.geotools.measure.CoordinateFormat} instead.
      */
-    // To be made package-private (do not delete)
     public static String toString(final DirectPosition position) {
-        final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(position)).append('[');
-        final int dimension = position.getDimension();
-        for (int i=0; i<dimension; i++) {
-            if (i != 0) {
-                buffer.append(", ");
-            }
-            buffer.append(position.getOrdinate(i));
-        }
-        return buffer.append(']').toString();
+        return AbstractDirectPosition.toString(position);
     }
 
     /**
-     * Returns a hash value for this coordinate. This value need not remain consistent between
-     * different implementations of the same class.
+     * Returns a hash value for this coordinate.
      */
     public int hashCode() {
         int code = hashCode(ordinates);
         if (crs != null) {
-            code ^= crs.hashCode();
+            code += crs.hashCode();
         }
+        assert code == super.hashCode();
         return code;
     }
 
@@ -363,16 +298,16 @@ public class GeneralDirectPosition implements DirectPosition, Serializable {
      * Returns a hash value for the specified ordinates.
      *
      * @todo Remove this method when we will alowed to use J2SE 1.5 runtime.
-     *       Put inline with GeoAPI definition.
      */
     static int hashCode(final double[] ordinates) {
-        long code = (int)serialVersionUID;
+        int code = 1;
         if (ordinates != null) {
-            for (int i=ordinates.length; --i>=0;) {
-                code = code*31 + Double.doubleToLongBits(ordinates[i]);
+            for (int i=0; i<ordinates.length; i++) {
+                final long bits = Double.doubleToLongBits(ordinates[i]);
+                code = 31 * code + ((int)(bits) ^ (int)(bits >>> 32));
             }
         }
-        return (int)(code >>> 32) ^ (int)code;
+        return code;
     }
 
     /**

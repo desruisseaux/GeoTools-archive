@@ -23,6 +23,7 @@ import ucar.nc2.dataset.EnhanceScaleMissing; // For javadoc
 
 // Geotools dependencies
 import org.geotools.resources.XArray;
+import org.geotools.image.io.metadata.Band;
 
 
 /**
@@ -52,7 +53,7 @@ final class VariableMetadata {
     public final double scale, offset;
 
     /**
-     * The minimal and maximal valid values in geophysics units, or {@link Double#NaN NaN} if none.
+     * The minimal and maximal valid values in geophysics units, or infinity if none.
      * They are converted from the packed values if needed, as UCAR does.
      */
     public final double minimum, maximum;
@@ -215,5 +216,15 @@ scan:   for (int i=0; i<missingCount; i++) {
      */
     private static boolean isFloatingPoint(final DataType type) {
         return DataType.FLOAT.equals(type) || DataType.DOUBLE.equals(type);
+    }
+
+    /**
+     * Copies the value in this variable metadata into the specified band.
+     */
+    public void copyTo(final Band band) {
+        band.setScale(scale);
+        band.setOffset(offset);
+        band.setValidRange(minimum, maximum);
+        band.setNoDataValues(missingValues);
     }
 }

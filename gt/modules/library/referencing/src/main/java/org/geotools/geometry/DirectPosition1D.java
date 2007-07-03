@@ -20,6 +20,7 @@ package org.geotools.geometry;
 import java.io.Serializable;
 
 // OpenGIS dependencies
+import org.opengis.util.Cloneable;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
@@ -32,8 +33,11 @@ import org.opengis.geometry.MismatchedDimensionException;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @see DirectPosition2D
+ * @see GeneralPosition
  */
-public class DirectPosition1D implements DirectPosition, Serializable, Cloneable {
+public class DirectPosition1D extends AbstractDirectPosition implements Serializable, Cloneable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -78,14 +82,6 @@ public class DirectPosition1D implements DirectPosition, Serializable, Cloneable
     }
 
     /**
-     * Returns always <code>this</code>, the direct position for this
-     * {@linkplain org.opengis.geometry.coordinate.Position position}.
-     */
-    public DirectPosition getPosition() {
-        return this;
-    }
-
-    /**
      * Returns the coordinate reference system in which the coordinate is given.
      * May be {@code null} if this particular {@code DirectPosition} is included
      * in a larger object with such a reference to a {@linkplain CoordinateReferenceSystem
@@ -103,7 +99,7 @@ public class DirectPosition1D implements DirectPosition, Serializable, Cloneable
      * @param crs The new coordinate reference system, or {@code null}.
      */
     public void setCoordinateReferenceSystem(final CoordinateReferenceSystem crs) {
-        GeneralDirectPosition.checkCoordinateReferenceSystemDimension(crs, 1);
+        checkCoordinateReferenceSystemDimension(crs, 1);
         this.crs = crs;
     }
 
@@ -121,8 +117,9 @@ public class DirectPosition1D implements DirectPosition, Serializable, Cloneable
      * Returns a sequence of numbers that hold the coordinate of this position in its
      * reference system.
      *
-     * @return The coordinates
+     * @return The coordinates.
      */
+    //@Override
     public double[] getCoordinates() {
         return new double[] {ordinate};
     }
@@ -170,44 +167,35 @@ public class DirectPosition1D implements DirectPosition, Serializable, Cloneable
      * @throws MismatchedDimensionException if this point doesn't have the expected dimension.
      */
     public void setLocation(final DirectPosition position) throws MismatchedDimensionException {
-        GeneralDirectPosition.ensureDimensionMatch("position", position.getDimension(), 1);
+        AbstractDirectPosition.ensureDimensionMatch("position", position.getDimension(), 1);
         setCoordinateReferenceSystem(position.getCoordinateReferenceSystem());
         ordinate = position.getOrdinate(0);
     }
     
     /**
-     * Returns a string representation of this coordinate. The default implementation formats
-     * this coordinate using a shared instance of {@link org.geotools.measure.CoordinateFormat}.
-     * This is okay for occasional formatting (for example for debugging purpose). But if there
-     * is a lot of positions to format, users will get better performance and more control by
-     * using their own instance of {@link org.geotools.measure.CoordinateFormat}.
-     */
-    public String toString() {
-        return GeneralDirectPosition.toString(this);
-    }
-    
-    /**
-     * Returns a hash value for this coordinate. This value need not remain consistent between
-     * different implementations of the same class.
+     * Returns a hash value for this coordinate.
      */
     public int hashCode() {
         final long value = Double.doubleToLongBits(ordinate);
-        int code = (int)value ^ (int)(value >>> 32);
+        int code = 31 + ((int)value ^ (int)(value >>> 32));
         if (crs != null) {
-            code ^= crs.hashCode();
+            code += crs.hashCode();
         }
+        assert code == super.hashCode();
         return code;
     }
 
     /**
      * Returns a copy of this position.
+     *
+     * @todo Uncomment after we removed the super-class method.
      */
-    public Object clone() {
-        try {
-            return super.clone();
-        } catch (CloneNotSupportedException exception) {
-            // Should not happen, since we are cloneable.
-            throw new AssertionError(exception);
-        }
-    }
+//    public Object clone() {
+//        try {
+//            return super.clone();
+//        } catch (CloneNotSupportedException exception) {
+//            // Should not happen, since we are cloneable.
+//            throw new AssertionError(exception);
+//        }
+//    }
 }

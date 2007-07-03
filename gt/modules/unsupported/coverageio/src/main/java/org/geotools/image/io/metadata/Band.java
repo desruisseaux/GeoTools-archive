@@ -16,52 +16,68 @@
  */
 package org.geotools.image.io.metadata;
 
+// Geotools dependencies
 import org.geotools.util.NumberRange;
-import org.w3c.dom.Node;
+
+// OpenGIS dependencies
+import org.opengis.coverage.SampleDimension;  // For javadoc
 
 
 /**
- * Provides convenience methods for encoding and decoding information about sample dimensions.
- * A sample dimension should be {@linkplain #select selected} before any {@code get} or {@code
- * set} method is invoked. Valid sample dimension index range from 0 inclusive to
- * {@link #elementCount elementCount()} exclusive.
+ * A {@code <SampleDimension>} element in
+ * {@linkplain GeographicMetadataFormat geographic metadata format}.
  *
  * @since 2.4
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @see SampleDimension
  */
-public class SampleDimensions extends MetadataAccessor {
+public class Band extends MetadataAccessor {
     /**
-     * Creates a parser for sample dimensions.
+     * Creates a parser for a band. This constructor should not be invoked
+     * directly; use {@link GeographicMetadata#getBand} instead.
      *
-     * @param  metadata The metadata node.
+     * @param metadata  The metadata which contains this band.
+     * @param bandIndex The band index for this instance.
      */
-    public SampleDimensions(final Node metadata) {
-        super(metadata, "SampleDimensions", "SampleDimension");
+    protected Band(final GeographicMetadata metadata, final int bandIndex) {
+        this(metadata.getBands(), bandIndex);
     }
 
     /**
-     * Returns the name for {@linkplain #select selected} sample dimension,
-     * or {@code null} if none.
+     * Creates a parser for a band. This constructor should not be invoked
+     * directly; use {@link GeographicMetadata#getBand} instead.
+     *
+     * @param parent    The set of all bands.
+     * @param bandIndex The band index for this instance.
+     */
+    Band(final ChildList parent, final int bandIndex) {
+        super(parent);
+        selectChild(bandIndex);
+    }
+
+    /**
+     * Returns the name for this band, or {@code null} if none.
      */
     public String getName() {
         return getString("name");
     }
 
     /**
-     * Sets the name for the {@linkplain #select selected} sample dimension.
+     * Sets the name for this band.
      *
-     * @param name The sample dimension name, or {@code null} if none.
+     * @param name The band name, or {@code null} if none.
      */
     public void setName(final String name) {
         setString("name", name);
     }
 
     /**
-     * Returns the range of valid values for the {@linkplain #select selected} sample dimension.
-     * The range use the {@link Integer} type if possible, or the {@link Double} type otherwise.
-     * Note that range {@linkplain NumberRange#getMinValue minimum value},
+     * Returns the range of valid values for this band. The range use the {@link Integer}
+     * type if possible, or the {@link Double} type otherwise. Note that range
+     * {@linkplain NumberRange#getMinValue minimum value},
      * {@linkplain NumberRange#getMaxValue maximum value} or both may be null if no
      * {@code "minValue"} or {@code "maxValue"} attribute were found for the
      * {@code "SampleDimensions/SampleDimension"} element.
@@ -104,21 +120,20 @@ public class SampleDimensions extends MetadataAccessor {
     }
 
     /**
-     * Returns the fill values for the {@linkplain #select selected} sample dimension,
-     * or {@code null} if none.
+     * Returns the fill values for this band, or {@code null} if none.
      */
-    public double[] getFillValues() {
+    public double[] getNoDataValues() {
         return getDoubles("fillValues", true);
     }
 
     /**
-     * Sets the fill values for the {@linkplain #select selected} sample dimension.
-     * This method formats all fill values as integers if possible, or all values as
-     * floating points otherwise. We apply a "all or nothing" rule for consistency.
+     * Sets the fill values for this band. This method formats all fill values as integers
+     * if possible, or all values as floating points otherwise. We apply a "all or nothing"
+     * rule for consistency.
      *
      * @param fillValues The packed values used for missing data, or {@code null} if none.
      */
-    public void setFillValues(final double[] fillValues) {
+    public void setNoDataValues(final double[] fillValues) {
         if (fillValues != null) {
             int[] asIntegers = new int[fillValues.length];
             for (int i=0; i<fillValues.length; i++) {
@@ -137,14 +152,15 @@ public class SampleDimensions extends MetadataAccessor {
     }
 
     /**
-     * Returns the scale factor for the {@linkplain #select selected} sample dimension.
+     * Returns the scale factor from packed to geophysics values, or {@code 1} if none.
      */
-    public Double getScale() {
-        return getDouble("scale");
+    public double getScale() {
+        final Double scale = getDouble("scale");
+        return (scale != null) ? scale.doubleValue() : 1.0;
     }
 
     /**
-     * Sets the scale factor for the {@linkplain #select selected} sample dimension.
+     * Sets the scale factor for this band.
      *
      * @param scale The scale from packed to geophysics values, or {@code 1} if none.
      */
@@ -153,14 +169,15 @@ public class SampleDimensions extends MetadataAccessor {
     }
 
     /**
-     * Returns the offset for the {@linkplain #select selected} sample dimension.
+     * Returns the offset from packed to geophysics values, or {@code 0} if none.
      */
-    public Double getOffset() {
-        return getDouble("offset");
+    public double getOffset() {
+        final Double offset = getDouble("offset");
+        return (offset != null) ? offset.doubleValue() : 0.0;
     }
 
     /**
-     * Sets the offset for the {@linkplain #select selected} sample dimension.
+     * Sets the offset for this band.
      *
      * @param offset The offset from packed to geophysics values, or {@code 0} if none.
      */

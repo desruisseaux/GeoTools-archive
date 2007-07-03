@@ -46,8 +46,7 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ComponentColorModelJAI;
-import org.geotools.image.io.metadata.GeographicMetadataParser;
-import org.geotools.image.io.metadata.SampleDimensions;
+import org.geotools.image.io.metadata.GeographicMetadata;
 
 
 /**
@@ -157,7 +156,7 @@ public abstract class SimpleImageReader extends ImageReader {
     /**
      * Metadata for each images, or {@code null} if not yet created.
      */
-    private transient GeographicMetadataParser[] metadata;
+    private transient GeographicMetadata[] metadata;
 
     /**
      * Constructs a new image reader.
@@ -301,34 +300,46 @@ public abstract class SimpleImageReader extends ImageReader {
     /**
      * Returns a helper parser for metadata associated with the given image. This implementation
      * invokes  <code>{@linkplain #getImageMetadata getImageMetadata}(imageIndex)</code>,  wraps
-     * the result in a {@link GeographicMetadataParser} object if non-null and caches the result.
+     * the result in a {@link GeographicMetadata} object if non-null and caches the result.
      *
      * @param  imageIndex The image index.
-     * @return The metadata, or {@code null} if none.
+     * @return The geographic metadata, or {@code null} if none.
      * @throws IOException if an error occurs during reading.
      */
-    private GeographicMetadataParser getMetadataParser(final int imageIndex) throws IOException {
+    public GeographicMetadata getGeographicMetadata(final int imageIndex) throws IOException {
         // Checks if a cached instance is available.
         if (metadata != null && imageIndex >= 0 && imageIndex < metadata.length) {
-            final GeographicMetadataParser parser = metadata[imageIndex];
+            final GeographicMetadata parser = metadata[imageIndex];
             if (parser != null) {
                 return parser;
             }
         }
         // Checks if metadata are availables. If the user set 'ignoreMetadata' to 'true',
         // we override his setting since we really need metadata for creating a ColorModel.
-        ignoreMetadata = false;
-        final IIOMetadata candidate = getImageMetadata(imageIndex);
+        final IIOMetadata candidate;
+        final boolean oldIgnore = ignoreMetadata;
+        try {
+            ignoreMetadata = false;
+            candidate = getImageMetadata(imageIndex);
+        } finally {
+            ignoreMetadata = oldIgnore;
+        }
         if (candidate == null) {
             return null;
         }
-        // Creates a new parser and caches it.
-        final GeographicMetadataParser parser = new GeographicMetadataParser(candidate);
+        // Wraps the IIOMetadata into a GeographicMetadata object,
+        // if it was not already of the appropriate type.
+        final GeographicMetadata parser;
+        if (candidate instanceof GeographicMetadata) {
+            parser = (GeographicMetadata) candidate;
+        } else {
+            parser = new GeographicMetadata(candidate);
+        }
         if (metadata == null) {
-            metadata = new GeographicMetadataParser[Math.max(imageIndex+1, 4)];
+            metadata = new GeographicMetadata[Math.max(imageIndex+1, 4)];
         }
         if (imageIndex >= metadata.length) {
-            metadata = (GeographicMetadataParser[]) XArray.resize(metadata, Math.max(imageIndex+1, metadata.length*2));
+            metadata = (GeographicMetadata[]) XArray.resize(metadata, Math.max(imageIndex+1, metadata.length*2));
         }
         metadata[imageIndex] = parser;
         return parser;
@@ -440,11 +451,9 @@ public abstract class SimpleImageReader extends ImageReader {
     public NumberRange getExpectedRange(final int imageIndex, final int bandIndex)
             throws IOException
     {
-        final GeographicMetadataParser parser = getMetadataParser(imageIndex);
+        final GeographicMetadata parser = getGeographicMetadata(imageIndex);
         if (parser != null) {
-            final SampleDimensions sd = parser.getSampleDimensions();
-            sd.selectChild(bandIndex);
-            return sd.getValidRange();
+            return parser.getBand(imageIndex).getValidRange();
         }
         return null;
     }

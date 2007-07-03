@@ -133,7 +133,7 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
               Math.min(minDP.y,  maxDP.y),
               Math.abs(maxDP.x - minDP.x),
               Math.abs(maxDP.y - minDP.y));
-        setCoordinateReferenceSystem(GeneralEnvelope.getCoordinateReferenceSystem(minDP, maxDP));
+        setCoordinateReferenceSystem(AbstractEnvelope.getCoordinateReferenceSystem(minDP, maxDP));
     }
 
     /**
@@ -151,7 +151,7 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
      * @param crs The new coordinate reference system, or {@code null}.
      */
     public void setCoordinateReferenceSystem(final CoordinateReferenceSystem crs) {
-        GeneralDirectPosition.checkCoordinateReferenceSystemDimension(crs, getDimension());
+        AbstractDirectPosition.checkCoordinateReferenceSystemDimension(crs, getDimension());
         this.crs = crs;
     }
     
@@ -241,7 +241,7 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
     public int hashCode() {
         int code = super.hashCode() ^ (int)serialVersionUID;
         if (crs != null) {
-            code ^= crs.hashCode();
+            code += crs.hashCode();
         }
         return code;
     }
@@ -304,6 +304,6 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
      * @since 2.4
      */
     public String toString() {
-        return GeneralEnvelope.toString(this);
+        return AbstractEnvelope.toString(this);
     }
 }

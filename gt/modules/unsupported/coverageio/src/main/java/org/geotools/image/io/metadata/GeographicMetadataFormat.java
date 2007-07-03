@@ -233,10 +233,13 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
          *   |           +-- Axis[1] (name, direction, units, origin)
          *   |           +-- ...etc...
          *   +-- GridGeometry (pixelOrientation)
+         *         +-- GridRange
+         *         |     +-- IndexRange[0] (minimum, maximum)
+         *         |     +-- IndexRange[1] (minimum, maximum)
+         *         |     +-- ...etc...
          *         +-- Envelope
-         *         |     +-- CoordinateValues[0]
-         *         |     +-- CoordinateRange[0] (minCoordinate, maxCoordinate)
-         *         |     +-- CoordinateValues[1]
+         *         |     +-- CoordinateValues[0] (minimum, maximum)
+         *         |     +-- CoordinateValues[1] (minimum, maximum)
          *         |     +-- ...etc...
          *         +-- AffineTransform (elements[6..n])
          */
@@ -244,7 +247,7 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
         addAttribute("CoordinateReferenceSystem", "name",      DATATYPE_STRING);
         addAttribute("CoordinateReferenceSystem", "type",      DATATYPE_STRING, false, null, CRS_TYPES);
         addElement  ("Datum", "CoordinateReferenceSystem",     CHILD_POLICY_EMPTY);
-        addAttribute("Datum",             "name",              DATATYPE_STRING, true, null);
+        addAttribute("Datum",             "name",              DATATYPE_STRING, true,  null);
         addElement  ("CoordinateSystem",  "CoordinateReferenceSystem", 2, maximumDimensions);
         addAttribute("CoordinateSystem",  "name",              DATATYPE_STRING);
         addAttribute("CoordinateSystem",  "type",              DATATYPE_STRING, false, null, CS_TYPES);
@@ -261,9 +264,8 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
         addAttribute("IndexRange",        "maximum",           DATATYPE_INTEGER, true, null); // inclusive
         addElement  ("Envelope",          "GridGeometry",      CHILD_POLICY_SEQUENCE);
         addElement  ("CoordinateValues",  "Envelope",          CHILD_POLICY_EMPTY);
-        addElement  ("CoordinateRange",   "Envelope",          CHILD_POLICY_EMPTY);
-        addAttribute("CoordinateRange",   "minimum",           DATATYPE_DOUBLE, true, null);
-        addAttribute("CoordinateRange",   "maximum",           DATATYPE_DOUBLE, true, null); // inclusive
+        addAttribute("CoordinateValues",  "minimum",           DATATYPE_DOUBLE, true, null);
+        addAttribute("CoordinateValues",  "maximum",           DATATYPE_DOUBLE, true, null); // inclusive
         addElement  ("AffineTransform",   "GridGeometry",      CHILD_POLICY_EMPTY);
         addAttribute("AffineTransform",   "elements",          DATATYPE_DOUBLE, true,
                 6, maximumDimensions * (maximumDimensions - 1));

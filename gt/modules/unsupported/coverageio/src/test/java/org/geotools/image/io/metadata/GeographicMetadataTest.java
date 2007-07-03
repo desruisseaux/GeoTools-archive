@@ -82,10 +82,11 @@ public class GeographicMetadataTest extends TestCase {
      */
     public void testSetting() {
         final GeographicMetadata metadata = new GeographicMetadata();
-        metadata.addAxis("latitude",  "north", "degrees");
-        metadata.addAxis("longitude", "east",  "degrees");
-        metadata.setCoordinateSystem("WGS84", "geographic");
-        metadata.setDatum("WGS84");
+        final ImageReferencing referencing = metadata.getReferencing();
+        referencing.addAxis("latitude",  "north", "degrees");
+        referencing.addAxis("longitude", "east",  "degrees");
+        referencing.setCoordinateSystem("WGS84", "geographic");
+        referencing.setDatum("WGS84");
 
         final String text = metadata.toString();
         assertTrue(text.indexOf("name=\"latitude\"" ) >= 0);

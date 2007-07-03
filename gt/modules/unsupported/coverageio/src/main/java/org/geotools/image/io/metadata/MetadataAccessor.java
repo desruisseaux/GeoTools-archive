@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 import javax.imageio.metadata.IIOMetadataNode;
+import org.geotools.resources.Utilities;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -115,6 +116,30 @@ public class MetadataAccessor {
     private transient Element current;
 
     /**
+     * The locale for formatting warnings.
+     *
+     * @todo Provide setter.
+     */
+    private transient Locale locale;
+
+    /**
+     * Creates an accessor with the same parent and childs than the specified one. The two
+     * accessors will share the same {@linkplain Node metadata nodes} (including the list
+     * of childs), so change in one accessor will be immediately reflected in the other
+     * accessor. However each accessor can {@linkplain #selectChild select their child}
+     * independently.
+     * <p>
+     * The main purpose of this constructor is to create many views over the same list
+     * of childs, where each view {@linkplain #selectChild select} a different child.
+     */
+    protected MetadataAccessor(final MetadataAccessor clone) {
+        parent    = clone.parent;
+        childPath = clone.childPath;
+        childs    = clone.childs;
+        locale    = clone.locale;
+    }
+
+    /**
      * Creates an accessor for the {@linkplain Element element} at the given path. Paths are
      * separated by the {@code '/'} character. See {@linkplain MetadataAccessor class javadoc}
      * for path examples.
@@ -126,12 +151,11 @@ public class MetadataAccessor {
      *                    {@linkplain Element elements}, or {@code null} if none.
      */
     protected MetadataAccessor(final Node metadata, final String parentPath, final String childPath) {
-        childs = new ArrayList(4);
-        this.childPath = childPath;
         /*
          * Fetchs the parent node and ensure that we got a singleton. If there is more nodes than
          * expected, log a warning and pickup the first one. If there is no node, create a new one.
          */
+        final List childs = new ArrayList(4);
         if (parentPath != null) {
             listChilds(metadata, parentPath, 0, childs, true);
             final int count = childs.size();
@@ -159,6 +183,7 @@ public class MetadataAccessor {
          * should be identical to searching from 'parent' node using 'childPath', except in
          * case of badly formed metadata where the parent node appears more than once.
          */
+        this.childPath = childPath;
         if (childPath != null) {
             final String path;
             if (parentPath != null) {
@@ -167,6 +192,9 @@ public class MetadataAccessor {
                 path = childPath;
             }
             listChilds(metadata, path, 0, childs, false);
+            this.childs = childs;
+        } else {
+            this.childs = Collections.EMPTY_LIST;
         }
         if (parent instanceof Element) {
             current = (Element) parent;
@@ -237,26 +265,30 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
      * @return The child {@linkplain Element elements} count.
      *
      * @see #selectChild
-     * @see #createChild
+     * @see #appendChild
      */
-    public int childCount() {
+    protected int childCount() {
         return childs.size();
     }
 
     /**
-     * Adds a new child {@linkplain Element element} at the path given at construction time
-     * and {@linkplain #selectChild select} it. The {@linkplain #childCount child count}
-     * will be increased by 1.
+     * Adds a new child {@linkplain Element element} at the path given at construction time.
+     * The {@linkplain #childCount child count} will be increased by 1.
+     * <p>
+     * The new child is <strong>not</strong> automatically selected. In order to select this
+     * new child, the {@link #selectChild} method must be invoked explicitly.
+     *
+     * @return The index of the new child element.
      *
      * @see #childCount
      * @see #selectChild
      */
-    public void createChild() {
+    protected int appendChild() {
         final int size = childs.size();
         final Node child = appendChild(parent, childPath);
         if (child instanceof Element) {
             childs.add((Element) child);
-            selectChild(size);
+            return size;
         } else {
             throw new UnsupportedImplementationException(child.getClass());
         }
@@ -267,13 +299,13 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
      * to {@code get} or {@code set} methods will apply to this selected child element.
      *
      * @param index The index of the element to select.
-     * @throws ArrayIndexOutOfBoundsException if the specified index is out of bounds.
+     * @throws IndexOutOfBoundsException if the specified index is out of bounds.
      *
      * @see #childCount
-     * @see #createChild
+     * @see #appendChild
      * @see #selectParent
      */
-    public void selectChild(final int index) throws ArrayIndexOutOfBoundsException {
+    protected void selectChild(final int index) throws IndexOutOfBoundsException {
         current = (Element) childs.get(index);
     }
 
@@ -285,7 +317,7 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
      *
      * @see #selectChild
      */
-    public void selectParent() throws NoSuchElementException {
+    protected void selectParent() throws NoSuchElementException {
         if (parent instanceof Element) {
             current = (Element) parent;
         } else {
@@ -309,12 +341,51 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
     }
 
     /**
+     * Returns the user object associated with the {@linkplain #selectChild selected element},
+     * or {@code null} if none. This is the only {@code get} method that doesn't parse the
+     * {@link #getString} value.
+     *
+     * @return The user object, or {@code null} if none.
+     *
+     * @see #setUserObject
+     */
+    protected Object getUserObject() {
+        final Element element = currentElement();
+        if (element instanceof IIOMetadataNode) {
+            return ((IIOMetadataNode) element).getUserObject();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Sets the user object associated with the {@linkplain #selectChild selected element}.
+     * This is the only {@code set} method that doesn't invoke {@link #setString} with a
+     * formatted value.
+     *
+     * @param  value The user object, or {@code null} if none.
+     * @throws UnsupportedImplementationException if the selected element is not an instance of
+     *         {@link IIOMetadataNode}.
+     *
+     * @see #getUserObject
+     */
+    protected void setUserObject(final Object value) throws UnsupportedImplementationException {
+        final Element element = currentElement();
+        if (element instanceof IIOMetadataNode) {
+            ((IIOMetadataNode) element).setUserObject(value);
+        } else {
+            throw new UnsupportedImplementationException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
+                    Utilities.getShortClassName(element), Utilities.getShortName(IIOMetadataNode.class)));
+        }
+    }
+
+    /**
      * Returns an attribute as a string for the {@linkplain #selectChild selected element},
      * or {@code null} if none. This method never returns an empty string.
      * <p>
-     * Every {@code get} methods in this class invoke this method first. Consequently,
-     * this method provides a single point for overriding if subclasses want to process
-     * the attribute before parsing.
+     * Every {@code get} methods in this class except {@link #getUserObject getUserObject}
+     * invoke this method first. Consequently, this method provides a single point for
+     * overriding if subclasses want to process the attribute before parsing.
      *
      * @param attribute The attribute to fetch (e.g. {@code "name"}).
      * @return The attribute value (never an empty string), or {@code null} if none.
@@ -334,9 +405,9 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
      * Set the attribute to the specified value,
      * or remove the attribute if the value is null.
      * <p>
-     * Every {@code set} methods in this class invoke this method last. Consequently,
-     * this method provides a single point for overriding if subclasses want to process
-     * the attribute after formatting.
+     * Every {@code set} methods in this class except {@link #setUserObject setUserObject}
+     * invoke this method last. Consequently, this method provides a single point for
+     * overriding if subclasses want to process the attribute after formatting.
      * 
      * @param attribute The attribute name.
      * @param value     The attribute value.
@@ -614,8 +685,8 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
      * Convenience method for logging a warning. Do not allow overriding, because
      * it would not work for warnings emitted by the {@link #getDate} method.
      */
-    private static void warning(final String method, final int key, final Object value) {
-        final LogRecord record = Errors.getResources(null).getLogRecord(Level.WARNING, key, value);
+    final void warning(final String method, final int key, final Object value) {
+        final LogRecord record = Errors.getResources(locale).getLogRecord(Level.WARNING, key, value);
         record.setSourceClassName(MetadataAccessor.class.getName());
         record.setSourceMethodName(method);
         Logger.getLogger("org.geotools.image.io.metadata").log(record);

@@ -17,13 +17,9 @@
 package org.geotools.image.io.metadata;
 
 // J2SE dependencies
-import java.lang.reflect.Array;
-import java.text.Format;
-import java.util.Date;
-import javax.imageio.metadata.IIOInvalidTreeException;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.w3c.dom.Element;
+import javax.imageio.metadata.IIOInvalidTreeException;
 import org.w3c.dom.Node;
 
 // Geotools dependencies
@@ -44,56 +40,32 @@ public class GeographicMetadata extends IIOMetadata {
     /**
      * The root node to be returned by {@link #getAsTree}.
      */
-    private IIOMetadataNode root;
+    private Node root;
 
     /**
      * The coordinate reference system node.
      * Will be created only when first needed.
      */
-    private IIOMetadataNode crs;
-
-    /**
-     * The coordinate system node.
-     * Will be created only when first needed.
-     */
-    private IIOMetadataNode cs;
-
-    /**
-     * The datum node.
-     * Will be created only when first needed.
-     */
-    private IIOMetadataNode datum;
+    private ImageReferencing referencing;
 
     /**
      * The grid geometry node.
      * Will be created only when first needed.
      */
-    private IIOMetadataNode gridGeometry;
+    private ImageGeometry geometry;
 
     /**
-     * The grid geometry node.
+     * The list of {@linkplain Band bands}.
      * Will be created only when first needed.
      */
-    private IIOMetadataNode gridRange;
-
-    /**
-     * The envelope node.
-     * Will be created only when first needed.
-     */
-    private IIOMetadataNode envelope;
-
-    /**
-     * The sample dimension node.
-     * Will be created only when first needed.
-     */
-    private IIOMetadataNode sampleDimensions;
+    private ChildList/*<Bands>*/ bands;
 
     /**
      * Creates a default metadata instance. This constructor defines no standard or native format.
      * The only format defined is the {@linkplain GeographicMetadataFormat geographic} one.
      */
-    protected GeographicMetadata() {
-        this(false, // Can not return or accept a DOM tree using the standard metadata format.
+    public GeographicMetadata() {
+        super(false, // Can not return or accept a DOM tree using the standard metadata format.
               null,  // There is no native metadata format.
               null,  // There is no native metadata format.
               new String[] {
@@ -102,6 +74,15 @@ public class GeographicMetadata extends IIOMetadata {
               new String[] {
                   "org.geotools.image.io.metadata.GeographicMetadataFormat"
               });
+    }
+
+    /**
+     * Wraps the specified metadata. This constructor defines no standard or native format.
+     * The only format defined is the {@linkplain GeographicMetadataFormat geographic} one.
+     */
+    public GeographicMetadata(final IIOMetadata metadata) {
+        this();
+        root = metadata.getAsTree(GeographicMetadataFormat.FORMAT_NAME);
     }
 
     /**
@@ -119,18 +100,17 @@ public class GeographicMetadata extends IIOMetadata {
      * @param extraMetadataFormatClassNames The class names of any additional formats
      *        supported by this object, or {@code null} if none.
      */
-    protected GeographicMetadata(final boolean  standardMetadataFormatSupported,
-                                 final String   nativeMetadataFormatName,
-                                 final String   nativeMetadataFormatClassName,
-                                 final String[] extraMetadataFormatNames,
-                                 final String[] extraMetadataFormatClassNames)
+    public GeographicMetadata(final boolean  standardMetadataFormatSupported,
+                              final String   nativeMetadataFormatName,
+                              final String   nativeMetadataFormatClassName,
+                              final String[] extraMetadataFormatNames,
+                              final String[] extraMetadataFormatClassNames)
     {
         super(standardMetadataFormatSupported,
               nativeMetadataFormatName,
               nativeMetadataFormatClassName,
               extraMetadataFormatNames,
               extraMetadataFormatClassNames);
-        reset();
     }
 
     /**
@@ -141,351 +121,91 @@ public class GeographicMetadata extends IIOMetadata {
     }
 
     /**
-     * Set the coordinate reference system to the specified value.
-     *
-     * @param name The coordinate reference system name, or {@code null} if unknown.
-     * @param type The coordinate reference system type (usually
-     *             {@value GeographicMetadataFormat#GEOGRAPHIC} or
-     *             {@value GeographicMetadataFormat#PROJECTED}), or {@code null} if unknown.
+     * Returns the root of a tree of metadata contained within this object
+     * according to the conventions defined by a given metadata format.
      */
-    public void setCoordinateReferenceSystem(final String name, final String type) {
-        if (crs == null) {
-            crs = new IIOMetadataNode("CoordinateReferenceSystem");
-            root.appendChild(crs);
+    private Node getRoot() {
+        if (root == null) {
+            root = new IIOMetadataNode(GeographicMetadataFormat.FORMAT_NAME);
         }
-        setAttribute(crs, "name", name);
-        setAttribute(crs, "type", type);
+        return root;
     }
 
     /**
-     * Set the datum to the specified value.
-     *
-     * @param name The datum name, or {@code null} if unknown.
+     * Returns the grid geometry.
      */
-    public void setDatum(final String name) {
-        if (crs == null) {
-            setCoordinateReferenceSystem(null, null);
+    public ImageReferencing getReferencing() {
+        if (referencing == null) {
+            referencing = new ImageReferencing(getRoot());
         }
-        if (datum == null) {
-            datum = new IIOMetadataNode("Datum");
-            crs.appendChild(datum);
+        return referencing;
+    }
+
+    /**
+     * Returns the grid geometry.
+     */
+    public ImageGeometry getGeometry() {
+        if (geometry == null) {
+            geometry = new ImageGeometry(getRoot());
         }
-        setAttribute(datum, "name", name);
+        return geometry;
     }
 
     /**
-     * Set the coordinate system to the specified value.
-     *
-     * @param name The coordinate system name, or {@code null} if unknown.
-     * @param type The coordinate system type (usually
-     *             {@value GeographicMetadataFormat#ELLIPSOIDAL} or
-     *             {@value GeographicMetadataFormat#CARTESIAN}), or {@code null} if unknown.
+     * Returns the list of all {@linkplain Band bands}.
      */
-    public void setCoordinateSystem(final String name, final String type) {
-        if (crs == null) {
-            setCoordinateReferenceSystem(null, null);
+    final ChildList/*<Bands>*/ getBands() {
+        if (bands == null) {
+            bands = new ChildList.Bands(getRoot());
         }
-        if (cs == null) {
-            cs = new IIOMetadataNode("CoordinateSystem");
-            crs.appendChild(cs);
-        }
-        setAttribute(cs, "name", name);
-        setAttribute(cs, "type", type);
+        return bands;
     }
 
     /**
-     * Adds an axis to the the coordinate system.
+     * Returns the sample type (typically {@value GeographicMetadataFormat#GEOPHYSICS} or
+     * {@value GeographicMetadataFormat#PACKED}), or {@code null} if none. This type applies
+     * to all {@linkplain Band bands}.
+     */
+    public String getSampleType() {
+        return getBands().getString("type");
+    }
+
+    /**
+     * Set the sample type for all {@linkplain Band bands}. Valid types include
+     * {@value GeographicMetadataFormat#GEOPHYSICS} and {@value GeographicMetadataFormat#PACKED}.
      *
-     * @param name The axis name, or {@code null} if unknown.
-     * @param direction The axis direction (usually {@code "east"}, {@code "weast"},
-     *        {@code "north"}, {@code "south"}, {@code "up"} or {@code "down"}),
-     *        or {@code null} if unknown.
-     * @param units The axis units symbol, or {@code null} if unknown.
+     * @param type The sample type, or {@code null} if none.
+     */
+    public void setSampleType(final String type) {
+        getBands().setEnum("type", type);
+    }
+
+    /**
+     * Returns the number of {@linkplain Band bands} in the coverage.
+     */
+    public int getNumBands() {
+        return getBands().childCount();
+    }
+
+    /**
+     * Returns the band at the specified index.
      *
-     * @see org.opengis.referencing.cs.AxisDirection
+     * @param  bandIndex the band index, ranging from 0 inclusive to {@link #getNumBands} exclusive.
+     * @throws IndexOutOfBoundsException if the index is out of bounds.
      */
-    public void addAxis(final String name,  final String direction, final String units) {
-        addAxis(name, direction, units, null);        
+    public Band getBand(final int bandIndex) throws IndexOutOfBoundsException {
+        return (Band) getBands().getChild(bandIndex);
     }
 
     /**
-     * Adds a time axis to the the coordinate system.
+     * Creates a new band and returns it.
      *
-     * @param name The axis name, or {@code null} if unknown.
-     * @param direction The axis direction, or {@code null} if unknown.
-     * @param units The axis units symbol, or {@code null} if unknown.
-     * @param origin The {@linkplain org.opengis.referencing.datum.TemporalDatum#getOrigin epoch},
-     *        or {@code null} if unknown.
-     *
-     * @see org.opengis.referencing.cs.AxisDirection
+     * @param name The name for the new band.
      */
-    public void addTimeAxis(final String name,  final String direction,
-                            final String units, final Date   origin)
-    {
-        addAxis(name, direction, units, origin);
-    }
-
-    /**
-     * Implementation of {@link #addAxis} and {@link #addTimeAxis}. Provided as a separated private
-     * method in order to not have the {@link #addAxis} method invoking {@link #addTimeAxis}, which
-     * would be unexpected.
-     */
-    private void addAxis(final String name,  final String direction,
-                         final String units, final Date   origin)
-    {
-        if (cs == null) {
-            setCoordinateSystem(null, null);
-        }
-        final IIOMetadataNode axis = new IIOMetadataNode("Axis");
-        setAttribute(axis, "name",      name);
-        setEnum     (axis, "direction", direction);
-        setAttribute(axis, "units",     units);
-        setAttribute(axis, "origin",    origin);
-        cs.appendChild(axis);
-    }
-
-    /**
-     * Set the grid geometry to the specified value. The pixel orientation gives the point in
-     * a pixel corresponding to the Earth location of the pixel. In the JAI framework, this is
-     * typically the {@linkplain org.opengis.metadata.spatial.PixelOrientation#UPPER_LEFT
-     * upper left} corner. In some OGC specifications, this is often the pixel
-     * {@linkplain org.opengis.metadata.spatial.PixelOrientation#CENTER center}.
-     *
-     * @param pixelOrientation The pixel orientation (usually {@code "center"},
-     *        {@code "lower left"}, {@code "lower right"}, {@code "upper right"}
-     *        or {@code "upper left"}), or {@code null} if unknown.
-     *
-     * @see org.opengis.metadata.spatial.PixelOrientation
-     */
-    public void setGridGeometry(final String pixelOrientation) {
-        if (gridGeometry == null) {
-            gridGeometry = new IIOMetadataNode("GridGeometry");
-            root.appendChild(gridGeometry);
-        }
-        setEnum(gridGeometry, "pixelOrientation", pixelOrientation);
-    }
-
-    /**
-     * Set the grid range to the specified value.
-     *
-     * This method is not yet public because there is no parameter yet.
-     */
-    private void setGridRange() {
-        if (gridGeometry == null) {
-            setGridGeometry(null);
-        }
-        if (gridRange == null) {
-            gridRange = new IIOMetadataNode("GridRange");
-            gridGeometry.appendChild(gridRange);
-        }
-    }
-
-    /**
-     * Set the envelope to the specified value.
-     *
-     * This method is not yet public because there is no parameter yet.
-     */
-    private void setEnvelope() {
-        if (gridGeometry == null) {
-            setGridGeometry(null);
-        }
-        if (envelope == null) {
-            envelope = new IIOMetadataNode("Envelope");
-            gridGeometry.appendChild(envelope);
-        }
-    }
-
-    /**
-     * Adds the range of index along a dimension. The ranges
-     * should be added in the same order than {@linkplain #addAxis axis}.
-     *
-     * @param minIndex The minimal index value, inclusive. This is usually 0.
-     * @param maxIndex The maximal index value, <strong>inclusive</strong>.
-     */
-    private void addGridRange(final int minIndex, final int maxIndex) {
-        if (gridRange == null) {
-            setGridRange();
-        }
-        final IIOMetadataNode range = new IIOMetadataNode("IndexRange");
-        setAttribute(range, "minimum", minIndex);
-        setAttribute(range, "maximum", maxIndex);
-        gridRange.appendChild(range);
-    }
-
-    /**
-     * Adds the range of values for an envelope along a dimension. The ranges
-     * should be added in the same order than {@linkplain #addAxis axis}.
-     *
-     * @param minIndex The minimal index value, inclusive. This is usually 0.
-     * @param maxIndex The maximal index value, <strong>inclusive</strong>.
-     * @param minValue The minimal coordinate value, inclusive.
-     * @param maxValue The maximal coordinate value, <strong>inclusive</strong>.
-     */
-    public void addCoordinateRange(final int    minIndex, final int    maxIndex,
-                                   final double minValue, final double maxValue)
-    {
-        addGridRange(minIndex, maxIndex);
-        if (envelope == null) {
-            setEnvelope();
-        }
-        final IIOMetadataNode range = new IIOMetadataNode("CoordinateRange");
-        setAttribute(range, "minimum", minValue);
-        setAttribute(range, "maximum", maxValue);
-        envelope.appendChild(range);
-    }
-
-    /**
-     * Adds coordinate values for an envelope along a dimension. This method may be invoked
-     * in replacement of {@link #addCoordinateRange} when every cell coordinates need to be
-     * specified explicitly.
-     *
-     * @param minIndex The minimal index value, inclusive. This is usually 0.
-     * @param values The coordinate values.
-     */
-    public void addCoordinateValues(final int minIndex, final double[] values) {
-        addGridRange(minIndex, minIndex + values.length);
-        if (envelope == null) {
-            setEnvelope();
-        }
-        final IIOMetadataNode cv = new IIOMetadataNode("CoordinateValues");
-        cv.setUserObject(values);
-        envelope.appendChild(cv);
-    }
-
-    /**
-     * Set the sample dimensions to the specified value.
-     *
-     * @param type The type for all sample dimensions (usually
-     *             {@value GeographicMetadataFormat#GEOPHYSICS} or
-     *             {@value GeographicMetadataFormat#PACKED}), or {@code null} if unknown.
-     */
-    public void setSampleDimensions(final String type) {
-        if (sampleDimensions == null) {
-            sampleDimensions = new IIOMetadataNode("SampleDimensions");
-            root.appendChild(sampleDimensions);
-        }
-        setEnum(sampleDimensions, "type", type);
-    }
-
-    /**
-     * @deprecated Moved to {@link SampleDimensions}.
-     */
-    public void addSampleDimension(final String name,
-                                   final double scale,    final double offset,
-                                   final double minValue, final double maxValue,
-                                   final double[] fillValues)
-    {
-    }
-
-    /**
-     * Set the attribute to the specified enumeration value,
-     * or remove the attribute if the value is null.
-     *
-     * @param node  The node on which to set the attribute.
-     * @param name  The attribute name.
-     * @param value The attribute value.
-     */
-    protected static void setEnum(final Element node, final String name, final String value) {
-        setAttribute(node, name, value, true);
-    }
-
-    /**
-     * Set the attribute to the specified value,
-     * or remove the attribute if the value is null.
-     *
-     * @param node  The node on which to set the attribute.
-     * @param name  The attribute name.
-     * @param value The attribute value.
-     */
-    protected static void setAttribute(final Element node, final String name, final String value) {
-        setAttribute(node, name, value, false);
-    }
-
-    /**
-     * Set the attribute to the specified value,
-     * or remove the attribute if the value is null.
-     *
-     * @param node       The node on which to set the attribute.
-     * @param name       The attribute name.
-     * @param value      The attribute value.
-     * @param isCodeList Reformat the value if it is a code list.
-     */
-    private static void setAttribute(final Element node, final String name, String value, boolean isCodeList) {
-        if (value == null || (value=value.trim()).length() == 0) {
-            if (node.hasAttribute(name)) {
-                node.removeAttribute(name);
-            }
-        } else {
-            if (isCodeList) {
-                value = value.replace('_', ' ').trim().toLowerCase();
-            }
-            node.setAttribute(name, value);
-        }
-    }
-
-    /**
-     * Set the attribute to the specified integer value.
-     *
-     * @param node  The node on which to set the attribute.
-     * @param name  The attribute name.
-     * @param value The attribute value.
-     */
-    protected static void setAttribute(final Element node, final String name, final int value) {
-        node.setAttribute(name, Integer.toString(value));
-    }
-
-    /**
-     * Set the attribute to the specified array of values,
-     * or remove the attribute if the array is {@code null}.
-     *
-     * @param node  The node on which to set the attributes.
-     * @param name  The attribute name.
-     * @param value The attribute values.
-     */
-    protected static void setAttribute(final Element node, final String name, final int[] values) {
-        setAttribute(node, name, toSequence(values));
-    }
-
-    /**
-     * Set the attribute to the specified floating point value,
-     * or remove the attribute if the value is NaN.
-     *
-     * @param node  The node on which to set the attribute.
-     * @param name  The attribute name.
-     * @param value The attribute value.
-     */
-    protected static void setAttribute(final Element node, final String name, final double value) {
-        if (Double.isNaN(value) || Double.isInfinite(value)) {
-            if (node.hasAttribute(name)) {
-                node.removeAttribute(name);
-            }
-        } else {
-            node.setAttribute(name, Double.toString(value));
-        }
-    }
-
-    /**
-     * @deprecated Moved to {@link MetadataAccessor}.
-     */
-    protected static void setAttribute(final Element node, final String name, final Date value) {
-    }
-
-    /**
-     * Returns the specified array as a sequence.
-     */
-    private static String toSequence(final Object array) {
-        if (array == null) {
-            return null;
-        }
-        final StringBuffer buffer = new StringBuffer();
-        final int length = Array.getLength(array);
-        for (int i=0; i<length; i++) {
-            if (i != 0) {
-                buffer.append(' ');
-            }
-            buffer.append(Array.get(array, i));
-        }
-        return buffer.toString();
+    public Band addBand(final String name) {
+        final Band band = (Band) getBands().addChild();
+        band.setName(name);
+        return band;
     }
 
     /**
@@ -510,7 +230,7 @@ public class GeographicMetadata extends IIOMetadata {
      */
     public Node getAsTree(final String formatName) throws IllegalArgumentException {
         checkFormatName(formatName);
-        return root;
+        return getRoot();
     }
 
     /**
@@ -528,12 +248,9 @@ public class GeographicMetadata extends IIOMetadata {
      * Resets all the data stored in this object to default values.
      */
     public void reset() {
-        root         = new IIOMetadataNode(GeographicMetadataFormat.FORMAT_NAME);
-        crs          = null;
-        cs           = null;
-        datum        = null;
-        gridGeometry = null;
-        envelope     = null;
+        root        = null;
+        referencing = null;
+        geometry    = null;
     }
 
     /**

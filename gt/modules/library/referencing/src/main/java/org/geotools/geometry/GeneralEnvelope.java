@@ -68,7 +68,7 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
  * @see org.geotools.geometry.jts.ReferencedEnvelope
  * @see org.opengis.metadata.extent.GeographicBoundingBox
  */
-public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
+public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -146,7 +146,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
 //      ensureNonNull("maxDP", maxDP);
         this(minDP.ordinates, maxDP.ordinates);
         crs = getCoordinateReferenceSystem(minDP, maxDP);
-        GeneralDirectPosition.checkCoordinateReferenceSystemDimension(crs, ordinates.length/2);
+        AbstractDirectPosition.checkCoordinateReferenceSystemDimension(crs, ordinates.length/2);
     }
 
     /**
@@ -317,30 +317,6 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     }
 
     /**
-     * Returns the common CRS of specified points.
-     *
-     * @param  minDP The first position.
-     * @param  maxDP The second position.
-     * @return Their common CRS, or {@code null} if none.
-     * @throws MismatchedReferenceSystemException if the two positions don't use the same CRS.
-     */
-    static CoordinateReferenceSystem getCoordinateReferenceSystem(final DirectPosition minDP,
-            final DirectPosition maxDP) throws MismatchedReferenceSystemException
-    {
-        final CoordinateReferenceSystem crs1 = minDP.getCoordinateReferenceSystem();
-        final CoordinateReferenceSystem crs2 = maxDP.getCoordinateReferenceSystem();
-        if (crs1 == null) {
-            return crs2;
-        } else {
-            if (crs2!=null && !crs1.equals(crs2)) {
-                throw new MismatchedReferenceSystemException(
-                          Errors.format(ErrorKeys.MISMATCHED_COORDINATE_REFERENCE_SYSTEM));
-            }
-            return crs1;
-        }
-    }
-
-    /**
      * Returns the coordinate reference system from an arbitrary envelope, or {@code null}
      * if unknown. This method performs some sanity checking for ensuring that the envelope
      * CRS is consistent.
@@ -391,7 +367,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     public void setCoordinateReferenceSystem(final CoordinateReferenceSystem crs)
             throws MismatchedDimensionException
     {
-        GeneralDirectPosition.checkCoordinateReferenceSystemDimension(crs, getDimension());
+        AbstractDirectPosition.checkCoordinateReferenceSystemDimension(crs, getDimension());
         this.crs = crs;
     }
 
@@ -408,6 +384,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
      *
      * @return The lower corner.
      */
+    //@Override
     public DirectPosition getLowerCorner() {
         final int dim = ordinates.length/2;
         final GeneralDirectPosition position = new GeneralDirectPosition(dim);
@@ -422,6 +399,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
      *
      * @return The upper corner.
      */
+    //@Override
     public DirectPosition getUpperCorner() {
         final int dim = ordinates.length/2;
         final GeneralDirectPosition position = new GeneralDirectPosition(dim);
@@ -536,7 +514,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
      */
     public void setEnvelope(final GeneralEnvelope envelope) throws MismatchedDimensionException {
         ensureNonNull("envelope", envelope);
-        GeneralDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), getDimension());
+        AbstractDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), getDimension());
         System.arraycopy(envelope.ordinates, 0, ordinates, 0, ordinates.length);
         if (envelope.crs != null) {
             crs = envelope.crs;
@@ -660,7 +638,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     public void add(final DirectPosition position) throws MismatchedDimensionException {
         ensureNonNull("position", position);
         final int dim = ordinates.length/2;
-        GeneralDirectPosition.ensureDimensionMatch("position", position.getDimension(), dim);
+        AbstractDirectPosition.ensureDimensionMatch("position", position.getDimension(), dim);
         assert equalsIgnoreMetadata(crs, position.getCoordinateReferenceSystem()) : position;
         for (int i=0; i<dim; i++) {
             final double value = position.getOrdinate(i);
@@ -684,7 +662,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     public void add(final Envelope envelope) throws MismatchedDimensionException {
         ensureNonNull("envelope", envelope);
         final int dim = ordinates.length / 2;
-        GeneralDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), dim);
+        AbstractDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), dim);
         assert equalsIgnoreMetadata(crs, envelope.getCoordinateReferenceSystem()) : envelope;
         for (int i=0; i<dim; i++) {
             final double min = envelope.getMinimum(i);
@@ -710,7 +688,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     public boolean contains(final DirectPosition position) throws MismatchedDimensionException {
         ensureNonNull("position", position);
         final int dim = ordinates.length/2;
-        GeneralDirectPosition.ensureDimensionMatch("point", position.getDimension(), dim);
+        AbstractDirectPosition.ensureDimensionMatch("point", position.getDimension(), dim);
         assert equalsIgnoreMetadata(crs, position.getCoordinateReferenceSystem()) : position;
         for (int i=0; i<dim; i++) {
             final double value = position.getOrdinate(i);
@@ -746,7 +724,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     {
         ensureNonNull("envelope", envelope);
         final int dim = ordinates.length/2;
-        GeneralDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), dim);
+        AbstractDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), dim);
         assert equalsIgnoreMetadata(crs, envelope.getCoordinateReferenceSystem()) : envelope;
         for (int i=0; i<dim; i++) {
             double inner = envelope.getMinimum(i);
@@ -789,7 +767,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     {
         ensureNonNull("envelope", envelope);
         final int dim = ordinates.length/2;
-        GeneralDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), dim);
+        AbstractDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), dim);
         assert equalsIgnoreMetadata(crs, envelope.getCoordinateReferenceSystem()) : envelope;
         for (int i=0; i<dim; i++) {
             double inner = envelope.getMaximum(i);
@@ -819,7 +797,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     public void intersect(final Envelope envelope) throws MismatchedDimensionException {
         ensureNonNull("envelope", envelope);
         final int dim = ordinates.length / 2;
-        GeneralDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), dim);
+        AbstractDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), dim);
         assert equalsIgnoreMetadata(crs, envelope.getCoordinateReferenceSystem()) : envelope;
         for (int i=0; i<dim; i++) {
             double min = Math.max(ordinates[i    ], envelope.getMinimum(i));
@@ -909,39 +887,14 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     }
 
     /**
-     * Returns a string representation of this envelope. The default implementation is okay
-     * for occasional formatting (for example for debugging purpose). But if there is a lot
-     * of envelopes to format, users will get more control by using their own instance of
-     * {@link org.geotools.measure.CoordinateFormat}.
-     */
-    public String toString() {
-        return toString(this);
-    }
-
-    /**
-     * Formats the specified envelope.
-     */
-    static String toString(final Envelope envelope) {
-        final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(envelope)).append('[');
-        final int dimension = envelope.getDimension();
-        for (int i=0; i<dimension; i++) {
-            if (i != 0) {
-                buffer.append(", ");
-            }
-            buffer.append(envelope.getMinimum(i)).append(" : ").append(envelope.getMaximum(i));
-        }
-        return buffer.append(']').toString();
-    }
-
-    /**
-     * Returns a hash value for this envelope. This value need not remain
-     * consistent between different implementations of the same class.
+     * Returns a hash value for this envelope.
      */
     public int hashCode() {
-        int code = GeneralDirectPosition.hashCode(ordinates) ^ (int)serialVersionUID;
+        int code = GeneralDirectPosition.hashCode(ordinates);
         if (crs != null) {
-            code ^= crs.hashCode();
+            code += crs.hashCode();
         }
+        assert code == super.hashCode();
         return code;
     }
 
