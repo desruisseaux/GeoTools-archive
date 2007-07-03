@@ -22,6 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.arcsde.data.ArcSDEDataStore;
+import org.geotools.arcsde.data.ViewRegisteringFactoryHelper;
 import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEConnectionPoolFactory;
@@ -151,6 +152,8 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
         } else {
             sdeDStore = new ArcSDEDataStore(connPool, namespaceUri);
         }
+        
+        ViewRegisteringFactoryHelper.registerSqlViews(sdeDStore, params);
         
         return sdeDStore;
     }

@@ -923,10 +923,10 @@ class ArcSDEQuery {
         private FIDReader fidReader;
 
         /** DOCUMENT ME! */
-        private SeLayer sdeLayer;
+        private final SeLayer sdeLayer;
 
         /** DOCUMENT ME! */
-        private Filter sourceFilter;
+        private final Filter sourceFilter;
 
         /** DOCUMENT ME! */
         private Filter sqlFilter;
@@ -962,6 +962,10 @@ class ArcSDEQuery {
          */
         public FilterSet(SeLayer sdeLayer, Filter sourceFilter, FeatureType ft,
                 SeQueryInfo definitionQuery, PlainSelect layerSelectStatement, FIDReader fidReader) {
+            assert sdeLayer != null;
+            assert sourceFilter != null;
+            assert ft != null;
+            
             this.sdeLayer = sdeLayer;
             this.sourceFilter = sourceFilter;
             this.featureType = ft;
