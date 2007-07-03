@@ -82,6 +82,7 @@ public class GeometryTestOperation extends Assert {
         operationMap.put("relate", new RelateOp());
         operationMap.put("isWithinDistance", new WithinDistanceOp());
         operationMap.put("distance", new DistanceOp());
+        operationMap.put("disjoint", new DisjointOp());
     }
 
     protected Object getExpectedResult() {
@@ -440,6 +441,25 @@ public class GeometryTestOperation extends Assert {
 			result = geom1.distance(geom2);
 			actualResult = result;
             return (Double.compare(result, (Double) expectedResult) == 0);
+        }
+    }
+    
+    /**
+     * Class defining the "disjoint" operation
+     */
+    private class DisjointOp extends OperationHandler {
+        /**
+         * performs the disjoint on the two arguments
+         * @param a Geometry object
+         * @param b Geometry Object
+         * @return a boolean indicating whether the result matched the expectation
+         */
+        public boolean doOperation(Geometry a, Geometry b) {
+            GeometryImpl geom1 = (GeometryImpl) setGeomArg(arg1, a, b);
+            GeometryImpl geom2 = (GeometryImpl) setGeomArg(arg2, a, b);
+            boolean result = geom1.disjoint(geom2);
+            actualResult = result;
+            return (actualResult == expectedResult);
         }
     }
     

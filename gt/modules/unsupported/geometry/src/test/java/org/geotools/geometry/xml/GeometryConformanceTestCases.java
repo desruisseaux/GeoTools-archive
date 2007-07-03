@@ -96,6 +96,9 @@ public class GeometryConformanceTestCases extends TestCase {
 	public void testTestConvexHull() throws Exception {
 		perform();
 	}
+	public void testTestDisjoint() throws Exception {
+		perform();
+	}
 	public void testTestFunctionAA() throws Exception {
 		perform();
 	}

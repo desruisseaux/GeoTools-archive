@@ -490,7 +490,7 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 	 *      org.opengis.referencing.operation.MathTransform)
 	 */
 	public Geometry transform(CoordinateReferenceSystem newCRS,
-			MathTransform transform) {
+			MathTransform transform) throws TransformException {
 
 		// loop through each ring in this Surface and transform it to the new CRS, then
 		// use the new rings to build a new Surface and return that.
@@ -505,22 +505,10 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 			
 			// exterior Ring should be first element in the list
 			if (newExterior == null) {
-				try {
-					newExterior = (RingImpl) thisRing.transform(newCRS);
-				} catch (TransformException e) {
-					Assert.isTrue(false, "Transform error for exterioir ring.");
-					return null;
-					//e.printStackTrace();
-				}
+				newExterior = (RingImpl) thisRing.transform(newCRS);
 			}
 			else {
-				try {
-					newInteriors.add((RingImpl) thisRing.transform(newCRS));
-				} catch (TransformException e) {
-					Assert.isTrue(false, "Transform error for interior ring.");
-					return null;
-					//e.printStackTrace();
-				}
+				newInteriors.add((RingImpl) thisRing.transform(newCRS));
 			}
 		}
 		

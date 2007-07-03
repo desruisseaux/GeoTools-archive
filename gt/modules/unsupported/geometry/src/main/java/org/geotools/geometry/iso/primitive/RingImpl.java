@@ -290,7 +290,7 @@ public class RingImpl extends CompositeCurveImpl implements Ring {
 	 *      org.opengis.referencing.operation.MathTransform)
 	 */
 	public Geometry transform(CoordinateReferenceSystem newCRS,
-			MathTransform transform) {
+			MathTransform transform) throws MismatchedDimensionException, TransformException {
 
 		// loop through each point in this Ring and transform it to the new CRS, then
 		// use the new points to build a new Ring and return that.
@@ -303,19 +303,9 @@ public class RingImpl extends CompositeCurveImpl implements Ring {
 		List<Position> newpositions = new ArrayList<Position>();
 		while (iter.hasNext()) {
 			DirectPositionImpl thispos = (DirectPositionImpl) iter.next();
-			try {
-				dp1 = new DirectPositionImpl(newCRS);
-				dp1 = (DirectPositionImpl) transform.transform(thispos, dp1);
-				newpositions.add(dp1);
-			} catch (MismatchedDimensionException e) {
-				Assert.isTrue(false, "Mismatched CRS dimension error for position: "+thispos);
-				return null;
-				//e.printStackTrace();
-			} catch (TransformException e) {
-				Assert.isTrue(false, "Transform error for position: "+thispos);
-				return null;
-				//e.printStackTrace();
-			}
+			dp1 = new DirectPositionImpl(newCRS);
+			dp1 = (DirectPositionImpl) transform.transform(thispos, dp1);
+			newpositions.add(dp1);
 		}
 		
 		// use the new positions list to build a new Ring and return it

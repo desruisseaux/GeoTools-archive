@@ -80,6 +80,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.Boundary;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
+import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.Precision;
 import org.opengis.geometry.TransfiniteSet;
@@ -279,7 +280,7 @@ public abstract class GeometryImpl implements Geometry {
 	 *      org.opengis.referencing.operation.MathTransform)
 	 */
 	public Geometry transform(CoordinateReferenceSystem newCRS,
-			MathTransform transform) {
+			MathTransform transform) throws MismatchedDimensionException, TransformException {
 
 			// this should be handled in each of the individual geometry classes (ie:
 			// PointImpl, CurveImpl, etc), if not it will fall through to here

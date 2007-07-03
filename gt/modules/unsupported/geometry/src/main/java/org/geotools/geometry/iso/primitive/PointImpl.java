@@ -324,23 +324,13 @@ public class PointImpl extends PrimitiveImpl implements Point {
 	 *      org.opengis.referencing.operation.MathTransform)
 	 */
 	public Geometry transform(CoordinateReferenceSystem newCRS,
-			MathTransform transform) {
+			MathTransform transform) throws MismatchedDimensionException, TransformException {
 
 		PositionFactory newPositionFactory = new PositionFactoryImpl(newCRS, positionFactory.getPrecision());
 		PrimitiveFactory newPrimitiveFactory = new PrimitiveFactoryImpl(newCRS, newPositionFactory);
 		DirectPosition dp1 = new DirectPositionImpl(newCRS);
-		try {
-			dp1 = transform.transform(((PointImpl)this).getPosition(), dp1);
-			return newPrimitiveFactory.createPoint( dp1 );
-		} catch (MismatchedDimensionException e) {
-			Assert.isTrue(false, "Mismatched CRS dimension error.");
-			//e.printStackTrace();
-		} catch (TransformException e) {
-			Assert.isTrue(false, "Transform error.");
-			//e.printStackTrace();
-		}
-		
-		return null;
+		dp1 = transform.transform(((PointImpl)this).getPosition(), dp1);
+		return newPrimitiveFactory.createPoint( dp1 );
 			
 	}
 }
