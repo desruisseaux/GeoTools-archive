@@ -51,7 +51,7 @@ import org.geotools.referencing.operation.transform.WarpTransform2D;
  * @author jezekjan
  *
  */
-public class LocalizationGridBuilder extends MathTransformBuilder {
+public class WarpGridBuilder extends MathTransformBuilder {
     /**
      * LocalizationGrid that will be computed
      */
@@ -108,7 +108,7 @@ public class LocalizationGridBuilder extends MathTransformBuilder {
      * @throws MismatchedDimensionException
      * @throws MismatchedReferenceSystemException
      */
-    public LocalizationGridBuilder(List vectors, double dx, double dy, Envelope envelope,
+    public WarpGridBuilder(List vectors, double dx, double dy, Envelope envelope,
         MathTransform realToGrid)
         throws MismatchedSizeException, MismatchedDimensionException,
             MismatchedReferenceSystemException {
