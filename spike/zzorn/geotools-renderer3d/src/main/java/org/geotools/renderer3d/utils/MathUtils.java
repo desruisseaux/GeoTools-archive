@@ -152,14 +152,14 @@ public class MathUtils
      * @param startValue
      * @param endValue
      */
-    public static float interpolateClamp( final float position,
-                                          final float startPosition,
-                                          final float endPosition,
-                                          final float startValue,
-                                          final float endValue )
+    public static double interpolateClamp( final double position,
+                                           final double startPosition,
+                                           final double endPosition,
+                                           final double startValue,
+                                           final double endValue )
     {
         // Clamp
-        float p = position;
+        double p = position;
         if ( p < startPosition )
         {
             p = startPosition;
@@ -169,7 +169,7 @@ public class MathUtils
             p = endPosition;
         }
 
-        return (float) interpolate( p, startPosition, endPosition, startValue, endValue );
+        return interpolate( p, startPosition, endPosition, startValue, endValue );
     }
 
 
