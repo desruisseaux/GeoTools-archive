@@ -342,7 +342,7 @@ public class AttributeBuilder {
                  * throw new IllegalArgumentException(type.getName() + " is not
                  * a subtype of " + declaredType.getName());
                  */
-                LOGGER.warning("Adding attribute " + name + " of type " + type.getName()
+                LOGGER.fine("Adding attribute " + name + " of type " + type.getName()
                         + " which is not a subtype of " + declaredType.getName());
             }
             int minOccurs = descriptor.getMinOccurs();

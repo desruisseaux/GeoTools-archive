@@ -180,6 +180,7 @@ public class AttributeImpl implements Attribute {
         sb.append(":");
         sb.append(content);
         sb.append("]");
-        return sb.toString();
+//        LOGGER.fine("converting value for unbound Attribute (possibly null value) " + sb.toString() );
+        return (content == null ? "" : content.toString() );
     }
 }

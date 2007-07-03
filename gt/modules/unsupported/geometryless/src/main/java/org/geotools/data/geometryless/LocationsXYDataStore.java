@@ -225,7 +225,9 @@ public class LocationsXYDataStore extends org.geotools.data.geometryless.JDBCDat
         }
 
         SQLEncoderLocationsXY encoder = new SQLEncoderLocationsXY(xCol, yCol);
+        encoder.setFeatureType(ftHanlder.getSchema(typeName));
         encoder.setFIDMapper(getFIDMapper(typeName));
+       
         return new LocationsXYSQLBuilder(encoder, geomName, XCoordColumnName, YCoordColumnName,
                 ftHanlder);
     }

@@ -643,8 +643,8 @@ public class MemoryDataAccess extends AbstractDataStore implements FeatureAccess
             Filter filter = query.getFilter();
             Feature first = (Feature) iterator.next();
 
-            envelope = new ReferencedEnvelope(first.getCRS());
-            envelope.init(first.getBounds());
+            envelope = new ReferencedEnvelope(first.getBounds());
+//            envelope.init(first.getBounds());
 
             while (iterator.hasNext() && (count < query.getMaxFeatures())) {
                 Feature feature = (Feature) iterator.next();

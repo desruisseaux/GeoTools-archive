@@ -26,7 +26,7 @@
     </Namespace>
     <Namespace>
       <prefix>sa</prefix>
-      <uri>http://www.opengis.net/sampling/0.0</uri>
+      <uri>http://www.opengis.net/sampling</uri>
     </Namespace>
     <Namespace>
       <prefix>geo</prefix>

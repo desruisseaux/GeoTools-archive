@@ -92,9 +92,8 @@ public abstract class FeatureCollections implements Factory {
             BoundingBox e = f.getBounds();
 
             if (bounds == null) {
-                bounds = new ReferencedEnvelope(e
-                        .getCoordinateReferenceSystem());
-                bounds.init(e);
+                bounds = new ReferencedEnvelope(e);
+//                bounds.init(e);
             } else {
                 bounds.include(e);
             }

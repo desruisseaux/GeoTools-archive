@@ -79,7 +79,8 @@ public class BypassSqlSQLBuilder extends GeoAPISQLBuilder {
 						+ e.getMessage());
 			}
 
-			String select = getSelect(sqlQuery, fType);
+			//String select = getSelect(sqlQuery, fType);
+			String select = "select " ; 
 			sqlBuffer.append(select);
 
 			sqlColumns(sqlBuffer, mapper, attrTypes, fieldAliases);
@@ -153,7 +154,7 @@ public class BypassSqlSQLBuilder extends GeoAPISQLBuilder {
 		
 		for(Iterator it = fieldsList.iterator(); it.hasNext();){
 			String aliasDef = (String)it.next();
-			aliasDef = aliasDef.trim();
+			aliasDef = aliasDef.trim().toLowerCase();
 			LOGGER.fine("parsing alias from '" + aliasDef + "'");
 			int idx = aliasDef.indexOf("as ");
 			if(idx > 0){

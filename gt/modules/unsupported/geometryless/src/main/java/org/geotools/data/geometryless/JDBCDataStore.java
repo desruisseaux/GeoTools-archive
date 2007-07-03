@@ -306,6 +306,8 @@ public class JDBCDataStore extends org.geotools.data.jdbc.JDBCDataStore implemen
     public SQLBuilder getSqlBuilder(String typeName) throws IOException {
         BypassSqlFeatureTypeHandler ftHandler = (BypassSqlFeatureTypeHandler) super.typeHandler;
         FilterToSQL encoder = new UnaliasSQLEncoder();
+        FeatureType schema = getSchema( typeName );
+		encoder.setFeatureType( schema );
         encoder.setFIDMapper(getFIDMapper(typeName));
         SQLBuilder sqlBuilder;
         /*

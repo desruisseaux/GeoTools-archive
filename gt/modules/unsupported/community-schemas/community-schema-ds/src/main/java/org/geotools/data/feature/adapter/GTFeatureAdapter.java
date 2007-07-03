@@ -80,8 +80,8 @@ public class GTFeatureAdapter implements org.geotools.feature.SimpleFeature {
     }
 
     public Envelope getBounds() {
-        ReferencedEnvelope envelope = new ReferencedEnvelope(adaptee.getCRS());
-        envelope.init(adaptee.getBounds());
+        ReferencedEnvelope envelope = new ReferencedEnvelope(adaptee.getBounds());
+//        envelope.init(adaptee.getBounds());
         return envelope;
     }
 
