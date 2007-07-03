@@ -135,11 +135,13 @@ public class GridDemo {
             Operations operations = new Operations(null);                               
             GridCoverage2D coverage = (GridCoverage2D)reader.read(null);
             Envelope env = coverage.getEnvelope();
-            List vectors = generateMappedPositions(env,7, 20);
+            List vectors = generateMappedPositions(env,10, 0.02);
             
-            LocalizationGridBuilder gridBuilder = new LocalizationGridBuilder(500,500, vectors,env);
+            LocalizationGridBuilder gridBuilder = new LocalizationGridBuilder(vectors, 0.7,0.7, env, coverage.getGridGeometry().getGridToCRS().inverse());
               
             MathTransform  trans = gridBuilder.getMathTransform();
+            
+            
             System.out.println(((AbstractMathTransform)trans).getParameterDescriptors());
           
    //////******************New reference System***************************///////

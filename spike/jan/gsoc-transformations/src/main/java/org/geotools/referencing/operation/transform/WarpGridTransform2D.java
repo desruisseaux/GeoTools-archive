@@ -1,3 +1,18 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.referencing.operation.transform;
 
 import javax.media.jai.Warp;
@@ -7,7 +22,6 @@ import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.MathTransformProvider;
-import org.geotools.referencing.operation.transform.WarpTransform2D;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -16,34 +30,35 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.Transformation;
 
 
+/**
+ * 
+ * @author jezekjan
+ *
+ */
 public class WarpGridTransform2D extends WarpTransform2D {
     private final Warp warp;
     private final Warp inverse;
 
-    public  WarpGridTransform2D(int xStart, int xStep, int xNumCells, int yStart,
-        int yStep, int yNumCells, float[] warpPositions) {
-    	 super( new WarpGrid(xStart, xStep, xNumCells, yStart, yStep, yNumCells,
-                 warpPositions), 
-                 new WarpGrid(xStart, xStep, xNumCells, yStart, yStep, yNumCells,
-                         warpPositions));
-        warp = new WarpGrid(xStart, xStep, xNumCells, yStart, yStep, yNumCells,
-                warpPositions);
-        inverse = null;//TODO generate inverse warpgrid
-        
-      // super(warp, null);
+    public WarpGridTransform2D(int xStart, int xStep, int xNumCells, int yStart, int yStep,
+        int yNumCells, float[] warpPositions) {
+        super(new WarpGrid(xStart, xStep, xNumCells, yStart, yStep, yNumCells, warpPositions),
+            new WarpGrid(xStart, xStep, xNumCells, yStart, yStep, yNumCells, warpPositions));
+        warp = new WarpGrid(xStart, xStep, xNumCells, yStart, yStep, yNumCells, warpPositions);
+        inverse = new WarpGrid(xStart, xStep, xNumCells, yStart, yStep, yNumCells, warpPositions); //TODO generate inverse warpgrid
+
+        // super(warp, null);
     }
-    /**
-     * Constructs a transform using the specified warp object. Transformations will be applied
-     * using the {@link Warp#warpPoint(int,int,float[]) warpPoint} method or something equivalent.
-     *
-     * @param warp    The image warp to wrap into a math transform.
-     * @param inverse An image warp to uses for the {@linkplain #inverse inverse transform},
-     *                or {@code null} in none.
-     */
+
+    public WarpGridTransform2D(Warp warp, Warp inverse){
+    	super(warp,inverse);
+    	this.warp = warp;
+    	this.inverse = inverse;
     
-   
+    }
+       
+    
     public ParameterDescriptorGroup getParameterDescriptors() {
-    	return Provider.PARAMETERS;
+        return Provider.PARAMETERS;
     }
 
     public static class Provider extends MathTransformProvider {
@@ -85,8 +100,7 @@ public class WarpGridTransform2D extends WarpTransform2D {
                     new NamedIdentifier(Citations.GEOTOOLS, "WarpGrid")
                 },
                 new ParameterDescriptor[] {
-                    xStart, xStep, xNumCells, yStart, yStep, yNumCells,
-                    warpPositions
+                    xStart, xStep, xNumCells, yStart, yStep, yNumCells, warpPositions
                 });
 
         /**
@@ -110,8 +124,8 @@ public class WarpGridTransform2D extends WarpTransform2D {
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        protected MathTransform createMathTransform(
-            final ParameterValueGroup values) throws ParameterNotFoundException {
+        public MathTransform createMathTransform(final ParameterValueGroup values)
+            throws ParameterNotFoundException {
             final int XSTART = intValue(xStart, values);
             final int XSTEP = intValue(xStep, values);
             final int XNUMCELLS = intValue(xNumCells, values);
@@ -120,11 +134,12 @@ public class WarpGridTransform2D extends WarpTransform2D {
             final int YNUMCELLS = intValue(yNumCells, values);
             final float[] WARPPOSITIONS = (float[]) value(warpPositions, values);
 
+            
             final Warp warp;
-            warp = new WarpGrid(XSTART, XSTEP, XNUMCELLS, YSTART, YSTEP,
-                    YNUMCELLS, WARPPOSITIONS);
-
-            return new WarpTransform2D(warp, (Warp)null);
+            warp = new WarpGrid(XSTART, XSTEP, XNUMCELLS, YSTART, YSTEP, YNUMCELLS, WARPPOSITIONS);
+            //TODO - inverse transform
+            
+             return new WarpGridTransform2D(warp, warp);
         }
     }
 }
