@@ -44,8 +44,16 @@ public class WarpGridTransform2D extends WarpTransform2D {
         super(new WarpGrid(xStart, xStep, xNumCells, yStart, yStep, yNumCells, warpPositions),
             new WarpGrid(xStart, xStep, xNumCells, yStart, yStep, yNumCells, warpPositions));
         warp = new WarpGrid(xStart, xStep, xNumCells, yStart, yStep, yNumCells, warpPositions);
+        
+        
+        inverse = null;
+        /*
+        for (int i=0; i<warpPositions.length; i++){
+        	warpPositions[i]=-warpPositions[i];
+        }
         inverse = new WarpGrid(xStart, xStep, xNumCells, yStart, yStep, yNumCells, warpPositions); //TODO generate inverse warpgrid
-
+        System.out.print("dsd");
+        */
         // super(warp, null);
     }
 

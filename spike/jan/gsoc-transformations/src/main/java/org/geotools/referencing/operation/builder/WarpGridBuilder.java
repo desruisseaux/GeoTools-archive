@@ -20,32 +20,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.media.jai.WarpGrid;
 import javax.vecmath.MismatchedSizeException;
-
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.geometry.MismatchedReferenceSystemException;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 import org.geotools.geometry.DirectPosition2D;
-import org.geotools.parameter.DefaultParameterDescriptor;
-import org.geotools.parameter.DefaultParameterDescriptorGroup;
-import org.geotools.parameter.ParameterGroup;
+import org.geotools.geometry.Envelope2D;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.referencing.operation.transform.WarpGridTransform2D;
 import org.geotools.referencing.operation.transform.WarpTransform2D;
-import org.opengis.geometry.DirectPosition;
-import org.opengis.geometry.Envelope;
-import org.opengis.geometry.MismatchedDimensionException;
-import org.opengis.geometry.MismatchedReferenceSystemException;
-import org.opengis.parameter.InvalidParameterTypeException;
-import org.opengis.parameter.InvalidParameterValueException;
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterNotFoundException;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchIdentifierException;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -54,7 +42,6 @@ import org.opengis.referencing.operation.TransformException;
  *
  */
 public class WarpGridBuilder extends MathTransformBuilder {
-  
     /**
      * Grid width
      */
@@ -78,7 +65,7 @@ public class WarpGridBuilder extends MathTransformBuilder {
     /**
      * GridValues like maxx maxt dx dy etc..
      */
-    WorldParamValues globalValues;
+    GridParamValues globalValues;
 
     /**
      * RealToGrid Math Transform
@@ -110,36 +97,18 @@ public class WarpGridBuilder extends MathTransformBuilder {
         MathTransform realToGrid)
         throws MismatchedSizeException, MismatchedDimensionException,
             MismatchedReferenceSystemException, TransformException {
-        // super.setMappedPositions(vectors);
         this.realToGrid = realToGrid;
-/*
-        globalValues = new WorldParamValues((float) envelope.getMinimum(0),
-                (float) envelope.getMinimum(1), (float) envelope.getMaximum(0),
-                (float) envelope.getMaximum(1), (float) dx, (float) dy, realToGrid);
-        */
-        
-        globalValues = new WorldParamValues(envelope, realToGrid, 
-        		(int)Math.ceil(envelope.getLength(0)/dx),
-        		(int)Math.ceil(envelope.getLength(1)/dy));
-        
-        super.setMappedPositions(transformMPToGrid(vectors));
-     
-     //   height = globalValues.PARAMETERS.parameter("yNumCells").intValue(); // globalValues.getGridHeight();
-      //  width = globalValues.PARAMETERS.parameter("xNumCells").intValue();
-        this.envelope = envelope;
-        //  gridShift = new LocalizationGrid(width, height);
-        //dxgrid = new float[width][height];
-        //dygrid = new float[width][height];
-       /* warpPositions = new float[2 * (globalValues.PARAMETERS.parameter("yNumCells").intValue() + 1)
-                                    * (globalValues.PARAMETERS.parameter("xNumCells").intValue() + 1)];*/
-      
-        
-        warpPositions = new float[2* (globalValues.WarpGridParameters.parameter("xNumCells").intValue()+1)*
-        		                      (globalValues.WarpGridParameters.parameter("yNumCells").intValue()+1)];
-        //    this.gridShiftToEnv = ProjectiveTransform.createScale(2, 0.5);//envelope.getLength(0) / width);
-        this.computeWarpGrid();
 
-        //	gridShift.transform((AffineTransform)this.gridShiftToEnv, null);
+        globalValues = new GridParamValues(envelope, realToGrid, dx, dy);
+
+        super.setMappedPositions(transformMPToGrid(vectors));
+
+        warpPositions = (float[]) globalValues.WarpGridParameters.parameter("warpPositions")
+                                                                 .getValue();
+
+        this.envelope = envelope;
+
+        this.computeWarpGrid();
     }
 
     /**
@@ -156,7 +125,6 @@ public class WarpGridBuilder extends MathTransformBuilder {
                 realToGrid.transform(mp.getSource(), gridSource);
                 realToGrid.transform(mp.getTarget(), gridTarget);
                 localpositions.add(new MappedPosition(gridSource, gridTarget));
-                                
             } catch (MismatchedDimensionException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -164,8 +132,8 @@ public class WarpGridBuilder extends MathTransformBuilder {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            
         }
+
         return localpositions;
     }
 
@@ -179,9 +147,8 @@ public class WarpGridBuilder extends MathTransformBuilder {
      * @see org.geotools.referencing.operation.builder.MathTransformBuilder#computeMathTransform()
      */
     protected MathTransform computeMathTransform() throws FactoryException {
-    	
         return (WarpTransform2D) (new WarpGridTransform2D.Provider()).createMathTransform(globalValues
-                .getWarpGridParameters());     
+            .getWarpGridParameters());
     }
 
     /*
@@ -190,7 +157,7 @@ public class WarpGridBuilder extends MathTransformBuilder {
      */
     public int getMinimumPointCount() {
         return 1;
-    }    
+    }
 
     /**
      * Computes GridWarp Positions using IDW interpolatio.
@@ -201,7 +168,7 @@ public class WarpGridBuilder extends MathTransformBuilder {
 
         for (int i = 0; i <= WarpParams.parameter("yNumCells").intValue(); i++) {
             for (int j = 0; j <= WarpParams.parameter("xNumCells").intValue(); j++) {
-                  Point2D shiftVector = calculateShift(new DirectPosition2D(WarpParams.parameter(
+                Point2D shiftVector = calculateShift(new DirectPosition2D(WarpParams.parameter(
                                 "xStart").intValue()
                             + (j * WarpParams.parameter("xStep").intValue()),
                             WarpParams.parameter("yStart").intValue()
@@ -211,9 +178,10 @@ public class WarpGridBuilder extends MathTransformBuilder {
                     + WarpParams.parameter("xStart").intValue();
                 double y = shiftVector.getY() + (i * WarpParams.parameter("yStep").intValue())
                     + WarpParams.parameter("yStart").intValue();
-              
+
                 warpPositions[(i * ((1 + WarpParams.parameter("xNumCells").intValue()) * 2))
                 + (2 * j)] = (float) x;
+
                 warpPositions[(i * ((1 + WarpParams.parameter("xNumCells").intValue()) * 2))
                 + (2 * j) + 1] = (float) y;
             }
@@ -221,7 +189,6 @@ public class WarpGridBuilder extends MathTransformBuilder {
 
         globalValues.setGridWarpPostions(warpPositions);
     }
-   
 
     public float[][] getDxGrid() {
         return dxgrid;
@@ -329,82 +296,39 @@ public class WarpGridBuilder extends MathTransformBuilder {
      * @author jezekjan
      *
      */
-    private static class WorldParamValues {
-        /** Descriptor for the "{@link WarpGrid#getXStart  xStart}" parameter value. */
-        private static final ParameterDescriptor xStart = new DefaultParameterDescriptor("xStart",
-                double.class, null, null);
-        private static final ParameterDescriptor xEnd = new DefaultParameterDescriptor("xEnd",
-                double.class, null, null);
-
-        /** Descriptor for the "{@link WarpGrid#getXStep xStep}" parameter value. */
-        private static final ParameterDescriptor xStep = new DefaultParameterDescriptor("xStep",
-                double.class, null, null);
-
-        /** Descriptor for the "{@link WarpGrid#getXNumCells xNumCells}" parameter value. */
-        private static final ParameterDescriptor xNumCells = new DefaultParameterDescriptor("xNumCells",
-                int.class, null, null);
-
-        /** Descriptor for the "{@link WarpGrid#getYStart yStart}" parameter value. */
-        private static final ParameterDescriptor yStart = new DefaultParameterDescriptor("yStart",
-                double.class, null, null);
-        private static final ParameterDescriptor yEnd = new DefaultParameterDescriptor("yEnd",
-                double.class, null, null);
-
-        /** Descriptor for the "{@link WarpGrid#getYStep yStep}" parameter value. */
-        private static final ParameterDescriptor yStep = new DefaultParameterDescriptor("yStep",
-                double.class, null, null);
-
-        /** Descriptor for the "{@link WarpGrid#getYNumCells yNumCells}" parameter value. */
-        private static final ParameterDescriptor yNumCells = new DefaultParameterDescriptor("yNumCells",
-                int.class, null, null);
-
-        /** Descriptor for the "{@link WarpGrid#warpPositions  warpPositions}" parameter value. */
-        private static final ParameterDescriptor warpPositions = new DefaultParameterDescriptor("warpPositions",
-                float[].class, null, null);
-
-        /**
-         * The parameters group.
-         */
-        final static ParameterDescriptorGroup DESRIPTORS = new DefaultParameterDescriptorGroup("WorldGridValues",
-                new ParameterDescriptor[] {
-                    xStart, xStep, xNumCells, xEnd, yStart, yStep, yNumCells, yEnd, warpPositions
-                });
-        final static ParameterGroup PARAMETERS = new ParameterGroup(DESRIPTORS);
+    private static class GridParamValues {
         private ParameterValueGroup WarpGridParameters;
 
-        /**
-         * TODO -Replace this with ParametrValueGroup
-         * Constructs ahelper class for handling global parameters.
-         * @param xmin xmin
-         * @param ymin ymin
-         * @param xmax xmax
-         * @param ymax ymax
-         * @param dx dx
-         * @param dy dy
-         */
-        public WorldParamValues(float xmin, float ymin, float xmax, float ymax, float dx, float dy,
-            MathTransform RealToGrid) {
-            super();
+        public GridParamValues(Envelope env, MathTransform trans, double dx, double dy)
+            throws TransformException {
+            Envelope dxdy = new Envelope2D(env.getCoordinateReferenceSystem(), env.getMinimum(0),
+                    env.getMinimum(1), dx, dy);
 
-            PARAMETERS.parameter("xStart").setValue((float) xmin);
-            PARAMETERS.parameter("xEnd").setValue((float) xmax);
-            PARAMETERS.parameter("xStep").setValue((float) dx);
-            PARAMETERS.parameter("xNumCells").setValue((int) Math.ceil(Math.abs(xmax - xmin) / dx));
+            /* Transforms dx, dy and envelope to grid system */
+            dxdy = CRS.transform(trans, dxdy);
+            env = CRS.transform(trans, env);
 
-            PARAMETERS.parameter("yStart").setValue((float) ymin);
-            PARAMETERS.parameter("yEnd").setValue((float) ymax);
-            PARAMETERS.parameter("yStep").setValue((float) dy);
-            PARAMETERS.parameter("yNumCells").setValue((int) Math.ceil(Math.abs(ymax - ymin) / dy));
+            ;
 
-            transformToGridValues((ParameterValueGroup) PARAMETERS, RealToGrid);
-        }
+            try {
+                final DefaultMathTransformFactory factory = new DefaultMathTransformFactory();
+                WarpGridParameters = factory.getDefaultParameters("WarpGrid");
+                WarpGridParameters.parameter("xStart").setValue((int) (env.getMinimum(0) + 0.5));
+                WarpGridParameters.parameter("yStart").setValue((int) (env.getMinimum(1) + 0.5));
+                WarpGridParameters.parameter("xStep").setValue((int) Math.ceil(dxdy.getLength(0)));
+                WarpGridParameters.parameter("yStep").setValue((int) Math.ceil(dxdy.getLength(1)));
+                WarpGridParameters.parameter("xNumCells")
+                                  .setValue((int) Math.ceil(env.getLength(0) / dxdy.getLength(0)));
+                WarpGridParameters.parameter("yNumCells")
+                                  .setValue((int) Math.ceil(env.getLength(1) / dxdy.getLength(1)));
 
-        /**
-         * Sets WarpPositions in real world coordinates
-         * @param warpPos
-         */
-        public void setWorldWarpPostions(float[] warpPos) {
-            PARAMETERS.parameter("warpPositions").setValue(warpPos);
+                WarpGridParameters.parameter("warpPositions")
+                                  .setValue(new float[2 * (WarpGridParameters.parameter("xNumCells")
+                                                                             .intValue() + 1) * (WarpGridParameters.parameter(
+                        "yNumCells").intValue() + 1)]);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         public void setGridWarpPostions(float[] warpPos) {
@@ -413,104 +337,6 @@ public class WarpGridBuilder extends MathTransformBuilder {
 
         public ParameterValueGroup getWarpGridParameters() {
             return WarpGridParameters;
-        }
-
-        public WorldParamValues(Envelope env, MathTransform trans, int xNumCells, int yNumCells) throws TransformException {
-        	env = CRS.transform(trans, env);
-        	
-			try {
-				final DefaultMathTransformFactory factory = new DefaultMathTransformFactory();
-				WarpGridParameters = factory.getDefaultParameters("WarpGrid");
-				WarpGridParameters.parameter("xStart").setValue(
-						(int) (env.getMinimum(0) + 0.5));
-				WarpGridParameters.parameter("yStart").setValue(
-						(int) (env.getMinimum(1) + 0.5));
-				WarpGridParameters.parameter("xStep").setValue((int)
-						(env.getLength(0)) / xNumCells);
-				WarpGridParameters.parameter("yStep").setValue((int)
-						(env.getLength(1) / yNumCells));
-				WarpGridParameters.parameter("xNumCells").setValue(
-						(int) xNumCells);
-				WarpGridParameters.parameter("yNumCells").setValue(
-						(int) yNumCells);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}             
-        }
-        /**
-         * Transforms real word values into the grid values
-         * @param WorldToGrid
-         * @return
-         */
-        private void transformToGridValues(ParameterValueGroup values, MathTransform WorldToGrid) {
-            ParameterValueGroup parameters = null;
-
-            //ParameterValueGroup results = (ParameterValueGroup) values.clone();
-            final double WorldXMIN = values.parameter("xStart").doubleValue();
-            final double WorldYMIN = values.parameter("yStart").doubleValue();
-
-            final double WorldXMAX = values.parameter("xEnd").doubleValue();
-            final double WorldYMAX = values.parameter("yEnd").doubleValue();
-
-            final double WorldXSTEP = values.parameter("xStep").doubleValue();
-            final double WorldYSTEP = values.parameter("yStep").doubleValue();
-
-            final double WorldXNUMCELLS = values.parameter("xNumCells").doubleValue();
-            final double WorldYNUMCELLS = values.parameter("yNumCells").doubleValue();
-
-            DirectPosition result = new DirectPosition2D();
-
-            try {
-                // Calculates grid start 
-                WorldToGrid.transform((DirectPosition) (new DirectPosition2D(WorldXMIN, WorldYMAX)),
-                    result);
-                
-
-                final double GridXStart = result.getCoordinates()[0] + 0.5; // center of the pixel
-                final double GridYStart = result.getCoordinates()[1] + 0.5; //center of the pixel
-
-                // calculates scale on axis
-                WorldToGrid.transform((DirectPosition) (new DirectPosition2D(WorldXMAX, WorldYMAX)),
-                    result);
-
-                final double xScale = (WorldXMAX - WorldXMIN) / ((result.getCoordinates()[0] + 0.5)
-                    - GridXStart);
-                final double yScale = (WorldYMAX - WorldYMIN) / ((result.getCoordinates()[0] + 0.5)
-                    - GridYStart);
-
-                final DefaultMathTransformFactory factory = new DefaultMathTransformFactory();
-
-                WarpGridParameters = factory.getDefaultParameters("WarpGrid");
-                WarpGridParameters.parameter("xStart").setValue((int) GridXStart);
-                WarpGridParameters.parameter("yStart").setValue((int) GridYStart);
-
-                WarpGridParameters.parameter("xStep")
-                                  .setValue((int) (values.parameter("xStep").doubleValue() / xScale));
-
-                WarpGridParameters.parameter("yStep")
-                                  .setValue((int) (values.parameter("yStep").doubleValue() / yScale));
-
-                WarpGridParameters.parameter("xNumCells")
-                                  .setValue((int) (values.parameter("xNumCells").doubleValue()));
-
-                WarpGridParameters.parameter("yNumCells")
-                                  .setValue((int) (values.parameter("yNumCells").doubleValue()));
-            } catch (InvalidParameterValueException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (ParameterNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (InvalidParameterTypeException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (NoSuchIdentifierException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (TransformException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
         }
     }
 }
