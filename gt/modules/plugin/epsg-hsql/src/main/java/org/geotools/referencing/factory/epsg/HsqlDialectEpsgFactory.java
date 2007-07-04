@@ -49,6 +49,12 @@ final class HsqlDialectEpsgFactory extends AnsiDialectEpsgFactory {
     /**
      * Constructs the factory for the given connection to the HSQL database.
      */
+    public HsqlDialectEpsgFactory(final Hints hints, final javax.sql.DataSource dataSource) {
+        super(hints, dataSource);
+    }
+    /**
+     * Constructs the factory for the given connection to the HSQL database.
+     */
     public HsqlDialectEpsgFactory(final Hints hints, final Connection connection) {
         super(hints, connection);
     }
@@ -92,7 +98,7 @@ final class HsqlDialectEpsgFactory extends AnsiDialectEpsgFactory {
      */
     protected void shutdown(final boolean active) throws SQLException {
         if (active) {
-            final Statement statement = connection.createStatement();
+            final Statement statement = getConnection().createStatement();
             statement.execute("SHUTDOWN");
             statement.close();
         }

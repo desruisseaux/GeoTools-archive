@@ -174,7 +174,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
      * <p>
      * This field is managed as part of our connection lifecycle.
      */
-    protected Connection connection;
+    private Connection connection;
 
     /**
      * A pool of prepared statements. Key are {@link String} object related to their
@@ -253,8 +253,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
         hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE);
         hints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS,   Boolean.FALSE);
         hints.put(Hints.FORCE_STANDARD_AXIS_UNITS,        Boolean.FALSE);
-        this.connection = connection;
-        ensureNonNull("connection", connection);
+        this.dataSource = dataSource;
     }
     /**
      * Constructs an authority factory using the specified connection.
@@ -282,8 +281,8 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
         if (authority == null) try {
             final String query = adaptSQL("SELECT VERSION_NUMBER, VERSION_DATE FROM [Version History]" +
                                           " ORDER BY VERSION_DATE DESC");
-            final DatabaseMetaData metadata  = connection.getMetaData();
-            final Statement        statement = connection.createStatement();
+            final DatabaseMetaData metadata  = getConnection().getMetaData();
+            final Statement        statement = getConnection().createStatement();
             final ResultSet        result    = statement.executeQuery(query);
             if (result.next()) {
                 final String version = result.getString(1);
@@ -328,7 +327,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
         }
         try {
             String s;
-            final DatabaseMetaData metadata = connection.getMetaData();
+            final DatabaseMetaData metadata = getConnection().getMetaData();
             if ((s=metadata.getDatabaseProductName()) != null) {
                 table.write(resources.getLabel(VocabularyKeys.DATABASE_ENGINE));
                 table.nextColumn();
@@ -423,7 +422,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
         assert Thread.holdsLock(this);
         PreparedStatement stmt = (PreparedStatement) statements.get(key);
         if (stmt == null) {
-            stmt = connection.prepareStatement(adaptSQL(sql));
+            stmt = getConnection().prepareStatement(adaptSQL(sql));
             statements.put(key, stmt);
         }
         return stmt;
@@ -572,7 +571,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
             if (statement == null) {
                 final String query = "SELECT " + codeColumn + " FROM " + table +
                                      " WHERE " + nameColumn + " = ?";
-                statement = connection.prepareStatement(adaptSQL(query));
+                statement = getConnection().prepareStatement(adaptSQL(query));
                 statements.put(KEY, statement);
             }
             statement.setString(1, identifier);
@@ -767,7 +766,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
                         stmt = prepareStatement(KEY, query.toString());
                     } else {
                         // Do not cache the statement for names.
-                        stmt = connection.prepareStatement(adaptSQL(query.toString()));
+                        stmt = getConnection().prepareStatement(adaptSQL(query.toString()));
                     }
                 }
                 /*
@@ -2562,7 +2561,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
             sql = adaptSQL(sql);
             final Set/*<String>*/ result = new LinkedHashSet();
             try {
-                final Statement s = connection.createStatement();
+                final Statement s = getConnection().createStatement();
                 final ResultSet r = s.executeQuery(sql);
                 while (r.next()) {
                     result.add(r.getString(1));
@@ -2657,6 +2656,30 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
      * @throws FactoryException if an error occured while closing the connection.
      */
     public synchronized void dispose() throws FactoryException {
+        disconnect();
+        super.dispose();
+    }
+
+    /**
+     * Connect to the database in anticipation of of use.
+     * @throws FactoryException
+     */
+    public void connect() throws FactoryException {
+        try {
+            getConnection();
+        } catch (SQLException e) {
+            throw new FactoryException(e);
+        }
+    }
+    /**
+     * Disconnect from the database, and remain idle. We will still keep our
+     * internal data structures, we are not going to hold onto a database connection
+     * unless we are going to be used.
+     * 
+     * @throws FactoryException
+     */
+    public void disconnect() throws FactoryException {
+        connection = null;
         final boolean isClosed;
         try {
             isClosed = connection.isClosed();            
@@ -2664,7 +2687,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
                 ((PreparedStatement) it.next()).close();
                 it.remove();
             }            
-            connection.close();
+            getConnection().close();
         } catch (SQLException exception) {
             throw new FactoryException(exception);
         }
@@ -2677,7 +2700,19 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
             LOGGER.log(Logging.format(Level.FINE, LoggingKeys.CLOSED_EPSG_DATABASE));
         }
     }
-
+    
+    /**
+     * Access to the connection used by this EpsgFactory. The connection will
+     * be created as needed.
+     * 
+     * @return the connection
+     */
+    protected synchronized Connection getConnection() throws SQLException {
+        if( connection == null ){
+            connection = dataSource.getConnection();            
+        }
+        return connection;
+    }
     /**
      * Shutdown the database engine. This method is invoked twice by {@link ThreadedEpsgFactory}
      * at JVM shutdown: one time before the {@linkplain #connection} is closed, and a second
@@ -3008,7 +3043,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
                     recoverableException("getAll", ignore);
                 }
             }
-            queryAll = connection.prepareStatement(sqlAll);
+            queryAll = getConnection().prepareStatement(sqlAll);
             return queryAll.executeQuery();
         }
 
@@ -3018,7 +3053,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
         private ResultSet getSingle(final Object code) throws SQLException {
             assert Thread.holdsLock(this);
             if (querySingle == null) {
-                querySingle = connection.prepareStatement(sqlSingle);
+                querySingle = getConnection().prepareStatement(sqlSingle);
             }
             querySingle.setString(1, code.toString());
             return querySingle.executeQuery();

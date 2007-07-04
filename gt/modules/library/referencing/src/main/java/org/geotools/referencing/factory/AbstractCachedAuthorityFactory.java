@@ -27,7 +27,6 @@ import javax.units.Unit;
 import org.geotools.factory.BufferedFactory;
 import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
@@ -106,12 +105,12 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 	 * Cache to be used for referencing objects defined by this authority.
 	 * Please note that this cache may be shared!
 	 */
-	ObjectCache cache;
+	protected ObjectCache cache;
 	
 	/**
 	 * A container of the "real factories" actually used to construct objects.
 	 */
-    protected final ReferencingFactoryContainer factories;
+    protected ReferencingFactoryContainer factories;
 
 	
 	/**
@@ -680,4 +679,11 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 	}
 
 	protected abstract Set generateFromCoordinateReferenceSystemCodes(String sourceCode, String targetCode)  throws FactoryException;
+
+	/** We will clear out our cache and factories reference 
+	 * @throws FactoryException */
+    public void dispose() throws FactoryException {
+        this.cache = null;
+        this.factories = null;
+    }
 }

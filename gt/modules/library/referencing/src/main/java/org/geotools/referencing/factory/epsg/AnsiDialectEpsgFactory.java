@@ -21,6 +21,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.sql.DataSource;
+
 // Geotools dependencies
 import org.geotools.factory.Hints;
 
@@ -123,6 +125,13 @@ public class AnsiDialectEpsgFactory extends AbstractEpsgFactory {
                                   final Connection connection)
     {
         super(userHints, connection);
+        for (int i=0; i<ANSI.length; i++) {
+            map.put(ANSI[i], ANSI[++i]);
+        }
+    }
+
+    public AnsiDialectEpsgFactory( Hints hints, DataSource dataSource ) {
+        super(hints, dataSource);
         for (int i=0; i<ANSI.length; i++) {
             map.put(ANSI[i], ANSI[++i]);
         }
