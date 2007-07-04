@@ -7,7 +7,9 @@ import java.util.Date;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.apache.commons.beanutils.converters.SqlDateConverter;
 import org.geotools.factory.Hints;
+import org.geotools.util.CommonsConverterFactory;
 import org.geotools.util.Converter;
 import org.geotools.util.ConverterFactory;
 
@@ -45,7 +47,17 @@ public class XmlConverterFactory implements ConverterFactory {
 		public Object convert(Object source, Class target) throws Exception {
 			String value = (String)source;
 			
-			Calendar date;
+                        //JD: this is a bit of a hack but delegate to the 
+                        // commons converter in case we are executing first.
+                        Converter converter = new CommonsConverterFactory().createConverter(value.getClass(), target, null );
+                        if (converter != null ) {
+                            Object converted = converter.convert(source, target);
+                            if ( converted != null ) {
+                                return converted;
+                            }    
+                        }
+                        
+                        Calendar date;
 			//try parsing as dateTime
 			try {
 				date = DatatypeConverter.parseDateTime( value );	
