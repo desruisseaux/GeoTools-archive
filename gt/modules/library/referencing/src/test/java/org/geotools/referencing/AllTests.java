@@ -71,6 +71,7 @@ public class AllTests extends TestCase {
         final TestSuite suite = new TestSuite("org.geotools.referencing");
         addTest(suite, "org.geotools.metadata.AllTests");
         suite.addTest(org.geotools.measure                         .FormatTest                     .suite());
+        suite.addTest(org.geotools.geometry                        .GeneralEnvelopeTest            .suite());
         suite.addTest(org.geotools.parameter                       .ParametersTest                 .suite());
         suite.addTest(org.geotools.parameter                       .ImagingParametersTest          .suite());
         suite.addTest(org.geotools.referencing                     .IdentifiedObjectTest           .suite());

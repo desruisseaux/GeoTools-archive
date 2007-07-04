@@ -25,6 +25,7 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.text.ParseException;
+import javax.imageio.ImageReader;   // For javadoc
 import javax.imageio.IIOException;
 import java.util.*;
 
@@ -34,6 +35,7 @@ import org.geotools.io.LineFormat;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.ResourceBundle;
 import org.geotools.resources.image.ColorUtilities;
 import org.geotools.util.Logging;
 import org.geotools.util.CanonicalSet;
@@ -79,9 +81,9 @@ public class PaletteFactory {
     private static final String LIST_FILE = "list.txt";
 
     /**
-     * The default palette factory.
+     * The default palette factories.
      */
-    private static PaletteFactory defaultFactory;
+    private static final Map/*<Locale,PaletteFactory>*/ defaultFactories = new HashMap();
 
     /**
      * The parent factory, or {@code null} if there is none. The parent factory
@@ -120,9 +122,14 @@ public class PaletteFactory {
     private final Charset charset;
 
     /**
-     * The locale to use for parsing files. or {@code null} for the current default.
+     * The locale to use for parsing files, or {@code null} for the current default.
      */
     private final Locale locale;
+
+    /**
+     * The locale to use for formatting error messages, or {@code null} for the current default.
+     */
+    private final Locale messageLocale;
 
     /**
      * The set of palettes already created.
@@ -140,18 +147,51 @@ public class PaletteFactory {
      * Gets the default palette factory. This default instance search for
      * {@code org/geotools/image/io/colors/*.pal} files where {@code '*'}
      * are the names to be specified to {@link #getPalette} and similar methods.
+     *
+     * @deprecated Use {@link #getDefault(Locale)} instead.
      */
-    public static synchronized PaletteFactory getDefault() {
-        if (defaultFactory == null) {
-            defaultFactory = new PaletteFactory(
+    public static PaletteFactory getDefault() {
+        return getDefault(null);
+    }
+
+    /**
+     * Gets the default palette factory. This default instance search for
+     * {@code org/geotools/image/io/colors/*.pal} files where {@code '*'}
+     * are the names to be specified to {@link #getPalette} and similar methods.
+     *
+     * @param messageLocale The locale to use for formatting error messages, or {@code null}
+     *        for the default locale. This is typically the {@linkplain ImageReader#getLocale
+     *        image reader locale}.
+     *
+     * @since 2.4
+     */
+    public static synchronized PaletteFactory getDefault(final Locale messageLocale) {
+        PaletteFactory factory = (PaletteFactory) defaultFactories.get(messageLocale);
+        if (factory == null) {
+            factory = new PaletteFactory(
             /* parent factory */ null,
             /* class loader   */ PaletteFactory.class,
             /* root directory */ new File("colors"),
             /* extension      */ ".pal",
             /* character set  */ Charset.forName("ISO-8859-1"),
-            /* locale         */ Locale.US);
+            /* locale         */ Locale.US,
+            /* message locale */ messageLocale);
+            defaultFactories.put(messageLocale, factory);
         }
-        return defaultFactory;
+        return factory;
+    }
+
+    /**
+     * @deprecated Use the same constructor with one additional {@link Locale} argument.
+     */
+    public PaletteFactory(final PaletteFactory parent,
+                          final ClassLoader    loader,
+                          final File        directory,
+                                String      extension,
+                          final Charset       charset,
+                          final Locale         locale)
+    {
+        this(parent, loader, directory, extension, charset, locale, null);
     }
 
     /**
@@ -170,25 +210,47 @@ public class PaletteFactory {
      *                  to add to filename. If non-null, this extension will be automatically
      *                  appended to filename. It should starts with the {@code '.'} character.
      * @param charset   The charset to use for parsing files, or {@code null} for the default.
-     * @param locale    The locale to use for parsing files. or {@code null} for the default.
+     * @param locale    The locale to use for parsing files, or {@code null} for the default.
+     * @param messageLocale The locale to use for formatting error messages, or {@code null}
+     *                  for the default locale. This is typically the
+     *                  {@linkplain ImageReader#getLocale image reader locale}.
+     *
+     * @since 2.4
      */
     public PaletteFactory(final PaletteFactory parent,
                           final ClassLoader    loader,
                           final File        directory,
                                 String      extension,
                           final Charset       charset,
-                          final Locale         locale)
+                          final Locale         locale,
+                          final Locale  messageLocale)
     {
         if (extension!=null && !extension.startsWith(".")) {
             extension = '.' + extension;
         }
-        this.parent      = parent;
-        this.classloader = loader;
-        this.loader      = null;
-        this.directory   = directory;
-        this.extension   = extension;
-        this.charset     = charset;
-        this.locale      = locale;
+        this.parent        = parent;
+        this.classloader   = loader;
+        this.loader        = null;
+        this.directory     = directory;
+        this.extension     = extension;
+        this.charset       = charset;
+        this.locale        = locale;
+        this.messageLocale = messageLocale;
+    }
+
+    /**
+     * @deprecated Use the same constructor with one additional {@link Locale} argument.
+     *
+     * @since 2.2
+     */
+    public PaletteFactory(final PaletteFactory parent,
+                          final Class          loader,
+                          final File        directory,
+                                String      extension,
+                          final Charset       charset,
+                          final Locale         locale)
+    {
+        this(parent, loader, directory, extension, charset, locale, null);
     }
 
     /**
@@ -211,26 +273,38 @@ public class PaletteFactory {
      *                  appended to filename. It should starts with the {@code '.'} character.
      * @param charset   The charset to use for parsing files, or {@code null} for the default.
      * @param locale    The locale to use for parsing files. or {@code null} for the default.
+     * @param messageLocale The locale to use for formatting error messages, or {@code null}
+     *                  for the default locale. This is typically the
+     *                  {@linkplain ImageReader#getLocale image reader locale}.
      *
-     * @since 2.2
+     * @since 2.4
      */
     public PaletteFactory(final PaletteFactory parent,
                           final Class          loader,
                           final File        directory,
                                 String      extension,
                           final Charset       charset,
-                          final Locale         locale)
+                          final Locale         locale,
+                          final Locale  messageLocale)
     {
         if (extension!=null && !extension.startsWith(".")) {
             extension = '.' + extension;
         }
-        this.parent      = parent;
-        this.classloader = null;
-        this.loader      = loader;
-        this.directory   = directory;
-        this.extension   = extension;
-        this.charset     = charset;
-        this.locale      = locale;
+        this.parent        = parent;
+        this.classloader   = null;
+        this.loader        = loader;
+        this.directory     = directory;
+        this.extension     = extension;
+        this.charset       = charset;
+        this.locale        = locale;
+        this.messageLocale = messageLocale;
+    }
+
+    /**
+     * Returns the resources for formatting error messages.
+     */
+    final ResourceBundle getErrorResources() {
+        return Errors.getResources(messageLocale);
     }
 
     /**
@@ -479,10 +553,9 @@ public class PaletteFactory {
     /**
      * Prepares an exception for the specified cause, which may be {@code null}.
      */
-    private static IIOException syntaxError(final LineNumberReader input, final String name,
-                                            final Exception cause)
-    {
-        String message = Errors.format(ErrorKeys.BAD_LINE_IN_FILE_$2, name, new Integer(input.getLineNumber()));
+    private IIOException syntaxError(final LineNumberReader input, final String name, final Exception cause) {
+        String message = getErrorResources().getString(
+                ErrorKeys.BAD_LINE_IN_FILE_$2, name, new Integer(input.getLineNumber()));
         if (cause != null) {
             message += cause.getLocalizedMessage();
         }
@@ -574,12 +647,12 @@ public class PaletteFactory {
             throws IOException
     {
         if (lower < 0) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                                               "lower", new Integer(lower)));
+            throw new IllegalArgumentException(getErrorResources().getString(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "lower", new Integer(lower)));
         }
         if (upper <= lower) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2,
-                                               new Integer(lower), new Integer(upper)));
+            throw new IllegalArgumentException(getErrorResources().getString(
+                    ErrorKeys.BAD_RANGE_$2, new Integer(lower), new Integer(upper)));
         }
         final Color[] colors = getColors(name);
         if (colors == null) {
@@ -594,12 +667,12 @@ public class PaletteFactory {
      * Ensure that the specified valus is inside the {@code [0..255]} range.
      * If the value is outside that range, a {@link ParseException} is thrown.
      */
-    private static int byteValue(final int value) throws ParseException {
+    private int byteValue(final int value) throws ParseException {
         if (value>=0 && value<256) {
             return value;
         }
-        throw new ParseException(Errors.format(ErrorKeys.RGB_OUT_OF_RANGE_$1,
-                                 new Integer(value)), 0);
+        throw new ParseException(getErrorResources().getString(
+                ErrorKeys.RGB_OUT_OF_RANGE_$1, new Integer(value)), 0);
     }
 
     /**

@@ -31,8 +31,8 @@ import java.io.IOException;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
-import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ColorUtilities;
 
 
@@ -135,6 +135,12 @@ public class Palette {
     protected Palette(final PaletteFactory factory, final String name,
                       final int lower, final int upper, int size)
     {
+        this.factory = factory;
+        if (factory == null) {
+            // Can't use factory.getErrorResources() here.
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.NULL_ARGUMENT_$1, "factory"));
+        }
         final int minAllowed, maxAllowed;
         if (lower < 0) {
             minAllowed = Short.MIN_VALUE;
@@ -149,26 +155,26 @@ public class Palette {
         ensureInsideBounds(upper, minAllowed, maxAllowed);
         ensureInsideBounds(size,  upper,      MAX_SIZE  );
         if (lower >= upper) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2,
-                    new Integer(lower), new Integer(upper)));
+            throw new IllegalArgumentException(factory.getErrorResources().getString(
+                    ErrorKeys.BAD_RANGE_$2, new Integer(lower), new Integer(upper)));
         }
-        this.factory = factory;
-        this.name    = name;
-        this.lower   = lower;
-        this.upper   = upper;
-        this.size    = size;
+        this.name  = name;
+        this.lower = lower;
+        this.upper = upper;
+        this.size  = size;
     }
 
     /**
-     * Ensure that the specified values in inside the expected bounds (inclusives).
+     * Ensures that the specified values in inside the expected bounds (inclusives).
      *
      * @throws IllegalArgumentException if the specified values are outside the bounds.
      */
-    private static void ensureInsideBounds(final int value, final int min, final int max)
+    private void ensureInsideBounds(final int value, final int min, final int max)
             throws IllegalArgumentException
     {
         if (value < min || value > max) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.VALUE_OUT_OF_BOUNDS_$3,
+            throw new IllegalArgumentException(factory.getErrorResources().getString(
+                    ErrorKeys.VALUE_OUT_OF_BOUNDS_$3,
                     new Integer(value), new Integer(min), new Integer(max)));
         }
     }
@@ -186,7 +192,8 @@ public class Palette {
     protected int[] createARGB() throws IOException {
         final Color[] colors = factory.getColors(name);
         if (colors == null) {
-            throw new FileNotFoundException(Errors.format(ErrorKeys.FILE_DOES_NOT_EXIST_$1, name));
+            throw new FileNotFoundException(factory.getErrorResources().getString(
+                    ErrorKeys.FILE_DOES_NOT_EXIST_$1, name));
         }
         final int[] ARGB = new int[size];
         if (lower >= 0) {

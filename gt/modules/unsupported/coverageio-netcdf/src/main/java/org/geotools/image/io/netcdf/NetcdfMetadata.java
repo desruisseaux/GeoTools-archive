@@ -27,6 +27,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.LogRecord;
 
 // OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection;
@@ -48,6 +51,8 @@ import org.geotools.image.io.metadata.ImageReferencing;
 import org.geotools.image.io.metadata.GeographicMetadata;
 import org.geotools.image.io.metadata.GeographicMetadataFormat;
 import org.geotools.util.LoggedFormat;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -182,6 +187,7 @@ public class NetcdfMetadata extends GeographicMetadata {
     public void addCoordinateAxis(final CoordinateAxis axis) {
         final String name = getName(axis);
         final AxisType type = axis.getAxisType();
+        String units = axis.getUnitsString();
         /*
          * Gets the axis direction, taking in account the possible reversal or vertical axis.
          * Note that geographic and projected CRS have the same directions. We can distinguish
@@ -195,13 +201,25 @@ public class NetcdfMetadata extends GeographicMetadata {
                 directionCode = directionCode.opposite();
             }
             direction = directionCode.name();
+            final int offset = units.lastIndexOf('_');
+            if (offset >= 0) {
+                final String unitsDirection = units.substring(offset + 1).trim();
+                final String opposite = directionCode.opposite().name();
+                if (unitsDirection.equalsIgnoreCase(opposite)) {
+                    warning("addCoordinateAxis", ErrorKeys.INCONSISTENT_AXIS_ORIENTATION_$2,
+                            new String[] {name, direction});
+                    direction = opposite;
+                }
+                if (unitsDirection.equalsIgnoreCase(direction)) {
+                    units = units.substring(0, offset).trim();
+                }
+            }
         }
         /*
-         * Gets the axis units and origin. In the particular case of time axis, units are typically
-         * written in the form "days since 1990-01-01 00:00:00". We extract the part before "since"
-         * as the units and the part after "since" as the date.
+         * Gets the axis origin. In the particular case of time axis, units are typically
+         * written in the form "days since 1990-01-01 00:00:00". We extract the part before
+         * "since" as the units and the part after "since" as the date.
          */
-        String units = axis.getUnitsString();
         final Axis axisNode = getReferencing().addAxis(name, direction, units);
         if (AxisType.Time.equals(type)) {
             String origin = null;
@@ -220,6 +238,7 @@ public class NetcdfMetadata extends GeographicMetadata {
                 epoch = (Date) parse(type, origin, Date.class, "addCoordinateAxis");
             }
             axisNode.setTimeOrigin(epoch);
+            axisNode.setUnits(units);
         }
         /*
          * If the axis is not numeric, we can't process any further.
@@ -271,7 +290,7 @@ public class NetcdfMetadata extends GeographicMetadata {
     private Object /*<T>*/ parse(final AxisType type, String value,
                                  final Class/*<T>*/ expected, final String caller)
     {
-        final LoggedFormat format = LoggedFormat.getInstance(getAxisFormat(type), expected);
+        final LoggedFormat format = createLoggedFormat(getAxisFormat(type), expected);
         format.setLogger("org.geotools.image.io.netcdf");
         format.setCaller(NetcdfMetadata.class, caller);
         return format.parse(value);
@@ -334,5 +353,16 @@ public class NetcdfMetadata extends GeographicMetadata {
      */
     protected boolean forcePacking(final String attribute) {
         return false;
+    }
+
+    /**
+     * Convenience method for logging a warning.
+     */
+    private void warning(final String method, final int key, final Object value) {
+        final LogRecord record = Errors.getResources(getWarningLocale()).
+                getLogRecord(Level.WARNING, key, value);
+        record.setSourceClassName(NetcdfMetadata.class.getName());
+        record.setSourceMethodName(method);
+        warningOccurred(record);
     }
 }

@@ -52,6 +52,7 @@ import org.geotools.image.io.PaletteFactory;
 import org.geotools.image.io.FileImageReader;
 import org.geotools.image.io.SampleConverter;
 import org.geotools.image.io.IntegerConverter;
+import org.geotools.image.io.metadata.GeographicMetadata;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -290,6 +291,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
             ensureFileOpen();
             ensureMetadataLoaded();
             streamMetadata = createMetadata(file);
+            complete(streamMetadata);
         }
         return streamMetadata;
     }
@@ -303,6 +305,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
             if (variable instanceof VariableDS) {
                 ensureMetadataLoaded();
                 imageMetadata = createMetadata((VariableDS) variable);
+                complete(imageMetadata);
             }
         }
         return imageMetadata;
@@ -326,6 +329,15 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
      */
     protected IIOMetadata createMetadata(final VariableDS variable) throws IOException {
         return new NetcdfMetadata(variable);
+    }
+
+    /**
+     * Complete the specified metadata by setting the locale, if applicable.
+     */
+    private void complete(final IIOMetadata metadata) {
+        if (metadata instanceof GeographicMetadata) {
+            ((GeographicMetadata) metadata).setWarningLocale(getLocale());
+        }
     }
 
     /**

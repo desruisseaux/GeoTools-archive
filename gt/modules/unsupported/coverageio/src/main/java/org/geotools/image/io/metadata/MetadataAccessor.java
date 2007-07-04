@@ -18,21 +18,25 @@ package org.geotools.image.io.metadata;
 
 // J2SE dependencies
 import java.lang.reflect.Array;
-import java.text.Format;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*; // We use a lot of classes from this package.
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.geotools.resources.Utilities;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 // Geotools dependencies
 import org.geotools.util.LoggedFormat;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.OptionalDependencies;
@@ -92,9 +96,14 @@ public class MetadataAccessor {
     private static final char SEPARATOR = '/';
 
     /**
+     * The owner of this accessor.
+     */
+    private final GeographicMetadata metadata;
+
+    /**
      * The parent of child {@linkplain Element elements}.
      */
-    protected final Node parent;
+    private final Node parent;
 
     /**
      * The {@linkplain #childs} path. This is the {@code childPath} parameter
@@ -116,13 +125,6 @@ public class MetadataAccessor {
     private transient Element current;
 
     /**
-     * The locale for formatting warnings.
-     *
-     * @todo Provide setter.
-     */
-    private transient Locale locale;
-
-    /**
      * Creates an accessor with the same parent and childs than the specified one. The two
      * accessors will share the same {@linkplain Node metadata nodes} (including the list
      * of childs), so change in one accessor will be immediately reflected in the other
@@ -133,10 +135,10 @@ public class MetadataAccessor {
      * of childs, where each view {@linkplain #selectChild select} a different child.
      */
     protected MetadataAccessor(final MetadataAccessor clone) {
+        metadata  = clone.metadata;
         parent    = clone.parent;
         childPath = clone.childPath;
         childs    = clone.childs;
-        locale    = clone.locale;
     }
 
     /**
@@ -146,18 +148,20 @@ public class MetadataAccessor {
      *
      * @param  metadata   The metadata node.
      * @param  parentPath The path to the {@linkplain Node node} of interest, or {@code null}
-     *                    if {@code metadata} is directly the node of interest.
+     *                    if the {@code metadata} root node is directly the node of interest.
      * @param  childPath  The path (relative to {@code parentPath}) to the child
      *                    {@linkplain Element elements}, or {@code null} if none.
      */
-    protected MetadataAccessor(final Node metadata, final String parentPath, final String childPath) {
+    protected MetadataAccessor(final GeographicMetadata metadata, final String parentPath, final String childPath) {
+        this.metadata = metadata;
+        final Node root = metadata.getRootNode();
         /*
          * Fetchs the parent node and ensure that we got a singleton. If there is more nodes than
          * expected, log a warning and pickup the first one. If there is no node, create a new one.
          */
         final List childs = new ArrayList(4);
         if (parentPath != null) {
-            listChilds(metadata, parentPath, 0, childs, true);
+            listChilds(root, parentPath, 0, childs, true);
             final int count = childs.size();
             switch (count) {
                 default: {
@@ -171,12 +175,12 @@ public class MetadataAccessor {
                     break;
                 }
                 case 0: {
-                    parent = appendChild(metadata, parentPath);
+                    parent = appendChild(root, parentPath);
                     break;
                 }
             }
         } else {
-            parent = metadata;
+            parent = root;
         }
         /*
          * Computes a full path to children. Searching from 'metadata' root node using 'path'
@@ -191,7 +195,7 @@ public class MetadataAccessor {
             } else {
                 path = childPath;
             }
-            listChilds(metadata, path, 0, childs, false);
+            listChilds(root, path, 0, childs, false);
             this.childs = childs;
         } else {
             this.childs = Collections.EMPTY_LIST;
@@ -310,8 +314,8 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
     }
 
     /**
-     * Selects the {@linkplain #parent parent} element. Every subsequent calls
-     * to {@code get} or {@code set} methods will apply to this parent element.
+     * Selects the <em>parent</em> of child elements. Every subsequent calls to {@code get}
+     * or {@code set} methods will apply to this parent element.
      *
      * @throws NoSuchElementException if there is no parent {@linkplain Element element}.
      *
@@ -429,10 +433,18 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
      * 
      * @param attribute The attribute name.
      * @param value     The attribute value.
+     * @param enums     The set of allowed values, or {@code null} if unknown.
      */
-    protected void setEnum(final String attribute, String value) {
+    final void setEnum(final String attribute, String value, final Collection enums) {
         if (value != null) {
-            value = value.trim().replace('_', ' ').toLowerCase();
+            value = value.replace('_', ' ').trim();
+        }
+        for (final Iterator it=enums.iterator(); it.hasNext();) {
+            final String e = (String) it.next();
+            if (value.equalsIgnoreCase(e)) {
+                value = e;
+                break;
+            }
         }
         setString(attribute, value);
     }
@@ -643,8 +655,8 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
     protected Date getDate(final String attribute) {
         final String value = getString(attribute);
         if (value != null) {
-            final LoggedFormat format = (LoggedFormat) dateFormat.get();
-            return (Date) format.parse(value);
+            // TODO: remove the cast with J2SE 1.5.
+            return (Date) metadata.dateFormat().parse(value);
         }
         return null;
     }
@@ -658,38 +670,30 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
     protected void setDate(final String attribute, final Date value) {
         String text = null;
         if (value != null) {
-            final Format format = (Format) dateFormat.get();
-            text = format.format(value);
+            text = metadata.dateFormat().format(value);
         }
         setString(attribute, text);
     }
-
-    /**
-     * A parser and formatter for {@link Date} objects. We use one instance per thread in order to
-     * avoid synchronization issues. The date format is part of {@link GeographicMetadataFormat}
-     * definition.
-     */
-    private static final ThreadLocal/*<LoggedFormat<Date>>*/ dateFormat = new ThreadLocal() {
-        //@Override
-        protected Object initialValue() {
-            final DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-            format.setTimeZone(TimeZone.getTimeZone("UTC"));
-            final LoggedFormat logged = LoggedFormat.getInstance(format, Date.class);
-            logged.setLogger("org.geotools.image.io.metadata");
-            logged.setCaller(MetadataAccessor.class, "getDate");
-            return logged;
-        }
-    };
 
     /**
      * Convenience method for logging a warning. Do not allow overriding, because
      * it would not work for warnings emitted by the {@link #getDate} method.
      */
     final void warning(final String method, final int key, final Object value) {
-        final LogRecord record = Errors.getResources(locale).getLogRecord(Level.WARNING, key, value);
+        final LogRecord record = Errors.getResources(metadata.getWarningLocale()).
+                getLogRecord(Level.WARNING, key, value);
         record.setSourceClassName(MetadataAccessor.class.getName());
         record.setSourceMethodName(method);
-        Logger.getLogger("org.geotools.image.io.metadata").log(record);
+        warningOccurred(record);
+    }
+
+    /**
+     * Invoked when a warning occured. This method is invoked when some inconsistency has
+     * been detected in the geographic metadata. The default implementation delegates
+     * to {@link GeographicMetadata#warningOccurred}.
+     */
+    protected void warningOccurred(final LogRecord record) {
+        metadata.warningOccurred(record);
     }
 
     /**

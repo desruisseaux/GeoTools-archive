@@ -26,7 +26,6 @@ import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 import javax.imageio.spi.ImageReaderSpi;
-import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
 
@@ -79,9 +78,10 @@ public abstract class FileImageReader extends SimpleImageReader {
      *
      * @throws FileNotFoundException if the file is not found or can not be read.
      */
-    private static void ensureFileExists(final File file) throws FileNotFoundException {
+    private void ensureFileExists(final File file) throws FileNotFoundException {
         if (!file.isFile() || !file.canRead()) {
-            throw new FileNotFoundException(Errors.format(ErrorKeys.FILE_DOES_NOT_EXIST_$1, file));
+            throw new FileNotFoundException(getErrorResources().getString(
+                    ErrorKeys.FILE_DOES_NOT_EXIST_$1, file));
         }
     }
 

@@ -62,35 +62,36 @@ public class PaletteTest extends TestCase {
      * Tests the argument check performed by constructor.
      */
     public void testConstructor() {
-        assertEquals(100, new Palette(null, "grayscale",    0, 100, 100).upper);
-        assertEquals( 50, new Palette(null, "grayscale", -100,  50, 100).upper);
+        final PaletteFactory factory = PaletteFactory.getDefault(null);
+        assertEquals(100, new Palette(factory, "grayscale",    0, 100, 100).upper);
+        assertEquals( 50, new Palette(factory, "grayscale", -100,  50, 100).upper);
         try {
-            new Palette(null, "grayscale", 0, 100, -100);
+            new Palette(factory, "grayscale", 0, 100, -100);
             fail("Should not accept negative size.");
         } catch (IllegalArgumentException e) {
             // This is the expected exception.
         }
         try {
-            new Palette(null, "grayscale", 100, 50, 256);
+            new Palette(factory, "grayscale", 100, 50, 256);
             fail("Should not accept invalid range.");
         } catch (IllegalArgumentException e) {
             // This is the expected exception.
         }
-        assertEquals(40000, new Palette(null, "grayscale", 1,  40000, 0xFFFF).upper);
+        assertEquals(40000, new Palette(factory, "grayscale", 1,  40000, 0xFFFF).upper);
         try {
-            new Palette(null, "grayscale", -1,  40000, 0xFFFF);
+            new Palette(factory, "grayscale", -1,  40000, 0xFFFF);
             fail("Should not accept value out of range.");
         } catch (IllegalArgumentException e) {
             // This is the expected exception.
         }
         try {
-            new Palette(null, "grayscale", 1,  70000, 0xFFFF);
+            new Palette(factory, "grayscale", 1,  70000, 0xFFFF);
             fail("Should not accept value out of range.");
         } catch (IllegalArgumentException e) {
             // This is the expected exception.
         }
         try {
-            new Palette(null, "grayscale", -40000,  0, 0xFFFF);
+            new Palette(factory, "grayscale", -40000,  0, 0xFFFF);
             fail("Should not accept value out of range.");
         } catch (IllegalArgumentException e) {
             // This is the expected exception.
@@ -101,7 +102,7 @@ public class PaletteTest extends TestCase {
      * Tests {@link PaletteFactory#getAvailableNames}.
      */
     public void testAvailableNames() {
-        final List names = Arrays.asList(PaletteFactory.getDefault().getAvailableNames());
+        final List names = Arrays.asList(PaletteFactory.getDefault(null).getAvailableNames());
         assertFalse(names.isEmpty());
         assertTrue (names.contains("rainbow"));
         assertTrue (names.contains("grayscale"));
@@ -113,7 +114,7 @@ public class PaletteTest extends TestCase {
      * Tests the cache.
      */
     public void testCache() {
-        final PaletteFactory factory = PaletteFactory.getDefault();
+        final PaletteFactory factory = PaletteFactory.getDefault(null);
         final Palette first  = factory.getPalettePadValueFirst("rainbow", 100);
         final Palette second = factory.getPalettePadValueFirst("bell",    100);
         final Palette third  = factory.getPalettePadValueFirst("rainbow", 100);
@@ -126,7 +127,7 @@ public class PaletteTest extends TestCase {
      * Tests the color model.
      */
     public void testColorModel() throws IOException {
-        final PaletteFactory  factory = PaletteFactory.getDefault();
+        final PaletteFactory  factory = PaletteFactory.getDefault(null);
         final Palette         palette = factory.getPalettePadValueFirst("rainbow", 100);
         final IndexColorModel icm     = (IndexColorModel) palette.getColorModel();
         assertEquals(100, icm.getMapSize());

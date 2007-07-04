@@ -593,8 +593,8 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
     /**
      * Determines whether or not this envelope is empty. An envelope is non-empty only if it has
      * at least one {@linkplain #getDimension dimension}, and the {@linkplain #getLength length}
-     * is greater than 0 along all dimensions. Note that an empty envelope is always {@linkplain
-     * #isNull null}, but the converse is not always true.
+     * is greater than 0 along all dimensions. Note that a non-empty envelope is always
+     * non-{@linkplain #isNull null}, but the converse is not always true.
      */
     public boolean isEmpty() {
         final int dimension = ordinates.length/2;

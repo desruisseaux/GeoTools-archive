@@ -21,14 +21,18 @@ import java.awt.color.ColorSpace;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
 import java.io.IOException;
+import java.util.Locale;
+import javax.imageio.ImageReader;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageTypeSpecifier;
 import javax.media.jai.ComponentSampleModelJAI;
 import javax.media.jai.util.Range;
+
 import org.geotools.resources.XArray;
 import org.geotools.resources.XMath;
-import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.ResourceBundle;
 import org.geotools.resources.image.ComponentColorModelJAI;
 import org.geotools.util.NumberRange;
 
@@ -60,17 +64,33 @@ public class SimpleImageReadParam extends ImageReadParam {
     private NumberRange[] destinationRanges;
 
     /**
-     * Creates a new, initially empty, set of parameters.
+     * The locale for formatting error messages.
      */
-    public SimpleImageReadParam() {
+    private Locale locale;
+
+    /**
+     * Creates a new, initially empty, set of parameters.
+     *
+     * @param reader The reader for which this parameter block is created
+     */
+    public SimpleImageReadParam(final ImageReader reader) {
+        locale = (reader != null) ? reader.getLocale() : null;
+    }
+
+    /**
+     * Returns the resources for formatting error messages.
+     */
+    private ResourceBundle getErrorResources() {
+        return Errors.getResources(locale);
     }
 
     /**
      * Ensures that the specified band number is valid.
      */
-    private static void ensureValidBand(final int band) throws IllegalArgumentException {
+    private void ensureValidBand(final int band) throws IllegalArgumentException {
         if (band < 0) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_BAND_NUMBER_$1, new Integer(band)));
+            throw new IllegalArgumentException(getErrorResources().getString(
+                    ErrorKeys.BAD_BAND_NUMBER_$1, new Integer(band)));
         }
     }
 
@@ -91,7 +111,8 @@ public class SimpleImageReadParam extends ImageReadParam {
                 return (destinationBands != null) ? destinationBands[i] : i;
             }
         }
-        throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_BAND_NUMBER_$1, new Integer(band)));
+        throw new IllegalArgumentException(getErrorResources().getString(
+                ErrorKeys.BAD_BAND_NUMBER_$1, new Integer(band)));
     }
 
     /**
@@ -111,7 +132,8 @@ public class SimpleImageReadParam extends ImageReadParam {
                 return (sourceBands != null) ? sourceBands[i] : i;
             }
         }
-        throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_BAND_NUMBER_$1, new Integer(band)));
+        throw new IllegalArgumentException(getErrorResources().getString(
+                ErrorKeys.BAD_BAND_NUMBER_$1, new Integer(band)));
     }
 
     /**
@@ -121,7 +143,7 @@ public class SimpleImageReadParam extends ImageReadParam {
      * @param band    The band number to update.
      * @param range   The range of expected values.
      */
-    private static NumberRange[] setRange(NumberRange[] ranges, final int band, final NumberRange range) {
+    private NumberRange[] setRange(NumberRange[] ranges, final int band, final NumberRange range) {
         ensureValidBand(band);
         if (ranges == null) {
             ranges = new NumberRange[Math.max(band + 1, 4)];
@@ -139,7 +161,7 @@ public class SimpleImageReadParam extends ImageReadParam {
      * @param  band The band number.
      * @return The range of expected values, or {@code null} if none.
      */
-    private static NumberRange getRange(final NumberRange[] ranges, final int band) {
+    private NumberRange getRange(final NumberRange[] ranges, final int band) {
         ensureValidBand(band);
         return (ranges != null && band < ranges.length) ? ranges[band] : null;
     }
@@ -269,7 +291,7 @@ public class SimpleImageReadParam extends ImageReadParam {
             bankIndices[i] = i;
         }
         final ColorSpace colorSpace = getColorSpace(range, numBands);
-        if (SimpleImageReader.USE_JAI_MODEL) {
+        if (GeographicImageReader.USE_JAI_MODEL) {
             final ColorModel cm = new ComponentColorModelJAI(
                     colorSpace, null, false, false, Transparency.OPAQUE, dataType);
             return new ImageTypeSpecifier(cm, new ComponentSampleModelJAI(
@@ -284,11 +306,8 @@ public class SimpleImageReadParam extends ImageReadParam {
      * Creates a image type for the specified range of values.
      * The image type is suitable for floating point values.
      */
-    static ImageTypeSpecifier getImageTypeSpecifier(final int    dataType,
-                                                    final Range  range,
-                                                    final int    numBands,
-                                                    final String paletteName,
-                                                    final boolean compact)
+    static ImageTypeSpecifier getImageTypeSpecifier(final int dataType, final Range range,
+            final int numBands, final String paletteName, final boolean compact, final Locale messageLocale)
             throws IOException
     {
         final int maxAllowed;
@@ -323,7 +342,7 @@ public class SimpleImageReadParam extends ImageReadParam {
                 }
             }
         }
-        final PaletteFactory factory = PaletteFactory.getDefault();
+        final PaletteFactory factory = PaletteFactory.getDefault(messageLocale);
         final Palette palette = factory.getPalette(paletteName, validMin, validMax,
                 compact ? validMax : maxAllowed);
         return palette.getImageTypeSpecifier();

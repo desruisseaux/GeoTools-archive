@@ -45,7 +45,7 @@ import org.geotools.resources.Arguments;
 
 
 /**
- * Test formatting done by the {@link CoordinateFormat} class.
+ * Tests formatting done by the {@link CoordinateFormat} class.
  *
  * @source $URL$
  * @version $Id$

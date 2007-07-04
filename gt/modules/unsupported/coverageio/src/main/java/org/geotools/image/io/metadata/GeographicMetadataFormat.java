@@ -17,7 +17,6 @@
 package org.geotools.image.io.metadata;
 
 // J2SE dependencies
-import java.util.Arrays;
 import java.util.List;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.metadata.IIOMetadataFormatImpl;
@@ -31,6 +30,9 @@ import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.operation.MathTransform;
+
+// Geotools dependencies
+import org.geotools.resources.UnmodifiableArrayList;
 
 
 /**
@@ -161,14 +163,14 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
     /**
      * Enumeration of valid coordinate reference system types.
      */
-    private static final List/*<String>*/ CRS_TYPES = Arrays.asList(new String[] {
+    static final List/*<String>*/ CRS_TYPES = new UnmodifiableArrayList(new String[] {
         GEOGRAPHIC, PROJECTED
     });
 
     /**
      * Enumeration of valid coordinate system types.
      */
-    private static final List/*<String>*/ CS_TYPES = Arrays.asList(new String[] {
+    static final List/*<String>*/ CS_TYPES = new UnmodifiableArrayList(new String[] {
         ELLIPSOIDAL, CARTESIAN
     });
 
@@ -177,7 +179,7 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
      * since they are already available as {@linkplain org.opengis.referencing.cs.AxisDirection
      * axis direction} code list.
      */
-    private static final List/*<String>*/ DIRECTIONS = Arrays.asList(new String[] {
+    static final List/*<String>*/ DIRECTIONS = new UnmodifiableArrayList(new String[] {
         "north", "east", "south", "west", "up", "down"
     });
 
@@ -186,14 +188,14 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
      * since they are already available as {@linkplain org.opengis.metadata.spatial.PixelOrientation
      * pixel orientation} code list.
      */
-    private static final List/*<String>*/ PIXEL_ORIENTATIONS = Arrays.asList(new String[] {
+    static final List/*<String>*/ PIXEL_ORIENTATIONS = new UnmodifiableArrayList(new String[] {
         "center", "lower left", "lower right", "upper right", "upper left"
     });
 
     /**
      * Enumeration of valid sample dimention types.
      */
-    private static final List/*<String>*/ SAMPLE_TYPES = Arrays.asList(new String[] {
+    static final List/*<String>*/ SAMPLE_TYPES = new UnmodifiableArrayList(new String[] {
         GEOPHYSICS, PACKED
     });
 

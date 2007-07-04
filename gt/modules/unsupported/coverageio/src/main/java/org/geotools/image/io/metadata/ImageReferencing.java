@@ -18,7 +18,6 @@ package org.geotools.image.io.metadata;
 
 // J2SE dependencies
 import java.util.Date;
-import org.w3c.dom.Node;
 
 // OpenGIS dependencies
 import org.opengis.referencing.datum.Datum;                     // For javadoc
@@ -56,7 +55,7 @@ public class ImageReferencing extends MetadataAccessor {
      *
      * @param metadata The metadata node.
      */
-    protected ImageReferencing(final Node metadata) {
+    protected ImageReferencing(final GeographicMetadata metadata) {
         super(metadata, "CoordinateReferenceSystem", null);
         datum = new MetadataAccessor(metadata, "CoordinateReferenceSystem/Datum",  null);
         cs    = new ChildList.Axes(metadata);
@@ -85,7 +84,7 @@ public class ImageReferencing extends MetadataAccessor {
      */
     public void setCoordinateReferenceSystem(final String name, final String type) {
         setString("name", name);
-        setEnum  ("type", type);
+        setEnum  ("type", type, GeographicMetadataFormat.CRS_TYPES);
     }
 
     /**
@@ -111,7 +110,7 @@ public class ImageReferencing extends MetadataAccessor {
      */
     public void setCoordinateSystem(final String name, final String type) {
         cs.setString("name", name);
-        cs.setEnum  ("type", type);
+        cs.setEnum  ("type", type, GeographicMetadataFormat.CS_TYPES);
     }
 
     /**
@@ -168,9 +167,9 @@ public class ImageReferencing extends MetadataAccessor {
      */
     public Axis addAxis(final String name, final String direction, final String units) {
         final Axis axis = (Axis) cs.addChild();
-        axis.setString("name",      name);
-        axis.setEnum  ("direction", direction);
-        axis.setString("units",     units);
+        axis.setName(name);
+        axis.setDirection(direction);
+        axis.setUnits(units);
         return axis;
     }
 }

@@ -50,7 +50,7 @@ abstract class ChildList/*<T extends MetadataAccessor>*/ extends MetadataAccesso
      * @param  childPath  The path (relative to {@code parentPath}) to the child
      *                    {@linkplain Element elements}, or {@code null} if none.
      */
-    protected ChildList(final Node metadata, final String parentPath, final String childPath) {
+    protected ChildList(final GeographicMetadata metadata, final String parentPath, final String childPath) {
         super(metadata, parentPath, childPath);
         final int count = childCount();
         childs = new ArrayList(count != 0 ? count : 4);
@@ -65,6 +65,9 @@ abstract class ChildList/*<T extends MetadataAccessor>*/ extends MetadataAccesso
     public /*T*/MetadataAccessor getChild(final int index) throws IndexOutOfBoundsException {
         if (index < 0 || index >= childCount()) {
             throw new IndexOutOfBoundsException(Errors.format(outOfBounds(), new Integer(index)));
+        }
+        while (childs.size() <= index) {
+            childs.add(null);
         }
         MetadataAccessor candidate = (MetadataAccessor) childs.get(index);
         if (candidate == null) {
@@ -102,7 +105,7 @@ abstract class ChildList/*<T extends MetadataAccessor>*/ extends MetadataAccesso
      */
     static final class Bands extends ChildList/*<Band>*/ {
         /** Creates a parser for bands. */
-        public Bands(final Node metadata) {
+        public Bands(final GeographicMetadata metadata) {
             super(metadata, "SampleDimensions", "SampleDimension");
         }
 
@@ -122,7 +125,7 @@ abstract class ChildList/*<T extends MetadataAccessor>*/ extends MetadataAccesso
      */
     static final class Axes extends ChildList/*<Axis>*/ {
         /** Creates a parser for axis. */
-        public Axes(final Node metadata) {
+        public Axes(final GeographicMetadata metadata) {
             super(metadata, "CoordinateReferenceSystem/CoordinateSystem", "Axis");
         }
 

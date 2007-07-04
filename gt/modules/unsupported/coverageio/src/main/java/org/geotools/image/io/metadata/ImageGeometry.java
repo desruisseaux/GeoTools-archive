@@ -16,9 +16,6 @@
  */
 package org.geotools.image.io.metadata;
 
-// J2SE dependencies
-import org.w3c.dom.Node;
-
 // OpenGIS dependencies
 import org.opengis.geometry.Envelope;                   // For javadoc
 import org.opengis.coverage.grid.GridRange;             // For javadoc
@@ -68,7 +65,7 @@ public class ImageGeometry extends MetadataAccessor {
      *
      * @param metadata The metadata node.
      */
-    protected ImageGeometry(final Node metadata) {
+    protected ImageGeometry(final GeographicMetadata metadata) {
         super(metadata, "GridGeometry", null);
         envelope  = new MetadataAccessor(metadata, "GridGeometry/Envelope",  "CoordinateValues");
         gridRange = new MetadataAccessor(metadata, "GridGeometry/GridRange", "IndexRange");
@@ -244,6 +241,6 @@ public class ImageGeometry extends MetadataAccessor {
      * @see PixelOrientation
      */
     public void setPixelOrientation(final String pixelOrientation) {
-        setEnum("pixelOrientation", pixelOrientation);
+        setEnum("pixelOrientation", pixelOrientation, GeographicMetadataFormat.PIXEL_ORIENTATIONS);
     }
 }

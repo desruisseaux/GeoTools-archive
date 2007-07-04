@@ -200,7 +200,7 @@ public class RawBinaryImageReadParam extends ImageReadParam {
             final int[] bankIndices = new int[numBands];
             final int[] bandOffsets = new int[numBands];
             for (int i=numBands; --i>=0;) bankIndices[i]=i;
-            if (SimpleImageReader.USE_JAI_MODEL) {
+            if (GeographicImageReader.USE_JAI_MODEL) {
                 sampleModel = new ComponentSampleModelJAI(targetDataType, width, height,
                                                           1, width, bankIndices, bandOffsets);
             } else {
