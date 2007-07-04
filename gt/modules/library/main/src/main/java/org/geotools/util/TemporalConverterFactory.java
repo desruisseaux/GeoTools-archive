@@ -32,6 +32,7 @@ import org.geotools.factory.Hints;
  *  <li>{@link java.sql.Time} to {@link java.util.Calendar}
  *  <li>{@link java.util.Date} to {@link java.sql.Timestamp}
  *  <li>{@link java.util.Date} to {@link java.sql.Time}
+ *  <li>{@link java.util.Date} to {@link java.sql.Date}
  *  <li>{@link java.util.Calendar} to {@link java.util.Date}
  *  <li>{@link java.util.Calendar} to {@link java.sql.Timestamp}
  *  <li>{@link java.util.Calendar} to {@link java.sql.Time}
@@ -62,7 +63,9 @@ public class TemporalConverterFactory implements ConverterFactory {
 			}
 			
 			//handle all of (java.util.Date) -> (java.sql.Timestamp,java.sql.Time)
-			if ( Timestamp.class.isAssignableFrom( target ) || Time.class.isAssignableFrom( target ) ) {
+			if ( Timestamp.class.isAssignableFrom( target ) || Time.class.isAssignableFrom( target ) || 
+                                java.sql.Date.class.isAssignableFrom( target ) ) {
+                            
 				return new Converter() {
 
 					public Object convert(Object source, Class target) throws Exception {
