@@ -1,4 +1,22 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2005-2007, GeoTools Project Managment Committee (PMC)
+ * 
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.referencing.factory;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
@@ -18,13 +36,24 @@ import org.opengis.util.InternationalString;
  * 
  * @author Cory Horner (Refractions Research)
  */
-public abstract class AbstractEpsgAuthorityMediator extends AbstractAuthorityMediator {
+public abstract class AbstractEpsgMediator extends AbstractAuthorityMediator {
 
-    protected AbstractEpsgAuthorityMediator(int priority, Hints hints) {
+    public AbstractEpsgMediator(int priority, Hints hints, DataSource datasource) {
         super(priority, hints);
+        this.datasource = datasource;
     }
-
+    
     DataSource datasource;
+
+    protected Connection getConnection() {
+        try {
+            return datasource.getConnection();
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
+    }
     
     public Citation getAuthority() {
         return Citations.EPSG;
@@ -45,6 +74,6 @@ public abstract class AbstractEpsgAuthorityMediator extends AbstractAuthorityMed
         if (identifier instanceof GenericName) {
             return ((GenericName) identifier).toInternationalString();
         }
-        return new SimpleInternationalString( identifier.getCode() );
+        return new SimpleInternationalString(identifier.getCode());
     }
 }

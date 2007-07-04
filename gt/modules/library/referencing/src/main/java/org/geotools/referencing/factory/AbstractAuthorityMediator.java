@@ -227,11 +227,12 @@ public abstract class AbstractAuthorityMediator extends
                         .getShortName(type)), authority.toString(), code);
     }
 
-    //
-    // AuthorityFactory
-    //    
+    /**
+     * The authority body of the objects this factory provides.
+     */
     public abstract Citation getAuthority();
 
+    
     public Set getAuthorityCodes(Class type) throws FactoryException {
         Set codes = (Set) cache.get(type);
         if (codes == null) {

@@ -36,17 +36,10 @@ import org.geotools.test.OnlineTestCase;
  * the oracle.jdbc-false profile) ... basically sticking a real ojdbc14.jar in your
  * path so we have a real driver to work with.
  * <p>
- * @author Jody
- *
+ * @author Jody Garnett (Refractions Research)
  */
 public class OracleOnlineTestCase extends OnlineTestCase {
     protected DataSource datasource;
-    
-    /** Creates PostGIS-specific JDBC driver class. */
-    private static final String DRIVER_CLASS = "oracle.jdbc.driver.OracleDriver";
-
-    /** Creates PostGIS-specific JDBC driver path. */
-    private static final String JDBC_PATH = "jdbc:oracle:thin:@";
     
     protected String getFixtureId() {
         return "epsg.oracle";
@@ -56,8 +49,6 @@ public class OracleOnlineTestCase extends OnlineTestCase {
     static final int DATASOURCE= 1;
     
     protected void connect() throws Exception {
-        //BasicDataSourceFactory factory = new BasicDataSourceFactory();
-        final int TECHNIQUE = DATASOURCE;
         OracleDataSource source;
         source = new OracleDataSource();
 
@@ -89,7 +80,7 @@ public class OracleOnlineTestCase extends OnlineTestCase {
         env.put( Context.INITIAL_CONTEXT_FACTORY, "org.osjava.sj.memory.MemoryContextFactory" );
         
         InitialContext context = new InitialContext(env);
-        String name = context.composeName("jdbc/EPSG", ""); // jdbc/EPSG
+        String name = context.composeName("jdbc/EPSG", "");
         //System.out.println( name );
         context.bind( name, source );
         
@@ -99,32 +90,7 @@ public class OracleOnlineTestCase extends OnlineTestCase {
     protected void disconnect() throws Exception {
         datasource = null;
     }
-    /*
-    public void XtestConnection() throws Exception{
-        assertNotNull( connection );
-        
-        DatabaseMetaData metaData = connection.getMetaData();     
-        assertEquals( fixture.getProperty("user").toUpperCase(), metaData.getUserName() );
-        
-        //dump( "schemas", metaData.getSchemas() );
-        //dump( "tables", metaData.getTables( null, "JODY_BRUNSWICK", "EPSG%", null ) );        
-    }
-    void dump( String handle, ResultSet results ) throws Exception {
-        ResultSetMetaData metaData = results.getMetaData();        
-        for( int col=1; col <= metaData.getColumnCount(); col++ ){
-            System.out.print( metaData.getColumnName( col ) );
-            System.out.print( "\t" );            
-        }        
-        for(  results.next(); !results.isAfterLast(); results.next() ){            
-            for( int col=1; col <= metaData.getColumnCount(); col++ ){
-                System.out.print( results.getObject( col ) );
-                System.out.print( "\t" );                
-            }
-            System.out.println();
-        }       
-    }
-    */
-    
+
     public void testEmpty() {
     }
 }
