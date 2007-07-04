@@ -96,6 +96,7 @@
        <modules>
          <module>hsql</module>
          <module>jpox</module>
+         <module>geomedia</module>
        </modules>
      </profile>
 
@@ -108,7 +109,6 @@
     <module>db2</module>
     <module>directory</module>
     <module>epsg-oracle</module>    
-    <module>geomedia</module>
     <module>gml</module>
     <module>gml3</module>
     <module>go</module>

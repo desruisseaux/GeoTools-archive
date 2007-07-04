@@ -19,10 +19,14 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.sql.DataSource;
+
 import oracle.jdbc.pool.OracleConnectionPoolDataSource;
 
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.ConnectionPoolManager;
+import org.geotools.data.jdbc.datasource.DataSourceFinder;
+import org.geotools.data.jdbc.datasource.DataSourceUtil;
 
 
 /**
@@ -32,6 +36,7 @@ import org.geotools.data.jdbc.ConnectionPoolManager;
  * @author $Author: seangeo $
  * @source $URL$
  * @version $Id$
+ * @deprecated Use {@link DataSource}, {@link DataSourceUtil} and {@link DataSourceFinder} instead
  */
 public class OracleConnectionFactory {
     /** The prefix of an Oracle JDBC url */

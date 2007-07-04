@@ -32,6 +32,8 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.jdbc.JDBCTextFeatureWriter;
 import org.geotools.data.jdbc.MutableFIDFeature;
 import org.geotools.data.jdbc.QueryData;
+import org.geotools.data.jdbc.datasource.DataSourceFinder;
+import org.geotools.data.jdbc.datasource.UnWrapper;
 import org.geotools.data.oracle.sdo.GeometryConverter;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
@@ -65,7 +67,14 @@ public class OracleFeatureWriter extends JDBCTextFeatureWriter {
     public OracleFeatureWriter(FeatureReader fReader, QueryData queryData )
         throws IOException {
         super(fReader, queryData);
-        this.converter = new GeometryConverter( (OracleConnection) queryData.getConnection() );
+        Connection conn = queryData.getConnection();
+        if(!(conn instanceof OracleConnection)) {
+            UnWrapper uw = DataSourceFinder.getUnWrapper(conn);
+            if(uw != null)
+                conn = uw.unwrap(conn);
+        }
+        OracleConnection oracleConnection = (OracleConnection) conn;
+        this.converter = new GeometryConverter(oracleConnection);
     }
 
     protected String getGeometryInsertText(Geometry geom, int srid)

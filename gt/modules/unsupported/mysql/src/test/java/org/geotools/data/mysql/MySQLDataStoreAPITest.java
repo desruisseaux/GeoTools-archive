@@ -47,6 +47,7 @@ import org.geotools.data.InProcessLockingManager;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.ConnectionPool;
+import org.geotools.data.jdbc.datasource.ManageableDataSource;
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
 import org.geotools.feature.AttributeType;
@@ -63,6 +64,7 @@ import org.opengis.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 
+import com.mysql.jdbc.jdbc2.optional.MysqlDataSourceFactory;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -102,8 +104,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
     private static final Logger LOGGER = Logger.getLogger("org.geotools.data.mysql");
     static boolean CHECK_TYPE = false;
     MySQLDataStore data;
-    MySQLConnectionFactory factory1;
-    ConnectionPool pool;
+    ManageableDataSource pool;
     String database;
     String victim = null; //"testGetFeatureWriterRemoveAll";
 
@@ -152,15 +153,15 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         this.database = database;
 
         String user = resource.getString("user");
-        String password = resource.getString("password");
+        String password = resource.getString("passwd");
 
         if (namespace.equals("http://www.geotools.org/data/postgis")) {
             throw new IllegalStateException(
                 "The fixture.properties file needs to be configured for your own database");
         }
+        
+        pool = MySQLDataStoreFactory.getDefaultDataSource(host, user, password, port, database, 10, 2, false);
 
-        factory1 = new MySQLConnectionFactory(host, port, database);
-        pool = factory1.getConnectionPool(user, password);
 
         setUpRoadTable();
         setUpRiverTable();
@@ -170,7 +171,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
             CHECK_TYPE = false; // just once
         }
 
-        data = new MySQLDataStore(pool, database, getName());
+        data = new MySQLDataStore(pool, null, getName());
         data.setFIDMapper("road", new TypedFIDMapper(new BasicFIDMapper("fid", 255, false), "road"));
         data.setFIDMapper("river", new TypedFIDMapper(new BasicFIDMapper("fid", 255, false), "river"));
         data.setFIDMapper("testset", new TypedFIDMapper(new BasicFIDMapper("gid", 255, true), "testset"));
@@ -463,10 +464,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
     protected void tearDown() throws Exception {
         data = null;
 
-        // MySQLConnectionFactory factory1 = new MySQLConnectionFactory("hydra", "5432", "jody");
-        factory1.free(pool);
-
-        //pool.close();
+        pool.close();
         super.tearDown();
     }
 
@@ -1026,7 +1024,6 @@ public class MySQLDataStoreAPITest extends DataTestCase {
 
         try {
             writer.close();
-            fail("Should be able to close a closed writer?");
         } catch (IOException expected) {
         }
     }
@@ -1420,12 +1417,8 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         assertEquals(type.getDefaultGeometry(), actual.getDefaultGeometry());
         assertEquals(type, actual);
 
-        //try {
-        assertEquals(new Envelope(), half.getBounds());
-
-        //  fail("half does not specify a default geometry");
-        //} catch (IOException io) {
-        //}
+        Envelope b = half.getBounds();
+        assertEquals(roadBounds , b);
     }
 
     public void testGetFeatureSourceRiver()
@@ -1691,7 +1684,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
     }
 
     public void testGetFeatureLockingExpire() throws Exception {
-        FeatureLock lock = FeatureLockFactory.generate("Timed", 1000);
+        FeatureLock lock = FeatureLockFactory.generate("Timed", 200);
 
         FeatureLocking road = (FeatureLocking) data.getFeatureSource("road");
         road.setFeatureLock(lock);
@@ -1701,8 +1694,8 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         assertTrue(isLocked("road", "road.rd1"));
         long then = System.currentTimeMillis();
         do {
-            Thread.sleep( 15 );
-        } while ( then == System.currentTimeMillis() ); 
+            Thread.sleep( 200 );
+        } while ( System.currentTimeMillis() - then < 200 ); 
         assertFalse(isLocked("road", "road.rd1"));
     }
 }

@@ -13,10 +13,11 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.data.jdbc.ds;
+package org.geotools.data.jdbc.datasource;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -127,6 +128,44 @@ public final class DataSourceFinder {
                 /** The logger for the filter module. */
                 LOGGER.log(Level.WARNING, "Could not test  " + uw
                         + " for unwrapping abilities agaist " + conn, t);
+                // Protect against DataStores that don't carefully
+                // code canProcess
+
+            }
+        }
+
+        return null;
+    }
+    
+    /**
+     * Checks each available {@link UnWrapper} implementation in turn and returns the first one which
+     * claims to support the resource identified by the params object.
+     * 
+     * @param params
+     *            A Map object which contains a defenition of the resource to connect to. for file
+     *            based resources the property 'url' should be set within this Map.
+     * 
+     * @return The first datasource which claims to process the required resource, returns null if
+     *         none can be found.
+     * 
+     * @throws IOException
+     *             If a suitable loader can be found, but it can not be attached to the specified
+     *             resource without errors.
+     */
+    public static synchronized UnWrapper getUnWrapper(Statement st) throws IOException {
+        Iterator ps = getUnWrappers();
+        UnWrapper uw;
+        while (ps.hasNext()) {
+            uw = (UnWrapper) ps.next();
+
+            try {
+                if (uw.canUnwrap(st)) {
+                    return uw;
+                }
+            } catch (Throwable t) {
+                /** The logger for the filter module. */
+                LOGGER.log(Level.WARNING, "Could not test  " + uw
+                        + " for unwrapping abilities agaist " + st, t);
                 // Protect against DataStores that don't carefully
                 // code canProcess
 

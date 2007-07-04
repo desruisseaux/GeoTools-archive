@@ -19,10 +19,14 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Map;
 
+import javax.sql.DataSource;
+
 import org.geotools.data.AbstractDataStoreFactory;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.jdbc.ConnectionPool;
+import org.geotools.data.jdbc.datasource.DataSourceUtil;
+import org.geotools.data.jdbc.datasource.ManageableDataSource;
 
 
 /**
@@ -61,6 +65,15 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
 
     public static final Param PASSWD = new Param("passwd", String.class,
             "password used to login", false);
+    
+    public static final Param MAXCONN = new Param("max connections", Integer.class,
+            "maximum number of open connections", false, new Integer(10));
+    
+    public static final Param MINCONN = new Param("min connections", Integer.class,
+            "minimum number of pooled connection", false, new Integer(4));
+    
+    public static final Param VALIDATECONN = new Param("validate connections", Boolean .class,
+            "check connection is alive before using it", false, Boolean.FALSE);
 
     public static final Param NAMESPACE = new Param("namespace", String.class,
             "namespace prefix used", false);
@@ -156,6 +169,9 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
         String user = (String) USER.lookUp(params);
         String passwd = (String) PASSWD.lookUp(params);
         Integer port = (Integer) PORT.lookUp(params);
+        Integer maxConn = (Integer) MAXCONN.lookUp(params);
+        Integer minConn = (Integer) MINCONN.lookUp(params);
+        Boolean validateConn = (Boolean) VALIDATECONN.lookUp(params);
         String schema = (String) SCHEMA.lookUp(params);
         String database = (String) DATABASE.lookUp(params);
         Boolean wkb_enabled = (Boolean) WKBENABLED.lookUp(params);
@@ -169,20 +185,14 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
         if (!canProcess(params)) {
             throw new IOException("The parameters map isn't correct!!");
         }        
-        PostgisConnectionFactory connFact = new PostgisConnectionFactory(host,
-                port.toString(), database);
 
-        connFact.setLogin(user, passwd);
 
-        ConnectionPool pool;
+        boolean validate = validateConn != null && validateConn.booleanValue();
+        int maxActive = maxConn != null ? maxConn.intValue() : 10;
+        int maxIdle = minConn != null ? minConn.intValue() : 4;
+        DataSource source = getDefaultDataSource(host, user, passwd, port.intValue(), database, maxActive, maxIdle, validate);
 
-        try {
-            pool = connFact.getConnectionPool();
-        } catch (SQLException e) {
-            throw new DataSourceException("Could not create connection", e);
-        }
-
-        PostgisDataStore dataStore = createDataStoreInternal(pool,namespace,schema);
+        PostgisDataStore dataStore = createDataStoreInternal(source,namespace,schema);
 
         if (wkb_enabled != null) {
             dataStore.setWKBEnabled(wkb_enabled.booleanValue());
@@ -200,42 +210,26 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
         return dataStore;
     }
     
+    public static ManageableDataSource getDefaultDataSource(String host, String user, String passwd, int port, String database, int maxActive, int maxIdle, boolean validate) throws DataSourceException {
+        String url = "jdbc:postgresql" + "://" + host + ":" + port + "/" + database;
+        String driver = "org.postgresql.Driver";
+        return DataSourceUtil.buildDefaultDataSource(url, driver, user, passwd, maxActive, maxIdle, validate ? "select now()" : null, false, 0);
+    }
+    
     protected PostgisDataStore createDataStoreInternal(
-		ConnectionPool pool, String namespace, String schema
+		DataSource dataSource, String namespace, String schema
     ) throws IOException {
     	
     	if (schema == null && namespace == null)
-    		return new PostgisDataStore(pool); 
+    		return new PostgisDataStore(dataSource); 
     	
     	if (schema == null && namespace != null) {
-    		return new PostgisDataStore(pool,namespace);
+    		return new PostgisDataStore(dataSource,namespace);
     	}
     	
-    	return new PostgisDataStore(pool,schema,namespace);
+    	return new PostgisDataStore(dataSource,schema,namespace);
     }
     
-    /**
-     * @deprecated this method is only here for backwards compatibility for 
-     * subclasses, use {@link #createDataStoreInternal(ConnectionPool, String, String)}
-     * instead.
-     */
-    protected PostgisDataStore createDataStoreInternal(ConnectionPool pool)
-    	throws IOException {
-    	
-    	return createDataStoreInternal(pool,null,null);
-    }
-    
-    /**
-     * @deprecated this method is only here for backwards compatibility for 
-     * subclasses, use {@link #createDataStoreInternal(ConnectionPool, String, String)}
-     * instead.
-     */
-    protected PostgisDataStore createDataStoreInternal(
-		ConnectionPool pool, String namespace
-	) throws IOException {
-    	
-    	return createDataStoreInternal(pool,namespace,null);
-    }
 
     /**
      * Postgis cannot create a new database.
@@ -287,7 +281,7 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
      */
     public Param[] getParametersInfo() {
         return new Param[] {
-            DBTYPE, HOST, PORT, SCHEMA, DATABASE, USER, PASSWD, WKBENABLED, 
+            DBTYPE, HOST, PORT, SCHEMA, DATABASE, USER, PASSWD, MAXCONN, MINCONN, VALIDATECONN, WKBENABLED, 
             LOOSEBBOX, ESTIMATEDEXTENT, NAMESPACE 
         };
     }

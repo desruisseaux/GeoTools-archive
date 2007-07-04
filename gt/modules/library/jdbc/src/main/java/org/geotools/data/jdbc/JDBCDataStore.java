@@ -18,6 +18,8 @@ package org.geotools.data.jdbc;
 import java.io.IOException;
 import java.sql.ResultSet;
 
+import javax.sql.DataSource;
+
 import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
 import org.geotools.feature.AttributeType;
 import org.geotools.filter.Filter;
@@ -110,7 +112,7 @@ import org.geotools.filter.Filter;
  * @version $Id$
  */
 public abstract class JDBCDataStore extends JDBC2DataStore {
-	protected JDBCDataStore( ConnectionPool pool, JDBCDataStoreConfig config ) throws IOException {
-		super( pool, config );		
+	protected JDBCDataStore( DataSource dataSource, JDBCDataStoreConfig config ) throws IOException {
+		super( dataSource, config );		
 	}
 }

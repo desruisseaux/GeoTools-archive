@@ -20,6 +20,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Set;
 
+import javax.sql.DataSource;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.ConnectionPool;
@@ -50,15 +52,15 @@ import org.opengis.util.InternationalString;
 public class JDBCAuthorityFactory implements CRSAuthorityFactory {
 
     protected CRSFactory factory;
-    protected ConnectionPool connectionPool;
+    protected DataSource dataSource;
     
     /**
      * Construct <code>PostgisAuthorityFactory</code>.
      *
      */
-    public JDBCAuthorityFactory(ConnectionPool pool) {
+    public JDBCAuthorityFactory(DataSource pool) {
         factory=ReferencingFactoryFinder.getCRSFactory(null);
-        this.connectionPool=pool;
+        this.dataSource=pool;
     }
     
     /**

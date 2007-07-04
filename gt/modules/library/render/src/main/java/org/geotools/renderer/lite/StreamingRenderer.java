@@ -1526,6 +1526,8 @@ public final class StreamingRenderer implements GTRenderer {
 			}
 			// transformMap = new HashMap();
 			lfts = createLiteFeatureTypeStyles(featureStylers,schema, graphics);
+                        if(lfts.size() == 0)
+                            return;
 	
 	        LiteFeatureTypeStyle[] featureTypeStyleArray = (LiteFeatureTypeStyle[]) lfts.toArray(new LiteFeatureTypeStyle[lfts.size()]);
 	        // /////////////////////////////////////////////////////////////////////

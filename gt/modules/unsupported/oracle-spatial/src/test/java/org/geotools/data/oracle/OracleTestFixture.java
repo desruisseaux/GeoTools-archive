@@ -19,9 +19,11 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import oracle.jdbc.OracleConnection;
+import javax.sql.DataSource;
 
-import org.geotools.data.jdbc.ConnectionPool;
+import org.geotools.data.jdbc.datasource.ManageableDataSource;
+
+import oracle.jdbc.OracleConnection;
 
 /**
  * Capture in one spot the location of *your* oracle instance.
@@ -41,7 +43,7 @@ public class OracleTestFixture {
 		private String schemaName;
 
 		/** Connection pool - incase you want to test a EPSG authority */
-		private ConnectionPool cPool;
+		private ManageableDataSource cPool;
 	    
 	    /**
 	     * OracleTestFixture used in JUnit 
@@ -66,12 +68,11 @@ public class OracleTestFixture {
 	       
 	       schemaName = properties.getProperty("schema");
 	       
-	       OracleConnectionFactory fact = new OracleConnectionFactory(properties.getProperty("host"), 
-	                properties.getProperty("port"), properties.getProperty("instance"));
-	       fact.setLogin(properties.getProperty("user"), properties.getProperty("passwd"));
-	       
 	       try {
-		       cPool = fact.getConnectionPool();	       
+		       cPool = OracleDataStoreFactory.getDefaultDataSource(properties.getProperty("host"), 
+	                    properties.getProperty("user"), properties.getProperty("passwd"),
+	                    Integer.parseInt(properties.getProperty("port")), properties.getProperty("instance"),
+	                    10, 4, false);	       
 		       System.out.println( "Connect to"+ properties );
 	    	   
 	    	   connection = (OracleConnection) cPool.getConnection();
@@ -85,9 +86,12 @@ public class OracleTestFixture {
 	    	   return;
 	       }
 	       System.out.println( connection.getTypeMap());
-	    }	    
+	    }	   
+	    
 	    public void close() throws SQLException{
 	        if( connection != null ) connection.close();
 	        connection = null;
+	        if(cPool != null)
+	            cPool.close();
 	    }    
 	}

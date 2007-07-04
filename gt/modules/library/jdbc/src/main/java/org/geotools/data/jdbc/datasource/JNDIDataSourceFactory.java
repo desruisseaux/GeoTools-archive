@@ -1,4 +1,4 @@
-package org.geotools.data.jdbc.ds;
+package org.geotools.data.jdbc.datasource;
 
 import java.io.IOException;
 import java.util.Map;

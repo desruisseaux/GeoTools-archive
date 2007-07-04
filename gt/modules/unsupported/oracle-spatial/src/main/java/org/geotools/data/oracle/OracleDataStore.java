@@ -25,6 +25,8 @@ import java.sql.Statement;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.sql.DataSource;
+
 import oracle.sql.ARRAY;
 import oracle.sql.Datum;
 import oracle.sql.STRUCT;
@@ -72,16 +74,16 @@ public class OracleDataStore extends JDBCDataStore {
      * @param config
      * @throws IOException
      */
-    public OracleDataStore(ConnectionPool connectionPool, JDBCDataStoreConfig config) throws IOException {
-        super(connectionPool, config);
+    public OracleDataStore(DataSource dataSource, JDBCDataStoreConfig config) throws IOException {
+        super(dataSource, config);
     }
 
     /**
      * @param connectionPool
      * @throws DataSourceException
      */
-    public OracleDataStore(ConnectionPool connectionPool, String schemaName, Map fidGeneration) throws IOException {
-        this(connectionPool, schemaName, schemaName, fidGeneration);
+    public OracleDataStore(DataSource dataSource, String schemaName, Map fidGeneration) throws IOException {
+        this(dataSource, schemaName, schemaName, fidGeneration);
     }
     
     /**
@@ -89,14 +91,14 @@ public class OracleDataStore extends JDBCDataStore {
      * @param namespace
      * @throws DataSourceException
      */
-    public OracleDataStore(ConnectionPool connectionPool, String namespace, String schemaName, Map fidGeneration) throws IOException {
+    public OracleDataStore(DataSource dataSource, String namespace, String schemaName, Map fidGeneration) throws IOException {
         //Ok, this needs more investigation, since the config constructor being
         //used seems to ignoe the fid map stuff.  I don't quite understand it,
         //and I think it may get picked up later, or at least auto-generated
         //later - maybe this is for the user specified stuff that never got
         //implemented.  Point being this needs to be looked into, I'm just 
         //setting it like this to get things working. -ch
-        this(connectionPool, new JDBCDataStoreConfig(namespace, schemaName, null, fidGeneration));
+        this(dataSource, new JDBCDataStoreConfig(namespace, schemaName, null, fidGeneration));
 
     }
 
@@ -281,7 +283,7 @@ public class OracleDataStore extends JDBCDataStore {
     
     private OracleAuthorityFactory getOracleAuthorityFactory() {
         if (af == null) {
-            af = new OracleAuthorityFactory(connectionPool);
+            af = new OracleAuthorityFactory(dataSource);
         }
 
         return af;

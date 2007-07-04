@@ -20,13 +20,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.sql.DataSource;
+
 import junit.framework.TestCase;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.Transaction;
-import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.JDBCUtils;
-import org.geotools.data.postgis.PostgisConnectionFactory;
+import org.geotools.data.jdbc.datasource.ManageableDataSource;
+import org.geotools.data.postgis.PostgisDataStoreFactory;
 import org.geotools.data.postgis.PostgisTests;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -42,7 +44,7 @@ public class PostgisAuthorityFactoryOnlineTest extends TestCase {
     private String TABLE_NAME="SPATIAL_REF_SYS";
     private String SRID_COLUMN="SRID";
     
-    public int getSRIDs(ConnectionPool pool) throws Exception{
+    public int getSRIDs(DataSource pool) throws Exception{
         Connection dbConnection = null;
 
         try {
@@ -71,10 +73,9 @@ public class PostgisAuthorityFactoryOnlineTest extends TestCase {
     }
     
     public void testCreateCRS() throws Exception{
-    	PostgisTests.Fixture fx = PostgisTests.newFixture();
-      PostgisConnectionFactory f = 
-    	  new PostgisConnectionFactory(fx.host,fx.port.intValue(),fx.database);
-      ConnectionPool pool=f.getConnectionPool(fx.user,fx.password);
+    	PostgisTests.Fixture f = PostgisTests.newFixture();
+        String url = "jdbc:postgresql" + "://" + f.host + ":" + f.port + "/" + f.database;
+        ManageableDataSource pool = PostgisDataStoreFactory.getDefaultDataSource(f.host, f.user, f.password, f.port.intValue(), f.database, 10, 2, false);
       PostgisAuthorityFactory factory=new PostgisAuthorityFactory(pool);
       CoordinateReferenceSystem crs=factory.createCRS(getSRIDs(pool));
       assertNotNull(crs);

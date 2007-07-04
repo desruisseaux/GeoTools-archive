@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 import java.util.PropertyResourceBundle;
 import java.util.logging.Logger;
 
@@ -28,6 +29,7 @@ import oracle.sql.ARRAY;
 import oracle.sql.Datum;
 import oracle.sql.STRUCT;
 
+import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DataTestCase;
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.ConnectionPoolManager;
@@ -79,40 +81,10 @@ public class QuickOracleOnlineTest extends DataTestCase {
     protected void setUp() throws Exception {
     	super.setUp();
 
-        PropertyResourceBundle resource;
-        resource =
-            new PropertyResourceBundle(this.getClass().getResourceAsStream("remote.properties"));
-
-        String namespace = resource.getString("namespace");
-        String host = resource.getString("host");
-        String port = resource.getString("port");        
-        String instance = resource.getString("instance");        
-        String schema = resource.getString("schema");
-        String user = resource.getString("user");
-        String password = resource.getString("passwd");
-
-        if (namespace.equals("http://www.geotools.org/data/postgis")) {
-            throw new IllegalStateException(
-                "The fixture.properties file needs to be configured for your own database");
-        }
-         
-        try {
-            OracleConnectionFactory factory1 = new OracleConnectionFactory(host, port, instance);
-            pool = factory1.getConnectionPool(user, password);        	
-        	conn = pool.getConnection();
-        }
-        catch( Throwable t ){
-                t.printStackTrace();
-        	System.out.println("Could not load test fixture, configure "+getClass().getResource("fixture.properties"));
-        	t.printStackTrace();
-        	return;
-        }
-        reset();
+        Properties resource = new Properties();
+        resource.load(this.getClass().getResourceAsStream("remote.properties"));
         
-        JDBCDataStoreConfig config =
-        	JDBCDataStoreConfig.createWithNameSpaceAndSchemaName( namespace, schema );                
-        
-        data = new OracleDataStore(pool, config );
+        data = (OracleDataStore) DataStoreFinder.getDataStore(resource);
         
         //BasicFIDMapper basic = new BasicFIDMapper("tid", 255, false);
         //TypedFIDMapper typed = new TypedFIDMapper( basic, "trim_utm10");

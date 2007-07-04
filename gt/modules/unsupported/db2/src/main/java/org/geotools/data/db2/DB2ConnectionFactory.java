@@ -19,11 +19,15 @@ package org.geotools.data.db2;
 import com.ibm.db2.jcc.DB2ConnectionPoolDataSource;
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.ConnectionPoolManager;
+import org.geotools.data.jdbc.datasource.DataSourceFinder;
+import org.geotools.data.jdbc.datasource.DataSourceUtil;
+
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.sql.ConnectionPoolDataSource;
+import javax.sql.DataSource;
 
 
 /**
@@ -31,6 +35,7 @@ import javax.sql.ConnectionPoolDataSource;
  *
  * @author David Adler - IBM Corporation
  * @source $URL$
+ * @deprecated Use {@link DataSource}, {@link DataSourceUtil} and {@link DataSourceFinder} instead
  */
 public class DB2ConnectionFactory {
     private static final Logger LOGGER = Logger.getLogger(

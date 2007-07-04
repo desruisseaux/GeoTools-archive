@@ -16,6 +16,7 @@
 package org.geotools.data.oracle.attributeio;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,6 +29,8 @@ import oracle.sql.STRUCT;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.jdbc.QueryData;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
+import org.geotools.data.jdbc.datasource.DataSourceFinder;
+import org.geotools.data.jdbc.datasource.UnWrapper;
 import org.geotools.data.oracle.sdo.GeometryConverter;
 import org.geotools.feature.AttributeType;
 
@@ -66,7 +69,13 @@ public class SDOAttributeIO implements AttributeIO {
 					+ "." + columnName);
 
 			// TODO should check that it is an OracleConnection
-			OracleConnection oracleConnection = (OracleConnection) queryData.getConnection();
+                        Connection conn = queryData.getConnection();
+                        if(!(conn instanceof OracleConnection)) {
+                            UnWrapper uw = DataSourceFinder.getUnWrapper(conn);
+                            if(uw != null)
+                                conn = uw.unwrap(conn);
+                        }
+			OracleConnection oracleConnection = (OracleConnection) conn;
 			//GeometryFactory gFact = null;
 
 			int srid = queryData.getFeatureTypeInfo().getSRID(columnName);
@@ -85,7 +94,7 @@ public class SDOAttributeIO implements AttributeIO {
 			//adapterSDO = new AdapterSDO(gFact, conn);
 			//adapterJTS = new AdapterJTS(gFact);
 			converter = new GeometryConverter( oracleConnection, geometryFactory );
-		}		
+				
 //		catch (SQLException e) {
 //			String msg = "Error setting up SDO Geometry convertor";
 //			LOGGER.log(Level.SEVERE, msg, e);
@@ -95,7 +104,9 @@ public class SDOAttributeIO implements AttributeIO {
 //			throw new DataSourceException(
 //					"Error setting up SDO Geometry convertor", e);
 //		}
-		finally {
+        } catch(IOException e) {
+            throw new DataSourceException(e);
+        } finally {
 			// hold try statement in place
 		}
 	}

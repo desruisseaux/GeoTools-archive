@@ -23,8 +23,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import javax.sql.DataSource;
+
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.ConnectionPoolManager;
+import org.geotools.data.jdbc.datasource.DataSourceFinder;
+import org.geotools.data.jdbc.datasource.DataSourceUtil;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
 
@@ -32,6 +36,7 @@ import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
  * Creates ConnectionPool objects for a certain MySQL database instance.
  * @author Gary Sheppard garysheppard@psu.edu
  * @source $URL$
+ * @deprecated Use {@link DataSource}, {@link DataSourceUtil} and {@link DataSourceFinder} instead
  */
 public class MySQLConnectionFactory {
 

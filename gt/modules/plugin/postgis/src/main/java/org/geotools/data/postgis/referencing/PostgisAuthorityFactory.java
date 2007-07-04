@@ -21,6 +21,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.sql.DataSource;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.ConnectionPool;
@@ -57,7 +59,7 @@ public class PostgisAuthorityFactory extends JDBCAuthorityFactory {
      * 
      * @param pool
      */
-    public PostgisAuthorityFactory( ConnectionPool pool ) {
+    public PostgisAuthorityFactory( DataSource pool ) {
         super(pool);
     }
 
@@ -67,7 +69,7 @@ public class PostgisAuthorityFactory extends JDBCAuthorityFactory {
         try {
             String sqlStatement = "SELECT * FROM " + TABLE_NAME + " WHERE " + SRID_COLUMN + " = "
                     + srid;
-            dbConnection = connectionPool.getConnection();
+            dbConnection = dataSource.getConnection();
 
             Statement statement = dbConnection.createStatement();
             ResultSet result = statement.executeQuery(sqlStatement);

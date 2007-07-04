@@ -22,10 +22,15 @@ import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.JDBCDataStoreConfig;
+import org.geotools.data.jdbc.datasource.DataSourceUtil;
+import org.geotools.data.jdbc.datasource.ManageableDataSource;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import javax.sql.DataSource;
 
 
 /**
@@ -37,19 +42,21 @@ import java.util.logging.Logger;
  */
 public class DB2DataStoreFactory extends AbstractDataStoreFactory
     implements DataStoreFactorySpi {
+    public static final String DRIVERNAME = "com.ibm.db2.jcc.DB2Driver";
+
     private static final Logger LOGGER = Logger.getLogger(
             "org.geotools.data.db2");
 
     // The DB2 JDBC universal driver class.  isAvailable() uses this to
     // check whether the DB2 JDBC library is in the classpath
-    private static final String DRIVER_CLASS = "com.ibm.db2.jcc.DB2Driver";
+    private static final String DRIVER_CLASS = DRIVERNAME;
     private static boolean isAvailable = false;
     private static final Param DBTYPE = new Param("dbtype", String.class,
             "must be 'DB2'", true, "DB2");
     private static final Param HOST = new Param("host", String.class,
             "DB2 host machine", true, "localhost");
-    private static final Param PORT = new Param("port", String.class,
-            "DB2 connection port", true, "50000");
+    private static final Param PORT = new Param("port", Integer.class,
+            "DB2 connection port", true, new Integer(50000));
     private static final Param DATABASE = new Param("database", String.class,
             "database name", true);
     private static final Param USER = new Param("user", String.class,
@@ -58,8 +65,16 @@ public class DB2DataStoreFactory extends AbstractDataStoreFactory
             "password used to login", false);
     private static final Param TABSCHEMA = new Param("tabschema", String.class,
             "default table schema", false);
+    public static final Param MAXCONN = new Param("max connections", Integer.class,
+            "maximum number of open connections", false, new Integer(10));
+    
+    public static final Param MINCONN = new Param("min connections", Integer.class,
+            "minimum number of pooled connection", false, new Integer(4));
+    
+    public static final Param VALIDATECONN = new Param("validate connections", Boolean .class,
+            "check connection is alive before using it", false, Boolean.FALSE);
     static final Param[] DB2PARMS = {
-            DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, TABSCHEMA
+            DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, TABSCHEMA, MAXCONN, MINCONN, VALIDATECONN
         };
 
     /**
@@ -97,24 +112,18 @@ public class DB2DataStoreFactory extends AbstractDataStoreFactory
         String host = (String) HOST.lookUp(params);
         String user = (String) USER.lookUp(params);
         String passwd = (String) PASSWD.lookUp(params);
-        String port = (String) PORT.lookUp(params);
+        int port = ((Integer) PORT.lookUp(params)).intValue();
         String database = (String) DATABASE.lookUp(params);
         String tabschema = (String) TABSCHEMA.lookUp(params);
-
-        DB2ConnectionFactory connFact = new DB2ConnectionFactory(host, port,
-                database);
-
-        connFact.setLogin(user, passwd);
-
-        ConnectionPool pool;
-
-        try {
-            pool = connFact.getConnectionPool();
-        } catch (SQLException e) {
-            LOGGER.info("Get connection pool failed: "
-                    + e);
-            throw new DataSourceException("Could not create connection pool", e);
-        }
+        Integer maxConn = (Integer) MAXCONN.lookUp(params);
+        Integer minConn = (Integer) MINCONN.lookUp(params);
+        Boolean validateConn = (Boolean) VALIDATECONN.lookUp(params);
+        
+        boolean validate = validateConn != null && validateConn.booleanValue();
+        int maxActive = maxConn != null ? maxConn.intValue() : 10;
+        int maxIdle = minConn != null ? minConn.intValue() : 4;
+        String url = getJDBCUrl(host, port, database);
+        DataSource source = getDefaultDataSource(url, user, passwd, maxActive, maxIdle, validate);
 
         // If the table schema is null or blank, uset the userid for the table schema
         if (tabschema == null || tabschema.length() == 0) {
@@ -134,7 +143,7 @@ public class DB2DataStoreFactory extends AbstractDataStoreFactory
         DB2DataStore ds;
 
         try {
-            ds = new DB2DataStore(pool, config, connFact.getDbURL());
+            ds = new DB2DataStore(source, config, url);
         } catch (IOException e) {
             LOGGER.info("Create DB2Datastore failed: "
                     + e);
@@ -142,9 +151,20 @@ public class DB2DataStoreFactory extends AbstractDataStoreFactory
         }
 
         LOGGER.info("Successfully created DB2Datastore for: "
-            + connFact.getDbURL());
+            + host + ":" + port + "/" + database);
 
         return ds;
+    }
+
+    public static ManageableDataSource getDefaultDataSource(String url, String user, String passwd, int maxActive, int maxIdle, boolean validate) throws DataSourceException {
+        return DataSourceUtil.buildDefaultDataSource(url, DRIVER_CLASS, user, passwd, maxActive, maxIdle, validate ? "select current date from sysibm.sysdummy1" : null, false, 0);
+    }
+
+    /**
+     * Returns the JDBC url used for connecting to a specific database
+     */
+    public static String getJDBCUrl(String host, int port, String database) {
+        return "jdbc:db2://" + host + ":" + port + "/" + database;
     }
 
     /**

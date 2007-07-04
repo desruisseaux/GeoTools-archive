@@ -21,10 +21,13 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.sql.DataSource;
+
 import org.geotools.data.AbstractDataStoreFactory;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.jdbc.ConnectionPool;
+import org.geotools.data.jdbc.datasource.DataSourceUtil;
 
 /**
  * Builds instances of the versioned Postgis datastore
@@ -131,20 +134,10 @@ public class VersionedPostgisDataStoreFactory extends AbstractDataStoreFactory {
         if (!canProcess(params)) {
             throw new IOException("The parameters map isn't correct!!");
         }
-        PostgisConnectionFactory connFact = new PostgisConnectionFactory(host, port.toString(),
-                database);
-
-        connFact.setLogin(user, passwd);
-
-        ConnectionPool pool;
-
-        try {
-            pool = connFact.getConnectionPool();
-        } catch (SQLException e) {
-            throw new DataSourceException("Could not create connection", e);
-        }
-
-        VersionedPostgisDataStore dataStore = createDataStoreInternal(pool, namespace, schema);
+        
+        String url = "jdbc:postgresql" + "://" + host + ":" + port + "/" + database;
+        DataSource source = DataSourceUtil.buildDefaultDataSource(url, "org.postgresql.Driver", user, passwd, "select now()");
+        VersionedPostgisDataStore dataStore = createDataStoreInternal(source, namespace, schema);
 
         if (wkb_enabled != null) {
             dataStore.setWKBEnabled(wkb_enabled.booleanValue());
@@ -170,39 +163,17 @@ public class VersionedPostgisDataStoreFactory extends AbstractDataStoreFactory {
         return dataStore;
     }
 
-    protected VersionedPostgisDataStore createDataStoreInternal(ConnectionPool pool,
+    protected VersionedPostgisDataStore createDataStoreInternal(DataSource dataSource,
             String namespace, String schema) throws IOException {
 
         if (schema == null && namespace == null)
-            return new VersionedPostgisDataStore(pool);
+            return new VersionedPostgisDataStore(dataSource);
 
         if (schema == null && namespace != null) {
-            return new VersionedPostgisDataStore(pool, namespace);
+            return new VersionedPostgisDataStore(dataSource, namespace);
         }
 
-        return new VersionedPostgisDataStore(pool, schema, namespace);
-    }
-
-    /**
-     * @deprecated this method is only here for backwards compatibility for
-     *             subclasses, use
-     *             {@link #createDataStoreInternal(ConnectionPool, String, String)}
-     *             instead.
-     */
-    protected VersionedPostgisDataStore createDataStoreInternal(ConnectionPool pool)
-            throws IOException {
-        return createDataStoreInternal(pool, null, null);
-    }
-
-    /**
-     * @deprecated this method is only here for backwards compatibility for
-     *             subclasses, use
-     *             {@link #createDataStoreInternal(ConnectionPool, String, String)}
-     *             instead.
-     */
-    protected VersionedPostgisDataStore createDataStoreInternal(ConnectionPool pool,
-            String namespace) throws IOException {
-        return createDataStoreInternal(pool, namespace, null);
+        return new VersionedPostgisDataStore(dataSource, schema, namespace);
     }
 
     /**

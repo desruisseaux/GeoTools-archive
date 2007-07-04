@@ -22,6 +22,10 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.sql.ConnectionPoolDataSource;
+import javax.sql.DataSource;
+
+import org.geotools.data.jdbc.datasource.DataSourceFinder;
+import org.geotools.data.jdbc.datasource.DataSourceUtil;
 
 /** Provides a Singleton manager of connection pools.
  * 
@@ -30,6 +34,7 @@ import javax.sql.ConnectionPoolDataSource;
  * @source $URL$
  * @version $Id$
  * Last Modified: $Date: 2003/11/21 18:51:20 $ 
+ * @deprecated Use {@link DataSource}, {@link DataSourceUtil} and {@link DataSourceFinder} instead
  */
 public class ConnectionPoolManager {
     /** The singleton instance of the ConnectionPoolManager. */

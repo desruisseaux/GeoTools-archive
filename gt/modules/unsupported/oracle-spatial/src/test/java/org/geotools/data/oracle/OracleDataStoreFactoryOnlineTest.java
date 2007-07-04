@@ -12,7 +12,6 @@ import java.util.Properties;
 import junit.framework.TestCase;
 
 import org.geotools.data.DataStoreFactorySpi;
-import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.ConnectionPoolManager;
 
 /**

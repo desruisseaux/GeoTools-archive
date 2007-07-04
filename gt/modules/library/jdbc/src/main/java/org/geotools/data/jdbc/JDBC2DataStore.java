@@ -19,7 +19,11 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
 
+import javax.sql.DataSource;
+
+import org.geotools.data.jdbc.datasource.ManageableDataSource;
 import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
 import org.geotools.feature.AttributeType;
 
@@ -106,8 +110,8 @@ import org.geotools.feature.AttributeType;
  */
 public abstract class JDBC2DataStore extends JDBC1DataStore {
 
-	protected ConnectionPool connectionPool;
-	
+    protected DataSource dataSource;
+
     /**
      * Construct a JDBCDataStore with ConnectionPool and associated
      * configuration.
@@ -117,16 +121,27 @@ public abstract class JDBC2DataStore extends JDBC1DataStore {
      *
      * @throws IOException
      */
-    public JDBC2DataStore(ConnectionPool connectionPool,
+    public JDBC2DataStore(DataSource dataSource,
         JDBCDataStoreConfig config) throws IOException {
     	super( config );
-        this.connectionPool = connectionPool;        
+        this.dataSource = dataSource;        
     }
         
     /**
      * Create a connection for your JDBC1 database
      */
     protected Connection createConnection() throws SQLException {
-    	return connectionPool.getConnection();
+    	return dataSource.getConnection();
+    }
+    
+    protected void finalize() throws Throwable {
+        if(dataSource != null && dataSource instanceof ManageableDataSource) {
+            try {
+                ((ManageableDataSource) dataSource).close();
+            } catch(SQLException e) {
+                // it's ok, we did our best..
+                LOGGER.log(Level.FINE, "Could not close dataSource", e);
+            }
+        }
     }
 }

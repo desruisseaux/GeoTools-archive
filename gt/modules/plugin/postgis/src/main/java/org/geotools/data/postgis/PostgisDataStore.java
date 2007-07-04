@@ -33,6 +33,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.sql.DataSource;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
@@ -235,26 +237,26 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     /** Flag indicating whether schema support **/
     protected boolean schemaEnabled = true;
 
-    protected PostgisDataStore(ConnectionPool connPool)
+    protected PostgisDataStore(DataSource dataSource)
         throws IOException {
-        this(connPool, (String) null);
+        this(dataSource, (String) null);
     }
 
-    protected PostgisDataStore(ConnectionPool connPool, String namespace)
+    protected PostgisDataStore(DataSource dataSource, String namespace)
         throws IOException {
-        this(connPool, schema(null), namespace);
+        this(dataSource, schema(null), namespace);
     }
 
-    protected PostgisDataStore(ConnectionPool connPool, String schema,
+    protected PostgisDataStore(DataSource dataSource, String schema,
         String namespace) throws IOException {
-        this(connPool,
+        this(dataSource,
             new JDBCDataStoreConfig(namespace, schema(schema), new HashMap(),
                 new HashMap()), OPTIMIZE_SQL);
     }
 
-    protected PostgisDataStore(ConnectionPool connPool, String schema,
+    protected PostgisDataStore(DataSource dataSource, String schema,
         String namespace, int optimizeMode) throws IOException {
-        this(connPool,
+        this(dataSource,
             new JDBCDataStoreConfig(namespace, schema(schema), new HashMap(),
                 new HashMap()), optimizeMode); 
     }
@@ -269,9 +271,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         return (String) PostgisDataStoreFactory.SCHEMA.sample;
     }
     	
-    public PostgisDataStore(ConnectionPool connectionPool,
+    public PostgisDataStore(DataSource dataSource,
         JDBCDataStoreConfig config, int optimizeMode) throws IOException {
-        super(connectionPool, config);
+        super(dataSource, config);
         guessDataStoreOptions();
         OPTIMIZE_MODE = optimizeMode;
 
@@ -1134,7 +1136,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
     private PostgisAuthorityFactory getPostgisAuthorityFactory() {
         if (paf == null) {
-            paf = new PostgisAuthorityFactory(connectionPool);
+            paf = new PostgisAuthorityFactory(dataSource);
         }
 
         return paf;
@@ -1932,8 +1934,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      *  
      * @return ConnectionPool
      */
-    public ConnectionPool getConnectionPool() {
-        return connectionPool;
+    public DataSource getDataSource() {
+        return dataSource;
     }
     
     /**

@@ -21,6 +21,9 @@ import junit.framework.TestCase;
 import org.geotools.data.db2.DB2ConnectionFactory;
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.JDBCDataStoreConfig;
+import org.geotools.data.jdbc.datasource.DataSourceUtil;
+import org.geotools.data.jdbc.datasource.ManageableDataSource;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -29,6 +32,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.PropertyResourceBundle;
 import java.util.Set;
+
+import javax.sql.DataSource;
 import javax.sql.PooledConnection;
 
 
@@ -49,7 +54,7 @@ public class DB2TestCase extends TestCase {
     protected String tabSchema = null;
     protected String dbURL = null;
     protected boolean mock = false;
-    protected ConnectionPool pool = null;
+    protected ManageableDataSource pool = null;
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -58,6 +63,8 @@ public class DB2TestCase extends TestCase {
     }
 
     protected void tearDown() throws Exception {
+        if(pool != null)
+            pool.close();
         super.tearDown();
     }
 
@@ -128,14 +135,9 @@ public class DB2TestCase extends TestCase {
      *
      * @throws Exception
      */
-    protected ConnectionPool getLocalConnectionPool() throws Exception {
-        DB2ConnectionFactory connFact = new DB2ConnectionFactory(host,
-                String.valueOf(portnum), dbname);
-        connFact.setLogin(user, pw);
-
-        ConnectionPool pool = connFact.getConnectionPool();
-
-        return pool;
+    protected ManageableDataSource getLocalConnectionPool() throws Exception {
+        String url = DB2DataStoreFactory.getJDBCUrl(host, portnum, dbname);
+        return DB2DataStoreFactory.getDefaultDataSource(url, user, pw, 10, 2, false);
     }
 
     /**

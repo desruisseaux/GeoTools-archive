@@ -16,16 +16,18 @@
 package org.geotools.data.mysql;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.sql.SQLException;
-import java.util.Map;
 import java.util.Collections;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.sql.DataSource;
+
+import org.geotools.data.AbstractDataStoreFactory;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
-import org.geotools.data.jdbc.ConnectionPool;
+import org.geotools.data.jdbc.datasource.DataSourceUtil;
+import org.geotools.data.jdbc.datasource.ManageableDataSource;
 
 
 /**
@@ -40,7 +42,7 @@ import org.geotools.data.jdbc.ConnectionPool;
  * @source $URL$
  */
 public class MySQLDataStoreFactory
-    implements org.geotools.data.DataStoreFactorySpi {
+    extends AbstractDataStoreFactory {
 
     private static final Logger LOGGER = Logger.getLogger(MySQLDataStoreFactory.class.getName());
         
@@ -56,7 +58,7 @@ public class MySQLDataStoreFactory
             "mysql host machine", true, "localhost");
 
     /** Param, package visibiity for JUnit tests */
-    static final Param PORT = new Param("port", String.class,
+    static final Param PORT = new Param("port", Integer.class,
             "mysql connection port", true, "3306");
 
     /** Param, package visibiity for JUnit tests */
@@ -70,6 +72,15 @@ public class MySQLDataStoreFactory
     /** Param, package visibiity for JUnit tests */
     static final Param PASSWD = new Param("passwd", String.class,
             "password used to login", false);
+    
+    static final Param MAXCONN = new Param("max connections", Integer.class,
+            "maximum number of open connections", false, new Integer(10));
+    
+    static final Param MINCONN = new Param("min connections", Integer.class,
+            "minimum number of pooled connection", false, new Integer(4));
+    
+    static final Param VALIDATECONN = new Param("validate connections", Boolean .class,
+            "check connection is alive before using it", false, Boolean.FALSE);
 
     /** Param, package visibiity for JUnit tests */
     static final Param NAMESPACE = new Param("namespace", String.class,
@@ -118,31 +129,10 @@ public class MySQLDataStoreFactory
      *         for host, user, passwd, and database.
      */
     public boolean canProcess(Map params) {
-        Object value;
+        if(!super.canProcess(params))
+            return false;
 
-        if (params != null) {
-            for (int i = 0; i < arrayParameters.length; i++) {
-                if (!(((value = params.get(arrayParameters[i].key)) != null)
-                        && (arrayParameters[i].type.isInstance(value)))) {
-                    if (arrayParameters[i].required) {
-                        if (LOGGER.isLoggable(Level.FINER)) {
-                            LOGGER.finer("Failed on : " 
-                                         + arrayParameters[i].key + ", full " +
-                                         "params= " + params.toString()); 
-                        }
-                        return (false);
-                    }
-                }
-            }
-        } else {
-            return (false);
-        }
-
-        if ((((String) params.get("dbtype")).equalsIgnoreCase("mysql"))) {
-            return (true);
-        } else {
-            return (false);
-        }
+        return ((String) params.get("dbtype")).equalsIgnoreCase("mysql");
     }
 
     /**
@@ -166,7 +156,10 @@ public class MySQLDataStoreFactory
         String host = (String) HOST.lookUp(params);
         String user = (String) USER.lookUp(params);
         String passwd = (String) PASSWD.lookUp(params);
-        String port = (String) PORT.lookUp(params);
+        Integer maxConn = (Integer) MAXCONN.lookUp(params);
+        Integer minConn = (Integer) MINCONN.lookUp(params);
+        Boolean validateConn = (Boolean) VALIDATECONN.lookUp(params);
+        int port = ((Integer) PORT.lookUp(params)).intValue();
         String database = (String) DATABASE.lookUp(params);
         String namespace = (String) NAMESPACE.lookUp(params);
 
@@ -176,25 +169,22 @@ public class MySQLDataStoreFactory
             throw new IOException("The parameteres map isn't correct!!");
         }
         
-        MySQLConnectionFactory connFact = new MySQLConnectionFactory(host,
-                new Integer(port).intValue(), database);
-
-        connFact.setLogin(user, passwd);
-
-        ConnectionPool pool;
-
-        try {
-            pool = connFact.getConnectionPool();
-        } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "Could not create connection to MySQL database.", e);
-            throw new DataSourceException("Could not create connection", e);
-        }
-
+        boolean validate = validateConn != null && validateConn.booleanValue();
+        int maxActive = maxConn != null ? maxConn.intValue() : 10;
+        int maxIdle = minConn != null ? minConn.intValue() : 4;
+        DataSource ds = getDefaultDataSource(host, user, passwd, port, database, maxActive, maxIdle, validate);
+        
         if (namespace != null) {
-            return new MySQLDataStore(pool, namespace);
+            return new MySQLDataStore(ds, namespace);
         } else {
-            return new MySQLDataStore(pool);
+            return new MySQLDataStore(ds);
         }
+    }
+
+    public static ManageableDataSource getDefaultDataSource(String host, String user, String passwd, int port, String database, int maxActive, int maxIdle, boolean validate) throws DataSourceException {
+        String url = "jdbc:mysql://" + host + ":" + port + "/" + database;
+        String driver = "com.mysql.jdbc.Driver";
+        return DataSourceUtil.buildDefaultDataSource(url, driver, user, passwd, maxActive, maxIdle, validate ? "select version()" : null, false, 0);
     }
 
     /**
@@ -266,7 +256,7 @@ public class MySQLDataStoreFactory
      */
     public Param[] getParametersInfo() {
         return new Param[] {
-            DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, NAMESPACE
+            DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, MAXCONN, MINCONN, VALIDATECONN, NAMESPACE
         };
     }
 

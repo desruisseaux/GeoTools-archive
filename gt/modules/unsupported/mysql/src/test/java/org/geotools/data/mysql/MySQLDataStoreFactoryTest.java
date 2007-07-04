@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
+import java.util.PropertyResourceBundle;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -40,7 +42,6 @@ public class MySQLDataStoreFactoryTest extends TestCase {
     static MySQLDataStoreFactory factory
         = new MySQLDataStoreFactory();
     
-    Map remote;
     Map local;
 
     public static void main(String[] args) {
@@ -56,68 +57,21 @@ public class MySQLDataStoreFactoryTest extends TestCase {
      * @see TestCase#setUp()
      */
     protected void setUp() throws Exception {
-         
-        remote = new HashMap();
-        remote.put("dbtype","postgis");        
-        remote.put("host","localhost");
-        remote.put("port", new Integer(5432));
-        remote.put("database", "testdb");
-        remote.put("user", "postgres");
-        remote.put("passwd", "postgres");
-        remote.put("namesapce", "topp");
-        //remote.put( remote, "topp");
         
-        local = new HashMap();
-        local.put("dbtype","postgis");        
-        local.put("host","hydra");
-        local.put("port", new Integer(5432));
-        local.put("database", "cite");
-        local.put("user", "cite");
-        local.put("passwd", "cite");
-        //local.put("charset", "");
-        //local.put("namesapce", "");
-        
-        super.setUp();
+        Properties resource = new Properties();
+        resource.load(this.getClass().getResourceAsStream("fixture.properties"));
+        this.local = resource;
     }
     
     public void testLocal() throws Exception {
-        Map map = local;
-        System.out.println( "local:"+map );
-        assertEquals( "cite", MySQLDataStoreFactory.DATABASE.lookUp(map) );        
-        assertEquals( "postgis", MySQLDataStoreFactory.DBTYPE.lookUp(map) );
-        assertEquals( "hydra", MySQLDataStoreFactory.HOST.lookUp(map) );
-        assertEquals( null, MySQLDataStoreFactory.NAMESPACE.lookUp(map) );
-        assertEquals( "cite", MySQLDataStoreFactory.PASSWD.lookUp(map) );
-        assertEquals( new Integer(5432), MySQLDataStoreFactory.PORT.lookUp(map) );
-        assertEquals( "cite", MySQLDataStoreFactory.USER.lookUp(map) );
-        
-        assertTrue( "canProcess", factory.canProcess(map));
+        assertTrue( "canProcess", factory.canProcess(local));
         try {
-            DataStore temp = factory.createDataStore(map);
+            DataStore temp = factory.createDataStore(local);
             assertNotNull( "created", temp );
         }
         catch( DataSourceException expected){
+            expected.printStackTrace();
             assertEquals("Could not get connection",expected.getMessage());
         }                        
     }
-    public void testRemote() throws Exception {
-        Map map = remote;
-        System.out.println( "local:"+map );
-        assertEquals( "testdb", MySQLDataStoreFactory.DATABASE.lookUp(map) );        
-        assertEquals( "postgis", MySQLDataStoreFactory.DBTYPE.lookUp(map) );
-        assertEquals( "localhost", MySQLDataStoreFactory.HOST.lookUp(map) );
-        assertEquals( null, MySQLDataStoreFactory.NAMESPACE.lookUp(map) );
-        assertEquals( "postgres", MySQLDataStoreFactory.PASSWD.lookUp(map) );
-        assertEquals( new Integer(5432), MySQLDataStoreFactory.PORT.lookUp(map) );
-        assertEquals( "postgres", MySQLDataStoreFactory.USER.lookUp(map) );
-        
-        assertTrue( "canProcess", factory.canProcess(map));
-        try {
-            DataStore temp = factory.createDataStore(map);
-            assertNotNull( "created", temp );
-        }
-        catch( DataSourceException expected){
-            assertEquals("Could not get connection",expected.getMessage());
-        }               
-    }    
 }

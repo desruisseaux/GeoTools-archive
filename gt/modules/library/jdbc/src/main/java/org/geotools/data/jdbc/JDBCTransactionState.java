@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import javax.sql.DataSource;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.Transaction;
 import org.geotools.data.Transaction.State;
@@ -38,7 +40,7 @@ public class JDBCTransactionState implements State {
     public JDBCTransactionState( Connection connection ) throws IOException{
         this.connection = connection;            
     }
-    public JDBCTransactionState( ConnectionPool pool) throws IOException{
+    public JDBCTransactionState( DataSource pool) throws IOException{
         try {
             connection = pool.getConnection();
             connection.setAutoCommit( false );                                    

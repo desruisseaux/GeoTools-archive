@@ -22,10 +22,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.sql.DataSource;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
+import org.geotools.data.DataStoreFactorySpi.Param;
 import org.geotools.data.jdbc.ConnectionPool;
+import org.geotools.data.jdbc.datasource.DataSourceUtil;
 
 /**
  * Creates an Oracle datastore based on a thick OCI client connection, instead
@@ -144,6 +148,9 @@ public class OracleOCIDataStoreFactory implements DataStoreFactorySpi {
         String schema = (String) SCHEMA.lookUp( params ); // checks uppercase
         String namespace = (String) NAMESPACE.lookUp( params );
         String dbtype = (String) DBTYPE.lookUp( params );
+        Integer maxConn = (Integer) MAXCONN.lookUp(params);
+        Integer minConn = (Integer) MINCONN.lookUp(params);
+        Boolean validateConn = (Boolean) VALIDATECONN.lookUp(params);
 
         if( !"oracle".equals( dbtype )){
             throw new IOException( "Parameter 'dbtype' must be oracle");
@@ -152,24 +159,16 @@ public class OracleOCIDataStoreFactory implements DataStoreFactorySpi {
             throw new IOException("Cannot connect using provided parameters");
         }
 
-        try {
-            OracleConnectionFactory ocFactory;
-                LOGGER.fine("Creating an oci Oracle connection based on alias= "
-                    + alias);
-                ocFactory = new OracleConnectionFactory(alias);
-            
+        boolean validate = validateConn != null && validateConn.booleanValue();
+        int maxActive = maxConn != null ? maxConn.intValue() : 10;
+        int maxIdle = minConn != null ? minConn.intValue() : 4;
+        DataSource source = getDefaultDataSource(alias, user, passwd, maxActive, maxIdle, validate);
+        return new OracleDataStore(source, namespace, schema, new HashMap());
+    }
 
-            ocFactory.setLogin(user, passwd);
-
-            ConnectionPool pool = ocFactory.getConnectionPool();
-
-            OracleDataStore dataStore = new OracleDataStore(pool, namespace, schema,
-                    new HashMap());
-
-            return dataStore;
-        } catch (SQLException ex) {
-            throw new DataSourceException("Error creating oracle DataSource", ex);
-        }
+    public static DataSource getDefaultDataSource(String alias, String user, String passwd, int maxActive, int maxIdle, boolean validate) throws DataSourceException {
+        String dbUrl = "jdbc:oracle:oci:@" + alias;
+        return DataSourceUtil.buildDefaultDataSource(dbUrl, JDBC_DRIVER, user, passwd, 10, 4, validate ? "select sysdate from dual" : null, false, 0);
     }
 
     /**
@@ -235,7 +234,12 @@ public class OracleOCIDataStoreFactory implements DataStoreFactorySpi {
     static final Param USER = new Param("user", String.class, "The user name to log in with.", true);
     static final Param PASSWD = new Param("passwd", String.class, "The password.", true);
     static final Param INSTANCE = new Param("instance", String.class, "The name of the Oracle instance to connect to.", true);
-    
+    public static final Param MAXCONN = new Param("max connections", Integer.class,
+            "maximum number of open connections", false, new Integer(10));
+    public static final Param MINCONN = new Param("min connections", Integer.class,
+            "minimum number of pooled connection", false, new Integer(4));
+    public static final Param VALIDATECONN = new Param("validate connections", Boolean .class,
+            "check connection is alive before using it", false, Boolean.FALSE);
     /** Apparently Schema must be uppercase */
     static final Param SCHEMA = new Param("schema", String.class, "The schema name to narrow down the exposed tables (must be upper case).", false){
        

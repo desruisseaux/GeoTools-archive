@@ -23,8 +23,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import javax.sql.DataSource;
+
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.ConnectionPoolManager;
+import org.geotools.data.jdbc.datasource.DataSourceFinder;
+import org.geotools.data.jdbc.datasource.DataSourceUtil;
 
 /**
  * Shell for JDBC transactions of all types. This creates connections for the
@@ -37,7 +41,8 @@ import org.geotools.data.jdbc.ConnectionPoolManager;
  * @author Chris Holmes, TOPP
  * @source $URL$
  * @version $Id$
- *
+ * @deprecated Use {@link DataSource}, {@link DataSourceUtil} and {@link DataSourceFinder} instead
+ *  *
  * @task REVISIT: connection pooling, implementing java.sql.Datasource.  I
  *       removed the implementing because that class should be provided by the
  *       vendor, not a hack on top of DriverManager.  The only problem is that

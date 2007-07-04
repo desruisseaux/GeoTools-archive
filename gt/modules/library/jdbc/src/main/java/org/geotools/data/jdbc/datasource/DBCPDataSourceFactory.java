@@ -1,4 +1,4 @@
-package org.geotools.data.jdbc.ds;
+package org.geotools.data.jdbc.datasource;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -20,10 +20,10 @@ import org.geotools.data.DataStoreFactorySpi.Param;
 public class DBCPDataSourceFactory extends AbstractDataSourceFactorySpi {
 
     public static final Param USERNAME = new Param("username", String.class,
-            "User name to login as", true);
+            "User name to login as", false);
 
     public static final Param PASSWORD = new Param("password", String.class,
-            "Password used to login", true);
+            "Password used to login", false);
 
     public static final Param JDBC_URL = new Param("jdbcUrl", String.class,
             "The JDBC url (check the JDCB driver docs to find out its format)", true);

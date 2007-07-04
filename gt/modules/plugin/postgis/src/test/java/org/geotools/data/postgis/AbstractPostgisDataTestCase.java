@@ -23,9 +23,13 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.sql.DataSource;
+
 import org.geotools.data.DataStore;
 import org.geotools.data.DataTestCase;
 import org.geotools.data.jdbc.ConnectionPool;
+import org.geotools.data.jdbc.datasource.DataSourceUtil;
+import org.geotools.data.jdbc.datasource.ManageableDataSource;
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
 import org.geotools.feature.Feature;
@@ -38,9 +42,8 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
 	static boolean CHECK_TYPE = false;
 	
 	PostgisTests.Fixture f;
-	ConnectionPool pool;
+	ManageableDataSource pool;
 	DataStore data;
-	PostgisConnectionFactory pcFactory;
 	
 	public AbstractPostgisDataTestCase(String name) {
 		super(name);
@@ -54,10 +57,7 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
         super.setUp();
 
         f = PostgisTests.newFixture(getFixtureFile());
-        
-        pcFactory = new PostgisConnectionFactory(f.host,
-                f.port.intValue(), f.database);
-        pool = pcFactory.getConnectionPool(f.user, f.password);
+        pool = PostgisDataStoreFactory.getDefaultDataSource(f.host, f.user, f.password, f.port.intValue(), f.database, 10, 2, false);
 
         setupDbTables();
 
@@ -93,11 +93,7 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
     
     protected void tearDown() throws Exception {
         data = null;
-        if (pcFactory != null && pool != null) {
-        	pcFactory.free(pool);
-        	pcFactory = null;
-        	pool.close();
-        }
+        pool.close();
         super.tearDown();
     }
     

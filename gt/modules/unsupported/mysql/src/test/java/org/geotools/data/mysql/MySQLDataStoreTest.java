@@ -23,6 +23,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.NoSuchElementException;
+import java.util.PropertyResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,9 +39,9 @@ import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.SchemaNotFoundException;
 import org.geotools.data.Transaction;
-import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.ConnectionPoolManager;
 import org.geotools.data.jdbc.JDBCTransactionState;
+import org.geotools.data.jdbc.datasource.ManageableDataSource;
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
 import org.geotools.feature.Feature;
@@ -83,9 +84,8 @@ public class MySQLDataStoreTest extends TestCase {
     private FeatureCollection collection = FeatureCollections.newCollection();
     private FeatureType schema;
     private int srid = -1;
-    private MySQLConnectionFactory connFactory;
     private MySQLDataStore dstore;
-    private ConnectionPool connPool;
+    private ManageableDataSource connPool;
     private CompareFilter tFilter;
     private int addId = 32;
     private org.geotools.filter.GeometryFilter geomFilter;
@@ -106,37 +106,35 @@ public class MySQLDataStoreTest extends TestCase {
 
         return suite;
     }
+    
+    protected void setUp() throws Exception {
+        super.setUp();
 
-    public void setUp() {
-        //LOGGER.info("creating postgis connection...");
-        connFactory = new MySQLConnectionFactory("localhost", 3306, "geodb");
+        PropertyResourceBundle resource;
+        resource =
+            new PropertyResourceBundle(this.getClass().getResourceAsStream("fixture.properties"));
 
-        //connFactory = new PostgisConnectionFactory("localhost", "5432", 
-        //   "testdb");
-        //LOGGER.info("created new db connection");
-        connFactory.setLogin("wolf", "geodb");
+        String namespace = resource.getString("namespace");
+        String host = resource.getString("host");
+        int port = Integer.parseInt(resource.getString("port"));
+        String database = resource.getString("database");
 
-        //LOGGER.info("set the login");
-        //LOGGER.info("created new datasource");
-        try {
-            // LOGGER.fine("getting connection pool");
-            connPool = connFactory.getConnectionPool();
-            setupTestTable(connPool.getConnection());
-            dstore = new MySQLDataStore(connPool, TEST_NS);
+        String user = resource.getString("user");
+        String password = resource.getString("passwd");
 
-            dstore.setFIDMapper(
+        if (namespace.equals("http://www.geotools.org/data/postgis")) {
+            throw new IllegalStateException(
+                "The fixture.properties file needs to be configured for your own database");
+        }
+        
+        connPool = MySQLDataStoreFactory.getDefaultDataSource(host, user, password, port, database, 10, 2, false);
+        setupTestTable(connPool.getConnection());
+
+        dstore = new MySQLDataStore(connPool, namespace);
+        dstore.setFIDMapper(
                 "testset",
                 new TypedFIDMapper(new BasicFIDMapper("gid", 255, true), "testset"));
-
-            
-
-            //LOGGER.fine("about to create ds");
-            //postgis = new PostgisDataSource(connection, FEATURE_TABLE);
-            //LOGGER.fine("created de");
-            schema = dstore.getSchema(FEATURE_TABLE);
-        } catch (Exception e) {
-            LOGGER.log(Level.INFO, "exception while making schema", e);
-        }
+        schema = dstore.getSchema(FEATURE_TABLE);
     }
 
     /**

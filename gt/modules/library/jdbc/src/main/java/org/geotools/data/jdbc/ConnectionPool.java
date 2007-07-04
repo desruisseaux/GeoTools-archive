@@ -25,7 +25,11 @@ import java.util.logging.Logger;
 import javax.sql.ConnectionEvent;
 import javax.sql.ConnectionEventListener;
 import javax.sql.ConnectionPoolDataSource;
+import javax.sql.DataSource;
 import javax.sql.PooledConnection;
+
+import org.geotools.data.jdbc.datasource.DataSourceFinder;
+import org.geotools.data.jdbc.datasource.DataSourceUtil;
 
 
 /**
@@ -40,6 +44,7 @@ import javax.sql.PooledConnection;
  * @author Chris Holmes
  * @source $URL$
  * @version $Id$
+ * @deprecated Use {@link DataSource}, {@link DataSourceUtil} and {@link DataSourceFinder} instead
  */
 public final class ConnectionPool {
     /** A logger */

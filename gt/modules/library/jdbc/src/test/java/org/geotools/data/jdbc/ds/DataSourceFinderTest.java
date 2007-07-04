@@ -9,6 +9,8 @@ import javax.sql.DataSource;
 import junit.framework.TestCase;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.geotools.data.jdbc.datasource.DBCPDataSourceFactory;
+import org.geotools.data.jdbc.datasource.DataSourceFinder;
 
 public class DataSourceFinderTest extends TestCase {
     public void testDbcpFactory() throws IOException {
@@ -28,7 +30,7 @@ public class DataSourceFinderTest extends TestCase {
         assertTrue(source instanceof BasicDataSource);
     }
     
-    public void testJNDIFactory() throws Exception {
+//    public void testJNDIFactory() throws Exception {
         // can't make this work... there are dependencies from EJBMock to stuff
         // that's not in the maven repos
         
@@ -51,5 +53,5 @@ public class DataSourceFinderTest extends TestCase {
 //        DataSource source =  DataSourceFinder.getDataSource(map);
 //        assertNotNull(source);
 //        assertEquals(mockDataSource, source);
-    }
+//    }
 }

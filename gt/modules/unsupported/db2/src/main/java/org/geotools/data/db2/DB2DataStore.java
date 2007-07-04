@@ -65,6 +65,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.sql.DataSource;
+
 
 /**
  * DB2 DataStore implementation.
@@ -119,12 +121,12 @@ public class DB2DataStore extends JDBCDataStore {
      *
      * @throws IOException
      */
-    public DB2DataStore(ConnectionPool connectionPool,
+    public DB2DataStore(DataSource dataSource,
         JDBCDataStoreConfig config, String dbURL) throws IOException {
-        super(connectionPool, config);
+        super(dataSource, config);
 
-        if (connectionPool == null) {
-            throw new IOException("Connection pool is null");
+        if (dataSource == null) {
+            throw new IOException("DataSource pool is null");
         }
 
         this.dbURL = dbURL;

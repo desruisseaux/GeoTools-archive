@@ -1262,7 +1262,7 @@ public class MemoryDataStoreTest extends DataTestCase {
         long then = System.currentTimeMillis();
         do {
             Thread.sleep( 15 );            
-        } while ( then == System.currentTimeMillis() );     
+        } while ( then > System.currentTimeMillis() - 15 );     
         assertFalse(isLocked("road", "road.rd1"));
     }
 }

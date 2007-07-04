@@ -84,7 +84,7 @@ public class PostgisFeatureReaderOnlineTest extends AbstractPostgisOnlineTestCas
     }
     
     protected void addFeatureManual(String table, String[] keys, String[] values) throws Exception {
-        Statement st = ds.getConnectionPool().getConnection().createStatement();
+        Statement st = ds.getDataSource().getConnection().createStatement();
         StringBuffer sql = new StringBuffer();
         sql.append("INSERT INTO \"");
         sql.append(table);

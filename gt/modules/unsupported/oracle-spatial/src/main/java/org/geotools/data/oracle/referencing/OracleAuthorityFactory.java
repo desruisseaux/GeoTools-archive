@@ -21,6 +21,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.sql.DataSource;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.ConnectionPool;
@@ -49,8 +51,8 @@ public class OracleAuthorityFactory extends JDBCAuthorityFactory {
      * 
      * @param pool
      */
-    public OracleAuthorityFactory( ConnectionPool pool ) {
-        super(pool);
+    public OracleAuthorityFactory( DataSource dataSource) {
+        super(dataSource);
     }
 
     public CoordinateReferenceSystem createCRS( int srid ) throws FactoryException, IOException {
@@ -59,7 +61,7 @@ public class OracleAuthorityFactory extends JDBCAuthorityFactory {
         try {
             String sqlStatement = "SELECT * FROM " + TABLE_NAME + " WHERE " + SRID_COLUMN + " = "
                     + srid;
-            dbConnection = connectionPool.getConnection();
+            dbConnection = dataSource.getConnection();
 
             Statement statement = dbConnection.createStatement();
             ResultSet result = statement.executeQuery(sqlStatement);

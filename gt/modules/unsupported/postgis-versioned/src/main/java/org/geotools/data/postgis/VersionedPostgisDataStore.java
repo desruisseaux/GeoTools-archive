@@ -32,6 +32,8 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.sql.DataSource;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
@@ -139,25 +141,25 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
     /** Manages listener lists for FeatureSource implementations */
     protected FeatureListenerManager listenerManager = new FeatureListenerManager();
 
-    public VersionedPostgisDataStore(ConnectionPool connPool, String schema, String namespace,
+    public VersionedPostgisDataStore(DataSource dataSource, String schema, String namespace,
             int optimizeMode) throws IOException {
-        wrapped = new WrappedPostgisDataStore(connPool, schema, namespace, optimizeMode);
+        wrapped = new WrappedPostgisDataStore(dataSource, schema, namespace, optimizeMode);
         checkVersioningDataStructures();
     }
 
-    public VersionedPostgisDataStore(ConnectionPool connPool, String schema, String namespace)
+    public VersionedPostgisDataStore(DataSource dataSource, String schema, String namespace)
             throws IOException {
-        wrapped = new WrappedPostgisDataStore(connPool, schema, namespace);
+        wrapped = new WrappedPostgisDataStore(dataSource, schema, namespace);
         checkVersioningDataStructures();
     }
 
-    public VersionedPostgisDataStore(ConnectionPool connPool, String namespace) throws IOException {
-        wrapped = new WrappedPostgisDataStore(connPool, namespace);
+    public VersionedPostgisDataStore(DataSource dataSource, String namespace) throws IOException {
+        wrapped = new WrappedPostgisDataStore(dataSource, namespace);
         checkVersioningDataStructures();
     }
 
-    public VersionedPostgisDataStore(ConnectionPool connPool) throws IOException {
-        wrapped = new WrappedPostgisDataStore(connPool);
+    public VersionedPostgisDataStore(DataSource dataSource) throws IOException {
+        wrapped = new WrappedPostgisDataStore(dataSource);
         checkVersioningDataStructures();
     }
 
@@ -388,7 +390,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
                 if (transaction != null)
                     conn = wrapped.getConnection(transaction);
                 else
-                    conn = wrapped.getConnectionPool().getConnection();
+                    conn = wrapped.getDataSource().getConnection();
                 st = conn.createStatement();
 
                 rs = executeQuery(st, "SELECT COUNT(*) from "
@@ -442,7 +444,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         ResultSet rs = null;
 
         try {
-            conn = wrapped.getConnectionPool().getConnection();
+            conn = wrapped.getDataSource().getConnection();
             st = conn.createStatement();
 
             rs = st.executeQuery("select max(revision) from " + TBL_CHANGESETS);
@@ -486,7 +488,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
             return new String[0];
 
         try {
-            conn = wrapped.getConnectionPool().getConnection();
+            conn = wrapped.getDataSource().getConnection();
             st = conn.createStatement();
 
             rs = st.executeQuery("select distinct(name) from " + TBL_VERSIONEDTABLES + " where id in "
@@ -818,7 +820,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         try {
             // gather a connection in auto commit mode, DDL are not subject to
             // transactions anyways
-            conn = wrapped.getConnectionPool().getConnection();
+            conn = wrapped.getDataSource().getConnection();
             conn.setAutoCommit(false);
 
             // gather all table names and check the required tables are there
@@ -931,7 +933,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         List tables = new ArrayList();
         try {
             PostgisSQLBuilder sqlb = wrapped.createSQLBuilder();
-            conn = wrapped.getConnectionPool().getConnection();
+            conn = wrapped.getDataSource().getConnection();
             st = conn.createStatement();
 
             rs = executeQuery(st, "SELECT NAME from " + sqlb.encodeTableName(TBL_VERSIONEDTABLES)

@@ -53,7 +53,7 @@ public class AbstractPostgisOnlineTestCase extends PostgisOnlineTestCase {
     }
     
     public Connection getConnection() throws Exception {
-        return ds.getConnectionPool().getConnection();
+        return ds.getDataSource().getConnection();
     }
     
     protected void setupGeometryColumns(Statement st) throws Exception {

@@ -26,6 +26,8 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.sql.DataSource;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.Transaction;
 import org.geotools.data.geomedia.attributeio.GeoMediaAttributeIO;
@@ -85,9 +87,9 @@ public class GeoMediaDataStore extends JDBCDataStore {
      *
      * @throws IOException
      */
-    public GeoMediaDataStore(ConnectionPool connectionPool)
+    public GeoMediaDataStore(DataSource dataSource)
         throws IOException {
-        super(connectionPool, new JDBCDataStoreConfig());
+        super(dataSource, new JDBCDataStoreConfig());
 
         mGFeatureCache = null;
     }

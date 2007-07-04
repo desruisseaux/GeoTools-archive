@@ -19,6 +19,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.sql.DataSource;
+
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.JDBCUtils;
 
@@ -30,7 +32,7 @@ import org.geotools.data.jdbc.JDBCUtils;
  */
 public class SqlTestUtils {
 
-    protected static void dropTable(ConnectionPool pool, String tableName, boolean geomColumns)
+    protected static void dropTable(DataSource pool, String tableName, boolean geomColumns)
             throws SQLException {
         Connection conn = null;
         Statement st = null;
@@ -49,7 +51,7 @@ public class SqlTestUtils {
         }
     }
 
-    protected static void execute(ConnectionPool pool, String sql) throws SQLException {
+    protected static void execute(DataSource pool, String sql) throws SQLException {
         Connection conn = null;
         Statement st = null;
         try {

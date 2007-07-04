@@ -106,9 +106,10 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
                 
                 if (WKBEnabled) {
                     if(byteaEnabled) {
-                        sql.append("encode(AsBinary(force_2d(\"" + colName + "\"), 'XDR'),'base64')");
+                        sql.append("AsBinary(force_2d(\"" + colName + "\"), 'XDR') as bytea");
+//                        sql.append("encode(AsBinary(force_2d(\"" + colName + "\"), 'XDR'),'base64')");
                     } else {
-                        sql.append("AsBinary(force_2d(\"" + colName + "\"), 'XDR')");
+//                        sql.append("AsBinary(force_2d(\"" + colName + "\"), 'XDR')");
                     }
                 } else {
                     sql.append("AsText(force_2d(\"" + colName + "\"))");

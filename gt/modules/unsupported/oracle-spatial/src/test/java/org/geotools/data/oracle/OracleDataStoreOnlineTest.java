@@ -29,8 +29,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.sql.DataSource;
+
 import junit.framework.TestCase;
 
+import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
@@ -42,6 +45,7 @@ import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.ConnectionPoolManager;
 import org.geotools.data.jdbc.JDBCDataStoreConfig;
+import org.geotools.data.jdbc.datasource.DataSourceUtil;
 import org.geotools.data.jdbc.fidmapper.MaxIncFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
 import org.geotools.feature.Feature;
@@ -72,13 +76,17 @@ import com.vividsolutions.jts.geom.Polygon;
  * @source $URL$
  */
 public class OracleDataStoreOnlineTest extends TestCase {
-    private ConnectionPool cPool;
     private FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
     private Properties properties;
     private GeometryFactory jtsFactory = new GeometryFactory();
     private String schemaName;
     private OracleDataStore dstore;
     private Connection conn;
+    
+    static {
+        DataStoreFinder.scanForPlugins();
+    }
+    
     /*
      * @see TestCase#setUp()
      */
@@ -87,19 +95,10 @@ public class OracleDataStoreOnlineTest extends TestCase {
         properties = new Properties();
         properties.load(this.getClass().getResourceAsStream("remote.properties"));
         schemaName = properties.getProperty("schema");
-        OracleConnectionFactory fact = new OracleConnectionFactory(properties.getProperty("host"), 
-                properties.getProperty("port"), properties.getProperty("instance"));
-        fact.setLogin(properties.getProperty("user"), properties.getProperty("passwd"));        
-        try {
-        	cPool = fact.getConnectionPool();                    
-            conn = cPool.getConnection();
-        } catch( Throwable t ){
-        	System.out.println("Warning: could not connect, configure "+getClass().getResource("test.properties"));
-        	return;
-        }
-        System.out.println(conn.getTypeMap());
+        
+        dstore =  (OracleDataStore) DataStoreFinder.getDataStore(properties);
+        conn = dstore.getConnection(Transaction.AUTO_COMMIT);
         reset();
-        dstore = new OracleDataStore(cPool, properties.getProperty("schema"), new HashMap());
         dstore.setFIDMapper("ORA_TEST_POINTS", new TypedFIDMapper(new MaxIncFIDMapper("ORA_TEST_POINTS", "ID", Types.INTEGER), "ORA_TEST_POINTS"));
         dstore.setFIDMapper("ORA_TEST_LINES", new TypedFIDMapper(new MaxIncFIDMapper("ORA_TEST_LINES", "ID", Types.INTEGER), "ORA_TEST_LINES"));
         dstore.setFIDMapper("ORA_TEST_POLYGONS", new TypedFIDMapper(new MaxIncFIDMapper("ORA_TEST_POLYGONS", "ID", Types.INTEGER), "ORA_TEST_POLYGONS"));
@@ -415,7 +414,7 @@ public class OracleDataStoreOnlineTest extends TestCase {
         fs.addFeatures(DataUtilities.collection(feature));
 
         // Select is directly from the DB
-        Connection conn = cPool.getConnection();
+        Connection conn = dstore.getConnection(Transaction.AUTO_COMMIT);
         Statement statement = conn.createStatement();
         ResultSet rs = statement.executeQuery("SELECT * FROM ORA_TEST_POINTS WHERE NAME = 'add_name'");
 

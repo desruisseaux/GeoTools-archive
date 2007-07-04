@@ -21,7 +21,8 @@ import java.sql.Statement;
 
 import org.geotools.data.DataTestCase;
 import org.geotools.data.DataUtilities;
-import org.geotools.data.jdbc.ConnectionPool;
+import org.geotools.data.jdbc.datasource.DataSourceUtil;
+import org.geotools.data.jdbc.datasource.ManageableDataSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 
@@ -32,7 +33,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
     PostgisTests.Fixture f;
 
-    ConnectionPool pool;
+    ManageableDataSource pool;
 
     VersionedPostgisDataStore store;
 
@@ -60,8 +61,8 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
 
         f = PostgisTests.newFixture(getFixtureFile());
 
-        pcFactory = new PostgisConnectionFactory(f.host, f.port.intValue(), f.database);
-        pool = pcFactory.getConnectionPool(f.user, f.password);
+        String url = "jdbc:postgresql" + "://" + f.host + ":" + f.port + "/" + f.database;
+        pool = DataSourceUtil.buildDefaultDataSource(url, "org.postgresql.Driver", f.user, f.password, "select now()");
 
         setUpLakeTable();
         setUpRiverTable();
@@ -123,11 +124,7 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
 
     protected void tearDown() throws Exception {
         store = null;
-        if (pcFactory != null && pool != null) {
-            pcFactory.free(pool);
-            pcFactory = null;
-            pool.close();
-        }
+        pool.close();
         super.tearDown();
     }
     

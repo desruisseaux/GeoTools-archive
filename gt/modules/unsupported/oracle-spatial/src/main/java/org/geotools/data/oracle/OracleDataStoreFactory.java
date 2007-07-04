@@ -16,16 +16,18 @@
 package org.geotools.data.oracle;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.sql.DataSource;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
-import org.geotools.data.jdbc.ConnectionPool;
+import org.geotools.data.jdbc.datasource.DataSourceUtil;
+import org.geotools.data.jdbc.datasource.ManageableDataSource;
 
 /**
  * Creates a PostgisDataStore baed on the correct params.
@@ -41,6 +43,7 @@ import org.geotools.data.jdbc.ConnectionPool;
 public class OracleDataStoreFactory implements DataStoreFactorySpi {
 	private static final Logger LOGGER = Logger.getLogger("org.geotools.data.oracle");     
     private static final String JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
+    private static final String JDBC_PATH = "jdbc:oracle:thin:@";
 
     /**
      * Creates a new instance of OracleDataStoreFactory
@@ -153,13 +156,16 @@ public class OracleDataStoreFactory implements DataStoreFactorySpi {
          * all these variables exist.
          */
         String host = (String) HOST.lookUp( params );
-        String port = (String) PORT.lookUp( params );
+        Integer port = (Integer) PORT.lookUp( params );
         String instance = (String) INSTANCE.lookUp( params );
         String user = (String) USER.lookUp( params );
         String passwd = (String) PASSWD.lookUp( params );
         String schema = (String) SCHEMA.lookUp( params ); // checks uppercase
         String namespace = (String) NAMESPACE.lookUp( params );
         String dbtype = (String) DBTYPE.lookUp( params );
+        Integer maxConn = (Integer) MAXCONN.lookUp(params);
+        Integer minConn = (Integer) MINCONN.lookUp(params);
+        Boolean validateConn = (Boolean) VALIDATECONN.lookUp(params);
         
         if( !"oracle".equals( dbtype )){
             throw new IOException( "Parameter 'dbtype' must be oracle");
@@ -168,19 +174,29 @@ public class OracleDataStoreFactory implements DataStoreFactorySpi {
         if (!canProcess(params)) {
             throw new IOException("Cannot connect using provided parameters");
         }
-        try {
-            OracleConnectionFactory ocFactory = new OracleConnectionFactory(host, port, instance);
-            ocFactory.setLogin(user, passwd);
-            ConnectionPool pool = ocFactory.getConnectionPool();
-            
-            
-            OracleDataStore dataStore = new OracleDataStore(pool, namespace, schema, new HashMap());
+        
+        
+        boolean validate = validateConn != null && validateConn.booleanValue();
+        int maxActive = maxConn != null ? maxConn.intValue() : 10;
+        int maxIdle = minConn != null ? minConn.intValue() : 4;
+        DataSource source = getDefaultDataSource(host, user, passwd, port.intValue(), instance, maxActive, maxIdle, validate);
+        OracleDataStore dataStore = new OracleDataStore(source, namespace, schema, new HashMap());
 
-            return dataStore;
-        } catch (SQLException ex) {
-            throw new DataSourceException("Error creating oracle DataSource", ex);
-        }                                                
+        return dataStore;
     }
+    
+    public static ManageableDataSource getDefaultDataSource(String host, String user, String passwd, int port, String instance, int maxActive, int maxIdle, boolean validate) throws DataSourceException {
+        String dbUrl = null;
+        if( instance.startsWith("(") )
+            dbUrl = JDBC_PATH + instance;
+        else if( instance.startsWith("/") )
+            dbUrl = JDBC_PATH + "//" + host + ":" + port + instance;
+        else
+            dbUrl = JDBC_PATH + host + ":" + port + ":" + instance;
+        
+        return DataSourceUtil.buildDefaultDataSource(dbUrl, JDBC_DRIVER, user, passwd, maxActive, maxIdle, validate ? "select sysdate from dual" : null, false, 0);
+    }
+    
     /**
      * Oracle cannot create a new database.
      * @param params
@@ -231,10 +247,16 @@ public class OracleDataStoreFactory implements DataStoreFactorySpi {
 
     static final Param DBTYPE = new Param("dbtype", String.class, "This must be 'oracle'.", true,"oracle");
     static final Param HOST = new Param("host", String.class, "The host name of the server.", true);
-    static final Param PORT = new Param("port", String.class, "The port oracle is running on. " +
+    static final Param PORT = new Param("port", Integer.class, "The port oracle is running on. " +
             "(Default is 1521)", true, "1521");    
     static final Param USER = new Param("user", String.class, "The user name to log in with.", true);
     static final Param PASSWD = new Param("passwd", String.class, "The password.", true);
+    public static final Param MAXCONN = new Param("max connections", Integer.class,
+            "maximum number of open connections", false, new Integer(10));
+    public static final Param MINCONN = new Param("min connections", Integer.class,
+            "minimum number of pooled connection", false, new Integer(4));
+    public static final Param VALIDATECONN = new Param("validate connections", Boolean .class,
+            "check connection is alive before using it", false, Boolean.FALSE);
     static final Param INSTANCE = new Param("instance", String.class, "The name of the Oracle instance to connect to.", true);
     
     /** Apparently Schema must be uppercase */
@@ -283,7 +305,10 @@ public class OracleDataStoreFactory implements DataStoreFactorySpi {
             PORT,
             USER,
             PASSWD,
-            INSTANCE,   
+            INSTANCE,
+            MAXCONN, 
+            MINCONN, 
+            VALIDATECONN, 
             SCHEMA,
             NAMESPACE
         };                

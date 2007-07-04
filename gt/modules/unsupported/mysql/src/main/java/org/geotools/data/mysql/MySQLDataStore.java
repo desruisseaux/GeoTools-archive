@@ -21,11 +21,12 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.logging.Logger;
 
+import javax.sql.DataSource;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
-import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.JDBCDataStore;
 import org.geotools.data.jdbc.JDBCDataStoreConfig;
 import org.geotools.data.jdbc.JDBCFeatureWriter;
@@ -33,6 +34,7 @@ import org.geotools.data.jdbc.QueryData;
 import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.jdbc.attributeio.WKTAttributeIO;
+import org.geotools.data.jdbc.datasource.DataSourceUtil;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.filter.Filter;
@@ -67,47 +69,42 @@ public class MySQLDataStore extends JDBCDataStore {
     private static final Logger LOGGER = Logger.getLogger("org.geotools.data.mysql");
 
     /**
-     * Basic constructor for MySQLDataStore.  Requires creation of a
-     * {@link org.geotools.data.jdbc.ConnectionPool ConnectionPool}, which could
+     * Basic constructor for MySQLDataStore.  
      * be done similar to the following:<br>
-     * <br>
-     * <code>MySQLConnectionFactory connectionFactory = new MySQLConnectionFactory("mysqldb.geotools.org", "3306", "myCoolSchema");</code><br>
-     * <code>ConnectionPool connectionPool = connectionFactory.getConnectionPool("omcnoleg", "myTrickyPassword123");</code><br>
-     * <code>DataStore dataStore = new MySQLDataStore(connectionPool);</code><br>
-     * @param connectionPool a MySQL {@link org.geotools.data.jdbc.ConnectionPool ConnectionPool}
+     * @param dataSource A source of connections for this datastore
      * @throws IOException if the database cannot be properly accessed
-     * @see org.geotools.data.jdbc.ConnectionPool
+     * @see javax.sql.DataSource
      * @see org.geotools.data.mysql.MySQLConnectionFactory
      */
-    public MySQLDataStore(ConnectionPool connectionPool) throws IOException {
-        this(connectionPool, null);
+    public MySQLDataStore(DataSource dataSource) throws IOException {
+        this(dataSource, null);
     }
 
     /**
      * Constructor for MySQLDataStore where the database schema name is provided.
-     * @param connectionPool a MySQL {@link org.geotools.data.jdbc.ConnectionPool ConnectionPool}
+     * @param dataSource A source of connections for this datastore
      * @param databaseSchemaName the database schema.  Can be null.  See the comments for the parameter schemaPattern in {@link java.sql.DatabaseMetaData#getTables(String, String, String, String[]) DatabaseMetaData.getTables}, because databaseSchemaName behaves in the same way.
      * @throws IOException if the database cannot be properly accessed
      */
-    public MySQLDataStore(ConnectionPool connectionPool, String databaseSchemaName)
+    public MySQLDataStore(DataSource dataSource, String databaseSchemaName)
         throws IOException {
-        this(connectionPool, databaseSchemaName, null);
+        this(dataSource, databaseSchemaName, null);
     }
 
     /**
      * Constructor for MySQLDataStore where the database schema name is provided.
-     * @param connectionPool a MySQL {@link org.geotools.data.jdbc.ConnectionPool ConnectionPool}
+     * @param dataSource A source of connections for this datastore
      * @param databaseSchemaName the database schema.  Can be null.  See the comments for the parameter schemaPattern in {@link java.sql.DatabaseMetaData#getTables(String, String, String, String[]) DatabaseMetaData.getTables}, because databaseSchemaName behaves in the same way.
      * @param namespace the namespace for this data store.  Can be null, in which case the namespace will simply be the schema name.
      * @throws IOException if the database cannot be properly accessed
      */
     public MySQLDataStore(
-        ConnectionPool connectionPool,
+        DataSource dataSource,
         String databaseSchemaName,
         String namespace)
         throws IOException {
         super(
-            connectionPool,
+            dataSource,
             JDBCDataStoreConfig.createWithNameSpaceAndSchemaName(namespace, databaseSchemaName));
     }
 
@@ -146,8 +143,10 @@ public class MySQLDataStore extends JDBCDataStore {
         String username,
         String password)
         throws IOException, SQLException {
-        return new MySQLDataStore(
-            new MySQLConnectionFactory(host, port, schema).getConnectionPool(username, password));
+        String url = "jdbc:mysql://" + host + ":" + port + "/" + schema;
+        String driver = "com.mysql.jdbc.Driver";
+        return new MySQLDataStore(DataSourceUtil.buildDefaultDataSource(url, driver, username, password, 
+                "select version()"));
     }
 
     /**

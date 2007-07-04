@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import javax.sql.DataSource;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
@@ -43,38 +45,38 @@ import org.geotools.data.postgis.fidmapper.VersionedFIDMapperFactory;
  */
 class WrappedPostgisDataStore extends PostgisDataStore {
 
-    public WrappedPostgisDataStore(ConnectionPool connectionPool, JDBCDataStoreConfig config,
+    public WrappedPostgisDataStore(DataSource dataSource, JDBCDataStoreConfig config,
             int optimizeMode) throws IOException {
-        super(connectionPool, config, optimizeMode);
+        super(dataSource, config, optimizeMode);
 
     }
 
-    public WrappedPostgisDataStore(ConnectionPool connPool, String schema, String namespace,
+    public WrappedPostgisDataStore(DataSource dataSource, String schema, String namespace,
             int optimizeMode) throws IOException {
-        super(connPool, schema, namespace, optimizeMode);
+        super(dataSource, schema, namespace, optimizeMode);
 
     }
 
-    public WrappedPostgisDataStore(ConnectionPool connPool, String schema, String namespace)
+    public WrappedPostgisDataStore(DataSource dataSource, String schema, String namespace)
             throws IOException {
-        super(connPool, schema, namespace);
+        super(dataSource, schema, namespace);
 
     }
 
-    public WrappedPostgisDataStore(ConnectionPool connPool, String namespace) throws IOException {
-        super(connPool, namespace);
+    public WrappedPostgisDataStore(DataSource dataSource, String namespace) throws IOException {
+        super(dataSource, namespace);
 
     }
 
-    public WrappedPostgisDataStore(ConnectionPool connPool) throws IOException {
-        super(connPool);
+    public WrappedPostgisDataStore(DataSource dataSource) throws IOException {
+        super(dataSource);
 
     }
 
     /**
      * Overridden to store a versioned jdbc transaction state instead
      */
-    protected Connection getConnection(Transaction transaction) throws IOException {
+    public Connection getConnection(Transaction transaction) throws IOException {
         if (transaction != Transaction.AUTO_COMMIT) {
             // we will need to save a JDBC connection is
             // transaction.putState( connectionPool, JDBCState )

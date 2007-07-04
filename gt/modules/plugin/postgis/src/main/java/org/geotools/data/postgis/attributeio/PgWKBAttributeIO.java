@@ -174,7 +174,8 @@ public class PgWKBAttributeIO implements AttributeIO {
 //            	compare(b,b2);
             	if (bytes == null) // ie. its a null column -> return a null geometry!
             		return null;
-                return WKB2Geometry(Base64.decode(bytes));
+//                return WKB2Geometry(Base64.decode(bytes));
+                return WKB2Geometry(bytes);
             } else {
                 return WKB2Geometry(hexToBytes(rs.getString(position)));
             }

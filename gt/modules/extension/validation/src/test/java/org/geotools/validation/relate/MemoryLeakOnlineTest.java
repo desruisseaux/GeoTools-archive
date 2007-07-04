@@ -20,14 +20,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.PropertyResourceBundle;
 
+import javax.sql.DataSource;
+
 import junit.framework.TestCase;
 
 import org.geotools.data.DataTestCase;
-import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.JDBCDataStoreConfig;
+import org.geotools.data.jdbc.datasource.DataSourceUtil;
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
-import org.geotools.data.postgis.PostgisConnectionFactory;
 import org.geotools.data.postgis.PostgisDataStore;
 import org.geotools.validation.ValidationResults;
 
@@ -64,7 +65,6 @@ import org.geotools.validation.ValidationResults;
 public class MemoryLeakOnlineTest extends DataTestCase {
     
     PostgisDataStore data;
-    ConnectionPool pool;
     String database;    
 
     /**
@@ -103,11 +103,9 @@ public class MemoryLeakOnlineTest extends DataTestCase {
                 "The fixture.properties file needs to be configured for your own database");
         }
 
-        PostgisConnectionFactory factory1 = new PostgisConnectionFactory(host, port, database);
-        pool = factory1.getConnectionPool(user, password);
-        
+        DataSource ds = DataSourceUtil.buildDefaultDataSource("jdbc:postgresql://" + host + ":" + port + "/" + database, "org.postgresql.Driver", user, password, null);
         JDBCDataStoreConfig config = JDBCDataStoreConfig.createWithNameSpaceAndSchemaName( namespace, schema );        
-        data = new PostgisDataStore(pool, config, PostgisDataStore.OPTIMIZE_SAFE);
+        data = new PostgisDataStore(ds, config, PostgisDataStore.OPTIMIZE_SAFE);
         BasicFIDMapper basic = new BasicFIDMapper("tid", 255, false);
         TypedFIDMapper typed = new TypedFIDMapper( basic, "trim_utm10");
         data.setFIDMapper("trim_utm10", typed );        
