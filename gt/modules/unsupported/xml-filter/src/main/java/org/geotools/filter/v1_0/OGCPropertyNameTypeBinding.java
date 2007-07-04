@@ -100,6 +100,11 @@ public class OGCPropertyNameTypeBinding extends AbstractComplexBinding {
         Expression expression = (Expression) value;
         String xpath = Filters.asString(expression);
 
+        //if null returned, assume empty string == default geometry
+        if (xpath == null) {
+            xpath = "";
+        }
+
         return factory.property(xpath);
     }
 
