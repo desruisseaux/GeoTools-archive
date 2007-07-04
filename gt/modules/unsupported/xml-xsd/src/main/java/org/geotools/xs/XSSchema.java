@@ -18,6 +18,8 @@ package org.geotools.xs;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
@@ -424,7 +426,7 @@ public class XSSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType DATETIME_TYPE = AttributeTypeFactory
-        .newAttributeType("dateTime", Calendar.class);
+        .newAttributeType("dateTime", Timestamp.class);
 
     /**
      * <p>
@@ -1008,7 +1010,7 @@ public class XSSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType TIME_TYPE = AttributeTypeFactory
-        .newAttributeType("time", Calendar.class);
+        .newAttributeType("time", Time.class);
 
     /**
      * <p>
@@ -1168,7 +1170,7 @@ public class XSSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType DATE_TYPE = AttributeTypeFactory
-        .newAttributeType("date", Date.class);
+        .newAttributeType("date", java.sql.Date.class);
 
     /**
      * <p>
