@@ -1,14 +1,11 @@
 package org.geotools.transformations;
 
-import java.awt.image.DataBuffer;
 import java.awt.image.RenderedImage;
-import java.awt.image.WritableRaster;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.media.jai.RasterFactory;
 import javax.media.jai.RenderedOp;
 
 import org.geotools.coverage.FactoryFinder;
@@ -20,17 +17,17 @@ import org.geotools.coverage.processing.DefaultProcessor;
 import org.geotools.coverage.processing.Operations;
 import org.geotools.factory.Hints;
 import org.geotools.gce.image.WorldImageReader;
-import org.geotools.gce.image.WorldImageWriter;
 import org.geotools.geometry.DirectPosition2D;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultDerivedCRS;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.operation.DefaultOperationMethod;
-import org.geotools.referencing.operation.builder.LocalizationGridBuilder;
+import org.geotools.referencing.operation.builder.IDWGridBuilder;
 import org.geotools.referencing.operation.builder.MappedPosition;
+import org.geotools.referencing.operation.builder.WarpGridBuilder;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
-import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -130,18 +127,23 @@ public class GridDemo {
             URL url = null;
 
             url = new File("/home/jezekjan/gsoc/geodata/p1010099.tif").toURL();
-            
+            url = new File("/media/sda5/Dokumenty/geodata/rasters/Mane_3_1_4.tif").toURL();
             WorldImageReader reader = new WorldImageReader(url);
             Operations operations = new Operations(null);                               
             GridCoverage2D coverage = (GridCoverage2D)reader.read(null);
             Envelope env = coverage.getEnvelope();
-            List vectors = generateMappedPositions(env,10, 0.02);
             
-            LocalizationGridBuilder gridBuilder = new LocalizationGridBuilder(vectors, 0.7,0.7, env, coverage.getGridGeometry().getGridToCRS().inverse());
+            System.out.println(coverage.getGridGeometry().getGridRange());
+            List vectors = generateMappedPositions(env,50, 2000);
+            
+            WarpGridBuilder gridBuilder = new IDWGridBuilder(vectors, 300,300, env, coverage.getGridGeometry().getGridToCRS().inverse());
               
             MathTransform  trans = gridBuilder.getMathTransform();
             
+            DirectPosition2D target = new DirectPosition2D();
             
+            trans.transform(new DirectPosition2D(coverage.getCoordinateReferenceSystem(),14,50 ), target);
+            System.out.println(target);
             System.out.println(((AbstractMathTransform)trans).getParameterDescriptors());
           
    //////******************New reference System***************************///////
@@ -156,12 +158,13 @@ public class GridDemo {
           
    //////******************Show Source***************************///////
                     
-            coverage.show();
+           // coverage.show();
             
-            
+            Envelope envelope = CRS.transform(coverage.getGridGeometry().getGridToCRS().inverse(),coverage.getEnvelope());
+                      
             //coverage.gridGeometry.
-            //(new GridCoverageFactory()).create("",gridBuilder.getDxGrid(),coverage.getEnvelope()).show();
-            //(new GridCoverageFactory()).create("",gridBuilder.getDyGrid(),coverage.getEnvelope()).show();
+           (new GridCoverageFactory()).create("",gridBuilder.getDxGrid(),coverage.getEnvelope()).show();
+           (new GridCoverageFactory()).create("",gridBuilder.getDyGrid(),coverage.getEnvelope()).show();
              
            // Viewer.show((GridCoverage2D)coverage, null);
             
@@ -171,8 +174,8 @@ public class GridDemo {
             
          //   GridCoverage2D coverage2 = generateCoverage2D(460,460,coverage.getEnvelope()) ;           
             
-            WritableRaster raster = RasterFactory.createBandedRaster(DataBuffer.TYPE_FLOAT,
-        (int)coverage.getEnvelope2D().width, (int)coverage.getEnvelope2D().height, 1, null);
+          //  WritableRaster raster = RasterFactory.createBandedRaster(DataBuffer.TYPE_FLOAT,
+        //(int)coverage.getEnvelope2D().width, (int)coverage.getEnvelope2D().height, 1, null);
          
               
             GridCoverage2D target1 = projectTo((GridCoverage2D)coverage,  gridCRS, (GridGeometry2D)coverage.getGridGeometry(), null, false);
@@ -198,10 +201,10 @@ public class GridDemo {
 /**/
            
 
-            WorldImageWriter writer = new WorldImageWriter((Object) (new File(
-                        "/home/jezekjan/gsoc/geodata/p.tif")));
+        //    WorldImageWriter writer = new WorldImageWriter((Object) (new File(
+           //             "/home/jezekjan/gsoc/geodata/p.tif")));
             
-            writer.write(target1, null);
+          //  writer.write(target1, null);
            
         } catch (Exception e) {
             // TODO Auto-generated catch block

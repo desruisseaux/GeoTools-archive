@@ -41,7 +41,7 @@ import org.geotools.referencing.operation.transform.WarpTransform2D;
  * @author jezekjan
  *
  */
-public class WarpGridBuilder extends MathTransformBuilder {
+public abstract class WarpGridBuilder extends MathTransformBuilder {
     /**
      * Grid width
      */
@@ -84,7 +84,7 @@ public class WarpGridBuilder extends MathTransformBuilder {
     private float[] warpPositions;
 
     /**
-     * Construts Builder from
+     * Construts Builder 
      * @param vectors
      * @param dx The horizontal spacing between grid cells.
      * @param dy The vertical spacing between grid cells.
@@ -102,13 +102,7 @@ public class WarpGridBuilder extends MathTransformBuilder {
         globalValues = new GridParamValues(envelope, realToGrid, dx, dy);
 
         super.setMappedPositions(transformMPToGrid(vectors));
-
-        warpPositions = (float[]) globalValues.WarpGridParameters.parameter("warpPositions")
-                                                                 .getValue();
-
-        this.envelope = envelope;
-
-        this.computeWarpGrid();
+        this.envelope = envelope;                     
     }
 
     /**
@@ -135,6 +129,7 @@ public class WarpGridBuilder extends MathTransformBuilder {
         }
 
         return localpositions;
+        
     }
 
     private void ensureVectorsInsideEnvelope() {
@@ -147,6 +142,13 @@ public class WarpGridBuilder extends MathTransformBuilder {
      * @see org.geotools.referencing.operation.builder.MathTransformBuilder#computeMathTransform()
      */
     protected MathTransform computeMathTransform() throws FactoryException {
+    	if (warpPositions == null ){
+    		warpPositions =  (float[]) globalValues.WarpGridParameters.parameter("warpPositions")
+                                                                     .getValue();
+    		warpPositions = this.computeWarpGrid(globalValues.WarpGridParameters);
+    		globalValues.setGridWarpPostions(warpPositions);
+    	}
+    	
         return (WarpTransform2D) (new WarpGridTransform2D.Provider()).createMathTransform(globalValues
             .getWarpGridParameters());
     }
@@ -163,7 +165,7 @@ public class WarpGridBuilder extends MathTransformBuilder {
      * Computes GridWarp Positions using IDW interpolatio.
      *
      */
-    private void computeWarpGrid() {
+    abstract protected float[] computeWarpGrid(ParameterValueGroup values);/* {
         ParameterValueGroup WarpParams = globalValues.WarpGridParameters;
 
         for (int i = 0; i <= WarpParams.parameter("yNumCells").intValue(); i++) {
@@ -184,113 +186,59 @@ public class WarpGridBuilder extends MathTransformBuilder {
 
                 warpPositions[(i * ((1 + WarpParams.parameter("xNumCells").intValue()) * 2))
                 + (2 * j) + 1] = (float) y;
+            }                        
+        }       
+      
+        return warpPositions;
+    }*/
+
+    public float[][] getDxGrid() {
+        if ((dxgrid == null) || (dxgrid.length == 0)) {
+            ParameterValueGroup WarpParams = globalValues.WarpGridParameters;
+            final int xNumCells = WarpParams.parameter("xNumCells").intValue();
+            final int yNumCells = WarpParams.parameter("yNumCells").intValue();
+            final int xStep = WarpParams.parameter("xStep").intValue();
+            final int yStep = WarpParams.parameter("yStep").intValue();
+
+            final float[] warpPositions = (float[]) WarpParams.parameter("warpPositions").getValue();
+
+            dxgrid = new float[xNumCells + 1][yNumCells + 1];
+
+            for (int i = 0; i <= WarpParams.parameter("yNumCells").intValue(); i++) {
+                for (int j = 0; j <= WarpParams.parameter("xNumCells").intValue(); j++) {
+                    dxgrid[j][i] = (float) warpPositions[(int) ((i * (1 + xNumCells) * 2) + (2 * j))]
+                        - (j * xStep);
+                }
             }
         }
 
-        globalValues.setGridWarpPostions(warpPositions);
-    }
-
-    public float[][] getDxGrid() {
         return dxgrid;
     }
 
     public float[][] getDyGrid() {
+        if ((dygrid == null) || (dygrid.length == 0)) {
+            ParameterValueGroup WarpParams = globalValues.WarpGridParameters;
+            final int xNumCells = WarpParams.parameter("xNumCells").intValue();
+            final int yNumCells = WarpParams.parameter("yNumCells").intValue();
+            final int xStep = WarpParams.parameter("xStep").intValue();
+            final int yStep = WarpParams.parameter("yStep").intValue();
+
+            final float[] warpPositions = (float[]) WarpParams.parameter("warpPositions").getValue();
+
+            dygrid = new float[xNumCells + 1][yNumCells + 1];
+
+            for (int i = 0; i <= WarpParams.parameter("yNumCells").intValue(); i++) {
+                for (int j = 0; j <= WarpParams.parameter("xNumCells").intValue(); j++) {
+                    dygrid[j][i] = (float) warpPositions[(int) ((i * (1 + xNumCells) * 2) + (2 * j)+1)]
+                        - (i * yStep);
+                }
+            }
+        }
+
         return dygrid;
     }
 
-    /**
-     * Calculates the real point shift from the iregular pairs of MappedPositions using
-     * Inverse distance weighting interpolation. The distance is cartesian.
-     * @param p position where we requaired the shift to be calculated
-     * @return
-     */
-    private Point2D calculateShift(Point2D p) {
-        double maxdist = (globalValues.WarpGridParameters.parameter("xStep").intValue() * globalValues.WarpGridParameters.parameter(
-                "xNumCells").intValue())
-            + (globalValues.WarpGridParameters.parameter("yStep").intValue() * globalValues.WarpGridParameters.parameter(
-                "yNumCells").intValue());
-
-        HashMap nearest = getNearestMappedPositions(p, maxdist, 8);
-
-        double dx;
-        double sumdx = 0;
-        double dy = 0;
-        double sumdy = 0;
-        double sumweight = 0;
-
-        for (Iterator i = nearest.keySet().iterator(); i.hasNext();) {
-            MappedPosition mp = (MappedPosition) i.next();
-            double distance = ((Double) nearest.get(mp)).doubleValue();
-            double weight = (1 / Math.pow(distance, 2));
-
-            if (distance > 0.000001) {
-                sumdx = sumdx
-                    + ((mp.getSource().getCoordinates()[0] - mp.getTarget().getCoordinates()[0]) * weight);
-                sumdy = sumdy
-                    + ((mp.getSource().getCoordinates()[1] - mp.getTarget().getCoordinates()[1]) * weight);
-
-                sumweight = sumweight + weight;
-            } else {
-                dx = (mp.getSource().getCoordinates()[0] - mp.getTarget().getCoordinates()[0]);
-                dy = (mp.getSource().getCoordinates()[1] - mp.getTarget().getCoordinates()[1]);
-
-                return (new DirectPosition2D(dx, dy));
-            }
-        }
-
-        dx = sumdx / sumweight;
-        dy = sumdy / sumweight;
-
-        return (new DirectPosition2D(dx, dy));
-    }
-
-    /**
-     *
-     * @param p
-     * @param maxdistance
-     * @return
-     */
-    private HashMap getNearestMappedPositions(Point2D p, double maxdistance) {
-        return getNearestMappedPositions(p, maxdistance, this.getSourcePoints().length);
-    }
-
-    /**
-     *
-     * @param p
-     * @param maxnumber
-     * @return
-     */
-    private HashMap getNearestMappedPositions(Point2D p, int maxnumber) {
-        return getNearestMappedPositions(p, (envelope.getLength(0) + envelope.getLength(1)),
-            this.getSourcePoints().length);
-    }
-
-    /**
-     * Computes nearest points.
-     * @param p
-     * @param maxdistance
-     * @param number
-     * @return
-     *
-     * @todo consider some indexing mechanism for finding the nearest positions
-     */
-    private HashMap getNearestMappedPositions(Point2D p, double maxdistance, int maxnumber) {
-        HashMap nearest = new HashMap();
-        MappedPosition mp = null;
-
-        for (Iterator i = this.getMappedPositions().iterator(); i.hasNext();) {
-            mp = (MappedPosition) i.next();
-
-            double dist = p.distance((Point2D) mp.getSource());
-
-            if ((dist < maxdistance) && (nearest.size() < maxnumber)) {
-                nearest.put(mp, new Double(dist));
-            }
-        }
-
-        return nearest;
-    }
-
+  
     /**
      *
      * @author jezekjan
