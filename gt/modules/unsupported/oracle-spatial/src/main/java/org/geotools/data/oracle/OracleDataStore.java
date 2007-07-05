@@ -23,6 +23,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.sql.DataSource;
@@ -371,7 +372,7 @@ public class OracleDataStore extends JDBCDataStore {
 	    	return ref;
 	    }
     	catch( Exception erp ){
-    		LOGGER.warning( erp.toString() );
+    		LOGGER.log(Level.WARNING, "Exception occurred computing the bbox", erp);
     		return null;
     	}
 	    finally{
