@@ -823,7 +823,8 @@ public final class StreamingRenderer implements GTRenderer {
 				canTransform = false;
 				query = new DefaultQuery(schema.getTypeName());
 				query.setPropertyNames(attributes);
-				if (envelope.intersects(source.getBounds())) {
+				Envelope bounds = source.getBounds();
+				if (bounds != null && envelope.intersects(bounds)) {
 					LOGGER
 							.fine(new StringBuffer(
 									"Got a tranform exception while trying to de-project the current ")
