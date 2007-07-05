@@ -147,8 +147,18 @@ public abstract class AbstractAuthorityMediator extends
     protected AbstractAuthorityMediator(int priority, Hints hints) {
         this(priority, ObjectCaches.create(hints), ReferencingFactoryContainer
                 .instance(hints));
-        //TODO: add hints to improve pool configuration
-        //poolConfig
+        if (hints.containsKey(Hints.AUTHORITY_POOL_MIN_IDLE)) {
+            poolConfig.minIdle = ((Integer) hints.get(Hints.AUTHORITY_POOL_MIN_IDLE)).intValue();
+        }
+        if (hints.containsKey(Hints.AUTHORITY_POOL_MAX_IDLE)) {
+            poolConfig.maxIdle = ((Integer) hints.get(Hints.AUTHORITY_POOL_MAX_IDLE)).intValue();
+        }
+        if (hints.containsKey(Hints.AUTHORITY_POOL_MAX_ACTIVE)) {
+            poolConfig.maxActive = ((Integer) hints.get(Hints.AUTHORITY_POOL_MAX_ACTIVE)).intValue();
+        }
+        if (hints.containsKey(Hints.AUTHORITY_POOL_MAX_WAIT)) {
+            poolConfig.maxWait = ((Integer) hints.get(Hints.AUTHORITY_POOL_MAX_WAIT)).intValue();
+        }
     }
 
     /**

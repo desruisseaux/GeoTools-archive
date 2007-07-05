@@ -468,6 +468,51 @@ public final class Hints extends RenderingHints {
     public static final IntegerKey BUFFER_LIMIT = new IntegerKey(50);
 
     /**
+     * Max active controls the maximum number of objects that can be borrowed
+     * from the pool at one time. When non-positive, there is no limit to the
+     * number of objects that may be active at one time. When maxActive is
+     * exceeded, the pool is said to be exhausted.
+     * 
+     * @since 2.4
+     */
+    public static final IntegerKey AUTHORITY_POOL_MAX_ACTIVE = new IntegerKey(8);
+    
+    /**
+     * Minimum number of objects allowed in the pool before the evictor thread (if active) spawns new objects.
+     *
+     * @since 2.4
+     */
+    public static final IntegerKey AUTHORITY_POOL_MIN_IDLE = new IntegerKey(0);
+    
+    /**
+     * Max idle controls the maximum number of objects that can sit idle in the
+     * pool at any time. When negative, there is no limit to the number of
+     * objects that may be idle at one time.
+     * 
+     * @since 2.4
+     */
+    public static final IntegerKey AUTHORITY_POOL_MAX_IDLE = new IntegerKey(8);
+    
+    /**
+     * If a positive maxWait value is supplied, the borrowObject() will block
+     * for at most that many milliseconds, after which a NoSuchElementException
+     * will be thrown. If maxWait is non-positive, the borrowObject() method
+     * will block indefinitely.
+     * 
+     * @since 2.4
+     */
+    public static final IntegerKey AUTHORITY_POOL_MAX_WAIT = new IntegerKey(-1);
+
+    //public static final IntegerKey AUTHORITY_POOL_MIN_EVICT_IDLETIME = new IntegerKey(1800000);
+    //public static final IntegerKey AUTHORITY_POOL_SOFTMIN_EVICT_IDLETIME = new IntegerKey(1800000);
+    
+    //public static final OptionKey AUTHORITY_POOL_TEST_ON_BORROW = new OptionKey("true", "false");
+    //public static final OptionKey AUTHORITY_POOL_TEST_ON_RETURN = new OptionKey("true", "false");
+    //public static final OptionKey AUTHORITY_POOL_TEST_WHILE_IDLE = new OptionKey("true", "false");
+    //public static final IntegerKey AUTHORITY_POOL_TIME_BETWEEN_EVICTION_RUNS = new IntegerKey(-1);
+    
+    
+    /**
      * Version number of the requested service. This hint is used for example in order to get
      * a {@linkplain org.opengis.referencing.crs.CRSAuthorityFactory CRS authority factory}
      * backed by a particular version of EPSG database. The value should be an instance of
