@@ -30,6 +30,7 @@ import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
+import javax.imageio.ImageReader;
 
 // OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection;
@@ -107,7 +108,8 @@ public class NetcdfMetadata extends GeographicMetadata {
      * {@link ucar.nc2.dataset.CoordSysBuilder#addCoordinateSystems} should have been invoked
      * (if needed) before this constructor.
      */
-    public NetcdfMetadata(final NetcdfDataset file) {
+    public NetcdfMetadata(final ImageReader reader, final NetcdfDataset file) {
+        super(reader);
         final List/*<CoordinateSystem>*/ systems = file.getCoordinateSystems();
         if (!systems.isEmpty()) {
             addCoordinateSystem((CoordinateSystem) systems.get(0));
@@ -120,7 +122,8 @@ public class NetcdfMetadata extends GeographicMetadata {
      * {@link ucar.nc2.dataset.CoordSysBuilder#addCoordinateSystems} should have been invoked
      * (if needed) before this constructor.
      */
-    public NetcdfMetadata(final VariableDS variable) {
+    public NetcdfMetadata(final ImageReader reader, final VariableDS variable) {
+        super(reader);
         final List/*<CoordinateSystem>*/ systems = variable.getCoordinateSystems();
         if (!systems.isEmpty()) {
             addCoordinateSystem((CoordinateSystem) systems.get(0));
@@ -359,7 +362,7 @@ public class NetcdfMetadata extends GeographicMetadata {
      * Convenience method for logging a warning.
      */
     private void warning(final String method, final int key, final Object value) {
-        final LogRecord record = Errors.getResources(getWarningLocale()).
+        final LogRecord record = Errors.getResources(getLocale()).
                 getLogRecord(Level.WARNING, key, value);
         record.setSourceClassName(NetcdfMetadata.class.getName());
         record.setSourceMethodName(method);

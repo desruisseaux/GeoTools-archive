@@ -680,7 +680,7 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
      * it would not work for warnings emitted by the {@link #getDate} method.
      */
     final void warning(final String method, final int key, final Object value) {
-        final LogRecord record = Errors.getResources(metadata.getWarningLocale()).
+        final LogRecord record = Errors.getResources(metadata.getLocale()).
                 getLogRecord(Level.WARNING, key, value);
         record.setSourceClassName(MetadataAccessor.class.getName());
         record.setSourceMethodName(method);

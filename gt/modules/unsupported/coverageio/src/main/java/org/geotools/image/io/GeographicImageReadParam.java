@@ -32,13 +32,13 @@ import org.geotools.resources.XArray;
 import org.geotools.resources.XMath;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.ResourceBundle;
+import org.geotools.resources.i18n.IndexedResourceBundle;
 import org.geotools.resources.image.ComponentColorModelJAI;
 import org.geotools.util.NumberRange;
 
 
 /**
- * Default parameters for {@link SimpleImageReader}. This class provides convenience methods for
+ * Default parameters for {@link StreamImageReader}. This class provides convenience methods for
  * {@linkplain #setDestinationType setting the destination type} from expected minimum and maximum
  * values, and from a color palette.
  *
@@ -47,7 +47,7 @@ import org.geotools.util.NumberRange;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class SimpleImageReadParam extends ImageReadParam {
+public class GeographicImageReadParam extends ImageReadParam {
     /**
      * The name of the color palette.
      */
@@ -73,14 +73,14 @@ public class SimpleImageReadParam extends ImageReadParam {
      *
      * @param reader The reader for which this parameter block is created
      */
-    public SimpleImageReadParam(final ImageReader reader) {
+    public GeographicImageReadParam(final ImageReader reader) {
         locale = (reader != null) ? reader.getLocale() : null;
     }
 
     /**
      * Returns the resources for formatting error messages.
      */
-    private ResourceBundle getErrorResources() {
+    private IndexedResourceBundle getErrorResources() {
         return Errors.getResources(locale);
     }
 

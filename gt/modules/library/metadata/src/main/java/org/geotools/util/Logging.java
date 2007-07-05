@@ -181,10 +181,10 @@ public final class Logging {
 
     /**
      * Invoked when an unexpected error occurs. This method logs a message at the
-     * {@link Level#WARNING WARNING} level to the logger for the specified package
-     * name. The originating class name and method name can optionnaly be specified.
-     * If any of them is {@code null}, then it will be inferred from the error stack
-     * trace as in {@link #unexpectedException(Logger, Throwable)}.
+     * {@link Level#WARNING WARNING} level to the specified logger. The originating
+     * class name and method name can optionnaly be specified. If any of them is
+     * {@code null}, then it will be inferred from the error stack trace as in
+     * {@link #unexpectedException(Logger, Throwable)}.
      * <p>
      * Explicit value for class and method names are sometime preferred to automatic
      * inference for the following reasons:
@@ -198,6 +198,27 @@ public final class Logging {
      *       private method. If a developper really want to know about the private method,
      *       the stack trace is still available anyway.</p></li>
      * </ul>
+     * 
+     * @param logger  Where to log the error.
+     * @param classe  The class where the error occurred, or {@code null}.
+     * @param method  The method where the error occurred, or {@code null}.
+     * @param error   The error.
+     *
+     * @since 2.4
+     */
+    public static void unexpectedException(final Logger logger, final Class classe,
+                                           final String method, final Throwable error)
+    {
+        // TODO: Refactor in order to use directly the logger after we removed the deprecated method.
+        unexpectedException(logger.getName(), classe, method, error);
+    }
+
+    /**
+     * Invoked when an unexpected error occurs. This method logs a message at the
+     * {@link Level#WARNING WARNING} level to the logger for the specified package
+     * name. The originating class name and method name can optionnaly be specified.
+     * If any of them is {@code null}, then it will be inferred from the error stack
+     * trace as in {@link #unexpectedException(Logger, Throwable)}.
      * 
      * @param paquet  The package where the error occurred, or {@code null}. This
      *                information is used for fetching an appropriate {@link Logger}

@@ -28,7 +28,7 @@ import javax.imageio.stream.ImageInputStream;
 
 // Geotools dependencies
 import org.geotools.io.LineFormat;
-import org.geotools.image.io.SimpleImageReader;
+import org.geotools.image.io.StreamImageReader;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 
@@ -50,7 +50,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public abstract class TextImageReader extends SimpleImageReader {
+public abstract class TextImageReader extends StreamImageReader {
     /**
      * Type des images les plus proches du format de l'image. Ce type
      * devrait être une des constantes {@link DataBuffer#TYPE_FLOAT},
@@ -361,7 +361,7 @@ public abstract class TextImageReader extends SimpleImageReader {
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    public static abstract class Spi extends SimpleImageReader.Spi {
+    public static abstract class Spi extends StreamImageReader.Spi {
         /**
          * List of legal input types for {@link TextImageReader}.
          */

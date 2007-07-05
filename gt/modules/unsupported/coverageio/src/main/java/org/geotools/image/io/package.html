@@ -7,14 +7,14 @@
   <BODY>
     Extensions to {@link javax.imageio.ImageReader} for binary and ASCII files.
 
-    <P ALIGN="justify">{@link org.geotools.image.io.SimpleImageReader} is the base
+    <P ALIGN="justify">{@link org.geotools.image.io.StreamImageReader} is the base
     class for image decoders reading stream with few (if any) meta-data. Examples
     of such streams are matrix containing the pixels values in a binary form (RAW
     images), or ASCII files containing values written as decimal numbers. Such files
     contain often geophysical values (e.g. temperature in Celsius degrees, elevation
     in metres, etc.) better represented as floating point numbers than integers.</P>
 
-    <P ALIGN="justify">By default, {@link org.geotools.image.io.SimpleImageReader}
+    <P ALIGN="justify">By default, {@link org.geotools.image.io.StreamImageReader}
     stores decoded image using data type {@link java.awt.image.DataBuffer#TYPE_FLOAT}
     and a grayscale color space. This politic produce images matching closely the
     original data, i.e. it involves as few transformations as possible. But

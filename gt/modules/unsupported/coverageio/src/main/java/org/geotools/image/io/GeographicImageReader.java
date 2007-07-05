@@ -19,6 +19,7 @@ package org.geotools.image.io;
 import java.util.Iterator;
 import java.util.Collections;
 import java.util.logging.Logger;
+import java.util.logging.LogRecord;
 
 import java.awt.Rectangle;
 import java.awt.image.ColorModel;
@@ -29,20 +30,55 @@ import java.io.IOException;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageTypeSpecifier;
-import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.spi.ImageReaderSpi;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.event.IIOReadWarningListener;
 
 import org.geotools.util.NumberRange;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Locales;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.ResourceBundle;
+import org.geotools.resources.i18n.IndexedResourceBundle;
 import org.geotools.image.io.metadata.GeographicMetadata;
 
 
 /**
- * Base class for reader of geographic images.
+ * Base class for reader of geographic images. The default implementation assumes that only one
+ * {@linkplain ImageTypeSpecifier image type} is supported (as opposed to the arbitrary number
+ * allowed by the standard {@link ImageReader}). It also provides a default image type built
+ * automatically from a color palette and a range of valid values.
+ * <p>
+ * More specifically, this class provides the following conveniences to implementors:
+ *
+ * <ul>
+ *   <li><p>Provides default {@link #getNumImages} and {@link #getNumBands} implementations,
+ *       which return 1. This default behavior matches simple image formats like flat binary
+ *       files or ASCII files. Those methods need to be overrided for more complex image
+ *       formats.</p></li>
+ *
+ *   <li><p>Provides {@link #checkImageIndex} and {@link #checkBandIndex} convenience methods.
+ *       Those methods are invoked by most implementation of public methods. They perform their
+ *       checks based on the informations provided by the above-cited {@link #getNumImages} and
+ *       {@link #getNumBands} methods.</p></li>
+ *
+ *   <li><p>Provides default implementations of {@link #getImageTypes} and {@link #getRawImageType},
+ *       which assume that only one {@linkplain ImageTypeSpecifier image type} is supported. The
+ *       default image type is created from the informations provided by {@link #getRawDataType}
+ *       and {@link #getImageMetadata}.</p></li>
+ *
+ *   <li><p>Provides {@link #getStreamMetadata} and {@link #getImageMetadata} default
+ *       implementations, which return {@code null} as authorized by the specification.
+ *       Note that subclasses should consider returning {@link GeographicMetadata} instances.</p></li>
+ * </ul>
+ * 
+ * Images may be flat binary or ASCII files with no meta-data and no color information.
+ * Their pixel values may be floating point values instead of integers. The default
+ * implementation assumes floating point values and uses a grayscale color space scaled
+ * to fit the range of values. Displaying such an image may be very slow. Consequently,
+ * users who want to display image are encouraged to change data type and color space with
+ * <a href="http://java.sun.com/products/java-media/jai/">Java Advanced Imaging</a>
+ * operators after reading.
  *
  * @since 2.4
  * @source $URL$
@@ -108,7 +144,7 @@ public abstract class GeographicImageReader extends ImageReader {
     /**
      * Returns the resources for formatting error messages.
      */
-    final ResourceBundle getErrorResources() {
+    final IndexedResourceBundle getErrorResources() {
         return Errors.getResources(getLocale());
     }
 
@@ -244,7 +280,8 @@ public abstract class GeographicImageReader extends ImageReader {
         if (candidate instanceof GeographicMetadata) {
             parser = (GeographicMetadata) candidate;
         } else {
-            parser = new GeographicMetadata(candidate);
+            parser = new GeographicMetadata(this);
+            parser.mergeTree(candidate);
         }
         if (metadata == null) {
             metadata = new GeographicMetadata[Math.max(imageIndex+1, 4)];
@@ -252,8 +289,6 @@ public abstract class GeographicImageReader extends ImageReader {
         if (imageIndex >= metadata.length) {
             metadata = (GeographicMetadata[]) XArray.resize(metadata, Math.max(imageIndex+1, metadata.length*2));
         }
-        parser.setWarningListeners(warningListeners);
-        parser.setWarningLocale(getLocale());
         metadata[imageIndex] = parser;
         return parser;
     }
@@ -324,7 +359,7 @@ public abstract class GeographicImageReader extends ImageReader {
         final int bandIndex = 0; // TODO
         final int dataType = getRawDataType(imageIndex);
         final NumberRange range = getExpectedRange(imageIndex, bandIndex);
-        return SimpleImageReadParam.getImageTypeSpecifier(dataType, range, numDstBand);
+        return GeographicImageReadParam.getImageTypeSpecifier(dataType, range, numDstBand);
     }
 
     /**
@@ -417,16 +452,30 @@ public abstract class GeographicImageReader extends ImageReader {
     }
 
     /**
-     * Restores the {@code SimpleImageReader} to its initial state.
+     * Invoked when a warning occured. The default implementation make the following choice:
+     * <p>
+     * <ul>
+     *   <li>If at least one {@linkplain IIOReadWarningListener warning listener}
+     *       has been {@linkplain #addIIOReadWarningListener specified}, then the
+     *       {@link IIOReadWarningListener#warningOccurred warningOccurred} method is
+     *       invoked for each of them and the log record is <strong>not</strong> logged.</li>
+     *
+     *   <li>Otherwise, the log record is sent to the {@linkplain #LOGGER logger}.</li>
+     * </ul>
+     *
+     * Subclasses may override this method if more processing is wanted, or for
+     * throwing exception if some warnings should be considered as fatal errors.
      */
-    //@Override
-    public void reset() {
-        metadata = null;
-        super.reset();
+    public void warningOccurred(final LogRecord record) {
+        if (warningListeners == null) {
+            LOGGER.log(record);
+        } else {
+            processWarningOccurred(IndexedResourceBundle.format(record));
+        }
     }
 
     /**
-     * To be overriden and made {@code protected} by {@link SimpleImageReader} only.
+     * To be overriden and made {@code protected} by {@link StreamImageReader} only.
      */
     void close() throws IOException {
         metadata = null;

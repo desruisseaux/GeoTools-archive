@@ -23,10 +23,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.Iterator;
-import java.util.Collection;
-import java.util.logging.Logger;
 import java.util.logging.LogRecord;
+import javax.imageio.ImageReader;
+import javax.imageio.ImageWriter;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.metadata.IIOMetadataNode;
 import javax.imageio.metadata.IIOInvalidTreeException;
@@ -38,6 +37,7 @@ import org.geotools.util.LoggedFormat;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.OptionalDependencies;
+import org.geotools.image.io.GeographicImageReader;
 
 
 /**
@@ -57,6 +57,12 @@ import org.geotools.resources.OptionalDependencies;
  * @author Martin Desruisseaux
  */
 public class GeographicMetadata extends IIOMetadata {
+    /**
+     * The {@link ImageReader} or {@link ImageWriter} that holds the metadata,
+     * or {@code null} if none.
+     */
+    private final Object owner;
+
     /**
      * The root node to be returned by {@link #getAsTree}.
      */
@@ -81,25 +87,17 @@ public class GeographicMetadata extends IIOMetadata {
     private ChildList/*<Bands>*/ bands;
 
     /**
-     * The locale for error messages.
-     */
-    private Locale locale = Locale.getDefault();
-
-    /**
      * The standard date format. Will be created only when first needed.
      */
     private transient LoggedFormat/*<Date>*/ dateFormat;
 
     /**
-     * Registered warning listeners, or {@code null} if none.
-     */
-    private transient Collection/*<IIOReadWarningListener>*/ warningListeners;
-
-    /**
      * Creates a default metadata instance. This constructor defines no standard or native format.
      * The only format defined is the {@linkplain GeographicMetadataFormat geographic} one.
+     *
+     * @param reader The source image reader, or {@code null} if none.
      */
-    public GeographicMetadata() {
+    public GeographicMetadata(final ImageReader reader) {
         super(false, // Can not return or accept a DOM tree using the standard metadata format.
               null,  // There is no native metadata format.
               null,  // There is no native metadata format.
@@ -109,15 +107,7 @@ public class GeographicMetadata extends IIOMetadata {
               new String[] {
                   "org.geotools.image.io.metadata.GeographicMetadataFormat"
               });
-    }
-
-    /**
-     * Wraps the specified metadata. This constructor defines no standard or native format.
-     * The only format defined is the {@linkplain GeographicMetadataFormat geographic} one.
-     */
-    public GeographicMetadata(final IIOMetadata metadata) {
-        this();
-        root = metadata.getAsTree(GeographicMetadataFormat.FORMAT_NAME);
+        owner = reader;
     }
 
     /**
@@ -146,6 +136,7 @@ public class GeographicMetadata extends IIOMetadata {
               nativeMetadataFormatClassName,
               extraMetadataFormatNames,
               extraMetadataFormatClassNames);
+        owner = null;
     }
 
     /**
@@ -248,7 +239,7 @@ public class GeographicMetadata extends IIOMetadata {
      */
     private void checkFormatName(final String formatName) throws IllegalArgumentException {
         if (!GeographicMetadataFormat.FORMAT_NAME.equals(formatName)) {
-            throw new IllegalArgumentException(Errors.getResources(getWarningLocale()).getString(
+            throw new IllegalArgumentException(Errors.getResources(getLocale()).getString(
                     ErrorKeys.ILLEGAL_ARGUMENT_$2, "formatName", formatName));
         }
     }
@@ -270,13 +261,27 @@ public class GeographicMetadata extends IIOMetadata {
 
     /**
      * Alters the internal state of this metadata from a tree whose syntax is defined by
-     * the given metadata format.
+     * the given metadata format. The default implementation simply replaces all existing
+     * state with the contents of the given tree.
      *
-     * @todo This method is not yet implemented.
+     * @param formatName The desired metadata format.
+     * @param root An XML DOM Node object forming the root of a tree.
      */
     public void mergeTree(final String formatName, final Node root) throws IIOInvalidTreeException {
         checkFormatName(formatName);
-        throw new IllegalStateException();
+        reset();
+        this.root = root;
+    }
+
+    /**
+     * Alters the internal state of this metadata from a tree defined by the specified metadata.
+     * The default implementation expect the {@value GeographicMetadataFormat#FORMAT_NAME} format.
+     *
+     * @param metadata The metadata to merge to this object.
+     */
+    public void mergeTree(final IIOMetadata metadata) throws IIOInvalidTreeException {
+        mergeTree(GeographicMetadataFormat.FORMAT_NAME,
+                metadata.getAsTree(GeographicMetadataFormat.FORMAT_NAME));
     }
 
     /**
@@ -290,56 +295,36 @@ public class GeographicMetadata extends IIOMetadata {
     }
 
     /**
-     * Returns the language to use when {@linkplain warningOccurred logging a warning}.
+     * Returns the language to use when {@linkplain #warningOccurred logging a warning},
+     * or {@code null} if none has been set. The default implementation delegates to
+     * {@link ImageReader#getLocale} or {@link ImageWriter#getLocale} if possible, or
+     * returns {@code null} otherwise.
      */
-    public Locale getWarningLocale() {
-        return locale;
+    public Locale getLocale() {
+        if (owner instanceof ImageReader) {
+            return ((ImageReader) owner).getLocale();
+        }
+        if (owner instanceof ImageWriter) {
+            return ((ImageWriter) owner).getLocale();
+        }
+        return null;
     }
 
     /**
-     * Sets the language to use when {@linkplain warningOccurred logging a warning}.
-     */
-    public void setWarningLocale(final Locale locale) {
-        this.locale = locale;
-    }
-
-    /**
-     * Sets the warning listeners, or {@code null} if none. If a non-null collection
-     * is given, then calls to {@link #warningOccurred} will delegate to
-     * {@link IIOReadWarningListener#warningOccurred} instead of
-     * {@linkplain Logger#log(LogRecord) logging} a warning.
-     */
-    public void setWarningListeners(final Collection/*<IIOReadWarningListener>*/ warningListeners) {
-        this.warningListeners = warningListeners;
-    }
-
-    /**
-     * Invoked when a warning occured. This method is invoked when some inconsistency has been
-     * detected in the geographic metadata. The default implementation make the following choice:
-     *
-     * <ul>
-     *   <li>If a collection of {@linkplain IIOReadWarningListener warning listeners}
-     *       has been {@linkplain #setWarningListeners specified}, then the
-     *       {@link IIOReadWarningListener#warningOccurred warningOccurred} method is
-     *       invoked for each of them and the log record is <strong>not</strong> logged.</li>
-     *
-     *   <li>Otherwise, the log record is logged without futher processing.</li>
-     * </ul>
-     *
+     * Invoked when a warning occured. This method is invoked when some inconsistency has
+     * been detected in the geographic metadata. The default implementation delegates to
+     * {@link GeographicImageReader#warningOccurred} if possible, or sent the record to
+     * the {@link GeographicImageReader#LOGGER} otherwise.
+     * <p>
      * Subclasses may override this method if more processing is wanted, or for
      * throwing exception if some warnings should be considered as fatal errors.
      */
-    protected boolean warningOccurred(final LogRecord record) {
-        if (warningListeners == null) {
-            Logger.getLogger("org.geotools.image.io.metadata").log(record);
-            return false;
+    protected void warningOccurred(final LogRecord record) {
+        if (owner instanceof GeographicImageReader) {
+            ((GeographicImageReader) owner).warningOccurred(record);
+        } else {
+            GeographicImageReader.LOGGER.log(record);
         }
-        final String message = record.getMessage();
-        for (final Iterator it=warningListeners.iterator(); it.hasNext();) {
-            final IIOReadWarningListener listener = (IIOReadWarningListener) it.next();
-            listener.warningOccurred(null, message);
-        }
-        return true;
     }
 
     /**
@@ -352,12 +337,12 @@ public class GeographicMetadata extends IIOMetadata {
         return new LoggedFormat/*<T>*/(format, type) {
             //@Override
             protected Locale getWarningLocale() {
-                return GeographicMetadata.this.getWarningLocale();
+                return getLocale();
             }
 
             //@Override
             protected void logWarning(final LogRecord warning) {
-                GeographicMetadata.this.warningOccurred(warning);
+                warningOccurred(warning);
             }
         };
     }

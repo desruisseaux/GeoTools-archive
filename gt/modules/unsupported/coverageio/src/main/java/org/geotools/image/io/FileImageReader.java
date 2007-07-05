@@ -41,7 +41,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  */
-public abstract class FileImageReader extends SimpleImageReader {
+public abstract class FileImageReader extends StreamImageReader {
     /**
      * The file to read. This is the same reference than {@link #input} if the later was
      * already a {@link File} object, or a temporary file otherwise.

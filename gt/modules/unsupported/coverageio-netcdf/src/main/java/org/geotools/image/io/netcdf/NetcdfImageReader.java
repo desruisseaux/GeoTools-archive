@@ -291,7 +291,6 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
             ensureFileOpen();
             ensureMetadataLoaded();
             streamMetadata = createMetadata(file);
-            complete(streamMetadata);
         }
         return streamMetadata;
     }
@@ -305,7 +304,6 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
             if (variable instanceof VariableDS) {
                 ensureMetadataLoaded();
                 imageMetadata = createMetadata((VariableDS) variable);
-                complete(imageMetadata);
             }
         }
         return imageMetadata;
@@ -318,7 +316,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
      * a more specific set of metadata.
      */
     protected IIOMetadata createMetadata(final NetcdfDataset file) throws IOException {
-        return new NetcdfMetadata(file);
+        return new NetcdfMetadata(this, file);
     }
 
     /**
@@ -328,16 +326,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
      * a more specific set of metadata.
      */
     protected IIOMetadata createMetadata(final VariableDS variable) throws IOException {
-        return new NetcdfMetadata(variable);
-    }
-
-    /**
-     * Complete the specified metadata by setting the locale, if applicable.
-     */
-    private void complete(final IIOMetadata metadata) {
-        if (metadata instanceof GeographicMetadata) {
-            ((GeographicMetadata) metadata).setWarningLocale(getLocale());
-        }
+        return new NetcdfMetadata(this, variable);
     }
 
     /**
