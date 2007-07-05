@@ -449,7 +449,7 @@ public final class Hints extends RenderingHints {
      * <ul>
      *   <li>{@code "weak"} for holding values through {@linkplain java.lang.ref.WeakReference
      *       weak references}. This option do not actually cache the objects since the garbage
-     *       collector cleans weak references agressively, but it allows sharing the instances
+     *       collector cleans weak references aggressively, but it allows sharing the instances
      *       already created and still in use.</li>
      *   <li>{@code "all"} for holding values through strong references.</li>
      *   <li>{@code "none"} for disabling the cache.</li>
@@ -468,48 +468,66 @@ public final class Hints extends RenderingHints {
     public static final IntegerKey BUFFER_LIMIT = new IntegerKey(50);
 
     /**
-     * Max active controls the maximum number of objects that can be borrowed
-     * from the pool at one time. When non-positive, there is no limit to the
-     * number of objects that may be active at one time. When maxActive is
-     * exceeded, the pool is said to be exhausted.
-     * 
-     * @since 2.4
-     */
-    public static final IntegerKey AUTHORITY_POOL_MAX_ACTIVE = new IntegerKey(8);
-    
-    /**
-     * Minimum number of objects allowed in the pool before the evictor thread (if active) spawns new objects.
+     * The maximum number of active AuthorityFactories. 
+     * <p>
+     * This hint is treated as an absolute LIMIT for AbstractAuthorityMediator 
+     * instances such as as HsqlDialectEpsgMediator. As such this will be the
+     * absolute limit on the number of database connections the mediator will
+     * make use of. When non-positive there is no limit to the number of
+     * connections used.
+     * <p>
+     * When this limit it reached, code will be forced to block while waiting
+     * for a connection to become available.
      *
      * @since 2.4
      */
-    public static final IntegerKey AUTHORITY_POOL_MIN_IDLE = new IntegerKey(0);
+    public static final IntegerKey AUTHORITY_MAX_ACTIVE = new IntegerKey(8);
     
     /**
+     * Minimum number of objects required before the evictor will begin
+     * removing objects.
+     * 
+     * @since 2.4
+     */
+    public static final IntegerKey AUTHORITY_MIN_IDLE = new IntegerKey(0);
+    
+    /**
+     * The number of idle AuthorityFactories.
+     * <p>
+     * This hint is treated as a recommendation for AbstractAuthorityMediator
+     * instances such as HsqlDialectEpsgMediator. As such this will control
+     * the number of connections the mediator is comfortable having open.
+     * <p>
+     * If AUTHORITY_MAX_ACTIVE is set to 20, up to twenty connections will
+     * be used during heavy load. If the AUTHORITY_MAX_IDLE is set to 10,
+     * connections will be immediately reclaimed until only 10 are open.
+     * <p>
+     * When the amount of time specified by AUTHORITY_IDLE_WAIT
      * Max idle controls the maximum number of objects that can sit idle in the
      * pool at any time. When negative, there is no limit to the number of
      * objects that may be idle at one time.
      * 
      * @since 2.4
      */
-    public static final IntegerKey AUTHORITY_POOL_MAX_IDLE = new IntegerKey(8);
+    public static final IntegerKey AUTHORITY_MAX_IDLE = new IntegerKey(8);
     
     /**
-     * If a positive maxWait value is supplied, the borrowObject() will block
-     * for at most that many milliseconds, after which a NoSuchElementException
-     * will be thrown. If maxWait is non-positive, the borrowObject() method
-     * will block indefinitely.
+     * If a positive AUTHORITY_MAX_WAIT value is supplied, the borrowObject() 
+     * will block for at most that many milliseconds, after which a 
+     * NoSuchElementException will be thrown. If AUTHORITY_MAX_WAIT is 
+     * non-positive, the borrowObject() method will block indefinitely.
      * 
      * @since 2.4
      */
-    public static final IntegerKey AUTHORITY_POOL_MAX_WAIT = new IntegerKey(-1);
+    public static final IntegerKey AUTHORITY_MAX_WAIT = new IntegerKey(-1);
 
-    //public static final IntegerKey AUTHORITY_POOL_MIN_EVICT_IDLETIME = new IntegerKey(1800000);
-    //public static final IntegerKey AUTHORITY_POOL_SOFTMIN_EVICT_IDLETIME = new IntegerKey(1800000);
+    //public static final IntegerKey AUTHORITY_MIN_EVICT_IDLETIME = new IntegerKey(1800000);
+    //public static final IntegerKey AUTHORITY_SOFTMIN_EVICT_IDLETIME = new IntegerKey(1800000);
     
-    //public static final OptionKey AUTHORITY_POOL_TEST_ON_BORROW = new OptionKey("true", "false");
-    //public static final OptionKey AUTHORITY_POOL_TEST_ON_RETURN = new OptionKey("true", "false");
-    //public static final OptionKey AUTHORITY_POOL_TEST_WHILE_IDLE = new OptionKey("true", "false");
-    //public static final IntegerKey AUTHORITY_POOL_TIME_BETWEEN_EVICTION_RUNS = new IntegerKey(-1);
+    //public static final OptionKey AUTHORITY_TEST_ON_BORROW = new OptionKey("true", "false");
+    //public static final OptionKey AUTHORITY_TEST_ON_RETURN = new OptionKey("true", "false");
+    //public static final OptionKey AUTHORITY_TEST_WHILE_IDLE = new OptionKey("true", "false");
+    //public static final IntegerKey AUTHORITY_TIME_BETWEEN_EVICTION_RUNS = new IntegerKey(-1);
     
     
     /**
@@ -787,7 +805,7 @@ public final class Hints extends RenderingHints {
     /**
      * Returns a string representation of the hints. This method formats the set of hints
      * as a tree. If some system-wide {@linkplain GeoTools#getDefaultHints default hints}
-     * exist, they are formatted after those hints for completness.
+     * exist, they are formatted after those hints for completeness.
      *
      * @since 2.4
      */

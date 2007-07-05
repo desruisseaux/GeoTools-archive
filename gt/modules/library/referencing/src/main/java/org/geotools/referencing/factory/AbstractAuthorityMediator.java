@@ -114,7 +114,7 @@ public abstract class AbstractAuthorityMediator extends
      * Pool to hold workers which will be used to construct referencing objects
      * which are not present in the cache.
      */
-    private ObjectPool pool;
+    private ObjectPool workers;
     
     /**
      * Configuration object for the object pool. The constructor reads its hints
@@ -147,18 +147,10 @@ public abstract class AbstractAuthorityMediator extends
     protected AbstractAuthorityMediator(int priority, Hints hints) {
         this(priority, ObjectCaches.create(hints), ReferencingFactoryContainer
                 .instance(hints));
-        if (hints.containsKey(Hints.AUTHORITY_POOL_MIN_IDLE)) {
-            poolConfig.minIdle = ((Integer) hints.get(Hints.AUTHORITY_POOL_MIN_IDLE)).intValue();
-        }
-        if (hints.containsKey(Hints.AUTHORITY_POOL_MAX_IDLE)) {
-            poolConfig.maxIdle = ((Integer) hints.get(Hints.AUTHORITY_POOL_MAX_IDLE)).intValue();
-        }
-        if (hints.containsKey(Hints.AUTHORITY_POOL_MAX_ACTIVE)) {
-            poolConfig.maxActive = ((Integer) hints.get(Hints.AUTHORITY_POOL_MAX_ACTIVE)).intValue();
-        }
-        if (hints.containsKey(Hints.AUTHORITY_POOL_MAX_WAIT)) {
-            poolConfig.maxWait = ((Integer) hints.get(Hints.AUTHORITY_POOL_MAX_WAIT)).intValue();
-        }
+        poolConfig.minIdle = Hints.AUTHORITY_MIN_IDLE.toValue(hints);
+        poolConfig.maxIdle = Hints.AUTHORITY_MAX_IDLE.toValue(hints);
+        poolConfig.maxActive = Hints.AUTHORITY_MAX_ACTIVE.toValue(hints);
+        poolConfig.maxWait = Hints.AUTHORITY_MAX_WAIT.toValue(hints);
     }
 
     /**
@@ -183,17 +175,17 @@ public abstract class AbstractAuthorityMediator extends
     }
     
     ObjectPool getPool() {
-        if (pool == null) {
+        if (workers == null) {
             //create pool
             PoolableObjectFactory objectFactory = new AuthorityPoolableObjectFactory();
             ObjectPoolFactory poolFactory = new GenericObjectPoolFactory(objectFactory, poolConfig);
             this.setPool(poolFactory.createPool());
         }
-        return pool;
+        return workers;
     }
 
     void setPool(ObjectPool pool) {
-        this.pool = pool;
+        this.workers = pool;
     }
 
     //
