@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2003-2007, Geotools Project Managment Committee (PMC)
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *    
  *    THIS IS AN AUTOMATICALLY GENERATED FILE. DO NOT EDIT!
- *    Generated with: org.geotools.resources.ResourceCompiler
+ *    Generated with: org.geotools.resources.IndexedResourceCompiler
  */
 package org.geotools.resources.i18n;
 
@@ -27,8 +27,8 @@ package org.geotools.resources.i18n;
  * classes compiled against the interface, provided that no class
  * implements this interface.
  *
- * @see org.geotools.resources.ResourceBundle
- * @see org.geotools.resources.ResourceCompiler
+ * @see org.geotools.resources.IndexedResourceBundle
+ * @see org.geotools.resources.IndexedResourceCompiler
  * @source $URL$
  */
 public final class ErrorKeys {

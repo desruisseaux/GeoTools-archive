@@ -24,25 +24,28 @@ import java.lang.reflect.Field;
 
 /**
  * Resource compiler. This class is run from the command line at compile time only.
- * {@code ResourceCompiler} scans for {@code .properties} files and copies their content
- * to {@code .utf} files using UTF8 encoding. It also checks for key validity and checks
- * values for {@link MessageFormat} compatibility. Finally, it creates a {@code FooKeys.java}
- * source file declaring resource keys as integer constants.
+ * {@code IndexedResourceCompiler} scans for {@code .properties} files and copies their content
+ * to {@code .utf} files using UTF8 encoding. It also checks for key validity and checks values
+ * for {@link MessageFormat} compatibility. Finally, it creates a {@code FooKeys.java} source
+ * file declaring resource keys as integer constants.
  * <p>
  * This class <strong>must</strong> be run from the maven root of Geotools project.
  * <p>
- * {@code ResourceCompiler} and all {@code FooKeys} classes don't need to be included in the final
- * JAR file. They are used at compile time only and no other classes should keep reference to them.
+ * {@code IndexedResourceCompiler} and all {@code FooKeys} classes don't need to be included in the
+ * final JAR file. They are used at compile time only and no other classes should keep reference to
+ * them.
  *
- * @since 2.0
+ * @since 2.4
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class ResourceCompiler implements Comparator {
+public final class IndexedResourceCompiler implements Comparator {
     /**
      * The base directory for {@code "java"} {@code "resources"} sub-directories.
      * The directory structure must be consistent with Maven conventions.
+     *
+     * @see #sourceDirectory
      */
     private static final File SOURCE_DIRECTORY = new File("modules/library/metadata/src/main");
 
@@ -58,13 +61,13 @@ public final class ResourceCompiler implements Comparator {
 
     /**
      * Extension for properties source files.
-     * Must be in the {@code SOURCE_DIRECTORY/java} directory.
+     * Must be in the {@code ${sourceDirectory}/java} directory.
      */
     private static final String PROPERTIES_EXT = ".properties";
 
     /**
      * Extension for resource target files.
-     * Will be be in the {@code SOURCE_DIRECTORY/resources} directory.
+     * Will be be in the {@code ${sourceDirectory}/resources} directory.
      */
     private static final String RESOURCES_EXT = ".utf";
 
@@ -78,6 +81,12 @@ public final class ResourceCompiler implements Comparator {
      * The maximal length of comment lines.
      */
     private static final int COMMENT_LENGTH = 92;
+
+    /**
+     * The base directory for {@code "java"} {@code "resources"} sub-directories.
+     * The directory structure must be consistent with Maven conventions.
+     */
+    private final File sourceDirectory;
 
     /**
      * Integer IDs allocated to resource keys. This map will be shared for all languages
@@ -97,18 +106,25 @@ public final class ResourceCompiler implements Comparator {
     private final PrintWriter out;
 
     /**
-     * Constructs a new {@code ResourceCompiler}. This method will immediately look for
-     * a {@code FooKeys.class} file. If one is found, integer keys are loaded in order to
-     * reuse the same values.
+     * Constructs a new {@code IndexedResourceCompiler}. This method will immediately look for
+     * a {@code FooKeys.class} file. If one is found, integer keys are loaded in order to reuse
+     * the same values.
      *
-     * @param  out The output stream for printing message.
+     * @param  sourceDirectory The base directory for {@code "java"} {@code "resources"}
+     *         sub-directories. The directory structure must be consistent with Maven conventions.
      * @param  bundleClass The resource bundle base class
      *         (e.g. <code>{@linkplain org.geotools.resources.i18n.Vocabulary}.class}</code>).
+     * @param  renumber {@code true} for renumbering all key values.
+     * @param  out The output stream for printing message.
      * @throws IOException if an input/output operation failed.
      */
-    private ResourceCompiler(final PrintWriter out, final Class bundleClass) throws IOException {
+    private IndexedResourceCompiler(final File sourceDirectory, final Class bundleClass,
+                                    final boolean renumber, final PrintWriter out)
+            throws IOException
+    {
+        this.sourceDirectory = sourceDirectory;
         this.out = out;
-        try {
+        if (!renumber) try {
             final String classname = toKeyClass(bundleClass.getName());
             final Field[] fields = Class.forName(classname).getFields();
             out.print("Loading ");
@@ -365,18 +381,18 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
         final int    packageEnd  = fullname.lastIndexOf('.');
         final String packageName = fullname.substring(0, packageEnd);
         final String classname   = fullname.substring(packageEnd + 1);
-        final File   file        = new File(SOURCE_DIRECTORY,
+        final File   file        = new File(sourceDirectory,
                 "java/" + fullname.replace('.', '/') + ".java");
         if (!file.getParentFile().isDirectory()) {
             warning(file, null, "Parent directory not found.", null);
             return;
         }
         final BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream(file), "ISO-8859-1"));
+                new FileOutputStream(file), "UTF-8"));
         out.write("/*\n" +
                   " *    GeoTools - OpenSource mapping toolkit\n" +
                   " *    http://geotools.org\n" +
-                  " *    (C) 2003-2006, Geotools Project Managment Committee (PMC)\n" +
+                  " *    (C) 2003-2007, Geotools Project Managment Committee (PMC)\n" +
                   " *    \n" +
                   " *    This library is free software; you can redistribute it and/or\n" +
                   " *    modify it under the terms of the GNU Lesser General Public\n" +
@@ -389,7 +405,7 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
                   " *    Lesser General Public License for more details.\n" +
                   " *    \n" +
                   " *    THIS IS AN AUTOMATICALLY GENERATED FILE. DO NOT EDIT!\n"   +
-                  " *    Generated with: org.geotools.resources.ResourceCompiler\n" +
+                  " *    Generated with: org.geotools.resources.IndexedResourceCompiler\n" +
                   " */\n");
         out.write("package ");
         out.write(packageName);
@@ -402,8 +418,8 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
                   " * classes compiled against the interface, provided that no class\n"    +
                   " * implements this interface.\n"                                        +
                   " *\n"                                                                   +
-                  " * @see org.geotools.resources.ResourceBundle\n"                        +
-                  " * @see org.geotools.resources.ResourceCompiler\n"                      +
+                  " * @see org.geotools.resources.IndexedResourceBundle\n"                 +
+                  " * @see org.geotools.resources.IndexedResourceCompiler\n"               +
                   " * @source \u0024URL\u0024\n"                                           +
                   " */\n");
         out.write("public final class "); out.write(classname); out.write(" {\n");
@@ -459,19 +475,25 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
     /**
      * Scans the package for resources.
      *
-     * @param  out The output stream for printing message.
+     * @param  sourceDirectory The base directory for {@code "java"} {@code "resources"}
+     *         sub-directories. The directory structure must be consistent with Maven conventions.
      * @param  bundleClass The resource bundle base class
      *         (e.g. <code>{@linkplain org.geotools.resources.i18n.Vocabulary}.class}</code>).
+     * @param  renumber {@code true} for renumbering all key values.
+     * @param  out The output stream for printing message.
      * @throws IOException if an input/output operation failed.
      */
-    private static void scanForResources(final PrintWriter out, final Class bundleClass) throws IOException {
+    private static void scanForResources(final File sourceDirectory, final Class bundleClass,
+                                         final boolean renumber, final PrintWriter out)
+            throws IOException
+    {
         final String fullname    = bundleClass.getName();
         final int    packageEnd  = fullname.lastIndexOf('.');
         final String packageName = fullname.substring(0, packageEnd);
         final String classname   = fullname.substring(packageEnd + 1);
         final String packageDir  = packageName.replace('.', '/');
-        final File   srcDir      = new File(SOURCE_DIRECTORY, "java/"      + packageDir);
-        final File   utfDir      = new File(SOURCE_DIRECTORY, "resources/" + packageDir);
+        final File   srcDir      = new File(sourceDirectory, "java/"      + packageDir);
+        final File   utfDir      = new File(sourceDirectory, "resources/" + packageDir);
         if (!srcDir.isDirectory()) {
             out.print('"');
             out.print(srcDir.getPath());
@@ -484,7 +506,7 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
             out.println("\" is not a directory.");
             return;
         }
-        ResourceCompiler compiler = null;
+        IndexedResourceCompiler compiler = null;
         final File[] content = srcDir.listFiles();
         File defaultLanguage = null;
         for (int i=0; i<content.length; i++) {
@@ -492,7 +514,7 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
             final String filename = file.getName();
             if (filename.startsWith(classname) && filename.endsWith(PROPERTIES_EXT)) {
                 if (compiler == null) {
-                    compiler = new ResourceCompiler(out, bundleClass);
+                    compiler = new IndexedResourceCompiler(sourceDirectory, bundleClass, renumber, out);
                 }
                 compiler.processPropertyFile(file);
                 final String noExt = filename.substring(0, filename.length() - PROPERTIES_EXT.length());
@@ -514,23 +536,37 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
 
     /**
      * Run the resource compiler.
+     *
+     * @param args The command-line arguments.
+     * @param  sourceDirectory The base directory for {@code "java"} {@code "resources"}
+     *         sub-directories. The directory structure must be consistent with Maven conventions.
+     * @param  resourcesToProcess The resource bundle base classes
+     *         (e.g. <code>{@linkplain org.geotools.resources.i18n.Vocabulary}.class}</code>).
      */
-    public static void main(String[] args) {
+    public static void main(String[] args, final File sourceDirectory, final Class[] resourcesToProcess) {
         final Arguments arguments = new Arguments(args);
+        final boolean renumber = arguments.getFlag("-renumber");
         final PrintWriter out = arguments.out;
         args = arguments.getRemainingArguments(0);
-        if (!SOURCE_DIRECTORY.isDirectory()) {
-            out.print(SOURCE_DIRECTORY);
+        if (!sourceDirectory.isDirectory()) {
+            out.print(sourceDirectory);
             out.println(" not found or is not a directory.");
             return;
         }
-        for (int i=0; i<RESOURCES_TO_PROCESS.length; i++) {
+        for (int i=0; i<resourcesToProcess.length; i++) {
             try {
-                scanForResources(out, RESOURCES_TO_PROCESS[i]);
+                scanForResources(sourceDirectory, resourcesToProcess[i], renumber, out);
             } catch (IOException exception) {
                 out.println(exception.getLocalizedMessage());
             }
         }
         out.flush();
+    }
+
+    /**
+     * Run the compiler for GeoTools resources.
+     */
+    public static void main(final String[] args) {
+        main(args, SOURCE_DIRECTORY, RESOURCES_TO_PROCESS);
     }
 }

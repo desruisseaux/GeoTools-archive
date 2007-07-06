@@ -32,7 +32,7 @@ import org.geotools.resources.XArray;
 import org.geotools.resources.XMath;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.IndexedResourceBundle;
+import org.geotools.resources.IndexedResourceBundle;
 import org.geotools.resources.image.ComponentColorModelJAI;
 import org.geotools.util.NumberRange;
 

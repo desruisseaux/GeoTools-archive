@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.resources.i18n;
+package org.geotools.resources;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -33,7 +33,6 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import org.opengis.util.InternationalString;
-import org.geotools.resources.Utilities;
 import org.geotools.util.Logging;
 
 

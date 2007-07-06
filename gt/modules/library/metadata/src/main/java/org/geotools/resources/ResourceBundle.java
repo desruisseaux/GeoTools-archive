@@ -17,7 +17,6 @@
 package org.geotools.resources;
 
 import java.text.MessageFormat;
-import org.geotools.resources.i18n.IndexedResourceBundle;
 
 
 /**
