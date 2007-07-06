@@ -80,13 +80,13 @@ public class GMLFilterGeometry extends org.xml.sax.helpers.XMLFilterImpl
             if( "srs".equalsIgnoreCase( NAME ) ){
                 srs = atts.getValue(i);
             }
-        }
-        currentHandler.setSRS( srs );
+        }        
         if (currentHandler == null) {
             currentHandler = handlerFactory.create(localName);
         } else {
             currentHandler.subGeometry(localName, currentHandler.GEOMETRY_START);
         }
+        currentHandler.setSRS( srs );            
     }
 
     /**
