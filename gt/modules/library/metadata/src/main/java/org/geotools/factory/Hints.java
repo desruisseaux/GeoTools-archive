@@ -485,11 +485,13 @@ public final class Hints extends RenderingHints {
     
     /**
      * Minimum number of objects required before the evictor will begin
-     * removing objects.
+     * removing objects.  This value is also used by 
+     * AUTHORITY_SOFTMIN_EVICT_IDLETIME to keep this many idle workers
+     * around.
      * 
      * @since 2.4
      */
-    public static final IntegerKey AUTHORITY_MIN_IDLE = new IntegerKey(0);
+    public static final IntegerKey AUTHORITY_MIN_IDLE = new IntegerKey(1);
     
     /**
      * The number of idle AuthorityFactories.
@@ -521,14 +523,29 @@ public final class Hints extends RenderingHints {
      */
     public static final IntegerKey AUTHORITY_MAX_WAIT = new IntegerKey(-1);
 
-    //public static final IntegerKey AUTHORITY_MIN_EVICT_IDLETIME = new IntegerKey(1800000);
-    //public static final IntegerKey AUTHORITY_SOFTMIN_EVICT_IDLETIME = new IntegerKey(1800000);
+    /**
+     * When the evictor is run, if more time (in milliseconds) than the value in
+     * AUTHORITY_MIN_EVICT_IDLETIME has passed, then the worker is destroyed.
+     * 
+     * @since 2.4
+     */
+    public static final IntegerKey AUTHORITY_MIN_EVICT_IDLETIME = new IntegerKey(2 * 60 * 000);
     
-    //public static final OptionKey AUTHORITY_TEST_ON_BORROW = new OptionKey("true", "false");
-    //public static final OptionKey AUTHORITY_TEST_ON_RETURN = new OptionKey("true", "false");
-    //public static final OptionKey AUTHORITY_TEST_WHILE_IDLE = new OptionKey("true", "false");
-    //public static final IntegerKey AUTHORITY_TIME_BETWEEN_EVICTION_RUNS = new IntegerKey(-1);
+    /**
+     * When the evictor is run, workers which have been idle for more than this
+     * value will be destroyed iff the number of idle workers exceeds
+     * AUTHORITY_MIN_IDLE.
+     * 
+     * @since 2.4
+     */
+    public static final IntegerKey AUTHORITY_SOFTMIN_EVICT_IDLETIME = new IntegerKey(10 * 000);
     
+    /**
+     * 
+     * 
+     * @since 2.4
+     */
+    public static final IntegerKey AUTHORITY_TIME_BETWEEN_EVICTION_RUNS = new IntegerKey(5 * 000);
     
     /**
      * Version number of the requested service. This hint is used for example in order to get
