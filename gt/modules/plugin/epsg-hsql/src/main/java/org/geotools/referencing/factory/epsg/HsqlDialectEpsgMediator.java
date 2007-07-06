@@ -30,28 +30,39 @@ import org.geotools.referencing.factory.AbstractEpsgMediator;
  */
 public class HsqlDialectEpsgMediator extends AbstractEpsgMediator {
 
+    Hints hints;
+    
     /**
-     * Creates an HsqlDialectEpsgMediator a 20 min timeout on a max of one worker.
+     * Creates an HsqlDialectEpsgMediator with a 20 min timeout, single worker,
+     * and no cache.
+     * 
      * @param priority
      * @param datasource
      */
     public HsqlDialectEpsgMediator(int priority, DataSource datasource) {
-        this(priority,
-             new Hints( Hints.AUTHORITY_MAX_ACTIVE, new Integer(1),
-                        Hints.AUTHORITY_MAX_IDLE, new Integer(20)),
-             datasource );
+        this(priority, 
+             new Hints(Hints.AUTHORITY_MAX_ACTIVE, 
+                 new Integer(1),
+                 new Object[] {
+                     Hints.AUTHORITY_MIN_EVICT_IDLETIME, new Integer(20 * 60 * 1000),
+                     Hints.BUFFER_POLICY, "none"
+                 }
+             ),
+             datasource
+         );
     }
     
     public HsqlDialectEpsgMediator(int priority, Hints hints, DataSource datasource) {
         super(priority, hints, datasource);
+        this.hints = hints;
     }
 
     /**
      * Reinitialize an instance to be returned by the pool.
      */
     protected void activateWorker(Object obj) throws Exception {
-        //HsqlDialectEpsgFactory factory = (HsqlDialectEpsgFactory) obj;
-        //factory.connect();
+        HsqlDialectEpsgFactory factory = (HsqlDialectEpsgFactory) obj;
+        factory.connect();
     }
 
     /**
@@ -60,6 +71,7 @@ public class HsqlDialectEpsgMediator extends AbstractEpsgMediator {
     protected void destroyWorker(Object obj) throws Exception {
         HsqlDialectEpsgFactory factory = (HsqlDialectEpsgFactory) obj;
         factory.dispose();
+        factory.disconnect();
         factory = null;
     }
 
@@ -67,10 +79,7 @@ public class HsqlDialectEpsgMediator extends AbstractEpsgMediator {
      * Creates an instance that can be returned by the pool.
      */
     protected Object makeWorker() throws Exception {
-        //DataSource datasource = HsqlEpsgDatabase.createDataSource();
-        //Connection connection = datasource.getConnection();
         Connection connection = getConnection();
-        Hints hints = new Hints(Hints.BUFFER_POLICY, "none");     
         HsqlDialectEpsgFactory factory = new HsqlDialectEpsgFactory(hints, connection);
         return factory;
     }
@@ -79,8 +88,6 @@ public class HsqlDialectEpsgMediator extends AbstractEpsgMediator {
      * Uninitialize an instance to be returned to the pool.
      */
     protected void passivateWorker(Object obj) throws Exception {
-        //HsqlDialectEpsgFactory factory = (HsqlDialectEpsgFactory) obj;
-        //factory.disconnect();
     }
 
     /**

@@ -27,6 +27,7 @@ import javax.units.Unit;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.ObjectPoolFactory;
 import org.apache.commons.pool.PoolableObjectFactory;
+import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPoolFactory;
 import org.apache.commons.pool.impl.GenericObjectPool.Config;
 import org.geotools.factory.BufferedFactory;
@@ -147,10 +148,17 @@ public abstract class AbstractAuthorityMediator extends
     protected AbstractAuthorityMediator(int priority, Hints hints) {
         this(priority, ObjectCaches.create(hints), ReferencingFactoryContainer
                 .instance(hints));
+        //configurable behaviour
         poolConfig.minIdle = Hints.AUTHORITY_MIN_IDLE.toValue(hints);
         poolConfig.maxIdle = Hints.AUTHORITY_MAX_IDLE.toValue(hints);
         poolConfig.maxActive = Hints.AUTHORITY_MAX_ACTIVE.toValue(hints);
-        poolConfig.maxWait = Hints.AUTHORITY_MAX_WAIT.toValue(hints);
+        poolConfig.minEvictableIdleTimeMillis = Hints.AUTHORITY_MIN_EVICT_IDLETIME.toValue(hints);
+        poolConfig.softMinEvictableIdleTimeMillis =  Hints.AUTHORITY_SOFTMIN_EVICT_IDLETIME.toValue(hints);
+        poolConfig.timeBetweenEvictionRunsMillis =  Hints.AUTHORITY_TIME_BETWEEN_EVICTION_RUNS.toValue(hints);
+        
+        //static behaviour
+        poolConfig.maxWait = -1; //block indefinitely until a worker is available
+        poolConfig.whenExhaustedAction = GenericObjectPool.WHEN_EXHAUSTED_BLOCK;
     }
 
     /**

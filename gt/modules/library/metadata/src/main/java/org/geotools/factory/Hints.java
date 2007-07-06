@@ -514,16 +514,6 @@ public final class Hints extends RenderingHints {
     public static final IntegerKey AUTHORITY_MAX_IDLE = new IntegerKey(8);
     
     /**
-     * If a positive AUTHORITY_MAX_WAIT value is supplied, the borrowObject() 
-     * will block for at most that many milliseconds, after which a 
-     * NoSuchElementException will be thrown. If AUTHORITY_MAX_WAIT is 
-     * non-positive, the borrowObject() method will block indefinitely.
-     * 
-     * @since 2.4
-     */
-    public static final IntegerKey AUTHORITY_MAX_WAIT = new IntegerKey(-1);
-
-    /**
      * When the evictor is run, if more time (in milliseconds) than the value in
      * AUTHORITY_MIN_EVICT_IDLETIME has passed, then the worker is destroyed.
      * 
@@ -541,7 +531,7 @@ public final class Hints extends RenderingHints {
     public static final IntegerKey AUTHORITY_SOFTMIN_EVICT_IDLETIME = new IntegerKey(10 * 000);
     
     /**
-     * 
+     * Time in milliseconds to wait between eviction runs.
      * 
      * @since 2.4
      */
@@ -644,64 +634,95 @@ public final class Hints extends RenderingHints {
     public Hints(final RenderingHints.Key key, final Object value) {
         super(key, value);
     }
+
     /**
      * Constructs a new object with two key/value pair.
      * 
      * @param key1   The key for the first pair
      * @param value1 The value for the first pair
-     * @param key2   The key2 for the first pair
-     * @param value2 The value2 for the first pair
+     * @param key2   The key2 for the second pair
+     * @param value2 The value2 for the second pair
      */
     public Hints(final RenderingHints.Key key1, final Object value1, final RenderingHints.Key key2, final Object value2) {
         this( fromPairs( new Object[]{ key1, value1, key2, value2 } ) );
     }
-    
+
+    /**
+     * Constructs a new object with key/value pairs from an array.
+     * 
+     * @param pairs
+     *            An array containing pairs of RenderingHints keys and values
+     */
+    public Hints(final RenderingHints.Key key1, final Object value1, final Object[] pairs) {
+        this(fromPairs(key1, value1, pairs));
+    }
+
     /**
      * Constructs a new object from key/value pair.
      * <p>
      * This method is intended for use with Java5:
      * <code>new Hints( Hints.BUFFER_LIMIT,1,Hints.BUFFER_POLICY,"weak" )</code>
      * 
-     * @param pairs Key value pairs
+     * @param pairs
+     *            Key value pairs
      */
-    public Hints( final RenderingHints.Key key1, final Object value1, final RenderingHints.Key key2, final Object value2, Object[] pairs ) {
-        this( fromPairs( key1, value1, key2, value2, pairs )  );
+    public Hints(final RenderingHints.Key key1, final Object value1,
+            final RenderingHints.Key key2, final Object value2, Object[] pairs) {
+        this(fromPairs(key1, value1, key2, value2, pairs));
     }
+
     /**
      * Utility method used to organize pairs into a Map.
-     * @param pairs An array of Key/Value pairs
+     * 
+     * @param pairs
+     *            An array of Key/Value pairs
      * @return Map<Key,Value>
-     * @throws ClassCastException if Key/Value pairs do not match
+     * @throws ClassCastException
+     *             if Key/Value pairs do not match
      */
-    private static Map fromPairs( RenderingHints.Key key1, Object value1, RenderingHints.Key key2, Object value2, Object[] pairs ){
-        Map map = new HashMap();
-        map.put( key1, value1 );
-        map.put( key2, value2 );
-        for( int i=0; i<pairs.length; i+=2){
-            Key key = (Key) pairs[i];
-            Object value = pairs[i+1];
-            if( key.isCompatibleValue(value)){
-                throw new ClassCastException( key + " requires "+key.getValueClass()+" - could cast "+value );
-            }
-            map.put( key, value );
-        }
+    private static Map fromPairs(RenderingHints.Key key1, Object value1,
+            Object[] pairs) {
+        Map map = fromPairs(pairs);
+        map.put(key1, value1);
         return map;
     }
+
     /**
      * Utility method used to organize pairs into a Map.
-     * @param pairs An array of Key/Value pairs
+     * 
+     * @param pairs
+     *            An array of Key/Value pairs
      * @return Map<Key,Value>
-     * @throws ClassCastException if Key/Value pairs do not match
+     * @throws ClassCastException
+     *             if Key/Value pairs do not match
      */
-    private static Map fromPairs( Object[] pairs ){
+    private static Map fromPairs(RenderingHints.Key key1, Object value1,
+            RenderingHints.Key key2, Object value2, Object[] pairs) {
+        Map map = fromPairs(pairs);
+        map.put(key1, value1);
+        map.put(key2, value2);
+        return map;
+    }
+
+    /**
+     * Utility method used to organize pairs into a Map.
+     * 
+     * @param pairs
+     *            An array of Key/Value pairs
+     * @return Map<Key,Value>
+     * @throws ClassCastException
+     *             if Key/Value pairs do not match
+     */
+    private static Map fromPairs(Object[] pairs) {
         Map map = new HashMap();
-        for( int i=0; i<pairs.length; i+=2){
+        for (int i = 0; i < pairs.length; i += 2) {
             Key key = (Key) pairs[i];
             Object value = pairs[i+1];
-            if( key.isCompatibleValue(value)){
-                throw new ClassCastException( key + " requires "+key.getValueClass()+" - could cast "+value );
+            if (key.isCompatibleValue(value)) {
+                throw new ClassCastException(key + " requires "
+                        + key.getValueClass() + " - could cast " + value);
             }
-            map.put( key, value );
+            map.put(key, value);
         }
         return map;
     }

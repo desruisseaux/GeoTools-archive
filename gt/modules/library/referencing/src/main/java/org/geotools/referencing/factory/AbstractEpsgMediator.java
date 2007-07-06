@@ -17,6 +17,8 @@ package org.geotools.referencing.factory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
@@ -38,6 +40,8 @@ import org.opengis.util.InternationalString;
  */
 public abstract class AbstractEpsgMediator extends AbstractAuthorityMediator {
 
+    private static final Logger LOGGER = Logger.getLogger("org.geotools.referencing.factory");
+    
     public AbstractEpsgMediator(int priority, Hints hints, DataSource datasource) {
         super(priority, hints);
         this.datasource = datasource;
@@ -45,13 +49,12 @@ public abstract class AbstractEpsgMediator extends AbstractAuthorityMediator {
     
     DataSource datasource;
 
-    protected Connection getConnection() {
+    protected Connection getConnection() throws SQLException {
         try {
             return datasource.getConnection();
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return null;
+            LOGGER.log(Level.SEVERE, "Connection failed", e);
+            throw e;
         }
     }
     

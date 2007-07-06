@@ -30,8 +30,11 @@ import org.geotools.referencing.factory.AbstractEpsgMediator;
  */
 public class OracleDialectEpsgMediator extends AbstractEpsgMediator {
 
+    Hints hints;
+    
     public OracleDialectEpsgMediator(int priority, Hints hints, DataSource datasource) {
         super(priority, hints, datasource);
+        this.hints = hints;
     }
 
     /**
@@ -47,6 +50,7 @@ public class OracleDialectEpsgMediator extends AbstractEpsgMediator {
      */
     protected void destroyWorker(Object obj) throws Exception {
         OracleDialectEpsgFactory factory = (OracleDialectEpsgFactory) obj;
+        factory.disconnect();
         factory.dispose();
         factory = null;
     }
@@ -58,7 +62,7 @@ public class OracleDialectEpsgMediator extends AbstractEpsgMediator {
         //DataSource datasource = HsqlEpsgDatabase.createDataSource();
         //Connection connection = datasource.getConnection();
         Connection connection = getConnection();
-        Hints hints = new Hints(Hints.BUFFER_POLICY, "none");     
+        //Hints hints = new Hints(Hints.BUFFER_POLICY, "none");     
         OracleDialectEpsgFactory factory = new OracleDialectEpsgFactory(hints, connection);
         return factory;
     }
@@ -67,8 +71,16 @@ public class OracleDialectEpsgMediator extends AbstractEpsgMediator {
      * Uninitialize an instance to be returned to the pool.
      */
     protected void passivateWorker(Object obj) throws Exception {
-        OracleDialectEpsgFactory factory = (OracleDialectEpsgFactory) obj;
-        factory.disconnect();
+        // Each implementation has the choice of closing connections when they
+        // are returned to the worker pool, or when the objects are destroyed.
+        // In this implementation, we have chosen to keep connections open
+        // during their idle time and close the connection when the worker is
+        // evicted. If we wanted to change this, we would move the disconnect
+        // statement to this method. Alternatively, we could also keep track
+        // of the idle time, and configure the pool to validate idle workers
+        // frequently. We would then do a check in the validateWorker method
+        // to close the connection when a connection close threshold is hit,
+        // prior to worker destruction.
     }
 
     /**
