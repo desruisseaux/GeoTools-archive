@@ -18,6 +18,7 @@ package org.geotools.gml;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 
 
 /**
@@ -70,6 +71,9 @@ public class SubHandlerPoint extends SubHandler {
      * @return Created Point.
      */
     public Geometry create(GeometryFactory geometryFactory) {
-        return geometryFactory.createPoint(coordinate);
+        Point point = geometryFactory.createPoint(coordinate);
+        point.setUserData( getSRS() );
+        point.setSRID( getSRID() );
+        return point;
     }
 }

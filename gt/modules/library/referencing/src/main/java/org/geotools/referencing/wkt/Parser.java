@@ -889,7 +889,7 @@ public class Parser extends MathTransformParser {
             }
             element.close();
             if (factories == null) {
-                final Hints hints = new Hints(null);
+                final Hints hints = new Hints( Collections.EMPTY_MAP );
                 hints.put(Hints.DATUM_FACTORY,          datumFactory);
                 hints.put(Hints.CS_FACTORY,             csFactory);
                 hints.put(Hints.CRS_FACTORY,            crsFactory);

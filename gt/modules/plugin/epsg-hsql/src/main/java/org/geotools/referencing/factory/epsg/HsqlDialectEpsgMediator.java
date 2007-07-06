@@ -30,6 +30,18 @@ import org.geotools.referencing.factory.AbstractEpsgMediator;
  */
 public class HsqlDialectEpsgMediator extends AbstractEpsgMediator {
 
+    /**
+     * Creates an HsqlDialectEpsgMediator a 20 min timeout on a max of one worker.
+     * @param priority
+     * @param datasource
+     */
+    public HsqlDialectEpsgMediator(int priority, DataSource datasource) {
+        this(priority,
+             new Hints( Hints.AUTHORITY_MAX_ACTIVE, new Integer(1),
+                        Hints.AUTHORITY_MAX_IDLE, new Integer(20)),
+             datasource );
+    }
+    
     public HsqlDialectEpsgMediator(int priority, Hints hints, DataSource datasource) {
         super(priority, hints, datasource);
     }

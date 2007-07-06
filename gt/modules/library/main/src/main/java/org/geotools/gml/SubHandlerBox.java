@@ -18,6 +18,7 @@ package org.geotools.gml;
 import java.util.logging.Logger;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
@@ -97,10 +98,11 @@ public class SubHandlerBox extends SubHandler {
             return null; // could this be handled better?
         }
 
-        com.vividsolutions.jts.geom.Geometry returnValue = geometryFactory
-            .createPolygon(r, null);
-        LOGGER.exiting("SubHandlerBox", "create", returnValue);
-
-        return returnValue;
+        Polygon polygon = geometryFactory.createPolygon(r, null);
+        LOGGER.exiting("SubHandlerBox", "create", polygon);
+        polygon.setUserData( getSRS() );
+        polygon.setSRID( getSRID() );
+        
+        return polygon;
     }
 }

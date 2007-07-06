@@ -74,10 +74,14 @@ public class GMLFilterGeometry extends org.xml.sax.helpers.XMLFilterImpl
      */
     public void geometryStart(String localName, org.xml.sax.Attributes atts)
         throws SAXException {
+        String srs = null;
         for (int i = 0; i < atts.getLength(); i++) {
-            //getName(i);
+            final String NAME = atts.getQName(i);
+            if( "srs".equalsIgnoreCase( NAME ) ){
+                srs = atts.getValue(i);
+            }
         }
-
+        currentHandler.setSRS( srs );
         if (currentHandler == null) {
             currentHandler = handlerFactory.create(localName);
         } else {

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 
 
 /**
@@ -72,7 +73,10 @@ public class SubHandlerLineString extends SubHandler {
      * @return JTS LineString geometry.
      */
     public Geometry create(GeometryFactory geometryFactory) {
-        return geometryFactory.createLineString((Coordinate[]) coordinateList
-            .toArray(new Coordinate[] {  }));
+        Coordinate[] coords = (Coordinate[]) coordinateList.toArray(new Coordinate[ coordinateList.size()]);
+        LineString lineString = geometryFactory.createLineString(coords);
+        lineString.setUserData( getSRS() );
+        lineString.setSRID( getSRID() );
+        return lineString;
     }
 }

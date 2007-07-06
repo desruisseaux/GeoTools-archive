@@ -33,6 +33,36 @@ public abstract class SubHandler {
     /** Indicates a sub geometry message. */
     public static final int GEOMETRY_SUB = 3;
 
+    private String srs = null;
+    
+    /**
+     * @return the srs
+     */
+    protected String getSRS() {
+        return srs;
+    }
+    /**
+     * Creates a basic SRID by looking at the provided srs.
+     * <p>
+     * As an example "EPSG:4326" would be turned into 4326
+     * 
+     * @return An int value based on the srs field, or 0
+     */
+    protected int getSRID(){
+        if( srs == null ) return 0;
+        String split[] = srs.split("\\:");
+        try {
+            return Integer.parseInt( split[ split.length-1]);
+        }
+        catch( NumberFormatException ignore ){
+            return 0; // probably some complicated OGC SRS
+        }
+    }
+    
+    public void setSRS( String SRS ){
+        srs = SRS;
+    }
+    
     /**
      * Adds a coordinate to the object being built if appropriate.
      *

@@ -23,9 +23,12 @@ import java.util.logging.Logger;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
@@ -140,23 +143,30 @@ public class SubHandlerMulti extends SubHandler {
      */
     public Geometry create(GeometryFactory geometryFactory) {
         if (internalType.equals("Point")) {
-            MultiPoint mp = geometryFactory.createMultiPoint(geometryFactory
-                    .toPointArray(geometries));
-            LOGGER.fine("created " + mp);
+            Point[] pointArray = geometryFactory.toPointArray(geometries);            
+            MultiPoint multiPoint = geometryFactory.createMultiPoint(pointArray);
+            multiPoint.setUserData( getSRS() );
+            multiPoint.setSRID( getSRID() );
+            LOGGER.fine("created " + multiPoint);
 
-            return mp;
+            return multiPoint;
         } else if (internalType.equals("LineString")) {
-            MultiLineString ml = geometryFactory.createMultiLineString(geometryFactory
-                    .toLineStringArray(geometries));
-            LOGGER.fine("created " + ml);
+            LineString[] lineStringArray = geometryFactory
+                    .toLineStringArray(geometries);
+            MultiLineString multiLineString = geometryFactory.createMultiLineString(lineStringArray);
+            multiLineString.setUserData( getSRS() );
+            multiLineString.setSRID( getSRID() );
+            LOGGER.fine("created " + multiLineString);
 
-            return ml;
+            return multiLineString;
         } else if (internalType.equals("Polygon")) {
-            MultiPolygon mp = geometryFactory.createMultiPolygon(geometryFactory
-                    .toPolygonArray(geometries));
-            LOGGER.fine("created " + mp);
+            Polygon[] polygonArray = geometryFactory.toPolygonArray(geometries);
+            MultiPolygon multiPolygon = geometryFactory.createMultiPolygon(polygonArray);
+            multiPolygon.setUserData( getSRS() );
+            multiPolygon.setSRID( getSRID() );
+            LOGGER.fine("created " + multiPolygon);
 
-            return mp;
+            return multiPolygon;
         } else {
             return null;
         }

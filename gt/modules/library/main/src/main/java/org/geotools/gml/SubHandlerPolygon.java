@@ -24,6 +24,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.TopologyException;
 
 
@@ -212,7 +213,6 @@ public class SubHandlerPolygon extends SubHandler {
     public Geometry create(GeometryFactory geometryFactory) {
         for (int i = 0; i < innerBoundaries.size(); i++) {
             LinearRing hole = (LinearRing) innerBoundaries.get(i);
-
             if (hole.crosses(outerBoundary)) {
                 LOGGER.warning("Topology Error building polygon");
 
@@ -220,7 +220,11 @@ public class SubHandlerPolygon extends SubHandler {
             }
         }
 
-        return geometryFactory.createPolygon(outerBoundary,
-            (LinearRing[]) innerBoundaries.toArray(new LinearRing[0]));
+        LinearRing[] rings =
+            (LinearRing[]) innerBoundaries.toArray(new LinearRing[innerBoundaries.size()]);
+        Polygon polygon = geometryFactory.createPolygon(outerBoundary,rings);
+        polygon.setUserData( getSRS() );
+        polygon.setSRID( getSRID() );
+        return polygon;
     }
 }

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.TopologyException;
 
 
@@ -83,8 +84,11 @@ public class SubHandlerLinearRing extends SubHandler {
      */
     public Geometry create(GeometryFactory geometryFactory) {
         try {
-            return geometryFactory.createLinearRing((Coordinate[]) coordinateList
-                .toArray(new Coordinate[] {  }));
+            Coordinate[] coords = (Coordinate[]) coordinateList.toArray(new Coordinate[coordinateList.size()]);
+            LinearRing ring = geometryFactory.createLinearRing(coords);
+            ring.setUserData( getSRS() );
+            ring.setSRID( getSRID() );
+            return ring;
         } catch (TopologyException e) {
             System.err.println(
                 "Caught Topology exception in GMLLinearRingHandler");

@@ -68,7 +68,7 @@ public final class Hints extends RenderingHints {
     /**
      * A set of system-wide hints to use by default.
      */
-    private static final Hints GLOBAL = new Hints(null);
+    private static final Hints GLOBAL = new Hints(Collections.EMPTY_MAP);
 
     /**
      * {@code true} if {@link #scanSystemProperties} needs to be invoked.
@@ -644,7 +644,68 @@ public final class Hints extends RenderingHints {
     public Hints(final RenderingHints.Key key, final Object value) {
         super(key, value);
     }
-
+    /**
+     * Constructs a new object with two key/value pair.
+     * 
+     * @param key1   The key for the first pair
+     * @param value1 The value for the first pair
+     * @param key2   The key2 for the first pair
+     * @param value2 The value2 for the first pair
+     */
+    public Hints(final RenderingHints.Key key1, final Object value1, final RenderingHints.Key key2, final Object value2) {
+        this( fromPairs( new Object[]{ key1, value1, key2, value2 } ) );
+    }
+    
+    /**
+     * Constructs a new object from key/value pair.
+     * <p>
+     * This method is intended for use with Java5:
+     * <code>new Hints( Hints.BUFFER_LIMIT,1,Hints.BUFFER_POLICY,"weak" )</code>
+     * 
+     * @param pairs Key value pairs
+     */
+    public Hints( final RenderingHints.Key key1, final Object value1, final RenderingHints.Key key2, final Object value2, Object[] pairs ) {
+        this( fromPairs( key1, value1, key2, value2, pairs )  );
+    }
+    /**
+     * Utility method used to organize pairs into a Map.
+     * @param pairs An array of Key/Value pairs
+     * @return Map<Key,Value>
+     * @throws ClassCastException if Key/Value pairs do not match
+     */
+    private static Map fromPairs( RenderingHints.Key key1, Object value1, RenderingHints.Key key2, Object value2, Object[] pairs ){
+        Map map = new HashMap();
+        map.put( key1, value1 );
+        map.put( key2, value2 );
+        for( int i=0; i<pairs.length; i+=2){
+            Key key = (Key) pairs[i];
+            Object value = pairs[i+1];
+            if( key.isCompatibleValue(value)){
+                throw new ClassCastException( key + " requires "+key.getValueClass()+" - could cast "+value );
+            }
+            map.put( key, value );
+        }
+        return map;
+    }
+    /**
+     * Utility method used to organize pairs into a Map.
+     * @param pairs An array of Key/Value pairs
+     * @return Map<Key,Value>
+     * @throws ClassCastException if Key/Value pairs do not match
+     */
+    private static Map fromPairs( Object[] pairs ){
+        Map map = new HashMap();
+        for( int i=0; i<pairs.length; i+=2){
+            Key key = (Key) pairs[i];
+            Object value = pairs[i+1];
+            if( key.isCompatibleValue(value)){
+                throw new ClassCastException( key + " requires "+key.getValueClass()+" - could cast "+value );
+            }
+            map.put( key, value );
+        }
+        return map;
+    }
+    
     /**
      * Constructs a new object with keys and values initialized from the
      * specified map (which may be null).
