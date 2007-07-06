@@ -151,7 +151,7 @@ public class PointArrayImpl extends ArrayList implements PointArray, JTSGeometry
      *
      * @see #get(int)
      */
-    public DirectPosition getPosition(int column, DirectPosition dest) throws IndexOutOfBoundsException {
+    public DirectPosition getDirectPosition(int column, DirectPosition dest) throws IndexOutOfBoundsException {
         DirectPosition position = (DirectPosition)pointList.get(column);
         if (dest == null) {
             dest = new DirectPositionImpl(position.getCoordinateReferenceSystem());
@@ -175,7 +175,7 @@ public class PointArrayImpl extends ArrayList implements PointArray, JTSGeometry
      *
      * @see List#set
      */
-    public void setPosition(int column, DirectPosition position) throws IndexOutOfBoundsException {
+    public void setDirectPosition(int column, DirectPosition position) throws IndexOutOfBoundsException {
         DirectPosition thisPosition = (DirectPosition)pointList.get(column);
         DirectPosition otherPosition = position.getPosition();
         for (int i = 0; i < thisPosition.getDimension(); i++) {
