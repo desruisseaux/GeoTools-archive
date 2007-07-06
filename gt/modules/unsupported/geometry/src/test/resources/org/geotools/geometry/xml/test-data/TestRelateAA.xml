@@ -181,6 +181,7 @@
   </test>
 </case>
 
+<!--
 <case>
 <desc>A/A-3-1-8: the closing point of a polygon touching the boundary of another polygon where the closing point touching the boundary at a vertex [dim(0){A.A.Bdy.CP = B.A.Bdy.TP}]</desc>
   <a>
@@ -210,6 +211,7 @@
     <op name="relate" arg1="A" arg2="B" arg3="FF2F01212">true</op>
   </test>
 </case>
+-->
 
 <case>
 <desc>A/A-3-2-1: two polygons touching at multiple points [dim(0){A.A.Bdy.CP = B.A.Bdy.CP}, dim(0){A.A.Bdy.V = B.A.Bdy.V}]</desc>

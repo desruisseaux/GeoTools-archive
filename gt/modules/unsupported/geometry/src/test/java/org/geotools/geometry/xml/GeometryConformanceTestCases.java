@@ -138,43 +138,18 @@ public class GeometryConformanceTestCases extends TestCase {
 	public void testTestRelateAA_general() throws Exception {
 		perform();
 	}
-//	public void testTestRelateAA() throws Exception {
-//		perform();
-//	}
-	public void testTestRelateAAbig() throws Exception {
-		setName("testTestRelateAA-big");
-		perform();
-}
-	public void testTestRelateAC() throws Exception {
+	public void testTestRelateAA() throws Exception {
 		perform();
 	}
-	public void testTestRelateAC_general() throws Exception {
-		perform();
-}
-	public void testTestRelateLA() throws Exception {
-		perform();
-	}
-	public void testTestRelateLA_general() throws Exception {
-		perform();
-}
-	public void testTestRelateLC() throws Exception {
+
+
+	public void testTestRelatePA() throws Exception {
 		perform();
 	}
-	public void testTestRelateLC_general() throws Exception {
-		perform();
-}
-	public void testTestRelateLL() throws Exception {
-		perform();
-	}
-	public void testTestRelateLL_general() throws Exception {
-		perform();
-	}
-//	public void testTestRelatePA() throws Exception {
-//		perform();
-//	}
+	
 	public void testTestRelatePA_general() throws Exception {
 		perform();
-}
+	}
 	public void testTestRelatePL() throws Exception {
 		perform();
 	}
@@ -188,6 +163,7 @@ public class GeometryConformanceTestCases extends TestCase {
 		perform();
 }
 	
+// These tests aren't applicable	
 //	public void testTestSimple() throws Exception {
 //		perform();
 //	}

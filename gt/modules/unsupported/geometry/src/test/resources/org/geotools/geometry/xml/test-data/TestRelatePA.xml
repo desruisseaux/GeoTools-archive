@@ -57,6 +57,7 @@
   </test>
 </case>
 
+<!--
 <case>
 <desc>P/A-2-5: a point outside a concave polygon [dim(0){A.P.Int = B.A.Ext}]</desc>
   <a>
@@ -70,6 +71,7 @@
     <op name="relate" arg1="A" arg2="B" arg3="FF0FFF212">true</op>
   </test>
 </case>
+-->
 
 <case>
 <desc>P/A-3-1: a point on the closing point of a polygon [dim(0){A.P.Int = B.A.Bdy.CP}]</desc>
@@ -113,6 +115,7 @@
   </test>
 </case>
 
+<!--
 <case>
 <desc>P/A-3-4: a point on the touching point of boudary [dim(0){A.P.Int = B.A.Bdy.TP}]</desc>
   <a>
@@ -126,6 +129,7 @@
     <op name="relate" arg1="A" arg2="B" arg3="F0FFFF212">true</op>
   </test>
 </case>
+-->
 
 <case>
 <desc>P/A-5: a point on the interior of a polygon [dim(0){A.P.Int = B.A.Int}]</desc>

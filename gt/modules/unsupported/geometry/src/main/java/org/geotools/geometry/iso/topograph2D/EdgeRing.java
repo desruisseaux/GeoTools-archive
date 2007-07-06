@@ -141,7 +141,25 @@ public abstract class EdgeRing {
 		this.crs = crs;
 		this.cga = cga;
 		this.computePoints(start);
-		this.computeRing();
+		// Ring is now computed (and stored) only when first asked for in the getter method.
+		// This change fixed a bug where building up a polygon with holes that touch the
+		// outer ring cause a "non-simple" error to occur before the maximaledgerings can
+		// be changed to minimaledgerings. isHole still needs to be computed now though.
+		//this.computeRing();
+		
+		// build list of direct positions and calculate hole
+		List<DirectPositionImpl> dpList = new LinkedList<DirectPositionImpl>();
+
+		for (int i = 0; i < this.pts.size(); i++) {
+			double[] doubleCoords = ((Coordinate) this.pts.get(i))
+					.getCoordinates();
+			DirectPositionImpl dp = new DirectPositionImpl(crs, doubleCoords);
+			dpList.add(dp);
+		}
+		
+		// See if the Ring is counterclockwise oriented
+		this.isHole = this.cga.isCCW(dpList);
+		
 	}
 
 	abstract public DirectedEdge getNext(DirectedEdge de);
@@ -161,7 +179,10 @@ public abstract class EdgeRing {
 		return (Coordinate) pts.get(i);
 	}
 
+	// If the ring obj is already computed, return it.  Otherwise, compute the ring and 
+	// store it for next time.
 	public RingImpl getRing() {
+		this.computeRing();
 		return this.ring;
 	}
 
@@ -247,9 +268,12 @@ public abstract class EdgeRing {
 		this.ring = (RingImpl) new RingImpl(orientableCurves);		
 		// this.ring = (RingImpl) this.mFeatGeomFactory.getPrimitiveFactory().createRingByDirectPositions(dpList);
 		
+		// isHole is now calculated in the constructor.
+		/*
 		// See if the Ring is counterclockwise oriented
 		this.isHole = this.cga.isCCW(CoordinateArrays
 				.toCoordinateArray(this.ring.asDirectPositions()));
+		*/
 
 		// Debug.println( (isHole ? "hole - " : "shell - ") +
 		// WKTWriter.toLineString(new
