@@ -30,7 +30,9 @@ import java.sql.Statement;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import org.geotools.factory.Hints;
 import org.hsqldb.jdbc.jdbcDataSource;
+import org.opengis.referencing.FactoryException;
 
 
 /**
@@ -81,6 +83,13 @@ public class HsqlEpsgDatabase {
         return createDataSource(getDirectory());
     }
 
+    public static javax.sql.DataSource createDataSource(Hints hints ) throws FactoryException {
+        try {
+            return createDataSource(getDirectory());
+        } catch (SQLException e) {
+            throw new FactoryException( e );
+        }
+    }
     public static javax.sql.DataSource createDataSource(File directory) throws SQLException {
         jdbcDataSource dataSource = new jdbcDataSource();
         /*

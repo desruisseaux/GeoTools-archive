@@ -9,7 +9,7 @@ import junit.framework.TestCase;
  */
 public class ObjectCacheEntryTest extends TestCase {
 
-    ObjectCacheEntry entry;
+    DefaultObjectCache.ObjectCacheEntry entry;
     
     private class EntryReaderThread implements Runnable {
 
@@ -56,7 +56,7 @@ public class ObjectCacheEntryTest extends TestCase {
 
     public void testWriteReadDeadlock() throws InterruptedException {
         //lock the entry as if we were writing
-        entry = new ObjectCacheEntry();
+        entry = new DefaultObjectCache.ObjectCacheEntry();
         entry.writeLock();
         
         //create another thread which starts reading
@@ -84,7 +84,7 @@ public class ObjectCacheEntryTest extends TestCase {
 
     public void testWriteWriteDeadlock() throws InterruptedException {
         //lock the entry as if we were writing
-        entry = new ObjectCacheEntry();
+        entry = new DefaultObjectCache.ObjectCacheEntry();
         entry.writeLock();
 
         //write the value 2

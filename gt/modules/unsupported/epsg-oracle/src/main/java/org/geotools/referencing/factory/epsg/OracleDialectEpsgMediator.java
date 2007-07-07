@@ -33,7 +33,7 @@ public class OracleDialectEpsgMediator extends AbstractEpsgMediator {
     Hints hints;
     
     public OracleDialectEpsgMediator(int priority, Hints hints, DataSource datasource) {
-        super(priority, hints, datasource);
+        super( hints, datasource);
         this.hints = hints;
     }
 

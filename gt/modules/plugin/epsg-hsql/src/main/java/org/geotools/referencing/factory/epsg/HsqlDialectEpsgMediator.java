@@ -15,12 +15,15 @@
  */
 package org.geotools.referencing.factory.epsg;
 
+import java.io.File;
 import java.sql.Connection;
 
 import javax.sql.DataSource;
 
+import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.referencing.factory.AbstractEpsgMediator;
+import org.opengis.referencing.FactoryException;
 
 /**
  * Mediator which delegates the creation of referencing objects to the
@@ -31,6 +34,27 @@ import org.geotools.referencing.factory.AbstractEpsgMediator;
 public class HsqlDialectEpsgMediator extends AbstractEpsgMediator {
 
     Hints hints;
+    
+    /**
+     * Creates a new instance of this factory.
+     */
+    public HsqlDialectEpsgMediator() throws FactoryException {
+        this( GeoTools.getDefaultHints() );
+    }
+    
+    /**
+     * Creates a new instance of this data source using the specified hints. The priority
+     * is set to a lower value than the {@linkplain FactoryOnAccess}'s one in order to give
+     * precedence to the Access-backed database, if presents. Priorities are set that way
+     * because:
+     * <ul>
+     *   <li>The MS-Access format is the primary EPSG database format.</li>
+     *   <li>If a user downloads the MS-Access database himself, he probably wants to use it.</li>
+     * </ul>
+     */
+    public HsqlDialectEpsgMediator(final Hints hints) throws FactoryException {
+        super(hints, HsqlEpsgDatabase.createDataSource( hints ));
+    }
     
     /**
      * Creates an HsqlDialectEpsgMediator with a 20 min timeout, single worker,
@@ -53,7 +77,7 @@ public class HsqlDialectEpsgMediator extends AbstractEpsgMediator {
     }
     
     public HsqlDialectEpsgMediator(int priority, Hints hints, DataSource datasource) {
-        super(priority, hints, datasource);
+        super(hints, datasource);
         this.hints = hints;
     }
 

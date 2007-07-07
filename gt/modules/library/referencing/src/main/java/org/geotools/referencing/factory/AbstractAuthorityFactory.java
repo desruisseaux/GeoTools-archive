@@ -70,7 +70,7 @@ import org.geotools.util.NameFactory;
  * @author Martin Desruisseaux
  */
 public abstract class AbstractAuthorityFactory extends ReferencingFactory
-        implements AuthorityFactory
+        implements AuthorityFactory, AuthorityFactory2
 {
     /**
      * Constructs an instance using the specified priority level.

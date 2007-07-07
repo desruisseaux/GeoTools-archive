@@ -42,8 +42,8 @@ public abstract class AbstractEpsgMediator extends AbstractAuthorityMediator {
 
     private static final Logger LOGGER = Logger.getLogger("org.geotools.referencing.factory");
     
-    public AbstractEpsgMediator(int priority, Hints hints, DataSource datasource) {
-        super(priority, hints);
+    public AbstractEpsgMediator(Hints hints, DataSource datasource) {
+        super(hints);
         this.datasource = datasource;
     }
     
@@ -61,7 +61,15 @@ public abstract class AbstractEpsgMediator extends AbstractAuthorityMediator {
     public Citation getAuthority() {
         return Citations.EPSG;
     }
+    
+    public void dispose(){
+        datasource = null;
+    }
 
+    public boolean isConnected(){
+        return datasource != null;        
+    }
+    
     /**
      * Gets a description of the object corresponding to a code.
      *

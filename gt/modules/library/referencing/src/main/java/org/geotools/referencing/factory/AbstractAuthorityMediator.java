@@ -101,10 +101,12 @@ import org.opengis.util.InternationalString;
  * @author Cory Horner (Refractions Research)
  */
 public abstract class AbstractAuthorityMediator extends
-        ReferencingFactory implements AuthorityFactory, CRSAuthorityFactory,
+        ReferencingFactory implements AuthorityFactory, AuthorityFactory2, CRSAuthorityFactory,
         CSAuthorityFactory, DatumAuthorityFactory,
         CoordinateOperationAuthorityFactory, BufferedFactory {
 
+    static final int PRIORITY = MAXIMUM_PRIORITY - 10;
+    
     /**
      * Cache to be used for referencing objects defined by this authority.
      * Please note that this cache may be shared!
@@ -128,6 +130,22 @@ public abstract class AbstractAuthorityMediator extends
      */
     protected final ReferencingFactoryContainer factories;
 
+    /**
+     * Constructs an instance making use of the default cache and priority level.
+     */
+    protected AbstractAuthorityMediator(){
+        this( PRIORITY );
+    }
+    
+    /**
+     * Constructs an instance based on the provided Hints
+     * 
+     * @param factory
+     *            The factory to cache. Can not be {@code null}.
+     */
+    protected AbstractAuthorityMediator(Hints hints) {
+        this( PRIORITY, hints );
+    }
     /**
      * Constructs an instance making use of the default cache.
      * 
@@ -180,6 +198,37 @@ public abstract class AbstractAuthorityMediator extends
         super(priority);
         this.factories = container;
         this.cache = cache;
+    }
+    
+    /**
+     * Returns a finder which can be used for looking up unidentified objects. The finder
+     * fetchs a fully {@linkplain IdentifiedObject identified object} from an incomplete one,
+     * for example from an object without identifier or "{@code AUTHORITY[...]}" element in
+     * <cite>Well Known Text</cite> terminology.
+     *
+     * @param  type The type of objects to look for. Should be a GeoAPI interface like
+     *         {@code GeographicCRS.class}, but this method accepts also implementation
+     *         class. If the type is unknown, use {@code IdentifiedObject.class}. A more
+     *         accurate type may help to speed up the search, since it reduces the amount
+     *         of tables to scan in some implementations like the factories backed by
+     *         EPSG database.
+     * @return A finder to use for looking up unidentified objects.
+     * @throws FactoryException if the finder can not be created.
+     *
+     * @since 2.4
+     */
+    public IdentifiedObjectFinder getIdentifiedObjectFinder(
+            final Class/*<? extends IdentifiedObject>*/ type) throws FactoryException
+    {
+        return new IdentifiedObjectFinder(this, type);
+    }    
+    
+    /**
+     * True if this mediator is currently connected to one or more workers.
+     * @return
+     */
+    public boolean isConnected(){
+        return (workers.getNumActive() + workers.getNumIdle() ) > 0;
     }
     
     ObjectPool getPool() {
@@ -1004,5 +1053,5 @@ public abstract class AbstractAuthorityMediator extends
     /**
      * Ensures that the instance is safe to be returned by the pool.
      */
-    protected abstract boolean validateWorker(Object obj);
+    protected abstract boolean validateWorker(Object obj);    
 }
