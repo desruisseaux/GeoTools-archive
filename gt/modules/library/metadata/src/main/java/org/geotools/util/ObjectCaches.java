@@ -113,11 +113,13 @@ public final class ObjectCaches {
      */
     public static ObjectCache create( String policy, int size ){
         if ("weak".equalsIgnoreCase(policy)) {
-            return new DefaultObjectCache(0);
+            return new WeakObjectCache(0);
         } else if ("all".equalsIgnoreCase(policy)) {
             return new DefaultObjectCache(size);
         } else if ("none".equalsIgnoreCase(policy)) {
             return NullObjectCache.INSTANCE;
+        } else if ("fixed".equalsIgnoreCase(policy)) {
+            return new FixedSizeObjectCache(size);
         } else {
             return new DefaultObjectCache(size);
         }

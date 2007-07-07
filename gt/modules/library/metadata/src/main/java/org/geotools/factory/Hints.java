@@ -457,7 +457,7 @@ public final class Hints extends RenderingHints {
      *
      * @since 2.4
      */
-    public static final OptionKey BUFFER_POLICY = new OptionKey("weak", "all", "none");
+    public static final OptionKey BUFFER_POLICY = new OptionKey("weak", "all", "fixed","none","default");
 
     /**
      * The recommended maximum number of referencing objects to hold in a
@@ -1300,6 +1300,14 @@ public final class Hints extends RenderingHints {
             this(new String[] {option1, option2, option4});
         }
 
+        /**
+         * Creates a new key for a configuration option.
+         *
+         * @todo Replace by variable arguments length when we will be allowed to compile for J2SE 1.5.
+         */
+        public OptionKey(String option1, String option2, String option3, String option4, String option5) {
+            this(new String[] {option1, option2, option4, option5});
+        }
         /**
          * Creates a new key for a configuration option.
          *

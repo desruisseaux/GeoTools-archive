@@ -187,7 +187,27 @@ public class WeakValueHashMap extends AbstractMap {
         threshold = Math.round(table.length*LOAD_FACTOR);
         lastRehashTime = System.currentTimeMillis();
     }
+    
+    /**
+     * Create a {@link WeakValueHashMap} of the requested size.
+     * @param initialSize
+     */
+    public WeakValueHashMap( int initialSize ){
+        table = new Entry[initialSize];
+        threshold = Math.round(table.length*LOAD_FACTOR);
+        lastRehashTime = System.currentTimeMillis();   
+    }
 
+    /**
+     * Create a new WeakValueHashMap populated with the contents of the provied map.
+     * 
+     * @param map Initial contents of the WeakValueHashMap
+     */
+    public WeakValueHashMap( Map map ){
+        this();
+        putAll( map );
+    }
+    
     /**
      * Invoked by {@link Entry} when an element has been collected
      * by the garbage collector. This method will remove the weak reference
