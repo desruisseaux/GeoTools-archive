@@ -15,15 +15,17 @@
  */
 package org.geotools.filter.visitor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import junit.framework.TestCase;
 
-import org.geotools.filter.CompareFilter;
-import org.opengis.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.FilterType;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
-import org.geotools.filter.LogicFilter;
+import org.opengis.filter.And;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.FilterFactory2;
 
 
 /**
@@ -40,25 +42,21 @@ public class DuplicatorFilterVisitorTest extends TestCase {
     }
 
     protected void setUp() throws Exception {
-        fac = FilterFactoryFinder.createFilterFactory();
+        fac = CommonFactoryFinder.getFilterFactory(null);
     }
     
     public void testLogicFilterDuplication() throws IllegalFilterException {
-    	//create a filter
-    	LogicFilter oldFilter = fac.createLogicFilter(FilterType.LOGIC_AND);
-    	CompareFilter filter1 = fac.createCompareFilter(FilterType.COMPARE_GREATER_THAN);
-    	filter1.addLeftValue(fac.createLiteralExpression(2));
-    	filter1.addRightValue(fac.createLiteralExpression(1));
-    	oldFilter.addFilter(filter1);
-    	CompareFilter filter2 = fac.createCompareFilter(FilterType.COMPARE_GREATER_THAN);
-    	filter2.addLeftValue(fac.createLiteralExpression(4));
-    	filter2.addRightValue(fac.createLiteralExpression(3));
-    	oldFilter.addFilter(filter2);
-    	
-    	//duplicate it
-    	DuplicatorFilterVisitor visitor = new DuplicatorFilterVisitor(fac);
-    	oldFilter.accept(visitor);
-    	Filter newFilter = (Filter) visitor.getCopy();
+        List filters = new ArrayList();
+        // create a filter
+        Filter filter1 = fac.greater(fac.literal(2), fac.literal(1));
+        filters.add(filter1);
+        Filter filter2 = fac.greater(fac.literal(4), fac.literal(3));
+        filters.add(filter2);
+
+        And oldFilter = fac.and(filters);
+        //duplicate it
+    	DuplicatingFilterVisitor visitor = new DuplicatingFilterVisitor((FilterFactory2) fac);
+    	Filter newFilter = (Filter) oldFilter.accept(visitor, null);
 
     	//compare it
     	assertNotNull(newFilter);

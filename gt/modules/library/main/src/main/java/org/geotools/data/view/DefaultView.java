@@ -32,14 +32,13 @@ import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
 import org.geotools.data.crs.ForceCoordinateSystemFeatureResults;
 import org.geotools.data.crs.ReprojectFeatureResults;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
-import org.opengis.filter.Filter;
-import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.FilterType;
-import org.geotools.filter.LogicFilter;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -62,7 +61,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * impement FeatureSource.
  * </p>
  * 
- * @author Gabriel Roldán
+ * @author Gabriel Roldï¿½n
  * @source $URL$
  */
 public class DefaultView implements FeatureSource {
@@ -276,7 +275,7 @@ public class DefaultView implements FeatureSource {
         Filter constraintFilter = constraintQuery.getFilter();
         try {
             if (constraintFilter != Filter.INCLUDE) {
-                FilterFactory ff = FilterFactoryFinder.createFilterFactory();
+                FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
                 newFilter = ff.and(constraintFilter, filter);
             }
         } catch (Exception ex) {

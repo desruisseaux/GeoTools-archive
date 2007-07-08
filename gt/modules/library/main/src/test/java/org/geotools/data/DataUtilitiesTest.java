@@ -16,29 +16,36 @@
 package org.geotools.data;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.geotools.filter.AbstractFilter;
-import org.geotools.filter.AttributeExpression;
-import org.geotools.filter.BetweenFilter;
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FidFilter;
-import org.opengis.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.FilterType;
-import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.IllegalFilterException;
-import org.geotools.filter.LikeFilter;
-import org.geotools.filter.LogicFilter;
-import org.geotools.filter.NullFilter;
+import org.geotools.filter.visitor.DefaultFilterVisitor;
+import org.opengis.filter.And;
+import org.opengis.filter.BinaryLogicOperator;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.FilterVisitor;
+import org.opengis.filter.Id;
+import org.opengis.filter.Not;
+import org.opengis.filter.PropertyIsBetween;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.PropertyIsLike;
+import org.opengis.filter.PropertyIsNull;
+import org.opengis.filter.expression.Add;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Function;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -81,7 +88,7 @@ public class DataUtilitiesTest extends DataTestCase {
      * Test for String[] attributeNames(Filter)
      */
     public void testAttributeNamesFilter() throws IllegalFilterException {
-        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+        FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
         String[] names;
 
         Filter filter = null;
@@ -90,49 +97,38 @@ public class DataUtilitiesTest extends DataTestCase {
         names = DataUtilities.attributeNames(filter);
         assertEquals(names.length, 0);
 
-        FidFilter fidFilter = factory.createFidFilter("fid");
+        Id fidFilter = factory.id(Collections.singleton(factory.featureId("fid")));
 
         // check fidFilter         
         names = DataUtilities.attributeNames(fidFilter);
         assertEquals(0, names.length);
 
-        AttributeExpression id = factory.createAttributeExpression(roadType, "id");
-        AttributeExpression name = factory.createAttributeExpression(roadType,
-                "name");
-        AttributeExpression geom = factory.createAttributeExpression(roadType,
-                "geom");
-
-        NullFilter nullFilter = factory.createNullFilter();
+        PropertyName id = factory.property("id");
+        PropertyName name = factory.property("name");
+        PropertyName geom = factory.property("geom");
 
         // check nullFilter
-        nullFilter.nullCheckValue(id);
+        PropertyIsNull nullFilter = factory.isNull(id);
         names = DataUtilities.attributeNames(nullFilter);
         assertEquals(1, names.length);
         assertEquals("id", names[0]);
 
-        CompareFilter equal = factory.createCompareFilter((short) 14);
-        equal.addLeftValue(name);
-        equal.addRightValue(id);
+        PropertyIsEqualTo equal = factory.equals(name, id);
         names = DataUtilities.attributeNames(equal);
         assertEquals(2, names.length);
         List list = Arrays.asList(names);
         assertTrue(list.contains("name"));
         assertTrue(list.contains("id"));
  
-        FunctionExpression fnCall = factory.createFunctionExpression("Max");
-        fnCall.setArgs(new Expression[] { id, name });
+        Function fnCall = factory.function("Max", new Expression[] { id, name });
 
-        LikeFilter fn = factory.createLikeFilter();
-        fn.setValue(fnCall);
+        PropertyIsLike fn = factory.like(fnCall, "does-not-matter");
         names = DataUtilities.attributeNames(fn);
         list = Arrays.asList(names);
         assertTrue(list.contains("name"));
         assertTrue(list.contains("id"));
 
-        BetweenFilter between = factory.createBetweenFilter();
-        between.addLeftValue(id);
-        between.addMiddleValue(name);
-        between.addRightValue(geom);
+        PropertyIsBetween between = factory.between(name, id, geom);
         names = DataUtilities.attributeNames(between);
         assertEquals(3, names.length);
         list = Arrays.asList(names);
@@ -141,9 +137,8 @@ public class DataUtilitiesTest extends DataTestCase {
         assertTrue(list.contains("geom"));
         
         // check logic filter
-        NullFilter geomNull = factory.createNullFilter();
-        geomNull.nullCheckValue(geom);
-        names = DataUtilities.attributeNames(geomNull.and(equal));
+        PropertyIsNull geomNull = factory.isNull(geom);
+        names = DataUtilities.attributeNames(factory.and(geomNull, equal));
         assertEquals(3, names.length);
         list = Arrays.asList(names);
         assertTrue(list.contains("name"));
@@ -151,7 +146,7 @@ public class DataUtilitiesTest extends DataTestCase {
         assertTrue(list.contains("geom"));
         
         // check not filter
-        names = DataUtilities.attributeNames(geomNull.not());
+        names = DataUtilities.attributeNames(factory.not(geomNull));
         assertEquals(1, names.length);
         assertEquals("geom", names[0]);
     }
@@ -160,15 +155,131 @@ public class DataUtilitiesTest extends DataTestCase {
      * Test for void traverse(Filter, FilterVisitor)
      */
     public void testTraverseFilterFilterVisitor() {
+        FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
+
+        final Literal exp1 = factory.literal(1);
+        final PropertyName exp2 = factory.property("ammount");
+        final PropertyIsEqualTo filter1 = factory.equals(exp1, exp2);
+
+        final Not testFilter = factory.not(filter1);
+
+        class TestVisitor extends DefaultFilterVisitor {
+            boolean exp1Called = false;
+
+            boolean exp2Called = false;
+
+            boolean filter1Called = false;
+
+            boolean filter2Called = false;
+
+            public Object visit(Literal exp, Object data) {
+                exp1Called = exp1 == exp;
+                return data;
+            }
+
+            public Object visit(PropertyName exp, Object data) {
+                exp2Called = exp2 == exp;
+                return data;
+            }
+
+            public Object visit(PropertyIsEqualTo filter, Object data) {
+                filter1Called = filter1 == filter;
+                return data;
+            }
+
+            public Object visit(Not filter, Object data) {
+                filter2Called = testFilter == filter;
+                return data;
+            }
+        }
+        ;
+
+        TestVisitor visitor = new TestVisitor();
+        DataUtilities.traverse(testFilter, visitor);
+
+        assertTrue(visitor.exp1Called);
+        assertTrue(visitor.exp2Called);
+        assertTrue(visitor.filter1Called);
+        assertTrue(visitor.filter2Called);        
     }
 
     /*
      * Test for void traverse(Set, FilterVisitor)
      */
     public void testTraverseSetFilterVisitor() {
+        FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
+        
+        final Literal exp1 = factory.literal(1);
+        final PropertyName exp2 = factory.property("ammount");
+        // the filters are unrelated to the above expressions to avoid
+        // the expressions being called as a side effect of the filters
+        // being called and thus not being sure if traverse(Set, FilterVisitor)
+        // actually called them directly
+        final PropertyIsEqualTo filter1 = factory.equals(factory.property("p1"), factory
+                .property("p2"));
+        final Not filter2 = factory
+                .not(factory.id(Collections.singleton(factory.featureId("id1"))));
+
+        Set set = new HashSet();
+        set.add(exp1);
+        set.add(exp2);
+        set.add(filter1);
+        set.add(filter2);
+        
+        class TestVisitor extends DefaultFilterVisitor {
+            boolean exp1Called = false;
+            boolean exp2Called = false;
+            boolean filter1Called = false;
+            boolean filter2Called = false;
+            
+            public Object visit(Literal exp, Object data){
+                exp1Called = exp1 == exp;
+                return data;
+            }
+            
+            public Object visit(PropertyName exp, Object data){
+                exp2Called = exp2 == exp;
+                return data;
+            }
+            
+            public Object visit(PropertyIsEqualTo filter, Object data){
+                filter1Called = filter1 == filter;
+                return data;
+            }
+            
+            public Object visit(Not filter, Object data){
+                filter2Called = filter2 == filter;
+                return data;
+            }
+        };
+        
+        TestVisitor visitor = new TestVisitor();
+        DataUtilities.traverse(set, visitor);
+        
+        assertTrue(visitor.exp1Called);
+        assertTrue(visitor.exp2Called);
+        assertTrue(visitor.filter1Called);
+        assertTrue(visitor.filter2Called);        
     }
 
     public void testTraverseDepth() {
+        FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
+
+        Expression exp1 = factory.literal(1);
+        Expression exp2 = factory.property("ammount");
+        Expression exp3 = factory.literal(4);
+        Expression exp4 = factory.add(exp1, exp2);
+        
+        Filter filter1 = factory.equals(exp4, exp3);
+        Filter filter2 = factory.not(filter1);
+        
+        Set set = DataUtilities.traverseDepth(filter2);
+        assertTrue(set.contains(exp1));
+        assertTrue(set.contains(exp2));
+        assertTrue(set.contains(exp3));
+        assertTrue(set.contains(exp4));
+        assertTrue(set.contains(filter1));
+        assertTrue(set.contains(filter2));
     }
 
     public void testCompare() throws SchemaException {
@@ -340,19 +451,14 @@ public class DataUtilitiesTest extends DataTestCase {
     	//now use some filters
     	Filter filter1 = null;
     	Filter filter2 = null;
-    	FilterFactory ffac = FilterFactoryFinder.createFilterFactory();
+    	FilterFactory ffac = CommonFactoryFinder.getFilterFactory(null);
 
     	String typeSpec = "geom:Point,att1:String,att2:String,att3:String,att4:String";
     	FeatureType testType = DataUtilities.createType("testType", typeSpec);
     	//System.err.println("created test type: " + testType);
     	
-    	filter1 = ffac.createCompareFilter(FilterType.COMPARE_EQUALS);
-    	((CompareFilter)filter1).addLeftValue(ffac.createAttributeExpression(testType, "att1"));
-    	((CompareFilter)filter1).addRightValue(ffac.createLiteralExpression("val1"));
-    	
-    	filter2 = ffac.createCompareFilter(FilterType.COMPARE_EQUALS);
-    	((CompareFilter)filter2).addLeftValue(ffac.createAttributeExpression(testType, "att2"));
-    	((CompareFilter)filter2).addRightValue(ffac.createLiteralExpression("val2"));
+    	filter1 = ffac.equals(ffac.property("att1"), ffac.literal("val1"));
+    	filter2 = ffac.equals(ffac.property("att2"), ffac.literal("val2"));
 
     	firstQuery = new DefaultQuery("typeName", filter1, 100, null, "handle");
     	secondQuery = new DefaultQuery("typeName", filter2, 20, new String[]{"att1", "att2", "att4"}, "handle2");
@@ -368,11 +474,11 @@ public class DataUtilitiesTest extends DataTestCase {
     	
     	Filter mixedFilter = mixed.getFilter();
     	assertNotNull(mixedFilter);
-    	assertTrue(mixedFilter instanceof LogicFilter);
-    	LogicFilter f = (LogicFilter)mixedFilter;
+    	assertTrue(mixedFilter instanceof BinaryLogicOperator);
+    	BinaryLogicOperator f = (BinaryLogicOperator) mixedFilter;
     	
-    	assertEquals(AbstractFilter.LOGIC_AND, f.getFilterType());
-    	for(Iterator fit = f.getFilterIterator(); fit.hasNext(); )
+    	assertTrue(f instanceof And);
+    	for(Iterator fit = f.getChildren().iterator(); fit.hasNext(); )
     	{
     		Filter subFilter = (Filter)fit.next();
     		assertTrue(filter1.equals(subFilter) || filter2.equals(subFilter));

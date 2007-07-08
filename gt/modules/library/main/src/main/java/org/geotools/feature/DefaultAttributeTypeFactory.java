@@ -15,19 +15,17 @@
  */
 package org.geotools.feature;
 
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.type.FeatureAttributeType;
 import org.geotools.feature.type.GeometricAttributeType;
 import org.geotools.feature.type.NumericAttributeType;
 import org.geotools.feature.type.TemporalAttributeType;
 import org.geotools.feature.type.TextualAttributeType;
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Expression;
-import org.opengis.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.FilterType;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LengthFunction;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -42,7 +40,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
 	private FilterFactory ff;
 	public DefaultAttributeTypeFactory(){
-		this( FilterFactoryFinder.createFilterFactory());
+		this(CommonFactoryFinder.getFilterFactory(null));
 	}
 	public DefaultAttributeTypeFactory( FilterFactory factory ){
 		ff = factory;
@@ -85,22 +83,20 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
     }
     
     protected Filter length(int fieldLength, String attributeXPath){
-        LengthFunction length = (LengthFunction)ff.createFunctionExpression("LengthFunction");
+        LengthFunction length = (LengthFunction)ff.function("LengthFunction", 
+                new Expression[]{ff.property(attributeXPath)});
         if( length == null ) {
             // TODO: Help Richard! ff.createFunctionExpression cannot find Length!
             return null;
         }
         
-        length.setArgs(new Expression[]{ff.createAttributeExpression(attributeXPath)});
-        CompareFilter cf = null;
+        Filter cf = null;
         try {
-            cf = ff.createCompareFilter(FilterType.COMPARE_LESS_THAN_EQUAL);
-            cf.addLeftValue(length);
-            cf.addRightValue(ff.createLiteralExpression(fieldLength));
+            cf = ff.equals(length, ff.literal(fieldLength));
         } catch (IllegalFilterException e) {
             // TODO something
         }
-        return cf == null ? org.geotools.filter.Filter.ALL : cf;
+        return cf == null ? Filter.EXCLUDE : cf;
     }
     
     /**
@@ -136,8 +132,6 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
     protected AttributeType createAttributeType(String name, Class clazz, 
         boolean isNillable, Filter filter, Object defaultValue, Object metadata, int min, int max) {
 
-    	LengthFunction length = (LengthFunction)ff.createFunctionExpression("LengthFunction");
-    	length.setArgs(new Expression[]{this.ff.createAttributeExpression(name)});
     	if (Number.class.isAssignableFrom(clazz)) {
             return new NumericAttributeType(
                 name, clazz, isNillable,min,max,defaultValue, filter);
@@ -161,17 +155,15 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
         Object metaData ){
             
         if( Geometry.class.isAssignableFrom( clazz) && metaData instanceof CoordinateReferenceSystem ){
-            LengthFunction length = (LengthFunction)ff.createFunctionExpression("LengthFunction");
-            length.setArgs(new Expression[]{ff.createAttributeExpression(name)});
-            CompareFilter cf = null;
+            LengthFunction length = (LengthFunction) ff.function("LengthFunction",
+                    new Expression[] { ff.property(name) });
+            Filter cf = null;
             try {
-                cf = ff.createCompareFilter(FilterType.COMPARE_LESS_THAN_EQUAL);
-            cf.addLeftValue(length);
-            cf.addRightValue(ff.createLiteralExpression(fieldLength));
+                cf = ff.equals(length, ff.literal(fieldLength));
             } catch (IllegalFilterException e) {
                 // TODO something
             }
-            Filter f = cf == null?org.geotools.filter.Filter.ALL:cf;
+            Filter f = cf == null ? Filter.EXCLUDE : cf;
             return new GeometricAttributeType(name,clazz,isNillable,minOccurs(isNillable),1, defaultValue, (CoordinateReferenceSystem) metaData,f);
         }
         return createAttributeType( name, clazz, isNillable, fieldLength, defaultValue );

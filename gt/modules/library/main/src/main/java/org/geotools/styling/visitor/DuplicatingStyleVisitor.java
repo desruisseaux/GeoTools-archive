@@ -407,9 +407,9 @@ public class DuplicatingStyleVisitor extends DuplicatingFilterVisitor implements
         copy.setDisplacement(displacementCopy);
         copy.setExternalGraphics(externalGraphicsCopy);
         copy.setMarks(marksCopy);
-        copy.setOpacity((org.geotools.filter.Expression) opacityCopy);
-        copy.setRotation((org.geotools.filter.Expression) rotationCopy);
-        copy.setSize((org.geotools.filter.Expression) sizeCopy);
+        copy.setOpacity((Expression) opacityCopy);
+        copy.setRotation((Expression) rotationCopy);
+        copy.setSize((Expression) sizeCopy);
         copy.setSymbols(symbolCopys);
 
         pages.push(copy);
@@ -452,10 +452,10 @@ public class DuplicatingStyleVisitor extends DuplicatingFilterVisitor implements
 
         copy = sf.createMark();
         copy.setFill(fillCopy);
-        copy.setRotation((org.geotools.filter.Expression) rotationCopy);
-        copy.setSize((org.geotools.filter.Expression) sizeCopy);
+        copy.setRotation((Expression) rotationCopy);
+        copy.setSize((Expression) sizeCopy);
         copy.setStroke(strokeCopy);
-        copy.setWellKnownName((org.geotools.filter.Expression) wellKnownNameCopy);
+        copy.setWellKnownName((Expression) wellKnownNameCopy);
 
         pages.push(copy);
     }

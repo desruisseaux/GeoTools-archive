@@ -17,20 +17,24 @@
  */
 package org.geotools.styling;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
 import org.geotools.data.memory.MemoryDataStore;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.filter.AttributeExpression;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.PropertyName;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 
 
 /**
@@ -43,8 +47,7 @@ import org.geotools.filter.AttributeExpression;
  * @source $URL$
  */
 public class TextSymbolTest extends TestCase {
-    private static final org.geotools.filter.FilterFactory filterFactory = org.geotools.filter.FilterFactoryFinder
-        .createFilterFactory();
+    private static final FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory(null);
 
     /** factory for attributes */
     private static AttributeTypeFactory attFactory = AttributeTypeFactory
@@ -134,27 +137,20 @@ public class TextSymbolTest extends TestCase {
         //an SLD document and not by hand
         org.geotools.styling.FontImpl font = new org.geotools.styling.FontImpl();
 
-        font.setFontFamily(filterFactory.createLiteralExpression(dataFolder
-                + "geog.ttf"));
-        font.setFontSize(filterFactory.createAttributeExpression(pointType,
-                "size"));
+        font.setFontFamily(filterFactory.literal(dataFolder + "geog.ttf"));
+        font.setFontSize(filterFactory.property("size"));
 
-        AttributeExpression symbExpr = filterFactory.createAttributeExpression(pointType,
-                "symbol");
+        PropertyName symbExpr = filterFactory.property("symbol");
         TextMark textMark = new TextMarkImpl(font, symbExpr);
 
         org.geotools.styling.FontImpl font2 = new org.geotools.styling.FontImpl();
-        font2.setFontFamily(filterFactory.createLiteralExpression(
-                "MapInfo Cartographic"));
-        font2.setFontSize(filterFactory.createAttributeExpression(pointType,
-                "size"));
+        font2.setFontFamily(filterFactory.literal("MapInfo Cartographic"));
+        font2.setFontSize(filterFactory.property("size"));
         textMark.addFont(font2);
 
         org.geotools.styling.FontImpl font3 = new org.geotools.styling.FontImpl();
-        font3.setFontFamily(filterFactory.createLiteralExpression(
-                "ESRI Cartography"));
-        font3.setFontSize(filterFactory.createAttributeExpression(pointType,
-                "size"));
+        font3.setFontFamily(filterFactory.literal("ESRI Cartography"));
+        font3.setFontSize(filterFactory.property("size"));
         textMark.addFont(font3);
 
         GraphicImpl graphic = new GraphicImpl();

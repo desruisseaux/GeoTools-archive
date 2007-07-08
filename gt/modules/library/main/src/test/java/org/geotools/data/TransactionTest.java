@@ -16,23 +16,23 @@
 package org.geotools.data;
 
 import java.io.IOException;
-import java.io.Reader;
+import java.util.Collections;
 import java.util.Set;
 
+import junit.framework.TestCase;
+
 import org.geotools.data.memory.MemoryDataStore;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.opengis.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
+import org.opengis.filter.FilterFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-
-import junit.framework.TestCase;
 
 
 /**
@@ -78,7 +78,9 @@ public class TransactionTest extends TestCase {
         Set fid=store.addFeatures( DataUtilities.collection(f1) );
 
         count(store, 2);
-        Filter f=FilterFactoryFinder.createFilterFactory().createFidFilter((String) fid.iterator().next());
+        String next = (String) fid.iterator().next();
+        FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory(null);
+        Filter f = filterFactory.id(Collections.singleton(filterFactory.featureId(next)));
         store.removeFeatures(f);
         
         count(store, 1);

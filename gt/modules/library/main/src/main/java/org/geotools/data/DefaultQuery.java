@@ -156,26 +156,6 @@ public class DefaultQuery implements Query {
       this.coordinateSystemReproject = query.getCoordinateSystemReproject();
       this.version = query.getVersion();
     }
-    // deprecated constructors
-    //
-    /** @deprecated Please use GeoAPI filter */
-    public DefaultQuery(String typeName, org.geotools.filter.Filter filter) {
-        this( typeName, (Filter) filter, Query.ALL_NAMES );
-    }
-    /** @deprecated Please use GeoAPI filter */
-    public DefaultQuery(String typeName, org.geotools.filter.Filter filter, String[] properties) {
-        this( typeName, null, (Filter) filter, Query.DEFAULT_MAX, properties, null );
-    }
-    /** @deprecated please use geoapi filter */
-    public DefaultQuery(String typeName, org.geotools.filter.Filter filter, int maxFeatures,
-        String[] propNames, String handle) {
-        this(typeName, null, (Filter) filter, maxFeatures, propNames, handle );
-    }
-    /** @deprecated please use geoapi filter */
-    public DefaultQuery(String typeName, URI namespace, org.geotools.filter.Filter filter, int maxFeatures,
-            String[] propNames, String handle) {
-        this( typeName, namespace, (Filter) filter, maxFeatures, propNames, handle );
-    }
     
     /**
      * The property names is used to specify the attributes that should be

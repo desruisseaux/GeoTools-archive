@@ -18,6 +18,7 @@ package org.geotools.data.memory;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -31,7 +32,6 @@ import org.geotools.data.EmptyFeatureReader;
 import org.geotools.data.EmptyFeatureWriter;
 import org.geotools.data.FeatureEvent;
 import org.geotools.data.FeatureListener;
-import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.FeatureLock;
 import org.geotools.data.FeatureLockFactory;
 import org.geotools.data.FeatureLocking;
@@ -45,6 +45,7 @@ import org.geotools.data.InProcessLockingManager;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.TransactionStateDiff;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
@@ -52,10 +53,9 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SimpleFeature;
-import org.geotools.filter.FidFilter;
 import org.opengis.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.Id;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -862,8 +862,9 @@ public class MemoryDataStoreTest extends DataTestCase {
                 new Coordinate(20, 1)}));
         writer.write();
         writer.close();
-        FidFilter filter = FilterFactoryFinder.createFilterFactory().createFidFilter(
-                feature.getID());
+        FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory(null);
+        Id filter = filterFactory.id(Collections
+                .singleton(filterFactory.featureId(feature.getID())));
 
         reader = data.getFeatureReader(new DefaultQuery("road", filter), t1);
         geom1 = reader.next().getDefaultGeometry();
@@ -1107,11 +1108,11 @@ public class MemoryDataStoreTest extends DataTestCase {
 
         store1.addFeatureListener(listener1);
         store2.addFeatureListener(listener2);
-        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+        FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
 
         // test that only the listener listening with the current transaction gets the event.
         final Feature feature = roadFeatures[0];
-        store1.removeFeatures(factory.createFidFilter(feature.getID()));
+        store1.removeFeatures(factory.id(Collections.singleton(factory.featureId(feature.getID()))));
         assertEquals(1, listener1.events.size());
         assertEquals(0, listener2.events.size());
         FeatureEvent event = listener1.getEvent(0);

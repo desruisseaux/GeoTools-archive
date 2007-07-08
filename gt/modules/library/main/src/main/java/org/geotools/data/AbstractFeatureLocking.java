@@ -20,7 +20,6 @@ import java.util.NoSuchElementException;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.IllegalAttributeException;
 import org.opengis.filter.Filter;
 
 /**
@@ -109,10 +108,7 @@ public abstract class AbstractFeatureLocking extends AbstractFeatureStore
     public int lockFeatures(Filter filter) throws IOException {
         return lockFeatures(new DefaultQuery(getSchema().getTypeName(),filter));
     }
-    public int lockFeatures(org.geotools.filter.Filter filter) throws IOException {
-        return lockFeatures((Filter)filter);
-    }
-
+    
     /**
      * Lock features matching Query.
      * 

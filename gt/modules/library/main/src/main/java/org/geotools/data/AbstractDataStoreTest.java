@@ -15,9 +15,17 @@
  */
 package org.geotools.data;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.MultiLineString;
+import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
@@ -26,18 +34,12 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SimpleFeature;
 import org.opengis.filter.Filter;
-import org.geotools.filter.FidFilter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.Id;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.MultiLineString;
 
 
 /**
@@ -162,11 +164,11 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         store1.addFeatureListener(listener1);
         store2.addFeatureListener(listener2);
 
-        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
+        FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
 
         //test that only the listener listening with the current transaction gets the event.
         final Feature feature = roadFeatures[0];
-        FidFilter fidFilter = ff.createFidFilter(feature.getID());
+        Id fidFilter = ff.id(Collections.singleton(ff.featureId(feature.getID())));
         
         store1.removeFeatures(fidFilter);
         

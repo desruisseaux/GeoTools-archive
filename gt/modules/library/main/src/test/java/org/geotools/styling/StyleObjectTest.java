@@ -15,11 +15,14 @@
  */
 package org.geotools.styling;
 
+import java.util.Collections;
+
 import junit.framework.TestCase;
 
-import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.FilterFactoryFinder;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 import org.opengis.util.Cloneable;
 
 
@@ -47,7 +50,7 @@ public class StyleObjectTest extends TestCase {
      */
     protected void setUp() throws Exception {
         styleFactory = StyleFactoryFinder.createStyleFactory();
-        filterFactory = FilterFactoryFinder.createFilterFactory();
+        filterFactory = CommonFactoryFinder.getFilterFactory(null);
     }
 
     /*
@@ -94,7 +97,7 @@ public class StyleObjectTest extends TestCase {
 
         rule1 = styleFactory.createRule();
         rule1.setName("rule1");
-        rule1.setFilter(filterFactory.createFidFilter("FID"));
+        rule1.setFilter(filterFactory.id(Collections.singleton(filterFactory.featureId("FID"))));
 
         Rule rule2 = styleFactory.createRule();
         rule2.setIsElseFilter(true);
@@ -107,7 +110,7 @@ public class StyleObjectTest extends TestCase {
 
         rule1 = styleFactory.createRule();
         rule1.setName("rule1");
-        rule1.setFilter(filterFactory.createFidFilter("FID"));
+        rule1.setFilter(filterFactory.id(Collections.singleton(filterFactory.featureId("FID"))));
 
         FeatureTypeStyle notEq = styleFactory.createFeatureTypeStyle();
         notEq.setName("fts-not-equal");
@@ -153,15 +156,15 @@ public class StyleObjectTest extends TestCase {
 
     public void testTextSymbolizer() {
         TextSymbolizer textSymb = styleFactory.createTextSymbolizer();
-        Expression offset = filterFactory.createLiteralExpression(10);
+        Expression offset = filterFactory.literal(10);
         textSymb.setLabelPlacement(styleFactory.createLinePlacement(offset));
 
         TextSymbolizer clone = (TextSymbolizer) ((Cloneable) textSymb).clone();
         assertClone(textSymb, clone);
 
         TextSymbolizer notEq = styleFactory.getDefaultTextSymbolizer();
-        Expression ancX = filterFactory.createLiteralExpression(10);
-        Expression ancY = filterFactory.createLiteralExpression(10);
+        Expression ancX = filterFactory.literal(10);
+        Expression ancY = filterFactory.literal(10);
         AnchorPoint ancPoint = styleFactory.createAnchorPoint(ancX, ancY);
         LabelPlacement placement = styleFactory.createPointPlacement(ancPoint,
                 null, null);
@@ -174,60 +177,53 @@ public class StyleObjectTest extends TestCase {
         Font clone = (Font) ((Cloneable) font).clone();
         assertClone(font, clone);
 
-        Font other = styleFactory.createFont(filterFactory
-                .createLiteralExpression("other"),
-                filterFactory.createLiteralExpression("normal"),
-                filterFactory.createLiteralExpression("BOLD"),
-                filterFactory.createLiteralExpression(12));
+        Font other = styleFactory.createFont(filterFactory.literal("other"),
+                filterFactory.literal("normal"),
+                filterFactory.literal("BOLD"),
+                filterFactory.literal(12));
 
         assertEqualsContract(clone, other, font);
     }
 
     public void testHalo() {
         Halo halo = styleFactory.createHalo(styleFactory.getDefaultFill(),
-                filterFactory.createLiteralExpression(10));
+                filterFactory.literal(10));
         Halo clone = (Halo) ((Cloneable) halo).clone();
         assertClone(halo, clone);
 
         Halo other = styleFactory.createHalo(styleFactory.getDefaultFill(),
-                filterFactory.createLiteralExpression(12));
+                filterFactory.literal(12));
         assertEqualsContract(clone, other, halo);
     }
 
     public void testLinePlacement() throws Exception {
-        LinePlacement linePlacement = styleFactory.createLinePlacement(filterFactory
-                .createLiteralExpression(12));
+        LinePlacement linePlacement = styleFactory.createLinePlacement(filterFactory.literal(12));
         LinePlacement clone = (LinePlacement) ((Cloneable) linePlacement).clone();
         assertClone(linePlacement, clone);
 
-        LinePlacement other = styleFactory.createLinePlacement(filterFactory
-                .createAttributeExpression(null, "NAME"));
+        LinePlacement other = styleFactory.createLinePlacement(filterFactory.property("NAME"));
         assertEqualsContract(clone, other, linePlacement);
     }
 
     public void testAnchorPoint() {
-        AnchorPoint anchorPoint = styleFactory.createAnchorPoint(filterFactory
-                .createLiteralExpression(1),
-                filterFactory.createLiteralExpression(2));
+        AnchorPoint anchorPoint = styleFactory.createAnchorPoint(filterFactory.literal(1),
+                filterFactory.literal(2));
         AnchorPoint clone = (AnchorPoint) ((Cloneable) anchorPoint).clone();
         assertClone(anchorPoint, clone);
 
-        AnchorPoint other = styleFactory.createAnchorPoint(filterFactory
-                .createLiteralExpression(3),
-                filterFactory.createLiteralExpression(4));
+        AnchorPoint other = styleFactory.createAnchorPoint(filterFactory.literal(3), filterFactory
+                .literal(4));
         assertEqualsContract(clone, other, anchorPoint);
     }
 
     public void testDisplacement() {
-        Displacement displacement = styleFactory.createDisplacement(filterFactory
-                .createLiteralExpression(1),
-                filterFactory.createLiteralExpression(2));
+        Displacement displacement = styleFactory.createDisplacement(filterFactory.literal(1),
+                filterFactory.literal(2));
         Displacement clone = (Displacement) ((Cloneable) displacement).clone();
         assertClone(displacement, clone);
 
-        Displacement other = styleFactory.createDisplacement(filterFactory
-                .createLiteralExpression(3),
-                filterFactory.createLiteralExpression(4));
+        Displacement other = styleFactory.createDisplacement(filterFactory.literal(3),
+                filterFactory.literal(4));
         assertEqualsContract(clone, other, displacement);
     }
 
@@ -237,7 +233,7 @@ public class StyleObjectTest extends TestCase {
         assertClone(pointPl, clone);
 
         PointPlacement other = (PointPlacement) ((Cloneable) pointPl).clone();
-        other.setRotation(filterFactory.createLiteralExpression(274.0));
+        other.setRotation(filterFactory.literal(274.0));
         assertEqualsContract(clone, other, pointPl);
     }
 
@@ -306,8 +302,7 @@ public class StyleObjectTest extends TestCase {
         Fill clone = (Fill) ((Cloneable) fill).clone();
         assertClone(fill, clone);
 
-        Fill notEq = styleFactory.createFill(filterFactory
-                .createLiteralExpression("#FF0000"));
+        Fill notEq = styleFactory.createFill(filterFactory.literal("#FF0000"));
         assertEqualsContract(clone, notEq, fill);
     }
 
@@ -316,9 +311,8 @@ public class StyleObjectTest extends TestCase {
         Stroke clone = (Stroke) stroke.clone();
         assertClone(stroke, clone);
 
-        Stroke notEq = styleFactory.createStroke(filterFactory
-                .createLiteralExpression("#FF0000"),
-                filterFactory.createLiteralExpression(10));
+        Stroke notEq = styleFactory.createStroke(filterFactory.literal("#FF0000"), filterFactory
+                .literal(10));
         assertEqualsContract(clone, notEq, stroke);
 
         // a stroke is a complex object with lots of properties,

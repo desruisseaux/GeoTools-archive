@@ -18,9 +18,12 @@ package org.geotools.filter;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.EmptyStackException;
 import java.util.Stack;
 
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.parser.ExpressionException;
 import org.geotools.filter.parser.ExpressionParser;
@@ -29,6 +32,21 @@ import org.geotools.filter.parser.Node;
 import org.geotools.filter.parser.ParseException;
 import org.geotools.filter.parser.Token;
 import org.geotools.filter.parser.TokenMgrError;
+import org.opengis.filter.And;
+import org.opengis.filter.Or;
+import org.opengis.filter.PropertyIsBetween;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.PropertyIsGreaterThan;
+import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
+import org.opengis.filter.PropertyIsLessThan;
+import org.opengis.filter.PropertyIsLessThanOrEqualTo;
+import org.opengis.filter.PropertyIsLike;
+import org.opengis.filter.PropertyIsNotEqualTo;
+import org.opengis.filter.expression.Add;
+import org.opengis.filter.expression.Divide;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Multiply;
+import org.opengis.filter.expression.Subtract;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -44,14 +62,14 @@ import com.vividsolutions.jts.io.WKTReader;
  * @author  Ian Schneider
  */
 public class ExpressionBuilder {
-	private FilterFactory factory;
+	private org.opengis.filter.FilterFactory factory;
 	public ExpressionBuilder(){
-		this( FilterFactoryFinder.createFilterFactory() );
+		this( CommonFactoryFinder.getFilterFactory(null) );
 	}
-	public ExpressionBuilder( FilterFactory factory ){
+	public ExpressionBuilder( org.opengis.filter.FilterFactory factory ){
 		this.factory = factory;
 	}
-    public void setFilterFactory( FilterFactory factory ){
+    public void setFilterFactory( org.opengis.filter.FilterFactory factory ){
     	this.factory = factory;
     }
     /**
@@ -135,11 +153,11 @@ public class ExpressionBuilder {
             return (StackItem) stack.pop();
         }
         
-        Expression expression() throws ExpressionException {
+        org.opengis.filter.expression.Expression expression() throws ExpressionException {
             StackItem item = null;
             try {
                 item = popStack();
-                return (Expression) item.built;
+                return (org.opengis.filter.expression.Expression) item.built;
             } catch (ClassCastException cce) {
                 throw new ExpressionException("Expecting Expression, but found Filter",item.token);
             } catch (EmptyStackException ese) {
@@ -147,11 +165,11 @@ public class ExpressionBuilder {
             }
         }
         
-        Filter filter() throws ExpressionException {
+        org.opengis.filter.Filter filter() throws ExpressionException {
             StackItem item = null;
             try {
                 item = popStack();
-                return (Filter) item.built;
+                return (org.opengis.filter.Filter) item.built;
             } catch (ClassCastException cce) {
                 throw new ExpressionException("Expecting Filter, but found Expression",item.token);
             } catch (EmptyStackException ese) {
@@ -161,7 +179,7 @@ public class ExpressionBuilder {
         
         double doubleValue() throws ExpressionException {
             try {
-                return ((Number) expression().getValue(null)).doubleValue();
+                return ((Number) expression().evaluate(null)).doubleValue();
             } catch (ClassCastException cce) {
                 throw new ExpressionException("Expected double",getToken(0));
             }
@@ -169,14 +187,14 @@ public class ExpressionBuilder {
         
         int intValue() throws ExpressionException {
             try {
-                return ((Number) expression().getValue(null)).intValue();
+                return ((Number) expression().evaluate(null)).intValue();
             } catch (ClassCastException cce) {
                 throw new ExpressionException("Expected int",getToken(0));
             }
         }
         
         String stringValue() throws ExpressionException {
-            return expression().getValue(null).toString();
+            return expression().evaluate(null).toString();
         }
         
         public void jjtreeOpenNodeScope(Node n) {
@@ -196,51 +214,76 @@ public class ExpressionBuilder {
             return getToken(0).image;
         }
         
-        MathExpression mathExpression(short type) throws ExpressionException {
+        org.opengis.filter.expression.Expression mathExpression(Class type) throws ExpressionException {
             try {
-                MathExpression e = factory.createMathExpression(type);
-                Expression right = expression();
-                Expression left = expression();
-                e.addLeftValue(left);
-                e.addRightValue(right);
+                org.opengis.filter.expression.Expression right = expression();
+                org.opengis.filter.expression.Expression left = expression();
+                org.opengis.filter.expression.Expression e;
+                if(Add.class == type){
+                    e = factory.add(left, right);
+                }else if(Subtract.class == type){
+                    e = factory.subtract(left, right);
+                }else if(Divide.class == type){
+                    e = factory.divide(left, right);
+                }else if(Multiply.class == type){
+                    e = factory.multiply(left, right);
+                }else{
+                    throw new IllegalArgumentException();
+                }
                 return e;
             } catch (IllegalFilterException ife) {
                 throw new ExpressionException("Exception building MathExpression",getToken(0),ife);
             }
         }
         
-        LogicFilter logicFilter(short type) throws ExpressionException {
+        org.opengis.filter.Filter logicFilter(Class type) throws ExpressionException {
             try {
-                Filter right = filter();
-                Filter left = filter();
-                return factory.createLogicFilter(left,right,type);
+                org.opengis.filter.Filter right = filter();
+                org.opengis.filter.Filter left = filter();
+                if(Or.class == type){
+                    return factory.or(left,right);
+                }else if(And.class == type){
+                    return factory.and(left, right);
+                }
+                throw new IllegalArgumentException();
             } catch (IllegalFilterException ife) {
                 throw new ExpressionException("Exception building LogicFilter",getToken(0),ife);
             }
         }
         
-        CompareFilter compareFilter(short type) throws ExpressionException {
+        org.opengis.filter.Filter compareFilter(Class type) throws ExpressionException {
             try {
-                CompareFilter f = factory.createCompareFilter(type);
-                Expression right = expression();
-                Expression left = expression();
-                f.addLeftValue(left);
-                f.addRightValue(right);
+                org.opengis.filter.expression.Expression right = expression();
+                org.opengis.filter.expression.Expression left = expression();
+                org.opengis.filter.Filter f;
+                if (PropertyIsLessThanOrEqualTo.class == type) {
+                    f = factory.lessOrEqual(left, right);
+                } else if (PropertyIsLessThan.class == type) {
+                    f = factory.less(left, right);
+                } else if (PropertyIsGreaterThanOrEqualTo.class == type) {
+                    f = factory.greaterOrEqual(left, right);
+                } else if (PropertyIsGreaterThan.class == type) {
+                    f = factory.greater(left, right);
+                } else if (PropertyIsEqualTo.class == type) {
+                    f = factory.equals(left, right);
+                } else if (PropertyIsNotEqualTo.class == type) {
+                    f = factory.notEqual(left, right, false);
+                } else {
+                    throw new IllegalArgumentException();
+                }
+                
                 return f;
             } catch (IllegalFilterException ife) {
                 throw new ExpressionException("Exception building CompareFilter",getToken(0),ife);
             }
         }
         
-        CompareFilter betweenFilter() throws ExpressionException {
+        org.opengis.filter.Filter betweenFilter() throws ExpressionException {
             try {   
-                BetweenFilter f = factory.createBetweenFilter();
-                Expression right = expression();
-                Expression middle = expression();
-                Expression left = expression();
-                f.addLeftValue(left);
-                f.addMiddleValue(middle);
-                f.addRightValue(right);
+                org.opengis.filter.expression.Expression right = expression();
+                org.opengis.filter.expression.Expression middle = expression();
+                org.opengis.filter.expression.Expression left = expression();
+                org.opengis.filter.Filter f = factory.between(middle, left, right);
                 return f;
             } catch (IllegalFilterException ife) {
                 throw new ExpressionException("Exception building CompareFilter",getToken(0),ife);
@@ -255,14 +298,20 @@ public class ExpressionBuilder {
                 // note, these should never throw because the parser grammar
                 // constrains input before we ever reach here!
                 case JJTINTEGERNODE:
-                    return factory.createLiteralExpression(Integer.parseInt(token()));
+                    return factory.literal(Integer.parseInt(token()));
                 case JJTFLOATINGNODE:
-                    return factory.createLiteralExpression(Double.parseDouble(token()));
+                    return factory.literal(Double.parseDouble(token()));
                 case JJTSTRINGNODE:
-                    return factory.createLiteralExpression(n.getToken().image);
+                    return factory.literal(n.getToken().image);
                 case JJTATTNODE:
                     try {
-                        return factory.createAttributeExpression(schema,token());
+                        String attName = token();
+                        if(schema != null){
+                            if(null == schema.getAttributeType(attName)){
+                                throw new IllegalArgumentException(attName + " not found in schema");
+                            }
+                        }
+                        return factory.property(attName);
                     } catch (IllegalFilterException ife) {
                         throw new ExpressionException("Exception building AttributeExpression",getToken(0),ife);
                     }
@@ -272,22 +321,22 @@ public class ExpressionBuilder {
                     
                     // Math Nodes
                 case JJTADDNODE:
-                    return mathExpression(DefaultExpression.MATH_ADD);
+                    return mathExpression(Add.class);
                 case JJTSUBTRACTNODE:
-                    return mathExpression(DefaultExpression.MATH_SUBTRACT);
+                    return mathExpression(Subtract.class);
                 case JJTMULNODE:
-                    return mathExpression(DefaultExpression.MATH_MULTIPLY);
+                    return mathExpression(Multiply.class);
                 case JJTDIVNODE:
-                    return mathExpression(DefaultExpression.MATH_DIVIDE);
+                    return mathExpression(Divide.class);
                     
                     
                     // Logic Nodes
                 case JJTORNODE:
-                    return logicFilter(AbstractFilter.LOGIC_OR);
+                    return logicFilter(Or.class);
                 case JJTANDNODE:
-                    return logicFilter(AbstractFilter.LOGIC_AND);
+                    return logicFilter(And.class);
                 case JJTNOTNODE:
-                    return filter().not();
+                    return factory.not(filter());
                     
                     // Between Node
                 case JJTBETWEENNODE:
@@ -295,17 +344,17 @@ public class ExpressionBuilder {
                     
                     // Compare Nodes
                 case JJTLENODE:
-                    return compareFilter(FilterType.COMPARE_LESS_THAN_EQUAL);
+                    return compareFilter(PropertyIsLessThanOrEqualTo.class);
                 case JJTLTNODE:
-                    return compareFilter(FilterType.COMPARE_LESS_THAN);
+                    return compareFilter(PropertyIsLessThan.class);
                 case JJTGENODE:
-                    return compareFilter(FilterType.COMPARE_GREATER_THAN_EQUAL);
+                    return compareFilter(PropertyIsGreaterThanOrEqualTo.class);
                 case JJTGTNODE:
-                    return compareFilter(FilterType.COMPARE_GREATER_THAN);
+                    return compareFilter(PropertyIsGreaterThan.class);
                 case JJTEQNODE:
-                    return compareFilter(FilterType.COMPARE_EQUALS);
+                    return compareFilter(PropertyIsEqualTo.class);
                 case JJTNENODE:
-                    return compareFilter(FilterType.COMPARE_NOT_EQUALS);
+                    return compareFilter(PropertyIsNotEqualTo.class);
                     
                     
                     // Geometries:
@@ -328,12 +377,13 @@ public class ExpressionBuilder {
             return null;
         }
         
-        LiteralExpression geometry(Token start,Token end) throws ExpressionException {
+        org.opengis.filter.expression.Literal geometry(Token start, Token end)
+                throws ExpressionException {
             if (reader == null)
                 reader = new WKTReader();
             try {
                 Geometry g = reader.read(input.substring(start.beginColumn - 1,end.endColumn));
-                return factory.createLiteralExpression(g);
+                return factory.literal(g);
             } catch (com.vividsolutions.jts.io.ParseException e) {
                 throw new ExpressionException(e.getMessage(),start);
             } catch (Exception e) {
@@ -353,7 +403,7 @@ public class ExpressionBuilder {
                 double d2 = doubleValue();
                 double d1 = doubleValue();
                 try {
-                    return factory.createBBoxExpression(new Envelope(
+                    return new BBoxExpressionImpl(new Envelope(
                     d1,d2,d3,d4
                     ));
                 } catch (IllegalFilterException ife) {
@@ -363,19 +413,16 @@ public class ExpressionBuilder {
                 if (n.jjtGetNumChildren() != 1) {
                     throw new ExpressionException("Feature ID filter requires 1 argument",getToken(0));
                 }
-                return factory.createFidFilter(stringValue());
+                return factory.id(Collections.singleton(factory.featureId(stringValue())));
             } else if ("between".equalsIgnoreCase(function)) {
                 if (n.jjtGetNumChildren() != 3) {
                     throw new ExpressionException("Between filter requires 3 arguments",getToken(0));
                 }
-                Expression two = expression();
-                Expression att = expression();
-                Expression one = expression();
+                org.opengis.filter.expression.Expression two = expression();
+                org.opengis.filter.expression.Expression att = expression();
+                org.opengis.filter.expression.Expression one = expression();
                 try {
-                    BetweenFilter b = factory.createBetweenFilter();
-                    b.addLeftValue(one);
-                    b.addMiddleValue(att);
-                    b.addRightValue(two);
+                    PropertyIsBetween b = factory.between(att, one, two);
                     return b;
                 } catch (IllegalFilterException ife) {
                     throw new ExpressionException("Exception building BetweenFilter",getToken(0),ife);
@@ -385,34 +432,37 @@ public class ExpressionBuilder {
                 if (n.jjtGetNumChildren() != 2) {
                     throw new ExpressionException("Like filter requires at least two arguments",getToken(0));
                 }
-                LikeFilter f = factory.createLikeFilter();
-                f.setPattern(stringValue(), "*", ".?", "//");
+                String pattern = stringValue();
+                Expression expr = expression();
                 try {
-                    f.setValue(expression());
+                    PropertyIsLike f = factory.like(expr, pattern, "*", ".?", "//");
+                    return f;
                 } catch (IllegalFilterException ife) {
-                    throw new ExpressionException("Exception building LikeFilter",getToken(0),ife);
+                    throw new ExpressionException("Exception building LikeFilter", getToken(0), ife);
                 }
-                return f;
             } else if ("null".equalsIgnoreCase(function) || "isNull".equalsIgnoreCase(function)) {
-                NullFilter nf = factory.createNullFilter();
                 Expression e = expression();
                 
                 try {
-                    if (e instanceof LiteralExpression) {
-                        e = factory.createAttributeExpression(schema, ((LiteralExpression)e).getValue(null).toString() );
+                    if (e instanceof org.opengis.filter.expression.Literal) {
+                        e = factory.property(((org.opengis.filter.expression.Literal) e).evaluate(
+                                null).toString());
                     }
-                    nf.nullCheckValue(e);
+                    org.opengis.filter.Filter nf = factory.isNull(e);
+                    return nf;
                 } catch (IllegalFilterException ife) {
                     throw new ExpressionException("Exception building NullFilter",getToken(0),ife);
                 }
-                return nf;
             }
             
             short geometryFilterType = lookupGeometryFilter(function);
             if (geometryFilterType >= 0)
                 return buildGeometryFilter(geometryFilterType);
             
-            FunctionExpression func = factory.createFunctionExpression(function);
+            //GR: GEOT-1192, don't know how to fetch the number of arguments
+            //before creating the function
+            FilterFactory f = (FilterFactory) factory;
+            FunctionExpression func = f.createFunctionExpression(function);
             if (func == null) throw new ExpressionException("Could not build function : " + function,getToken(0));
 
             int nArgs = func.getArgCount();
@@ -425,7 +475,7 @@ public class ExpressionBuilder {
                 args[i] = expression();
             }
             
-            func.setArgs(args);
+            func.setParameters(Arrays.asList(args));
             return func; 
             
         }
@@ -447,9 +497,10 @@ public class ExpressionBuilder {
             Expression right = expression();
             Expression left = expression();
             try {
-                GeometryFilter f = factory.createGeometryFilter(type);
-                f.addLeftGeometry(left);
-                f.addRightGeometry(right);
+                FilterFactory ff = (FilterFactory) factory;
+                GeometryFilter f = ff.createGeometryFilter(type);
+                f.addLeftGeometry((org.geotools.filter.Expression) left);
+                f.addRightGeometry((org.geotools.filter.Expression) right);
                 return f;
             } catch (IllegalFilterException ife) {
                 throw new ExpressionException("Exception building GeometryFilter",getToken(0),ife);

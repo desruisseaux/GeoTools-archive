@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.geotools.data.DataTestCase;
 import org.geotools.data.DataUtilities;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SimpleFeature;
@@ -30,10 +31,9 @@ import org.geotools.feature.visitor.MaxVisitor.MaxResult;
 import org.geotools.feature.visitor.MedianVisitor.MedianResult;
 import org.geotools.feature.visitor.MinVisitor.MinResult;
 import org.geotools.feature.visitor.UniqueVisitor.UniqueResult;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -333,8 +333,8 @@ public class VisitorCalculationTest extends DataTestCase {
     }
     
     public void testQuantileList() throws Exception {
-        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
-        Expression expr = factory.createAttributeExpression(ft.getAttributeType(0).getName());
+        FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
+        Expression expr = factory.property(ft.getAttributeType(0).getName());
         QuantileListVisitor visitor = new QuantileListVisitor(expr, 2);
         fc.accepts(visitor, null);
         List[] qResult = (List[]) visitor.getResult().getValue();
@@ -344,8 +344,8 @@ public class VisitorCalculationTest extends DataTestCase {
     }
 
     public void testStandardDeviation() throws Exception {
-    	FilterFactory factory = FilterFactoryFinder.createFilterFactory();
-    	Expression expr = factory.createAttributeExpression(ft3.getAttributeType(0).getName());
+    	FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
+    	Expression expr = factory.property(ft3.getAttributeType(0).getName());
     	AverageVisitor visit1 = new AverageVisitor(expr);
     	fc3.accepts(visit1, null);
     	double average = visit1.getResult().toDouble();

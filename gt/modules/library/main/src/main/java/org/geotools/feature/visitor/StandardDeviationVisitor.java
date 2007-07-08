@@ -16,7 +16,7 @@
 package org.geotools.feature.visitor;
 
 import org.geotools.feature.Feature;
-import org.geotools.filter.Expression;
+import org.opengis.filter.expression.Expression;
 
 /**
  * Determines the standard deviation. 

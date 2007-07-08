@@ -42,7 +42,7 @@ public abstract class AbstractFilterImpl
      */
     public Filter or(org.opengis.filter.Filter filter) {
         try {
-        	return factory.or(this,(Filter)filter);
+        	return (Filter) factory.or(this,(Filter)filter);
         } catch (IllegalFilterException ife) {
             return (Filter) filter;
         }
@@ -57,7 +57,7 @@ public abstract class AbstractFilterImpl
      */
     public Filter and(org.opengis.filter.Filter filter) {
         try {
-            return factory.and(this,(Filter)filter);
+            return (Filter) factory.and(this, filter);
         } catch (IllegalFilterException ife) {
             return (Filter) filter;
         }
@@ -70,7 +70,7 @@ public abstract class AbstractFilterImpl
      */
     public Filter not() {
         try {
-            return factory.not( this );
+            return (Filter) factory.not( this );
         } catch (IllegalFilterException ife) {
             return this;
         }

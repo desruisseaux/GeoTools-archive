@@ -32,15 +32,15 @@ public abstract class BinaryComparisonAbstract extends AbstractFilter
 
 	boolean matchingCase;
 	
-	protected BinaryComparisonAbstract(FilterFactory factory) {
+	protected BinaryComparisonAbstract(org.opengis.filter.FilterFactory factory) {
 		this(factory,null,null);
 	}
 	
-	protected BinaryComparisonAbstract(FilterFactory factory, Expression expression1, Expression expression2 ) {
+	protected BinaryComparisonAbstract(org.opengis.filter.FilterFactory factory, Expression expression1, Expression expression2 ) {
 		this(factory,expression1,expression2,true);
 	}
 	
-	protected BinaryComparisonAbstract(FilterFactory factory, Expression expression1, Expression expression2, boolean matchingCase ) {
+	protected BinaryComparisonAbstract(org.opengis.filter.FilterFactory factory, Expression expression1, Expression expression2, boolean matchingCase ) {
 		super(factory);
 		this.expression1 = expression1;
 		this.expression2 = expression2;		
@@ -68,15 +68,15 @@ public abstract class BinaryComparisonAbstract extends AbstractFilter
 	}
 	
 	public Filter and(org.opengis.filter.Filter filter) {        
-		return factory.and((Filter)this,(Filter)filter);
+		return (Filter) factory.and(this, filter);
 	}
 
 	public Filter or(org.opengis.filter.Filter filter) {
-		return factory.or((Filter)this,(Filter)filter);
+		return (Filter) factory.or(this, filter);
 	}
 
 	public Filter not() {
-		return factory.not(this);
+		return (Filter) factory.not(this);
 	}
 
 	/**

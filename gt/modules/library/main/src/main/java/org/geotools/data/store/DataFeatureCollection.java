@@ -45,11 +45,11 @@ import org.geotools.feature.collection.FeatureState;
 import org.geotools.feature.collection.SubFeatureCollection;
 import org.geotools.feature.type.FeatureAttributeType;
 import org.geotools.feature.visitor.FeatureVisitor;
-import org.opengis.filter.Filter;
-import org.opengis.filter.sort.SortBy;
 import org.geotools.filter.SortBy2;
 import org.geotools.util.NullProgressListener;
 import org.geotools.util.ProgressListener;
+import org.opengis.filter.Filter;
+import org.opengis.filter.sort.SortBy;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;

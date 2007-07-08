@@ -21,16 +21,16 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.FilterType;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 
 import com.vividsolutions.jts.geom.LineString;
 
@@ -60,7 +60,7 @@ public class StyleAttributeExtractorTest extends TestCase {
      */
     protected void setUp() throws Exception {
         styleFactory = StyleFactoryFinder.createStyleFactory();
-        filterFactory = FilterFactoryFinder.createFilterFactory();
+        filterFactory = CommonFactoryFinder.getFilterFactory(null);
 
         // Create the schema attributes
         AttributeType geometryAttribute = AttributeTypeFactory.newAttributeType("testGeometry",
@@ -181,10 +181,8 @@ public class StyleAttributeExtractorTest extends TestCase {
         s.getFeatureTypeStyles()[0].addRule(rule);
         assertAttributeName(s, new String[] { "geometry", "shape" });
 
-        CompareFilter f = filterFactory.createCompareFilter(FilterType.COMPARE_EQUALS);
-        f.addLeftValue(filterFactory.createAttributeExpression(testSchema,
-                "testLong"));
-        f.addRightValue(filterFactory.createLiteralExpression(10.0));
+        Filter f = filterFactory.equals(filterFactory.property("testLong"), filterFactory
+                .literal(10.0));
         rule.setFilter(f);
 
         assertAttributeName(s, new String[] { "geometry", "shape", "testLong" });
@@ -196,17 +194,13 @@ public class StyleAttributeExtractorTest extends TestCase {
                 "image/png");
         Mark mark = styleFactory.createMark();
         Stroke stroke = styleFactory.getDefaultStroke();
-        stroke.setWidth(filterFactory.createAttributeExpression(testSchema,
-                "testInteger"));
+        stroke.setWidth(filterFactory.property("testInteger"));
         mark.setStroke(stroke);
-        mark.setWellKnownName(filterFactory.createAttributeExpression(testSchema, "testString"));
+        mark.setWellKnownName(filterFactory.property("testString"));
 
-        Expression opacity = filterFactory.createAttributeExpression(testSchema,
-                "testLong");
-        Expression rotation = filterFactory.createAttributeExpression(testSchema,
-                "testDouble");
-        Expression size = filterFactory.createAttributeExpression(testSchema,
-                "testFloat");
+        Expression opacity = filterFactory.property("testLong");
+        Expression rotation = filterFactory.property("testDouble");
+        Expression size = filterFactory.property("testFloat");
         Graphic g = styleFactory.createGraphic(new ExternalGraphic[] { eg },
                 new Mark[] { mark }, null, opacity, rotation, size);
         pointSymb.setGraphic(g);
@@ -228,10 +222,8 @@ public class StyleAttributeExtractorTest extends TestCase {
 
     public void testTextSymbolizer() throws Exception {
         TextSymbolizer textSymb = styleFactory.createTextSymbolizer();
-        Expression offset = filterFactory.createAttributeExpression(testSchema,
-                "testInteger");
-        Expression label = filterFactory.createAttributeExpression(testSchema,
-                "testString");
+        Expression offset = filterFactory.property("testInteger");
+        Expression label = filterFactory.property("testString");
         textSymb.setLabelPlacement(styleFactory.createLinePlacement(offset));
         textSymb.setLabel(label);
 
@@ -241,10 +233,8 @@ public class StyleAttributeExtractorTest extends TestCase {
             });
         assertAttributeName(s, new String[] { "testInteger", "testString" });
 
-        Expression ancX = filterFactory.createAttributeExpression(testSchema,
-                "testFloat");
-        Expression ancY = filterFactory.createAttributeExpression(testSchema,
-                "testDouble");
+        Expression ancX = filterFactory.property("testFloat");
+        Expression ancY = filterFactory.property("testDouble");
         AnchorPoint ancPoint = styleFactory.createAnchorPoint(ancX, ancY);
         LabelPlacement placement = styleFactory.createPointPlacement(ancPoint,
                 null, null);
@@ -256,18 +246,14 @@ public class StyleAttributeExtractorTest extends TestCase {
     
     public void testFont() throws Exception {
         Font font = styleFactory.createFont(filterFactory
-                .createAttributeExpression(testSchema, "testString"),
-                filterFactory.createAttributeExpression(testSchema,
-                    "testString2"),
-                filterFactory.createAttributeExpression(testSchema, "testLong"),
-                filterFactory.createAttributeExpression(testSchema,
-                    "testBoolean"));
+                .property("testString"),
+                filterFactory.property("testString2"),
+                filterFactory.property("testLong"),
+                filterFactory.property("testBoolean"));
 
         TextSymbolizer textSymb = styleFactory.createTextSymbolizer();
-        Expression offset = filterFactory.createAttributeExpression(testSchema,
-                "testFloat");
-        Expression label = filterFactory.createAttributeExpression(testSchema,
-                "testByte");
+        Expression offset = filterFactory.property("testFloat");
+        Expression label = filterFactory.property("testByte");
         textSymb.setLabelPlacement(styleFactory.createLinePlacement(offset));
         textSymb.setLabel(label);
         textSymb.setFonts(new Font[] { font });
@@ -285,11 +271,9 @@ public class StyleAttributeExtractorTest extends TestCase {
 
     public void testHalo() throws Exception {
         Fill fill = styleFactory.getDefaultFill();
-        fill.setColor(filterFactory.createAttributeExpression(testSchema,
-                "testString"));
+        fill.setColor(filterFactory.property("testString"));
 
-        Expression radius = filterFactory.createAttributeExpression(testSchema,
-                "testLong");
+        Expression radius = filterFactory.property("testLong");
         Halo halo = styleFactory.createHalo(fill, radius);
         TextSymbolizer textSymb = styleFactory.createTextSymbolizer();
         textSymb.setHalo(halo);
@@ -303,7 +287,7 @@ public class StyleAttributeExtractorTest extends TestCase {
 
     public void testLinePlacement() throws Exception {
         LinePlacement linePlacement = styleFactory.createLinePlacement(filterFactory
-                .createAttributeExpression(testSchema, "testLong"));
+                .property("testLong"));
         TextSymbolizer textSymb = styleFactory.createTextSymbolizer();
         textSymb.setLabelPlacement(linePlacement);
 
@@ -317,22 +301,17 @@ public class StyleAttributeExtractorTest extends TestCase {
     public void testPointPlacement() throws Exception {
         PointPlacement pp = styleFactory.getDefaultPointPlacement();
 
-        Expression x = filterFactory.createAttributeExpression(testSchema,
-                "testLong");
-        Expression y = filterFactory.createAttributeExpression(testSchema,
-                "testInteger");
+        Expression x = filterFactory.property("testLong");
+        Expression y = filterFactory.property("testInteger");
         AnchorPoint ap = styleFactory.createAnchorPoint(x, y);
 
-        Expression dx = filterFactory.createAttributeExpression(testSchema,
-                "testFloat");
-        Expression dy = filterFactory.createAttributeExpression(testSchema,
-                "testDouble");
+        Expression dx = filterFactory.property("testFloat");
+        Expression dy = filterFactory.property("testDouble");
         Displacement displacement = styleFactory.createDisplacement(dx, dy);
 
         pp.setAnchorPoint(ap);
         pp.setDisplacement(displacement);
-        pp.setRotation(filterFactory.createAttributeExpression(testSchema,
-                "testFloat"));
+        pp.setRotation(filterFactory.property("testFloat"));
 
         TextSymbolizer textSymb = styleFactory.createTextSymbolizer();
         textSymb.setLabelPlacement(pp);
@@ -348,12 +327,10 @@ public class StyleAttributeExtractorTest extends TestCase {
     public void testPolygonSymbolizer() throws Exception {
         PolygonSymbolizer ps = styleFactory.createPolygonSymbolizer();
         Stroke stroke = styleFactory.getDefaultStroke();
-        stroke.setColor(filterFactory.createAttributeExpression(testSchema,
-                "testString"));
+        stroke.setColor(filterFactory.property("testString"));
 
         Fill fill = styleFactory.getDefaultFill();
-        fill.setOpacity(filterFactory.createAttributeExpression(testSchema,
-                "testDouble"));
+        fill.setOpacity(filterFactory.property("testDouble"));
         ps.setStroke(stroke);
         ps.setFill(fill);
 
@@ -367,8 +344,7 @@ public class StyleAttributeExtractorTest extends TestCase {
     public void testLineSymbolizer() throws IllegalFilterException {
         LineSymbolizer ls = styleFactory.createLineSymbolizer();
         Stroke stroke = styleFactory.getDefaultStroke();
-        stroke.setColor(filterFactory.createAttributeExpression(testSchema,
-                "testString"));
+        stroke.setColor(filterFactory.property("testString"));
         ls.setStroke(stroke);
 
         Style s = createStyle();
@@ -380,15 +356,12 @@ public class StyleAttributeExtractorTest extends TestCase {
 
     public void testFill() throws IllegalFilterException {
         Fill fill = styleFactory.getDefaultFill();
-        fill.setBackgroundColor(filterFactory.createAttributeExpression(
-                testSchema, "testString"));
-        fill.setColor(filterFactory.createAttributeExpression(testSchema,
-                "testString2"));
+        fill.setBackgroundColor(filterFactory.property("testString"));
+        fill.setColor(filterFactory.property("testString2"));
 
         Mark mark = styleFactory.createMark();
-        Expression le = filterFactory.createLiteralExpression(1);
-        Expression rot = filterFactory.createAttributeExpression(testSchema,
-                "testFloat");
+        Expression le = filterFactory.literal(1);
+        Expression rot = filterFactory.property("testFloat");
         Graphic graphic = styleFactory.createGraphic(null, new Mark[] { mark },
                 null, le, le, rot);
         fill.setGraphicFill(graphic);
@@ -406,15 +379,12 @@ public class StyleAttributeExtractorTest extends TestCase {
 
     public void testStroke() throws IllegalFilterException {
         Stroke stroke = styleFactory.getDefaultStroke();
-        stroke.setColor(filterFactory.createAttributeExpression(testSchema,
-                "testString2"));
-        stroke.setDashOffset(filterFactory.createAttributeExpression(
-                testSchema, "testString"));
+        stroke.setColor(filterFactory.property("testString2"));
+        stroke.setDashOffset(filterFactory.property("testString"));
 
         Mark mark = styleFactory.createMark();
-        Expression le = filterFactory.createLiteralExpression(1);
-        Expression rot = filterFactory.createAttributeExpression(testSchema,
-                "testFloat");
+        Expression le = filterFactory.literal(1);
+        Expression rot = filterFactory.property("testFloat");
         Graphic graphic = styleFactory.createGraphic(null, new Mark[] { mark },
                 null, le, le, rot);
         stroke.setGraphicFill(graphic);

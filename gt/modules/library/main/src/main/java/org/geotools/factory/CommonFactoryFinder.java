@@ -17,27 +17,21 @@ package org.geotools.factory;
 
 // J2SE dependencies
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Set;
 
-// Geotools dependencies
-import org.geotools.styling.StyleFactory;
-import org.geotools.catalog.ServiceFactory;
-import org.geotools.data.FeatureLock;
 import org.geotools.data.FeatureLockFactory;
 import org.geotools.data.FileDataStoreFactorySpi;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.DefaultFeatureTypeFactory;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.FunctionImpl;
 import org.geotools.resources.LazySet;
-
-// OpenGIS dependencies
+import org.geotools.styling.StyleFactory;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.expression.Function;
 
 
 /**
@@ -84,7 +78,8 @@ public final class CommonFactoryFinder {
                     FeatureLockFactory.class,
                     FileDataStoreFactorySpi.class,
                     FunctionImpl.class,
-                    FunctionExpression.class,
+                    FunctionExpression.class,//TODO: remove
+                    Function.class,
                     AttributeTypeFactory.class,
                     FeatureCollections.class,
                     FeatureTypeFactory.class}));
@@ -146,7 +141,7 @@ public final class CommonFactoryFinder {
     public static synchronized Set getFunctionExpressions(Hints hints) {
         hints = addDefaultHints(hints);
         return new LazySet(getServiceRegistry().getServiceProviders(
-                FunctionExpression.class, null, hints));
+                Function.class, null, hints));
     }
 
 

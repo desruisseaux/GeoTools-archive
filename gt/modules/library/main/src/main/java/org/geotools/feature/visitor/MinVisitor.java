@@ -15,12 +15,13 @@
  */
 package org.geotools.feature.visitor;
 
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 
 /**
  * Calculates the minimum value of an attribute.
@@ -37,20 +38,20 @@ public class MinVisitor implements FeatureCalc {
     boolean visited = false;
 
     public MinVisitor(String attributeTypeName) {
-        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
-        expr = factory.createAttributeExpression(attributeTypeName);
+        FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
+        expr = factory.property(attributeTypeName);
     }
     
     public MinVisitor(int attributeTypeIndex, FeatureType type)
         throws IllegalFilterException {
-        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
-        expr = factory.createAttributeExpression(type.getAttributeType(attributeTypeIndex).getName());
+        FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
+        expr = factory.property(type.getAttributeType(attributeTypeIndex).getName());
     }
 
     public MinVisitor(String attrName, FeatureType type)
         throws IllegalFilterException {
-        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
-        expr = factory.createAttributeExpression(type.getAttributeType(attrName).getName());
+        FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
+        expr = factory.property(type.getAttributeType(attrName).getName());
     }
 
     public MinVisitor(Expression expr) throws IllegalFilterException {

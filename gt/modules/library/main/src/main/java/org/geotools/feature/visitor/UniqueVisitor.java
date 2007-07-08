@@ -20,12 +20,12 @@ import java.util.HashSet;
 import java.util.ListIterator;
 import java.util.Set;
 
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 
 
 /**
@@ -41,20 +41,20 @@ public class UniqueVisitor implements FeatureCalc {
     Set set = new HashSet();
 
     public UniqueVisitor(String attributeTypeName) {
-        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
-        expr = factory.createAttributeExpression(attributeTypeName);
+        FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
+        expr = factory.property(attributeTypeName);
     }
 
     public UniqueVisitor(int attributeTypeIndex, FeatureType type)
         throws IllegalFilterException {
-        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
-        expr = factory.createAttributeExpression(type.getAttributeType(attributeTypeIndex).getName());
+        FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
+        expr = factory.property(type.getAttributeType(attributeTypeIndex).getName());
     }
 
     public UniqueVisitor(String attrName, FeatureType type)
         throws IllegalFilterException {
-        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
-        expr = factory.createAttributeExpression(type.getAttributeType(attrName).getName());
+        FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
+        expr = factory.property(type.getAttributeType(attrName).getName());
     }
 
     public UniqueVisitor(Expression expr) {

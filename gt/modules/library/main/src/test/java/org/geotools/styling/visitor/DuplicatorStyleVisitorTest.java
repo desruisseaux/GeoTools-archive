@@ -17,13 +17,14 @@ package org.geotools.styling.visitor;
 
 import junit.framework.TestCase;
 
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryFinder;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.FilterFactory2;
 
 
 /**
@@ -43,7 +44,7 @@ public class DuplicatorStyleVisitorTest extends TestCase {
 
     protected void setUp() throws Exception {
     	sf = StyleFactoryFinder.createStyleFactory();
-        ff = FilterFactoryFinder.createFilterFactory();
+        ff = CommonFactoryFinder.getFilterFactory(null);
         sb = new StyleBuilder(sf, ff);
     }
     
@@ -52,7 +53,7 @@ public class DuplicatorStyleVisitorTest extends TestCase {
     	Style oldStyle = sb.createStyle("FTSName", sf.createPolygonSymbolizer());
     	oldStyle.getFeatureTypeStyles()[0].setSemanticTypeIdentifiers(new String[] {"simple", "generic:geometry"});
     	//duplicate it
-    	DuplicatorStyleVisitor visitor = new DuplicatorStyleVisitor(sf, ff);
+    	DuplicatingStyleVisitor visitor = new DuplicatingStyleVisitor(sf, (FilterFactory2) ff);
     	oldStyle.accept(visitor);
     	Style newStyle = (Style) visitor.getCopy();
     	

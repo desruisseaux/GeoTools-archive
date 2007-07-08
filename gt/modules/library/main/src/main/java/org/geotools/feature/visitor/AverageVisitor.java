@@ -121,8 +121,8 @@ public class AverageVisitor implements FeatureCalc {
         strategy.add(value);
     }
 
-    public org.geotools.filter.Expression getExpression() {
-        return (org.geotools.filter.Expression) expr;
+    public Expression getExpression() {
+        return expr;
     }
 
     /**

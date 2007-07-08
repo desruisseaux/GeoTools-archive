@@ -27,7 +27,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.opengis.filter.Filter;
-import org.geotools.filter.SortBy;
+import org.opengis.filter.sort.SortBy;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;

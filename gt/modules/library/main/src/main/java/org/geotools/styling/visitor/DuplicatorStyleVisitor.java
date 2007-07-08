@@ -18,9 +18,6 @@ package org.geotools.styling.visitor;
 import java.util.Stack;
 
 import org.geotools.event.GTCloneUtil;
-import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory2;
-import org.opengis.filter.expression.Expression;
 import org.geotools.filter.visitor.DuplicatingFilterVisitor;
 import org.geotools.styling.AnchorPoint;
 import org.geotools.styling.ColorMap;
@@ -51,6 +48,9 @@ import org.geotools.styling.Symbol;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.styling.UserLayer;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.expression.Expression;
 
 /**
  * Used to duplicate a Style object (anything in the SLD hierarchy).
@@ -87,7 +87,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
     }
     
     /** Duplicate an expression using copyFilter */
-    public Filter copy( org.geotools.filter.Filter filter ){
+    public Filter copy( Filter filter ){
         return (Filter) filter.accept( copyFilter, null );
 //        return (Filter) copyFilter.getPages().pop();
     }
@@ -221,7 +221,7 @@ public class DuplicatorStyleVisitor implements StyleVisitor {
         Filter filterCopy = null;
 
         if (rule.getFilter() != null) {
-            org.geotools.filter.Filter filter = (org.geotools.filter.Filter) rule.getFilter();
+            Filter filter = rule.getFilter();
             filterCopy = copy( filter );
         }
 

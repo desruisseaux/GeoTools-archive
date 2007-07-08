@@ -20,6 +20,7 @@ package org.geotools.filter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.Feature;
 import org.opengis.filter.FilterVisitor;
 
@@ -57,7 +58,7 @@ public abstract class CompareFilterImpl extends BinaryComparisonAbstract
      * @deprecated use {@link #CompareFilterImpl(FilterFactory, org.opengis.filter.expression.Expression, org.opengis.filter.expression.Expression)}
      */
     protected CompareFilterImpl(short filterType) throws IllegalFilterException {
-    	super(FilterFactoryFinder.createFilterFactory());
+    	super(CommonFactoryFinder.getFilterFactory(null));
     	if (isCompareFilter(filterType)) {
             this.filterType = filterType;
         } else {

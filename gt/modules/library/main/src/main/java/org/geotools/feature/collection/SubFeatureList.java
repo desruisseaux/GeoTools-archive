@@ -19,23 +19,25 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import org.geotools.data.collection.ResourceCollection;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureList;
-import org.geotools.filter.AttributeExpression;
-import org.geotools.filter.FidFilter;
-import org.opengis.filter.Filter;
-import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
-import org.opengis.filter.sort.SortBy;
-import org.geotools.filter.SortOrder;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.Id;
 import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.sort.SortBy;
+import org.opengis.filter.sort.SortOrder;
 
 public class SubFeatureList extends SubFeatureCollection implements FeatureList, RandomFeatureAccess {
     List sort; 
@@ -78,9 +80,12 @@ public class SubFeatureList extends SubFeatureCollection implements FeatureList,
     
     /** Lazy create a filter based on index */
     protected Filter createFilter() {
-        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-        FidFilter fids = ff.createFidFilter();
-        fids.addAllFids( index );
+        FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+        Set featureIds = new HashSet();
+        for(Iterator it = index.iterator(); it.hasNext();){
+           featureIds.add(ff.featureId((String) it.next())); 
+        }
+        Id fids = ff.id(featureIds);
             
         return fids;
     }

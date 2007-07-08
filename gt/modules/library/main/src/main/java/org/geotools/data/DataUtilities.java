@@ -15,7 +15,6 @@
  */
 package org.geotools.data;
 
-import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -37,7 +36,6 @@ import java.util.Map.Entry;
 
 import org.geotools.data.collection.CollectionDataStore;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.DefaultFeatureType;
@@ -46,35 +44,54 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.type.GeometricAttributeType;
-import org.geotools.filter.AttributeExpression;
-import org.geotools.filter.BetweenFilter;
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FidFilter;
-import org.geotools.filter.FilterVisitor;
-import org.geotools.filter.FilterVisitorFilterWrapper;
-import org.geotools.filter.FunctionExpression;
-import org.geotools.filter.GeometryFilter;
-import org.geotools.filter.LikeFilter;
-import org.geotools.filter.LiteralExpression;
-import org.geotools.filter.LogicFilter;
-import org.geotools.filter.MathExpression;
-import org.geotools.filter.NullFilter;
+import org.geotools.filter.FilterAttributeExtractor;
+import org.geotools.filter.visitor.DefaultFilterVisitor;
 import org.geotools.referencing.CRS;
-import org.geotools.resources.CRSUtilities;
-import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.filter.And;
+import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.filter.FilterVisitor;
+import org.opengis.filter.Id;
+import org.opengis.filter.IncludeFilter;
+import org.opengis.filter.Not;
+import org.opengis.filter.Or;
+import org.opengis.filter.PropertyIsBetween;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.PropertyIsGreaterThan;
+import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
+import org.opengis.filter.PropertyIsLessThan;
+import org.opengis.filter.PropertyIsLessThanOrEqualTo;
+import org.opengis.filter.PropertyIsLike;
+import org.opengis.filter.PropertyIsNotEqualTo;
+import org.opengis.filter.PropertyIsNull;
+import org.opengis.filter.expression.Add;
+import org.opengis.filter.expression.Divide;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.ExpressionVisitor;
+import org.opengis.filter.expression.Function;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.Multiply;
+import org.opengis.filter.expression.NilExpression;
+import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.expression.Subtract;
+import org.opengis.filter.spatial.BBOX;
+import org.opengis.filter.spatial.Beyond;
+import org.opengis.filter.spatial.Contains;
+import org.opengis.filter.spatial.Crosses;
+import org.opengis.filter.spatial.DWithin;
+import org.opengis.filter.spatial.Disjoint;
+import org.opengis.filter.spatial.Equals;
+import org.opengis.filter.spatial.Intersects;
+import org.opengis.filter.spatial.Overlaps;
+import org.opengis.filter.spatial.Touches;
+import org.opengis.filter.spatial.Within;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -88,7 +105,6 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 
 /**
@@ -189,36 +205,40 @@ public class DataUtilities {
     	 if (filter == null) {
              return new String[0];
          }
-
-         final Set set = new HashSet();
-         traverse(filter,
-             new DataUtilities.AbstractFilterVisitor() {
-                 public void visit(AttributeExpression attributeExpression) {
-                	//evaluate to get actual attribute type
-                	 if ( featureType != null ) {
-                		 AttributeType type = 
-                			 (AttributeType) attributeExpression.evaluate( featureType );
-                		 if ( type != null ) {
-                			 set.add( type.getName() );
-                			 return;
-                		 }
-                	 }
-                	
-                	 set.add(attributeExpression.getAttributePath());
-                 }
-             });
-
-         if (set.size() == 0) {
-             return new String[0];
-         }
-
-         String[] names = new String[set.size()];
-         int index = 0;
-
-         for (Iterator i = set.iterator(); i.hasNext(); index++) {
-             names[index] = (String) i.next();
-         }
-         return names;
+         FilterAttributeExtractor attExtractor = new FilterAttributeExtractor();
+         filter.accept(attExtractor, null);
+         String[] attributeNames = attExtractor.getAttributeNames();
+         return attributeNames;
+//GR: GEOT-1192 in progress... guess the provided implementation replacement is far simpler...
+//         final Set set = new HashSet();
+//         traverse(filter,
+//             new DataUtilities.AbstractFilterVisitor() {
+//                 public void visit(AttributeExpression attributeExpression) {
+//                	//evaluate to get actual attribute type
+//                	 if ( featureType != null ) {
+//                		 AttributeType type = 
+//                			 (AttributeType) attributeExpression.evaluate( featureType );
+//                		 if ( type != null ) {
+//                			 set.add( type.getName() );
+//                			 return;
+//                		 }
+//                	 }
+//                	
+//                	 set.add(attributeExpression.getAttributePath());
+//                 }
+//             });
+//
+//         if (set.size() == 0) {
+//             return new String[0];
+//         }
+//
+//         String[] names = new String[set.size()];
+//         int index = 0;
+//
+//         for (Iterator i = set.iterator(); i.hasNext(); index++) {
+//             names[index] = (String) i.next();
+//         }
+//         return names;
     }
     
     /**
@@ -240,36 +260,41 @@ public class DataUtilities {
     	 if (expression == null) {
              return new String[0];
          }
+         FilterAttributeExtractor attExtractor = new FilterAttributeExtractor();
+         expression.accept(attExtractor, null);
+         String[] attributeNames = attExtractor.getAttributeNames();
+         return attributeNames;
 
-         final Set set = new HashSet();
-         traverse(expression,
-             new DataUtilities.AbstractFilterVisitor() {
-                 public void visit(AttributeExpression attributeExpression) {
-                	//evaluate to get actual attribute type
-                	 if ( featureType != null ) {
-                		 AttributeType type = 
-                			 (AttributeType) attributeExpression.evaluate( featureType );
-                		 if ( type != null ) {
-                			 set.add( type.getName() );
-                			 return;
-                		 }
-                	 }
-                	
-                	 set.add(attributeExpression.getAttributePath());
-                 }
-             });
-
-         if (set.size() == 0) {
-             return new String[0];
-         }
-
-         String[] names = new String[set.size()];
-         int index = 0;
-
-         for (Iterator i = set.iterator(); i.hasNext(); index++) {
-             names[index] = (String) i.next();
-         }
-         return names;
+//      GR: GEOT-1192 in progress... guess the provided implementation replacement is far simpler...
+//         final Set set = new HashSet();
+//         traverse(expression,
+//             new DataUtilities.AbstractFilterVisitor() {
+//                 public void visit(AttributeExpression attributeExpression) {
+//                	//evaluate to get actual attribute type
+//                	 if ( featureType != null ) {
+//                		 AttributeType type = 
+//                			 (AttributeType) attributeExpression.evaluate( featureType );
+//                		 if ( type != null ) {
+//                			 set.add( type.getName() );
+//                			 return;
+//                		 }
+//                	 }
+//                	
+//                	 set.add(attributeExpression.getAttributePath());
+//                 }
+//             });
+//
+//         if (set.size() == 0) {
+//             return new String[0];
+//         }
+//
+//         String[] names = new String[set.size()];
+//         int index = 0;
+//
+//         for (Iterator i = set.iterator(); i.hasNext(); index++) {
+//             names[index] = (String) i.next();
+//         }
+//         return names;
     }
     
     /**
@@ -311,33 +336,43 @@ public class DataUtilities {
         for (Iterator i = set.iterator(); i.hasNext();) {
             Object here = i.next();
 
-            if (here instanceof BetweenFilter) {
-                visitor.visit((BetweenFilter) here);
-            } else if (here instanceof CompareFilter) {
-                visitor.visit((CompareFilter) here);
-            } else if (here instanceof GeometryFilter) {
-                visitor.visit((GeometryFilter) here);
-            } else if (here instanceof LikeFilter) {
-                visitor.visit((LikeFilter) here);
-            } else if (here instanceof LogicFilter) {
-                visitor.visit((LogicFilter) here);
-            } else if (here instanceof NullFilter) {
-                visitor.visit((NullFilter) here);
-            } else if (here instanceof FidFilter) {
-                visitor.visit((FidFilter) here);
-            } else if (here instanceof Filter) {
-                visitor.visit((org.geotools.filter.Filter) here);
-            } else if (here instanceof AttributeExpression) {
-                visitor.visit((AttributeExpression) here);
-            } else if (here instanceof LiteralExpression) {
-                visitor.visit((LiteralExpression) here);
-            } else if (here instanceof MathExpression) {
-                visitor.visit((MathExpression) here);
-            } else if (here instanceof FunctionExpression) {
-                visitor.visit((FunctionExpression) here);
+            if (here instanceof Filter) {
+                ((Filter) here).accept(visitor, null);
             } else if (here instanceof Expression) {
-                visitor.visit((org.geotools.filter.Filter) here);
+                if (!(visitor instanceof ExpressionVisitor)) {
+                    throw new IllegalArgumentException("visitor is not an ExpressionVisitor");
+                }
+                ((Expression) here).accept((ExpressionVisitor) visitor, null);
+            } else {
+                throw new IllegalArgumentException("Not a Filter or an Expression: " + here);
             }
+//            if (here instanceof BetweenFilter) {
+//                visitor.visit((BetweenFilter) here);
+//            } else if (here instanceof CompareFilter) {
+//                visitor.visit((CompareFilter) here);
+//            } else if (here instanceof GeometryFilter) {
+//                visitor.visit((GeometryFilter) here);
+//            } else if (here instanceof LikeFilter) {
+//                visitor.visit((LikeFilter) here);
+//            } else if (here instanceof LogicFilter) {
+//                visitor.visit((LogicFilter) here);
+//            } else if (here instanceof NullFilter) {
+//                visitor.visit((NullFilter) here);
+//            } else if (here instanceof FidFilter) {
+//                visitor.visit((FidFilter) here);
+//            } else if (here instanceof Filter) {
+//                visitor.visit((org.geotools.filter.Filter) here);
+//            } else if (here instanceof AttributeExpression) {
+//                visitor.visit((AttributeExpression) here);
+//            } else if (here instanceof LiteralExpression) {
+//                visitor.visit((LiteralExpression) here);
+//            } else if (here instanceof MathExpression) {
+//                visitor.visit((MathExpression) here);
+//            } else if (here instanceof FunctionExpression) {
+//                visitor.visit((FunctionExpression) here);
+//            } else if (here instanceof Expression) {
+//                visitor.visit((org.geotools.filter.Filter) here);
+//            }
         }
     }
 
@@ -360,7 +395,7 @@ public class DataUtilities {
                 }
             };
 
-        filter.accept( new FilterVisitorFilterWrapper( traverse ), null );
+        filter.accept(traverse, null );
         
         return set;
     }
@@ -373,7 +408,7 @@ public class DataUtilities {
      */
     public static Set traverseDepth(Expression expression) {
         final Set set = new HashSet();
-        FilterVisitor traverse = new Traversal() {
+        ExpressionVisitor traverse = new Traversal() {
                 void traverse(Filter f) {
                     set.add(f);
                 }
@@ -383,7 +418,7 @@ public class DataUtilities {
                 }
             };
 
-        expression.accept(traverse);
+        expression.accept(traverse, null);
 
         return set;
     }
@@ -1514,278 +1549,461 @@ public class DataUtilities {
         }
     }
 
-    /**
-     * A quick and dirty FilterVisitor.
-     * 
-     * <p>
-     * This is useful when creating FilterVisitors for use with traverseDepth(
-     * Filter, FilterVisitor ) method.
-     * </p>
-     * 
-     * <p>
-     * visit( Filter ) and visit( Expression ) will pass their arguments off to
-     * more specialized functions.
-     * </p>
-     * @deprecated TODO: Traversal 
-     */
-    abstract static class AbstractFilterVisitor implements FilterVisitor {
-        /**
-         * DOCUMENT ME!
-         *
-         * @param filter DOCUMENT ME!
-         */
-        public void visit(org.geotools.filter.Filter filter) {
-            if (filter instanceof BetweenFilter) {
-                visit((BetweenFilter) filter);
-            } else if (filter instanceof CompareFilter) {
-                visit((CompareFilter) filter);
-            } else if (filter instanceof GeometryFilter) {
-                visit((GeometryFilter) filter);
-            } else if (filter instanceof LikeFilter) {
-                visit((LikeFilter) filter);
-            } else if (filter instanceof LogicFilter) {
-                visit((LogicFilter) filter);
-            } else if (filter instanceof NullFilter) {
-                visit((NullFilter) filter);
-            } else if (filter instanceof FidFilter) {
-                visit((FidFilter) filter);
-            }
-        }
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @param betweenFilter DOCUMENT ME!
-         */
-        public void visit(BetweenFilter betweenFilter) {
-            // DOCUMENT ME!
-        }
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @param comparefilter DOCUMENT ME!
-         */
-        public void visit(CompareFilter comparefilter) {
-            // DOCUMENT ME!
-        }
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @param geometryFilter DOCUMENT ME!
-         */
-        public void visit(GeometryFilter geometryFilter) {
-            // DOCUMENT ME!
-        }
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @param likeFilter DOCUMENT ME!
-         */
-        public void visit(LikeFilter likeFilter) {
-            // DOCUMENT ME!
-        }
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @param logicFilter DOCUMENT ME!
-         */
-        public void visit(LogicFilter logicFilter) {
-            // DOCUMENT ME!
-        }
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @param nullFilter DOCUMENT ME!
-         */
-        public void visit(NullFilter nullFilter) {
-            // DOCUMENT ME!
-        }
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @param fidFilter DOCUMENT ME!
-         */
-        public void visit(FidFilter fidFilter) {
-            // DOCUMENT ME!
-        }
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @param attributeExpression DOCUMENT ME!
-         */
-        public void visit(AttributeExpression attributeExpression) {
-            // DOCUMENT ME!
-        }
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @param expression DOCUMENT ME!
-         */
-        public void visit(Expression expression) {
-            if (expression instanceof AttributeExpression) {
-                visit((AttributeExpression) expression);
-            } else if (expression instanceof LiteralExpression) {
-                visit((LiteralExpression) expression);
-            } else if (expression instanceof MathExpression) {
-                visit((MathExpression) expression);
-            } else if (expression instanceof FunctionExpression) {
-                visit((FunctionExpression) expression);
-            }
-        }
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @param literalExpression DOCUMENT ME!
-         */
-        public void visit(LiteralExpression literalExpression) {
-            // DOCUMENT ME!
-        }
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @param mathExpression DOCUMENT ME!
-         */
-        public void visit(MathExpression mathExpression) {
-            // DOCUMENT ME!
-        }
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @param functionExpression DOCUMENT ME!
-         */
-        public void visit(FunctionExpression functionExpression) {
-            // DOCUMENT ME!
-        }
-    }
-
+//    /**
+//     * A quick and dirty FilterVisitor.
+//     * 
+//     * <p>
+//     * This is useful when creating FilterVisitors for use with traverseDepth(
+//     * Filter, FilterVisitor ) method.
+//     * </p>
+//     * 
+//     * <p>
+//     * visit( Filter ) and visit( Expression ) will pass their arguments off to
+//     * more specialized functions.
+//     * </p>
+//     * @deprecated TODO: Traversal 
+//     */
+//    abstract static class AbstractFilterVisitor implements FilterVisitor {
+//        /**
+//         * DOCUMENT ME!
+//         *
+//         * @param filter DOCUMENT ME!
+//         */
+//        public void visit(Filter filter) {
+//            if (filter instanceof BetweenFilter) {
+//                visit((BetweenFilter) filter);
+//            } else if (filter instanceof CompareFilter) {
+//                visit((CompareFilter) filter);
+//            } else if (filter instanceof GeometryFilter) {
+//                visit((GeometryFilter) filter);
+//            } else if (filter instanceof LikeFilter) {
+//                visit((LikeFilter) filter);
+//            } else if (filter instanceof LogicFilter) {
+//                visit((LogicFilter) filter);
+//            } else if (filter instanceof NullFilter) {
+//                visit((NullFilter) filter);
+//            } else if (filter instanceof FidFilter) {
+//                visit((FidFilter) filter);
+//            }
+//        }
+//
+//        /**
+//         * DOCUMENT ME!
+//         *
+//         * @param betweenFilter DOCUMENT ME!
+//         */
+//        public void visit(BetweenFilter betweenFilter) {
+//            // DOCUMENT ME!
+//        }
+//
+//        /**
+//         * DOCUMENT ME!
+//         *
+//         * @param comparefilter DOCUMENT ME!
+//         */
+//        public void visit(CompareFilter comparefilter) {
+//            // DOCUMENT ME!
+//        }
+//
+//        /**
+//         * DOCUMENT ME!
+//         *
+//         * @param geometryFilter DOCUMENT ME!
+//         */
+//        public void visit(GeometryFilter geometryFilter) {
+//            // DOCUMENT ME!
+//        }
+//
+//        /**
+//         * DOCUMENT ME!
+//         *
+//         * @param likeFilter DOCUMENT ME!
+//         */
+//        public void visit(LikeFilter likeFilter) {
+//            // DOCUMENT ME!
+//        }
+//
+//        /**
+//         * DOCUMENT ME!
+//         *
+//         * @param logicFilter DOCUMENT ME!
+//         */
+//        public void visit(LogicFilter logicFilter) {
+//            // DOCUMENT ME!
+//        }
+//
+//        /**
+//         * DOCUMENT ME!
+//         *
+//         * @param nullFilter DOCUMENT ME!
+//         */
+//        public void visit(NullFilter nullFilter) {
+//            // DOCUMENT ME!
+//        }
+//
+//        /**
+//         * DOCUMENT ME!
+//         *
+//         * @param fidFilter DOCUMENT ME!
+//         */
+//        public void visit(FidFilter fidFilter) {
+//            // DOCUMENT ME!
+//        }
+//
+//        /**
+//         * DOCUMENT ME!
+//         *
+//         * @param attributeExpression DOCUMENT ME!
+//         */
+//        public void visit(AttributeExpression attributeExpression) {
+//            // DOCUMENT ME!
+//        }
+//
+//        /**
+//         * DOCUMENT ME!
+//         *
+//         * @param expression DOCUMENT ME!
+//         */
+//        public void visit(Expression expression) {
+//            if (expression instanceof AttributeExpression) {
+//                visit((AttributeExpression) expression);
+//            } else if (expression instanceof LiteralExpression) {
+//                visit((LiteralExpression) expression);
+//            } else if (expression instanceof MathExpression) {
+//                visit((MathExpression) expression);
+//            } else if (expression instanceof FunctionExpression) {
+//                visit((FunctionExpression) expression);
+//            }
+//        }
+//
+//        /**
+//         * DOCUMENT ME!
+//         *
+//         * @param literalExpression DOCUMENT ME!
+//         */
+//        public void visit(LiteralExpression literalExpression) {
+//            // DOCUMENT ME!
+//        }
+//
+//        /**
+//         * DOCUMENT ME!
+//         *
+//         * @param mathExpression DOCUMENT ME!
+//         */
+//        public void visit(MathExpression mathExpression) {
+//            // DOCUMENT ME!
+//        }
+//
+//        /**
+//         * DOCUMENT ME!
+//         *
+//         * @param functionExpression DOCUMENT ME!
+//         */
+//        public void visit(FunctionExpression functionExpression) {
+//            // DOCUMENT ME!
+//        }
+//    }
+//
+//    /**
+//     * Will traverse the entire data structure
+//     * 
+//     * @deprecated Please use org.geotools.filter.visitor.AbstractFilterVisitor
+//     */
+//    abstract static class Traversal extends AbstractFilterVisitor {
+//        abstract void traverse(Filter filter);
+//
+//        abstract void traverse(Expression expression);
+//
+//        /**
+//         * DOCUMENT ME!
+//         *
+//         * @param betweenFilter DOCUMENT ME!
+//         */
+//        public void visit(BetweenFilter betweenFilter) {
+//            traverse(betweenFilter.getLeftValue());
+//            visit(betweenFilter.getLeftValue());
+//
+//            traverse(betweenFilter.getMiddleValue());
+//            visit(betweenFilter.getMiddleValue());
+//
+//            traverse(betweenFilter.getRightValue());
+//            visit(betweenFilter.getRightValue());
+//        }
+//
+//        /**
+//         * DOCUMENT ME!
+//         *
+//         * @param compareFilter DOCUMENT ME!
+//         */
+//        public void visit(CompareFilter compareFilter) {
+//            traverse(compareFilter.getLeftValue());
+//            visit(compareFilter.getLeftValue());
+//
+//            traverse(compareFilter.getRightValue());
+//            visit(compareFilter.getRightValue());
+//        }
+//
+//        /**
+//         * DOCUMENT ME!
+//         *
+//         * @param geometryFilter DOCUMENT ME!
+//         */
+//        public void visit(GeometryFilter geometryFilter) {
+//            traverse(geometryFilter.getLeftGeometry());
+//            visit(geometryFilter.getLeftGeometry());
+//
+//            traverse(geometryFilter.getRightGeometry());
+//            visit(geometryFilter.getRightGeometry());
+//        }
+//
+//        /**
+//         * DOCUMENT ME!
+//         *
+//         * @param likeFilter DOCUMENT ME!
+//         */
+//        public void visit(LikeFilter likeFilter) {
+//            traverse(likeFilter.getValue());
+//            visit(likeFilter.getValue());
+//        }
+//
+//        /**
+//         * DOCUMENT ME!
+//         *
+//         * @param logicFilter DOCUMENT ME!
+//         */
+//        public void visit(LogicFilter logicFilter) {
+//            for (Iterator i = logicFilter.getFilterIterator(); i.hasNext();) {
+//                // GR: LogicFilters are the only ones whose members are Filters
+//                // instead of Expressions, so it was causing ClassCastExceptions
+//                Filter f = (Filter) i.next();
+//                traverse(f);
+//                visit((org.geotools.filter.Filter) f);
+//            }
+//        }
+//
+//        /**
+//         * DOCUMENT ME!
+//         *
+//         * @param nullFilter DOCUMENT ME!
+//         */
+//        public void visit(NullFilter nullFilter) {
+//            traverse(nullFilter.getNullCheckValue());
+//            visit(nullFilter.getNullCheckValue());
+//        }
+//
+//        /**
+//         * DOCUMENT ME!
+//         *
+//         * @param mathExpression DOCUMENT ME!
+//         */
+//        public void visit(MathExpression mathExpression) {
+//            traverse(mathExpression.getLeftValue());
+//            visit(mathExpression.getLeftValue());
+//
+//            traverse(mathExpression.getRightValue());
+//            visit(mathExpression.getRightValue());
+//        }
+//
+//        /**
+//         * DOCUMENT ME!
+//         *
+//         * @param functionExpression DOCUMENT ME!
+//         */
+//        public void visit(FunctionExpression functionExpression) {
+//            Expression[] args = functionExpression.getArgs();
+//
+//            for (int i = 0; i < args.length; i++) {
+//                traverse(args[i]);
+//                visit(args[i]);
+//            }
+//        }
+//    }
+//	
+	
     /**
      * Will traverse the entire data structure
-     * 
-     * @deprecated Please use org.geotools.filter.visitor.AbstractFilterVisitor
      */
-    abstract static class Traversal extends AbstractFilterVisitor {
+    abstract static class Traversal extends DefaultFilterVisitor {
         abstract void traverse(Filter filter);
 
         abstract void traverse(Expression expression);
 
-        /**
-         * DOCUMENT ME!
-         *
-         * @param betweenFilter DOCUMENT ME!
-         */
-        public void visit(BetweenFilter betweenFilter) {
-            traverse(betweenFilter.getLeftValue());
-            visit(betweenFilter.getLeftValue());
-
-            traverse(betweenFilter.getMiddleValue());
-            visit(betweenFilter.getMiddleValue());
-
-            traverse(betweenFilter.getRightValue());
-            visit(betweenFilter.getRightValue());
+        public Object visit(ExcludeFilter filter, Object data) {
+            traverse(filter);
+            return super.visit(filter, data);
         }
 
-        /**
-         * DOCUMENT ME!
-         *
-         * @param compareFilter DOCUMENT ME!
-         */
-        public void visit(CompareFilter compareFilter) {
-            traverse(compareFilter.getLeftValue());
-            visit(compareFilter.getLeftValue());
-
-            traverse(compareFilter.getRightValue());
-            visit(compareFilter.getRightValue());
+        public Object visit(IncludeFilter filter, Object data) {
+            traverse(filter);
+            return super.visit(filter, data);
         }
 
-        /**
-         * DOCUMENT ME!
-         *
-         * @param geometryFilter DOCUMENT ME!
-         */
-        public void visit(GeometryFilter geometryFilter) {
-            traverse(geometryFilter.getLeftGeometry());
-            visit(geometryFilter.getLeftGeometry());
-
-            traverse(geometryFilter.getRightGeometry());
-            visit(geometryFilter.getRightGeometry());
+        public Object visit(And filter, Object data) {
+            traverse(filter);
+            return super.visit(filter, data);
         }
 
-        /**
-         * DOCUMENT ME!
-         *
-         * @param likeFilter DOCUMENT ME!
-         */
-        public void visit(LikeFilter likeFilter) {
-            traverse(likeFilter.getValue());
-            visit(likeFilter.getValue());
+        public Object visit(Id filter, Object data) {
+            traverse(filter);
+            return super.visit(filter, data);
         }
 
-        /**
-         * DOCUMENT ME!
-         *
-         * @param logicFilter DOCUMENT ME!
-         */
-        public void visit(LogicFilter logicFilter) {
-            for (Iterator i = logicFilter.getFilterIterator(); i.hasNext();) {
-		//GR: LogicFilters are the only ones whose members are Filters
-		//instead of Expressions, so it was causing ClassCastExceptions
-                Filter f = (Filter) i.next();
-		traverse(f);
-		visit((org.geotools.filter.Filter) f);
-            }
+        public Object visit(Not filter, Object data) {
+            traverse(filter);
+            return super.visit(filter, data);
         }
 
-        /**
-         * DOCUMENT ME!
-         *
-         * @param nullFilter DOCUMENT ME!
-         */
-        public void visit(NullFilter nullFilter) {
-            traverse(nullFilter.getNullCheckValue());
-            visit(nullFilter.getNullCheckValue());
+        public Object visit(Or filter, Object data) {
+            traverse(filter);
+            return super.visit(filter, data);
         }
 
-        /**
-         * DOCUMENT ME!
-         *
-         * @param mathExpression DOCUMENT ME!
-         */
-        public void visit(MathExpression mathExpression) {
-            traverse(mathExpression.getLeftValue());
-            visit(mathExpression.getLeftValue());
-
-            traverse(mathExpression.getRightValue());
-            visit(mathExpression.getRightValue());
+        public Object visit(PropertyIsBetween filter, Object data) {
+            traverse(filter);
+            return super.visit(filter, data);
         }
 
-        /**
-         * DOCUMENT ME!
-         *
-         * @param functionExpression DOCUMENT ME!
-         */
-        public void visit(FunctionExpression functionExpression) {
-            Expression[] args = functionExpression.getArgs();
+        public Object visit(PropertyIsEqualTo filter, Object data) {
+            traverse(filter);
+            return super.visit(filter, data);
+        }
 
-            for (int i = 0; i < args.length; i++) {
-                traverse(args[i]);
-                visit(args[i]);
-            }
+        public Object visit(PropertyIsNotEqualTo filter, Object data) {
+            traverse(filter);
+            return super.visit(filter, data);
+        }
+
+        public Object visit(PropertyIsGreaterThan filter, Object data) {
+            traverse(filter);
+            return super.visit(filter, data);
+        }
+
+        public Object visit(PropertyIsGreaterThanOrEqualTo filter, Object data) {
+            traverse(filter);
+            return super.visit(filter, data);
+        }
+
+        public Object visit(PropertyIsLessThan filter, Object data) {
+            traverse(filter);
+            return super.visit(filter, data);
+        }
+
+        public Object visit(PropertyIsLessThanOrEqualTo filter, Object data) {
+            traverse(filter);
+            return super.visit(filter, data);
+        }
+
+        public Object visit(PropertyIsLike filter, Object data) {
+            traverse(filter);
+            return super.visit(filter, data);
+        }
+
+        public Object visit(PropertyIsNull filter, Object data) {
+            traverse(filter);
+            return super.visit(filter, data);
+        }
+
+        public Object visit(BBOX filter, Object data) {
+            traverse(filter);
+            return super.visit(filter, data);
+        }
+
+        public Object visit(Beyond filter, Object data) {
+            traverse(filter);
+            return super.visit(filter, data);
+        }
+
+        public Object visit(Contains filter, Object data) {
+            traverse(filter);
+            return super.visit(filter, data);
+        }
+
+        public Object visit(Crosses filter, Object data) {
+            traverse(filter);
+            return super.visit(filter, data);
+        }
+
+        public Object visit(Disjoint filter, Object data) {
+            traverse(filter);
+            return super.visit(filter, data);
+        }
+
+        public Object visit(DWithin filter, Object data) {
+            traverse(filter);
+            return super.visit(filter, data);
+        }
+
+        public Object visit(Equals filter, Object data) {
+            traverse(filter);
+            return super.visit(filter, data);
+        }
+
+        public Object visit(Intersects filter, Object data) {
+            traverse(filter);
+            return super.visit(filter, data);
+        }
+
+        public Object visit(Overlaps filter, Object data) {
+            traverse(filter);
+            return super.visit(filter, data);
+        }
+
+        public Object visit(Touches filter, Object data) {
+            traverse(filter);
+            return super.visit(filter, data);
+        }
+
+        public Object visit(Within filter, Object data) {
+            traverse(filter);
+            return super.visit(filter, data);
+        }
+
+        public Object visitNullFilter(Object data) {
+            return super.visitNullFilter(data);
+        }
+
+        public Object visit(NilExpression expr, Object data) {
+            traverse(expr);
+            return super.visit(expr, data);
+        }
+
+        public Object visit(Add expr, Object data) {
+            traverse(expr);
+            return super.visit(expr, data);
+        }
+
+        public Object visit(Divide expr, Object data) {
+            traverse(expr);
+            return super.visit(expr, data);
+        }
+
+        public Object visit(Function expr, Object data) {
+            traverse(expr);
+            return super.visit(expr, data);
+        }
+
+        public Object visit(Literal expr, Object data) {
+            traverse(expr);
+            return super.visit(expr, data);
+        }
+
+        public Object visit(Multiply expr, Object data) {
+            traverse(expr);
+            return super.visit(expr, data);
+        }
+
+        public Object visit(PropertyName expr, Object data) {
+            traverse(expr);
+            return super.visit(expr, data);
+        }
+
+        public Object visit(Subtract expr, Object data) {
+            traverse(expr);
+            return super.visit(expr, data);
         }
     }
-	
-	
-	/**
+    
+    /**
 	 * Manually calculates the bounds of a feature collection.
 	 * @param collection
 	 * @return

@@ -29,6 +29,7 @@ import java.util.logging.Level;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
 import org.geotools.filter.ExpressionBuilder;
+import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 import org.w3c.dom.Element;
@@ -787,7 +788,7 @@ public class SLDParser {
                     //advance to the first actual element (rather than whitespace)
                     firstChild = firstChild.getNextSibling();
                 }
-                org.geotools.filter.Filter filter = org.geotools.filter.FilterDOMParser.parseFilter(firstChild);
+                Filter filter = org.geotools.filter.FilterDOMParser.parseFilter(firstChild);
                 rule.setFilter(filter);
 			}
 

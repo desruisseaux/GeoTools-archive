@@ -8,18 +8,16 @@ import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.memory.MemoryDataStore;
-import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.geotools.filter.CompareFilter;
-import org.opengis.filter.Filter;
-import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.FilterType;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -79,7 +77,7 @@ public class DefaultViewTest extends TestCase {
     public void testGetFeaturesFilter() throws Exception {
 
         FeatureSource view = getView();
-        CompareFilter f = getFilter();
+        Filter f = getFilter();
         FeatureIterator features = view.getFeatures(f).features();
         int count=0;
         while( features.hasNext() ){
@@ -99,25 +97,21 @@ public class DefaultViewTest extends TestCase {
     }
 
     private DefaultQuery getQuery() throws IllegalFilterException {
-        CompareFilter f = getFilter();
+        Filter f = getFilter();
         DefaultQuery defaultQuery = new DefaultQuery(typeName, f, new String[0]);
         return defaultQuery;
     }
 
-    private CompareFilter getFilter() throws IllegalFilterException {
-        FilterFactory fac=FilterFactoryFinder.createFilterFactory();
-        CompareFilter f = fac.createCompareFilter(FilterType.COMPARE_EQUALS);
-        f.addLeftValue(fac.createAttributeExpression("name"));
-        f.addRightValue(fac.createLiteralExpression("name2"));
+    private Filter getFilter() throws IllegalFilterException {
+        FilterFactory fac = CommonFactoryFinder.getFilterFactory(null);
+        Filter f = fac.equals(fac.property("name"), fac.literal("name2"));
         return f;
     }
 
     private FeatureSource getView() throws IllegalFilterException, IOException, SchemaException {
-        FilterFactory fac=FilterFactoryFinder.createFilterFactory();
-        CompareFilter f = fac.createCompareFilter(FilterType.COMPARE_LESS_THAN);
-        f.addLeftValue(fac.createAttributeExpression("id"));
-        f.addRightValue(fac.createLiteralExpression(3));
-        
+        FilterFactory fac = CommonFactoryFinder.getFilterFactory(null);
+        Filter f = fac.less(fac.property("id"), fac.literal(3));
+
         FeatureSource view = ds.getView(new DefaultQuery(typeName, f));
         return view;
     }

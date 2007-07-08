@@ -25,16 +25,15 @@ import java.util.logging.Logger;
 
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Expression;
+import org.geotools.filter.LengthFunction;
+import org.geotools.xml.transform.TransformerBase;
+import org.geotools.xml.transform.Translator;
+import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.PropertyIsLessThanOrEqualTo;
-import org.geotools.filter.FilterType;
-import org.geotools.filter.LengthFunction;
-import org.geotools.filter.LiteralExpression;
-import org.geotools.xml.transform.TransformerBase;
-import org.geotools.xml.transform.Translator;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Literal;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -367,13 +366,13 @@ public class FeatureTypeTransformer extends TransformerBase {
             	Filter f = attribute.getRestriction();
             	if(f instanceof PropertyIsLessThan ||
                    f instanceof PropertyIsLessThanOrEqualTo ){
-            		CompareFilter cf = (CompareFilter)f;
-            		Expression e = cf.getLeftValue();
+            		BinaryComparisonOperator cf = (BinaryComparisonOperator) f;
+            		Expression e = cf.getExpression1();
             		if(e!= null && e instanceof LengthFunction){
-            			length = Integer.parseInt(((LiteralExpression)cf.getRightValue()).getLiteral().toString());
+            			length = Integer.parseInt(((Literal)cf.getExpression2()).getValue().toString());
             		}else{
-            			if(cf.getRightValue() instanceof LengthFunction){
-            				length = Integer.parseInt(((LiteralExpression)cf.getLeftValue()).getLiteral().toString());
+            			if(cf.getExpression2() instanceof LengthFunction){
+            				length = Integer.parseInt(((Literal)cf.getExpression1()).getValue().toString());
             			}
             		}
             	}
