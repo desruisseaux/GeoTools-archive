@@ -24,17 +24,13 @@ import java.util.Map;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
-import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.filter.AttributeExpression;
-import org.geotools.filter.Expression;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.FilterType;
-import org.geotools.filter.GeometryFilter;
-import org.geotools.filter.LiteralExpression;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.spatial.Intersects;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -68,7 +64,7 @@ public class FilterExample {
 		System.exit(0);
 	}
 
-	private static void polygonIntersectsPoint() throws IOException, FactoryConfigurationError {
+	private static void polygonIntersectsPoint() throws IOException {
 		// locate the data
 		URL url = getResource("test-data/bc_2m_lakes.shp");
 
@@ -83,8 +79,7 @@ public class FilterExample {
 		FeatureSource featureSource = dataStore.getFeatureSource(typeName);
 
 		// create a filter
-		FilterFactory filterFactory = FilterFactoryFinder
-				.createFilterFactory();
+		FilterFactory2 filterFactory = (FilterFactory2) CommonFactoryFinder.getFilterFactory(null);
 
 		// look up geometry attribute name used for testing
 		//
@@ -92,8 +87,7 @@ public class FilterExample {
 				.getDefaultGeometry().getName();
 
 		// Create the attribute expression
-		AttributeExpression geometryExpression = filterFactory
-				.createAttributeExpression(geometryName);
+		PropertyName geometryExpression = filterFactory.property(geometryName);
 
 		// Create the point used for testing
 		//
@@ -104,16 +98,11 @@ public class FilterExample {
 		Point point = geometryFactory.createPoint(pointCoordinate);
 
 		// Create the literal expression
-		LiteralExpression pointExpression = filterFactory
-				.createLiteralExpression();
-		pointExpression.setLiteral(point);
+		Literal pointExpression = filterFactory.literal(point);
 
 		// create the actual test
 		//
-		GeometryFilter withinFilter = filterFactory
-		.createGeometryFilter(FilterType.GEOMETRY_INTERSECTS);			
-		withinFilter.addLeftGeometry(geometryExpression);
-		withinFilter.addRightGeometry(pointExpression);
+		Intersects withinFilter = filterFactory.intersects(geometryExpression, pointExpression);
 
 		// grab features matching the filter
 		FeatureCollection featureCollection = featureSource
