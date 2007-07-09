@@ -274,7 +274,7 @@ public abstract class AbstractAuthorityMediator extends
      *            The GeoAPI interface that was to be created (e.g.
      *            {@code CoordinateReferenceSystem.class}).
      * @param code
-     *            The unknow authority code.
+     *            The unknown authority code.
      * @return An exception initialized with an error message built from the
      *         specified informations.
      */
@@ -298,10 +298,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(type);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     codes = worker.getAuthorityCodes(type);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(type);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -322,10 +324,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     obj = worker.createObject(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -347,15 +351,19 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     crs = worker.createCompoundCRS(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
             } catch (Exception e) {
                 throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return crs;
@@ -370,10 +378,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     crs = worker.createCoordinateReferenceSystem(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -391,10 +401,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     crs = worker.createDerivedCRS(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -413,10 +425,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     crs = worker.createEngineeringCRS(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -435,10 +449,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     crs = worker.createGeocentricCRS(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -457,10 +473,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     crs = worker.createGeographicCRS(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -478,10 +496,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     crs = worker.createImageCRS(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -499,10 +519,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     crs = worker.createProjectedCRS(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -520,10 +542,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     crs = worker.createTemporalCRS(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -541,10 +565,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     crs = worker.createVerticalCRS(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -565,10 +591,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     cs = worker.createCartesianCS(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -587,10 +615,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     cs = worker.createCoordinateSystem(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -610,10 +640,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     axis = worker.createCoordinateSystemAxis(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -632,10 +664,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     cs = worker.createCylindricalCS(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -654,10 +688,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     cs = worker.createEllipsoidalCS(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -675,10 +711,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     cs = worker.createPolarCS(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -696,10 +734,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     cs = worker.createSphericalCS(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -717,10 +757,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     cs = worker.createTimeCS(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -738,10 +780,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     unit = worker.createUnit(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -759,10 +803,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     cs = worker.createVerticalCS(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -783,10 +829,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     datum = worker.createDatum(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -804,10 +852,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     ellipsoid = worker.createEllipsoid(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -826,10 +876,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     datum = worker.createEngineeringDatum(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -848,10 +900,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     datum = worker.createGeodeticDatum(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -869,10 +923,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     datum = worker.createImageDatum(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -891,10 +947,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     datum = worker.createPrimeMeridian(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -913,10 +971,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     datum = worker.createTemporalDatum(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -935,10 +995,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     datum = worker.createVerticalDatum(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -957,10 +1019,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     operation = worker.createCoordinateOperation(code);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
@@ -982,10 +1046,12 @@ public abstract class AbstractAuthorityMediator extends
             try {
                 AbstractCachedAuthorityFactory worker = null;
                 try {
+                    cache.writeLock(key);
                     worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                     operations = worker.createFromCoordinateReferenceSystemCodes(sourceCode, targetCode);
                 } finally {
                     getPool().returnObject(worker);
+                    cache.writeUnLock(key);
                 }
             } catch (FactoryException e) {
                 throw e;
