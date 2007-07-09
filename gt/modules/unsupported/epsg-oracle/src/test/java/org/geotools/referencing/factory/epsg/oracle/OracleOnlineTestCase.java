@@ -52,22 +52,23 @@ public class OracleOnlineTestCase extends OnlineTestCase {
         OracleDataSource source;
         source = new OracleDataSource();
 
-        source.setUser( fixture.getProperty("user"));
-        source.setPassword( fixture.getProperty("password"));
-        source.setURL( fixture.getProperty("url"));
+        source.setUser(fixture.getProperty("user"));
+        source.setPassword(fixture.getProperty("password"));
+        source.setURL(fixture.getProperty("url"));
         
         datasource = source;
 
         Connection connection = source.getConnection();        
         try {
-            DatabaseMetaData metaData = connection.getMetaData();        
+            DatabaseMetaData metaData = connection.getMetaData();
             String user = fixture.getProperty("user").toUpperCase();
-            ResultSet epsgTables = metaData.getTables( null, user, "EPSG%", null );
+            ResultSet epsgTables = metaData
+                    .getTables(null, user, "EPSG%", null);
             List list = new ArrayList();
-            while( epsgTables.next() ){
-                list.add( epsgTables.getObject( 3 ));
+            while (epsgTables.next()) {
+                list.add(epsgTables.getObject(3));
             }
-            if( list.isEmpty() ){
+            if (list.isEmpty()) {
                 throw new SQLException("Could not find EPSG tables");
             }
         }
@@ -75,16 +76,16 @@ public class OracleOnlineTestCase extends OnlineTestCase {
             connection.close();
         }
         
-        //System.out.println( list );
+        //  System.out.println(list);
         Hashtable env = new Hashtable();
-        env.put( Context.INITIAL_CONTEXT_FACTORY, "org.osjava.sj.memory.MemoryContextFactory" );
+        env.put(Context.INITIAL_CONTEXT_FACTORY, "org.osjava.sj.memory.MemoryContextFactory");
         
         InitialContext context = new InitialContext(env);
         String name = context.composeName("jdbc/EPSG", "");
-        //System.out.println( name );
-        context.bind( name, source );
+        // System.out.println(name);
+        context.bind(name, source);
         
-        JNDI.init( context );
+        JNDI.init(context);
     }
 
     protected void disconnect() throws Exception {
