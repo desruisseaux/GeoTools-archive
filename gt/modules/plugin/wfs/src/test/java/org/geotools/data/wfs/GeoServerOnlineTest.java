@@ -23,9 +23,11 @@ import java.net.NoRouteToHostException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,20 +44,19 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.AttributeExpression;
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.FidFilter;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.FilterType;
 import org.geotools.filter.IllegalFilterException;
-import org.geotools.filter.NullFilter;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.Id;
+import org.opengis.filter.PropertyIsNull;
+import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.identity.FeatureId;
 import org.xml.sax.SAXException;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -241,10 +242,10 @@ public class GeoServerOnlineTest extends TestCase {
         m.put(WFSDataStoreFactory.URL.key,url);
         m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(100000));
         WFSDataStore wfs = (WFSDataStore)(new WFSDataStoreFactory()).createNewDataStore(m);
-        FilterFactory fac = FilterFactoryFinder.createFilterFactory();
-        CompareFilter filter=fac.createCompareFilter(FilterType.COMPARE_EQUALS);
-        filter.addLeftValue(fac.createAttributeExpression("NAME"));
-        filter.addRightValue(fac.createLiteralExpression("E 58th St"));
+        FilterFactory2 fac = CommonFactoryFinder.getFilterFactory2(null);
+
+        Filter filter = fac.equals(fac.property("NAME"), fac.literal("E 58th St"));
+        
         Query query=new DefaultQuery("tiger:tiger_roads", filter);
         FeatureReader reader = wfs.getFeatureReader(query, new DefaultTransaction());
         int expected=0;
@@ -288,17 +289,16 @@ public class GeoServerOnlineTest extends TestCase {
         Watcher watcher = new Watcher();
         fs.addFeatureListener( watcher );
         
-        FidFilter startingFeatures=createFidFilter(fs);
+        Id startingFeatures=createFidFilter(fs);
+        FilterFactory2 filterFac = CommonFactoryFinder.getFilterFactory2(null);
         try{
         GeometryFactory gf = new GeometryFactory();
         MultiPolygon mp = gf.createMultiPolygon(new Polygon[]{gf.createPolygon(gf.createLinearRing(new Coordinate[]{new Coordinate(-88.071564,37.51099), new Coordinate(-88.467644,37.400757), new Coordinate(-90.638329,42.509361), new Coordinate(-89.834618,42.50346),new Coordinate(-88.071564,37.51099)}),new LinearRing[]{})});
         mp.setUserData("http://www.opengis.net/gml/srs/epsg.xml#"+EPSG_CODE);
       
-        FilterFactory filterFac = FilterFactoryFinder.createFilterFactory();
-		NullFilter geomNullCheck = filterFac.createNullFilter();
-        AttributeExpression geometryAttributeExpression = filterFac.createAttributeExpression(ft.getDefaultGeometry().getName());
-		geomNullCheck.nullCheckValue(geometryAttributeExpression);
-		Query query=new DefaultQuery(typename, geomNullCheck.not(), 1, Query.ALL_NAMES, null);
+        PropertyName geometryAttributeExpression = filterFac.property(ft.getDefaultGeometry().getName());
+		PropertyIsNull geomNullCheck = filterFac.isNull(geometryAttributeExpression);
+		Query query=new DefaultQuery(typename, filterFac.not(geomNullCheck), 1, Query.ALL_NAMES, null);
         FeatureIterator inStore = fs.getFeatures(query).features();
         
         Feature f,f2;
@@ -313,7 +313,7 @@ public class GeoServerOnlineTest extends TestCase {
         
         Logger.getLogger("org.geotools.data.wfs").setLevel(Level.FINE);
         FeatureCollection inserts = DataUtilities.collection(new Feature[] {f,f2});
-        FidFilter fp = WFSDataStoreWriteOnlineTest.doInsert(post,ft,inserts);
+        Id fp = WFSDataStoreWriteOnlineTest.doInsert(post,ft,inserts);
         
         /// okay now count ...
         FeatureReader count = post.getFeatureReader(new DefaultQuery(ft.getTypeName()),Transaction.AUTO_COMMIT);        
@@ -328,18 +328,23 @@ public class GeoServerOnlineTest extends TestCase {
 //        assertFalse("events not fired", watcher.count == 0);
         }finally{
         	try{
-        	((FeatureStore)fs).removeFeatures(startingFeatures.not());
+        	((FeatureStore)fs).removeFeatures(filterFac.not(startingFeatures));
         	}catch (Exception e) {
         		System.out.println(e);
 			}
         }
     }
-	private FidFilter createFidFilter(FeatureSource fs) throws IOException {
+	private Id createFidFilter(FeatureSource fs) throws IOException {
 		FeatureIterator iter = fs.getFeatures().features();
+        FilterFactory2 ffac = CommonFactoryFinder.getFilterFactory2(null);
+        Set fids = new HashSet();
 		try{
-			FidFilter filter = FilterFactoryFinder.createFilterFactory().createFidFilter();
-			while(iter.hasNext())
-				filter.addFid(iter.next().getID());
+			while(iter.hasNext()){
+				String id = iter.next().getID();
+                FeatureId fid = ffac.featureId(id);
+                fids.add(fid);
+            }
+            Id filter = ffac.id(fids);
 			return filter;
 		}finally{
 			iter.close();
