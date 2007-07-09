@@ -2,16 +2,20 @@ package org.geotools.geometry.iso.operations;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
+import org.geotools.geometry.Geometry;
 import org.geotools.geometry.iso.PositionFactoryImpl;
 import org.geotools.geometry.iso.PrecisionModel;
+import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
+import org.geotools.geometry.iso.root.GeometryImpl;
 import org.geotools.referencing.CRS;
 import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.coordinate.GeometryFactory;
@@ -37,6 +41,69 @@ public class TransformTest extends TestCase {
 		this.crs1 = CRS.decode("EPSG:4326");
 		this.crs2 = CRS.decode("EPSG:3005");
 	}
+	
+	// test that two points, curves, rings, or surfaces are equal within a tolerance
+	// (equals means same CRS and same ordinates within tolerance)
+	private void assertEqualsWithinTolerance(GeometryImpl geom1, GeometryImpl geom2, double epsilon) {
+		if ( !CRS.equalsIgnoreMetadata(geom1.getCoordinateReferenceSystem(), geom2.getCoordinateReferenceSystem()) ) {
+			assertTrue("CRS of two objects do not match", false);
+		}	
+		if (geom1.getCoordinateDimension() != geom2.getCoordinateDimension()) {
+			assertTrue("Coordinate dimension of objects do not match", false);
+		}
+		
+		if (geom1 instanceof PointImpl && geom2 instanceof PointImpl) {
+			PointImpl point1 = (PointImpl) geom1;
+			PointImpl point2 = (PointImpl) geom2;
+			for (int i=0; i<point1.getPosition().getCoordinates().length; i++) {
+				assertEquals(point1.getPosition().getOrdinate(i), point2.getPosition().getOrdinate(i), epsilon);
+			}
+			
+		}
+		else if (geom1 instanceof CurveImpl && geom2 instanceof CurveImpl) {
+			CurveImpl curve1 = (CurveImpl) geom1;
+			CurveImpl curve2 = (CurveImpl) geom2;
+			List<DirectPositionImpl> list1 = curve1.asDirectPositions();
+			List<DirectPositionImpl> list2 = curve2.asDirectPositions();
+			Iterator<DirectPositionImpl> iterator1 = list1.iterator();
+			Iterator<DirectPositionImpl> iterator2 = list2.iterator();
+			while (iterator1.hasNext() && iterator2.hasNext()) {
+				PointImpl p1 = new PointImpl((DirectPositionImpl) iterator1.next());
+				PointImpl p2 = new PointImpl((DirectPositionImpl) iterator2.next());
+				assertEqualsWithinTolerance(p1, p2, epsilon);
+			}
+		}
+		else if (geom1 instanceof RingImpl && geom2 instanceof RingImpl) {
+			RingImpl ring1 = (RingImpl) geom1;
+			RingImpl ring2 = (RingImpl) geom2;
+			List<DirectPositionImpl> list1 = ring1.asDirectPositions();
+			List<DirectPositionImpl> list2 = ring2.asDirectPositions();
+			Iterator<DirectPositionImpl> iterator1 = list1.iterator();
+			Iterator<DirectPositionImpl> iterator2 = list2.iterator();
+			while (iterator1.hasNext() && iterator2.hasNext()) {
+				PointImpl p1 = new PointImpl((DirectPositionImpl) iterator1.next());
+				PointImpl p2 = new PointImpl((DirectPositionImpl) iterator2.next());
+				assertEqualsWithinTolerance(p1, p2, epsilon);
+			}
+		}
+		else if (geom1 instanceof SurfaceImpl && geom2 instanceof SurfaceImpl) {
+			SurfaceImpl surface1 = (SurfaceImpl) geom1;
+			SurfaceImpl surface2 = (SurfaceImpl) geom2;
+			List<RingImpl> list1 = surface1.getBoundaryRings();
+			List<RingImpl> list2 = surface2.getBoundaryRings();
+			Iterator<RingImpl> iterator1 = list1.iterator();
+			Iterator<RingImpl> iterator2 = list2.iterator();
+			while (iterator1.hasNext() && iterator2.hasNext()) {
+				RingImpl r1 = (RingImpl) iterator1.next();
+				RingImpl r2 = (RingImpl) iterator2.next();
+				assertEqualsWithinTolerance(r1, r2, epsilon);
+			}
+		}
+		else {
+			assertTrue("unsupported or unmatching geometries", false);
+		}
+		
+	}
 
 	public void testPoint() throws Exception {
 
@@ -56,10 +123,11 @@ public class TransformTest extends TestCase {
 		//System.out.println(point2);
 		//System.out.println(expectedPoint2);
 		
-		assertTrue(point2.equals(expectedPoint2));
+		//assertTrue(point2.equals(expectedPoint2));
+		assertEqualsWithinTolerance(point2, expectedPoint2, 0.9);
 		
 	}
-	
+
 	public void testCurve() throws Exception {
 
 		PositionFactory positionFactory = new PositionFactoryImpl(crs1, new PrecisionModel());
@@ -92,11 +160,12 @@ public class TransformTest extends TestCase {
         
         CurveImpl expectedCurve = (CurveImpl) expectedPrimF2.createCurve(expectedCurveSegmentList);
 		
-//		System.out.println(curve1);
-//		System.out.println(curve2);
-//		System.out.println(expectedCurve);
+		//System.out.println(curve1);
+		//System.out.println(curve2);
+		//System.out.println(expectedCurve);
 		
-		assertTrue(curve2.equals(expectedCurve));
+		//assertTrue(curve2.equals(expectedCurve));
+		assertEqualsWithinTolerance(curve2, expectedCurve, 0.9);
 	}
 	
 	public void testRing() throws Exception {
@@ -145,11 +214,12 @@ public class TransformTest extends TestCase {
 		
 		RingImpl expectedRing = (RingImpl) expectedPrimF2.createRing(expectedCurveList);
         
-//		System.out.println(ring1);
-//		System.out.println(ring2);
-//		System.out.println(expectedRing);
+		//System.out.println(ring1);
+		//System.out.println(ring2);
+		//System.out.println(expectedRing);
 		
-		assertTrue(ring2.equals(expectedRing));
+		//assertTrue(ring2.equals(expectedRing));
+		assertEqualsWithinTolerance(ring2, expectedRing, 0.9);
 	}
 	
 	public void testSurface() throws Exception {
@@ -210,6 +280,7 @@ public class TransformTest extends TestCase {
 		//System.out.println(surface2);
 		//System.out.println(expectedSurface);
 		
-		assertTrue(surface2.equals(expectedSurface));
+		//assertTrue(surface2.equals(expectedSurface));
+		assertEqualsWithinTolerance((SurfaceImpl) surface2, (SurfaceImpl) expectedSurface, 0.9);
 	}
 }
