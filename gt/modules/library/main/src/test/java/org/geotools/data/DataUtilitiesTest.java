@@ -149,6 +149,15 @@ public class DataUtilitiesTest extends DataTestCase {
         names = DataUtilities.attributeNames(factory.not(geomNull));
         assertEquals(1, names.length);
         assertEquals("geom", names[0]);
+        
+        //check with namespace qualified name
+        PropertyIsEqualTo equalToWithPrefix = factory.equals(factory.property("gml:name"),id);
+        names = DataUtilities.attributeNames(equalToWithPrefix,roadType);
+        assertEquals(2, names.length);
+        list = Arrays.asList(names);
+        assertTrue(list.contains("name"));
+        assertTrue(list.contains("id"));
+        
     }
 
     /*
