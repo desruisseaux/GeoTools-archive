@@ -19,6 +19,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.FeatureType;
 import org.geotools.filter.visitor.DefaultFilterVisitor;
 import org.opengis.filter.expression.PropertyName;
 
@@ -33,7 +35,18 @@ import org.opengis.filter.expression.PropertyName;
 public class FilterAttributeExtractor extends DefaultFilterVisitor {
     /** Last set visited */
     protected Set attributeNames = new HashSet();
+    /** feature type to evaluate against */
+    protected FeatureType featureType;
 
+    /**
+     * @deprecated Should use {@link #FilterAttributeExtractor(FeatureType)}.
+     */
+    public FilterAttributeExtractor() {
+        this(null);
+    }
+    public FilterAttributeExtractor(FeatureType featureType) {
+        this.featureType = featureType;
+    }
     /**
      * DOCUMENT ME!
      *
@@ -63,7 +76,22 @@ public class FilterAttributeExtractor extends DefaultFilterVisitor {
         if( data != null && data != attributeNames ){
             attributeNames = (Set) data;
         }
-        attributeNames.add( expression.getPropertyName() );
+        if (featureType != null) {
+            //evaluate against the feature type instead of using straight name
+            // since the path from the property name may be an xpath or a 
+            // namespace prefixed string
+            AttributeType type = (AttributeType) expression.evaluate( featureType );
+            if ( type != null ) {
+               attributeNames.add( type.getName() );
+            }
+            else {
+               attributeNames.add( expression.getPropertyName() );
+            }
+        }
+        else {
+            attributeNames.add( expression.getPropertyName() );
+        }
+
         return attributeNames;
     }
 }

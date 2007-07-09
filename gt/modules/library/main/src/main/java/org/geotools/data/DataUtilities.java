@@ -205,7 +205,7 @@ public class DataUtilities {
     	 if (filter == null) {
              return new String[0];
          }
-         FilterAttributeExtractor attExtractor = new FilterAttributeExtractor();
+         FilterAttributeExtractor attExtractor = new FilterAttributeExtractor(featureType);
          filter.accept(attExtractor, null);
          String[] attributeNames = attExtractor.getAttributeNames();
          return attributeNames;
