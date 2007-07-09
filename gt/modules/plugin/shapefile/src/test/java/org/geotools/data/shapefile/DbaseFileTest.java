@@ -121,6 +121,25 @@ static final String TEST_FILE = "shapes/statepop.dbf";
     }
   }
 
+  public void testAddColumn() throws Exception {
+      DbaseFileHeader header = new DbaseFileHeader();
+      
+      Level before = LOGGER.getLevel();
+      try {
+          LOGGER.setLevel(Level.INFO);
+      
+          header.addColumn("emptyInt", 'N', 9, 0);
+          assertSame(Integer.class, header.getFieldClass(0));
+          assertEquals(9, header.getFieldLength(0));
+
+          header.addColumn("emptyString", 'C', 20, 0);
+          assertSame(String.class, header.getFieldClass(1));
+          assertEquals(20, header.getFieldLength(1));
+      }
+      finally {
+          LOGGER.setLevel( before );
+      }
+    }
   
   public void testEmptyFields() throws Exception {
     DbaseFileHeader header = new DbaseFileHeader();

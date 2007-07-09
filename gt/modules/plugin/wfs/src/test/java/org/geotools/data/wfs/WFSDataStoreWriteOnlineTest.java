@@ -16,6 +16,7 @@
 package org.geotools.data.wfs;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -26,23 +27,20 @@ import junit.framework.TestCase;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultTransaction;
-import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Transaction;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.FidFilter;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.FilterType;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.Id;
+import org.opengis.filter.identity.FeatureId;
 
 /**
  * <p> 
@@ -69,7 +67,7 @@ public class WFSDataStoreWriteOnlineTest extends TestCase {
         Logger.global.setLevel(Level.SEVERE);
     }
     
-    public static FidFilter doInsert(DataStore ds,FeatureType ft,FeatureCollection insert) throws NoSuchElementException, IOException, IllegalAttributeException{
+    public static Id doInsert(DataStore ds,FeatureType ft,FeatureCollection insert) throws NoSuchElementException, IOException, IllegalAttributeException{
     	Transaction t = new DefaultTransaction();
     	WFSFeatureStore fs = (WFSFeatureStore)ds.getFeatureSource(ft.getTypeName());
     	fs.setTransaction(t);
@@ -92,10 +90,14 @@ public class WFSDataStoreWriteOnlineTest extends TestCase {
         fr.close();
     	assertEquals(count1+insert.size(), count2);
 
-        FilterFactory fac=FilterFactoryFinder.createFilterFactory();
-        FidFilter fidfilter = fac.createFidFilter();
-        
-        fidfilter.addAllFids(fids1);
+        FilterFactory fac=CommonFactoryFinder.getFilterFactory(null);
+        Set featureIds = new HashSet();
+        for(Iterator it = fids1.iterator();it.hasNext();){
+            String fid = (String) it.next();
+            FeatureId id = fac.featureId(fid);
+            featureIds.add(id);
+        }
+        Id fidfilter = fac.id(featureIds);
         
         System.out.println("Remove Inserted Features");
         fs.removeFeatures(fidfilter);
@@ -135,15 +137,18 @@ public class WFSDataStoreWriteOnlineTest extends TestCase {
     	assertEquals(count2,count3);
     	
     	WFSTransactionState ts = (WFSTransactionState)t.getState(ds);
-    	FidFilter ff = FilterFactoryFinder.createFilterFactory().createFidFilter();
     	String[] fids = ts.getFids(ft.getTypeName());
     	assertNotNull(fids);
-    	for(int i=0;i<fids.length;i++)
-    		ff.addFid(fids[i]);
+    	
+        Set ids = new HashSet();
+        for(int i=0;i<fids.length;i++){
+    		ids.add(fac.featureId(fids[i]));
+        }
+        Id ff = fac.id(ids);
     	return ff;
     }
     
-    public static void doDelete(DataStore ds,FeatureType ft, FidFilter ff) throws NoSuchElementException, IllegalAttributeException, IOException{
+    public static void doDelete(DataStore ds,FeatureType ft, Id ff) throws NoSuchElementException, IllegalAttributeException, IOException{
     	assertNotNull("doInsertFailed?",ff);
     	Transaction t = new DefaultTransaction();
     	FeatureStore fs = (FeatureStore)ds.getFeatureSource(ft.getTypeName());
@@ -194,9 +199,9 @@ public class WFSDataStoreWriteOnlineTest extends TestCase {
     	AttributeType at = ft.getAttributeType(attributeToChange);
     	assertNotNull("Attribute "+attributeToChange+" does not exist",at);
     	
-    	CompareFilter f = FilterFactoryFinder.createFilterFactory().createCompareFilter(FilterType.COMPARE_EQUALS);
-    	f.addLeftValue(FilterFactoryFinder.createFilterFactory().createAttributeExpression(at.getName()));
-    	f.addRightValue(FilterFactoryFinder.createFilterFactory().createLiteralExpression(newValue));
+    	FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory(null);
+        Filter f = filterFactory.equals(filterFactory.property(at.getName()), filterFactory
+                .literal(newValue));
 
     	System.out.println("Update Read 1");
     	FeatureIterator fr = fs.getFeatures(f).features();

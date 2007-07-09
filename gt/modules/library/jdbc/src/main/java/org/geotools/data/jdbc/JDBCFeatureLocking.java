@@ -23,13 +23,11 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureLock;
 import org.geotools.data.FeatureLockException;
 import org.geotools.data.FeatureLocking;
-import org.geotools.data.FeatureReader;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
 import org.opengis.filter.Filter;
 
 
@@ -124,9 +122,10 @@ public class JDBCFeatureLocking extends JDBCFeatureStore
     public int lockFeatures(Filter filter) throws IOException {
         return lockFeatures(new DefaultQuery(getSchema().getTypeName(), filter));
     }
-    public int lockFeatures(org.geotools.filter.Filter filter) throws IOException {
-        return lockFeatures(new DefaultQuery(getSchema().getTypeName(), filter));
-    }
+    //GEOT-1192
+    //public int lockFeatures(org.geotools.filter.Filter filter) throws IOException {
+    //    return lockFeatures(new DefaultQuery(getSchema().getTypeName(), filter));
+    //}
     /**
      * Lock features matching Query.
      * 

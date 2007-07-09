@@ -28,7 +28,6 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.FactoryCreator;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.factory.Hints;
-import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.FunctionImpl;
 import org.geotools.resources.LazySet;
 import org.geotools.styling.StyleFactory;

@@ -286,7 +286,7 @@ public class JDBCFeatureSource implements FeatureSource {
         throws IOException {
         Filter filter = query.getFilter();
 
-        if (filter == org.geotools.filter.Filter.ALL) {
+        if (Filter.EXCLUDE.equals(filter)) {
             return 0;
         }
 
@@ -294,7 +294,7 @@ public class JDBCFeatureSource implements FeatureSource {
         SQLBuilder sqlBuilder = jdbc.getSqlBuilder(featureType.getTypeName());
 
         Filter postFilter = (Filter) sqlBuilder.getPostQueryFilter(filter); 
-        if (postFilter != null && postFilter != org.geotools.filter.Filter.NONE) {
+        if (postFilter != null && !Filter.INCLUDE.equals(postFilter)) {
             // this would require postprocessing the filter
             // so we cannot optimize
             return -1;

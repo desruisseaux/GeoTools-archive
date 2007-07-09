@@ -192,7 +192,7 @@ public class DefaultSQLBuilder implements SQLBuilder {
     public void sqlWhere(StringBuffer sql, Filter preFilter)
         throws SQLEncoderException {
         if ((preFilter != null) && (preFilter != Filter.INCLUDE)) {
-            String where = encoder.encode((org.geotools.filter.Filter)preFilter);
+            String where = encoder.encode(preFilter);
             sql.append(" ");
             sql.append(where);
         }

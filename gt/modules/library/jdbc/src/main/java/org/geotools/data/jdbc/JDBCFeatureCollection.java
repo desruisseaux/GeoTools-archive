@@ -29,6 +29,7 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.MaxFeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.crs.ReprojectFeatureReader;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.visitor.AverageVisitor;
 import org.geotools.feature.visitor.CountVisitor;
 import org.geotools.feature.visitor.FeatureVisitor;
@@ -37,14 +38,15 @@ import org.geotools.feature.visitor.MedianVisitor;
 import org.geotools.feature.visitor.MinVisitor;
 import org.geotools.feature.visitor.SumVisitor;
 import org.geotools.feature.visitor.UniqueVisitor;
-import org.geotools.filter.AttributeExpression;
-import org.geotools.filter.Expression;
-import org.geotools.filter.Filter;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.visitor.AbstractFilterVisitor;
+import org.geotools.filter.visitor.DefaultFilterVisitor;
 import org.geotools.util.NullProgressListener;
 import org.geotools.util.ProgressListener;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.PropertyName;
 
 
 /**
@@ -293,7 +295,7 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
             
 	            //extract the column names from the expression
 	            //(if we see "featureMembers/*/ATTRIBUTE" change to "ATTRIBUTE")
-            	expression.accept(new ExpressionSimplifier());
+            	expression = (Expression)expression.accept(new ExpressionSimplifier(), null);
             
             	//            if (sqlBuilder instanceof DefaultSQLBuilder) {
             	//            	DefaultSQLBuilder builder = (DefaultSQLBuilder) sqlBuilder;
@@ -356,21 +358,19 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
 	 * @author Cory Horner, Refractions
 	 * 
 	 */
-    class ExpressionSimplifier extends AbstractFilterVisitor {
-        public void visit(AttributeExpression expression) {
-            String xpath = expression.getAttributePath();
-
+    class ExpressionSimplifier extends DefaultFilterVisitor {
+        public Object visit(PropertyName expression, Object extraData) {
+            String xpath = expression.getPropertyName();
+            
             if (xpath.startsWith("featureMembers/*/")) {
                 xpath = xpath.substring(17);
             } else if (xpath.startsWith("featureMember/*/")) {
                 xpath = xpath.substring(16);
             }
 
-            try {
-                expression.setAttributePath(xpath);
-            } catch (IllegalFilterException e) {
-                // ignore
-            }
+            FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+            PropertyName simplified = ff.property(xpath);
+            return simplified;
         }
     }
 }
