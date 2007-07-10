@@ -31,6 +31,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.type.GeometricAttributeType;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -241,39 +242,37 @@ public class DefaultFeatureResults extends DataFeatureCollection {
      *
      * @see org.geotools.data.FeatureResults#getBounds()
      */
-    public Envelope getBounds() {
+    public ReferencedEnvelope getBounds() {
         Envelope bounds;
 
         try {
             bounds = featureSource.getBounds(query);
         } catch (IOException e1) {
-            return new Envelope();
-        }
-
-        if (bounds != null) {
-            return bounds;
-        }
-
-        try {
-            Feature feature;
             bounds = new Envelope();
-
-            FeatureReader reader = boundsReader();
-
-            while (reader.hasNext()) {
-                feature = reader.next();
-                bounds.expandToInclude(feature.getBounds());
-            }
-
-            reader.close();
-
-            return bounds;
-        } catch (IllegalAttributeException e) {
-            //throw new DataSourceException("Could not read feature ", e);
-            return new Envelope();
-        } catch (IOException e) {
-            return new Envelope();
         }
+
+        if (bounds == null) {
+        	try {
+	            Feature feature;
+	            bounds = new Envelope();
+	
+	            FeatureReader reader = boundsReader();
+	
+	            while (reader.hasNext()) {
+	                feature = reader.next();
+	                bounds.expandToInclude(feature.getBounds());
+	            }
+	
+	            reader.close();
+        	} catch (IllegalAttributeException e) {
+	            //throw new DataSourceException("Could not read feature ", e);
+	            bounds = new Envelope();
+	        } catch (IOException e) {
+	            bounds = new Envelope();
+	        }
+        }
+        
+        return ReferencedEnvelope.reference(bounds);
     }
 
     /**

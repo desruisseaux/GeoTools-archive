@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -15,12 +15,13 @@
  */
 package org.geotools.geometry.jts;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
 
 // JTS dependencies
 import com.vividsolutions.jts.geom.CoordinateSequence;
+
+// OpenGIS dependencies
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -42,5 +43,5 @@ public interface CoordinateSequenceTransformer {
      * @throws TransformException if at least one coordinate can't be transformed.
      */
     public CoordinateSequence transform(CoordinateSequence sequence, MathTransform transform)
-            throws TransformException;
+        throws TransformException;
 }

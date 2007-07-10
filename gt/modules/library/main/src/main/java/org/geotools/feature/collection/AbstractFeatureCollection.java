@@ -28,6 +28,7 @@ import org.geotools.feature.FeatureList;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.visitor.FeatureVisitor;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 import org.geotools.util.ProgressListener;
@@ -103,14 +104,26 @@ public abstract class AbstractFeatureCollection extends AbstractResourceCollecti
     public void setAttribute( String xPath, Object attribute ) throws IllegalAttributeException {
         state.setAttribute( xPath, attribute );
     }
-    public Geometry getDefaultGeometry() {
-        return state.getDefaultGeometry();
+    /**
+     * @deprecated use {@link #getPrimaryGeometry()}
+     */
+    public final Geometry getDefaultGeometry() {
+        return getPrimaryGeometry();
     }
-    public void setDefaultGeometry( Geometry geometry ) throws IllegalAttributeException {
-        state.setDefaultGeometry( geometry );
+    public Geometry getPrimaryGeometry() {
+    	return state.getDefaultGeometry();
     }
-    public Envelope getBounds() {
-        return state.getBounds();
+    /**
+     * @deprecated use {@link #setPrimaryGeometry(Geometry)}
+     */
+    public final void setDefaultGeometry( Geometry geometry ) throws IllegalAttributeException {
+        setPrimaryGeometry(geometry);
+    }
+    public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
+    	state.setDefaultGeometry( geometry );
+    }
+    public ReferencedEnvelope getBounds() {
+        return ReferencedEnvelope.reference( state.getBounds() );
     }
     public FeatureType getSchema() {
         return state.getChildFeatureType();

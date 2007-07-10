@@ -70,14 +70,26 @@ public class ListAttributeType implements AttributeType {
 	/* (non-Javadoc)
 	 * @see org.geotools.feature.AttributeType#getName()
 	 */
-	public String getName() {
+	public final String getName() {
+		return getLocalName();
+	}
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getLocalName() {
 		return name;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.geotools.feature.AttributeType#getType()
 	 */
-	public Class getType() {
+	public final Class getType() {
+		return getBinding();
+	}
+	/**
+	 * {@inheritDoc}
+	 */
+	public Class getBinding() {
 //		The field for 'Class type' should be added when GT has moved to java 1.5
 		return List.class;
 	}

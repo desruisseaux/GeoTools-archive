@@ -17,6 +17,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.collection.DelegateFeatureIterator;
 import org.geotools.feature.visitor.FeatureVisitor;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.ProgressListener;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
@@ -201,13 +202,17 @@ public class MaxFeaturesFeatureCollection implements FeatureCollection {
 	public Geometry getDefaultGeometry() {
 		return delegate.getDefaultGeometry();
 	}
-
+	public Geometry getPrimaryGeometry() {
+		return delegate.getPrimaryGeometry();
+	}
 	public void setDefaultGeometry(Geometry geometry) throws IllegalAttributeException {
 		delegate.setDefaultGeometry( geometry );
 	}
-
-	public Envelope getBounds() {
+	public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
+		delegate.setPrimaryGeometry(geometry);
+	}
+	public ReferencedEnvelope getBounds() {
 		//calculate manually
-		return DataUtilities.bounds( this );
+		return ReferencedEnvelope.reference( DataUtilities.bounds( this ) );
 	}
 }

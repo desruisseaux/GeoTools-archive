@@ -391,6 +391,13 @@ public class VPFFeatureClass implements DataTypesDefinition, FileConstants,
     public GeometryAttributeType getDefaultGeometry() {
         return featureType.getDefaultGeometry();
     }
+    
+    /* (non-Javadoc)
+     * @see org.geotools.feature.FeatureType#getPrimaryGeometry()
+     */
+    public GeometryAttributeType getPrimaryGeometry() {
+    	return featureType.getPrimaryGeometry();
+    }
 
     /* (non-Javadoc)
      * @see org.geotools.feature.FeatureType#getAttributeCount()

@@ -251,7 +251,8 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
         
         Envelope result = ds.getFeatureSource().getBounds(query);
         
-        assertEquals(bounds, result);
+        //assertEquals(bounds, result);
+        assertTrue(result.equals(bounds));
     }
 
     public static final void main(String[] args) throws Exception {

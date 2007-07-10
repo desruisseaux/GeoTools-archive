@@ -195,9 +195,25 @@ public class DefaultFeatureType implements FeatureType {
      *
      * @return The attribute type of the default geometry, which will contain
      *         the position.
+     *         
+     * @deprecated use {@link #getPrimaryGeometry()}
      */
-    public GeometryAttributeType getDefaultGeometry() {
-        return defaultGeom;
+    public final GeometryAttributeType getDefaultGeometry() {
+        return getPrimaryGeometry();
+    }
+    /**
+     * Gets the primary geometry AttributeType.  If the FeatureType has more
+     * one geometry it is up to the implementor to determine which geometry is
+     * the default.  If working with multiple geometries it is best to get the
+     * attributeTypes and iterate through them, checking isGeometry on each.
+     * This should just be used a convenience method when it is known that the
+     * features are flat.
+     *
+     * @return The attribute type of the default geometry, which will contain
+     *         the position.
+     */
+    public GeometryAttributeType getPrimaryGeometry() {
+    	return defaultGeom;
     }
 
     /**

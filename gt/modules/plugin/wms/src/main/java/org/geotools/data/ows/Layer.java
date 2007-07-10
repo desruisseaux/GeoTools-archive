@@ -456,7 +456,8 @@ public class Layer implements Comparable {
                 try {
                     fromCRS = CRS.decode(epsg);
                     
-                    ReferencedEnvelope oldEnv = new ReferencedEnvelope(env, fromCRS);
+                    ReferencedEnvelope oldEnv = new ReferencedEnvelope(
+                		env.getMinimum(0),env.getMaximum(0), env.getMinimum(1),env.getMaximum(1),fromCRS);
                     ReferencedEnvelope newEnv = oldEnv.transform(crs, true);
                     
                     env = new GeneralEnvelope(new double[] {newEnv.getMinimum(0), newEnv.getMinimum(1)}, 

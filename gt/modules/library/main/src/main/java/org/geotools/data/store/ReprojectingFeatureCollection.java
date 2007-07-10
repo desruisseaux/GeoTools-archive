@@ -20,6 +20,7 @@ import org.geotools.feature.SchemaException;
 import org.geotools.feature.collection.DelegateFeatureIterator;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.geometry.jts.GeometryCoordinateSequenceTransformer;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.util.ProgressListener;
 import org.opengis.filter.Filter;
@@ -300,12 +301,17 @@ public class ReprojectingFeatureCollection implements FeatureCollection {
     public Geometry getDefaultGeometry() {
         return delegate.getDefaultGeometry();
     }
-
+    public Geometry getPrimaryGeometry() {
+    	return delegate.getPrimaryGeometry();
+    }
     public void setDefaultGeometry(Geometry geometry)
             throws IllegalAttributeException {
         delegate.setDefaultGeometry(geometry);
     }
 
+    public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
+    	delegate.setPrimaryGeometry(geometry);
+    }
     /**
      * This method computes reprojected bounds the hard way, but computing them
      * feature by feature. This method could be faster if computed the
@@ -316,7 +322,7 @@ public class ReprojectingFeatureCollection implements FeatureCollection {
      * 
      * @see org.geotools.data.FeatureResults#getBounds()
      */
-    public Envelope getBounds() {
+    public ReferencedEnvelope getBounds() {
         FeatureIterator r = features();
         try {
             Envelope newBBox = new Envelope();
@@ -328,7 +334,7 @@ public class ReprojectingFeatureCollection implements FeatureCollection {
                 internal = feature.getDefaultGeometry().getEnvelopeInternal();
                 newBBox.expandToInclude(internal);
             }
-            return newBBox;
+            return ReferencedEnvelope.reference(newBBox);
         } catch (Exception e) {
             throw new RuntimeException(
                     "Exception occurred while computing reprojected bounds", e);

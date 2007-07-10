@@ -289,6 +289,27 @@ public interface FeatureType {
     GeometryAttributeType getDefaultGeometry();
 
     /**
+     * Gets the primary or default geometry AttributeType.
+     * <p>
+     * If the FeatureType has more one geometry it is up to the implementor to determine which
+     * geometry is the default. If working with multiple geometries it is best to get the
+     * attributeTypes and iterate through them, checking for instances of GeometryAttribtueType.
+     * </p>
+     * <p>
+     * This should just be used a convenience method when it is known that the features do not have
+     * multiple geometries.
+     * </p>
+     * <p>
+     * This method is a replacement for {@link #getDefaultGeometry()} in order
+     * to resolve a naming conflict with the geoapi feature model.
+     * </p>
+     *
+     * @return The attribute type of the default geometry, which will contain the position.
+     * @since 2.4
+     */
+    GeometryAttributeType getPrimaryGeometry();
+
+    /**
      * The number of attribues defined by this schema.
      * <p>
      * This method to allows access to the complete schema as defined by this

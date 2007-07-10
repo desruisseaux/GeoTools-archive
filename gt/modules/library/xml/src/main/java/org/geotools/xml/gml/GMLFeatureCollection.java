@@ -16,6 +16,7 @@
 package org.geotools.xml.gml;
 
 import org.geotools.feature.DefaultFeatureCollection;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -27,16 +28,16 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL$
  */
 public class GMLFeatureCollection extends DefaultFeatureCollection {
-	private Envelope bounds;
+	private ReferencedEnvelope bounds;
     
 	protected GMLFeatureCollection(String id, Envelope b){
 		super(id,null);
-		bounds = b;
+		bounds = ReferencedEnvelope.reference(b);;
 	}
 	/* (non-Javadoc)
 	 * @see org.geotools.feature.FeatureCollection#getBounds()
 	 */
-	public Envelope getBounds() {
+	public ReferencedEnvelope getBounds() {
 		return bounds;
 	}
 }

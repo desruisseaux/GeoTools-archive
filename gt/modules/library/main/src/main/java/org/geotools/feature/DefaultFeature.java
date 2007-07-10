@@ -19,6 +19,7 @@ import java.rmi.server.UID;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.util.Cloneable;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -296,15 +297,22 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
      * Gets the geometry for this feature.
      *
      * @return Geometry for this feature.
+     * @deprecated use {@link #getPrimaryGeometry()}.
      */
-    public Geometry getDefaultGeometry() {
-        int idx = schema.defaultGeomIdx;
+    public final Geometry getDefaultGeometry() {
+    	return getPrimaryGeometry();
+    }
+    /**
+     * {@inheritDoc}
+     */
+    public Geometry getPrimaryGeometry() {
+    	 int idx = schema.defaultGeomIdx;
 
-        if (idx == -1) {
-            return null;
-        }
+         if (idx == -1) {
+             return null;
+         }
 
-        return (Geometry) attributes[idx];
+         return (Geometry) attributes[idx];
     }
 
     /**
@@ -314,18 +322,25 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
      *
      * @throws IllegalAttributeException if the feature does not have a
      *         geometry.
+     * @deprecated use {@link #setPrimaryGeometry(Geometry)}.
      */
-    public void setDefaultGeometry(Geometry geometry)
+    public final void setDefaultGeometry(Geometry geometry)
         throws IllegalAttributeException {
-        int idx = schema.defaultGeomIdx;
+       setPrimaryGeometry(geometry);
+    }
+    /**
+     * {@inheritDoc}
+     */
+    public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
+    	 int idx = schema.defaultGeomIdx;
 
-        if (idx < 0) {
-            throw new IllegalAttributeException(
-                "Feature does not have geometry");
-        }
+         if (idx < 0) {
+             throw new IllegalAttributeException(
+                 "Feature does not have geometry");
+         }
 
-        attributes[idx] = geometry;
-        bounds = null;
+         attributes[idx] = geometry;
+         bounds = null;
     }
 
     /**
@@ -349,7 +364,7 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
      *       For now we'll return a null envelope, make this part of
      *       interface? (IanS - by OGC standards, all Feature must have geom)
      */
-    public Envelope getBounds() {
+    public ReferencedEnvelope getBounds() {
         if (bounds == null) {
             bounds = new Envelope();
 
@@ -376,7 +391,10 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
         }
 
         // lets be defensive
-        return new Envelope(bounds);
+        if (schema.getPrimaryGeometry() != null) {
+        	return new ReferencedEnvelope(bounds,schema.getPrimaryGeometry().getCoordinateSystem());
+        }
+        return new ReferencedEnvelope(bounds,null);
     }
 
     /**

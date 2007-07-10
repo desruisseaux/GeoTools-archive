@@ -17,6 +17,7 @@ package org.geotools.feature;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 
 
 /**
@@ -272,8 +273,25 @@ public interface Feature {
      * </p>
      *
      * @return Default geometry for this feature, or <code>null</code>
+     * @deprecated use {@link #getPrimaryGeometry()}
      */
     Geometry getDefaultGeometry();
+
+    /**
+     * Gets the default or primary geometry for this feature.
+     * <p>
+     * This method will return <code>null</code> if no PrimaryGeometry has been
+     * defined by the schema.
+     * </p>
+     * <p>
+     * This method is a replacement for {@link #getDefaultGeometry()} in order
+     * to resolve a naming conflict with the geoapi feature model.
+     * </p>
+     * @return Primary geometry for this feature, or <code>null</code>
+     * @see org.opengis.feature.Feature#getDefaultGeometry()
+     * @since 2.4
+     */
+    Geometry getPrimaryGeometry();
 
     /**
      * Sets the default geometry for this feature.
@@ -282,8 +300,25 @@ public interface Feature {
      *
      * @throws IllegalAttributeException If the AttributeType is not a
      *         geometry, or is invalid for some other reason.
+     * @deprecated use {@link #setPrimaryGeometry(Geometry)}.
      */
     void setDefaultGeometry(Geometry geometry) throws IllegalAttributeException;
+
+    /**
+     * Sets the primary or default geometry for this feature.
+     * <p>
+     * This method is a replacement for {@link #setDefaultGeometry(Geometry)} in order
+     * to resolve a naming conflict with the geoapi feature model.
+     * </p>
+     * @param geometry The geometry to set.
+     *
+     * @throws IllegalAttributeException If the AttributeType is not a
+     *         geometry, or is invalid for some other reason.
+     *
+     * @see org.opengis.feature.Feature#setDefaultGeometry(org.opengis.feature.GeometryAttribute)
+     * @since 2.4
+     */
+    void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException;
 
     /**
      * Get the total bounds of this feature which is calculated by doing a
@@ -296,7 +331,7 @@ public interface Feature {
      *
      * @return An Envelope containing the total bounds of this Feature.
      */
-    Envelope getBounds();
+    ReferencedEnvelope getBounds();
 
     /**
      * Not straight forward, this is a "null" object to represent the value

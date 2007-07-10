@@ -28,6 +28,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -93,14 +94,21 @@ public abstract class AbstractFeatureList extends AbstractResourceList implement
     public void setAttribute( String xPath, Object attribute ) throws IllegalAttributeException {
         state.setAttribute( xPath, attribute );
     }
-    public Geometry getDefaultGeometry() {
-        return state.getDefaultGeometry();
+    public final Geometry getDefaultGeometry() {
+        return getPrimaryGeometry();
     }
-    public void setDefaultGeometry( Geometry geometry ) throws IllegalAttributeException {
-        state.setDefaultGeometry( geometry );
+    public Geometry getPrimaryGeometry() {
+    	return state.getDefaultGeometry();
     }
-    public Envelope getBounds() {
-        return state.getBounds();
+    public final void setDefaultGeometry( Geometry geometry ) throws IllegalAttributeException {
+    	setPrimaryGeometry(geometry);
+    }
+    public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
+    	state.setDefaultGeometry( geometry );
+    }
+    
+    public ReferencedEnvelope getBounds() {
+        return ReferencedEnvelope.reference(state.getBounds());
     }
     //
     // FeatureCollection - Events

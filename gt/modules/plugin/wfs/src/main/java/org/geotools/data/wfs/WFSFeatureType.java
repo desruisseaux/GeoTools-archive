@@ -28,6 +28,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SimpleFeature;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -129,6 +130,10 @@ class WFSFeatureType implements FeatureType {
 
     public GeometryAttributeType getDefaultGeometry() {
         return delegate.getDefaultGeometry();
+    }
+    
+    public GeometryAttributeType getPrimaryGeometry() {
+    	return delegate.getPrimaryGeometry();
     }
 
     public URI getNamespace() {
@@ -489,15 +494,24 @@ class WFSFeatureType implements FeatureType {
          * Gets the geometry for this feature.
          *
          * @return Geometry for this feature.
+         * @deprecated use {@link #getDefaultGeometry()}
          */
-        public Geometry getDefaultGeometry() {
+        public final Geometry getDefaultGeometry() {
+        	return getPrimaryGeometry();
+        }
+        /**
+         * Gets the geometry for this feature.
+         *
+         * @return Geometry for this feature.
+         */
+        public Geometry getPrimaryGeometry() {
             if (defaultGeomIndex == -1) {
                 return null;
             }
 
             return (Geometry) attributes[defaultGeomIndex];
         }
-
+        
         /**
          * Modifies the geometry.
          *
@@ -505,11 +519,24 @@ class WFSFeatureType implements FeatureType {
          *
          * @throws IllegalAttributeException if the feature does not have a
          *         geometry.
+         * @deprecated use {@link #setPrimaryGeometry(Geometry)}
          */
-        public void setDefaultGeometry(Geometry geometry)
+        public final void setDefaultGeometry(Geometry geometry)
             throws IllegalAttributeException {
 
-            if (defaultGeomIndex < 0) {
+        	setPrimaryGeometry(geometry);
+        }
+        /**
+         * Modifies the geometry.
+         *
+         * @param geometry feature geometry.
+         *
+         * @throws IllegalAttributeException if the feature does not have a
+         *         geometry.
+         * 
+         */
+        public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
+        	if (defaultGeomIndex < 0) {
                 throw new IllegalAttributeException(
                     "Feature does not have geometry");
             }
@@ -539,7 +566,7 @@ class WFSFeatureType implements FeatureType {
          *       For now we'll return a null envelope, make this part of
          *       interface? (IanS - by OGC standards, all Feature must have geom)
          */
-        public Envelope getBounds() {
+        public ReferencedEnvelope getBounds() {
             if (bounds == null) {
                 bounds = new Envelope();
 
@@ -566,7 +593,7 @@ class WFSFeatureType implements FeatureType {
             }
 
             // lets be defensive
-            return new Envelope(bounds);
+            return ReferencedEnvelope.reference(new Envelope(bounds));
         }
 
         /**

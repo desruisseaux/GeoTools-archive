@@ -23,9 +23,8 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.collection.AbstractFeatureCollection;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -115,8 +114,8 @@ public class ForceCoordinateSystemFeatureResults extends AbstractFeatureCollecti
     /**
      * @see org.geotools.data.FeatureResults#getBounds()
      */
-    public Envelope getBounds() {
-        return results.getBounds();
+    public ReferencedEnvelope getBounds() {
+        return ReferencedEnvelope.reference( results.getBounds() );
     }
 
     public int size() {

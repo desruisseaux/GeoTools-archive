@@ -126,10 +126,14 @@ public class GTFeatureTypeAdapter implements FeatureType {
         throw new UnsupportedOperationException("not implemented yet");
     }
 
-    public GeometryAttributeType getDefaultGeometry() {
-        throw new UnsupportedOperationException("not implemented yet");
+    public final GeometryAttributeType getDefaultGeometry() {
+        return getPrimaryGeometry();
     }
 
+    public GeometryAttributeType getPrimaryGeometry() {
+    	throw new UnsupportedOperationException("not implemented yet");
+    }
+    
     public URI getNamespace() {
         try {
             return new URI(type.getName().getNamespaceURI());

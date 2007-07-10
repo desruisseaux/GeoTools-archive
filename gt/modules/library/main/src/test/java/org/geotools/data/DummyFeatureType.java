@@ -74,6 +74,10 @@ public class DummyFeatureType implements FeatureType {
         return null;
     }
     
+    public GeometryAttributeType getPrimaryGeometry() {
+    	return null;
+    }
+    
     public URI getNamespace() {
         return null;
     }

@@ -181,6 +181,14 @@ public class VPFFeatureType implements FeatureType {
     public GeometryAttributeType getDefaultGeometry() {
         return featureClass.getDefaultGeometry();
     }
+    
+    /* (non-Javadoc)
+     * @see org.geotools.feature.FeatureType#getPrimaryGeometry()
+     */
+    public GeometryAttributeType getPrimaryGeometry() {
+    	return featureClass.getPrimaryGeometry();
+    }
+    
     /**
      * @return The <code>String</code> path for the directory containing the
      *         <code>VPFFeatureClass</code> that this <code>FeatureType</code> 

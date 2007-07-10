@@ -39,6 +39,7 @@ import org.geotools.feature.visitor.FeatureVisitor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 import org.geotools.filter.SortBy2;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.NullProgressListener;
 import org.geotools.util.ProgressListener;
 
@@ -116,7 +117,7 @@ public class DefaultFeatureCollection implements FeatureCollection {
      * @return the envelope of the geometries contained by this feature
      *         collection.
      */
-    public Envelope getBounds() {
+    public ReferencedEnvelope getBounds() {
         if (bounds == null) {
             bounds = new Envelope();
 
@@ -130,7 +131,7 @@ public class DefaultFeatureCollection implements FeatureCollection {
                 }
             }
         }
-        return bounds;
+        return ReferencedEnvelope.reference(bounds);
     }
 
     /**
@@ -667,14 +668,20 @@ public class DefaultFeatureCollection implements FeatureCollection {
 	/* (non-Javadoc)
 	 * @see org.geotools.feature.Feature#getDefaultGeometry()
 	 */
-	public Geometry getDefaultGeometry() {
+	public final Geometry getDefaultGeometry() {
+		return getPrimaryGeometry();
+	}
+	public Geometry getPrimaryGeometry() {
 		return null;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.geotools.feature.Feature#setDefaultGeometry(com.vividsolutions.jts.geom.Geometry)
 	 */
-	public void setDefaultGeometry(Geometry geometry) throws IllegalAttributeException {
+	public final void setDefaultGeometry(Geometry geometry) throws IllegalAttributeException {
+		setPrimaryGeometry(geometry);
+	}
+	public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
 		throw new IllegalAttributeException("Not Supported");
 	}
 

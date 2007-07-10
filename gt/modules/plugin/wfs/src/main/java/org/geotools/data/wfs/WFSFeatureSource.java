@@ -29,6 +29,7 @@ import org.geotools.data.store.EmptyFeatureCollection;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -185,9 +186,9 @@ public class WFSFeatureSource extends AbstractFeatureSource {
          * 
          * @see org.geotools.data.FeatureResults#getBounds()
          */
-        public Envelope getBounds(){
+        public ReferencedEnvelope getBounds(){
             try {
-				return fs.getBounds(query);
+				return ReferencedEnvelope.reference(fs.getBounds(query));
 			} catch (IOException e) {
 				e.printStackTrace();
 				return null;

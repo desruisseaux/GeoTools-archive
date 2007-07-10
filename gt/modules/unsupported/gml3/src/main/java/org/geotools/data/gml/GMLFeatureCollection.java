@@ -11,6 +11,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gml3.GMLConfiguration;
 import org.geotools.xml.StreamingParser;
 import org.opengis.filter.Filter;
@@ -37,7 +38,7 @@ public class GMLFeatureCollection extends DataFeatureCollection {
 		((GMLIterator)close).close(); 
 	}
 	
-	public Envelope getBounds() {
+	public ReferencedEnvelope getBounds() {
 		//, look for bounds on feature collection
 		InputStream input = null;
 		try {
@@ -85,7 +86,7 @@ public class GMLFeatureCollection extends DataFeatureCollection {
 			}
 		}
 		
-		return bounds;
+		return ReferencedEnvelope.reference(bounds);
 	}
 
 	public int getCount() throws IOException {

@@ -272,6 +272,14 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
         return featureType.getDefaultGeometry();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.geotools.feature.FeatureType#getPrimaryGeometry()
+     */
+    public GeometryAttributeType getPrimaryGeometry() {
+    	return featureType.getPrimaryGeometry();
+    }
+    
     /**
      * Gets the value of the description of table content. This is nice to
      * have, but I don't know how to make use of it.

@@ -15,6 +15,8 @@
  */
 package org.geotools.feature;
 
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.Filter;
 
 
@@ -88,15 +90,40 @@ public interface AttributeType {
      * Gets the name of this attribute.
      *
      * @return Name.
+     * @deprecated use {@link #getLocalName()}
      */
     String getName();
+
+    /**
+     * Returns the unqualified name of this attribute.
+     * <p>
+     * This method is a replacement for {@link #getName()} in order to resolve
+     * a naming conflict with the geoapi feature model.
+     * </p>
+     * @see PropertyDescriptor#getName()
+     * @since 2.4
+     */
+    String getLocalName();
 
     /**
      * Gets the type of this attribute.
      *
      * @return Type.
+     * @deprecated use {@link #getBinding()}
      */
     Class getType();
+
+    /**
+     * Gets the class/type/binding for this attribute.
+     * <p>
+     * This method is a replacement for {@link #getType()} in order to resolve
+     * a naming conflict with the geoapi feature model.
+     * </p>
+     *
+     * @see AttributeDescriptor#getType()
+     * @since 2.4
+     */
+    Class getBinding();
 
     /**
      * This represents a Facet in XML schema ... for example can be used to

@@ -267,7 +267,10 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
         try {
             
             LOGGER.info("Creating coverage out of request: imagesize -- " + requestedDim + "  envelope -- " + requestedEnvelope);
-            ReferencedEnvelope reqEnv = new ReferencedEnvelope(requestedEnvelope, requestedEnvelope.getCoordinateReferenceSystem());
+            ReferencedEnvelope reqEnv = new ReferencedEnvelope(
+        		requestedEnvelope.getMinimum(0), requestedEnvelope.getMaximum(0),
+        		requestedEnvelope.getMinimum(1), requestedEnvelope.getMaximum(1),
+        		requestedEnvelope.getCoordinateReferenceSystem());
             int level = 0;
             if (forcedLevel != null) {
                 level = forcedLevel.intValue();

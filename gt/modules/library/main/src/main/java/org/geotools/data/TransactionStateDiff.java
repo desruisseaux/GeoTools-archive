@@ -28,6 +28,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SimpleFeature;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.filter.Filter;
 
 
@@ -356,7 +357,7 @@ public class TransactionStateDiff implements State {
 			return null;
 		}
 
-		public Envelope getBounds() {
+		public ReferencedEnvelope getBounds() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -366,6 +367,11 @@ public class TransactionStateDiff implements State {
 			return null;
 		}
 
+		public Geometry getPrimaryGeometry() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
 		public FeatureType getFeatureType() {
 			// TODO Auto-generated method stub
 			return null;
@@ -397,6 +403,11 @@ public class TransactionStateDiff implements State {
 		}
 
 		public void setDefaultGeometry(Geometry arg0) throws IllegalAttributeException {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
 			// TODO Auto-generated method stub
 			
 		}

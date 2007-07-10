@@ -35,6 +35,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -76,8 +77,10 @@ public class GazetteerNameValidationOnlineTest extends TestCase {
 			//	used
 			public void setAttribute(String xPath, Object attribute)throws IllegalAttributeException{attrs.put(xPath,attribute);}
 			public Geometry getDefaultGeometry(){return null;}
+			public Geometry getPrimaryGeometry() {return null;}
 			public void setDefaultGeometry(Geometry geometry) throws IllegalAttributeException{}
-			public Envelope getBounds(){return null;}
+			public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException{}
+			public ReferencedEnvelope getBounds(){return null;}
 		}
 		Feature f = new testFeature();
 		try{f.setAttribute("CityName","Vancouver");}catch(Exception e){}

@@ -26,6 +26,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.collection.AbstractFeatureCollection;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -160,7 +161,7 @@ public class ReprojectFeatureResults extends AbstractFeatureCollection {
      *
      * @see org.geotools.data.FeatureResults#getBounds()
      */
-    public Envelope getBounds() {
+    public ReferencedEnvelope getBounds() {
         FeatureIterator r = features();
         try {            
             Envelope newBBox = new Envelope();
@@ -172,7 +173,7 @@ public class ReprojectFeatureResults extends AbstractFeatureCollection {
                 internal = feature.getDefaultGeometry().getEnvelopeInternal();
                 newBBox.expandToInclude(internal);
             }
-            return newBBox;
+            return ReferencedEnvelope.reference(newBBox);
         } catch (Exception e) {
             throw new RuntimeException("Exception occurred while computing reprojected bounds",
                 e);

@@ -66,17 +66,28 @@ public class FeatureAttributeType implements AttributeType {
 	/* (non-Javadoc)
 	 * @see org.geotools.feature.AttributeType#getName()
 	 */
-	public String getName() {
+	public final String getName() {
+		return getLocalName();
+	}
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getLocalName() {
 		return name;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.geotools.feature.AttributeType#getType()
 	 */
-	public Class getType() {
+	public final Class getType() {
+		return getBinding();
+	}
+	/**
+	 * {@inheritDoc}
+	 */
+	public Class getBinding() {
 		return Feature.class;
 	}
-
 	/* (non-Javadoc)
 	 * @see org.geotools.feature.AttributeType#isNillable()
 	 */

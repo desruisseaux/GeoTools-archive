@@ -12,6 +12,7 @@ import org.geotools.feature.FeatureList;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.visitor.FeatureVisitor;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.ProgressListener;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
@@ -24,7 +25,7 @@ public class EmptyFeatureCollection extends DataFeatureCollection {
 	/**
 	 * null bounds
 	 */
-	static Envelope bounds = new Envelope();
+	static ReferencedEnvelope bounds = new ReferencedEnvelope(new Envelope(),null);
 	static {
 		bounds.setToNull();
 	}
@@ -42,7 +43,7 @@ public class EmptyFeatureCollection extends DataFeatureCollection {
 		return schema;
 	}
 
-	public Envelope getBounds() {
+	public ReferencedEnvelope getBounds() {
 		return bounds;
 	}
 

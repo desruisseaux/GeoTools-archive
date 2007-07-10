@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -15,16 +15,17 @@
  */
 package org.geotools.geometry.jts;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.geometry.MismatchedDimensionException;
 
 // JTS dependencies
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.DefaultCoordinateSequenceFactory;
+import org.opengis.geometry.MismatchedDimensionException;
+
+// OpenGIS dependencies
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -67,53 +68,87 @@ public class DefaultCoordinateSequenceTransformer implements CoordinateSequenceT
     /**
      * {@inheritDoc}
      */
-    public CoordinateSequence transform(final CoordinateSequence sequence, final MathTransform transform)
-            throws TransformException
-    {
-        final int sourceDim      = transform.getSourceDimensions();
-        final int targetDim      = transform.getTargetDimensions();
-        final int size           = sequence.size();
-        final Coordinate[] tcs   = new Coordinate[size];
+    public CoordinateSequence transform(final CoordinateSequence sequence,
+        final MathTransform transform) throws TransformException {
+        final int sourceDim = transform.getSourceDimensions();
+        final int targetDim = transform.getTargetDimensions();
+        final int size = sequence.size();
+        final Coordinate[] tcs = new Coordinate[size];
         final int bufferCapacity = buffer.length / Math.max(sourceDim, targetDim);
         int remainingBeforeFlush = Math.min(bufferCapacity, size);
         int ib = 0; // Index in the buffer array.
         int it = 0; // Index in the target array.
-        for (int i=0; i<size; i++) {
+
+        for (int i = 0; i < size; i++) {
             final Coordinate c = sequence.getCoordinate(i);
+
             switch (sourceDim) {
-                default: throw new MismatchedDimensionException();
-                case 3:  buffer[ib+2] = c.z; // Fall through
-                case 2:  buffer[ib+1] = c.y; // Fall through
-                case 1:  buffer[ib  ] = c.x; // Fall through
-                case 0:  break;
+            default:
+                throw new MismatchedDimensionException();
+
+            case 3:
+                buffer[ib + 2] = c.z; // Fall through
+
+            case 2:
+                buffer[ib + 1] = c.y; // Fall through
+
+            case 1:
+                buffer[ib] = c.x; // Fall through
+
+            case 0:
+                break;
             }
+
             ib += sourceDim;
+
             if (--remainingBeforeFlush == 0) {
                 /*
                  * The buffer is full, or we just copied the last coordinates.
                  * Transform the coordinates and flush to the destination array.
                  */
-                assert ib % sourceDim == 0;
-                final int n = ib/sourceDim;
+                assert (ib % sourceDim) == 0;
+
+                final int n = ib / sourceDim;
                 transform.transform(buffer, 0, buffer, 0, n);
                 ib = 0;
-                for (int j=0; j<n; j++) {
+
+                for (int j = 0; j < n; j++) {
                     final Coordinate t;
+
                     switch (targetDim) {
-                        default: throw new MismatchedDimensionException();
-                        case 3: t = new Coordinate(buffer[ib++], buffer[ib++], buffer[ib++]); break;
-                        case 2: t = new Coordinate(buffer[ib++], buffer[ib++]              ); break;
-                        case 1: t = new Coordinate(buffer[ib++], Double.NaN                ); break;
-                        case 0: t = new Coordinate(Double.NaN,   Double.NaN                ); break;
+                    default:
+                        throw new MismatchedDimensionException();
+
+                    case 3:
+                        t = new Coordinate(buffer[ib++], buffer[ib++], buffer[ib++]);
+
+                        break;
+
+                    case 2:
+                        t = new Coordinate(buffer[ib++], buffer[ib++]);
+
+                        break;
+
+                    case 1:
+                        t = new Coordinate(buffer[ib++], Double.NaN);
+
+                        break;
+
+                    case 0:
+                        t = new Coordinate(Double.NaN, Double.NaN);
+
+                        break;
                     }
+
                     tcs[it++] = t;
                 }
-                assert ib == n*targetDim;
+                assert ib == (n * targetDim);
                 ib = 0;
-                remainingBeforeFlush = Math.min(bufferCapacity, size-(i+1));
+                remainingBeforeFlush = Math.min(bufferCapacity, size - (i + 1));
             }
         }
-        assert it == tcs.length : tcs.length-it;
+        assert it == tcs.length : tcs.length - it;
+
         return csFactory.create(tcs);
     }
 }

@@ -183,6 +183,13 @@ public class VPFColumn implements AttributeType, DataTypesDefinition {
     public String getName() {
         return attribute.getName();
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String getLocalName() {
+    	return attribute.getLocalName();
+    }
 
     /**
      * Gets the value of narrTable
@@ -207,6 +214,13 @@ public class VPFColumn implements AttributeType, DataTypesDefinition {
      */
     public Class getType() {
         return attribute.getType();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public Class getBinding() {
+    	return attribute.getBinding();
     }
 
     /**

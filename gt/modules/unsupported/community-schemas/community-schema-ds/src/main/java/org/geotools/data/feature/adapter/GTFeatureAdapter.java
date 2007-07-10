@@ -79,16 +79,20 @@ public class GTFeatureAdapter implements org.geotools.feature.SimpleFeature {
         return values;
     }
 
-    public Envelope getBounds() {
+    public ReferencedEnvelope getBounds() {
         ReferencedEnvelope envelope = new ReferencedEnvelope(adaptee.getBounds());
 //        envelope.init(adaptee.getBounds());
         return envelope;
     }
 
-    public Geometry getDefaultGeometry() {
-        GeometryAttribute defaultGeometry = adaptee.getDefaultGeometry();
-        return (Geometry) (defaultGeometry == null ? null : defaultGeometry
-                .get());
+    public final Geometry getDefaultGeometry() {
+    	return getPrimaryGeometry();
+    }
+    
+    public Geometry getPrimaryGeometry() {
+	   GeometryAttribute defaultGeometry = adaptee.getDefaultGeometry();
+       return (Geometry) (defaultGeometry == null ? null : defaultGeometry
+               .get());
     }
 
     public FeatureType getFeatureType() {
@@ -113,9 +117,13 @@ public class GTFeatureAdapter implements org.geotools.feature.SimpleFeature {
         adaptee.set(xPath, attribute);
     }
 
-    public void setDefaultGeometry(Geometry geometry)
+    public final void setDefaultGeometry(Geometry geometry)
             throws IllegalAttributeException {
-        SimpleFeatureType type = (SimpleFeatureType) adaptee.getType();
+        setDefaultGeometry(geometry);
+    }
+
+    public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
+    	SimpleFeatureType type = (SimpleFeatureType) adaptee.getType();
         AttributeDescriptor descriptor = type.getDefaultGeometry();
         GeometryType defGeomType = (GeometryType) descriptor.getType();
 
@@ -128,7 +136,7 @@ public class GTFeatureAdapter implements org.geotools.feature.SimpleFeature {
         geometryAttribute = (GeometryAttribute) builder.build();
         adaptee.setDefaultGeometry(geometryAttribute);
     }
-
+    
     public void setAttributes(Object[] attributes)
             throws IllegalAttributeException {
 

@@ -122,8 +122,15 @@ public class DefaultAttributeType implements AttributeType {
      *
      * @return The name of this attribute.
      */
-    public String getName() {
-        return name;
+    public final String getName() {
+        return getLocalName();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String getLocalName() {
+    	return name;
     }
 
     /**
@@ -134,8 +141,15 @@ public class DefaultAttributeType implements AttributeType {
      * @return The class that the attribute must match to be valid for this
      *         AttributeType.
      */
-    public Class getType() {
-        return type;
+    public final Class getType() {
+        return getBinding();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public Class getBinding() {
+    	return type;
     }
 
     /**

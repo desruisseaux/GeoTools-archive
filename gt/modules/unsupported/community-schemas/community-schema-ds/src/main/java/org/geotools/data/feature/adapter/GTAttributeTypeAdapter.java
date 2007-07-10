@@ -107,9 +107,13 @@ public class GTAttributeTypeAdapter implements org.geotools.feature.AttributeTyp
     }
 
     public String getName() {
-        return adaptee.getName().getLocalPart();
+        return getLocalName();
     }
 
+    public String getLocalName() {
+    	return adaptee.getName().getLocalPart();
+    }
+    
     public Filter getRestriction() {
         return null;
     }

@@ -29,6 +29,7 @@ import org.geotools.feature.FeatureList;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.visitor.FeatureVisitor;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.sort.SortBy;
@@ -116,17 +117,26 @@ public class SubFeatureCollection extends AbstractResourceCollection implements 
 		return state.getId();
 	}
 
-	public Envelope getBounds(){
-        return state.getBounds();        
+	public ReferencedEnvelope getBounds(){
+        return ReferencedEnvelope.reference(state.getBounds());        
 	}
 	
-	public Geometry getDefaultGeometry() {
+	public final Geometry getDefaultGeometry() {
+		return getPrimaryGeometry();
+	}
+	
+	public Geometry getPrimaryGeometry() {
 		return state.getDefaultGeometry();
 	}
 
-	public void setDefaultGeometry(Geometry g) throws IllegalAttributeException {
-		state.setDefaultGeometry( g );
+	public final void setDefaultGeometry(Geometry g) throws IllegalAttributeException {
+		setPrimaryGeometry(g);
 	}
+	
+	public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
+		state.setDefaultGeometry( geometry );
+	}
+	
     public void addListener(CollectionListener listener) throws NullPointerException {
         state.addListener( listener );
     }

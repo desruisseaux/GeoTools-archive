@@ -584,7 +584,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		//
 		// /////////////////////////////////////////////////////////////////////
 		final ReferencedEnvelope intersectionJTSEnvelope = new ReferencedEnvelope(
-				intersectionEnvelope, crs);
+			intersectionEnvelope.getMinimum(0), intersectionEnvelope.getMaximum(0), 
+			intersectionEnvelope.getMinimum(1), intersectionEnvelope.getMaximum(1), crs);
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -956,7 +957,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			// transparency.
 			//
 			// Fourth step is the blending for having nice Fading effect at
-			// overlapping regions.ù
+			// overlapping regions.
 			//
 			// /////////////////////////////////////////////////////////////////////
 			double th = getThreshold(loadedImage.getSampleModel().getDataType());

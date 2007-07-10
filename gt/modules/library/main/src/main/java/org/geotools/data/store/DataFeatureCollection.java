@@ -46,6 +46,7 @@ import org.geotools.feature.collection.SubFeatureCollection;
 import org.geotools.feature.type.FeatureAttributeType;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.filter.SortBy2;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.NullProgressListener;
 import org.geotools.util.ProgressListener;
 import org.opengis.filter.Filter;
@@ -138,7 +139,7 @@ public abstract class DataFeatureCollection implements FeatureCollection {
     //    
     public abstract FeatureType getSchema();
 
-    public abstract Envelope getBounds();
+    public abstract ReferencedEnvelope getBounds();
 
     public abstract int getCount() throws IOException;;
 
@@ -597,14 +598,24 @@ public abstract class DataFeatureCollection implements FeatureCollection {
         }*/
     }
 
+    /**
+     * @deprecated use {@link #getPrimaryGeometry()}.
+     */
     public Geometry getDefaultGeometry() {
-        return null;
+        return getPrimaryGeometry();
     }
-
-    public void setDefaultGeometry( Geometry geometry ) throws IllegalAttributeException {
-        throw new IllegalAttributeException( "DefaultGeometry not supported" );
+    public Geometry getPrimaryGeometry() {
+    	return null;
     }
-
+    /**
+     * @deprecated use {@link #setPrimaryGeometry(Geometry)}.
+     */
+    public final void setDefaultGeometry( Geometry geometry ) throws IllegalAttributeException {
+        setPrimaryGeometry(geometry);
+    }
+    public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
+    	throw new IllegalAttributeException( "DefaultGeometry not supported" );
+    }
     /**
      * Accepts a visitor, which then visits each feature in the collection.
      * @throws IOException 

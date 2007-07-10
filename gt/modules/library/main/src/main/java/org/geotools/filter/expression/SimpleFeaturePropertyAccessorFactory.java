@@ -44,7 +44,8 @@ public class SimpleFeaturePropertyAccessorFactory implements
         if (!Feature.class.isAssignableFrom(type) && !FeatureType.class.isAssignableFrom(type))
             return null; // we only work with simple feature
 
-        if ("".equals(xpath) && target == Geometry.class)
+        //if ("".equals(xpath) && target == Geometry.class)
+        if ("".equals(xpath))
             return DEFAULT_GEOMETRY_ACCESS;
 
         //check for fid access
@@ -104,8 +105,8 @@ public class SimpleFeaturePropertyAccessorFactory implements
         	if ( !"".equals( xpath ) )
         		return false;
         	
-        	if ( target != Geometry.class ) 
-        		return false;
+//        	if ( target != Geometry.class ) 
+//        		return false;
         	
         	if ( !( object instanceof Feature || object instanceof FeatureType ) ) {
         		return false;

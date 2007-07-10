@@ -22,6 +22,7 @@ import java.util.Iterator;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.feature.visitor.FeatureVisitor;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 import org.geotools.util.ProgressListener;
@@ -46,7 +47,7 @@ public class MockFeatureCollection implements org.geotools.feature.FeatureCollec
         return null;
     }
     
-    public com.vividsolutions.jts.geom.Envelope getBounds() {
+    public ReferencedEnvelope getBounds() {
         return null;
     }
     
@@ -200,11 +201,21 @@ public class MockFeatureCollection implements org.geotools.feature.FeatureCollec
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public Geometry getPrimaryGeometry() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	/* (non-Javadoc)
 	 * @see org.geotools.feature.Feature#setDefaultGeometry(com.vividsolutions.jts.geom.Geometry)
 	 */
 	public void setDefaultGeometry(Geometry geometry) throws IllegalAttributeException {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
 		// TODO Auto-generated method stub
 		
 	}

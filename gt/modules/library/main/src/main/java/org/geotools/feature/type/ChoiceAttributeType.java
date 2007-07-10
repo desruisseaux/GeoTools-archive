@@ -97,8 +97,15 @@ public class ChoiceAttributeType implements AttributeType {
     /* (non-Javadoc)
      * @see org.geotools.feature.AttributeType#getName()
      */
-    public String getName() {
-        return name;
+    public final String getName() {
+        return getLocalName();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String getLocalName() {
+    	return name;
     }
 
     /**
@@ -116,8 +123,12 @@ public class ChoiceAttributeType implements AttributeType {
      *
      * @see org.geotools.feature.AttributeType#getType()
      */
-    public Class getType() {
-        //		The field for 'Class type' should be added when GT has moved to java 1.5
+    public final Class getType() {
+        return getBinding();
+    }
+    
+    public Class getBinding() {
+		//The field for 'Class type' should be added when GT has moved to java 1.5
         return Object.class;
     }
 

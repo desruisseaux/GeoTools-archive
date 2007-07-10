@@ -28,6 +28,7 @@ import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.index.strtree.STRtree;
@@ -120,8 +121,8 @@ public final class IndexedFeatureResults extends DataFeatureCollection {
 	/**
 	 * @see org.geotools.data.FeatureResults#getBounds()
 	 */
-	public Envelope getBounds() {
-		return bounds;
+	public ReferencedEnvelope getBounds() {
+		return ReferencedEnvelope.reference(bounds);
 	}
 
 	/**

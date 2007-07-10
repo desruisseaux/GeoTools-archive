@@ -30,6 +30,7 @@ import org.geotools.feature.FeatureList;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.visitor.FeatureVisitor;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.ProgressListener;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
@@ -240,7 +241,7 @@ public class JDBCFeatureCollection implements FeatureCollection {
 		return source.getSchema();
 	}
 
-    public Envelope getBounds() {
+    public ReferencedEnvelope getBounds() {
 		
 		JDBCRunnable runnable = new JDBCRunnable() {
 
@@ -264,13 +265,13 @@ public class JDBCFeatureCollection implements FeatureCollection {
 				
 				rs.close();
 				
-				return bounds;
+				return ReferencedEnvelope.reference(bounds);
 			}
 			
 		};
 		
 		try {
-			return (Envelope) JDBCUtils.statement( state.getConnection(), runnable );
+			return (ReferencedEnvelope) JDBCUtils.statement( state.getConnection(), runnable );
 		} 
 		catch (IOException e) {
 			throw new RuntimeException( e );
@@ -375,11 +376,17 @@ public class JDBCFeatureCollection implements FeatureCollection {
 		return null;
 	}
 
+	/**
+	 * @deprecated use {@link #getPrimaryGeometry()}
+	 */
 	public Geometry getDefaultGeometry() {
-		// TODO Auto-generated method stub
-		return null;
+		return getPrimaryGeometry();
 	}
 
+	public Geometry getPrimaryGeometry() {
+		return null;
+	}
+	
 	public String getID() {
 		// TODO Auto-generated method stub
 		return null;
@@ -400,10 +407,17 @@ public class JDBCFeatureCollection implements FeatureCollection {
 		
 	}
 
-	public void setDefaultGeometry(Geometry geometry) throws IllegalAttributeException {
-		// TODO Auto-generated method stub
+	/**
+	 * @deprecated use {@link #setPrimaryGeometry(Geometry)}
+	 */
+	public final void setDefaultGeometry(Geometry geometry) throws IllegalAttributeException {
+		setPrimaryGeometry(geometry);
+	}
+	
+	public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
 		
 	}
+	
 
 }
 
