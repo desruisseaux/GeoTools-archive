@@ -209,36 +209,6 @@ public class DataUtilities {
          filter.accept(attExtractor, null);
          String[] attributeNames = attExtractor.getAttributeNames();
          return attributeNames;
-//GR: GEOT-1192 in progress... guess the provided implementation replacement is far simpler...
-//         final Set set = new HashSet();
-//         traverse(filter,
-//             new DataUtilities.AbstractFilterVisitor() {
-//                 public void visit(AttributeExpression attributeExpression) {
-//                	//evaluate to get actual attribute type
-//                	 if ( featureType != null ) {
-//                		 AttributeType type = 
-//                			 (AttributeType) attributeExpression.evaluate( featureType );
-//                		 if ( type != null ) {
-//                			 set.add( type.getName() );
-//                			 return;
-//                		 }
-//                	 }
-//                	
-//                	 set.add(attributeExpression.getAttributePath());
-//                 }
-//             });
-//
-//         if (set.size() == 0) {
-//             return new String[0];
-//         }
-//
-//         String[] names = new String[set.size()];
-//         int index = 0;
-//
-//         for (Iterator i = set.iterator(); i.hasNext(); index++) {
-//             names[index] = (String) i.next();
-//         }
-//         return names;
     }
     
     /**
@@ -260,41 +230,10 @@ public class DataUtilities {
     	 if (expression == null) {
              return new String[0];
          }
-         FilterAttributeExtractor attExtractor = new FilterAttributeExtractor();
+         FilterAttributeExtractor attExtractor = new FilterAttributeExtractor(featureType);
          expression.accept(attExtractor, null);
          String[] attributeNames = attExtractor.getAttributeNames();
          return attributeNames;
-
-//      GR: GEOT-1192 in progress... guess the provided implementation replacement is far simpler...
-//         final Set set = new HashSet();
-//         traverse(expression,
-//             new DataUtilities.AbstractFilterVisitor() {
-//                 public void visit(AttributeExpression attributeExpression) {
-//                	//evaluate to get actual attribute type
-//                	 if ( featureType != null ) {
-//                		 AttributeType type = 
-//                			 (AttributeType) attributeExpression.evaluate( featureType );
-//                		 if ( type != null ) {
-//                			 set.add( type.getName() );
-//                			 return;
-//                		 }
-//                	 }
-//                	
-//                	 set.add(attributeExpression.getAttributePath());
-//                 }
-//             });
-//
-//         if (set.size() == 0) {
-//             return new String[0];
-//         }
-//
-//         String[] names = new String[set.size()];
-//         int index = 0;
-//
-//         for (Iterator i = set.iterator(); i.hasNext(); index++) {
-//             names[index] = (String) i.next();
-//         }
-//         return names;
     }
     
     /**

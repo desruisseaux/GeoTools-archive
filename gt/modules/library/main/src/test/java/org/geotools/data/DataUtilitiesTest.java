@@ -65,9 +65,9 @@ public class DataUtilitiesTest extends DataTestCase {
     public DataUtilitiesTest(String arg0) {
         super(arg0);
     }
-    
-    /*
-     * Test for String[] attributeNames(FeatureType)
+
+    /**
+     * Test for {@link DataUtilities#attributeNames(FeatureType)}
      */
     public void testAttributeNamesFeatureType() {
         String[] names;
@@ -156,8 +156,42 @@ public class DataUtilitiesTest extends DataTestCase {
         assertEquals(2, names.length);
         list = Arrays.asList(names);
         assertTrue(list.contains("name"));
-        assertTrue(list.contains("id"));
-        
+        assertTrue(list.contains("id"));     
+    }
+
+    /**
+     * Test for {@link DataUtilities#attributeNames(Filter, FeatureType)} 
+     */
+    public void testAttributeNamesFilterFeatureType() {
+        FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
+        Filter filter = factory.equals(factory.property("id"), factory.add(
+                factory.property("geom"), factory.property("gml:name")));
+
+        String[] names;
+
+        names = DataUtilities.attributeNames(filter, roadType);
+        assertEquals(3, names.length);
+        List namesList = Arrays.asList(names);
+        assertTrue(namesList.contains("id"));
+        assertTrue(namesList.contains("geom"));
+        assertTrue(namesList.contains("name"));
+    }
+
+    /**
+     * Test for {@link DataUtilities#attributeNames(Expression, FeatureType)} 
+     */
+    public void testAttributeExpressionFilterFeatureType() {
+        FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
+        Expression expression = factory.add(factory.property("geom"), 
+                factory.property("gml:name"));
+
+        String[] names;
+
+        names = DataUtilities.attributeNames(expression, roadType);
+        assertEquals(2, names.length);
+        List namesList = Arrays.asList(names);
+        assertTrue(namesList.contains("geom"));
+        assertTrue(namesList.contains("name"));
     }
 
     /*
