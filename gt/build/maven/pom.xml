@@ -84,7 +84,6 @@
     <module>rmic</module>
     <module>unopkg</module>
     <module>xmlcodegen</module>
-    <module>depgraph</module>
   </modules>
   
 
