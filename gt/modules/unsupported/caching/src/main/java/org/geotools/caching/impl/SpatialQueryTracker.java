@@ -40,7 +40,7 @@ import org.geotools.index.rtree.*;
 import org.geotools.index.rtree.memory.MemoryPageStore;
 
 
-/** First implementation of QueryTracker to handler BBox queries.
+/** First implementation of QueryTracker to handle BBox queries.
  * Stores the extent of queries in a R-tree,
  * so this tracker can tell what areas are already covered by previous queries.
  * Can compute a rough approximation of the complementary area needed to cover a new query.

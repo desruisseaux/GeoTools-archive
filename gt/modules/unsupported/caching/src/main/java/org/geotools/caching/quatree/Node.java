@@ -36,7 +36,14 @@ public class Node implements INode {
     protected int level;
 
     // Constructors
-    public Node(Region s, int id, Node parent) {
+    
+    /** Constructor : creates a new node descending from another node.
+     * 
+     * @param s envelope of new node
+     * @param id of new node
+     * @param parent node
+     */
+    protected Node(Region s, int id, Node parent) {
         this.bounds = s;
         this.id = id;
         this.parent = parent;
@@ -51,6 +58,18 @@ public class Node implements INode {
         } else {
             this.level = parent.level - 1;
         }
+    }
+    
+    /** Constructor : creates a root node.
+     * Supplied level parameter indicates the maximum height of the tree.
+     * 
+     * @param s envelope of new node
+     * @param id of new node
+     * @param level is the maximum height of the tree. Must be > 0. 
+     */
+    protected Node(Region s, int id, int level) {
+    	this(s, id, null) ;
+    	this.level = level ;
     }
 
     // Interface
@@ -185,5 +204,13 @@ public class Node implements INode {
         //if (numShapes == 0) {
         // do we have to to something ?
         //}
+    }
+    
+    public String toString() {
+    	StringBuffer r = new StringBuffer() ;
+    	r.append("Node ID=" + this.id + " ") ;
+    	r.append("# of data=" + this.numShapes + " ") ;
+    	r.append("MBR=" + this.bounds) ;
+    	return r.toString() ;
     }
 }

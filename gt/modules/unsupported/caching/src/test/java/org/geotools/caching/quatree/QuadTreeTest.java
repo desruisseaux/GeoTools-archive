@@ -18,10 +18,13 @@ package org.geotools.caching.quatree;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.vividsolutions.jts.geom.Envelope;
@@ -122,6 +125,31 @@ public class QuadTreeTest extends TestCase {
         tree.containmentQuery(r, v);
         assertTrue(v.lastNode.getShape().contains(r));
     }
+    
+    public void testMaximumDepth() {
+    	Region r = new Region(new double[] { 0d, 0d }, new double[] { 1000d, 1000d }) ;
+    	int height = 5 ;
+    	tree = new QuadTree(r, height) ;
+    	testInsertData() ;
+    	LevelCountVisitor v = new LevelCountVisitor() ;
+    	tree.intersectionQuery(r, v) ;
+    	assertTrue(height+1 >= v.getNumLevels()) ;
+    	assertEquals(height, v.getMaxLevel()) ;
+    	assertTrue(0 <= v.getMinLevel()) ;
+    	//printTree(tree, System.out) ;
+    }
+    
+    public void testRootExpansion() {
+    	Region r = new Region(new double[] { 0d, 0d }, new double[] { 10d, 10d }) ;
+    	tree = new QuadTree(r) ;
+    	tree.insertData(null, new Region(new double[] { 0d, 0d }, new double[] { 100d, 100d }), 1) ;
+    	tree.insertData(null, new Region(new double[] { 200d, 200d }, new double[] { 500d, 500d }), 2) ;
+    	CountingVisitor v = new CountingVisitor() ;
+    	tree.intersectionQuery(new Region(new double[] { 0d, 0d }, new double[] { 1000d, 1000d }), v) ;
+    	assertEquals(2, v.data) ;
+    }
+    
+    // Test Utilities
 
     /** Transform a JTS Envelope to a Region
      *
@@ -133,6 +161,27 @@ public class QuadTreeTest extends TestCase {
                 new double[] { e.getMaxX(), e.getMaxY() });
 
         return r;
+    }
+    
+    protected void printTree(final QuadTree t, final PrintStream out) {
+    	t.queryStrategy(new QueryStrategy() {
+    		Stack nodes = new Stack() ;
+
+			public Node getNextNode(Node current, boolean[] hasNext) {
+				out.println("@level " + current.getLevel() + " : " + current) ;
+				for (int i = 0 ; i < current.getChildrenCount() ; i++) {
+					nodes.add(0, current.getSubNode(i)) ;
+				}
+				if (!nodes.isEmpty()) {
+					hasNext[0] = true ;
+					return (Node) nodes.pop() ;
+				} else {
+					hasNext[0] = false ;
+					return null ;
+				}
+			}
+    		
+    	}) ;
     }
 
     class CountingVisitor implements IVisitor {
@@ -173,4 +222,38 @@ public class QuadTreeTest extends TestCase {
             lastNode = n;
         }
     }
+    
+    class LevelCountVisitor implements IVisitor {
+    	
+    	int minLevel = -1 ;
+    	int maxLevel = -1 ;
+
+
+    	public void visitData(IData d) {
+    		// TODO Auto-generated method stub
+
+    	}
+
+    	public void visitNode(INode n) {
+    		if (maxLevel == -1) {
+    			minLevel = n.getLevel() ;
+    			maxLevel = minLevel ;
+    		} else if (minLevel > n.getLevel()) {
+    			minLevel = n.getLevel() ;
+    		}
+    	}
+    	
+    	public int getNumLevels() {
+    		return maxLevel - minLevel + 1 ;
+    	}
+    	
+    	public int getMaxLevel() {
+    		return maxLevel ;
+    	}
+    	
+    	public int getMinLevel() {
+    		return minLevel ;
+    	}
+    }
+
 }
