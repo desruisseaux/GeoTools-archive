@@ -45,6 +45,7 @@ import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
@@ -242,7 +243,7 @@ public class GeoServerOnlineTest extends TestCase {
         m.put(WFSDataStoreFactory.URL.key,url);
         m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(100000));
         WFSDataStore wfs = (WFSDataStore)(new WFSDataStoreFactory()).createNewDataStore(m);
-        FilterFactory2 fac = CommonFactoryFinder.getFilterFactory2(null);
+        FilterFactory2 fac = CommonFactoryFinder.getFilterFactory2(GeoTools.getDefaultHints());
 
         Filter filter = fac.equals(fac.property("NAME"), fac.literal("E 58th St"));
         
@@ -290,7 +291,7 @@ public class GeoServerOnlineTest extends TestCase {
         fs.addFeatureListener( watcher );
         
         Id startingFeatures=createFidFilter(fs);
-        FilterFactory2 filterFac = CommonFactoryFinder.getFilterFactory2(null);
+        FilterFactory2 filterFac = CommonFactoryFinder.getFilterFactory2(GeoTools.getDefaultHints());
         try{
         GeometryFactory gf = new GeometryFactory();
         MultiPolygon mp = gf.createMultiPolygon(new Polygon[]{gf.createPolygon(gf.createLinearRing(new Coordinate[]{new Coordinate(-88.071564,37.51099), new Coordinate(-88.467644,37.400757), new Coordinate(-90.638329,42.509361), new Coordinate(-89.834618,42.50346),new Coordinate(-88.071564,37.51099)}),new LinearRing[]{})});
@@ -336,7 +337,7 @@ public class GeoServerOnlineTest extends TestCase {
     }
 	private Id createFidFilter(FeatureSource fs) throws IOException {
 		FeatureIterator iter = fs.getFeatures().features();
-        FilterFactory2 ffac = CommonFactoryFinder.getFilterFactory2(null);
+        FilterFactory2 ffac = CommonFactoryFinder.getFilterFactory2(GeoTools.getDefaultHints());
         Set fids = new HashSet();
 		try{
 			while(iter.hasNext()){
