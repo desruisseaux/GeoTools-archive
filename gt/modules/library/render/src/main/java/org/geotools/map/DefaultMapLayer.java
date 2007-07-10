@@ -27,7 +27,6 @@ import org.geotools.data.FeatureEvent;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
-import org.geotools.data.Source;
 import org.geotools.data.memory.CollectionSource;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.FeatureCollection;
@@ -51,8 +50,8 @@ import org.opengis.referencing.operation.TransformException;
 public class DefaultMapLayer implements MapLayer {
     
 
-	/** Holds value of property Source? */
-    private Source source = null;
+	/** Simple wrapper around a raw collection */
+    private CollectionSource source = null;
 
 	/** Holds value of property FeatureSource. */
 	protected FeatureSource featureSource;
@@ -108,7 +107,7 @@ public class DefaultMapLayer implements MapLayer {
 		this.visible = true;
 	}
 
-    public DefaultMapLayer(Source source, Style style, String title) {
+    public DefaultMapLayer(CollectionSource source, Style style, String title) {
         
         if ((source == null) || (style == null) || (title == null)) {
             throw new NullPointerException();
@@ -257,7 +256,7 @@ public class DefaultMapLayer implements MapLayer {
 		return this.featureSource;
 	}
 
-    public Source getSource() {
+    public CollectionSource getSource() {
         return this.source;
     }
     

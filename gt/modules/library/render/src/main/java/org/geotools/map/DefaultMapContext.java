@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.Source;
+import org.geotools.data.memory.CollectionSource;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.IllegalAttributeException;
@@ -272,7 +272,7 @@ public class DefaultMapContext implements MapContext {
 		this.addLayer(new DefaultMapLayer(featureSource, style, ""));
 	}
     
-    public void addLayer(Source source, Style style) {
+    public void addLayer(CollectionSource source, Style style) {
         // JG: for later when feature source extends source
 //        if( source instanceof FeatureSource){
 //            addLayer( (FeatureSource) source, style);

@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.geotools.catalog.GeoResourceInfo;
-import org.geotools.data.Source;
 import org.geotools.data.Transaction;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.TypeName;
@@ -22,7 +21,7 @@ import org.opengis.filter.capability.FilterCapabilities;
  * 
  * @author Jody Garnett
  */
-public class CollectionSource implements Source {
+public final class CollectionSource {
 
     private Collection collection;
 

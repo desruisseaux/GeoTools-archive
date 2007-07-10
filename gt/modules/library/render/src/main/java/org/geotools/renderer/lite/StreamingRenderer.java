@@ -52,9 +52,9 @@ import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
-import org.geotools.data.Source;
 import org.geotools.data.collection.ResourceCollection;
 import org.geotools.data.crs.ForceCoordinateSystemFeatureResults;
+import org.geotools.data.memory.CollectionSource;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeType;
@@ -673,7 +673,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 * @param source Source to read data from
 	 */
 	//TODO: Implement filtering for bbox and read in only the need attributes 
-	Collection queryLayer(MapLayer currLayer, Source source) {
+	Collection queryLayer(MapLayer currLayer, CollectionSource source) {
 		
 		Collection results = null;
 		DefaultQuery query = new DefaultQuery(DefaultQuery.ALL);
@@ -1543,7 +1543,7 @@ public final class StreamingRenderer implements GTRenderer {
 				mapArea, destinationCrs, sourceCrs, screenSize,
 				geometryAttribute, at);
         } else {
-        	Source source = currLayer.getSource();
+            CollectionSource source = currLayer.getSource();
         	result = queryLayer( currLayer, currLayer.getSource() );
         	sourceCrs = null;
         	lfts = createLiteFeatureTypeStyles( featureStylers, source.describe(), graphics );

@@ -22,7 +22,6 @@ import java.util.Iterator;
 
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.Source;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.event.MapBoundsEvent;
@@ -77,16 +76,6 @@ public interface MapContext {
 	 *            a FeatureSource with the new layer that will be added.
 	 */
 	void addLayer(FeatureSource featureSource, Style style);
-
-    /**
-     * Add a new layer and trigger a {@link LayerListEvent}.
-     * <p>
-     * The Source interface allows lazy query based access to
-     * a range of geospatial content.
-     * </p>
-     * @param source 
-     */
-    void addLayer(Source source, Style style);
 
 	/**
 	 * Add a new layer and trigger a {@link LayerListEvent}.

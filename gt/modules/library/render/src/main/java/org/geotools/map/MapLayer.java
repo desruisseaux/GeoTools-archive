@@ -17,7 +17,7 @@ package org.geotools.map;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
-import org.geotools.data.Source;
+import org.geotools.data.memory.CollectionSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.event.MapLayerListener;
 import org.geotools.styling.Style;
@@ -48,7 +48,7 @@ public interface MapLayer {
      *         or if {@link FeatureSource} is used
      */
     
-    Source getSource();
+    CollectionSource getSource();
 
     
     /**
