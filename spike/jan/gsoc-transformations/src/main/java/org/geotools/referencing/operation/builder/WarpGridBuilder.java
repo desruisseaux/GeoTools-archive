@@ -81,6 +81,10 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
      * Grid of y shifts
      */
     private float[][] dygrid;
+    
+    /**
+     * Warp positions
+     */
     private float[] warpPositions;
 
     /**
@@ -142,13 +146,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
      * @see org.geotools.referencing.operation.builder.MathTransformBuilder#computeMathTransform()
      */
     protected MathTransform computeMathTransform() throws FactoryException {
-    	if (warpPositions == null ){
-    		warpPositions =  (float[]) globalValues.WarpGridParameters.parameter("warpPositions")
-                                                                     .getValue();
-    		warpPositions = this.computeWarpGrid(globalValues.WarpGridParameters);
-    		globalValues.setGridWarpPostions(warpPositions);
-    	}
-    	
+    	warpPositions  = getGrid();    	
         return (WarpTransform2D) (new WarpGridTransform2D.Provider()).createMathTransform(globalValues
             .getWarpGridParameters());
     }
@@ -165,33 +163,26 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
      * Computes GridWarp Positions using IDW interpolatio.
      *
      */
-    abstract protected float[] computeWarpGrid(ParameterValueGroup values);/* {
-        ParameterValueGroup WarpParams = globalValues.WarpGridParameters;
+    abstract protected float[] computeWarpGrid(ParameterValueGroup values);
+    
+    /**
+     * 
+     * @return
+     */
+    private float[] getGrid(){
+    	if (warpPositions == null){
+    		warpPositions = computeWarpGrid(globalValues.WarpGridParameters);
+    	}
+    	else {
+    		return warpPositions;
+    	}
+    	return warpPositions;
+    }
 
-        for (int i = 0; i <= WarpParams.parameter("yNumCells").intValue(); i++) {
-            for (int j = 0; j <= WarpParams.parameter("xNumCells").intValue(); j++) {
-                Point2D shiftVector = calculateShift(new DirectPosition2D(WarpParams.parameter(
-                                "xStart").intValue()
-                            + (j * WarpParams.parameter("xStep").intValue()),
-                            WarpParams.parameter("yStart").intValue()
-                            + (i * WarpParams.parameter("yStep").intValue())));
-
-                double x = shiftVector.getX() + (j * WarpParams.parameter("xStep").intValue())
-                    + WarpParams.parameter("xStart").intValue();
-                double y = shiftVector.getY() + (i * WarpParams.parameter("yStep").intValue())
-                    + WarpParams.parameter("yStart").intValue();
-
-                warpPositions[(i * ((1 + WarpParams.parameter("xNumCells").intValue()) * 2))
-                + (2 * j)] = (float) x;
-
-                warpPositions[(i * ((1 + WarpParams.parameter("xNumCells").intValue()) * 2))
-                + (2 * j) + 1] = (float) y;
-            }                        
-        }       
-      
-        return warpPositions;
-    }*/
-
+    /**
+     * 
+     * @return
+     */
     public float[][] getDxGrid() {
         if ((dxgrid == null) || (dxgrid.length == 0)) {
             ParameterValueGroup WarpParams = globalValues.WarpGridParameters;
@@ -200,13 +191,12 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
             final int xStep = WarpParams.parameter("xStep").intValue();
             final int yStep = WarpParams.parameter("yStep").intValue();
 
-            final float[] warpPositions = (float[]) WarpParams.parameter("warpPositions").getValue();
-
-            dxgrid = new float[xNumCells + 1][yNumCells + 1];
+            final float[] warpPositions = getGrid();
+            dxgrid = new float[yNumCells + 1][xNumCells + 1];
 
             for (int i = 0; i <= WarpParams.parameter("yNumCells").intValue(); i++) {
                 for (int j = 0; j <= WarpParams.parameter("xNumCells").intValue(); j++) {
-                    dxgrid[j][i] = (float) warpPositions[(int) ((i * (1 + xNumCells) * 2) + (2 * j))]
+                    dxgrid[i][j] = (float) warpPositions[(int) ((i * (1 + xNumCells) * 2) + (2 * j))]
                         - (j * xStep);
                 }
             }
@@ -223,13 +213,13 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
             final int xStep = WarpParams.parameter("xStep").intValue();
             final int yStep = WarpParams.parameter("yStep").intValue();
 
-            final float[] warpPositions = (float[]) WarpParams.parameter("warpPositions").getValue();
-
-            dygrid = new float[xNumCells + 1][yNumCells + 1];
+            final float[] warpPositions = getGrid();
+            
+            dygrid = new float[yNumCells + 1][xNumCells + 1];
 
             for (int i = 0; i <= WarpParams.parameter("yNumCells").intValue(); i++) {
                 for (int j = 0; j <= WarpParams.parameter("xNumCells").intValue(); j++) {
-                    dygrid[j][i] = (float) warpPositions[(int) ((i * (1 + xNumCells) * 2) + (2 * j)+1)]
+                    dygrid[i][j] = (float) warpPositions[(int) ((i * (1 + xNumCells) * 2) + (2 * j)+1)]
                         - (i * yStep);
                 }
             }

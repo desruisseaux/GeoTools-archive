@@ -17,21 +17,20 @@ package org.geotools.referencing.operation.transform;
 
 import javax.media.jai.Warp;
 import javax.media.jai.WarpGrid;
-
-import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.parameter.DefaultParameterDescriptor;
-import org.geotools.referencing.NamedIdentifier;
-import org.geotools.referencing.operation.MathTransformProvider;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.Transformation;
+import org.geotools.metadata.iso.citation.Citations;
+import org.geotools.parameter.DefaultParameterDescriptor;
+import org.geotools.referencing.NamedIdentifier;
+import org.geotools.referencing.operation.MathTransformProvider;
 
 
 /**
- * 
+ *
  * @author jezekjan
  *
  */
@@ -44,27 +43,26 @@ public class WarpGridTransform2D extends WarpTransform2D {
         super(new WarpGrid(xStart, xStep, xNumCells, yStart, yStep, yNumCells, warpPositions),
             new WarpGrid(xStart, xStep, xNumCells, yStart, yStep, yNumCells, warpPositions));
         warp = new WarpGrid(xStart, xStep, xNumCells, yStart, yStep, yNumCells, warpPositions);
-        
-        
+
         inverse = null;
+
         /*
-        for (int i=0; i<warpPositions.length; i++){
-        	warpPositions[i]=-warpPositions[i];
-        }
-        inverse = new WarpGrid(xStart, xStep, xNumCells, yStart, yStep, yNumCells, warpPositions); //TODO generate inverse warpgrid
-        System.out.print("dsd");
-        */
+           for (int i=0; i<warpPositions.length; i++){
+                   warpPositions[i]=-warpPositions[i];
+           }
+           inverse = new WarpGrid(xStart, xStep, xNumCells, yStart, yStep, yNumCells, warpPositions); //TODO generate inverse warpgrid
+           System.out.print("dsd");
+         */
+
         // super(warp, null);
     }
 
-    public WarpGridTransform2D(Warp warp, Warp inverse){
-    	super(warp,inverse);
-    	this.warp = warp;
-    	this.inverse = inverse;
-    
+    public WarpGridTransform2D(Warp warp, Warp inverse) {
+        super(warp, inverse);
+        this.warp = warp;
+        this.inverse = inverse;
     }
-       
-    
+
     public ParameterDescriptorGroup getParameterDescriptors() {
         return Provider.PARAMETERS;
     }
@@ -142,12 +140,35 @@ public class WarpGridTransform2D extends WarpTransform2D {
             final int YNUMCELLS = intValue(yNumCells, values);
             final float[] WARPPOSITIONS = (float[]) value(warpPositions, values);
 
-            
-            final Warp warp;
-            warp = new WarpGrid(XSTART, XSTEP, XNUMCELLS, YSTART, YSTEP, YNUMCELLS, WARPPOSITIONS);
+            final Warp warp = new WarpGrid(XSTART, XSTEP, XNUMCELLS, YSTART, YSTEP, YNUMCELLS,
+                    WARPPOSITIONS);
+            final Warp inverse = new WarpGrid(XSTART, XSTEP, XNUMCELLS, YSTART, YSTEP, YNUMCELLS,
+            		calculateInverse(values));
+
             //TODO - inverse transform
-            
-             return new WarpGridTransform2D(warp, warp);
+            return new WarpGridTransform2D(warp, inverse);
+        }
+
+        protected float[] calculateInverse(final ParameterValueGroup values) {
+            final int XSTART = intValue(xStart, values);
+            final int XSTEP = intValue(xStep, values);
+            final int XNUMCELLS = intValue(xNumCells, values);
+            final int YSTART = intValue(yStart, values);
+            final int YSTEP = intValue(yStep, values);
+            final int YNUMCELLS = intValue(yNumCells, values);
+            final float[] WARPPOSITIONS = (float[]) value(warpPositions, values);
+            final float[] inversePos = new float[WARPPOSITIONS.length];
+
+            for (int i = 0; i <= YNUMCELLS; i++) {
+                for (int j = 0; j <= XNUMCELLS; j++) {
+                    inversePos[(i * ((1 + XNUMCELLS) * 2)) + (2 * j)] =  2*( ((j * XSTEP) + XSTART))
+                    -WARPPOSITIONS[(i * ((1 + XNUMCELLS) * 2)) + (2 * j)];
+
+                    inversePos[(i * ((1+ XNUMCELLS) * 2)) + (2 * j) + 1]=  2*( ((i * YSTEP) + YSTART))
+                    -WARPPOSITIONS[(i * ((1 + XNUMCELLS) * 2)) + (2 * j) + 1];
+                }
+            }
+            return  inversePos;
         }
     }
 }
