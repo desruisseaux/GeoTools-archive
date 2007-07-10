@@ -39,7 +39,6 @@ import javax.sql.DataSource;
 import javax.sql.PooledConnection;
 
 import org.geotools.factory.GeoTools;
-import org.geotools.factory.JNDI;
 
 
 /**
@@ -86,7 +85,7 @@ public final class DataSourceManager implements ConnectionManager {
      * @throws ClassCastException If the name does not refer to a DataSource 
      */
     public DataSourceManager(String dataSourceName ) throws NamingException, ClassCastException {
-        this( (DataSource) JNDI.getInitialContext(GeoTools.getDefaultHints()).lookup( dataSourceName ));
+        this( (DataSource) GeoTools.getInitialContext(GeoTools.getDefaultHints()).lookup( dataSourceName ));
     }
     /**
      * Creates a new DataSourceManager using the provided DataSource.

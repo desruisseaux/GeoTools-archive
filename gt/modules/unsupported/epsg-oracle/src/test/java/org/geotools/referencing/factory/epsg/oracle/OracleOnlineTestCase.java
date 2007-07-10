@@ -14,7 +14,7 @@ import javax.sql.DataSource;
 
 import oracle.jdbc.pool.OracleDataSource;
 
-import org.geotools.factory.JNDI;
+import org.geotools.factory.GeoTools;
 import org.geotools.test.OnlineTestCase;
 
 /**
@@ -85,7 +85,7 @@ public class OracleOnlineTestCase extends OnlineTestCase {
         // System.out.println(name);
         context.bind(name, source);
         
-        JNDI.init(context);
+        GeoTools.init(context);
     }
 
     protected void disconnect() throws Exception {

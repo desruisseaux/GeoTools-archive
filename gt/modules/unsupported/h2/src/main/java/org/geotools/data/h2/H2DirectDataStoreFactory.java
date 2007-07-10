@@ -22,7 +22,6 @@ import org.geotools.data.jdbc.ConnectionManager;
 import org.geotools.data.jdbc.DataSourceManager;
 import org.geotools.data.jdbc.JDBCDataStore;
 import org.geotools.factory.GeoTools;
-import org.geotools.factory.JNDI;
 
 /**
  * Factory will connect to the H2 database using a DataSource you provide.
@@ -55,14 +54,14 @@ public class H2DirectDataStoreFactory extends AbstractDataStoreFactory {
         }
         if( dataSource == null ){
             try {
-                dataSource = (DataSource) JNDI.getInitialContext( GeoTools.getDefaultHints() ).lookup( name );
+                dataSource = (DataSource) GeoTools.getInitialContext( GeoTools.getDefaultHints() ).lookup( name );
             } catch (NamingException e) {
                 throw (IOException) new IOException("Could not locate DataSource:"+e).initCause(e);
             }            
         }
         else {
             try {
-                JNDI.getInitialContext( GeoTools.getDefaultHints() ).bind( name, dataSource );
+                GeoTools.getInitialContext( GeoTools.getDefaultHints() ).bind( name, dataSource );
             } catch (NamingException e) {
                 // log warning
             }

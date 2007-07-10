@@ -20,6 +20,9 @@ import java.awt.RenderingHints;
 import java.util.Iterator;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
@@ -35,10 +38,28 @@ import org.geotools.util.Version;
 
 
 /**
- * Static methods relative to the global Geotools configuration. GeoTools can be configured
+ * Static methods relative to the global GeoTools configuration. GeoTools can be configured
  * in a system-wide basis through {@linkplain System#getProperties system properties}, some
  * of them are declared as {@link String} constants in this class.
- *
+ * <p>
+ * There are two aspects to the configuration of GeoTools:
+ * <ul>
+ * <li>Default Settings: Are handled as the Hints returned by {@link getDefaultHints()}, the default values
+ * can be provided by your code, or specified using system properties.
+ * <li>Integration JNDI: Telling the GeoTools library about the facilities of your application, or application
+ * container takes several forms. This class provides the {@link initContext( InitialContext ) } method
+ * allowing you to tell GeoTools about the JNDI context you would like it to use.
+ * <li>Intergration Plugins: If you are hosting GeoTools in a alternate plugin system such as Spring or OSGi you will need to hunt down the FactoryFinders and
+ * register additional "FactoryIterators" you would like GeoTools to search using the {@link addFactoryIteratorProvider} method.
+ * </ul>
+ * <h3>JNDI Integration</h3>
+ * This class provides a {@linkplain InitialContext initial context} for <cite>Java Naming and Directory
+ * Interfaces</cite> (JNDI) in Geotools. This classes provides a central place where initial
+ * context can been found for the Geotools library. This context is used for example by the
+ * {@linkplain org.geotools.referencing.factory.epsg.ThreadedEpsgFactory EPSG factory} in order to
+ * find connection parameters to an EPSG database. Using JNDI, such connection parameters can
+ * be set in a J2EE environment.
+ * 
  * @since 2.4
  * @source $URL$
  * @version $Id$
@@ -117,6 +138,11 @@ public final class GeoTools {
     static {
         bind(FORCE_LONGITUDE_FIRST_AXIS_ORDER, Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER);
     }
+
+    /**
+     * The initial context. Will be created only when first needed.
+     */
+    static InitialContext context;
 
     /**
      * Do not allow instantiation of this class.
@@ -355,5 +381,28 @@ public final class GeoTools {
         args = arguments.getRemainingArguments(0);
         arguments.out.print("GeoTools version ");
         arguments.out.println(getVersion());
+    }
+
+    /**
+     * Used for force the initial context for test cases ... or as needed.
+     */
+    public static void init( InitialContext applicationContext ){
+        context = applicationContext;
+    }
+
+    /**
+     * Returns the default initial context.
+     *
+     * @param  hints An optional set of hints, or {@code null} if none.
+     * @return The initial context (never {@code null}).
+     * @throws NamingException if the initial context can't be created.
+     */
+    public static synchronized InitialContext getInitialContext(final Hints hints)
+            throws NamingException
+    {
+        if (context == null) {
+            context = new InitialContext();
+        }
+        return context;
     }
 }

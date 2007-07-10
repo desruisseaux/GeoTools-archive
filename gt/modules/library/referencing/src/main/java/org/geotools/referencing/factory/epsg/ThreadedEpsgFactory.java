@@ -41,7 +41,7 @@ import org.opengis.referencing.datum.DatumAuthorityFactory;
 import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
 
 // Geotools dependencies
-import org.geotools.factory.JNDI;
+import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.metadata.iso.citation.Citations;
@@ -313,7 +313,7 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
         InitialContext context = null;
         DataSource     source  = null;
         try {
-            context = JNDI.getInitialContext(new Hints(hints));
+            context = GeoTools.getInitialContext(new Hints(hints));
             source = (DataSource) context.lookup(datasourceName);
         } catch (NoInitialContextException exception) {
             // Fall back on 'return null' below.

@@ -8,7 +8,6 @@ import javax.sql.DataSource;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStoreFactorySpi.Param;
 import org.geotools.factory.GeoTools;
-import org.geotools.factory.JNDI;
 
 /**
  * A datasource factory SPI doing JDNI lookups
@@ -29,7 +28,7 @@ public class JNDIDataSourceFactory extends AbstractDataSourceFactorySpi {
     public DataSource createNewDataSource(Map params) throws IOException {
         String refName = (String) JNDI_REFNAME.lookUp(params);
         try {
-            return (DataSource) JNDI.getInitialContext(GeoTools.getDefaultHints()).lookup(refName);
+            return (DataSource) GeoTools.getInitialContext(GeoTools.getDefaultHints()).lookup(refName);
         } catch (Exception e) {
             throw new DataSourceException("Could not find the specified data source in JNDI", e);
         }
@@ -48,7 +47,7 @@ public class JNDIDataSourceFactory extends AbstractDataSourceFactorySpi {
      */
     public boolean isAvailable() {
         try {
-            JNDI.getInitialContext(GeoTools.getDefaultHints());
+            GeoTools.getInitialContext(GeoTools.getDefaultHints());
             return true;
         } catch (Exception e) {
             return false;

@@ -3,7 +3,7 @@ package org.geotools.referencing.factory.epsg.oracle;
 import javax.naming.Context;
 import javax.sql.DataSource;
 
-import org.geotools.factory.JNDI;
+import org.geotools.factory.GeoTools;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.factory.epsg.ThreadedOracleEpsgFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -22,7 +22,7 @@ public class ThreadedOracleEpsgAuthorityOnlineTest extends OracleOnlineTestCase 
         assertNotNull(crs);
     }
     public void testJNDIConfiguredProperlyForTest() throws Exception {
-        Context context = JNDI.getInitialContext(null);
+        Context context = GeoTools.getInitialContext(null);
         DataSource source = (DataSource) context.lookup("jdbc/EPSG");
         assertNotNull(source);
         assertSame(source, this.datasource);
