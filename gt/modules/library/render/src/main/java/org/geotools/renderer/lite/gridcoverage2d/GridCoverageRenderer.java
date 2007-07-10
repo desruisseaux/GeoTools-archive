@@ -960,10 +960,11 @@ public final class GridCoverageRenderer {
      */
     private boolean isScaleTranslate(MathTransform transform) {
         if(!(transform instanceof AffineTransform))
-            return false;
-        AffineTransform at = (AffineTransform) transform;
-        return at.getShearX() < EPS && at.getShearY() < EPS;
+			return false;
+		final AffineTransform at = new AffineTransform((AffineTransform) transform);
+		XAffineTransform.round(at, EPS);
+		final double rotation= XAffineTransform.getRotation(at);
+		final boolean retVal =(Math.abs(rotation)==0);
+		return retVal;
     }
-     
-
 }
