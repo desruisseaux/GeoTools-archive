@@ -116,8 +116,6 @@ public class JDBCFeatureLocking extends JDBCFeatureStore
      * @return Number of locked Features
      *
      * @throws IOException
-     *
-     * @see org.geotools.data.FeatureLocking#lockFeatures(org.geotools.filter.Filter)
      */
     public int lockFeatures(Filter filter) throws IOException {
         return lockFeatures(new DefaultQuery(getSchema().getTypeName(), filter));
@@ -197,8 +195,6 @@ public class JDBCFeatureLocking extends JDBCFeatureStore
      * @param filter
      *
      * @throws IOException
-     *
-     * @see org.geotools.data.FeatureLocking#unLockFeatures(org.geotools.filter.Filter)
      */
     public void unLockFeatures(Filter filter) throws IOException {
         unLockFeatures(new DefaultQuery(getSchema().getTypeName(),filter));

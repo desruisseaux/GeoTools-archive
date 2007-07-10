@@ -417,8 +417,6 @@ public class DefaultView implements FeatureSource {
      * 
      * @return @throws
      *         IOException
-     * 
-     * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.filter.Filter)
      */
     public FeatureCollection getFeatures(Filter filter) throws IOException {
         return getFeatures(new DefaultQuery(schema.getTypeName(),filter));

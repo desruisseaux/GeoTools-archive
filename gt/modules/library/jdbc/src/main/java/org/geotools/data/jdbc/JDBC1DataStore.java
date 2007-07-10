@@ -438,9 +438,6 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * name spaces.
 	 * </p>
 	 * (non-Javadoc)
-	 *
-	 * @see org.geotools.data.DataStore#getFeatureReader(org.geotools.feature.FeatureType,
-	 *      org.geotools.filter.Filter, org.geotools.data.Transaction)
 	 */
 	public FeatureReader getFeatureReader(final FeatureType requestType,
 			final Filter filter, final Transaction transaction)
@@ -1493,9 +1490,6 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * @throws NullPointerException
 	 *             If the provided filter is null
 	 * @throws DataSourceException
-	 *
-	 * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String,
-	 *      org.geotools.filter.Filter, org.geotools.data.Transaction)
 	 */
 	public FeatureWriter getFeatureWriter(String typeName, org.opengis.filter.Filter filter,
 			Transaction transaction) throws IOException {

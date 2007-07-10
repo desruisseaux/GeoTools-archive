@@ -71,9 +71,6 @@ public abstract class AbstractFileDataStore extends AbstractDataStore {
 
     /**
      * Singular version, calls parent with getSchema().getTypeName()
-     *
-     * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String,
-     *      org.geotools.filter.Filter, org.geotools.data.Transaction)
      */
     public FeatureWriter getFeatureWriter(Filter filter, Transaction transaction)
         throws IOException {

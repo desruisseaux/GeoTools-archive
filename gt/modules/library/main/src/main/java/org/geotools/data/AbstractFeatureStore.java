@@ -79,9 +79,6 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
      * @param filter Identifies features to modify
      *
      * @throws IOException If modification could not be made
-     *
-     * @see org.geotools.data.FeatureStore#modifyFeatures(org.geotools.feature.AttributeType,
-     *      java.lang.Object, org.geotools.filter.Filter)
      */
     public void modifyFeatures(AttributeType type, Object value, Filter filter)
         throws IOException {
@@ -121,9 +118,6 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
      *
      * @throws IOException If we could not modify Feature
      * @throws DataSourceException See IOException
-     *
-     * @see org.geotools.data.FeatureStore#modifyFeatures(org.geotools.feature.AttributeType,
-     *      java.lang.Object, org.geotools.filter.Filter)
      */
     public void modifyFeatures(AttributeType[] type, Object[] value,
         Filter filter) throws IOException {
@@ -291,9 +285,6 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
      * @param filter Identifies features to remove
      *
      * @throws IOException
-     *
-     * @see org.geotools.data.FeatureStore#modifyFeatures(org.geotools.feature.AttributeType,
-     *      java.lang.Object, org.geotools.filter.Filter)
      */
     public void removeFeatures(Filter filter) throws IOException {
         String typeName = getSchema().getTypeName();
@@ -343,9 +334,6 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
      *
      * @throws IOException if anything goes wrong during replacement
      * @throws DataSourceException See IOException
-     *
-     * @see org.geotools.data.FeatureStore#modifyFeatures(org.geotools.feature.AttributeType,
-     *      java.lang.Object, org.geotools.filter.Filter)
      */
     public void setFeatures(FeatureReader reader) throws IOException {
         String typeName = getSchema().getTypeName();

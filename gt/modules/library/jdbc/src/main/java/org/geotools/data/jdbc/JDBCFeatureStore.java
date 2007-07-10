@@ -173,9 +173,6 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
      * @param filter Identifies features to modify
      *
      * @throws IOException
-     *
-     * @see org.geotools.data.FeatureStore#modifyFeatures(org.geotools.feature.AttributeType,
-     *      java.lang.Object, org.geotools.filter.Filter)
      */
     public void modifyFeatures(AttributeType type, Object value, Filter filter)
         throws IOException {
@@ -213,9 +210,6 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
      * @param filter Identifies features to modify
      *
      * @throws IOException
-     *
-     * @see org.geotools.data.FeatureStore#modifyFeatures(org.geotools.feature.AttributeType,
-     *      java.lang.Object, org.geotools.filter.Filter)
      */
     public void modifyFeatures(AttributeType[] type, Object[] value,
         Filter filter) throws IOException {
@@ -416,9 +410,6 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
      * @param filter Identifies features to remove
      *
      * @throws IOException
-     *
-     * @see org.geotools.data.FeatureStore#modifyFeatures(org.geotools.feature.AttributeType,
-     *      java.lang.Object, org.geotools.filter.Filter)
      */
     public void removeFeatures(Filter filter) throws IOException {
         String typeName = getSchema().getTypeName();
@@ -469,9 +460,6 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
      * @param reader Contents to replace with
      *
      * @throws IOException
-     *
-     * @see org.geotools.data.FeatureStore#modifyFeatures(org.geotools.feature.AttributeType,
-     *      java.lang.Object, org.geotools.filter.Filter)
      */
     public void setFeatures(FeatureReader reader) throws IOException {
         String typeName = getSchema().getTypeName();
