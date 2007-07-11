@@ -97,15 +97,17 @@ public final class GeoTiffException extends IOException {
 			Throwable t) {
 		super(msg);
 		this.metadata = metadata;
-		this.initCause(t);
+		if (t != null)
+			this.initCause(t);
 
-		int numGeoKeys = metadata.getNumGeoKeys();
+		if (metadata != null) {
+			final int numGeoKeys = metadata.getNumGeoKeys();
+			if (numGeoKeys > 0) {
+				geoKeys = new GeoKeyEntry[numGeoKeys];
 
-		if (numGeoKeys > 0) {
-			geoKeys = new GeoKeyEntry[numGeoKeys];
-
-			for (int i = 0; i < numGeoKeys; i++) {
-				geoKeys[i] = metadata.getGeoKeyRecordByIndex(i);
+				for (int i = 0; i < numGeoKeys; i++) {
+					geoKeys[i] = metadata.getGeoKeyRecordByIndex(i);
+				}
 			}
 		}
 	}
@@ -116,7 +118,9 @@ public final class GeoTiffException extends IOException {
 	 * @return Value of property modelTransformation.
 	 */
 	public AffineTransform getModelTransformation() {
-		return metadata.getModelTransformation();
+		if (metadata != null)
+			return metadata.getModelTransformation();
+		return null;
 	}
 
 	/**
@@ -129,8 +133,8 @@ public final class GeoTiffException extends IOException {
 	}
 
 	public String getMessage() {
-		StringWriter text = new StringWriter(1024);
-		PrintWriter message = new PrintWriter(text);
+		final StringWriter text = new StringWriter(1024);
+		final PrintWriter message = new PrintWriter(text);
 
 		// Header
 		message.println("GEOTIFF Module Error Report");
@@ -140,33 +144,40 @@ public final class GeoTiffException extends IOException {
 
 		// do the model pixel scale tags
 		message.print("ModelPixelScaleTag: ");
-
-		PixelScale modelPixelScales = metadata.getModelPixelScales();
-
-		if (modelPixelScales != null) {
-			message.println("[" + modelPixelScales.getScaleX() + ","
-					+ modelPixelScales.getScaleY() + ","
-					+ modelPixelScales.getScaleZ() + "]");
-		} else {
+		if (metadata != null) {
+			final PixelScale modelPixelScales = metadata.getModelPixelScales();
+			if (modelPixelScales != null) {
+				message.println("[" + modelPixelScales.getScaleX() + ","
+						+ modelPixelScales.getScaleY() + ","
+						+ modelPixelScales.getScaleZ() + "]");
+			} else {
+				message.println("NOT AVAILABLE");
+			}
+		} else
 			message.println("NOT AVAILABLE");
-		}
 
 		// do the model tie point tags
 		message.print("ModelTiePointTag: ");
-
-		TiePoint[] modelTiePoints = metadata.getModelTiePoints();
-		int numTiePoints = modelTiePoints.length;
-		message.println("(" + (numTiePoints) + " tie points)");
-
-		for (int i = 0; i < (numTiePoints); i++) {
-			message.print("TP #" + i + ": ");
-			message.print("[" + modelTiePoints[i].getValueAt(0));
-			message.print("," + modelTiePoints[i].getValueAt(1));
-			message.print("," + modelTiePoints[i].getValueAt(2));
-			message.print("] -> [" + modelTiePoints[i].getValueAt(3));
-			message.print("," + modelTiePoints[i].getValueAt(4));
-			message.println("," + modelTiePoints[i].getValueAt(5) + "]");
-		}
+		if (metadata != null) {
+			final TiePoint[] modelTiePoints = metadata.getModelTiePoints();
+			if (modelTiePoints != null) {
+				final int numTiePoints = modelTiePoints.length;
+				message.println("(" + (numTiePoints) + " tie points)");
+				for (int i = 0; i < (numTiePoints); i++) {
+					message.print("TP #" + i + ": ");
+					message.print("[" + modelTiePoints[i].getValueAt(0));
+					message.print("," + modelTiePoints[i].getValueAt(1));
+					message.print("," + modelTiePoints[i].getValueAt(2));
+					message.print("] -> [" + modelTiePoints[i].getValueAt(3));
+					message.print("," + modelTiePoints[i].getValueAt(4));
+					message
+							.println("," + modelTiePoints[i].getValueAt(5)
+									+ "]");
+				}
+			} else
+				message.println("NOT AVAILABLE");
+		} else
+			message.println("NOT AVAILABLE");
 
 		// do the transformation tag
 		message.print("ModelTransformationTag: ");
@@ -189,14 +200,15 @@ public final class GeoTiffException extends IOException {
 		}
 
 		// do all the GeoKeys
-		int numTags = geoKeys.length;
-
-		for (int i = 0; i < numTags; i++) {
-			message.print("GeoKey #" + (i + 1) + ": ");
-			message.println("Key = " + geoKeys[i].getKeyID() + ", Value = "
-					+ metadata.getGeoKey(geoKeys[i].getKeyID()));
+		if (geoKeys != null) {
+			int numTags = geoKeys.length;
+			for (int i = 0; i < numTags; i++) {
+				message.print("GeoKey #" + (i + 1) + ": ");
+				message.println("Key = " + geoKeys[i].getKeyID() + ", Value = "
+						+ metadata.getGeoKey(geoKeys[i].getKeyID()));
+			}
 		}
-
+		
 		// print out the localized message
 		Throwable t = getCause();
 		if (t != null)
