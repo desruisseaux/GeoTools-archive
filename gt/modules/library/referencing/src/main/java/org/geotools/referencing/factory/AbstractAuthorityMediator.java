@@ -21,6 +21,7 @@ package org.geotools.referencing.factory;
 
 // J2SE dependencies and extensions
 import java.util.Set;
+import java.util.logging.Level;
 
 import javax.units.Unit;
 
@@ -296,19 +297,30 @@ public abstract class AbstractAuthorityMediator extends
         Set codes = (Set) cache.get(type);
         if (codes == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(type);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    codes = worker.getAuthorityCodes(type);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(type);
+                cache.writeLock(type);
+                codes = (Set) cache.peek(type);
+                if (codes == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        codes = worker.getAuthorityCodes(type);
+                        cache.put(type, codes);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(type);
             }
         }
         return codes;
@@ -322,19 +334,30 @@ public abstract class AbstractAuthorityMediator extends
         IdentifiedObject obj = (IdentifiedObject) cache.get(key);
         if (obj == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    obj = worker.createObject(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                obj = (IdentifiedObject) cache.peek(key);
+                if (obj == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        obj = worker.createDerivedCRS(code);
+                        cache.put(key, obj);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return obj;
@@ -349,19 +372,28 @@ public abstract class AbstractAuthorityMediator extends
         CompoundCRS crs = (CompoundCRS) cache.get(key);
         if (crs == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    crs = worker.createCompoundCRS(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                crs = (CompoundCRS) cache.peek(key);
+                if (crs == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        crs = worker.createCompoundCRS(code);
+                        cache.put(key, crs);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
             } finally {
                 cache.writeUnLock(key);
             }
@@ -376,19 +408,30 @@ public abstract class AbstractAuthorityMediator extends
                 .get(key);
         if (crs == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    crs = worker.createCoordinateReferenceSystem(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                crs = (CoordinateReferenceSystem) cache.peek(key);
+                if (crs == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        crs = worker.createCoordinateReferenceSystem(code);
+                        cache.put(key, crs);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return crs;
@@ -399,19 +442,30 @@ public abstract class AbstractAuthorityMediator extends
         DerivedCRS crs = (DerivedCRS) cache.get(key);
         if (crs == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    crs = worker.createDerivedCRS(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                crs = (DerivedCRS) cache.peek(key);
+                if (crs == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        crs = worker.createDerivedCRS(code);
+                        cache.put(key, crs);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return crs;
@@ -423,19 +477,30 @@ public abstract class AbstractAuthorityMediator extends
         EngineeringCRS crs = (EngineeringCRS) cache.get(key);
         if (crs == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    crs = worker.createEngineeringCRS(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                crs = (EngineeringCRS) cache.peek(key);
+                if (crs == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        crs = worker.createEngineeringCRS(code);
+                        cache.put(key, crs);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return crs;
@@ -447,19 +512,30 @@ public abstract class AbstractAuthorityMediator extends
         GeocentricCRS crs = (GeocentricCRS) cache.get(key);
         if (crs == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    crs = worker.createGeocentricCRS(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                crs = (GeocentricCRS) cache.peek(key);
+                if (crs == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        crs = worker.createGeocentricCRS(code);
+                        cache.put(key, crs);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return crs;
@@ -471,19 +547,30 @@ public abstract class AbstractAuthorityMediator extends
         GeographicCRS crs = (GeographicCRS) cache.get(key);
         if (crs == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    crs = worker.createGeographicCRS(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                crs = (GeographicCRS) cache.peek(key);
+                if (crs == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        crs = worker.createGeographicCRS(code);
+                        cache.put(key, crs);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return crs;
@@ -494,19 +581,30 @@ public abstract class AbstractAuthorityMediator extends
         ImageCRS crs = (ImageCRS) cache.get(key);
         if (crs == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    crs = worker.createImageCRS(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                crs = (ImageCRS) cache.peek(key);
+                if (crs == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        crs = worker.createImageCRS(code);
+                        cache.put(key, crs);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return crs;
@@ -517,19 +615,30 @@ public abstract class AbstractAuthorityMediator extends
         ProjectedCRS crs = (ProjectedCRS) cache.get(key);
         if (crs == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    crs = worker.createProjectedCRS(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                crs = (ProjectedCRS) cache.peek(key);
+                if (crs == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        crs = worker.createProjectedCRS(code);
+                        cache.put(key, crs);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return crs;
@@ -540,19 +649,30 @@ public abstract class AbstractAuthorityMediator extends
         TemporalCRS crs = (TemporalCRS) cache.get(key);
         if (crs == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    crs = worker.createTemporalCRS(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                crs = (TemporalCRS) cache.peek(key);
+                if (crs == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        crs = worker.createTemporalCRS(code);
+                        cache.put(key, crs);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return crs;
@@ -563,19 +683,30 @@ public abstract class AbstractAuthorityMediator extends
         VerticalCRS crs = (VerticalCRS) cache.get(key);
         if (crs == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    crs = worker.createVerticalCRS(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                crs = (VerticalCRS) cache.peek(key);
+                if (crs == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        crs = worker.createVerticalCRS(code);
+                        cache.put(key, crs);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return crs;
@@ -589,19 +720,30 @@ public abstract class AbstractAuthorityMediator extends
         CartesianCS cs = (CartesianCS) cache.get(key);
         if (cs == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    cs = worker.createCartesianCS(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                cs = (CartesianCS) cache.peek(key);
+                if (cs == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        cs = worker.createCartesianCS(code);
+                        cache.put(key, cs);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return cs;
@@ -613,19 +755,30 @@ public abstract class AbstractAuthorityMediator extends
         CoordinateSystem cs = (CoordinateSystem) cache.get(key);
         if (cs == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    cs = worker.createCoordinateSystem(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                cs = (CoordinateSystem) cache.peek(key);
+                if (cs == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        cs = worker.createCoordinateSystem(code);
+                        cache.put(key, cs);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return cs;
@@ -638,19 +791,30 @@ public abstract class AbstractAuthorityMediator extends
         CoordinateSystemAxis axis = (CoordinateSystemAxis) cache.get(key);
         if (axis == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    axis = worker.createCoordinateSystemAxis(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                axis = (CoordinateSystemAxis) cache.peek(key);
+                if (axis == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        axis = worker.createCoordinateSystemAxis(code);
+                        cache.put(key, axis);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return axis;
@@ -662,19 +826,30 @@ public abstract class AbstractAuthorityMediator extends
         CylindricalCS cs = (CylindricalCS) cache.get(key);
         if (cs == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    cs = worker.createCylindricalCS(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                cs = (CylindricalCS) cache.peek(key);
+                if (cs == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        cs = worker.createCylindricalCS(code);
+                        cache.put(key, cs);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return cs;
@@ -686,19 +861,30 @@ public abstract class AbstractAuthorityMediator extends
         EllipsoidalCS cs = (EllipsoidalCS) cache.get(key);
         if (cs == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    cs = worker.createEllipsoidalCS(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                cs = (EllipsoidalCS) cache.peek(key);
+                if (cs == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        cs = worker.createEllipsoidalCS(code);
+                        cache.put(key, cs);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return cs;
@@ -709,19 +895,30 @@ public abstract class AbstractAuthorityMediator extends
         PolarCS cs = (PolarCS) cache.get(key);
         if (cs == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    cs = worker.createPolarCS(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                cs = (PolarCS) cache.peek(key);
+                if (cs == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        cs = worker.createPolarCS(code);
+                        cache.put(key, cs);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return cs;
@@ -732,19 +929,30 @@ public abstract class AbstractAuthorityMediator extends
         SphericalCS cs = (SphericalCS) cache.get(key);
         if (cs == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    cs = worker.createSphericalCS(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                cs = (SphericalCS) cache.peek(key);
+                if (cs == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        cs = worker.createSphericalCS(code);
+                        cache.put(key, cs);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return cs;
@@ -755,19 +963,30 @@ public abstract class AbstractAuthorityMediator extends
         TimeCS cs = (TimeCS) cache.get(key);
         if (cs == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    cs = worker.createTimeCS(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                cs = (TimeCS) cache.peek(key);
+                if (cs == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        cs = worker.createTimeCS(code);
+                        cache.put(key, cs);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return cs;
@@ -778,19 +997,30 @@ public abstract class AbstractAuthorityMediator extends
         Unit unit = (Unit) cache.get(key);
         if (unit == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    unit = worker.createUnit(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                unit = (Unit) cache.peek(key);
+                if (unit == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        unit = worker.createUnit(code);
+                        cache.put(key, unit);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return unit;
@@ -801,19 +1031,30 @@ public abstract class AbstractAuthorityMediator extends
         VerticalCS cs = (VerticalCS) cache.get(key);
         if (cs == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    cs = worker.createVerticalCS(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                cs = (VerticalCS) cache.peek(key);
+                if (cs == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        cs = worker.createVerticalCS(code);
+                        cache.put(key, cs);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return cs;
@@ -827,19 +1068,30 @@ public abstract class AbstractAuthorityMediator extends
         Datum datum = (Datum) cache.get(key);
         if (datum == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    datum = worker.createDatum(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                datum = (Datum) cache.peek(key);
+                if (datum == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        datum = worker.createDatum(code);
+                        cache.put(key, datum);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return datum;
@@ -850,19 +1102,30 @@ public abstract class AbstractAuthorityMediator extends
         Ellipsoid ellipsoid = (Ellipsoid) cache.get(key);
         if (ellipsoid == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    ellipsoid = worker.createEllipsoid(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                ellipsoid = (Ellipsoid) cache.peek(key);
+                if (ellipsoid == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        ellipsoid = worker.createEllipsoid(code);
+                        cache.put(key, ellipsoid);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return ellipsoid;
@@ -874,19 +1137,30 @@ public abstract class AbstractAuthorityMediator extends
         EngineeringDatum datum = (EngineeringDatum) cache.get(key);
         if (datum == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    datum = worker.createEngineeringDatum(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                datum = (EngineeringDatum) cache.peek(key);
+                if (datum == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        datum = worker.createEngineeringDatum(code);
+                        cache.put(key, datum);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return datum;
@@ -898,19 +1172,30 @@ public abstract class AbstractAuthorityMediator extends
         GeodeticDatum datum = (GeodeticDatum) cache.get(key);
         if (datum == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    datum = worker.createGeodeticDatum(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                datum = (GeodeticDatum) cache.peek(key);
+                if (datum == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        datum = worker.createGeodeticDatum(code);
+                        cache.put(key, datum);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return datum;
@@ -921,19 +1206,30 @@ public abstract class AbstractAuthorityMediator extends
         ImageDatum datum = (ImageDatum) cache.get(key);
         if (datum == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    datum = worker.createImageDatum(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                datum = (ImageDatum) cache.peek(key);
+                if (datum == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        datum = worker.createImageDatum(code);
+                        cache.put(key, datum);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return datum;
@@ -945,19 +1241,30 @@ public abstract class AbstractAuthorityMediator extends
         PrimeMeridian datum = (PrimeMeridian) cache.get(key);
         if (datum == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    datum = worker.createPrimeMeridian(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                datum = (PrimeMeridian) cache.peek(key);
+                if (datum == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        datum = worker.createPrimeMeridian(code);
+                        cache.put(key, datum);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return datum;
@@ -969,19 +1276,30 @@ public abstract class AbstractAuthorityMediator extends
         TemporalDatum datum = (TemporalDatum) cache.get(key);
         if (datum == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    datum = worker.createTemporalDatum(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                datum = (TemporalDatum) cache.peek(key);
+                if (datum == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        datum = worker.createTemporalDatum(code);
+                        cache.put(key, datum);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return datum;
@@ -993,19 +1311,30 @@ public abstract class AbstractAuthorityMediator extends
         VerticalDatum datum = (VerticalDatum) cache.get(key);
         if (datum == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    datum = worker.createVerticalDatum(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                datum = (VerticalDatum) cache.peek(key);
+                if (datum == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        datum = worker.createVerticalDatum(code);
+                        cache.put(key, datum);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return datum;
@@ -1017,19 +1346,30 @@ public abstract class AbstractAuthorityMediator extends
         CoordinateOperation operation = (CoordinateOperation) cache.get(key);
         if (operation == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    operation = worker.createCoordinateOperation(code);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                operation = (CoordinateOperation) cache.peek(key);
+                if (operation == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        operation = worker.createCoordinateOperation(code);
+                        cache.put(key, operation);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return operation;
@@ -1044,19 +1384,30 @@ public abstract class AbstractAuthorityMediator extends
         Set operations = (Set) cache.get(key);
         if (operations == null) {
             try {
-                AbstractCachedAuthorityFactory worker = null;
-                try {
-                    cache.writeLock(key);
-                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                    operations = worker.createFromCoordinateReferenceSystemCodes(sourceCode, targetCode);
-                } finally {
-                    getPool().returnObject(worker);
-                    cache.writeUnLock(key);
+                cache.writeLock(key);
+                operations = (Set) cache.peek(key);
+                if (operations == null) {
+                    AbstractCachedAuthorityFactory worker = null;
+                    try {
+                        worker = (AbstractCachedAuthorityFactory) getPool()
+                                .borrowObject();
+                        operations = worker.createFromCoordinateReferenceSystemCodes(sourceCode, targetCode);
+                        cache.put(key, operations);
+                    } catch (FactoryException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new FactoryException(e);
+                    } finally {
+                        try {
+                            getPool().returnObject(worker);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.WARNING,
+                                    "Unable to return worker " + e, e);
+                        }
+                    }
                 }
-            } catch (FactoryException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new FactoryException(e);
+            } finally {
+                cache.writeUnLock(key);
             }
         }
         return operations;
