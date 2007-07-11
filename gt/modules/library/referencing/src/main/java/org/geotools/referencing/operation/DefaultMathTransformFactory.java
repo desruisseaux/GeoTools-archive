@@ -260,7 +260,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
      * @throws NoSuchIdentifierException if there is no provider registered for the specified
      *         method.
      */
-    private MathTransformProvider getProvider(final String method)
+    private synchronized MathTransformProvider getProvider(final String method)
             throws NoSuchIdentifierException
     {
         MathTransformProvider provider = lastProvider; // Avoid synchronization

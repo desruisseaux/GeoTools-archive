@@ -58,7 +58,7 @@ import org.geotools.resources.i18n.LoggingKeys;
  * <p>
  * <strong>NOTE: This class is not thread safe</strong>. Users are responsable
  * for synchronisation. This is usually done in an utility class wrapping this
- * service registry (e.g. {@link org.geotools.referencing.FactoryFinder}).
+ * service registry (e.g. {@link org.geotools.referencing.ReferencingFactoryFinder}).
  *
  * @since 2.1
  * @source $URL$
@@ -159,6 +159,8 @@ public class FactoryRegistry extends ServiceRegistry {
          * more implementation details.
          */
         if (scanningCategories.contains(category)) {
+            // Please note you will get errors here if you accidentally allow
+            // more than one thread to use your FactoryRegistry at a time.
             throw new RecursiveSearchException(category);
         }
         final Filter hintsFilter = new Filter() {
