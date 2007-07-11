@@ -42,6 +42,7 @@ public class ShapefileService extends AbstractService {
     private URI uri;
     private Map params;
     private List members;
+    private static ShapefileDataStoreFactory factory = new ShapefileDataStoreFactory();
 
     public ShapefileService(Catalog parent, URI uri, Map params) {
         super(parent);
@@ -107,23 +108,22 @@ public class ShapefileService extends AbstractService {
         if (dataStore == null) {
             synchronized (ShapefileDataStore.class) {
                 if (dataStore == null) {
-                    ShapefileDataStoreFactory factory = new ShapefileDataStoreFactory();
-
                     if (factory.canProcess(params)) {
                         try {
                             msg = null;
                             dataStore = (ShapefileDataStore) factory
                                     .createDataStore(params);
+                            } catch( IOException io){
+                                msg = io; // save message for later
+                                throw io;                        
                             } catch (Throwable t) {
-                                //save error to report back later
-                                msg = t;
-                                new IOException().initCause(t);
+                                msg = t; //save error to report back later                                
+                                throw (IOException) new IOException().initCause(t);
                             }
                         }
                     }
                 }
             }
-
             return dataStore;
         }
 

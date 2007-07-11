@@ -30,7 +30,7 @@ import java.net.URL;
  */
 public interface FileDataStoreFactorySpi extends DataStoreFactorySpi {
     /**
-     * DOCUMENT ME!
+     * The list of filename extentions handled by this factory.
      *
      * @return An ordered list of file extensions which can be read by this
      *         dataStore.
@@ -38,7 +38,7 @@ public interface FileDataStoreFactorySpi extends DataStoreFactorySpi {
     public String[] getFileExtensions();
 
     /**
-     * DOCUMENT ME!
+     * True if the url can be handled by this factory.
      *
      * @param f URL a url to a real file (may not be local)
      *
@@ -48,7 +48,7 @@ public interface FileDataStoreFactorySpi extends DataStoreFactorySpi {
     public boolean canProcess(URL f);
 
     /**
-     * DOCUMENT ME!
+     * A DataStore attached to the provided url, may be created if needed.
      *
      * @param url A URL to the data location for the single featureType of this
      *        DataStore
@@ -63,7 +63,7 @@ public interface FileDataStoreFactorySpi extends DataStoreFactorySpi {
     public DataStore createDataStore(URL url) throws IOException;
 
     /**
-     * DOCUMENT ME!
+     * The typeName represented by the provided url.
      *
      * @param url The location of the datum to parse into features
      *

@@ -143,45 +143,13 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     
     public ShapefileDataStore(URL url,boolean useMemoryMappedBuffer, Charset dbfCharset) throws java.net.MalformedURLException {
         String filename = null;
-
-        if (url == null) {
-            throw new NullPointerException("Null URL for ShapefileDataSource");
-        }
-
-        try {
-            filename = java.net.URLDecoder.decode(url.getFile(), "US-ASCII");
-        } catch (java.io.UnsupportedEncodingException use) {
-            throw new java.net.MalformedURLException("Unable to decode " + url
-                + " cause " + use.getMessage());
-        }
-
-        String shpext = ".shp";
-        String dbfext = ".dbf";
-        String shxext = ".shx";
-        String prjext = ".prj";
-        String xmlext = ".shp.xml"; // yes, its a double extention.
-
-        if (filename.endsWith(shpext) || filename.endsWith(dbfext)
-                || filename.endsWith(shxext)) {
-            filename = filename.substring(0, filename.length() - 4);
-        } else if (filename.endsWith(".SHP") || filename.endsWith(".DBF")
-                || filename.endsWith(".SHX")) {
-            filename = filename.substring(0, filename.length() - 4);
-            shpext = ".SHP";
-            dbfext = ".DBF";
-            shxext = ".SHX";
-            prjext = ".PRJ";
-            xmlext = ".SHP.XML";
-        }
-
-        shpURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + shpext);
-        dbfURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + dbfext);
-        shxURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + shxext);
-        prjURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + prjext);
-        xmlURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + xmlext);
+        shpURL = ShapefileDataStoreFactory.toShpURL(url);
+        dbfURL = ShapefileDataStoreFactory.toDbfURL(url);
+        shxURL = ShapefileDataStoreFactory.toShxURL(url);
+        prjURL = ShapefileDataStoreFactory.toPrjURL(url);
+        xmlURL = ShapefileDataStoreFactory.toXmlURL(url);
         this.dbfCharset = dbfCharset; 
     }
-
     /**
      * this sets the datastore's namespace during construction (so the schema -
      * FeatureType - will have the correct value) You can call this with

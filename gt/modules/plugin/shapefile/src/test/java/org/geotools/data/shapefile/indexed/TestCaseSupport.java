@@ -60,10 +60,12 @@ public abstract class TestCaseSupport extends TestCase {
      */
     private final List tmpFiles = new ArrayList();
 
+    protected TestCaseSupport() {
+    }
     /**
      * Creates a new instance of {@code TestCaseSupport} with the given name.
      */
-    protected TestCaseSupport(final String name) throws IOException {
+    protected TestCaseSupport(final String name) {
         super(name);
     }
 

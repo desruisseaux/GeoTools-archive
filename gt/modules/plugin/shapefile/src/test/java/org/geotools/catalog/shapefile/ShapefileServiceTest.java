@@ -15,42 +15,62 @@
  */
 package org.geotools.catalog.shapefile;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.geotools.TestData;
 import org.geotools.catalog.Service;
+import org.geotools.catalog.ServiceInfo;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
+import org.geotools.data.shapefile.indexed.TestCaseSupport;
 
-public class ShapefileServiceTest extends TestCase {
-
+public class ShapefileServiceTest extends TestCaseSupport {
+    final static String STATE_POP = "shapes/statepop.shp";
+    
 	/**
 	 * Test that shapefile geo resource throws a FileNotFoundException when 
 	 * the file does not exist.
 	 * 
 	 */
-	public void testShapefileNotExists() throws Exception {
-		
+	public void testShapefileNotExists() throws Exception {		
 		URI uri = new URI("file:///home/nouser/nofile.shp"); 
 		HashMap params = new HashMap();
 		params.put( ShapefileDataStoreFactory.URLP.key, uri.toURL() );
 		
 		Service service = new ShapefileService( null, uri , params );
-		service.getInfo( null );
-		
+		try {
+		    service.getInfo( null );
+		    fail("Expected a filenot found exception");
+		}
+        catch( FileNotFoundException e ) {
+            //ok
+        }    
+	}
+	//
+	public void testShapefileExists() throws Exception {
+	    File file = copyShapefiles( STATE_POP );
+	    URL url = file.toURI().toURL();
+	    
+	    HashMap params = new HashMap();
+        params.put( ShapefileDataStoreFactory.URLP.key, url );
+        
+        Service service = new ShapefileService( null, url.toURI() , params );
+        
+        // show we can connect
+        ServiceInfo info = service.getInfo(null);
+        assertNotNull( info );
+        
 		List members = service.members( null );
 		assertEquals( 1, members.size() );
 		
 		ShapefileGeoResource resource = (ShapefileGeoResource) members.get( 0 );
-		try {
-			resource.getInfo( null );
-			fail( "resource should have thrown IOException" );
-		}
-		catch( FileNotFoundException e ) {
-			//ok
-		}
+		resource.getInfo( null );		
 	}
 }

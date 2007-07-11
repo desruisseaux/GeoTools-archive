@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import org.geotools.TestData;
 import org.geotools.data.DataStore;
+import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 
 
@@ -57,17 +58,17 @@ public class IndexedShapefileDataStoreFactoryTest extends TestCaseSupport {
     public void testCreateDataStoreMap() throws Exception {
         testCreateDataStore(true);
 
-        IndexedShapefileDataStore ds1 = testCreateDataStore(true);
-        IndexedShapefileDataStore ds2 = testCreateDataStore(true);
+        ShapefileDataStore ds1 = testCreateDataStore(true,true);
+        ShapefileDataStore ds2 = testCreateDataStore(true,true);
 
         assertSame(ds1, ds2);
 
-        ds2 = testCreateDataStore(false);
+        ds2 = testCreateDataStore(true,false);
         assertNotSame(ds1, ds2);
     }
 
-    private IndexedShapefileDataStore testCreateDataStore(boolean createIndex) throws Exception {
-        return testCreateDataStore(false, createIndex);
+    private ShapefileDataStore testCreateDataStore(boolean createIndex) throws Exception {
+        return testCreateDataStore( true, createIndex);
     }
 
     public void testNamespace() throws Exception {
@@ -86,25 +87,28 @@ public class IndexedShapefileDataStoreFactoryTest extends TestCaseSupport {
                  .getNamespace());
     }
 
-    private IndexedShapefileDataStore testCreateDataStore(boolean newDS,boolean createIndex)
+    private ShapefileDataStore testCreateDataStore(boolean newDS,boolean createIndex)
         throws Exception {
         copyShapefiles(ShapefileDataStoreTest.STATE_POP);
         Map map = new HashMap();
-        map.put(IndexedShapefileDataStoreFactory.URLP.key,
+        map.put(ShapefileDataStoreFactory.URLP.key,
             TestData.url(this, ShapefileDataStoreTest.STATE_POP));
-        map.put(IndexedShapefileDataStoreFactory.CREATE_SPATIAL_INDEX.key,
-            new Boolean(createIndex));
+        map.put(ShapefileDataStoreFactory.CREATE_SPATIAL_INDEX.key,
+                createIndex ? Boolean.TRUE : Boolean.FALSE );
 
-        IndexedShapefileDataStore ds;
+        ShapefileDataStore ds;
 
         if (newDS) {
-            ds = (IndexedShapefileDataStore) factory.createNewDataStore(map);
+            // This may provided a warning if the file already is created
+            ds = (ShapefileDataStore) factory.createNewDataStore(map);
         } else {
-            ds = (IndexedShapefileDataStore) factory.createDataStore(map);
+            ds = (ShapefileDataStore) factory.createDataStore(map);
         }
 
-        testDataStore(IndexedShapefileDataStore.TREE_QIX, createIndex, ds);
-
+        if( ds instanceof IndexedShapefileDataStore){
+            IndexedShapefileDataStore indexed = (IndexedShapefileDataStore) ds;
+            testDataStore(IndexedShapefileDataStore.TREE_QIX, createIndex, indexed);            
+        }
         return ds;
     }
 
@@ -114,8 +118,7 @@ public class IndexedShapefileDataStoreFactoryTest extends TestCaseSupport {
         assertEquals(treeType, ds.treeType);
         assertEquals(treeType != IndexedShapefileDataStore.TREE_NONE,
             ds.useIndex);
-        assertEquals(createIndex
-            && (treeType != IndexedShapefileDataStore.TREE_NONE),
+        assertEquals(createIndex && (treeType != IndexedShapefileDataStore.TREE_NONE),
             ds.createIndex);
     }
 
@@ -123,8 +126,8 @@ public class IndexedShapefileDataStoreFactoryTest extends TestCaseSupport {
      * Test method for 'org.geotools.data.shapefile.indexed.IndexedShapefileDataStoreFactory.createNewDataStore(Map)'
      */
     public void testCreateNewDataStore() throws Exception {
-        IndexedShapefileDataStore ds1 = testCreateDataStore(true);
-        IndexedShapefileDataStore ds2 = testCreateDataStore(true, true);
+        ShapefileDataStore ds1 = testCreateDataStore(true, false );
+        ShapefileDataStore ds2 = testCreateDataStore(true, true);
 
         assertNotSame(ds1, ds2);
     }

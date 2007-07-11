@@ -50,6 +50,7 @@ import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.TransactionStateDiff;
 import org.geotools.data.shapefile.ShapefileDataStore;
+import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.shapefile.dbf.DbaseFileException;
 import org.geotools.data.shapefile.dbf.DbaseFileHeader;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
@@ -248,41 +249,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 			boolean useMemoryMappedBuffer, boolean createIndex, byte treeType, Charset dbfCharset)
 			throws java.net.MalformedURLException {
 		super(url, namespace, true, dbfCharset);
-
-		String filename = null;
-
-		if (url == null) {
-			throw new NullPointerException("Null URL for ShapefileDataSource");
-		}
-
-		try {
-			filename = java.net.URLDecoder.decode(url.getFile(), "US-ASCII");
-		} catch (java.io.UnsupportedEncodingException use) {
-			throw new java.net.MalformedURLException("Unable to decode " + url
-				+ " cause " + use.getMessage());
-		}
-
-		String shpext = ".shp";
-		String dbfext = ".dbf";
-		String shxext = ".shx";
-		String grxext = ".grx";
-		String qixext = ".qix";
-		String fixext = ".fix";
-
-		if (filename.endsWith(shpext) || filename.endsWith(dbfext)
-				|| filename.endsWith(shxext)) {
-			filename = filename.substring(0, filename.length() - 4);
-		} else if (filename.endsWith(".SHP") || filename.endsWith(".DBF")
-				|| filename.endsWith(".SHX")) {
-			filename = filename.substring(0, filename.length() - 4);
-			shpext = ".SHP";
-			dbfext = ".DBF";
-			shxext = ".SHX";
-			grxext = ".GRX";
-			qixext = ".QIX";
-			fixext = ".FIX";
-		}
-
 		// test that the shx file can be accessed
 
 		this.treeType = treeType;
@@ -291,23 +257,23 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 		this.useIndex = treeType != TREE_NONE && isLocal();
 
 		if (this.isLocal()) {
-			fixURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + fixext);
+			fixURL = ShapefileDataStoreFactory.toFixURL(url);
 			if (treeType == TREE_QIX) {
-				treeURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + qixext);
+				treeURL = ShapefileDataStoreFactory.toQixURL(url);
 				this.treeType = TREE_QIX;
 				LOGGER.fine("Using qix tree");
 			} else if (treeType == TREE_GRX) {
-				treeURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + grxext);
+				treeURL = ShapefileDataStoreFactory.toGrxURL(url);
 				LOGGER.fine("Using grx tree");
 			} else {
-				treeURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + qixext);
+				treeURL = ShapefileDataStoreFactory.toQixURL(url);
 				this.treeType = TREE_NONE;
 			}
 			this.createIndex = new File(new File(treeURL.getFile()).getParent())
 					.canWrite()
 					&& createIndex && useIndex;
 		} else {
-			treeURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), filename + qixext);
+			treeURL = ShapefileDataStoreFactory.toQixURL(url);
 			this.treeType = TREE_NONE;
 			this.createIndex = false;
 			fixURL=null;

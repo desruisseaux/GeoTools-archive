@@ -43,9 +43,9 @@ public class ServiceTest extends TestCaseSupport {
     }
 
     /**
-     * Make sure that the loading mechanism is working properly.
+     * Make sure that the loading mechanism does not pick up this factory!
      */
-    public void testIsAvailable() {
+    public void testIsNotAvailable() {
         Iterator list = DataStoreFinder.getAvailableDataStores();
         boolean found = false;
 
@@ -59,8 +59,7 @@ public class ServiceTest extends TestCaseSupport {
                 break;
             }
         }
-
-        assertTrue("ShapefileDataSourceFactory not registered", found);
+        assertFalse("ShapefileDataSourceFactory not registered", found);
     }
 
     /**
