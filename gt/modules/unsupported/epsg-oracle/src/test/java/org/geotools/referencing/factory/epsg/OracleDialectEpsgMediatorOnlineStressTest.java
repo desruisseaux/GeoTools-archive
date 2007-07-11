@@ -32,10 +32,9 @@ import org.opengis.referencing.operation.MathTransform;
 public class OracleDialectEpsgMediatorOnlineStressTest extends
         OracleOnlineTestCase {
 
-    //tests currently fail with multiple threads
-    final static int RUNNER_COUNT = 1;
-    final static int ITERATIONS = 1;
-    final static int MAX_TIME = 10 * 60 * 1000;
+    final static int RUNNER_COUNT = 10;
+    final static int ITERATIONS = 50;
+    final static int MAX_TIME = 5 * 60 * 1000;
     
     OracleDialectEpsgMediator mediator;
     
@@ -67,7 +66,6 @@ public class OracleDialectEpsgMediatorOnlineStressTest extends
         if (exceptions != 0) {
             fail(exceptions + " exception(s) occurred");
         }
-        //System.out.println("DONE");
     }
     
     public class ClientThread extends TestRunnable {
@@ -116,8 +114,7 @@ public class OracleDialectEpsgMediatorOnlineStressTest extends
                             true);
                     DirectPosition pos = new DirectPosition2D(48.417, 123.35);
                     try {
-                        // transform.transform(pos, null);
-                        // DISABLED UNTIL THREADSAFE
+                        transform.transform(pos, null);
                     } catch (Exception e) {
                         // chomp
                     }
