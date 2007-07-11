@@ -44,9 +44,9 @@ import org.opengis.parameter.ParameterDescriptor;
 
 /**
  * A Format to allow discovery of Readers/Writers for raster images that support
- * world files containing information about the image. Supports .gif+.gfw,
- * .jpg/.jpeg+.jgw, .tif/.tiff+.tfw and .png+.pgw. .wld may be used in place of
- * the format specific extension (.jpg+.wld, etc) Designed to be used with
+ * world files containing information about the image. Supports gif+gfw,
+ * jpg/jpeg+jgw, tif/tiff+tfw and png+pgw. wld may be used in place of
+ * the format specific extension (jpg+wld, etc) Designed to be used with
  * GridCoverageExchange.
  * 
  * @source $URL:
