@@ -143,9 +143,11 @@ final class WeakObjectCache implements ObjectCache {
                 throw new IllegalMonitorStateException("Cannot unlock prior to locking");
             }
             lock.release();
-            if (lock.holds() == 0) {
-                locks.remove(key);
-            }
+            //TODO: stop lock from being removed when another worker is trying to acquire it
+            //TODO: review w/ J2SE 5.0
+            //if (lock.holds() == 0) {
+            //    locks.remove(key);
+            //}
         }
     }
 
