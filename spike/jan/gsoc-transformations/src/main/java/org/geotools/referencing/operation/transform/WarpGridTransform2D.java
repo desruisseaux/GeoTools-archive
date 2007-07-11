@@ -17,6 +17,8 @@ package org.geotools.referencing.operation.transform;
 
 import javax.media.jai.Warp;
 import javax.media.jai.WarpGrid;
+import javax.media.jai.WarpPolynomial;
+
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -30,7 +32,8 @@ import org.geotools.referencing.operation.MathTransformProvider;
 
 
 /**
- *
+ * Basic implementation of JAI's GridWarp Transformation. This class just encapsulate GridWarp into the 
+ * GeoTools transformations conventions. 
  * @author jezekjan
  *
  */
@@ -44,29 +47,34 @@ public class WarpGridTransform2D extends WarpTransform2D {
             new WarpGrid(xStart, xStep, xNumCells, yStart, yStep, yNumCells, warpPositions));
         warp = new WarpGrid(xStart, xStep, xNumCells, yStart, yStep, yNumCells, warpPositions);
 
-        inverse = null;
-
-        /*
-           for (int i=0; i<warpPositions.length; i++){
-                   warpPositions[i]=-warpPositions[i];
-           }
-           inverse = new WarpGrid(xStart, xStep, xNumCells, yStart, yStep, yNumCells, warpPositions); //TODO generate inverse warpgrid
-           System.out.print("dsd");
-         */
-
-        // super(warp, null);
+        inverse = null;      
     }
-
+    /**
+     * Constructs a transform using the specified warp object. 
+     * 
+     * @param warp    The image warp to wrap into a math transform.
+     * @param inverse An image warp to uses for the {@linkplain #inverse inverse transform},
+     *                or {@code null} in none.
+     */
     public WarpGridTransform2D(Warp warp, Warp inverse) {
         super(warp, inverse);
         this.warp = warp;
         this.inverse = inverse;
     }
-
+    
     public ParameterDescriptorGroup getParameterDescriptors() {
         return Provider.PARAMETERS;
     }
 
+    /**
+     *  
+     * The provider for the {@link WarpGridTransform2D}. This provider constructs a JAI
+     * {@linkplain GridWarp image warp} from a set of mapped positions,
+     * and wrap it in a {@link WarpTransform2D} object.  
+     *
+     * @author jezekjan
+     *
+     */
     public static class Provider extends MathTransformProvider {
         /** Serial number for interoperability with different versions. */
         private static final long serialVersionUID = -123487815665723468L;
@@ -148,7 +156,11 @@ public class WarpGridTransform2D extends WarpTransform2D {
             //TODO - inverse transform
             return new WarpGridTransform2D(warp, inverse);
         }
-
+        /**
+         * Calculates parameters inverse transformation.
+         * @param values Parameter values
+         * @return array of warp positions for inverse transformation
+         */
         protected float[] calculateInverse(final ParameterValueGroup values) {
             final int XSTART = intValue(xStart, values);
             final int XSTEP = intValue(xStep, values);

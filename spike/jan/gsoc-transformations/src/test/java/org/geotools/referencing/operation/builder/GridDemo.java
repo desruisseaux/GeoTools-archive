@@ -95,7 +95,8 @@ public class GridDemo {
 
             URL url = null;
 
-             url = new File("/home/jezekjan/gsoc/geodata/p1010099.tif").toURL();
+             url = new File("/home/jezekjan/gsoc/geodata/p1010099.tif").toURL();             
+             
            // url = new File("/media/sda5/Dokumenty/geodata/rasters/Mane_3_1_4.tif").toURL();
             WorldImageReader reader = new WorldImageReader(url);
             Operations operations = new Operations(null);                               

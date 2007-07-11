@@ -194,9 +194,10 @@ public class TPSGridBuilder extends WarpGridBuilder {
     	
         for (int i = 0; i < number; i++) {
             MappedPosition mp = ((MappedPosition) getMappedPositions().get(i));
-            V.setElement(i, 0, mp.getDelta(dim));
+          //  V.setElement(i, 0, mp.getDelta(dim));
+            V.setElement(i, 0, mp.getSource().getOrdinate(dim)-mp.getTarget().getOrdinate(dim));
+        
         }
-
         V.setElement(V.getNumRow() - 3, 0, 0);
         V.setElement(V.getNumRow() - 2, 0, 0);
         V.setElement(V.getNumRow() - 1, 0, 0);
@@ -212,12 +213,15 @@ public class TPSGridBuilder extends WarpGridBuilder {
             Cx.setRow(i,
                 new double[] {
                     position.getSource().getOrdinate(0), position.getSource().getOrdinate(1),
-                    position.getDelta(0)
+                   // position.getDelta(0)
+                    position.getSource().getOrdinate(0)-position.getTarget().getOrdinate(0)
                 });
             Cy.setRow(i,
                 new double[] {
                     position.getSource().getOrdinate(0), position.getSource().getOrdinate(1),
-                    position.getDelta(1)
+                   // position.getDelta(1)
+                    position.getSource().getOrdinate(1)-position.getTarget().getOrdinate(1)
+                    
                 });
         }
     }

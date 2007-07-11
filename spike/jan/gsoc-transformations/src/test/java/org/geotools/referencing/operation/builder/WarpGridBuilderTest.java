@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import org.opengis.geometry.Envelope;
-import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
@@ -25,6 +25,7 @@ import org.geotools.referencing.crs.DefaultEngineeringCRS;
 public class WarpGridBuilderTest extends TestCase {
     private double tolerance = 0.02; //cm
     private CoordinateReferenceSystem crs = DefaultEngineeringCRS.GENERIC_2D;
+    private boolean show = true;
 
     /**
      * Run the suite from the command line.
@@ -38,7 +39,7 @@ public class WarpGridBuilderTest extends TestCase {
     /**
      * Returns the test suite.
      *
-     * @return DOCUMENT ME!
+     * @return 
      */
     public static Test suite() {
         return new TestSuite(WarpGridBuilderTest.class);
@@ -48,7 +49,7 @@ public class WarpGridBuilderTest extends TestCase {
      * Generates Mapped positions inside specified envelope.
      * @param env Envelope
      * @param number Number of points to be generated
-     * @param deltas aproximatly the delats betwean source and target point.
+     * @param deltas approximately the deltas between source and target point.
      * @return
      */
     private List /*<MappedPositions>*/ generateMappedPositions(Envelope env, int number,
@@ -74,42 +75,60 @@ public class WarpGridBuilderTest extends TestCase {
         return vectors;
     }
 
+    /**
+     * Test of TPDWarpGridBuilder
+     *
+     */
     public void testTPSWarpGridBuilder() {
         try {
             // Envelope 20*20 km 
             Envelope env = new Envelope2D(crs, 0, 0, 20000, 20000);
 
-            // Generates 15 MappedPositions of aproximatly 2 m diferences
+            // Generates 15 MappedPositions of approximately 2 m differences
             List mp = generateMappedPositions(env, 15, 2, crs);
 
-            TPSGridBuilder builder = new TPSGridBuilder(mp, 500, 500, env);
+            WarpGridBuilder builder = new IDWGridBuilder(mp, 100, 100, env);
 
-            // Uncoment to show the grid
-            //(new GridCoverageFactory()).create("",builder.getDxGrid(),env).show();
+            if (show == true) {
+                (new GridCoverageFactory()).create("IDW - dx", builder.getDxGrid(), env).show();
+                (new GridCoverageFactory()).create("IDW - dy", builder.getDyGrid(), env).show();
+            }
+
             assertBuilder(builder);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    
+
+    /**
+     * Test of IDWDWarpGridBuilder
+     *
+     */
     public void testIDWarpGridBuilder() {
         try {
             // Envelope 20*20 km 
             Envelope env = new Envelope2D(crs, 0, 0, 20000, 20000);
 
-            // Generates 15 MappedPositions of aproximatly 2 m diferences
+            // Generates 15 MappedPositions of approximately 2 m differences
             List mp = generateMappedPositions(env, 15, 2, crs);
 
-            TPSGridBuilder builder = new TPSGridBuilder(mp, 500, 500, env);
+            WarpGridBuilder builder = new TPSGridBuilder(mp, 100, 100, env);
 
-            // Uncoment to show the grid
-            //(new GridCoverageFactory()).create("",builder.getDxGrid(),env).show();
+            if (show == true) {
+                (new GridCoverageFactory()).create("TPS - dx", builder.getDxGrid(), env).show();
+                (new GridCoverageFactory()).create("TPS - dy", builder.getDyGrid(), env).show();
+            }
+
             assertBuilder(builder);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Tests that transformed source point fits to target point (considering tolerance).
+     * @param builder
+     */
     private void assertBuilder(MathTransformBuilder builder) {
         List mp = builder.getMappedPositions();
 
