@@ -118,6 +118,12 @@
       <artifactId>hsqldb</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
+    <dependency>
+      <groupId>net.sourceforge.groboutils</groupId>
+      <artifactId>groboutils-core</artifactId>
+      <version>5</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
 
