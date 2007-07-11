@@ -59,21 +59,28 @@ public class OracleDialectEpsgMediatorOnlineStressTest extends
         MultiThreadedTestRunner mttr = new MultiThreadedTestRunner(runners, null);
         mttr.runTestRunnables(MAX_TIME);
         
-//        for (int i = 0; i < runnerCount; i++) {
-//            ClientThread thread = (ClientThread) runners[i];
-//        }
+        int exceptions = 0;
+        for (int i = 0; i < RUNNER_COUNT; i++) {
+            ClientThread thread = (ClientThread) runners[i];
+            exceptions += thread.exceptions;
+        }
+        if (exceptions != 0) {
+            fail(exceptions + " exception(s) occurred");
+        }
+        //System.out.println("DONE");
     }
     
     public class ClientThread extends TestRunnable {
 
         String values;
         int id = -1; //thread identifier
+        public int exceptions = 0;
         
         /** number of iterations to perform */
         public int iterations = 10;
 
         Random rand = new Random();
-        String[] codes = {"3005", "4145", "2729", "2166", "2043", "31528", "2936", "32639", "5775"};
+        String[] codes = {"3005", "4145", "2729", "2166", "2043", "31528", "2936", "32639"};
 
         OracleDialectEpsgMediator mediator; //victim
         
@@ -83,7 +90,7 @@ public class OracleDialectEpsgMediatorOnlineStressTest extends
         }
 
         private String getRandomCode() {
-            return codes[rand.nextInt(codes.length - 1)];
+            return codes[rand.nextInt(codes.length)];
         }
         
         private CoordinateReferenceSystem acquireCRS(String code) throws FactoryException {
@@ -101,15 +108,24 @@ public class OracleDialectEpsgMediatorOnlineStressTest extends
                 while (code2 == null || code1.equalsIgnoreCase(code2)) {
                     code2 = getRandomCode();
                 }
-                CoordinateReferenceSystem crs2 = acquireCRS(code2);
-                
-                //reproject
-                MathTransform transform = CRS.findMathTransform(crs1, crs2, true);
-                DirectPosition pos = new DirectPosition2D(48.417, 123.35);
                 try {
-                    transform.transform(pos, null);
+                    CoordinateReferenceSystem crs2 = acquireCRS(code2);
+
+                    // reproject
+                    MathTransform transform = CRS.findMathTransform(crs1, crs2,
+                            true);
+                    DirectPosition pos = new DirectPosition2D(48.417, 123.35);
+                    try {
+                        // transform.transform(pos, null);
+                        // DISABLED UNTIL THREADSAFE
+                    } catch (Exception e) {
+                        // chomp
+                    }
                 } catch (Exception e) {
-                    //chomp
+                    exceptions++;
+                    System.out.println("Exception in Thread " + id + ", EPSG: " + code2);
+                    //TODO: save exception
+                    e.printStackTrace();
                 }
                 
                 //TODO: record time elapsed
