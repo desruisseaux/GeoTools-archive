@@ -61,7 +61,7 @@ public class ShapefileServiceTest extends TestCaseSupport {
 	    HashMap params = new HashMap();
         params.put( ShapefileDataStoreFactory.URLP.key, url );
         
-        Service service = new ShapefileService( null, url.toURI() , params );
+        Service service = new ShapefileService( null, new URI(url.toString()) , params );
         
         // show we can connect
         ServiceInfo info = service.getInfo(null);
