@@ -37,6 +37,9 @@ import org.geotools.referencing.operation.transform.WarpTransform2D;
 
 
 /**
+ * Provides a basic implementation for {@linkplain WarpGridTransform2D warp grid math transform} builders.
+ * 
+ * @see <A HREF="http://java.sun.com/products/java-media/jai/forDevelopers/jai-apidocs/javax/media/jai/WarpGrid.html">WarpGrid at JAI </A>
  *
  * @author jezekjan
  *
@@ -81,18 +84,18 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
      * Grid of y shifts
      */
     private float[][] dygrid;
-    
+
     /**
      * Warp positions
      */
     private float[] warpPositions;
 
     /**
-     * Construts Builder 
-     * @param vectors
+     * Constructs Builder
+     * @param vectors Mapped positions
      * @param dx The horizontal spacing between grid cells.
      * @param dy The vertical spacing between grid cells.
-     * @param Envelope Envelope of generated grid.
+     * @param envelope Envelope of generated grid.
      * @throws MismatchedSizeException
      * @throws MismatchedDimensionException
      * @throws MismatchedReferenceSystemException
@@ -106,7 +109,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
         globalValues = new GridParamValues(envelope, realToGrid, dx, dy);
 
         super.setMappedPositions(transformMPToGrid(vectors));
-        this.envelope = envelope;                     
+        this.envelope = envelope;
     }
 
     /**
@@ -133,7 +136,6 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
         }
 
         return localpositions;
-        
     }
 
     private void ensureVectorsInsideEnvelope() {
@@ -146,7 +148,8 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
      * @see org.geotools.referencing.operation.builder.MathTransformBuilder#computeMathTransform()
      */
     protected MathTransform computeMathTransform() throws FactoryException {
-    	warpPositions  = getGrid();    	
+        warpPositions = getGrid();
+
         return (WarpTransform2D) (new WarpGridTransform2D.Provider()).createMathTransform(globalValues
             .getWarpGridParameters());
     }
@@ -160,28 +163,28 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
     }
 
     /**
-     * Computes GridWarp Positions using IDW interpolatio.
+     * Computes WarpGrid Positions.
      *
      */
     abstract protected float[] computeWarpGrid(ParameterValueGroup values);
-    
+
     /**
-     * 
+     * Returs Grid
      * @return
      */
-    private float[] getGrid(){
-    	if (warpPositions == null){
-    		warpPositions = computeWarpGrid(globalValues.WarpGridParameters);
-    	}
-    	else {
-    		return warpPositions;
-    	}
-    	return warpPositions;
+    private float[] getGrid() {
+        if (warpPositions == null) {
+            warpPositions = computeWarpGrid(globalValues.WarpGridParameters);
+        } else {
+            return warpPositions;
+        }
+
+        return warpPositions;
     }
 
     /**
-     * 
-     * @return
+     * Return array of Shifts. This method is useful to create Coverage2D object.
+     * @return array of Shifts
      */
     public float[][] getDxGrid() {
         if ((dxgrid == null) || (dxgrid.length == 0)) {
@@ -205,6 +208,10 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
         return dxgrid;
     }
 
+    /**
+     * Return array of Shifts. This method is useful to create Coverage2D object.
+     * @return array of Shifts
+     */
     public float[][] getDyGrid() {
         if ((dygrid == null) || (dygrid.length == 0)) {
             ParameterValueGroup WarpParams = globalValues.WarpGridParameters;
@@ -214,13 +221,13 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
             final int yStep = WarpParams.parameter("yStep").intValue();
 
             final float[] warpPositions = getGrid();
-            
+
             dygrid = new float[yNumCells + 1][xNumCells + 1];
 
             for (int i = 0; i <= WarpParams.parameter("yNumCells").intValue(); i++) {
                 for (int j = 0; j <= WarpParams.parameter("xNumCells").intValue(); j++) {
-                    dygrid[i][j] = (float) warpPositions[(int) ((i * (1 + xNumCells) * 2) + (2 * j)+1)]
-                        - (i * yStep);
+                    dygrid[i][j] = (float) warpPositions[(int) ((i * (1 + xNumCells) * 2) + (2 * j)
+                        + 1)] - (i * yStep);
                 }
             }
         }
@@ -228,15 +235,23 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
         return dygrid;
     }
 
-  
     /**
-     *
+     * Takes care about parameters
      * @author jezekjan
      *
      */
     private static class GridParamValues {
+    	
         private ParameterValueGroup WarpGridParameters;
 
+        /**
+         * Constructs GridParamValues from such properties.
+         * @param env Envelope
+         * @param trans Transformation to Grid CRS.
+         * @param dx x step
+         * @param dy y step
+         * @throws TransformException
+         */
         public GridParamValues(Envelope env, MathTransform trans, double dx, double dy)
             throws TransformException {
             Envelope dxdy = new Envelope2D(env.getCoordinateReferenceSystem(), env.getMinimum(0),
@@ -269,10 +284,18 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
             }
         }
 
+        /**
+         * Sets the grid warp positions in
+         * @param warpPos array of grid warp positions
+         */
         public void setGridWarpPostions(float[] warpPos) {
             WarpGridParameters.parameter("warpPositions").setValue(warpPos);
         }
 
+        /**
+         * Returns warp grid positions.
+         * @return warp grid positions
+         */
         public ParameterValueGroup getWarpGridParameters() {
             return WarpGridParameters;
         }

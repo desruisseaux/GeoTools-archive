@@ -68,16 +68,16 @@ public class WarpGridTransform2D extends WarpTransform2D {
 
     /**
      *  
-     * The provider for the {@link WarpGridTransform2D}. This provider constructs a JAI
-     * {@linkplain GridWarp image warp} from a set of mapped positions,
-     * and wrap it in a {@link WarpTransform2D} object.  
+     * The provider for the {@linkplain WarpGridTransform2D}. This provider constructs a JAI
+     * {@linkplain WarpGrid image warp} from a set of mapped positions,
+     * and wrap it in a {@linkplain WarpGridTransform2D} object.  
      *
      * @author jezekjan
      *
      */
     public static class Provider extends MathTransformProvider {
         /** Serial number for interoperability with different versions. */
-        private static final long serialVersionUID = -123487815665723468L;
+        private static final long serialVersionUID = -1126785723468L;
 
         /** Descriptor for the "{@link WarpGrid#getXStart  xStart}" parameter value. */
         public static final ParameterDescriptor xStart = new DefaultParameterDescriptor("xStart",
@@ -103,7 +103,7 @@ public class WarpGridTransform2D extends WarpTransform2D {
         public static final ParameterDescriptor yNumCells = new DefaultParameterDescriptor("yNumCells",
                 int.class, null, null);
 
-        /** Descriptor for the "{@link WarpGrid#warpPositions  warpPositions}" parameter value. */
+        /** Descriptor for the warpPositions parameter value. */
         public static final ParameterDescriptor warpPositions = new DefaultParameterDescriptor("warpPositions",
                 float[].class, null, null);
 
