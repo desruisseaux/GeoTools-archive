@@ -86,9 +86,10 @@ public class TestUtilites {
 
     public static IndexedShapefileDataStore getPoints() throws IOException {
         URL url = TestData.url("shapes/pointtest.shp");
-        IndexedShapefileDataStoreFactory factory = new IndexedShapefileDataStoreFactory();
-
-        return (IndexedShapefileDataStore) factory.createDataStore(url);
+        //IndexedShapefileDataStoreFactory factory = new IndexedShapefileDataStoreFactory();
+        //return (IndexedShapefileDataStore) factory.createDataStore(url);
+        
+        return new IndexedShapefileDataStore(url);
     }
 
     public static Style createTestStyle(String polyName, String lineName)
