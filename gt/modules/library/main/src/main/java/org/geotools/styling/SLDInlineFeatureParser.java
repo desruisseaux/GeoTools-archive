@@ -217,7 +217,7 @@ public class SLDInlineFeatureParser
 	 *  return the corresponding value.
 	 * @param child
 	 */
-	private Object getValue(Node root) 
+	private Object getValue(Node root) throws Exception
 	{
 		NodeList children = root.getChildNodes();
 		StringBuffer strVal = new StringBuffer();
@@ -260,7 +260,7 @@ public class SLDInlineFeatureParser
 	 * 
 	 * @param root  -- points to "<gml:Point>"
 	 */
-	private Geometry parseGeometry(Node root) 
+	private Geometry parseGeometry(Node root) throws Exception
 	{
 		NamedNodeMap atts = root.getAttributes();
 		if (SRS == null) //try to avoid parsing more than once.
@@ -272,27 +272,6 @@ public class SLDInlineFeatureParser
 			}
 		}
 		return ExpressionDOMParser.parseGML(root);
-	}
-
-	/**
-	 *  expected input:
-	 *  "http://www.opengis.net/gml/srs/epsg.xml#4326"
-	 *   NOTE: only supports epsg#s.
-	 * @param srs
-	 */
-	private void parseSRS(String srs) 
-	{
-		 if (srs ==null)
-		 	return;
-		 String epsgCode = srs.substring(srs.indexOf('#')+1);
-		 try {
-		 	int srsnum = Integer.parseInt(epsgCode);
-		    SRS= getSRS(srsnum);
-		 }
-		 catch (Exception e)
-		 {
-		 	System.out.println("couldnt decode SRS - EPSG:"+epsgCode+". currently only supporting EPSG #"); // dont report to user - just put in log
-		 }		
 	}
 
 	/**
@@ -489,7 +468,9 @@ public class SLDInlineFeatureParser
 			//okay, have a tag, check to see if its a geometry
 			if (isGeometry(child))
 			{
-				attType = AttributeTypeFactory.newAttributeType(childName,Geometry.class);
+			    // force full geometry parsing so that we get to know the declared SRS
+			    getValue(child);
+				attType = AttributeTypeFactory.newAttributeType(childName,Geometry.class, true,  0, null, SRS);
 			}
 			else
 			{
@@ -556,6 +537,20 @@ public class SLDInlineFeatureParser
 	{
 		return uniqueNumber++;
 	}
+	
+	/**
+     *  expected input:
+     *  "http://www.opengis.net/gml/srs/epsg.xml#4326"
+     *   NOTE: only supports epsg#s.
+     * @param srs
+     */
+    private void parseSRS(String srs) throws Exception {
+         if (srs ==null)
+            return;
+         String epsgCode = srs.substring(srs.indexOf('#')+1);
+         int srsnum = Integer.parseInt(epsgCode);
+         SRS= getSRS(srsnum);
+    }
 	
 	/**
      *  simple way of getting epsg #.

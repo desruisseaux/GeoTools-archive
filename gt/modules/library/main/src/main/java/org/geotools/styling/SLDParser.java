@@ -439,8 +439,7 @@ public class SLDParser {
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
-			throw new IllegalArgumentException(e.getLocalizedMessage());
+			throw (IllegalArgumentException) new IllegalArgumentException().initCause(e);
 		}
 		
 	}
