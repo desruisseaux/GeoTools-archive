@@ -474,7 +474,7 @@ public class ShapefileDataStoreFactory
             filename = filename.substring(0, filename.length() - 4);
             filename += ".FIX";            
         }
-        return new URL(url.getProtocol(), url.getHost(), url.getPort(), filename );
+        return new URL(filename);
     }
     /** Figure out the URL for the "qix" file */
     public static URL toQixURL( URL url ) throws java.net.MalformedURLException {
@@ -488,7 +488,7 @@ public class ShapefileDataStoreFactory
             filename = filename.substring(0, filename.length() - 4);
             filename += ".QIX";            
         }
-        return new URL(url.getProtocol(), url.getHost(), url.getPort(), filename );
+        return new URL(filename);
     }
     
     /** Figure out the URL for the "grx" file */
@@ -503,7 +503,7 @@ public class ShapefileDataStoreFactory
             filename = filename.substring(0, filename.length() - 4);
             filename += ".GRX";            
         }
-        return new URL(url.getProtocol(), url.getHost(), url.getPort(), filename );
+        return new URL(filename);
     }
     
     /** Figure out the URL for the "prj" file */
@@ -518,15 +518,32 @@ public class ShapefileDataStoreFactory
             filename = filename.substring(0, filename.length() - 4);
             filename += ".SHP.XML";            
         }
-        return new URL(url.getProtocol(), url.getHost(), url.getPort(), filename );
+        return new URL(filename);
     }
 
+    /**
+     * Convert a URL to a String that is suitable for manipulation of its
+     * extension (generally the last three characters of the file).
+     * 
+     * This uses URL.toExternalForm() in order to preserve valuable
+     * information about the URL's Authority.
+     * 
+     * @param url the url to convert to a String. Must not be null.
+     * @return a String representation of the URL
+     * @throws MalformedURLException if the url is invalid
+     */
     public static String toFilename( URL url ) throws MalformedURLException {
         if (url == null) {
             throw new NullPointerException("A shapefile URL is required");
         }
         try {
-            return java.net.URLDecoder.decode(url.getFile(),"US-ASCII");
+        	/*
+        	 * The use of the four parameter URL constructor is discouraged
+        	 * as it throws away valuable information about the authority that
+        	 * the URL is hosted by. It is better if we use the full URL
+        	 * String to reconstruct the other URLs.
+        	 */
+            return java.net.URLDecoder.decode(url.toExternalForm(),"US-ASCII");
         } catch (java.io.UnsupportedEncodingException use) {
             throw new java.net.MalformedURLException("Unable to decode " + url
                 + " cause " + use.getMessage());
@@ -545,7 +562,7 @@ public class ShapefileDataStoreFactory
             filename = filename.substring(0, filename.length() - 4);
             filename += ".PRJ";            
         }
-        return new URL(url.getProtocol(), url.getHost(), url.getPort(), filename );
+        return new URL(filename);
     }
 
     /** Figure out the URL for the "shx" file */
@@ -560,7 +577,7 @@ public class ShapefileDataStoreFactory
             filename = filename.substring(0, filename.length() - 4);
             filename += ".SHX";            
         }
-        return new URL(url.getProtocol(), url.getHost(), url.getPort(), filename );
+        return new URL(filename);
     }
 
     /** Figure out the URL for the "dbf" file */
@@ -575,7 +592,7 @@ public class ShapefileDataStoreFactory
             filename = filename.substring(0, filename.length() - 4);
             filename += ".DBF";            
         }
-        return new URL(url.getProtocol(), url.getHost(), url.getPort(), filename );
+        return new URL(filename);
     }
 
     /** Figure out the URL for the "shp" file */
@@ -590,6 +607,6 @@ public class ShapefileDataStoreFactory
             filename = filename.substring(0, filename.length() - 4);
             filename += ".SHP";            
         }
-        return new URL(url.getProtocol(), url.getHost(), url.getPort(), filename );
+        return new URL(filename);
     }
 }
