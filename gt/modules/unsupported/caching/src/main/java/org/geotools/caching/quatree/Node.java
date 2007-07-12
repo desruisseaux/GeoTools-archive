@@ -15,16 +15,22 @@
  */
 package org.geotools.caching.quatree;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import org.geotools.caching.spatialindex.spatialindex.INode;
 import org.geotools.caching.spatialindex.spatialindex.IShape;
 import org.geotools.caching.spatialindex.spatialindex.Region;
 
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 
 public class Node implements INode {
     private Region bounds;
+    protected NodeCacheEntry entry;
     protected int numShapes;
     protected int[] shapesId;
     protected byte[][] shapesData;
@@ -36,9 +42,9 @@ public class Node implements INode {
     protected int level;
 
     // Constructors
-    
+
     /** Constructor : creates a new node descending from another node.
-     * 
+     *
      * @param s envelope of new node
      * @param id of new node
      * @param parent node
@@ -52,6 +58,7 @@ public class Node implements INode {
         this.shapesId = new int[4];
         Arrays.fill(shapesId, -1);
         this.shapesData = new byte[4][];
+        this.entry = new NodeCacheEntry(this);
 
         if (parent == null) {
             this.level = 0;
@@ -59,17 +66,17 @@ public class Node implements INode {
             this.level = parent.level - 1;
         }
     }
-    
+
     /** Constructor : creates a root node.
      * Supplied level parameter indicates the maximum height of the tree.
-     * 
+     *
      * @param s envelope of new node
      * @param id of new node
-     * @param level is the maximum height of the tree. Must be > 0. 
+     * @param maxDepth is the maximum height of the tree. Must be > 0.
      */
-    protected Node(Region s, int id, int level) {
-    	this(s, id, null) ;
-    	this.level = level ;
+    protected Node(Region s, int id, int maxDepth) {
+        this(s, id, null);
+        this.level = maxDepth;
     }
 
     // Interface
@@ -103,6 +110,43 @@ public class Node implements INode {
 
     public IShape getShape() {
         return bounds;
+    }
+
+    // Additional public methods, for our caching purpose
+
+    /** Attach features to this node
+     *
+     * @param feature to attach to this node
+     */
+    public void attach(Feature f) {
+        this.entry.linkedFeatures.add(f);
+    }
+
+    /** Attach a list of features to this node
+     *
+     * @param list of features
+     */
+    public void attach(FeatureCollection features) {
+        FeatureIterator it = features.features();
+
+        try {
+            while (it.hasNext()) {
+                attach((Feature) it.next());
+            }
+        } finally {
+            features.close(it);
+        }
+    }
+
+    /** Hit node, cause access statistics to be updated.
+     * Actually, hit associated NodeCacheEntry
+     */
+    public void hit() {
+        this.entry.hit();
+    }
+
+    public boolean isValid() {
+        return this.entry.isValid();
     }
 
     // Internal
@@ -140,7 +184,7 @@ public class Node implements INode {
      * @param in an Envelope to split
      * @return an array of 2 Envelopes
      */
-    protected Region[] splitBounds(Region in, double SPLITRATIO) {
+    public static Region[] splitBounds(Region in, double SPLITRATIO) {
         Region[] ret = new Region[2];
         double range;
         double calc;
@@ -202,15 +246,16 @@ public class Node implements INode {
         numShapes--;
 
         //if (numShapes == 0) {
-        // do we have to to something ?
+        // do we have to do something ?
         //}
     }
-    
+
     public String toString() {
-    	StringBuffer r = new StringBuffer() ;
-    	r.append("Node ID=" + this.id + " ") ;
-    	r.append("# of data=" + this.numShapes + " ") ;
-    	r.append("MBR=" + this.bounds) ;
-    	return r.toString() ;
+        StringBuffer r = new StringBuffer();
+        r.append("Node ID=" + this.id + " ");
+        r.append("# of data=" + this.numShapes + " ");
+        r.append("MBR=" + this.bounds);
+
+        return r.toString();
     }
 }

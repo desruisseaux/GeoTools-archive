@@ -15,19 +15,12 @@
  */
 package org.geotools.caching.impl;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.logging.Level;
 import com.vividsolutions.jts.geom.Envelope;
-import org.opengis.filter.Filter;
+
 import org.geotools.caching.DataCache;
 import org.geotools.caching.FeatureIndex;
 import org.geotools.caching.QueryTracker;
+
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
@@ -40,6 +33,7 @@ import org.geotools.data.InProcessLockingManager;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
@@ -47,6 +41,18 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.SimpleFeature;
+
+import org.opengis.filter.Filter;
+
+import java.io.IOException;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.logging.Level;
 
 
 /** Implementation of DataCache that uses in-memory storage,
@@ -88,7 +94,8 @@ public class InMemoryDataCache extends AbstractDataStore implements DataCache {
             String[] types = ds.getTypeNames();
 
             for (int i = 0; i < types.length; i++) {
-                CacheInternalEngine engine = new CacheInternalEngine(this, ds.getSchema(types[i]));
+                CacheInternalEngine engine = new CacheInternalEngine(this,
+                        ds.getSchema(types[i]));
                 engines.put(types[i], engine);
             }
         } catch (IOException e) {
@@ -156,7 +163,8 @@ public class InMemoryDataCache extends AbstractDataStore implements DataCache {
     }
 
     public String[] getTypeNames() throws IOException {
-        return (String[]) engines.keySet().toArray(new String[engines.keySet().size()]);
+        return (String[]) engines.keySet()
+                                 .toArray(new String[engines.keySet().size()]);
     }
 
     /* (non-Javadoc)
@@ -220,7 +228,8 @@ public class InMemoryDataCache extends AbstractDataStore implements DataCache {
             CacheInternalEngine engine = new CacheInternalEngine(this, ft);
             engines.put(ftname, engine);
         } catch (IOException e) {
-            AbstractDataStore.LOGGER.log(Level.SEVERE, "Exception when updating schema", e);
+            AbstractDataStore.LOGGER.log(Level.SEVERE,
+                "Exception when updating schema", e);
         }
     }
 
@@ -232,14 +241,16 @@ public class InMemoryDataCache extends AbstractDataStore implements DataCache {
         throws IOException {
         return new FeatureReader() {
                 FeatureType featureType = source.getSchema(typeName);
-                Iterator iterator = source.getFeatureSource(typeName).getFeatures().iterator();
+                Iterator iterator = source.getFeatureSource(typeName)
+                                          .getFeatures().iterator();
 
                 public FeatureType getFeatureType() {
                     return featureType;
                 }
 
                 public Feature next()
-                    throws IOException, IllegalAttributeException, NoSuchElementException {
+                    throws IOException, IllegalAttributeException,
+                        NoSuchElementException {
                     if (iterator == null) {
                         throw new IOException("Feature Reader has been closed");
                     }
@@ -247,7 +258,8 @@ public class InMemoryDataCache extends AbstractDataStore implements DataCache {
                     try {
                         return featureType.duplicate((Feature) iterator.next());
                     } catch (NoSuchElementException end) {
-                        throw new DataSourceException("There are no more Features", end);
+                        throw new DataSourceException("There are no more Features",
+                            end);
                     }
                 }
 
@@ -283,11 +295,12 @@ public class InMemoryDataCache extends AbstractDataStore implements DataCache {
         }
     }
 
-    protected FeatureWriter createFeatureWriter(final String typeName, final Transaction transaction)
-        throws IOException {
+    protected FeatureWriter createFeatureWriter(final String typeName,
+        final Transaction transaction) throws IOException {
         // Not sure of what I am doing
         // If I pass provided transaction to source.getFeatureWriter, two transaction.commit() are needed to complete transaction.
-        FeatureWriter writer = source.getFeatureWriter(typeName, Transaction.AUTO_COMMIT);
+        FeatureWriter writer = source.getFeatureWriter(typeName,
+                Transaction.AUTO_COMMIT);
 
         return writer;
 
@@ -406,6 +419,6 @@ public class InMemoryDataCache extends AbstractDataStore implements DataCache {
        }*/
 
     /*protected FeatureWriter getFeatureWriter(String typeName) throws IOException {
-    
+
                                     }*/
 }

@@ -18,7 +18,9 @@ package org.geotools.caching.impl;
 import org.geotools.caching.DataCache;
 import org.geotools.caching.FeatureIndex;
 import org.geotools.caching.QueryTracker;
+
 import org.geotools.data.DataStore;
+
 import org.geotools.feature.FeatureType;
 
 

@@ -3,9 +3,8 @@
  */
 package org.geotools.caching.impl;
 
-import java.io.IOException;
-import org.opengis.filter.Filter;
 import org.geotools.caching.DataCache;
+
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
@@ -13,15 +12,21 @@ import org.geotools.data.FeatureWriter;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
+
+import org.opengis.filter.Filter;
+
+import java.io.IOException;
 
 
 /**
  * @author Christophe Rousson, SoC 2007, CRG-ULAVAL
  *
  */
-public abstract class AbstractDataCache extends AbstractDataStore implements DataCache {
+public abstract class AbstractDataCache extends AbstractDataStore
+    implements DataCache {
     /* (non-Javadoc)
      * @see org.geotools.caching.DataCache#clear()
      */
@@ -72,8 +77,8 @@ public abstract class AbstractDataCache extends AbstractDataStore implements Dat
     /* (non-Javadoc)
      * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String, org.geotools.data.Transaction)
      */
-    public FeatureWriter getFeatureWriter(String typeName, Transaction transaction)
-        throws IOException {
+    public FeatureWriter getFeatureWriter(String typeName,
+        Transaction transaction) throws IOException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -81,8 +86,8 @@ public abstract class AbstractDataCache extends AbstractDataStore implements Dat
     /* (non-Javadoc)
      * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String, org.opengis.filter.Filter, org.geotools.data.Transaction)
      */
-    public FeatureWriter getFeatureWriter(String typeName, Filter filter, Transaction transaction)
-        throws IOException {
+    public FeatureWriter getFeatureWriter(String typeName, Filter filter,
+        Transaction transaction) throws IOException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -90,8 +95,8 @@ public abstract class AbstractDataCache extends AbstractDataStore implements Dat
     /* (non-Javadoc)
      * @see org.geotools.data.DataStore#getFeatureWriterAppend(java.lang.String, org.geotools.data.Transaction)
      */
-    public FeatureWriter getFeatureWriterAppend(String typeName, Transaction transaction)
-        throws IOException {
+    public FeatureWriter getFeatureWriterAppend(String typeName,
+        Transaction transaction) throws IOException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -123,7 +128,8 @@ public abstract class AbstractDataCache extends AbstractDataStore implements Dat
     /* (non-Javadoc)
      * @see org.geotools.data.DataStore#getView(org.geotools.data.Query)
      */
-    public FeatureSource getView(Query query) throws IOException, SchemaException {
+    public FeatureSource getView(Query query)
+        throws IOException, SchemaException {
         // TODO Auto-generated method stub
         return null;
     }

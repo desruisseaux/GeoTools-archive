@@ -15,16 +15,18 @@
  */
 package org.geotools.caching.util;
 
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.IllegalAttributeException;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
 
 
 /** Simple marshaller that can write features to an ObjectOutputStream.
@@ -159,8 +161,9 @@ public class FeatureMarshaller {
         String fid = (String) s.readObject();
         int natt = s.readInt();
 
-        if (!(typeHash == type.hashCode()) && (typeName.equals(type.getTypeName()))
-                && (natt == type.getAttributeCount())) {
+        if (!(typeHash == type.hashCode()) &&
+                (typeName.equals(type.getTypeName())) &&
+                (natt == type.getAttributeCount())) {
             throw new IOException("Schema error");
         }
 

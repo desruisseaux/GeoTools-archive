@@ -15,11 +15,8 @@
  */
 package org.geotools.caching.quatree;
 
-import java.util.Stack;
-import java.util.logging.Logger;
 import org.geotools.caching.spatialindex.spatialindex.IData;
 import org.geotools.caching.spatialindex.spatialindex.INearestNeighborComparator;
-import org.geotools.caching.spatialindex.spatialindex.INode;
 import org.geotools.caching.spatialindex.spatialindex.INodeCommand;
 import org.geotools.caching.spatialindex.spatialindex.IQueryStrategy;
 import org.geotools.caching.spatialindex.spatialindex.IShape;
@@ -28,6 +25,9 @@ import org.geotools.caching.spatialindex.spatialindex.IStatistics;
 import org.geotools.caching.spatialindex.spatialindex.IVisitor;
 import org.geotools.caching.spatialindex.spatialindex.Region;
 import org.geotools.caching.spatialindex.storagemanager.PropertySet;
+
+import java.util.Stack;
+import java.util.logging.Logger;
 
 
 /** A QuadTree implementation, inspired by the shapefile quadtree in org.geotools.index.quadtree,
@@ -44,7 +44,7 @@ import org.geotools.caching.spatialindex.storagemanager.PropertySet;
  *
  * 2007-07-10: implemented maximum depth : allow to specify that the tree must not grow more than n levels
  * TODO: implement full interface
- * TODO: allow to extend the tree from top, by changing root node
+ * 2007-07-11: allowed to extend the tree from top, by changing root node
  * TODO: make tree serializable or loadable from disk
  *
  */
@@ -55,13 +55,14 @@ public class QuadTree implements ISpatialIndex {
      * I guess that we want quadrants to overlap a bit, due to roundoff errors.
      * Defaults to orginial value picked in org.geotools.index.quadtree.QuadTree
      */
-    private static final double SPLITRATIO = 0.55d;
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.caching.quadtree");
+    protected static final double SPLITRATIO = 0.55d;
+    protected static final Logger LOGGER = Logger.getLogger(
+            "org.geotools.caching.quadtree");
 
     /**
      * First node of the tree, pointing recursively to all other nodes.
      */
-    private Node root;
+    protected Node root;
 
     // Constructors
 
@@ -73,15 +74,15 @@ public class QuadTree implements ISpatialIndex {
     public QuadTree(Region bounds, int maxHeight) {
         this.root = new Node(new Region(bounds), 0, maxHeight);
     }
-    
+
     /** Creates a new QuadTree with first node with given bounds.
      * Tree height defaults to 20 levels.
-     * Use @see QuadTree(Region, int) to specify height.  
-     * 
+     * Use @see QuadTree(Region, int) to specify height.
+     *
      * @param root node bounds
      */
     public QuadTree(Region bounds) {
-    	this(bounds, 20) ;
+        this(bounds, 20);
     }
 
     // Interface
@@ -118,7 +119,8 @@ public class QuadTree implements ISpatialIndex {
                 }
 
                 for (int i = 0; i < current.numShapes; i++) {
-                    v.visitData(new Data(current.shapesData[i], null, current.shapesId[i]));
+                    v.visitData(new Data(current.shapesData[i], null,
+                            current.shapesId[i]));
                 }
 
                 current.visited = true;
@@ -162,13 +164,13 @@ public class QuadTree implements ISpatialIndex {
     }
 
     public void insertData(byte[] data, IShape shape, int id) {
-    	if (this.root.getShape().contains(shape)) {
-    		insertData(this.root, data, shape, id);
-    	} else {
-    		createNewRoot(shape) ;
-    		assert (this.root.getShape().contains(shape)) ;
-    		insertData(this.root, data, shape, id) ;
-    	}
+        if (this.root.getShape().contains(shape)) {
+            insertData(this.root, data, shape, id);
+        } else {
+            createNewRoot(shape);
+            assert (this.root.getShape().contains(shape));
+            insertData(this.root, data, shape, id);
+        }
     }
 
     public void intersectionQuery(IShape query, IVisitor v) {
@@ -192,7 +194,8 @@ public class QuadTree implements ISpatialIndex {
                 }
 
                 for (int i = 0; i < current.numShapes; i++) {
-                    v.visitData(new Data(current.shapesData[i], null, current.shapesId[i]));
+                    v.visitData(new Data(current.shapesData[i], null,
+                            current.shapesId[i]));
                 }
 
                 current.visited = true;
@@ -223,7 +226,8 @@ public class QuadTree implements ISpatialIndex {
         return false;
     }
 
-    public void nearestNeighborQuery(int k, IShape query, IVisitor v, INearestNeighborComparator nnc) {
+    public void nearestNeighborQuery(int k, IShape query, IVisitor v,
+        INearestNeighborComparator nnc) {
         // TODO Auto-generated method stub
     }
 
@@ -283,9 +287,9 @@ public class QuadTree implements ISpatialIndex {
      * but this is what is expected. This is why method is kept private.
      *
      * @param n target node
-     * @param data data to insert
-     * @param shape MBR of new data
-     * @param id id of data
+     * @param data to insert
+     * @param MBR of new data
+     * @param id of data
      */
     private void insertData(Node n, byte[] data, IShape shape, int id) {
         if (n.isIndex()) {
@@ -294,121 +298,164 @@ public class QuadTree implements ISpatialIndex {
              */
             for (int i = 0; i < n.getChildrenCount(); i++) {
                 Node subNode = n.getSubNode(i);
-                boolean done = false ;
+                boolean done = false;
+
                 if (subNode.getShape().contains(shape)) {
                     insertData(subNode, data, shape, id);
-                    // we allow for multiple insertion, so we postpone method return
-                    done = true ;
+                    // we allow for multiple insertion, so we postpone returning from method
+                    done = true;
                 }
-                if (done) return ;
+
+                if (done) {
+                    return;
+                }
             }
         } else if (n.level > 0) { // we do not want the tree to grow much too tall
-        	                      // if level == 0, we will add data to this node rather than splitting
-            /* Otherwise, consider creating four subnodes if could fit into
+                                  // if level == 0, we will add data to this node rather than splitting
+                                  /* Otherwise, consider creating four subnodes if could fit into
              * them, and adding to the appropriate subnode.
              */
             n.split(SPLITRATIO);
             // recurse
             insertData(n, data, shape, id);
-            return ;
+
+            return;
         }
 
         // If none of that worked, just add it to this nodes list.
         n.insertData(data, id);
     }
-    
+
     private void createNewRoot(IShape s) {
-    	// TODO: take care of tree maximum height
-    	final Region old = this.root.getShape().getMBR() ;
-    	final Region r = enlargeRootRegion(old, old.combinedRegion(s.getMBR())) ;
-    	final Node oldRoot = this.root ;
-    	this.root = new Node(r, 0, this.root.level) ;
-    	this.queryStrategy(new QueryStrategy() {
-    		Stack nodes = new Stack() ;
-    		boolean insertionMode = true ;
-    		boolean inserted = false ;
-    		int targetNode = -1 ;
-			public Node getNextNode(Node current, boolean[] hasNext) {
-				if (!insertionMode) {
-					if (!inserted) {
-						assert (targetNode > -1) ;
-						current.subNodes.remove(targetNode) ;
-						current.addSubNode(oldRoot) ;
-						hasNext[0] = true ;
-						oldRoot.parent = current ;
-						inserted = true ;
-						return oldRoot ;
-					} else {
-						current.level = current.parent.level-1 ;
-						for (int i = 0 ; i < current.getChildrenCount() ; i++) {
-							nodes.add(0, current.getSubNode(i)) ;
-						}
-						if (!nodes.isEmpty()) {
-							hasNext[0] = true ;
-							return (Node) nodes.pop() ;
-						} else {
-							hasNext[0] = false ;
-							return null ;
-						}
-					}
-				} else if (current.getShape().contains(old)) {
-					if (current.isLeaf()) {
-						current.split(SPLITRATIO) ;
-					}
-					insertionMode = false ;
-					for (int i = 0 ; i < current.getChildrenCount() ; i++) {
-						if (current.getSubNode(i).getShape().contains(old)) {
-							hasNext[0] = true ;
-							insertionMode = true ;
-							targetNode = i ;
-							return current.getSubNode(i) ;
-						}
-					}
-					hasNext[0] = true ;
-					return current.parent ;
-				} else {
-					hasNext[0] = false ;
-					return null ;
-				}
-			}
-    		
-    	}) ;
+        // TODO: take care of tree maximum height
+        final Region old = this.root.getShape().getMBR();
+        final Region r = enlargeRootRegion(old, s.getMBR());
+        final Node oldRoot = this.root;
+        this.root = new Node(r, 0, this.root.level);
+        this.queryStrategy(new QueryStrategy() {
+                Stack nodes = new Stack();
+                boolean insertionMode = true;
+                boolean inserted = false;
+                int targetNode = -1;
+
+                public Node getNextNode(Node current, boolean[] hasNext) {
+                    if (!insertionMode) {
+                        if (!inserted) {
+                            assert (targetNode > -1);
+                            current.subNodes.remove(targetNode);
+                            current.addSubNode(oldRoot);
+                            hasNext[0] = true;
+                            oldRoot.parent = current;
+                            inserted = true;
+
+                            return oldRoot;
+                        } else {
+                            current.level = current.parent.level - 1;
+
+                            for (int i = 0; i < current.getChildrenCount();
+                                    i++) {
+                                nodes.add(0, current.getSubNode(i));
+                            }
+
+                            if (!nodes.isEmpty()) {
+                                hasNext[0] = true;
+
+                                return (Node) nodes.pop();
+                            } else {
+                                hasNext[0] = false;
+
+                                return null;
+                            }
+                        }
+                    } else if (current.getShape().contains(old)) {
+                        if (current.isLeaf()) {
+                            current.split(SPLITRATIO);
+                        }
+
+                        insertionMode = false;
+
+                        for (int i = 0; i < current.getChildrenCount(); i++) {
+                            if (current.getSubNode(i).getShape().contains(old)) {
+                                hasNext[0] = true;
+                                insertionMode = true;
+                                targetNode = i;
+
+                                return current.getSubNode(i);
+                            }
+                        }
+
+                        hasNext[0] = true;
+
+                        return current.parent;
+                    } else {
+                        hasNext[0] = false;
+
+                        return null;
+                    }
+                }
+            });
     }
-    
+
     private Region enlargeRootRegion(Region old, final Region regionToInclude) {
-    	Region r = new Region(regionToInclude) ;
-    	double SPLITRATIO = 0.53d ;
-    	if ((r.getLow(0) == old.getLow(0)) && (r.getLow(1) == old.getLow(1))) {
-    		double xmin = old.getLow(0) ;
-    		double ymin = old.getLow(1) ;
-    		double xmax = old.getLow(0) + (old.getHigh(0) - old.getLow(0))/SPLITRATIO ;
-    		double ymax = old.getLow(1) + (old.getHigh(1) - old.getLow(1))/SPLITRATIO ;
-    		r = new Region(new double[] {xmin, ymin}, new double[] {xmax, ymax}) ;
-    	} else if ((r.getLow(0) == old.getLow(0)) && (r.getHigh(1) == old.getHigh(1))) {
-    		double xmin = old.getLow(0) ;
-    		double ymin = old.getHigh(1) - (old.getHigh(1) - old.getLow(1))/SPLITRATIO ;
-    		double xmax = old.getLow(0) + (old.getHigh(0) - old.getLow(0))/SPLITRATIO ;
-    		double ymax = old.getHigh(1) ;
-    		r = new Region(new double[] {xmin, ymin}, new double[] {xmax, ymax}) ;
-    	} else if ((r.getHigh(0) == old.getHigh(0)) && (r.getHigh(1) == old.getHigh(1))) {
-    		double xmin = old.getHigh(0) - (old.getHigh(0) - old.getLow(0))/SPLITRATIO ;
-    		double ymin = old.getHigh(1) - (old.getHigh(1) - old.getLow(1))/SPLITRATIO ;
-    		double xmax = old.getHigh(0) ;
-    		double ymax = old.getHigh(1) ;
-    		r = new Region(new double[] {xmin, ymin}, new double[] {xmax, ymax}) ;
-    	} else {
-    		assert ((r.getHigh(0) == old.getHigh(0)) && (r.getLow(1) == old.getLow(1))) ;
-    		double xmin = old.getHigh(0) - (old.getHigh(0) - old.getLow(0))/SPLITRATIO ;
-    		double ymin = old.getLow(1) ;
-    		double xmax = old.getHigh(0)  ;
-    		double ymax = old.getLow(1) + (old.getHigh(1) - old.getLow(1))/SPLITRATIO ;
-    		r = new Region(new double[] {xmin, ymin}, new double[] {xmax, ymax}) ;
-    	}
-    	if (r.contains(regionToInclude)) {
-    		return r ;
-    	} else {
-    		return enlargeRootRegion(r, regionToInclude) ;
-    	}
+        Region r = old.combinedRegion(regionToInclude);
+
+        /* we actually make tiles a little bigger than how nodes do normally split
+               so we use a slightly smaller ratio */
+        double SPLITRATIO = QuadTree.SPLITRATIO - 0.02d;
+
+        /*double xmin = (r.getLow(0) == old.getLow(0)) ? old.getLow(0) : old.getHigh(0) - (old.getHigh(0) - old.getLow(0))/SPLITRATIO ;
+                double ymin = (r.getLow(1) == old.getLow(1)) ? old.getLow(1) : old.getHigh(1) - (old.getHigh(1) - old.getLow(1))/SPLITRATIO ;
+            double xmax = (r.getHigh(0) == old.getHigh(0)) ? old.getHigh(0) : old.getLow(0) + (old.getHigh(0) - old.getLow(0))/SPLITRATIO ;
+                double ymax = (r.getHigh(1) == old.getHigh(1)) ? old.getHigh(1) : old.getLow(1) + (old.getHigh(1) - old.getLow(1))/SPLITRATIO ;
+                r = new Region(new double[] {xmin, ymin}, new double[] {xmax, ymax}) ;*/
+        if ((r.getLow(0) == old.getLow(0)) && (r.getLow(1) == old.getLow(1))) {
+            double xmin = old.getLow(0);
+            double ymin = old.getLow(1);
+            double xmax = old.getLow(0) +
+                ((old.getHigh(0) - old.getLow(0)) / SPLITRATIO);
+            double ymax = old.getLow(1) +
+                ((old.getHigh(1) - old.getLow(1)) / SPLITRATIO);
+            r = new Region(new double[] { xmin, ymin },
+                    new double[] { xmax, ymax });
+        } else if ((r.getLow(0) == old.getLow(0)) &&
+                (r.getHigh(1) == old.getHigh(1))) {
+            double xmin = old.getLow(0);
+            double ymin = old.getHigh(1) -
+                ((old.getHigh(1) - old.getLow(1)) / SPLITRATIO);
+            double xmax = old.getLow(0) +
+                ((old.getHigh(0) - old.getLow(0)) / SPLITRATIO);
+            double ymax = old.getHigh(1);
+            r = new Region(new double[] { xmin, ymin },
+                    new double[] { xmax, ymax });
+        } else if ((r.getHigh(0) == old.getHigh(0)) &&
+                (r.getHigh(1) == old.getHigh(1))) {
+            double xmin = old.getHigh(0) -
+                ((old.getHigh(0) - old.getLow(0)) / SPLITRATIO);
+            double ymin = old.getHigh(1) -
+                ((old.getHigh(1) - old.getLow(1)) / SPLITRATIO);
+            double xmax = old.getHigh(0);
+            double ymax = old.getHigh(1);
+            r = new Region(new double[] { xmin, ymin },
+                    new double[] { xmax, ymax });
+        } else {
+            assert ((r.getHigh(0) == old.getHigh(0)) &&
+            (r.getLow(1) == old.getLow(1)));
+
+            double xmin = old.getHigh(0) -
+                ((old.getHigh(0) - old.getLow(0)) / SPLITRATIO);
+            double ymin = old.getLow(1);
+            double xmax = old.getHigh(0);
+            double ymax = old.getLow(1) +
+                ((old.getHigh(1) - old.getLow(1)) / SPLITRATIO);
+            r = new Region(new double[] { xmin, ymin },
+                    new double[] { xmax, ymax });
+        }
+
+        if (r.contains(regionToInclude)) {
+            return r;
+        } else {
+            return enlargeRootRegion(r, regionToInclude);
+        }
     }
 
     /** Utility class to expose data records outside of the tree.

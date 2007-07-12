@@ -15,28 +15,27 @@
  */
 package org.geotools.caching.impl;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 import com.vividsolutions.jts.geom.Envelope;
-import org.opengis.filter.Filter;
+
 import org.geotools.caching.DataCache;
 import org.geotools.caching.FeatureIndex;
 import org.geotools.caching.InternalStore;
+
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.view.DefaultView;
+
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
+
 import org.geotools.filter.spatial.BBOXImpl;
+
 import org.geotools.index.Data;
 import org.geotools.index.DataDefinition;
 import org.geotools.index.LockTimeoutException;
@@ -44,6 +43,15 @@ import org.geotools.index.TreeException;
 import org.geotools.index.rtree.PageStore;
 import org.geotools.index.rtree.RTree;
 import org.geotools.index.rtree.memory.MemoryPageStore;
+
+import org.opengis.filter.Filter;
+
+import java.io.IOException;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 
 /** An implementation of FeatureIndex, that stores every thing needed in memory.
@@ -165,7 +173,8 @@ public class MemoryFeatureIndex implements FeatureIndex {
         if (f instanceof BBOXImpl) {
             List candidates = new ArrayList();
             BBOXImpl bb = (BBOXImpl) f;
-            Envelope env = new Envelope(bb.getMinX(), bb.getMaxX(), bb.getMinY(), bb.getMaxY());
+            Envelope env = new Envelope(bb.getMinX(), bb.getMaxX(),
+                    bb.getMinY(), bb.getMaxY());
 
             try {
                 List results = tree.search(env);
@@ -222,7 +231,8 @@ public class MemoryFeatureIndex implements FeatureIndex {
      */
     private static RTree createTree() {
         try {
-            PageStore ps = new MemoryPageStore(df, 8, 4, PageStore.SPLIT_QUADRATIC);
+            PageStore ps = new MemoryPageStore(df, 8, 4,
+                    PageStore.SPLIT_QUADRATIC);
             RTree tree = new RTree(ps);
 
             return tree;

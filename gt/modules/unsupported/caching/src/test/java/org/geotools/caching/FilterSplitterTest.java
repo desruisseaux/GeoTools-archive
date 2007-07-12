@@ -15,21 +15,26 @@
  */
 package org.geotools.caching;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import java.util.ArrayList;
-import java.util.List;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+import org.geotools.caching.util.FilterSplitter;
+
+import org.geotools.filter.FilterFactoryImpl;
+
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
-import org.geotools.caching.util.FilterSplitter;
-import org.geotools.filter.FilterFactoryImpl;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class FilterSplitterTest extends TestCase {
@@ -51,14 +56,16 @@ public class FilterSplitterTest extends TestCase {
         att = ff.like(ff.property("dummydata"), "Id: 1*");
 
         Polygon p = createPolygon();
-        bso = ((FilterFactoryImpl) ff).intersects(ff.property("geom"), ff.literal(p));
+        bso = ((FilterFactoryImpl) ff).intersects(ff.property("geom"),
+                ff.literal(p));
         bsoenv = p.getEnvelopeInternal();
     }
 
     protected static Polygon createPolygon() {
         Coordinate[] coords = new Coordinate[] {
-                new Coordinate(200, 210), new Coordinate(200, 500), new Coordinate(2000, 2100),
-                new Coordinate(500, 510), new Coordinate(200, 210)
+                new Coordinate(200, 210), new Coordinate(200, 500),
+                new Coordinate(2000, 2100), new Coordinate(500, 510),
+                new Coordinate(200, 210)
             };
         CoordinateArraySequence seq = new CoordinateArraySequence(coords);
         LinearRing ls = new LinearRing(seq, new GeometryFactory());

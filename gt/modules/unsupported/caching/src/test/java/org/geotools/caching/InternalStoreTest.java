@@ -18,14 +18,17 @@ package org.geotools.caching;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+
 import org.geotools.caching.Generator;
 import org.geotools.caching.InternalStore;
 import org.geotools.caching.impl.HashMapInternalStore;
 import org.geotools.caching.impl.SimpleHashMapInternalStore;
+
 import org.geotools.feature.Feature;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 
 public class InternalStoreTest extends TestCase {

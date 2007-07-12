@@ -73,8 +73,8 @@ public class RWLock {
 
         synchronized (lock) {
             synchronized (this) {
-                boolean okay_to_write = (writer_locks.size() == 0) && (active_readers == 0)
-                    && (active_writers == 0);
+                boolean okay_to_write = (writer_locks.size() == 0) &&
+                    (active_readers == 0) && (active_writers == 0);
 
                 if (okay_to_write) {
                     ++active_writers;
@@ -93,7 +93,8 @@ public class RWLock {
     }
 
     synchronized public boolean write_lock_noblock() {
-        if ((writer_locks.size() == 0) && (active_readers == 0) && (active_writers == 0)) {
+        if ((writer_locks.size() == 0) && (active_readers == 0) &&
+                (active_writers == 0)) {
             ++active_writers;
 
             return true;

@@ -50,8 +50,10 @@ public class Point implements IShape, Cloneable {
             }
 
             for (int cIndex = 0; cIndex < m_pCoords.length; cIndex++) {
-                if ((m_pCoords[cIndex] < (pt.m_pCoords[cIndex] - SpatialIndex.EPSILON))
-                        || (m_pCoords[cIndex] > (pt.m_pCoords[cIndex] + SpatialIndex.EPSILON))) {
+                if ((m_pCoords[cIndex] < (pt.m_pCoords[cIndex] -
+                        SpatialIndex.EPSILON)) ||
+                        (m_pCoords[cIndex] > (pt.m_pCoords[cIndex] +
+                        SpatialIndex.EPSILON))) {
                     return false;
                 }
             }
@@ -124,7 +126,8 @@ public class Point implements IShape, Cloneable {
             return getMinimumDistance((Point) s);
         }
 
-        throw new IllegalStateException("getMinimumDistance: Not implemented yet!");
+        throw new IllegalStateException(
+            "getMinimumDistance: Not implemented yet!");
     }
 
     double getMinimumDistance(final Point p) {

@@ -28,8 +28,9 @@
 //    marioh@cs.ucr.edu
 package org.geotools.caching.spatialindex.rtree;
 
-import java.util.*;
 import org.geotools.caching.spatialindex.spatialindex.*;
+
+import java.util.*;
 
 
 public class Leaf extends Node {
@@ -125,7 +126,8 @@ public class Leaf extends Node {
                 // keep this in the for loop. The tree height might change after insertions.
                 boolean[] overflowTable = new boolean[m_pTree.m_stats.m_treeHeight];
 
-                for (int cLevel = 0; cLevel < m_pTree.m_stats.m_treeHeight; cLevel++)
+                for (int cLevel = 0; cLevel < m_pTree.m_stats.m_treeHeight;
+                        cLevel++)
                     overflowTable[cLevel] = false;
 
                 m_pTree.insertData_impl(n.m_pData[cChild], n.m_pMBR[cChild],

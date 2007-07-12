@@ -76,10 +76,13 @@ public class Region implements IShape {
             }
 
             for (int cIndex = 0; cIndex < m_pLow.length; cIndex++) {
-                if ((m_pLow[cIndex] < (r.m_pLow[cIndex] - SpatialIndex.EPSILON))
-                        || (m_pLow[cIndex] > (r.m_pLow[cIndex] + SpatialIndex.EPSILON))
-                        || (m_pHigh[cIndex] < (r.m_pHigh[cIndex] - SpatialIndex.EPSILON))
-                        || (m_pHigh[cIndex] > (r.m_pHigh[cIndex] + SpatialIndex.EPSILON))) {
+                if ((m_pLow[cIndex] < (r.m_pLow[cIndex] - SpatialIndex.EPSILON)) ||
+                        (m_pLow[cIndex] > (r.m_pLow[cIndex] +
+                        SpatialIndex.EPSILON)) ||
+                        (m_pHigh[cIndex] < (r.m_pHigh[cIndex] -
+                        SpatialIndex.EPSILON)) ||
+                        (m_pHigh[cIndex] > (r.m_pHigh[cIndex] +
+                        SpatialIndex.EPSILON))) {
                     return false;
                 }
             }
@@ -173,7 +176,8 @@ public class Region implements IShape {
             return getMinimumDistance((Point) s);
         }
 
-        throw new IllegalStateException("getMinimumDistance: Not implemented yet!");
+        throw new IllegalStateException(
+            "getMinimumDistance: Not implemented yet!");
     }
 
     public boolean intersects(final Region r) {
@@ -183,7 +187,8 @@ public class Region implements IShape {
         }
 
         for (int cIndex = 0; cIndex < m_pLow.length; cIndex++) {
-            if ((m_pLow[cIndex] > r.m_pHigh[cIndex]) || (m_pHigh[cIndex] < r.m_pLow[cIndex])) {
+            if ((m_pLow[cIndex] > r.m_pHigh[cIndex]) ||
+                    (m_pHigh[cIndex] < r.m_pLow[cIndex])) {
                 return false;
             }
         }
@@ -198,7 +203,8 @@ public class Region implements IShape {
         }
 
         for (int cIndex = 0; cIndex < m_pLow.length; cIndex++) {
-            if ((m_pLow[cIndex] > r.m_pLow[cIndex]) || (m_pHigh[cIndex] < r.m_pHigh[cIndex])) {
+            if ((m_pLow[cIndex] > r.m_pLow[cIndex]) ||
+                    (m_pHigh[cIndex] < r.m_pHigh[cIndex])) {
                 return false;
             }
         }
@@ -208,14 +214,17 @@ public class Region implements IShape {
 
     public boolean touches(final Region r) {
         if (m_pLow.length != r.m_pLow.length) {
-            throw new IllegalArgumentException("touches: Shape has the wrong number of dimensions.");
+            throw new IllegalArgumentException(
+                "touches: Shape has the wrong number of dimensions.");
         }
 
         for (int cIndex = 0; cIndex < m_pLow.length; cIndex++) {
-            if (((m_pLow[cIndex] > (r.m_pLow[cIndex] - SpatialIndex.EPSILON))
-                    && (m_pLow[cIndex] < (r.m_pLow[cIndex] + SpatialIndex.EPSILON)))
-                    || ((m_pHigh[cIndex] > (r.m_pHigh[cIndex] - SpatialIndex.EPSILON))
-                    && (m_pHigh[cIndex] < (r.m_pHigh[cIndex] + SpatialIndex.EPSILON)))) {
+            if (((m_pLow[cIndex] > (r.m_pLow[cIndex] - SpatialIndex.EPSILON)) &&
+                    (m_pLow[cIndex] < (r.m_pLow[cIndex] + SpatialIndex.EPSILON))) ||
+                    ((m_pHigh[cIndex] > (r.m_pHigh[cIndex] -
+                    SpatialIndex.EPSILON)) &&
+                    (m_pHigh[cIndex] < (r.m_pHigh[cIndex] +
+                    SpatialIndex.EPSILON)))) {
                 return true;
             }
         }
@@ -253,7 +262,8 @@ public class Region implements IShape {
         }
 
         for (int cIndex = 0; cIndex < m_pLow.length; cIndex++) {
-            if ((m_pLow[cIndex] > p.m_pCoords[cIndex]) || (m_pHigh[cIndex] < p.m_pCoords[cIndex])) {
+            if ((m_pLow[cIndex] > p.m_pCoords[cIndex]) ||
+                    (m_pHigh[cIndex] < p.m_pCoords[cIndex])) {
                 return false;
             }
         }
@@ -263,14 +273,18 @@ public class Region implements IShape {
 
     public boolean touches(final Point p) {
         if (m_pLow.length != p.m_pCoords.length) {
-            throw new IllegalArgumentException("touches: Shape has the wrong number of dimensions.");
+            throw new IllegalArgumentException(
+                "touches: Shape has the wrong number of dimensions.");
         }
 
         for (int cIndex = 0; cIndex < m_pLow.length; cIndex++) {
-            if (((m_pLow[cIndex] > (p.m_pCoords[cIndex] - SpatialIndex.EPSILON))
-                    && (m_pLow[cIndex] < (p.m_pCoords[cIndex] + SpatialIndex.EPSILON)))
-                    || ((m_pHigh[cIndex] > (p.m_pCoords[cIndex] - SpatialIndex.EPSILON))
-                    && (m_pHigh[cIndex] < (p.m_pCoords[cIndex] + SpatialIndex.EPSILON)))) {
+            if (((m_pLow[cIndex] > (p.m_pCoords[cIndex] - SpatialIndex.EPSILON)) &&
+                    (m_pLow[cIndex] < (p.m_pCoords[cIndex] +
+                    SpatialIndex.EPSILON))) ||
+                    ((m_pHigh[cIndex] > (p.m_pCoords[cIndex] -
+                    SpatialIndex.EPSILON)) &&
+                    (m_pHigh[cIndex] < (p.m_pCoords[cIndex] +
+                    SpatialIndex.EPSILON)))) {
                 return true;
             }
         }
@@ -308,7 +322,8 @@ public class Region implements IShape {
         // check for intersection.
         // marioh: avoid function call since this is called billions of times.
         for (cIndex = 0; cIndex < m_pLow.length; cIndex++) {
-            if ((m_pLow[cIndex] > r.m_pHigh[cIndex]) || (m_pHigh[cIndex] < r.m_pLow[cIndex])) {
+            if ((m_pLow[cIndex] > r.m_pHigh[cIndex]) ||
+                    (m_pHigh[cIndex] < r.m_pLow[cIndex])) {
                 return 0.0;
             }
         }
@@ -368,8 +383,10 @@ public class Region implements IShape {
         }
 
         for (int cIndex = 0; cIndex < pToModify.m_pLow.length; cIndex++) {
-            pToModify.m_pLow[cIndex] = Math.min(pToModify.m_pLow[cIndex], pConst.m_pLow[cIndex]);
-            pToModify.m_pHigh[cIndex] = Math.max(pToModify.m_pHigh[cIndex], pConst.m_pHigh[cIndex]);
+            pToModify.m_pLow[cIndex] = Math.min(pToModify.m_pLow[cIndex],
+                    pConst.m_pLow[cIndex]);
+            pToModify.m_pHigh[cIndex] = Math.max(pToModify.m_pHigh[cIndex],
+                    pConst.m_pHigh[cIndex]);
         }
     }
 

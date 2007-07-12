@@ -15,38 +15,46 @@
  */
 package org.geotools.caching;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeSet;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
+
 import org.geotools.caching.Generator;
 import org.geotools.caching.impl.InMemoryDataCache;
 import org.geotools.caching.impl.InMemoryFeatureCache;
 import org.geotools.caching.impl.SpatialQueryTracker;
+
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureLocking;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.data.shapefile.ShapefileDataStore;
+
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
+
 import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.filter.spatial.BBOXImpl;
+
+import java.io.File;
+import java.io.IOException;
+
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TreeSet;
 
 
 public class InMemoryFeatureCacheBenchmarkTest extends TestCase {
@@ -60,7 +68,8 @@ public class InMemoryFeatureCacheBenchmarkTest extends TestCase {
     private void createQuerySet(int numberOfQueries) {
         System.out.println("=== Creating Query Set");
 
-        Coordinate p = Generator.pickRandomPoint(new Coordinate(500, 500), 950, 950);
+        Coordinate p = Generator.pickRandomPoint(new Coordinate(500, 500), 950,
+                950);
         Coordinate last = p;
 
         for (int i = 0; i < numberOfQueries; i++) {
@@ -80,7 +89,8 @@ public class InMemoryFeatureCacheBenchmarkTest extends TestCase {
         System.out.println("=== Creating Query Set");
 
         for (int i = 0; i < numberOfQueries; i++) {
-            Coordinate p = Generator.pickRandomPoint(new Coordinate(500, 500), 950, 950);
+            Coordinate p = Generator.pickRandomPoint(new Coordinate(500, 500),
+                    950, 950);
             querySet.add(Generator.createBboxQuery(p, 10, 10));
         }
     }
@@ -111,14 +121,16 @@ public class InMemoryFeatureCacheBenchmarkTest extends TestCase {
 
     public void ztestShapefileStore() throws IOException, MalformedURLException {
         File f = new File("target/test.shp");
-        ShapefileDataStore sds = new ShapefileDataStore(f.toURL(), URI.create("testStore"));
+        ShapefileDataStore sds = new ShapefileDataStore(f.toURL(),
+                URI.create("testStore"));
 
         if (!f.exists()) {
             sds.createSchema(type);
 
             if (sds.getFeatureSource() instanceof FeatureLocking) {
                 FeatureLocking fl = (FeatureLocking) sds.getFeatureSource();
-                FeatureCollection col = new DefaultFeatureCollection("testStore", type);
+                FeatureCollection col = new DefaultFeatureCollection("testStore",
+                        type);
                 col.addAll(data);
                 fl.addFeatures(col);
             }
@@ -159,7 +171,8 @@ public class InMemoryFeatureCacheBenchmarkTest extends TestCase {
         System.out.println("Evictions = " + tested.getEvictions());
     }
 
-    public void testDataCachePerformance() throws IOException, FeatureCacheException {
+    public void testDataCachePerformance()
+        throws IOException, FeatureCacheException {
         createQuerySet(25);
 
         MemoryDataStore control = new MemoryDataStore();
@@ -173,7 +186,8 @@ public class InMemoryFeatureCacheBenchmarkTest extends TestCase {
         InMemoryFeatureCache tested = new InMemoryFeatureCache(ds, type, 2500);
         tested.getFeatures(new FilterFactoryImpl().bbox("", 0, 0, 1000, 1000, ""));
 
-        long diff = compareDataStores(tested, control.getFeatureSource(type.getTypeName()), querySet);
+        long diff = compareDataStores(tested,
+                control.getFeatureSource(type.getTypeName()), querySet);
 
         //assertTrue(diff < 0);
         System.out.println("Cache reads = " + tested.getCacheReads());
@@ -194,7 +208,8 @@ public class InMemoryFeatureCacheBenchmarkTest extends TestCase {
         ds.addFeatures(data);
 
         InMemoryFeatureCache tested = new InMemoryFeatureCache(ds, type, 1000);
-        long diff = compareDataStores(tested, control.getFeatureSource(type.getTypeName()), querySet);
+        long diff = compareDataStores(tested,
+                control.getFeatureSource(type.getTypeName()), querySet);
 
         System.out.println("Cache reads = " + tested.getCacheReads());
         System.out.println("Store reads = " + tested.getStoreReads());
@@ -206,12 +221,15 @@ public class InMemoryFeatureCacheBenchmarkTest extends TestCase {
             return UNCHANGED;
         }
 
-        if ((q1.getFilter() instanceof BBOXImpl) && (q2.getFilter() instanceof BBOXImpl)) {
+        if ((q1.getFilter() instanceof BBOXImpl) &&
+                (q2.getFilter() instanceof BBOXImpl)) {
             BBOXImpl bb = (BBOXImpl) q1.getFilter();
-            Envelope env1 = new Envelope(bb.getMinX(), bb.getMaxX(), bb.getMinY(), bb.getMaxY());
+            Envelope env1 = new Envelope(bb.getMinX(), bb.getMaxX(),
+                    bb.getMinY(), bb.getMaxY());
             bb = (BBOXImpl) q2.getFilter();
 
-            Envelope env2 = new Envelope(bb.getMinX(), bb.getMaxX(), bb.getMinY(), bb.getMaxY());
+            Envelope env2 = new Envelope(bb.getMinX(), bb.getMaxX(),
+                    bb.getMinY(), bb.getMaxY());
 
             if (env1.equals(env2)) {
                 return UNCHANGED;
@@ -259,7 +277,8 @@ public class InMemoryFeatureCacheBenchmarkTest extends TestCase {
         return stats;
     }
 
-    protected static long compareDataStores(FeatureSource ds, FeatureSource control, List querySet) {
+    protected static long compareDataStores(FeatureSource ds,
+        FeatureSource control, List querySet) {
         QueryStatistics[] ds_stats = runQueries(ds, querySet);
         QueryStatistics[] control_stats = runQueries(control, querySet);
         long meanDifference = 0;
@@ -270,7 +289,8 @@ public class InMemoryFeatureCacheBenchmarkTest extends TestCase {
 
         for (int i = 0; i < querySet.size(); i++) {
             if (i > 1) {
-                long diff = ds_stats[i].getExecutionTime() - control_stats[i].getExecutionTime();
+                long diff = ds_stats[i].getExecutionTime() -
+                    control_stats[i].getExecutionTime();
                 meanDifference += diff;
 
                 if (diff > 0) {
@@ -288,20 +308,22 @@ public class InMemoryFeatureCacheBenchmarkTest extends TestCase {
                + control_stats[i].getExecutionTime() + " ms ; "); */
         }
 
-        meanDifference = ((querySet.size() - 2) > 0) ? (meanDifference / (querySet.size() - 2)) : 0;
+        meanDifference = ((querySet.size() - 2) > 0)
+            ? (meanDifference / (querySet.size() - 2)) : 0;
         meanOverhead = (overheadCount > 0) ? (meanOverhead / overheadCount) : 0;
         meanLeverage = (leverageCount > 0) ? (meanLeverage / leverageCount) : 0;
-        System.out.println("Mean execution time difference = " + meanDifference + " ms.");
-        System.out.println("Mean overhead = " + meanOverhead + " ms. ("
-            + ((100 * overheadCount) / (overheadCount + leverageCount)) + " %)");
-        System.out.println("Mean leverage = " + meanLeverage + " ms. ("
-            + ((100 * leverageCount) / (overheadCount + leverageCount)) + " %)");
+        System.out.println("Mean execution time difference = " +
+            meanDifference + " ms.");
+        System.out.println("Mean overhead = " + meanOverhead + " ms. (" +
+            ((100 * overheadCount) / (overheadCount + leverageCount)) + " %)");
+        System.out.println("Mean leverage = " + meanLeverage + " ms. (" +
+            ((100 * leverageCount) / (overheadCount + leverageCount)) + " %)");
 
         return meanDifference;
     }
 
-    protected static boolean compareFeatureCollectionByID(FeatureCollection set1,
-        FeatureCollection set2) {
+    protected static boolean compareFeatureCollectionByID(
+        FeatureCollection set1, FeatureCollection set2) {
         if (set1.size() == set2.size()) {
             FeatureIterator iter = set1.features();
             TreeSet ids1 = new TreeSet();
@@ -338,8 +360,8 @@ public class InMemoryFeatureCacheBenchmarkTest extends TestCase {
         return false;
     }
 
-    protected static boolean compareFeatureCollectionByHash(FeatureCollection set1,
-        FeatureCollection set2) {
+    protected static boolean compareFeatureCollectionByHash(
+        FeatureCollection set1, FeatureCollection set2) {
         if (set1.size() == set2.size()) {
             FeatureIterator iter = set1.features();
             TreeSet ids1 = new TreeSet();

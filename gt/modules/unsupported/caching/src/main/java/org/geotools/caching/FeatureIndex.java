@@ -15,12 +15,14 @@
  */
 package org.geotools.caching;
 
-import java.io.IOException;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
+
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.SchemaException;
+
+import java.io.IOException;
 
 
 /** Provides an indexed store where to keep features

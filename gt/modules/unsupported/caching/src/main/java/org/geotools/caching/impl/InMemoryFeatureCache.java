@@ -15,16 +15,8 @@
  */
 package org.geotools.caching.impl;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 import com.vividsolutions.jts.geom.Envelope;
-import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory;
+
 import org.geotools.caching.FeatureCache;
 import org.geotools.caching.FeatureCacheException;
 import org.geotools.caching.spatialindex.rtree.Index;
@@ -41,6 +33,7 @@ import org.geotools.caching.spatialindex.spatialindex.SpatialIndex;
 import org.geotools.caching.spatialindex.storagemanager.MemoryStorageManager;
 import org.geotools.caching.spatialindex.storagemanager.PropertySet;
 import org.geotools.caching.util.FilterSplitter;
+
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureListener;
@@ -48,6 +41,7 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.store.EmptyFeatureCollection;
+
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.Feature;
@@ -55,8 +49,21 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
+
 import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.filter.spatial.BBOXImpl;
+
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+
+import java.io.IOException;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 
 /** An implementation of FeatureCache :
@@ -103,8 +110,8 @@ public class InMemoryFeatureCache implements FeatureCache {
         }
 
         if ((dstype == null) || !dstype.equals(t)) {
-            throw new FeatureCacheException(new SchemaException("Datastore does not have type "
-                    + t.getTypeName()));
+            throw new FeatureCacheException(new SchemaException(
+                    "Datastore does not have type " + t.getTypeName()));
         }
 
         this.ds = ds;
@@ -115,7 +122,8 @@ public class InMemoryFeatureCache implements FeatureCache {
         this.capacity = capacity;
 
         PropertySet ps = new PropertySet();
-        ps.setProperty("TreeVariant", new Integer(SpatialIndex.RtreeVariantLinear));
+        ps.setProperty("TreeVariant",
+            new Integer(SpatialIndex.RtreeVariantLinear));
         ps.setProperty("LeafCapacity", new Integer(capacity / 10));
 
         MemoryStorageManager sm = new MemoryStorageManager();
@@ -127,7 +135,8 @@ public class InMemoryFeatureCache implements FeatureCache {
             });
         this.index.addReadNodeCommand(new INodeCommand() {
                 public void execute(INode n) {
-                    NodeCacheEntry entry = (NodeCacheEntry) nodes.get(new Integer(n.getIdentifier()));
+                    NodeCacheEntry entry = (NodeCacheEntry) nodes.get(new Integer(
+                                n.getIdentifier()));
 
                     if (entry == null) {
                         entry = new NodeCacheEntry(n);
@@ -317,8 +326,8 @@ public class InMemoryFeatureCache implements FeatureCache {
         return transaction;
     }
 
-    public void modifyFeatures(AttributeType[] type, Object[] value, Filter filter)
-        throws IOException {
+    public void modifyFeatures(AttributeType[] type, Object[] value,
+        Filter filter) throws IOException {
         throw new UnsupportedOperationException();
     }
 
@@ -354,12 +363,14 @@ public class InMemoryFeatureCache implements FeatureCache {
     }
 
     public Envelope getBounds(Query query) throws IOException {
-        return getDataStore().getFeatureSource(type.getTypeName()).getBounds(query);
+        return getDataStore().getFeatureSource(type.getTypeName())
+                   .getBounds(query);
     }
 
     public int getCount(Query query) throws IOException {
         // may be we should return -1 if this is too expensive, or an estimate ?
-        return getDataStore().getFeatureSource(type.getTypeName()).getCount(query);
+        return getDataStore().getFeatureSource(type.getTypeName())
+                   .getCount(query);
     }
 
     public DataStore getDataStore() {
@@ -371,7 +382,8 @@ public class InMemoryFeatureCache implements FeatureCache {
     }
 
     public FeatureCollection getFeatures(Query query) throws IOException {
-        if ((query.getTypeName() != null) && (query.getTypeName() != type.getTypeName())) {
+        if ((query.getTypeName() != null) &&
+                (query.getTypeName() != type.getTypeName())) {
             return new EmptyFeatureCollection(getSchema());
         }
 
@@ -392,7 +404,8 @@ public class InMemoryFeatureCache implements FeatureCache {
         Filter missing = filters[SPATIAL_RESTRICTION_MISSING];
 
         if (missing != Filter.EXCLUDE) {
-            FeatureCollection fromStore = loadFromStore(ff.and(missing, filters[OTHER_RESTRICTIONS]));
+            FeatureCollection fromStore = loadFromStore(ff.and(missing,
+                        filters[OTHER_RESTRICTIONS]));
             //tracker.register(missing);
             putAll(fromStore, missing);
             //System.out.println("from store = " + fromStore.size()) ;
@@ -407,7 +420,8 @@ public class InMemoryFeatureCache implements FeatureCache {
 
     protected FeatureCollection loadFromStore(Filter f)
         throws IOException {
-        FeatureCollection c = ds.getFeatureSource(type.getTypeName()).getFeatures(f);
+        FeatureCollection c = ds.getFeatureSource(type.getTypeName())
+                                .getFeatures(f);
 
         //System.out.println(index.getStatistics()) ;
         return c;
@@ -431,7 +445,8 @@ public class InMemoryFeatureCache implements FeatureCache {
                     }
 
                     public void visitNode(final INode n) {
-                        NodeCacheEntry e = (NodeCacheEntry) nodes.get(new Integer(n.getIdentifier()));
+                        NodeCacheEntry e = (NodeCacheEntry) nodes.get(new Integer(
+                                    n.getIdentifier()));
 
                         if (e == null) {
                             e = new NodeCacheEntry(n);
@@ -446,7 +461,8 @@ public class InMemoryFeatureCache implements FeatureCache {
                     }
                 });
 
-            return DataUtilities.collection((Feature[]) features.toArray(new Feature[1]));
+            return DataUtilities.collection((Feature[]) features.toArray(
+                    new Feature[1]));
         }
     }
 
@@ -477,8 +493,8 @@ public class InMemoryFeatureCache implements FeatureCache {
             if (e instanceof Index) {
                 // TODO handle case there is no child
                 Index n = (Index) e;
-                NodeCacheEntry entry = (NodeCacheEntry) nodes.get(new Integer(n.getChildIdentifier(
-                                0)));
+                NodeCacheEntry entry = (NodeCacheEntry) nodes.get(new Integer(
+                            n.getChildIdentifier(0)));
                 long accessTime;
 
                 if (entry == null) {
@@ -491,7 +507,8 @@ public class InMemoryFeatureCache implements FeatureCache {
                     NodeCacheEntry next = (NodeCacheEntry) nodes.get(new Integer(
                                 n.getChildIdentifier(i)));
 
-                    if ((next != null) && (next.getLastAccessTime() < accessTime)) {
+                    if ((next != null) &&
+                            (next.getLastAccessTime() < accessTime)) {
                         accessTime = next.getLastAccessTime();
                         entry = next;
                     }
@@ -526,7 +543,8 @@ public class InMemoryFeatureCache implements FeatureCache {
                 }
 
                 Region r = (Region) leaf.getShape();
-                Envelope e = new Envelope(r.getLow(0), r.getHigh(0), r.getLow(1), r.getHigh(1));
+                Envelope e = new Envelope(r.getLow(0), r.getHigh(0),
+                        r.getLow(1), r.getHigh(1));
                 tracker.unregister(e);
             }
         }

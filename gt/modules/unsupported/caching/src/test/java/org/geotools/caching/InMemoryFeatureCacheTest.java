@@ -15,27 +15,35 @@
  */
 package org.geotools.caching;
 
+import com.vividsolutions.jts.geom.Envelope;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import com.vividsolutions.jts.geom.Envelope;
-import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory;
-import org.opengis.filter.expression.Expression;
+
 import org.geotools.caching.impl.InMemoryFeatureCache;
+
 import org.geotools.data.DataUtilities;
 import org.geotools.data.Query;
 import org.geotools.data.memory.MemoryDataStore;
+
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+
 import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.filter.spatial.BBOXImpl;
+
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
+
+import java.io.IOException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class InMemoryFeatureCacheTest extends TestCase {
@@ -103,7 +111,8 @@ public class InMemoryFeatureCacheTest extends TestCase {
         assertEquals(data.size(), fc.size());
     }
 
-    public void testPut() throws IllegalAttributeException, FeatureCacheException {
+    public void testPut()
+        throws IllegalAttributeException, FeatureCacheException {
         Feature f = DataUtilities.template(type, "put");
         Feature c = cache.peek("put");
         assertNull(c);
@@ -130,9 +139,11 @@ public class InMemoryFeatureCacheTest extends TestCase {
         Feature f = (Feature) data.get(0);
         FilterFactory ff = new FilterFactoryImpl();
         Envelope env = f.getBounds();
-        Filter bb = ff.bbox(type.getDefaultGeometry().getName(), env.getMinX(), env.getMinY(),
-                env.getMaxX(), env.getMaxY(), type.getDefaultGeometry().getName());
-        Filter globalbb = ff.bbox(type.getDefaultGeometry().getName(), 0, env.getMinY(),
+        Filter bb = ff.bbox(type.getDefaultGeometry().getName(), env.getMinX(),
+                env.getMinY(), env.getMaxX(), env.getMaxY(),
+                type.getDefaultGeometry().getName());
+        Filter globalbb = ff.bbox(type.getDefaultGeometry().getName(), 0,
+                env.getMinY(),
                 env.getMinX() + ((env.getMaxX() - env.getMinX()) / 2),
                 env.getMinY() + ((env.getMaxY() - env.getMinY()) / 2),
                 type.getDefaultGeometry().getName());
@@ -146,8 +157,9 @@ public class InMemoryFeatureCacheTest extends TestCase {
         /*System.out.println(split[0]);
            System.out.println(split[1]);
            System.out.println(split[2]);*/
-        Filter newbb = ff.bbox(type.getDefaultGeometry().getName(), 0, env.getMinY(),
-                env.getMinX(), env.getMinY() + ((env.getMaxY() - env.getMinY()) / 2),
+        Filter newbb = ff.bbox(type.getDefaultGeometry().getName(), 0,
+                env.getMinY(), env.getMinX(),
+                env.getMinY() + ((env.getMaxY() - env.getMinY()) / 2),
                 type.getDefaultGeometry().getName());
         assertEquals(split[0], globalbb);
         assertEquals(split[1], newbb);
@@ -164,14 +176,16 @@ public class InMemoryFeatureCacheTest extends TestCase {
         ds.createSchema(type);
         ds.addFeatures(data);
         assertEquals(data.size(), cache.getCount(Query.ALL));
-        assertEquals(ds.getFeatureSource(type.getTypeName()).getBounds(), cache.getBounds());
+        assertEquals(ds.getFeatureSource(type.getTypeName()).getBounds(),
+            cache.getBounds());
         assertEquals(ds.getFeatureSource(type.getTypeName()).getBounds(Query.ALL),
             cache.getBounds(Query.ALL));
     }
 
     public void testEviction() throws IOException {
         FilterFactory ff = new FilterFactoryImpl();
-        Filter all = ff.bbox(type.getDefaultGeometry().getName(), 0, 0, 1000, 1000, "srs");
+        Filter all = ff.bbox(type.getDefaultGeometry().getName(), 0, 0, 1000,
+                1000, "srs");
         FeatureCollection fc = cache.getFeatures(all);
         assertEquals(data.size(), fc.size());
         fc = cache.getFeatures(all);

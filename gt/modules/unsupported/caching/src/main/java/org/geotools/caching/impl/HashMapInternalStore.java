@@ -15,12 +15,14 @@
  */
 package org.geotools.caching.impl;
 
+import org.geotools.caching.InternalStore;
+
+import org.geotools.feature.Feature;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
-import org.geotools.caching.InternalStore;
-import org.geotools.feature.Feature;
 
 
 /** In-memory implementation of InternalStore, using a HashMap storage.
