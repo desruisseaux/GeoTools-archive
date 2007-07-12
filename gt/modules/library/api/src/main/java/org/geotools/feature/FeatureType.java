@@ -285,6 +285,7 @@ public interface FeatureType {
      * </p>
      *
      * @return The attribute type of the default geometry, which will contain the position.
+     * @deprecated use {@link #getPrimaryGeometry()}.
      */
     GeometryAttributeType getDefaultGeometry();
 
