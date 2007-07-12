@@ -839,7 +839,7 @@ scanForType:    for (int i=0; i<FACTORY_TYPES.length; i++) {
                         finder.setFullScanAllowed(isFullScanAllowed());
                         return finder;
                     }
-                }
+                }                
             }
             return null;
         }

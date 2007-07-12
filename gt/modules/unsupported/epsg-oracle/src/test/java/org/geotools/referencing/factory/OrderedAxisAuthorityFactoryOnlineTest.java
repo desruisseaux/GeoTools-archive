@@ -312,8 +312,9 @@ public class OrderedAxisAuthorityFactoryOnlineTest extends OracleOnlineTestCase 
         final CRSAuthorityFactory factory = ReferencingFactoryFinder.getCRSAuthorityFactory(
                 "EPSG", new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE));
         assertTrue(factory instanceof AbstractAuthorityFactory);
-        final IdentifiedObjectFinder finder = ((AbstractAuthorityFactory) factory).
-                getIdentifiedObjectFinder(CoordinateReferenceSystem.class);
+        AbstractAuthorityFactory findable = (AbstractAuthorityFactory) factory;
+        final IdentifiedObjectFinder finder = findable.getIdentifiedObjectFinder(CoordinateReferenceSystem.class);
+        
         /*
          * We tested in DefaultFactoryTest that WGS84 is not found when searching
          * directly in ThreadedEpsgFactory. Now we perform the same search through the

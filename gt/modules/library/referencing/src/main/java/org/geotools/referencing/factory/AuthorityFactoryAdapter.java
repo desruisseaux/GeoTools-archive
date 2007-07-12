@@ -486,7 +486,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     }
 
     /**
-     * Returns one of the underlying factories as an instance of the Geotools implementation. If
+     * Returns one of the underlying factories as an instance of the GeoTools implementation. If
      * there is none of them, then returns {@code null} or throws an exception if {@code caller}
      * is not null.
      */

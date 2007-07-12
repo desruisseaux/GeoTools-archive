@@ -21,6 +21,7 @@ package org.geotools.referencing.factory;
 // J2SE dependencies
 import java.util.Set;
 import java.util.Iterator;
+import java.util.logging.Logger;
 
 // OpenGIS dependencies
 import org.opengis.util.GenericName;
@@ -317,7 +318,8 @@ public class IdentifiedObjectFinder {
             IdentifiedObject candidate;
             try {
                 candidate = proxy.create(code);
-            } catch (FactoryException e) {
+            }
+            catch (FactoryException e) {
                 // Some object cannot be created properly.
                 continue;
             }

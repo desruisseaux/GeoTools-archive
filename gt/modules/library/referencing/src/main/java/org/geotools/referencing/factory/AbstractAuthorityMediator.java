@@ -78,17 +78,15 @@ import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
 import org.opengis.util.InternationalString;
 
 /**
- * An authority mediator that consults (a possibily shared) cache before
- * delegating the generation of the content to an authority factory.
+ * An authority mediator that consults (a possibily shared) cache before delegating the generation
+ * of the content to an authority factory.
  * </p>
- * The behaviour of the {@code createFoo(String)} methods first looks if a
- * previously created object exists for the given code. If such an object
- * exists, it is returned directly. The testing of the cache is synchronized and
- * may block if the referencing object is under construction.
+ * The behaviour of the {@code createFoo(String)} methods first looks if a previously created object
+ * exists for the given code. If such an object exists, it is returned directly. The testing of the
+ * cache is synchronized and may block if the referencing object is under construction.
  * <p>
- * If the object is not yet created, the definition is delegated to the
- * appropriate {@code createFoo} method of the factory, which will 
- * cache the result for next time.
+ * If the object is not yet created, the definition is delegated to the appropriate
+ * {@code createFoo} method of the factory, which will cache the result for next time.
  * <p>
  * This object is responsible for using a provided {{ObjectCache}}.
  * </p>
@@ -96,36 +94,39 @@ import org.opengis.util.InternationalString;
  * @since 2.4
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/library/referencing/src/main/java/org/geotools/referencing/factory/AbstractBufferedAuthorityFactory.java $
- * @version $Id: BufferedAuthorityDecorator.java 26038 2007-06-27 01:58:12Z
- *          jgarnett $
+ * @version $Id$
  * @author Jody Garnett (Refractions Research)
  * @author Cory Horner (Refractions Research)
  */
-public abstract class AbstractAuthorityMediator extends
-        ReferencingFactory implements AuthorityFactory, AuthorityFactory2, CRSAuthorityFactory,
-        CSAuthorityFactory, DatumAuthorityFactory,
-        CoordinateOperationAuthorityFactory, BufferedFactory {
+public abstract class AbstractAuthorityMediator extends AbstractAuthorityFactory
+        implements
+            AuthorityFactory,
+            CRSAuthorityFactory,
+            CSAuthorityFactory,
+            DatumAuthorityFactory,
+            CoordinateOperationAuthorityFactory,
+            BufferedFactory {
 
     static final int PRIORITY = MAXIMUM_PRIORITY - 10;
-    
+
     /**
-     * Cache to be used for referencing objects defined by this authority.
-     * Please note that this cache may be shared!
+     * Cache to be used for referencing objects defined by this authority. Please note that this
+     * cache may be shared!
      */
     ObjectCache cache;
 
     /**
-     * Pool to hold workers which will be used to construct referencing objects
-     * which are not present in the cache.
+     * Pool to hold workers which will be used to construct referencing objects which are not
+     * present in the cache.
      */
     private ObjectPool workers;
-    
+
     /**
-     * Configuration object for the object pool. The constructor reads its hints
-     * and sets the pool configuration in this object;
+     * Configuration object for the object pool. The constructor reads its hints and sets the pool
+     * configuration in this object;
      */
     Config poolConfig = new Config();
-    
+
     /**
      * A container of the "real factories" actually used to construct objects.
      */
@@ -134,107 +135,98 @@ public abstract class AbstractAuthorityMediator extends
     /**
      * Constructs an instance making use of the default cache and priority level.
      */
-    protected AbstractAuthorityMediator(){
-        this( PRIORITY );
+    protected AbstractAuthorityMediator() {
+        this(PRIORITY);
     }
-    
+
     /**
      * Constructs an instance based on the provided Hints
      * 
-     * @param factory
-     *            The factory to cache. Can not be {@code null}.
+     * @param factory The factory to cache. Can not be {@code null}.
      */
-    protected AbstractAuthorityMediator(Hints hints) {
-        this( PRIORITY, hints );
+    protected AbstractAuthorityMediator( Hints hints ) {
+        this(PRIORITY, hints);
     }
     /**
      * Constructs an instance making use of the default cache.
      * 
-     * @param factory
-     *            The factory to cache. Can not be {@code null}.
+     * @param factory The factory to cache. Can not be {@code null}.
      */
-    protected AbstractAuthorityMediator(int priority) {
-        this(priority, ObjectCaches.create("weak", 50),
-                ReferencingFactoryContainer.instance(null));
+    protected AbstractAuthorityMediator( int priority ) {
+        this(priority, ObjectCaches.create("weak", 50), ReferencingFactoryContainer.instance(null));
     }
 
     /**
      * Constructs an instance making use of the default cache.
      * 
-     * @param factory
-     *            The factory to cache. Can not be {@code null}.
+     * @param factory The factory to cache. Can not be {@code null}.
      */
-    protected AbstractAuthorityMediator(int priority, Hints hints) {
-        this(priority, ObjectCaches.create(hints), ReferencingFactoryContainer
-                .instance(hints));
-        //configurable behaviour
+    protected AbstractAuthorityMediator( int priority, Hints hints ) {
+        this(priority, ObjectCaches.create(hints), ReferencingFactoryContainer.instance(hints));
+        // configurable behaviour
         poolConfig.minIdle = Hints.AUTHORITY_MIN_IDLE.toValue(hints);
         poolConfig.maxIdle = Hints.AUTHORITY_MAX_IDLE.toValue(hints);
         poolConfig.maxActive = Hints.AUTHORITY_MAX_ACTIVE.toValue(hints);
         poolConfig.minEvictableIdleTimeMillis = Hints.AUTHORITY_MIN_EVICT_IDLETIME.toValue(hints);
-        poolConfig.softMinEvictableIdleTimeMillis =  Hints.AUTHORITY_SOFTMIN_EVICT_IDLETIME.toValue(hints);
-        poolConfig.timeBetweenEvictionRunsMillis =  Hints.AUTHORITY_TIME_BETWEEN_EVICTION_RUNS.toValue(hints);
-        
-        //static behaviour
-        poolConfig.maxWait = -1; //block indefinitely until a worker is available
+        poolConfig.softMinEvictableIdleTimeMillis = Hints.AUTHORITY_SOFTMIN_EVICT_IDLETIME
+                .toValue(hints);
+        poolConfig.timeBetweenEvictionRunsMillis = Hints.AUTHORITY_TIME_BETWEEN_EVICTION_RUNS
+                .toValue(hints);
+
+        // static behaviour
+        poolConfig.maxWait = -1; // block indefinitely until a worker is available
         poolConfig.whenExhaustedAction = GenericObjectPool.WHEN_EXHAUSTED_BLOCK;
     }
 
     /**
      * Constructs an instance making use of the indicated cache.
      * <p>
-     * This constructor is protected because subclasses must declare which of
-     * the {@link DatumAuthorityFactory}, {@link CSAuthorityFactory},
-     * {@link CRSAuthorityFactory} and
-     * {@link CoordinateOperationAuthorityFactory} interfaces they choose to
-     * implement.
+     * This constructor is protected because subclasses must declare which of the
+     * {@link DatumAuthorityFactory}, {@link CSAuthorityFactory}, {@link CRSAuthorityFactory} and
+     * {@link CoordinateOperationAuthorityFactory} interfaces they choose to implement.
      * 
-     * @param factory
-     *            The factory to cache. Can not be {@code null}.
-     * @param maxStrongReferences
-     *            The maximum number of objects to keep by strong reference.
+     * @param factory The factory to cache. Can not be {@code null}.
+     * @param maxStrongReferences The maximum number of objects to keep by strong reference.
      */
-    protected AbstractAuthorityMediator(int priority, ObjectCache cache,
-            ReferencingFactoryContainer container) {
+    protected AbstractAuthorityMediator( int priority, ObjectCache cache,
+            ReferencingFactoryContainer container ) {
         super(priority);
         this.factories = container;
         this.cache = cache;
     }
-    
+
     /**
-     * Returns a finder which can be used for looking up unidentified objects. The finder
-     * fetchs a fully {@linkplain IdentifiedObject identified object} from an incomplete one,
-     * for example from an object without identifier or "{@code AUTHORITY[...]}" element in
-     * <cite>Well Known Text</cite> terminology.
-     *
-     * @param  type The type of objects to look for. Should be a GeoAPI interface like
-     *         {@code GeographicCRS.class}, but this method accepts also implementation
-     *         class. If the type is unknown, use {@code IdentifiedObject.class}. A more
-     *         accurate type may help to speed up the search, since it reduces the amount
-     *         of tables to scan in some implementations like the factories backed by
-     *         EPSG database.
+     * Returns a finder which can be used for looking up unidentified objects. The finder fetchs a
+     * fully {@linkplain IdentifiedObject identified object} from an incomplete one, for example
+     * from an object without identifier or "{@code AUTHORITY[...]}" element in <cite>Well Known
+     * Text</cite> terminology.
+     * 
+     * @param type The type of objects to look for. Should be a GeoAPI interface like
+     *        {@code GeographicCRS.class}, but this method accepts also implementation class. If
+     *        the type is unknown, use {@code IdentifiedObject.class}. A more accurate type may
+     *        help to speed up the search, since it reduces the amount of tables to scan in some
+     *        implementations like the factories backed by EPSG database.
      * @return A finder to use for looking up unidentified objects.
      * @throws FactoryException if the finder can not be created.
-     *
      * @since 2.4
      */
     public IdentifiedObjectFinder getIdentifiedObjectFinder(
-            final Class/*<? extends IdentifiedObject>*/ type) throws FactoryException
-    {
+            final Class/* <? extends IdentifiedObject> */type ) throws FactoryException {
         return new IdentifiedObjectFinder(this, type);
-    }    
-    
+    }
+
     /**
      * True if this mediator is currently connected to one or more workers.
+     * 
      * @return
      */
-    public boolean isConnected(){
-        return (workers.getNumActive() + workers.getNumIdle() ) > 0;
+    public boolean isConnected() {
+        return (workers.getNumActive() + workers.getNumIdle()) > 0;
     }
-    
+
     ObjectPool getPool() {
         if (workers == null) {
-            //create pool
+            // create pool
             PoolableObjectFactory objectFactory = new AuthorityPoolableObjectFactory();
             ObjectPoolFactory poolFactory = new GenericObjectPoolFactory(objectFactory, poolConfig);
             this.setPool(poolFactory.createPool());
@@ -242,49 +234,27 @@ public abstract class AbstractAuthorityMediator extends
         return workers;
     }
 
-    void setPool(ObjectPool pool) {
+    void setPool( ObjectPool pool ) {
         this.workers = pool;
     }
 
     //
     // Utility Methods and Cache Care and Feeding
     //
-    protected String toKey(String code) {
+    protected String toKey( String code ) {
         return ObjectCaches.toKey(getAuthority(), code);
     }
 
     /**
-     * Trims the authority scope, if present. For example if this factory is an
-     * EPSG authority factory and the specified code start with the "EPSG:"
-     * prefix, then the prefix is removed. Otherwise, the string is returned
-     * unchanged (except for leading and trailing spaces).
+     * Trims the authority scope, if present. For example if this factory is an EPSG authority
+     * factory and the specified code start with the "EPSG:" prefix, then the prefix is removed.
+     * Otherwise, the string is returned unchanged (except for leading and trailing spaces).
      * 
-     * @param code
-     *            The code to trim.
+     * @param code The code to trim.
      * @return The code without the authority scope.
      */
-    protected String trimAuthority(String code) {
+    protected String trimAuthority( String code ) {
         return toKey(code);
-    }
-
-    /**
-     * Creates an exception for an unknown authority code. This convenience
-     * method is provided for implementation of {@code createXXX} methods.
-     * 
-     * @param type
-     *            The GeoAPI interface that was to be created (e.g.
-     *            {@code CoordinateReferenceSystem.class}).
-     * @param code
-     *            The unknown authority code.
-     * @return An exception initialized with an error message built from the
-     *         specified informations.
-     */
-    protected final NoSuchAuthorityCodeException noSuchAuthorityCode(
-            final Class type, final String code) {
-        final InternationalString authority = getAuthority().getTitle();
-        return new NoSuchAuthorityCodeException(Errors.format(
-                ErrorKeys.NO_SUCH_AUTHORITY_CODE_$3, code, authority, Utilities
-                        .getShortName(type)), authority.toString(), code);
     }
 
     /**
@@ -292,8 +262,7 @@ public abstract class AbstractAuthorityMediator extends
      */
     public abstract Citation getAuthority();
 
-    
-    public Set getAuthorityCodes(Class type) throws FactoryException {
+    public Set getAuthorityCodes( Class type ) throws FactoryException {
         Set codes = (Set) cache.get(type);
         if (codes == null) {
             try {
@@ -302,8 +271,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (codes == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         codes = worker.getAuthorityCodes(type);
                         cache.put(type, codes);
                     } catch (FactoryException e) {
@@ -314,8 +282,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -326,10 +293,9 @@ public abstract class AbstractAuthorityMediator extends
         return codes;
     }
 
-    public abstract InternationalString getDescriptionText(String code)
-            throws FactoryException;
+    public abstract InternationalString getDescriptionText( String code ) throws FactoryException;
 
-    public IdentifiedObject createObject(String code) throws FactoryException {
+    public IdentifiedObject createObject( String code ) throws FactoryException {
         final String key = toKey(code);
         IdentifiedObject obj = (IdentifiedObject) cache.get(key);
         if (obj == null) {
@@ -339,8 +305,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (obj == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         obj = worker.createDerivedCRS(code);
                         cache.put(key, obj);
                     } catch (FactoryException e) {
@@ -351,8 +316,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -366,8 +330,7 @@ public abstract class AbstractAuthorityMediator extends
     //
     // CRSAuthority
     //
-    public synchronized CompoundCRS createCompoundCRS(final String code)
-            throws FactoryException {
+    public synchronized CompoundCRS createCompoundCRS( final String code ) throws FactoryException {
         final String key = toKey(code);
         CompoundCRS crs = (CompoundCRS) cache.get(key);
         if (crs == null) {
@@ -377,8 +340,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (crs == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         crs = worker.createCompoundCRS(code);
                         cache.put(key, crs);
                     } catch (FactoryException e) {
@@ -389,8 +351,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -401,11 +362,10 @@ public abstract class AbstractAuthorityMediator extends
         return crs;
     }
 
-    public CoordinateReferenceSystem createCoordinateReferenceSystem(String code)
+    public CoordinateReferenceSystem createCoordinateReferenceSystem( String code )
             throws FactoryException {
         final String key = toKey(code);
-        CoordinateReferenceSystem crs = (CoordinateReferenceSystem) cache
-                .get(key);
+        CoordinateReferenceSystem crs = (CoordinateReferenceSystem) cache.get(key);
         if (crs == null) {
             try {
                 cache.writeLock(key);
@@ -413,8 +373,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (crs == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         crs = worker.createCoordinateReferenceSystem(code);
                         cache.put(key, crs);
                     } catch (FactoryException e) {
@@ -425,8 +384,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -437,7 +395,7 @@ public abstract class AbstractAuthorityMediator extends
         return crs;
     }
 
-    public DerivedCRS createDerivedCRS(String code) throws FactoryException {
+    public DerivedCRS createDerivedCRS( String code ) throws FactoryException {
         final String key = toKey(code);
         DerivedCRS crs = (DerivedCRS) cache.get(key);
         if (crs == null) {
@@ -447,8 +405,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (crs == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         crs = worker.createDerivedCRS(code);
                         cache.put(key, crs);
                     } catch (FactoryException e) {
@@ -459,8 +416,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -471,8 +427,7 @@ public abstract class AbstractAuthorityMediator extends
         return crs;
     }
 
-    public EngineeringCRS createEngineeringCRS(String code)
-            throws FactoryException {
+    public EngineeringCRS createEngineeringCRS( String code ) throws FactoryException {
         final String key = toKey(code);
         EngineeringCRS crs = (EngineeringCRS) cache.get(key);
         if (crs == null) {
@@ -482,8 +437,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (crs == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         crs = worker.createEngineeringCRS(code);
                         cache.put(key, crs);
                     } catch (FactoryException e) {
@@ -494,8 +448,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -506,8 +459,7 @@ public abstract class AbstractAuthorityMediator extends
         return crs;
     }
 
-    public GeocentricCRS createGeocentricCRS(String code)
-            throws FactoryException {
+    public GeocentricCRS createGeocentricCRS( String code ) throws FactoryException {
         final String key = toKey(code);
         GeocentricCRS crs = (GeocentricCRS) cache.get(key);
         if (crs == null) {
@@ -517,8 +469,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (crs == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         crs = worker.createGeocentricCRS(code);
                         cache.put(key, crs);
                     } catch (FactoryException e) {
@@ -529,8 +480,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -541,8 +491,7 @@ public abstract class AbstractAuthorityMediator extends
         return crs;
     }
 
-    public GeographicCRS createGeographicCRS(String code)
-            throws FactoryException {
+    public GeographicCRS createGeographicCRS( String code ) throws FactoryException {
         final String key = toKey(code);
         GeographicCRS crs = (GeographicCRS) cache.get(key);
         if (crs == null) {
@@ -552,8 +501,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (crs == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         crs = worker.createGeographicCRS(code);
                         cache.put(key, crs);
                     } catch (FactoryException e) {
@@ -564,8 +512,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -576,7 +523,7 @@ public abstract class AbstractAuthorityMediator extends
         return crs;
     }
 
-    public ImageCRS createImageCRS(String code) throws FactoryException {
+    public ImageCRS createImageCRS( String code ) throws FactoryException {
         final String key = toKey(code);
         ImageCRS crs = (ImageCRS) cache.get(key);
         if (crs == null) {
@@ -586,8 +533,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (crs == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         crs = worker.createImageCRS(code);
                         cache.put(key, crs);
                     } catch (FactoryException e) {
@@ -598,8 +544,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -610,7 +555,7 @@ public abstract class AbstractAuthorityMediator extends
         return crs;
     }
 
-    public ProjectedCRS createProjectedCRS(String code) throws FactoryException {
+    public ProjectedCRS createProjectedCRS( String code ) throws FactoryException {
         final String key = toKey(code);
         ProjectedCRS crs = (ProjectedCRS) cache.get(key);
         if (crs == null) {
@@ -620,8 +565,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (crs == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         crs = worker.createProjectedCRS(code);
                         cache.put(key, crs);
                     } catch (FactoryException e) {
@@ -632,8 +576,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -644,7 +587,7 @@ public abstract class AbstractAuthorityMediator extends
         return crs;
     }
 
-    public TemporalCRS createTemporalCRS(String code) throws FactoryException {
+    public TemporalCRS createTemporalCRS( String code ) throws FactoryException {
         final String key = toKey(code);
         TemporalCRS crs = (TemporalCRS) cache.get(key);
         if (crs == null) {
@@ -654,8 +597,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (crs == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         crs = worker.createTemporalCRS(code);
                         cache.put(key, crs);
                     } catch (FactoryException e) {
@@ -666,8 +608,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -678,7 +619,7 @@ public abstract class AbstractAuthorityMediator extends
         return crs;
     }
 
-    public VerticalCRS createVerticalCRS(String code) throws FactoryException {
+    public VerticalCRS createVerticalCRS( String code ) throws FactoryException {
         final String key = toKey(code);
         VerticalCRS crs = (VerticalCRS) cache.get(key);
         if (crs == null) {
@@ -688,8 +629,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (crs == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         crs = worker.createVerticalCRS(code);
                         cache.put(key, crs);
                     } catch (FactoryException e) {
@@ -700,8 +640,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -715,7 +654,7 @@ public abstract class AbstractAuthorityMediator extends
     //
     // CSAuthority
     //
-    public CartesianCS createCartesianCS(String code) throws FactoryException {
+    public CartesianCS createCartesianCS( String code ) throws FactoryException {
         final String key = toKey(code);
         CartesianCS cs = (CartesianCS) cache.get(key);
         if (cs == null) {
@@ -725,8 +664,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (cs == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         cs = worker.createCartesianCS(code);
                         cache.put(key, cs);
                     } catch (FactoryException e) {
@@ -737,8 +675,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -749,8 +686,7 @@ public abstract class AbstractAuthorityMediator extends
         return cs;
     }
 
-    public CoordinateSystem createCoordinateSystem(String code)
-            throws FactoryException {
+    public CoordinateSystem createCoordinateSystem( String code ) throws FactoryException {
         final String key = toKey(code);
         CoordinateSystem cs = (CoordinateSystem) cache.get(key);
         if (cs == null) {
@@ -760,8 +696,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (cs == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         cs = worker.createCoordinateSystem(code);
                         cache.put(key, cs);
                     } catch (FactoryException e) {
@@ -772,8 +707,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -785,8 +719,7 @@ public abstract class AbstractAuthorityMediator extends
     }
 
     // sample implemenation with get/test
-    public CoordinateSystemAxis createCoordinateSystemAxis(String code)
-            throws FactoryException {
+    public CoordinateSystemAxis createCoordinateSystemAxis( String code ) throws FactoryException {
         final String key = toKey(code);
         CoordinateSystemAxis axis = (CoordinateSystemAxis) cache.get(key);
         if (axis == null) {
@@ -796,8 +729,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (axis == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         axis = worker.createCoordinateSystemAxis(code);
                         cache.put(key, axis);
                     } catch (FactoryException e) {
@@ -808,8 +740,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -820,8 +751,7 @@ public abstract class AbstractAuthorityMediator extends
         return axis;
     }
 
-    public CylindricalCS createCylindricalCS(String code)
-            throws FactoryException {
+    public CylindricalCS createCylindricalCS( String code ) throws FactoryException {
         final String key = toKey(code);
         CylindricalCS cs = (CylindricalCS) cache.get(key);
         if (cs == null) {
@@ -831,8 +761,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (cs == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         cs = worker.createCylindricalCS(code);
                         cache.put(key, cs);
                     } catch (FactoryException e) {
@@ -843,8 +772,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -855,8 +783,7 @@ public abstract class AbstractAuthorityMediator extends
         return cs;
     }
 
-    public EllipsoidalCS createEllipsoidalCS(String code)
-            throws FactoryException {
+    public EllipsoidalCS createEllipsoidalCS( String code ) throws FactoryException {
         final String key = toKey(code);
         EllipsoidalCS cs = (EllipsoidalCS) cache.get(key);
         if (cs == null) {
@@ -866,8 +793,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (cs == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         cs = worker.createEllipsoidalCS(code);
                         cache.put(key, cs);
                     } catch (FactoryException e) {
@@ -878,8 +804,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -890,7 +815,7 @@ public abstract class AbstractAuthorityMediator extends
         return cs;
     }
 
-    public PolarCS createPolarCS(String code) throws FactoryException {
+    public PolarCS createPolarCS( String code ) throws FactoryException {
         final String key = toKey(code);
         PolarCS cs = (PolarCS) cache.get(key);
         if (cs == null) {
@@ -900,8 +825,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (cs == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         cs = worker.createPolarCS(code);
                         cache.put(key, cs);
                     } catch (FactoryException e) {
@@ -912,8 +836,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -924,7 +847,7 @@ public abstract class AbstractAuthorityMediator extends
         return cs;
     }
 
-    public SphericalCS createSphericalCS(String code) throws FactoryException {
+    public SphericalCS createSphericalCS( String code ) throws FactoryException {
         final String key = toKey(code);
         SphericalCS cs = (SphericalCS) cache.get(key);
         if (cs == null) {
@@ -934,8 +857,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (cs == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         cs = worker.createSphericalCS(code);
                         cache.put(key, cs);
                     } catch (FactoryException e) {
@@ -946,8 +868,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -958,7 +879,7 @@ public abstract class AbstractAuthorityMediator extends
         return cs;
     }
 
-    public TimeCS createTimeCS(String code) throws FactoryException {
+    public TimeCS createTimeCS( String code ) throws FactoryException {
         final String key = toKey(code);
         TimeCS cs = (TimeCS) cache.get(key);
         if (cs == null) {
@@ -968,8 +889,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (cs == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         cs = worker.createTimeCS(code);
                         cache.put(key, cs);
                     } catch (FactoryException e) {
@@ -980,8 +900,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -992,7 +911,7 @@ public abstract class AbstractAuthorityMediator extends
         return cs;
     }
 
-    public Unit createUnit(String code) throws FactoryException {
+    public Unit createUnit( String code ) throws FactoryException {
         final String key = toKey(code);
         Unit unit = (Unit) cache.get(key);
         if (unit == null) {
@@ -1002,8 +921,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (unit == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         unit = worker.createUnit(code);
                         cache.put(key, unit);
                     } catch (FactoryException e) {
@@ -1014,8 +932,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -1026,7 +943,7 @@ public abstract class AbstractAuthorityMediator extends
         return unit;
     }
 
-    public VerticalCS createVerticalCS(String code) throws FactoryException {
+    public VerticalCS createVerticalCS( String code ) throws FactoryException {
         final String key = toKey(code);
         VerticalCS cs = (VerticalCS) cache.get(key);
         if (cs == null) {
@@ -1036,8 +953,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (cs == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         cs = worker.createVerticalCS(code);
                         cache.put(key, cs);
                     } catch (FactoryException e) {
@@ -1048,8 +964,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -1063,7 +978,7 @@ public abstract class AbstractAuthorityMediator extends
     //
     // DatumAuthorityFactory
     //
-    public Datum createDatum(String code) throws FactoryException {
+    public Datum createDatum( String code ) throws FactoryException {
         final String key = toKey(code);
         Datum datum = (Datum) cache.get(key);
         if (datum == null) {
@@ -1073,8 +988,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (datum == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         datum = worker.createDatum(code);
                         cache.put(key, datum);
                     } catch (FactoryException e) {
@@ -1085,8 +999,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -1097,7 +1010,7 @@ public abstract class AbstractAuthorityMediator extends
         return datum;
     }
 
-    public Ellipsoid createEllipsoid(String code) throws FactoryException {
+    public Ellipsoid createEllipsoid( String code ) throws FactoryException {
         final String key = toKey(code);
         Ellipsoid ellipsoid = (Ellipsoid) cache.get(key);
         if (ellipsoid == null) {
@@ -1107,8 +1020,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (ellipsoid == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         ellipsoid = worker.createEllipsoid(code);
                         cache.put(key, ellipsoid);
                     } catch (FactoryException e) {
@@ -1119,8 +1031,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -1131,8 +1042,7 @@ public abstract class AbstractAuthorityMediator extends
         return ellipsoid;
     }
 
-    public EngineeringDatum createEngineeringDatum(String code)
-            throws FactoryException {
+    public EngineeringDatum createEngineeringDatum( String code ) throws FactoryException {
         final String key = toKey(code);
         EngineeringDatum datum = (EngineeringDatum) cache.get(key);
         if (datum == null) {
@@ -1142,8 +1052,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (datum == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         datum = worker.createEngineeringDatum(code);
                         cache.put(key, datum);
                     } catch (FactoryException e) {
@@ -1154,8 +1063,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -1166,8 +1074,7 @@ public abstract class AbstractAuthorityMediator extends
         return datum;
     }
 
-    public GeodeticDatum createGeodeticDatum(String code)
-            throws FactoryException {
+    public GeodeticDatum createGeodeticDatum( String code ) throws FactoryException {
         final String key = toKey(code);
         GeodeticDatum datum = (GeodeticDatum) cache.get(key);
         if (datum == null) {
@@ -1177,8 +1084,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (datum == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         datum = worker.createGeodeticDatum(code);
                         cache.put(key, datum);
                     } catch (FactoryException e) {
@@ -1189,8 +1095,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -1201,7 +1106,7 @@ public abstract class AbstractAuthorityMediator extends
         return datum;
     }
 
-    public ImageDatum createImageDatum(String code) throws FactoryException {
+    public ImageDatum createImageDatum( String code ) throws FactoryException {
         final String key = toKey(code);
         ImageDatum datum = (ImageDatum) cache.get(key);
         if (datum == null) {
@@ -1211,8 +1116,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (datum == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         datum = worker.createImageDatum(code);
                         cache.put(key, datum);
                     } catch (FactoryException e) {
@@ -1223,8 +1127,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -1235,8 +1138,7 @@ public abstract class AbstractAuthorityMediator extends
         return datum;
     }
 
-    public PrimeMeridian createPrimeMeridian(String code)
-            throws FactoryException {
+    public PrimeMeridian createPrimeMeridian( String code ) throws FactoryException {
         final String key = toKey(code);
         PrimeMeridian datum = (PrimeMeridian) cache.get(key);
         if (datum == null) {
@@ -1246,8 +1148,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (datum == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         datum = worker.createPrimeMeridian(code);
                         cache.put(key, datum);
                     } catch (FactoryException e) {
@@ -1258,8 +1159,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -1270,8 +1170,7 @@ public abstract class AbstractAuthorityMediator extends
         return datum;
     }
 
-    public TemporalDatum createTemporalDatum(String code)
-            throws FactoryException {
+    public TemporalDatum createTemporalDatum( String code ) throws FactoryException {
         final String key = toKey(code);
         TemporalDatum datum = (TemporalDatum) cache.get(key);
         if (datum == null) {
@@ -1281,8 +1180,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (datum == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         datum = worker.createTemporalDatum(code);
                         cache.put(key, datum);
                     } catch (FactoryException e) {
@@ -1293,8 +1191,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -1305,8 +1202,7 @@ public abstract class AbstractAuthorityMediator extends
         return datum;
     }
 
-    public VerticalDatum createVerticalDatum(String code)
-            throws FactoryException {
+    public VerticalDatum createVerticalDatum( String code ) throws FactoryException {
         final String key = toKey(code);
         VerticalDatum datum = (VerticalDatum) cache.get(key);
         if (datum == null) {
@@ -1316,8 +1212,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (datum == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         datum = worker.createVerticalDatum(code);
                         cache.put(key, datum);
                     } catch (FactoryException e) {
@@ -1328,8 +1223,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -1340,8 +1234,7 @@ public abstract class AbstractAuthorityMediator extends
         return datum;
     }
 
-    public CoordinateOperation createCoordinateOperation(String code)
-            throws FactoryException {
+    public CoordinateOperation createCoordinateOperation( String code ) throws FactoryException {
         final String key = toKey(code);
         CoordinateOperation operation = (CoordinateOperation) cache.get(key);
         if (operation == null) {
@@ -1351,8 +1244,7 @@ public abstract class AbstractAuthorityMediator extends
                 if (operation == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
                         operation = worker.createCoordinateOperation(code);
                         cache.put(key, operation);
                     } catch (FactoryException e) {
@@ -1363,8 +1255,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -1376,11 +1267,9 @@ public abstract class AbstractAuthorityMediator extends
     }
 
     public synchronized Set/* <CoordinateOperation> */createFromCoordinateReferenceSystemCodes(
-            final String sourceCode, final String targetCode)
-            throws FactoryException {
+            final String sourceCode, final String targetCode ) throws FactoryException {
 
-        final Object key = ObjectCaches.toKey(getAuthority(), sourceCode,
-                targetCode);
+        final Object key = ObjectCaches.toKey(getAuthority(), sourceCode, targetCode);
         Set operations = (Set) cache.get(key);
         if (operations == null) {
             try {
@@ -1389,9 +1278,9 @@ public abstract class AbstractAuthorityMediator extends
                 if (operations == null) {
                     AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool()
-                                .borrowObject();
-                        operations = worker.createFromCoordinateReferenceSystemCodes(sourceCode, targetCode);
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
+                        operations = worker.createFromCoordinateReferenceSystemCodes(sourceCode,
+                                targetCode);
                         cache.put(key, operations);
                     } catch (FactoryException e) {
                         throw e;
@@ -1401,8 +1290,7 @@ public abstract class AbstractAuthorityMediator extends
                         try {
                             getPool().returnObject(worker);
                         } catch (Exception e) {
-                            LOGGER.log(Level.WARNING,
-                                    "Unable to return worker " + e, e);
+                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
                 }
@@ -1413,23 +1301,60 @@ public abstract class AbstractAuthorityMediator extends
         return operations;
     }
 
+    public String getBackingStoreDescription() throws FactoryException {
+        AbstractCachedAuthorityFactory worker = null;
+        try {
+            worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
+            return worker.getBackingStoreDescription();
+        } catch (FactoryException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FactoryException(e);
+        }
+        finally {
+            try {
+                getPool().returnObject(worker);
+            } catch (Exception e) {
+                LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
+            }
+        }
+    }
     /**
-     * Creates the objects, subclasses of AbstractCachedAuthorityFactory, which
-     * are held by the ObjectPool.  This implementation simply delegates each
-     * method to the subclass.
+     * Clean up the object pool of workers (since we are shutting down).
+     * <p>
+     * Subclasses may wish to override this method if they have their own resources
+     * to clean up (like a database connection). If you do this please remember to call
+     * super.dispose().
+     * </p>
+     */
+    public void dispose() throws FactoryException {
+        if (workers != null) {
+            try {
+                workers.clear();
+            } catch (FactoryException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new FactoryException( e );
+            }
+            workers = null;
+        }
+    }
+    /**
+     * Creates the objects, subclasses of AbstractCachedAuthorityFactory, which are held by the
+     * ObjectPool. This implementation simply delegates each method to the subclass.
      * 
      * @author Cory Horner (Refractions Research)
      */
     private class AuthorityPoolableObjectFactory implements PoolableObjectFactory {
-        
+
         AuthorityPoolableObjectFactory() {
         }
 
-        public void activateObject(Object obj) throws Exception {
+        public void activateObject( Object obj ) throws Exception {
             activateWorker(obj);
         }
 
-        public void destroyObject(Object obj) throws Exception {
+        public void destroyObject( Object obj ) throws Exception {
             destroyWorker(obj);
         }
 
@@ -1437,25 +1362,25 @@ public abstract class AbstractAuthorityMediator extends
             return makeWorker();
         }
 
-        public void passivateObject(Object obj) throws Exception {
+        public void passivateObject( Object obj ) throws Exception {
             passivateWorker(obj);
         }
 
-        public boolean validateObject(Object obj) {
+        public boolean validateObject( Object obj ) {
             return validateWorker(obj);
         }
-        
+
     }
- 
+
     /**
      * Reinitialize an instance to be returned by the pool.
      */
-    protected abstract void activateWorker(Object obj) throws Exception;
+    protected abstract void activateWorker( Object obj ) throws Exception;
 
     /**
      * Destroys an instance no longer needed by the pool.
      */
-    protected abstract void destroyWorker(Object obj) throws Exception;
+    protected abstract void destroyWorker( Object obj ) throws Exception;
 
     /**
      * Creates an instance that can be returned by the pool.
@@ -1465,10 +1390,10 @@ public abstract class AbstractAuthorityMediator extends
     /**
      * Uninitialize an instance to be returned to the pool.
      */
-    protected abstract void passivateWorker(Object obj) throws Exception;
+    protected abstract void passivateWorker( Object obj ) throws Exception;
 
     /**
      * Ensures that the instance is safe to be returned by the pool.
      */
-    protected abstract boolean validateWorker(Object obj);    
+    protected abstract boolean validateWorker( Object obj );    
 }

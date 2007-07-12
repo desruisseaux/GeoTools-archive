@@ -71,16 +71,8 @@ import org.opengis.util.InternationalString;
 /**
  * An authority factory that caches all objects created by delegate factories.
  * This class is set up to cache the full complement of referencing objects:
- * <ul>
- * <li>AuthorityFactory from getAuthorityFactory()
- * <li>CRSAuthorityFactory from getCRSAuthorityFactory()
- * <li>CSAuthorityFactory from getCSAuthorityFactory()
- * <li>DatumAuthorityFactory from getDatumAuthorityFactory()
- * <li>CoordinateOperationAuthorityFactory from
- * getCoordinateOperationAuthorityFactory()
- * </ul>
- * In many cases a single implementation will support several of the above
- * interfaces.
+ * In many cases a single implementation will be used for several the authority factory
+ * interfaces - but this is not a requirement.
  * </p>
  * The behaviour of the {@code createFoo(String)} methods first looks if a
  * previously created object exists for the given code. If such an object
@@ -88,7 +80,7 @@ import org.opengis.util.InternationalString;
  * may block if the referencing object is under construction.
  * <p>
  * If the object is not yet created, the definition is delegated to the
- * appropratie the {@linkplain an AuthorityFactory authority factory} and the
+ * appropriate the {@linkplain an AuthorityFactory authority factory} and the
  * result is cached for next time.
  * <p>
  * This object is responsible for owning a {{ReferencingObjectCache}}; there are
@@ -102,7 +94,7 @@ import org.opengis.util.InternationalString;
  *          jgarnett $
  * @author Jody Garnett
  */
-public final class CachedAuthorityDecorator extends ReferencingFactory
+public final class CachedAuthorityDecorator extends AbstractAuthorityFactory
 		implements AuthorityFactory, CRSAuthorityFactory, CSAuthorityFactory,
 		DatumAuthorityFactory, CoordinateOperationAuthorityFactory,
 		BufferedFactory {
@@ -124,6 +116,9 @@ public final class CachedAuthorityDecorator extends ReferencingFactory
 
 	/** The delegate authority for coordinate operations. */
 	private CoordinateOperationAuthorityFactory operationAuthority;
+
+	/** The delegate authority for searching. */
+    private AbstractAuthorityFactory delegate;
 
 	/**
 	 * Constructs an instance wrapping the specified factory with a default
@@ -150,7 +145,7 @@ public final class CachedAuthorityDecorator extends ReferencingFactory
 	 * <p>
 	 * This constructor is protected because subclasses must declare which of
 	 * the {@link DatumAuthorityFactory}, {@link CSAuthorityFactory},
-	 * {@link CRSAuthorityFactory} and
+	 * {@link CRSAuthorityFactory} {@link SearchableAuthorityFactory} and
 	 * {@link CoordinateOperationAuthorityFactory} interfaces they choose to
 	 * implement.
 	 * 
@@ -161,12 +156,14 @@ public final class CachedAuthorityDecorator extends ReferencingFactory
 	 */
 	protected CachedAuthorityDecorator(AuthorityFactory factory,
 			ObjectCache cache) {
+	    super( ((ReferencingFactory)factory).getPriority() ); // TODO
 		this.cache = cache;
 		authority = factory;
 		crsAuthority = (CRSAuthorityFactory) factory;
 		csAuthority = (CSAuthorityFactory) factory;
 		datumAuthority = (DatumAuthorityFactory) factory;
 		operationAuthority = (CoordinateOperationAuthorityFactory) factory;
+		this.delegate = (AbstractAuthorityFactory) factory;
 	}
 
 	/** Utility method used to produce cache based on hint */
@@ -788,5 +785,22 @@ public final class CachedAuthorityDecorator extends ReferencingFactory
 			}
 		}
 		return operations;
-	}
+	}	
+	//
+	// AbstractAuthorityFactory
+	//
+    public IdentifiedObjectFinder getIdentifiedObjectFinder( Class type ) throws FactoryException {
+        return delegate.getIdentifiedObjectFinder( type );
+    }
+
+    public void dispose() throws FactoryException {
+        delegate.dispose();
+        cache.clear();
+        cache = null;
+        delegate = null;
+    }
+
+    public String getBackingStoreDescription() throws FactoryException {
+        return delegate.getBackingStoreDescription();
+    }
 }

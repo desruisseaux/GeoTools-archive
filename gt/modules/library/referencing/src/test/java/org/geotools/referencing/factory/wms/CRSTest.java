@@ -19,26 +19,21 @@ package org.geotools.referencing.factory.wms;
 import java.util.Collection;
 import java.util.logging.Level;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.GeographicCRS;
-import org.opengis.referencing.crs.CRSAuthorityFactory;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-// Geotools dependencies
 import org.geotools.referencing.CRS;
-import org.geotools.resources.Arguments;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.referencing.factory.IdentifiedObjectFinder;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
-import org.geotools.referencing.factory.ThreadedAuthorityFactory;
-
+import org.geotools.referencing.factory.CachedCRSAuthorityDecorator;
+import org.geotools.referencing.factory.IdentifiedObjectFinder;
+import org.geotools.resources.Arguments;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.GeographicCRS;
 
 /**
  * Tests {@link WebCRSFactory}.
@@ -51,7 +46,7 @@ public final class CRSTest extends TestCase {
     /**
      * The factory to test.
      */
-    private AbstractAuthorityFactory factory;
+    private WebCRSFactory factory;
 
     /**
      * Run the suite from the command line.
@@ -194,7 +189,7 @@ public final class CRSTest extends TestCase {
      * The objects found are expected to be cached.
      */
     public void testBufferedFind() throws FactoryException {
-        final AbstractAuthorityFactory factory = new Buffered(this.factory);
+        final AbstractAuthorityFactory factory = new CachedCRSAuthorityDecorator(this.factory);
         final GeographicCRS CRS84 = factory.createGeographicCRS("CRS:84");
         final IdentifiedObjectFinder finder = factory.getIdentifiedObjectFinder(CoordinateReferenceSystem.class);
 
@@ -217,12 +212,4 @@ public final class CRSTest extends TestCase {
         assertEquals("CRS:84", finder.findIdentifier(DefaultGeographicCRS.WGS84));
     }
 
-    /**
-     * For {@link #testBufferedFind}.
-     */
-    private static final class Buffered extends ThreadedAuthorityFactory implements CRSAuthorityFactory {
-        Buffered(final AbstractAuthorityFactory factory) {
-            super(factory);
-        }
-    }
 }

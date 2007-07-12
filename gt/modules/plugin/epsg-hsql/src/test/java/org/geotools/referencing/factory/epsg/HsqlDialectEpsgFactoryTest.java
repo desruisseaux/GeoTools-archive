@@ -41,4 +41,70 @@ public class HsqlDialectEpsgFactoryTest extends TestCase {
         assertTrue(authorityCodes.size() > 3000);
     }
 
+    public void XtestFind() throws FactoryException {
+        final IdentifiedObjectFinder finder = factory.getIdentifiedObjectFinder(
+                CoordinateReferenceSystem.class);
+        assertTrue("Full scan should be enabled by default.", finder.isFullScanAllowed());
+        assertNull("Should not find WGS84 because the axis order is not the same.",finder.find(DefaultGeographicCRS.WGS84));
+
+        String wkt;
+        wkt = "GEOGCS[\"WGS 84\",\n"                                    +
+              "  DATUM[\"World Geodetic System 1984\",\n"               +
+              "    SPHEROID[\"WGS 84\", 6378137.0, 298.257223563]],\n"  +
+              "  PRIMEM[\"Greenwich\", 0.0],\n"                         +
+              "  UNIT[\"degree\", 0.017453292519943295],\n"             +
+              "  AXIS[\"Geodetic latitude\", NORTH],\n"                 +
+              "  AXIS[\"Geodetic longitude\", EAST]]";
+        CoordinateReferenceSystem crs = CRS.parseWKT(wkt);
+        finder.setFullScanAllowed(false);
+        assertNull("Should not find without a full scan, because the WKT contains no identifier " +
+                   "and the CRS name is ambiguous (more than one EPSG object have this name).",
+                   finder.find(crs));
+
+        finder.setFullScanAllowed(true);
+        IdentifiedObject find = finder.find(crs);
+        assertNotNull("With full scan allowed, the CRS should be found.", find);
+        assertTrue("Should found an object equals (ignoring metadata) to the requested one.",
+                   CRS.equalsIgnoreMetadata(crs, find));
+        assertEquals("4326",
+                AbstractIdentifiedObject.getIdentifier(find, factory.getAuthority()).getCode());
+        finder.setFullScanAllowed(false);
+        // TODO: fix the full scan
+        //assertEquals("The CRS should still in the cache.","EPSG:4326", finder.findIdentifier(crs));
+        
+        /*
+         * The PROJCS below intentionnaly uses a name different from the one found in the
+         * EPSG database, in order to force a full scan (otherwise the EPSG database would
+         * find it by name, but we want to test the scan).
+         */
+        wkt = "PROJCS[\"Beijing 1954\",\n"                                 +
+              "   GEOGCS[\"Beijing 1954\",\n"                              +
+              "     DATUM[\"Beijing 1954\",\n"                             +
+              "       SPHEROID[\"Krassowsky 1940\", 6378245.0, 298.3]],\n" +
+              "     PRIMEM[\"Greenwich\", 0.0],\n"                         +
+              "     UNIT[\"degree\", 0.017453292519943295],\n"             +
+              "     AXIS[\"Geodetic latitude\", NORTH],\n"                 +
+              "     AXIS[\"Geodetic longitude\", EAST]],\n"                +
+              "   PROJECTION[\"Transverse Mercator\"],\n"                  +
+              "   PARAMETER[\"central_meridian\", 135.0],\n"               +
+              "   PARAMETER[\"latitude_of_origin\", 0.0],\n"               +
+              "   PARAMETER[\"scale_factor\", 1.0],\n"                     +
+              "   PARAMETER[\"false_easting\", 500000.0],\n"               +
+              "   PARAMETER[\"false_northing\", 0.0],\n"                   +
+              "   UNIT[\"m\", 1.0],\n"                                     +
+              "   AXIS[\"Northing\", NORTH],\n"                            +
+              "   AXIS[\"Easting\", EAST]]";
+        crs = CRS.parseWKT(wkt);
+        finder.setFullScanAllowed(false);
+        assertNull("Should not find the CRS without a full scan.", finder.find(crs));
+        finder.setFullScanAllowed(true);
+        find = finder.find(crs);
+        assertNotNull("With full scan allowed, the CRS should be found.", find);
+        assertTrue("Should found an object equals (ignoring metadata) to the requested one.",
+                   CRS.equalsIgnoreMetadata(crs, find));
+        assertEquals("2442", AbstractIdentifiedObject.getIdentifier(find, factory.getAuthority()).getCode());
+        finder.setFullScanAllowed(false);
+        assertEquals("The CRS should still in the cache.",
+                     "EPSG:2442", finder.findIdentifier(crs));
+    }
 }

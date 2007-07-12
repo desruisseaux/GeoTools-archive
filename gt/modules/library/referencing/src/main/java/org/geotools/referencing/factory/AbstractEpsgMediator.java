@@ -62,7 +62,8 @@ public abstract class AbstractEpsgMediator extends AbstractAuthorityMediator {
         return Citations.EPSG;
     }
     
-    public void dispose(){
+    public void dispose() throws FactoryException {
+        super.dispose();
         datasource = null;
     }
 

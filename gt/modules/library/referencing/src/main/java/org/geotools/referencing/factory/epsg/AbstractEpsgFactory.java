@@ -2492,20 +2492,6 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
     }
 
     /**
-     * Returns a finder which can be used for looking up unidentified objects.
-     *
-     * @param  type The type of objects to look for.
-     * @return A finder to use for looking up unidentified objects.
-     * @throws FactoryException if the finder can not be created.
-     */
-    //@Override
-    public IdentifiedObjectFinder getIdentifiedObjectFinder(
-            final Class/*<? extends IdentifiedObject>*/ type) throws FactoryException
-    {
-        return new Finder( type);
-    }
-
-    /**
      * An implementation of {@link IdentifiedObjectFinder} which scans over a smaller set
      * of authority codes.
      * <p>

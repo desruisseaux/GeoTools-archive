@@ -49,7 +49,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * method will reduce the amount of tables to be queried.
  * <p>
  * This class is useful when the same {@code create} method need to be invoked often,
- * but is unknow at compile time. It may also be used as a workaround for authority
+ * but is unknown at compile time. It may also be used as a workaround for authority
  * factories that don't implement the {@code createObject} method.
  * <p>
  * <b>Example:</b> The following code creates a proxy which will delegates its work to the

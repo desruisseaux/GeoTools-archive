@@ -96,7 +96,7 @@ import org.opengis.util.InternationalString;
  *          jgarnett $
  * @author Jody Garnett
  */
-public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
+public abstract class AbstractCachedAuthorityFactory extends AbstractAuthorityFactory
 		implements AuthorityFactory, CRSAuthorityFactory, CSAuthorityFactory,
 		DatumAuthorityFactory, CoordinateOperationAuthorityFactory,
 		BufferedFactory {
@@ -106,6 +106,13 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 	 * Please note that this cache may be shared!
 	 */
 	protected ObjectCache cache;
+	
+	/**
+	 * Cache to be used for finding referencing objects defined by this
+	 * authority.
+	 * Please note this cache is shared with multiple IdentifiedObjectFinderer.
+	 */
+	protected ObjectCache findCache;
 	
 	/**
 	 * A container of the "real factories" actually used to construct objects.
@@ -150,7 +157,9 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
 	protected AbstractCachedAuthorityFactory(int priority, ObjectCache cache, ReferencingFactoryContainer container) {
 		super( priority );
 		this.factories = container;
+		
 		this.cache = cache;
+		this.findCache = ObjectCaches.chain( ObjectCaches.create("weak",0), cache ); 
 	}
 
 	//
@@ -184,24 +193,6 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
             return name.asLocalName().toString().trim();
         }
         return code;
-    }
-    
-    /**
-     * Creates an exception for an unknow authority code. This convenience method is provided
-     * for implementation of {@code createXXX} methods.
-     *
-     * @param  type  The GeoAPI interface that was to be created
-     *               (e.g. {@code CoordinateReferenceSystem.class}).
-     * @param  code  The unknow authority code.
-     * @return An exception initialized with an error message built
-     *         from the specified informations.
-     */
-    protected final NoSuchAuthorityCodeException noSuchAuthorityCode(final Class  type,
-                                                                     final String code)
-    {
-        final InternationalString authority = getAuthority().getTitle();
-        return new NoSuchAuthorityCodeException(Errors.format(ErrorKeys.NO_SUCH_AUTHORITY_CODE_$3,
-                   code, authority, Utilities.getShortName(type)), authority.toString(), code);
     }
     
     /**
@@ -685,5 +676,102 @@ public abstract class AbstractCachedAuthorityFactory extends ReferencingFactory
     public void dispose() throws FactoryException {
         this.cache = null;
         this.factories = null;
+    }
+    
+    /**
+     * Returns a finder which can be used for looking up unidentified objects.
+     * The default implementation delegates lookup to the underlying backing
+     * store and caches the result.
+     *
+     * @since 2.4
+     */
+    //@Override
+    public synchronized IdentifiedObjectFinder getIdentifiedObjectFinder(
+            final Class/*<? extends IdentifiedObject>*/ type) throws FactoryException
+    {        
+        if( findCache == null ){
+            findCache = ObjectCaches.create("weak",250);
+        }
+        IdentifiedObjectFinder rawFinder = super.getIdentifiedObjectFinder( type );
+        //return new CachedFinder( rawFinder );
+        return rawFinder;
+    }
+
+    /**
+     * An implementation of {@link IdentifiedObjectFinder} which delegates
+     * the work to the underlying backing store and caches the result.
+     * <p>
+     * A separate ObjectCache, findCache, is used to store the values created over the course
+     * of finding. The findCache is set up as a "chain" allowing it to use our cache
+     * to prevent duplication of effort. In the future this findCache may be shared between
+     * instances.
+     * <p>
+     * <b>Implementation note:</b> we will create objects using directly the underlying backing
+     * store, not using the cache. This is because hundred of objects may be created during a
+     * scan while only one will be typically retained. We don't want to overload the cache with
+     * every false candidates that we encounter during the scan.
+     */
+    private final class CachedFinder extends IdentifiedObjectFinder.Adapter {
+        /**
+         * Creates a finder for the underlying backing store.
+         */
+        CachedFinder(final IdentifiedObjectFinder finder ) {
+            super(finder);
+        }
+
+        /**
+         * Looks up an object from this authority factory which is equals, ignoring metadata,
+         * to the specified object. The default implementation performs the same lookup than
+         * the backing store and caches the result.
+         */
+        //@Override
+        public IdentifiedObject find(final IdentifiedObject object) throws FactoryException {
+            /*
+             * Do not synchronize on 'BufferedAuthorityFactory.this'. This method may take a
+             * while to execute and we don't want to block other threads. The synchronizations
+             * in the 'create' methods and in the 'findPool' map should be suffisient.
+             *
+             * TODO: avoid to search for the same object twice. For now we consider that this
+             *       is not a big deal if the same object is searched twice; it is "just" a
+             *       waste of CPU.
+             */
+            IdentifiedObject candidate;
+            candidate = (IdentifiedObject) findCache.get(object);
+            
+            if (candidate == null) {
+                // Must delegates to 'finder' (not to 'super') in order to take
+                // advantage of the method overriden by AllAuthoritiesFactory.
+                IdentifiedObject found = finder.find(object);
+                if (found != null) {
+                    try {
+                        findCache.writeLock(object);
+                        candidate = (IdentifiedObject) findCache.peek(object);
+                        if( candidate == null ){
+                            findCache.put(object, found);
+                            return found;
+                        }
+
+                    } finally {
+                        findCache.writeLock(object);
+                    }
+                }
+            }
+            return candidate;
+        }
+
+        /**
+         * Returns the identifier for the specified object.
+         */
+        //@Override
+        public String findIdentifier(final IdentifiedObject object) throws FactoryException {
+            IdentifiedObject candidate;
+            candidate = (IdentifiedObject) findCache.get(object);            
+            if (candidate != null) {
+                return getIdentifier(candidate);
+            }
+            // We don't rely on super-class implementation, because we want to
+            // take advantage of the method overriden by AllAuthoritiesFactory.
+            return finder.findIdentifier(object);
+        }
     }
 }

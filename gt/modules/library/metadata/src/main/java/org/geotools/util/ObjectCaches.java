@@ -94,6 +94,72 @@ public final class ObjectCaches {
     }
 
     /**
+     * Create a two level cache, operates as a level1 cache that is willing to
+     * obtain values from a (usually shared) level2 cache.
+     * <p>
+     * This functionality is used to tie two ObjectCache implementations together
+     * (allowing them to collaborate while focusing on different use cases).
+     * The real world example of chaining is in {@link AbstractFindableAuthorityFactory} in which:
+     * <ul>
+     * <li>create uses: chain( cache, findCache )
+     * <li>find uses: chain( findCache, cache )
+     * </ul>
+     * In this manner the find operation does not upset normal cache. It will not create any
+     * objects already present in the cache.
+     * 
+     * @param level1
+     * @param level2
+     * @return ObjectCache
+     */
+    public static ObjectCache chain( final ObjectCache level1, final ObjectCache level2 ){
+        if ( level1 == level2 ) {
+            return level1;        
+        }
+        if( level1 == null ) return level2;
+        if( level2 == null ) return level1;
+        return new ObjectCache(){
+            public void clear() {
+                level1.clear();
+            }
+            public Object get( Object key ) {
+                Object value = level1.get( key );
+                if( value == null ){
+                    Object check = level2.get( key );
+                    if( check != null ) {
+                        try {
+                            level1.writeLock(key);
+                            value = level1.peek(key);
+                            if( value == null ){
+                                level1.put(key, check );
+                                value = check;
+                            }
+                        }
+                        finally {
+                            level1.writeUnLock(key);
+                        }
+                    }
+                }
+                return value;
+            }
+
+            public Object peek( Object key ) {  
+                return level1.peek(key);                
+            }
+
+            public void put( Object key, Object object ) {
+                level1.put(key, object );
+            }
+
+            public void writeLock( Object key ) {
+                level1.writeLock(key);
+            }
+
+            public void writeUnLock( Object key ) {
+                level1.writeLock(key);                
+            }            
+        };
+    }
+    /**
      * Utility method used to produce cache based on provide Hint
      */
     public static ObjectCache create( Hints hints )
