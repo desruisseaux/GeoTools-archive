@@ -56,7 +56,7 @@ public class ShapefileServiceTest extends TestCaseSupport {
 	//
 	public void testShapefileExists() throws Exception {
 	    File file = copyShapefiles( STATE_POP );
-	    URL url = file.toURI().toURL();
+	    URL url = file.toURL();
 	    
 	    HashMap params = new HashMap();
         params.put( ShapefileDataStoreFactory.URLP.key, url );
