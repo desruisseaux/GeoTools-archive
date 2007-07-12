@@ -74,16 +74,16 @@ import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 
 /**
- * An authority factory that consults (a possibily shared) cache before generating
+ * An authority factory that consults (a possibly shared) cache before generating
  * content itself.
  * </p>
- * The behaviour of the {@code createFoo(String)} methods first looks if a
+ * The behavior of the {@code createFoo(String)} methods first looks if a
  * previously created object exists for the given code. If such an object
  * exists, it is returned directly. The testing of the cache is synchronized and
  * may block if the referencing object is under construction.
  * <p>
  * If the object is not yet created, the definition is delegated to the
- * appropratie the {@code generateFoo} methd and the result is cached for
+ * appropriate the {@code generateFoo} method and the result is cached for
  * next time.
  * <p>
  * This object is responsible for using a provided {{ReferencingObjectCache}}.
@@ -693,8 +693,7 @@ public abstract class AbstractCachedAuthorityFactory extends AbstractAuthorityFa
             findCache = ObjectCaches.create("weak",250);
         }
         IdentifiedObjectFinder rawFinder = super.getIdentifiedObjectFinder( type );
-        //return new CachedFinder( rawFinder );
-        return rawFinder;
+        return new CachedFinder( rawFinder );        
     }
 
     /**
@@ -711,7 +710,7 @@ public abstract class AbstractCachedAuthorityFactory extends AbstractAuthorityFa
      * scan while only one will be typically retained. We don't want to overload the cache with
      * every false candidates that we encounter during the scan.
      */
-    private final class CachedFinder extends IdentifiedObjectFinder.Adapter {
+    private final class CachedFinder extends IdentifiedObjectFinder {
         /**
          * Creates a finder for the underlying backing store.
          */
@@ -739,9 +738,7 @@ public abstract class AbstractCachedAuthorityFactory extends AbstractAuthorityFa
             candidate = (IdentifiedObject) findCache.get(object);
             
             if (candidate == null) {
-                // Must delegates to 'finder' (not to 'super') in order to take
-                // advantage of the method overriden by AllAuthoritiesFactory.
-                IdentifiedObject found = finder.find(object);
+                IdentifiedObject found = super.find(object);
                 if (found != null) {
                     try {
                         findCache.writeLock(object);
@@ -769,9 +766,7 @@ public abstract class AbstractCachedAuthorityFactory extends AbstractAuthorityFa
             if (candidate != null) {
                 return getIdentifier(candidate);
             }
-            // We don't rely on super-class implementation, because we want to
-            // take advantage of the method overriden by AllAuthoritiesFactory.
-            return finder.findIdentifier(object);
+            return super.findIdentifier(object);
         }
     }
 }

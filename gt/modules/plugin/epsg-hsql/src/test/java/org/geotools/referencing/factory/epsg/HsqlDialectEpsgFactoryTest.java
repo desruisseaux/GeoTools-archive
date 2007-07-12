@@ -15,14 +15,21 @@ import javax.sql.DataSource;
 import junit.framework.TestCase;
 
 public class HsqlDialectEpsgFactoryTest extends TestCase {
-    private HsqlDialectEpsgFactory factory;
-
+    
+    private static HsqlDialectEpsgFactory factory;
+    private static IdentifiedObjectFinder finder;
+    
     protected void setUp() throws Exception {
         super.setUp();
-        DataSource datasource = HsqlEpsgDatabase.createDataSource();
-        Connection connection = datasource.getConnection();
-        Hints hints = new Hints(Hints.BUFFER_POLICY, "default");
-        factory = new HsqlDialectEpsgFactory(hints, connection);
+        if( factory == null ){
+            DataSource datasource = HsqlEpsgDatabase.createDataSource();
+            Connection connection = datasource.getConnection();
+            Hints hints = new Hints(Hints.BUFFER_POLICY, "default");
+            factory = new HsqlDialectEpsgFactory(hints, connection);
+        }
+        if( finder == null ){
+            finder = factory.getIdentifiedObjectFinder(CoordinateReferenceSystem.class);
+        }
     }
 
     public void testCreation() throws Exception {
@@ -36,17 +43,11 @@ public class HsqlDialectEpsgFactoryTest extends TestCase {
 
     public void testAuthorityCodes() throws Exception {
         Set authorityCodes = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
-
         assertNotNull(authorityCodes);
         assertTrue(authorityCodes.size() > 3000);
     }
 
-    public void XtestFind() throws FactoryException {
-        final IdentifiedObjectFinder finder = factory.getIdentifiedObjectFinder(
-                CoordinateReferenceSystem.class);
-        assertTrue("Full scan should be enabled by default.", finder.isFullScanAllowed());
-        assertNull("Should not find WGS84 because the axis order is not the same.",finder.find(DefaultGeographicCRS.WGS84));
-
+    public void testFindWSG84() throws FactoryException {
         String wkt;
         wkt = "GEOGCS[\"WGS 84\",\n"                                    +
               "  DATUM[\"World Geodetic System 1984\",\n"               +
@@ -55,29 +56,32 @@ public class HsqlDialectEpsgFactoryTest extends TestCase {
               "  UNIT[\"degree\", 0.017453292519943295],\n"             +
               "  AXIS[\"Geodetic latitude\", NORTH],\n"                 +
               "  AXIS[\"Geodetic longitude\", EAST]]";
+        
         CoordinateReferenceSystem crs = CRS.parseWKT(wkt);
         finder.setFullScanAllowed(false);
+        
         assertNull("Should not find without a full scan, because the WKT contains no identifier " +
                    "and the CRS name is ambiguous (more than one EPSG object have this name).",
                    finder.find(crs));
 
         finder.setFullScanAllowed(true);
         IdentifiedObject find = finder.find(crs);
-        assertNotNull("With full scan allowed, the CRS should be found.", find);
-        assertTrue("Should found an object equals (ignoring metadata) to the requested one.",
-                   CRS.equalsIgnoreMetadata(crs, find));
-        assertEquals("4326",
-                AbstractIdentifiedObject.getIdentifier(find, factory.getAuthority()).getCode());
-        finder.setFullScanAllowed(false);
-        // TODO: fix the full scan
-        //assertEquals("The CRS should still in the cache.","EPSG:4326", finder.findIdentifier(crs));
         
+        assertNotNull("With full scan allowed, the CRS should be found.", find);
+        
+        assertTrue("Should found an object equals (ignoring metadata) to the requested one.",CRS.equalsIgnoreMetadata(crs, find));
+        assertEquals("4326",AbstractIdentifiedObject.getIdentifier(find, factory.getAuthority()).getCode());
+        
+        finder.setFullScanAllowed(false);
+        assertEquals("The CRS should still in the cache.","EPSG:4326", finder.findIdentifier(crs));
+    }
+    public void testFindBeijing1954() throws FactoryException {
         /*
-         * The PROJCS below intentionnaly uses a name different from the one found in the
+         * The PROJCS below intentionally uses a name different from the one found in the
          * EPSG database, in order to force a full scan (otherwise the EPSG database would
          * find it by name, but we want to test the scan).
          */
-        wkt = "PROJCS[\"Beijing 1954\",\n"                                 +
+        String wkt = "PROJCS[\"Beijing 1954\",\n"                          +
               "   GEOGCS[\"Beijing 1954\",\n"                              +
               "     DATUM[\"Beijing 1954\",\n"                             +
               "       SPHEROID[\"Krassowsky 1940\", 6378245.0, 298.3]],\n" +
@@ -94,17 +98,20 @@ public class HsqlDialectEpsgFactoryTest extends TestCase {
               "   UNIT[\"m\", 1.0],\n"                                     +
               "   AXIS[\"Northing\", NORTH],\n"                            +
               "   AXIS[\"Easting\", EAST]]";
-        crs = CRS.parseWKT(wkt);
+        CoordinateReferenceSystem crs = CRS.parseWKT(wkt);
+        
         finder.setFullScanAllowed(false);
         assertNull("Should not find the CRS without a full scan.", finder.find(crs));
+        
         finder.setFullScanAllowed(true);
-        find = finder.find(crs);
+        IdentifiedObject find = finder.find(crs);        
         assertNotNull("With full scan allowed, the CRS should be found.", find);
+        
         assertTrue("Should found an object equals (ignoring metadata) to the requested one.",
                    CRS.equalsIgnoreMetadata(crs, find));
+        
         assertEquals("2442", AbstractIdentifiedObject.getIdentifier(find, factory.getAuthority()).getCode());
         finder.setFullScanAllowed(false);
-        assertEquals("The CRS should still in the cache.",
-                     "EPSG:2442", finder.findIdentifier(crs));
+        assertEquals("The CRS should still in the cache.","EPSG:2442", finder.findIdentifier(crs));
     }
 }
