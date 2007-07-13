@@ -808,14 +808,12 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             try {
             	writer = new ShapefileWriter(shpChannel,
                         shxChannel, readWriteLock);
-                Envelope env = new Envelope(-179, 179, -89, 89);
-                Envelope transformedBounds;
+                ReferencedEnvelope env = new ReferencedEnvelope(new Envelope(-179, 179, -89, 89), DefaultGeographicCRS.WGS84);
+                ReferencedEnvelope transformedBounds;
 
                 if (cs != null) {
                     try {
-                        transformedBounds = JTS.transform(env,
-                                CRS.findMathTransform(DefaultGeographicCRS.WGS84, cs,
-                                    true));
+                        transformedBounds = env.transform(cs, true);
                     } catch (Exception e) {
                         cs = null;
                         transformedBounds = env;
