@@ -64,6 +64,8 @@ public class DataSourceUtil {
      *            the jdbc driver full qualified class name
      * @param username
      * @param password
+     * @param maxActive maximum number of concurrent connections in the pool
+     * @param minIdle minimum number of concurrent connections in the pool
      * @param validationQuery
      *            the validation query to be used for connection liveliness on
      *            borrow, or null, if no check is to be performed
@@ -74,7 +76,7 @@ public class DataSourceUtil {
      */
     public static ManageableDataSource buildDefaultDataSource(String url,
             String driverName, String username, String password,
-            int maxActive, int maxIdle, String validationQuery, boolean cachePreparedStatements, int removeAbandonedTimeout)
+            int maxActive, int minIdle, String validationQuery, boolean cachePreparedStatements, int removeAbandonedTimeout)
             throws DataSourceException {
         // basics
         BasicDataSource dataSource = new BasicDataSource();
@@ -86,7 +88,7 @@ public class DataSourceUtil {
 
         // pool size
         dataSource.setMaxActive(maxActive);
-        dataSource.setMaxIdle(maxIdle);
+        dataSource.setMinIdle(minIdle);
         
         // pool eviction settings
         dataSource.setMinEvictableIdleTimeMillis(1000 * 20);
