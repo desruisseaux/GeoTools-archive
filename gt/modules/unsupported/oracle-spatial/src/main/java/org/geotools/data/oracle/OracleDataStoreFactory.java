@@ -185,7 +185,7 @@ public class OracleDataStoreFactory implements DataStoreFactorySpi {
         return dataStore;
     }
     
-    public static ManageableDataSource getDefaultDataSource(String host, String user, String passwd, int port, String instance, int maxActive, int maxIdle, boolean validate) throws DataSourceException {
+    public static ManageableDataSource getDefaultDataSource(String host, String user, String passwd, int port, String instance, int maxActive, int minIdle, boolean validate) throws DataSourceException {
         String dbUrl = null;
         if( instance.startsWith("(") )
             dbUrl = JDBC_PATH + instance;
@@ -194,7 +194,7 @@ public class OracleDataStoreFactory implements DataStoreFactorySpi {
         else
             dbUrl = JDBC_PATH + host + ":" + port + ":" + instance;
         
-        return DataSourceUtil.buildDefaultDataSource(dbUrl, JDBC_DRIVER, user, passwd, maxActive, maxIdle, validate ? "select sysdate from dual" : null, false, 0);
+        return DataSourceUtil.buildDefaultDataSource(dbUrl, JDBC_DRIVER, user, passwd, maxActive, minIdle, validate ? "select sysdate from dual" : null, false, 0);
     }
     
     /**

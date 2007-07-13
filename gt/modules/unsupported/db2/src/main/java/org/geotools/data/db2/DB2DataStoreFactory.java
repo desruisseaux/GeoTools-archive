@@ -156,8 +156,8 @@ public class DB2DataStoreFactory extends AbstractDataStoreFactory
         return ds;
     }
 
-    public static ManageableDataSource getDefaultDataSource(String url, String user, String passwd, int maxActive, int maxIdle, boolean validate) throws DataSourceException {
-        return DataSourceUtil.buildDefaultDataSource(url, DRIVER_CLASS, user, passwd, maxActive, maxIdle, validate ? "select current date from sysibm.sysdummy1" : null, false, 0);
+    public static ManageableDataSource getDefaultDataSource(String url, String user, String passwd, int maxActive, int minIdle, boolean validate) throws DataSourceException {
+        return DataSourceUtil.buildDefaultDataSource(url, DRIVER_CLASS, user, passwd, maxActive, minIdle, validate ? "select current date from sysibm.sysdummy1" : null, false, 0);
     }
 
     /**

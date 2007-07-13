@@ -210,10 +210,10 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
         return dataStore;
     }
     
-    public static ManageableDataSource getDefaultDataSource(String host, String user, String passwd, int port, String database, int maxActive, int maxIdle, boolean validate) throws DataSourceException {
+    public static ManageableDataSource getDefaultDataSource(String host, String user, String passwd, int port, String database, int maxActive, int minIdle, boolean validate) throws DataSourceException {
         String url = "jdbc:postgresql" + "://" + host + ":" + port + "/" + database;
         String driver = "org.postgresql.Driver";
-        return DataSourceUtil.buildDefaultDataSource(url, driver, user, passwd, maxActive, maxIdle, validate ? "select now()" : null, false, 0);
+        return DataSourceUtil.buildDefaultDataSource(url, driver, user, passwd, maxActive, minIdle, validate ? "select now()" : null, false, 0);
     }
     
     protected PostgisDataStore createDataStoreInternal(
