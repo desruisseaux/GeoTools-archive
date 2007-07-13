@@ -166,9 +166,9 @@ public class OracleOCIDataStoreFactory implements DataStoreFactorySpi {
         return new OracleDataStore(source, namespace, schema, new HashMap());
     }
 
-    public static DataSource getDefaultDataSource(String alias, String user, String passwd, int maxActive, int maxIdle, boolean validate) throws DataSourceException {
+    public static DataSource getDefaultDataSource(String alias, String user, String passwd, int maxActive, int minIdle, boolean validate) throws DataSourceException {
         String dbUrl = "jdbc:oracle:oci:@" + alias;
-        return DataSourceUtil.buildDefaultDataSource(dbUrl, JDBC_DRIVER, user, passwd, 10, 4, validate ? "select sysdate from dual" : null, false, 0);
+        return DataSourceUtil.buildDefaultDataSource(dbUrl, JDBC_DRIVER, user, passwd, maxActive, minIdle, validate ? "select sysdate from dual" : null, false, 0);
     }
 
     /**
