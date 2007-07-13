@@ -241,16 +241,6 @@ public class EnvelopeImpl implements Envelope {
 		}
 		return result;
 	}
-
-	/**
-	 * @return GeometryFactoryImpl
-	 */
-	public PositionFactory getPositionFactory() {
-        if (factory == null ){
-            factory = new PositionFactoryImpl( getCoordinateReferenceSystem(), null );            
-        }
-		return factory;
-	}
     
 	/**
 	 * Unions an envelope with an another envelope
@@ -397,20 +387,18 @@ public class EnvelopeImpl implements Envelope {
 	 * @throws UnsupportedDimensionException 
 	 */
 	public DirectPosition getSECorner() throws UnsupportedDimensionException {
-		// Test ok (indirect by Primitive Factory Test)
-        PositionFactory fact = getPositionFactory();  
         
 		DirectPosition rDP = null;
+		CoordinateReferenceSystem crs = getCoordinateReferenceSystem();
         int D = DimensionModel.toD( getCoordinateReferenceSystem() );
 		if ( D == DimensionModel.TWO_DIMENSIONIAL ) {
-			rDP = fact.createDirectPosition(new double[]{
+			rDP = new DirectPositionImpl( crs, new double[]{
                this.pMax.getOrdinate(X),
                this.pMin.getOrdinate(Y)
             });
 		} else
             if ( D == DimensionModel.TWOoFIVE_DIMENSIONIAL ) {
-			rDP = fact.createDirectPosition(
-		        new double[]{
+			rDP = new DirectPositionImpl( crs, new double[]{
                         this.pMax.getOrdinate(X),
                         this.pMin.getOrdinate(Y),
                         this.pMin.getOrdinate(Z)}
@@ -431,7 +419,6 @@ public class EnvelopeImpl implements Envelope {
 	 * @throws UnsupportedDimensionException 
 	 */
 	public DirectPositionImpl getNWCornerOld() throws UnsupportedDimensionException {
-		// Test ok (indirect by Primitive Factory Test)
 		
 		DirectPositionImpl rDP = null;
 		CoordinateReferenceSystem crs = getCoordinateReferenceSystem();
@@ -447,7 +434,6 @@ public class EnvelopeImpl implements Envelope {
 		return rDP;
 	}
 	public DirectPositionImpl getNWCorner() throws UnsupportedDimensionException {
-		// Test ok (indirect by Primitive Factory Test)
 		
 		DirectPositionImpl rDP = null;
 		CoordinateReferenceSystem crs = getCoordinateReferenceSystem();

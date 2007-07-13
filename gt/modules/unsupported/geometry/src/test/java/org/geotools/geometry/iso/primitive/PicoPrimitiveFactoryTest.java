@@ -23,6 +23,7 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.Precision;
+import org.opengis.geometry.complex.Complex;
 import org.opengis.geometry.coordinate.LineSegment;
 import org.opengis.geometry.primitive.Curve;
 import org.opengis.geometry.primitive.CurveSegment;
@@ -176,6 +177,34 @@ public class PicoPrimitiveFactoryTest extends TestCase {
 		SurfaceImpl expected = new SurfaceImpl( boundary );
 		assertEquals(expected.getBoundary(), impl.getBoundary());
 		assertTrue(expected.equals(impl));
+		
+		// test get/add ContainedPrimitives
+		Set<Primitive> containedPrimitives = impl.getContainedPrimitives();
+		assertTrue(containedPrimitives == null);
+		impl.addContainedPrimitive((PrimitiveImpl) sb.getBoundary());
+		containedPrimitives = new HashSet<Primitive>();
+		containedPrimitives.add((PrimitiveImpl) sb.getBoundary());
+		assertTrue(containedPrimitives.equals(impl.getContainedPrimitives()));
+		
+		// test get/add ContainingPrimitives
+		Set<Primitive> containingPrimitives = impl.getContainingPrimitives();
+		assertTrue(containingPrimitives == null);
+		impl.addContainingPrimitive((PrimitiveImpl) sb.getBoundary());
+		containingPrimitives = new HashSet<Primitive>();
+		containingPrimitives.add((PrimitiveImpl) sb.getBoundary());
+		assertTrue(containingPrimitives.equals(impl.getContainingPrimitives()));
+		
+		// test get/add Complexes
+		Set<Complex> complexes = impl.getComplexes();
+		assertTrue(complexes == null);
+		impl.addComplex(sb);
+		complexes = new HashSet<Complex>();
+		complexes.add(sb);
+		assertTrue(complexes.equals(impl.getComplexes()));
+		
+		// test getMaximalComplex
+		Set<Complex> maximalComplexes = impl.getMaximalComplex();
+		assertTrue(maximalComplexes.toArray()[0] == sb);
 	}
 	
 	public void testBoundaryEquals() {
@@ -243,4 +272,5 @@ public class PicoPrimitiveFactoryTest extends TestCase {
 		//System.out.println(mp.getBoundary());
 		//assertEquals(sb, mp.getBoundary());
 	}
+	
 }

@@ -40,6 +40,7 @@ package org.geotools.geometry.iso.coordinate;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.util.DoubleOperation;
@@ -426,6 +427,9 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 	public void split(double maxSpacing) {
 		// TODO Test
 		// TODO Documentation
+		// gdavis: this looping structure seems broken, and I'm not 
+		// sure what it's meant to do... can't this be re-written in
+		// a readable way?
 
 		double[] c0 = getCoordinate(0);
 		for (int i = 1, n = length(); i < n; i++) {
@@ -587,7 +591,20 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
+		if (obj == this)
+		    return true;
+		if (!(obj instanceof List))
+		    return false;
+		
+		ListIterator<Position> e1 = listIterator();
+		ListIterator e2 = ((List) obj).listIterator();
+		while(e1.hasNext() && e2.hasNext()) {
+		    Position o1 = e1.next();
+		    Object o2 = e2.next();
+		    if (!(o1==null ? o2==null : o1.equals(o2)))
+			return false;
+		}
+		if (!(!(e1.hasNext() || e2.hasNext())))
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
@@ -599,6 +616,7 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 			return false;
 		return true;
 	}
+
 
 
 

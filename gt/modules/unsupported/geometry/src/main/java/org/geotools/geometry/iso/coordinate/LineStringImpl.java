@@ -233,7 +233,10 @@ public class LineStringImpl extends CurveSegmentImpl implements LineString {
         // TODO implementation
         // TODO test
         // TODO documentation
-        this.controlPoints.split(maxSpacing);
+    	
+    	// gdavis: this method seems to be broken, needs fixing
+        //this.controlPoints.split(maxSpacing);
+    	throw new UnsupportedOperationException("not implemented yet.");
     }
 
     /*
@@ -373,8 +376,9 @@ public class LineStringImpl extends CurveSegmentImpl implements LineString {
 
         // TO DO JR: check with a discussion in geotools/codehaus about the
         // return parameters.
-        assert false;
-        return null;
+    	throw new UnsupportedOperationException("not implemented yet.");
+        //assert false;
+        //return null;
         // /* Receive LineString as LineSegments */
         // List<LineSegmentImpl> segments = this.asLineSegments();
         //		
@@ -607,8 +611,10 @@ public class LineStringImpl extends CurveSegmentImpl implements LineString {
 			return true;
 		if (obj == null)
 			return false;
-		if (getClass() != obj.getClass())
+		if (!(obj instanceof LineStringImpl))
 			return false;
+//		if (getClass() != obj.getClass())
+//			return false;
 		final LineStringImpl other = (LineStringImpl) obj;
 		if (controlPoints == null) {
 			if (other.controlPoints != null)

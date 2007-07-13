@@ -343,37 +343,42 @@ public abstract class CurveSegmentImpl implements CurveSegment {
 	 *          appropriately
 	 */
 	public double length(Position point0, Position point1) {
-		/* Default-Values */
-		if (point0 == null && point1 == null)
-			return this.length();
-		if (point0 == null)
-			point0 = new PositionImpl((DirectPosition) this.getStartPoint().clone());
-			//point0 = this.getCurve().getFeatGeometryFactory()
-				//.getGeometryFactoryImpl().createPosition(this.getStartPoint());
-		if (point1 == null)
-			point1 = new PositionImpl((DirectPosition) this.getEndPoint().clone());
-			//point1 = this.getCurve().getFeatGeometryFactory()
-					//.getGeometryFactoryImpl().createPosition(this.getEndPoint());
-		/* Get all Params for closest points to startposition point1 */
-		ParamForPoint obj0 = this.getParamForPoint(point0.getPosition());
-		/* Get all Params for closest points to endposition point2 */
-		ParamForPoint obj1 = this.getParamForPoint(point1.getPosition());
-
-		/*
-		 * Compare the distances between each found startParam and endParam and
-		 * choose the smallest one
-		 */
-		double minLength = Double.MAX_VALUE;
-
-		minLength = Math.min(Math.abs(obj0.getDistance() - obj1.getDistance()),
-				minLength);
-		// for( Object param0 : obj0) {
-		// for( Object param1 : obj1) {
-		// minLength = Math.min(Math.abs((Double)param0 - (Double)param1),
-		// minLength);
-		// }
-		// }
-		return minLength;
+		
+		// this method seems to be broken currently because getParamForPoint
+		// has problems
+		throw new UnsupportedOperationException("not implemented yet.");
+		
+//		/* Default-Values */
+//		if (point0 == null && point1 == null)
+//			return this.length();
+//		if (point0 == null)
+//			point0 = new PositionImpl((DirectPosition) this.getStartPoint().clone());
+//			//point0 = this.getCurve().getFeatGeometryFactory()
+//				//.getGeometryFactoryImpl().createPosition(this.getStartPoint());
+//		if (point1 == null)
+//			point1 = new PositionImpl((DirectPosition) this.getEndPoint().clone());
+//			//point1 = this.getCurve().getFeatGeometryFactory()
+//					//.getGeometryFactoryImpl().createPosition(this.getEndPoint());
+//		/* Get all Params for closest points to startposition point1 */
+//		ParamForPoint obj0 = this.getParamForPoint(point0.getPosition());
+//		/* Get all Params for closest points to endposition point2 */
+//		ParamForPoint obj1 = this.getParamForPoint(point1.getPosition());
+//
+//		/*
+//		 * Compare the distances between each found startParam and endParam and
+//		 * choose the smallest one
+//		 */
+//		double minLength = Double.MAX_VALUE;
+//
+//		minLength = Math.min(Math.abs(obj0.getDistance() - obj1.getDistance()),
+//				minLength);
+//		// for( Object param0 : obj0) {
+//		// for( Object param1 : obj1) {
+//		// minLength = Math.min(Math.abs((Double)param0 - (Double)param1),
+//		// minLength);
+//		// }
+//		// }
+//		return minLength;
 	}
 
 	/*

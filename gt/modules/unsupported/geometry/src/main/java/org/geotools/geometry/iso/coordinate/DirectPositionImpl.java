@@ -341,6 +341,8 @@ public class DirectPositionImpl implements DirectPosition {
 	public boolean equals(Object o) {
 		if (o instanceof DirectPosition)
 			return this.equals((DirectPosition) o, 0);
+		else if (o instanceof Position)
+			return ((Position)o).equals(this);
 		else
 			return false;
 	}

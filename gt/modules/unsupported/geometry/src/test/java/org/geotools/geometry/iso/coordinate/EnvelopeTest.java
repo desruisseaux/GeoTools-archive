@@ -3,6 +3,7 @@ package org.geotools.geometry.iso.coordinate;
 import junit.framework.TestCase;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.iso.UnsupportedDimensionException;
 import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
@@ -92,7 +93,37 @@ public class EnvelopeTest extends TestCase {
 		env1.expand(dp5.getCoordinates());
 		//System.outprintln(env1);
 		
-		// TODO Test Intersects		
+		// Test other envelope methods
+		env1.setValues(env2);
+		DirectPositionImpl[] dpArray = new DirectPositionImpl[2];
+		dpArray[0] = dp0;
+		dpArray[1] = dp4;
+		EnvelopeImpl impl = env1.createEnvelope(dpArray);
+		
+		// test toString
+		String toS = impl.toString();
+		assertTrue(toS != null);
+		assertTrue(toS.length() > 0);
+		
+		// test intersects
+		assertTrue(impl.intersects(dp0));
+		assertFalse(impl.intersects(dp1));
+		
+		// test get corners
+		assertTrue(impl.getNECorner().equals(dp0));
+		assertTrue(impl.getSWCorner().equals(dp4));
+		try {
+			assertTrue(impl.getSECorner().equals(dp4));
+		} catch (UnsupportedDimensionException e) {
+			e.printStackTrace();
+			fail();
+		}
+		try {
+			assertTrue(impl.getNWCornerOld().equals(dp0));
+		} catch (UnsupportedDimensionException e) {
+			e.printStackTrace();
+			fail();
+		}
 	}
 
 	

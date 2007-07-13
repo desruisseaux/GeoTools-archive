@@ -184,7 +184,7 @@ public abstract class PrimitiveImpl extends GeometryImpl implements Primitive {
 	 */
 	public void addContainingPrimitive(PrimitiveImpl newSubelement) {
 		if (this.containingPrimitive == null)
-			this.containedPrimitive = new TreeSet<Primitive>();
+			this.containingPrimitive = new TreeSet<Primitive>();
 		this.containingPrimitive.add(newSubelement);
 	}
 

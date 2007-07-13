@@ -475,11 +475,13 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 				return false;
 		} else if (!boundary.equals(other.boundary))
 			return false;
+		/*  Envelope.class doesn't have equals implemented
 		if (envelope == null) {
 			if (other.envelope != null)
 				return false;
 		} else if (!envelope.equals(other.envelope))
 			return false;
+		*/
 		return true;
 	}
 	

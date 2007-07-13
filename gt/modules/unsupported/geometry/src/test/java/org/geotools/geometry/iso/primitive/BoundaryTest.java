@@ -6,12 +6,14 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.PositionImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.primitive.CurveBoundary;
@@ -19,6 +21,7 @@ import org.opengis.geometry.primitive.CurveSegment;
 import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.primitive.SurfaceBoundary;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * @author sanjay
@@ -26,9 +29,12 @@ import org.opengis.geometry.primitive.SurfaceBoundary;
  */
 public class BoundaryTest extends TestCase {
 	
+	private CoordinateReferenceSystem crs;
+	
 	public void testMain() {
 		
 		FeatGeomFactoryImpl tGeomFactory = FeatGeomFactoryImpl.getDefault2D();
+		this.crs = DefaultGeographicCRS.WGS84;
 		
 		this._testCurveBoundary1(tGeomFactory);
 		this._testSurfaceBoundary1(tGeomFactory);
@@ -53,7 +59,53 @@ public class BoundaryTest extends TestCase {
 		assertTrue(dp.getOrdinate(1) == 0);
 		
 		assertTrue(curveBoundary1.isCycle() == true);
+		
+		// Test creating a curve boundary with the same start and end point (should result in
+		//  an exception).
+		PointImpl point1 = new PointImpl(dp1);
+		try {
+			CurveBoundaryImpl b2 = new CurveBoundaryImpl(this.crs, point1, point1);
+			// fail if we get here, the above should throw an exception
+			fail();
+		}
+		catch (IllegalArgumentException expected) {
+			
+		}
+		
+		// test clone
+		PointImpl point2 = new PointImpl(dp2);
+		CurveBoundaryImpl b2 = new CurveBoundaryImpl(curveBoundary1.getCoordinateReferenceSystem(), point1, point2);
+		try {
+			CurveBoundaryImpl expected = ((CurveBoundaryImpl) curveBoundary1).clone();
+			assertTrue(b2.equals(expected));
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+			fail();
+		}
+		
+		// test toString
+		String toS = b2.toString();
+		assertTrue(toS != null);
+		assertTrue(toS.length() > 0);
+		
+		// test getEnvelope
+		EnvelopeImpl env = b2.getEnvelope();
+		EnvelopeImpl exp_env = new EnvelopeImpl(dp1, dp2);
+		assertTrue(env.equals(exp_env));
+		
+		// test isSimple
+		assertTrue(b2.isSimple());
 
+		// test obj equals and hashcode
+		assertTrue(b2.equals((Object) curveBoundary1));
+		assertTrue(b2.equals((Object) b2));
+		assertFalse(b2.equals((Object) dp1));
+		assertFalse(b2.equals((Object) null));
+		DirectPositionImpl dp3 = tCoordFactory.createDirectPosition(new double[] {3, 3});
+		PointImpl point3 = new PointImpl(dp3);
+		assertFalse(b2.equals((Object) new CurveBoundaryImpl(this.crs, point1, point3)));
+		
+		assertFalse(b2.hashCode() == ((CurveBoundaryImpl) curveBoundary1).hashCode());
 	}
 
 	private void _testSurfaceBoundary1(FeatGeomFactoryImpl aGeomFactory) {

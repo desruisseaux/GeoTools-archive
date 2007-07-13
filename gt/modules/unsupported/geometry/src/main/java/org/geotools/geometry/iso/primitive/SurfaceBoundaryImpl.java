@@ -202,7 +202,7 @@ public class SurfaceBoundaryImpl extends PrimitiveBoundaryImpl implements
 	 */
 	public int getDimension(DirectPosition point) {
 		// TODO What is going to happen with the point parameter?!
-		// The Dimension of a SurfaceBoundary is 1, because a SurfaceBounday consists of Rings.
+		// The Dimension of a SurfaceBoundary is 1, because a SurfaceBoundary consists of Rings.
 		return 1;
 	}
 

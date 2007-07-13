@@ -153,6 +153,12 @@ public class PicoGeometryFactoryTest extends TestCase {
 		PolygonImpl expected = new PolygonImpl((SurfaceBoundaryImpl) boundary);
 		assertEquals(poly, expected);
 		
+		// test the PolygonImpl equals
+		assertTrue(expected.equals((Object) poly));
+		assertTrue(expected.equals((Object) expected));
+		assertFalse(expected.equals((Object) interiors));
+		assertFalse(expected.equals((Object) null));
+		
 	}
 
 }

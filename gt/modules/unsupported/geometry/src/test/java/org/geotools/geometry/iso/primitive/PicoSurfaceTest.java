@@ -8,7 +8,9 @@ import org.geotools.geometry.iso.PositionFactoryImpl;
 import org.geotools.geometry.iso.PrecisionModel;
 import org.geotools.geometry.iso.aggregate.AggregateFactoryImpl;
 import org.geotools.geometry.iso.complex.ComplexFactoryImpl;
+import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
+import org.geotools.geometry.iso.coordinate.SurfacePatchImpl;
 import org.geotools.geometry.iso.io.CollectionFactoryMemoryImpl;
 import org.geotools.geometry.iso.util.elem2D.Geo2DFactory;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -43,7 +45,8 @@ public class PicoSurfaceTest extends TestCase {
 		// Created by Patches
 		this._testSurface1(tGeomFactory, tPrimFactory);
 		
-		
+		// test other surface methods
+		this._testOhterSurfaceMethods(tGeomFactory, tPrimFactory);
 	}
 	
 	/**
@@ -171,6 +174,86 @@ public class PicoSurfaceTest extends TestCase {
 //		System.out.print("\ngetDimension: " + surface.getDimension(null));
 		assertTrue(surface.isCycle() == false);
 		
+	}
+	
+	public void _testOhterSurfaceMethods(GeometryFactoryImpl aGeomFactory, PrimitiveFactoryImpl tPrimFactory) {
+
+		List<DirectPosition> directPositionList = new ArrayList<DirectPosition>();
+		directPositionList.add(aGeomFactory.createDirectPosition(new double[] {20, 10}));
+		directPositionList.add(aGeomFactory.createDirectPosition(new double[] {40, 10}));
+		directPositionList.add(aGeomFactory.createDirectPosition(new double[] {50, 40}));
+		directPositionList.add(aGeomFactory.createDirectPosition(new double[] {30, 50}));
+		directPositionList.add(aGeomFactory.createDirectPosition(new double[] {10, 30}));
+		directPositionList.add(aGeomFactory.createDirectPosition(new double[] {20, 10}));
+
+		RingImpl exteriorRing = (RingImpl) tPrimFactory.createRingByDirectPositions(directPositionList);
+		List<Ring> interiors = new ArrayList<Ring>();
+		
+		SurfaceBoundaryImpl surfaceBoundary1 = tPrimFactory.createSurfaceBoundary(exteriorRing, interiors );
+		
+		SurfaceImpl surface = tPrimFactory.createSurface(surfaceBoundary1);
+		
+		// ***** clone()
+		SurfaceImpl surface2 = null;
+		SurfaceImpl surface_bak = null;
+		try {
+			surface2 = surface.clone();
+			surface_bak = surface.clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+			fail();
+		}
+		
+		// test setBoundary
+		surface.setBoundary(surfaceBoundary1);
+		assertTrue(surface.getBoundary().equals(surface2.getBoundary()));
+		
+		// test set/get Patches
+		List<? extends SurfacePatch> triangleList = this._testTriangle1(aGeomFactory, tPrimFactory);
+		List<SurfacePatch> surfacePatches1 = (List<SurfacePatch>)triangleList;
+		surface.setPatches(surfacePatches1);
+		List<SurfacePatch> surfacePatches2 = (List<SurfacePatch>) surface.getPatches();
+		assertTrue(surfacePatches1.equals(surfacePatches2));
+
+		// test toString
+		String toS = surface.toString();
+		assertTrue(toS != null);
+		assertTrue(toS.length() > 0);
+		
+		// test obj equals
+		assertTrue(surface_bak.equals((Object) surface2));
+		assertTrue(surface_bak.equals((Object) surface_bak));
+		assertFalse(surface_bak.equals((Object) surfacePatches1));
+		assertFalse(surface_bak.equals((Object) null));
+		SurfaceImpl surface3 = tPrimFactory.createSurface(surfacePatches1);
+		assertFalse(surface_bak.equals(surface3));
+		
+		// test some SurfaceBoundaryImpl methods now
+		// test getDimension
+		assertTrue(surfaceBoundary1.getDimension(null) == 1);
+
+		// test toString
+		String toS2 = surfaceBoundary1.toString();
+		assertTrue(toS2 != null);
+		assertTrue(toS2.length() > 0);
+		
+		// test obj equals
+		assertTrue(surfaceBoundary1.equals((Object) tPrimFactory.createSurfaceBoundary(exteriorRing, interiors )));
+		assertTrue(surfaceBoundary1.equals((Object) surfaceBoundary1));
+		assertFalse(surfaceBoundary1.equals((Object) surfacePatches1));
+		assertFalse(surfaceBoundary1.equals((Object) null));
+		directPositionList.remove(directPositionList.size()-1);
+		directPositionList.add(aGeomFactory.createDirectPosition(new double[] {15, 25}));
+		directPositionList.add(aGeomFactory.createDirectPosition(new double[] {20, 10}));
+		RingImpl exteriorRing2 = (RingImpl) tPrimFactory.createRingByDirectPositions(directPositionList);
+		SurfaceBoundaryImpl surfaceBoundary2 = tPrimFactory.createSurfaceBoundary(exteriorRing2, interiors );
+		assertFalse(surfaceBoundary1.equals(surfaceBoundary2));
+		
+		// test more surfacepathces methods
+		SurfacePatchImpl patch = (SurfacePatchImpl) surfacePatches1.get(0);
+		assertNotNull(patch.getInterpolation());
+		assertTrue(surface.equals(patch.getSurface()));
+		assertNotNull(patch.getNumDerivativesOnBoundary());
 	}
 
 }

@@ -188,7 +188,8 @@ public class AlgoPointND {
 			double r = 1.0 / n;
 			double[][] result = new double[n-1][];
 			for (int i=1; i<n; ++i) {
-				result[i] =  evaluate(c0, c1, i*r);
+				result[i-1] =  evaluate(c0, c1, i*r);
+				//result[i] =  evaluate(c0, c1, i*r);
 			}
 			return result;
 		}

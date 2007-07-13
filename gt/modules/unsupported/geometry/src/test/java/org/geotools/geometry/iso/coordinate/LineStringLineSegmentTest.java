@@ -11,6 +11,8 @@ import org.geotools.geometry.iso.coordinate.LineStringImpl;
 import org.geotools.geometry.iso.coordinate.PositionImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
+import org.geotools.geometry.iso.primitive.RingImpl;
+import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.LineSegment;
 import org.opengis.geometry.coordinate.PointArray;
@@ -319,7 +321,37 @@ public class LineStringLineSegmentTest extends TestCase {
 		assertEquals(controlPoints.getDirectPosition(3, null), p2.getPosition());
 		assertEquals(controlPoints.getDirectPosition(4, null), p1.getPosition());
 		//System.out.println("Reversed. Line1: " + line1);
-
+		
+		
+		// test more curvesegment methods using tLineList
+		CurveSegmentImpl cseg = (CurveSegmentImpl) tLineList.get(0);
+		assertNotNull(cseg.getBoundary());
+		assertNotNull(cseg.getInterpolation());
+		assertTrue(cseg.length(0,1) > 0);
+		try {
+			cseg.setCurve(null);
+			fail();  // should not get here
+		}
+		catch (IllegalArgumentException e) {
+			// good
+		}
+		
+		// test more linestringimpl methods
+		//line1.split(1); broken?
+		LineStringImpl newline = line1.asLineString(1, 1);
+		assertNotNull(newline);
+		
+		// test toString
+		String toS = newline.toString();
+		assertTrue(toS != null);
+		assertTrue(toS.length() > 0);
+		
+		// test obj equals
+		assertTrue(newline.equals((Object) line1.asLineString(1, 1)));
+		assertTrue(line1.equals((Object) line1));
+		assertFalse(line1.equals((Object) controlPoints));
+		assertFalse(line1.equals((Object) null));
+		assertFalse(line1.equals(line1.asLineString(0.5, 0.5)));
 	}
 
 }

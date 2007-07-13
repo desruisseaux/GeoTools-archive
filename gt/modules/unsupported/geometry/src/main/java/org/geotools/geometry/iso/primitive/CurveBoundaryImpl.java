@@ -89,7 +89,7 @@ public class CurveBoundaryImpl extends PrimitiveBoundaryImpl implements
 	public CurveBoundaryImpl clone() throws CloneNotSupportedException {
 		// ok
 		// Return new CurveBoundary with the cloned start and end point of this CurveBoundary
-		return this.getFeatGeometryFactory().getPrimitiveFactory().createCurveBoundary(this.getStartPoint().clone(), this.getEndPoint().clone());
+		return new CurveBoundaryImpl(this.getCoordinateReferenceSystem(), this.getStartPoint().clone(), this.getEndPoint().clone());
 	}
 
 	/*

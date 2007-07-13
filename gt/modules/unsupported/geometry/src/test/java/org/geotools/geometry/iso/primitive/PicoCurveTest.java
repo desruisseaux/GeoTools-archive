@@ -8,6 +8,8 @@ import org.geotools.geometry.iso.PositionFactoryImpl;
 import org.geotools.geometry.iso.PrecisionModel;
 import org.geotools.geometry.iso.aggregate.AggregateFactoryImpl;
 import org.geotools.geometry.iso.complex.ComplexFactoryImpl;
+import org.geotools.geometry.iso.coordinate.CurveSegmentImpl;
+import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.coordinate.LineSegmentImpl;
 import org.geotools.geometry.iso.coordinate.LineStringImpl;
@@ -20,6 +22,7 @@ import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.Precision;
 import org.opengis.geometry.complex.Complex;
 import org.opengis.geometry.complex.CompositeCurve;
+import org.opengis.geometry.coordinate.ParamForPoint;
 import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.primitive.CurveBoundary;
 import org.opengis.geometry.primitive.CurveSegment;
@@ -266,7 +269,69 @@ public class PicoCurveTest extends TestCase {
 		Complex cc1 = curve1.getClosure();
 		//System.out.println(cc1);
 		assertTrue(cc1 instanceof CompositeCurve);
+	
+	}
+	
+	public void testOtherCurveMethods() {
+		CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
+		PicoContainer container = container( crs ); // normal 2D
+		//PrimitiveFactoryImpl factory = (PrimitiveFactoryImpl) container.getComponentInstanceOfType( PrimitiveFactoryImpl.class );
+		PositionFactory positionFactory = (PositionFactory ) container.getComponentInstanceOfType( PositionFactory.class );
+		
+		DirectPosition positionA = positionFactory.createDirectPosition(new double[]{10, 10});
+		DirectPosition positionB = positionFactory.createDirectPosition(new double[]{20, 20});
+		
+		CurveImpl curve = createCurve(positionA, positionB);		
 
+		// test split (split seems broken)
+		//curve.split(5);
+		
+		// test getSegmentAt
+		CurveSegmentImpl segmentAt = curve.getSegmentAt(1);
+		assertTrue(segmentAt.equals(curve.asLineSegments().get(0)));
+		
+		// test getParamForPoint (not fully implemented yet)
+		//ParamForPoint paramForPoint = curve.getParamForPoint(positionA);
+		//System.out.println(paramForPoint);
+		
+		// test length
+		double d = curve.length(0,1);
+		assertTrue(d == 1);
+		// the following length uses getParamForPoint and it's not fully implemented yet)
+		//double e = curve.length(positionA, positionB);
+		//System.out.println(e);
+		
+		// test asLineString
+		LineStringImpl linestring = curve.asLineString();
+		List<Position> posList = new ArrayList<Position>();
+		posList.add(positionA);
+		posList.add(positionB);
+		assertTrue(linestring.equals(new LineStringImpl(posList)));
+		
+		// test getDimension
+		assertEquals(curve.getDimension(positionA), 1);
+		
+		// test toString
+		String toS = curve.toString();
+		assertTrue(toS != null);
+		assertTrue(toS.length() > 0);
+		
+		// test obj equals
+		CurveImpl curve2 = null;
+		try {
+			curve2 = curve.clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+			fail();
+		}
+
+		assertTrue(curve.equals((Object) curve2));
+		assertTrue(curve.equals((Object) curve));
+		assertFalse(curve.equals((Object) positionA));
+		assertFalse(curve.equals((Object) null));
+		DirectPosition positionC = positionFactory.createDirectPosition(new double[]{30, 30});
+		CurveImpl curve3 = createCurve(positionA, positionC);
+		assertFalse(curve.equals((Object) curve3));
 		
 	}
 }
