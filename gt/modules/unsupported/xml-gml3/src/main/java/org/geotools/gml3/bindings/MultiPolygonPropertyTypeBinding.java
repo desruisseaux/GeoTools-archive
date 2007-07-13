@@ -77,4 +77,13 @@ public class MultiPolygonPropertyTypeBinding extends AbstractComplexBinding {
         throws Exception {
         return node.getChildValue(MultiPolygon.class);
     }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if (GML.MultiPolygon.equals(name)) {
+            return object;
+        }
+
+        return null;
+    }
 }
