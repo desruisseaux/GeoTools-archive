@@ -16,13 +16,13 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>gt2-community-schemas</artifactId>
-    <version>2.4-SNAPSHOT</version>
+    <version>2.5-SNAPSHOT</version>
   </parent>
 
 
   <groupId>org.geotools</groupId>
   <artifactId>gt2-fm</artifactId>
-  <version>2.4-SNAPSHOT</version>
+  <version>2.5-SNAPSHOT</version>
   <name>ISO Feature Implementation module</name>
   <url>http://maven.geotools.fr/reports/main/</url>
   <scm>
@@ -55,7 +55,7 @@
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-main</artifactId>
-      <version>2.4-SNAPSHOT</version>
+      <version>2.5-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>commons-jxpath</groupId>

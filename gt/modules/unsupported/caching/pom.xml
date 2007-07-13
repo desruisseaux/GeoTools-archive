@@ -5,13 +5,13 @@
   <parent>
      <groupId>org.geotools</groupId>
      <artifactId>gt2-unsupported</artifactId>
-     <version>2.4-SNAPSHOT</version>
+     <version>2.5-SNAPSHOT</version>
   </parent>
 
   <groupId>org.geotools</groupId>
   <artifactId>gt2-caching</artifactId>
   <packaging>jar</packaging>
-  <version>2.4-SNAPSHOT</version>
+  <version>2.5-SNAPSHOT</version>
   <name>Caching</name>
   <url>http://maven.geotools.fr/reports/modules/unsupported/caching</url>
 
@@ -60,32 +60,32 @@
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-main</artifactId>
-      <version>2.4-SNAPSHOT</version>
+      <version>2.5-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-shapefile</artifactId>
-      <version>2.4-SNAPSHOT</version>
+      <version>2.5-SNAPSHOT</version>
     </dependency>
 <!--    <dependency>
         <groupId>org.geotools</groupId>
         <artifactId>gt2-unsupported</artifactId>
-        <version>2.4-SNAPSHOT</version>
+        <version>2.5-SNAPSHOT</version>
     </dependency> -->
 <!--    <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-hsql</artifactId>
-      <version>2.4-SNAPSHOT</version>
+      <version>2.5-SNAPSHOT</version>
     </dependency> -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-shapefile-renderer</artifactId>
-      <version>2.4-SNAPSHOT</version>
+      <version>2.5-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-mappane</artifactId>
-      <version>2.4-SNAPSHOT</version>
+      <version>2.5-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
