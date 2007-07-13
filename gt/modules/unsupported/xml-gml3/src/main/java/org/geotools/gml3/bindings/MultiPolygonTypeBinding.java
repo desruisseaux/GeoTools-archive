@@ -72,10 +72,6 @@ public class MultiPolygonTypeBinding extends AbstractComplexBinding {
         return MultiPolygon.class;
     }
 
-    public int getExecutionMode() {
-        return BEFORE;
-    }
-
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
