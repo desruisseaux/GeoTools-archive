@@ -115,7 +115,7 @@ public class IDWGridBuilder extends WarpGridBuilder {
             double distance = ((Double) nearest.get(mp)).doubleValue();
             double weight = (1 / Math.pow(distance, 2));
 
-            if (distance > 0.05) {
+            if (distance > 0.005) {
                 sumdx = sumdx
                     + ((mp.getTarget().getCoordinates()[0] - mp.getSource().getCoordinates()[0]) * weight);
                 sumdy = sumdy
@@ -124,9 +124,7 @@ public class IDWGridBuilder extends WarpGridBuilder {
                 sumweight = sumweight + weight;
             } else {
                 dx = (mp.getTarget().getCoordinates()[0] - mp.getSource().getCoordinates()[0]);
-                dy = (mp.getTarget().getCoordinates()[1] - mp.getSource().getCoordinates()[1]);
-                System.out.println("dfsd");
-
+                dy = (mp.getTarget().getCoordinates()[1] - mp.getSource().getCoordinates()[1]);              
                 return (new DirectPosition2D(dx, dy));
             }
         }

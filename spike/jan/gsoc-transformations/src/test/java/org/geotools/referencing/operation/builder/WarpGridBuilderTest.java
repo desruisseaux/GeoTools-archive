@@ -8,14 +8,20 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import org.opengis.geometry.Envelope;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.referencing.operation.TransformException;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
+import org.geotools.referencing.operation.matrix.GeneralMatrix;
+import org.geotools.referencing.operation.transform.ProjectiveTransform;
 
 
 /**
@@ -23,7 +29,7 @@ import org.geotools.referencing.crs.DefaultEngineeringCRS;
  *
  */
 public class WarpGridBuilderTest extends TestCase {
-    private double tolerance = 0.02; //cm
+    private double tolerance = 0.05; //cm
     private CoordinateReferenceSystem crs = DefaultEngineeringCRS.GENERIC_2D;
     private boolean show = true;
 
@@ -39,7 +45,7 @@ public class WarpGridBuilderTest extends TestCase {
     /**
      * Returns the test suite.
      *
-     * @return 
+     * @return
      */
     public static Test suite() {
         return new TestSuite(WarpGridBuilderTest.class);
@@ -79,7 +85,7 @@ public class WarpGridBuilderTest extends TestCase {
      * Test of TPDWarpGridBuilder
      *
      */
-    public void testTPSWarpGridBuilder() {
+    public void testIDWWarpGridBuilder() {
         try {
             // Envelope 20*20 km 
             Envelope env = new Envelope2D(crs, 0, 0, 20000, 20000);
@@ -104,15 +110,24 @@ public class WarpGridBuilderTest extends TestCase {
      * Test of IDWDWarpGridBuilder
      *
      */
-    public void testIDWarpGridBuilder() {
+    public void testTPSWarpGridBuilder() {
         try {
             // Envelope 20*20 km 
-            Envelope env = new Envelope2D(crs, 0, 0, 20000, 20000);
+            Envelope env = new Envelope2D(crs, 0, 0, 6000, 6000);
 
             // Generates 15 MappedPositions of approximately 2 m differences
-            List mp = generateMappedPositions(env, 15, 2, crs);
+            List mp = generateMappedPositions(env, 15, 5, crs);
 
-            WarpGridBuilder builder = new TPSGridBuilder(mp, 100, 100, env);
+            GeneralMatrix M = new GeneralMatrix(3, 3);
+            double[] m0 = { 1000, 0, 0 };
+            double[] m1 = { 0, 1000, 0 };
+            double[] m2 = { 0, 0, 1 };
+            M.setRow(0, m0);
+            M.setRow(1, m1);
+            M.setRow(2, m2);
+
+            WarpGridBuilder builder = new TPSGridBuilder(mp, 20, 20, env,
+                    ProjectiveTransform.create(M));
 
             if (show == true) {
                 (new GridCoverageFactory()).create("TPS - dx", builder.getDxGrid(), env).show();
@@ -120,6 +135,7 @@ public class WarpGridBuilderTest extends TestCase {
             }
 
             assertBuilder(builder);
+            assertInverse(builder);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -141,5 +157,32 @@ public class WarpGridBuilderTest extends TestCase {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void assertInverse(MathTransformBuilder builder) {
+        try {
+            List mp = builder.getMappedPositions();
+
+            for (int i = 0; i < mp.size(); i++) {
+                MappedPosition p = (MappedPosition) mp.get(i);
+
+                MappedPosition inversMp = new MappedPosition(p.getTarget(), p.getSource());
+                //inversMp.add(new MappedPosition(p.getTarget(),p.getSource()));
+             //   System.out.println(inversMp.getError(builder.getMathTransform().inverse(), null));
+                Assert.assertEquals(0, inversMp.getError(builder.getMathTransform().inverse(), null),
+                    tolerance);
+            }
+        } catch (NoninvertibleTransformException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (TransformException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (FactoryException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        //builder.getMathTransform().inverse();
     }
 }

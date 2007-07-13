@@ -15,62 +15,215 @@
  */
 package org.geotools.referencing.operation.transform;
 
+import java.awt.geom.Point2D;
+
 import javax.media.jai.Warp;
 import javax.media.jai.WarpGrid;
-import javax.media.jai.WarpPolynomial;
 
+import org.geotools.metadata.iso.citation.Citations;
+import org.geotools.parameter.DefaultParameterDescriptor;
+import org.geotools.referencing.NamedIdentifier;
+import org.geotools.referencing.operation.MathTransformProvider;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.Transformation;
-import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.parameter.DefaultParameterDescriptor;
-import org.geotools.referencing.NamedIdentifier;
-import org.geotools.referencing.operation.MathTransformProvider;
 
 
 /**
- * Basic implementation of JAI's GridWarp Transformation. This class just encapsulate GridWarp into the 
- * GeoTools transformations conventions. 
+ * Basic implementation of JAI's GridWarp Transformation. This class just encapsulate GridWarp into the
+ * GeoTools transformations conventions.
  * @author jezekjan
  *
  */
 public class WarpGridTransform2D extends WarpTransform2D {
-    private final Warp warp;
-    private final Warp inverse;
+   // private final Warp warp;
+    private MathTransform inverse;
+    private MathTransform worldToGrid;
 
+
+    private int xStart;
+    private int xStep;
+    private int xNumCells;
+    private int yStart;
+    private int yStep;
+    private int yNumCells;
+    private float[] warpPositions;
+    
     public WarpGridTransform2D(int xStart, int xStep, int xNumCells, int yStart, int yStep,
         int yNumCells, float[] warpPositions) {
         super(new WarpGrid(xStart, xStep, xNumCells, yStart, yStep, yNumCells, warpPositions),
-            new WarpGrid(xStart, xStep, xNumCells, yStart, yStep, yNumCells, warpPositions));
-        warp = new WarpGrid(xStart, xStep, xNumCells, yStart, yStep, yNumCells, warpPositions);
+        		null);//calculateInverse(xStart, xStep, xNumCells, yStart, yStep, yNumCells, warpPositions));
+   //     warp = new WarpGrid(xStart, xStep, xNumCells, yStart, yStep, yNumCells, warpPositions);
 
-        inverse = null;      
+       // inverse = new WarpGridTransform2D(xStart, xStep, xNumCells, yStart, yStep, yNumCells, warpPositions);
+        
+        this.xStart = xStart;
+        this.xStep = xStep;
+        this.xNumCells = xNumCells;
+        this.yStart = yStart;
+        this.yStep = yStep;
+        this.yNumCells = yNumCells;
+        this.warpPositions = warpPositions;
+        
+
     }
+
     /**
-     * Constructs a transform using the specified warp object. 
-     * 
+     * Constructs a transform using the specified warp object.
+     *
      * @param warp    The image warp to wrap into a math transform.
      * @param inverse An image warp to uses for the {@linkplain #inverse inverse transform},
      *                or {@code null} in none.
      */
-    public WarpGridTransform2D(Warp warp, Warp inverse) {
+    protected WarpGridTransform2D(Warp warp, Warp inverse) {
         super(warp, inverse);
-        this.warp = warp;
-        this.inverse = inverse;
+        //this.inverse = (inverse!=null) ? new WarpTransform2D(inverse, this) : null;
+       // this.warp = warp;
+        //this.inverse = inverse;
     }
-    
+   
+
+   
     public ParameterDescriptorGroup getParameterDescriptors() {
         return Provider.PARAMETERS;
     }
 
+    public void setWorldtoGridTransform(MathTransform worldToGrid) {
+        this.worldToGrid = worldToGrid;       
+    }
+
+    public MathTransform getWorldtoGridTransform() {
+        return worldToGrid;
+    }    
+
+    public void transform(double[] srcPts, int srcOff, double[] dstPts, int dstOff, int numPts) {
+        // TODO Auto-generated method stub
+        //transformToGrid(srcPts, srcOff, srcPts, srcOff, numPts, false);
+    	
+        try {
+            if (worldToGrid != null) {
+                worldToGrid.transform(srcPts, srcOff, srcPts, srcOff, numPts);}
+            } catch (TransformException e) {           
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            super.transform(srcPts, srcOff, dstPts, dstOff, numPts);
+
+        try{
+            if (worldToGrid != null) {
+                worldToGrid.inverse().transform(dstPts, dstOff, dstPts, dstOff, numPts);
+            }
+        } catch (NoninvertibleTransformException e) {
+        	e.printStackTrace();
+        } catch (TransformException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public void transform(float[] srcPts, int srcOff, float[] dstPts, int dstOff, int numPts) {
+    	 try {
+             if (worldToGrid != null) {
+                 worldToGrid.transform(srcPts, srcOff, srcPts, srcOff, numPts);}
+             } catch (TransformException e) {           
+                 // TODO Auto-generated catch block
+                 e.printStackTrace();
+             }
+        super.transform(srcPts, srcOff, dstPts, dstOff, numPts);
+        try{
+            if (worldToGrid != null) {
+                worldToGrid.inverse().transform(dstPts, dstOff, dstPts, dstOff, numPts);
+            }
+        } catch (NoninvertibleTransformException e) {
+        	e.printStackTrace();
+        } catch (TransformException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public Point2D transform(Point2D ptSrc, Point2D ptDst) {
+    	
+    	try {
+            if (worldToGrid != null) {
+                worldToGrid.transform((DirectPosition)ptSrc,(DirectPosition)ptSrc);}
+            } catch (TransformException e) {           
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            ptDst = super.transform(ptSrc, ptDst);
+            
+            try{
+                if (worldToGrid != null) {
+                    worldToGrid.inverse().transform((DirectPosition)ptDst, (DirectPosition)ptDst);
+                }
+            } catch (NoninvertibleTransformException e) {
+            	e.printStackTrace();
+            } catch (TransformException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            
+            return ptDst;
+    }
+    
     /**
-     *  
+     * Calculation inverse values. Calculation is not exact, but should provide good results 
+     * when shifts are smaller than grid cells.  
+     * @param xStart
+     * @param xStep
+     * @param xNumCells
+     * @param yStart
+     * @param yStep
+     * @param yNumCells
+     * @param warpPositions
+     * @return
+     */
+    protected WarpGridTransform2D calculateInverse(int xStart, int xStep, int xNumCells, int yStart, int yStep,
+            int yNumCells, float[] warpPositions) {      
+
+    	float[] inversePos = new float[warpPositions.length];
+        for (int i = 0; i <= yNumCells; i++) {
+            for (int j = 0; j <= xNumCells; j++) {
+                inversePos[(i * ((1 + xNumCells) * 2)) + (2 * j)] = (2 * ((j * xStep) + xStart))
+                    - warpPositions[(i * ((1 + xNumCells) * 2)) + (2 * j)];
+
+                inversePos[(i * ((1 + xNumCells) * 2)) + (2 * j) + 1] = (2 * ((i * yStep)
+                    + yStart)) - warpPositions[(i * ((1 + xNumCells) * 2)) + (2 * j) + 1];
+            }
+        }
+        
+       
+      
+        WarpGridTransform2D wgt = new WarpGridTransform2D(xStart,xStep, xNumCells, yStart, yStep,
+                 yNumCells, inversePos);
+        
+        wgt.setWorldtoGridTransform(this.worldToGrid);
+        return wgt;
+        
+    }
+   
+    public MathTransform inverse() throws NoninvertibleTransformException {
+		// TODO Auto-generated method stub
+    	if (inverse == null){
+    		inverse = calculateInverse(xStart, xStep, xNumCells, yStart, yStep, yNumCells, warpPositions);    		
+    	}
+		return inverse;  
+	}
+
+    /**
+     *
      * The provider for the {@linkplain WarpGridTransform2D}. This provider constructs a JAI
      * {@linkplain WarpGrid image warp} from a set of mapped positions,
-     * and wrap it in a {@linkplain WarpGridTransform2D} object.  
+     * and wrap it in a {@linkplain WarpGridTransform2D} object.
      *
      * @author jezekjan
      *
@@ -151,11 +304,17 @@ public class WarpGridTransform2D extends WarpTransform2D {
             final Warp warp = new WarpGrid(XSTART, XSTEP, XNUMCELLS, YSTART, YSTEP, YNUMCELLS,
                     WARPPOSITIONS);
             final Warp inverse = new WarpGrid(XSTART, XSTEP, XNUMCELLS, YSTART, YSTEP, YNUMCELLS,
-            		calculateInverse(values));
-
-            //TODO - inverse transform
-            return new WarpGridTransform2D(warp, inverse);
+                    calculateInverse(values));
+            
+            WarpGridTransform2D wgt = new WarpGridTransform2D(XSTART, XSTEP, XNUMCELLS, YSTART, YSTEP, YNUMCELLS,
+                    WARPPOSITIONS);
+            /*WarpGridTransform2D inversewgt = new WarpGridTransform2D(XSTART, XSTEP, XNUMCELLS, YSTART, YSTEP, YNUMCELLS,
+                    WARPPOSITIONS);*/
+           
+            
+            return wgt;//new WarpGridTransform2D(warp, inverse);
         }
+
         /**
          * Calculates parameters inverse transformation.
          * @param values Parameter values
@@ -173,14 +332,17 @@ public class WarpGridTransform2D extends WarpTransform2D {
 
             for (int i = 0; i <= YNUMCELLS; i++) {
                 for (int j = 0; j <= XNUMCELLS; j++) {
-                    inversePos[(i * ((1 + XNUMCELLS) * 2)) + (2 * j)] =  2*( ((j * XSTEP) + XSTART))
-                    -WARPPOSITIONS[(i * ((1 + XNUMCELLS) * 2)) + (2 * j)];
+                    inversePos[(i * ((1 + XNUMCELLS) * 2)) + (2 * j)] = (2 * ((j * XSTEP) + XSTART))
+                        - WARPPOSITIONS[(i * ((1 + XNUMCELLS) * 2)) + (2 * j)];
 
-                    inversePos[(i * ((1+ XNUMCELLS) * 2)) + (2 * j) + 1]=  2*( ((i * YSTEP) + YSTART))
-                    -WARPPOSITIONS[(i * ((1 + XNUMCELLS) * 2)) + (2 * j) + 1];
+                    inversePos[(i * ((1 + XNUMCELLS) * 2)) + (2 * j) + 1] = (2 * ((i * YSTEP)
+                        + YSTART)) - WARPPOSITIONS[(i * ((1 + XNUMCELLS) * 2)) + (2 * j) + 1];
                 }
             }
-            return  inversePos;
+
+            return inversePos;
         }
     }
+
+	
 }

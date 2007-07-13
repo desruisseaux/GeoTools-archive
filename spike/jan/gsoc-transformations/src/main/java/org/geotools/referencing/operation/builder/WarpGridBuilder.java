@@ -15,25 +15,26 @@
  */
 package org.geotools.referencing.operation.builder;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.vecmath.MismatchedSizeException;
+
+import org.geotools.geometry.DirectPosition2D;
+import org.geotools.geometry.Envelope2D;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.operation.DefaultMathTransformFactory;
+import org.geotools.referencing.operation.transform.ConcatenatedTransform;
+import org.geotools.referencing.operation.transform.WarpGridTransform2D;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.geometry.MismatchedReferenceSystemException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
-import org.geotools.geometry.DirectPosition2D;
-import org.geotools.geometry.Envelope2D;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.operation.DefaultMathTransformFactory;
-import org.geotools.referencing.operation.transform.WarpGridTransform2D;
-import org.geotools.referencing.operation.transform.WarpTransform2D;
 
 
 /**
@@ -63,32 +64,26 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
     /**
      * List of Mapped Positions in ggrid coordinates
      */
-    List /*<MappedPosition>*/ localpositions = new ArrayList();
+    List /*<MappedPosition>*/ localpositions =  new ArrayList();
+    
+    List /*<MappedPosition>*/ worldpositions ;
 
-    /**
-     * GridValues like maxx maxt dx dy etc..
-     */
+    
+     /** GridValues like maxx maxt dx dy etc.. */
     GridParamValues globalValues;
-
-    /**
-     * RealToGrid Math Transform
-     */
-    MathTransform realToGrid;
-
-    /**
-     * Grid of x shifts
-     */
+    
+    /** RealToGrid Math Transform */
+    MathTransform worldToGrid;
+    
+    /** Grid of x shifts */   
     private float[][] dxgrid;
 
-    /**
-     * Grid of y shifts
-     */
+     /** Grid of y shifts*/    
     private float[][] dygrid;
 
-    /**
-     * Warp positions
-     */
+     /** Warp positions*/
     private float[] warpPositions;
+      
 
     /**
      * Constructs Builder
@@ -104,28 +99,38 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
         MathTransform realToGrid)
         throws MismatchedSizeException, MismatchedDimensionException,
             MismatchedReferenceSystemException, TransformException {
-        this.realToGrid = realToGrid;
+    	
+        this.worldToGrid = realToGrid;
 
         globalValues = new GridParamValues(envelope, realToGrid, dx, dy);
-
-        super.setMappedPositions(transformMPToGrid(vectors));
+         super.setMappedPositions(vectors);
+       
+       // super.setMappedPositions(transformMPToGrid(vectors, realToGrid));
+         localpositions = transformMPToGrid(vectors, realToGrid);
         this.envelope = envelope;
     }
 
+    public List getGridMappedPositions(){
+    	if (localpositions == null){
+    		localpositions = transformMPToGrid(getMappedPositions(), worldToGrid);
+    	}
+    	return localpositions;
+    }
     /**
      * Transforms MappedPostions to grid system
      *
      */
-    private List transformMPToGrid(List MappedPositions) {
+    private List transformMPToGrid(List MappedPositions, MathTransform trans) {
+    	List gridmp = new ArrayList();
         for (Iterator i = MappedPositions.iterator(); i.hasNext();) {
             MappedPosition mp = (MappedPosition) i.next();
 
             try {
                 DirectPosition2D gridSource = new DirectPosition2D();
                 DirectPosition2D gridTarget = new DirectPosition2D();
-                realToGrid.transform(mp.getSource(), gridSource);
-                realToGrid.transform(mp.getTarget(), gridTarget);
-                localpositions.add(new MappedPosition(gridSource, gridTarget));
+                trans.transform(mp.getSource(), gridSource);
+                trans.transform(mp.getTarget(), gridTarget);
+                gridmp.add(new MappedPosition(gridSource, gridTarget));
             } catch (MismatchedDimensionException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -135,7 +140,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
             }
         }
 
-        return localpositions;
+        return gridmp;
     }
 
     private void ensureVectorsInsideEnvelope() {
@@ -148,10 +153,13 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
      * @see org.geotools.referencing.operation.builder.MathTransformBuilder#computeMathTransform()
      */
     protected MathTransform computeMathTransform() throws FactoryException {
-        warpPositions = getGrid();
-
-        return (WarpTransform2D) (new WarpGridTransform2D.Provider()).createMathTransform(globalValues
+        warpPositions = getGrid();      
+        
+        WarpGridTransform2D wt = (WarpGridTransform2D)(new WarpGridTransform2D.Provider()).createMathTransform(globalValues
             .getWarpGridParameters());
+       
+			wt.setWorldtoGridTransform(this.worldToGrid);	
+			return	wt;		
     }
 
     /*
@@ -260,9 +268,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
             /* Transforms dx, dy and envelope to grid system */
             dxdy = CRS.transform(trans, dxdy);
             env = CRS.transform(trans, env);
-
-            ;
-
+          
             try {
                 final DefaultMathTransformFactory factory = new DefaultMathTransformFactory();
                 WarpGridParameters = factory.getDefaultParameters("WarpGrid");

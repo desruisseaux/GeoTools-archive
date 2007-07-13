@@ -133,7 +133,7 @@ public class TPSGridBuilder extends WarpGridBuilder {
         double sum = 0;
 
         for (int i = 0; i < (v.getNumRow() - 3); i++) {
-            double dist = p.distance((Point2D) ((MappedPosition) getMappedPositions().get(i))
+            double dist = p.distance((Point2D) ((MappedPosition) getGridMappedPositions().get(i))
                     .getSource());
 
             sum = sum + (v.getElement(i, 0) * functionU(dist));
@@ -177,8 +177,8 @@ public class TPSGridBuilder extends WarpGridBuilder {
 
         for (int i = 0; i < number; i++) {
             for (int j = i + 1; j < number; j++) {
-                double u = calculateFunctionU((MappedPosition) super.getMappedPositions().get(i),
-                        (MappedPosition) super.getMappedPositions().get(j));
+                double u = calculateFunctionU((MappedPosition) super.getGridMappedPositions().get(i),
+                        (MappedPosition) super.getGridMappedPositions().get(j));
                 L.setElement(i, j, u);
                 L.setElement(j, i, u);
                 alfa = alfa + (u * 2); // same for upper and lower part
@@ -195,7 +195,7 @@ public class TPSGridBuilder extends WarpGridBuilder {
         for (int i = 0; i < number; i++) {
             L.setElement(i, i, 0);
 
-            DirectPosition source = ((MappedPosition) getMappedPositions().get(i)).getSource();
+            DirectPosition source = ((MappedPosition) getGridMappedPositions().get(i)).getSource();
 
             L.setElement(i, number + 0, 1);
             L.setElement(i, number + 1, source.getCoordinates()[0]);
@@ -227,7 +227,7 @@ public class TPSGridBuilder extends WarpGridBuilder {
         V = new GeneralMatrix(number + 3, 1);
 
         for (int i = 0; i < number; i++) {
-            MappedPosition mp = ((MappedPosition) getMappedPositions().get(i));
+            MappedPosition mp = ((MappedPosition) getGridMappedPositions().get(i));
             //  V.setElement(i, 0, mp.getDelta(dim));
             V.setElement(i, 0, mp.getSource().getOrdinate(dim) - mp.getTarget().getOrdinate(dim));
         }
