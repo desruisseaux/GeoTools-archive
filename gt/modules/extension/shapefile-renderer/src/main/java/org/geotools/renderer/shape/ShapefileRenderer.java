@@ -98,7 +98,9 @@ import org.geotools.util.NumberRange;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.Operation;
 import org.opengis.referencing.operation.TransformException;
 
 
@@ -1276,11 +1278,14 @@ public class ShapefileRenderer implements GTRenderer {
                 	dataCRS=getForceCRSHint();
                 
                 MathTransform mt;
+                CoordinateOperation op;
 
                 try {
-                    mt = CRS.findMathTransform (dataCRS, destinationCrs, true);
+                    op = CRS.getCoordinateOperationFactory(true).createOperation(dataCRS, destinationCrs);
+                    mt = op.getMathTransform();
                     bbox = bbox.transform(dataCRS, true, 10);
                 } catch (Exception e) {
+                    op = null;
                     mt = null;
                 }
 
@@ -1310,7 +1315,7 @@ public class ShapefileRenderer implements GTRenderer {
                 DefaultQuery query = new DefaultQuery(currLayer.getQuery());
                 if( query.getFilter() !=null ){
                     // now reproject the geometries in filter because geoms are retrieved projected to screen space
-                    FilterTransformer transformer= new  FilterTransformer(mt);
+                    FilterTransformer transformer= new  FilterTransformer(dataCRS, destinationCrs, mt);
                     query.setFilter((Filter) query.getFilter().accept(transformer, null));
                 }
                 

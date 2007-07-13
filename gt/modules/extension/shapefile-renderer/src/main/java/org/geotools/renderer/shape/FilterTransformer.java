@@ -18,9 +18,15 @@ package org.geotools.renderer.shape;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.visitor.DuplicatingFilterVisitor;
 import org.geotools.geometry.jts.JTS;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.ReferencingFactoryFinder;
+import org.geotools.referencing.operation.matrix.Matrix2;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
@@ -35,10 +41,46 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class FilterTransformer extends DuplicatingFilterVisitor {
 
-    final MathTransform mt;
+    MathTransform mt;
+    CoordinateReferenceSystem fromCRS;
+    CoordinateReferenceSystem toCRS;
     
     public FilterTransformer(final MathTransform mt) {
         this.mt = mt;
+    }
+    
+    /**
+     * Alternate constructor, takes the source CRS, the destination CRS, and an affine transform to 
+     * be concatenated to the geographic transfromation. This contructor allows for accurate envelope
+     * transformations when the data set contains extreme points such as the poles or the Greenwitch
+     * antimeridian.
+     * @see ReferencedEnvelope#transform(CoordinateReferenceSystem, boolean)
+     * @param fromCRS
+     * @param toCRS
+     * @param affineTransform
+     * @throws FactoryException
+     */
+    public FilterTransformer(final CoordinateReferenceSystem fromCRS, final CoordinateReferenceSystem toCRS, final MathTransform affineTransform) throws FactoryException {
+        this.fromCRS = fromCRS;
+        this.toCRS = toCRS;
+        
+        try {
+            mt = CRS.findMathTransform(fromCRS, toCRS);
+        } catch (Exception e) {
+            mt = null;
+        }
+
+         if (mt == null) {
+            mt = affineTransform;
+        } else {
+            mt = ReferencingFactoryFinder.getMathTransformFactory(null).createConcatenatedTransform(
+                    mt, affineTransform);
+        }
+         
+        // if everything else failed, use the identity transform 
+        if(mt == null)
+            mt = ReferencingFactoryFinder.getMathTransformFactory(null).createAffineTransform(
+                    new Matrix2(1,0,0,1));
     }
     
     public Object visit(BBOX filter, Object extraData) {
@@ -66,15 +108,18 @@ public class FilterTransformer extends DuplicatingFilterVisitor {
         try {
             if( value instanceof com.vividsolutions.jts.geom.Geometry ){
                 return getFactory(extraData).literal(JTS.transform((com.vividsolutions.jts.geom.Geometry)value, mt));
-        }
+            }
             if( value instanceof Envelope ){
-                return getFactory(extraData).literal(JTS.transform((Envelope)value, mt));
-        }
+                ReferencedEnvelope start = new ReferencedEnvelope((Envelope)value, fromCRS);
+                return getFactory(extraData).literal(start.transform(toCRS, true));
+            }
         } catch (MismatchedDimensionException e) {
             throw new RuntimeException(e);
         } catch (IllegalFilterException e) {
             throw new RuntimeException(e);
         } catch (TransformException e) {
+            throw new RuntimeException(e);
+        } catch (FactoryException e) {
             throw new RuntimeException(e);
         }
         return super.visit(expression, extraData);
