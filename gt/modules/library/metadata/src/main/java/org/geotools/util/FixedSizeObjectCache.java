@@ -34,7 +34,7 @@ import EDU.oswego.cs.dl.util.concurrent.ReentrantLock;
  * @since 2.4
  * @version $Id$
  * @source $URL$
- * @author Cory Horner (Refractions Research)
+ * @author Jody Garnett (Refractions Research)
  */
 final class FixedSizeObjectCache implements ObjectCache {
     

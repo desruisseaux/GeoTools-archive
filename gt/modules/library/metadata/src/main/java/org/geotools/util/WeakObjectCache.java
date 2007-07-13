@@ -35,6 +35,8 @@ import EDU.oswego.cs.dl.util.concurrent.ReentrantLock;
  * @version $Id$
  * @source $URL$
  * @author Cory Horner (Refractions Research)
+ * @author Jody Garnett (Refractions Research)
+ * @author Martin Desruisseaux (Geomatys)
  */
 final class WeakObjectCache implements ObjectCache {
     
