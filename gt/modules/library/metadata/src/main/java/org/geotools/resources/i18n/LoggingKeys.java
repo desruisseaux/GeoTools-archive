@@ -41,7 +41,7 @@ public final class LoggingKeys {
     public static final int ADJUSTED_GRID_GEOMETRY_$1 = 0;
 
     /**
-     * Ambiguity between inverse flattening and semi minor axis length. Using inverse flattening.
+     * Ambiguity between inverse flattening and semi minor axis length for ellipsoid "{0}". Using inverse flattening.
      */
     public static final int AMBIGUOUS_ELLIPSOID = 1;
 

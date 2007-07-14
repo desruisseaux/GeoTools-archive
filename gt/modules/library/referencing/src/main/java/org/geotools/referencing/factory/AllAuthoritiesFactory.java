@@ -191,8 +191,8 @@ public class AllAuthoritiesFactory extends ManyAuthoritiesFactory {
          * Returns all factories to try.
          */
         private Set/*<AuthorityFactory>*/ fromFactoryRegistry() {
-            final ManyAuthoritiesFactory factory = (ManyAuthoritiesFactory) proxy.getAuthorityFactory();
-            final Class/*<? extends AuthorityFactory>*/ type = proxy.getType();
+            final ManyAuthoritiesFactory factory = (ManyAuthoritiesFactory) getProxy().getAuthorityFactory();
+            final Class/*<? extends AuthorityFactory>*/ type = getProxy().getType();
             final Set factories = new LinkedHashSet();
             for (final Iterator it=ReferencingFactoryFinder.getAuthorityNames().iterator(); it.hasNext();) {
                 final String authority = (String) it.next();

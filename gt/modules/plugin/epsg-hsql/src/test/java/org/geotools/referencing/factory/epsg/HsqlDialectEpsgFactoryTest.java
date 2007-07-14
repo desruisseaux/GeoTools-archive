@@ -4,13 +4,17 @@ import java.sql.Connection;
 import java.util.Set;
 
 import org.geotools.factory.Hints;
+import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.IdentifiedObjectFinder;
+import org.opengis.geometry.DirectPosition;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+
 import javax.sql.DataSource;
 import junit.framework.TestCase;
 
@@ -24,7 +28,7 @@ public class HsqlDialectEpsgFactoryTest extends TestCase {
         if( factory == null ){
             DataSource datasource = HsqlEpsgDatabase.createDataSource();
             Connection connection = datasource.getConnection();
-            Hints hints = new Hints(Hints.BUFFER_POLICY, "default");
+            Hints hints = new Hints(Hints.BUFFER_POLICY, "weak");
             factory = new HsqlDialectEpsgFactory(hints, connection);
         }
         if( finder == null ){
@@ -40,7 +44,15 @@ public class HsqlDialectEpsgFactoryTest extends TestCase {
         assertEquals("4326 equals EPSG:4326", code4326, epsg4326);
         assertSame("4326 == EPSG:4326", code4326, epsg4326);
     }
+    public void testFunctionality() throws Exception {
+        CoordinateReferenceSystem crs1 = factory.createCoordinateReferenceSystem("4326");
+        CoordinateReferenceSystem crs2 = factory.createCoordinateReferenceSystem("3005");
 
+        // reproject
+        MathTransform transform = CRS.findMathTransform(crs1, crs2,true);
+        DirectPosition pos = new DirectPosition2D(48.417, 123.35);
+        transform.transform(pos, null);        
+    }
     public void testAuthorityCodes() throws Exception {
         Set authorityCodes = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
         assertNotNull(authorityCodes);
@@ -73,7 +85,8 @@ public class HsqlDialectEpsgFactoryTest extends TestCase {
         assertEquals("4326",AbstractIdentifiedObject.getIdentifier(find, factory.getAuthority()).getCode());
         
         finder.setFullScanAllowed(false);
-        assertEquals("The CRS should still in the cache.","EPSG:4326", finder.findIdentifier(crs));
+        String id = finder.findIdentifier(crs);
+        assertEquals("The CRS should still be in the cache.","EPSG:4326", id);
     }
     public void testFindBeijing1954() throws FactoryException {
         /*
@@ -112,6 +125,7 @@ public class HsqlDialectEpsgFactoryTest extends TestCase {
         
         assertEquals("2442", AbstractIdentifiedObject.getIdentifier(find, factory.getAuthority()).getCode());
         finder.setFullScanAllowed(false);
-        assertEquals("The CRS should still in the cache.","EPSG:2442", finder.findIdentifier(crs));
+        String id = finder.findIdentifier(crs);
+        assertEquals("The CRS should still be in the cache.","EPSG:2442", id);
     }
 }

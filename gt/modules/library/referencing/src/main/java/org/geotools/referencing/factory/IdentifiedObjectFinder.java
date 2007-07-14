@@ -59,18 +59,22 @@ public class IdentifiedObjectFinder {
     /**
      * The proxy for object creation.
      */
-    final AuthorityFactoryProxy proxy;
+    private AuthorityFactoryProxy proxy;
 
     /**
      * {@code true} for performing full scans, or {@code false} otherwise.
      */
     private boolean fullScan = true;
 
+    /** Default constructor, subclass should provide an override for getProxy */
+    protected IdentifiedObjectFinder() {        
+    }
+    
     /**
      * Creates a finder using the same proxy than the specified finder.
      */
     IdentifiedObjectFinder(final IdentifiedObjectFinder finder) {
-        this.proxy = finder.proxy;
+        this.setProxy(finder.getProxy());
     }
 
     /**
@@ -84,7 +88,7 @@ public class IdentifiedObjectFinder {
     protected IdentifiedObjectFinder(final AuthorityFactory factory,
                                      final Class/*<? extends IdentifiedObject>*/ type)
     {
-        proxy = AuthorityFactoryProxy.getInstance(factory, type);
+        setProxy(AuthorityFactoryProxy.getInstance(factory, type));
     }
 
     /*
@@ -98,6 +102,13 @@ public class IdentifiedObjectFinder {
      * AbstractAuthorityFactory implementations create proxy to the underlying backing
      * store rather than to the factory on which 'getIdentifiedObjectFinder()' was invoked.
      */
+
+    /**
+     * @return the proxy
+     */
+    protected AuthorityFactoryProxy getProxy() {
+        return proxy;
+    }
 
     /**
      * If {@code true}, an exhaustive full scan against all registered objects
@@ -178,12 +189,19 @@ public class IdentifiedObjectFinder {
         final IdentifiedObject candidate = find(object);
         return (candidate != null) ? getIdentifier(candidate) : null;
     }
-
+    
+    /**
+     * The Authority for this Finder; used during get Identifier. 
+     * @return Citation for the authority being represented.
+     */
+    protected Citation getAuthority(){
+        return getProxy().getAuthorityFactory().getAuthority();
+    }
     /**
      * Returns the identifier for the specified object.
      */
     final String getIdentifier(final IdentifiedObject object) {
-        Citation authority = proxy.getAuthorityFactory().getAuthority();
+        Citation authority = getAuthority();
         if (ReferencingFactory.ALL.equals(authority)) {
             /*
              * "All" is a pseudo-authority declared by AllAuthoritiesFactory. This is not a real
@@ -221,7 +239,7 @@ public class IdentifiedObjectFinder {
      * @throws FactoryException if an error occured while creating an object.
      */
     final IdentifiedObject createFromIdentifiers(final IdentifiedObject object) throws FactoryException {
-        final Citation authority = proxy.getAuthorityFactory().getAuthority();
+        final Citation authority = getProxy().getAuthorityFactory().getAuthority();
         final boolean isAll = ReferencingFactory.ALL.equals(authority);
         for (final Iterator it=object.getIdentifiers().iterator(); it.hasNext();) {
             final Identifier id = (Identifier) it.next();
@@ -231,7 +249,7 @@ public class IdentifiedObjectFinder {
             }
             IdentifiedObject candidate;
             try {
-                candidate = proxy.create(id.getCode());
+                candidate = getProxy().create(id.getCode());
             } catch (NoSuchAuthorityCodeException e) {
                 // The identifier was not recognized. No problem, let's go on.
                 continue;
@@ -263,7 +281,7 @@ public class IdentifiedObjectFinder {
     final IdentifiedObject createFromNames(final IdentifiedObject object) throws FactoryException {
         IdentifiedObject candidate;
         try {
-            candidate = proxy.create(object.getName().getCode());
+            candidate = getProxy().create(object.getName().getCode());
             candidate = deriveEquivalent(candidate, object);
             if (candidate != null) {
                 return candidate;
@@ -280,7 +298,7 @@ public class IdentifiedObjectFinder {
         for (final Iterator it=object.getAlias().iterator(); it.hasNext();) {
             final GenericName id = (GenericName) it.next();
             try {
-                candidate = proxy.create(id.toString());
+                candidate = getProxy().create(id.toString());
             } catch (FactoryException e) {
                 // The name was not recognized. No problem, let's go on.
                 continue;
@@ -320,7 +338,7 @@ public class IdentifiedObjectFinder {
             final String code = (String) it.next();
             IdentifiedObject candidate;
             try {
-                candidate = proxy.create(code);
+                candidate = getProxy().create(code);
             }
             catch (FactoryException e) {
                 LOGGER.log( Level.FINEST, "Could not create '"+code+"':"+e );
@@ -361,7 +379,7 @@ public class IdentifiedObjectFinder {
      * @throws FactoryException if an error occured while fetching the set of code candidates.
      */
     protected Set/*<String>*/ getCodeCandidates(final IdentifiedObject object) throws FactoryException {
-        return proxy.getAuthorityCodes();
+        return getProxy().getAuthorityCodes();
     }
 
     /*
@@ -410,7 +428,17 @@ public class IdentifiedObjectFinder {
      */
     //@Override
     public String toString() {
-        return proxy.toString(IdentifiedObjectFinder.class);
+        return getProxy().toString(IdentifiedObjectFinder.class);
+    }
+
+
+
+
+    /**
+     * @param proxy the proxy to set
+     */
+    public void setProxy( AuthorityFactoryProxy proxy ) {
+        this.proxy = proxy;
     }
 
 

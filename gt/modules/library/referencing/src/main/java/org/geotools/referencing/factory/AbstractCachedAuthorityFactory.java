@@ -102,18 +102,25 @@ public abstract class AbstractCachedAuthorityFactory extends AbstractAuthorityFa
 		BufferedFactory {
 
 	/**
-	 * Cache to be used for referencing objects defined by this authority.
-	 * Please note that this cache may be shared!
-	 */
+     * Cache to be used for referencing objects defined by this authority. Please note that this
+     * cache may be shared!
+     * <p>
+     * Your cache may grow to considerable size during actual use; in addition to storing
+     * CoordinateReferenceSystems (by code); it will also store all the component parts 
+     * (each under its own code), along with MathTransformations between two
+     * CoordinateReferenceSystems. So even if you are only planning on working with
+     * 50 CoordianteReferenceSystems please keep in mind that you will need larger
+     * cache size in order to prevent a bottleneck.
+     */
 	protected ObjectCache cache;
 	
 	/**
-	 * Cache to be used for finding referencing objects defined by this
-	 * authority.
-	 * Please note this cache is shared with multiple IdentifiedObjectFinderer.
-	 */
-	protected ObjectCache findCache;
-	
+     * The findCache is used to store search results; often match a "raw"
+     * CoordinateReferenceSystem created from WKT (as the key) with a
+     * "real" CoordianteReferenceSystem as defined by this authority.
+     */
+    ObjectCache findCache;
+		
 	/**
 	 * A container of the "real factories" actually used to construct objects.
 	 */
@@ -157,9 +164,8 @@ public abstract class AbstractCachedAuthorityFactory extends AbstractAuthorityFa
 	protected AbstractCachedAuthorityFactory(int priority, ObjectCache cache, ReferencingFactoryContainer container) {
 		super( priority );
 		this.factories = container;
-		
 		this.cache = cache;
-		this.findCache = ObjectCaches.chain( ObjectCaches.create("weak",0), cache ); 
+		this.findCache = ObjectCaches.create("weak",0);
 	}
 
 	//
@@ -689,11 +695,7 @@ public abstract class AbstractCachedAuthorityFactory extends AbstractAuthorityFa
     public synchronized IdentifiedObjectFinder getIdentifiedObjectFinder(
             final Class/*<? extends IdentifiedObject>*/ type) throws FactoryException
     {        
-        if( findCache == null ){
-            findCache = ObjectCaches.create("weak",250);
-        }
-        IdentifiedObjectFinder rawFinder = super.getIdentifiedObjectFinder( type );
-        return new CachedFinder( rawFinder );        
+        return new CachedFinder( type );        
     }
 
     /**
@@ -714,8 +716,8 @@ public abstract class AbstractCachedAuthorityFactory extends AbstractAuthorityFa
         /**
          * Creates a finder for the underlying backing store.
          */
-        CachedFinder(final IdentifiedObjectFinder finder ) {
-            super(finder);
+        CachedFinder(Class type) {
+            super( AbstractCachedAuthorityFactory.this, type );
         }
 
         /**
@@ -725,35 +727,29 @@ public abstract class AbstractCachedAuthorityFactory extends AbstractAuthorityFa
          */
         //@Override
         public IdentifiedObject find(final IdentifiedObject object) throws FactoryException {
-            /*
-             * Do not synchronize on 'BufferedAuthorityFactory.this'. This method may take a
-             * while to execute and we don't want to block other threads. The synchronizations
-             * in the 'create' methods and in the 'findPool' map should be suffisient.
-             *
-             * TODO: avoid to search for the same object twice. For now we consider that this
-             *       is not a big deal if the same object is searched twice; it is "just" a
-             *       waste of CPU.
-             */
             IdentifiedObject candidate;
-            candidate = (IdentifiedObject) findCache.get(object);
             
-            if (candidate == null) {
-                IdentifiedObject found = super.find(object);
-                if (found != null) {
-                    try {
-                        findCache.writeLock(object);
-                        candidate = (IdentifiedObject) findCache.peek(object);
-                        if( candidate == null ){
-                            findCache.put(object, found);
-                            return found;
-                        }
-
-                    } finally {
-                        findCache.writeLock(object);
-                    }
-                }
+            candidate = (IdentifiedObject) findCache.get(object);
+            if (candidate != null) {
+                return candidate;
             }
-            return candidate;
+            try {
+                findCache.writeLock(object); // avoid searching for the same object twice
+                IdentifiedObject found = super.find(object);
+                if( found == null) {
+                    return null; // not found
+                }
+                candidate = (IdentifiedObject) findCache.peek(object); 
+                if( candidate == null ){
+                    findCache.put(object, found);
+                    return found;
+                }
+                else {
+                    return candidate;
+                }
+            } finally {
+                findCache.writeUnLock(object);
+            }
         }
 
         /**
@@ -762,7 +758,7 @@ public abstract class AbstractCachedAuthorityFactory extends AbstractAuthorityFa
         //@Override
         public String findIdentifier(final IdentifiedObject object) throws FactoryException {
             IdentifiedObject candidate;
-            candidate = (IdentifiedObject) findCache.get(object);            
+            candidate = (IdentifiedObject) findCache.get(object);
             if (candidate != null) {
                 return getIdentifier(candidate);
             }

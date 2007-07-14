@@ -1199,7 +1199,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                     if (semiMinorAxis != 0) {
                         // Both 'inverseFlattening' and 'semiMinorAxis' are defined.
                         // Log a warning and create the ellipsoid using the inverse flattening.
-                        LOGGER.log(Logging.format(Level.WARNING, LoggingKeys.AMBIGUOUS_ELLIPSOID));
+                        LOGGER.log(Logging.format(Level.WARNING, LoggingKeys.AMBIGUOUS_ELLIPSOID,code));
                     }
                     ellipsoid = factories.getDatumFactory().createFlattenedSphere(
                                 properties, semiMajorAxis, inverseFlattening, unit);

@@ -68,7 +68,7 @@ public abstract class AbstractEpsgMediator extends AbstractAuthorityMediator {
     }
 
     public boolean isConnected(){
-        return datasource != null;        
+        return datasource != null && super.isConnected();
     }
     
     /**

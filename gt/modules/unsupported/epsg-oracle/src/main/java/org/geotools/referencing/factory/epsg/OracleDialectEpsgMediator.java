@@ -20,6 +20,8 @@ import java.sql.Connection;
 import javax.sql.DataSource;
 
 import org.geotools.factory.Hints;
+import org.geotools.referencing.factory.AbstractAuthorityFactory;
+import org.geotools.referencing.factory.AbstractCachedAuthorityFactory;
 import org.geotools.referencing.factory.AbstractEpsgMediator;
 
 /**
@@ -40,7 +42,7 @@ public class OracleDialectEpsgMediator extends AbstractEpsgMediator {
     /**
      * Reinitialize an instance to be returned by the pool.
      */
-    protected void activateWorker(Object obj) throws Exception {
+    protected void activateWorker(AbstractCachedAuthorityFactory obj) throws Exception {
         OracleDialectEpsgFactory factory = (OracleDialectEpsgFactory) obj;
         factory.connect();
     }
@@ -48,7 +50,7 @@ public class OracleDialectEpsgMediator extends AbstractEpsgMediator {
     /**
      * Destroys an instance no longer needed by the pool.
      */
-    protected void destroyWorker(Object obj) throws Exception {
+    protected void destroyWorker(AbstractCachedAuthorityFactory obj) throws Exception {
         OracleDialectEpsgFactory factory = (OracleDialectEpsgFactory) obj;
         factory.disconnect();
         factory.dispose();
@@ -58,11 +60,11 @@ public class OracleDialectEpsgMediator extends AbstractEpsgMediator {
     /**
      * Creates an instance that can be returned by the pool.
      */
-    protected Object makeWorker() throws Exception {
+    protected AbstractCachedAuthorityFactory makeWorker() throws Exception {
         //DataSource datasource = HsqlEpsgDatabase.createDataSource();
         //Connection connection = datasource.getConnection();
         Connection connection = getConnection();
-        //Hints hints = new Hints(Hints.BUFFER_POLICY, "none");     
+        //Hints hints = new Hints(Hints.BUFFER_POLICY, "none");
         OracleDialectEpsgFactory factory = new OracleDialectEpsgFactory(hints, connection);
         return factory;
     }
@@ -70,7 +72,7 @@ public class OracleDialectEpsgMediator extends AbstractEpsgMediator {
     /**
      * Uninitialize an instance to be returned to the pool.
      */
-    protected void passivateWorker(Object obj) throws Exception {
+    protected void passivateWorker(AbstractCachedAuthorityFactory obj) throws Exception {
         // Each implementation has the choice of closing connections when they
         // are returned to the worker pool, or when the objects are destroyed.
         // In this implementation, we have chosen to keep connections open
@@ -86,7 +88,7 @@ public class OracleDialectEpsgMediator extends AbstractEpsgMediator {
     /**
      * Ensures that the instance is safe to be returned by the pool.
      */
-    protected boolean validateWorker(Object obj) {
+    protected boolean validateWorker(AbstractCachedAuthorityFactory obj) {
         //TODO: ensure that the worker is no longer in use
         return true;
     }

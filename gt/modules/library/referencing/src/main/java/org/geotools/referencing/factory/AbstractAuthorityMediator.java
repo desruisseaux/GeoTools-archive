@@ -33,16 +33,12 @@ import org.apache.commons.pool.impl.GenericObjectPoolFactory;
 import org.apache.commons.pool.impl.GenericObjectPool.Config;
 import org.geotools.factory.BufferedFactory;
 import org.geotools.factory.Hints;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Errors;
 import org.geotools.util.ObjectCache;
 import org.geotools.util.ObjectCaches;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CompoundCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -112,8 +108,22 @@ public abstract class AbstractAuthorityMediator extends AbstractAuthorityFactory
     /**
      * Cache to be used for referencing objects defined by this authority. Please note that this
      * cache may be shared!
+     * <p>
+     * Your cache may grow to considerable size during actual use; in addition to storing
+     * CoordinateReferenceSystems (by code); it will also store all the component parts 
+     * (each under its own code), along with MathTransformations between two
+     * CoordinateReferenceSystems. So even if you are only planning on working with
+     * 50 CoordianteReferenceSystems please keep in mind that you will need larger
+     * cache size in order to prevent a bottleneck.
      */
     ObjectCache cache;
+
+    /**
+     * The findCache is used to store search results; often match a "raw" CoordinateReferenceSystem
+     * created from WKT (as the key) with a "real" CoordianteReferenceSystem as defined
+     * by this authority.
+     */
+    ObjectCache findCache;
 
     /**
      * Pool to hold workers which will be used to construct referencing objects which are not
@@ -193,26 +203,7 @@ public abstract class AbstractAuthorityMediator extends AbstractAuthorityFactory
         super(priority);
         this.factories = container;
         this.cache = cache;
-    }
-
-    /**
-     * Returns a finder which can be used for looking up unidentified objects. The finder fetchs a
-     * fully {@linkplain IdentifiedObject identified object} from an incomplete one, for example
-     * from an object without identifier or "{@code AUTHORITY[...]}" element in <cite>Well Known
-     * Text</cite> terminology.
-     * 
-     * @param type The type of objects to look for. Should be a GeoAPI interface like
-     *        {@code GeographicCRS.class}, but this method accepts also implementation class. If
-     *        the type is unknown, use {@code IdentifiedObject.class}. A more accurate type may
-     *        help to speed up the search, since it reduces the amount of tables to scan in some
-     *        implementations like the factories backed by EPSG database.
-     * @return A finder to use for looking up unidentified objects.
-     * @throws FactoryException if the finder can not be created.
-     * @since 2.4
-     */
-    public IdentifiedObjectFinder getIdentifiedObjectFinder(
-            final Class/* <? extends IdentifiedObject> */type ) throws FactoryException {
-        return new IdentifiedObjectFinder(this, type);
+        this.findCache = ObjectCaches.chain( ObjectCaches.create("weak",0), cache );        
     }
 
     /**
@@ -1351,49 +1342,162 @@ public abstract class AbstractAuthorityMediator extends AbstractAuthorityFactory
         }
 
         public void activateObject( Object obj ) throws Exception {
-            activateWorker(obj);
+            AbstractCachedAuthorityFactory worker = (AbstractCachedAuthorityFactory) obj;
+            worker.cache = cache;
+            activateWorker( worker );
         }
 
         public void destroyObject( Object obj ) throws Exception {
-            destroyWorker(obj);
+            destroyWorker((AbstractCachedAuthorityFactory) obj);
         }
 
         public Object makeObject() throws Exception {
-            return makeWorker();
+            AbstractCachedAuthorityFactory worker = makeWorker();
+            return worker;
         }
 
         public void passivateObject( Object obj ) throws Exception {
-            passivateWorker(obj);
+            passivateWorker((AbstractCachedAuthorityFactory) obj);
         }
 
         public boolean validateObject( Object obj ) {
-            return validateWorker(obj);
+            return validateWorker((AbstractCachedAuthorityFactory) obj);
         }
-
     }
 
     /**
      * Reinitialize an instance to be returned by the pool.
+     * <p>
+     * Please note that BEFORE this method has been called AbstractAuthorityMediator has already:
+     * <ul>
+     * <li>provided the worker with the single shared <code>cache</code>
+     * <li>provided the worker with the single shared <code>findCache</code>
+     * </ul>
      */
-    protected abstract void activateWorker( Object obj ) throws Exception;
+    protected abstract void activateWorker( AbstractCachedAuthorityFactory worker ) throws Exception;
 
     /**
      * Destroys an instance no longer needed by the pool.
      */
-    protected abstract void destroyWorker( Object obj ) throws Exception;
+    protected abstract void destroyWorker( AbstractCachedAuthorityFactory worker ) throws Exception;
 
     /**
      * Creates an instance that can be returned by the pool.
      */
-    protected abstract Object makeWorker() throws Exception;
+    protected abstract AbstractCachedAuthorityFactory makeWorker() throws Exception;
 
     /**
-     * Uninitialize an instance to be returned to the pool.
+     * Un-initialize an instance to be returned to the pool.
      */
-    protected abstract void passivateWorker( Object obj ) throws Exception;
+    protected abstract void passivateWorker( AbstractCachedAuthorityFactory worker ) throws Exception;
 
     /**
      * Ensures that the instance is safe to be returned by the pool.
      */
-    protected abstract boolean validateWorker( Object obj );    
+    protected abstract boolean validateWorker( AbstractCachedAuthorityFactory worker );
+    
+    /**
+     * Returns a finder which can be used for looking up unidentified objects.
+     * <p>
+     * The returned implementation will make use of workers as needed. 
+     * 
+     * @param type The type of objects to look for.
+     * @return A finder to use for looking up unidentified objects.
+     * @throws FactoryException if the finder can not be created.
+     * @since 2.4
+     */
+    public IdentifiedObjectFinder getIdentifiedObjectFinder(
+            final Class/* <? extends IdentifiedObject> */type ) throws FactoryException {        
+        return new LazyCachedFinder(type);
+    }    
+    /**
+     * An {@link IdentifiedObjectFinder} which uses a worker when searching.
+     * <p>
+     * The worker used is configured to store answers in a separate <code>findCache</code>, rather
+     * that disrupt the regular <code>cached</code>(which is focused on retaining codes requested
+     * by the user application). This is because hundred of objects may be created during a
+     * scan while only one will be typically retained. We don't want to overload the cache with
+     * every false candidates that we encounter during the scan.
+     * <p>
+     * Because the worker is configured differently before use we must be careful to return it to
+     * its original state before returning back to the <code>workers</code> pool.
+     */
+    private final class LazyCachedFinder extends IdentifiedObjectFinder {
+        private Class type;
+        /**
+         * Creates a finder for the underlying backing store.
+         */
+        LazyCachedFinder(final Class type) {
+            super( AbstractAuthorityMediator.this, type);
+            this.type = type;
+        }
+
+        /**
+         * Looks up an object from this authority factory which is equals, ignoring metadata,
+         * to the specified object. The default implementation performs the same lookup than
+         * the backing store and caches the result.
+         */
+        //@Override
+        public IdentifiedObject find(final IdentifiedObject object) throws FactoryException {               
+            IdentifiedObject candidate;            
+            candidate = (IdentifiedObject) findCache.get(object);            
+            if (candidate != null) {
+                return candidate;
+            }
+            try {
+                findCache.writeLock(object); // avoid searching for the same object twice
+                IdentifiedObject found;    
+                AbstractCachedAuthorityFactory worker = null;
+                try {
+                    worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
+                    worker.cache = ObjectCaches.chain( ObjectCaches.create("weak",3000), cache );
+                    worker.findCache = findCache;
+                    
+                    setProxy(AuthorityFactoryProxy.getInstance(worker, type));
+
+                    found = super.find(object);
+                } catch (Exception e) {
+                    throw new FactoryException(e);
+                }
+                finally {
+                    setProxy(null);
+                    worker.cache = cache;
+                    worker.findCache = findCache;
+                    try {
+                        getPool().returnObject(worker);
+                    } catch (Exception e) {
+                        LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
+                    }
+                }
+                if( found == null) {
+                    return null; // not found
+                }
+                candidate = (IdentifiedObject) findCache.peek(object); 
+                if( candidate == null ){
+                    findCache.put(object, found);
+                    return found;
+                }
+                else {
+                    return candidate;
+                }
+            } finally {
+                findCache.writeUnLock(object);
+            }
+        }
+        protected Citation getAuthority(){
+            return AbstractAuthorityMediator.this.getAuthority();
+        }
+        /**
+         * Returns the identifier for the specified object.
+         */
+        //@Override
+        public String findIdentifier(final IdentifiedObject object) throws FactoryException {
+            IdentifiedObject candidate;
+            candidate = (IdentifiedObject) findCache.get(object);
+            if (candidate != null) {
+                return getIdentifier(candidate);
+            }
+            return super.findIdentifier(object);
+        }
+    }
 }

@@ -818,7 +818,7 @@ scanForType:    for (int i=0; i<FACTORY_TYPES.length; i++) {
          * Returns the user-supplied factories.
          */
         final Collection getFactories() {
-            return ((ManyAuthoritiesFactory) proxy.getAuthorityFactory()).factories;
+            return ((ManyAuthoritiesFactory) getProxy().getAuthorityFactory()).factories;
         }
 
         /**
@@ -834,7 +834,7 @@ scanForType:    for (int i=0; i<FACTORY_TYPES.length; i++) {
                 }
                 if (factory instanceof AbstractAuthorityFactory) {
                     final IdentifiedObjectFinder finder = ((AbstractAuthorityFactory) factory).
-                            getIdentifiedObjectFinder(proxy.getType());
+                            getIdentifiedObjectFinder(getProxy().getType());
                     if (finder != null) {
                         finder.setFullScanAllowed(isFullScanAllowed());
                         return finder;

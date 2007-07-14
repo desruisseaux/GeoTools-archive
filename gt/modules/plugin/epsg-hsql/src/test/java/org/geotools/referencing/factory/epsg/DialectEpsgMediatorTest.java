@@ -3,14 +3,11 @@ package org.geotools.referencing.factory.epsg;
 import java.sql.Connection;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
-import junit.framework.TestCase;
-
 import org.geotools.factory.Hints;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.IdentifiedObjectFinder;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.referencing.FactoryException;
@@ -18,30 +15,34 @@ import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
-public class HsqlDialectEpsgMediatorTest extends TestCase {
-    private HsqlDialectEpsgMediator factory;
-    private IdentifiedObjectFinder finder;
+import javax.sql.DataSource;
+import junit.framework.TestCase;
+
+public class DialectEpsgMediatorTest extends TestCase {
+    
+    private static HsqlDialectEpsgMediator factory;
+    private static IdentifiedObjectFinder finder;
     
     protected void setUp() throws Exception {
         super.setUp();
         if( factory == null ){
             DataSource datasource = HsqlEpsgDatabase.createDataSource();
-            Hints hints = new Hints( Hints.BUFFER_POLICY, "default" );     
-            factory = new HsqlDialectEpsgMediator(80, hints, datasource);            
+            Connection connection = datasource.getConnection();
+            Hints hints = new Hints(Hints.BUFFER_POLICY, "default");
+            factory = new HsqlDialectEpsgMediator( hints );
         }
         if( finder == null ){
             finder = factory.getIdentifiedObjectFinder(CoordinateReferenceSystem.class);
         }
     }
-    
+
     public void testCreation() throws Exception {
         assertNotNull(factory);
         CoordinateReferenceSystem epsg4326 = factory.createCoordinateReferenceSystem("EPSG:4326");
         CoordinateReferenceSystem code4326 = factory.createCoordinateReferenceSystem("4326");
-        
-        assertNotNull(epsg4326);
+
         assertEquals("4326 equals EPSG:4326", code4326, epsg4326);
-        assertSame("4326 == EPSG:4326", code4326, epsg4326);       
+        assertSame("4326 == EPSG:4326", code4326, epsg4326);
     }
     public void testFunctionality() throws Exception {
         CoordinateReferenceSystem crs1 = factory.createCoordinateReferenceSystem("4326");
@@ -84,8 +85,7 @@ public class HsqlDialectEpsgMediatorTest extends TestCase {
         assertEquals("4326",AbstractIdentifiedObject.getIdentifier(find, factory.getAuthority()).getCode());
         
         finder.setFullScanAllowed(false);
-        String id = finder.findIdentifier(crs);
-        assertEquals("The CRS should still in the cache.","EPSG:4326", id);
+        assertEquals("The CRS should still in the cache.","EPSG:4326", finder.findIdentifier(crs));
     }
     public void testFindBeijing1954() throws FactoryException {
         /*
@@ -124,7 +124,6 @@ public class HsqlDialectEpsgMediatorTest extends TestCase {
         
         assertEquals("2442", AbstractIdentifiedObject.getIdentifier(find, factory.getAuthority()).getCode());
         finder.setFullScanAllowed(false);
-        String id = finder.findIdentifier(crs);
-        assertEquals("The CRS should still in the cache.","EPSG:2442", id);
+        assertEquals("The CRS should still in the cache.","EPSG:2442", finder.findIdentifier(crs));
     }
 }

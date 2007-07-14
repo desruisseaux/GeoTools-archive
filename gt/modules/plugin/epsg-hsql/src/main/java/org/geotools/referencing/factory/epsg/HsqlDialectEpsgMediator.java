@@ -22,6 +22,7 @@ import javax.sql.DataSource;
 
 import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
+import org.geotools.referencing.factory.AbstractCachedAuthorityFactory;
 import org.geotools.referencing.factory.AbstractEpsgMediator;
 import org.opengis.referencing.FactoryException;
 
@@ -84,7 +85,7 @@ public class HsqlDialectEpsgMediator extends AbstractEpsgMediator {
     /**
      * Reinitialize an instance to be returned by the pool.
      */
-    protected void activateWorker(Object obj) throws Exception {
+    protected void activateWorker(AbstractCachedAuthorityFactory obj) throws Exception {
         HsqlDialectEpsgFactory factory = (HsqlDialectEpsgFactory) obj;
         factory.connect();
     }
@@ -92,7 +93,7 @@ public class HsqlDialectEpsgMediator extends AbstractEpsgMediator {
     /**
      * Destroys an instance no longer needed by the pool.
      */
-    protected void destroyWorker(Object obj) throws Exception {
+    protected void destroyWorker(AbstractCachedAuthorityFactory obj) throws Exception {
         HsqlDialectEpsgFactory factory = (HsqlDialectEpsgFactory) obj;
         factory.dispose();
         factory.disconnect();
@@ -102,7 +103,7 @@ public class HsqlDialectEpsgMediator extends AbstractEpsgMediator {
     /**
      * Creates an instance that can be returned by the pool.
      */
-    protected Object makeWorker() throws Exception {
+    protected AbstractCachedAuthorityFactory makeWorker() throws Exception {
         Connection connection = getConnection();
         HsqlDialectEpsgFactory factory = new HsqlDialectEpsgFactory(hints, connection);
         return factory;
@@ -111,13 +112,13 @@ public class HsqlDialectEpsgMediator extends AbstractEpsgMediator {
     /**
      * Uninitialize an instance to be returned to the pool.
      */
-    protected void passivateWorker(Object obj) throws Exception {
+    protected void passivateWorker(AbstractCachedAuthorityFactory obj) throws Exception {
     }
 
     /**
      * Ensures that the instance is safe to be returned by the pool.
      */
-    protected boolean validateWorker(Object obj) {
+    protected boolean validateWorker(AbstractCachedAuthorityFactory obj) {
         //TODO: ensure that the worker is no longer in use
         return true;
     }

@@ -838,7 +838,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
          */
         private void ensureFallback() throws FactoryException {
             if (fallback == null) {
-                fallback = FallbackAuthorityFactory.this.getIdentifiedObjectFinder(proxy.getType());
+                fallback = FallbackAuthorityFactory.this.getIdentifiedObjectFinder(getProxy().getType());
             }
             fallback.setFullScanAllowed(isFullScanAllowed());
         }
