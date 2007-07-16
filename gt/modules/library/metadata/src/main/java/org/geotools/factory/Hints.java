@@ -481,7 +481,7 @@ public final class Hints extends RenderingHints {
      *
      * @since 2.4
      */
-    public static final IntegerKey AUTHORITY_MAX_ACTIVE = new IntegerKey(8);
+    public static final IntegerKey AUTHORITY_MAX_ACTIVE = new IntegerKey(2);
     
     /**
      * Minimum number of objects required before the evictor will begin
@@ -511,7 +511,7 @@ public final class Hints extends RenderingHints {
      * 
      * @since 2.4
      */
-    public static final IntegerKey AUTHORITY_MAX_IDLE = new IntegerKey(8);
+    public static final IntegerKey AUTHORITY_MAX_IDLE = new IntegerKey(2);
     
     /**
      * When the evictor is run, if more time (in milliseconds) than the value in
