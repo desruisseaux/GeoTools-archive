@@ -20,6 +20,15 @@
  */
 package jhdf.hdf4.test.vgroup;
 
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
+import java.nio.ShortBuffer;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -34,7 +43,9 @@ public class H4VGroupTest extends TestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		testFilePath = "d:\\work\\data\\hdf\\MISR_AM1_CGLS_WIN_2005_F04_0017.hdf";
+		// testFilePath =
+		// "E:/work/data/hdf/MISR_AM1_CGLS_WIN_2005_F04_0017.hdf";
+		testFilePath = "E:/work/data/hdf/MODPM2007027121858.L3_000_EAST_MED.hdf";
 	}
 
 	public H4VGroupTest(String name) {
@@ -52,43 +63,43 @@ public class H4VGroupTest extends TestCase {
 	}
 
 	public void testGetInfo() {
-		int fid = HDFConstants.FAIL;
+		int fileID = HDFConstants.FAIL;
 		try {
 			// //
 			// Open the HDF file for reading.
 			// //
-			fid = HDFLibrary.Hopen(testFilePath, HDFConstants.DFACC_READ);
-			assertNotSame(fid, HDFConstants.FAIL);
+			fileID = HDFLibrary.Hopen(testFilePath, HDFConstants.DFACC_READ);
+			assertNotSame(fileID, HDFConstants.FAIL);
 
 			// //
 			// Initialize the V interface.
 			// //
-			assertTrue(HDFLibrary.Vstart(fid));
+			assertTrue(HDFLibrary.Vstart(fileID));
 
 			// Get and print the names and class names of all the lone vgroups.
-			// First, call Vlone with num_of_lones set to 0 to get the number of
+			// First, call Vlone with bufferSize set to 0 to get the number of
 			// lone vgroups in the file, but not to get their reference numbers.
 
-			final int num_of_lones = HDFLibrary.Vlone(fid, null, 0);
-			System.out.println("This dataset contains " + num_of_lones
+			final int lonesNumber = HDFLibrary.Vlone(fileID, null, 0);
+			System.out.println("This dataset contains " + lonesNumber
 					+ " vgroups");
 			System.out.println("");
 			System.out.println("");
-			if (num_of_lones > 0) {
+			if (lonesNumber > 0) {
 				// //
 				// Get their reference numbers.
 				// //
-				final int[] ref_array = new int[num_of_lones];
-				HDFLibrary.Vlone(fid, ref_array, num_of_lones);
-				for (int lone_vg_number = 0; lone_vg_number < num_of_lones; lone_vg_number++) {
+				final int[] referencesArray = new int[lonesNumber];
+				HDFLibrary.Vlone(fileID, referencesArray, lonesNumber);
+				for (int loneVgroupIndex = 0; loneVgroupIndex < lonesNumber; loneVgroupIndex++) {
 					// Attach to the current vgroup then get and display its
 					// name and class. Note: the current vgroup must be detached
 					// before moving to the next.
-					final int vgroup_id = HDFLibrary.Vattach(fid,
-							ref_array[lone_vg_number], "r");
-					assertNotSame(vgroup_id, HDFConstants.FAIL);
+					final int vgroupID = HDFLibrary.Vattach(fileID,
+							referencesArray[loneVgroupIndex], "r");
+					assertNotSame(vgroupID, HDFConstants.FAIL);
 
-					dumpVGroup(vgroup_id, fid, 1);
+					dumpVGroup(vgroupID, fileID, 1);
 				}
 
 			}
@@ -97,35 +108,43 @@ public class H4VGroupTest extends TestCase {
 		} finally {
 
 			try {
-				if (fid != HDFConstants.FAIL)
-					HDFLibrary.Hclose(fid);
+				if (fileID != HDFConstants.FAIL)
+					HDFLibrary.Hclose(fileID);
 			} catch (Exception e) {
 			}
 
 			try {
-				if (fid != HDFConstants.FAIL)
-					HDFLibrary.Vend(fid);
+				if (fileID != HDFConstants.FAIL)
+					HDFLibrary.Vend(fileID);
 			} catch (Exception e) {
 			}
 
 		}
 	}
 
-	private void dumpVGroup(final int vgroup_id, int fid, int lev)
+	private void dumpVGroup(final int vgroupID, int fileID, int lev)
 			throws HDFException {
 		System.out.println("");
-		final String[] vgroup_name = { "" };
-		final String[] vgroup_class = { "" };
-		HDFLibrary.Vgetname(vgroup_id, vgroup_name);
-		HDFLibrary.Vgetclass(vgroup_id, vgroup_class);
+		final String[] vgroupName = { "" };
+		final String[] vgroupClass = { "" };
+
+		// //
+		// Getting the vgroup name and class
+		// //
+		HDFLibrary.Vgetname(vgroupID, vgroupName);
+		HDFLibrary.Vgetclass(vgroupID, vgroupClass);
 		final StringBuffer preamble = new StringBuffer();
 
 		for (int l = 0; l < lev; l++)
 			preamble.append("\t");
 		System.out.println(preamble.toString()
-				+ "<=========Vgroup Start========>");
-		System.out.println(preamble.toString() + "Vgroup name "
-				+ vgroup_name[0] + " and class " + vgroup_class[0]);
+				+ "<=========Vgroup Start (level " + lev + ")========>");
+		System.out.println(preamble.toString() + "Vgroup name " + vgroupName[0]
+				+ " and class " + vgroupClass[0]);
+		System.out.println(preamble.toString() + "Vgroup reference "
+				+ HDFLibrary.VQueryref(vgroupID));
+		System.out.println(preamble.toString() + "Vgroup identifier "
+				+ vgroupID);
 		// //
 		//
 		// Dump vgroup info
@@ -133,47 +152,136 @@ public class H4VGroupTest extends TestCase {
 		// //
 
 		// Get the total number of tag/reference id pairs.
-		final int npairs = HDFLibrary.Vntagrefs(vgroup_id);
+		final int npairs = HDFLibrary.Vntagrefs(vgroupID);
 		assertNotSame(HDFConstants.FAIL, npairs);
 		System.out.println(preamble.toString() + "Vgroup # objects " + npairs);
-		if (vgroup_class[0].equalsIgnoreCase(HDFConstants.HDF_ATTRIBUTE)
-				|| vgroup_class[0].equalsIgnoreCase(HDFConstants.HDF_VARIABLE)
-				|| vgroup_class[0].equalsIgnoreCase(HDFConstants.HDF_DIMENSION)
-				|| vgroup_class[0]
-						.equalsIgnoreCase(HDFConstants.HDF_UDIMENSION)
-				|| vgroup_class[0].equalsIgnoreCase(HDFConstants.DIM_VALS)
-				|| vgroup_class[0].equalsIgnoreCase(HDFConstants.DIM_VALS01)
-				|| vgroup_class[0].equalsIgnoreCase(HDFConstants.HDF_CHK_TBL)
-				|| vgroup_class[0].equalsIgnoreCase(HDFConstants.HDF_CDF)
-				|| vgroup_class[0].equalsIgnoreCase(HDFConstants.GR_NAME)
-				|| vgroup_class[0].equalsIgnoreCase(HDFConstants.RI_NAME)
-				|| vgroup_class[0].equalsIgnoreCase(HDFConstants.RIGATTRNAME)
-				|| vgroup_class[0].equalsIgnoreCase(HDFConstants.RIGATTRCLASS)) {
+		if (vgroupClass[0].equalsIgnoreCase(HDFConstants.HDF_ATTRIBUTE)
+				|| vgroupClass[0].equalsIgnoreCase(HDFConstants.HDF_VARIABLE)
+				|| vgroupClass[0].equalsIgnoreCase(HDFConstants.HDF_DIMENSION)
+				|| vgroupClass[0].equalsIgnoreCase(HDFConstants.HDF_UDIMENSION)
+				|| vgroupClass[0].equalsIgnoreCase(HDFConstants.DIM_VALS)
+				|| vgroupClass[0].equalsIgnoreCase(HDFConstants.DIM_VALS01)
+				|| vgroupClass[0].equalsIgnoreCase(HDFConstants.HDF_CHK_TBL)
+				|| vgroupClass[0].equalsIgnoreCase(HDFConstants.HDF_CDF)
+				|| vgroupClass[0].equalsIgnoreCase(HDFConstants.GR_NAME)
+				|| vgroupClass[0].equalsIgnoreCase(HDFConstants.RI_NAME)
+				|| vgroupClass[0].equalsIgnoreCase(HDFConstants.RIGATTRNAME)
+				|| vgroupClass[0].equalsIgnoreCase(HDFConstants.RIGATTRCLASS)) {
 			System.out.println(preamble.toString() + "Standard HDF VGroup");
-
 		}
+
+		// //
+		//
+		// Getting Attribute information
+		// 
+		// //
+
+		// Get and display the number of attributes attached to this vgroup.
+		final int attributesNum = HDFLibrary.Vnattrs(vgroupID);
+		System.out.println(preamble.toString()
+				+ "Vgroup "
+				+ ((attributesNum > 0 ? ("# attributes" + attributesNum)
+						: "has not attributes")));
+
+		if (attributesNum > 0) {
+			// //
+			// Get and display the name and the number of values of each
+			// attribute.
+			// //
+
+			final String[] attribName = new String[] { " " };
+			final int[] attribInfo = { 0, 0, 0 };
+			for (int ii = 0; ii < attributesNum; ii++) {
+				attribName[0] = "";
+				// get various info about this attribute
+				assertTrue(HDFLibrary.Vattrinfo(vgroupID, ii, attribName,
+						attribInfo));
+				final String dataTypeString = HDFConstants
+						.getType(attribInfo[0]);
+				System.out.println("\tVgroup Attribute " + ii + " name "
+						+ attribName[0] + "dataType=" + dataTypeString
+						+ " number of values=" + attribInfo[1] + " size="
+						+ attribInfo[2]);
+
+				// TODO: Find a valid sample with Vgroups having attributes to
+				// test this code.
+				final int size = attribInfo[2];
+				byte b[] = new byte[size];
+				ByteBuffer bb = null;
+				Buffer attributeBuffer = null;
+
+				assertTrue(HDFLibrary.Vgetattr(vgroupID, ii, b));
+				bb = ByteBuffer.wrap(b);
+				bb.order(ByteOrder.nativeOrder());
+
+				System.out.print("\tAttribute values\n\t");
+				if (dataTypeString.equals(HDFConstants.INT16)) {
+					attributeBuffer = bb.asShortBuffer();
+					for (int kk = 0; kk < size;)
+						System.out.print(((ShortBuffer) attributeBuffer)
+								.get(kk++)
+								+ ((kk % 10 == 0) ? "\n\t" : " "));
+				} else if (dataTypeString.equals(HDFConstants.INT32)) {
+					attributeBuffer = bb.asIntBuffer();
+					for (int kk = 0; kk < size;)
+						System.out.print(((IntBuffer) attributeBuffer)
+								.get(kk++)
+								+ ((kk % 10 == 0) ? "\n\t" : " "));
+				} else if (dataTypeString.equals(HDFConstants.INT64)) {
+					attributeBuffer = bb.asLongBuffer();
+					for (int kk = 0; kk < size;)
+						System.out.print(((LongBuffer) attributeBuffer)
+								.get(kk++)
+								+ ((+kk % 10 == 0) ? "\n\t" : " "));
+				} else if (dataTypeString.equals(HDFConstants.FLOAT32)) {
+					attributeBuffer = bb.asFloatBuffer();
+					for (int kk = 0; kk < size;)
+						System.out.print(((FloatBuffer) attributeBuffer)
+								.get(kk++)
+								+ ((kk % 10 == 0) ? "\n\t" : " "));
+				} else if (dataTypeString.equals(HDFConstants.FLOAT64)) {
+					attributeBuffer = bb.asDoubleBuffer();
+					for (int kk = 0; kk < size;)
+						System.out.print(((DoubleBuffer) attributeBuffer)
+								.get(kk++)
+								+ ((kk % 10 == 0) ? "\n\t" : " "));
+				} else
+					attributeBuffer = null;
+				System.out.print("\n");
+			}
+		}
+
+		// //
+		//
+		// Getting TAG information
+		// 
+		// //
 
 		// Print every tag and reference id with their corresponding file
 		// position.
-
 		for (int i = 0; i < npairs; i++) {
 			final int tagRef[] = { 0, 0 };
-			HDFLibrary.Vgettagref(vgroup_id, i, tagRef);
-			final boolean isVgroup = HDFLibrary.Visvg(vgroup_id, tagRef[1]);
-
-			if (isVgroup) {
-				final int subID = HDFLibrary.Vattach(fid, tagRef[1], "r");
-				assertNotSame(vgroup_id, HDFConstants.FAIL);
-				dumpVGroup(subID, fid, lev + 1);
-			}
-
-			System.out.println(preamble.toString() + "Found tag = " + tagRef[0]
+			HDFLibrary.Vgettagref(vgroupID, i, tagRef);
+			System.out.print(preamble.toString() + "Found tag = " + tagRef[0]
 					+ ", ref = " + tagRef[1] + " at position " + i);
-			System.out.println(preamble.toString()
-					+ "Referred object is a VGroup? " + isVgroup);
+
+			final boolean isVgroup = HDFLibrary.Visvg(vgroupID, tagRef[1]);
+			final boolean isVData = HDFLibrary.Visvs(vgroupID, tagRef[1]);
+			if (isVData)
+				System.out.println("--> Referred object is a Vdata");
+			else if (isVgroup) {
+				System.out.println("--> Referred object is a VGroup");
+				final int subID = HDFLibrary.Vattach(fileID, tagRef[1], "r");
+				assertNotSame(vgroupID, HDFConstants.FAIL);
+				dumpVGroup(subID, fileID, lev + 1);
+			} else
+				System.out
+						.println("--> Referred object is neither a VGroup nor a Vdata");
+
 		}
-		System.out.println(preamble.toString()
-				+ "<=========Vgroup End========>" + "\n");
-		HDFLibrary.Vdetach(vgroup_id);
+
+		System.out.println(preamble.toString() + "<=========Vgroup End (level "
+				+ lev + ")=======>" + "\n");
+		HDFLibrary.Vdetach(vgroupID);
 	}
 }

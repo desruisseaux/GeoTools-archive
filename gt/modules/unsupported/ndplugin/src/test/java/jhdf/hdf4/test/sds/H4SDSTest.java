@@ -143,6 +143,7 @@ public class H4SDSTest extends TestCase {
 					System.out.println("SDS Interface Attribute " + ii
 							+ " value " + buf);
 			}
+			
 			// ////////////////////////////////////////////////////////////////
 			//
 			// Access every data set and print its name, rank, dimension sizes,
@@ -214,9 +215,9 @@ public class H4SDSTest extends TestCase {
 					byte b[] = new byte[dimSize * typeSize];
 					ByteBuffer bb = null;
 					Buffer scaleBuffer = null;
-					int dim_id = HDFLibrary.SDgetdimid(sdsID, 0);
-					assertTrue(dim_id != HDFConstants.FAIL);
-					HDFLibrary.SDgetdimscale(dim_id, b);
+					int dimID = HDFLibrary.SDgetdimid(sdsID, 0);
+					assertTrue(dimID != HDFConstants.FAIL);
+					HDFLibrary.SDgetdimscale(dimID, b);
 					bb = ByteBuffer.wrap(b);
 					bb.order(ByteOrder.nativeOrder());
 

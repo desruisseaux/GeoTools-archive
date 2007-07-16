@@ -31,7 +31,6 @@ public class H4FileTest extends TestCase {
 
 	public H4FileTest(String name) {
 		super(name);
-
 	}
 
 	public static void main(String[] args) {
@@ -78,6 +77,5 @@ public class H4FileTest extends TestCase {
 					e.printStackTrace();
 				}
 		}
-
 	}
 }

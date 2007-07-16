@@ -48,7 +48,6 @@ public class H4GRImageTest extends TestCase {
 	}
 
 	public void testGetInfo() {
-
 		int fileID = HDFConstants.FAIL;
 		int grInterfaceID = HDFConstants.FAIL;
 		boolean status = false;
@@ -133,8 +132,8 @@ public class H4GRImageTest extends TestCase {
 				// select the GR image
 				//
 				// //
-				final int gr_ID = HDFLibrary.GRselect(grInterfaceID, i);
-				assertNotSame(gr_ID, HDFConstants.FAIL);
+				final int grID = HDFLibrary.GRselect(grInterfaceID, i);
+				assertNotSame(grID, HDFConstants.FAIL);
 
 				// //
 				//
@@ -145,11 +144,11 @@ public class H4GRImageTest extends TestCase {
 				final int dimSizes[] = { 0, 0 };
 				String name[] = { "" };
 				assertTrue(HDFLibrary
-						.GRgetiminfo(gr_ID, name, grInfo, dimSizes));
+						.GRgetiminfo(grID, name, grInfo, dimSizes));
 
 				System.out.println("");
 				final int index = HDFLibrary.GRreftoindex(grInterfaceID,
-						HDFLibrary.GRidtoref(gr_ID));
+						HDFLibrary.GRidtoref(grID));
 				assertSame(index, i);
 				assertNotSame(index, HDFConstants.FAIL);
 				System.out
@@ -159,8 +158,8 @@ public class H4GRImageTest extends TestCase {
 				System.out
 						.println("=====================================================================");
 				System.out.println("\tGR image reference "
-						+ HDFLibrary.GRidtoref(gr_ID));
-				System.out.println("\tGR image identifier " + gr_ID);
+						+ HDFLibrary.GRidtoref(grID));
+				System.out.println("\tGR image identifier " + grID);
 				System.out.println("\tGR image name " + name[0]);
 				System.out.println("\tGR image number of components "
 						+ grInfo[0]);
@@ -197,7 +196,7 @@ public class H4GRImageTest extends TestCase {
 				// //
 				System.out.println("\t\t      ===      ");
 				final HDFCompInfo compInfo = new HDFCompInfo();
-				status = HDFLibrary.GRgetcompress(gr_ID, compInfo);
+				status = HDFLibrary.GRgetcompress(grID, compInfo);
 				final String compression;
 
 				if (compInfo.ctype == HDFConstants.COMP_CODE_DEFLATE)
@@ -220,7 +219,7 @@ public class H4GRImageTest extends TestCase {
 				System.out.println("\t\t      ===      ");
 				HDFChunkInfo chunkInfo = new HDFChunkInfo();
 				final int[] cflag = { HDFConstants.HDF_NONE };
-				status = HDFLibrary.GRgetchunkinfo(gr_ID, chunkInfo, cflag);
+				status = HDFLibrary.GRgetchunkinfo(grID, chunkInfo, cflag);
 				if (cflag[0] == HDFConstants.HDF_NONE)
 					System.out.println("\tGR image has no chunking");
 				else {
@@ -236,7 +235,7 @@ public class H4GRImageTest extends TestCase {
 				//
 				// //
 				System.out.println("\t\t      ===      ");
-				final int nPalettes = HDFLibrary.GRgetnluts(gr_ID);
+				final int nPalettes = HDFLibrary.GRgetnluts(grID);
 
 				// Getting Number of palettes
 				if (nPalettes == 0)
@@ -249,7 +248,7 @@ public class H4GRImageTest extends TestCase {
 				for (int pal = 0; pal < nPalettes; pal++) {
 
 					// Getting palette ID
-					int lutID = HDFLibrary.GRgetlutid(gr_ID, pal);
+					int lutID = HDFLibrary.GRgetlutid(grID, pal);
 					final int lutInfo[] = new int[] { 0, 0, 0, 0 };
 
 					// Getting palette information
@@ -339,7 +338,7 @@ public class H4GRImageTest extends TestCase {
 				for (int ii = 0; ii < numGRimageAttributes; ii++) {
 					grImageAttrName[0] = "";
 					// get various info about this attribute
-					assertTrue(HDFLibrary.GRattrinfo(gr_ID, ii,
+					assertTrue(HDFLibrary.GRattrinfo(grID, ii,
 							grImageAttrName, grAttrInfo));
 					System.out.println("\tGR Image Attribute " + ii + " name "
 							+ grImageAttrName[0]);
@@ -349,7 +348,7 @@ public class H4GRImageTest extends TestCase {
 							+ grAttrInfo[1]);
 					Object buf = H4Datatype.allocateArray(grAttrInfo[0],
 							grAttrInfo[1]);
-					assertTrue(HDFLibrary.GRgetattr(gr_ID, ii, buf));
+					assertTrue(HDFLibrary.GRgetattr(grID, ii, buf));
 
 					if (buf != null) {
 						if (grAttrInfo[0] == HDFConstants.DFNT_CHAR
@@ -369,11 +368,11 @@ public class H4GRImageTest extends TestCase {
 				//
 				// ////////////////////////////////////////////////////////////////
 				System.out.println("\t\t      ===      ");
-				printAttributeByName(gr_ID, "FILL_ATTR",
+				printAttributeByName(grID, "FILL_ATTR",
 						"\tGR Image PREDEFINED ");
 
 				// Disposing GR Image
-				HDFLibrary.GRendaccess(gr_ID);
+				HDFLibrary.GRendaccess(grID);
 			}
 
 		} catch (HDFException e) {
@@ -398,7 +397,7 @@ public class H4GRImageTest extends TestCase {
 		}
 	}
 
-	private void printAttributeByName(int gr_ID, String attributeName,
+	private void printAttributeByName(int grID, String attributeName,
 			String message) throws HDFException {
 
 		final String[] grImagePredefAttrName = { attributeName };
@@ -409,7 +408,7 @@ public class H4GRImageTest extends TestCase {
 		// provided attribute name
 		//
 		// //
-		final int attributeIndex = HDFLibrary.GRfindattr(gr_ID,
+		final int attributeIndex = HDFLibrary.GRfindattr(grID,
 				grImagePredefAttrName[0]);
 		if (attributeIndex == HDFConstants.FAIL) {
 			System.out
@@ -423,7 +422,7 @@ public class H4GRImageTest extends TestCase {
 		//
 		// //
 		grImagePredefAttrName[0] = "";
-		assertTrue(HDFLibrary.GRattrinfo(gr_ID, attributeIndex,
+		assertTrue(HDFLibrary.GRattrinfo(grID, attributeIndex,
 				grImagePredefAttrName, grPredefAttrInfo));
 		System.out.println(message + " Attribute " + attributeName + " index "
 				+ attributeIndex);
@@ -440,7 +439,7 @@ public class H4GRImageTest extends TestCase {
 		Object buf = H4Datatype.allocateArray(grPredefAttrInfo[0],
 				grPredefAttrInfo[1]);
 		assertNotNull(buf);
-		assertTrue(HDFLibrary.GRgetattr(gr_ID, attributeIndex, buf));
+		assertTrue(HDFLibrary.GRgetattr(grID, attributeIndex, buf));
 		assertNotNull(buf);
 
 		// //
