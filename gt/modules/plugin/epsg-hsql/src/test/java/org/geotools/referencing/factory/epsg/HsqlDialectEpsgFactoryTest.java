@@ -7,7 +7,6 @@ import org.geotools.factory.Hints;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.IdentifiedObjectFinder;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.referencing.FactoryException;

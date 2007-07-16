@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002-2007, GeoTools Project Managment Committee (PMC)
+ *    (C) 2002-2007, GeoTools Project Management Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -38,9 +38,10 @@ import org.opengis.referencing.operation.MathTransform;
 public class HsqlDialectEpsgMediatorStressTest extends TestCase {
 
     final static int RUNNER_COUNT = 10;
-    final static int ITERATIONS = 10;
+    final static int ITERATIONS = 50;
     final static int MAX_TIME = 5 * 60 * 1000;
     final static boolean SHOW_OUTPUT = false;
+    final static int MAX_WORKERS = 2;
     
     HsqlDialectEpsgMediator mediator;
     DataSource datasource;
@@ -49,7 +50,8 @@ public class HsqlDialectEpsgMediatorStressTest extends TestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
-        hints = new Hints(Hints.BUFFER_POLICY, "none");     
+        hints = new Hints(Hints.BUFFER_POLICY, "none");
+        hints.put(Hints.AUTHORITY_MAX_ACTIVE, new Integer(MAX_WORKERS));
         datasource = HsqlEpsgDatabase.createDataSource();
         mediator = new HsqlDialectEpsgMediator(80, hints, datasource);
         codes = getCodes();
@@ -84,6 +86,7 @@ public class HsqlDialectEpsgMediatorStressTest extends TestCase {
         }
         if (SHOW_OUTPUT) {
             System.out.println("Threads: " + RUNNER_COUNT);
+            System.out.println("Maximum Workers: " + MAX_WORKERS);
             System.out.println("Iterations per Thread: " + ITERATIONS);
             System.out.println("Average Time: " + (totalTime / totalRuns) + " ms");
             System.out.println("Cumulative Time: " + totalTime + " ms");
@@ -97,6 +100,8 @@ public class HsqlDialectEpsgMediatorStressTest extends TestCase {
             //append results to file
             StringBuffer sb = new StringBuffer();
             sb.append(RUNNER_COUNT);
+            sb.append(", ");
+            sb.append(MAX_WORKERS);
             sb.append(", ");
             sb.append(ITERATIONS);
             sb.append(", ");
@@ -119,7 +124,7 @@ public class HsqlDialectEpsgMediatorStressTest extends TestCase {
             String header = null;
             String content = sb.toString();
             if (!file.exists()) {
-                header = "THREADS, ITERATIONS_PER_THREAD, CACHE, AVG_TIME, TOTAL_TIME, TOTAL_RUNS, THROUGHPUT, MIN_TIME, MAX_TIME, EXCEPTIONS";
+                header = "THREADS, MAX_WORKERS, ITERATIONS_PER_THREAD, CACHE, AVG_TIME, TOTAL_TIME, TOTAL_RUNS, THROUGHPUT, MIN_TIME, MAX_TIME, EXCEPTIONS";
             }
             file.createNewFile();
             BufferedWriter bw = new BufferedWriter(new FileWriter(file));
@@ -336,7 +341,6 @@ public class HsqlDialectEpsgMediatorStressTest extends TestCase {
         public long totalTime = 0;
         public int totalRuns = 0;
         
-        
         /** number of iterations to perform */
         public int iterations = 10;
 
@@ -362,7 +366,7 @@ public class HsqlDialectEpsgMediatorStressTest extends TestCase {
                 long timeStart = System.currentTimeMillis();
                 
                 //select first CRS
-                String code1 = "4326"; //getRandomCode();
+                String code1 = "4326";
                 CoordinateReferenceSystem crs1 = acquireCRS(code1);
 
                 //select second CRS
