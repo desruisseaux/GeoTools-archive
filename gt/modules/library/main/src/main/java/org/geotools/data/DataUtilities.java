@@ -38,6 +38,7 @@ import org.geotools.data.collection.CollectionDataStore;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.DefaultFeatureType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
@@ -900,9 +901,7 @@ public class DataUtilities {
      * @return FeatureCollection
      */
     public static FeatureCollection collection( FeatureCollection featureCollection ){
-        FeatureCollection collection = FeatureCollections.newCollection();
-        collection.addAll(featureCollection);        
-        return collection;
+        return new DefaultFeatureCollection( featureCollection );
     }
     /**
      * Copies the provided features into a FeatureCollection.
