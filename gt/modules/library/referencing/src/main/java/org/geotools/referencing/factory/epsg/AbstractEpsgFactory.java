@@ -2639,7 +2639,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
     /**
      * Disposes any resources hold by this object.
      *
-     * @throws FactoryException if an error occured while closing the connection.
+     * @throws FactoryException if an error occurred while closing the connection.
      */
     public synchronized void dispose() throws FactoryException {
         disconnect();
@@ -2665,25 +2665,27 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
      * @throws FactoryException
      */
     public void disconnect() throws FactoryException {
-        connection = null;
-        final boolean isClosed;
-        try {
-            isClosed = connection.isClosed();            
-            for (final Iterator it=statements.values().iterator(); it.hasNext();) {
-                ((PreparedStatement) it.next()).close();
-                it.remove();
-            }            
-            getConnection().close();
-        } catch (SQLException exception) {
-            throw new FactoryException(exception);
-        }
-        if (!isClosed) {
-            /*
-             * The above code was run inconditionnaly as a safety, even if the connection
-             * was already closed. However we will log a message only if we actually closed
-             * the connection, otherwise the log records are a little bit misleading.
-             */
-            LOGGER.log(Logging.format(Level.FINE, LoggingKeys.CLOSED_EPSG_DATABASE));
+        if (connection != null) {
+            final boolean isClosed;
+            try {
+                isClosed = connection.isClosed();            
+                for (final Iterator it=statements.values().iterator(); it.hasNext();) {
+                    ((PreparedStatement) it.next()).close();
+                    it.remove();
+                }            
+                connection.close();
+            } catch (SQLException exception) {
+                throw new FactoryException(exception);
+            }
+            if (!isClosed) {
+                /*
+                 * The above code was run unconditionally as a safety, even if the connection
+                 * was already closed. However we will log a message only if we actually closed
+                 * the connection, otherwise the log records are a little bit misleading.
+                 */
+                LOGGER.log(Logging.format(Level.FINE, LoggingKeys.CLOSED_EPSG_DATABASE));
+            }
+            connection = null;
         }
     }
     
@@ -2694,7 +2696,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
      * @return the connection
      */
     protected synchronized Connection getConnection() throws SQLException {
-        if( connection == null ){
+        if (connection == null) {
             connection = dataSource.getConnection();            
         }
         return connection;
@@ -2702,7 +2704,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
     /**
      * Shutdown the database engine. This method is invoked twice by {@link ThreadedEpsgFactory}
      * at JVM shutdown: one time before the {@linkplain #connection} is closed, and a second
-     * time after. This shutdown hook is usefull for <cite>embedded</cite> database engine
+     * time after. This shutdown hook is useful for <cite>embedded</cite> database engine
      * starting a server process in addition to the client process. Just closing the connection
      * is not enough for them. Example:
      * <P>
@@ -2713,7 +2715,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
      *       manager} after all connections have been closed.</LI>
      * </UL>
      * <P>
-     * The default implementation does nothing, which is suffisient for implementations
+     * The default implementation does nothing, which is sufficient for implementations
      * connecting to a distant server (i.e. non-embedded database engine), for example
      * {@linkplain AccessDataSource MS-Access} or {@linkplain PostgreDataSource PostgreSQL}.
      *
@@ -2728,7 +2730,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
     /**
      * Invokes {@link #dispose} when this factory is garbage collected.
      *
-     * @throws Throwable if an error occured while closing the connection.
+     * @throws Throwable if an error occurred while closing the connection.
      */
     protected final void finalize() throws Throwable {
         dispose();

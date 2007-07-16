@@ -74,7 +74,7 @@ import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
 import org.opengis.util.InternationalString;
 
 /**
- * An authority mediator that consults (a possibily shared) cache before delegating the generation
+ * An authority mediator that consults (a possibly shared) cache before delegating the generation
  * of the content to an authority factory.
  * </p>
  * The behaviour of the {@code createFoo(String)} methods first looks if a previously created object
@@ -220,13 +220,9 @@ public abstract class AbstractAuthorityMediator extends AbstractAuthorityFactory
             // create pool
             PoolableObjectFactory objectFactory = new AuthorityPoolableObjectFactory();
             ObjectPoolFactory poolFactory = new GenericObjectPoolFactory(objectFactory, poolConfig);
-            this.setPool(poolFactory.createPool());
+            workers = poolFactory.createPool();
         }
         return workers;
-    }
-
-    void setPool( ObjectPool pool ) {
-        this.workers = pool;
     }
 
     //
@@ -1321,7 +1317,7 @@ public abstract class AbstractAuthorityMediator extends AbstractAuthorityFactory
     public void dispose() throws FactoryException {
         if (workers != null) {
             try {
-                workers.clear();
+                workers.close();
             } catch (FactoryException e) {
                 throw e;
             } catch (Exception e) {
@@ -1500,4 +1496,5 @@ public abstract class AbstractAuthorityMediator extends AbstractAuthorityFactory
             return super.findIdentifier(object);
         }
     }
+    
 }

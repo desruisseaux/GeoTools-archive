@@ -47,7 +47,7 @@ public abstract class AbstractEpsgMediator extends AbstractAuthorityMediator {
         this.datasource = datasource;
     }
     
-    DataSource datasource;
+    protected DataSource datasource;
 
     protected Connection getConnection() throws SQLException {
         try {
