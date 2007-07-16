@@ -20,7 +20,7 @@ package org.geotools.util;
  * Null implementation for the {@link ObjectCache}. Used for cases where
  * caching is <strong>not</strong> desired.
  * 
- * @since 2.4
+ * @since 2.5
  * @version $Id$
  * @source $URL$
  * @author Cory Horner (Refractions Research)

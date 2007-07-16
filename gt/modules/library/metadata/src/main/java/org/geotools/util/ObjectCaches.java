@@ -34,6 +34,7 @@ import org.opengis.util.GenericName;
  *   <li>A Pair data object (think of C STRUCT) for use as a key when storing a value against two objects.</li>
  * </ul>
  * 
+ * @since 2.5
  * @author Jody Garnett
  * @author Cory Horner
  */

@@ -31,7 +31,7 @@ import EDU.oswego.cs.dl.util.concurrent.ReentrantLock;
  * are ignored by the cache.
  * </p>
  * 
- * @since 2.4
+ * @since 2.5
  * @version $Id$
  * @source $URL$
  * @author Jody Garnett (Refractions Research)

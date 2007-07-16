@@ -41,7 +41,7 @@ import java.lang.ref.Reference;  // For javadoc
  * <blockquote><pre>
  * try {
  *     cache.writeLock(key); // may block if another writer is working on this code.
- *     value = cache.test(key);
+ *     value = cache.peek(key);
  *     if (value == null) {
  *        // another writer got here first
  *     } else { 
@@ -72,7 +72,7 @@ import java.lang.ref.Reference;  // For javadoc
  * return cs;
  * </pre></blockquote>
  *
- * @since 2.4
+ * @since 2.5
  * @version $Id$
  * @source $URL$
  * @author Cory Horner (Refractions Research)

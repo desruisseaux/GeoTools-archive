@@ -26,7 +26,7 @@ import EDU.oswego.cs.dl.util.concurrent.ReentrantWriterPreferenceReadWriteLock;
  * Caching implementation for {@link ObjectCache}. This instance is used when
  * actual caching is desired.
  * 
- * @since 2.4
+ * @since 2.5
  * @version $Id$
  * @source $URL$
  * @author Cory Horner (Refractions Research)

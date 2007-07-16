@@ -53,7 +53,7 @@ import org.geotools.resources.Utilities;
  * use of a hint by a GeoTools factory implementation is considered a bug (as
  * it will prevent the use of this library for application specific tasks).
  * <p>
- * When hints are used in conjuction with the {@linkplain FactoryRegistry factory service
+ * When hints are used in conjunction with the {@linkplain FactoryRegistry factory service
  * discovery mechanism} we have the complete geotools plugin system. By using hints to
  * allow application code to effect service discovery we allow client code to
  * retarget the geotools library for their needs.
@@ -605,7 +605,7 @@ public final class Hints extends RenderingHints {
      * constructor. Valid values include (but is not limited to) {@code "raw"},
      * {@code "gzip"} and {@code "jpeg"}.
      * <p>
-     * <strong>Note:</strong> We recommand to avoid the {@code "jpeg"} codec
+     * <strong>Note:</strong> We recommend to avoid the {@code "jpeg"} codec
      * for grid coverages.
      * 
      * @see org.geotools.coverage.FactoryFinder#getGridCoverageFactory

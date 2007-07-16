@@ -31,7 +31,7 @@ import EDU.oswego.cs.dl.util.concurrent.ReentrantLock;
  * Values are held in a WeakReference, the garbage collector may reclaim them
  * at any time.
  * 
- * @since 2.4
+ * @since 2.5
  * @version $Id$
  * @source $URL$
  * @author Cory Horner (Refractions Research)
