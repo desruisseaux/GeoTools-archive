@@ -39,13 +39,13 @@ public class HsqlDialectEpsgMediatorStressTest extends TestCase {
 
     final static int RUNNER_COUNT = 10;
     final static int ITERATIONS = 50;
-    final static int MAX_TIME = 5 * 60 * 1000;
+    final static int MAX_TIME = 2 * 60 * 1000;
     final static boolean SHOW_OUTPUT = false;
     final static int MAX_WORKERS = 2;
     
     HsqlDialectEpsgMediator mediator;
     DataSource datasource;
-    String[] codes;
+    static String[] codes;
     Hints hints;
 
     protected void setUp() throws Exception {
@@ -146,7 +146,7 @@ public class HsqlDialectEpsgMediatorStressTest extends TestCase {
      * @return array of EPSG codes
      * @throws FactoryException
      */
-    public String[] getCodes() {
+    public static String[] getCodes() {
         return new String[] { "4269", "2043", "31528", "2936", "32639", "2027",
                 "2028", "2029", "2030", "2031", "2032", "2033", "2034", "2035",
                 "2040", "2041", "2042", "2043", "2058", "2059", "2060", "2061",
@@ -329,7 +329,7 @@ public class HsqlDialectEpsgMediatorStressTest extends TestCase {
                 "32196", "32197", "32198" };
     }
     
-    public class ClientThread extends TestRunnable {
+    public static class ClientThread extends TestRunnable {
 
         String values;
         int id = -1; //thread identifier
@@ -353,6 +353,9 @@ public class HsqlDialectEpsgMediatorStressTest extends TestCase {
         }
 
         private String getRandomCode() {
+            if (codes == null) {
+                codes = getCodes();
+            }
             return codes[rand.nextInt(codes.length)];
         }
         

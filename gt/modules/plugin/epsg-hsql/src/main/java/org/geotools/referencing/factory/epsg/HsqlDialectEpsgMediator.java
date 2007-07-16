@@ -15,9 +15,6 @@
  */
 package org.geotools.referencing.factory.epsg;
 
-import java.io.File;
-import java.sql.Connection;
-
 import javax.sql.DataSource;
 
 import org.geotools.factory.GeoTools;
@@ -95,8 +92,8 @@ public class HsqlDialectEpsgMediator extends AbstractEpsgMediator {
      */
     protected void destroyWorker(AbstractCachedAuthorityFactory obj) throws Exception {
         HsqlDialectEpsgFactory factory = (HsqlDialectEpsgFactory) obj;
-        factory.dispose();
         factory.disconnect();
+        factory.dispose();
         factory = null;
     }
 
@@ -104,8 +101,7 @@ public class HsqlDialectEpsgMediator extends AbstractEpsgMediator {
      * Creates an instance that can be returned by the pool.
      */
     protected AbstractCachedAuthorityFactory makeWorker() throws Exception {
-        Connection connection = getConnection();
-        HsqlDialectEpsgFactory factory = new HsqlDialectEpsgFactory(hints, connection);
+        HsqlDialectEpsgFactory factory = new HsqlDialectEpsgFactory(hints, datasource);
         return factory;
     }
 
@@ -113,13 +109,14 @@ public class HsqlDialectEpsgMediator extends AbstractEpsgMediator {
      * Uninitialize an instance to be returned to the pool.
      */
     protected void passivateWorker(AbstractCachedAuthorityFactory obj) throws Exception {
+        HsqlDialectEpsgFactory factory = (HsqlDialectEpsgFactory) obj;
+        factory.disconnect();
     }
 
     /**
      * Ensures that the instance is safe to be returned by the pool.
      */
     protected boolean validateWorker(AbstractCachedAuthorityFactory obj) {
-        //TODO: ensure that the worker is no longer in use
         return true;
     }
 

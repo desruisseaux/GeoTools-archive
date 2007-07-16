@@ -29,7 +29,7 @@ import org.geotools.factory.Hints;
 /**
  * Adapts SQL statements for HSQL. The HSQL database engine doesn't understand
  * the parenthesis in (INNER JOIN ... ON) statements for the "BursaWolfParameters"
- * query. Unfortunatly, those parenthesis are required by MS-Access. We need to
+ * query. Unfortunately, those parenthesis are required by MS-Access. We need to
  * removes them programmatically here.
  *
  * @since 2.2
