@@ -894,6 +894,19 @@ public class DataUtilities {
     /**
      * Copies the provided features into a FeatureCollection.
      * <p>
+     * Often used when gathering a FeatureCollection into memory.
+     * 
+     * @param features FeatureCollection
+     * @return FeatureCollection
+     */
+    public static FeatureCollection collection( FeatureCollection featureCollection ){
+        FeatureCollection collection = FeatureCollections.newCollection();
+        collection.addAll(featureCollection);        
+        return collection;
+    }
+    /**
+     * Copies the provided features into a FeatureCollection.
+     * <p>
      * Often used when gathering features for FeatureStore:<pre><code>
      * featureStore.addFeatures( DataUtilities.collection(feature));
      * </code></pre>

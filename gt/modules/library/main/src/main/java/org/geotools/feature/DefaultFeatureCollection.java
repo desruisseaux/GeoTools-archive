@@ -78,7 +78,16 @@ public class DefaultFeatureCollection implements FeatureCollection {
     private String id; /// fid
 
     /**
-     * This contructor should not be used by client code.
+     * This constructor should not be used by client code.
+     * @param collection FeatureCollection to copy into memory
+     */
+    public DefaultFeatureCollection( FeatureCollection collection ) {
+        this( collection.getID(), collection.getFeatureType() );
+        addAll(collection);
+    }
+    
+    /**
+     * This constructor should not be used by client code.
      * <p>
      * Opportunistic reuse is encouraged, but only for the purposes
      * of testing or other specialized uses. Normal creation should
@@ -86,7 +95,6 @@ public class DefaultFeatureCollection implements FeatureCollection {
      * allowing applications to customize any generated collections.
      * </p>
      * 
-     * </p>
      * @param id may be null ... feature id
      * @param featureType optional, may be null
      */
