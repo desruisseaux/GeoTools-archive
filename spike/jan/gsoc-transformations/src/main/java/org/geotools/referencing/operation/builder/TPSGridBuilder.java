@@ -105,16 +105,20 @@ public class TPSGridBuilder extends WarpGridBuilder {
                     + WarpParams.parameter("xStart").intValue();
                 double y = -calculateTPSFunction(resulty, dp)
                     + (i * WarpParams.parameter("yStep").intValue())
-                    + WarpParams.parameter("yStart").intValue();
+                    + WarpParams.parameter("yStart").intValue();                           
 
+               // System.out.println((i * ((1 + WarpParams.parameter("xNumCells").intValue()) * 2))
+                 //       + (2 * j));
+                
                 warpPositions[(i * ((1 + WarpParams.parameter("xNumCells").intValue()) * 2))
                 + (2 * j)] = (float) x;
 
                 warpPositions[(i * ((1 + WarpParams.parameter("xNumCells").intValue()) * 2))
                 + (2 * j) + 1] = (float) y;
+                                
             }
         }
-
+       
         return warpPositions;
     }
 

@@ -106,14 +106,14 @@ public class GridDemo {
            //coverage = GridCoverageExamples.getExample(0);
             
             System.out.println(coverage.getGridGeometry().getGridRange());
-            List vectors = generateMappedPositions(env,40, 0.03);
+            List vectors = generateMappedPositions(env,20, 0.1);
             
             WarpGridBuilder gridBuilder = new TPSGridBuilder(vectors, 0.01,0.01, env, coverage.getGridGeometry().getGridToCRS().inverse());
               
             (new GridCoverageFactory()).create("DX",gridBuilder.getDxGrid(),coverage.getEnvelope()).show();
             (new GridCoverageFactory()).create("DY",gridBuilder.getDyGrid(),coverage.getEnvelope()).show();
          
-            MathTransform  trans = gridBuilder.getMathTransform();//.inverse();
+            MathTransform  trans = gridBuilder.getMathTransform();
                  
    //////******************New reference System***************************///////
             

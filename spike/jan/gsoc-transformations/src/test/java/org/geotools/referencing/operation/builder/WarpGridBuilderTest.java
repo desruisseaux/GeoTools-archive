@@ -3,25 +3,29 @@
  */
 package org.geotools.referencing.operation.builder;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-import org.opengis.geometry.Envelope;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.NoninvertibleTransformException;
-import org.opengis.referencing.operation.TransformException;
+
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
+import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.referencing.operation.transform.WarpGridTransform2D.ProviderFile;
+import org.opengis.geometry.Envelope;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -88,12 +92,12 @@ public class WarpGridBuilderTest extends TestCase {
     public void testIDWWarpGridBuilder() {
         try {
             // Envelope 20*20 km 
-            Envelope env = new Envelope2D(crs, 0, 0, 20000, 20000);
+            Envelope env = new Envelope2D(crs, 0, 0, 500, 500);
 
             // Generates 15 MappedPositions of approximately 2 m differences
-            List mp = generateMappedPositions(env, 15, 2, crs);
+            List mp = generateMappedPositions(env, 10, 3, crs);
 
-            WarpGridBuilder builder = new IDWGridBuilder(mp, 100, 100, env);
+            WarpGridBuilder builder = new IDWGridBuilder(mp, 5, 5, env);
 
             if (show == true) {
                 (new GridCoverageFactory()).create("IDW - dx", builder.getDxGrid(), env).show();
@@ -101,6 +105,8 @@ public class WarpGridBuilderTest extends TestCase {
             }
 
             assertBuilder(builder);
+            assertInverse(builder);
+       
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -112,33 +118,63 @@ public class WarpGridBuilderTest extends TestCase {
      */
     public void testTPSWarpGridBuilder() {
         try {
-            // Envelope 20*20 km 
-            Envelope env = new Envelope2D(crs, 0, 0, 6000, 6000);
+           
+            Envelope env = new Envelope2D(crs, 0, 0, 500, 500);
 
             // Generates 15 MappedPositions of approximately 2 m differences
-            List mp = generateMappedPositions(env, 15, 5, crs);
+            List mp = generateMappedPositions(env, 10, 3, crs);
 
             GeneralMatrix M = new GeneralMatrix(3, 3);
-            double[] m0 = { 1000, 0, 0 };
-            double[] m1 = { 0, 1000, 0 };
+            double[] m0 = { 1, 0, 0 };
+            double[] m1 = { 0, 1, 0 };
             double[] m2 = { 0, 0, 1 };
             M.setRow(0, m0);
             M.setRow(1, m1);
             M.setRow(2, m2);
 
-            WarpGridBuilder builder = new TPSGridBuilder(mp, 20, 20, env,
+            WarpGridBuilder builder = new TPSGridBuilder(mp, 5, 5, env,
                     ProjectiveTransform.create(M));
 
             if (show == true) {
                 (new GridCoverageFactory()).create("TPS - dx", builder.getDxGrid(), env).show();
                 (new GridCoverageFactory()).create("TPS - dy", builder.getDyGrid(), env).show();
             }
+            
+            String path = "/home/jezekjan/zkk.txt";
+            builder.getDeltaFile(0,path);
 
             assertBuilder(builder);
             assertInverse(builder);
+            
+          
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    public void testFileProvider(){
+    	   try {
+               // Envelope 20*20 km 
+               Envelope env = new Envelope2D(crs, 0, 0, 500, 500);
+
+               // Generates 15 MappedPositions of approximately 2 m differences
+               List mp = generateMappedPositions(env, 10, 3, crs);
+
+               WarpGridBuilder builder = new IDWGridBuilder(mp, 5, 5, env);
+
+               final DefaultMathTransformFactory factory = new DefaultMathTransformFactory();
+               ParameterValueGroup gridParams = factory.getDefaultParameters("Warp Grid (form file)");
+               String pathx = "/home/jezekjan/dx";
+               String pathy = "/home/jezekjan/dy";
+               builder.getDeltaFile(0, pathx);
+               builder.getDeltaFile(1, pathy);
+               gridParams.parameter("X_difference_file").setValue(pathx);
+               gridParams.parameter("Y_difference_file").setValue(pathy);
+            //   (new ProviderFile()).createMathTransform(gridParams);
+         
+           } catch (Exception e) {
+               e.printStackTrace();
+           }
     }
 
     /**

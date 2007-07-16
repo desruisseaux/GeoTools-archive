@@ -148,7 +148,7 @@ public class IDWGridBuilder extends WarpGridBuilder {
         HashMap nearest = new HashMap();
         MappedPosition mp = null;
 
-        for (Iterator i = this.getMappedPositions().iterator(); i.hasNext();) {
+        for (Iterator i = this.getGridMappedPositions().iterator(); i.hasNext();) {
             mp = (MappedPosition) i.next();
 
             double dist = p.distance((Point2D) mp.getSource());
