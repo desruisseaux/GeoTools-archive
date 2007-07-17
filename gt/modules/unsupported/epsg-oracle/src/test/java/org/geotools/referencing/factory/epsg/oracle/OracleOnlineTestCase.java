@@ -48,6 +48,17 @@ public class OracleOnlineTestCase extends OnlineTestCase {
     static final int DRIVER = 0;
     static final int DATASOURCE= 1;
     
+    /**
+     * A hook to allow subclasses to configure the oracle datasource to their
+     * liking.
+     * 
+     * @param datasource
+     *            OracleDataSource
+     * @throws SQLException 
+     */
+    protected void configure(OracleDataSource datasource) throws SQLException {
+    }
+    
     protected void connect() throws Exception {
         OracleDataSource source;
         source = new OracleDataSource();
@@ -55,6 +66,7 @@ public class OracleOnlineTestCase extends OnlineTestCase {
         source.setUser(fixture.getProperty("user"));
         source.setPassword(fixture.getProperty("password"));
         source.setURL(fixture.getProperty("url"));
+        configure(source);
         
         datasource = source;
 
