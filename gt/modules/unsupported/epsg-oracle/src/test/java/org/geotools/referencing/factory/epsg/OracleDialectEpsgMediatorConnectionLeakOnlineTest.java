@@ -15,9 +15,8 @@ import net.sourceforge.groboutils.junit.v1.MultiThreadedTestRunner;
 import net.sourceforge.groboutils.junit.v1.TestRunnable;
 
 import org.geotools.factory.Hints;
-import org.geotools.referencing.factory.epsg.HsqlDialectEpsgMediatorStressTest.ClientThread;
-
-import junit.framework.TestCase;
+import org.geotools.referencing.factory.epsg.OracleDialectEpsgMediatorOnlineStressTest.ClientThread;
+import org.geotools.referencing.factory.epsg.oracle.OracleOnlineTestCase;
 
 /**
  * Multi-threaded test to check that no connections are leaked by the EPSG
@@ -25,7 +24,7 @@ import junit.framework.TestCase;
  * 
  * @author Cory Horner (Refractions Research)
  */
-public class HsqlDialectEpsgMediatorConnectionLeakTest extends TestCase {
+public class OracleDialectEpsgMediatorConnectionLeakOnlineTest extends OracleOnlineTestCase {
 
     final static int RUNNER_COUNT = 3;
     final static int ITERATIONS = 3;
@@ -33,24 +32,27 @@ public class HsqlDialectEpsgMediatorConnectionLeakTest extends TestCase {
     final static int MAX_WORKERS = 2;
     final static boolean VERBOSE = false;
     
-    HsqlDialectEpsgMediator mediator;
-    DataSourceWrapper datasource;
+    OracleDialectEpsgMediator mediator;
+    DataSourceWrapper wrappedDataSource;
     String[] codes;
     Hints hints;
-    
-    protected void setUp() throws Exception {
-        super.setUp();
-        hints = new Hints(Hints.BUFFER_POLICY, "none");
+
+    protected void connect() throws Exception {
+        super.connect();
+        hints = new Hints(Hints.BUFFER_POLICY, "none");     
         hints.put(Hints.AUTHORITY_MAX_ACTIVE, new Integer(MAX_WORKERS));
-        datasource = new DataSourceWrapper(HsqlEpsgDatabase.createDataSource());
-        mediator = new HsqlDialectEpsgMediator(80, hints, datasource);
-        codes = HsqlDialectEpsgMediatorStressTest.getCodes();
+        if (datasource == null) {
+            fail("no datasource available");
+        }
+        wrappedDataSource = new DataSourceWrapper(datasource);
+        mediator = new OracleDialectEpsgMediator(80, hints, wrappedDataSource);
+        codes = OracleDialectEpsgMediatorOnlineStressTest.getCodes();
     }
 
     public void testLeak() throws Throwable {
         TestRunnable runners[] = new TestRunnable[RUNNER_COUNT];
         for (int i = 0; i < RUNNER_COUNT; i++) {
-            ClientThread thread = new HsqlDialectEpsgMediatorStressTest.ClientThread(i, mediator); 
+            ClientThread thread = new OracleDialectEpsgMediatorOnlineStressTest.ClientThread(i, mediator); 
             thread.iterations = ITERATIONS;
             runners[i] = thread;
         }
@@ -65,7 +67,7 @@ public class HsqlDialectEpsgMediatorConnectionLeakTest extends TestCase {
         }
         //destroy the mediator, check for open connections or exceptions
         mediator.dispose();
-        assertEquals(0, datasource.connectionsInUse);
+        assertEquals(0, wrappedDataSource.connectionsInUse);
         assertEquals(0, exceptions);
     }
     
