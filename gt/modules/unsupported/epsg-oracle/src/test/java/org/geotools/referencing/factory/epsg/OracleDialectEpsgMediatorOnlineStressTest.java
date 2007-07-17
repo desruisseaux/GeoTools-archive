@@ -42,7 +42,7 @@ public class OracleDialectEpsgMediatorOnlineStressTest extends
     final static int MAX_WORKERS = 2;
     
     OracleDialectEpsgMediator mediator;
-    String[] codes;
+    static String[] codes;
     Hints hints;
     
     protected void connect() throws Exception {
@@ -145,7 +145,7 @@ public class OracleDialectEpsgMediatorOnlineStressTest extends
      * @return array of EPSG codes
      * @throws FactoryException
      */
-    public String[] getCodes() {
+    public static String[] getCodes() {
         return new String[] { "4269", "2043", "31528", "2936", "32639", "2027",
                 "2028", "2029", "2030", "2031", "2032", "2033", "2034", "2035",
                 "2040", "2041", "2042", "2043", "2058", "2059", "2060", "2061",
@@ -328,7 +328,7 @@ public class OracleDialectEpsgMediatorOnlineStressTest extends
                 "32196", "32197", "32198" };
     }
 
-    public class ClientThread extends TestRunnable {
+    public static class ClientThread extends TestRunnable {
 
         String values;
         int id = -1; //thread identifier
@@ -352,6 +352,9 @@ public class OracleDialectEpsgMediatorOnlineStressTest extends
         }
 
         private String getRandomCode() {
+            if (codes == null) {
+                codes = getCodes();
+            }
             return codes[rand.nextInt(codes.length)];
         }
         

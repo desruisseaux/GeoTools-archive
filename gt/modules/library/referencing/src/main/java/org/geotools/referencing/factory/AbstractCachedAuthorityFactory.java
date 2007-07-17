@@ -27,9 +27,6 @@ import javax.units.Unit;
 import org.geotools.factory.BufferedFactory;
 import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Errors;
 import org.geotools.util.NameFactory;
 import org.geotools.util.ObjectCache;
 import org.geotools.util.ObjectCaches;
@@ -185,9 +182,9 @@ public abstract class AbstractCachedAuthorityFactory extends AbstractAuthorityFa
      */
     protected String trimAuthority(String code) {
         /*
-         * IMPLEMENTATION NOTE: This method is overrided in PropertyAuthorityFactory. If
-         * implementation below is modified, it is probably worth to revisit the overrided
-         * method as well.
+         * IMPLEMENTATION NOTE: This method is overridden in
+         * PropertyAuthorityFactory. If the implementation below is modified, it
+         * is probably worth revisiting the overridden method as well.
          */
         code = code.trim();
         final GenericName name  = NameFactory.create(code);
@@ -202,12 +199,12 @@ public abstract class AbstractCachedAuthorityFactory extends AbstractAuthorityFa
     }
     
     /**
-     * Creates an exception for an unknow authority code. This convenience method is provided
+     * Creates an exception for an unknown authority code. This convenience method is provided
      * for implementation of {@code createXXX} methods.
      *
      * @param  type  The GeoAPI interface that was to be created
      *               (e.g. {@code CoordinateReferenceSystem.class}).
-     * @param  code  The unknow authority code.
+     * @param  code  The unknown authority code.
      * @param  cause The cause of this error, or {@code null}.
      * @return An exception initialized with an error message built
      *         from the specified informations.

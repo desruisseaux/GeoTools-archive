@@ -15,12 +15,9 @@
  */
 package org.geotools.referencing.factory.epsg;
 
-import java.sql.Connection;
-
 import javax.sql.DataSource;
 
 import org.geotools.factory.Hints;
-import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.AbstractCachedAuthorityFactory;
 import org.geotools.referencing.factory.AbstractEpsgMediator;
 
@@ -35,9 +32,31 @@ public class OracleDialectEpsgMediator extends AbstractEpsgMediator {
     Hints hints;
     
     public OracleDialectEpsgMediator(int priority, Hints hints, DataSource datasource) {
-        super( hints, datasource);
+        super(hints, datasource);
         this.hints = hints;
     }
+    
+    /**
+     * Creates an OracleDialectEpsgMediator with a 60 second timeout, two workers,
+     * and no cache.
+     * 
+     * @param priority
+     * @param datasource
+     */
+    public OracleDialectEpsgMediator(int priority, DataSource datasource) {
+        this(priority, 
+             new Hints(Hints.AUTHORITY_MAX_ACTIVE, 
+                 new Integer(2),
+                 new Object[] {
+                     Hints.AUTHORITY_MIN_EVICT_IDLETIME, new Integer(1 * 60 * 1000),
+                     Hints.BUFFER_POLICY, "none"
+                 }
+             ),
+             datasource
+         );
+        //TODO: change to weak cache!
+    }
+
 
     /**
      * Reinitialize an instance to be returned by the pool.
@@ -61,11 +80,7 @@ public class OracleDialectEpsgMediator extends AbstractEpsgMediator {
      * Creates an instance that can be returned by the pool.
      */
     protected AbstractCachedAuthorityFactory makeWorker() throws Exception {
-        //DataSource datasource = HsqlEpsgDatabase.createDataSource();
-        //Connection connection = datasource.getConnection();
-        Connection connection = getConnection();
-        //Hints hints = new Hints(Hints.BUFFER_POLICY, "none");
-        OracleDialectEpsgFactory factory = new OracleDialectEpsgFactory(hints, connection);
+        OracleDialectEpsgFactory factory = new OracleDialectEpsgFactory(hints, datasource);
         return factory;
     }
 
@@ -89,7 +104,6 @@ public class OracleDialectEpsgMediator extends AbstractEpsgMediator {
      * Ensures that the instance is safe to be returned by the pool.
      */
     protected boolean validateWorker(AbstractCachedAuthorityFactory obj) {
-        //TODO: ensure that the worker is no longer in use
         return true;
     }
 

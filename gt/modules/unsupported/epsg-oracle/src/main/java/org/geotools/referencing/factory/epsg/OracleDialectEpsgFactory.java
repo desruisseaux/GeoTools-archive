@@ -21,6 +21,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import javax.sql.DataSource;
+
 // Geotools dependencies
 import org.geotools.factory.Hints;
 
@@ -37,8 +39,6 @@ import org.geotools.factory.Hints;
  *       instantiated by the user, we need some way to pass the schema information to this class.
  *       one possible approach is to set the schema in preferences. Maybe a better was is to look
  *       for a place in the Oracle {@link javax.sql.DataSource} for that.
- *
- * @todo This class need to move in the {@code epsg-oracle} module.
  */
 public class OracleDialectEpsgFactory extends AnsiDialectEpsgFactory {
     /**
@@ -58,6 +58,19 @@ public class OracleDialectEpsgFactory extends AnsiDialectEpsgFactory {
         super(userHints, connection);
     }
 
+    /**
+     * Constructs an authority factory using the specified datasource.
+     *
+     * @param userHints  The underlying factories used for objects creation.
+     * @param datasource The datasource of the underlying EPSG database.
+     */
+    public OracleDialectEpsgFactory(final Hints      userHints,
+                                    final DataSource datasource)
+    {
+        super(userHints, datasource);
+    }
+
+    
     /**
      * Constructs an authority factory using the specified connection to an EPSG database
      * and a database schema. If the database schema is not supplied, or it is null
