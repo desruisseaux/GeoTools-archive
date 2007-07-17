@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
+ *    (C) 2005-2006, GeoTools Project Management Committee (PMC)
  *    (C) 2005, Refractions Research Inc.
  *
  *    This library is free software; you can redistribute it and/or
