@@ -74,7 +74,7 @@ import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
 import org.opengis.util.InternationalString;
 
 /**
- * An authority mediator that consults (a possibly shared) cache before delegating the generation
+ * An authority mediator that consults (a possibily shared) cache before delegating the generation
  * of the content to an authority factory.
  * </p>
  * The behaviour of the {@code createFoo(String)} methods first looks if a previously created object
@@ -206,6 +206,14 @@ public abstract class AbstractAuthorityMediator extends AbstractAuthorityFactory
         this.findCache = ObjectCaches.chain( ObjectCaches.create("weak",0), cache );        
     }
 
+    protected void completeHints() {
+        hints.put(Hints.DATUM_AUTHORITY_FACTORY, this);
+        hints.put(Hints.CS_AUTHORITY_FACTORY, this);
+        hints.put(Hints.CRS_AUTHORITY_FACTORY, this );
+        hints.put(Hints.COORDINATE_OPERATION_AUTHORITY_FACTORY, this );
+        
+    }
+    
     /**
      * True if this mediator is currently connected to one or more workers.
      * 
@@ -220,9 +228,13 @@ public abstract class AbstractAuthorityMediator extends AbstractAuthorityFactory
             // create pool
             PoolableObjectFactory objectFactory = new AuthorityPoolableObjectFactory();
             ObjectPoolFactory poolFactory = new GenericObjectPoolFactory(objectFactory, poolConfig);
-            workers = poolFactory.createPool();
+            this.setPool(poolFactory.createPool());
         }
         return workers;
+    }
+
+    void setPool( ObjectPool pool ) {
+        this.workers = pool;
     }
 
     //
@@ -1317,7 +1329,7 @@ public abstract class AbstractAuthorityMediator extends AbstractAuthorityFactory
     public void dispose() throws FactoryException {
         if (workers != null) {
             try {
-                workers.close();
+                workers.clear();
             } catch (FactoryException e) {
                 throw e;
             } catch (Exception e) {
@@ -1496,5 +1508,4 @@ public abstract class AbstractAuthorityMediator extends AbstractAuthorityFactory
             return super.findIdentifier(object);
         }
     }
-    
 }

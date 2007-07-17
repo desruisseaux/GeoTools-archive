@@ -25,6 +25,7 @@ import javax.sql.DataSource;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
+import org.opengis.referencing.FactoryException;
 
 
 /**
@@ -116,20 +117,38 @@ public class AnsiDialectEpsgFactory extends AbstractEpsgFactory {
     private String prefix = "epsg_";
 
     /**
-     * Constructs an authority factory using the specified connection.
+     * Constructs an authority factory, the hints should describe the data source it use.
      *
      * @param userHints  The underlying factories used for objects creation.
-     * @param connection The connection to the underlying EPSG database.
+     * @throws FactoryException 
      */
-    public AnsiDialectEpsgFactory(final Hints      userHints,
-                                  final Connection connection)
+    public AnsiDialectEpsgFactory(final Hints userHints) throws FactoryException
     {
-        super(userHints, connection);
+        super(userHints );
         for (int i=0; i<ANSI.length; i++) {
             map.put(ANSI[i], ANSI[++i]);
         }
     }
-
+    /**
+     * Constructs an authority factory using the specified connection.
+     *
+     * @param userHints  The underlying factories used for objects creation.
+     * @param connection The connection to the underlying EPSG database.
+     * @throws FactoryException 
+     */
+    public AnsiDialectEpsgFactory( Hints hints, Connection connection ) {
+        super(hints, connection );
+        for (int i=0; i<ANSI.length; i++) {
+            map.put(ANSI[i], ANSI[++i]);
+        }
+    }
+    /**
+     * Constructs an authority factory using the specified connection.
+     *
+     * @param userHints  The underlying factories used for objects creation.
+     * @param  dataSource Used to create a connection to the underlying EPSG database
+     * @throws FactoryException 
+     */
     public AnsiDialectEpsgFactory( Hints hints, DataSource dataSource ) {
         super(hints, dataSource);
         for (int i=0; i<ANSI.length; i++) {

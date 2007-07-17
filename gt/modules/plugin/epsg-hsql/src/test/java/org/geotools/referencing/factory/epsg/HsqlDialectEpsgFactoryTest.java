@@ -26,9 +26,9 @@ public class HsqlDialectEpsgFactoryTest extends TestCase {
         super.setUp();
         if( factory == null ){
             DataSource datasource = HsqlEpsgDatabase.createDataSource();
-            Connection connection = datasource.getConnection();
+            
             Hints hints = new Hints(Hints.BUFFER_POLICY, "weak");
-            factory = new HsqlDialectEpsgFactory(hints, connection);
+            factory = new HsqlDialectEpsgFactory(hints, datasource);
         }
         if( finder == null ){
             finder = factory.getIdentifiedObjectFinder(CoordinateReferenceSystem.class);

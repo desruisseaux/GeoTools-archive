@@ -17,84 +17,127 @@
 package org.geotools.referencing.factory.epsg;
 
 // J2SE dependencies and extensions
-import java.util.*;
 import java.io.File;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.sql.Date;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
-import java.sql.ResultSet;
 import java.sql.DatabaseMetaData;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
-import java.lang.ref.SoftReference;
+import java.sql.Statement;
+import java.util.AbstractMap;
+import java.util.AbstractSet;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
+import javax.naming.NamingException;
+import javax.sql.DataSource;
 import javax.units.NonSI;
-import javax.units.Unit;
 import javax.units.SI;
+import javax.units.Unit;
 
-// OpenGIS dependencies
-import org.opengis.metadata.Identifier;
-import org.opengis.metadata.extent.Extent;
-import org.opengis.metadata.citation.Citation;
-import org.opengis.metadata.quality.EvaluationMethodType;
-import org.opengis.metadata.quality.PositionalAccuracy;
-import org.opengis.parameter.*;
-import org.opengis.referencing.*;
-import org.opengis.referencing.cs.*;
-import org.opengis.referencing.crs.*;
-import org.opengis.referencing.datum.*;
-import org.opengis.referencing.operation.*;
-import org.opengis.util.GenericName;
-import org.opengis.util.InternationalString;
-
-// Geotools dependencies
+import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
+import org.geotools.io.TableWriter;
 import org.geotools.measure.Units;
-import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.metadata.iso.extent.ExtentImpl;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
-import org.geotools.metadata.iso.quality.QuantitativeResultImpl;
 import org.geotools.metadata.iso.quality.AbsoluteExternalPositionalAccuracyImpl;
+import org.geotools.metadata.iso.quality.QuantitativeResultImpl;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.referencing.AbstractIdentifiedObject;
-import org.geotools.referencing.factory.AbstractAuthorityFactory;
+import org.geotools.referencing.NamedIdentifier;
+import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
+import org.geotools.referencing.datum.BursaWolfParameters;
+import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.factory.AbstractCachedAuthorityFactory;
+import org.geotools.referencing.factory.BufferedAuthorityFactory;
 import org.geotools.referencing.factory.DirectAuthorityFactory;
 import org.geotools.referencing.factory.IdentifiedObjectFinder;
-import org.geotools.referencing.factory.ReferencingFactoryContainer;
-import org.geotools.referencing.NamedIdentifier;
-import org.geotools.referencing.datum.DefaultGeodeticDatum;
-import org.geotools.referencing.datum.BursaWolfParameters;
-import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotools.referencing.operation.DefaultConcatenatedOperation;
-import org.geotools.referencing.operation.DefaultOperationMethod;
 import org.geotools.referencing.operation.DefaultOperation;
+import org.geotools.referencing.operation.DefaultOperationMethod;
 import org.geotools.referencing.operation.DefiningConversion;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
-import org.geotools.io.TableWriter;
 import org.geotools.util.LocalName;
-import org.geotools.util.SimpleInternationalString;
+import org.geotools.util.ObjectCache;
 import org.geotools.util.ScopedName;
+import org.geotools.util.SimpleInternationalString;
 import org.geotools.util.Version;
+import org.opengis.metadata.Identifier;
+import org.opengis.metadata.citation.Citation;
+import org.opengis.metadata.extent.Extent;
+import org.opengis.metadata.quality.EvaluationMethodType;
+import org.opengis.metadata.quality.PositionalAccuracy;
+import org.opengis.parameter.InvalidParameterValueException;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.IdentifiedObject;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.referencing.NoSuchIdentifierException;
+import org.opengis.referencing.crs.CRSFactory;
+import org.opengis.referencing.crs.CompoundCRS;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.GeneralDerivedCRS;
+import org.opengis.referencing.crs.GeocentricCRS;
+import org.opengis.referencing.crs.GeographicCRS;
+import org.opengis.referencing.crs.ProjectedCRS;
+import org.opengis.referencing.crs.SingleCRS;
+import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.cs.CSFactory;
+import org.opengis.referencing.cs.CartesianCS;
+import org.opengis.referencing.cs.CoordinateSystem;
+import org.opengis.referencing.cs.CoordinateSystemAxis;
+import org.opengis.referencing.cs.EllipsoidalCS;
+import org.opengis.referencing.cs.SphericalCS;
+import org.opengis.referencing.cs.VerticalCS;
+import org.opengis.referencing.datum.Datum;
+import org.opengis.referencing.datum.DatumFactory;
+import org.opengis.referencing.datum.Ellipsoid;
+import org.opengis.referencing.datum.EngineeringDatum;
+import org.opengis.referencing.datum.GeodeticDatum;
+import org.opengis.referencing.datum.PrimeMeridian;
+import org.opengis.referencing.datum.VerticalDatum;
+import org.opengis.referencing.datum.VerticalDatumType;
+import org.opengis.referencing.operation.ConcatenatedOperation;
+import org.opengis.referencing.operation.Conversion;
+import org.opengis.referencing.operation.CoordinateOperation;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.OperationMethod;
+import org.opengis.referencing.operation.Projection;
+import org.opengis.referencing.operation.Transformation;
+import org.opengis.util.GenericName;
+import org.opengis.util.InternationalString;
 
 
 /**
@@ -246,14 +289,50 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
      */
     private final Set safetyGuard = new HashSet();
 
-    public AbstractEpsgFactory(final Hints userHints, final javax.sql.DataSource dataSource) {
-    	super( MAXIMUM_PRIORITY-20 );
+    public AbstractEpsgFactory(final Hints userHints ) throws FactoryException {
+        super( MAXIMUM_PRIORITY-20 );        
         // The following hints have no effect on this class behaviour,
         // but tell to the user what this factory do about axis order.
         hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE);
         hints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS,   Boolean.FALSE);
         hints.put(Hints.FORCE_STANDARD_AXIS_UNITS,        Boolean.FALSE);
-        this.dataSource = dataSource;
+        
+        //
+        // We need to obtain our DataSource
+        if (userHints != null) {
+            Object hint = userHints.get(Hints.EPSG_DATA_SOURCE);
+            if( hint instanceof String ){
+                String name = (String) hint;
+                try {
+                    dataSource = (DataSource) GeoTools.getInitialContext(userHints).lookup(name);
+                } catch (NamingException e) {
+                    throw new FactoryException("A EPSG_DATA_SOURCE hint is required:"+e);
+                }
+                hints.put(Hints.EPSG_DATA_SOURCE, dataSource );           
+            }
+            else if( hint instanceof DataSource ){
+                dataSource = (DataSource) hint;
+                hints.put(Hints.EPSG_DATA_SOURCE, dataSource );
+            }
+            else {
+                throw new FactoryException("A EPSG_DATA_SOURCE hint is required.");
+            }
+        }
+        else {
+            throw new FactoryException("A EPSG_DATA_SOURCE hint is required.");
+        }
+    }
+    
+    public AbstractEpsgFactory(final Hints userHints, final javax.sql.DataSource dataSource) {
+    	super( MAXIMUM_PRIORITY-20 );
+    	
+    	this.dataSource = dataSource;
+        // The following hints have no effect on this class behaviour,
+        // but tell to the user what this factory do about axis order.
+        hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE);
+        hints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS,   Boolean.FALSE);
+        hints.put(Hints.FORCE_STANDARD_AXIS_UNITS,        Boolean.FALSE);
+        hints.put(Hints.EPSG_DATA_SOURCE, dataSource );
     }
     /**
      * Constructs an authority factory using the specified connection.

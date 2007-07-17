@@ -48,15 +48,17 @@ final class HsqlDialectEpsgFactory extends AnsiDialectEpsgFactory {
 
     /**
      * Constructs the factory for the given connection to the HSQL database.
+     * @throws SQLException 
      */
-    public HsqlDialectEpsgFactory(final Hints hints, final javax.sql.DataSource dataSource) {
-        super(hints, dataSource);
+    public HsqlDialectEpsgFactory(final Hints hints) throws SQLException {
+        super(hints, HsqlEpsgDatabase.createDataSource());
     }
+    
     /**
      * Constructs the factory for the given connection to the HSQL database.
      */
-    public HsqlDialectEpsgFactory(final Hints hints, final Connection connection) {
-        super(hints, connection);
+    public HsqlDialectEpsgFactory(final Hints hints, final javax.sql.DataSource dataSource) {
+        super(hints, dataSource);
     }
 
     /**

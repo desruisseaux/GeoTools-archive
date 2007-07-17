@@ -165,6 +165,13 @@ public abstract class AbstractCachedAuthorityFactory extends AbstractAuthorityFa
 		this.findCache = ObjectCaches.create("weak",0);
 	}
 
+    final void completeHints() {
+        hints.put(Hints.DATUM_AUTHORITY_FACTORY, this );
+        hints.put(Hints.CS_AUTHORITY_FACTORY, this );
+        hints.put(Hints.CRS_AUTHORITY_FACTORY, this );
+        hints.put(Hints.COORDINATE_OPERATION_AUTHORITY_FACTORY, this );        
+    }
+    
 	//
 	// Utility Methods and Cache Care and Feeding
 	//

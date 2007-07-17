@@ -40,15 +40,21 @@ import org.opengis.util.InternationalString;
  */
 public abstract class AbstractEpsgMediator extends AbstractAuthorityMediator {
 
+    /**
+     * The default priority level for this factory.
+     */
+    public static final int PRIORITY = MAXIMUM_PRIORITY - 10;
     private static final Logger LOGGER = Logger.getLogger("org.geotools.referencing.factory");
+
+    protected DataSource datasource;
     
     public AbstractEpsgMediator(Hints hints, DataSource datasource) {
-        super(hints);
-        this.datasource = datasource;
+        super(PRIORITY,hints);
+        
+        this.datasource = datasource;        
+        hints.put(Hints.EPSG_DATA_SOURCE, this.datasource );
     }
     
-    protected DataSource datasource;
-
     protected Connection getConnection() throws SQLException {
         try {
             return datasource.getConnection();
