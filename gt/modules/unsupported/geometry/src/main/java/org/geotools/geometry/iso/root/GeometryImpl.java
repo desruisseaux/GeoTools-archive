@@ -52,7 +52,6 @@ import org.geotools.geometry.iso.aggregate.MultiSurfaceImpl;
 import org.geotools.geometry.iso.complex.ComplexImpl;
 import org.geotools.geometry.iso.complex.CompositeCurveImpl;
 import org.geotools.geometry.iso.complex.CompositeSurfaceImpl;
-import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.geometry.iso.operation.overlay.OverlayOp;
 import org.geotools.geometry.iso.operation.relate.RelateOp;
@@ -71,7 +70,6 @@ import org.geotools.geometry.iso.util.algorithm2D.CentroidArea2D;
 import org.geotools.geometry.iso.util.algorithm2D.ConvexHull;
 import org.geotools.geometry.iso.util.algorithmND.CentroidLine;
 import org.geotools.geometry.iso.util.algorithmND.CentroidPoint;
-import org.geotools.geometry.jts.GeometryCoordinateSequenceTransformer;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -87,22 +85,11 @@ import org.opengis.geometry.TransfiniteSet;
 import org.opengis.geometry.aggregate.MultiPrimitive;
 import org.opengis.geometry.complex.Complex;
 import org.opengis.geometry.coordinate.LineSegment;
-import org.opengis.geometry.primitive.Curve;
 import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.OrientableSurface;
 import org.opengis.geometry.primitive.Primitive;
-import org.opengis.geometry.primitive.PrimitiveFactory;
 import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.Geometry;
-
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * 
