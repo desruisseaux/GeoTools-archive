@@ -33,8 +33,17 @@ import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
 public class H4GRImageTest extends TestCase {
+	private String testFilePath;
+	
 	public H4GRImageTest(String string) {
 		super(string);
+	}
+	
+	protected void setUp() throws Exception {
+		super.setUp();
+		testFilePath = "E:/work/data/hdf/MISR_AM1_CGLS_WIN_2005_F04_0017.hdf";
+		// testFilePath =
+		// "E:/work/data/hdf/MODPM2007027121858.L3_000_EAST_MED.hdf";
 	}
 
 	public static void main(String[] args) {
@@ -59,7 +68,7 @@ public class H4GRImageTest extends TestCase {
 			//
 			// /////////////////////////////////////////////////////////////////
 			fileID = HDFLibrary
-					.Hopen("E:/Work/data/HDF/TOVS_BROWSE_DAILY_AM_861031_NF.HDF");
+					.Hopen(testFilePath);
 			assertNotSame(fileID, HDFConstants.FAIL);
 
 			// /////////////////////////////////////////////////////////////////

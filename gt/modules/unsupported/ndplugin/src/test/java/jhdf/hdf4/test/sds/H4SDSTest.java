@@ -47,6 +47,21 @@ public class H4SDSTest extends TestCase {
 		super(string);
 	}
 
+	private final static boolean VISUALIZE_FIRST_CHUNK_VALUES = false;
+
+	private final static boolean VISUALIZE_DIMENSION_SCALES_VALUES = true;
+
+	private String testFilePath;
+
+	private final String chunkTestFilePath = "E:/work/data/hdf/MISR_AM1_CGLS_WIN_2005_F04_0017.hdf";
+
+	private final String dimensionScaleTestFilePath = "E:/Work/data/HDF/TOVS_5DAYS_AM_B870511.E870515_NG.HDF";
+
+	protected void setUp() throws Exception {
+		super.setUp();
+		testFilePath = dimensionScaleTestFilePath;
+	}
+
 	public static void main(String[] args) {
 		TestRunner.run(H4SDSTest.class);
 	}
@@ -68,8 +83,7 @@ public class H4SDSTest extends TestCase {
 			// file id, useless but nice to have :-)
 			//
 			// /////////////////////////////////////////////////////////////////
-			fileID = HDFLibrary
-					.Hopen("E:/work/data/hdf/TOVS_5DAYS_AM_B870511.E870515_NG.HDF");
+			fileID = HDFLibrary.Hopen(testFilePath);
 			assertNotSame(fileID, HDFConstants.FAIL);
 
 			// /////////////////////////////////////////////////////////////////
@@ -77,12 +91,10 @@ public class H4SDSTest extends TestCase {
 			// start sds interface
 			//
 			// /////////////////////////////////////////////////////////////////
-			sdsInterfaceID = HDFLibrary.SDstart(
-					"E:/work/data/hdf/TOVS_5DAYS_AM_B870511.E870515_NG.HDF",
+			sdsInterfaceID = HDFLibrary.SDstart(testFilePath,
 					HDFConstants.DFACC_RDONLY | HDFConstants.DFACC_PARALLEL);
 			assertNotSame(sdsInterfaceID, HDFConstants.FAIL);
-			final int sdsInterfaceID1 = HDFLibrary.SDstart(
-					"E:/work/data/hdf/TOVS_5DAYS_AM_B870511.E870515_NG.HDF",
+			final int sdsInterfaceID1 = HDFLibrary.SDstart(testFilePath,
 					HDFConstants.DFACC_RDONLY | HDFConstants.DFACC_PARALLEL);
 			// //
 			//
@@ -143,7 +155,7 @@ public class H4SDSTest extends TestCase {
 					System.out.println("SDS Interface Attribute " + ii
 							+ " value " + buf);
 			}
-			
+
 			// ////////////////////////////////////////////////////////////////
 			//
 			// Access every data set and print its name, rank, dimension sizes,
@@ -196,6 +208,7 @@ public class H4SDSTest extends TestCase {
 					System.out.println("\tSDS Dataset dimension length: "
 							+ dimSizes[j]);
 				final int dataType = sdInfo[1];
+				final int typeSize = HDFConstants.getTypeSize(dataType);
 				final String dataTypeString = HDFConstants.getType(dataType);
 				System.out.println("\tSDS Dataset datatype " + dataTypeString);
 				System.out.println("\tSDS Dataset num attributes " + sdInfo[2]);
@@ -210,50 +223,15 @@ public class H4SDSTest extends TestCase {
 						+ isDimensionScale);
 
 				if (isDimensionScale) {
-					final int typeSize = HDFConstants.getTypeSize(dataType);
 					final int dimSize = dimSizes[0];
 					byte b[] = new byte[dimSize * typeSize];
-					ByteBuffer bb = null;
-					Buffer scaleBuffer = null;
 					int dimID = HDFLibrary.SDgetdimid(sdsID, 0);
 					assertTrue(dimID != HDFConstants.FAIL);
 					HDFLibrary.SDgetdimscale(dimID, b);
-					bb = ByteBuffer.wrap(b);
-					bb.order(ByteOrder.nativeOrder());
-
-					System.out.print("\tDimension scale values\n\t");
-					if (dataTypeString.equals(HDFConstants.INT16)) {
-						scaleBuffer = bb.asShortBuffer();
-						for (int kk = 0; kk < dimSize;)
-							System.out.print(((ShortBuffer) scaleBuffer)
-									.get(kk++)
-									+ ((kk % 10 == 0) ? "\n\t" : " "));
-					} else if (dataTypeString.equals(HDFConstants.INT32)) {
-						scaleBuffer = bb.asIntBuffer();
-						for (int kk = 0; kk < dimSize;)
-							System.out.print(((IntBuffer) scaleBuffer)
-									.get(kk++)
-									+ ((kk % 10 == 0) ? "\n\t" : " "));
-					} else if (dataTypeString.equals(HDFConstants.INT64)) {
-						scaleBuffer = bb.asLongBuffer();
-						for (int kk = 0; kk < dimSize;)
-							System.out.print(((LongBuffer) scaleBuffer)
-									.get(kk++)
-									+ ((+kk % 10 == 0) ? "\n\t" : " "));
-					} else if (dataTypeString.equals(HDFConstants.FLOAT32)) {
-						scaleBuffer = bb.asFloatBuffer();
-						for (int kk = 0; kk < dimSize;)
-							System.out.print(((FloatBuffer) scaleBuffer)
-									.get(kk++)
-									+ ((kk % 10 == 0) ? "\n\t" : " "));
-					} else if (dataTypeString.equals(HDFConstants.FLOAT64)) {
-						scaleBuffer = bb.asDoubleBuffer();
-						for (int kk = 0; kk < dimSize;)
-							System.out.print(((DoubleBuffer) scaleBuffer)
-									.get(kk++)
-									+ ((kk % 10 == 0) ? "\n\t" : " "));
-					} else
-						scaleBuffer = null;
+					if (VISUALIZE_DIMENSION_SCALES_VALUES) {
+						System.out.print("\tDimension scale values\n\t");
+						printValues(b, dataTypeString, dimSize);
+					}
 					System.out.print("\n");
 				}
 				// //
@@ -302,10 +280,23 @@ public class H4SDSTest extends TestCase {
 				if (cflag[0] == HDFConstants.HDF_NONE)
 					System.out.println("\tSDS dataset has no chunking");
 				else {
-					for (int k = 0; k < rank; k++)
+					int chunkValues = 1;
+					int chunkCoordinates[] = new int[rank];
+					for (int k = 0; k < rank; k++) {
 						System.out.println("\tSDS dataset dimension " + k
 								+ " has chunking "
 								+ (long) chunkInfo.chunk_lengths[k]);
+						chunkValues *= chunkInfo.chunk_lengths[k];
+						chunkCoordinates[k] = 0;
+					}
+					if (VISUALIZE_FIRST_CHUNK_VALUES) {
+						final int dimSize = chunkValues * typeSize;
+						byte chunksToBread[] = new byte[dimSize];
+						assertTrue(HDFLibrary.SDreadchunk(sdsID,
+								chunkCoordinates, chunksToBread));
+						System.out.print("\tChunk values\n\t");
+						printValues(chunksToBread, dataTypeString, chunkValues);
+					}
 				}
 
 				// ////////////////////////////////////////////////////////////////
@@ -499,6 +490,42 @@ public class H4SDSTest extends TestCase {
 				}
 
 		}
+	}
+
+	private void printValues(byte[] b, String dataTypeString, final int nValues) {
+		ByteBuffer bb = null;
+		Buffer scaleBuffer = null;
+		bb = ByteBuffer.wrap(b);
+		bb.order(ByteOrder.nativeOrder());
+
+		if (dataTypeString.equals(HDFConstants.INT16)) {
+			scaleBuffer = bb.asShortBuffer();
+			for (int kk = 0; kk < nValues;)
+				System.out.print(((ShortBuffer) scaleBuffer).get(kk++)
+						+ ((kk % 10 == 0) ? "\n\t" : " "));
+		} else if (dataTypeString.equals(HDFConstants.INT32)) {
+			scaleBuffer = bb.asIntBuffer();
+			for (int kk = 0; kk < nValues;)
+				System.out.print(((IntBuffer) scaleBuffer).get(kk++)
+						+ ((kk % 10 == 0) ? "\n\t" : " "));
+		} else if (dataTypeString.equals(HDFConstants.INT64)) {
+			scaleBuffer = bb.asLongBuffer();
+			for (int kk = 0; kk < nValues;)
+				System.out.print(((LongBuffer) scaleBuffer).get(kk++)
+						+ ((+kk % 10 == 0) ? "\n\t" : " "));
+		} else if (dataTypeString.equals(HDFConstants.FLOAT32)) {
+			scaleBuffer = bb.asFloatBuffer();
+			for (int kk = 0; kk < nValues;)
+				System.out.print(((FloatBuffer) scaleBuffer).get(kk++)
+						+ ((kk % 10 == 0) ? "\n\t" : " "));
+		} else if (dataTypeString.equals(HDFConstants.FLOAT64)) {
+			scaleBuffer = bb.asDoubleBuffer();
+			for (int kk = 0; kk < nValues;)
+				System.out.print(((DoubleBuffer) scaleBuffer).get(kk++)
+						+ ((kk % 10 == 0) ? "\n\t" : " "));
+		} else
+			scaleBuffer = null;
+
 	}
 
 	private void printAttributeByName(int sdsID, String attributeName,
