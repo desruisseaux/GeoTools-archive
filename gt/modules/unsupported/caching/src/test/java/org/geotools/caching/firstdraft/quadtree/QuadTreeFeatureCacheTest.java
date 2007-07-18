@@ -24,6 +24,7 @@ import junit.framework.TestSuite;
 import org.geotools.caching.firstdraft.FeatureCacheException;
 import org.geotools.caching.firstdraft.Generator;
 import org.geotools.caching.firstdraft.impl.InMemoryFeatureCache;
+import org.geotools.caching.firstdraft.quadtree.QuadTreeFeatureCache;
 import org.geotools.caching.firstdraft.spatialindex.spatialindex.Region;
 
 import org.geotools.data.DataUtilities;
