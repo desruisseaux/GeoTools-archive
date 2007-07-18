@@ -13,7 +13,8 @@ public class SeConnection {
 	public String getDatabaseName() throws SeException { return null; }
 	public String getUser() throws SeException { return null; }
 	public void close() throws SeException {}
-	public java.util.List getLayers() throws SeException { return null; }
+	public java.util.Vector getLayers() throws SeException { return null; }
 	public void setConcurrency(int i) {}
 	public boolean isClosed() { return false; }
+	public SeRelease getRelease() { return null; }
 }

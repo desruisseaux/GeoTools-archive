@@ -146,6 +146,10 @@ public class ArcSDEDataStoreTest extends TestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
+        //facilitates running a single test at a time (eclipse lets you do this and it's very useful)
+        if (testData == null) {
+            oneTimeSetUp();
+        }
         this.store = testData.getDataStore();
     }
 
@@ -175,6 +179,13 @@ public class ArcSDEDataStoreTest extends TestCase {
         LOGGER.fine("testFinder OK :" + sdeDs.getClass().getName());
     }
     
+    /**
+     * This test is currently broken.  It's a placeholder for some logic
+     * that sfarber wrote which tries to guess the SRS of a featureclass, based on connecting
+     * to it via an SeLayer.
+     * 
+     * @throws Throwable
+     */
     public void _testAutoFillSRS() throws Throwable {
         
         ArcSDEDataStore ds = testData.getDataStore();

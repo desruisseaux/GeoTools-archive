@@ -7,7 +7,7 @@ public class SeQuery {
 	public SeQuery(SeConnection c) {}
 	public SeQuery(SeConnection c, String[] s, SeSqlConstruct y) {}
 	
-	public static /* GEOT-947 final*/ int SE_OPTIMIZE = 0;
+	public static /* GEOT-947 final*/ short SE_OPTIMIZE = 0;
 	
 	public void prepareQuery() {}
 	public void prepareQueryInfo(SeQueryInfo i)throws SeException {}
@@ -18,7 +18,7 @@ public class SeQuery {
 	public void cancel(boolean b) {}
 	public void setRowLocking(int i) {}
 	public SeRow fetch() { return null; }
-	public void setSpatialConstraints(int i, boolean b, SeFilter[] f) {}
+	public void setSpatialConstraints(short i, boolean b, SeFilter[] f) {}
 	public SeTableStats calculateTableStatistics(String s, int i, SeQueryInfo q, int j) { return null; }
 	public void queryRasterTile(SeRasterConstraint c) {}
 	public void prepareSql(String s) {}

@@ -21,7 +21,7 @@ public class SeRow {
 	public void setShape(int i, SeShape s) {}
 	public SeRasterAttr getRaster(int i) { return null; }
 	public SeRasterTile getRasterTile() { return null; }
-	public int getNumColumns() { return -1; }
+	public short getNumColumns() { return -1; }
 	public int getIndicator(int i) { return -1; }
 	
 	

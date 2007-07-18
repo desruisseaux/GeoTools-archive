@@ -26,11 +26,18 @@ import org.geotools.arcsde.data.ViewRegisteringFactoryHelper;
 import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEConnectionPoolFactory;
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 
+import com.esri.sde.sdk.GeoToolsDummyAPI;
 import com.esri.sde.sdk.client.SeConnection;
+import com.esri.sde.sdk.client.SeDBTune;
+import com.esri.sde.sdk.client.SeException;
+import com.esri.sde.sdk.client.SeRelease;
 import com.esri.sde.sdk.pe.PeCoordinateSystem;
+import com.esri.sde.sdk.pe.PeFactory;
 
 /**
  * Factory to create DataStores over a live ArcSDE instance.
@@ -49,6 +56,14 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
     
     /** DOCUMENT ME! */
     private static Param[] paramMetadata = new Param[10];
+    
+    
+    public static final int JSDE_VERSION_DUMMY = -1;
+    public static final int JSDE_VERSION_90 = 0;
+    public static final int JSDE_VERSION_91 = 1;
+    public static final int JSDE_VERSION_92 = 2;
+    
+    public static int JSDE_CLIENT_VERSION;
     
     static {
         paramMetadata[0] = new Param("namespace", String.class,
@@ -85,6 +100,36 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
                 Integer.class,
                 "Milliseconds to wait for an available connection before failing to connect",
                 false, new Integer(ArcSDEConnectionPool.DEFAULT_MAX_WAIT_TIME));
+        
+        //determine which JSDE api we're running against
+        determineJsdeVersion();
+        
+    }
+    
+    private static void determineJsdeVersion() {
+        try {
+            int i = GeoToolsDummyAPI.DUMMY_API_VERSION;
+            JSDE_CLIENT_VERSION = JSDE_VERSION_DUMMY;
+        } catch (Throwable t) {
+            //good, we're not using the Dummy API placeholder.
+            try {
+                //SeDBTune only exists in 9.2
+                Class.forName("com.esri.sde.sdk.client.SeDBTune");
+                JSDE_CLIENT_VERSION = JSDE_VERSION_92;
+                LOGGER.info("Using ArcSDE API version 9.2 (or higher)");
+            } catch (Throwable t2) {
+                //we're using 9.1 or 9.0.
+                //perhaps I am the hack-master.
+                int[] projcss = PeFactory.projcsCodelist();
+                if (projcss.length == 16380) {
+                    JSDE_CLIENT_VERSION = JSDE_VERSION_91;
+                    LOGGER.info("Using ArcSDE API version 9.1");
+                } else {
+                    JSDE_CLIENT_VERSION = JSDE_VERSION_90;
+                    LOGGER.info("Using ArcSDE API version 9.0 (or an earlier 8.x version)");
+                }
+            }
+        }
     }
     
     /** factory of connection pools to different SDE databases */
@@ -143,9 +188,55 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
      *             if somthing goes wrong creating the datastore.
      */
     public DataStore createDataStore(Map params) throws java.io.IOException {
+        if (JSDE_CLIENT_VERSION == JSDE_VERSION_DUMMY) {
+            throw new DataSourceException("Can't connect to ArcSDE with the dummy jar.");
+        }
+        
         ArcSDEDataStore sdeDStore = null;
         ArcSDEConnectionConfig config = new ArcSDEConnectionConfig(params);
+        
+        //check to see if our sdk is compatible with this arcsde instance
+        SeConnection conn = null;
+        try {
+            conn = new SeConnection(config.getServerName(),
+                config.getPortNumber().intValue(),
+                config.getDatabaseName(),
+                config.getUserName(),
+                config.getUserPassword());
+            SeRelease releaseInfo = conn.getRelease();
+            int majVer = releaseInfo.getMajor();
+            int minVer = releaseInfo.getMinor();
+            
+            if (majVer == 9 && minVer > 1 && JSDE_CLIENT_VERSION < JSDE_VERSION_91) {
+                //we can't connect to ArcSDE 9.2 with the arcsde 9.0 jars.  It just won't
+                //work when trying to draw maps.  Oh well, at least we'll warn people.
+                LOGGER.severe("\n\n**************************\n" +
+                		"DANGER DANGER DANGER!!!  You're using the ArcSDE 9.0 (or earlier) jars with " +
+                        "ArcSDE " + majVer + "." + minVer + " on host '" + config.getServerName() + "' .  " +
+                        "This PROBABLY WON'T WORK.  If you have issues " +
+                        "or unexplained exceptions when rendering maps, upgrade your ArcSDE jars to version " +
+                        "9.2 or higher.  See http://docs.codehaus.org/display/GEOTOOLS/ArcSDE+Plugin\n" +
+                        "**************************\n\n");
+            }
+            
+            conn.close();
+            conn = null;
+            
+        } catch (SeException se) {
+            throw new DataSourceException(se);
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception e) {
+                    //meh...nothing to do about it now.
+                }
+                conn = null;
+            }
+        }
+        
         ArcSDEConnectionPool connPool = poolFactory.createPool(config);
+        
         String namespaceUri = config.getNamespaceUri();
         if (namespaceUri == null) {
             sdeDStore = new ArcSDEDataStore(connPool);
@@ -204,6 +295,9 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
      *
      */
     public boolean canProcess(Map params) {
+        if (JSDE_CLIENT_VERSION == JSDE_VERSION_DUMMY) {
+            return false;
+        }
         boolean canProcess = true;
         
         try {
@@ -225,6 +319,13 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
      *         create DataStores.
      */
     public boolean isAvailable() {
+        if (JSDE_CLIENT_VERSION == JSDE_VERSION_DUMMY) {
+            LOGGER.warning("You must download and install the *real* ArcSDE JSDE jar files. " +
+            		"Currently the GeoTools ArcSDE 'dummy jar' is on your classpath. " +
+                    "ArcSDE connectivity is DISABLED. " +
+                    "See http://docs.codehaus.org/display/GEOTOOLS/ArcSDE+Plugin");
+            return false;
+        }
         try {
             LOGGER.finer(SeConnection.class.getName() + " is in place.");
             LOGGER.finer(PeCoordinateSystem.class.getName() + " is in place.");
