@@ -22,11 +22,14 @@ import java.sql.SQLException;
 import java.util.Properties;
 import java.util.Random;
 
+import javax.sql.DataSource;
+
 import net.sourceforge.groboutils.junit.v1.MultiThreadedTestRunner;
 import net.sourceforge.groboutils.junit.v1.TestRunnable;
 
 import oracle.jdbc.pool.OracleDataSource;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.CRS;
@@ -40,38 +43,62 @@ import org.opengis.referencing.operation.MathTransform;
 public class OracleDialectEpsgMediatorStarvationOnlineStressTest extends
         OracleOnlineTestCase {
 
-    final static int RUNNER_COUNT = 4;
-    final static int ITERATIONS = 10;
-    final static int MAX_TIME = 1 * 60 * 1000;
-    final static boolean SHOW_OUTPUT = false;
+    final static int RUNNER_COUNT = 2;
+    final static int ITERATIONS = 2;
+    final static int MAX_TIME = 10 * 1000;
+    final static boolean SHOW_OUTPUT = true;
     final static boolean VERBOSE = true;
-    final static int MAX_WORKERS = 4;
+    final static int MAX_WORKERS = 3;
     
     OracleDialectEpsgMediator mediator;
     static String[] codes;
     Hints hints;
     DataSourceWrapper wrappedDS;
     
-    protected void configure(OracleDataSource datasource) throws SQLException {
-        Properties properties = new Properties();
-        properties.setProperty("InitialLimit", "1");
-        properties.setProperty("MinLimit", "1");
-        properties.setProperty("MaxLimit", "1");
-        datasource.setConnectionProperties(properties);
-        datasource.setConnectionCacheProperties(properties);
+//    protected void configure(OracleDataSource datasource) throws SQLException {
+//        
+//        BasicDataSource dataSource = new BasicDataSource();
+//        dataSource.setDriverClassName((String) DRIVERCLASS.lookUp(params));
+//        dataSource.setUrl((String) JDBC_URL.lookUp(params));
+//        dataSource.setUsername((String) USERNAME.lookUp(params));
+//        dataSource.setPassword((String) PASSWORD.lookUp(params));
+//        
+//        dataSource.setAccessToUnderlyingConnectionAllowed(true);
+//        dataSource.setMaxActive( 1 );
+//        dataSource.setMaxIdle( 0 );
+//    }
+    
+    protected DataSource connect( String user, String password, String url, Properties params )
+            throws SQLException {
+        //DataSource origional = super.connect( user, password, url, params );
+        
+        BasicDataSource origional = new BasicDataSource();
+        origional.setDriverClassName("oracle.jdbc.driver.OracleDriver");
+        origional.setUsername( user );
+        origional.setPassword( password );
+        origional.setUrl( url );
+        origional.setMaxActive(10);
+        origional.setMaxIdle(1);        
+        return new DataSourceWrapper( origional, VERBOSE);
     }
     
-    protected void connect() throws Exception {
-        super.connect();
-        configure((OracleDataSource) datasource);
+    protected void setUp() throws Exception {
+        super.setUp();
+        if( fixture == null ) return; // we are not online - skip test
+        
+        wrappedDS = (DataSourceWrapper) datasource;
         hints = new Hints(Hints.BUFFER_POLICY, "none");     
-        hints.put(Hints.AUTHORITY_MAX_ACTIVE, new Integer(MAX_WORKERS));
-        if (datasource == null) {
-            fail("no datasource available");
-        }
-        wrappedDS = new DataSourceWrapper(datasource, VERBOSE);
-        mediator = new OracleDialectEpsgMediator(80, hints, wrappedDS);
+        hints.put(Hints.AUTHORITY_MAX_ACTIVE, new Integer(MAX_WORKERS));        
+        
+        mediator = new OracleDialectEpsgMediator(80, hints, datasource);
         codes = getCodes();
+    }
+    protected void tearDown() throws Exception {
+        if( mediator != null){
+            mediator.dispose();
+        }
+        
+        super.tearDown();
     }
     
     public void testRunners() throws Throwable {
@@ -85,6 +112,7 @@ public class OracleDialectEpsgMediatorStarvationOnlineStressTest extends
         MultiThreadedTestRunner mttr = new MultiThreadedTestRunner(runners, null);
         long timeStart = System.currentTimeMillis();
         mttr.runTestRunnables(MAX_TIME);
+        
         long timeElapsed = System.currentTimeMillis() - timeStart;
         
         //count exceptions and metrics
@@ -154,10 +182,11 @@ public class OracleDialectEpsgMediatorStarvationOnlineStressTest extends
         }
         if (exceptions != 0) {
             fail(exceptions + " exception(s) occurred");
-        }
-        
-        assertEquals(1, wrappedDS.getMaxConnections());
-        assertEquals(0, wrappedDS.getConnectionsInUse());
+        }        
+        mediator.dispose();
+        mediator = null;
+        assertEquals(3, wrappedDS.getMaxConnections());        
+        assertEquals(1, wrappedDS.getConnectionsInUse());
     }
     
     /**

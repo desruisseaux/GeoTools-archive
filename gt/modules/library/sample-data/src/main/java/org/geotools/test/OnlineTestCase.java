@@ -104,7 +104,7 @@ public abstract class OnlineTestCase extends TestCase {
      * Tear down method for test, calls through to {@link #disconnect()} if the
      * test is active.
      */
-    protected final void tearDown() throws Exception {
+    protected void tearDown() throws Exception {
         if (fixture != null) {
             try {
                 disconnect();

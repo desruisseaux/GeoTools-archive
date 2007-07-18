@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Properties;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -44,49 +45,37 @@ public class OracleOnlineTestCase extends OnlineTestCase {
     protected String getFixtureId() {
         return "epsg.oracle";
     }
-
-    static final int DRIVER = 0;
-    static final int DATASOURCE= 1;
     
     /**
-     * A hook to allow subclasses to configure the oracle datasource to their
-     * liking.
+     * Connect using OracleDataSource (by default).
+     * <p>
+     * Subclasses can override to wrap this DataSource, or make use of an alternate
+     * Implementation as required.
      * 
-     * @param datasource
-     *            OracleDataSource
-     * @throws SQLException 
+     * @param params
+     * @return
+     * @throws SQLException
      */
-    protected void configure(OracleDataSource datasource) throws SQLException {
+    protected DataSource connect( String user, String password, String url, Properties params ) throws SQLException{
+        OracleDataSource source = new OracleDataSource();
+
+        source.setUser( user );
+        source.setPassword( password );
+        source.setURL( url );
+        //source.setConnectionProperties( params ); //not available in dummy jar
+        return source;
     }
     
     protected void connect() throws Exception {
-        OracleDataSource source;
-        source = new OracleDataSource();
-
-        source.setUser(fixture.getProperty("user"));
-        source.setPassword(fixture.getProperty("password"));
-        source.setURL(fixture.getProperty("url"));
-        configure(source);
+        String user = fixture.getProperty("user");
+        String password = fixture.getProperty("password");
+        String url = fixture.getProperty("url");
         
+        DataSource source = connect( user, password, url, fixture );
+        if( !isEpsgDatabaseLoaded( source ) ){
+            throw new SQLException("Could not find EPSG tables");
+        }
         datasource = source;
-
-        Connection connection = source.getConnection();        
-        try {
-            DatabaseMetaData metaData = connection.getMetaData();
-            String user = fixture.getProperty("user").toUpperCase();
-            ResultSet epsgTables = metaData
-                    .getTables(null, user, "EPSG%", null);
-            List list = new ArrayList();
-            while (epsgTables.next()) {
-                list.add(epsgTables.getObject(3));
-            }
-            if (list.isEmpty()) {
-                throw new SQLException("Could not find EPSG tables");
-            }
-        }
-        finally {
-            connection.close();
-        }
         
         //  System.out.println(list);
         Hashtable env = new Hashtable();
@@ -100,10 +89,40 @@ public class OracleOnlineTestCase extends OnlineTestCase {
         GeoTools.init(context);
     }
 
+    /**
+     * Confirm that the EPSG Database tables are present and accounted for.
+     * <p>
+     * This method is used as part of connect to ensure the EPSG tables
+     * have been loaded correctly.
+     * 
+     * @param source
+     * @return true if source is non null and tables are present
+     * @throws Exception
+     */
+    public boolean isEpsgDatabaseLoaded( DataSource source ) throws Exception {
+        if( source == null ) return false;
+        Connection connection = source.getConnection();        
+        try {
+            DatabaseMetaData metaData = connection.getMetaData();
+            String user = fixture.getProperty("user").toUpperCase();
+            ResultSet epsgTables = metaData
+                    .getTables(null, user, "EPSG%", null);
+            List list = new ArrayList();
+            while (epsgTables.next()) {
+                list.add(epsgTables.getObject(3));
+            }
+            if (list.isEmpty()) {
+                throw new SQLException("Could not find EPSG tables");
+            }
+            return true;
+        }
+        finally {
+            connection.close();
+        }
+    }
+    
     protected void disconnect() throws Exception {
         datasource = null;
     }
 
-    public void testEmpty() {
-    }
 }

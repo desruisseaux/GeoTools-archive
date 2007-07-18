@@ -43,7 +43,7 @@ public abstract class AbstractEpsgMediator extends AbstractAuthorityMediator {
     /**
      * The default priority level for this factory.
      */
-    public static final int PRIORITY = MAXIMUM_PRIORITY - 10;
+    public static final int PRIORITY = NORMAL_PRIORITY - 10;
     private static final Logger LOGGER = Logger.getLogger("org.geotools.referencing.factory");
 
     protected DataSource datasource;

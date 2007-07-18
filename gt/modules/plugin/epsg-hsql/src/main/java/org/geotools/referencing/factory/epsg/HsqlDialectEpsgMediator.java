@@ -62,7 +62,7 @@ public class HsqlDialectEpsgMediator extends AbstractEpsgMediator {
      * @param datasource
      */
     public HsqlDialectEpsgMediator(int priority, DataSource datasource) {
-        this(priority, 
+        this( priority, 
              new Hints(Hints.AUTHORITY_MAX_ACTIVE, 
                  new Integer(1),
                  new Object[] {
