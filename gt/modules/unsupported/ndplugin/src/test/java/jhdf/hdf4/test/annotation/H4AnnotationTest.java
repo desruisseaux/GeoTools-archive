@@ -28,31 +28,41 @@ import ncsa.hdf.hdflib.HDFConstants;
 import ncsa.hdf.hdflib.HDFLibrary;
 
 public class H4AnnotationTest extends TestCase {
+	
+	private final static String TESTPATH_FOR_OBSOLETETAGS_ANNOTATION = "E:/Work/data/HDF/TOVS_5DAYS_AM_B870511.E870515_NG.HDF";
+	
+	private final static String TESTPATH_FOR_NEWTAGS_ANNOTATION = "E:/Work/data/HDF/TOVS_BROWSE_DAILY_AM_861031_NF.HDF";
+	
 	public H4AnnotationTest(String string) {
 		super(string);
 	}
 
-	private String testFilePath;
-
 	protected void setUp() throws Exception {
 		super.setUp();
-
-		// This dataset contains a lof of annotations. Please, use this one for
-		// testing
-		testFilePath = "E:/Work/data/HDF/TOVS_5DAYS_AM_B870511.E870515_NG.HDF";
 	}
 
 	public static void main(String[] args) {
-		TestRunner.run(H4AnnotationTest.class);
+		TestRunner.run(suite());
 	}
 
 	public static Test suite() {
 		TestSuite suite = new TestSuite();
-		suite.addTest(new H4AnnotationTest("testGetInfo"));
+		suite.addTest(new H4AnnotationTest("testObsoleteTags"));
+		
+		suite.addTest(new H4AnnotationTest("testNewTags"));
+		
 		return suite;
 	}
 
-	public void testGetInfo() {
+	public void testObsoleteTags(){
+		testGetInfo(TESTPATH_FOR_OBSOLETETAGS_ANNOTATION);
+	}
+	
+	public void testNewTags(){
+		testGetInfo(TESTPATH_FOR_NEWTAGS_ANNOTATION);
+	}
+	
+	private void testGetInfo(final String testFilePath) {
 		int fileID = HDFConstants.FAIL;
 		try {
 			// //
@@ -93,7 +103,8 @@ public class H4AnnotationTest extends TestCase {
 					assertTrue(HDFLibrary.ANid2tagref(annID, tagRef));
 					System.out.println("Annotation index = " + i + " ; ID = "
 							+ annID + " ; TAG = " + tagRef[0] + " ; REF = "
-							+ tagRef[1] + "\n" + "Annotation content text = " + annBuf[0]);
+							+ tagRef[1] + "\n" + "Annotation content text = "
+							+ annBuf[0]);
 					HDFLibrary.ANendaccess(annID);
 				}
 			}
@@ -112,7 +123,8 @@ public class H4AnnotationTest extends TestCase {
 					assertTrue(HDFLibrary.ANid2tagref(annID, tagRef));
 					System.out.println("Annotation index = " + i + " ; ID = "
 							+ annID + " ; TAG = " + tagRef[0] + " ; REF = "
-							+ tagRef[1] + "\n" + "Annotation content text = " + annBuf[0]);
+							+ tagRef[1] + "\n" + "Annotation content text = "
+							+ annBuf[0]);
 					HDFLibrary.ANendaccess(annID);
 				}
 			}
@@ -131,10 +143,10 @@ public class H4AnnotationTest extends TestCase {
 					assertTrue(HDFLibrary.ANid2tagref(annID, tagRef));
 					System.out.println("Annotation index = " + i + " ; ID = "
 							+ annID + " ; TAG = " + tagRef[0] + " ; REF = "
-							+ tagRef[1] + "\n" + "Annotation content text = " + annBuf[0]);
+							+ tagRef[1] + "\n" + "Annotation content text = "
+							+ annBuf[0]);
 					HDFLibrary.ANendaccess(annID);
 				}
-
 			}
 			if (annotationsInfo[3] != 0) {
 				final int dataObjectDescriptions = annotationsInfo[3];
@@ -152,11 +164,52 @@ public class H4AnnotationTest extends TestCase {
 					assertTrue(HDFLibrary.ANid2tagref(annID, tagRef));
 					System.out.println("Annotation index = " + i + " ; ID = "
 							+ annID + " ; TAG = " + tagRef[0] + " ; REF = "
-							+ tagRef[1] + "\n" + "Annotation content text = " + annBuf[0]);
+							+ tagRef[1] + "\n" + "Annotation content text = "
+							+ annBuf[0]);
 					HDFLibrary.ANendaccess(annID);
 				}
 			}
 
+			System.out
+					.println("\n=========================\nAnnotation related to SDS");
+			System.out
+					.println("=========================\nRetrieving from obsolete TAGS: DFTAG_SDG = 700");
+			final short obsoleteTag = (short)HDFConstants.DFTAG_SDG;
+			for (int j = 0; j < 10000; j++) {
+				
+				final int numTag = HDFLibrary.ANnumann(anInterfaceID,
+						HDFConstants.AN_DATA_DESC, obsoleteTag, (short) j);
+				if (numTag > 0) {
+					final int annIDs[] = new int[numTag];
+					HDFLibrary.ANannlist(anInterfaceID,
+							HDFConstants.AN_DATA_DESC, obsoleteTag, (short) j,
+							annIDs);
+					for (int k = 0; k < numTag; k++) {
+						System.out.println("Found Annotation with identifier "
+								+ annIDs[k] + " related to Object with TAG = " + obsoleteTag + " and REF = " + j);
+					}
+				}
+			}
+			System.out
+					.println("\n=========================\nRetrieving from new TAGS: DFTAG_NDG = 720");
+			final short newTag = (short)HDFConstants.DFTAG_NDG;
+			for (int j = 0; j < 10000; j++) {
+				
+				final int numTag = HDFLibrary.ANnumann(anInterfaceID,
+						HDFConstants.AN_DATA_DESC, newTag, (short) j);
+				if (numTag > 0) {
+					final int annIDs[] = new int[numTag];
+					HDFLibrary.ANannlist(anInterfaceID,
+							HDFConstants.AN_DATA_DESC, newTag, (short) j,
+							annIDs);
+					for (int k = 0; k < numTag; k++) {
+						System.out.println("Found Annotation with identifier "
+								+ annIDs[k] + " related to Object with TAG = " + newTag + " and REF = " + j);
+					}
+				}
+			}
+			System.out
+			.println("\n=========================\n");
 			if (anInterfaceID != HDFConstants.FAIL) {
 				HDFLibrary.ANend(anInterfaceID);
 			}

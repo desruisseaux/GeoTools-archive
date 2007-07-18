@@ -49,7 +49,11 @@ public class H4SDSTest extends TestCase {
 
 	private final static boolean VISUALIZE_FIRST_CHUNK_VALUES = false;
 
-	private final static boolean VISUALIZE_DIMENSION_SCALES_VALUES = true;
+	private final static boolean VISUALIZE_DIMENSION_SCALES_VALUES = false;
+
+	private final static boolean VISUALIZE_ATTRIBUTES = false;
+
+	private final static boolean VISUALIZE_DIMENSIONS = false;
 
 	private String testFilePath;
 
@@ -305,111 +309,38 @@ public class H4SDSTest extends TestCase {
 				//
 				// ////////////////////////////////////////////////////////////////
 				System.out.println("\t\t      ===      ");
-				final int numSDSAttributes = sdInfo[2];
-				final String[] SDSAttrName = new String[1];
-				final int[] SDSAttrInfo = { 0, 0 };
-				for (int ii = 0; ii < numSDSAttributes; ii++) {
-					SDSAttrName[0] = "";
-					// get various info about this attribute
-					assertTrue(HDFLibrary.SDattrinfo(sdsID, ii, SDSAttrName,
-							SDSAttrInfo));
-					System.out.println("\tSDS Dataset Attribute " + ii
-							+ " name " + SDSAttrName[0]);
-					// mask off the litend bit
-					SDSAttrInfo[0] = SDSAttrInfo[0]
-							& (~HDFConstants.DFNT_LITEND);
-					System.out.println("\tSDS Dataset Attribute " + ii
-							+ " dim " + SDSAttrInfo[1]);
-					Object buf = H4Datatype.allocateArray(SDSAttrInfo[0],
-							SDSAttrInfo[1]);
-					assertTrue(HDFLibrary.SDreadattr(sdsID, ii, buf));
-
-					if (buf != null) {
-						if (SDSAttrInfo[0] == HDFConstants.DFNT_CHAR
-								|| SDSAttrInfo[0] == HDFConstants.DFNT_UCHAR8) {
-							System.out.println("\tSDS Dataset Attribute value "
-									+ Dataset.byteToString((byte[]) buf,
-											SDSAttrInfo[1])[0]);
-						}
-					} else
+				if (VISUALIZE_ATTRIBUTES) {
+					final int numSDSAttributes = sdInfo[2];
+					final String[] SDSAttrName = new String[1];
+					final int[] SDSAttrInfo = { 0, 0 };
+					for (int ii = 0; ii < numSDSAttributes; ii++) {
+						SDSAttrName[0] = "";
+						// get various info about this attribute
+						assertTrue(HDFLibrary.SDattrinfo(sdsID, ii,
+								SDSAttrName, SDSAttrInfo));
 						System.out.println("\tSDS Dataset Attribute " + ii
-								+ " value " + buf);
-				}
+								+ " name " + SDSAttrName[0]);
+						// mask off the litend bit
+						SDSAttrInfo[0] = SDSAttrInfo[0]
+								& (~HDFConstants.DFNT_LITEND);
+						System.out.println("\tSDS Dataset Attribute " + ii
+								+ " dim " + SDSAttrInfo[1]);
+						Object buf = H4Datatype.allocateArray(SDSAttrInfo[0],
+								SDSAttrInfo[1]);
+						assertTrue(HDFLibrary.SDreadattr(sdsID, ii, buf));
 
-				// ////////////////////////////////////////////////////////////////
-				//
-				// SDS PREDEFINED attributes for this sds
-				//
-				// ////////////////////////////////////////////////////////////////
-				System.out.println("\t\t      ===      ");
-				printAttributeByName(sdsID, "long_name", "\tSDS PREDEFINED ");
-				printAttributeByName(sdsID, "units", "\tSDS PREDEFINED ");
-				printAttributeByName(sdsID, "format", "\tSDS PREDEFINED ");
-				printAttributeByName(sdsID, "coordsys", "\tSDS PREDEFINED ");
-				final Object fillValue = SDgetfillvalue(sdsID);
-				if (fillValue != null)
-					System.out.println("\tSDS PREDEFINED _fillValue "
-							+ fillValue);
-				final double[] range = { 0.0, 0.0 };
-				if (HDFLibrary.SDgetrange(sdsID, range))
-					System.out.println("\tSDS PREDEFINED range " + range[1]
-							+ " " + range[0]);
-				final double calibrationParams[] = { 0.0, 0.0, 0.0, 0.0 };
-				int[] NT = { 0 };
-				if (HDFLibrary.SDgetcal(sdsID, calibrationParams, NT)) {
-					System.out.println("\tSDS PREDEFINED calibration factor "
-							+ calibrationParams[0]);
-					System.out.println("\tSDS PREDEFINED calibration error "
-							+ calibrationParams[1]);
-					System.out.println("\tSDS PREDEFINED offset "
-							+ calibrationParams[2]);
-					System.out.println("\tSDS PREDEFINED offset factor "
-							+ calibrationParams[3]);
-				}
-
-				// ////////////////////////////////////////////////////////////////
-				//
-				// Dimension information
-				//
-				// ////////////////////////////////////////////////////////////////
-				for (int r = 0; r < rank; r++) {
-					// get the id of the first dimension for this dataset
-					final int dimensionID = HDFLibrary.SDgetdimid(sdsID, r);
-					assertNotSame(dimensionID, HDFConstants.FAIL);
-					System.out
-							.println("\t===============================================================");
-					System.out
-							.println("\t--------------> SDS dataset dimension index "
-									+ r + " <---------------");
-					System.out
-							.println("\t===============================================================");
-					System.out.println("\t\tSDS dataset dimension id "
-							+ dimensionID);
-					final String[] dimName = { "" };
-					final int[] dimInfo = { 0, 0, 0 };
-					assertTrue(HDFLibrary.SDdiminfo(dimensionID, dimName,
-							dimInfo));
-					System.out.println("\t\tSDS dataset dimension name "
-							+ dimName[0]);
-					System.out.println("\t\tSDS dataset dimension datatype "
-							+ HDFConstants.getType(dimInfo[1]));
-					System.out
-							.println("\t\tSDS dataset dimension num attributes "
-									+ dimInfo[2]);
-
-					// dimension predefined attributes
-					if (dimInfo[2] > 0) {
-						final String predefinedAttributes[] = { "NONE", "NONE",
-								"NONE" };
-						HDFLibrary.SDgetdimstrs(dimensionID,
-								predefinedAttributes, HDFConstants.DFS_MAXLEN);
-						System.out
-								.println("\t\tSDS dataset dimension long_name "
-										+ predefinedAttributes[0]);
-						System.out.println("\t\tSDS dataset dimension unit "
-								+ predefinedAttributes[1]);
-						System.out.println("\t\tSDS dataset dimension format "
-								+ predefinedAttributes[2]);
+						if (buf != null) {
+							if (SDSAttrInfo[0] == HDFConstants.DFNT_CHAR
+									|| SDSAttrInfo[0] == HDFConstants.DFNT_UCHAR8) {
+								System.out
+										.println("\tSDS Dataset Attribute value "
+												+ Dataset.byteToString(
+														(byte[]) buf,
+														SDSAttrInfo[1])[0]);
+							}
+						} else
+							System.out.println("\tSDS Dataset Attribute " + ii
+									+ " value " + buf);
 					}
 
 					// ////////////////////////////////////////////////////////////////
@@ -417,52 +348,141 @@ public class H4SDSTest extends TestCase {
 					// SDS PREDEFINED attributes for this sds
 					//
 					// ////////////////////////////////////////////////////////////////
-					System.out.println("\t\t\t     ===      ");
-					printAttributeByName(dimensionID, "long_name",
-							"\t\tSDS dataset dimension ");
-					printAttributeByName(dimensionID, "units",
-							"\t\tSDS dataset dimension ");
-					printAttributeByName(dimensionID, "format",
-							"\t\tSDS dataset dimension ");
+					System.out.println("\t\t      ===      ");
+					printAttributeByName(sdsID, "long_name",
+							"\tSDS PREDEFINED ");
+					printAttributeByName(sdsID, "units", "\tSDS PREDEFINED ");
+					printAttributeByName(sdsID, "format", "\tSDS PREDEFINED ");
+					printAttributeByName(sdsID, "coordsys", "\tSDS PREDEFINED ");
+					final Object fillValue = SDgetfillvalue(sdsID);
+					if (fillValue != null)
+						System.out.println("\tSDS PREDEFINED _fillValue "
+								+ fillValue);
+					final double[] range = { 0.0, 0.0 };
+					if (HDFLibrary.SDgetrange(sdsID, range))
+						System.out.println("\tSDS PREDEFINED range " + range[1]
+								+ " " + range[0]);
+					final double calibrationParams[] = { 0.0, 0.0, 0.0, 0.0 };
+					int[] NT = { 0 };
+					if (HDFLibrary.SDgetcal(sdsID, calibrationParams, NT)) {
+						System.out
+								.println("\tSDS PREDEFINED calibration factor "
+										+ calibrationParams[0]);
+						System.out
+								.println("\tSDS PREDEFINED calibration error "
+										+ calibrationParams[1]);
+						System.out.println("\tSDS PREDEFINED offset "
+								+ calibrationParams[2]);
+						System.out.println("\tSDS PREDEFINED offset factor "
+								+ calibrationParams[3]);
+					}
+				}
 
-					// //
-					//
-					// dimension attributes
-					//
-					// //
-					System.out.println("\t\t\t      ===      ");
-					final int numDimensionAttributes = dimInfo[2];
-					final String[] dimAttrName = new String[1];
-					final int[] dimAttrInfo = { 0, 0 };
-					for (int ii = 0; ii < numDimensionAttributes; ii++) {
-						dimAttrName[0] = "";
-						// get various info about this attribute
-						assertTrue(HDFLibrary.SDattrinfo(dimensionID, ii,
-								dimAttrName, dimAttrInfo));
-						System.out.println("\t\tSDS Dimension Attribute " + ii
-								+ " name " + dimAttrName[0]);
-						// mask off the litend bit
-						dimAttrInfo[0] = dimAttrInfo[0]
-								& (~HDFConstants.DFNT_LITEND);
-						System.out.println("\t\tSDS Dimension Attribute " + ii
-								+ " dim " + dimAttrInfo[1]);
-						Object buf = H4Datatype.allocateArray(dimAttrInfo[0],
-								dimAttrInfo[1]);
-						assertTrue(HDFLibrary.SDreadattr(dimensionID, ii, buf));
+				// ////////////////////////////////////////////////////////////////
+				//
+				// Dimension information
+				//
+				// ////////////////////////////////////////////////////////////////
 
-						if (buf != null) {
-							if (dimAttrInfo[0] == HDFConstants.DFNT_CHAR
-									|| dimAttrInfo[0] == HDFConstants.DFNT_UCHAR8) {
-								System.out
-										.println("\t\tSDS Dimension Attribute value "
-												+ Dataset.byteToString(
-														(byte[]) buf,
-														dimAttrInfo[1])[0]);
-							}
+				if (VISUALIZE_DIMENSIONS) {
+					for (int r = 0; r < rank; r++) {
+						// get the id of the first dimension for this dataset
+						final int dimensionID = HDFLibrary.SDgetdimid(sdsID, r);
+						assertNotSame(dimensionID, HDFConstants.FAIL);
+						System.out
+								.println("\t===============================================================");
+						System.out
+								.println("\t--------------> SDS dataset dimension index "
+										+ r + " <---------------");
+						System.out
+								.println("\t===============================================================");
+						System.out.println("\t\tSDS dataset dimension id "
+								+ dimensionID);
+						final String[] dimName = { "" };
+						final int[] dimInfo = { 0, 0, 0 };
+						assertTrue(HDFLibrary.SDdiminfo(dimensionID, dimName,
+								dimInfo));
+						System.out.println("\t\tSDS dataset dimension name "
+								+ dimName[0]);
+						System.out
+								.println("\t\tSDS dataset dimension datatype "
+										+ HDFConstants.getType(dimInfo[1]));
+						System.out
+								.println("\t\tSDS dataset dimension num attributes "
+										+ dimInfo[2]);
 
-						} else
+						// dimension predefined attributes
+						if (dimInfo[2] > 0) {
+							final String predefinedAttributes[] = { "NONE",
+									"NONE", "NONE" };
+							HDFLibrary.SDgetdimstrs(dimensionID,
+									predefinedAttributes,
+									HDFConstants.DFS_MAXLEN);
+							System.out
+									.println("\t\tSDS dataset dimension long_name "
+											+ predefinedAttributes[0]);
+							System.out
+									.println("\t\tSDS dataset dimension unit "
+											+ predefinedAttributes[1]);
+							System.out
+									.println("\t\tSDS dataset dimension format "
+											+ predefinedAttributes[2]);
+						}
+
+						// ////////////////////////////////////////////////////////////////
+						//
+						// SDS PREDEFINED attributes for this sds
+						//
+						// ////////////////////////////////////////////////////////////////
+						System.out.println("\t\t\t     ===      ");
+						printAttributeByName(dimensionID, "long_name",
+								"\t\tSDS dataset dimension ");
+						printAttributeByName(dimensionID, "units",
+								"\t\tSDS dataset dimension ");
+						printAttributeByName(dimensionID, "format",
+								"\t\tSDS dataset dimension ");
+
+						// //
+						//
+						// dimension attributes
+						//
+						// //
+						System.out.println("\t\t\t      ===      ");
+						final int numDimensionAttributes = dimInfo[2];
+						final String[] dimAttrName = new String[1];
+						final int[] dimAttrInfo = { 0, 0 };
+						for (int ii = 0; ii < numDimensionAttributes; ii++) {
+							dimAttrName[0] = "";
+							// get various info about this attribute
+							assertTrue(HDFLibrary.SDattrinfo(dimensionID, ii,
+									dimAttrName, dimAttrInfo));
 							System.out.println("\t\tSDS Dimension Attribute "
-									+ ii + " value " + buf);
+									+ ii + " name " + dimAttrName[0]);
+							// mask off the litend bit
+							dimAttrInfo[0] = dimAttrInfo[0]
+									& (~HDFConstants.DFNT_LITEND);
+							System.out.println("\t\tSDS Dimension Attribute "
+									+ ii + " dim " + dimAttrInfo[1]);
+							Object buf = H4Datatype.allocateArray(
+									dimAttrInfo[0], dimAttrInfo[1]);
+							assertTrue(HDFLibrary.SDreadattr(dimensionID, ii,
+									buf));
+
+							if (buf != null) {
+								if (dimAttrInfo[0] == HDFConstants.DFNT_CHAR
+										|| dimAttrInfo[0] == HDFConstants.DFNT_UCHAR8) {
+									System.out
+											.println("\t\tSDS Dimension Attribute value "
+													+ Dataset.byteToString(
+															(byte[]) buf,
+															dimAttrInfo[1])[0]);
+								}
+
+							} else
+								System.out
+										.println("\t\tSDS Dimension Attribute "
+												+ ii + " value " + buf);
+						}
 					}
 				}
 				// //

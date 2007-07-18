@@ -40,7 +40,7 @@ import ncsa.hdf.hdflib.HDFLibrary;
 public class H4VGroupTest extends TestCase {
 
 	private final static String SUBGROUPS_TESTFILEPATH = "E:/work/data/hdf/MISR_AM1_CGLS_WIN_2005_F04_0017.hdf";
-
+	
 	private String testFilePath;
 
 	private final static boolean PRINT_ANY_VGROUP = false;
@@ -48,8 +48,6 @@ public class H4VGroupTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		testFilePath = SUBGROUPS_TESTFILEPATH;
-		// testFilePath =
-		// "E:/work/data/hdf/MODPM2007027121858.L3_000_EAST_MED.hdf";
 	}
 
 	public H4VGroupTest(String name) {
