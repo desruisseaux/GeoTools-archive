@@ -39,7 +39,7 @@ import org.opengis.filter.expression.Function;
  * common factories. Those "common" factories comprise the {@linkplain StyleFactory style}
  * and {@linkplain FilterFactory filter} factories. Note that some specialized factories
  * finder like {@linkplain org.geotools.referencing.ReferencingFactoryFinder referencing} and
- * {@linkplain org.geotools.coverage.ReferencingFactoryFinder coverage} are defined in specialized
+ * {@linkplain org.geotools.coverage.GeometryFactoryFinder coverage} are defined in specialized
  * classes.
  * <p>
  * <b>Tip:</b> The {@link BasicFactories} classes provides an other way to access the various

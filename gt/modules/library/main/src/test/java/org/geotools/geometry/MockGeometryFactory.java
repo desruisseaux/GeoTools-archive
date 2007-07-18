@@ -272,7 +272,7 @@ public class MockGeometryFactory implements GeometryFactory, PrimitiveFactory {
             }
 
             public DirectPosition getEndPoint() {
-                return points.getDirectPosition(points.size() - 1, null);
+                return points.getPosition(points.size() - 1, null);
             }
 
             public ParamForPoint getParamForPoint( DirectPosition p ) {
@@ -288,7 +288,7 @@ public class MockGeometryFactory implements GeometryFactory, PrimitiveFactory {
             }
 
             public DirectPosition getStartPoint() {
-                return points.getDirectPosition(0, null);
+                return points.getPosition(0, null);
             }
 
             public double[] getTangent( double s ) {

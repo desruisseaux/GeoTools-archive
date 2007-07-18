@@ -37,7 +37,7 @@ import org.opengis.referencing.operation.MathTransformFactory;
 public final class FactoryGroup extends ReferencingFactoryContainer {
     /**
      * Constructs an instance using the specified factories. If any factory is null,
-     * a default instance will be created by {@link ReferencingFactoryFinder} when first needed.
+     * a default instance will be created by {@link GeometryFactoryFinder} when first needed.
      *
      * @param datumFactory The {@linkplain Datum datum} factory.
      * @param    csFactory The {@linkplain CoordinateSystem coordinate system} factory.

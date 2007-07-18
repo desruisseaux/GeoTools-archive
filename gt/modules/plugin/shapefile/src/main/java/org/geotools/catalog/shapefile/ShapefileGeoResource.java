@@ -132,7 +132,7 @@ public class ShapefileGeoResource extends AbstractGeoResource {
                                     Feature element = reader.next();
                                 
                                     if (bounds.isNull()) {
-                                        bounds.init(element.getBounds());
+                                        bounds.init((Envelope)element.getBounds());
                                     } else {
                                         bounds.expandToInclude(element.getBounds());
                                     }

@@ -27,8 +27,6 @@ import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.geotools.geometry.DirectPosition2D;
-import org.geotools.geometry.Envelope2D;
-import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.resources.Utilities;
@@ -64,7 +62,7 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
     /**
      * The coordinate reference system, or {@code null}.
      */
-    private final CoordinateReferenceSystem crs;
+    private CoordinateReferenceSystem crs;
 
     /**
      * Creates a null envelope with the specified coordinate reference system.
@@ -169,6 +167,12 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
         checkCoordinateReferenceSystemDimension();
     }
 
+    public void init(BoundingBox bounds) {
+        super.init(bounds.getMinimum(0), bounds.getMaximum(0), bounds.getMinimum(1),
+            bounds.getMaximum(1));
+        this.crs = bounds.getCoordinateReferenceSystem();
+    }
+
     /**
      * Creates a new envelope from an existing OGC envelope.
      *
@@ -239,6 +243,10 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
         return crs;
     }
 
+    public CoordinateReferenceSystem crs() {
+        return getCoordinateReferenceSystem();
+    }
+
     /**
      * Returns the number of dimensions.
      */
@@ -262,6 +270,14 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
         }
     }
 
+    public double minX() {
+        return getMinX();
+    }
+
+    public double minY() {
+        return getMinY();
+    }
+
     /**
      * Returns the maximal ordinate along the specified dimension.
      */
@@ -276,6 +292,14 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
         default:
             throw new IndexOutOfBoundsException(String.valueOf(dimension));
         }
+    }
+
+    public double maxX() {
+        return getMaxX();
+    }
+
+    public double maxY() {
+        return getMaxY();
     }
 
     /**

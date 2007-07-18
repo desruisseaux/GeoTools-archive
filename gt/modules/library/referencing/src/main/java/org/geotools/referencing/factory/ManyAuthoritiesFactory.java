@@ -54,7 +54,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * by {@code "EPSG:"}, then this class delegates the object creation to one of the authority
  * factories provided to the constructor.
  * <p>
- * This class is not registered in {@link ReferencingFactoryFinder}, because it is not a real
+ * This class is not registered in {@link GeometryFactoryFinder}, because it is not a real
  * authority factory. There is not a single authority name associated to this factory, but rather
  * a set of names determined from all available authority factories.
  *
@@ -91,7 +91,7 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
 
     /**
      * A set of user-specified factories to try before to delegate to
-     * {@link ReferencingFactoryFinder}, or {@code null} if none.
+     * {@link GeometryFactoryFinder}, or {@code null} if none.
      */
     private final Collection/*<AuthorityFactory>*/ factories;
 
@@ -130,7 +130,7 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      *
      * @param userHints An optional set of hints, or {@code null} if none.
      * @param factories A set of user-specified factories to try before to delegate
-     *        to {@link ReferencingFactoryFinder}.
+     *        to {@link GeometryFactoryFinder}.
      */
     public ManyAuthoritiesFactory(final Hints userHints,
             final Collection/*<? extends AuthorityFactory>*/ factories)
@@ -428,7 +428,7 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
     /**
      * Searchs for a factory of the given type. This method first search in user-supplied
      * factories. If no user factory is found, then this method request for a factory using
-     * {@link ReferencingFactoryFinder}. The authority name is inferred from the specified code.
+     * {@link GeometryFactoryFinder}. The authority name is inferred from the specified code.
      *
      * @param  type The interface to be implemented.
      * @param  code The code of the object to create.

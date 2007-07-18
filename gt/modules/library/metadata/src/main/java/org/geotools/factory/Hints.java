@@ -626,6 +626,16 @@ public final class Hints extends RenderingHints {
             "org.opengis.coverage.SampleDimensionType");
 
     /**
+     * The {@link org.opengis.referencing.crs.CoordinateReferenceSystem} to use.
+     */
+    public static final Key CRS = new Key("org.opengis.referencing.crs.CoordinateReferenceSystem");
+    public static final Key PRECISION = new Key(" org.opengis.geometry.Precision");
+    public static final Key POSITION_FACTORY = new Key("org.opengis.geometry.PositionFactory");
+    public static final Key GEOMETRY_FACTORY = new Key("org.opengis.geometry.coordinate.GeometryFactory");
+
+    
+
+    /**
      * Constructs a new object with the specified key/value pair.
      * 
      * @param key   The key of the particular hint property.

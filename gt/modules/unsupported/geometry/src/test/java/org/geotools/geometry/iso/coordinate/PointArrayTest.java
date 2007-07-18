@@ -58,12 +58,12 @@ public class PointArrayTest extends TestCase {
 		assertTrue(pa.size() == 5);
 
 		// get-method creates new DP instance
-		DirectPosition directPosition = pa.getDirectPosition(0, null);
+		DirectPosition directPosition = pa.getPosition(0, null);
 		////System.out.println(dp);
 		assertTrue(directPosition.getOrdinate(0) == -50);
 		assertTrue(directPosition.getOrdinate(1) == 0);
 		
-		DirectPosition directPositionAt4 = pa.getDirectPosition(4, directPosition);
+		DirectPosition directPositionAt4 = pa.getPosition(4, directPosition);
 		////System.out.println(dp);
 		assertTrue(directPosition.getOrdinate(0) == 50);
 		assertTrue(directPosition.getOrdinate(1) == 0);
@@ -71,9 +71,9 @@ public class PointArrayTest extends TestCase {
 		assertTrue(directPositionAt4 == directPosition);
 		
 		DirectPosition directPositionAddition = tCoordFactory.createDirectPosition(new double[]{5, 5});
-		pa.setDirectPosition(4, directPositionAddition); // test to see of object or values is stored        
+		pa.setPosition(4, directPositionAddition); // test to see of object or values is stored        
         
-        DirectPosition directPositionAt4mk2 = pa.getDirectPosition(4, directPosition); // retrive
+        DirectPosition directPositionAt4mk2 = pa.getPosition(4, directPosition); // retrive
         assertEquals( "Same values as we put into 4", directPositionAt4mk2, directPositionAddition );
         assertNotSame( "Not the same object we put into 4", directPositionAt4mk2, directPositionAddition );
         
@@ -88,7 +88,7 @@ public class PointArrayTest extends TestCase {
 		directPositionAddition.setOrdinate( 0, 2);
 		
         // retrive values from position 4 again
-        DirectPosition directPositionAt4mk3 = pa.getDirectPosition(4, directPosition);		
+        DirectPosition directPositionAt4mk3 = pa.getPosition(4, directPosition);		
 		assertEquals( "check if position is independent", 5.0, directPositionAt4mk3.getOrdinate(0) );
 		
 		double[] coord = ((PointArrayImpl)pa).getCoordinate(0);

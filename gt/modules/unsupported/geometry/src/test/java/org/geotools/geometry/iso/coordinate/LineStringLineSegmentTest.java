@@ -315,11 +315,11 @@ public class LineStringLineSegmentTest extends TestCase {
 		PointArray controlPoints = line1.getControlPoints();
 		assertEquals(controlPoints.length() , 5);
 		// control points are in opposite order
-		assertEquals(controlPoints.getDirectPosition(0, null), p5.getPosition());
-		assertEquals(controlPoints.getDirectPosition(1, null), p4.getPosition());
-		assertEquals(controlPoints.getDirectPosition(2, null), p3.getPosition());
-		assertEquals(controlPoints.getDirectPosition(3, null), p2.getPosition());
-		assertEquals(controlPoints.getDirectPosition(4, null), p1.getPosition());
+		assertEquals(controlPoints.getPosition(0, null), p5.getPosition());
+		assertEquals(controlPoints.getPosition(1, null), p4.getPosition());
+		assertEquals(controlPoints.getPosition(2, null), p3.getPosition());
+		assertEquals(controlPoints.getPosition(3, null), p2.getPosition());
+		assertEquals(controlPoints.getPosition(4, null), p1.getPosition());
 		//System.out.println("Reversed. Line1: " + line1);
 		
 		

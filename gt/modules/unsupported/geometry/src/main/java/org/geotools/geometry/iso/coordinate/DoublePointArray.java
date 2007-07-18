@@ -77,7 +77,7 @@ public class DoublePointArray extends AbstractList<Position> implements PointArr
     public int size() {
         return end-start / crs.getCoordinateSystem().getDimension();
     }    
-    public DirectPosition getDirectPosition( int index, DirectPosition position ) throws IndexOutOfBoundsException {
+    public DirectPosition getPosition( int index, DirectPosition position ) throws IndexOutOfBoundsException {
         int D = getDimension();        
         if( position == null ){            
             double[] copy = new double[ D ];
@@ -89,7 +89,7 @@ public class DoublePointArray extends AbstractList<Position> implements PointArr
         }
         return position;        
     }
-    public void setDirectPosition( int index, DirectPosition position ) throws IndexOutOfBoundsException, UnsupportedOperationException {
+    public void setPosition( int index, DirectPosition position ) throws IndexOutOfBoundsException, UnsupportedOperationException {
         // note: tempting to use System arraycopy on position.getCoordiantes() but that would make an tempoaray extra array
         int D = getDimension();
         for( int i=0; i<D;i++){
