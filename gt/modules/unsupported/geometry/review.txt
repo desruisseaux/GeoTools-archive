@@ -3,8 +3,8 @@ MODULE GEOMETRY
 Module Maintainer: Sanjay Dominik Jena, Grahem Davis (Refractions Research)
 
 IP Review:
+- Grahem Davis, July 17/18th, 2007
 - Jody Garnett, July 17th, 2007
-- Grahem Davis, July 17th, 2007
 
 This module is a formal fork of the JTS Topology Suite version 1.7.2 backed onto
 GeoAPI geometry interfaces. This work was undertaken by the University of 
@@ -24,9 +24,6 @@ in a public repository meets this requirement.
 
 IP:
 - LICENSE.txt created to hold a copy of the LGPL license
-
-TODO:
-- we need to sort out what version of the LGPL license we are using
 
 
 org.geotools.geometry.iso
@@ -73,7 +70,7 @@ org.geotools.geometry.iso
  - added project description and contact information to the wiki page and package.html
  - reverted all files to standard project header
  - PrecisionModel had the following header, changed the header to just list the
- (c) information (extra details placed onto the wiki and package.html).
+ copyright information (extra details placed onto the wiki and package.html).
  /*
  * This class was copied from the JTS Topology Suite Version 1.7.2
  * of Vivid Solutions and modified and reused in this library under
@@ -269,4 +266,226 @@ the org.geotools.geometry.iso.index package.
 - created package.html
 
 
+org.geotools.geometry.iso.io
+----------------------------
+
+- All files originally had the same header as the files originally did in
+the org.geotools.geometry.iso.aggregate package.
+- reverted all files to standard project header
+- created package.html
+
+
+org.geotools.geometry.iso.wkt
+-----------------------------
+
+- Coordinate.java, ParseException.java, and WKTReader.java originally had the same 
+header as the files originally did in the org.geotools.geometry.iso.index package.
+- GeometryToWKTString.java, and WKTConstants.java originally had the same header as 
+the files originally did in the org.geotools.geometry.iso.aggregate package.
+- reverted all files to standard project header
+- created package.html
+
+
+org.geotools.geometry.iso.operation
+-----------------------------------
+
+- Merger.java originally had the same header as the files originally did in 
+the org.geotools.geometry.iso.aggregate package.
+- GeometryGraphOperation.java, and IsSimpleOp.java originally had the same
+header as the files originally did in the org.geotools.geometry.iso.index package.
+- reverted all files to standard project header
+- created package.html
+
+
+org.geotools.geometry.iso.overlay
+---------------------------------
+
+- All files originally had the same header as the files originally did in 
+the org.geotools.geometry.iso.index package.
+- reverted all files to standard project header
+- created package.html
+
+
+org.geotools.geometry.iso.relate
+--------------------------------
+
+- All files originally had the same header as the files originally did in 
+the org.geotools.geometry.iso.index package.
+- reverted all files to standard project header
+- created package.html
+
+
+org.geotools.geometry.iso.primitive
+-----------------------------------
+
+- All files originally had the same header as the files originally did in 
+the org.geotools.geometry.iso.aggregate package.
+header as the files originally did in the org.geotools.geometry.iso.index package.
+- reverted all files to standard project header
+- created package.html
+
+
+org.geotools.geometry.iso.root
+------------------------------
+
+- GeometryImpl.java originally had the same header as the files originally did in 
+the org.geotools.geometry.iso.aggregate package.
+header as the files originally did in the org.geotools.geometry.iso.index package.
+- reverted all files to standard project header
+- created package.html
+
+
+org.geotools.geometry.iso.topograph2D
+-------------------------------------
+
+- All files originally had the same header as the files originally did in 
+the org.geotools.geometry.iso.index package.
+- reverted all files to standard project header
+- created package.html
+
+
+org.geotools.geometry.iso.topograph2D.index
+-------------------------------------------
+
+- All files originally had the same header as the files originally did in 
+the org.geotools.geometry.iso.index package.
+- reverted all files to standard project header
+- created package.html
+
+
+org.geotools.geometry.iso.topograph2D.util
+------------------------------------------
+
+- All files originally had the same header as the files originally did in 
+the org.geotools.geometry.iso.index package.
+- reverted all files to standard project header
+- created package.html
+
+
+org.geotools.geometry.iso.util
+------------------------------
+
+- DoubleOperation.java, and ExactDoubleOperation.java originally had the same 
+header as the files originally did in the org.geotools.geometry.iso.aggregate package.
+- Assert.java, and AssertionFailedException.java originally had the same header as 
+the files originally did in the org.geotools.geometry.iso.index package.
+- reverted all files to standard project header
+- created package.html
+
+
+org.geotools.geometry.iso.util.algorithm2D
+------------------------------------------
+
+- AlgoArea.java, AlgoLine2D.java, AlgoPoint2D.java, and AlgoRectangle2D.java originally 
+had the same header as the files originally did in 
+the org.geotools.geometry.iso.aggregate package.
+- All other files originally had the same header as the files originally did in
+the org.geotools.geometry.iso.index package.
+- reverted all files to standard project header
+- created package.html
+
+
+org.geotools.geometry.iso.util.algorithmND
+------------------------------------------
+
+- AlgoLineND.java, AlgoPointND.java, and AlgoRectangleND.java originally 
+had the same header as the files originally did in 
+the org.geotools.geometry.iso.aggregate package.
+- All other files originally had the same header as the files originally did in
+the org.geotools.geometry.iso.index package.
+- reverted all files to standard project header
+- created package.html
+
+
+org.geotools.geometry.iso.util.algorithmND
+------------------------------------------
+
+- Circle2D.java originally had this header:
+/*
+ * Created on 03/11/2004
+ */
+ 
+ - Edge2D.java originally had this header:
+/*
+ * Created on 21.01.2005
+ *
+ * TODO To change the template for this generated file go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+ 
+ - Geo2DFactory.java originally had this header:
+/*
+ * Created on 06.08.2005
+ *
+ * TODO To change the template for this generated file go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+ 
+ - Node2D.java originally had this header:
+/*
+ * Created on 23.07.2005
+ *
+ * TODO To change the template for this generated file go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+ 
+ - Quadrilateral2D.java originally had this header:
+/*
+ * Created on 21.01.2005
+ *
+ * TODO To change the template for this generated file go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+ 
+ - Simplex2D.java originally had no header.
+ - Triangle2D.java originally had this header:
+/*
+ * Created on 21.01.2005
+ *
+ * TODO To change the template for this generated file go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+ 
+- reverted all files to standard project header
+- created package.html
+
+
+org.geotools.geometry.iso.util.interpolation
+--------------------------------------------
+
+- PointNeighboursGradients.java originally had this header:
+/*
+ * Created on 26.01.2005
+ *
+ * TODO To change the template for this generated file go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+ 
+- All other files originally had no headers
+- reverted all files to standard project header
+- created package.html
+
+
+org.geotools.geometry.iso.util.topology
+---------------------------------------
+
+- BdryEdge2D.java originally had this header:
+/*
+ * Created on 21.01.2005
+ *
+ * TODO To change the template for this generated file go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+ 
+- Simplex2D.java originally had no header.
+- All other files originally had this header:
+/*
+ * Created on 23.07.2005
+ *
+ * TODO To change the template for this generated file go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+ 
+- reverted all files to standard project header
+- created package.html
 
