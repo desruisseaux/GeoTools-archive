@@ -32,9 +32,8 @@ import org.geotools.caching.firstdraft.spatialindex.storagemanager.PropertySet;
 
 
 public interface SpatialIndex {
-	
     public static final double EPSILON = 1.192092896e-07;
-    
+
     public void flush() throws IllegalStateException;
 
     public void insertData(final Object data, final Shape shape, int id);
@@ -47,8 +46,8 @@ public interface SpatialIndex {
 
     public void pointLocationQuery(final Shape query, final Visitor v);
 
-    public void nearestNeighborQuery(int k, final Shape query,
-        final Visitor v, NearestNeighborComparator nnc);
+    public void nearestNeighborQuery(int k, final Shape query, final Visitor v,
+        NearestNeighborComparator nnc);
 
     public void nearestNeighborQuery(int k, final Shape query, final Visitor v);
 

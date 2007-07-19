@@ -91,19 +91,20 @@ public class QuadTreeQueryTrackerTest extends TestCase {
     }
 
     public void testRegister() {
-    	createQuerySet(1);
-    	Query control = (Query) querySet.get(0);
-    	Query m = tracker.match(control);
-    	short comp = compareQuery(control, m);
-    	assertTrue((comp == UNCHANGED) || (comp == EXPANDED));
-    	tracker.register(m);
-    	m = tracker.match(control);
-    	comp = compareQuery(control, m) ;
-    	assertEquals(EMPTYQUERY, comp);
-    	// test for repetibility
-    	m = tracker.match(control);
-    	comp = compareQuery(control, m) ;
-    	assertEquals(EMPTYQUERY, comp);
+        createQuerySet(1);
+
+        Query control = (Query) querySet.get(0);
+        Query m = tracker.match(control);
+        short comp = compareQuery(control, m);
+        assertTrue((comp == UNCHANGED) || (comp == EXPANDED));
+        tracker.register(m);
+        m = tracker.match(control);
+        comp = compareQuery(control, m);
+        assertEquals(EMPTYQUERY, comp);
+        // test for repetibility
+        m = tracker.match(control);
+        comp = compareQuery(control, m);
+        assertEquals(EMPTYQUERY, comp);
     }
 
     public void testUnregister() {
@@ -129,30 +130,31 @@ public class QuadTreeQueryTrackerTest extends TestCase {
         comp = compareQuery(q, m);
         assertTrue((comp == UNCHANGED) || (comp == EXPANDED));
     }
-    
+
     public void testHitting() {
-    	createQuerySet(50) ;
-    	for (Iterator it = querySet.iterator() ; it.hasNext() ;) {
-    		Query q = (Query) it.next() ;
-    		Query m = tracker.match(q) ;
-    		if (!m.getFilter().equals(Filter.EXCLUDE)) {
-    			tracker.register(q) ;
-    		}
-    	}
-    	tracker.tree.root.entry.getOldestChildAccess() ;
-    	tracker.tree.intersectionQuery(tracker.tree.root.getShape(),
-    			new IVisitor() {
+        createQuerySet(50);
 
-					public void visitData(IData d) {
-						// do nothing
-					}
+        for (Iterator it = querySet.iterator(); it.hasNext();) {
+            Query q = (Query) it.next();
+            Query m = tracker.match(q);
 
-					public void visitNode(INode n) {
-						Node node = (Node) n ;
-						System.out.println(node.entry) ;
-					}
-    		
-    	}) ;
+            if (!m.getFilter().equals(Filter.EXCLUDE)) {
+                tracker.register(q);
+            }
+        }
+
+        tracker.tree.root.entry.getOldestChildAccess();
+        tracker.tree.intersectionQuery(tracker.tree.root.getShape(),
+            new IVisitor() {
+                public void visitData(IData d) {
+                    // do nothing
+                }
+
+                public void visitNode(INode n) {
+                    Node node = (Node) n;
+                    System.out.println(node.entry);
+                }
+            });
     }
 
     //

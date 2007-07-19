@@ -8,7 +8,7 @@ import org.geotools.caching.firstdraft.spatialindex.spatialindex.Region;
 
 public class ValidatingVisitor implements IVisitor {
     private final Region target;
-    private Node lastNode = null ;
+    private Node lastNode = null;
 
     public ValidatingVisitor(Region target) {
         this.target = target;
@@ -25,15 +25,16 @@ public class ValidatingVisitor implements IVisitor {
             if (target.contains(node.getShape())) {
                 node.entry.setValid();
             }
+
             if (node.getShape().contains(target)) {
-            	lastNode = node ;
+                lastNode = node;
             }
         }
     }
-    
+
     public void updateTree() {
-    	if (lastNode != null) {
-    		lastNode.entry.setValid() ;
-    	}
+        if (lastNode != null) {
+            lastNode.entry.setValid();
+        }
     }
 }

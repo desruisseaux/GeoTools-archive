@@ -46,13 +46,15 @@ public class QuadTreeQueryTracker implements QueryTracker {
 
         if (v.isCovered) {
             // we do not need extra data
-        	HitEntryVisitor h = new HitEntryVisitor() ;
-        	tree.intersectionQuery(r, h) ;
+            HitEntryVisitor h = new HitEntryVisitor();
+            tree.intersectionQuery(r, h);
+
             return Filter.EXCLUDE;
         } else { // we need extra data
                  // find missing tiles
 
             if (v.lastNode == null) { // case 1: outside of quadtree, ie of root node MBR
+
                 return f; // in first approximation, we can't answer this query
                           // TODO: handle in a more subtle manner
             }
@@ -104,7 +106,7 @@ public class QuadTreeQueryTracker implements QueryTracker {
 
     /* (non-Javadoc)
      * @see org.geotools.caching.QueryTracker#register(org.opengis.filter.Filter)
-     * 
+     *
      * You should not register an already register filter, although this will not cause an error
      * Use match(Filter) to check before.
      */
@@ -121,7 +123,7 @@ public class QuadTreeQueryTracker implements QueryTracker {
 
         ValidatingVisitor v = new ValidatingVisitor(r);
         tree.intersectionQuery(r, v);
-        v.updateTree() ;
+        v.updateTree();
     }
 
     public void unregister(Query q) {
@@ -137,11 +139,10 @@ public class QuadTreeQueryTracker implements QueryTracker {
         tree.containmentQuery(r, v);
         v.updateTree();
     }
-    
+
     // Public methods not in interface QueryTracker
-    
     public Region getNextEvictionRegion() {
-    	return null ;
+        return null;
     }
 
     // Internals
@@ -169,9 +170,9 @@ public class QuadTreeQueryTracker implements QueryTracker {
                     if (!child.isValid()) {
                         searchMissingTiles(r, child, s);
                     } else {
-                    	// do not forget to update cache statistics,
-                    	// as we will access this part of the universe we already know
-                    	child.hit() ;
+                        // do not forget to update cache statistics,
+                        // as we will access this part of the universe we already know
+                        child.hit();
                     }
                 }
             }

@@ -31,7 +31,7 @@ package org.geotools.caching.spatialindex;
 public class Region implements Shape {
     private double[] m_pLow = null;
     private double[] m_pHigh = null;
-    private volatile int hashCode = 0 ;
+    private volatile int hashCode = 0;
 
     public Region() {
     }
@@ -69,9 +69,10 @@ public class Region implements Shape {
     }
 
     public boolean equals(Object o) {
-    	if (o == null) {
-    		return false ;
-    	}
+        if (o == null) {
+            return false;
+        }
+
         if (o instanceof Region) {
             Region r = (Region) o;
 
@@ -430,22 +431,25 @@ public class Region implements Shape {
 
         return s;
     }
-    
+
     public int hashCode() {
-    	if (hashCode == 0) {
-    		int hash = 17 ;
-    		int c ;
-    		long l ;
-    		for (int cIndex = 0; cIndex < m_pLow.length; cIndex++) {
-    			l = Double.doubleToLongBits(m_pLow[cIndex]) ;
-    			c = (int) (l^(l>>>32)) ;
-    			hash = 37*hash + c ;
-    			l = Double.doubleToLongBits(m_pHigh[cIndex]) ;
-    			c = (int) (l^(l>>>32)) ;
-    			hash = 37*hash + c ;
-    		}
-    		hashCode = hash ;
-    	}
-    	return hashCode ;
+        if (hashCode == 0) {
+            int hash = 17;
+            int c;
+            long l;
+
+            for (int cIndex = 0; cIndex < m_pLow.length; cIndex++) {
+                l = Double.doubleToLongBits(m_pLow[cIndex]);
+                c = (int) (l ^ (l >>> 32));
+                hash = (37 * hash) + c;
+                l = Double.doubleToLongBits(m_pHigh[cIndex]);
+                c = (int) (l ^ (l >>> 32));
+                hash = (37 * hash) + c;
+            }
+
+            hashCode = hash;
+        }
+
+        return hashCode;
     }
 }

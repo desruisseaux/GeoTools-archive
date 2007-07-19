@@ -313,8 +313,8 @@ public class QuadTree implements ISpatialIndex {
         } else if (n.level > 0) { // we do not want the tree to grow much too tall
                                   // if level == 0, we will add data to this node rather than splitting
                                   /* Otherwise, consider creating four subnodes if could fit into
-             * them, and adding to the appropriate subnode.
-             */
+            * them, and adding to the appropriate subnode.
+            */
             n.split(SPLITRATIO);
             // recurse
             insertData(n, data, shape, id);

@@ -26,7 +26,5 @@
 package org.geotools.caching.spatialindex;
 
 public interface QueryStrategy {
-    
-    public Node getNextNode(Node n, boolean[] hasNext) ;
-    
+    public Node getNextNode(Node n, boolean[] hasNext);
 } // IQueryStrategy

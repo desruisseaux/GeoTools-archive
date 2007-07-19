@@ -40,10 +40,10 @@ public interface Node extends Entry {
     public boolean isIndex();
 
     public boolean isLeaf();
-    
-    public void setVisited(boolean visited) ;
-    
-    public boolean isVisited() ;
-    
-    public Node getSubNode(int index) throws IndexOutOfBoundsException ;
+
+    public void setVisited(boolean visited);
+
+    public boolean isVisited();
+
+    public Node getSubNode(int index) throws IndexOutOfBoundsException;
 } // INode

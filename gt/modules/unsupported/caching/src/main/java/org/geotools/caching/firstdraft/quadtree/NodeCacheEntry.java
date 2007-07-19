@@ -12,7 +12,7 @@ public class NodeCacheEntry implements CacheEntry {
     private int hits;
     private long creationTime;
     private long lastAccessTime;
-    private long oldestChildAccessTime ;
+    private long oldestChildAccessTime;
     private boolean valid = false;
 
     public NodeCacheEntry(Node node) {
@@ -21,7 +21,7 @@ public class NodeCacheEntry implements CacheEntry {
         hits = 0;
         creationTime = System.currentTimeMillis();
         lastAccessTime = creationTime;
-        oldestChildAccessTime = -1 ;
+        oldestChildAccessTime = -1;
     }
 
     public long getCost() {
@@ -82,45 +82,56 @@ public class NodeCacheEntry implements CacheEntry {
 
     public void hit() {
         hits++;
-        if ((node.parent != null) && (lastAccessTime == node.parent.entry.oldestChildAccessTime)) {
-        	Node current = node.parent ;
-        	while (current != null) {
-        		current.entry.oldestChildAccessTime = -1 ;
-        		current = current.parent ;
-        	}
+
+        if ((node.parent != null) &&
+                (lastAccessTime == node.parent.entry.oldestChildAccessTime)) {
+            Node current = node.parent;
+
+            while (current != null) {
+                current.entry.oldestChildAccessTime = -1;
+                current = current.parent;
+            }
         }
+
         lastAccessTime = System.currentTimeMillis();
     }
-    
+
     public long getOldestChildAccess() {
-    	if (oldestChildAccessTime == -1) {
-    		updateOldestChildAccess() ;
-    	}
-    	return oldestChildAccessTime ;
+        if (oldestChildAccessTime == -1) {
+            updateOldestChildAccess();
+        }
+
+        return oldestChildAccessTime;
     }
-    
+
     protected void updateOldestChildAccess() {
-    	if (node.isLeaf()) {
-    		oldestChildAccessTime = lastAccessTime ;
-    	} else {
-    		assert (node.getChildrenCount() > 1) ;
-    		long latest = node.getSubNode(0).entry.getOldestChildAccess() ;
-    		for (int i = 1 ; i < node.getChildrenCount() ; i++) {
-    			long nextlatest = node.getSubNode(i).entry.getOldestChildAccess() ;
-    			if (nextlatest < latest) {
-    				latest = nextlatest ;
-    			}
-    		}
-    		oldestChildAccessTime = latest ;
-    	}
+        if (node.isLeaf()) {
+            oldestChildAccessTime = lastAccessTime;
+        } else {
+            assert (node.getChildrenCount() > 1);
+
+            long latest = node.getSubNode(0).entry.getOldestChildAccess();
+
+            for (int i = 1; i < node.getChildrenCount(); i++) {
+                long nextlatest = node.getSubNode(i).entry.getOldestChildAccess();
+
+                if (nextlatest < latest) {
+                    latest = nextlatest;
+                }
+            }
+
+            oldestChildAccessTime = latest;
+        }
     }
-    
+
     public String toString() {
-    	StringBuffer ret = new StringBuffer() ;
-    	ret.append("Level=" + node.getLevel() + " Parent=" + ((node.parent==null) ? 0 : node.parent.id) + " Node=" + node.id) ;
-    	ret.append(" Hits: " + hits) ;
-    	ret.append(" lastAccess: " + lastAccessTime) ;
-    	ret.append(" oldestChildAccess: " + oldestChildAccessTime) ;
-    	return ret.toString() ;
+        StringBuffer ret = new StringBuffer();
+        ret.append("Level=" + node.getLevel() + " Parent=" +
+            ((node.parent == null) ? 0 : node.parent.id) + " Node=" + node.id);
+        ret.append(" Hits: " + hits);
+        ret.append(" lastAccess: " + lastAccessTime);
+        ret.append(" oldestChildAccess: " + oldestChildAccessTime);
+
+        return ret.toString();
     }
 }
