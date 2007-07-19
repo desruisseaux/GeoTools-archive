@@ -57,7 +57,7 @@
       <id>jmacgill</id>
       <name>James Macgill</name>
       <email>jmacgill@users.sourceforge.net</email>
-      <organization>CCG</organization>
+      <organization>Google</organization>
       <roles>
         <role>Java Developer</role>
       </roles>
@@ -65,10 +65,20 @@
     <developer>
       <id>chorner</id>
       <name>Cory Horner</name>
-      <email>chorner@refractions.net</email>
-      <organization>Refractions Research</organization>
+      <email>cory.horner@gmail.com</email>
       <roles>
         <role>Java Developer</role>
+        <role>Module Maintainer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Ian Turton</name>
+      <id>ianturton</id>
+      <email>ianturton@users.sourceforge.net</email>
+      <organization>CCG</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Module Maintainer</role>
       </roles>
     </developer>
   </developers>
