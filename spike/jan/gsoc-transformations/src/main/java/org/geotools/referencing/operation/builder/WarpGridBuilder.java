@@ -22,6 +22,8 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.StringTokenizer;
+
 import javax.vecmath.MismatchedSizeException;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
@@ -264,33 +266,29 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
         /*Print first row (number of columns, number of rows,
          * number of z–values (always one), minimum longitude, cell
          *  size, minimum latitude, cell size, and not used. )*/
-        osw.write(WarpParams.parameter("xNumCells").intValue() + " "
-            + WarpParams.parameter("yNumCells").intValue() + " " + "1 "
+        osw.write((WarpParams.parameter("xNumCells").intValue()+1) + " "
+            + (WarpParams.parameter("yNumCells").intValue()+1) + " " + "1 "
             + WarpParams.parameter("xStart").doubleValue() + " "
             + WarpParams.parameter("xStep").doubleValue() + " "
             + WarpParams.parameter("yStart").doubleValue() + " "
             + WarpParams.parameter("yStep").doubleValue() + " 0");
 
-        osw.write("\n");
+        //osw.write("\n");
 
         int ii = 0;
         if (dim == 0) {
             for (int i = 0; i < getDxGrid().length; i++) {
+            	osw.write(String.valueOf("\n"));
                 for (int j = 0; j < getDxGrid()[i].length; j++) {
                 	                	
                     osw.write(String.valueOf(getDxGrid()[i][j]) + " ");
-                	
-                    if (ii > 10){
-                    	osw.write(String.valueOf("\n"));
-                    	ii = 0;
-                    }
-                    ii++;
-                    
+                	                            
                 }
                 
             }
         } else if (dim == 1) {
             for (int i = 0; i < getDxGrid().length; i++) {
+            	osw.write(String.valueOf("\n"));
                 for (int j = 0; j < getDxGrid()[i].length; j++) {
                     osw.write(String.valueOf(getDyGrid()[i][j]) + " ");
                 }
@@ -304,9 +302,25 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
         return file;
     }
 
-    //todo
-    private File generateFile(int dimension, String path) {
-        return null;
+    /**
+     * Converts warp positions from float[] containing target 
+     * positions to float[][] containing deltas.
+     *
+     */
+    public static void warpPosToDeltas(int xStart, int xStep, int xNumCells, int  yStart, int yStep, int yNumCells, float[][] yDeltas, float[][] xDeltas){
+    	
+    }
+    
+    public static float[] deltasToWarpPos(int xStart, int xStep, int xNumCells, int  yStart, int yStep, int yNumCells, float[][] yDeltas, float[][] xDeltas){
+    	
+    	float[] warpPos = new float[(xNumCells+1)*(yNumCells+1)*2];
+    	for (int i = 0; i < yNumCells; i++) {
+            for (int j = 0; j < xNumCells; j++) {            	
+                     warpPos[2*j+xNumCells*i*2] = xStart + j*xStep  +xDeltas[i][j];
+                     warpPos[2*j+xNumCells*i*2 +1 ] = yStart + i*yStep + yDeltas[i][j];                    
+                }
+            }
+    	return warpPos;
     }
 
     /**

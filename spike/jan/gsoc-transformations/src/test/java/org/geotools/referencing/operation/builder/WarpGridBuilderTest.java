@@ -19,11 +19,13 @@ import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.referencing.operation.transform.WarpGridTransform2D;
 import org.geotools.referencing.operation.transform.WarpGridTransform2D.ProviderFile;
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
 
@@ -35,7 +37,7 @@ import org.opengis.referencing.operation.TransformException;
 public class WarpGridBuilderTest extends TestCase {
     private double tolerance = 0.05; //cm
     private CoordinateReferenceSystem crs = DefaultEngineeringCRS.GENERIC_2D;
-    private boolean show = true;
+    private boolean show = false;
 
     /**
      * Run the suite from the command line.
@@ -136,7 +138,7 @@ public class WarpGridBuilderTest extends TestCase {
                     ProjectiveTransform.create(M));
 
             if (show == true) {
-                (new GridCoverageFactory()).create("TPS - dx", builder.getDxGrid(), env).show();
+                (new GridCoverageFactory()).create("TPS- dx", builder.getDxGrid(), env).show();
                 (new GridCoverageFactory()).create("TPS - dy", builder.getDyGrid(), env).show();
             }
             
@@ -158,9 +160,9 @@ public class WarpGridBuilderTest extends TestCase {
                Envelope env = new Envelope2D(crs, 0, 0, 500, 500);
 
                // Generates 15 MappedPositions of approximately 2 m differences
-               List mp = generateMappedPositions(env, 10, 3, crs);
+               List mp = generateMappedPositions(env, 15, 1, crs);
 
-               WarpGridBuilder builder = new IDWGridBuilder(mp, 5, 5, env);
+               WarpGridBuilder builder = new IDWGridBuilder(mp, 20, 20, env);
 
                final DefaultMathTransformFactory factory = new DefaultMathTransformFactory();
                ParameterValueGroup gridParams = factory.getDefaultParameters("Warp Grid (form file)");
@@ -170,7 +172,18 @@ public class WarpGridBuilderTest extends TestCase {
                builder.getDeltaFile(1, pathy);
                gridParams.parameter("X_difference_file").setValue(pathx);
                gridParams.parameter("Y_difference_file").setValue(pathy);
-            //   (new ProviderFile()).createMathTransform(gridParams);
+               MathTransform mt = (new ProviderFile()).createMathTransform(gridParams);
+               MathTransform mtOriginal = builder.getMathTransform();
+               
+              
+            	  
+            	float[] wp = ( float[] )(((WarpGridTransform2D)mt).getParameterValues().parameter("warpPositions").getValue());
+            	
+            	float[] wpOrig = ( float[] )(((WarpGridTransform2D)mtOriginal).getParameterValues().parameter("warpPositions").getValue());
+                
+            	 for (int i = 0; i < wp.length; i++){
+                  Assert.assertEquals(wp[i], wpOrig[i], 0.0001);
+               }
          
            } catch (Exception e) {
                e.printStackTrace();

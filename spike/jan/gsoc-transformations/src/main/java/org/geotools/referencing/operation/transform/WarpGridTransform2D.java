@@ -26,23 +26,31 @@ import java.util.prefs.Preferences;
 
 import javax.media.jai.Warp;
 import javax.media.jai.WarpGrid;
+import javax.media.jai.WarpPolynomial;
+
+import org.geotools.metadata.iso.citation.Citations;
+import org.geotools.parameter.DefaultParameterDescriptor;
+import org.geotools.parameter.Parameter;
+import org.geotools.parameter.ParameterGroup;
+import org.geotools.referencing.NamedIdentifier;
+import org.geotools.referencing.operation.MathTransformProvider;
+import org.geotools.referencing.operation.builder.WarpGridBuilder;
+import org.geotools.referencing.operation.transform.WarpTransform2D.Provider;
+import org.geotools.resources.XArray;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.Transformation;
-import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.parameter.DefaultParameterDescriptor;
-import org.geotools.referencing.NamedIdentifier;
-import org.geotools.referencing.operation.MathTransformProvider;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -55,13 +63,14 @@ public class WarpGridTransform2D extends WarpTransform2D {
     // private final Warp warp;
     private MathTransform inverse;
     private MathTransform worldToGrid;
-    private int xStart;
-    private int xStep;
-    private int xNumCells;
-    private int yStart;
-    private int yStep;
-    private int yNumCells;
-    private float[] warpPositions;
+    private final Warp warp;
+    private final int xStart;
+    private final int xStep;
+    private final int xNumCells;
+    private final int yStart;
+    private final int yStep;
+    private final int yNumCells;
+    private final float[] warpPositions;
 
     /**
      *
@@ -75,8 +84,10 @@ public class WarpGridTransform2D extends WarpTransform2D {
      */
     public WarpGridTransform2D(int xStart, int xStep, int xNumCells, int yStart, int yStep,
         int yNumCells, float[] warpPositions) {
-        super(new WarpGrid(xStart, xStep, xNumCells, yStart, yStep, yNumCells, warpPositions), null);
+        super( new WarpGrid(xStart, xStep, xNumCells, yStart, yStep, yNumCells, warpPositions), null);
 
+        this.warp = super.getWarp();
+        
         this.xStart = xStart;
         this.xStep = xStep;
         this.xNumCells = xNumCells;
@@ -93,130 +104,30 @@ public class WarpGridTransform2D extends WarpTransform2D {
      * @param inverse An image warp to uses for the {@linkplain #inverse inverse transform},
      *                or {@code null} in none.
      */
-    protected WarpGridTransform2D(Warp warp, Warp inverse) {
+  /*  protected WarpGridTransform2D(Warp warp, Warp inverse) {
         super(warp, inverse);
+        this.warp = warp;
+        
+        this.xStart = warp.xStart;
+        this.xStep = xStep;
+        this.xNumCells = xNumCells;
+        this.yStart = yStart;
+        this.yStep = yStep;
+        this.yNumCells = yNumCells;
+        this.warpPositions = warpPositions;
 
         //this.inverse = (inverse!=null) ? new WarpTransform2D(inverse, this) : null;
         // this.warp = warp;
         //this.inverse = inverse;
     }
 
-    public WarpGridTransform2D(final String latGridName, final String longGridName)
+   /* public WarpGridTransform2D(final String latGridName, final String longGridName)
         throws MalformedURLException, IOException, FactoryException {
-        super(createWarpGrid(latGridName, longGridName), null);
-    }
+        super((createWarpGrid(latGridName, longGridName)).getWarp(),
+        null);
+    }*/
 
-    /**
-     *
-     * @param latGridName
-     * @param longGridName
-     * @return
-     */
-    private static Warp createWarpGrid(final String xGridName, final String yGridName)
-        throws MalformedURLException, IOException, FactoryException {
-    	final URL xGridURL  = makeURL(xGridName);
-        final URL yGridURL = makeURL(yGridName);
-      //TODO
-
-        loadTextGrid(xGridURL, yGridURL);
-
-        return null;
-    }
-
-    /**
-     *
-     * @param latGridUrl
-     * @param longGridUrl
-     * @throws IOException
-     * @throws FactoryException
-     */
-    private static void loadTextGrid(URL latGridUrl, URL longGridUrl)
-        throws IOException, FactoryException {
-        String latLine;
-        String longLine;
-        StringTokenizer latSt;
-        StringTokenizer longSt;
-
-        ////////////////////////
-        //setup
-        ////////////////////////
-        InputStreamReader latIsr = new InputStreamReader(latGridUrl.openStream());
-        BufferedReader latBr = new BufferedReader(latIsr);
-
-        InputStreamReader longIsr = new InputStreamReader(longGridUrl.openStream());
-        BufferedReader longBr = new BufferedReader(longIsr);
-
-        ////////////////////////
-        //read header info
-        ////////////////////////
-        latLine = latBr.readLine(); //skip header description        
-        latLine = latBr.readLine();
-        latSt = new StringTokenizer(latLine, " ");
-
-        if (latSt.countTokens() > 8) {
-            throw new FactoryException(Errors.format(ErrorKeys.HEADER_UNEXPECTED_LENGTH_$1,
-                    String.valueOf(latSt.countTokens())));
-        }
-
-        int nc = Integer.parseInt(latSt.nextToken());
-        int nr = Integer.parseInt(latSt.nextToken());
-        int nz = Integer.parseInt(latSt.nextToken());
-
-        float xStart = Float.parseFloat(latSt.nextToken());
-        float xStep = Float.parseFloat(latSt.nextToken());
-        float yStart = Float.parseFloat(latSt.nextToken());
-        float yStep = Float.parseFloat(latSt.nextToken());
-
-       // float angle = Float.parseFloat(latSt.nextToken());
-        float xmax = xStart + ((nc - 1) * xStart);
-        float ymax = yStart + ((nr - 1) * yStep);
-
-        //now read long shift grid
-        longLine = longBr.readLine(); //skip header description
-        longLine = longBr.readLine();
-        longSt = new StringTokenizer(longLine, " ");
-
-        if (longSt.countTokens() > 8) {
-            throw new FactoryException(Errors.format(ErrorKeys.HEADER_UNEXPECTED_LENGTH_$1,
-                    String.valueOf(longSt.countTokens())));
-        }
-
-        //check that latitude grid header is the same as for latitude grid
-        if ((nc != Integer.parseInt(longSt.nextToken()))
-                || (nr != Integer.parseInt(longSt.nextToken()))
-                || (nz != Integer.parseInt(longSt.nextToken()))
-                || (xStart != Float.parseFloat(longSt.nextToken()))
-                || (xStep != Float.parseFloat(longSt.nextToken()))
-                || (yStart != Float.parseFloat(longSt.nextToken()))
-                || (yStep != Float.parseFloat(longSt.nextToken()))){
-               // || (angle != Float.parseFloat(longSt.nextToken()))) {
-            throw new FactoryException(Errors.format(ErrorKeys.GRID_LOCATIONS_UNEQUAL));
-        }
-
-        ////////////////////////
-        //read grid shift data into LocalizationGrid
-        ////////////////////////    
-        int i = 0;
-        int j = 0;
-
-        for (i = 0; i < nr; i++) {
-            for (j = 0; j < nc;) {
-                latLine = latBr.readLine();
-                latSt = new StringTokenizer(latLine, " ");
-                longLine = longBr.readLine();
-                longSt = new StringTokenizer(longLine, " ");
-
-                while (latSt.hasMoreTokens() && longSt.hasMoreTokens()) {
-                	System.out.println( (double) Float.parseFloat(longSt.nextToken()));
-                    /*  gridShift.setLocalizationPoint(j, i,
-                       (double) Float.parseFloat(longSt.nextToken()),
-                       (double) Float.parseFloat(latSt.nextToken()));*/
-                    ++j;
-                }
-            }
-        }
-    }
-
+   
     /**
      * Returns a URL from the string representation. If the string has no
      * path, the default path preferece is added.
@@ -233,6 +144,7 @@ public class WarpGridTransform2D extends WarpTransform2D {
             // just a file name , prepend base location
             final Preferences prefs = Preferences.userNodeForPackage(WarpGridTransform2D.class);
             final String baseLocation = prefs.get("GRID_LOCATION", "");
+
             return makeURLfromString(baseLocation + "/" + str);
         }
     }
@@ -245,7 +157,8 @@ public class WarpGridTransform2D extends WarpTransform2D {
      * @return a URL created from the string representation
      * @throws MalformedURLException if the URL cannot be created
      */
-    private static URL makeURLfromString(final String str) throws MalformedURLException {
+    private static URL makeURLfromString(final String str)
+        throws MalformedURLException {
         try {
             return new URL(str);
         } catch (MalformedURLException e) {
@@ -253,9 +166,32 @@ public class WarpGridTransform2D extends WarpTransform2D {
             return new URL("file", "", str);
         }
     }
-    
+
     public ParameterDescriptorGroup getParameterDescriptors() {
         return Provider.PARAMETERS;
+    }
+    /**
+     * Returns the parameter values for this math transform.
+     */
+   
+    public ParameterValueGroup getParameterValues() {
+        if (this.warp instanceof WarpGrid) {
+            final WarpGrid wGrid = (WarpGrid) warp;
+            final ParameterValue[] p = new ParameterValue[7];
+            int c = 0;
+            p[c++] = new Parameter(Provider.xStart,   new Integer(this.xStart));
+            p[c++] = new Parameter(Provider.xStep, new Integer(this.xStep));
+            p[c++] = new Parameter(Provider.xNumCells, new Integer(this.xNumCells));
+            p[c++] = new Parameter(Provider.yStart,   new Integer(this.yStart));
+            p[c++] = new Parameter(Provider.yStep, new Integer(this.yStep));
+            p[c++] = new Parameter(Provider.yNumCells, new Integer(this.yNumCells));
+         
+            p[c++] = new Parameter(Provider.warpPositions, (Object)this.warpPositions.clone());
+            
+            return new ParameterGroup(getParameterDescriptors(), (ParameterValue[]) XArray.resize(p, c));
+        } else {
+            return super.getParameterValues();
+        }
     }
 
     public void setWorldtoGridTransform(MathTransform worldToGrid) {
@@ -520,7 +456,7 @@ public class WarpGridTransform2D extends WarpTransform2D {
          * Constructs a provider.
          */
         public ProviderFile() {
-        	 super(2, 2, PARAMETERS);
+            super(2, 2, PARAMETERS);
         }
 
         /**
@@ -533,23 +469,135 @@ public class WarpGridTransform2D extends WarpTransform2D {
         public MathTransform createMathTransform(final ParameterValueGroup values)
             throws ParameterNotFoundException {
             try {
-				return new WarpGridTransform2D(values.parameter("X_difference_file").stringValue(),
-						values.parameter("Y_difference_file").stringValue());
-			} catch (InvalidParameterTypeException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (FactoryException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return null;
+                return createWarpGrid(values.parameter("X_difference_file").stringValue(),
+                    values.parameter("Y_difference_file").stringValue());
+            } catch (InvalidParameterTypeException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (FactoryException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            return null;
         }
+        /**
+        *
+        * @param latGridName
+        * @param longGridName
+        * @return
+        */
+       private static WarpGridTransform2D createWarpGrid(final String xGridName, final String yGridName)
+           throws MalformedURLException, IOException, FactoryException {
+           final URL xGridURL = makeURL(xGridName);
+           final URL yGridURL = makeURL(yGridName);
+           
+           return loadTextGrid(xGridURL, yGridURL);
+       }
+
+       /**
+        *
+        * @param latGridUrl
+        * @param longGridUrl
+        * @throws IOException
+        * @throws FactoryException
+        */
+       private static WarpGridTransform2D loadTextGrid(URL xGridUrl, URL longGridUrl)
+           throws IOException, FactoryException {
+           String xLine;
+           String longLine;
+           StringTokenizer xSt;
+           StringTokenizer longSt;
+
+           ////////////////////////
+           //setup
+           ////////////////////////
+           InputStreamReader xIsr = new InputStreamReader(xGridUrl.openStream());
+           BufferedReader xBr = new BufferedReader(xIsr);
+
+           InputStreamReader longIsr = new InputStreamReader(longGridUrl.openStream());
+           BufferedReader longBr = new BufferedReader(longIsr);
+
+           ////////////////////////
+           //read header info
+           ////////////////////////
+           xLine = xBr.readLine(); //skip header description        
+           xLine = xBr.readLine();
+           xSt = new StringTokenizer(xLine, " ");
+
+           if (xSt.countTokens() > 8) {
+               throw new FactoryException(Errors.format(ErrorKeys.HEADER_UNEXPECTED_LENGTH_$1,
+                       String.valueOf(xSt.countTokens())));
+           }
+
+           int nc = Integer.parseInt(xSt.nextToken());
+           int nr = Integer.parseInt(xSt.nextToken());
+           int nz = Integer.parseInt(xSt.nextToken());
+
+           float xStart = Float.parseFloat(xSt.nextToken());
+           float xStep = Float.parseFloat(xSt.nextToken());
+           float yStart = Float.parseFloat(xSt.nextToken());
+           float yStep = Float.parseFloat(xSt.nextToken());
+
+           // float angle = Float.parseFloat(latSt.nextToken());
+           float xmax = xStart + ((nc - 1) * xStart);
+           float ymax = yStart + ((nr - 1) * yStep);
+
+           //now read long shift grid
+           longLine = longBr.readLine(); //skip header description
+           longLine = longBr.readLine();
+           longSt = new StringTokenizer(longLine, " ");
+
+           if (longSt.countTokens() > 8) {
+               throw new FactoryException(Errors.format(ErrorKeys.HEADER_UNEXPECTED_LENGTH_$1,
+                       String.valueOf(longSt.countTokens())));
+           }
+
+           //check that latitude grid header is the same as for latitude grid
+           if ((nc != Integer.parseInt(longSt.nextToken()))
+                   || (nr != Integer.parseInt(longSt.nextToken()))
+                   || (nz != Integer.parseInt(longSt.nextToken()))
+                   || (xStart != Float.parseFloat(longSt.nextToken()))
+                   || (xStep != Float.parseFloat(longSt.nextToken()))
+                   || (yStart != Float.parseFloat(longSt.nextToken()))
+                   || (yStep != Float.parseFloat(longSt.nextToken()))) {
+               // || (angle != Float.parseFloat(longSt.nextToken()))) {
+               throw new FactoryException(Errors.format(ErrorKeys.GRID_LOCATIONS_UNEQUAL));
+           }
+
+           ////////////////////////
+           //read grid shift data into LocalizationGrid
+           ////////////////////////    
+           int i = 0;
+           int j = 0;
+           float[] warpPos = new float[2 * (nc) * (nr)];
+           
+          
+           for (i = 0; i < nr; i++) {
+               for (j = 0; j < nc;) {
+                   xLine = xBr.readLine();
+                   xSt = new StringTokenizer(xLine, " ");
+                   longLine = longBr.readLine();
+                   longSt = new StringTokenizer(longLine, " ");
+
+                   while (xSt.hasMoreTokens() && longSt.hasMoreTokens()) {     
+                        warpPos[2*j+nc*i*2] = xStart + j*xStep  +(float) Float.parseFloat(xSt.nextToken());
+                        warpPos[2*j+nc*i*2 +1 ] = yStart + i*yStep + (float) Float.parseFloat(longSt.nextToken());
+                       ++j;
+                   }
+               }
+           }
+          
+
+           return new WarpGridTransform2D((int) xStart, (int) xStep, nc-1, (int) yStart, (int) yStep, nr-1, warpPos);
+       }
+
         
     }
 }
