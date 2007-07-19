@@ -22,10 +22,10 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.caching.firstdraft.Generator;
 import org.geotools.caching.firstdraft.impl.InMemoryDataCache;
 import org.geotools.caching.firstdraft.impl.InMemoryFeatureCache;
 import org.geotools.caching.firstdraft.impl.SpatialQueryTracker;
+import org.geotools.caching.firstdraft.util.Generator;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureLocking;

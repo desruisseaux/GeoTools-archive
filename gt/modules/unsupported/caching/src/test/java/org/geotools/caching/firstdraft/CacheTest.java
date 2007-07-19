@@ -22,9 +22,9 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.caching.firstdraft.Generator;
 import org.geotools.caching.firstdraft.impl.InMemoryDataCache;
 import org.geotools.caching.firstdraft.impl.SpatialQueryTracker;
+import org.geotools.caching.firstdraft.util.Generator;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureLocking;
@@ -45,7 +45,6 @@ import java.io.IOException;
 
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.Collection;

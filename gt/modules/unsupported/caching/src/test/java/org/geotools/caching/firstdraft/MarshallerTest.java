@@ -20,6 +20,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.geotools.caching.firstdraft.util.FeatureMarshaller;
+import org.geotools.caching.firstdraft.util.Generator;
 
 import org.geotools.feature.DefaultFeature;
 import org.geotools.feature.Feature;

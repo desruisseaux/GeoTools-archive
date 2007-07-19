@@ -19,10 +19,10 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.caching.firstdraft.Generator;
 import org.geotools.caching.firstdraft.InternalStore;
 import org.geotools.caching.firstdraft.impl.HashMapInternalStore;
 import org.geotools.caching.firstdraft.impl.SimpleHashMapInternalStore;
+import org.geotools.caching.firstdraft.util.Generator;
 
 import org.geotools.feature.Feature;
 

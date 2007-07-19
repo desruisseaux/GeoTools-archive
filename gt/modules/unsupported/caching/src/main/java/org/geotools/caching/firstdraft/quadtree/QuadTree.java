@@ -263,7 +263,7 @@ public class QuadTree implements ISpatialIndex {
     /** This a variant of the original interface method, using nodes directly rather than references to nodes using ids,
      * as in this implementation nodes does not have a unique ID in the tree, they have a unique ID in their quadrant.
      *
-     * @see org.geotools.caching.spatialindex.spatialindex.ISpatialIndex#queryStrategy(IQueryStrategy) ;
+     * @see org.geotools.caching.spatialindex.spatialindex.SpatialIndex#queryStrategy(IQueryStrategy) ;
      *
      * @param qs
      */

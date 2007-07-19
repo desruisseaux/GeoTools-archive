@@ -21,7 +21,6 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.caching.firstdraft.Generator;
 import org.geotools.caching.firstdraft.quadtree.Node;
 import org.geotools.caching.firstdraft.quadtree.QuadTree;
 import org.geotools.caching.firstdraft.quadtree.QueryStrategy;
@@ -29,6 +28,7 @@ import org.geotools.caching.firstdraft.spatialindex.spatialindex.IData;
 import org.geotools.caching.firstdraft.spatialindex.spatialindex.INode;
 import org.geotools.caching.firstdraft.spatialindex.spatialindex.IVisitor;
 import org.geotools.caching.firstdraft.spatialindex.spatialindex.Region;
+import org.geotools.caching.firstdraft.util.Generator;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;

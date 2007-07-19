@@ -22,6 +22,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.geotools.caching.firstdraft.impl.InMemoryFeatureCache;
+import org.geotools.caching.firstdraft.util.Generator;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.data.Query;

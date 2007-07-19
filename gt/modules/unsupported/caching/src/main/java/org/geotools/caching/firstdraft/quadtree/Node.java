@@ -37,7 +37,7 @@ public class Node implements INode {
     protected List subNodes;
     protected Node parent;
     protected boolean visited = false;
-    protected boolean childrenVisited = false;
+    //protected boolean childrenVisited = false;
     protected int id;
     protected int level;
 
