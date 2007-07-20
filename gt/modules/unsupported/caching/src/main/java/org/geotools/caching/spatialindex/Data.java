@@ -29,5 +29,5 @@
 package org.geotools.caching.spatialindex;
 
 public interface Data extends Entry {
-    public byte[] getData();
+    public Object getData();
 } // IData

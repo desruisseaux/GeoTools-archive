@@ -44,7 +44,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-public class QuadTreeTest extends TestCase {
+public class QuadTreeXest extends TestCase {
     protected FeatureType type;
     protected List data;
     protected QuadTree tree;
@@ -70,7 +70,7 @@ public class QuadTreeTest extends TestCase {
     }
 
     public static Test suite() {
-        return new TestSuite(QuadTreeTest.class);
+        return new TestSuite(QuadTreeXest.class);
     }
 
     public void testInsertData() {

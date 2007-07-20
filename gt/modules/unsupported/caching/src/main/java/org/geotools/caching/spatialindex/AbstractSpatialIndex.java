@@ -15,10 +15,10 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
     protected Node root;
     protected int dimension;
     protected Region infiniteRegion;
-    protected Statistics stats;
     protected ArrayList writeNodeCommands = new ArrayList();
     protected ArrayList readNodeCommands = new ArrayList();
     protected ArrayList deleteNodeCommands = new ArrayList();
+    protected ThisStatistics stats = new ThisStatistics();
 
     public void addDeleteNodeCommand(NodeCommand nc) {
         deleteNodeCommands.add(nc);
@@ -97,7 +97,7 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
                     current.getSubNode(i).setVisited(false);
                 }
 
-                visitData(current, v);
+                visitData(current, v, query, type);
 
                 current.setVisited(true);
             }
@@ -123,13 +123,13 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
         }
     }
 
-    protected abstract void visitData(Node n, Visitor v);
+    protected abstract void visitData(Node n, Visitor v, Shape query, int type);
 
     protected static boolean relate(Shape candidate, Shape query, int type) {
         if (type == IntersectionQuery) {
-            return candidate.intersects(query);
+            return query.intersects(candidate);
         } else if (type == ContainmentQuery) {
-            return candidate.contains(query);
+            return query.contains(candidate);
         } else {
             throw new UnsupportedOperationException(
                 "Type must be either IntersectionQuery or ContainmentQuery");
@@ -190,4 +190,54 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
 
     protected abstract void insertDataOutOfBounds(Object data, Shape shape,
         int id);
+
+    public Statistics getStatistics() {
+        return stats;
+    }
+
+    public class ThisStatistics implements Statistics {
+        int stats_reads = 0;
+        int stats_writes = 0;
+        int stats_nodes = 0;
+        int stats_data = 0;
+
+        public long getNumberOfData() {
+            return stats_data;
+        }
+
+        public long getNumberOfNodes() {
+            return stats_nodes;
+        }
+
+        public long getReads() {
+            return stats_reads;
+        }
+
+        public long getWrites() {
+            return stats_writes;
+        }
+
+        public void addToReadsCounter(int count) {
+            stats_reads += count;
+        }
+
+        public void addToWritesCounter(int count) {
+            stats_writes += count;
+        }
+
+        public void addToNodesCounter(int count) {
+            stats_nodes += count;
+        }
+
+        public void addToDataCounter(int count) {
+            stats_data += count;
+        }
+
+        public void reset() {
+            stats_reads = 0;
+            stats_writes = 0;
+            stats_nodes = 0;
+            stats_data = 0;
+        }
+    }
 }

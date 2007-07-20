@@ -81,7 +81,7 @@ import java.util.NoSuchElementException;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/library/main/src/test/java/org/geotools/data/memory/MemoryDataStoreTest.java $
  */
-public class CacheDataStoreTest extends DataTestCase {
+public class CacheDataStoreXest extends DataTestCase {
     InMemoryDataCache data;
 
     /**
@@ -89,7 +89,7 @@ public class CacheDataStoreTest extends DataTestCase {
      *
      * @param arg0
      */
-    public CacheDataStoreTest(String arg0) {
+    public CacheDataStoreXest(String arg0) {
         super(arg0);
     }
 

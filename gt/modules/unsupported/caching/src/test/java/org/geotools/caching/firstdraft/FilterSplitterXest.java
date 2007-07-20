@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class FilterSplitterTest extends TestCase {
+public class FilterSplitterXest extends TestCase {
     protected FilterFactory ff;
     protected Filter bb;
     protected Filter bb2;
@@ -75,7 +75,7 @@ public class FilterSplitterTest extends TestCase {
     }
 
     public static Test suite() {
-        return new TestSuite(FilterSplitterTest.class);
+        return new TestSuite(FilterSplitterXest.class);
     }
 
     public void testBBoxFilter() {

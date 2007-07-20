@@ -31,9 +31,9 @@ import java.util.List;
 import java.util.Random;
 
 
-public class InternalStoreTest extends TestCase {
+public class InternalStoreXest extends TestCase {
     public static Test suite() {
-        return new TestSuite(InternalStoreTest.class);
+        return new TestSuite(InternalStoreXest.class);
     }
 
     public void testSimpleHashMapInternalStore() {

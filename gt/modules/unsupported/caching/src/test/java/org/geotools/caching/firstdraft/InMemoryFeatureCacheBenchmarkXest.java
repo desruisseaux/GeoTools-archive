@@ -57,7 +57,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 
-public class InMemoryFeatureCacheBenchmarkTest extends TestCase {
+public class InMemoryFeatureCacheBenchmarkXest extends TestCase {
     private final static short UNCHANGED = 0;
     private final static short OPTIMIZED = 1;
     private final static short EMPTYQUERY = 2;
@@ -116,7 +116,7 @@ public class InMemoryFeatureCacheBenchmarkTest extends TestCase {
     }
 
     public static Test suite() {
-        return new TestSuite(InMemoryFeatureCacheBenchmarkTest.class);
+        return new TestSuite(InMemoryFeatureCacheBenchmarkXest.class);
     }
 
     public void ztestShapefileStore() throws IOException, MalformedURLException {

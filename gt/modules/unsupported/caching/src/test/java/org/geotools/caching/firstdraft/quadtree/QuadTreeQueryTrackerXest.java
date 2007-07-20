@@ -30,7 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 
 
-public class QuadTreeQueryTrackerTest extends TestCase {
+public class QuadTreeQueryTrackerXest extends TestCase {
     private final static short ERROR = -1;
     private final static short UNCHANGED = 0;
     private final static short OPTIMIZED = 1;
@@ -48,7 +48,7 @@ public class QuadTreeQueryTrackerTest extends TestCase {
     }
 
     public static Test suite() {
-        return new TestSuite(QuadTreeQueryTrackerTest.class);
+        return new TestSuite(QuadTreeQueryTrackerXest.class);
     }
 
     public void testTracker() {

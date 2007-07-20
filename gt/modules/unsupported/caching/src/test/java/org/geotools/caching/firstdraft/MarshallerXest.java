@@ -36,9 +36,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MarshallerTest extends TestCase {
+public class MarshallerXest extends TestCase {
     public static Test suite() {
-        return new TestSuite(MarshallerTest.class);
+        return new TestSuite(MarshallerXest.class);
     }
 
     /** Marshall and unmarshall a DefaultFeature, and test for equality with the result.

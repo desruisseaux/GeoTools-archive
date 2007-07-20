@@ -3,6 +3,7 @@ package org.geotools.caching.spatialindex.grid;
 import org.geotools.caching.spatialindex.Node;
 import org.geotools.caching.spatialindex.Region;
 import org.geotools.caching.spatialindex.Shape;
+import org.geotools.caching.spatialindex.grid.GridData;
 
 import java.util.HashMap;
 
@@ -15,15 +16,15 @@ public class GridNode implements Node {
     HashMap node_data;
     int num_data;
     int[] data_ids;
-    Object[] data;
+    GridData[] data;
 
     GridNode(int id, GridNode parent, Region mbr) {
         this.id = id;
-        this.mbr = mbr;
+        this.mbr = new Region(mbr);
         this.parent = parent;
         this.node_data = new HashMap();
         this.num_data = 0;
-        this.data = new Object[10];
+        this.data = new GridData[10];
         this.data_ids = new int[10];
     }
 
@@ -71,10 +72,10 @@ public class GridNode implements Node {
         return mbr;
     }
 
-    protected void insertData(int id, Object data) {
+    protected void insertData(int id, GridData data) {
         if (num_data == data_ids.length) {
             int[] n_data_ids = new int[data_ids.length * 2];
-            Object[] n_data = new Object[this.data.length * 2];
+            GridData[] n_data = new GridData[this.data.length * 2];
             System.arraycopy(data_ids, 0, n_data_ids, 0, num_data);
             System.arraycopy(this.data, 0, n_data, 0, num_data);
             data_ids = n_data_ids;

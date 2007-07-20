@@ -53,7 +53,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 
-public class CacheTest extends TestCase {
+public class CacheXest extends TestCase {
     private final static short UNCHANGED = 0;
     private final static short OPTIMIZED = 1;
     private final static short EMPTYQUERY = 2;
@@ -112,7 +112,7 @@ public class CacheTest extends TestCase {
     }
 
     public static Test suite() {
-        return new TestSuite(CacheTest.class);
+        return new TestSuite(CacheXest.class);
     }
 
     public void ztestShapefileStore() throws IOException, MalformedURLException {

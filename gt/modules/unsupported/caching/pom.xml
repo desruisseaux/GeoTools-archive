@@ -93,16 +93,6 @@
   <!--     Build Configuration                                     -->
   <!-- =========================================================== -->
   <build>
-    <resources>
-      <resource>
-        <targetPath>META-INF/lib</targetPath>
-        <filtering>false</filtering>
-        <directory>${basedir}/lib</directory>
-        <includes>
-          <include>spatialindex.jar</include>
-        </includes>
-      </resource>
-    </resources>
     <plugins>
       <!-- ====    Code Formatting  ============================== -->
       <plugin>
