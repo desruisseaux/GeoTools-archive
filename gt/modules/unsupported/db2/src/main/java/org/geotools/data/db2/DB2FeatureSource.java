@@ -120,7 +120,7 @@ public class DB2FeatureSource extends JDBCFeatureSource {
 
 		if (getSchema() != null) {
 			String typeName = getSchema().getTypeName();
-			GeometryAttributeType geomType = getSchema().getDefaultGeometry();
+			GeometryAttributeType geomType = getSchema().getPrimaryGeometry();
 
 			if (geomType != null) {
 				Filter filter = query.getFilter();
@@ -192,9 +192,9 @@ public class DB2FeatureSource extends JDBCFeatureSource {
 		double xmin = 0, ymin = 0, xmax = 0, ymax = 0;
 		if (operator.getExpression1() == null) {
 			String attName = null;
-			GeometryAttributeType dg = getSchema().getDefaultGeometry();
+			GeometryAttributeType dg = getSchema().getPrimaryGeometry();
 			if (dg != null)
-				attName = dg.getName();
+				attName = dg.getLocalName();
 			if (attName != null) {
 				FilterFactory2 ff = (FilterFactory2) CommonFactoryFinder
 						.getFilterFactory(null);

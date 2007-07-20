@@ -16,6 +16,7 @@
 package org.geotools.feature;
 
 import java.util.List;
+import org.opengis.feature.simple.SimpleFeatureList;
 import org.opengis.filter.Filter;
 
 
@@ -35,7 +36,7 @@ import org.opengis.filter.Filter;
  * @author Jody Garnett, Refractions Research, Inc.
  * @source $URL$
  */
-public interface FeatureList extends List, FeatureCollection {
+public interface FeatureList extends List, FeatureCollection, SimpleFeatureList {
     /**
      * Similar to subCollection, explicitly constructs a ordered List.
      * <p>

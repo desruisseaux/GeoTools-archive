@@ -116,14 +116,14 @@ public class SimpleTypeGT implements SimpleType {
     }
 
     /**
-     * @see org.geotools.xml.xsi.Type#getName()
+     * @see org.geotools.xml.xsi.Type#getLocalName()
      */
     public String getName() {
         return name;
     }
 
     /**
-     * @see org.geotools.xml.xsi.Type#getName()
+     * @see org.geotools.xml.xsi.Type#getLocalName()
      */
     public URI getNamespace() {
         return namespace;

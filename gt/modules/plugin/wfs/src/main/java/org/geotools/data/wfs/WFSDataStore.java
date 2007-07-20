@@ -383,7 +383,7 @@ public class WFSDataStore extends AbstractDataStore {
         
         if(ftName!=null){
             try {
-            	t = FeatureTypeBuilder.newFeatureType(t.getAttributeTypes(),ftName==null?typeName:ftName,t.getNamespace(),t.isAbstract(),t.getAncestors(),t.getDefaultGeometry());
+            	t = FeatureTypeBuilder.newFeatureType(t.getAttributeTypes(),ftName==null?typeName:ftName,t.getNamespace(),t.isAbstract(),t.getAncestors(),t.getPrimaryGeometry());
                 
             } catch (SchemaException e1) {
                 WFSDataStoreFactory.logger.warning(e1.getMessage());

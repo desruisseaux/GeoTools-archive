@@ -107,7 +107,7 @@ public abstract class FIDReader {
         for (Iterator it = attDescriptors.iterator(); it.hasNext(); i++) {
             AttributeType property = (AttributeType) it.next();
             // /attNames.add( property.getName().getLocalPart() );
-            attNames.add(property.getName());
+            attNames.add(property.getLocalName());
         }
 
         String fidColumn = getFidColumn();
@@ -218,7 +218,7 @@ public abstract class FIDReader {
             int i = 0;
             for (Iterator it = attDescriptors.iterator(); it.hasNext(); i++) {
                 AttributeType property = (AttributeType) it.next();
-                attNames.add(property.getName());
+                attNames.add(property.getLocalName());
             }
 
             shapeIndex = attNames.indexOf(shapeColName);

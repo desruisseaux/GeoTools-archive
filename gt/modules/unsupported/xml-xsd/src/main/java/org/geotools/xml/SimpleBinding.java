@@ -96,7 +96,7 @@ public interface SimpleBinding extends Binding {
      *
      * @return The parsed object, or null if the component could not be parsed.
      *
-     * @throws Strategy objects should not attempt to handle any exceptions.
+     * @throws Delegate objects should not attempt to handle any exceptions.
      */
     Object parse(InstanceComponent instance, Object value)
         throws Exception;

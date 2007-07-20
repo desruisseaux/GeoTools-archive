@@ -16,7 +16,11 @@
 package org.geotools.feature.collection;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.data.collection.DelegateFeatureReader;
@@ -29,6 +33,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.type.AttributeType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 import org.geotools.util.ProgressListener;
@@ -45,118 +50,42 @@ import com.vividsolutions.jts.geom.Geometry;
  * </p>
  * @author Jody Garnett, Refractions Research Inc.
  */
-public abstract class AbstractFeatureCollection extends AbstractResourceCollection implements FeatureCollection {
-    FeatureState state;
-
-    /**
-     * Feature methods will be delegated to provided state.
-     * <p>
-     * You can use this implemenation with a choice of stratagy objects:
-     * <ul>
-     * <li>BaseFeatureState - when this collection is independent
-     * <li>SubFeatureState - when this collection delegates content
-     * </ul> 
-     */
-    protected AbstractFeatureCollection( FeatureState state ){
-        this.state = state;
-    }
-
-    /**
-     * Creates an AbstractFeatureCollection delegating the FeatureState
-     * implementaion content to iterator() and close( iterator ).
-     * 
-     * @param schema
-     */
-    public AbstractFeatureCollection( FeatureType schema ) {
-        state = new BaseFeatureState( this, schema );
-    }
-
-    //
-    // FeatureCollection - Feature methods
-    //
-    public FeatureCollection getParent() {
-        return state.getParent();
-    }
-    public void setParent( FeatureCollection collection ) {
-        state.setParent( collection );
-    }
-    public FeatureType getFeatureType() {
-        return state.getFeatureType();
-    }
-    public String getID() {
-        return state.getId();
-    }
-    public Object[] getAttributes( Object[] attributes ) {
-        return state.getAttributes( attributes );
-    }
-    public Object getAttribute( String xPath ) {
-        return state.getAttribute( xPath );
-    }
-    public Object getAttribute( int index ) {
-        return state.getAttribute( index );
-    }
-    public void setAttribute( int position, Object val ) throws IllegalAttributeException, ArrayIndexOutOfBoundsException {
-        state.setAttribute( position, val );
-    }
-    public int getNumberOfAttributes() {
-        return state.getNumberOfAttributes();
-    }
-    public void setAttribute( String xPath, Object attribute ) throws IllegalAttributeException {
-        state.setAttribute( xPath, attribute );
-    }
-    /**
-     * @deprecated use {@link #getPrimaryGeometry()}
-     */
-    public final Geometry getDefaultGeometry() {
-        return getPrimaryGeometry();
-    }
-    public Geometry getPrimaryGeometry() {
-    	return state.getDefaultGeometry();
-    }
-    /**
-     * @deprecated use {@link #setPrimaryGeometry(Geometry)}
-     */
-    public final void setDefaultGeometry( Geometry geometry ) throws IllegalAttributeException {
-        setPrimaryGeometry(geometry);
-    }
-    public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
-    	state.setDefaultGeometry( geometry );
-    }
-    public ReferencedEnvelope getBounds() {
-        return ReferencedEnvelope.reference( state.getBounds() );
-    }
-    public FeatureType getSchema() {
-        return state.getChildFeatureType();
-    }    
-    //
-    // FeatureCollection - Events
-    //
-    public void addListener( CollectionListener listener ) {
-        state.addListener( listener );
-    }
-    public void removeListener( CollectionListener listener ) throws NullPointerException {
-        state.removeListener( listener );
-    }
+public abstract class AbstractFeatureCollection extends BaseFeatureCollection /*extends AbstractResourceCollection*/ implements FeatureCollection {
     
+	AbstractResourceCollection rc;
+
+	protected AbstractFeatureCollection( FeatureType memberType ) {
+		super(null,memberType);
+	}
+	
+	protected AbstractFeatureCollection( FeatureType memberType, AbstractResourceCollection rc ) {
+		super(null,memberType);
+		this.rc = rc;
+	}
+	
+	protected void setResourceCollection( AbstractResourceCollection rc ) {
+		this.rc = rc;
+	}
+	
     //
     // FeatureCollection - Feature Access
     // 
     public FeatureIterator features() {
-        FeatureIterator iter = new DelegateFeatureIterator( this, openIterator() );
-        open.add( iter );
+        FeatureIterator iter = new DelegateFeatureIterator( this, rc.openIterator() );
+        rc.getOpenIterators().add( iter );
         return iter; 
     }
     public void close( FeatureIterator close ) {     
         closeIterator( close );
-        open.remove( close );
+        rc.getOpenIterators().remove( close );
     }
     public void closeIterator( FeatureIterator close ) {
         DelegateFeatureIterator iter = (DelegateFeatureIterator) close;
-        closeIterator( iter.delegate );
+        rc.closeIterator( iter.delegate );
         iter.close(); 
     }
     public void purge() {
-        for( Iterator i = open.iterator(); i.hasNext(); ){
+        for( Iterator i = rc.getOpenIterators().iterator(); i.hasNext(); ){
             Object resource = i.next();
             if( resource instanceof FeatureIterator ){
                 FeatureIterator resourceIterator = (FeatureIterator) resource;
@@ -171,14 +100,76 @@ public abstract class AbstractFeatureCollection extends AbstractResourceCollecti
                 }
             }
         }        
-        super.purge();
+
+        rc.purge();
     }
-    /**
+    
+    final public int size() {
+    	return rc.size();
+    }
+    
+    final public Iterator iterator() {
+    	return rc.iterator();
+    }
+    
+    final public void close(Iterator close) {
+    	rc.close(close);
+    };
+    
+    final public boolean add(Object o) {
+		return rc.add(o);
+	}
+
+    final public boolean addAll(Collection c) {
+		return rc.addAll(c);
+	}
+
+    final public void clear() {
+    	rc.clear();
+	}
+
+    final public boolean contains(Object o) {
+    	return rc.contains(o);
+	}
+
+    final public boolean containsAll(Collection c) {
+		return rc.containsAll(c);
+	}
+
+    final public boolean isEmpty() {
+		return rc.isEmpty();
+	}
+
+    final public boolean remove(Object o) {
+		return rc.remove(o);
+	}
+
+    final public boolean removeAll(Collection c) {
+		return rc.removeAll(c);
+	}
+
+    final public boolean retainAll(Collection c) {
+		return rc.retainAll(c);
+	}
+
+    final public Object[] toArray() {
+		return rc.toArray();
+	}
+
+    final public Object[] toArray(Object[] a) {
+		return rc.toArray(a);
+	}
+
+	/**
      * Accepts a visitor, which then visits each feature in the collection.
      * @throws IOException 
      */
-    public void accepts(FeatureVisitor visitor, ProgressListener progress ) throws IOException {
-        Iterator iterator = null;
+    public final void accepts(FeatureVisitor visitor, ProgressListener progress ) throws IOException {
+        accepts((org.opengis.feature.FeatureVisitor)visitor,(org.opengis.util.ProgressListener)progress);
+    }
+    
+    public void accepts(org.opengis.feature.FeatureVisitor visitor, org.opengis.util.ProgressListener progress) {
+    	Iterator iterator = null;
         // if( progress == null ) progress = new NullProgressListener();
         try{
             float size = size();
@@ -200,7 +191,7 @@ public abstract class AbstractFeatureCollection extends AbstractResourceCollecti
             close( iterator );
         }
     }
-        
+    
     //
     // Feature Collections API
     //
@@ -233,4 +224,6 @@ public abstract class AbstractFeatureCollection extends AbstractResourceCollecti
         return this;
     }
     */
+    
+    
 }

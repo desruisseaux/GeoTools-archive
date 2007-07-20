@@ -83,6 +83,8 @@ public class FeatureWrappedComplexTest extends TestCase {
             fail("not out of bounds");
         } catch (ArrayIndexOutOfBoundsException aioobe) {
         }
+        catch (IndexOutOfBoundsException aioobe) {
+        }
 
         try {
             f.setAttribute("1244", "x");

@@ -178,14 +178,14 @@ public class FileGMLDataStore extends AbstractDataStore {
 		FeatureTypeBuilder builder=FeatureTypeBuilder.newInstance(f.getFeatureType().getTypeName());
 		for (int i = 0; i < f.getNumberOfAttributes(); i++) {
 			AttributeType att = f.getFeatureType().getAttributeType(i);
-			if( !Geometry.class.isAssignableFrom(att.getType()) ){
+			if( !Geometry.class.isAssignableFrom(att.getBinding()) ){
 				builder.addType(att);
 			}else{
 				Geometry geom = (Geometry) f.getAttribute(i);
 				Object data = geom.getUserData();
 				if( data instanceof CoordinateReferenceSystem ){
-					builder.addType(AttributeTypeFactory.newAttributeType(att.getName(), 
-							att.getType(), att.isNillable(), att.getRestriction(), 
+					builder.addType(AttributeTypeFactory.newAttributeType(att.getLocalName(), 
+							att.getBinding(), att.isNillable(), att.getRestriction(), 
 							att.createDefaultValue(), data));
 				}else if( data instanceof String){
 					String string=(String) data;
@@ -204,8 +204,8 @@ public class FileGMLDataStore extends AbstractDataStore {
 					}else{
 						crs=null;
 					}
-					builder.addType(AttributeTypeFactory.newAttributeType(att.getName(), 
-							att.getType(), att.isNillable(), att.getRestriction(), 
+					builder.addType(AttributeTypeFactory.newAttributeType(att.getLocalName(), 
+							att.getBinding(), att.isNillable(), att.getRestriction(), 
 							att.createDefaultValue(), crs));
 				}
 			}

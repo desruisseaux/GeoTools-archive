@@ -115,15 +115,15 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         fidMapper = postgisDataStore.getFIDMapper(tableName);
         sqlBuilder = (PostgisSQLBuilder) postgisDataStore.getSqlBuilder(tableName);
 
-        AttributeType geomType = featureType.getDefaultGeometry();
+        AttributeType geomType = featureType.getPrimaryGeometry();
         encoder = new SQLEncoderPostgis();
         encoder.setFeatureType( featureType );
         encoder.setFIDMapper(postgisDataStore.getFIDMapper(featureType.getTypeName()));
 
         if (geomType != null) {
             //HACK: encoder should be set for each geometry.
-            int srid = getSRID(geomType.getName());
-            encoder.setDefaultGeometry(geomType.getName());
+            int srid = getSRID(geomType.getLocalName());
+            encoder.setDefaultGeometry(geomType.getLocalName());
             encoder.setSRID(srid);
             encoder.setFIDMapper(fidMapper);
         }
@@ -598,7 +598,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
                 //check her to make sure object matches attribute type.
                 if (curType  instanceof GeometryAttributeType) {
                     //create the text to add geometry
-                    int srid = getSRID(curType.getName());
+                    int srid = getSRID(curType.getLocalName());
                     String geoText = geometryWriter.write((Geometry) curValue);
                     newValue = "GeometryFromText('" + geoText + "', " + srid + ")";
                 } else {
@@ -606,7 +606,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
                     newValue = addQuotes(curValue);
                 }
 
-                sqlStatement.append(sqlBuilder.encodeColumnName(curType.getName()) + " = " + newValue);
+                sqlStatement.append(sqlBuilder.encodeColumnName(curType.getLocalName()) + " = " + newValue);
 
                 //sqlStatement.append(curType.getName() + " = " + newValue);
                 sqlStatement.append((i < (arrLength - 1)) ? ", " : " ");
@@ -676,9 +676,9 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         LOGGER.finer("making sql for " + numAttributes + " attributes");
 
         for (int i = 0; i < numAttributes; i++) {
-            String curAttName = attributeTypes[i].getName();
+            String curAttName = attributeTypes[i].getLocalName();
 
-            if (Geometry.class.isAssignableFrom(attributeTypes[i].getType())) {
+            if (Geometry.class.isAssignableFrom(attributeTypes[i].getBinding())) {
                 sqlStatement.append(", AsText(force_2d(\"" + curAttName + "\"))");
             } else {
                 sqlStatement.append(", \"" + curAttName + "\"");
@@ -743,9 +743,9 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         LOGGER.finer("making sql for " + numAttributes + " attributes");
 
         for (int i = 0; i < numAttributes; i++) {
-            String curAttName = attributeTypes[i].getName();
+            String curAttName = attributeTypes[i].getLocalName();
 
-            if (Geometry.class.isAssignableFrom(attributeTypes[i].getType())) {
+            if (Geometry.class.isAssignableFrom(attributeTypes[i].getBinding())) {
                 sqlStatement.append(", AsText(force_2d(\"" + curAttName + "\"))");
             } else {
                 sqlStatement.append(", \"" + curAttName + "\"");
@@ -824,7 +824,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
             int retPos = 0;
 
             for (int i = 0, n = schemaTypes.length; i < n; i++) {
-                String schemaTypeName = schemaTypes[i].getName();
+                String schemaTypeName = schemaTypes[i].getLocalName();
 
                 if (attNames.contains(schemaTypeName)) {
                     retAttTypes[retPos++] = schemaTypes[i];
@@ -905,14 +905,14 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 			if(!query.retrieveAllProperties()) {
 				try {
                     schemaNew = DataUtilities.createSubType(schema, query.getPropertyNames());
-                    if (schemaNew.getDefaultGeometry() == null)  // does the sub-schema have a geometry in it?
+                    if (schemaNew.getPrimaryGeometry() == null)  // does the sub-schema have a geometry in it?
                     {
                     	//uh-oh better get one!
-                    	if (schema.getDefaultGeometry() != null)  // does the entire schema have a geometry in it? 
+                    	if (schema.getPrimaryGeometry() != null)  // does the entire schema have a geometry in it? 
                     	{
                     		//buff-up the sub-schema so it has the default geometry in it.
 	                    	ArrayList al = new ArrayList (Arrays.asList(query.getPropertyNames()));
-	                    	al.add(schema.getDefaultGeometry().getName());
+	                    	al.add(schema.getPrimaryGeometry().getLocalName());
 	                    	schemaNew = DataUtilities.createSubType(schema, (String[]) al.toArray(new String[1]) );       
                     	}
                     }
@@ -926,9 +926,9 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 			 attributeTypes = schemaNew.getAttributeTypes();
 				 
             for (int j = 0, n = schemaNew.getAttributeCount(); j < n; j++) {
-                if (Geometry.class.isAssignableFrom(attributeTypes[j].getType())) // same as .isgeometry() - see new featuretype javadoc
+                if (Geometry.class.isAssignableFrom(attributeTypes[j].getBinding())) // same as .isgeometry() - see new featuretype javadoc
                 {
-                    String attName = attributeTypes[j].getName();
+                    String attName = attributeTypes[j].getLocalName();
                     Envelope curEnv = getEnvelope(conn, attName, sqlBuilder, filter);
 
                     if (curEnv == null) {
@@ -941,8 +941,8 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 
             LOGGER.finer("returning bounds " + retEnv);
 
-            if ( (schemaNew!=null) && (schemaNew.getDefaultGeometry() != null) )
-                return new ReferencedEnvelope(retEnv,schemaNew.getDefaultGeometry().getCoordinateSystem());
+            if ( (schemaNew!=null) && (schemaNew.getPrimaryGeometry() != null) )
+                return new ReferencedEnvelope(retEnv,schemaNew.getPrimaryGeometry().getCoordinateSystem());
             if(query.getCoordinateSystem()!=null)
                 return new ReferencedEnvelope(retEnv,query.getCoordinateSystem());
             return new ReferencedEnvelope(retEnv,null);

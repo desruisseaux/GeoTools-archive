@@ -368,6 +368,11 @@ public class TypeBuilder {
 	private boolean isNillable;
 
 	/**
+	 * default value
+	 */
+	private Object defaultValue;
+	
+	/**
 	 * Map of java class bound to properties types.
 	 * <p>
 	 * Please see
@@ -668,7 +673,7 @@ public class TypeBuilder {
 		AttributeDescriptor attribute = getTypeFactory()
 				.createAttributeDescriptor((AttributeType) propertyType,
 						typeName(), getMinOccurs(), getMaxOccurs(),
-						isNillable());
+						isNillable(), getDefaultValue());
 		reset();
 		return attribute;
 	}
@@ -801,6 +806,14 @@ public class TypeBuilder {
 
 	public boolean isNillable() {
 		return isNillable;
+	}
+	
+	public void setDefaultValue(Object defaultValue) {
+		this.defaultValue = defaultValue;
+	}
+	
+	public Object getDefaultValue() {
+		return defaultValue;
 	}
 
 	public void setIdentified(boolean isIdentified) {
@@ -993,7 +1006,7 @@ public class TypeBuilder {
 	public TypeBuilder attribute(Name name, AttributeType type) {
 		AttributeDescriptor descriptor = getTypeFactory()
 				.createAttributeDescriptor(type, name, getMinOccurs(),
-						getMaxOccurs(), isNillable());
+						getMaxOccurs(), isNillable(), getDefaultValue());
 		add(descriptor);
 		return this;
 	}
@@ -1021,7 +1034,7 @@ public class TypeBuilder {
 	public void addAttribute(Name name, AttributeType type) {
 		AttributeDescriptor descriptor = getTypeFactory()
 				.createAttributeDescriptor(type, name, getMinOccurs(),
-						getMaxOccurs(), isNillable());
+						getMaxOccurs(), isNillable(), getDefaultValue());
 		add(descriptor);
 	}
 

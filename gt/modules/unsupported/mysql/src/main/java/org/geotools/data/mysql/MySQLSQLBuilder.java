@@ -72,10 +72,10 @@ public class MySQLSQLBuilder extends DefaultSQLBuilder {
         }
 
         for (int i = 0; i < attributes.length; i++) {
-            String colName = attributes[i].getName();
+            String colName = attributes[i].getLocalName();
 
             if (attributes[i] instanceof GeometryAttributeType) {
-                sql.append("AsText(" + attributes[i].getName() + ") AS " + attributes[i].getName());
+                sql.append("AsText(" + attributes[i].getLocalName() + ") AS " + attributes[i].getLocalName());
             } else {
                 sql.append(colName);
             }

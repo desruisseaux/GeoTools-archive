@@ -51,8 +51,8 @@ public class GMLFeatureStreamingTest extends TestCase {
             assertNotNull(f);
 
             assertEquals(i + "", f.getID());
-            assertEquals(i, ((Point) f.getDefaultGeometry()).getX(), 0d);
-            assertEquals(i, ((Point) f.getDefaultGeometry()).getY(), 0d);
+            assertEquals(i, ((Point) f.getPrimaryGeometry()).getX(), 0d);
+            assertEquals(i, ((Point) f.getPrimaryGeometry()).getY(), 0d);
             assertEquals(i, ((Integer) f.getAttribute("count")).intValue());
         }
 

@@ -82,7 +82,7 @@ public class FilterAttributeExtractor extends DefaultFilterVisitor {
             // namespace prefixed string
             AttributeType type = (AttributeType) expression.evaluate( featureType );
             if ( type != null ) {
-               attributeNames.add( type.getName() );
+               attributeNames.add( type.getLocalName() );
             }
             else {
                attributeNames.add( expression.getPropertyName() );

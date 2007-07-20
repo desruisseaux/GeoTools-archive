@@ -16,9 +16,11 @@
 package org.geotools.feature.type;
 
 import org.geotools.feature.AttributeType;
+import org.geotools.feature.DefaultAttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.Name;
 import org.opengis.filter.Filter;
 
 /**
@@ -29,11 +31,8 @@ import org.opengis.filter.Filter;
  * @author dzwiers
  * @source $URL$
  */
-public class FeatureAttributeType implements AttributeType {
+public class FeatureAttributeType extends AttributeDescriptorImpl implements AttributeType {
 
-	private final boolean nill;
-	private final int min,max;
-    private final String name;
 	private final FeatureType featureType;
 	
 	
@@ -41,74 +40,41 @@ public class FeatureAttributeType implements AttributeType {
 	 * @param copy
 	 */
 	public FeatureAttributeType(FeatureAttributeType copy) {
-		nill = copy.isNillable();
-		min = copy.getMinOccurs();
-		max = copy.getMaxOccurs();
-        this.name = copy.getName();
+		super(copy.getType(),copy.getName(),copy.getMinOccurs(),copy.getMaxOccurs(),copy.isNillable(),copy.getDefaultValue());
+        
 		featureType = copy.getFeatureType();
 	}
 
 	// The field for 'Class type' should be added when GT has moved to java 1.5
     public FeatureAttributeType(String name,FeatureType featureType, boolean nillable, int min, int max) {
-    	nill = nillable;
-    	this.min = min;
-    	this.max = max;
-        this.name = name;
+    	super(DefaultAttributeType.createAttributeType(name, Feature.class, Filter.INCLUDE),new Name(name),min,max,nillable,null);
+    	
     	this.featureType = featureType;
     }
 
     public FeatureAttributeType(String name,FeatureType featureType, boolean nillable){
     	this(name,featureType, nillable, 1, 1);
     }
-    public Filter getRestriction(){return Filter.INCLUDE;}
+    public Filter getRestriction(){
+    	return DefaultAttributeType.getRestriction(this);
+    }
     
     protected FeatureType getFeatureType(){return featureType;}
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.AttributeType#getName()
-	 */
-	public final String getName() {
-		return getLocalName();
-	}
-	/**
+	
+    /**
 	 * {@inheritDoc}
 	 */
 	public String getLocalName() {
-		return name;
+		return DefaultAttributeType.getLocalName(this);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.AttributeType#getType()
-	 */
-	public final Class getType() {
-		return getBinding();
-	}
 	/**
 	 * {@inheritDoc}
 	 */
 	public Class getBinding() {
-		return Feature.class;
+		return DefaultAttributeType.getBinding(this);
 	}
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.AttributeType#isNillable()
-	 */
-	public boolean isNillable() {
-		return nill;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.AttributeType#getMinOccurs()
-	 */
-	public int getMinOccurs() {
-		return min;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.AttributeType#getMaxOccurs()
-	 */
-	public int getMaxOccurs() {
-		return max;
-	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.geotools.feature.AttributeType#isGeometry()
 	 */
@@ -131,7 +97,7 @@ public class FeatureAttributeType implements AttributeType {
 				ee.initCause(e);
 				throw ee;
 			}
-		throw new IllegalArgumentException(getName()+" needs to parse an array of Objects");
+		throw new IllegalArgumentException(getLocalName()+" needs to parse an array of Objects");
 	}
 
 	/* (non-Javadoc)

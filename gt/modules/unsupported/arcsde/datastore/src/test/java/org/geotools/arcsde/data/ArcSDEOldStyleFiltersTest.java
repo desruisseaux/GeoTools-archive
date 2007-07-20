@@ -147,7 +147,7 @@ public class ArcSDEOldStyleFiltersTest extends TestCase {
         FeatureSource fs = ds.getFeatureSource(typeName);
         FeatureType schema = fs.getSchema();
         AttributeType att = schema.getAttributeType(0);
-        String attName = att.getName();
+        String attName = att.getLocalName();
 
         FeatureIterator reader = fs.getFeatures().features();
         Object val1 = reader.next().getAttribute(0);

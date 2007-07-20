@@ -66,7 +66,6 @@ public class DefaultFeatureResults extends DataFeatureCollection {
      */
     protected FeatureSource featureSource;
 
-    protected FeatureType schema;
     protected MathTransform transform;
     
     /**
@@ -84,7 +83,9 @@ public class DefaultFeatureResults extends DataFeatureCollection {
      * @param query
      */
     public DefaultFeatureResults(FeatureSource source, Query query) throws IOException {
-        this.featureSource = source;        
+    	super(null,getSchemaInternal(source,query));
+    	this.featureSource = source;        
+        
         FeatureType origionalType = source.getSchema();
         
         String typeName = origionalType.getTypeName();        
@@ -101,35 +102,18 @@ public class DefaultFeatureResults extends DataFeatureCollection {
             //((DefaultQuery) this.query).setCoordinateSystem(query.getCoordinateSystem());
             //((DefaultQuery) this.query).setCoordinateSystemReproject(query.getCoordinateSystemReproject());
         }
+       
+        if( origionalType.getPrimaryGeometry() == null ){
+            return; // no transform needed
+        }
+        
         CoordinateReferenceSystem cs = null;        
         if (query.getCoordinateSystemReproject() != null) {
             cs = query.getCoordinateSystemReproject();
         } else if (query.getCoordinateSystem() != null) {
             cs = query.getCoordinateSystem();
-        }
-        try {
-            if( cs == null ){
-                if (query.retrieveAllProperties()) { // we can use the origionalType as is                
-                    schema = featureSource.getSchema();
-                } else { 
-                    schema = DataUtilities.createSubType(featureSource.getSchema(), query.getPropertyNames());                    
-                } 
-            }
-            else {
-                // we need to change the projection of the origional type
-                schema = DataUtilities.createSubType(origionalType, query.getPropertyNames(), cs, query.getTypeName(), null);
-            }
-        }
-        catch (SchemaException e) {
-            // we were unable to create the schema requested!
-            //throw new DataSourceException("Could not create schema", e);
-            LOGGER.log( Level.WARNING, "Could not change projection to "+cs, e );
-            schema = null; // client will notice something is amiss when getSchema() return null
-        }
-        if( origionalType.getDefaultGeometry() == null ){
-            return; // no transform needed
-        }
-        CoordinateReferenceSystem origionalCRS = origionalType.getDefaultGeometry().getCoordinateSystem();
+        }     
+        CoordinateReferenceSystem origionalCRS = origionalType.getPrimaryGeometry().getCoordinateSystem();
         if( query.getCoordinateSystem() != null ){
             origionalCRS = query.getCoordinateSystem();
         }
@@ -142,6 +126,38 @@ public class DefaultFeatureResults extends DataFeatureCollection {
         }
     }
 
+    static FeatureType getSchemaInternal( FeatureSource featureSource, Query query ) {
+    	FeatureType origionalType = featureSource.getSchema();
+    	FeatureType schema = null;
+    	
+    	 CoordinateReferenceSystem cs = null;        
+         if (query.getCoordinateSystemReproject() != null) {
+             cs = query.getCoordinateSystemReproject();
+         } else if (query.getCoordinateSystem() != null) {
+             cs = query.getCoordinateSystem();
+         }
+         try {
+             if( cs == null ){
+                 if (query.retrieveAllProperties()) { // we can use the origionalType as is                
+                     schema = featureSource.getSchema();
+                 } else { 
+                     schema = DataUtilities.createSubType(featureSource.getSchema(), query.getPropertyNames());                    
+                 } 
+             }
+             else {
+                 // we need to change the projection of the origional type
+                 schema = DataUtilities.createSubType(origionalType, query.getPropertyNames(), cs, query.getTypeName(), null);
+             }
+         }
+         catch (SchemaException e) {
+             // we were unable to create the schema requested!
+             //throw new DataSourceException("Could not create schema", e);
+             LOGGER.log( Level.WARNING, "Could not change projection to "+cs, e );
+             schema = null; // client will notice something is amiss when getSchema() return null
+         }
+         
+         return schema;
+    }
     /**
      * FeatureSchema for provided query.
      *
@@ -161,7 +177,7 @@ public class DefaultFeatureResults extends DataFeatureCollection {
      * @throws DataSourceException DOCUMENT ME!
      */
     public FeatureType getSchema() {
-        return schema;        
+        return super.getSchema();        
     }
 
     /**
@@ -196,7 +212,7 @@ public class DefaultFeatureResults extends DataFeatureCollection {
             reader = new MaxFeatureReader(reader, maxFeatures);
         }        
         if( transform != null ){
-            reader = new ReprojectFeatureReader( reader, schema, transform );
+            reader = new ReprojectFeatureReader( reader, getSchema(), transform );
         }
         return reader;
     }   
@@ -211,7 +227,7 @@ public class DefaultFeatureResults extends DataFeatureCollection {
         for (int i = 0; i < schema.getAttributeCount(); i++) {
             AttributeType at = schema.getAttributeType(i);
             if(at instanceof GeometricAttributeType)
-                attributes.add(at.getName());
+                attributes.add(at.getLocalName());
         }
         
         DefaultQuery q = new DefaultQuery(query);

@@ -110,7 +110,7 @@ public abstract class AbstractFeatureSource implements FeatureSource {
         }
         
         FeatureCollection collection = new DefaultFeatureResults(this, query);
-        if( collection.getDefaultGeometry() == null ){
+        if( collection.getPrimaryGeometry() == null ){
             return collection; // no geometry no reprojection needed
         }
         

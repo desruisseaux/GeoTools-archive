@@ -23,12 +23,10 @@ public class GMLFeatureCollection extends DataFeatureCollection {
 	GMLTypeEntry entry;
 	
 	GMLFeatureCollection( GMLTypeEntry entry ) {
+		super(null,entry.getFeatureType());
 		this.entry = entry;
 	}
 	
-	public FeatureType getSchema() {
-		return entry.getFeatureType();
-	}
 	
 	protected Iterator openIterator() throws IOException {
 		return new GMLIterator( entry );

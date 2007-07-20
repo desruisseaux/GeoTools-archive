@@ -202,8 +202,8 @@ public class FeatureTypeHandler {
             // get srdid for each geometry
             for (int i = 0; i < types.length; i++) {
                 if (types[i] instanceof GeometryAttributeType ) {
-                    int srid = dataStore.determineSRID(featureTypeName, types[i].getName());
-                    info.putSRID(types[i].getName(), srid);
+                    int srid = dataStore.determineSRID(featureTypeName, types[i].getLocalName());
+                    info.putSRID(types[i].getLocalName(), srid);
                 }
             }
 

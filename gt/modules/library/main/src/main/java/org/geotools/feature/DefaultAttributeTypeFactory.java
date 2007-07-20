@@ -83,6 +83,9 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
     }
     
     protected Filter length(int fieldLength, String attributeXPath){
+    	if ( fieldLength < 0 ) {
+    		return null;
+    	}
         LengthFunction length = (LengthFunction)ff.function("LengthFunction", 
                 new Expression[]{ff.property(attributeXPath)});
         if( length == null ) {
@@ -92,7 +95,8 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
         
         Filter cf = null;
         try {
-            cf = ff.equals(length, ff.literal(fieldLength));
+            //cf = ff.equals(length, ff.literal(fieldLength));
+            cf = ff.lessOrEqual(length, ff.literal(fieldLength));
         } catch (IllegalFilterException e) {
             // TODO something
         }
@@ -159,7 +163,7 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
                     new Expression[] { ff.property(name) });
             Filter cf = null;
             try {
-                cf = ff.equals(length, ff.literal(fieldLength));
+                cf = ff.lessOrEqual(length, ff.literal(fieldLength));
             } catch (IllegalFilterException e) {
                 // TODO something
             }

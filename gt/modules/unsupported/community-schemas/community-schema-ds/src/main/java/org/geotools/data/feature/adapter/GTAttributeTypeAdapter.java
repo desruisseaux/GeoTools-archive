@@ -19,7 +19,10 @@ package org.geotools.data.feature.adapter;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.GeometryType;
+import org.opengis.feature.type.Name;
+import org.opengis.feature.type.PropertyType;
 import org.opengis.feature.type.TypeName;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -50,10 +53,6 @@ public class GTAttributeTypeAdapter implements org.geotools.feature.AttributeTyp
      */
     protected GTAttributeTypeAdapter(AttributeDescriptor descriptor) {
         this.adaptee = descriptor;
-    }
-
-    public Class getBinding() {
-        return adaptee.getType().getBinding();
     }
 
     private static class GTGeometryTypeAdapter extends GTAttributeTypeAdapter implements
@@ -106,10 +105,6 @@ public class GTAttributeTypeAdapter implements org.geotools.feature.AttributeTyp
         return adaptee.getMinOccurs();
     }
 
-    public String getName() {
-        return getLocalName();
-    }
-
     public String getLocalName() {
     	return adaptee.getName().getLocalPart();
     }
@@ -118,7 +113,7 @@ public class GTAttributeTypeAdapter implements org.geotools.feature.AttributeTyp
         return null;
     }
 
-    public Class getType() {
+    public Class getBinding() {
         return adaptee.getType().getBinding();
     }
 
@@ -133,5 +128,25 @@ public class GTAttributeTypeAdapter implements org.geotools.feature.AttributeTyp
     public void validate(Object obj) throws IllegalArgumentException {
         // TODO Auto-generated method stub
     }
+
+	public AttributeType getType() {
+		return adaptee.getType();
+	}
+
+	public Name getName() {
+		return adaptee.getName();
+	}
+
+	public Object getUserData(Object key) {
+		return adaptee.getUserData(key);
+	}
+
+	public void putUserData(Object key, Object data) {
+		adaptee.putUserData(key, data);
+	}
+
+	public PropertyType type() {
+		return adaptee.type();
+	}
 
 }

@@ -118,7 +118,7 @@ public class OracleFeatureWriter extends JDBCTextFeatureWriter {
                     LOGGER.fine("ORACLE SPATIAL: geometry to be written:"
                         + geometry);
                     
-                    int srid = queryData.getFeatureTypeInfo().getSRID(type.getName());
+                    int srid = queryData.getFeatureTypeInfo().getSRID(type.getLocalName());
                     geometry.setSRID(srid);
                     
                     STRUCT struct = converter.toSDO(geometry);
@@ -179,7 +179,7 @@ public class OracleFeatureWriter extends JDBCTextFeatureWriter {
                     
                     // set the proper SRID, otherwise insertion will fail due to issues
                     // with the spatial index
-                    int srid = queryData.getFeatureTypeInfo().getSRID(type.getName());
+                    int srid = queryData.getFeatureTypeInfo().getSRID(type.getLocalName());
                     geometry.setSRID(srid);
                     
             		STRUCT struct = converter.toSDO( geometry );

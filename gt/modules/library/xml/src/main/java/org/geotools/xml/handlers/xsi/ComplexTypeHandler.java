@@ -1035,7 +1035,7 @@ public class ComplexTypeHandler extends XSIElementHandler {
         }
 
         /**
-         * @see org.geotools.xml.xsi.Type#getName()
+         * @see org.geotools.xml.xsi.Type#getLocalName()
          */
         public String getName() {
             return name;

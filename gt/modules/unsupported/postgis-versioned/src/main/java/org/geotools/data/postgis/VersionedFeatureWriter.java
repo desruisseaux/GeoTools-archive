@@ -237,9 +237,9 @@ class VersionedFeatureWriter implements FeatureWriter {
                 boolean dirty = false;
                 for (int i = 0; i < liveFeature.getNumberOfAttributes(); i++) {
                     AttributeType at = liveFeature.getFeatureType().getAttributeType(i);
-                    Object newValue = liveFeature.getAttribute(at.getName());
-                    Object oldValue = oldFeature.getAttribute(at.getName());
-                    newFeature.setAttribute(at.getName(), newValue);
+                    Object newValue = liveFeature.getAttribute(at.getLocalName());
+                    Object oldValue = oldFeature.getAttribute(at.getLocalName());
+                    newFeature.setAttribute(at.getLocalName(), newValue);
                     if (!DataUtilities.attributesEqual(newValue, oldValue)) {
                         dirty = true;
                     }
@@ -263,7 +263,7 @@ class VersionedFeatureWriter implements FeatureWriter {
                 // copy attributes from live to new
                 for (int i = 0; i < liveFeature.getNumberOfAttributes(); i++) {
                     AttributeType at = liveFeature.getFeatureType().getAttributeType(i);
-                    oldFeature.setAttribute(at.getName(), liveFeature.getAttribute(at.getName()));
+                    oldFeature.setAttribute(at.getLocalName(), liveFeature.getAttribute(at.getLocalName()));
                 }
                 
                 // write the old one
@@ -278,7 +278,7 @@ class VersionedFeatureWriter implements FeatureWriter {
                 // copy attributes from live to new
                 for (int i = 0; i < liveFeature.getNumberOfAttributes(); i++) {
                     AttributeType at = liveFeature.getFeatureType().getAttributeType(i);
-                    newFeature.setAttribute(at.getName(), liveFeature.getAttribute(at.getName()));
+                    newFeature.setAttribute(at.getLocalName(), liveFeature.getAttribute(at.getLocalName()));
                 }
     
                 //set revision and expired,

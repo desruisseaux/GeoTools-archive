@@ -28,14 +28,14 @@ public class JDBCTypeBuilderTest extends TestCase {
 		typeBuilder.attribute( "double", Types.DOUBLE );
 		typeBuilder.attribute( "string", Types.VARCHAR );
 		
-		FeatureType featureType = typeBuilder.feature();
+		FeatureType featureType = typeBuilder.buildFeatureType();
 		assertNotNull( featureType );
 		assertNotNull( featureType.getAttributeType( "int" ) );
-		assertEquals( Integer.class, featureType.getAttributeType( "int" ).getType() );
+		assertEquals( Integer.class, featureType.getAttributeType( "int" ).getBinding() );
 		assertNotNull( featureType.getAttributeType( "double" ) );
-		assertEquals( Double.class, featureType.getAttributeType( "double" ).getType() );
+		assertEquals( Double.class, featureType.getAttributeType( "double" ).getBinding() );
 		assertNotNull( featureType.getAttributeType( "string" ) );
-		assertEquals( String.class, featureType.getAttributeType( "string" ).getType() );
+		assertEquals( String.class, featureType.getAttributeType( "string" ).getBinding() );
 	}
 	
 }

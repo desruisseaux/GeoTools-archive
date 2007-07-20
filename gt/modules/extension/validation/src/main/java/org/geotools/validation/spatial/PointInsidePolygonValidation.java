@@ -95,7 +95,7 @@ public class PointInsidePolygonValidation extends PointPolygonAbstractValidation
 
         for (int i = 0; i < points.length; i++) {
             Feature tmp = (Feature) points[i];
-            Geometry gt = tmp.getDefaultGeometry();
+            Geometry gt = tmp.getPrimaryGeometry();
 
             if (gt instanceof Polygon) {
             	Polygon ls = (Polygon) gt;
@@ -103,7 +103,7 @@ public class PointInsidePolygonValidation extends PointPolygonAbstractValidation
                 boolean r = false;
                 for (int j = 0; j < polys.length && !r; j++) {
                     Feature tmp2 = (Feature) polys[j];
-                    Geometry gt2 = tmp2.getDefaultGeometry();
+                    Geometry gt2 = tmp2.getPrimaryGeometry();
 
                     if (gt2 instanceof Point) {
                     	Point pt = (Point) gt2;

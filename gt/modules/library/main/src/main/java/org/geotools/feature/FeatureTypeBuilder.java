@@ -587,7 +587,7 @@ public abstract class FeatureTypeBuilder extends FeatureTypes implements Factory
      */
     public final boolean contains(AttributeType type) {
         for (int i = 0, ii = getAttributeCount(); i < ii; i++) {
-            if (get(i).getName().equals(type.getName())) {
+            if (get(i).getLocalName().equals(type.getLocalName())) {
                 return true;
             }
         }

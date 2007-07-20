@@ -122,7 +122,7 @@ public class BypassSqlSQLBuilder extends GeoAPISQLBuilder {
 		}
 
 		for (int i = 0; i < attributes.length; i++) {
-			alias = attributes[i].getName();
+			alias = attributes[i].getLocalName();
 			sqlExpression = (String)aliases.get(alias);
 
 			String fieldName = sqlExpression;
@@ -188,7 +188,7 @@ public class BypassSqlSQLBuilder extends GeoAPISQLBuilder {
 	private String getSelect(String sqlQueryDefinition, FeatureType fType)
 			throws SQLEncoderException {
 		AttributeType firstAtt = fType.getAttributeTypes()[0];
-		String firstAttName = firstAtt.getName().toLowerCase();
+		String firstAttName = firstAtt.getLocalName().toLowerCase();
 
 		int index = sqlQueryDefinition.indexOf(firstAttName);
 		if (index == -1) {

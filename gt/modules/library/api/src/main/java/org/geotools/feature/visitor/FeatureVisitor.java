@@ -25,7 +25,8 @@ import org.geotools.feature.Feature;
  *
  * @since 2.2.M2
  * @source $URL$
+ * @deprecated use {@link org.opengis.feature.FeatureVisitor}.
  */
-public interface FeatureVisitor {
+public interface FeatureVisitor extends org.opengis.feature.FeatureVisitor {
     public void visit(Feature feature);
 }

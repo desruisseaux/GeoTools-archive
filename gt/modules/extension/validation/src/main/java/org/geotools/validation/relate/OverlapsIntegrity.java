@@ -189,7 +189,7 @@ public class OverlapsIntegrity extends RelationIntegrity
 				counter++;
 				Feature f1 = fr1.next();
 				
-				Geometry g1 = f1.getDefaultGeometry();
+				Geometry g1 = f1.getPrimaryGeometry();
 				Filter filter2 = filterBBox(g1.getEnvelope().getEnvelopeInternal(), ft);
 
 				FeatureCollection collectionB = featureSourceB.getFeatures(filter2);
@@ -200,7 +200,7 @@ public class OverlapsIntegrity extends RelationIntegrity
 					while (fr2 != null && fr2.hasNext())
 					{
 						Feature f2 = fr2.next();
-						Geometry g2 = f2.getDefaultGeometry();
+						Geometry g2 = f2.getPrimaryGeometry();
 						if (!usedIDs.contains(f2.getID()))
 						{
 							
@@ -305,7 +305,7 @@ public class OverlapsIntegrity extends RelationIntegrity
 				counter++;
 				Feature f1 = fr1.next();
 				
-				Geometry g1 = f1.getDefaultGeometry();
+				Geometry g1 = f1.getPrimaryGeometry();
 				Filter filter2 = filterBBox(g1.getEnvelope().getEnvelopeInternal(), ft);
 
 				FeatureCollection collectionB = featureSourceA.getFeatures(filter2);
@@ -316,7 +316,7 @@ public class OverlapsIntegrity extends RelationIntegrity
 					while (fr2 != null && fr2.hasNext())
 					{
 						Feature f2 = fr2.next();
-						Geometry g2 = f2.getDefaultGeometry();
+						Geometry g2 = f2.getPrimaryGeometry();
 						if (!usedIDs.contains(f2.getID()))
 						{
 							
@@ -376,7 +376,7 @@ public class OverlapsIntegrity extends RelationIntegrity
 		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 		BBoxExpression bboxExpr = ff.createBBoxExpression(bBox);
 		//GeometryFilter bbFilter = ff.createGeometryFilter(Filter.GEOMETRY_BBOX);
-		AttributeExpression geomExpr = ff.createAttributeExpression(ft, ft.getDefaultGeometry().getName());
+		AttributeExpression geomExpr = ff.createAttributeExpression(ft, ft.getPrimaryGeometry().getLocalName());
 		GeometryFilter disjointFilter = ff.createGeometryFilter(FilterType.GEOMETRY_DISJOINT);
 		disjointFilter.addLeftGeometry(geomExpr);
 		disjointFilter.addRightGeometry(bboxExpr);

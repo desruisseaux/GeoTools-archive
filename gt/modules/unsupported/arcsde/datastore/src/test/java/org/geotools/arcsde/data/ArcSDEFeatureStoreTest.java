@@ -139,7 +139,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         FeatureSource fs = ds.getFeatureSource(typeName);
         FeatureType schema = fs.getSchema();
         AttributeType att = schema.getAttributeType(0);
-        String attName = att.getName();
+        String attName = att.getLocalName();
 
         FeatureIterator reader = fs.getFeatures().features();
         Object val1 = reader.next().getAttribute(0);
@@ -416,8 +416,8 @@ public class ArcSDEFeatureStoreTest extends TestCase {
                     Transaction.AUTO_COMMIT);
             assertTrue(r.hasNext());
             f = r.next();
-            LOGGER.info("recovered geometry " + f.getDefaultGeometry() + " from single inserted feature.");
-            assertTrue(f.getDefaultGeometry().isEmpty());
+            LOGGER.info("recovered geometry " + f.getPrimaryGeometry() + " from single inserted feature.");
+            assertTrue(f.getPrimaryGeometry().isEmpty());
             //save the ID to update the feature later
             String newId = f.getID();
             assertFalse(r.hasNext());
@@ -454,7 +454,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
             r = ds.getFeatureReader(query, Transaction.AUTO_COMMIT);
             assertTrue(r.hasNext());
             f = r.next();
-            MultiLineString recoveredMLS = (MultiLineString)f.getDefaultGeometry();
+            MultiLineString recoveredMLS = (MultiLineString)f.getPrimaryGeometry();
             assertTrue(!recoveredMLS.isEmpty());
             //I tried to compare the recovered MLS to the sampleMultiLineString, but they're
             // slightly different.  SDE does some rounding, and winds up giving me 0.0000002 for zero,

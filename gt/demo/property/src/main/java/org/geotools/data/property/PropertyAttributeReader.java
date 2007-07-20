@@ -283,7 +283,7 @@ public class PropertyAttributeReader implements AttributeReader {
                     e);
             }
         } else {
-        	value = Converters.convert( stringValue, attType.getType() );
+        	value = Converters.convert( stringValue, attType.getBinding() );
         }
 
         return value;

@@ -18,6 +18,7 @@ package org.geotools.feature.visitor;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import org.geotools.feature.Feature;
+import org.opengis.feature.type.FeatureCollectionType;
 
 
 /**
@@ -31,11 +32,20 @@ import org.geotools.feature.Feature;
 public class BoundsVisitor implements FeatureCalc {
     Envelope bounds = new Envelope();
 
+    public void init(FeatureCollectionType collection) {
+    	//do nothing
+    }
+    
+    
     public void visit(Feature feature) {
-        Geometry geom = feature.getDefaultGeometry();
-        Envelope bbox = geom.getEnvelopeInternal();
+       visit((org.opengis.feature.Feature)feature);
+    }
+    
+    public void visit(org.opengis.feature.Feature feature) {
+    	 Geometry geom = (Geometry) feature.getDefaultGeometry().get();
+         Envelope bbox = geom.getEnvelopeInternal();
 
-        bounds.expandToInclude(bbox);
+         bounds.expandToInclude(bbox);
     }
 
     public Envelope getBounds() {

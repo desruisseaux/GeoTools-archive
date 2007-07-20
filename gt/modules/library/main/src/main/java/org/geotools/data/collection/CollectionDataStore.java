@@ -139,14 +139,14 @@ public class CollectionDataStore extends AbstractDataStore {
         if (iterator.hasNext()) {
             int count = 1;
             Filter filter = query.getFilter();
-            envelope = iterator.next().getDefaultGeometry().getEnvelopeInternal();
+            envelope = iterator.next().getPrimaryGeometry().getEnvelopeInternal();
 
             while (iterator.hasNext() && (count < query.getMaxFeatures())) {
                 Feature feature = iterator.next();
 
                 if (filter.evaluate(feature)) {
                     count++;
-                    envelope.expandToInclude(feature.getDefaultGeometry().getEnvelopeInternal());
+                    envelope.expandToInclude(feature.getPrimaryGeometry().getEnvelopeInternal());
                 }
             }
         }

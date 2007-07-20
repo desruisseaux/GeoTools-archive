@@ -60,12 +60,12 @@ public class ChoiceAttrTypeTest extends TestCase {
 
     public void testGetName() {
         AttributeType type = SampleFeatureFixtures.getChoiceAttrType1();
-        assertEquals("choiceTest1", type.getName());
+        assertEquals("choiceTest1", type.getLocalName());
     }
 
     public void testGetType() {
         AttributeType type = SampleFeatureFixtures.getChoiceAttrType1();
-        assertEquals(Object.class, type.getType());
+        assertEquals(Object.class, type.getBinding());
     }
 
     public void testEquals() {

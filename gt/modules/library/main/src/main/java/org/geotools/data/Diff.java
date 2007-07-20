@@ -137,7 +137,7 @@ public class Diff{
 	}
 	
 	protected void addToSpatialIndex(Feature f) {
-		if (f.getDefaultGeometry() != null) {
+		if (f.getPrimaryGeometry() != null) {
 			Envelope bounds = f.getBounds();
 			if( !bounds.isNull() )
 				spatialIndex.insert(bounds, f);

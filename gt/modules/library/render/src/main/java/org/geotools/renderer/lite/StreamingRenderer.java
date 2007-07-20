@@ -787,7 +787,7 @@ public final class StreamingRenderer implements GTRenderer {
 				length = ats.length;
 				attributes = new String[length];
 				for (int t = 0; t < length; t++) {
-					attributes[t] = ats[t].getName();
+					attributes[t] = ats[t].getLocalName();
 				}
 			} else {
 				attributes = findStyleAttributes(styles, schema);
@@ -1122,7 +1122,7 @@ public final class StreamingRenderer implements GTRenderer {
 
 		final int attTypesLength = attTypes.length;
 		for (int i = 0; i < attTypesLength; i++) {
-			attName = attTypes[i].getName();
+			attName = attTypes[i].getLocalName();
 
 			// DJB: This geometry check was commented out. I think it should
 			// actually be back in or
@@ -1152,8 +1152,8 @@ public final class StreamingRenderer implements GTRenderer {
 			// DJB:geos-469 if the default geometry was used in the style, we
 			// need to grab it.
 			if (sae.getDefaultGeometryUsed()
-					&& (!atts.contains(schema.getDefaultGeometry().getName()))) {
-				atts.add(schema.getDefaultGeometry().getName());
+					&& (!atts.contains(schema.getPrimaryGeometry().getLocalName()))) {
+				atts.add(schema.getPrimaryGeometry().getLocalName());
 			}
 		} catch (Exception e) {
 			// might not be a geometry column. That will cause problems down the
@@ -1207,7 +1207,7 @@ public final class StreamingRenderer implements GTRenderer {
 			}
 
 			if (attType instanceof GeometryAttributeType) {                                
-                BBOX gfilter = filterFactory.bbox( attType.getName(), bbox.getMinX(), bbox.getMinY(), bbox.getMaxX(), bbox.getMaxY(), null );
+                BBOX gfilter = filterFactory.bbox( attType.getLocalName(), bbox.getMinX(), bbox.getMinY(), bbox.getMaxX(), bbox.getMaxY(), null );
                 
 				if (filter == null) {
 					filter = gfilter;
@@ -1427,7 +1427,7 @@ public final class StreamingRenderer implements GTRenderer {
         // The correct value is in sourceCrs.
 
         // this is the reader's CRS
-        CoordinateReferenceSystem rCS = features.getSchema().getDefaultGeometry().getCoordinateSystem();
+        CoordinateReferenceSystem rCS = features.getSchema().getPrimaryGeometry().getCoordinateSystem();
 
         // sourceCrs == source's real SRS
         // if we need to recode the incoming geometries
@@ -1517,7 +1517,7 @@ public final class StreamingRenderer implements GTRenderer {
         if ( featureSource != null ) {
 			final FeatureType schema = featureSource.getSchema();
 	        
-			final GeometryAttributeType geometryAttribute = schema.getDefaultGeometry();
+			final GeometryAttributeType geometryAttribute = schema.getPrimaryGeometry();
 			sourceCrs = geometryAttribute.getCoordinateSystem();
 			if (LOGGER.isLoggable(Level.FINE)) {
 				LOGGER.fine(new StringBuffer("processing ").append(
@@ -2070,7 +2070,7 @@ public final class StreamingRenderer implements GTRenderer {
             String geomName = getGeometryPropertyName(s).getPropertyName();        
             if (geomName == null || "".equals(geomName)) {
                 FeatureType schema = f.getFeatureType();
-                GeometryAttributeType geom = schema.getDefaultGeometry();
+                GeometryAttributeType geom = schema.getPrimaryGeometry();
                 return geom.getCoordinateSystem();
             } else {
                 FeatureType schema = f.getFeatureType();

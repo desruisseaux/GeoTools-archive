@@ -22,6 +22,8 @@ import java.util.TreeMap;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.collection.AbstractFeatureCollection;
+import org.geotools.feature.collection.AbstractResourceCollection;
+
 import org.geotools.feature.collection.FeatureState;
 import org.geotools.feature.collection.RandomFeatureAccess;
 
@@ -45,28 +47,32 @@ public class MemoryFeatureCollection extends AbstractFeatureCollection implement
     
     public MemoryFeatureCollection( FeatureType schema ){
         super( schema );
+        setResourceCollection(
+    		new AbstractResourceCollection() {
+    			public boolean add( Object o ) {
+    		        Feature feature = (Feature) o;
+    		        contents.put( feature.getID(), feature );
+    		        return true;
+    			}
+    		    
+			  public int size() {
+			        return contents.size();
+			  }
+
+			  public Iterator openIterator() {
+			        return new MemoryIterator( contents.values().iterator() );
+			  }
+
+			  public void closeIterator( Iterator close ) {
+			        if( close == null ) return;
+			        
+			        MemoryIterator it = (MemoryIterator) close;
+			        it.close();
+			  }
+    	   }
+		);
     }
     
-    public int size() {
-        return contents.size();
-    }
-
-    protected Iterator openIterator() {
-        return new MemoryIterator( contents.values().iterator() );
-    }
-
-    protected void closeIterator( Iterator close ) {
-        if( close == null ) return;
-        
-        MemoryIterator it = (MemoryIterator) close;
-        it.close();
-    }
-    
-    public boolean add( Object o ) {
-        Feature feature = (Feature) o;
-        contents.put( feature.getID(), feature );
-        return true;
-    }
     
     class MemoryIterator implements Iterator {
         Iterator it;

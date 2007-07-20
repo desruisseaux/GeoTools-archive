@@ -72,10 +72,10 @@ public class GMLDataStoreTest extends AbstractGMLTestCase {
         assertNotNull(schema);
         assertEquals(3, schema.getAttributeCount());
         assertEquals(MultiLineString.class,
-            schema.getAttributeType("the_geom").getType());
-        assertEquals(String.class, schema.getAttributeType("FID").getType());
-        assertEquals(String.class, schema.getAttributeType("NAME").getType());
-        assertEquals(CRS.decode("EPSG:4326"), schema.getDefaultGeometry().getCoordinateSystem());
+            schema.getAttributeType("the_geom").getBinding());
+        assertEquals(String.class, schema.getAttributeType("FID").getBinding());
+        assertEquals(String.class, schema.getAttributeType("NAME").getBinding());
+        assertEquals(CRS.decode("EPSG:4326"), schema.getPrimaryGeometry().getCoordinateSystem());
     }
 
     /**
@@ -96,13 +96,13 @@ public class GMLDataStoreTest extends AbstractGMLTestCase {
             assertEquals("Streams.1", feature1.getID());
             assertEquals("Cam Stream", feature1.getAttribute("NAME"));
             assertEquals("111", feature1.getAttribute("FID"));
-            assertTrue(feature1.getDefaultGeometry() instanceof MultiLineString);
+            assertTrue(feature1.getPrimaryGeometry() instanceof MultiLineString);
 
             feature1 = reader.next();
             assertEquals("Streams.2", feature1.getID());
             assertEquals("", feature1.getAttribute("NAME"));
             assertEquals("112", feature1.getAttribute("FID"));
-            assertTrue(feature1.getDefaultGeometry() instanceof MultiLineString);
+            assertTrue(feature1.getPrimaryGeometry() instanceof MultiLineString);
         } finally {
             reader.close();
         }

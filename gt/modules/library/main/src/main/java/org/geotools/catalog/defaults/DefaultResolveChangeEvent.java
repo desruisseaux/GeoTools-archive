@@ -91,7 +91,7 @@ public class DefaultResolveChangeEvent implements ResolveChangeEvent {
     }
 
     /**
-     * @see net.refractions.udig.catalog.ICatalogChangeEvent#getType()
+     * @see net.refractions.udig.catalog.ICatalogChangeEvent#getBinding()
      */
     public Type getType() {
         return type;

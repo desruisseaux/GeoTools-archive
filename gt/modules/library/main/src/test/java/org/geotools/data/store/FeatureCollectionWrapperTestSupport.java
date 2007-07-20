@@ -2,6 +2,7 @@ package org.geotools.data.store;
 
 import junit.framework.TestCase;
 
+import org.geotools.feature.DefaultFeatureBuilder;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
@@ -10,6 +11,7 @@ import org.geotools.feature.simple.SimpleFeatureFactoryImpl;
 import org.geotools.feature.simple.SimpleSchema;
 import org.geotools.feature.simple.SimpleTypeBuilder;
 import org.geotools.feature.simple.SimpleTypeFactoryImpl;
+import org.geotools.feature.type.DefaultFeatureTypeBuilder;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -27,20 +29,20 @@ public class FeatureCollectionWrapperTestSupport extends TestCase {
 		crs = CRS.parseWKT( 
 			"GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]]" 
 		);
-		SimpleTypeBuilder typeBuilder = new SimpleTypeBuilder( new SimpleTypeFactoryImpl() );
-		typeBuilder.load( new SimpleSchema() );
+		DefaultFeatureTypeBuilder typeBuilder = new DefaultFeatureTypeBuilder();
 		
 		typeBuilder.setName( "test" );
 		typeBuilder.setNamespaceURI( "test" );
 		typeBuilder.setCRS( crs );
-		typeBuilder.addAttribute( "defaultGeom", Point.class );
-		typeBuilder.addAttribute( "someAtt", Integer.class );
-		typeBuilder.addAttribute( "otherGeom", LineString.class );
-		typeBuilder.setGeometryName( "defaultGeom" );
+		typeBuilder.add( "defaultGeom", Point.class, crs );
+		typeBuilder.add( "someAtt", Integer.class );
+		typeBuilder.add( "otherGeom", LineString.class );
+		typeBuilder.setDefaultGeometry( "defaultGeom" );
 		
-		FeatureType featureType = typeBuilder.feature();
+		FeatureType featureType = (FeatureType) typeBuilder.buildFeatureType();
 		
-		SimpleFeatureBuilder builder = new SimpleFeatureBuilder( new SimpleFeatureFactoryImpl() );
+		DefaultFeatureBuilder builder = new DefaultFeatureBuilder();
+		builder.setType( featureType );
 		
 		GeometryFactory gf = new GeometryFactory();
 		delegate = new DefaultFeatureCollection( "test", featureType ){};
@@ -48,9 +50,6 @@ public class FeatureCollectionWrapperTestSupport extends TestCase {
 		double x = -140;
 		double y = 45;
 		for ( int i = 0; i < 5; i++ ) {
-			builder.init();
-			builder.setType( featureType );
-			
 			Point point = gf.createPoint( new Coordinate( x+i, y+i ) );
 			point.setUserData( crs );
 			

@@ -16,7 +16,10 @@
 package org.geotools.feature.collection;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.data.collection.DelegateFeatureReader;
@@ -28,8 +31,10 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureList;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureCollectionImpl;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.type.AttributeType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.sort.SortBy;
@@ -49,19 +54,23 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @source $URL$
  */
-public class SubFeatureCollection extends AbstractResourceCollection implements FeatureCollection {
+public class SubFeatureCollection extends BaseFeatureCollection implements FeatureCollection {
 	/** Filter */
     protected Filter filter;
     
     /** Origional Collection */
 	protected FeatureCollection collection;    
-    protected FeatureState state;
+    //protected FeatureState state;
     protected FilterFactory ff = CommonFactoryFinder.getFilterFactory( null );
+    
+    protected AbstractResourceCollection rc; 
     
     public SubFeatureCollection(FeatureCollection collection ) {
         this( collection, null );
     }
 	public SubFeatureCollection(FeatureCollection collection, Filter subfilter ){
+		super(null,collection.getFeatureCollectionType());
+		
 		if (subfilter != null && subfilter.equals(Filter.EXCLUDE)) {
 			throw new IllegalArgumentException("A subcollection with Filter.EXCLUDE is a null operation");
 		}
@@ -76,7 +85,38 @@ public class SubFeatureCollection extends AbstractResourceCollection implements 
 			this.collection = collection;
 			this.filter = subfilter;
 		}
-        state = new SubFeatureState( this.collection, this );
+        
+        rc = createResourceCollection();
+    }
+	
+	AbstractResourceCollection createResourceCollection() {
+		return new AbstractResourceCollection() {
+			public Iterator openIterator() {
+    			return new FilteredIterator( collection, filter() );
+    		}
+
+    		public void closeIterator(Iterator iterator) {
+    			if( iterator == null ) return;
+    			
+    			if( iterator instanceof FilteredIterator){
+    				FilteredIterator filtered = (FilteredIterator) iterator;			
+    				filtered.close();
+    			}
+    		}
+    		
+    		public int size() {
+    			int count = 0;
+    			Iterator i = null;		
+    			try {
+    				for( i = iterator(); i.hasNext(); count++) i.next();
+    			}
+    			finally {
+    				close( i );
+    			}
+    			return count;
+    		}
+			
+		};
 	}
     
 	protected Filter filter(){
@@ -90,92 +130,15 @@ public class SubFeatureCollection extends AbstractResourceCollection implements 
         return Filter.INCLUDE;
     }
     
-	public FeatureType getFeatureType() {
-		return state.getFeatureType();
-	}
-	
 	public FeatureIterator features() {
 		return new DelegateFeatureIterator( this, iterator() );		
 	}	
 	
-	public void closeIterator(Iterator iterator) {
-		if( iterator == null ) return;
-		
-		if( iterator instanceof FilteredIterator){
-			FilteredIterator filtered = (FilteredIterator) iterator;			
-			filtered.close();
-		}
-	}
+	
 	public void close(FeatureIterator close) {
 		if( close != null ) close.close();
 	}
 
-    //
-    // Feature methods
-    //
-	public String getID() {
-		return state.getId();
-	}
-
-	public ReferencedEnvelope getBounds(){
-        return ReferencedEnvelope.reference(state.getBounds());        
-	}
-	
-	public final Geometry getDefaultGeometry() {
-		return getPrimaryGeometry();
-	}
-	
-	public Geometry getPrimaryGeometry() {
-		return state.getDefaultGeometry();
-	}
-
-	public final void setDefaultGeometry(Geometry g) throws IllegalAttributeException {
-		setPrimaryGeometry(g);
-	}
-	
-	public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
-		state.setDefaultGeometry( geometry );
-	}
-	
-    public void addListener(CollectionListener listener) throws NullPointerException {
-        state.addListener( listener );
-    }
-
-    public void removeListener(CollectionListener listener) throws NullPointerException {
-        state.removeListener( listener );
-    }
-    
-    public FeatureCollection getParent() {
-        return state.getParent(); 
-    }
-
-    public void setParent(FeatureCollection collection) {
-        state.setParent( collection );
-    }
-
-    public Object[] getAttributes(Object[] attributes) {
-        return state.getAttributes( attributes );
-    }
-
-    public Object getAttribute(String xPath) {
-        return state.getAttribute( xPath );
-    }
-
-    public Object getAttribute(int index) {
-        return state.getAttribute( index );
-    }
-
-    public void setAttribute(int position, Object val) throws IllegalAttributeException, ArrayIndexOutOfBoundsException {
-        state.setAttribute( position, val  );
-    }
-    public int getNumberOfAttributes() {
-        return state.getNumberOfAttributes();
-    }
-
-    public void setAttribute(String xPath, Object attribute) throws IllegalAttributeException {
-        state.setAttribute( xPath, attribute );
-    }
-    
     //
     //
     //
@@ -189,18 +152,7 @@ public class SubFeatureCollection extends AbstractResourceCollection implements 
 		return new SubFeatureCollection(this, filter);
 	}
 
-	public int size() {
-		int count = 0;
-		Iterator i = null;		
-		try {
-			for( i = iterator(); i.hasNext(); count++) i.next();
-		}
-		finally {
-			close( i );
-		}
-		return count;
-	}
-
+	
 	public boolean isEmpty() {
 		Iterator iterator = iterator();
 		try {
@@ -211,10 +163,6 @@ public class SubFeatureCollection extends AbstractResourceCollection implements 
 		}
 	}
 	
-	public Iterator openIterator() {
-		return new FilteredIterator( collection, filter() );
-	}
-
 
 	public FeatureType getSchema() {
         return collection.getSchema();
@@ -224,8 +172,12 @@ public class SubFeatureCollection extends AbstractResourceCollection implements 
      * Accepts a visitor, which then visits each feature in the collection.
      * @throws IOException 
      */
-    public void accepts(FeatureVisitor visitor, ProgressListener progress ) throws IOException {
-        Iterator iterator = null;
+    public final void accepts(FeatureVisitor visitor, ProgressListener progress ) throws IOException {
+        accepts((org.opengis.feature.FeatureVisitor) visitor, (org.opengis.util.ProgressListener) progress);
+    }
+    
+	public void accepts(org.opengis.feature.FeatureVisitor visitor, org.opengis.util.ProgressListener progress) {
+		Iterator iterator = null;
         // if( progress == null ) progress = new NullProgressListener();
         try{
             float size = size();
@@ -245,7 +197,7 @@ public class SubFeatureCollection extends AbstractResourceCollection implements 
             progress.complete();            
             close( iterator );
         }
-    }
+	}	
 
 	public FeatureReader reader() throws IOException {
 		return new DelegateFeatureReader( getSchema(), features() );
@@ -265,5 +217,45 @@ public class SubFeatureCollection extends AbstractResourceCollection implements 
 
 	public void purge() {
 		collection.purge();
-	}	
+	}
+	public void close(Iterator close) {
+		rc.close(close);
+	}
+	public Iterator iterator() {
+		return rc.iterator();
+	}
+	public boolean add(Object o) {
+		return rc.add(o); 
+	}
+	public boolean addAll(Collection c) {
+		return rc.addAll(c);
+	}
+	public void clear() {
+		rc.clear();
+	}
+	public boolean contains(Object o) {
+		return rc.contains(o);
+	}
+	public boolean containsAll(Collection c) {
+		return rc.containsAll(c);
+	}
+	public boolean remove(Object o) {
+		return rc.remove(o);
+	}
+	public boolean removeAll(Collection c) {
+		return rc.removeAll(c);
+	}
+	public boolean retainAll(Collection c) {
+		return rc.retainAll(c);
+	}
+	public int size() {
+		return rc.size();
+	}
+	public Object[] toArray() {
+		return rc.toArray();
+	}
+	public Object[] toArray(Object[] a) {
+		return rc.toArray(a);
+	}
+
 }

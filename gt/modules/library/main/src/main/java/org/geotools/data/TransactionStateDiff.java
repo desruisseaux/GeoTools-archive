@@ -17,8 +17,10 @@ package org.geotools.data;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -29,7 +31,13 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SimpleFeature;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.GeometryAttribute;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.Name;
+import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.Filter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -362,11 +370,6 @@ public class TransactionStateDiff implements State {
 			return null;
 		}
 
-		public Geometry getDefaultGeometry() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
 		public Geometry getPrimaryGeometry() {
 			// TODO Auto-generated method stub
 			return null;
@@ -402,11 +405,6 @@ public class TransactionStateDiff implements State {
 			
 		}
 
-		public void setDefaultGeometry(Geometry arg0) throws IllegalAttributeException {
-			// TODO Auto-generated method stub
-			
-		}
-		
 		public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
 			// TODO Auto-generated method stub
 			
@@ -415,6 +413,146 @@ public class TransactionStateDiff implements State {
 		public void setParent(FeatureCollection arg0) {
 			// TODO Auto-generated method stub
 			
+		}
+
+		public Object getDefaultGeometryValue() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public AttributeType getType() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public List getTypes() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public Object getValue(String name) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public Object getValue(int index) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public List getValues() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public Object operation(String name, Object parameters) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public void setDefaultGeometryValue(Object geometry) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public void setValue(String name, Object value) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public void setValue(int index, Object value) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public void setValues(List values) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public void setValues(Object[] values) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public CoordinateReferenceSystem getCRS() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public GeometryAttribute getDefaultGeometry() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public Object getUserData(Object key) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public void putUserData(Object key, Object value) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public void setCRS(CoordinateReferenceSystem crs) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public void setDefaultGeometry(GeometryAttribute geometryAttribute) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public Collection associations() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public Collection attributes() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public Object get() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public List get(Name name) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public AttributeDescriptor getDescriptor() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public void set(Object newValue) throws IllegalArgumentException {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public boolean nillable() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		public Object operation(Name name, List parameters) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public PropertyDescriptor descriptor() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public Name name() {
+			// TODO Auto-generated method stub
+			return null;
 		}
     	
     };

@@ -152,9 +152,9 @@ final class SqlStatementEncoder {
         AttributeType[] attributeTypes = schema.getAttributeTypes();
 
         for (int i = 0; i < attributeTypes.length; i++) {
-            sql.append(attributeTypes[i].getName());
+            sql.append(attributeTypes[i].getLocalName());
             sql.append(" ");
-            sql.append( makeType( attributeTypes[i].getType() ));
+            sql.append( makeType( attributeTypes[i].getBinding() ));
             if (i < (attributeTypes.length - 1)) {
                 sql.append(",");
             } else { 
@@ -180,7 +180,7 @@ final class SqlStatementEncoder {
     	StringBuffer sql = new StringBuffer();
     	
         // SPATIAL INDEX (On default geometry)
-        String defaultGeometry = schema.getDefaultGeometry().getName();
+        String defaultGeometry = schema.getPrimaryGeometry().getLocalName();
     	sql.append("CREATE INDEX ");
     	sql.append( tableName );
         sql.append("_sidx ON ");
@@ -217,7 +217,7 @@ final class SqlStatementEncoder {
         AttributeType[] attributeTypes = featureType.getAttributeTypes();
 
         for (int i = 0; i < attributeTypes.length; i++) {
-            sql.append(attributeTypes[i].getName());
+            sql.append(attributeTypes[i].getLocalName());
             if (i < (attributeTypes.length - 1)) {
                 sql.append(",");
             } else { 
@@ -264,7 +264,7 @@ final class SqlStatementEncoder {
 
         for (int i = 0; i < attrTypes.length; i++) {
             sqlBuffer.append(", ");
-            sqlBuffer.append(attrTypes[i].getName());
+            sqlBuffer.append(attrTypes[i].getLocalName());
         }
 
         sqlBuffer.append(" FROM ");
@@ -307,7 +307,7 @@ final class SqlStatementEncoder {
         buffer.append(" SET ");
 
         for (int i = 0; i < attributeTypes.length; i++) {
-            buffer.append(attributeTypes[i].getName());
+            buffer.append(attributeTypes[i].getLocalName());
             buffer.append(" = ? ");
             if (i < (attributeTypes.length - 1)) {
                 buffer.append(", ");
@@ -334,7 +334,7 @@ final class SqlStatementEncoder {
     	StringBuffer sql = new StringBuffer();
     	
         // SPATIAL INDEX (On default geometry)
-        String defaultGeometry = featureType.getDefaultGeometry().getName();
+        String defaultGeometry = featureType.getPrimaryGeometry().getLocalName();
         
     	sql.append("INSERT INTO user_sdo_geom_metadata");    	
     	sql.append("  (TABLE_NAME, COLUMN_NAME,DIMINFO,SRID)");

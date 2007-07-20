@@ -609,7 +609,7 @@ public class WFSSchema implements Schema {
         }
 
         /**
-         * @see schema.Element#getName()
+         * @see schema.Element#getLocalName()
          */
         public String getName() {
             return name;
@@ -630,7 +630,7 @@ public class WFSSchema implements Schema {
         }
 
         /**
-         * @see schema.Element#getType()
+         * @see schema.Element#getBinding()
          */
         public Type getType() {
             return type;

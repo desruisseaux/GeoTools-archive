@@ -24,6 +24,8 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
+import org.opengis.feature.type.Name;
+import org.opengis.feature.type.PropertyType;
 import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -177,13 +179,6 @@ public class VPFColumn implements AttributeType, DataTypesDefinition {
 //        return attribute.getFieldLength();
 //    }
 
-    /* (non-Javadoc)
-     * @see org.geotools.feature.AttributeType#getName()
-     */
-    public String getName() {
-        return attribute.getName();
-    }
-    
     /**
      * {@inheritDoc}
      */
@@ -209,13 +204,6 @@ public class VPFColumn implements AttributeType, DataTypesDefinition {
         return this.thematicIdx;
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.feature.AttributeType#getType()
-     */
-    public Class getType() {
-        return attribute.getType();
-    }
-    
     /**
      * {@inheritDoc}
      */
@@ -331,4 +319,23 @@ public class VPFColumn implements AttributeType, DataTypesDefinition {
     public int hashCode() {
 	return attribute.hashCode();
     }
+    
+	public org.opengis.feature.type.AttributeType getType() {
+		return attribute.getType();
+	}
+	public Name getName() {
+		return attribute.getName();
+	}
+	public Object getDefaultValue() {
+		return attribute.getDefaultValue();
+	}
+	public Object getUserData(Object key) {
+		return attribute.getUserData(key);
+	}
+	public void putUserData(Object key, Object data) {
+		attribute.putUserData(key, data);
+	}
+	public PropertyType type() {
+		return attribute.getType();
+	}
 }

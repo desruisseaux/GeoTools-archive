@@ -18,13 +18,24 @@
 package org.geotools.feature;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.GeometryAttribute;
+import org.opengis.feature.simple.SimpleFeatureCollectionType;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.Name;
+import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.util.ProgressListener;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -194,27 +205,11 @@ public class MockFeatureCollection implements org.geotools.feature.FeatureCollec
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.Feature#getDefaultGeometry()
-	 */
-	public Geometry getDefaultGeometry() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
 	public Geometry getPrimaryGeometry() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.Feature#setDefaultGeometry(com.vividsolutions.jts.geom.Geometry)
-	 */
-	public void setDefaultGeometry(Geometry geometry) throws IllegalAttributeException {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
 		// TODO Auto-generated method stub
 		
@@ -256,6 +251,165 @@ public class MockFeatureCollection implements org.geotools.feature.FeatureCollec
 	}
 
 	public void purge() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public Object getDefaultGeometryValue() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public AttributeType getType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public List getTypes() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Object getValue(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Object getValue(int index) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public List getValues() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Object operation(String name, Object parameters) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void setDefaultGeometryValue(Object geometry) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setValue(String name, Object value) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setValue(int index, Object value) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setValues(List values) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setValues(Object[] values) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public CoordinateReferenceSystem getCRS() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public GeometryAttribute getDefaultGeometry() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Object getUserData(Object key) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void putUserData(Object key, Object value) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setCRS(CoordinateReferenceSystem crs) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setDefaultGeometry(GeometryAttribute geometryAttribute) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public Collection associations() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Collection attributes() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Object get() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public List get(Name name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public AttributeDescriptor getDescriptor() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void set(Object newValue) throws IllegalArgumentException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public boolean nillable() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public Object operation(Name name, List parameters) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public PropertyDescriptor descriptor() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Name name() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public SimpleFeatureCollectionType getFeatureCollectionType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public SimpleFeatureType getMemberType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Collection memberTypes() {
+		return Collections.EMPTY_SET;
+	}
+	
+	public void accepts(org.opengis.feature.FeatureVisitor visitor, org.opengis.util.ProgressListener progress) {
 		// TODO Auto-generated method stub
 		
 	}

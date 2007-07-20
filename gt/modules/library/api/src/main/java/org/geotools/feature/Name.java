@@ -126,8 +126,8 @@ public class Name implements org.opengis.feature.type.Name {
      * value object with equality based on name and namespace.
      */
     public boolean equals(Object obj) {
-        if (obj instanceof Name) {
-            Name other = (Name) obj;
+        if (obj instanceof org.opengis.feature.type.Name) {
+            org.opengis.feature.type.Name other = (org.opengis.feature.type.Name) obj;
 
             return Utilities.equals(getURI(), other.getURI());
         }

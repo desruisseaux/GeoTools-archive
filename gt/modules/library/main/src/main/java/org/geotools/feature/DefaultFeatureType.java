@@ -18,7 +18,17 @@ package org.geotools.feature;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Logger;
+
+import org.geotools.feature.simple.SimpleFeatureTypeImpl;
+import org.geotools.feature.type.TypeName;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.util.InternationalString;
 
 /**
  * A basic implementation of FeatureType.
@@ -27,34 +37,35 @@ import java.util.Iterator;
  * @source $URL$
  * @version $Id$
  */
-public class DefaultFeatureType implements FeatureType {
+public class DefaultFeatureType extends SimpleFeatureTypeImpl implements FeatureType {
+	
     /** The name of this FeatureType. */
-    private final String typeName;
+    //private final String typeName;
 
     /** The namespace to uniquely identify this FeatureType. */
-    private final URI namespace;
+    //private final URI namespace;
 
     /** The array of types that this FeatureType can have as attributes. */
-    private final AttributeType[] types;
+    //private final AttributeType[] types;
 
     /** The FeatureTypes this is descended from. */
     private final FeatureType[] ancestors;
 
     /** The default geometry AttributeType. */
-    private final GeometryAttributeType defaultGeom;
+    //private final GeometryAttributeType defaultGeom;
     
     private final int hashCode;
 
     /** The position of the default Geometry 
      *  Leave as package protected for use by DefaultFeature
      */
-    final int defaultGeomIdx;
+    //final int defaultGeomIdx;
     
     /** An feature type with no attributes */
     public static final FeatureType EMPTY = new DefaultFeatureType();
     
     /** attname:string -> position:int */
-    private final java.util.Map attLookup;
+    //private final java.util.Map attLookup;
     
     private final static URI toURI( String namespace ) throws SchemaException {
         try {
@@ -87,54 +98,77 @@ public class DefaultFeatureType implements FeatureType {
     public DefaultFeatureType(String typeName, URI namespace,
         Collection types, Collection superTypes, GeometryAttributeType defaultGeom)
         throws NullPointerException {
+    	super( namespace != null ? new TypeName( namespace.toString(), typeName ) : new TypeName( FeatureTypes.DEFAULT_NAMESPACE.toString(), typeName ), 
+    			(List)types, defaultGeom, null, null, null );
+    	
         if (typeName == null) {
             throw new NullPointerException(typeName);
         }
 
-        this.typeName = typeName;
-        this.namespace = namespace == null ? FeatureTypes.DEFAULT_NAMESPACE : namespace;
+//        this.typeName = typeName;
+//        this.namespace = namespace == null ? FeatureTypes.DEFAULT_NAMESPACE : namespace;
         this.ancestors = (FeatureType[]) superTypes.toArray(new FeatureType[superTypes
                 .size()]);
-
-        Collection attributes = new java.util.ArrayList( types );
-        for (int i = 0, ii = ancestors.length; i < ii; i++) {
-            FeatureType ancestor = ancestors[i];
-            for (int j = 0, jj = ancestor.getAttributeCount(); j < jj; j++) {
-                attributes.add(ancestor.getAttributeType(j));
-            }
-        }
-        if(attributes.size()!=0)
-            this.types = (AttributeType[]) attributes.toArray(new AttributeType[attributes.size()]);
-        else
-            this.types = new AttributeType[0];
-
-        this.defaultGeom = defaultGeom;
+//
+//        Collection attributes = new java.util.ArrayList( types );
+//        for (int i = 0, ii = ancestors.length; i < ii; i++) {
+//            FeatureType ancestor = ancestors[i];
+//            for (int j = 0, jj = ancestor.getAttributeCount(); j < jj; j++) {
+//                attributes.add(ancestor.getAttributeType(j));
+//            }
+//        }
+//        if(attributes.size()!=0)
+//            this.types = (AttributeType[]) attributes.toArray(new AttributeType[attributes.size()]);
+//        else
+//            this.types = new AttributeType[0];
+//
+//        this.defaultGeom = defaultGeom;
         
-        attLookup = new java.util.HashMap(this.types.length);
-        for (int i = 0, ii = this.types.length; i < ii; i++) {
-            attLookup.put(this.types[i].getName(),new Integer(i));
-        }
+        //attLookup = new java.util.HashMap(this.types.length);
+        //attLookup = new java.util.HashMap(types.size());
+        //for (int i = 0, ii = this.types.length; i < ii; i++) {
+//        int i = 0;
+//        for( Iterator t = types.iterator(); t.hasNext(); ) {
+//        	AttributeType type = (AttributeType) t.next();
+//            //attLookup.put(this.types[i].getLocalName(),new Integer(i));
+//        	attLookup.put(type.getLocalName(),new Integer(i++));
+//        }
         
-        this.defaultGeomIdx = find(defaultGeom);
+        //this.defaultGeomIdx = find(defaultGeom);
             
         hashCode = computeHash();
     }
     
-    /**
+    
+    public DefaultFeatureType(org.opengis.feature.type.TypeName name, List schema, AttributeDescriptor defaultGeometry, CoordinateReferenceSystem crs, Set restrictions, InternationalString description) {
+		super(name, schema, defaultGeometry, crs, restrictions, description);
+
+		this.ancestors = new FeatureType[0];
+		hashCode = computeHash();
+	}
+	/**
      * Builds an empty feature type, useful for testing
      * @throws SchemaException
      */
     private DefaultFeatureType() {
-        this.typeName = "emptyFeatureType";
-            namespace = FeatureTypes.DEFAULT_NAMESPACE;
-        this.types = new AttributeType[0];
-        this.ancestors = new FeatureType[0];
-        this.defaultGeomIdx = -1;
-        this.defaultGeom = null;
-        hashCode = computeHash();
-        attLookup = java.util.Collections.EMPTY_MAP;
+    	this("emptyFeatreType", FeatureTypes.DEFAULT_NAMESPACE, Collections.EMPTY_LIST, Collections.EMPTY_LIST, null );
+//        this.typeName = "emptyFeatureType";
+//            namespace = FeatureTypes.DEFAULT_NAMESPACE;
+//        this.types = new AttributeType[0];
+//        this.ancestors = new FeatureType[0];
+//        this.defaultGeomIdx = -1;
+//        this.defaultGeom = null;
+//        hashCode = computeHash();
+//        attLookup = java.util.Collections.EMPTY_MAP;
     }
 
+    /*
+     * additional initialization shared among constructors.
+     */
+    private void init() {
+    	
+    }
+    
     /**
      * Creates a new feature, with a generated unique featureID.  This is less
      * than ideal, as a FeatureID should be persistant over time, generally
@@ -166,41 +200,53 @@ public class DefaultFeatureType implements FeatureType {
      */
     public Feature create(Object[] attributes, String featureID)
         throws IllegalAttributeException {
-        return new DefaultFeature(this, attributes, featureID);
+    	if ( attributes == null && getAttributeCount() != 0 ) {
+    		throw new IllegalAttributeException("attributes null");
+    	}
+    	
+    	try {
+    		DefaultFeatureBuilder builder = new DefaultFeatureBuilder();
+        	builder.setType( this );
+        	builder.add( attributes );
+        	
+        	return (Feature) builder.build(featureID);	
+    	}
+    	catch( Exception e ) {
+    		throw (IllegalAttributeException) new IllegalAttributeException("illegal attribute").initCause(e);
+    	}
+    	
+        //return new DefaultFeature(this, attributes, featureID);
     }
 
     public Feature duplicate(Feature original) throws IllegalAttributeException{
         if( original == null ) return null;
         FeatureType featureType = original.getFeatureType();
-        if (!featureType.equals(this)) { 
-        throw new IllegalAttributeException("Feature type " + featureType
-                        + " does not match " + this);
-        }
-        String id = original.getID();
-        int numAtts = featureType.getAttributeCount();
-        Object attributes[] = new Object[numAtts];
-        for (int i = 0; i < numAtts; i++) {
-        AttributeType curAttType = getAttributeType(i);
-            attributes[i] = curAttType.duplicate(original.getAttribute(i));
-        }
-        return featureType.create(attributes, id );
+	    if (!featureType.equals(this)) { 
+		      throw new IllegalAttributeException("Feature type " + featureType
+		                      + " does not match " + this);
+		      }
+	    
+        try {
+    		DefaultFeatureBuilder builder = new DefaultFeatureBuilder();
+        	builder.init( original );
+        	
+        	return (Feature) builder.build(original.getID());	
+    	}
+    	catch( Exception e ) {
+    		throw (IllegalAttributeException) new IllegalAttributeException("illegal attribute").initCause(e);
+    	}
+    	
+        
+//        String id = original.getID();
+//        int numAtts = featureType.getAttributeCount();
+//        Object attributes[] = new Object[numAtts];
+//        for (int i = 0; i < numAtts; i++) {
+//        AttributeType curAttType = getAttributeType(i);
+//            attributes[i] = curAttType.duplicate(original.getAttribute(i));
+//        }
+//        return featureType.create(attributes, id );
     }
-    /**
-     * Gets the default geometry AttributeType.  If the FeatureType has more
-     * one geometry it is up to the implementor to determine which geometry is
-     * the default.  If working with multiple geometries it is best to get the
-     * attributeTypes and iterate through them, checking isGeometry on each.
-     * This should just be used a convenience method when it is known that the
-     * features are flat.
-     *
-     * @return The attribute type of the default geometry, which will contain
-     *         the position.
-     *         
-     * @deprecated use {@link #getPrimaryGeometry()}
-     */
-    public final GeometryAttributeType getDefaultGeometry() {
-        return getPrimaryGeometry();
-    }
+    
     /**
      * Gets the primary geometry AttributeType.  If the FeatureType has more
      * one geometry it is up to the implementor to determine which geometry is
@@ -213,7 +259,8 @@ public class DefaultFeatureType implements FeatureType {
      *         the position.
      */
     public GeometryAttributeType getPrimaryGeometry() {
-    	return defaultGeom;
+//    	return defaultGeom;
+    	return (GeometryAttributeType) getDefaultGeometry();
     }
 
     /**
@@ -224,12 +271,13 @@ public class DefaultFeatureType implements FeatureType {
      *
      * @return True if attribute exists.
      */
-    public AttributeType getAttributeType(String xPath) {        
-        AttributeType attType = null;
-        int idx = find(xPath);
-        if (idx >= 0)
-            attType = types[idx];
-        return attType;
+    public AttributeType getAttributeType(String xPath) {
+    	return (AttributeType) getAttribute(xPath);
+//        AttributeType attType = null;
+//        int idx = find(xPath);
+//        if (idx >= 0)
+//            attType = types[idx];
+//        return attType;
     }
 
     /**
@@ -240,9 +288,10 @@ public class DefaultFeatureType implements FeatureType {
      * @return -1 if not found, a zero-based index if found.
      */
     public int find(AttributeType type) {
+    	
         if (type == null) return -1;
-        int idx = find(type.getName());
-        if (idx < 0 || !types[idx].equals(type))
+        int idx = find(type.getLocalName());
+        if (idx < 0 || !getAttributes().get(idx).equals(type))
             idx = -1;
         return idx;
     }
@@ -253,8 +302,9 @@ public class DefaultFeatureType implements FeatureType {
      * @return -1 if not found, zero-based index otherwise
      */
     public int find(String attName) {
-        Integer idx = (Integer) attLookup.get(attName);
-        return idx == null ? -1 : idx.intValue();
+    	return indexOf(attName);
+//        Integer idx = (Integer) attLookup.get(attName);
+//        return idx == null ? -1 : idx.intValue();
     }
 
     /**
@@ -265,11 +315,13 @@ public class DefaultFeatureType implements FeatureType {
      * @return The attribute type at the specified position.
      */
     public AttributeType getAttributeType(int position) {
-        return types[position];
+//        return types[position];
+        return (AttributeType) getAttributes().get(position);
     }
 
     public AttributeType[] getAttributeTypes() {
-        return (AttributeType[]) types.clone();
+//        return (AttributeType[]) types.clone();
+        return (AttributeType[]) getAttributes().toArray( new AttributeType[ getAttributes().size()]);
     }
 
     /**
@@ -278,7 +330,14 @@ public class DefaultFeatureType implements FeatureType {
      * @return Namespace of schema.
      */
     public URI getNamespace() {
-        return namespace;
+//        return namespace;
+    	try {
+			return getName().getNamespaceURI() != null ? new URI( getName().getNamespaceURI() ) : null;
+		} 
+    	catch (URISyntaxException e) {
+    		//dont have to worry, would have thrown an exception in constructor
+    		return null;
+    	}
     }
 
     /**
@@ -287,7 +346,8 @@ public class DefaultFeatureType implements FeatureType {
      * @return Namespace of schema.
      */
     public String getTypeName() {
-        return typeName;
+//        return typeName;
+        return getName().getLocalPart(); 
     }
 
     /**
@@ -310,78 +370,81 @@ public class DefaultFeatureType implements FeatureType {
      * @return the total number of first level attributes.
      */
     public int getAttributeCount() {
-        return types.length;
+//        return types.length;
+        return getAttributes().size();
     }
 
-    public boolean equals(FeatureType other) {
-        if(other == this)
-            return true;
-        
-        if (other == null) {
-            return false;
-        }
-
-        if ((typeName == null) && (other.getTypeName() != null)) {
-            return false;
-        } else if (!typeName.equals(other.getTypeName())) {
-            return false;
-        }
-
-        if ((namespace == null) && (other.getNamespace() != null)) {
-            return false;
-        } else if (!namespace.equals(other.getNamespace())) {
-            return false;
-        }
-
-        if (types.length != other.getAttributeCount()) {
-            return false;
-        }
-
-        for (int i = 0, ii = types.length; i < ii; i++) {
-            if (!types[i].equals(other.getAttributeType(i))) {
-                return false;
-            }
-        }
-
-        return true;
-    }
+//    public boolean equals(FeatureType other) {
+//        if(other == this)
+//            return true;
+//        
+//        if (other == null) {
+//            return false;
+//        }
+//
+//        if ((typeName == null) && (other.getTypeName() != null)) {
+//            return false;
+//        } else if (!typeName.equals(other.getTypeName())) {
+//            return false;
+//        }
+//
+//        if ((namespace == null) && (other.getNamespace() != null)) {
+//            return false;
+//        } else if (!namespace.equals(other.getNamespace())) {
+//            return false;
+//        }
+//
+//        if (types.length != other.getAttributeCount()) {
+//            return false;
+//        }
+//
+//        for (int i = 0, ii = types.length; i < ii; i++) {
+//            if (!types[i].equals(other.getAttributeType(i))) {
+//                return false;
+//            }
+//        }
+//
+//        return true;
+//    }
     
     private int computeHash() {
-        int hash = typeName.hashCode() ^ namespace.hashCode();
-        for (int i = 0, ii = types.length; i < ii; i++) {
-            hash ^= types[i].hashCode();
-        }
-        return hash;
+//        int hash = typeName.hashCode() ^ namespace.hashCode();
+//        for (int i = 0, ii = types.length; i < ii; i++) {
+//            hash ^= types[i].hashCode();
+//        }
+//        return hash;
+    	return super.hashCode();
     }
 
     public int hashCode() {
         return hashCode;
     }
 
-    public String toString() {
-        String info = "name=" + typeName;
-        info += (" , namespace=" + namespace);
-        info += (" , abstract=" + isAbstract());
-
-        String types1 = "types=(";
-
-        for (int i = 0, ii = this.types.length; i < ii; i++) {
-            types1 += this.types[i].toString();
-
-            if (i < ii) {
-                types1 += ",";
-            }
-        }
-
-        types1 += ")";
-        info += (" , " + types1);
-
-        return "DefaultFeatureType [" + info + "]";
-    }
+//    public String toString() {
+//        String info = "name=" + typeName;
+//        info += (" , namespace=" + namespace);
+//        info += (" , abstract=" + isAbstract());
+//
+//        String types1 = "types=(";
+//
+//        for (int i = 0, ii = this.types.length; i < ii; i++) {
+//            types1 += this.types[i].toString();
+//
+//            if (i < ii) {
+//                types1 += ",";
+//            }
+//        }
+//
+//        types1 += ")";
+//        info += (" , " + types1);
+//
+//        return "DefaultFeatureType [" + info + "]";
+//    }
 
     public boolean equals(Object other) {
         if (other instanceof FeatureType) 
-        	return equals((FeatureType) other);
+        	return super.equals((FeatureType) other);
+        
        	return false;
     }
 
@@ -392,7 +455,8 @@ public class DefaultFeatureType implements FeatureType {
      * @return An array of ancestors.
      */
     public FeatureType[] getAncestors() {
-        return ancestors;
+//        return ancestors;
+        return null;
     }
 
     /**
@@ -430,7 +494,7 @@ public class DefaultFeatureType implements FeatureType {
      * @task HACK: if nsURI is null only typeName is tested.
      */
     public boolean isDescendedFrom(URI nsURI, String typeName1) {
-        for (int i = 0, ii = ancestors.length; i < ii; i++) {
+    	for (int i = 0, ii = ancestors.length; i < ii; i++) {
             if (((nsURI == null)
                     || ancestors[i].getNamespace().equals(nsURI))
                     && ancestors[i].getTypeName().equals(typeName1)) {

@@ -17,6 +17,10 @@ package org.geotools.data.wfs;
 
 import java.net.URI;
 import java.rmi.server.UID;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 
 import org.geotools.feature.AttributeType;
@@ -28,13 +32,21 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SimpleFeature;
+import org.geotools.feature.simple.SimpleFeatureImpl;
+import org.geotools.feature.simple.SimpleFeatureTypeImpl;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryType;
+import org.opengis.feature.type.Name;
+import org.opengis.feature.type.TypeName;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.util.InternationalString;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
- * A FeatureType that adds the information about the XMLSchema used to create the FeatureType.   
+ * A FeatureType that adds the information about the XMLSchema used to create the delegate.   
  * @author Jesse
  * @since 1.1.0
  */
@@ -79,18 +91,18 @@ class WFSFeatureType implements FeatureType {
     public Feature duplicate( Feature original ) throws IllegalAttributeException {
         if( original == null ) return null;
         FeatureType featureType = original.getFeatureType();
-        if (!featureType.equals(this)) { 
+        if (!delegate.equals(this)) { 
         throw new IllegalAttributeException("Feature type " + featureType
                         + " does not match " + this);
         }
         String id = original.getID();
-        int numAtts = featureType.getAttributeCount();
+        int numAtts = delegate.getAttributeCount();
         Object attributes[] = new Object[numAtts];
         for (int i = 0; i < numAtts; i++) {
         AttributeType curAttType = getAttributeType(i);
             attributes[i] = curAttType.duplicate(original.getAttribute(i));
         }
-        return featureType.create(attributes, id );
+        return delegate.create(attributes, id );
     }
 
     public boolean equals( Object arg0 ) {
@@ -128,10 +140,6 @@ class WFSFeatureType implements FeatureType {
         return delegate.getAttributeTypes();
     }
 
-    public GeometryAttributeType getDefaultGeometry() {
-        return delegate.getDefaultGeometry();
-    }
-    
     public GeometryAttributeType getPrimaryGeometry() {
     	return delegate.getPrimaryGeometry();
     }
@@ -172,7 +180,95 @@ class WFSFeatureType implements FeatureType {
         return delegate.toString();
     }
     
-    private static class LenientFeature implements SimpleFeature, Feature{
+    public AttributeDescriptor getAttribute(String name) {
+		return delegate.getAttribute(name);
+	}
+
+	public AttributeDescriptor getAttribute(int index) {
+		return delegate.getAttribute(index);
+	}
+
+	public GeometryType getDefaultGeometryType() {
+		return delegate.getDefaultGeometryType();
+	}
+
+	public org.opengis.feature.type.AttributeType getType(String name) {
+		return delegate.getType( name );
+	}
+
+	public org.opengis.feature.type.AttributeType getType(int index) {
+		return delegate.getType( index );
+	}
+
+	public List getTypes() {
+		return delegate.getTypes();
+	}
+
+	public CoordinateReferenceSystem getCRS() {
+		return delegate.getCRS();
+	}
+
+	public AttributeDescriptor getDefaultGeometry() {
+		return delegate.getDefaultGeometry();
+	}
+
+	public Collection associations() {
+		return delegate.associations(); 
+	}
+
+	public Collection attributes() {
+		return delegate.attributes();
+	}
+
+	public Class getBinding() {
+		return delegate.getBinding();
+	}
+
+	public Collection getProperties() {
+		return delegate.getProperties();
+	}
+
+	public boolean isInline() {
+		return delegate.isInline();
+	}
+
+	public Collection getOperations() {
+		return delegate.getOperations();
+	}
+
+	public Set getRestrictions() {
+		return delegate.getRestrictions();
+	}
+
+	public org.opengis.feature.type.AttributeType getSuper() {
+		return delegate.getSuper();
+	}
+
+	public boolean isIdentified() {
+		return delegate.isIdentified();
+	}
+
+	public InternationalString getDescription() {
+		return delegate.getDescription();
+	}
+
+	public TypeName getName() {
+		return delegate.getName();
+	}
+
+	public Object getUserData(Object key) {
+		return delegate.getUserData(key);
+	}
+
+	public void putUserData(Object key, Object data) {
+		delegate.putUserData(key, data);
+	}
+	
+	public int indexOf(String name) {
+		return delegate.indexOf(name);
+	}
+	
+    private static class LenientFeature extends SimpleFeatureImpl implements SimpleFeature, Feature{
 
         /** The unique id of this feature */
         protected String featureId;
@@ -208,6 +304,8 @@ class WFSFeatureType implements FeatureType {
         protected LenientFeature(WFSFeatureType schema, Object[] attributes,
             String featureID)
             throws IllegalAttributeException, NullPointerException {
+        	
+        	super(Arrays.asList(attributes),schema,featureID);
             constructing=true;
             if (schema == null) {
                 throw new NullPointerException("schema");
@@ -219,7 +317,7 @@ class WFSFeatureType implements FeatureType {
 
             setAttributes(attributes);
             
-            defaultGeomIndex=schema.find(schema.getDefaultGeometry());
+            defaultGeomIndex=schema.find(schema.getPrimaryGeometry());
             constructing=false;
         }
 
@@ -413,7 +511,7 @@ class WFSFeatureType implements FeatureType {
                 AttributeType att = schema.getAttributeType(i);
                 if( object==null )
                     continue;
-                Class requiredClass = att.getType();
+                Class requiredClass = att.getBinding();
                 Class realClass = object.getClass();
                 if( !requiredClass.isAssignableFrom(realClass) )
                     return null;
@@ -435,7 +533,7 @@ class WFSFeatureType implements FeatureType {
                 Class realClass = object.getClass();
                 for( int j = 0; j < schema.getAttributeCount(); j++ ) {
                     AttributeType att = schema.getAttributeType(j);
-                    Class requiredClass = att.getType();
+                    Class requiredClass = att.getBinding();
                     if( relaxedAttrs[j]==null && requiredClass.isAssignableFrom(realClass) ){
                         relaxedAttrs[j]=object;
                         found=true;
@@ -494,15 +592,7 @@ class WFSFeatureType implements FeatureType {
          * Gets the geometry for this feature.
          *
          * @return Geometry for this feature.
-         * @deprecated use {@link #getDefaultGeometry()}
-         */
-        public final Geometry getDefaultGeometry() {
-        	return getPrimaryGeometry();
-        }
-        /**
-         * Gets the geometry for this feature.
-         *
-         * @return Geometry for this feature.
+         * 
          */
         public Geometry getPrimaryGeometry() {
             if (defaultGeomIndex == -1) {
@@ -512,20 +602,6 @@ class WFSFeatureType implements FeatureType {
             return (Geometry) attributes[defaultGeomIndex];
         }
         
-        /**
-         * Modifies the geometry.
-         *
-         * @param geometry All feature attributes.
-         *
-         * @throws IllegalAttributeException if the feature does not have a
-         *         geometry.
-         * @deprecated use {@link #setPrimaryGeometry(Geometry)}
-         */
-        public final void setDefaultGeometry(Geometry geometry)
-            throws IllegalAttributeException {
-
-        	setPrimaryGeometry(geometry);
-        }
         /**
          * Modifies the geometry.
          *
@@ -631,7 +707,7 @@ class WFSFeatureType implements FeatureType {
             FeatureType featType = getFeatureType();
 
             for (int i = 0, n = attributes.length; i < n; i++) {
-                retString += (featType.getAttributeType(i).getName() + "=");
+                retString += (featType.getAttributeType(i).getLocalName() + "=");
                 retString += attributes[i];
 
                 if ((i + 1) < n) {

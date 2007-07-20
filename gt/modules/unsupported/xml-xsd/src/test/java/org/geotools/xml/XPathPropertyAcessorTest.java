@@ -2,12 +2,14 @@ package org.geotools.xml;
 
 import junit.framework.TestCase;
 
+import org.geotools.feature.DefaultFeatureBuilder;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureFactoryImpl;
 import org.geotools.feature.simple.SimpleTypeBuilder;
 import org.geotools.feature.simple.SimpleTypeFactoryImpl;
+import org.geotools.feature.type.DefaultFeatureTypeBuilder;
 import org.geotools.filter.expression.PropertyAccessor;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -21,20 +23,20 @@ public class XPathPropertyAcessorTest extends TestCase {
 	Feature target;
 	
 	protected void setUp() throws Exception {
-		SimpleTypeBuilder typeBuilder = new SimpleTypeBuilder( new SimpleTypeFactoryImpl() );
+		DefaultFeatureTypeBuilder typeBuilder = new DefaultFeatureTypeBuilder();
 		typeBuilder.setName( "test" );
 		typeBuilder.setNamespaceURI( "http://www.geotools.org/test" );
-		typeBuilder.addAttribute( "name", String.class );
-		typeBuilder.addAttribute( "description", String.class );
-		typeBuilder.addAttribute( "geometry", Geometry.class );
-		type = typeBuilder.feature();
+		typeBuilder.add( "name", String.class );
+		typeBuilder.add( "description", String.class );
+		typeBuilder.add( "geometry", Geometry.class );
+		type = (FeatureType) typeBuilder.buildFeatureType();
 		
-		SimpleFeatureBuilder builder = new SimpleFeatureBuilder( new SimpleFeatureFactoryImpl() );
+		DefaultFeatureBuilder builder = new DefaultFeatureBuilder();
 		builder.setType( type );
 		builder.add( "theName" );
 		builder.add( "theDescription" );
 		builder.add( new GeometryFactory().createPoint( new Coordinate( 0, 0 ) )  );
-		target = builder.feature( "fid" );
+		target = (Feature) builder.feature( "fid" );
 	}
 	
 	public void testSimpleXpath() {

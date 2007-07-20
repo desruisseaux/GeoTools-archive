@@ -26,6 +26,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.collection.AbstractFeatureCollection;
+import org.geotools.feature.collection.AbstractResourceCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.FactoryException;
@@ -95,8 +96,30 @@ public class ReprojectFeatureResults extends AbstractFeatureCollection {
                         
         this.results = origionalCollection( results );        
         
-        CoordinateReferenceSystem originalCs = results.getSchema().getDefaultGeometry().getCoordinateSystem();
-        this.transform = CRS.findMathTransform(originalCs,destinationCS, true);            
+        CoordinateReferenceSystem originalCs = results.getSchema().getPrimaryGeometry().getCoordinateSystem();
+        this.transform = CRS.findMathTransform(originalCs,destinationCS, true);
+        
+        setResourceCollection(createResourceCollection());
+    }
+    
+    private AbstractResourceCollection createResourceCollection() {
+    	return new AbstractResourceCollection() {
+    		public Iterator openIterator() {
+			        return new ReprojectFeatureIterator( results.features(), getSchema(), transform );
+ 			 }
+ 			    
+ 			 public void closeIterator( Iterator close ) {
+			        if( close == null ) return;
+			        if( close instanceof ReprojectFeatureIterator){
+			            ReprojectFeatureIterator iterator = (ReprojectFeatureIterator) close;
+			            iterator.close();
+			        }
+			    }
+ 			 
+			    public int size() {
+			        return results.size();
+			    }
+    	};
     }
 
     private static FeatureCollection origionalCollection( FeatureCollection results ){
@@ -128,7 +151,7 @@ public class ReprojectFeatureResults extends AbstractFeatureCollection {
         if (forcedCS == null) {
             throw new NullPointerException("CoordinateSystem required");
         }
-        CoordinateReferenceSystem originalCs = startingType.getDefaultGeometry().getCoordinateSystem();
+        CoordinateReferenceSystem originalCs = startingType.getPrimaryGeometry().getCoordinateSystem();
         
         if (forcedCS.equals(originalCs)) {
             return startingType;
@@ -138,17 +161,7 @@ public class ReprojectFeatureResults extends AbstractFeatureCollection {
         }
     }
     
-    protected Iterator openIterator() {
-        return new ReprojectFeatureIterator( results.features(), getSchema(), this.transform );
-    }
-    
-    protected void closeIterator( Iterator close ) {
-        if( close == null ) return;
-        if( close instanceof ReprojectFeatureIterator){
-            ReprojectFeatureIterator iterator = (ReprojectFeatureIterator) close;
-            iterator.close();
-        }
-    }
+   
 
     /**
      * This method computes reprojected bounds the hard way, but computing them
@@ -170,7 +183,7 @@ public class ReprojectFeatureResults extends AbstractFeatureCollection {
 
             while ( r.hasNext()) {
                 feature = r.next();
-                internal = feature.getDefaultGeometry().getEnvelopeInternal();
+                internal = feature.getPrimaryGeometry().getEnvelopeInternal();
                 newBBox.expandToInclude(internal);
             }
             return ReferencedEnvelope.reference(newBBox);
@@ -183,13 +196,7 @@ public class ReprojectFeatureResults extends AbstractFeatureCollection {
         }
     }
 
-    /**
-     * @see org.geotools.data.FeatureResults#getCount()
-     */
-    public int size() {
-        return results.size();
-    }
-
+   
     /**
      * @see org.geotools.data.FeatureResults#collection()
      *

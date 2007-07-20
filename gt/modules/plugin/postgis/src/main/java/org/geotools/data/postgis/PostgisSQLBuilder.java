@@ -100,7 +100,7 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
         }
 
         for (int i = 0; i < attributes.length; i++) {
-            String colName = attributes[i].getName();
+            String colName = attributes[i].getLocalName();
 
             if (attributes[i] instanceof GeometryAttributeType) {
                 

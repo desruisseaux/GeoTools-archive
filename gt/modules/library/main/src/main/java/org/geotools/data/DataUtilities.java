@@ -159,7 +159,7 @@ public class DataUtilities {
         String[] names = new String[featureType.getAttributeCount()];
         final int count = featureType.getAttributeCount();
         for (int i = 0; i < count; i++) {
-        	names[i] = featureType.getAttributeType(i).getName();
+        	names[i] = featureType.getAttributeType(i).getLocalName();
         }
         
         return names;
@@ -429,7 +429,7 @@ public class DataUtilities {
 
             if (isMatch(a, typeB.getAttributeType(i))) {
                 match++;
-            } else if (isMatch(a, typeB.getAttributeType(a.getName()))) {
+            } else if (isMatch(a, typeB.getAttributeType(a.getLocalName()))) {
                 // match was found in a different position
             } else {
                 // cannot find any match for Attribute in typeA
@@ -482,7 +482,7 @@ public class DataUtilities {
             return true;
         }
 
-        if (a.getName().equals(b.getName())
+        if (a.getLocalName().equals(b.getLocalName())
                 && a.getClass().equals(b.getClass())) {
             return true;
         }
@@ -515,7 +515,7 @@ public class DataUtilities {
 
         for (int i = 0; i < numAtts; i++) {
             AttributeType curAttType = featureType.getAttributeType(i);
-            xpath = curAttType.getName();
+            xpath = curAttType.getLocalName();
             attributes[i] = curAttType.duplicate(feature.getAttribute(xpath));
         }
 
@@ -1036,7 +1036,7 @@ public class DataUtilities {
         if(properties == null) {
           properties = new String[featureType.getAttributeCount()];
           for (int i = 0; i < properties.length; i++) {
-            properties[i] = featureType.getAttributeType(i).getName();
+            properties[i] = featureType.getAttributeType(i).getLocalName();
           }
         }
 
@@ -1046,7 +1046,7 @@ public class DataUtilities {
 
         for (int i = 0; (i < featureType.getAttributeCount()) && same; i++) {
             AttributeType type = featureType.getAttributeType(i);
-            same = type.getName().equals(properties[i])
+            same = type.getLocalName().equals(properties[i])
                 && (((override != null)
                 && type instanceof GeometryAttributeType)
                 ? assertEquals(override, ((GeometryAttributeType) type).getCoordinateSystem())
@@ -1098,7 +1098,7 @@ public class DataUtilities {
         boolean same = featureType.getAttributeCount() == properties.length;
 
         for (int i = 0; (i < featureType.getAttributeCount()) && same; i++) {
-            same = featureType.getAttributeType(i).getName().equals(properties[i]);
+            same = featureType.getAttributeType(i).getLocalName().equals(properties[i]);
         }
 
         if (same) {
@@ -1223,9 +1223,9 @@ public class DataUtilities {
         StringBuffer buf = new StringBuffer();
 
         for (int i = 0; i < types.length; i++) {
-            buf.append(types[i].getName());
+            buf.append(types[i].getLocalName());
             buf.append(":");
-            buf.append(typeMap(types[i].getType()));
+            buf.append(typeMap(types[i].getBinding()));
 
             if (i < (types.length - 1)) {
                 buf.append(",");
@@ -1494,7 +1494,7 @@ public class DataUtilities {
                 }
             }
             
-            return AttributeTypeFactory.newAttributeType(name, type(type), nillable, Integer.MAX_VALUE, null, crs );
+            return AttributeTypeFactory.newAttributeType(name, type(type), nillable, -1, null, crs );
         } catch (ClassNotFoundException e) {
             throw new SchemaException("Could not type " + name + " as:" + type);
         }

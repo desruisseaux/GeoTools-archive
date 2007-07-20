@@ -355,7 +355,7 @@ public class ArcSDEDataStore extends AbstractDataStore {
          * SimpleFeatureType"); }
          */
 
-        if (featureType.getDefaultGeometry() == null) {
+        if (featureType.getPrimaryGeometry() == null) {
             throw new IllegalArgumentException(
                     "FeatureType must have at least a geometry attribute");
         }
@@ -539,7 +539,7 @@ public class ArcSDEDataStore extends AbstractDataStore {
      */
     private void createSeLayer(SeLayer layer, String qualifiedName,
             GeometryAttributeType geometryAtt) throws SeException {
-        String spatialColName = geometryAtt.getName();
+        String spatialColName = geometryAtt.getLocalName();
         LOGGER.info("setting spatial column name: " + spatialColName);
         layer.setSpatialColumnName(spatialColName);
 
@@ -847,7 +847,7 @@ public class ArcSDEDataStore extends AbstractDataStore {
 
         // Extract the attribute names for the query, we want them all...
         for (int i = 0; i < names.length; i++) {
-            names[i] = attributes[i].getName();
+            names[i] = attributes[i].getLocalName();
         }
 
         DefaultQuery query = new DefaultQuery(typeName, filter, 100, names, "handle");

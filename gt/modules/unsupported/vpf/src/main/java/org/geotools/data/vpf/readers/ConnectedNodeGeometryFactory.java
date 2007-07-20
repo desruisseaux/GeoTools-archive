@@ -59,6 +59,6 @@ public class ConnectedNodeGeometryFactory extends VPFGeometryFactory implements 
         VPFFile nodeFile = VPFFileFactory.getInstance().getFile(nodeTableName);
         Feature row = nodeFile.getRowFromId("id", nodeId);
         result = (Geometry)row.getAttribute("coordinate");
-        values.setDefaultGeometry(result);
+        values.setPrimaryGeometry(result);
     }
 }

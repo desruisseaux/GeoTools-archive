@@ -115,7 +115,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 	public void testLoadDanishChars() throws Exception {
         FeatureCollection fc = loadFeatures(DANISH, null);
         Feature first = fc.features().next();
-        // Charløtte, if you can read it with your OS charset
+        // Charlï¿½tte, if you can read it with your OS charset
         assertEquals("Charl\u00F8tte", first.getAttribute("TEKST1"));
     }
     
@@ -132,7 +132,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 		FeatureType schema = s.getSchema(s.getTypeNames()[0]);
 		AttributeType[] types = schema.getAttributeTypes();
 		assertEquals("Number of Attributes", 253, types.length);
-		assertNotNull(schema.getDefaultGeometry().getCoordinateSystem());
+		assertNotNull(schema.getPrimaryGeometry().getCoordinateSystem());
 	}
 
 	public void testSpacesInPath() throws Exception {
@@ -218,7 +218,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 		FilterFactory fac = FilterFactoryFinder.createFilterFactory();
 		org.geotools.filter.BBoxExpression bbox = fac.createBBoxExpression(newBounds);
 		org.geotools.filter.AttributeExpression attrExpression = fac.createAttributeExpression(
-				indexedDS.getSchema().getDefaultGeometry().getName());
+				indexedDS.getSchema().getPrimaryGeometry().getLocalName());
 		GeometryFilter filter = fac
 				.createGeometryFilter(FilterType.GEOMETRY_BBOX);
 		filter.addLeftGeometry(attrExpression);
@@ -283,7 +283,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         //assertEquals("Number of Features loaded", 3, count); // JAR WRONG
 
 		FeatureType schema = firstFeature(features).getFeatureType();
-		assertNotNull(schema.getDefaultGeometry());
+		assertNotNull(schema.getPrimaryGeometry());
 		assertEquals("Number of Attributes", 253,
 				schema.getAttributeTypes().length);
 		assertEquals("Value of statename is wrong", firstFeature(features)
@@ -453,13 +453,13 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 		Feature[] newFeatures2 = new Feature[2];
 		GeometryFactory fac = new GeometryFactory();
 		newFeatures1[0] = DataUtilities.template(sds.getSchema());
-		newFeatures1[0].setDefaultGeometry(fac
+		newFeatures1[0].setPrimaryGeometry(fac
 				.createPoint(new Coordinate(0, 0)));
 		newFeatures2[0] = DataUtilities.template(sds.getSchema());
-		newFeatures2[0].setDefaultGeometry(fac
+		newFeatures2[0].setPrimaryGeometry(fac
 				.createPoint(new Coordinate(0, 0)));
 		newFeatures2[1] = DataUtilities.template(sds.getSchema());
-		newFeatures2[1].setDefaultGeometry(fac
+		newFeatures2[1].setPrimaryGeometry(fac
 				.createPoint(new Coordinate(0, 0)));
 
 		store.addFeatures(DataUtilities.collection(newFeatures1));
@@ -594,7 +594,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 		// verify
 		while (fci.hasNext()) {
 			Feature f = fci.next();
-			Geometry fromShape = f.getDefaultGeometry();
+			Geometry fromShape = f.getPrimaryGeometry();
 
 			if (fromShape instanceof GeometryCollection) {
 				if (!(geom instanceof GeometryCollection)) {

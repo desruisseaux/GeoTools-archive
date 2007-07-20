@@ -56,16 +56,16 @@ class ChoiceAttributeTypeImpl extends DefaultAttributeType implements ChoiceAttr
 		
 		public Object convert(Object obj) {
 			GeometryFactory fac=new GeometryFactory();
-			if (getType()==MultiPolygon.class && obj instanceof Polygon ){
+			if (getBinding()==MultiPolygon.class && obj instanceof Polygon ){
 				return fac.createMultiPolygon(new Polygon[]{(Polygon) obj});
 			}
-			if (getType()==MultiPoint.class && obj instanceof Point ){
+			if (getBinding()==MultiPoint.class && obj instanceof Point ){
 				return fac.createMultiPoint(new Point[]{(Point) obj});
 			}
-			if (getType()==MultiLineString.class && obj instanceof LineString ){
+			if (getBinding()==MultiLineString.class && obj instanceof LineString ){
 				return fac.createMultiLineString(new LineString[]{(LineString) obj});
 			}
-			if (getType()==GeometryCollection.class && obj instanceof Geometry ){
+			if (getBinding()==GeometryCollection.class && obj instanceof Geometry ){
 				return fac.createGeometryCollection(new com.vividsolutions.jts.geom.Geometry[]{(com.vividsolutions.jts.geom.Geometry) obj});
 			}
 			

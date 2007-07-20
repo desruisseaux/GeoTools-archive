@@ -43,10 +43,10 @@ public class CreateFeatureTypeTest extends TestCase {
 	        Schema schema = SchemaFactory.getInstance(null, in);
 	        FeatureType ft = WFSDataStore.parseDescribeFeatureTypeResponse("WATER", schema);
 	        assertNotNull(ft);
-	        assertEquals(Integer.class, ft.getAttributeType("ID").getType());
-	        assertEquals(String.class, ft.getAttributeType("CODE").getType());
-	        assertEquals(Float.class, ft.getAttributeType("KM").getType());
-	        assertEquals(Polygon.class, ft.getAttributeType("GEOM").getType());
+	        assertEquals(Integer.class, ft.getAttributeType("ID").getBinding());
+	        assertEquals(String.class, ft.getAttributeType("CODE").getBinding());
+	        assertEquals(Float.class, ft.getAttributeType("KM").getBinding());
+	        assertEquals(Polygon.class, ft.getAttributeType("GEOM").getBinding());
 		}finally{
 			in.close();
 		}
@@ -58,10 +58,10 @@ public class CreateFeatureTypeTest extends TestCase {
 	        Schema schema = SchemaFactory.getInstance(null, in);
 	        FeatureType ft = WFSDataStore.parseDescribeFeatureTypeResponse("WATER", schema);
 	        assertNotNull(ft);
-	        assertEquals(Integer.class, ft.getAttributeType("ID").getType());
-	        assertEquals(String.class, ft.getAttributeType("CODE").getType());
-	        assertEquals(Float.class, ft.getAttributeType("KM").getType());
-	        assertEquals(MultiPolygon.class, ft.getAttributeType("GEOM").getType());
+	        assertEquals(Integer.class, ft.getAttributeType("ID").getBinding());
+	        assertEquals(String.class, ft.getAttributeType("CODE").getBinding());
+	        assertEquals(Float.class, ft.getAttributeType("KM").getBinding());
+	        assertEquals(MultiPolygon.class, ft.getAttributeType("GEOM").getBinding());
 		}finally{
 			in.close();
 		}

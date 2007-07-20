@@ -324,6 +324,7 @@ public class MIFDataStoreTest extends TestCase {
 
                 transaction.commit();
             } catch (Exception e) {
+            	e.printStackTrace();
                 transaction.rollback();
                 fail(e.getMessage());
             } finally {
@@ -421,7 +422,7 @@ public class MIFDataStoreTest extends TestCase {
             fr = getFeatureReader("grafo");
 
             Feature f = fr.next();
-            assertEquals(f.getDefaultGeometry().getFactory().getSRID(),
+            assertEquals(f.getPrimaryGeometry().getFactory().getSRID(),
                 MIFTestUtils.SRID);
 
             fr.close();

@@ -24,7 +24,9 @@ import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -36,6 +38,12 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.GeometryAttribute;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.Name;
+import org.opengis.feature.type.PropertyDescriptor;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -76,11 +84,121 @@ public class GazetteerNameValidationOnlineTest extends TestCase {
 			public void setAttributes(Object[] attributes) throws IllegalAttributeException{}
 			//	used
 			public void setAttribute(String xPath, Object attribute)throws IllegalAttributeException{attrs.put(xPath,attribute);}
-			public Geometry getDefaultGeometry(){return null;}
 			public Geometry getPrimaryGeometry() {return null;}
-			public void setDefaultGeometry(Geometry geometry) throws IllegalAttributeException{}
 			public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException{}
 			public ReferencedEnvelope getBounds(){return null;}
+			public Object getDefaultGeometryValue() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			public AttributeType getType() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			public List getTypes() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			public Object getValue(String name) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			public Object getValue(int index) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			public List getValues() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			public Object operation(String name, Object parameters) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			public void setDefaultGeometryValue(Object geometry) {
+				// TODO Auto-generated method stub
+				
+			}
+			public void setValue(String name, Object value) {
+				// TODO Auto-generated method stub
+				
+			}
+			public void setValue(int index, Object value) {
+				// TODO Auto-generated method stub
+				
+			}
+			public void setValues(List values) {
+				// TODO Auto-generated method stub
+				
+			}
+			public void setValues(Object[] values) {
+				// TODO Auto-generated method stub
+				
+			}
+			public CoordinateReferenceSystem getCRS() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			public GeometryAttribute getDefaultGeometry() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			public Object getUserData(Object key) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			public void putUserData(Object key, Object value) {
+				// TODO Auto-generated method stub
+				
+			}
+			public void setCRS(CoordinateReferenceSystem crs) {
+				// TODO Auto-generated method stub
+				
+			}
+			public void setDefaultGeometry(GeometryAttribute geometryAttribute) {
+				// TODO Auto-generated method stub
+				
+			}
+			public Collection associations() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			public Collection attributes() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			public Object get() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			public List get(Name name) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			public AttributeDescriptor getDescriptor() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			public void set(Object newValue) throws IllegalArgumentException {
+				// TODO Auto-generated method stub
+				
+			}
+			public boolean nillable() {
+				// TODO Auto-generated method stub
+				return false;
+			}
+			public Object operation(Name name, List parameters) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			public PropertyDescriptor descriptor() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			public Name name() {
+				// TODO Auto-generated method stub
+				return null;
+			}
 		}
 		Feature f = new testFeature();
 		try{f.setAttribute("CityName","Vancouver");}catch(Exception e){}

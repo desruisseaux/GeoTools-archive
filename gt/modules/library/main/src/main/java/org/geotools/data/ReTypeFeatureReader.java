@@ -111,7 +111,7 @@ public class ReTypeFeatureReader implements FeatureReader {
 
         for (int i = 0; i < target.getAttributeCount(); i++) {
             AttributeType attrib = target.getAttributeType(i);
-            xpath = attrib.getName();
+            xpath = attrib.getLocalName();
             types[i] = attrib;
 
             if (!attrib.equals(origional.getAttributeType(xpath))) {
@@ -147,7 +147,7 @@ public class ReTypeFeatureReader implements FeatureReader {
         String xpath;
 
         for (int i = 0; i < types.length; i++) {
-            xpath = types[i].getName();
+            xpath = types[i].getLocalName();
             if(clone)
                 attributes[i] = types[i].duplicate(next.getAttribute(xpath));
             else

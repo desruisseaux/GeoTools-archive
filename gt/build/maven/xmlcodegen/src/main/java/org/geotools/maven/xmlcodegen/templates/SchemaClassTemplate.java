@@ -78,8 +78,8 @@ public class SchemaClassTemplate
 	for (Iterator itr = schema.values().iterator(); itr.hasNext();) {
 		AttributeType type = (AttributeType) itr.next();
 		
-		String name = type.getName();
-		String binding = type.getType().getName() + ".class";
+		String name = type.getLocalName();
+		String binding = type.getBinding().getName() + ".class";
 
     stringBuffer.append(TEXT_7);
     
@@ -129,9 +129,9 @@ public class SchemaClassTemplate
     stringBuffer.append(TEXT_16);
     stringBuffer.append(schema.namespace().getURI());
     stringBuffer.append(TEXT_17);
-    stringBuffer.append(type.getName());
+    stringBuffer.append(type.getLocalName());
     stringBuffer.append(TEXT_18);
-    stringBuffer.append(type.getName().toUpperCase());
+    stringBuffer.append(type.getLocalName().toUpperCase());
     stringBuffer.append(TEXT_19);
     
 	}

@@ -163,7 +163,7 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
 	        AttributeType type = featureType.getAttributeType(i);
 
 	        //the column name
-	        name(type.getName());
+	        name(type.getLocalName());
 	        sql.append(" ");
 
 	        //sql type name
@@ -304,7 +304,7 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
 		}
 		//attribute columns
 		for ( int i = n; i < propertyNames.length; i++ ) {
-			propertyNames[i] = featureType.getAttributeType( i - n ).getName();
+			propertyNames[i] = featureType.getAttributeType( i - n ).getLocalName();
 		}
 		select( featureType, propertyNames );
 		
@@ -389,7 +389,7 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
                 
                 if (attributeType != null) {
                     //check for geometry, because it is encided differnently
-                    if (Geometry.class.isAssignableFrom(attributeType.getType())) {
+                    if (Geometry.class.isAssignableFrom(attributeType.getBinding())) {
                     	
                     }
                 }
@@ -449,12 +449,12 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
      *
      */
     protected void geometry(FeatureType featureType) {
-    	if ( featureType.getDefaultGeometry() == null ) {
+    	if ( featureType.getPrimaryGeometry() == null ) {
     		String msg = "No geometry column to encode";
     		throw new IllegalStateException( msg );
     	}
     	
-    	name( featureType.getDefaultGeometry().getName() );
+    	name( featureType.getPrimaryGeometry().getLocalName() );
     }
     
     /**
@@ -547,10 +547,10 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
 
             if (attributeType != null) {
                 //encode the name of the attribute, not the property name itself
-                name(attributeType.getName());
+                name(attributeType.getLocalName());
 
                 //return the type as the return 
-                return attributeType.getType();
+                return attributeType.getBinding();
             }
 
             //2. not in type, could it be a primary key?
@@ -646,8 +646,8 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
                 crs = (CoordinateReferenceSystem) data;
             } else {
                 //check the feature type
-                if (featureType.getDefaultGeometry() != null) {
-                    crs = featureType.getDefaultGeometry().getCoordinateSystem();
+                if (featureType.getPrimaryGeometry() != null) {
+                    crs = featureType.getPrimaryGeometry().getCoordinateSystem();
                 }
             }
 

@@ -20,6 +20,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.feature.type.FeatureCollectionType;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 
@@ -45,25 +46,31 @@ public class MinVisitor implements FeatureCalc {
     public MinVisitor(int attributeTypeIndex, FeatureType type)
         throws IllegalFilterException {
         FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
-        expr = factory.property(type.getAttributeType(attributeTypeIndex).getName());
+        expr = factory.property(type.getAttributeType(attributeTypeIndex).getLocalName());
     }
 
     public MinVisitor(String attrName, FeatureType type)
         throws IllegalFilterException {
         FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
-        expr = factory.property(type.getAttributeType(attrName).getName());
+        expr = factory.property(type.getAttributeType(attrName).getLocalName());
     }
 
     public MinVisitor(Expression expr) throws IllegalFilterException {
         this.expr = expr;
     }
 
+    public void init(FeatureCollectionType collection) {
+    	//do nothing
+    }
     /**
      * Visitor function, which looks at each feature and finds the minimum.
      *
      * @param feature the feature to be visited
      */
     public void visit(Feature feature) {
+        visit((org.opengis.feature.Feature)feature);
+    }
+    public void visit(org.opengis.feature.Feature feature) {
         Object attribValue = expr.evaluate(feature);
 
         if (attribValue == null) {

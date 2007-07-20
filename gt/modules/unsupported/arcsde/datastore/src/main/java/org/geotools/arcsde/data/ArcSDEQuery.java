@@ -278,7 +278,7 @@ class ArcSDEQuery {
 
             for (Iterator it = attNames.iterator(); it.hasNext();) {
                 AttributeType att = (AttributeType) it.next();
-                String attName = att.getName();
+                String attName = att.getLocalName();
                 columNames.add(attName);
             }
         } else {
@@ -599,7 +599,7 @@ class ArcSDEQuery {
         try {
             SeExtent extent = null;
             
-            String[] spatialCol = { schema.getDefaultGeometry().getName() };
+            String[] spatialCol = { schema.getPrimaryGeometry().getLocalName() };
 
             extentQuery = createSeQueryForQueryInfo(connection);
 

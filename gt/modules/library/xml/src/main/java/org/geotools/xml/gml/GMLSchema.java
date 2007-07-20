@@ -588,7 +588,7 @@ public class GMLSchema implements Schema {
         }
 
         /**
-         * @see schema.Element#getName()
+         * @see schema.Element#getLocalName()
          */
         public String getName() {
             return name;
@@ -609,7 +609,7 @@ public class GMLSchema implements Schema {
         }
 
         /**
-         * @see schema.Element#getType()
+         * @see schema.Element#getBinding()
          */
         public Type getType() {
             return type;
@@ -813,7 +813,7 @@ public class GMLSchema implements Schema {
         }
 
         /**
-         * @see schema.Attribute#getName()
+         * @see schema.Attribute#getLocalName()
          */
         public String getName() {
             return name;
@@ -883,7 +883,7 @@ public class GMLSchema implements Schema {
         }
 
         /**
-         * @see schema.AttributeGroup#getName()
+         * @see schema.AttributeGroup#getLocalName()
          */
         public String getName() {
             return "AssociationAttributeGroup";
@@ -929,7 +929,7 @@ public class GMLSchema implements Schema {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public String getName() {
             return "NullType";

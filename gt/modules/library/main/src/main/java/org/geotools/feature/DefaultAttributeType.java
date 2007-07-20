@@ -26,6 +26,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.geotools.feature.type.AttributeDescriptorImpl;
+import org.geotools.feature.type.AttributeTypeImpl;
+
 import org.opengis.filter.Filter;
 import org.opengis.coverage.grid.GridCoverage;
 
@@ -43,36 +46,10 @@ import com.vividsolutions.jts.geom.Geometry;
  * @source $URL$
  * @version $Id$
  */
-public class DefaultAttributeType implements AttributeType {
-    /** Name of this attribute. */
-    protected final String name;
-
-    /** Class type of this attribute. */
-    protected final Class type;
-
-    /** Indicates if nulls are allowed for this attribute */
-    protected final boolean nillable;
-    /** min/max */
-    protected final int min,max;
-    protected Object defaultValue;
-
+public class DefaultAttributeType extends AttributeDescriptorImpl 
+	implements AttributeType {
+	
 	/**
-	 * Defaults are flat, always return 1.
-	 * @task REVISIT: return 0?  That's our current assumption in some 
-	 * code, but
-	 */
-	public int getMinOccurs() {
-		return min;
-	}
-
-	/**
-	 * Defaults are flat, always return 1.
-	 */
-	public int getMaxOccurs() {
-		return max;
-	}
-
-    /**
      * Constructor with name and type.
      *
      * @param name Name of this attribute.
@@ -88,16 +65,16 @@ public class DefaultAttributeType implements AttributeType {
      */
     protected DefaultAttributeType(String name, Class type, boolean nillable, int min, int max,
             Object defaultValue, Filter f) {
-            this.name = (name == null) ? "" : name;
-            this.type = (type == null) ? Object.class : type;
-            this.nillable = nillable;
-            this.min = min;
-            this.max = max;
-            this.defaultValue = defaultValue;
-            this.filter = f;
-            if(defaultValue!=null && !type.isAssignableFrom(defaultValue.getClass()))
-                throw new IllegalArgumentException("Default value does not match type");
-        }
+		this(createAttributeType(name, type != null ? type : Object.class, f),name,nillable,min,max,defaultValue);
+    }
+    
+    protected DefaultAttributeType(org.opengis.feature.type.AttributeType type,String name,boolean nillable,int min,int max, Object defaultValue) {
+    	super(type,new Name((name == null) ? "" : name),min,max,nillable,defaultValue);
+        
+        if(defaultValue!=null && !type.getBinding().isAssignableFrom(defaultValue.getClass()))
+            throw new IllegalArgumentException("Default value does not match type");
+    }
+    
     protected DefaultAttributeType(String name, Class type, boolean nillable, int min, int max,
             Object defaultValue) {
             this(name,type,nillable,min,max,defaultValue,Filter.INCLUDE);
@@ -109,30 +86,22 @@ public class DefaultAttributeType implements AttributeType {
     }
 
     protected DefaultAttributeType(AttributeType copy) {
-        this.name = copy.getName();
-        this.type = copy.getType();
-        this.nillable = copy.isNillable();
-        this.min = copy.getMinOccurs();
-        this.max = copy.getMaxOccurs();
-        this.defaultValue = copy.createDefaultValue();
+    	super(copy.getType(),copy.getName(),copy.getMinOccurs(),copy.getMaxOccurs(),copy.isNillable(),copy.getDefaultValue());
     }
 
-    /**
+    public DefaultAttributeType(org.opengis.feature.type.AttributeType type, org.opengis.feature.type.Name name, int min, int max, boolean isNillable,Object defaultValue) {
+		super(type, name, min, max, isNillable,defaultValue);
+	}
+
+	/**
      * Gets the name of this attribute.
      *
      * @return The name of this attribute.
      */
-    public final String getName() {
-        return getLocalName();
+    public String getLocalName() {
+    	return getName().getLocalPart();
     }
     
-    /**
-     * {@inheritDoc}
-     */
-    public String getLocalName() {
-    	return name;
-    }
-
     /**
      * Gets the type of this attribute.  All attributes that are assigned to
      * this AttributeType must be an instance of this class.  Subclasses are
@@ -141,24 +110,8 @@ public class DefaultAttributeType implements AttributeType {
      * @return The class that the attribute must match to be valid for this
      *         AttributeType.
      */
-    public final Class getType() {
-        return getBinding();
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
     public Class getBinding() {
-    	return type;
-    }
-
-    /**
-     * Returns whether nulls are allowed for this attribute.
-     *
-     * @return true if nulls are permitted, false otherwise.
-     */
-    public boolean isNillable() {
-        return nillable;
+    	return getType().getBinding();
     }
 
     /**
@@ -291,7 +244,7 @@ public class DefaultAttributeType implements AttributeType {
      * @return hashCode for this object.
      */
     public int hashCode() {
-        return name.hashCode() ^ type.hashCode();
+        return super.hashCode() ^ type.hashCode();
     }
 
     /**
@@ -312,17 +265,11 @@ public class DefaultAttributeType implements AttributeType {
 
         AttributeType att = (AttributeType) other;
 
-        if (name == null) {
-            if (att.getName() != null) {
-                return false;
-            }
+        if (!super.equals(att)) {
+        	return false;
         }
 
-        if (!name.equals(att.getName())) {
-            return false;
-        }
-
-        if (!type.equals(att.getType())) {
+        if (!getBinding().equals(att.getBinding())) {
             return false;
         }
 
@@ -335,7 +282,7 @@ public class DefaultAttributeType implements AttributeType {
      * @return true if the attribute's type is a geometry.
      */
     public boolean isGeometry() {
-        return Geometry.class.isAssignableFrom(this.type);
+        return Geometry.class.isAssignableFrom(getBinding());
     }
 
     /**
@@ -346,8 +293,8 @@ public class DefaultAttributeType implements AttributeType {
     public String toString() {
         String details = "name=" + name;
         details += (" , type=" + type);
-        details += (" , nillable=" + nillable) + ", min=" + min 
-	    + ", max=" + min;
+        details += (" , nillable=" + isNillable()) + ", min=" + getMinOccurs() 
+	    + ", max=" + getMaxOccurs();
 
         return "DefaultAttributeType [" + details + "]";
     }
@@ -375,7 +322,7 @@ public class DefaultAttributeType implements AttributeType {
     /**
      * Whether the tested object passes the validity constraints of  this
      * AttributeType.  At a minimum it should be of the correct class
-     * specified by {@link #getType()}, non-null if isNillable is
+     * specified by {@link #getBinding()}, non-null if isNillable is
      * <tt>false</tt>, and a geometry if isGeometry is <tt>true</tt>.  If The
      * object does not validate then an IllegalArgumentException reporting the
      * error in validation should be thrown.
@@ -387,14 +334,14 @@ public class DefaultAttributeType implements AttributeType {
     public void validate(Object attribute) throws IllegalArgumentException {
         if (attribute == null) {
             if (!isNillable()) {
-                throw new IllegalArgumentException(getName()
+                throw new IllegalArgumentException(getLocalName()
                     + " is not nillable");
             }
 
             return;
-        } else if (type != attribute.getClass() && !type.isAssignableFrom(attribute.getClass())) {
+        } else if (getBinding() != attribute.getClass() && !getBinding().isAssignableFrom(attribute.getClass())) {
             throw new IllegalArgumentException(attribute.getClass().getName()
-                + " is not an acceptable class for " + getName()
+                + " is not an acceptable class for " + getLocalName()
                 + " as it is not assignable from " + type);
         }
     }
@@ -407,8 +354,56 @@ public class DefaultAttributeType implements AttributeType {
      * @see org.geotools.feature.AttributeType#getRestriction()
      */
     public Filter getRestriction() {
-        return filter;
+        if ( !getType().getRestrictions().isEmpty() ) {
+        	return (Filter) getType().getRestrictions().iterator().next();
+        }
+        
+        return null;
     }
-    private Filter filter;
 
+    //
+    // The following methods are called by org.geotools.feature.AttributeType 
+    // implementations while they transition to implement the geoapi AttributeDescriptor 
+    // interface.
+    //
+    
+    /**
+     * Method for geotools AttributeType implementations to create a geoapi 
+     * attribute type.
+     * <p>
+     * This method is usually called from the constructors of the old AttributeType
+     * implememtnations. 
+     * </p>
+     * @param name THe attribute type name.
+     * @param binding The attribute type binding.
+     * @param restriction Restriction on the attribute type.
+     * 
+     * @return A geoapi attribute type.
+     * 
+     * @since 2.5
+     */
+    public static org.opengis.feature.type.AttributeType createAttributeType(String name,Class binding,Filter restriction) {
+    	return new AttributeTypeImpl( 
+			new org.geotools.feature.type.TypeName(name),binding,false,false,
+			restriction != null ? Collections.singleton(restriction) : Collections.EMPTY_SET, 
+			null,null);
+    }
+    
+    public static String getLocalName( AttributeType type ) {
+    	return type.getName().getLocalPart();
+    }
+    
+    public static Class getBinding( AttributeType type ) {
+    	return type.getType().getBinding();
+    }
+    
+    public static Filter getRestriction( AttributeType type ) {
+    	if ( type.getType() != null && type.getType().getRestrictions() != null 
+			&& !type.getType().getRestrictions().isEmpty() ) {
+    		
+    		return (Filter) type.getType().getRestrictions().iterator().next();
+    	}
+    	
+    	return null;
+    }
 }

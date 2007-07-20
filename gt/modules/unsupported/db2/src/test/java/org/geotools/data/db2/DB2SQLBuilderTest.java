@@ -85,7 +85,7 @@ public class DB2SQLBuilderTest extends DB2TestCase {
 		AttributeType[] attrTypes = new AttributeType[ft.getAttributeCount()];
 
 		for (int i = 0; i < ft.getAttributeCount(); i++) {
-			attrNames[i] = ft.getAttributeType(i).getName();
+			attrNames[i] = ft.getAttributeType(i).getLocalName();
 			attrTypes[i] = ft.getAttributeType(i);
 		}
 
@@ -125,7 +125,7 @@ public class DB2SQLBuilderTest extends DB2TestCase {
 		AttributeType[] attrTypes = new AttributeType[ft.getAttributeCount()];
 
 		for (int i = 0; i < ft.getAttributeCount(); i++) {
-			attrNames[i] = ft.getAttributeType(i).getName();
+			attrNames[i] = ft.getAttributeType(i).getLocalName();
 			attrTypes[i] = ft.getAttributeType(i);
 		}
 		sqlBuilder = (DB2SQLBuilder) dataStore.getSqlBuilder("Places");
@@ -175,7 +175,7 @@ public class DB2SQLBuilderTest extends DB2TestCase {
 		AttributeType[] attrTypes = new AttributeType[ft.getAttributeCount()];
 
 		for (int i = 0; i < ft.getAttributeCount(); i++) {
-			attrNames[i] = ft.getAttributeType(i).getName();
+			attrNames[i] = ft.getAttributeType(i).getLocalName();
 			attrTypes[i] = ft.getAttributeType(i);
 		}
 

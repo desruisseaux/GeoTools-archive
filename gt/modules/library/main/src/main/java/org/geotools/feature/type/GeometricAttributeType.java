@@ -15,9 +15,15 @@
  */
 package org.geotools.feature.type;
 
+import java.util.Collections;
+
 import org.geotools.feature.DefaultAttributeType;
+import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.geometry.jts.JTS;
+import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.GeometryType;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.geotools.referencing.crs.DefaultGeocentricCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -49,16 +55,16 @@ import com.vividsolutions.jts.io.WKTReader;
  */
 public class GeometricAttributeType extends DefaultAttributeType implements org.geotools.feature.GeometryAttributeType{
     /** CoordianteSystem used by this GeometryAttributeType */
-    protected CoordinateReferenceSystem coordinateSystem;
+    //protected CoordinateReferenceSystem crs;
     protected GeometryFactory geometryFactory;
-    private Filter filter;
+    
 
     public GeometricAttributeType(String name, Class type, boolean nillable, int min, int max,
-        Object defaultValue, CoordinateReferenceSystem cs, Filter filter) {
-        super(name, type, nillable,min,max, defaultValue);
-        this.filter = filter;
-        coordinateSystem = cs;
-        geometryFactory = cs == null ? CSGeometryFactory.DEFAULT : new CSGeometryFactory(cs);
+        Object defaultValue, CoordinateReferenceSystem crs, Filter filter) {
+        super(createAttributeType(name, type, crs,filter), name, nillable,min,max,defaultValue);
+         
+        geometryFactory = getCoordinateSystem() == null ? 
+        		CSGeometryFactory.DEFAULT : new CSGeometryFactory(getCoordinateSystem());
         
         /*
         coordinateSystem = (cs != null) ? cs : LocalCoordinateSystem.CARTESIAN;
@@ -73,22 +79,20 @@ public class GeometricAttributeType extends DefaultAttributeType implements org.
    }
 
     public GeometricAttributeType(GeometricAttributeType copy, CoordinateReferenceSystem override) {
-        super(copy);
-        coordinateSystem = copy.getCoordinateSystem();
-
-        if (override != null) {
-            coordinateSystem = override;
-        }
-
-        if (coordinateSystem == null) {
-            coordinateSystem = DefaultGeocentricCRS.CARTESIAN;
-        }
-        geometryFactory = (coordinateSystem == DefaultGeocentricCRS.CARTESIAN)
-            ? CSGeometryFactory.DEFAULT : new CSGeometryFactory(coordinateSystem);            
+    	this( copy.getLocalName(), copy.getBinding(), copy.isNillable(), copy.getMinOccurs(),copy.getMaxOccurs(), null, crs(override), copy.getRestriction() );
+    	
+    	
+        geometryFactory = (getCoordinateSystem() == DefaultGeocentricCRS.CARTESIAN)
+            ? CSGeometryFactory.DEFAULT : new CSGeometryFactory(getCoordinateSystem());            
     }
 
-    public CoordinateReferenceSystem getCoordinateSystem() {
-        return coordinateSystem;
+    
+    protected GeometricAttributeType(GeometryType type, Name name, int min, int max, boolean isNillable,Object defaultValue) {
+		super(type, name, min, max, isNillable,defaultValue);
+	}
+
+	public CoordinateReferenceSystem getCoordinateSystem() {
+        return ((GeometryType)getType()).getCRS();
     }
 
     public GeometryFactory getGeometryFactory() {
@@ -134,11 +138,25 @@ public class GeometricAttributeType extends DefaultAttributeType implements org.
         throw new IllegalAttributeException("Cannot duplicate " + o.getClass().getName());
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.feature.PrimativeAttributeType#getRestriction()
-     */
-    public Filter getRestriction() {
-        return filter;
+    public static CoordinateReferenceSystem crs( CoordinateReferenceSystem override ) {
+    	CoordinateReferenceSystem crs = override;
+
+        if (override != null) {
+            crs = override;
+        }
+
+        if (crs == null) {
+            crs = DefaultGeocentricCRS.CARTESIAN;
+        }
+        
+        return crs;
+    }
+    
+    public static GeometryType createAttributeType(String name,Class binding,CoordinateReferenceSystem crs,Filter restriction) {
+    	return new GeometryTypeImpl( 
+			new org.geotools.feature.type.TypeName(name),binding,crs,false,false,
+			restriction != null ? Collections.singleton(restriction) : Collections.EMPTY_SET, 
+			null,null);
     }
 }
 /**

@@ -1,15 +1,18 @@
 package org.geotools.feature.simple;
 
+import java.util.Collections;
 import java.util.List;
 
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.Name;
 import org.geotools.feature.type.SchemaImpl;
+import org.geotools.feature.type.TypeFactoryImpl;
+import org.geotools.feature.type.TypeName;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.feature.simple.SimpleFeatureCollectionType;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Schema;
 
 import com.vividsolutions.jts.geom.LineString;
@@ -17,17 +20,6 @@ import com.vividsolutions.jts.geom.Point;
 
 import junit.framework.TestCase;
 
-/**
- * This test cases will check that the typeBuilder works as advertised.
- * <p>
- * This test uses the container set up for simple types implementation. If you
- * wish to subclass this you may reuse the test methods with alternate
- * implementations.
- * </p>
- * 
- * @author Jody Garnett
- * @author Justin Deoliveira
- */
 public class SimpleTypeBuilderTest extends TestCase {
 
 	static final String URI = "gopher://localhost/test";
@@ -37,115 +29,55 @@ public class SimpleTypeBuilderTest extends TestCase {
 	protected void setUp() throws Exception {
 		Schema schema = new SchemaImpl( "test" );
 		
-		AttributeType pointType = AttributeTypeFactory.newAttributeType( "pointType", Point.class );
+		TypeFactoryImpl typeFactory = new TypeFactoryImpl();
+		AttributeType pointType = 
+			typeFactory.createGeometryType( new TypeName( "test", "pointType" ), Point.class, null, false, false, Collections.EMPTY_SET, null, null);		
 		schema.put( new Name( "test", "pointType" ), pointType );
 		
-		AttributeType intType = AttributeTypeFactory.newAttributeType( "intType", Integer.class );
+		AttributeType intType = 
+			typeFactory.createAttributeType( new TypeName( "test", "intType" ), Integer.class, false, false, Collections.EMPTY_SET, null, null);
 		schema.put( new Name( "test", "intType" ), intType );
 		
 		builder = new SimpleTypeBuilder( new SimpleTypeFactoryImpl() );
-		//builder.load( schema );
+		builder.setBindings(schema);
 	}
 	
-	public void test() {
+	public void testSanity() {
 		builder.setName( "testName" );
 		builder.setNamespaceURI( "testNamespaceURI" );
-		builder.addGeometry( "point", Point.class );
-		builder.addAttribute( "integer", Integer.class );
+		builder.add( "point", Point.class, null );
+		builder.add( "integer", Integer.class );
 		
-		FeatureType type = builder.feature();
+		SimpleFeatureType type = builder.buildFeatureType();
 		assertNotNull( type );
 		
 		assertEquals( 2, type.getAttributeCount() );
 		
-		AttributeType t = type.getAttributeType( "point" );
+		AttributeType t = type.getType( "point" );
 		assertNotNull( t );
-		assertEquals( Point.class, t.getType() );
+		assertEquals( Point.class, t.getBinding() );
 		
-		t = type.getAttributeType( "integer" );
+		t = type.getType( "integer" );
 		assertNotNull( t );
-		assertEquals( Integer.class, t.getType() );
+		assertEquals( Integer.class, t.getBinding() );
 		
-		t = type.getDefaultGeometry();
+		t = type.getDefaultGeometryType();
 		assertNotNull( t );
-		assertEquals( Point.class, t.getType() );
+		assertEquals( Point.class, t.getBinding() );
 	}
 	
-	/**
-	 * Defines a simple setup of Address, Fullname, Person and then defines a
-	 * collection of Person as a Country.
-	 * 
-	 * <pre><code>
-	 *     +-------------------+
-	 *     | ROAD (Feature)    |
-	 *     +-------------------+
-	 *     |name: Text         |
-	 *     |route: Route       |
-	 *     +-------------------+
-	 *              *|
-	 *               |members
-	 *               |
-	 *     +--------------------------+
-	 *     | ROADS(FeatureCollection) |
-	 *     +--------------------------+
-	 * </code></pre>
-	 * 
-	 * <p>
-	 * Things to note in this example:
-	 * <ul>
-	 * <li>Definition of "atomic" types like Text and Number that bind directly
-	 * to Java classes
-	 * <li>Definition of "geometry" types like Route that bind to a geometry
-	 * implementation
-	 * <li>Definition of a "simple feature" made of atomic and geometry types
-	 * without support for descriptors or associations
-	 * <li>Definition of a "simple feature collection" able to hold a
-	 * collection of simple feature, but unable to hold attributes itself.
-	 * </ul>
-	 */
-	public void testBuilding() throws Exception {
-		//builder.load(new SimpleSchema()); // load java types
-		builder.setNamespaceURI(URI);
+	public void testCRS() {
+		builder.setName( "testName" );
+		builder.setNamespaceURI( "testNamespaceURI" );
+		
 		builder.setCRS(DefaultGeographicCRS.WGS84);
-
-		builder.setName("ROAD");
-		builder.addAttribute("name", String.class);
-		builder.addGeometry("route", LineString.class);
+		builder.add( "point", Point.class );
+		builder.add( "point2", Point.class, DefaultGeographicCRS.WGS84 );
+		builder.setDefaultGeometry("point");
+		SimpleFeatureType type = builder.buildFeatureType();
+		assertEquals( DefaultGeographicCRS.WGS84, type.getCRS() );
 		
-		//SimpleFeatureType ROAD = builder.feature();
-		FeatureType ROAD = builder.feature();
-		
-		assertEquals(2, ROAD.getAttributeCount());
-		assertEquals(LineString.class, ROAD.getDefaultGeometry().getType());
-		//assertTrue(List.class.isInstance(ROAD.attributes()));
-
-//		builder.setName("ROADS");
-//		builder.setMember(ROAD);
-//
-//		SimpleFeatureCollectionType ROADS = builder.collection();
-//		assertEquals(0, ROADS.attributes().size());
-//		assertEquals(ROAD, ROADS.getMemberType());
-	}
-
-	public void testTerse() throws Exception {
-		//builder.load(new SimpleSchema()); // load java types
-		builder.setNamespaceURI(URI);
-		builder.setCRS(DefaultGeographicCRS.WGS84);
-
-		/*SimpleFeatureType*/org.geotools.feature.FeatureType ROAD = 
-			builder.name("ROAD").attribute("name", String.class).geometry("route", LineString.class)
-				.feature();
-
-		//assertEquals(2, ROAD.getNumberOfAttribtues());
-		assertEquals(2, ROAD.getAttributeCount());
-		assertEquals(LineString.class, ROAD.getDefaultGeometry().getType());
-		//assertTrue(List.class.isInstance(ROAD.attributes()));
-		assertEquals( DefaultGeographicCRS.WGS84, ROAD.getDefaultGeometry().getCoordinateSystem() );
-		
-//		SimpleFeatureCollectionType ROADS = builder.name("ROADS").member(ROAD).collection();
-//
-//		assertEquals(0, ROADS.attributes().size());
-//		assertEquals(ROAD, ROADS.getMemberType());
-//		assertEquals( DefaultGeographicCRS.WGS84, ROADS.getCRS() );		
+		assertNull( type.getDefaultGeometryType().getCRS() );
+		assertEquals( DefaultGeographicCRS.WGS84, ((GeometryType)type.getType("point2")).getCRS());
 	}
 }

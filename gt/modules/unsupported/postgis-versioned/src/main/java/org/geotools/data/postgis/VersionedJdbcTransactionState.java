@@ -190,7 +190,7 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
 
                 // update it
                 f = writer.next();
-                f.setDefaultGeometry(toLatLonRectange(bbox));
+                f.setPrimaryGeometry(toLatLonRectange(bbox));
                 writer.write();
             } catch (IllegalAttributeException e) {
                 // if this happens there's a programming error
@@ -300,7 +300,7 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
             if(!bbox.isNull() && bbox.getHeight() == 0 && bbox.getWidth() == 0)
                 currentBox = expandBBox(bbox);
             
-            f.setDefaultGeometry(toLatLonRectange(currentBox));
+            f.setPrimaryGeometry(toLatLonRectange(currentBox));
             writer.write();
         } catch (IllegalAttributeException e) {
             // if this happens there's a programming error

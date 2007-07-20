@@ -80,7 +80,7 @@ public class AttributeGroupGT implements AttributeGroup {
     }
 
     /**
-     * @see org.geotools.xml.xsi.AttributeGroup#getName()
+     * @see org.geotools.xml.xsi.AttributeGroup#getLocalName()
      */
     public String getName() {
         return name;

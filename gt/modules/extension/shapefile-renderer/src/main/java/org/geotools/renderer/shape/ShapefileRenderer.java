@@ -483,7 +483,7 @@ public class ShapefileRenderer implements GTRenderer {
         }
 
         OpacityFinder opacityFinder = new OpacityFinder(getAcceptableSymbolizers(type
-                .getDefaultGeometry()));
+                .getPrimaryGeometry()));
 
         for( Iterator iter = ruleList.iterator(); iter.hasNext(); ) {
             Rule rule = (Rule) iter.next();
@@ -641,8 +641,8 @@ public class ShapefileRenderer implements GTRenderer {
     }
 
     private Class[] getAcceptableSymbolizers( GeometryAttributeType defaultGeometry ) {
-        if (Polygon.class.isAssignableFrom(defaultGeometry.getType())
-                || MultiPolygon.class.isAssignableFrom(defaultGeometry.getType())) {
+        if (Polygon.class.isAssignableFrom(defaultGeometry.getBinding())
+                || MultiPolygon.class.isAssignableFrom(defaultGeometry.getBinding())) {
             return new Class[]{PointSymbolizer.class, LineSymbolizer.class, PolygonSymbolizer.class};
         }
 
@@ -652,7 +652,7 @@ public class ShapefileRenderer implements GTRenderer {
     Feature createFeature( FeatureType type, Record record, DbaseFileReader dbfreader, String id )
             throws Exception {
         if (type.getAttributeCount() == 1) {
-            return type.create(new Object[]{getGeom(record.shape(), type.getDefaultGeometry())}, id);
+            return type.create(new Object[]{getGeom(record.shape(), type.getPrimaryGeometry())}, id);
         } else {
             DbaseFileHeader header = dbfreader.getHeader();
 
@@ -667,7 +667,7 @@ public class ShapefileRenderer implements GTRenderer {
                 }
             }
 
-            values[values.length - 1] = getGeom(record.shape(), type.getDefaultGeometry());
+            values[values.length - 1] = getGeom(record.shape(), type.getPrimaryGeometry());
 
             return type.create(values, id);
         }
@@ -685,13 +685,13 @@ public class ShapefileRenderer implements GTRenderer {
             return geom;
         }
         if (defaultGeom == null) {
-            if (MultiPolygon.class.isAssignableFrom(defaultGeometry.getType())) {
+            if (MultiPolygon.class.isAssignableFrom(defaultGeometry.getBinding())) {
                 defaultGeom = MULTI_POLYGON_GEOM;
-            } else if (MultiLineString.class.isAssignableFrom(defaultGeometry.getType())) {
+            } else if (MultiLineString.class.isAssignableFrom(defaultGeometry.getBinding())) {
                 defaultGeom = MULTI_LINE_GEOM;
-            } else if (Point.class.isAssignableFrom(defaultGeometry.getType())) {
+            } else if (Point.class.isAssignableFrom(defaultGeometry.getBinding())) {
                 defaultGeom = POINT_GEOM;
-            } else if (MultiPoint.class.isAssignableFrom(defaultGeometry.getType())) {
+            } else if (MultiPoint.class.isAssignableFrom(defaultGeometry.getBinding())) {
                 defaultGeom = MULTI_POINT_GEOM;
             }
         }
@@ -729,7 +729,7 @@ public class ShapefileRenderer implements GTRenderer {
         }
 
         FeatureType type = FeatureTypeBuilder.newFeatureType(types, schema.getTypeName(), schema
-                .getNamespace(), false, null, schema.getDefaultGeometry());
+                .getNamespace(), false, null, schema.getPrimaryGeometry());
 
         return type;
     }
@@ -790,7 +790,7 @@ public class ShapefileRenderer implements GTRenderer {
                 try {
                     labelCache.put(layerId,(TextSymbolizer) symbolizers[m], 
                             feature, 
-                            new LiteShape2(feature.getDefaultGeometry(), null, null, false),
+                            new LiteShape2(feature.getPrimaryGeometry(), null, null, false),
                             scaleRange);
                 } catch (Exception e) {
                     fireErrorEvent(e);
@@ -838,7 +838,7 @@ public class ShapefileRenderer implements GTRenderer {
                 LOGGER.finer("applying symbolizer " + symbolizers[m]);
             }
 
-            Geometry g = feature.getDefaultGeometry();
+            Geometry g = feature.getPrimaryGeometry();
             shape = new LiteShape2(g, transform, getDecimator(transform), false);
 
             if (symbolizers[m] instanceof TextSymbolizer) {
@@ -1272,7 +1272,7 @@ public class ShapefileRenderer implements GTRenderer {
                 
                 CoordinateReferenceSystem dataCRS;
                 if( getForceCRSHint()==null )
-                	dataCRS = ds.getSchema().getDefaultGeometry()
+                	dataCRS = ds.getSchema().getPrimaryGeometry()
                         .getCoordinateSystem();
                 else
                 	dataCRS=getForceCRSHint();

@@ -55,9 +55,9 @@ public interface GeometryAttributeType extends AttributeType, PrimativeAttribute
      * Warning this will need revisiting for Geotools 2.2 when
      * GeoAPI Geometry enters use.
      * </p>
-     * @see org.geotools.feature.AttributeType#getType()
+     * @see org.geotools.feature.AttributeType#getBinding()
      */
-    Class getType();
+    Class getBinding();
 
     /**
      * Restriction is assumed to be in agreement with Geometry class indicated.

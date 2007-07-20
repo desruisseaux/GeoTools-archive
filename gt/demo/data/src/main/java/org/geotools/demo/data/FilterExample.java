@@ -84,7 +84,7 @@ public class FilterExample {
 		// look up geometry attribute name used for testing
 		//
 		String geometryName = featureSource.getSchema()
-				.getDefaultGeometry().getName();
+				.getPrimaryGeometry().getLocalName();
 
 		// Create the attribute expression
 		PropertyName geometryExpression = filterFactory.property(geometryName);

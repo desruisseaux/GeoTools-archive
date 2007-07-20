@@ -392,7 +392,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     protected FeatureReader getFeatureReader(String typeName, Query query)
         throws IOException {
         String[] propertyNames = query.getPropertyNames();
-        String defaultGeomName = schema.getDefaultGeometry().getName();
+        String defaultGeomName = schema.getPrimaryGeometry().getLocalName();
         
         // gather attributes needed by the query tool, they will be used by the query filter
         StyleAttributeExtractor extractor = new StyleAttributeExtractor();
@@ -442,7 +442,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         if (!readDbf) {
             LOGGER.fine(
                 "The DBF file won't be opened since no attributes will be read from it");
-            atts = new AttributeType[] { schema.getDefaultGeometry() };
+            atts = new AttributeType[] { schema.getPrimaryGeometry() };
 
             return new Reader(atts, openShapeReader(), null);
         }
@@ -628,7 +628,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             try {
                 AttributeType[] types = readAttributes();
                 FeatureType parent = null;
-                Class geomType = types[0].getType();
+                Class geomType = types[0].getBinding();
 
                 if ((geomType == Point.class) || (geomType == MultiPoint.class)) {
                     parent = BasicFeatureTypes.POINT;
@@ -774,13 +774,13 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         clear();
         schema = featureType;
 
-        CoordinateReferenceSystem cs = featureType.getDefaultGeometry()
+        CoordinateReferenceSystem cs = featureType.getPrimaryGeometry()
                                                   .getCoordinateSystem();
 
         long temp = System.currentTimeMillis();
 
         if (isLocal()) {
-            Class geomType = featureType.getDefaultGeometry().getType();
+            Class geomType = featureType.getPrimaryGeometry().getBinding();
             ShapeType shapeType;
 
             if (Point.class.isAssignableFrom(geomType)) {
@@ -896,7 +896,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
 
             if (schema != null) {
                 return new ReferencedEnvelope(env,
-                    schema.getDefaultGeometry().getCoordinateSystem());
+                    schema.getPrimaryGeometry().getCoordinateSystem());
             }
 
             return new ReferencedEnvelope(env, null);
@@ -1068,8 +1068,8 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         for (int i = 0, ii = featureType.getAttributeCount(); i < ii; i++) {
             AttributeType type = featureType.getAttributeType(i);
 
-            Class colType = type.getType();
-            String colName = type.getName();
+            Class colType = type.getBinding();
+            String colName = type.getLocalName();
 
             int fieldLen = -1;
             Filter f = type.getRestriction();
@@ -1419,9 +1419,9 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             // another problem.
             if ((records <= 0) && (shapeType == null)) {
                 GeometryAttributeType geometryAttributeType = featureType
-                    .getDefaultGeometry();
+                    .getPrimaryGeometry();
 
-                Class gat = geometryAttributeType.getType();
+                Class gat = geometryAttributeType.getBinding();
                 shapeType = JTSUtilities.getShapeType(gat);
             }
 
@@ -1594,7 +1594,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             }
 
             // writing of Geometry
-            Geometry g = currentFeature.getDefaultGeometry();
+            Geometry g = currentFeature.getPrimaryGeometry();
 
             // if this is the first Geometry, find the shapeType and handler
             if (shapeType == null) {

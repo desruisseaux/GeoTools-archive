@@ -80,7 +80,7 @@ public class ShapeReader {
                 AttributeType attributeType = featureType.getAttributeType(i);
 
                 if ( !(attributeType instanceof GeometryAttributeType)) {
-                    System.out.print(attributeType.getType().getName() + "\t");
+                    System.out.print(attributeType.getBinding().getName() + "\t");
                 }
             }
 
@@ -91,7 +91,7 @@ public class ShapeReader {
                 AttributeType at = featureType.getAttributeType(i);
 
                 if ( at instanceof GeometryAttributeType) {
-                    System.out.print(at.getName() + "\t");
+                    System.out.print(at.getLocalName() + "\t");
                 }
             }
 
@@ -127,7 +127,7 @@ public class ShapeReader {
 	            for( int count=0; iterator.hasNext(); count++) {
 	                Feature feature = (Feature) iterator.next();
 	                System.out.print(feature.getID() + "\t");
-	                System.out.println(feature.getDefaultGeometry());
+	                System.out.println(feature.getPrimaryGeometry());
 	                System.out.println();
 	                
 	                if( count == 10) break; // only 10

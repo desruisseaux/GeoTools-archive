@@ -80,7 +80,7 @@ public class StyleGeneratorTest extends DataTestCase {
         MathExpression expr = null;
         MathExpression expr2 = null;
         FeatureType type = roadType;
-        String attribName = type.getAttributeType(0).getName();
+        String attribName = type.getAttributeType(0).getLocalName();
         FeatureCollection fc = DataUtilities.collection(roadFeatures);
         FeatureSource fs = DataUtilities.source(fc);
 
@@ -113,7 +113,7 @@ public class StyleGeneratorTest extends DataTestCase {
 
         // get the fts
         FeatureTypeStyle fts = StyleGenerator.createFeatureTypeStyle(classifier, expr2, colors,
-                "myfts", roadFeatures[0].getFeatureType().getDefaultGeometry(),
+                "myfts", roadFeatures[0].getFeatureType().getPrimaryGeometry(),
                 StyleGenerator.ELSEMODE_IGNORE, 0.5, null);
         assertNotNull(fts);
 

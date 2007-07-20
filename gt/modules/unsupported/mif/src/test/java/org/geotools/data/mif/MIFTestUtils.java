@@ -166,8 +166,8 @@ public class MIFTestUtils {
         AttributeType[] attrs = ft.getAttributeTypes();
 
         for (int i = 0; i < attrs.length; i++) {
-            print("   " + attrs[i].getName() + " - "
-                + attrs[i].getType().toString() + "("
+            print("   " + attrs[i].getLocalName() + " - "
+                + attrs[i].getBinding().toString() + "("
                 + AttributeTypes.getFieldLength(attrs[i], 0) + ")", logger);
         }
     }

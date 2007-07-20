@@ -132,11 +132,11 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
 
                 for (int i = 0; i < type.length; i++) {
                     try {
-                        feature.setAttribute(type[i].getName(), value[i]);
+                        feature.setAttribute(type[i].getLocalName(), value[i]);
                     } catch (IllegalAttributeException e) {
                         throw new DataSourceException(
                             "Could not update feature " + feature.getID()
-                            + " with " + type[i].getName() + "=" + value[i], e);
+                            + " with " + type[i].getLocalName() + "=" + value[i], e);
                     }
                 }
 

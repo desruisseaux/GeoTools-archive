@@ -40,10 +40,14 @@ import org.geotools.feature.FeatureList;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.collection.BaseFeatureCollection;
 import org.geotools.feature.collection.DelegateFeatureIterator;
 import org.geotools.feature.collection.FeatureState;
 import org.geotools.feature.collection.SubFeatureCollection;
+import org.geotools.feature.simple.SimpleFeatureCollectionImpl;
+import org.geotools.feature.simple.SimpleFeatureCollectionTypeImpl;
 import org.geotools.feature.type.FeatureAttributeType;
+import org.geotools.feature.type.TypeName;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.filter.SortBy2;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -79,14 +83,11 @@ import com.vividsolutions.jts.geom.Geometry;
  * @since 2.1.RC0
  * @source $URL$
  */
-public abstract class DataFeatureCollection implements FeatureCollection {
+public abstract class DataFeatureCollection extends BaseFeatureCollection implements FeatureCollection {
     
 	/** logger */
 	static Logger LOGGER = Logger.getLogger( "org.geotools.data" );
 	
-    /** Internal listener storage list */
-    private List listeners = new ArrayList(2);
-
     static private int unique = 0;
     
     /**
@@ -99,14 +100,12 @@ public abstract class DataFeatureCollection implements FeatureCollection {
      * Collection based on a generic collection
      */
     protected DataFeatureCollection( String id ){
-        ID = id;
-        featureType = null;
+    	this(id,null);
     }
     
     /** Subclass must think about what consitructors it needs. */
-    protected DataFeatureCollection( String id, FeatureType featureType ){
-        ID = id;
-        this.featureType = featureType;
+    protected DataFeatureCollection( String id, FeatureType memberType ){
+    	super(id,memberType);
     }
     
     /**
@@ -137,7 +136,9 @@ public abstract class DataFeatureCollection implements FeatureCollection {
     // 
     // To be implemented by subclass
     //    
-    public abstract FeatureType getSchema();
+    public FeatureType getSchema() {
+    	return super.getSchema();
+    }
 
     public abstract ReferencedEnvelope getBounds();
 
@@ -166,23 +167,6 @@ public abstract class DataFeatureCollection implements FeatureCollection {
     // 
     // implemented in terms of feature results
     //
-    /**
-     * Adds a listener for collection events.
-     *
-     * @param listener The listener to add
-     */
-    public void addListener(CollectionListener listener) {
-        listeners.add(listener);
-    }
-
-    /**
-     * Removes a listener for collection events.
-     *
-     * @param listener The listener to remove
-     */
-    public void removeListener(CollectionListener listener) {
-        listeners.remove(listener);
-    }
     
     //
     // Content Access
@@ -439,9 +423,9 @@ public abstract class DataFeatureCollection implements FeatureCollection {
     // of FeatureAttributeType with the value of getSchema
     //
     private FeatureCollection parent;
-    private final String ID;
+    //private final String ID;
     /** The featureType of this actual colletion */
-    FeatureType featureType;
+    //FeatureType featureType;
     
     /**
      * FeatureType of this FeatureCollection.
@@ -456,32 +440,27 @@ public abstract class DataFeatureCollection implements FeatureCollection {
      * </ul>
      * </p> 
      */
-    public synchronized FeatureType getFeatureType() {
-        if( featureType == null ){
-            List ats = new LinkedList();
-            ats.add(new FeatureAttributeType( getSchema().getTypeName(), getSchema(),false));
-            featureType = new DefaultFeatureType("AbstractFeatureCollectionType",FeatureTypes.DEFAULT_NAMESPACE,ats,new LinkedList(),null);        
-        }
-        return featureType;
-    }
+//    public synchronized FeatureType getFeatureType() {
+//        if( featureType == null ){
+//            List ats = new LinkedList();
+//            ats.add(new FeatureAttributeType( getSchema().getTypeName(), getSchema(),false));
+//            featureType = new DefaultFeatureType("AbstractFeatureCollectionType",FeatureTypes.DEFAULT_NAMESPACE,ats,new LinkedList(),null);        
+//        }
+//        return featureType;
+//    }
+    
     public FeatureCollection getParent() {
         return parent; // TODO deal with listeners?        
     }
     public void setParent(FeatureCollection collection) {
         parent = collection;
     }    
-    public String getID() {
-        return ID;
-    }
-    public Object[] getAttributes( Object[] attributes ) {
-        List list = (List) getAttribute( 0 );
-        return list.toArray( attributes );        
-    }
+   
     /**
      * Not really interested yet .. 
      */
-    public Object getAttribute( String xPath ) {
-        if(xPath.indexOf(featureType.getTypeName())>-1)
+    public Object getValue( String xPath ) {
+        if(xPath.indexOf(getFeatureType().getTypeName())>-1)
             if(xPath.endsWith("]")){
                 // TODO get index and grab it
                 return getAttribute(0);
@@ -491,7 +470,7 @@ public abstract class DataFeatureCollection implements FeatureCollection {
         return null;
     }
     
-    public Object getAttribute( int index ) {
+    public Object getValue( int index ) {
         if(index == 0){
             FeatureReader reader = null;
             try {
@@ -524,7 +503,7 @@ public abstract class DataFeatureCollection implements FeatureCollection {
         return null;        
     }
     
-    public void setAttribute( int position, Object val ) throws IllegalAttributeException, ArrayIndexOutOfBoundsException {
+    public void setValue( int position, Object val )  {
         if(position == 0 && val instanceof Collection){
             Collection list = (Collection)val;
             if( !FeatureState.isFeatures( list )) return;
@@ -544,7 +523,11 @@ public abstract class DataFeatureCollection implements FeatureCollection {
                     Feature newFeature = writer.next(); // grab a "new" Feature
                     Object values[] = feature.getAttributes( null );
                     for( int a=0; a<values.length; a++){
-                        newFeature.setAttribute( a, values[a] );                        
+                        try {
+							newFeature.setAttribute( a, values[a] );
+						} catch (IllegalAttributeException e) {
+							throw new IllegalArgumentException(e);
+						}                        
                     }
                     writer.write();
                 }                
@@ -556,19 +539,15 @@ public abstract class DataFeatureCollection implements FeatureCollection {
                     try {
                         writer.close();
                     } catch (IOException io) {
-                        throw (IllegalAttributeException) new IllegalAttributeException("Unsuccessful:"+io).initCause( io );                    
+                        throw (IllegalArgumentException) new IllegalArgumentException("Unsuccessful:"+io).initCause( io );                    
                     }
                 }
             }
         }
     }
 
-    public int getNumberOfAttributes() {
-        return size();
-    }
-
     public void setAttribute( String xPath, Object attribute ) throws IllegalAttributeException {
-        if(xPath.indexOf(featureType.getTypeName())>-1){
+        if(xPath.indexOf(getFeatureType().getTypeName())>-1){
             if(xPath.endsWith("]")){
                 // TODO get index and grab it
             }else{
@@ -598,21 +577,10 @@ public abstract class DataFeatureCollection implements FeatureCollection {
         }*/
     }
 
-    /**
-     * @deprecated use {@link #getPrimaryGeometry()}.
-     */
-    public Geometry getDefaultGeometry() {
-        return getPrimaryGeometry();
-    }
     public Geometry getPrimaryGeometry() {
     	return null;
     }
-    /**
-     * @deprecated use {@link #setPrimaryGeometry(Geometry)}.
-     */
-    public final void setDefaultGeometry( Geometry geometry ) throws IllegalAttributeException {
-        setPrimaryGeometry(geometry);
-    }
+   
     public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
     	throw new IllegalAttributeException( "DefaultGeometry not supported" );
     }
@@ -620,8 +588,12 @@ public abstract class DataFeatureCollection implements FeatureCollection {
      * Accepts a visitor, which then visits each feature in the collection.
      * @throws IOException 
      */
-    public void accepts(FeatureVisitor visitor, ProgressListener progress ) throws IOException {
-        Iterator iterator = null;
+    public final void accepts(FeatureVisitor visitor, ProgressListener progress ) throws IOException {
+    	accepts((org.opengis.feature.FeatureVisitor) visitor, (org.opengis.util.ProgressListener) progress);
+	}
+    
+    public void accepts(org.opengis.feature.FeatureVisitor visitor, org.opengis.util.ProgressListener progress) {
+    	Iterator iterator = null;
         if (progress == null) progress = new NullProgressListener();
         try{
             float size = size();
@@ -641,7 +613,7 @@ public abstract class DataFeatureCollection implements FeatureCollection {
             progress.complete();            
         	close( iterator );
         }
-	}
+    }
     
     /**
      * Will return an optimized subCollection based on access

@@ -374,6 +374,14 @@ public abstract class AbstractResourceCollection implements ResourceCollection {
     protected final Set open = new HashSet();
 
     /**
+     * Returns the set of open iterators.
+     * 
+     */
+    final public Set getOpenIterators() {
+    	return open;
+    }
+    
+    /**
      * Please implement!
      * <p>
      * Note: If you return a ResourceIterator, the default implemntation of close( Iterator )

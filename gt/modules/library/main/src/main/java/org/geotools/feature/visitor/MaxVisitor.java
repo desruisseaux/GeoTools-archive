@@ -19,6 +19,7 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.feature.type.FeatureCollectionType;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 
@@ -46,26 +47,33 @@ public class MaxVisitor implements FeatureCalc {
     public MaxVisitor(int attributeTypeIndex, FeatureType type)
         throws IllegalFilterException {
         FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
-        expr = factory.property(type.getAttributeType(attributeTypeIndex).getName());
+        expr = factory.property(type.getAttributeType(attributeTypeIndex).getLocalName());
     }
 
     public MaxVisitor(String attrName, FeatureType type)
         throws IllegalFilterException {
         FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
-        expr = factory.property(type.getAttributeType(attrName).getName());
+        expr = factory.property(type.getAttributeType(attrName).getLocalName());
     }
 
     public MaxVisitor(Expression expr) throws IllegalFilterException {
         this.expr = expr;
     }
 
+    public void init(FeatureCollectionType collection) {
+    	//do nothing
+    }
+    
     /**
      * Visitor function, which looks at each feature and finds the maximum.
      *
      * @param feature the feature to be visited
      */
     public void visit(Feature feature) {
-        Object attribValue = expr.evaluate(feature);
+        visit((org.opengis.feature.Feature)feature);
+    }
+    public void visit(org.opengis.feature.Feature feature) {
+    	Object attribValue = expr.evaluate(feature);
 
         if (attribValue == null) {
         	countNull++; //increment the null count, but don't store its value            
@@ -89,7 +97,7 @@ public class MaxVisitor implements FeatureCalc {
 
         // throw new IllegalStateException("Expression is not comparable!");
     }
-
+    
     /**
      * Get the max value.
      *

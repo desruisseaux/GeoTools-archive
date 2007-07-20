@@ -80,7 +80,7 @@ public final class MemorySpatialIndex {
 		Geometry g;
 		while (it.hasNext()) {
 			f = it.next();
-			g = f.getDefaultGeometry();
+			g = f.getPrimaryGeometry();
 			index.insert(g.getEnvelopeInternal(), f);
 		}
 		// closing he iterator to free some resources.

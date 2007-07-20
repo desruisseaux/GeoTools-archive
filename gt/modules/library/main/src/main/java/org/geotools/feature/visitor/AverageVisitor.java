@@ -22,6 +22,7 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.feature.type.FeatureCollectionType;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 
@@ -55,8 +56,8 @@ public class AverageVisitor implements FeatureCalc {
         throws IllegalFilterException {
         FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
         AttributeType attributeType = type.getAttributeType(attributeTypeIndex);
-        expr = factory.property(attributeType.getName());
-        createStrategy(attributeType.getType());
+        expr = factory.property(attributeType.getLocalName());
+        createStrategy(attributeType.getBinding());
     }
 
     /**
@@ -71,8 +72,8 @@ public class AverageVisitor implements FeatureCalc {
         throws IllegalFilterException {
         FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
         AttributeType attributeType = type.getAttributeType(attrName);
-        expr = factory.property(attributeType.getName());
-        createStrategy(attributeType.getType());
+        expr = factory.property(attributeType.getLocalName());
+        createStrategy(attributeType.getBinding());
     }
 
     /**
@@ -86,6 +87,10 @@ public class AverageVisitor implements FeatureCalc {
         this.expr = expr;
     }
 
+    public void init(FeatureCollectionType collection) {
+    	//do nothing
+    }
+    
     /**
      * Factory method for creating the appropriate strategy object
      * 
@@ -111,7 +116,11 @@ public class AverageVisitor implements FeatureCalc {
     }
 
     public void visit(Feature feature) {
-        Object value = expr.evaluate(feature);
+        visit((org.opengis.feature.Feature)feature);
+    }
+    
+    public void visit(org.opengis.feature.Feature feature) {
+    	Object value = expr.evaluate(feature);
 
         if (strategy == null) {
             Class type = value.getClass();

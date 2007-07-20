@@ -98,8 +98,8 @@ public class NumericAttributeType extends DefaultAttributeType implements Primat
         }
 
         // no parse needed here if types are compatable
-        if ((value.getClass() == type)
-                || type.isAssignableFrom(value.getClass())) {
+        if ((value.getClass() == getBinding())
+                || getBinding().isAssignableFrom(value.getClass())) {
             return value;
         }
 
@@ -152,39 +152,39 @@ public class NumericAttributeType extends DefaultAttributeType implements Primat
 
     protected Object parseFromString(String value)
         throws IllegalArgumentException {
-        if (type == Byte.class) {
+        if (getBinding() == Byte.class) {
             return Byte.decode(value);
         }
 
-        if (type == Short.class) {
+        if (getBinding() == Short.class) {
             return Short.decode(value);
         }
 
-        if (type == Integer.class) {
+        if (getBinding() == Integer.class) {
             return Integer.decode(value);
         }
 
-        if (type == Float.class) {
+        if (getBinding() == Float.class) {
             return Float.valueOf(value);
         }
 
-        if (type == Double.class) {
+        if (getBinding() == Double.class) {
             return Double.valueOf(value);
         }
 
-        if (type == Long.class) {
+        if (getBinding() == Long.class) {
             return Long.decode(value);
         }
 
-        if (type == BigInteger.class) {
+        if (getBinding() == BigInteger.class) {
             return new BigInteger(value);
         }
 
-        if (type == BigDecimal.class) {
+        if (getBinding() == BigDecimal.class) {
             return new BigDecimal(value);
         }
 
-        if (Number.class.isAssignableFrom(type)) {
+        if (Number.class.isAssignableFrom(getBinding())) {
             return new Double(value);
         }
 
@@ -192,35 +192,35 @@ public class NumericAttributeType extends DefaultAttributeType implements Primat
     }
 
     protected Object convertNumber(Number number) {
-        if (type == Byte.class) {
+        if (getBinding() == Byte.class) {
             return new Byte(number.byteValue());
         }
 
-        if (type == Short.class) {
+        if (getBinding() == Short.class) {
             return new Short(number.shortValue());
         }
 
-        if (type == Integer.class) {
+        if (getBinding() == Integer.class) {
             return new Integer(number.intValue());
         }
 
-        if (type == Float.class) {
+        if (getBinding() == Float.class) {
             return new Float(number.floatValue());
         }
 
-        if (type == Double.class) {
+        if (getBinding() == Double.class) {
             return new Double(number.doubleValue());
         }
 
-        if (type == Long.class) {
+        if (getBinding() == Long.class) {
             return new Long(number.longValue());
         }
 
-        if (type == BigInteger.class) {
+        if (getBinding() == BigInteger.class) {
             return BigInteger.valueOf(number.longValue());
         }
 
-        if (type == BigDecimal.class) {
+        if (getBinding() == BigDecimal.class) {
             return BigDecimal.valueOf(number.longValue());
         }
 

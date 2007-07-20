@@ -53,7 +53,7 @@ public class FeatureGraphGenerator extends BasicGraphGenerator {
 	
 	public Graphable add( Object obj ) {
 		Feature feature = (Feature) obj;
-		Graphable g = decorated.add( feature.getDefaultGeometry() );
+		Graphable g = decorated.add( feature.getPrimaryGeometry() );
 		g.setObject( feature );
 	
 		return g;
@@ -61,11 +61,11 @@ public class FeatureGraphGenerator extends BasicGraphGenerator {
 	
 	public Graphable remove( Object obj ) {
 		Feature feature = (Feature) obj;
-		return decorated.remove( feature.getDefaultGeometry() );
+		return decorated.remove( feature.getPrimaryGeometry() );
 	}
 	
 	public Graphable get(Object obj) {
 		Feature feature = (Feature) obj;
-		return decorated.get( feature.getDefaultGeometry() );
+		return decorated.get( feature.getPrimaryGeometry() );
 	}
 }

@@ -18,20 +18,25 @@
 package org.geotools.data;
 
 import java.net.URI;
+import java.util.Collections;
 
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
+import org.geotools.feature.simple.SimpleFeatureTypeImpl;
+import org.geotools.feature.type.TypeName;
+import org.opengis.feature.type.AttributeType;
 
 /**
  * An empty FeatureType implementation used in the AbstractDataSourceTest
  * @author  wolf
  * @source $URL$
  */
-public class DummyFeatureType implements FeatureType {
+public class DummyFeatureType extends SimpleFeatureTypeImpl implements FeatureType {
     private String typeName;
     
     /** Creates a new instance of DummyFeatureType */
     public DummyFeatureType(String typeName) {
+    	super(new TypeName(typeName),Collections.EMPTY_LIST, (AttributeType) null, null, Collections.EMPTY_SET, null);
     }
     
     public org.geotools.feature.Feature create(Object[] attributes) throws org.geotools.feature.IllegalAttributeException {
@@ -69,11 +74,7 @@ public class DummyFeatureType implements FeatureType {
     public org.geotools.feature.AttributeType[] getAttributeTypes() {
         return new org.geotools.feature.AttributeType[] {};
     }
-    
-    public GeometryAttributeType getDefaultGeometry() {
-        return null;
-    }
-    
+   
     public GeometryAttributeType getPrimaryGeometry() {
     	return null;
     }

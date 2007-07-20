@@ -24,7 +24,7 @@ public class FeaturePropertyHandler implements DynamicPropertyHandler {
 		//set is ok because jxpath ignores order
 		String[] propertyNames = new String[ featureType.getAttributeCount() ];
 		for ( int i = 0; i < propertyNames.length; i++ ) {
-			propertyNames[ i ] = featureType.getAttributeType( i ).getName();
+			propertyNames[ i ] = featureType.getAttributeType( i ).getLocalName();
 		}
 		
 		return propertyNames;

@@ -234,7 +234,7 @@ public class DefaultView implements FeatureSource {
             propNames = new String[schema.getAttributeCount()];
 
             for (int i = 0; i < schema.getAttributeCount(); i++) {
-                propNames[i] = schema.getAttributeType(i).getName();
+                propNames[i] = schema.getAttributeType(i).getLocalName();
             }
         } else {
             String[] queriedAtts = query.getPropertyNames();

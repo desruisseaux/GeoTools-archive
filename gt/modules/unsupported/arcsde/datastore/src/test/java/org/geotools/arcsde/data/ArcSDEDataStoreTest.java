@@ -189,7 +189,7 @@ public class ArcSDEDataStoreTest extends TestCase {
     public void _testAutoFillSRS() throws Throwable {
         
         ArcSDEDataStore ds = testData.getDataStore();
-        CoordinateReferenceSystem sdeCRS = ds.getSchema("GISDATA.TOWNS_POLY").getDefaultGeometry().getCoordinateSystem();
+        CoordinateReferenceSystem sdeCRS = ds.getSchema("GISDATA.TOWNS_POLY").getPrimaryGeometry().getCoordinateSystem();
         
         LOGGER.info(sdeCRS.toWKT().replaceAll(" ","").replaceAll("\n", "").replaceAll("\"", "\\\""));
         
@@ -263,12 +263,12 @@ public class ArcSDEDataStoreTest extends TestCase {
             assertEquals("After size()", initialPoolSize, pool.getPoolSize());
             
             
-            BBOX bbox = ff.bbox(schema.getDefaultGeometry().getName(),
+            BBOX bbox = ff.bbox(schema.getPrimaryGeometry().getLocalName(),
                     layerBounds.getMinX() + 10,
                     layerBounds.getMinY() + 10,
                     layerBounds.getMaxX() - 10,
                     layerBounds.getMaxY() - 10,
-                    schema.getDefaultGeometry().getCoordinateSystem().getName().getCode());
+                    schema.getPrimaryGeometry().getCoordinateSystem().getName().getCode());
             
             for(int i = 0; i < 20; i++){
             	LOGGER.fine("Running iteration #" + i);
@@ -429,7 +429,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         final String[] queryAtts = new String[queriedAttributeCount];
 
         for (int i = 0; i < queryAtts.length; i++) {
-            queryAtts[i] = schema.getAttributeType(i).getName();
+            queryAtts[i] = schema.getAttributeType(i).getLocalName();
         }
 
         //build the query asking for a subset of attributes
@@ -450,7 +450,7 @@ public class ArcSDEDataStoreTest extends TestCase {
 
         for (int i = 0; i < queriedAttributeCount; i++) {
             assertEquals(queryAtts[i],
-                resultSchema.getAttributeType(i).getName());
+                resultSchema.getAttributeType(i).getLocalName());
         }
     }
 
@@ -472,7 +472,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         //build the attnames in inverse order
         for (int i = queryAtts.length, j = 0; i > 0; j++) {
             --i;
-            queryAtts[j] = schema.getAttributeType(i).getName();
+            queryAtts[j] = schema.getAttributeType(i).getLocalName();
         }
 
         //build the query asking for a subset of attributes
@@ -486,7 +486,7 @@ public class ArcSDEDataStoreTest extends TestCase {
             assertEquals(queriedAttributeCount, resultSchema.getAttributeCount());
 
             for (int i = 0; i < queriedAttributeCount; i++) {
-                assertEquals(queryAtts[i], resultSchema.getAttributeType(i).getName());
+                assertEquals(queryAtts[i], resultSchema.getAttributeType(i).getLocalName());
             }
         } finally {
             reader.close();
@@ -511,7 +511,7 @@ public class ArcSDEDataStoreTest extends TestCase {
             assertNotNull(f.getFeatureType());
             assertNotNull(f.getBounds());
 
-            Geometry geom = f.getDefaultGeometry();
+            Geometry geom = f.getPrimaryGeometry();
             assertNotNull(geom);
 
             return true;
@@ -533,7 +533,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         Query q = new DefaultQuery(typeName, Filter.INCLUDE);
         FeatureReader reader = store.getFeatureReader(q, Transaction.AUTO_COMMIT);
         FeatureType retType = reader.getFeatureType();
-        assertNotNull(retType.getDefaultGeometry());
+        assertNotNull(retType.getPrimaryGeometry());
         assertTrue(reader.hasNext());
 
         return reader;
@@ -632,7 +632,7 @@ public class ArcSDEDataStoreTest extends TestCase {
                 continue;
             }
 
-            propNames.add(type.getAttributeType(i).getName());
+            propNames.add(type.getAttributeType(i).getLocalName());
         }
 
         attOnlyQuery.setPropertyNames(propNames);
@@ -643,7 +643,7 @@ public class ArcSDEDataStoreTest extends TestCase {
 
         for (int i = 0; i < propNames.size(); i++) {
             assertEquals(propNames.get(i),
-                resultSchema.getAttributeType(i).getName());
+                resultSchema.getAttributeType(i).getLocalName());
         }
 
         //the problem described in GEOT-408 arises in attribute reader, so
@@ -1053,9 +1053,9 @@ public class ArcSDEDataStoreTest extends TestCase {
      */
     private Filter getBBoxfilter(FeatureSource fs) throws Exception {
         FeatureType schema = fs.getSchema();
-        BBOX bbe = ff.bbox(schema.getDefaultGeometry().getName(),
+        BBOX bbe = ff.bbox(schema.getPrimaryGeometry().getLocalName(),
                 -60, -55, -40, -20,
-                schema.getDefaultGeometry().getCoordinateSystem().getName().getCode());
+                schema.getPrimaryGeometry().getCoordinateSystem().getName().getCode());
         return bbe;
     }
 

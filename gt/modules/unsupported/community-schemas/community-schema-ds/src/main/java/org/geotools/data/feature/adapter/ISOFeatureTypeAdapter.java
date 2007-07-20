@@ -73,7 +73,7 @@ public class ISOFeatureTypeAdapter implements FeatureType, SimpleFeatureType {
             Name name = Types.attributeName(nsUri, attType.getName().getLocalPart());
             builder.addAttribute(name, attType);
         }
-        builder.defaultGeometry(featureType.getDefaultGeometry().getName());
+        builder.defaultGeometry(featureType.getPrimaryGeometry().getLocalName());
         builder.setName(type.getTypeName());
         isoType = builder.feature();
     }
@@ -100,7 +100,7 @@ public class ISOFeatureTypeAdapter implements FeatureType, SimpleFeatureType {
     }
 
     public CoordinateReferenceSystem getCRS() {
-        GeometryAttributeType defGeom = type.getDefaultGeometry();
+        GeometryAttributeType defGeom = type.getPrimaryGeometry();
         return defGeom == null ? null : defGeom.getCoordinateSystem();
     }
 

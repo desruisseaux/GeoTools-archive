@@ -63,7 +63,7 @@ public class PostgisWithoutGeosOnlineTest extends AbstractPostgisDataTestCase {
 		FeatureCollection fc = data.getFeatureSource("road").getFeatures();
 		for (Iterator itr = fc.iterator(); itr.hasNext();) {
 			Feature f = (Feature)itr.next();
-			bbox.add(f.getDefaultGeometry().getEnvelopeInternal());
+			bbox.add(f.getPrimaryGeometry().getEnvelopeInternal());
 			fids.add(f.getID());
 		}
 		

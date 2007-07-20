@@ -52,12 +52,12 @@ public class ISOAttributeTypeAdapter implements AttributeType {
     protected ISOAttributeTypeAdapter(String nsUri,
             org.geotools.feature.AttributeType gtType) {
         this.name = new org.geotools.feature.type.TypeName(nsUri, gtType
-                .getName());
+                .getLocalName());
         this.adaptee = gtType;
     }
 
     public Class getBinding() {
-        return adaptee.getType();
+        return adaptee.getBinding();
     }
 
     public Collection getOperations() {

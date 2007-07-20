@@ -49,7 +49,7 @@ public class TemporalAttributeType extends DefaultAttributeType implements Prima
             return value;
         }
 
-        if (type.isAssignableFrom(value.getClass())) {
+        if (getBinding().isAssignableFrom(value.getClass())) {
             return value;
         }
 
@@ -63,7 +63,7 @@ public class TemporalAttributeType extends DefaultAttributeType implements Prima
 
         //second to last restort, try the converters inteface 
         //TODO: this single call should replace this entire routine
-        Object converted = Converters.convert( value, type );
+        Object converted = Converters.convert( value, getBinding() );
         if ( converted != null ) {
         	return converted;
         }

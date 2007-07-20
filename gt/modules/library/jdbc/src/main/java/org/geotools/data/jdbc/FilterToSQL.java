@@ -324,7 +324,7 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
         Class context;
         AttributeType attType = (AttributeType)expr.evaluate(featureType);
         if (attType != null) {
-            context = attType.getType();
+            context = attType.getBinding();
         } else {
             //assume it's a string?
             context = String.class;
@@ -545,14 +545,14 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
             // as context to the tree walker.
             AttributeType attType = (AttributeType)left.evaluate(featureType);
             if (attType != null) {
-                rightContext = attType.getType();
+                rightContext = attType.getBinding();
             }
         }
         
         if (right instanceof PropertyName) {
             AttributeType attType = (AttributeType)right.evaluate(featureType);
             if (attType != null) {
-                leftContext = attType.getType();
+                leftContext = attType.getBinding();
             }
         }
 

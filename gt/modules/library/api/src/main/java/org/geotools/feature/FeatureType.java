@@ -16,6 +16,7 @@
 package org.geotools.feature;
 
 import java.net.URI;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -162,8 +163,10 @@ import java.net.URI;
  * @see org.geotools.feature.FeatureTypeFactory
  * @see org.geotools.feature.type.NestedAttributeType
  * @see org.geotools.feature.DefaultFeatureType
+ *
+ * @deprecated use {@link SimpleFeatureType}.
  */
-public interface FeatureType {
+public interface FeatureType extends SimpleFeatureType {
     //
     // XML Mapping Information
     //
@@ -287,7 +290,8 @@ public interface FeatureType {
      * @return The attribute type of the default geometry, which will contain the position.
      * @deprecated use {@link #getPrimaryGeometry()}.
      */
-    GeometryAttributeType getDefaultGeometry();
+
+    //GeometryAttributeType getPrimaryGeometry();
 
     /**
      * Gets the primary or default geometry AttributeType.

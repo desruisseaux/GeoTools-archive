@@ -22,6 +22,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.visitor.AverageVisitor.AverageResult;
 import org.geotools.feature.visitor.CountVisitor.CountResult;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.feature.type.FeatureCollectionType;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 
@@ -42,22 +43,26 @@ public class SumVisitor implements FeatureCalc {
         throws IllegalFilterException {
         FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
         AttributeType attributeType = type.getAttributeType(attributeTypeIndex);
-        expr = factory.property(attributeType.getName());
-        createStrategy(attributeType.getType());
+        expr = factory.property(attributeType.getLocalName());
+        createStrategy(attributeType.getBinding());
     }
 
     public SumVisitor(String attrName, FeatureType type)
         throws IllegalFilterException {
         FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
         AttributeType attributeType = type.getAttributeType(attrName);
-        expr = factory.property(attributeType.getName());
-        createStrategy(attributeType.getType());
+        expr = factory.property(attributeType.getLocalName());
+        createStrategy(attributeType.getBinding());
     }
 
     public SumVisitor(Expression expr) throws IllegalFilterException {
         this.expr = expr;
     }
 
+    public void init(FeatureCollectionType collection) {
+    	//do nothing
+    }
+    
     /**
      * Factory method
      *
@@ -80,6 +85,9 @@ public class SumVisitor implements FeatureCalc {
     }
 
     public void visit(Feature feature) {
+        visit((org.opengis.feature.Feature)feature);
+    }
+    public void visit(org.opengis.feature.Feature feature) {
         Object value = expr.evaluate(feature);
 
         if (strategy == null) {

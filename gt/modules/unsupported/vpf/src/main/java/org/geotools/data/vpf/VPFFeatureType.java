@@ -18,13 +18,21 @@
 package org.geotools.data.vpf;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryType;
+import org.opengis.feature.type.Name;
+import org.opengis.feature.type.TypeName;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.util.InternationalString;
 
 
 /**
@@ -176,13 +184,6 @@ public class VPFFeatureType implements FeatureType {
     }
 
     /* (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#getDefaultGeometry()
-     */
-    public GeometryAttributeType getDefaultGeometry() {
-        return featureClass.getDefaultGeometry();
-    }
-    
-    /* (non-Javadoc)
      * @see org.geotools.feature.FeatureType#getPrimaryGeometry()
      */
     public GeometryAttributeType getPrimaryGeometry() {
@@ -290,5 +291,104 @@ public class VPFFeatureType implements FeatureType {
         return featureClass.hashCode();
     }
 
+    
+    public AttributeDescriptor getAttribute(Name name) {
+		return featureClass.getAttribute(name);
+	}
 
+	public AttributeDescriptor getAttribute(String name) {
+		return featureClass.getAttribute(name);
+	}
+
+	public AttributeDescriptor getAttribute(int index) {
+		return featureClass.getAttribute(index);
+	}
+
+	public List getAttributes() {
+		return featureClass.getAttributes();
+	}
+
+	public GeometryType getDefaultGeometryType() {
+		return featureClass.getDefaultGeometryType();
+	}
+
+	public org.opengis.feature.type.AttributeType getType(Name name) {
+		return featureClass.getType( name );
+	}
+
+	public org.opengis.feature.type.AttributeType getType(String name) {
+		return featureClass.getType( name );
+	}
+
+	public org.opengis.feature.type.AttributeType getType(int index) {
+		return featureClass.getType( index );
+	}
+
+	public List getTypes() {
+		return featureClass.getTypes();
+	}
+
+	public CoordinateReferenceSystem getCRS() {
+		return featureClass.getCRS();
+	}
+
+	public AttributeDescriptor getDefaultGeometry() {
+		return featureClass.getDefaultGeometry();
+	}
+
+	public Collection associations() {
+		return featureClass.associations(); 
+	}
+
+	public Collection attributes() {
+		return featureClass.attributes();
+	}
+
+	public Class getBinding() {
+		return featureClass.getBinding();
+	}
+
+	public Collection getProperties() {
+		return featureClass.getProperties();
+	}
+
+	public boolean isInline() {
+		return featureClass.isInline();
+	}
+
+	public Collection getOperations() {
+		return featureClass.getOperations();
+	}
+
+	public Set getRestrictions() {
+		return featureClass.getRestrictions();
+	}
+
+	public org.opengis.feature.type.AttributeType getSuper() {
+		return featureClass.getSuper();
+	}
+
+	public boolean isIdentified() {
+		return featureClass.isIdentified();
+	}
+
+	public InternationalString getDescription() {
+		return featureClass.getDescription();
+	}
+
+	public TypeName getName() {
+		return featureClass.getName();
+	}
+
+	public Object getUserData(Object key) {
+		return featureClass.getUserData(key);
+	}
+
+	public void putUserData(Object key, Object data) {
+		featureClass.putUserData(key, data);
+	}
+
+	public int indexOf(String name) {
+		return featureClass.indexOf(name);
+	}
 }

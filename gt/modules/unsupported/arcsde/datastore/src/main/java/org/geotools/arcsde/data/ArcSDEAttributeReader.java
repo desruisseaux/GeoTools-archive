@@ -105,10 +105,10 @@ class ArcSDEAttributeReader implements AttributeReader {
         this.fidPrefix = new StringBuffer(typeName).append('.');
         this.fidPrefixLen = this.fidPrefix.length();
 
-        final GeometryAttributeType geomType = schema.getDefaultGeometry();
+        final GeometryAttributeType geomType = schema.getPrimaryGeometry();
 
         if (geomType != null) {
-            Class geometryClass = geomType.getType();
+            Class geometryClass = geomType.getBinding();
             this.geometryBuilder = ArcSDEGeometryBuilder.builderFor(geometryClass);
         }
 	}

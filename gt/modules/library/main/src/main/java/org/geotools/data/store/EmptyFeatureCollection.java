@@ -30,19 +30,11 @@ public class EmptyFeatureCollection extends DataFeatureCollection {
 		bounds.setToNull();
 	}
 	
-	/**
-	 * the schema
-	 */
-	FeatureType schema;
-	
 	public EmptyFeatureCollection( FeatureType schema ) {
-		this.schema = schema;
+		super(null,schema);
 	}
 	
-	public FeatureType getSchema() {
-		return schema;
-	}
-
+	
 	public ReferencedEnvelope getBounds() {
 		return bounds;
 	}

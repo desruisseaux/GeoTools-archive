@@ -118,8 +118,8 @@ public class GMLAbstractFeatureTypeBinding extends AbstractComplexBinding {
                 return bounds;
             }
 
-            CoordinateReferenceSystem crs = (feature.getFeatureType().getDefaultGeometry() != null)
-                ? feature.getFeatureType().getDefaultGeometry().getCoordinateSystem() : null;
+            CoordinateReferenceSystem crs = (feature.getFeatureType().getPrimaryGeometry() != null)
+                ? feature.getFeatureType().getPrimaryGeometry().getCoordinateSystem() : null;
 
             return new ReferencedEnvelope(bounds, crs);
         }

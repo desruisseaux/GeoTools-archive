@@ -206,6 +206,15 @@ public class GML2ParsingUtils {
             int min = particle.getMinOccurs();
             int max = particle.getMaxOccurs();
 
+            //check for uniitialized values
+            if (min == -1) {
+                min = 0;
+            }
+
+            if (max == -1) {
+                max = 1;
+            }
+
             // create the type
             AttributeType type = AttributeTypeFactory.newAttributeType(property.getName(),
                     theClass, true, null, null, null, min, max);
@@ -221,11 +230,11 @@ public class GML2ParsingUtils {
 
         for (int i = 0; i < fType.getAttributeCount(); i++) {
             AttributeType attType = fType.getAttributeType(i);
-            Object attValue = node.getChildValue(attType.getName());
+            Object attValue = node.getChildValue(attType.getLocalName());
 
-            if ((attValue != null) && !attType.getType().isAssignableFrom(attValue.getClass())) {
+            if ((attValue != null) && !attType.getBinding().isAssignableFrom(attValue.getClass())) {
                 //type mismatch, to try convert
-                Object converted = Converters.convert(attValue, attType.getType());
+                Object converted = Converters.convert(attValue, attType.getBinding());
 
                 if (converted != null) {
                     attValue = converted;

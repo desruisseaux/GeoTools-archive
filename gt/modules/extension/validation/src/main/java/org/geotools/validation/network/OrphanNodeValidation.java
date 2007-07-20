@@ -97,7 +97,7 @@ public class OrphanNodeValidation extends DefaultIntegrityValidation {
 
           if (envelope.contains(ft.getBounds())) {
               //lgb.add(ft);
-          	lgb.add(ft.getDefaultGeometry());
+          	lgb.add(ft.getPrimaryGeometry());
           }
       }
 

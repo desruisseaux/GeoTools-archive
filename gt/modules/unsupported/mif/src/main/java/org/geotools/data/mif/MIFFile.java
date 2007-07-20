@@ -566,7 +566,7 @@ public class MIFFile {
 
         for (int i = 1; i < numAttribs; i++) {
             AttributeType at = featureType.getAttributeType(i);
-            header += ("  " + at.getName() + " " + getMapInfoAttrType(at)
+            header += ("  " + at.getLocalName() + " " + getMapInfoAttrType(at)
             + "\n");
         }
 
@@ -603,7 +603,7 @@ public class MIFFile {
      * @return the String description of the MapInfo Type
      */
     private String getMapInfoAttrType(AttributeType at) {
-        if (at.getType() == String.class) {
+        if (at.getBinding() == String.class) {
             int l = AttributeTypes.getFieldLength(at, MAX_STRING_LEN);
 
             if (l <= 0) {
@@ -611,14 +611,14 @@ public class MIFFile {
             }
 
             return "Char(" + l + ")";
-        } else if (at.getType() == Integer.class) {
+        } else if (at.getBinding() == Integer.class) {
             return "Integer";
-        } else if ((at.getType() == Double.class)
-                || (at.getType() == Float.class)) {
+        } else if ((at.getBinding() == Double.class)
+                || (at.getBinding() == Float.class)) {
             return "Float";
-        } else if (at.getType() == Boolean.class) {
+        } else if (at.getBinding() == Boolean.class) {
             return "Logical";
-        } else if (at.getType() == Date.class) {
+        } else if (at.getBinding() == Date.class) {
             return "Date";
         } else {
             return "Char(" + MAX_STRING_LEN + ")"; // TODO Should it raise an exception here (UnsupportedSchema) ?
@@ -999,7 +999,7 @@ public class MIFFile {
         for (int i = 0; i < featureType.getAttributeCount(); i++) {
             AttributeType at = featureType.getAttributeType(i);
 
-            Class atc = at.getType();
+            Class atc = at.getBinding();
 
             if (Geometry.class.isAssignableFrom(atc)) {
                 if (geomFieldIndex >= 0) {
@@ -1038,7 +1038,7 @@ public class MIFFile {
 
         for (int i = 0; i < featureType.getAttributeCount(); i++) {
             AttributeType at = featureType.getAttributeType(i);
-            Class atc = at.getType();
+            Class atc = at.getBinding();
 
             if (i == geomFieldIndex) {
                 fieldValueSetters[i] = null;

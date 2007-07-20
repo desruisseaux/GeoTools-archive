@@ -31,12 +31,15 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
+import org.geotools.feature.DefaultFeatureBuilder;
+import org.geotools.feature.DefaultTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureFactoryImpl;
 import org.geotools.feature.simple.SimpleTypeBuilder;
 import org.geotools.feature.simple.SimpleTypeFactoryImpl;
+import org.geotools.feature.type.DefaultFeatureTypeBuilder;
 import org.geotools.gml2.TEST;
 
 
@@ -273,20 +276,19 @@ public class GML2MockData {
     }
 
     static Feature feature() throws Exception {
-        SimpleTypeBuilder typeBuilder = new SimpleTypeBuilder(new SimpleTypeFactoryImpl());
+        DefaultFeatureTypeBuilder typeBuilder = new DefaultFeatureTypeBuilder();
         typeBuilder.setName(TEST.TestFeature.getLocalPart());
         typeBuilder.setNamespaceURI(TEST.TestFeature.getNamespaceURI());
 
-        typeBuilder.addAttribute("name", String.class);
-        typeBuilder.addAttribute("description", String.class);
-        typeBuilder.addAttribute("geom", Point.class);
-        typeBuilder.addAttribute("count", Integer.class);
-        typeBuilder.addAttribute("date", Date.class);
+        typeBuilder.add("name", String.class);
+        typeBuilder.add("description", String.class);
+        typeBuilder.add("geom", Point.class);
+        typeBuilder.add("count", Integer.class);
+        typeBuilder.add("date", Date.class);
 
-        FeatureType type = typeBuilder.feature();
+        FeatureType type = (FeatureType) typeBuilder.buildFeatureType();
 
-        SimpleFeatureBuilder builder = new SimpleFeatureBuilder(new SimpleFeatureFactoryImpl());
-        builder.init();
+        DefaultFeatureBuilder builder = new DefaultFeatureBuilder();
         builder.setType(type);
         builder.add("theName");
         builder.add("theDescription");
@@ -294,7 +296,7 @@ public class GML2MockData {
         builder.add(new Integer(1));
         builder.add(new Date());
 
-        return builder.feature("fid.1");
+        return (Feature) builder.feature("fid.1");
     }
 
     static Element featureMember(Document document, Node parent) {

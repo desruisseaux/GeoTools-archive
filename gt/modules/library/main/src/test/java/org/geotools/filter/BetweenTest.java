@@ -75,7 +75,7 @@ public class BetweenTest extends TestCase {
         a.addRightValue(new LiteralExpressionImpl(new Double(15)));
         a.addMiddleValue(new AttributeExpressionImpl(schema, "value"));
 
-        LOGGER.fine("a1 official name is " + a1.getName());
+        LOGGER.fine("a1 official name is " + a1.getLocalName());
 
         //FlatFeatureFactory fFac = new FlatFeatureFactory(schema);
         LOGGER.fine("geometry is " + schema.getAttributeType("geometry"));

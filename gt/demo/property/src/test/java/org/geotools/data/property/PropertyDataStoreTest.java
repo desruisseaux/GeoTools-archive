@@ -106,11 +106,11 @@ public class PropertyDataStoreTest extends TestCase {
         AttributeType id = type.getAttributeType(0);        
         AttributeType name = type.getAttributeType(1);
         
-        assertEquals( "id", id.getName() );
-        assertEquals( "class java.lang.Integer", id.getType().toString() );
+        assertEquals( "id", id.getLocalName() );
+        assertEquals( "class java.lang.Integer", id.getBinding().toString() );
                 
-        assertEquals( "name", name.getName() );
-        assertEquals( "class java.lang.String", name.getType().toString() );                        
+        assertEquals( "name", name.getLocalName() );
+        assertEquals( "class java.lang.String", name.getBinding().toString() );                        
     }
     public void testGetFeaturesFeatureTypeFilterTransaction1() throws Exception {
         FeatureType type = store.getSchema( "road" );

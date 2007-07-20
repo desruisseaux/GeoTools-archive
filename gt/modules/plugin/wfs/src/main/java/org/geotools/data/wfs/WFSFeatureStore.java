@@ -229,7 +229,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
                     bounds.expandToInclude(g.getEnvelopeInternal());
                 }
         	}
-            props.put(type[i].getName(), value[i]);
+            props.put(type[i].getLocalName(), value[i]);
         }
 
         ts.addAction(getSchema().getTypeName(), new UpdateAction(getSchema().getTypeName(), filter, props));

@@ -185,7 +185,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
         // encode insertion for attributes, but remember to avoid auto-increment ones, 
         // they may be included in the feature type as well
         for (int i = 0; i < attributeTypes.length; i++) {
-            String attName = attributeTypes[i].getName();
+            String attName = attributeTypes[i].getLocalName();
             if(!autoincrementColumns.contains(attName) || feature.getAttribute(attName) != null) {
                 String colName = encodeColumnName(attName);
                 statementSQL.append(colName).append(",");
@@ -217,7 +217,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
         for (int i = 0; i < attributeTypes.length; i++) {
             attrValue = null;
             if (attributeTypes[i] instanceof GeometryAttributeType) {
-                String geomName = attributeTypes[i].getName();
+                String geomName = attributeTypes[i].getLocalName();
                 int srid = ftInfo.getSRID(geomName);
                 Geometry geometry = (Geometry) attributes[i];
                 if( geometry==null ){
@@ -225,7 +225,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
                 }else
                     attrValue = getGeometryInsertText(geometry, srid);
             } else {
-                if(!autoincrementColumns.contains(attributeTypes[i].getName()) || attributes[i] != null)
+                if(!autoincrementColumns.contains(attributeTypes[i].getLocalName()) || attributes[i] != null)
                     attrValue = addQuotes(attributes[i]);
             }
 
@@ -480,7 +480,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
 
 				String attrValue = null;
 				if (attributes[i] instanceof GeometryAttributeType) {
-				    String geomName = attributes[i].getName();
+				    String geomName = attributes[i].getLocalName();
 				    int srid = ftInfo.getSRID(geomName);
 				    Geometry geometry = (Geometry) currAtt;
                     if( geometry == null )
@@ -492,7 +492,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
 				}
 
 
-				String colName = encodeColumnName(attributes[i].getName());
+				String colName = encodeColumnName(attributes[i].getLocalName());
                 statementSQL.append(colName).append(" = ")
                             .append(attrValue).append(", ");
             }

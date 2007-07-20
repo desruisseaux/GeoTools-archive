@@ -60,7 +60,7 @@ public class GMLFeatureSourceTest extends GMLDataStoreTestSupport {
 		assertNotNull( f );
 		
 		assertEquals( 1, f.getFeatureType().getAttributeCount() );
-		assertNull( f.getDefaultGeometry() );
+		assertNull( f.getPrimaryGeometry() );
 		assertEquals( new Integer( 1 ), f.getAttribute( "count" ) );
 		
 		features.close( i );

@@ -141,16 +141,16 @@ public class DisjointIntegrity extends RelationIntegrity {
 			while (fr1.hasNext())
 			{
 				Feature f1 = fr1.next();
-				Geometry g1 = f1.getDefaultGeometry();
+				Geometry g1 = f1.getPrimaryGeometry();
 				fr2 = FeatureCollectionB.features();
 				
 				while (fr2 != null && fr2.hasNext())
 				{
 					Feature f2 = fr2.next();
-					Geometry g2 = f2.getDefaultGeometry();
+					Geometry g2 = f2.getPrimaryGeometry();
 					if(g1.disjoint(g2) != expected )
 					{
-						results.error( f1, f1.getDefaultGeometry().getGeometryType()+" "+getGeomTypeRefA()+" is disjoint from "+getGeomTypeRefB()+"("+f2.getID()+"), Result was not "+expected );
+						results.error( f1, f1.getPrimaryGeometry().getGeometryType()+" "+getGeomTypeRefA()+" is disjoint from "+getGeomTypeRefB()+"("+f2.getID()+"), Result was not "+expected );
 						success = false;
 					}
 				}		
@@ -219,18 +219,18 @@ public class DisjointIntegrity extends RelationIntegrity {
 			while (fr1.hasNext())
 			{
 				Feature f1 = fr1.next();
-				Geometry g1 = f1.getDefaultGeometry();
+				Geometry g1 = f1.getPrimaryGeometry();
 				fr2 = collection.features();
 				
 				while (fr2 != null && fr2.hasNext())
 				{
 					Feature f2 = fr2.next();
-					Geometry g2 = f2.getDefaultGeometry();
+					Geometry g2 = f2.getPrimaryGeometry();
 					if (!f1.getID().equals(f2.getID()))	// if they are the same feature, move onto the next one
 					{
 						if(g1.disjoint(g2) != expected )
 						{
-							results.error( f1, f1.getDefaultGeometry().getGeometryType()+" "+getGeomTypeRefA()+" is disjoint from "+getGeomTypeRefA()+"("+f2.getID()+"), Result was not "+expected );
+							results.error( f1, f1.getPrimaryGeometry().getGeometryType()+" "+getGeomTypeRefA()+" is disjoint from "+getGeomTypeRefA()+"("+f2.getID()+"), Result was not "+expected );
 							success = false;
 						}
 					}

@@ -19,7 +19,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.geotools.feature.AttributeType;
+import org.geotools.feature.DefaultAttributeType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.Name;
 import org.opengis.filter.Filter;
 
 /**
@@ -32,89 +34,48 @@ import org.opengis.filter.Filter;
  * @author dzwiers
  * @source $URL$
  */
-public class SetAttributeType implements AttributeType {
+public class SetAttributeType extends AttributeDescriptorImpl 
+	implements AttributeType {
 
-	private final boolean nill;
-	private final int min,max;
-	private final String name;
 	private final AttributeType[] children;
-	private Filter restriction;
 	
 	
 	/**
 	 * @param copy
 	 */
 	public SetAttributeType(SetAttributeType copy) {
-		nill = copy.isNillable();
-		min = copy.getMinOccurs();
-		max = copy.getMaxOccurs();
-		name = copy.getName();
+		super(copy.getType(),copy.getName(),copy.getMinOccurs(),copy.getMaxOccurs(),copy.isNillable(),copy.getDefaultValue());
 		children = copy.getAttributeTypes();
-		restriction = copy.getRestriction();
 	}
 
 	// The field for 'Class type' should be added when GT has moved to java 1.5
     public SetAttributeType(String name, boolean nillable, int min, int max,
     		AttributeType[] children, Filter restriction) {
-    	nill = nillable;
-    	this.min = min;
-    	this.max = max;
-    	this.name = name;
+    	super(DefaultAttributeType.createAttributeType(name, Set.class, restriction),
+    			new Name(name),min,max,nillable,null);
     	this.children = children;
-    	this.restriction = restriction;
     }
 
     public SetAttributeType(String name, boolean nillable,
     		AttributeType[] children) {
     	this(name, nillable, 1, 1, children,Filter.EXCLUDE);
     }
-    public Filter getRestriction(){return restriction;}
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.AttributeType#getName()
-	 */
-	public String getName() {
-		return getLocalName();
+    public Filter getRestriction(){
+    	return DefaultAttributeType.getRestriction(this);
 	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
 	public String getLocalName() {
-		return name;
+		return DefaultAttributeType.getLocalName(this);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.AttributeType#getType()
-	 */
-	public final Class getType() {
-		return getBinding();
-	}
 	/**
 	 * {@inheritDoc}
 	 */
 	public Class getBinding() {
-//		The field for 'Class type' should be added when GT has moved to java 1.5
-		return Set.class;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.AttributeType#isNillable()
-	 */
-	public boolean isNillable() {
-		return nill;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.AttributeType#getMinOccurs()
-	 */
-	public int getMinOccurs() {
-		return min;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.AttributeType#getMaxOccurs()
-	 */
-	public int getMaxOccurs() {
-		return max;
+		return DefaultAttributeType.getBinding(this);
 	}
 
 	/* (non-Javadoc)
@@ -274,7 +235,7 @@ public class SetAttributeType implements AttributeType {
      */
     public int find(AttributeType type) {
         if (type == null) return -1;
-        int idx = find(type.getName());
+        int idx = find(type.getLocalName());
         if (idx < 0 || !children[idx].equals(type))
             idx = -1;
         return idx;
@@ -287,7 +248,7 @@ public class SetAttributeType implements AttributeType {
      */
     public int find(String attName) {
     	int i=0;
-    	while(i<children.length && !attName.equals(children[i].getName()))i++;
+    	while(i<children.length && !attName.equals(children[i].getLocalName()))i++;
         return i == children.length?-1:i;
     }
 

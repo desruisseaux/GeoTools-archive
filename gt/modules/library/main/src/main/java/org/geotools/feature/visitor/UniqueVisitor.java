@@ -24,6 +24,7 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.feature.type.FeatureCollectionType;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 
@@ -48,20 +49,27 @@ public class UniqueVisitor implements FeatureCalc {
     public UniqueVisitor(int attributeTypeIndex, FeatureType type)
         throws IllegalFilterException {
         FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
-        expr = factory.property(type.getAttributeType(attributeTypeIndex).getName());
+        expr = factory.property(type.getAttributeType(attributeTypeIndex).getLocalName());
     }
 
     public UniqueVisitor(String attrName, FeatureType type)
         throws IllegalFilterException {
         FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
-        expr = factory.property(type.getAttributeType(attrName).getName());
+        expr = factory.property(type.getAttributeType(attrName).getLocalName());
     }
 
     public UniqueVisitor(Expression expr) {
         this.expr = expr;
     }
 
+    public void init(FeatureCollectionType collection) {
+    	//do nothing
+    }
+    
     public void visit(Feature feature) {
+        visit((org.opengis.feature.Feature)feature);
+    }
+    public void visit(org.opengis.feature.Feature feature) {
         //we ignore null attributes
         Object value = expr.evaluate(feature);
         if (value != null) {

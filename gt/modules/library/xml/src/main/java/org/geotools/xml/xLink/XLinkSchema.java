@@ -321,7 +321,7 @@ public class XLinkSchema implements Schema {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public String getName() {
             return null;
@@ -487,7 +487,7 @@ public class XLinkSchema implements Schema {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public String getName() {
             return null;
@@ -682,7 +682,7 @@ public class XLinkSchema implements Schema {
         }
 
         /**
-         * @see schema.Attribute#getName()
+         * @see schema.Attribute#getLocalName()
          */
         public String getName() {
             return "href";
@@ -718,7 +718,7 @@ public class XLinkSchema implements Schema {
         }
 
         /**
-         * @see schema.Attribute#getName()
+         * @see schema.Attribute#getLocalName()
          */
         public String getName() {
             return "role";
@@ -765,7 +765,7 @@ public class XLinkSchema implements Schema {
         }
 
         /**
-         * @see schema.Attribute#getName()
+         * @see schema.Attribute#getLocalName()
          */
         public String getName() {
             return "arcrole";
@@ -815,7 +815,7 @@ public class XLinkSchema implements Schema {
         }
 
         /**
-         * @see schema.Attribute#getName()
+         * @see schema.Attribute#getLocalName()
          */
         public String getName() {
             return "title";
@@ -864,7 +864,7 @@ public class XLinkSchema implements Schema {
         }
 
         /**
-         * @see schema.Attribute#getName()
+         * @see schema.Attribute#getLocalName()
          */
         public String getName() {
             return "show";
@@ -917,7 +917,7 @@ public class XLinkSchema implements Schema {
         }
 
         /**
-         * @see schema.Attribute#getName()
+         * @see schema.Attribute#getLocalName()
          */
         public String getName() {
             return "actuate";
@@ -963,7 +963,7 @@ public class XLinkSchema implements Schema {
         }
 
         /**
-         * @see schema.Attribute#getName()
+         * @see schema.Attribute#getLocalName()
          */
         public String getName() {
             return "label";
@@ -1013,7 +1013,7 @@ public class XLinkSchema implements Schema {
         }
 
         /**
-         * @see schema.Attribute#getName()
+         * @see schema.Attribute#getLocalName()
          */
         public String getName() {
             return "from";
@@ -1063,7 +1063,7 @@ public class XLinkSchema implements Schema {
         }
 
         /**
-         * @see schema.Attribute#getName()
+         * @see schema.Attribute#getLocalName()
          */
         public String getName() {
             return "to";
@@ -1110,7 +1110,7 @@ public class XLinkSchema implements Schema {
         }
 
         /**
-         * @see schema.Attribute#getName()
+         * @see schema.Attribute#getLocalName()
          */
         public String getName() {
             return "type";
@@ -1190,7 +1190,7 @@ public class XLinkSchema implements Schema {
         }
 
         /**
-         * @see schema.AttributeGroup#getName()
+         * @see schema.AttributeGroup#getLocalName()
          */
         public String getName() {
             return "simpleLink";
@@ -1232,7 +1232,7 @@ public class XLinkSchema implements Schema {
         }
 
         /**
-         * @see schema.AttributeGroup#getName()
+         * @see schema.AttributeGroup#getLocalName()
          */
         public String getName() {
             return "extendedLink";
@@ -1274,7 +1274,7 @@ public class XLinkSchema implements Schema {
         }
 
         /**
-         * @see schema.AttributeGroup#getName()
+         * @see schema.AttributeGroup#getLocalName()
          */
         public String getName() {
             return "locatorLink";
@@ -1316,7 +1316,7 @@ public class XLinkSchema implements Schema {
         }
 
         /**
-         * @see schema.AttributeGroup#getName()
+         * @see schema.AttributeGroup#getLocalName()
          */
         public String getName() {
             return "arcLink";
@@ -1359,7 +1359,7 @@ public class XLinkSchema implements Schema {
         }
 
         /**
-         * @see schema.AttributeGroup#getName()
+         * @see schema.AttributeGroup#getLocalName()
          */
         public String getName() {
             return "resourceLink";
@@ -1398,7 +1398,7 @@ public class XLinkSchema implements Schema {
         }
 
         /**
-         * @see schema.AttributeGroup#getName()
+         * @see schema.AttributeGroup#getLocalName()
          */
         public String getName() {
             return "titleLink";
@@ -1437,7 +1437,7 @@ public class XLinkSchema implements Schema {
         }
 
         /**
-         * @see schema.AttributeGroup#getName()
+         * @see schema.AttributeGroup#getLocalName()
          */
         public String getName() {
             return "emptyLink";

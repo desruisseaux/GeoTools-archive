@@ -560,14 +560,14 @@ public class MemoryDataStore extends AbstractDataStore {
             int count = 1;
             Filter filter = query.getFilter();
             Feature first = (Feature) iterator.next();
-            envelope = new Envelope(first.getDefaultGeometry().getEnvelopeInternal());
+            envelope = new Envelope(first.getPrimaryGeometry().getEnvelopeInternal());
 
             while (iterator.hasNext() && (count < query.getMaxFeatures())) {
                 Feature feature = (Feature) iterator.next();
 
                 if (filter.evaluate(feature)) {
                     count++;
-                    envelope.expandToInclude(feature.getDefaultGeometry().getEnvelopeInternal());
+                    envelope.expandToInclude(feature.getPrimaryGeometry().getEnvelopeInternal());
                 }
             }
         }

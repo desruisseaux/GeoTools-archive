@@ -109,7 +109,7 @@ public class Schema {
         if( attributes != null && attributes.length != 0 ){
             for( int i=0, length = attributes.length; i<length; i++ ){
                 AttributeType type = attributes[i];
-	            String name = type.getName();
+	            String name = type.getLocalName();
 	            if( !names.contains( name )){
 	                names.add( name );
 	            }
@@ -146,7 +146,7 @@ public class Schema {
         if( attributes != null && attributes.length != 0 ){
             for( int i=0, length = attributes.length; i<length; i++ ){
                 AttributeType type = attributes[i];
-	            String name = type.getName();
+	            String name = type.getLocalName();
 	            int index = getIndexOf( list, name );
 	            if( index != -1 ){
 	            	AttributeType origional = (AttributeType) list.get( index );
@@ -220,7 +220,7 @@ public class Schema {
         int index = 0;
         for( Iterator i=attributes.iterator(); i.hasNext(); index++){
             AttributeType type = (AttributeType) i.next();
-            if( name.equals( type.getName() )) return index;
+            if( name.equals( type.getLocalName() )) return index;
         }
         return -1;
     }
@@ -232,13 +232,13 @@ public class Schema {
         int min = override.getMinOccurs();
         if( min < 0 ) min = type.getMinOccurs();
         
-        String name = override.getName();
-        if( name == null ) name = type.getName();
+        String name = override.getLocalName();
+        if( name == null ) name = type.getLocalName();
         
         Filter restriction = override( type.getRestriction(), override.getRestriction() );
         
-        Class javaType = override.getType();
-        if( javaType == null ) javaType = type.getType();
+        Class javaType = override.getBinding();
+        if( javaType == null ) javaType = type.getBinding();
         
         boolean isNilable = override.isNillable();
         
@@ -261,7 +261,7 @@ public class Schema {
         if( attributes != null && attributes.length != 0 ){
             for( int i=0, length = attributes.length; i<length; i++ ){
                 AttributeType type = attributes[i];
-                if( name.equals( type.getName() )){
+                if( name.equals( type.getLocalName() )){
                     filter = override( filter, type.getRestriction() );                 
                 }
             }

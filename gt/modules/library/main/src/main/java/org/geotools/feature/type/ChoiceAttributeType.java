@@ -17,8 +17,10 @@ package org.geotools.feature.type;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.geotools.feature.AttributeType;
+import org.geotools.feature.DefaultAttributeType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.Name;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.util.Arrays;
@@ -44,38 +46,29 @@ import java.util.Arrays;
  * @author Chris Holmes, TOPP
  * @source $URL$
  */
-public class ChoiceAttributeType implements AttributeType {
-    private final boolean nill;
-    private final int min;
-    private final int max;
-    private final String name;
+public class ChoiceAttributeType extends AttributeDescriptorImpl implements AttributeType {
+    
     private final AttributeType[] children;
-    private Filter restriction;
-
+    
     /**
      * DOCUMENT ME!
      *
      * @param copy
      */
     public ChoiceAttributeType(ChoiceAttributeType copy) {
-        nill = copy.isNillable();
-        min = copy.getMinOccurs();
-        max = copy.getMaxOccurs();
-        name = copy.getName();
+    	super( copy.getType(), copy.getName(), copy.getMinOccurs(), copy.getMaxOccurs(), copy.isNillable(), copy.getDefaultValue() );
+        
         this.children = copyChildren(copy.getAttributeTypes());
-        restriction = copy.getRestriction();
     }
 
     // The field for 'Class type' should be added when GT has moved to java 1.5
     public ChoiceAttributeType(String name, int min, int max,
         AttributeType[] children, Filter restriction) {
-        nill = calculateNillable(children);
-        this.min = min;
-        this.max = max;
-        this.name = name;
-        //ensure immutable.
+    	super(DefaultAttributeType.createAttributeType(name, Object.class, restriction),
+    			new Name(name),min,max,calculateNillableStatic(children),null);
+        
+    	//ensure immutable.
         this.children = copyChildren(children);
-        this.restriction = restriction;
     }
 
     public ChoiceAttributeType(String name, AttributeType[] children) {
@@ -83,7 +76,7 @@ public class ChoiceAttributeType implements AttributeType {
     }
 
     public Filter getRestriction() {
-        return restriction;
+        return DefaultAttributeType.getRestriction(this);
     }
 
     protected AttributeType[] copyChildren(AttributeType[] attributes) {
@@ -93,19 +86,11 @@ public class ChoiceAttributeType implements AttributeType {
 	return returnArray;
     }
 
-
-    /* (non-Javadoc)
-     * @see org.geotools.feature.AttributeType#getName()
-     */
-    public final String getName() {
-        return getLocalName();
-    }
-    
     /**
      * {@inheritDoc}
      */
     public String getLocalName() {
-    	return name;
+    	return DefaultAttributeType.getLocalName(this);
     }
 
     /**
@@ -121,25 +106,21 @@ public class ChoiceAttributeType implements AttributeType {
      *       the broadest class - like Number if the choices were Double and
      *       Integer.
      *
-     * @see org.geotools.feature.AttributeType#getType()
+     * @see org.geotools.feature.AttributeType#getBinding()
      */
-    public final Class getType() {
-        return getBinding();
-    }
-    
     public Class getBinding() {
-		//The field for 'Class type' should be added when GT has moved to java 1.5
-        return Object.class;
-    }
-
-    /* (non-Javadoc)
-     * @see org.geotools.feature.AttributeType#isNillable()
-     */
-    public boolean isNillable() {
-        return nill;
+		return DefaultAttributeType.getBinding(this);
     }
 
     public boolean calculateNillable(AttributeType[] children) {
+    	return calculateNillableStatic(children);
+    }
+
+    /**
+     * static verison of {@link #calculateNillable(AttributeType[])} which can 
+     * be called from constructor.
+     */
+    private static boolean calculateNillableStatic(AttributeType[] children) {
         for (int i = 0, ii = children.length; i < ii; i++) {
             if (children[i].isNillable()) {
                 return true;
@@ -149,21 +130,7 @@ public class ChoiceAttributeType implements AttributeType {
         //none of the children can take a null, so no nulls are allowed.
         return false;
     }
-
-    /* (non-Javadoc)
-     * @see org.geotools.feature.AttributeType#getMinOccurs()
-     */
-    public int getMinOccurs() {
-        return min;
-    }
-
-    /* (non-Javadoc)
-     * @see org.geotools.feature.AttributeType#getMaxOccurs()
-     */
-    public int getMaxOccurs() {
-        return max;
-    }
-
+    
     /* (non-Javadoc)
      * @see org.geotools.feature.AttributeType#isGeometry()
      */
@@ -318,7 +285,7 @@ public class ChoiceAttributeType implements AttributeType {
             return -1;
         }
 
-        int idx = find(type.getName());
+        int idx = find(type.getLocalName());
 
         if ((idx < 0) || !children[idx].equals(type)) {
             idx = -1;
@@ -337,7 +304,7 @@ public class ChoiceAttributeType implements AttributeType {
     public int find(String attName) {
         int i = 0;
 
-        while ((i < children.length) && !attName.equals(children[i].getName()))
+        while ((i < children.length) && !attName.equals(children[i].getLocalName()))
             i++;
 
         return (i == children.length) ? (-1) : i;
@@ -369,14 +336,10 @@ public class ChoiceAttributeType implements AttributeType {
 
         ChoiceAttributeType att = (ChoiceAttributeType) other;
 
-        if (name == null) {
-            if (att.getName() != null) {
-                return false;
-            }
-        } else if (!name.equals(att.getName())) {
-            return false;
+        if (!super.equals(att)) {
+        	return false;
         }
-
+       
         //hmmm... This makes the assumption that the order of the choices
         //matters - not sure if that's true.  Though the order does matter a
         //a bit for our parse method, so this is probably right, since two
@@ -394,7 +357,7 @@ public class ChoiceAttributeType implements AttributeType {
      * @return hashCode for this object.
      */
     public int hashCode() {
-        int hash = name.hashCode();
+        int hash = super.hashCode();
 
         for (int i = 0, ii = children.length; i < ii; i++) {
             hash ^= children[i].hashCode();
@@ -410,7 +373,7 @@ public class ChoiceAttributeType implements AttributeType {
      */
     public String toString() {
         String details = "name=" + name;
-        details += ((" , nillable=" + nill) + ", min=" + min + ", max=" + max);
+        details += ((" , nillable=" + isNillable()) + ", min=" + getMinOccurs() + ", max=" + getMaxOccurs());
         details += (", choices: " + Arrays.asList(children));
 
         return "ChoiceAttributeType [" + details + "]";

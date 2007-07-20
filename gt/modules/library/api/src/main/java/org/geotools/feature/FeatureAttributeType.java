@@ -76,9 +76,9 @@ public interface FeatureAttributeType extends AttributeType, PrimativeAttributeT
      * </code></pre>
      * </p>
      *
-     * @see org.geotools.feature.AttributeType#getType()
+     * @see org.geotools.feature.AttributeType#getBinding()
      */
-    Class getType();
+    Class getBinding();
 
     /**
      * Retrieve the schema for this FeatureType

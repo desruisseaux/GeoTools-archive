@@ -27,6 +27,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.geotools.data.collection.ResourceCollection;
+import org.geotools.data.collection.ResourceList;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
@@ -57,7 +58,6 @@ public class SubFeatureList extends SubFeatureCollection implements FeatureList,
 	 */
 	public SubFeatureList(FeatureCollection list, Filter filter, SortBy subSort) {
 		super( list,  filter );
-        state = new SubFeatureState( list, this );
         if( subSort == null ){
             sort = Collections.EMPTY_LIST;
         } else {
@@ -73,9 +73,43 @@ public class SubFeatureList extends SubFeatureCollection implements FeatureList,
     
     public SubFeatureList(FeatureCollection list, List order) {
         super( list );        
-        state = new SubFeatureState( list, this );        
+         
         index = order;
         filter = null;
+    }
+    
+    AbstractResourceCollection createResourceCollection() {
+    	return new DefaultResourceList(
+    		new DefaultResourceList.Strategy() {
+
+    			 public Object get( int index ) {
+    			        if( collection instanceof RandomFeatureAccess){
+    			            RandomFeatureAccess random = (RandomFeatureAccess) collection;
+    			            String id = (String) index().get( index );            
+    			            random.getFeatureMember( id );
+    			        }
+    			        Iterator it = iterator();
+    			        try {
+    			            for( int i=0; it.hasNext(); i++){
+    			                Feature feature = (Feature) it.next();
+    			                if( i == index ){
+    			                    return feature;
+    			                }
+    			            }
+    			            throw new IndexOutOfBoundsException();
+    			        }
+    			        finally {
+    			            close( it );
+    			        }
+    			    }
+    			 
+				public int size() {
+					// TODO Auto-generated method stub
+					return 0;
+				}
+    			
+    		}
+    	);
     }
     
     /** Lazy create a filter based on index */
@@ -142,124 +176,35 @@ public class SubFeatureList extends SubFeatureCollection implements FeatureList,
         return fids;
     }
 
-    public boolean addAll(int index, Collection c) {
-        boolean modified = false;
-        Iterator e = c.iterator();
-        try {
-            while (e.hasNext()) {
-                add(index++, e.next());
-                modified = true;
-            }
-            return modified;
-        }
-        finally {
-            if( c instanceof ResourceCollection ){
-                ((ResourceCollection)c).close( e );
-            }
-        }
-    }
-
-    public Object get( int index ) {
-        if( collection instanceof RandomFeatureAccess){
-            RandomFeatureAccess random = (RandomFeatureAccess) collection;
-            String id = (String) index().get( index );            
-            random.getFeatureMember( id );
-        }
-        Iterator it = iterator();
-        try {
-            for( int i=0; it.hasNext(); i++){
-                Feature feature = (Feature) it.next();
-                if( i == index ){
-                    return feature;
-                }
-            }
-            throw new IndexOutOfBoundsException();
-        }
-        finally {
-            close( it );
-        }
-    }
     
-    public Object set( int index, Object feature ) {
-        throw new UnsupportedOperationException();
-    }
-    
-    public void add( int index, Object feature ) {
-        throw new UnsupportedOperationException();
-    }
-    
-    public Object remove( int index ) {
-        String fid = (String) index().get( index );
-        Feature feature = getFeatureMember( fid );
-        
-        if( collection.remove( feature ) )
-            return feature;
-        
-        return null;
-    }
-    public int indexOf( Object o ) {
-        Feature feature = (Feature) o;
-        return index().indexOf( feature.getID() );
-    }
-    public int lastIndexOf( Object o ) {
-        Feature feature = (Feature) o;
-        return index().lastIndexOf( feature.getID() );
-    }
-    public ListIterator listIterator() {
-        return listIterator( 0 );
-    }
-    public ListIterator listIterator(final int index) {
-        if (index<0 || index>size())
-            throw new IndexOutOfBoundsException("Index: "+index);
-        ListIterator iterator = openIterator( index );
-        open.add( iterator );
-        return iterator;                        
-    }
-    public ListIterator openIterator( final int index ){           
-       return new SubListItr(index);
-    }
-    class SubListItr implements ListIterator {
-        ListIterator it;
-        String fid;
-        public SubListItr( int fromIndex ){
-            it = index().subList( fromIndex,index.size() ).listIterator();
-        }
-        public boolean hasNext() {
-            return it.hasNext();
-        }
-        public Object next() {
-            fid = (String) it.next();
-            return getFeatureMember( fid );
-        }
-        public void remove() {            
-            it.remove();
-            if( fid == null )
-                throw new IllegalStateException();
-            removeFeatureMember( fid );
-            index.remove( fid );            
-        }
-        public boolean hasPrevious() {
-            return it.hasPrevious();
-        }
-        public Object previous() {
-            fid = (String) it.previous();
-            return getFeatureMember( fid );
-        }
-        public int nextIndex() {
-            return it.nextIndex();
-        }
-        public int previousIndex() {
-            return it.previousIndex();
-        }
-        public void set( Object arg0 ) {
-            throw new UnsupportedOperationException();
-        }
-        public void add( Object feature ) {
-            SubFeatureList.this.add( it.nextIndex()-1,feature );
-        }
-    }
-    
-    //
+    public void add(int index, Object element) {
+		((ResourceList)rc).add(index,element);
+	}
+	public boolean addAll(int index, Collection c) {
+		return ((ResourceList)rc).addAll(index,c);
+	}
+	public Object get(int index) {
+		return ((ResourceList)rc).get(index);
+	}
+	public int indexOf(Object o) {
+		return ((ResourceList)rc).indexOf(o);
+	}
+	public int lastIndexOf(Object o) {
+		return ((ResourceList)rc).lastIndexOf(o);
+	}
+	public ListIterator listIterator() {
+		return ((ResourceList)rc).listIterator();
+	}
+	public ListIterator listIterator(int index) {
+		return ((ResourceList)rc).listIterator(index);
+	}
+	public Object remove(int index) {
+		return ((ResourceList)rc).remove(index);
+	}
+	public Object set(int index, Object element) {
+		return ((ResourceList)rc).set(index, element);
+	}
+	//
     // Fature Collection methods
     //
     /**

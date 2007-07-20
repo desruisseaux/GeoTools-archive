@@ -81,9 +81,9 @@ public class MIFFileTest extends TestCase {
             FeatureType schema = mif.getSchema();
             assertNotNull(schema);
             assertEquals(11, schema.getAttributeCount());
-            assertEquals("DESCRIPTION", schema.getAttributeType(1).getName());
+            assertEquals("DESCRIPTION", schema.getAttributeType(1).getLocalName());
             assertEquals(Double.class,
-                schema.getAttributeType("LENGTH").getType());
+                schema.getAttributeType("LENGTH").getBinding());
 
             FeatureReader fr = mif.getFeatureReader();
             int tot = 0;
@@ -320,7 +320,7 @@ public class MIFFileTest extends TestCase {
 
             FeatureType ft = mif.getSchema();
 
-            assertEquals(ft.getDefaultGeometry().getType(), Geometry.class);
+            assertEquals(ft.getPrimaryGeometry().getBinding(), Geometry.class);
 
             FeatureReader fr = mif.getFeatureReader();
 
@@ -432,7 +432,7 @@ public class MIFFileTest extends TestCase {
 
             FeatureType ft = mif.getSchema();
 
-            assertEquals(geomClass, ft.getDefaultGeometry().getType());
+            assertEquals(geomClass, ft.getPrimaryGeometry().getBinding());
 
             FeatureReader fr = mif.getFeatureReader();
 

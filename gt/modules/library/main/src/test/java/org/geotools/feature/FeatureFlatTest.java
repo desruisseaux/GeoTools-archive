@@ -177,7 +177,7 @@ public class FeatureFlatTest extends TestCase {
         testFeature.setAttribute("testGeometry", newGeom);
         assertEquals("match modified (geometry) attribute", testFeature.getAttribute("testGeometry"), newGeom);
 
-        testFeature.setDefaultGeometry(newGeom);
+        testFeature.setPrimaryGeometry(newGeom);
         assertEquals("match modified (geometry) attribute", testFeature.getAttribute("testGeometry"), newGeom);
 
     }
@@ -214,6 +214,9 @@ public class FeatureFlatTest extends TestCase {
             f.setAttribute(1244, "x");
             fail("not out of bounds");
         } catch (ArrayIndexOutOfBoundsException aioobe) {
+
+        }
+        catch (IndexOutOfBoundsException ioobe) {
 
         }
         try {
@@ -270,15 +273,15 @@ public class FeatureFlatTest extends TestCase {
     public void testDefaultGeometry() throws Exception {
         FeatureType testType = testFeature.getFeatureType();
         AttributeType geometry = testType.getAttributeType("testGeometry");
-        assertTrue(geometry == testType.getDefaultGeometry());
-        assertTrue(testFeature.getDefaultGeometry().getEnvelopeInternal().equals(testFeature.getBounds()));
+        assertTrue(geometry == testType.getPrimaryGeometry());
+        assertTrue(testFeature.getPrimaryGeometry().getEnvelopeInternal().equals(testFeature.getBounds()));
 
         FeatureType another =
             FeatureTypeFactory.newFeatureType(new AttributeType[] { newAtt("name", String.class)}, "different");
         DefaultFeature f1 = (DefaultFeature) another.create(new Object[1]);
-        assertEquals(null, f1.getDefaultGeometry());
+        assertEquals(null, f1.getPrimaryGeometry());
         try {
-            f1.setDefaultGeometry(null);
+            f1.setPrimaryGeometry(null);
             fail("allowed bogus default geometry set ");
         } catch (IllegalAttributeException iae) {
 

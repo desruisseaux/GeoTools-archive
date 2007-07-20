@@ -69,19 +69,19 @@ public abstract class JDBCConformanceTestSupport extends TestCase {
 		
 		tb.attribute( "geometry", Point.class );
 		tb.attribute( "intProperty", Integer.class );
-		point = tb.feature();
+		point = tb.buildFeatureType();
 		
 		tb.init();
 		tb.setName( "line" );
 		tb.attribute( "geometry", LineString.class );
 		tb.attribute( "doubleProperty", Double.class );
-		line = tb.feature();
+		line = tb.buildFeatureType();
 		
 		tb.init();
 		tb.setName( "polygon" );
 		tb.attribute( "geometry", Polygon.class );
 		tb.attribute( "stringProperty", String.class );
-		polygon = tb.feature();
+		polygon = tb.buildFeatureType();
 	
 		SimpleFeatureBuilder fb = new SimpleFeatureBuilder( new SimpleFeatureFactoryImpl() );
 		GeometryFactory gf = new GeometryFactory();

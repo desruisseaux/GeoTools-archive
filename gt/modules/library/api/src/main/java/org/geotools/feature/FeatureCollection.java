@@ -17,10 +17,13 @@ package org.geotools.feature;
 
 import java.io.IOException;
 import java.util.Iterator;
+import com.vividsolutions.jts.geom.Geometry;
+import org.opengis.feature.simple.SimpleFeatureCollection;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 import org.geotools.data.collection.ResourceCollection;
 import org.geotools.feature.visitor.FeatureVisitor;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.ProgressListener;
 
 
@@ -89,8 +92,10 @@ import org.geotools.util.ProgressListener;
  * @author Jody Garnett, Refractions Research, Inc.
  * @source $URL$
  * @version $Id$
+ *
+ * @deprecated use {@link SimpleFeatureCollection}.
  */
-public interface FeatureCollection extends ResourceCollection, Feature {
+public interface FeatureCollection extends ResourceCollection, Feature, SimpleFeatureCollection {
     /**
      * Obtain a FeatureIterator of the Features within this collection.
      * <p>
@@ -235,7 +240,8 @@ public interface FeatureCollection extends ResourceCollection, Feature {
      *
      * @return A reference to this collections type
      */
-    FeatureType getFeatureType();
+
+    //FeatureType getFeatureType();
 
     /**
      * The schema for the child features of this collection.

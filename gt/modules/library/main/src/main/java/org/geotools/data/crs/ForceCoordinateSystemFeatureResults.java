@@ -23,6 +23,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.collection.AbstractFeatureCollection;
+import org.geotools.feature.collection.AbstractResourceCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -68,8 +69,10 @@ public class ForceCoordinateSystemFeatureResults extends AbstractFeatureCollecti
 
     public ForceCoordinateSystemFeatureResults(FeatureCollection results,            
         CoordinateReferenceSystem forcedCS, boolean forceOnlyMissing) throws IOException, SchemaException {
-        super( forceType( origionalType( results ), forcedCS, forceOnlyMissing ) );
+        super( forceType( origionalType( results ), forcedCS, forceOnlyMissing ));
+        
         this.results = results;
+        setResourceCollection(createResourceCollection());
     }
     
     private static FeatureType origionalType( FeatureCollection results ){
@@ -85,12 +88,34 @@ public class ForceCoordinateSystemFeatureResults extends AbstractFeatureCollecti
         return results.getSchema();
     }
     
+    private AbstractResourceCollection createResourceCollection() {
+    	return new AbstractResourceCollection() {
+
+    		 public Iterator openIterator() {
+			        return new ForceCoordinateSystemIterator( results.features(), getSchema() );
+			  }
+			  
+			  public void closeIterator( Iterator close ) {
+				  	if( close == null ) return;
+			        if( close instanceof ForceCoordinateSystemIterator){
+			            ForceCoordinateSystemIterator iterator = (ForceCoordinateSystemIterator) close;
+			            iterator.close();
+			        }
+			  }
+				
+			  public int size() {
+			        return results.size();
+			  }
+    		
+    	};
+    }
+    
     private static FeatureType forceType( FeatureType startingType, CoordinateReferenceSystem forcedCS, boolean forceOnlyMissing ) throws SchemaException{
         if (forcedCS == null) {
             throw new NullPointerException("CoordinateSystem required");
         }
-        CoordinateReferenceSystem originalCs = startingType.getDefaultGeometry() != null ? 
-            startingType.getDefaultGeometry().getCoordinateSystem() : null;
+        CoordinateReferenceSystem originalCs = startingType.getPrimaryGeometry() != null ? 
+            startingType.getPrimaryGeometry().getCoordinateSystem() : null;
         
         if (forcedCS.equals(originalCs)) {
             return startingType;
@@ -100,16 +125,7 @@ public class ForceCoordinateSystemFeatureResults extends AbstractFeatureCollecti
         }
     }
    
-    protected Iterator openIterator() {
-        return new ForceCoordinateSystemIterator( results.features(), getSchema() );
-    }
-    protected void closeIterator( Iterator close ) {
-        if( close == null ) return;
-        if( close instanceof ForceCoordinateSystemIterator){
-            ForceCoordinateSystemIterator iterator = (ForceCoordinateSystemIterator) close;
-            iterator.close();
-        }
-    }
+  
 
     /**
      * @see org.geotools.data.FeatureResults#getBounds()
@@ -118,10 +134,7 @@ public class ForceCoordinateSystemFeatureResults extends AbstractFeatureCollecti
         return ReferencedEnvelope.reference( results.getBounds() );
     }
 
-    public int size() {
-        return results.size();
-    }
-
+   
     /**
      * @see org.geotools.data.FeatureResults#collection()
      */

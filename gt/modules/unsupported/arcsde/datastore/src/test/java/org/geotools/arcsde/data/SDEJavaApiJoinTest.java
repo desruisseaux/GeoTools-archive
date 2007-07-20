@@ -336,15 +336,15 @@ public class SDEJavaApiJoinTest extends TestCase {
         AttributeType att3 = (AttributeType) atts.get(2);
         AttributeType att4 = (AttributeType) atts.get(3);
 
-        assertEquals("ID", att1.getName());
-        assertEquals("NAME", att2.getName());
-        assertEquals("SHAPE", att3.getName());
-        assertEquals("DESCRIPTION", att4.getName());
+        assertEquals("ID", att1.getLocalName());
+        assertEquals("NAME", att2.getLocalName());
+        assertEquals("SHAPE", att3.getLocalName());
+        assertEquals("DESCRIPTION", att4.getLocalName());
 
-        assertEquals(Integer.class, att1.getType());
-        assertEquals(String.class, att2.getType());
-        assertEquals(Point.class, att3.getType());
-        assertEquals(String.class, att4.getType());
+        assertEquals(Integer.class, att1.getBinding());
+        assertEquals(String.class, att2.getBinding());
+        assertEquals(Point.class, att3.getBinding());
+        assertEquals(String.class, att4.getBinding());
     }
 
     public void testViewBounds() throws IOException {

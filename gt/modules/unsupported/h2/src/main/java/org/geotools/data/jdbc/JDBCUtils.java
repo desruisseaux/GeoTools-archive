@@ -89,7 +89,7 @@ public class JDBCUtils {
 
         for (int i = 0; i < featureType.getAttributeCount(); i++) {
             AttributeType attributeType = featureType.getAttributeType(i);
-            Class clazz = attributeType.getType();
+            Class clazz = attributeType.getBinding();
 
             sqlTypes[i] = typeBuilder.mapping(clazz);
         }
@@ -263,7 +263,7 @@ public class JDBCUtils {
                     builder.attribute(name, binding);
                 }
 
-                return builder.feature();
+                return builder.buildFeatureType();
             } finally {
                 columns.close();
                 primaryKeys.close();

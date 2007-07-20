@@ -37,6 +37,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.simple.SimpleTypeBuilder;
 import org.geotools.feature.simple.SimpleTypeFactoryImpl;
+import org.geotools.feature.type.DefaultFeatureTypeBuilder;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.identity.Identifier;
@@ -144,7 +145,7 @@ public class ArcSDEAdapter {
             throw new NullPointerException("a GeometryAttributeType must be provided, got null");
         }
 
-        Class geometryClass = attribute.getType();
+        Class geometryClass = attribute.getBinding();
 
         int shapeTypes = 0;
 
@@ -198,10 +199,10 @@ public class ArcSDEAdapter {
      */
     public static SeColumnDefinition createSeColumnDefinition(AttributeType type) throws SeException {
         SeColumnDefinition colDef = null;
-        String colName = type.getName();
+        String colName = type.getLocalName();
         boolean nillable = type.isNillable();
 
-        SdeTypeDef def = getSdeType(type.getType());
+        SdeTypeDef def = getSdeType(type.getBinding());
 
         int sdeColType = def.colDefType;
         int fieldLength = def.size;
@@ -393,17 +394,17 @@ public class ArcSDEAdapter {
 
     private static FeatureType createSchema(String typeName, String namespace, List properties) {
         // TODO: use factory lookup mechanism once its in place
-        SimpleTypeFactoryImpl factory = new SimpleTypeFactoryImpl();
-        SimpleTypeBuilder builder = new SimpleTypeBuilder(factory);
+        DefaultFeatureTypeBuilder builder = new DefaultFeatureTypeBuilder();
 
         builder.setName(typeName);
         builder.setNamespaceURI(namespace);
         for (Iterator it = properties.iterator(); it.hasNext();) {
             AttributeType attType = (AttributeType) it.next();
-            builder.addAttribute(attType);
+            builder.add(attType.getLocalName(),attType.getBinding());
+            
         }
 
-        FeatureType type = builder.feature();
+        FeatureType type = (FeatureType) builder.buildFeatureType();
 
         return type;
     }

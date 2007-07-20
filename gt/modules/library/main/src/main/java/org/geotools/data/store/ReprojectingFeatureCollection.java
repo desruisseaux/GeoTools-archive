@@ -17,6 +17,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.collection.DecoratingFeatureCollection;
 import org.geotools.feature.collection.DelegateFeatureIterator;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.geometry.jts.GeometryCoordinateSequenceTransformer;
@@ -37,7 +38,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author Justin
  */
-public class ReprojectingFeatureCollection implements FeatureCollection {
+public class ReprojectingFeatureCollection extends DecoratingFeatureCollection 
+	implements FeatureCollection {
 
     /**
      * The decorated collection
@@ -71,12 +73,13 @@ public class ReprojectingFeatureCollection implements FeatureCollection {
     
     public ReprojectingFeatureCollection(FeatureCollection delegate,
             CoordinateReferenceSystem target) {
-        this( delegate, delegate.getSchema().getDefaultGeometry().getCoordinateSystem(), target );
+        this( delegate, delegate.getSchema().getPrimaryGeometry().getCoordinateSystem(), target );
     }
     
     public ReprojectingFeatureCollection(
 		FeatureCollection delegate, CoordinateReferenceSystem source, CoordinateReferenceSystem target
 	) {
+    	super(delegate);
     	this.delegate = delegate;
         this.target = target;
         FeatureType schema = delegate.getSchema();
@@ -116,7 +119,7 @@ public class ReprojectingFeatureCollection implements FeatureCollection {
             return FeatureTypes.transform(type, target);
         } catch (SchemaException e) {
             throw new IllegalArgumentException(
-                    "Could not transform source schema");
+                    "Could not transform source schema", e);
         }
     }
 
@@ -145,27 +148,12 @@ public class ReprojectingFeatureCollection implements FeatureCollection {
         delegate.close(iterator);
     }
 
-    public void addListener(CollectionListener listener)
-            throws NullPointerException {
-        delegate.addListener(listener);
-    }
-
-    public void removeListener(CollectionListener listener)
-            throws NullPointerException {
-        delegate.removeListener(listener);
-    }
-
     public FeatureType getFeatureType() {
         return this.featureType;
     }
 
     public FeatureType getSchema() {
         return this.schema;
-    }
-
-    public void accepts(FeatureVisitor visitor, ProgressListener progress)
-            throws IOException {
-        delegate.accepts(visitor, progress);
     }
 
     public FeatureCollection subCollection(Filter filter) {
@@ -196,22 +184,6 @@ public class ReprojectingFeatureCollection implements FeatureCollection {
         throw new UnsupportedOperationException("Not yet");
     }
 
-    public void purge() {
-        delegate.purge();
-    }
-
-    public int size() {
-        return delegate.size();
-    }
-
-    public void clear() {
-        delegate.clear();
-    }
-
-    public boolean isEmpty() {
-        return delegate.isEmpty();
-    }
-
     public Object[] toArray() {
         return toArray(new Object[size()]);
     }
@@ -236,82 +208,6 @@ public class ReprojectingFeatureCollection implements FeatureCollection {
         // return delegate.add( o );
     }
 
-    public boolean contains(Object o) {
-        // must back project any geometry attributes
-        return delegate.add(o);
-    }
-
-    public boolean remove(Object o) {
-        // must back project any geometry attributes
-        return delegate.remove(o);
-    }
-
-    public boolean addAll(Collection c) {
-        // must back project any geometry attributes
-        return delegate.addAll(c);
-    }
-
-    public boolean containsAll(Collection c) {
-        // must back project any geometry attributes
-        return delegate.containsAll(c);
-    }
-
-    public boolean removeAll(Collection c) {
-        // must back project any geometry attributes
-        return delegate.removeAll(c);
-    }
-
-    public boolean retainAll(Collection c) {
-        // must back project any geometry attributes
-        return delegate.retainAll(c);
-    }
-
-    public String getID() {
-        return delegate.getID();
-    }
-
-    public Object[] getAttributes(Object[] attributes) {
-        // must reproject any geometry attributes
-        return delegate.getAttributes(attributes);
-    }
-
-    public Object getAttribute(String xPath) {
-        // must project any geometry attributes
-        return delegate.getAttribute(xPath);
-    }
-
-    public Object getAttribute(int index) {
-        return delegate.getAttribute(index);
-    }
-
-    public void setAttribute(int position, Object val)
-            throws IllegalAttributeException, ArrayIndexOutOfBoundsException {
-        delegate.setAttribute(position, val);
-    }
-
-    public int getNumberOfAttributes() {
-        return delegate.getNumberOfAttributes();
-    }
-
-    public void setAttribute(String xPath, Object attribute)
-            throws IllegalAttributeException {
-        delegate.setAttribute(xPath, attribute);
-    }
-
-    public Geometry getDefaultGeometry() {
-        return delegate.getDefaultGeometry();
-    }
-    public Geometry getPrimaryGeometry() {
-    	return delegate.getPrimaryGeometry();
-    }
-    public void setDefaultGeometry(Geometry geometry)
-            throws IllegalAttributeException {
-        delegate.setDefaultGeometry(geometry);
-    }
-
-    public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
-    	delegate.setPrimaryGeometry(geometry);
-    }
     /**
      * This method computes reprojected bounds the hard way, but computing them
      * feature by feature. This method could be faster if computed the
@@ -331,7 +227,7 @@ public class ReprojectingFeatureCollection implements FeatureCollection {
 
             while (r.hasNext()) {
                 feature = r.next();
-                internal = feature.getDefaultGeometry().getEnvelopeInternal();
+                internal = feature.getPrimaryGeometry().getEnvelopeInternal();
                 newBBox.expandToInclude(internal);
             }
             return ReferencedEnvelope.reference(newBBox);

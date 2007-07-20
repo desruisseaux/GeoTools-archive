@@ -189,7 +189,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         List filtered = new ArrayList();
         for (int i = 0; i < ft.getAttributeCount(); i++) {
             AttributeType cat = ft.getAttributeType(i);
-            String name = cat.getName().toLowerCase();
+            String name = cat.getLocalName().toLowerCase();
             if (names.contains(name)) {
                 filtered.add(cat);
             }
@@ -199,7 +199,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
 
         try {
             return FeatureTypeBuilder.newFeatureType(ats, ft.getTypeName(), ft.getNamespace(), ft
-                    .isAbstract(), ft.getAncestors(), ft.getDefaultGeometry());
+                    .isAbstract(), ft.getAncestors(), ft.getPrimaryGeometry());
         } catch (SchemaException e) {
             throw new DataSourceException(
                     "Error converting FeatureType from versioned (internal) schema "
@@ -1007,7 +1007,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
             // gather bbox, we need it for the first commit msg
             Envelope envelope = wrapped.getFeatureSource(typeName).getBounds();
             if (envelope != null) {
-                CoordinateReferenceSystem crs = wrapped.getSchema(typeName).getDefaultGeometry()
+                CoordinateReferenceSystem crs = wrapped.getSchema(typeName).getPrimaryGeometry()
                         .getCoordinateSystem();
                 if (crs != null)
                     envelope = JTS.toGeographic(envelope, crs);
@@ -1134,7 +1134,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
             // gather bbox, we need it for the first commit msg
             Envelope envelope = wrapped.getFeatureSource(typeName).getBounds();
             if (envelope != null) {
-                CoordinateReferenceSystem crs = wrapped.getSchema(typeName).getDefaultGeometry()
+                CoordinateReferenceSystem crs = wrapped.getSchema(typeName).getPrimaryGeometry()
                         .getCoordinateSystem();
                 if (crs != null)
                     envelope = JTS.toGeographic(envelope, crs);

@@ -133,9 +133,10 @@ public class FeatureCollectionIteration {
             AttributeType type = schema.getAttributeType(i);
 
             // recurse if attribute type is another collection
-            if (FeatureCollection.class.isAssignableFrom(type.getType())) {
+            if (FeatureCollection.class.isAssignableFrom(type.getBinding())) {
                 walker((FeatureCollection) feature.getAttribute(i));
-            } else if (type instanceof FeatureType) {
+//            } else if (type instanceof FeatureType) {
+            } else if (type instanceof FeatureAttributeType ) {
                 // recurse if attribute type is another feature
                 walker((Feature) feature.getAttribute(i));
             } else {

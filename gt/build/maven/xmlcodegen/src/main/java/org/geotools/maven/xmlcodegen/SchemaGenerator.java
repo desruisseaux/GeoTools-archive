@@ -283,7 +283,7 @@ public class SchemaGenerator extends AbstractGenerator {
         for (Iterator itr = types.values().iterator(); itr.hasNext();) {
             AttributeType gtType = (AttributeType) itr.next();
             gtSchema.put(new org.geotools.feature.Name(
-                    schema.getTargetNamespace(), gtType.getName()), gtType);
+                    schema.getTargetNamespace(), gtType.getLocalName()), gtType);
         }
 
         Object[] input = new Object[] {

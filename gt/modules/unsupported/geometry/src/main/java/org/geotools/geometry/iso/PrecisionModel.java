@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006-2007, GeoTools Project Management Committee (PMC)
- *    (C) 2006       University of Applied Sciences Köln (Fachhochschule Köln)
+ *    (C) 2006       University of Applied Sciences Kï¿½ln (Fachhochschule Kï¿½ln)
  *    (C) 2001-2006  Vivid Solutions
  *    
  *    This library is free software; you can redistribute it and/or
@@ -206,6 +206,8 @@ public class PrecisionModel implements Serializable, Precision {
 	public PrecisionType getType() {
 		return modelType;
 	}
+	
+	
 
 	/**
 	 * Sets the multiplying factor used to obtain a precise coordinate. This

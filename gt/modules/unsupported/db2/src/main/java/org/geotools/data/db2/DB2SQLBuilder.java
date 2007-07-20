@@ -94,7 +94,7 @@ public class DB2SQLBuilder extends GeoAPISQLBuilder {
      * @return the String with the escaped name.
      */
     String sqlGeometryColumnName(AttributeType geomAttribute) {
-        return this.encoder.escapeName(geomAttribute.getName());
+        return this.encoder.escapeName(geomAttribute.getLocalName());
     }
 
     /**
@@ -226,7 +226,7 @@ public class DB2SQLBuilder extends GeoAPISQLBuilder {
 		StringBuffer valueList = new StringBuffer("");
 
         for (int i = 0; i < attributes.length; i++) {
-			String colName = escapeName(attributes[i].getName());
+			String colName = escapeName(attributes[i].getLocalName());
 			if (!firstAttr) {
 				colNameList.append(", ");
 				valueList.append(", ");
@@ -239,10 +239,10 @@ public class DB2SQLBuilder extends GeoAPISQLBuilder {
 				attrValue = "NULL";
 			}
 			else 
-			if (Geometry.class.isAssignableFrom(attributes[i].getType())) {
+			if (Geometry.class.isAssignableFrom(attributes[i].getBinding())) {
 				attrValue = db2Encoder.db2Geom((Geometry) currAtt);
 			} else 
-			if (String.class.isAssignableFrom(attributes[i].getType())) {
+			if (String.class.isAssignableFrom(attributes[i].getBinding())) {
 				attrValue = "'" + currAtt.toString() + "'";
 				} else	{
 					attrValue = currAtt.toString();
@@ -287,13 +287,13 @@ public class DB2SQLBuilder extends GeoAPISQLBuilder {
 					LOGGER.fine("modifying att# " + i + " to " + currAtt);
 				}
 				String attrValue = null;
-				String attrName = attributes[i].getName();
+				String attrName = attributes[i].getLocalName();
 
-				if (Geometry.class.isAssignableFrom(attributes[i].getType())) {
+				if (Geometry.class.isAssignableFrom(attributes[i].getBinding())) {
 
 					attrValue = db2Encoder.db2Geom((Geometry) currAtt);
 				} else 
-				if (String.class.isAssignableFrom(attributes[i].getType())) {
+				if (String.class.isAssignableFrom(attributes[i].getBinding())) {
 					attrValue = "'" + currAtt.toString() + "'";
 					} else {
 						attrValue = currAtt.toString();

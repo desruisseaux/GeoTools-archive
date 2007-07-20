@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.feature.type.TypeName;
 import org.geotools.filter.LengthFunction;
 import org.geotools.geometry.jts.JTS;
 import org.opengis.filter.BinaryComparisonOperator;
@@ -69,8 +70,11 @@ public class FeatureTypes {
 		DEFAULT_NAMESPACE = uri;
 	}
 		
+	/** default feature collection name */
+	final public static TypeName DEFAULT_TYPENAME = 
+		new TypeName( "AbstractFeatureCollectionType", DEFAULT_NAMESPACE.toString() );
 	
-    /** represent an unbounded field length */
+	/** represent an unbounded field length */
     final public static int ANY_LENGTH = -1;
 
     /**
@@ -87,8 +91,8 @@ public class FeatureTypes {
      */
     public static int getFieldLength( AttributeType type ) {
 
-        Class colType = type.getType();
-        String colName = type.getName();
+        Class colType = type.getBinding();
+        String colName = type.getLocalName();
 
         int fieldLen = -1;
         Filter f = type.getRestriction();
@@ -154,10 +158,10 @@ public class FeatureTypes {
                     forced = geometryType;
                 else
                     forced = (GeometryAttributeType) AttributeTypeFactory.newAttributeType(
-                        geometryType.getName(), geometryType.getType(), geometryType.isNillable(),
+                        geometryType.getLocalName(), geometryType.getBinding(), geometryType.isNillable(),
                         0, geometryType.createDefaultValue(), crs);
 
-                if (defaultGeometryType == null || geometryType == schema.getDefaultGeometry()) {
+                if (defaultGeometryType == null || geometryType == schema.getPrimaryGeometry()) {
                     defaultGeometryType = forced;
                 }
                 factory.addType(forced);
@@ -184,13 +188,13 @@ public class FeatureTypes {
             throws MismatchedDimensionException, TransformException, IllegalAttributeException {
         feature = schema.create(feature.getAttributes(null), feature.getID());
 
-        GeometryAttributeType geomType = schema.getDefaultGeometry();
-        Geometry geom = (Geometry) feature.getAttribute(geomType.getName());
+        GeometryAttributeType geomType = schema.getPrimaryGeometry();
+        Geometry geom = (Geometry) feature.getAttribute(geomType.getLocalName());
 
         geom = JTS.transform(geom, transform);
 
         try {
-            feature.setAttribute(geomType.getName(), geom);
+            feature.setAttribute(geomType.getLocalName(), geom);
         } catch (IllegalAttributeException shouldNotHappen) {
             // we are expecting the transform to return the same geometry type
         }

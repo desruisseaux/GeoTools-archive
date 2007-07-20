@@ -379,7 +379,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 			ArrayList indexes = new ArrayList();
 
 			for (int i = 0; i < attributeTypes.length; i++) {
-                if (attributeTypes[i].getName().equals(this.layer.getShapeAttributeName(SeLayer.SE_SHAPE_ATTRIBUTE_FID))) {
+                if (attributeTypes[i].getLocalName().equals(this.layer.getShapeAttributeName(SeLayer.SE_SHAPE_ATTRIBUTE_FID))) {
                     //this is an attribute added to the featuretype
                     //solely to support FIDs.  It isn't an actual attribute
                     //on the underlying SDE table, and as such it can't
@@ -395,7 +395,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 				// their
 				// documentation. 1 indicates an ArcSDE managed field.
 				if (this.columnDefinitions[i].getRowIdType() != 1) {
-					columnList.add(attributeTypes[i].getName().toUpperCase());
+					columnList.add(attributeTypes[i].getLocalName().toUpperCase());
 					indexes.add(new Integer(i));
 				}
 			}

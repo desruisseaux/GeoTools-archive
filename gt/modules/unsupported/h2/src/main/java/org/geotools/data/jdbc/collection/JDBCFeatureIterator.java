@@ -46,7 +46,7 @@ public class JDBCFeatureIterator implements FeatureIterator {
 		for ( int i = 0; i < featureType.getAttributeCount(); i++ ) {
 			AttributeType type = featureType.getAttributeType( i );
 			try {
-				Object value = st.getResultSet().getObject( type.getName() );
+				Object value = st.getResultSet().getObject( type.getLocalName() );
 				if ( value != null ) {
 					attributes.add( value );
 				}

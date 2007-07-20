@@ -108,13 +108,13 @@ public class LineCoveredByPolygonValidation
         while(fLine.hasNext()){
         	Feature line = fLine.next();
         	FeatureIterator fPoly = fcPoly.features();
-        	Geometry lineGeom = line.getDefaultGeometry();
+        	Geometry lineGeom = line.getPrimaryGeometry();
         	if(envelope.contains(lineGeom.getEnvelopeInternal())){
         		// 	check for valid comparison
         		if(LineString.class.isAssignableFrom(lineGeom.getClass())){
         			while(fPoly.hasNext()){
         				Feature poly = fPoly.next();
-        				Geometry polyGeom = poly.getDefaultGeometry(); 
+        				Geometry polyGeom = poly.getPrimaryGeometry(); 
         				if(envelope.contains(polyGeom.getEnvelopeInternal())){
         					if(Polygon.class.isAssignableFrom(polyGeom.getClass())){
         						if(!polyGeom.contains(lineGeom)){

@@ -72,7 +72,7 @@ public class QueryTest extends TestCase {
     public void dtestBBOXFilter() throws Exception {
         BBoxExpression bbox = TestUtilites.filterFactory.createBBoxExpression(new Envelope(
                     -4, -2, 0, -3));
-        String geom = source.getSchema().getDefaultGeometry().getName();
+        String geom = source.getSchema().getPrimaryGeometry().getLocalName();
         AttributeExpression geomExpr = TestUtilites.filterFactory
             .createAttributeExpression(source.getSchema(), geom);
 

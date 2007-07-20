@@ -259,7 +259,7 @@ public class DefaultSQLBuilder implements SQLBuilder {
             if (attributes[i] instanceof GeometryAttributeType) {
                 sqlGeometryColumn(sql, attributes[i]);
             } else {
-                sql.append(encoder.escapeName(attributes[i].getName()));
+                sql.append(encoder.escapeName(attributes[i].getLocalName()));
             }
 
             if (i < (attributes.length - 1)) {
@@ -281,7 +281,7 @@ public class DefaultSQLBuilder implements SQLBuilder {
      * @param geomAttribute An AttributeType for a geometry attribute
      */
     public void sqlGeometryColumn(StringBuffer sql, AttributeType geomAttribute) {
-        sql.append(encoder.escapeName(geomAttribute.getName()));
+        sql.append(encoder.escapeName(geomAttribute.getLocalName()));
     }
     
     /**
@@ -299,7 +299,7 @@ public class DefaultSQLBuilder implements SQLBuilder {
     	for ( int i = 0; i < sortBy.length; i++ ) {
     		AttributeType type = (AttributeType) sortBy[i].getPropertyName().evaluate( ft );
     		if ( type != null ) {
-    			sql.append( encoder.escapeName( type.getName() ) );
+    			sql.append( encoder.escapeName( type.getLocalName() ) );
     		}
     		else {
     			sql.append( encoder.escapeName( sortBy[i].getPropertyName().getPropertyName() ) );	

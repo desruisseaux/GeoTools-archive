@@ -198,7 +198,7 @@ public class FCBuffer extends Thread implements FeatureReader {
             throw fc.exception;
         }
 
-        if(fc.getFeatureType()!=null && fc.getFeatureType().getDefaultGeometry()!=null && fc.getFeatureType().getDefaultGeometry().getCoordinateSystem() == null){
+        if(fc.getFeatureType()!=null && fc.getFeatureType().getPrimaryGeometry()!=null && fc.getFeatureType().getPrimaryGeometry().getCoordinateSystem() == null){
                 // load crs
 //                Feature f = fc.peek();
                 // TODO set crs here.

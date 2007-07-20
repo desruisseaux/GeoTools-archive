@@ -311,7 +311,7 @@ public class JDBCFeatureWriter implements FeatureWriter {
         // set up attributes and write row
         for (int i = 0; i < current.getNumberOfAttributes(); i++) {
             Object currAtt = current.getAttribute(i);
-            String attName = current.getFeatureType().getAttributeType(i).getName();
+            String attName = current.getFeatureType().getAttributeType(i).getLocalName();
             if(!autoincrementColumns.contains(attName)) 
                 queryData.write(i, currAtt);
         }

@@ -288,20 +288,20 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         assertEquals(new Long(1), f.getAttribute("revision"));
         // TODO : get revision back among the attributes
         // assertEquals(new Long(1), f.getAttribute("revision"));
-        assertEquals(originalBounds, f.getDefaultGeometry().getEnvelopeInternal());
+        assertEquals(originalBounds, f.getPrimaryGeometry().getEnvelopeInternal());
         // ... first change
         assertTrue(fr.hasNext());
         f = fr.next();
         assertEquals(new Long(2), f.getAttribute("revision"));
         assertEquals("first change", f.getAttribute("message"));
-        assertEquals(roadFeatures[0].getDefaultGeometry().getEnvelope(), f.getDefaultGeometry()
+        assertEquals(roadFeatures[0].getPrimaryGeometry().getEnvelope(), f.getPrimaryGeometry()
                 .getEnvelope());
         // ... second change
         assertTrue(fr.hasNext());
         f = fr.next();
         assertEquals(new Long(3), f.getAttribute("revision"));
         assertEquals("second change", f.getAttribute("message"));
-        assertEquals(roadFeatures[0].getDefaultGeometry().getEnvelope(), f.getDefaultGeometry()
+        assertEquals(roadFeatures[0].getPrimaryGeometry().getEnvelope(), f.getPrimaryGeometry()
                 .getEnvelope());
         // finish
         assertFalse(fr.hasNext());
@@ -584,14 +584,14 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         FeatureWriter fw = ds.getFeatureWriter("rail", Filter.INCLUDE, t);
         assertTrue(fw.hasNext());
         Feature f = fw.next();
-        f.setDefaultGeometry(line(new int[] { 0, 0, -10, -10 }));
+        f.setPrimaryGeometry(line(new int[] { 0, 0, -10, -10 }));
         fw.write();
         fw.close();
         t.commit();
 
         fw = ds.getFeatureWriterAppend("rail", t);
         f = fw.next();
-        f.setDefaultGeometry(line(new int[] { -10, -10, -20, -10 }));
+        f.setPrimaryGeometry(line(new int[] { -10, -10, -20, -10 }));
         fw.write();
         assertEquals("rail.2", f.getID());
         fw.close();
@@ -945,7 +945,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         // ... can't compare directly, they have different geometry factories
         // (afaik)
         assertTrue(DataUtilities.attributesEqual(lines(new int[][] { { 200, 200, 120, 120 } }),
-                diff.getFeature().getDefaultGeometry()));
+                diff.getFeature().getPrimaryGeometry()));
         assertFalse(fdr.hasNext());
         fdr.close();
 

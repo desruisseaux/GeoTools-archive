@@ -87,9 +87,9 @@ public class TypeFactoryImpl implements TypeFactory {
 	}
 
 	public AttributeDescriptor createAttributeDescriptor(AttributeType type,
-			Name name, int minOccurs, int maxOccurs, boolean isNillable) {
-		throw new UnsupportedOperationException();
-		//return new AttributeDescriptorImpl(type, name, minOccurs, maxOccurs, isNillable);
+			Name name, int minOccurs, int maxOccurs, boolean isNillable, Object defaultValue) {
+		
+		return new AttributeDescriptorImpl(type, name, minOccurs, maxOccurs, isNillable,defaultValue);
 	}
 
 	public AssociationType createAssociationType(TypeName name,
@@ -101,23 +101,22 @@ public class TypeFactoryImpl implements TypeFactory {
 //				isAbstract, restrictions, superType, description);
 	}
 
-	public org.geotools.feature.AttributeType createAttributeType( TypeName name, Class binding,
-			boolean isIdentifiable, boolean isAbstract, Set restrictions,
-			org.geotools.feature.AttributeType superType, InternationalString description ) {
-		
-		Filter filter = (Filter) (restrictions != null && !restrictions.isEmpty() ? 
-				restrictions.iterator().next() : null);
-				
-		return AttributeTypeFactory.newAttributeType( name.getLocalPart(), binding, true, filter, null, null );
-	}
-	
+//	public org.geotools.feature.AttributeType createAttributeType( TypeName name, Class binding,
+//			boolean isIdentifiable, boolean isAbstract, Set restrictions,
+//			org.geotools.feature.AttributeType superType, InternationalString description ) {
+//		
+//		Filter filter = (Filter) (restrictions != null && !restrictions.isEmpty() ? 
+//				restrictions.iterator().next() : null);
+//				
+//		return AttributeTypeFactory.newAttributeType( name.getLocalPart(), binding, true, filter, null, null );
+//	}
+//	
 	public AttributeType createAttributeType(TypeName name, Class binding,
 			boolean isIdentifiable, boolean isAbstract, Set restrictions,
 			AttributeType superType, InternationalString description) {
 
-		throw new UnsupportedOperationException();
-//		return new AttributeTypeImpl(name, binding, isIdentifiable, isAbstract,
-//				restrictions, superType, description);
+		return new AttributeTypeImpl(name, binding, isIdentifiable, isAbstract,
+				restrictions, superType, description);
 	}
 
 	public ComplexType createComplexType(TypeName name, Collection schema,
@@ -129,27 +128,26 @@ public class TypeFactoryImpl implements TypeFactory {
 //				restrictions, superType, description);
 	}
 
-	public GeometryAttributeType createGeometryType( 
-		TypeName name, Class binding, CoordinateReferenceSystem crs, boolean isIdentifiable,
-		boolean isAbstract, Set restrictions, org.geotools.feature.AttributeType superType, 
-		InternationalString description
-	) {
-		
-		Filter filter = (Filter) (restrictions != null && !restrictions.isEmpty() ? 
-				restrictions.iterator().next() : null);
-		return (GeometryAttributeType) AttributeTypeFactory.newAttributeType( 
-			name.getLocalPart(), binding, true, filter, null, crs 
-		);
-	}
+//	public GeometryAttributeType createGeometryType( 
+//		TypeName name, Class binding, CoordinateReferenceSystem crs, boolean isIdentifiable,
+//		boolean isAbstract, Set restrictions, org.geotools.feature.AttributeType superType, 
+//		InternationalString description
+//	) {
+//		
+//		Filter filter = (Filter) (restrictions != null && !restrictions.isEmpty() ? 
+//				restrictions.iterator().next() : null);
+//		return (GeometryAttributeType) AttributeTypeFactory.newAttributeType( 
+//			name.getLocalPart(), binding, true, filter, null, crs 
+//		);
+//	}
 	
 	public GeometryType createGeometryType(TypeName name, Class binding,
 			CoordinateReferenceSystem crs, boolean isIdentifiable,
 			boolean isAbstract, Set restrictions, AttributeType superType,
 			InternationalString description) {
 
-		throw new UnsupportedOperationException();
-//		return new GeometryTypeImpl(name, binding, crs, isIdentifiable,
-//				isAbstract, restrictions, superType, description);
+		return new GeometryTypeImpl(name, binding, crs, isIdentifiable,
+				isAbstract, restrictions, superType, description);
 	}
 
 	public FeatureType createFeatureType(TypeName name, Collection schema,

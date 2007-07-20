@@ -596,7 +596,7 @@ public class SLDTransformer extends TransformerBase {
                 ftrax.setGmlPrefixing(true);
                 ftrax.setIndentation(2);
                 final CoordinateReferenceSystem crs = featureType
-                        .getDefaultGeometry().getCoordinateSystem();
+                        .getPrimaryGeometry().getCoordinateSystem();
                 String srsName = null;
                 if (crs == null) {
                     LOGGER.warning("Null CRS in feature type named [" + ftName

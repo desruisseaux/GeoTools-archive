@@ -1,5 +1,6 @@
 package org.geotools.filter.expression;
 
+import org.geotools.feature.DefaultFeatureBuilder;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
@@ -7,6 +8,7 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureFactoryImpl;
 import org.geotools.feature.simple.SimpleTypeBuilder;
 import org.geotools.feature.simple.SimpleTypeFactoryImpl;
+import org.geotools.feature.type.DefaultFeatureTypeBuilder;
 import org.geotools.filter.expression.SimpleFeaturePropertyAccessorFactory;
 
 import junit.framework.TestCase;
@@ -18,22 +20,21 @@ public class SimpleFeaturePropertyAccessorTest extends TestCase {
 	PropertyAccessor accessor = SimpleFeaturePropertyAccessorFactory.ATTRIBUTE_ACCESS;
 	
 	protected void setUp() throws Exception {
-		SimpleTypeBuilder typeBuilder = new SimpleTypeBuilder( new SimpleTypeFactoryImpl() );
-		typeBuilder.init();
+		DefaultFeatureTypeBuilder typeBuilder = new DefaultFeatureTypeBuilder();
+		
 		typeBuilder.setName( "test" );
 		typeBuilder.setNamespaceURI( "http://www.geotools.org/test" );
-		typeBuilder.addAttribute( "foo", Integer.class );
-		typeBuilder.addAttribute( "bar", Double.class );
+		typeBuilder.add( "foo", Integer.class );
+		typeBuilder.add( "bar", Double.class );
 		
-		type = typeBuilder.feature();
+		type = (FeatureType) typeBuilder.buildFeatureType();
 		
-		SimpleFeatureBuilder builder = new SimpleFeatureBuilder( new SimpleFeatureFactoryImpl() );
-		builder.init();
+		DefaultFeatureBuilder builder = new DefaultFeatureBuilder();
 		builder.setType( type );
 		builder.add( new Integer( 1 ) );
 		builder.add( new Double( 2.0 ) );
 
-		feature = builder.feature( "fid" );
+		feature = (Feature) builder.feature( "fid" );
 		accessor = SimpleFeaturePropertyAccessorFactory.ATTRIBUTE_ACCESS;
 	}
 	

@@ -62,8 +62,10 @@ import org.opengis.filter.Filter;
  * @author Chris Holmes, TOPP
  * @source $URL$
  * @version $Id$
+ *
+ * @deprecated use {@link AttributeDescriptor}.
  */
-public interface AttributeType {
+public interface AttributeType extends AttributeDescriptor {
     /** Represents any number of elements. Same '' in a reg-ex */
     public static int UNBOUNDED = Integer.MAX_VALUE;
 
@@ -92,7 +94,8 @@ public interface AttributeType {
      * @return Name.
      * @deprecated use {@link #getLocalName()}
      */
-    String getName();
+
+    //String getLocalName();
 
     /**
      * Returns the unqualified name of this attribute.
@@ -111,7 +114,8 @@ public interface AttributeType {
      * @return Type.
      * @deprecated use {@link #getBinding()}
      */
-    Class getType();
+
+    //Class getBinding();
 
     /**
      * Gets the class/type/binding for this attribute.
@@ -173,7 +177,7 @@ public interface AttributeType {
     /**
      * Whether the tested object passes the validity constraints of  this
      * AttributeType.  At a minimum it should be of the correct class
-     * specified by {@link #getType()}, non-null if isNillable is
+     * specified by {@link #getBinding()}, non-null if isNillable is
      * <tt>false</tt>, and a geometry if isGeometry is <tt>true</tt>.  If The
      * object does not validate then an IllegalArgumentException reporting the
      * error in validation should be thrown.

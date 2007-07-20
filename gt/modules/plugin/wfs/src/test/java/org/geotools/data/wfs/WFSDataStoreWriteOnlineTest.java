@@ -200,7 +200,7 @@ public class WFSDataStoreWriteOnlineTest extends TestCase {
     	assertNotNull("Attribute "+attributeToChange+" does not exist",at);
     	
     	FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory(null);
-        Filter f = filterFactory.equals(filterFactory.property(at.getName()), filterFactory
+        Filter f = filterFactory.equals(filterFactory.property(at.getLocalName()), filterFactory
                 .literal(newValue));
 
     	System.out.println("Update Read 1");

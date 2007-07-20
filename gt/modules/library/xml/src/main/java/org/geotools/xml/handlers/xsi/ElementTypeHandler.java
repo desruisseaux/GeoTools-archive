@@ -499,7 +499,7 @@ public class ElementTypeHandler extends ElementGroupingHandler {
         }
 
         /**
-         * @see org.geotools.xml.xsi.Element#getName()
+         * @see org.geotools.xml.xsi.Element#getLocalName()
          */
         public String getName() {
             return name;
@@ -520,7 +520,7 @@ public class ElementTypeHandler extends ElementGroupingHandler {
         }
 
         /**
-         * @see org.geotools.xml.xsi.Element#getType()
+         * @see org.geotools.xml.xsi.Element#getBinding()
          */
         public Type getType() {
             return type;

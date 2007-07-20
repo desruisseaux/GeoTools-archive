@@ -884,7 +884,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "AbstractGeometryType";
@@ -1027,7 +1027,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "AbstractGeometryCollectionBaseType";
@@ -1201,7 +1201,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "GeometryAssociationType";
@@ -1379,7 +1379,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "PointMemberType";
@@ -1560,7 +1560,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "LineStringMemberType";
@@ -1740,7 +1740,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "PolygonMemberType";
@@ -1923,7 +1923,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "LinearRingMemberType";
@@ -2084,7 +2084,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "PointType";
@@ -2266,7 +2266,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "LineStringType";
@@ -2462,7 +2462,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "LinearRingType";
@@ -2653,7 +2653,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "BoxType";
@@ -2880,7 +2880,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "PolygonType";
@@ -3059,7 +3059,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "GeometryCollectionType";
@@ -3221,7 +3221,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "MultiPointType";
@@ -3390,7 +3390,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "MultiLineStringType";
@@ -3559,7 +3559,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "MultiPolygonType";
@@ -3727,7 +3727,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "CoordType";
@@ -3913,7 +3913,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "CoordinatesType";
@@ -4151,7 +4151,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "AbstractFeatureType";
@@ -4275,7 +4275,7 @@ public class GMLComplexTypes {
 			AttributeType attributeType = ft.getAttributeType(k);
 			String typeName = ft.getTypeName();
 			
-			if( !attributeType.getName().equals(typeName) )
+			if( !attributeType.getLocalName().equals(typeName) )
 				return false;
 			
 			Class instanceClass = value[i].getValue().getClass();
@@ -4288,14 +4288,14 @@ public class GMLComplexTypes {
 						return true;
 				}
 			}
-			return attributeType.getType().isAssignableFrom(instanceClass);
+			return attributeType.getBinding().isAssignableFrom(instanceClass);
 		}
 
 		private int searchByName(ElementValue[] value, FeatureType ft, int i, int j) {
 			for (int k=0;k<ft.getAttributeCount() && j==-1;k++){
 			    // TODO use equals
-			    if((ft.getAttributeType(k).getName()==null && value[i].getElement().getName()==null) ||
-			            ft.getAttributeType(k).getName().equals(value[i].getElement().getName()))
+			    if((ft.getAttributeType(k).getLocalName()==null && value[i].getElement().getName()==null) ||
+			            ft.getAttributeType(k).getLocalName().equals(value[i].getElement().getName()))
 			        j = k;
 			}
 			return j;
@@ -4431,7 +4431,7 @@ public class GMLComplexTypes {
 
             if (ats != null) {
                 for (int i = 0; i < ats.length; i++) {
-                    Element e2 = e.findChildElement(ats[i].getName());
+                    Element e2 = e.findChildElement(ats[i].getLocalName());
                     e2.getType().encode(e2, f.getAttribute(i), ph, hints);
                 }
             }
@@ -4456,7 +4456,7 @@ public class GMLComplexTypes {
 
             if (ats != null) {
                 for (int i = 0; i < ats.length; i++) {
-                    Type t = XSISimpleTypes.find(ats[i].getType());
+                    Type t = XSISimpleTypes.find(ats[i].getBinding());
                     t.encode(null, f.getAttribute(i), ph, hints);
                 }
             }
@@ -4533,7 +4533,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "AbstractFeatureCollectionBaseType";
@@ -4700,7 +4700,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "AbstractFeatureCollectionType";
@@ -4900,7 +4900,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "GeometryPropertyType";
@@ -5077,7 +5077,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "FeatureAssociationType";
@@ -5247,7 +5247,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "BoundingShapeType";
@@ -5417,7 +5417,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "PointPropertyType";
@@ -5575,7 +5575,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "PolygonPropertyType";
@@ -5733,7 +5733,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "LineStringPropertyType";
@@ -5892,7 +5892,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "MultiPointPropertyType";
@@ -6060,7 +6060,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "MultiLineStringPropertyType";
@@ -6229,7 +6229,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "MultiPolygonPropertyType";
@@ -6399,7 +6399,7 @@ public class GMLComplexTypes {
         }
 
         /**
-         * @see schema.ComplexType#getName()
+         * @see schema.ComplexType#getLocalName()
          */
         public String getName() {
             return "MultiGeometryPropertyType";
@@ -6527,7 +6527,7 @@ public class GMLComplexTypes {
 
         if ((geometryAttribute == null)
                 && attrs[i] instanceof GeometryAttributeType) {
-            if (!attrs[i].getName()
+            if (!attrs[i].getLocalName()
 //                    .equalsIgnoreCase(BoxType.getInstance().getName())) {
                 .equalsIgnoreCase(AbstractFeatureType.getInstance().getChildElements()[2].getName())){
                 geometryAttribute = (GeometryAttributeType) attrs[i];
@@ -6567,7 +6567,7 @@ public class GMLComplexTypes {
 
             if ((geometryAttribute == null)
                 && attrs[i] instanceof GeometryAttributeType) {
-                if (!attrs[i].getName()
+                if (!attrs[i].getLocalName()
                     .equalsIgnoreCase(AbstractFeatureType.getInstance().getChildElements()[2].getName())){
                     geometryAttribute = (GeometryAttributeType) attrs[i];
                 }
@@ -6718,7 +6718,7 @@ public class GMLComplexTypes {
     	int i=0;
     	for (Iterator iter = l.iterator(); iter.hasNext(); i++) {
 			AttributeType type = (AttributeType) iter.next();
-			choices[i]=type.getType();
+			choices[i]=type.getBinding();
 		}
     	return choices;
 	}
@@ -6737,10 +6737,10 @@ public class GMLComplexTypes {
             at = (AttributeType)i.next();
             if(at!= null){
                 if(common == null){
-                    common = at.getType();
+                    common = at.getBinding();
                 }else{
                     // merge two types
-                    Class t = at.getType();
+                    Class t = at.getBinding();
                     if(t!=null){
                         if(!common.isAssignableFrom(t)){
                             // either t is super class .. or they share one

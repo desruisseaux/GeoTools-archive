@@ -155,7 +155,7 @@ public class H2SQLBuilder implements FilterVisitor, ExpressionVisitor {
             AttributeType type = featureType.getAttributeType(i);
 
             //the column name
-            name(type.getName());
+            name(type.getLocalName());
             sql.append(" ");
 
             //sql type name
@@ -223,7 +223,7 @@ public class H2SQLBuilder implements FilterVisitor, ExpressionVisitor {
             AttributeType type = featureType.getAttributeType(i);
 
             //the column name
-            name(type.getName());
+            name(type.getLocalName());
             sql.append(" ");
 
             //sql type name
@@ -375,7 +375,7 @@ public class H2SQLBuilder implements FilterVisitor, ExpressionVisitor {
             names = new String[featureType.getAttributeCount()];
 
             for (int i = 0; i < names.length; i++) {
-                names[i] = featureType.getAttributeType(i).getName();
+                names[i] = featureType.getAttributeType(i).getLocalName();
             }
         }
 
@@ -404,7 +404,7 @@ public class H2SQLBuilder implements FilterVisitor, ExpressionVisitor {
             Literal literal = filterFactory.literal(values[i]);
             AttributeType type = types[i];
 
-            literal.accept(this, type.getType());
+            literal.accept(this, type.getBinding());
 
             if (i < (values.length - 1)) {
                 sql.append(", ");
@@ -452,7 +452,7 @@ public class H2SQLBuilder implements FilterVisitor, ExpressionVisitor {
 
         if (attributeType != null) {
             //check for geometry, because it is encided differnently
-            if (Geometry.class.isAssignableFrom(attributeType.getType())) {
+            if (Geometry.class.isAssignableFrom(attributeType.getBinding())) {
                 propertyName.accept(this, null);
             } else {
                 //normal property , nothign special
@@ -922,8 +922,8 @@ public class H2SQLBuilder implements FilterVisitor, ExpressionVisitor {
                 crs = (CoordinateReferenceSystem) data;
             } else {
                 //check the feature type
-                if (featureType.getDefaultGeometry() != null) {
-                    crs = featureType.getDefaultGeometry().getCoordinateSystem();
+                if (featureType.getPrimaryGeometry() != null) {
+                    crs = featureType.getPrimaryGeometry().getCoordinateSystem();
                 }
             }
 
@@ -987,10 +987,10 @@ public class H2SQLBuilder implements FilterVisitor, ExpressionVisitor {
 
             if (attributeType != null) {
                 //encode the name of the attribute, not the property name itself
-                name(attributeType.getName());
+                name(attributeType.getLocalName());
 
                 //return the type as the return 
-                return attributeType.getType();
+                return attributeType.getBinding();
             }
 
             //2. not in type, could it be a primary key?

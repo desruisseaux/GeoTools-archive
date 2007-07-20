@@ -64,7 +64,7 @@ public class FeatureTypeAttributePointer extends NodePointer {
 	 * feature attribute.
 	 */
 	public QName getName() {
-		return new QName( null, featureType.getAttributeType( index ).getName() );
+		return new QName( null, featureType.getAttributeType( index ).getLocalName() );
 	}
 
 	public Object getBaseValue() {

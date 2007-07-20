@@ -28,10 +28,10 @@ public class JDBCDataStoreTest extends JDBCTestSupport {
 		assertNotNull( ft1.getAttributeType("doubleProperty") );
 		assertNotNull( ft1.getAttributeType("stringProperty") );
 		
-		assertEquals( Geometry.class, ft1.getAttributeType("geometry").getType() );
-		assertEquals( Integer.class, ft1.getAttributeType("intProperty").getType()  );
-		assertEquals( Double.class, ft1.getAttributeType("doubleProperty").getType()  );
-		assertEquals( String.class, ft1.getAttributeType("stringProperty").getType()  );
+		assertEquals( Geometry.class, ft1.getAttributeType("geometry").getBinding() );
+		assertEquals( Integer.class, ft1.getAttributeType("intProperty").getBinding()  );
+		assertEquals( Double.class, ft1.getAttributeType("doubleProperty").getBinding()  );
+		assertEquals( String.class, ft1.getAttributeType("stringProperty").getBinding()  );
 		
 	}
 	
@@ -44,7 +44,7 @@ public class JDBCDataStoreTest extends JDBCTestSupport {
 		builder.attribute( "intProperty", Integer.class );
 		builder.attribute( "dateProperty", Date.class );
 		
-		FeatureType featureType = builder.feature(); 
+		FeatureType featureType = builder.buildFeatureType(); 
 		dataStore.createSchema( featureType );
 		
 		FeatureType ft2 = dataStore.getSchema( "ft2" );

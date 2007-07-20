@@ -16,10 +16,18 @@
 package org.geotools.feature;
 
 import java.rmi.server.UID;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.geotools.feature.simple.SimpleFeatureImpl;
+import org.geotools.feature.type.DefaultFeatureTypeBuilder;
+import org.geotools.feature.type.GeometricAttributeType;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.util.Cloneable;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -54,18 +62,19 @@ import com.vividsolutions.jts.geom.Geometry;
  *       for validity if someone else tries to change them).
  * @source $URL$
  */
-public class DefaultFeature implements SimpleFeature, Cloneable {
-    /** The unique id of this feature */
-    protected String featureId;
-
-    /** Flat feature type schema for this feature. */
-    private final DefaultFeatureType schema;
-
-    /** Attributes for the feature. */
-    private Object[] attributes;
-
-    /** The bounds of this feature. */
-    private Envelope bounds;
+public class DefaultFeature extends SimpleFeatureImpl 
+	implements SimpleFeature, Cloneable {
+//    /** The unique id of this feature */
+//    protected String featureId;
+//
+//    /** Flat feature type schema for this feature. */
+//    private final DefaultFeatureType schema;
+//
+//    /** Attributes for the feature. */
+//    private Object[] attributes;
+//
+//    /** The bounds of this feature. */
+//    private Envelope bounds;
 
     /** The collection that this Feature is a member of */
     private FeatureCollection parent;
@@ -85,19 +94,42 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
      * @throws NullPointerException if schema is null.
      */
     protected DefaultFeature(DefaultFeatureType schema, Object[] attributes,
-        String featureID)
-        throws IllegalAttributeException, NullPointerException {
+        String featureID) throws IllegalAttributeException, NullPointerException {
+    	//super( Arrays.asList(attributes), schema, featureID );
+    	super(wrapValues(attributes,schema), schema, featureID );
+    
         if (schema == null) {
             throw new NullPointerException("schema");
         }
 
-        this.schema = schema;
-        this.featureId = (featureID == null) ? defaultID() : featureID;
-        this.attributes = new Object[schema.getAttributeCount()];
-
-        setAttributes(attributes);
+//        this.schema = schema;
+//        this.featureId = (featureID == null) ? defaultID() : featureID;
+//        this.attributes = new Object[schema.getAttributeCount()];
+//
+//        setAttributes(attributes);
     }
 
+    
+/**
+     * wraps an array of raw values in attributes.
+     *
+     */
+    static List wrapValues( Object[] values, DefaultFeatureType schema ) {
+    	ArrayList atts = new ArrayList(values.length);
+    	for ( int i = 0; i < values.length; i++ ) {
+    		atts.add(
+				new AttributeImpl( values[i], schema.getAttribute(i),null) {
+					public void set(Object newValue) throws IllegalArgumentException, IllegalStateException {
+						 newValue = parse(newValue);
+						 content = newValue;
+					}
+				}
+			);
+    	}
+    	
+    	return atts;
+    }
+    
     /**
      * Creates a new instance of flat feature, which must take a flat feature
      * type schema and all attributes as arguments.
@@ -116,6 +148,9 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
         this(schema, attributes, null);
     }
 
+    public DefaultFeature(List/*<Attribute>*/ attributes,DefaultFeatureType schema, String id ) {
+    	super( attributes, schema, id );
+    }
     /**
      * Creates an ID from a hashcode.
      *
@@ -142,7 +177,7 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
      *         schema.
      */
     public FeatureType getFeatureType() {
-        return schema;
+        return (FeatureType) getType();
     }
 
     /**
@@ -150,9 +185,9 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
      *
      * @return The unique id.
      */
-    public String getID() {
-        return featureId;
-    }
+//    public String getID() {
+//        return featureId;
+//    }
 
     /**
      * Copy all the attributes of this Feature into the given array. If the
@@ -168,15 +203,17 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
     public Object[] getAttributes(Object[] array) {
         Object[] retArray;
 
+        List values = getValues();
         if (array == null) {
-            retArray = new Object[attributes.length];
+            //retArray = new Object[attributes.length];
+        	retArray = new Object[values.size()];
         } else {
             retArray = array;
         }
 
-        System.arraycopy(attributes, 0, retArray, 0, attributes.length);
-
-        return retArray;
+        //System.arraycopy(attributes, 0, retArray, 0, attributes.length);
+        //return retArray;
+        return values.toArray( retArray );
     }
 
     /**
@@ -187,13 +224,15 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
      * @return Attribute.
      */
     public Object getAttribute(String xPath) {
-        int idx = schema.find(xPath);
-
-        if (idx == -1) {
-            return null;
-        }
-
-        return attributes[idx];
+    	return getValue( xPath );
+    	
+//        int idx = schema.find(xPath);
+//
+//        if (idx == -1) {
+//            return null;
+//        }
+//
+//        return attributes[idx];
     }
 
     /**
@@ -204,7 +243,8 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
      * @return The attribute at the given index.
      */
     public Object getAttribute(int index) {
-        return attributes[index];
+        //return attributes[index];
+        return getValue( index );
     }
 
     /**
@@ -218,16 +258,23 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
      */
     public void setAttribute(int position, Object val)
         throws IllegalAttributeException {
-        AttributeType type = schema.getAttributeType(position);
-
-        try {
-            if ((val == null) && !type.isNillable()) val = type.createDefaultValue(); 
-            Object parsed = type.parse(val);
-            type.validate(parsed);
-            setAttributeValue(position, parsed);
-        } catch (IllegalArgumentException iae) {
-            throw new IllegalAttributeException(type, val, iae);
-        }
+    	 try {
+    		 setValue( position, val );
+    	 }
+    	 catch( IllegalArgumentException e ) {
+    		 throw (IllegalAttributeException) new IllegalAttributeException("").initCause(e);
+    	 }
+    	
+//        AttributeType type = schema.getAttributeType(position);
+//
+//        try {
+//            if ((val == null) && !type.isNillable()) val = type.createDefaultValue(); 
+//            Object parsed = type.parse(val);
+//            type.validate(parsed);
+//            setAttributeValue(position, parsed);
+//        } catch (IllegalArgumentException iae) {
+//            throw new IllegalAttributeException(type, val, iae);
+//        }
     }
 
     /**
@@ -239,7 +286,8 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
      * @param val the new value to give the attribute at position.
      */
     protected void setAttributeValue(int position, Object val) {
-        attributes[position] = val;
+        //attributes[position] = val;
+        setValue( position, val );
     }
 
     /**
@@ -253,22 +301,31 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
      */
     public void setAttributes(Object[] attributes)
         throws IllegalAttributeException {
-        // the passed in attributes were null, lets make that a null array
-        Object[] newAtts = attributes;
-
-        if (attributes == null) {
-            newAtts = new Object[this.attributes.length];
-        }
-
-        if (newAtts.length != this.attributes.length) {
-            throw new IllegalAttributeException(
-                "Wrong number of attributes expected "
-                + schema.getAttributeCount() + " got " + newAtts.length);
-        }
-
-        for (int i = 0, ii = newAtts.length; i < ii; i++) {
-            setAttribute(i, newAtts[i]);
-        }
+    	
+    	try {
+    		setValues( attributes );
+    	}
+    	catch( IllegalArgumentException e ) {
+    		throw (IllegalAttributeException) new IllegalAttributeException("illegal attribute").initCause(e);
+    	}
+    	
+//    	
+//        // the passed in attributes were null, lets make that a null array
+//        Object[] newAtts = attributes;
+//
+//        if (attributes == null) {
+//            newAtts = new Object[this.attributes.length];
+//        }
+//
+//        if (newAtts.length != this.attributes.length) {
+//            throw new IllegalAttributeException(
+//                "Wrong number of attributes expected "
+//                + schema.getAttributeCount() + " got " + newAtts.length);
+//        }
+//
+//        for (int i = 0, ii = newAtts.length; i < ii; i++) {
+//            setAttribute(i, newAtts[i]);
+//        }
     }
 
     /**
@@ -284,13 +341,21 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
      */
     public void setAttribute(String xPath, Object attribute)
         throws IllegalAttributeException {
-        int idx = schema.find(xPath);
-
-        if (idx < 0) {
-            throw new IllegalAttributeException("No attribute named " + xPath);
-        }
-
-        setAttribute(idx, attribute);
+    	try {
+    		setValue( xPath, attribute );	
+    	}
+    	catch( IllegalArgumentException e ) {
+    		throw (IllegalAttributeException) new IllegalAttributeException("illegal attribute").initCause(e);
+    	}
+    	
+    	
+//        int idx = schema.find(xPath);
+//
+//        if (idx < 0) {
+//            throw new IllegalAttributeException("No attribute named " + xPath);
+//        }
+//
+//        setAttribute(idx, attribute);
     }
 
     /**
@@ -299,20 +364,16 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
      * @return Geometry for this feature.
      * @deprecated use {@link #getPrimaryGeometry()}.
      */
-    public final Geometry getDefaultGeometry() {
-    	return getPrimaryGeometry();
-    }
-    /**
-     * {@inheritDoc}
-     */
     public Geometry getPrimaryGeometry() {
-    	 int idx = schema.defaultGeomIdx;
-
-         if (idx == -1) {
-             return null;
-         }
-
-         return (Geometry) attributes[idx];
+    	return (Geometry) getDefaultGeometryValue();
+    	
+//    	 int idx = schema.defaultGeomIdx;
+//
+//         if (idx == -1) {
+//             return null;
+//         }
+//
+//         return (Geometry) attributes[idx];
     }
 
     /**
@@ -324,23 +385,28 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
      *         geometry.
      * @deprecated use {@link #setPrimaryGeometry(Geometry)}.
      */
-    public final void setDefaultGeometry(Geometry geometry)
-        throws IllegalAttributeException {
-       setPrimaryGeometry(geometry);
-    }
-    /**
-     * {@inheritDoc}
-     */
     public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
-    	 int idx = schema.defaultGeomIdx;
-
-         if (idx < 0) {
-             throw new IllegalAttributeException(
-                 "Feature does not have geometry");
-         }
-
-         attributes[idx] = geometry;
-         bounds = null;
+    	
+    	if ( geometry == null ) {
+    		throw new IllegalAttributeException("geometry cannot be set to null");
+    	}
+    	
+    	try {
+    		setDefaultGeometryValue(geometry);	
+    	}
+    	catch( IllegalArgumentException e ) {
+			 throw (IllegalAttributeException) new IllegalAttributeException("").initCause(e);
+		}
+//    	
+//    	 int idx = schema.defaultGeomIdx;
+//
+//         if (idx < 0) {
+//             throw new IllegalAttributeException(
+//                 "Feature does not have geometry");
+//         }
+//
+//         attributes[idx] = geometry;
+//         bounds = null;
     }
 
     /**
@@ -350,9 +416,9 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
      *
      * @return The total number of attributes this Feature contains.
      */
-    public int getNumberOfAttributes() {
-        return attributes.length;
-    }
+//    public int getNumberOfAttributes() {
+//        return attributes.length;
+//    }
 
     /**
      * Get the total bounds of this feature which is calculated by doing a
@@ -365,36 +431,37 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
      *       interface? (IanS - by OGC standards, all Feature must have geom)
      */
     public ReferencedEnvelope getBounds() {
-        if (bounds == null) {
-            bounds = new Envelope();
-
-            for (int i = 0, n = schema.getAttributeCount(); i < n; i++) {
-                if (schema.getAttributeType(i) instanceof GeometryAttributeType ) {
-                    Geometry g = (Geometry) attributes[i];
-
-                    // IanS - check for null geometry!
-                    if (g == null) {
-                        continue;
-                    }
-
-                    Envelope e = g.getEnvelopeInternal();
-
-                    // IanS
-                    // as of JTS 1.3, expandToInclude does not check to see if
-                    // Envelope is "null", and simply adds the flagged values.
-                    // This ensures that this behavior does not occur.
-                    if (!e.isNull()) {
-                        bounds.expandToInclude(e);
-                    }
-                }
-            }
-        }
-
-        // lets be defensive
-        if (schema.getPrimaryGeometry() != null) {
-        	return new ReferencedEnvelope(bounds,schema.getPrimaryGeometry().getCoordinateSystem());
-        }
-        return new ReferencedEnvelope(bounds,null);
+    	return (ReferencedEnvelope) super.getBounds();
+//        if (bounds == null) {
+//            bounds = new Envelope();
+//
+//            for (int i = 0, n = schema.getAttributeCount(); i < n; i++) {
+//                if (schema.getAttributeType(i) instanceof GeometryAttributeType ) {
+//                    Geometry g = (Geometry) attributes[i];
+//
+//                    // IanS - check for null geometry!
+//                    if (g == null) {
+//                        continue;
+//                    }
+//
+//                    Envelope e = g.getEnvelopeInternal();
+//
+//                    // IanS
+//                    // as of JTS 1.3, expandToInclude does not check to see if
+//                    // Envelope is "null", and simply adds the flagged values.
+//                    // This ensures that this behavior does not occur.
+//                    if (!e.isNull()) {
+//                        bounds.expandToInclude(e);
+//                    }
+//                }
+//            }
+//        }
+//
+//        // lets be defensive
+//        if (schema.getPrimaryGeometry() != null) {
+//        	return new ReferencedEnvelope(bounds,schema.getPrimaryGeometry().getCoordinateSystem());
+//        }
+//        return new ReferencedEnvelope(bounds,null);
     }
 
     /**
@@ -407,14 +474,16 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
     public Object clone() {
         try {
             DefaultFeature clone = (DefaultFeature) super.clone();
-
-            for (int i = 0; i < attributes.length; i++) {
-                try {
-                    clone.setAttribute(i, attributes[i]);
-                } catch (IllegalAttributeException e1) {
-                    throw new RuntimeException("The impossible has happened", e1);
-                }
-            }
+            List values = getValues();
+            clone.setValues(values);
+            
+//            for (int i = 0; i < values.size(); i++) {
+//                try {
+//                    clone.setAttribute(i
+//                } catch (IllegalAttributeException e1) {
+//                    throw new RuntimeException("The impossible has happened", e1);
+//                }
+//            }
 
             return clone;
         } catch (CloneNotSupportedException e) {
@@ -431,9 +500,10 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
         String retString = "Feature[ id=" + getID() + " , ";
         FeatureType featType = getFeatureType();
 
-        for (int i = 0, n = attributes.length; i < n; i++) {
-            retString += (featType.getAttributeType(i).getName() + "=");
-            retString += attributes[i];
+        List attributes = getValues();
+        for (int i = 0, n = attributes.size(); i < n; i++) {
+            retString += (featType.getAttributeType(i).getLocalName() + "=");
+            retString += attributes.get(i);
 
             if ((i + 1) < n) {
                 retString += " , ";
@@ -448,9 +518,9 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
      *
      * @return A unique int
      */
-    public int hashCode() {
-        return featureId.hashCode() * schema.hashCode();
-    }
+//    public int hashCode() {
+//    	return featureId.hashCode() * schema.hashCode();
+//    }
 
     /**
      * override of equals.  Returns if the passed in object is equal to this.
@@ -473,53 +543,54 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
             return false;
         }
 
-        Feature feat = (Feature) obj;
-
-        if (!feat.getFeatureType().equals(schema)) {
-            return false;
-        }
-
-        // this check shouldn't exist, by contract, 
-        //all features should have an ID.
-        if (featureId == null) {
-            if (feat.getID() != null) {
-                return false;
-            }
-        }
-
-        if (!featureId.equals(feat.getID())) {
-            return false;
-        }
-
-        for (int i = 0, ii = attributes.length; i < ii; i++) {
-            Object otherAtt = feat.getAttribute(i);
-
-            if (attributes[i] == null) {
-                if (otherAtt != null) {
-                    return false;
-                }
-            } else {
-                if (!attributes[i].equals(otherAtt)) {
-                    if (attributes[i] instanceof Geometry
-                            && otherAtt instanceof Geometry) {
-                        // we need to special case Geometry
-                        // as JTS is broken
-                        // Geometry.equals( Object ) and Geometry.equals( Geometry )
-                        // are different 
-                        // (We should fold this knowledge into AttributeType...)
-                        // 
-                        if (!((Geometry) attributes[i]).equals(
-                                    (Geometry) otherAtt)) {
-                            return false;
-                        }
-                    } else {
-                        return false;
-                    }
-                }
-            }
-        }
-
-        return true;
+        return super.equals( obj );
+//        Feature feat = (Feature) obj;
+//        
+//        if (!feat.getFeatureType().equals(schema)) {
+//            return false;
+//        }
+//
+//        // this check shouldn't exist, by contract, 
+//        //all features should have an ID.
+//        if (featureId == null) {
+//            if (feat.getID() != null) {
+//                return false;
+//            }
+//        }
+//
+//        if (!featureId.equals(feat.getID())) {
+//            return false;
+//        }
+//
+//        for (int i = 0, ii = attributes.length; i < ii; i++) {
+//            Object otherAtt = feat.getAttribute(i);
+//
+//            if (attributes[i] == null) {
+//                if (otherAtt != null) {
+//                    return false;
+//                }
+//            } else {
+//                if (!attributes[i].equals(otherAtt)) {
+//                    if (attributes[i] instanceof Geometry
+//                            && otherAtt instanceof Geometry) {
+//                        // we need to special case Geometry
+//                        // as JTS is broken
+//                        // Geometry.equals( Object ) and Geometry.equals( Geometry )
+//                        // are different 
+//                        // (We should fold this knowledge into AttributeType...)
+//                        // 
+//                        if (!((Geometry) attributes[i]).equals(
+//                                    (Geometry) otherAtt)) {
+//                            return false;
+//                        }
+//                    } else {
+//                        return false;
+//                    }
+//                }
+//            }
+//        }
+//
+//        return true;
     }
 
     /**
@@ -577,7 +648,7 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
          */
         private ComplexWrapper(DefaultFeatureType fType, Object[] atts,
             String fid) throws IllegalAttributeException {
-            super(fType, wrapInList(atts, fType.getAttributeCount()), fid);
+            super(wrapValuesComplex(atts,makeComplex(fType)), makeComplex(fType), fid );
         }
 
         public ComplexWrapper(DefaultFeatureType fType, Object[] atts)
@@ -681,6 +752,26 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
             setAttribute(idx, attribute);
         }
 
+        static List wrapValuesComplex( Object[] values, DefaultFeatureType schema ) {
+        	ArrayList atts = new ArrayList(values.length);
+        	for ( int i = 0; i < values.length; i++ ) {
+        		atts.add(
+    				new AttributeImpl( wrapInList(values[i]), schema.getAttribute(i),null) {
+    					public void set(Object newValue) throws IllegalArgumentException, IllegalStateException {
+    						 newValue = parse(newValue);
+    						 content = newValue;
+    					}
+    					
+    					protected Object parse(Object value) throws IllegalArgumentException {
+    						return value;
+    					}
+    				}
+    			);
+        	}
+        	
+        	return atts;
+        }
+        
         protected static List wrapInList(Object attribute) {
             return java.util.Collections.singletonList(attribute);
         }
@@ -700,6 +791,31 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
             }
 
             return retArray;
+        }
+        
+        protected static DefaultFeatureType makeComplex( DefaultFeatureType original ) {
+        	
+        	DefaultFeatureTypeBuilder builder = new DefaultFeatureTypeBuilder() {
+        		protected AttributeDescriptor createAttributeDescriptor(String name, final Class binding) {
+        			return new DefaultAttributeType( name, List.class, true, 1,1, null, null ){
+        				public void validate(Object attribute) throws IllegalArgumentException {
+        					if ( !binding.isAssignableFrom(attribute.getClass())) {
+        						throw new IllegalArgumentException();
+        					}
+        				}
+        				
+        			};
+        		};
+        	};
+        	builder.setName( original.getName().getLocalPart() );
+        	builder.setNamespaceURI(original.getName().getNamespaceURI());
+        	
+        	for ( int i = 0; i < original.getAttributeCount(); i++ ) {
+        		AttributeType attributeType = original.getAttributeType(i);
+        		builder.add( attributeType.getLocalName(), attributeType.getBinding() );
+        	}
+        	
+        	return (DefaultFeatureType) builder.buildFeatureType();
         }
     }
 }

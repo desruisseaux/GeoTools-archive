@@ -103,7 +103,7 @@ public class GTComlexFeatureTypeAdapter implements FeatureType {
     }
 
     public int find(AttributeType type) {
-        return find(type.getName());
+        return find(type.getLocalName());
     }
 
     public int find(String attName) {
@@ -143,10 +143,6 @@ public class GTComlexFeatureTypeAdapter implements FeatureType {
         return types;
     }
 
-    public final GeometryAttributeType getDefaultGeometry() {
-        return getPrimaryGeometry();
-    }
-    
     public GeometryAttributeType getPrimaryGeometry() {
     	return defaultGeom;
     }

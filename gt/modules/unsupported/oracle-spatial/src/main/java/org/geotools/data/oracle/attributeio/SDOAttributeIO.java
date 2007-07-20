@@ -64,7 +64,7 @@ public class SDOAttributeIO implements AttributeIO {
 		try {
 			String tableName = queryData.getFeatureTypeInfo()
 					.getFeatureTypeName();
-			String columnName = attributeType.getName();
+			String columnName = attributeType.getLocalName();
 			LOGGER.fine("About to create Geometry convertor for " + tableName
 					+ "." + columnName);
 

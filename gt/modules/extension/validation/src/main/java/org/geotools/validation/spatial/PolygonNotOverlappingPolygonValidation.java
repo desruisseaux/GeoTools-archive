@@ -110,12 +110,12 @@ public class PolygonNotOverlappingPolygonValidation
         for (int i = 0; i < poly1.length; i++) {
         	Feature tmp = (Feature) poly1[i];
         	LOGGER.finest("Polgon overlap test for:"+tmp.getID() );
-            Geometry gt = tmp.getDefaultGeometry();
+            Geometry gt = tmp.getPrimaryGeometry();
 
             for (int j = 0; j < poly2.length; j++) {
                 Feature tmp2 = (Feature) poly2[j];
                 LOGGER.finest("Polgon overlap test against:"+tmp2.getID() );                
-                Geometry gt2 = tmp2.getDefaultGeometry();
+                Geometry gt2 = tmp2.getPrimaryGeometry();
 
                 if (gt2.overlaps(gt) != expected) {
                 	results.error( tmp, "Polygon "+typeRef1+" overlapped Polygon "+typeRef2+"("+tmp2.getID()+") was not "+expected );

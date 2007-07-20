@@ -21,9 +21,11 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.URI;
 import java.util.AbstractList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import org.geotools.data.vpf.VPFColumn;
@@ -47,6 +49,12 @@ import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.LengthFunction;
 import org.geotools.filter.LiteralExpression;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryType;
+import org.opengis.feature.type.Name;
+import org.opengis.feature.type.TypeName;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.util.InternationalString;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateList;
@@ -265,14 +273,6 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
     }
 
     /*
-     *  (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#getDefaultGeometry()
-     */
-    public GeometryAttributeType getDefaultGeometry() {
-        return featureType.getDefaultGeometry();
-    }
-
-    /*
      * (non-Javadoc)
      * @see org.geotools.feature.FeatureType#getPrimaryGeometry()
      */
@@ -286,9 +286,9 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
      *
      * @return the value of description
      */
-    public String getDescription() {
-        return description;
-    }
+//    public String getDescription() {
+//        return description;
+//    }
 
     /**
      * Returns the directory name for this file by chopping off the file name
@@ -409,7 +409,7 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
 
         try {
             // This speeds things up mightily
-            String firstColumnName = ((VPFColumn) columns.get(0)).getName();
+            String firstColumnName = ((VPFColumn) columns.get(0)).getLocalName();
 
             if (idName.equals(firstColumnName)) {
                 setPosition(id);
@@ -1089,5 +1089,93 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
 	 */
 	public int find(String attName) {
         return featureType.find(attName);
+	}
+
+	public AttributeDescriptor getAttribute(String name) {
+		return featureType.getAttribute(name);
+	}
+
+	public AttributeDescriptor getAttribute(int index) {
+		return featureType.getAttribute(index);
+	}
+
+	public GeometryType getDefaultGeometryType() {
+		return featureType.getDefaultGeometryType();
+	}
+
+	public org.opengis.feature.type.AttributeType getType(String name) {
+		return featureType.getType( name );
+	}
+
+	public org.opengis.feature.type.AttributeType getType(int index) {
+		return featureType.getType( index );
+	}
+
+	public List getTypes() {
+		return featureType.getTypes();
+	}
+
+	public CoordinateReferenceSystem getCRS() {
+		return featureType.getCRS();
+	}
+
+	public AttributeDescriptor getDefaultGeometry() {
+		return featureType.getDefaultGeometry();
+	}
+
+	public Collection associations() {
+		return featureType.associations(); 
+	}
+
+	public Collection attributes() {
+		return featureType.attributes();
+	}
+
+	public Class getBinding() {
+		return featureType.getBinding();
+	}
+
+	public Collection getProperties() {
+		return featureType.getProperties();
+	}
+
+	public boolean isInline() {
+		return featureType.isInline();
+	}
+
+	public Collection getOperations() {
+		return featureType.getOperations();
+	}
+
+	public Set getRestrictions() {
+		return featureType.getRestrictions();
+	}
+
+	public org.opengis.feature.type.AttributeType getSuper() {
+		return featureType.getSuper();
+	}
+
+	public boolean isIdentified() {
+		return featureType.isIdentified();
+	}
+
+	public InternationalString getDescription() {
+		return featureType.getDescription();
+	}
+
+	public TypeName getName() {
+		return featureType.getName();
+	}
+
+	public Object getUserData(Object key) {
+		return featureType.getUserData(key);
+	}
+
+	public void putUserData(Object key, Object data) {
+		featureType.putUserData(key, data);
+	}
+	
+	public int indexOf(String name) {
+		return featureType.indexOf(name);
 	}
 }

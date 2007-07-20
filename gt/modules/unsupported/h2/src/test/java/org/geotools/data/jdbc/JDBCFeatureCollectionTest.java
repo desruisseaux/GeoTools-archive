@@ -52,8 +52,8 @@ public class JDBCFeatureCollectionTest extends JDBCTestSupport {
 			assertTrue( new GeometryFactory().createPoint( new Coordinate( i, i ) ).equals( (Geometry) feature.getAttribute( "geometry") ) );
 			assertEquals( new Integer( i ), feature.getAttribute("intProperty") );
 			
-			assertNotNull( feature.getDefaultGeometry() );
-			assertEquals( feature.getAttribute("geometry"),feature.getDefaultGeometry() );
+			assertNotNull( feature.getPrimaryGeometry() );
+			assertEquals( feature.getAttribute("geometry"),feature.getPrimaryGeometry() );
 		}
 		
 		assertFalse( features.hasNext() );

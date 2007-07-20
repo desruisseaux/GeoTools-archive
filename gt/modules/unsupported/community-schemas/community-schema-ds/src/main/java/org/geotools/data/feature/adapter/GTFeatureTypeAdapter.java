@@ -80,7 +80,7 @@ public class GTFeatureTypeAdapter implements FeatureType {
     }
 
     public int find(AttributeType type) {
-        return find(type.getName());
+        return find(type.getLocalName());
     }
 
     public int find(String attName) {
@@ -124,10 +124,6 @@ public class GTFeatureTypeAdapter implements FeatureType {
 
     public AttributeType[] getAttributeTypes() {
         throw new UnsupportedOperationException("not implemented yet");
-    }
-
-    public final GeometryAttributeType getDefaultGeometry() {
-        return getPrimaryGeometry();
     }
 
     public GeometryAttributeType getPrimaryGeometry() {

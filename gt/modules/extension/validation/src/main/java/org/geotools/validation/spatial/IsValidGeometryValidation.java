@@ -114,10 +114,10 @@ public class IsValidGeometryValidation extends DefaultFeatureValidation {
      */
     public boolean validate(Feature feature, FeatureType type,
         ValidationResults results) {
-        Geometry geom = feature.getDefaultGeometry();
+        Geometry geom = feature.getPrimaryGeometry();
 
         if (geom == null) {
-            if (type.getDefaultGeometry().isNillable()) {
+            if (type.getPrimaryGeometry().isNillable()) {
                 LOGGER.log(Level.FINEST,
                     getName() + "(" + feature.getID() + ") passed");
 

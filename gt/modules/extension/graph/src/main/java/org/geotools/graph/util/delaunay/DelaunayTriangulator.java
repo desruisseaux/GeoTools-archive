@@ -75,7 +75,7 @@ public class DelaunayTriangulator {
         int index = 0;
         while (iter.hasNext()){
             Feature next = iter.next();
-            Geometry geom = next.getDefaultGeometry();
+            Geometry geom = next.getPrimaryGeometry();
             Point centroid;
             if (geom instanceof Point){
                 centroid = (Point) geom;

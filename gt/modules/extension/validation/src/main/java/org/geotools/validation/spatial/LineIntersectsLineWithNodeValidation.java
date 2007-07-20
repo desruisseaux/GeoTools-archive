@@ -92,13 +92,13 @@ public class LineIntersectsLineWithNodeValidation
         while(fLine.hasNext()){
         	Feature line = fLine.next();
         	FeatureIterator fRLine = fcRLine.features();
-        	Geometry lineGeom = line.getDefaultGeometry();
+        	Geometry lineGeom = line.getPrimaryGeometry();
         	if(envelope.contains(lineGeom.getEnvelopeInternal())){
         		// 	check for valid comparison
         		if(LineString.class.isAssignableFrom(lineGeom.getClass())){
         			while(fRLine.hasNext()){
         				Feature rLine = fRLine.next();
-        				Geometry rLineGeom = rLine.getDefaultGeometry(); 
+        				Geometry rLineGeom = rLine.getPrimaryGeometry(); 
         				if(envelope.contains(rLineGeom.getEnvelopeInternal())){
         					if(LineString.class.isAssignableFrom(rLineGeom.getClass())){
     							if(lineGeom.intersects(rLineGeom)){

@@ -18,6 +18,7 @@ package org.geotools.feature;
 // J2SE interfaces
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -31,11 +32,13 @@ import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
+import org.geotools.feature.collection.BaseFeatureCollection;
 import org.geotools.feature.collection.FeatureState;
 import org.geotools.feature.collection.FeatureIteratorImpl;
 import org.geotools.feature.collection.SubFeatureCollection;
 import org.geotools.feature.type.FeatureAttributeType;
 import org.geotools.feature.visitor.FeatureVisitor;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 import org.geotools.filter.SortBy2;
@@ -58,8 +61,9 @@ import com.vividsolutions.jts.geom.Geometry;
  * @source $URL$
  * @version $Id$
  */
-public class DefaultFeatureCollection implements FeatureCollection {
+public class DefaultFeatureCollection extends BaseFeatureCollection implements FeatureCollection {
     
+	
     /**
      * Contents of collection, referenced by FeatureID.
      * <p>
@@ -70,12 +74,12 @@ public class DefaultFeatureCollection implements FeatureCollection {
     private SortedMap contents = new TreeMap();
     
     /** Internal listener storage list */
-    private List listeners = new ArrayList(2);
+    //private List listeners = new ArrayList(2);
 
     /** Internal envelope of bounds. */
     private Envelope bounds = null;
         
-    private String id; /// fid
+    //private String id; /// fid
 
     /**
      * This constructor should not be used by client code.
@@ -99,24 +103,26 @@ public class DefaultFeatureCollection implements FeatureCollection {
      * @param featureType optional, may be null
      */
     public DefaultFeatureCollection(String id, FeatureType featureType) {
-    	this.id = id;
-    	if(featureType == null){
-    		List ats = new LinkedList();
-    		ats.add(new FeatureAttributeType("_Feature",new DefaultFeatureType("AbstractFeatureType",FeatureTypes.DEFAULT_NAMESPACE,new LinkedList(),new LinkedList(),null),false));
-    		featureType = new DefaultFeatureType("AbstractFeatureCollectionType",FeatureTypes.DEFAULT_NAMESPACE,ats,new LinkedList(),null);
-    	}
-    	this.featureType = featureType;
+    	super(id,featureType == null ? new DefaultFeatureType("AbstractFeatureType",FeatureTypes.DEFAULT_NAMESPACE,new LinkedList(),new LinkedList(),null) : featureType );
+    	
+//    	this.id = id;
+//    	if(featureType == null){
+//    		List ats = new LinkedList();
+//    		ats.add(new FeatureAttributeType("_Feature",new DefaultFeatureType("AbstractFeatureType",FeatureTypes.DEFAULT_NAMESPACE,new LinkedList(),new LinkedList(),null),false));
+//    		featureType = new DefaultFeatureType("AbstractFeatureCollectionType",FeatureTypes.DEFAULT_NAMESPACE,ats,new LinkedList(),null);
+//    	}
+//    	this.featureType = featureType;
         this.childType = null; // no children yet
     }
-    private FeatureType featureType;
+//    private FeatureType featureType;
     private FeatureType childType;
 
-    public FeatureType getSchema() {
-        if( childType == null ) {
-            // no children guess Features are okay then
-            new DefaultFeatureType("AbstractFeatureType",FeatureTypes.DEFAULT_NAMESPACE,new LinkedList(),new LinkedList(),null); 
-        }
-        return childType;
+    public SimpleFeatureType getMemberType() {
+    	if ( childType != null ) {
+    		return childType;
+    	}
+    
+    	return super.getMemberType();
     }
     
     /**
@@ -140,24 +146,6 @@ public class DefaultFeatureCollection implements FeatureCollection {
             }
         }
         return ReferencedEnvelope.reference(bounds);
-    }
-
-    /**
-     * Adds a listener for collection events.
-     *
-     * @param listener The listener to add
-     */
-    public void addListener(CollectionListener listener) {
-        listeners.add(listener);
-    }
-
-    /**
-     * Removes a listener for collection events.
-     *
-     * @param listener The listener to remove
-     */
-    public void removeListener(CollectionListener listener) {
-        listeners.remove(listener);
     }
 
     /**
@@ -221,13 +209,18 @@ public class DefaultFeatureCollection implements FeatureCollection {
         if( ID == null ) return false; // ID is required!
         if( contents.containsKey( ID ) ) return false; // feature all ready present
         
-        if ( childType==null ){
-        	childType=feature.getFeatureType();
-        }else{
-        	if( !feature.getFeatureType().equals(childType) )
-        		Logger.getAnonymousLogger("org.geotools.feature.collections").warning("Feature Collection contains a heterogeneous" +
-        				" mix of features");
+        if( this.childType == null ) {
+        	this.childType = feature.getFeatureType(); 
         }
+        FeatureType childType = (FeatureType) getMemberType();
+//        if ( childType==null ){
+//        	//this.childType=
+//        }else{
+    	if( !feature.getFeatureType().equals(childType) )
+    		LOGGER.warning("Feature Collection contains a heterogeneous" +
+			" mix of features");
+        		
+//        }
         //TODO check inheritance with FeatureType here!!!
         contents.put( ID, feature );
         if(fire) {
@@ -572,15 +565,8 @@ public class DefaultFeatureCollection implements FeatureCollection {
      * @return an array containing the elements of this collection
      */
     public Object[] toArray(Object[] a) {
-        return contents.values().toArray(a);
+        return contents.values().toArray(a != null ? a : new Object[ contents.size() ]);
     }
-
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.FeatureCollection#getFeatureType()
-	 */
-	public FeatureType getFeatureType() {
-		return featureType;
-	}
 
 	private FeatureCollection parent;
 	/* (non-Javadoc)
@@ -599,24 +585,17 @@ public class DefaultFeatureCollection implements FeatureCollection {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.geotools.feature.Feature#getID()
-	 */
-	public String getID() {
-		return id;
-	}
-
-	/* (non-Javadoc)
 	 * @see org.geotools.feature.Feature#getAttributes(java.lang.Object[])
 	 */
-	public Object[] getAttributes(Object[] attributes) {
-        return toArray( attributes );		
+	public List getValues() {
+		return Arrays.asList(toArray(null));
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.geotools.feature.Feature#getAttribute(java.lang.String)
 	 */
-	public Object getAttribute(String xPath) {
-		if(xPath.indexOf(featureType.getTypeName())>-1)
+	public Object getValue(String xPath) {
+		if(xPath.indexOf(getFeatureType().getTypeName())>-1)
 			if(xPath.endsWith("]")){
 				return contents.values(); // TODO get index and grab it                
 			}
@@ -629,7 +608,7 @@ public class DefaultFeatureCollection implements FeatureCollection {
 	/* (non-Javadoc)
 	 * @see org.geotools.feature.Feature#getAttribute(int)
 	 */
-	public Object getAttribute(int index) {
+	public Object getValue(int index) {
 		if(index == 0){
 			return contents.values();
         }
@@ -639,7 +618,7 @@ public class DefaultFeatureCollection implements FeatureCollection {
 	/* (non-Javadoc)
 	 * @see org.geotools.feature.Feature#setAttribute(int, java.lang.Object)
 	 */
-	public void setAttribute(int position, Object val) throws IllegalAttributeException, ArrayIndexOutOfBoundsException {
+	public void setValue(int position, Object val)  {
 		if(position == 0 && val instanceof List){
             List nw = (List)val;
 			if( !FeatureState.isFeatures( nw )) return;
@@ -654,46 +633,27 @@ public class DefaultFeatureCollection implements FeatureCollection {
 	}
     
 	/* (non-Javadoc)
-	 * @see org.geotools.feature.Feature#getNumberOfAttributes()
-	 */
-	public int getNumberOfAttributes() {
-		return featureType == null ? 1 : featureType.getAttributeCount();		
-	}
-
-	/* (non-Javadoc)
 	 * @see org.geotools.feature.Feature#setAttribute(java.lang.String, java.lang.Object)
 	 */
-	public void setAttribute(String xPath, Object attribute) throws IllegalAttributeException {
-		if(xPath.indexOf(featureType.getTypeName())>-1){
+	public void setValue(String xPath, Object attribute) {
+		if(xPath.indexOf(getFeatureType().getTypeName())>-1){
 			if(xPath.endsWith("]")){
 				// TODO get index and grab it
 			}else{
-				setAttribute(0,attribute);
+				setValue(0,attribute);
 			}
         }
 	}
 
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.Feature#getDefaultGeometry()
-	 */
-	public final Geometry getDefaultGeometry() {
-		return getPrimaryGeometry();
-	}
-	public Geometry getPrimaryGeometry() {
+	public Object getDefaultGeometryValue() {
 		return null;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.Feature#setDefaultGeometry(com.vividsolutions.jts.geom.Geometry)
-	 */
-	public final void setDefaultGeometry(Geometry geometry) throws IllegalAttributeException {
-		setPrimaryGeometry(geometry);
+	public void setDefaultGeometryValue(Object geometry) {
+		throw new UnsupportedOperationException("Not Supported");
 	}
-	public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
-		throw new IllegalAttributeException("Not Supported");
-	}
-
-    public void close( FeatureIterator close ) {
+	
+	public void close( FeatureIterator close ) {
         if( close instanceof FeatureIteratorImpl){
         	FeatureIteratorImpl wrapper = (FeatureIteratorImpl) close;
         	wrapper.close();
@@ -729,7 +689,7 @@ public class DefaultFeatureCollection implements FeatureCollection {
     }
 
     public FeatureCollection collection() throws IOException {
-        FeatureCollection copy = new DefaultFeatureCollection( null, featureType );
+        FeatureCollection copy = new DefaultFeatureCollection( null, getFeatureType() );
         List list = new ArrayList( contents.size() );
         for( FeatureIterator iterator = features(); iterator.hasNext(); ){
             Feature feature = iterator.next();
@@ -759,8 +719,12 @@ public class DefaultFeatureCollection implements FeatureCollection {
      * Accepts a visitor, which then visits each feature in the collection.
      * @throws IOException 
      */
-    public void accepts(FeatureVisitor visitor, ProgressListener progress ) throws IOException {
-        Iterator iterator = null;
+    public final void accepts(FeatureVisitor visitor, ProgressListener progress ) throws IOException {
+    	accepts((org.opengis.feature.FeatureVisitor) visitor, (org.opengis.util.ProgressListener) progress);
+    }
+    
+    public void accepts(org.opengis.feature.FeatureVisitor visitor, org.opengis.util.ProgressListener progress) {
+    	Iterator iterator = null;
         if (progress == null) progress = new NullProgressListener();
         try{
             float size = size();
@@ -779,7 +743,7 @@ public class DefaultFeatureCollection implements FeatureCollection {
         finally {
             progress.complete();            
             close( iterator );
-        }
+        }	
     }
 
     /**

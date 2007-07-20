@@ -1,7 +1,6 @@
 package org.geotools.feature.simple;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,56 +9,80 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.geotools.feature.GeometryAttributeType;
+import org.geotools.feature.AttributeTypeBuilder;
+import org.geotools.feature.type.TypeFactoryImpl;
 import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeatureCollectionType;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.simple.SimpleTypeFactory;
-import org.opengis.feature.type.AssociationDescriptor;
-import org.opengis.feature.type.AssociationType;
-import org.opengis.feature.type.PropertyType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Schema;
+import org.opengis.feature.type.TypeFactory;
 import org.opengis.feature.type.TypeName;
+import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
 
 /**
- * Builder to ease creation of simple types.
+ * A builder for simple feature and feature collection types.
  * <p>
- * This type builder pre-loads itself with bindings from 
- * {@link org.geotools.feature.simple.SimpleSchema}
+ * Simple Usage:
+ * <pre>
+ *  <code>
+ *  //create the builder
+ *  SimpleTypeBuilder builder = new SimpleTypeBuilder();
+ *  
+ *  //set global state
+ *  builder.setName( "testType" );
+ *  builder.setNamespaceURI( "http://www.geotools.org/" );
+ *  builder.setCRS( "EPSG:4326" );
+ *  
+ *  //add attributes
+ *  builder.add( "intProperty", Integer.class );
+ *  builder.add( "stringProperty", String.class );
+ *  builder.add( "pointProperty", Point.class );
+ *  
+ *  //add attribute setting per attribute state
+ *  builder.minOccurs(0).maxOccurs(2).nillable(false).add("doubleProperty",Double.class);
+ *  
+ *  //build the type
+ *  SimpleFeatureType featureType = builder.feature();
+ *  </code>
+ * </pre>
+ * </p>
+ * This builder builds type by maintaining state. Two types of state are maintained:
+ * <i>Global Type State</i> and <i>Per Attribute State</i>. Methods which set
+ * global state are named <code>set&lt;property>()</code>. Methods which set per attribute 
+ * state are named <code>&lt;property>()</code>. Furthermore calls to per attribute 
  * </p>
  * <p>
- * For reference these are the limitations of a "Simple Feature" model:
- * <ol>
- * <li>Properties limited to attributes only (no associations)
- * <li>Properties is a List - order of attributes matters
- * <li>Attribute "index" is as good as a Name
- * <li>Attribute "name" (ie String) is as good as Name
- * <ul>
- * <li>No name conflict, so lookup with simple string is okay
- * </ul>
- * <li>getSuper() is <code>null</code>, required for safe use of index and
- * name
- * </ol>
+ * Global state is reset after a call to {@link #buildFeatureType()}. Per 
+ * attribute state is reset after a call to {@link #add}.
+ * <p>
+ * This class maintains a set of {@link Class},{@link AttributeType} mappings
+ * which are used to build attributes by specifying classes. By default these 
+ * mappings are defined by {@link org.geotools.feature.simple.SimpleSchema}. The
+ * methods {@link #addBinding(AttributeType)},{@link #addBindings(Schema)}, and 
+ * {@link #setBindings(Schema)} can be used to change the defaults.
  * </p>
  * <p>
- * There are four methods to manage builder state:
- * <ul>
- * <li>{@link init()} - completly replace settings with builder defaul
- * <li>{@link init( PropertyType )} - completly replace settings from type
- * <li>{@link reset()} - called after type creation to reset common type
- * settings
- * </ul>
- * For examples of use please review the two type creation methods:
- * <ul>
- * <li>{@link feature()}
- * <li>{@link collection()}
- * </ul>
- * Several methods for adding attribute make use of a Class directly, this class
- * is used to lookup an AttributeType "binding" to be used as a prototype. In
- * addition to providing binding one at a time, you can load a {@link Schema} in
- * one fell swoop. You may find SimpleSchema a useful starting place.
+ * A default geometry for the feature type can be specified explictly via 
+ * {@link #setDefaultGeometry(String)}. However if one is not set the first
+ * geometric attribute ({@link GeometryType}) added will be resulting default.
+ * So if only specifying a single geometry for the type there is no need to 
+ * call the method. However if specifying multiple geometries then it is good
+ * practice to specify the name of the default geometry type. For instance:
+ * <code>
+ * 	<pre>
+ *  builder.add( "pointProperty", Point.class );
+ *  builder.add( "lineProperty", LineString.class );
+ *  builder.add( "polygonProperty", "polygonProperty" );
+ *  
+ *  builder.setDefaultGeometry( "lineProperty" );
+ * 	</pre>
+ * </code>
  * </p>
  * 
  * @author Justin Deolivera
@@ -67,122 +90,103 @@ import org.opengis.util.InternationalString;
  */
 public class SimpleTypeBuilder {
 	/**
-	 * Used for content creation (contains a crs and filter factory)
+	 * factories
 	 */
-	private SimpleTypeFactoryImpl factory;
-
-	/**
-	 * Naming: local name
-	 */
-	private String local;
-
-	/**
-	 * Naming: uri indicating scope
-	 */
-	private String uri;
-
-	/**
-	 * Description of type.
-	 */
-	private InternationalString description;
-
-	/**
-	 * MemberType for collection.
-	 * <p>
-	 * A simple feature collection can only represent one association.
-	 */
-	private SimpleFeatureType memberType;
-	
-	/**
-	 * List of attributes.
-	 */
-	private List attributes;
-
-	/**
-	 * Additional restrictions on the type.
-	 */
-	private Set restrictions;
-
-	/** Name of the default geometry to use */
-	private String defaultGeom;
-
-	protected CoordinateReferenceSystem crs;
+	protected SimpleTypeFactory factory;
 
 	/**
 	 * Map of java class bound to properties types.
 	 */
 	protected Map/* <Class,AttributeType> */bindings;
+	
+	// Global state for the feature type
+	//
+	/**
+	 * Naming: local name
+	 */
+	protected String local;
 
-	public SimpleTypeBuilder(SimpleTypeFactory factory) {
-		this.factory = (SimpleTypeFactoryImpl) factory;
-		load( new SimpleSchema() );
+	/**
+	 * Naming: uri indicating scope
+	 */
+	protected String uri;
+
+	/**
+	 * Description of type.
+	 */
+	protected InternationalString description;
+
+	/**
+	 * List of attributes.
+	 */
+	protected List attributes;
+
+	/**
+	 * Additional restrictions on the type.
+	 */
+	protected Set restrictions;
+
+	/** 
+	 * Name of the default geometry to use 
+	 */
+	protected String defaultGeometry;
+
+	/** 
+	 * coordinate reference system of the type 
+	 */
+	protected CoordinateReferenceSystem crs;
+	
+	/**
+	 * MemberType for collection.
+	 * <p>
+	 * A simple feature collection can only represent one association.
+	 */
+	protected SimpleFeatureType memberType;
+	
+	/**
+	 * attribute builder
+	 */
+	protected AttributeTypeBuilder attributeBuilder;
+
+	/**
+	 * Constructs the builder.
+	 */
+	public SimpleTypeBuilder() {
+		this( new SimpleTypeFactoryImpl() );
 	}
-
+	
+	/**
+	 * Constructs the builder specifying the factory for creating feature and 
+	 * feature collection types.
+	 */
+	public SimpleTypeBuilder(SimpleTypeFactory factory) {
+		this.factory = factory;
+		
+		attributeBuilder = new AttributeTypeBuilder();
+		setBindings( new SimpleSchema() );
+	}
+	
 	// Dependency Injection
 	//
+	/**
+	 * Sets the factory used to create feature and feature collection types.
+	 */
 	public void setSimpleTypeFactory(SimpleTypeFactory factory) {
-		this.factory = (SimpleTypeFactoryImpl) factory;
+		this.factory = factory;
 	}
-
+	/**
+	 * The factory used to create feature and feature collection types.
+	 */
 	public SimpleTypeFactory getSimpleTypeFactory() {
 		return factory;
 	}
-
-	// Creation Methods
+	
+	// Builder methods
 	//
 	/**
-	 * Creation of simple feature.
-	 * 
-	 * @return SimpleFeatureType created
+	 * Initializes the builder with state from a pre-existing feature type.
 	 */
-//	public SimpleFeatureType feature() {
-//		AttributeType geom = lookUp(getGeometryName());
-//		SimpleFeatureType type = factory.createSimpleFeatureType(typeName(),
-//				getAttributes(), geom, getCRS(), restrictions(),
-//				getDescription());
-//		reset();
-//		return type;
-//	}
-	public org.geotools.feature.FeatureType feature() {
-		GeometryAttributeType geom = (GeometryAttributeType) lookUp(getGeometryName());
-		
-		SimpleTypeFactoryImpl factory = (SimpleTypeFactoryImpl) this.factory;
-		org.geotools.feature.FeatureType type = factory.createSimpleFeatureType(
-			typeName(), getAttributes(), geom, getCRS(), restrictions(), getDescription() 
-		);
-				
-		reset();
-		return type;
-	}
-
-	/**
-	 * Creation of simple feature collection.
-	 * 
-	 * @return SimpleFeatureCollectionType created
-	 */
-	public SimpleFeatureCollectionType collection() {
-		SimpleFeatureCollectionType type = getSimpleTypeFactory()
-				.createSimpleFeatureCollectionType(typeName(), memberType,
-						getDescription());
-		reset();
-		return type;
-	}
-
-	// Builder State
-	//
-	/** Reset the builder for new conent */
-	public void init() {
-//		this.description = null;
-//		this.defaultGeom = null;
-//		this.local = null;
-//		this.memberType = null;
-//		this.uri = null;
-//		this.crs = null;
-		this.attributes = null;
-
-	}
-
-	public void init(PropertyType type) {
+	public void init(SimpleFeatureType type) {
 		init();
 		if (type == null)
 			return;
@@ -193,10 +197,8 @@ public class SimpleTypeBuilder {
 		restrictions = null;
 		restrictions().addAll(type.getRestrictions());
 
-		if (type instanceof SimpleFeatureType) {
-			SimpleFeatureType feature = (SimpleFeatureType) type;
-			attributes = newList((List) feature.attributes());
-		}
+		attributes = newList((List) type.attributes());
+		
 		if (type instanceof SimpleFeatureCollectionType) {
 			SimpleFeatureCollectionType collection = (SimpleFeatureCollectionType) type;
 			attributes = Collections.EMPTY_LIST; // will prevent any addition
@@ -206,340 +208,449 @@ public class SimpleTypeBuilder {
 	}
 
 	/**
-	 * Reset is called after creation a "new" type.
-	 * <p>
-	 * The following informatoin is reset:
-	 * <ul>
-	 * <li>local = local part of name
-	 * <li>attributes (aka structural properties)
-	 * <li>default geometry
-	 * </ul>
+	 * Clears the running list of attributes. 
 	 */
-	public void reset() {
-		this.local = null;
-		this.attributes = newList(attributes);
-		this.defaultGeom = null;
+	protected void init() {
+		attributes = null;
 	}
-
-	// Naming
-	//
-	public void setNamespaceURI(String namespace) {
-		this.uri = namespace;
+	
+	/**
+	 * Completely resets all builder state.
+	 *
+	 */
+	protected void reset() {
+		uri = null;
+		local = null;
+		description = null;
+		restrictions = null;
+		attributes = null;
+		memberType = null;
+		crs = null;
 	}
-
+	
+	/**
+	 * Set the namespace uri of the built type.
+	 */
+	public void setNamespaceURI(String namespaceURI) {
+		this.uri = namespaceURI;
+	}
+	/**
+	 * The namespace uri of the built type.
+	 */
 	public String getNamespaceURI() {
 		return uri;
 	}
-
+	/**
+	 * Sets the namespace uri of the built type.
+	 */
+	public SimpleTypeBuilder namespaceURI(String namespaceURI) {
+		setNamespaceURI(namespaceURI);
+		return this;
+	}
+	/**
+	 * Sets the name of the built type.
+	 */
 	public void setName(String name) {
 		this.local = name;
 	}
-
-	public SimpleTypeBuilder name(String name) {
-		setName(name);
-		return this;
-	}
-
+	/**
+	 * The name of the built type.
+	 */
 	public String getName() {
 		return local;
 	}
-
+	
+	/**
+	 * Sets the description of the built type.
+	 */
 	public void setDescription(InternationalString description) {
 		this.description = description;
 	}
+	/**
+	 * The description of the built type.
+	 */
 	public InternationalString getDescription() {
 		return description;
 	}
 	
 	/**
-	 * Used to lookup AttributeType for provided binding.
-	 * 
-	 * @param binding
-	 * @return AttributeType
+	 * Sets the name of the default geometry attribute of the built type.
 	 */
-	public org.geotools.feature.AttributeType getBinding(Class binding) {
-		return (org.geotools.feature.AttributeType) bindings().get(binding);
+	public void setDefaultGeometry(String defaultGeometryName) {
+		this.defaultGeometry = defaultGeometryName;
 	}
-//	public AttributeType getBinding(Class binding) {
-//		return (AttributeType) bindings().get(binding);
-//	}
-
 	/**
-	 * Used to provide a specific type for provided binding.
-	 * <p>
-	 * You can use this method to map the AttributeType used when addAttribute(
-	 * String name, Class binding ) is called.
-	 * 
-	 * @param binding
-	 * @param type
+	 * The name of the default geometry attribute of the built type.
 	 */
-	public void addBinding(Class binding, org.geotools.feature.AttributeType type) {
-		bindings().put(binding, type);
-	}
-//	public void addBinding(Class binding, AttributeType type) {
-//		bindings().put(binding, type);
-//	}
-
-	/**
-	 * Load the indicated schema to map Java class to your Type System. (please
-	 * us a profile to prevent binding conflicts).
-	 * 
-	 * @param schema
-	 */
-	public void load( Schema schema ) {
-		for (Iterator itr = schema.values().iterator(); itr.hasNext();) {
-			org.geotools.feature.AttributeType type = 
-				(org.geotools.feature.AttributeType) itr.next();
-			addBinding(type.getType(), type );
-		}
-	}
-//	public void load(Schema schema) {
-//		for (Iterator itr = schema.values().iterator(); itr.hasNext();) {
-//			AttributeType type = (AttributeType) itr.next();
-//			addBinding(type.getBinding(), type);
-//		}
-//	}
-	
-	
-
-	// Attributes
-	//
-	/**
-	 * Access to attributes used by builder.
-	 * <p>
-	 * You can use this method to perform collection opperations before
-	 * construction. This is most useful when initializing the builder with a
-	 * known type, performing modifications, and then creating a derrived type.
-	 * </p>
-	 * 
-	 * @return List of attributes used for creation
-	 */
-	public List getAttributes() {
-		if (attributes == null) {
-			attributes = newList();
-		}
-		return attributes;
-	}
-
-	/**
-	 * Allow for user supplied list implementaion used for attributes.
-	 * <p>
-	 * Examples of useful attribute lists:
-	 * <ul>
-	 * <li>ArrayList - fixed length, use new ArrayList( size ) when known
-	 * <li>LinkedList etc...
-	 * </ul>
-	 * The list class used here should also be used for feature contents.
-	 * </p>
-	 * 
-	 * @param attributes
-	 *            List implementation used to organize attributes
-	 */
-	public void setAttributes(List attributes) {
-		this.attributes = attributes;
-	}
-
-	public SimpleTypeBuilder attribute(org.geotools.feature.AttributeType type) {
-		addAttribute(type);
-		return this;
-	}
-//	public SimpleTypeBuilder attribute(AttributeType type) {
-//		addAttribute(type);
-//		return this;
-//	}
-
-	/**
-	 * Adds a new AttributeType w/ provided name and binding.
-	 * <p>
-	 * The binding will be used to locate an AttributeType to use as a
-	 * prototype, or will be used directly if a binding cannot be found.
-	 * 
-	 * @param name
-	 * @param bind
-	 * @return SimpleTypeBuilder for use with chaining
-	 */
-	public SimpleTypeBuilder attribute(String name, Class bind) {
-		addAttribute( name, bind );
-		return this;
-	}
-	public SimpleTypeBuilder geometry(String name, Class bind) {
-		addGeometry( name, bind );
-		return this;
-	}
-	
-	public void addAttribute(org.geotools.feature.AttributeType type) {
-		// simple feature type => attribute name == type name, so create a new
-		// type with the same name as the attribute, which extends the old
-		// type
-		attributes().add(type);
-	}
-//	public void addAttribute(AttributeType type) {
-//		// simple feature type => attribute name == type name, so create a new
-//		// type with the same name as the attribute, which extends the old
-//		// type
-//		attributes().add(type);
-//	}
-	
-	/**
-	 * Adds a new AttributeType w/ provided name and binding.
-	 * <p>
-	 * The binding will be used to locate an AttributeType to use as a
-	 * prototype, or will be used directly if a binding cannot be found.
-	 * 
-	 * @param name
-	 * @param bind
-	 * 
-	 */
-	public void addAttribute(String name, Class bind) {
-		org.geotools.feature.AttributeType prototype = getBinding( bind );
-		org.geotools.feature.AttributeType type;
-		TypeName typeName = new org.geotools.feature.type.TypeName( name );
-		if( prototype != null ){
-			if( prototype instanceof GeometryAttributeType ){
-				type = createPrototype( typeName, prototype, crs );
-			}
-			else {
-				type = createPrototype( typeName, prototype );
-			}
-		}
-		else {
-			type = createType( typeName, bind );
-		}
-		addAttribute(type);
-	}
-//	public void addAttribute(String name, Class bind) {
-//		AttributeType prototype = getBinding( bind );
-//		AttributeType type;
-//		TypeName typeName = new org.geotools.feature.type.TypeName( name );
-//		if( prototype != null ){
-//			if( prototype instanceof GeometryType ){
-//				type = createPrototype( typeName, prototype, crs );
-//			}
-//			else {
-//				type = createPrototype( typeName, prototype );
-//			}
-//		}
-//		else {
-//			type = createType( typeName, bind );
-//		}
-//		addAttribute(type);
-//	}
-	
-	/**
-	 * Add a new GeometryAttributeType w/ provided name and binding.
-	 * <p>
-	 * A GeometryAttribute will be created in the same manner
-	 * as for addAttribute with the addition of the CRS.
-	 * @param name
-	 * @param bind
-	 */
-	public void addGeometry(String name, Class bind ){
-		org.geotools.feature.AttributeType prototype = getBinding( bind );
-		org.geotools.feature.AttributeType type;
-		TypeName typeName = new org.geotools.feature.type.TypeName( name );
-		if( prototype != null ){			
-			type = createPrototype( typeName, prototype, crs );
-		}
-		else {
-			type = createType( typeName, bind, crs );
-		}
-		addAttribute(type);
-	}
-
-	/** Indicate "default" geometry by attributeName */
-	public SimpleTypeBuilder geometry(String attributeName) {
-		setGeometryName(attributeName);
-		return this;
-	}
-
-	public void setGeometryName(String type) {
-		defaultGeom = type;
-	}
-
-	/**
-	 * Return the current defaultGeometry.
-	 * <p>
-	 * This is the name of the AttributeType that will be used for the
-	 * FeatureType to be created. You make explicitly set a string, or let the
-	 * first GeometryType found be used as the default.
-	 * </p>
-	 * 
-	 * @return name of the default GeometryAttributeType
-	 */
-	public String getGeometryName() {
-		if (defaultGeom == null) {
-			for (Iterator i = attributes.iterator(); i.hasNext();) {
-				org.geotools.feature.AttributeType attribute = 
-					(org.geotools.feature.AttributeType) i.next();
-				if (attribute instanceof GeometryAttributeType) {
-					return attribute.getName();
+	public String getDefaultGeometry() {
+		if (defaultGeometry == null) {
+			for (Iterator i = attributes().iterator(); i.hasNext();) {
+				AttributeDescriptor att = (AttributeDescriptor) i.next();
+				if ( att.getType() instanceof GeometryType ) {
+					return att.getName().getLocalPart();
 				}
 			}
 			return null;
 		}
-		return defaultGeom;
+		return defaultGeometry;
 	}
-//	public String getGeometryName() {
-//		if (defaultGeom == null) {
-//			for (Iterator i = attributes.iterator(); i.hasNext();) {
-//				AttributeType attribute = (AttributeType) i.next();
-//				if (attribute instanceof GeometryType) {
-//					return attribute.getName().getLocalPart();
-//				}
-//			}
-//			return null;
-//		}
-//		return defaultGeom;
-//	}
 	
+	/**
+	 * Sets the coordinate reference system of the built type.
+	 */
 	public void setCRS(CoordinateReferenceSystem crs) {
 		this.crs = crs;
 	}
-
-	public SimpleTypeBuilder crs(CoordinateReferenceSystem crs) {
-		setCRS(crs);
-		return this;
-	}
-
 	/**
-	 * Uses CRS utility class with buildres TypeFactory.getCRSFactory to look up
-	 * a CoordinateReferenceSystem based on the provied srs.
-	 * <p>
-	 * A SpatialReferenceSystem can be one of the following:
-	 * <ul>
-	 * <li>"AUTHORITY:CODE"
-	 * <li>Well Known Text
-	 * </ul>
-	 * 
-	 * @param SRS
-	 * 
-	 * @return TypeBuilder ready for chaining
-	 * @throws IllegalArgumentException
-	 *             When SRS not understood
+	 * The coordinate reference system of the built type.
 	 */
-	public SimpleTypeBuilder crs(String SRS) {
+	public CoordinateReferenceSystem getCRS() {
+		return crs;
+	}
+	
+	/**
+	 * Sets the coordinate reference system of the built type by specifying its
+	 * srs.
+	 * 
+	 */
+	public void setSRS(String SRS) {
 		try {
 			setCRS(CRS.decode(SRS));
 		} catch (Exception  e) {
 			String msg = "SRS '" + SRS + "' unknown:" + e.getLocalizedMessage(); 
 			throw (IllegalArgumentException) new IllegalArgumentException( msg ).initCause( e );
 		}
-		return this;
-	}
-
-	public CoordinateReferenceSystem getCRS() {
-		return crs;
-	}
-
-	public SimpleTypeBuilder member(SimpleFeatureType memberType ){
-		setMember(memberType);
-		return this;
-	}
-	public void setMember(SimpleFeatureType memberType) {
-		this.memberType = memberType;
 	}
 	
-	// Factory method argument preparation
+	/**
+	 * Specifies an attribute type binding.
+	 * <p>
+	 * This method is used to associate an attribute type with a java class. 
+	 * The class is retreived from <code>type.getBinding()</code>. When the
+	 * {@link #add(String, Class)} method is used to add an attribute to the 
+	 * type being built, this binding is used to locate the attribute type.
+	 * </p>
+	 * 
+	 * @param type The attribute type.
+	 */
+	public void addBinding(AttributeType type) {
+		bindings().put(type.getBinding(), type);
+	}
+	
+	/**
+	 * Specifies a number of attribute type bindings.
+	 * 
+	 * @param schema The schema containing the attribute types.
+	 * 
+	 * @see {@link #addBinding(AttributeType)}.
+	 */
+	public void addBindings( Schema schema ) {
+		for (Iterator itr = schema.values().iterator(); itr.hasNext();) {
+			AttributeType type = (AttributeType) itr.next();
+			addBinding(type);
+		}
+	}
+	
+	/**
+	 * Specifies a number of attribute type bindings clearing out all existing
+	 * bindings.
+	 * 
+	 * @param schema The schema contianing attribute types.
+	 * 
+	 * @see {@link #addBinding(AttributeType)}.
+	 */
+	public void setBindings( Schema schema ) {
+		bindings().clear();
+		addBindings( schema );
+	}
+	
+	/**
+	 * Looks up an attribute type which has been bound to a class.
+	 * 
+	 * @param binding The class.
+	 * 
+	 * @return AttributeType The bound attribute type.
+	 */
+	public AttributeType getBinding(Class binding) {
+		return (AttributeType) bindings().get(binding);
+	}
+	
+	// per attribute methods
+	//
+	/**
+	 * Sets the minOccurs of the next attribute added to the feature type.
+	 * <p>
+	 * This value is reset after a call to {@link #add(String, Class)}
+	 * </p>
+	 */
+	public SimpleTypeBuilder minOccurs( int minOccurs ) {
+		attributeBuilder.setMinOccurs(minOccurs);
+		return this;
+	}
+	/**
+	 * Sets the maxOccurs of the next attribute added to the feature type.
+	 * <p>
+	 * This value is reset after a call to {@link #add(String, Class)}
+	 * </p>
+	 */
+	public SimpleTypeBuilder maxOccurs( int maxOccurs ) {
+		attributeBuilder.setMaxOccurs(maxOccurs);
+		return this;
+	}
+	/**
+	 * Sets the nullability of the next attribute added to the feature type.
+	 * <p>
+	 * This value is reset after a call to {@link #add(String, Class)}
+	 * </p>
+	 */
+	public SimpleTypeBuilder nillable( boolean isNillable ) {
+		attributeBuilder.setNillable(isNillable);
+		return this;
+	}
+	/**
+	 * Adds a restriction to the next attribute added to the feature type.
+	 * <p>
+	 * This value is reset after a call to {@link #add(String, Class)}
+	 * </p>
+	 */
+	public SimpleTypeBuilder restriction( Filter filter ) {
+		attributeBuilder.addRestriction( filter );
+		return this;
+	}
+	/**
+	 * Sets the description of the next attribute added to the feature type.
+	 * <p>
+	 * This value is reset after a call to {@link #add(String, Class)}
+	 * </p>
+	 */
+	public SimpleTypeBuilder description( String description ) {
+		attributeBuilder.setDescription( description );
+		return this;
+	}
+	/**
+	 * Sets the default value of the next attribute added to the feature type.
+	 * <p>
+	 * This value is reset after a call to {@link #add(String, Class)}
+	 * </p>
+	 */
+	public SimpleTypeBuilder defaultValue( Object defaultValue ) {
+		attributeBuilder.setDefaultValue( defaultValue );
+		return this;
+	}
+	/**
+	 * Sets the crs of the next attribute added to the feature type.
+	 * <p>
+	 * This only applies if the attribute added is geometric.
+	 * </p>
+	 * <p>
+	 * This value is reset after a call to {@link #add(String, Class)}
+	 * </p>
+	 */
+	public SimpleTypeBuilder crs( CoordinateReferenceSystem crs ) {
+		attributeBuilder.setCRS(crs);
+		return this;
+	}
+	
+	/**
+	 * Adds a new attribute w/ provided name and class.
+	 * 
+	 * <p>
+	 * The provided class is used to locate an attribute type binding previously 
+	 * specified by {@link #addBinding(AttributeType)},{@link #addBindings(Schema)}, 
+	 * or {@link #setBindings(Schema)}. 
+	 * </p>
+	 * <p>
+	 * If not such binding exists then an attribute type is created on the fly.
+	 * </p>
+	 * @param name The name of the attribute.
+	 * @param bind The class the attribute is bound to.
+	 * 
+	 */
+	public void add(String name, Class binding) {
+
+		//check if this is the name of the default geomtry, in that case we 
+		// better make it a geometry type
+		if ( defaultGeometry != null && defaultGeometry.equals( name ) ) {
+			add( name, binding, null );
+			return;
+		}
+		
+		attributeBuilder.setBinding(binding);
+		attributeBuilder.setName(name);
+
+		AttributeType type = attributeBuilder.buildType();
+		AttributeDescriptor descriptor = attributeBuilder.buildDescriptor(name,type);
+		attributes().add(descriptor);
+	}
+	
+	public void add(String name, Class binding, CoordinateReferenceSystem crs ) {
+		attributeBuilder.setBinding(binding);
+		attributeBuilder.setName(name);
+		attributeBuilder.setCRS(crs);
+		
+		GeometryType type = attributeBuilder.buildGeometryType();
+		AttributeDescriptor descriptor = attributeBuilder.buildDescriptor(name,type);
+		attributes().add(descriptor);
+	}
+	
+	/**
+	 * Builds a feature type from compiled state.
+	 * <p>
+	 * After the type is built the running list of attributes is cleared.
+	 * </p>
+	 * @return The built feature type.
+	 */
+	public SimpleFeatureType buildFeatureType() {
+		AttributeDescriptor defaultGeometry = null;
+		
+		//was a default geometry set?
+		if ( this.defaultGeometry != null ) {
+			List atts = attributes();
+			for ( int i = 0; i < atts.size(); i++) {
+				AttributeDescriptor att = (AttributeDescriptor) atts.get(i);
+				if ( this.defaultGeometry.equals( att.getName().getLocalPart() ) ) {
+					//ensure the type is a geometry type
+					if ( !(att.getType() instanceof GeometryType) ) {
+						attributeBuilder.init( att );
+						GeometryType type = attributeBuilder.buildGeometryType();
+						att = attributeBuilder.buildDescriptor(att.getName(),type);
+						atts.set( i, att );
+					}
+					defaultGeometry = att;
+					break;
+				}
+			}
+		}
+		
+		if ( defaultGeometry == null ) {
+			//none was set by name, look for first geometric type
+			for ( Iterator a = attributes().iterator(); a.hasNext(); ) {
+				AttributeDescriptor att = (AttributeDescriptor) a.next();
+				if ( att.getType() instanceof GeometryType ) {
+					defaultGeometry = att;
+					break;
+				}
+			}
+		}
+		
+		SimpleFeatureType built = factory.createSimpleFeatureType(
+			typeName(), attributes(), defaultGeometry, crs, restrictions(), description);
+		
+		init();
+		return built;
+	}
+	
+	// Internal api available for subclasses to override
+	//
+	/**
+	 * Determines if the attribute descriptor represents a geometric attribute.
+	 * 
+	 * @param descriptor The attribute descriptor.
+	 */
+	protected boolean isGeometry(Class binding) {
+		return false;
+	}
+	
+	/**
+	 * Creates a descriptor from the name/binding of an attribute.
+	 * 
+	 * @param name The name of the attribute.
+	 * @param binding The binding of the attribute.
+	 * 
+	 */
+//	protected final AttributeDescriptor createAttributeDescriptor(String name,Class binding,boolean isNillable,Set restrictions) {
+//		TypeName typeName = new org.geotools.feature.type.TypeName(name);
+//		
+//		AttributeType type = getBinding(binding); 
+//		if ( type != null ) {
+//			//we need to actually prototype the attribute type beacuse for simple
+//			// content we need to ensure the the descriptor name == type name
+//			type = createPrototype(typeName, type );
+//		}
+//		else {
+//			//create one on the fly
+//			type = typeFactory.createAttributeType(
+//				typeName,binding,false,false,restrictions,null,null);
+//		}
+//		
+//		return typeFactory.createAttributeDescriptor(type,typeName,1,1,isNillable);
+//	}
+	
+	/**
+	 * Prototypes an attribute type, overriding only the name of hte resulting
+	 * attribute type.
+	 * 
+	 * @param typeName The new name of the attribute type.
+	 * @param proto The prototype.
+	 * 
+	 */
+//	protected final AttributeType createPrototype( TypeName typeName, AttributeType proto ){
+//		if ( proto instanceof GeometryType ) {
+//			GeometryType gProto = (GeometryType) proto;
+//			
+//			//if a crs set, override the crs as well as the name
+//			CoordinateReferenceSystem crs = null;
+//			if ( this.crs != null ) {
+//				crs = this.crs;
+//			}
+//			else {
+//				crs = gProto.getCRS();
+//			}
+//			
+//			return typeFactory.createGeometryType( typeName, proto.getBinding(), 
+//				crs, proto.isIdentified(), proto.isAbstract(), proto.getRestrictions(), 
+//				proto.getSuper(), proto.getDescription()); 
+//		}
+//		
+//		return typeFactory.createAttributeType( typeName, proto.getBinding(), 
+//			proto.isIdentified(), proto.isAbstract(), proto.getRestrictions(), 
+//			proto.getSuper(), proto.getDescription()); 
+//	}
+	
+	/**
+	 * Creates a new set instance, this default implementation returns {@link HashSet}.
+	 */
+	protected Set newSet(){
+		return new HashSet();
+	}
+	/**
+	 * Creates a new list instance, this default impelementation returns {@link ArrayList}.
+	 */
+	protected List newList() {
+		return new ArrayList();
+	}
+	
+	/**
+	 * Creates a new map instance, this default implementation returns {@link HashMap}
+	 */
+	protected Map newMap() {
+		return new HashMap();
+	}
+	
+	/**
+	 * Creates a new list which is the same type as the provided list.
+	 * <p>
+	 * If the new copy can not be created reflectively.. {@link #newList()} is 
+	 * returned.
+	 * </p>
+	 */
+	protected List newList(List origional) {
+		if (origional == null) {
+			return newList();
+		}
+		if (origional == Collections.EMPTY_LIST) {
+			return newList();
+		}
+		try {
+			return (List) origional.getClass().newInstance();
+		} catch (InstantiationException e) {
+			return newList();
+		} catch (IllegalAccessException e) {
+			return newList();
+		}
+	}
+	
+	// Helper methods, 
 	//
 	/**
 	 * Naming: Accessor which returns type name as follows:
@@ -558,18 +669,17 @@ public class SimpleTypeBuilder {
 	}
 
 	/**
-	 * Grab property collection as an argument to factory method.
-	 * <p>
-	 * This may return a copy as needed, since most calls to a factory method
-	 * end up with a reset this seems not be needed at present.
-	 * </p>
+	 * Accessor for attributes.
 	 */
-	protected Collection attributes() {
+	protected List attributes() {
 		if (attributes == null) {
 			attributes = newList();
 		}
 		return attributes;
 	}
+	/**
+	 * Accessor for restrictions.
+	 */
 	protected Set restrictions(){
 		if (restrictions == null) {
 			restrictions = newSet();
@@ -581,148 +691,10 @@ public class SimpleTypeBuilder {
 	 */
 	protected Map bindings() {
 		if (bindings == null) {
-			bindings = new HashMap();
+			bindings = newMap();
 		}
 		return bindings;
 	}
-
-	protected AssociationDescriptor contentsDescriptor() {
-		AssociationType assocType = factory.createAssociationType(memberType
-				.getName(), memberType, false, false, Collections.EMPTY_SET,
-				null, null);
-		// Q: not sure if we should be creating null names here?
-		// A: just use "memberOf" unless they say different...
-		
-		return factory.createAssociationDescriptor(
-			assocType, new org.geotools.feature.type.TypeName("memberType"), 0, Integer.MAX_VALUE
-		);
-	}
-
-	// Utility Methods
-	// (Subclass may customize)
-	//
-	protected Set newSet(){
-		return new HashSet();
-	}
-	/**
-	 * Template method to enable subclasses to customize the list implementation
-	 * used by "default".
-	 * 
-	 * @return List (subclass may override)
-	 */
-	protected List newList() {
-		return new ArrayList();
-	}
-
-	/**
-	 * Provides an empty copy of the provided origional list.
-	 * <p>
-	 * This method is used by reset for the following goals:
-	 * <ul>
-	 * <li>use the user supplied collection directly by the TypeFactory,
-	 * <li>remember the user supplied collection type for subsequent builder
-	 * use
-	 * </ul>
-	 * This allows a user to indicate that attributes are stored in a
-	 * "LinkedList" once.
-	 * 
-	 * @param origional
-	 *            Origional collection
-	 * @return New instance of the originoal Collection
-	 */
-	protected List newList(List origional) {
-		if (origional == null) {
-			return newList();
-		}
-		if (origional == Collections.EMPTY_LIST) {
-			return newList();
-		}
-		try {
-			return (List) origional.getClass().newInstance();
-		} catch (InstantiationException e) {
-			return newList();
-		} catch (IllegalAccessException e) {
-			return newList();
-		}
-	}
-
-	private org.geotools.feature.AttributeType lookUp( String name ) {
-		if (name == null)
-			return null;
-		for (Iterator i = attributes.iterator(); i.hasNext();) {
-			org.geotools.feature.AttributeType attributeType = 
-				(org.geotools.feature.AttributeType) i.next();
-			if (name.equals(attributeType.getName())) {
-				return attributeType;
-			}
-		}
-		return null;
-	}
 	
-//	private AttributeType lookUp(String name) {
-//		if (name == null)
-//			return null;
-//		for (Iterator i = attributes.iterator(); i.hasNext();) {
-//			AttributeType attributeType = (AttributeType) i.next();
-//			if (name.equals(attributeType.getName().getLocalPart())) {
-//				return attributeType;
-//			}
-//		}
-//		return null;
-//	}
-
-	protected org.geotools.feature.AttributeType createPrototype( TypeName typeName, org.geotools.feature.AttributeType proto ){
-		return factory.createAttributeType( 
-			typeName, proto.getType(), false, false, Collections.EMPTY_SET, 
-			(org.geotools.feature.AttributeType) null, null
-		);
-	}
-//	protected AttributeType createPrototype( TypeName typeName, AttributeType proto ){
-//		return factory.createAttributeType( typeName,
-//				proto.getBinding(), false, false, Collections.EMPTY_SET, null, null);
-//	}
 	
-	protected GeometryAttributeType createPrototype( TypeName typeName, org.geotools.feature.AttributeType proto, CoordinateReferenceSystem crs ){
-		return factory.createGeometryType( 
-			typeName, proto.getType(), crs, false, false, Collections.EMPTY_SET, 
-			(org.geotools.feature.AttributeType) null, null
-		);
-	}
-//	protected GeometryType createPrototype( TypeName typeName, AttributeType proto, CoordinateReferenceSystem crs ){
-//		return factory.createGeometryType( typeName,
-//				proto.getBinding(), crs, false, false, Collections.EMPTY_SET, null, null);
-//	}
-	/**
-	 * Create an AttributeType bound to this Java class.
-	 * Attribute Type created with:
-	 * <ul>
-	 * <li>name: typeName
-	 * <li>binding: bind
-	 * <li>
-	 * </ul>
-	 * Subclass may override.
-	 * @param typeName Name of attribute type to create
-	 * @param bind
-	 * 
-	 */
-	protected org.geotools.feature.AttributeType createType( TypeName typeName, Class bind ){
-		return factory.createAttributeType( 
-			typeName, bind, false, false, Collections.EMPTY_SET, 
-			(org.geotools.feature.AttributeType) null, null
-		);
-	}
-//	protected AttributeType createType( TypeName typeName, Class bind ){
-//		return factory.createAttributeType( typeName,
-//				bind, false, false, Collections.EMPTY_SET, null, null);
-//	}
-	protected GeometryAttributeType createType( TypeName typeName, Class bind, CoordinateReferenceSystem crs){
-		return factory.createGeometryType( 
-			typeName, bind, crs, false, false, Collections.EMPTY_SET, 
-			(org.geotools.feature.AttributeType) null, null
-		);
-	}
-//	protected GeometryType createType( TypeName typeName, Class bind, CoordinateReferenceSystem crs){
-//		return factory.createGeometryType( typeName,
-//				proto.getBinding(), crs, false, false, Collections.EMPTY_SET, null, null);
-//	}
 }

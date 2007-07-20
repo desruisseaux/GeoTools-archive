@@ -17,6 +17,7 @@ package org.geotools.feature;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import org.opengis.feature.simple.SimpleFeature;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
 
@@ -147,8 +148,10 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
  *
  * @see org.geotools.feature.FeatureType
  * @see org.geotools.feature.DefaultFeature
+ *
+ * @deprecated use {@link SimpleFeature}.
  */
-public interface Feature {
+public interface Feature extends SimpleFeature {
     /**
      * Gets a reference to the schema for this feature.
      *
@@ -275,7 +278,8 @@ public interface Feature {
      * @return Default geometry for this feature, or <code>null</code>
      * @deprecated use {@link #getPrimaryGeometry()}
      */
-    Geometry getDefaultGeometry();
+
+    //Geometry getPrimaryGeometry();
 
     /**
      * Gets the default or primary geometry for this feature.
@@ -302,7 +306,8 @@ public interface Feature {
      *         geometry, or is invalid for some other reason.
      * @deprecated use {@link #setPrimaryGeometry(Geometry)}.
      */
-    void setDefaultGeometry(Geometry geometry) throws IllegalAttributeException;
+
+    //void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException;
 
     /**
      * Sets the primary or default geometry for this feature.

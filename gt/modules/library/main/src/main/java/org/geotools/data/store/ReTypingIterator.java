@@ -56,7 +56,7 @@ public class ReTypingIterator implements Iterator {
 
         try {
 			for (int i = 0; i < types.length; i++) {
-			    xpath = types[i].getName();
+			    xpath = types[i].getLocalName();
 			    //attributes[i] = types[i].duplicate(next.getAttribute(xpath));
 			    attributes[i] = next.getAttribute(xpath);
 			}
@@ -99,7 +99,7 @@ public class ReTypingIterator implements Iterator {
 
         for (int i = 0; i < target.getAttributeCount(); i++) {
             AttributeType attrib = target.getAttributeType(i);
-            xpath = attrib.getName();
+            xpath = attrib.getLocalName();
             types[i] = attrib;
 
             if (!attrib.equals(original.getAttributeType(xpath))) {

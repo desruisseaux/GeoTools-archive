@@ -118,7 +118,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     public void testLoadDanishChars() throws Exception {
         FeatureCollection fc = loadFeatures(DANISH, Query.ALL);
         Feature first = fc.features().next();
-        // Charløtte, if you can read it with your OS charset
+        // Charlï¿½tte, if you can read it with your OS charset
         assertEquals("Charl\u00F8tte", first.getAttribute("TEKST1"));
     }
     
@@ -178,7 +178,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         //assertEquals("Number of Features loaded",3, count);           // JAR
         
         FeatureType schema = firstFeature(features).getFeatureType();
-        assertNotNull(schema.getDefaultGeometry());
+        assertNotNull(schema.getPrimaryGeometry());
         assertEquals("Number of Attributes",253,schema.getAttributeTypes().length);
         assertEquals("Value of statename is wrong",firstFeature(features).getAttribute("STATE_NAME"),"Illinois");
         assertEquals("Value of land area is wrong",((Double)firstFeature(features).getAttribute("LAND_KM")).doubleValue(),143986.61,0.001);
@@ -224,8 +224,8 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         FeatureType after = ds.getSchema();
         
         assertNotSame( before, after );        
-        assertNull( "4326", before.getDefaultGeometry().getCoordinateSystem() );
-        assertEquals( "NAD83 / BC Albers", after.getDefaultGeometry().getCoordinateSystem().getName().getCode() );
+        assertNull( "4326", before.getPrimaryGeometry().getCoordinateSystem() );
+        assertEquals( "NAD83 / BC Albers", after.getPrimaryGeometry().getCoordinateSystem().getName().getCode() );
                 
         file.deleteOnExit();        
         file=new File("test.dbf");
@@ -543,7 +543,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         // verify
         while (fci.hasNext()) {
             Feature f = fci.next();
-            Geometry fromShape = f.getDefaultGeometry();
+            Geometry fromShape = f.getPrimaryGeometry();
             
             if (fromShape instanceof GeometryCollection) {
                 if ( ! (geom instanceof GeometryCollection) ) {
@@ -593,7 +593,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         Query query = new DefaultQuery(s.getSchema().getTypeName(), Filter.INCLUDE, new String[] {"the_geom"});
         FeatureReader reader = s.getFeatureReader(s.getSchema().getTypeName(), query);
         assertEquals(1, reader.getFeatureType().getAttributeCount());
-        assertEquals("the_geom", reader.getFeatureType().getAttributeTypes()[0].getName());
+        assertEquals("the_geom", reader.getFeatureType().getAttributeTypes()[0].getLocalName());
         
         // here too, the filter is using the geometry only
         FilterFactory ff = FilterFactoryFinder.createFilterFactory();
@@ -606,7 +606,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         query = new DefaultQuery(s.getSchema().getTypeName(), gf, new String[] {"the_geom"});
         reader = s.getFeatureReader( s.getSchema().getTypeName(), query);
         assertEquals(1, reader.getFeatureType().getAttributeCount());
-        assertEquals("the_geom", reader.getFeatureType().getAttributeTypes()[0].getName());
+        assertEquals("the_geom", reader.getFeatureType().getAttributeTypes()[0].getLocalName());
         
         // here not, we need state_name in the feature type, so open the dbf file please
         CompareFilter cf = ff.createCompareFilter(Filter.COMPARE_EQUALS);

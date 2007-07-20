@@ -376,13 +376,6 @@ public class JDBCFeatureCollection implements FeatureCollection {
 		return null;
 	}
 
-	/**
-	 * @deprecated use {@link #getPrimaryGeometry()}
-	 */
-	public Geometry getDefaultGeometry() {
-		return getPrimaryGeometry();
-	}
-
 	public Geometry getPrimaryGeometry() {
 		return null;
 	}
@@ -407,13 +400,6 @@ public class JDBCFeatureCollection implements FeatureCollection {
 		
 	}
 
-	/**
-	 * @deprecated use {@link #setPrimaryGeometry(Geometry)}
-	 */
-	public final void setDefaultGeometry(Geometry geometry) throws IllegalAttributeException {
-		setPrimaryGeometry(geometry);
-	}
-	
 	public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
 		
 	}

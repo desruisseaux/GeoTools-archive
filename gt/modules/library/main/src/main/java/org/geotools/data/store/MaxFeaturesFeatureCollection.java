@@ -9,21 +9,14 @@ import java.util.List;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.collection.DelegateFeatureReader;
-import org.geotools.feature.CollectionListener;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureList;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.collection.DecoratingFeatureCollection;
 import org.geotools.feature.collection.DelegateFeatureIterator;
-import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.util.ProgressListener;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
-
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * FeatureCollection wrapper which limits the number of features returned.
@@ -31,12 +24,14 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Justin Deoliveira, The Open Planning Project
  *
  */
-public class MaxFeaturesFeatureCollection implements FeatureCollection {
+public class MaxFeaturesFeatureCollection extends DecoratingFeatureCollection 
+	implements FeatureCollection {
 
 	FeatureCollection delegate;
 	long max;
 	
 	public MaxFeaturesFeatureCollection( FeatureCollection delegate, long max ) {
+		super(delegate);
 		this.delegate = delegate;
 		this.max = max;
 	}
@@ -62,26 +57,6 @@ public class MaxFeaturesFeatureCollection implements FeatureCollection {
 		delegate.close( iterator );
 	}
 
-	public void addListener(CollectionListener listener) throws NullPointerException {
-		delegate.addListener( listener );
-	}
-
-	public void removeListener(CollectionListener listener) throws NullPointerException {
-		delegate.removeListener( listener );
-	}
-
-	public FeatureType getFeatureType() {
-		return delegate.getFeatureType();
-	}
-
-	public FeatureType getSchema() {
-		return delegate.getSchema();
-	}
-
-	public void accepts(FeatureVisitor visitor, ProgressListener progress) throws IOException {
-		delegate.accepts( visitor, progress );
-	}
-
 	public FeatureCollection subCollection(Filter filter) {
 		throw new UnsupportedOperationException();
 	}
@@ -90,16 +65,8 @@ public class MaxFeaturesFeatureCollection implements FeatureCollection {
 		throw new UnsupportedOperationException();
 	}
 
-	public void purge() {
-		delegate.purge();
-	}
-
 	public int size() {
 		return (int) Math.min( delegate.size(), max );
-	}
-
-	public void clear() {
-		delegate.clear();
 	}
 
 	public boolean isEmpty() {
@@ -134,14 +101,6 @@ public class MaxFeaturesFeatureCollection implements FeatureCollection {
 		return false;
 	}
 
-	public boolean contains(Object o) {
-		return delegate.add( o );
-	}
-
-	public boolean remove(Object o) {
-		return delegate.remove( o );
-	}
-
 	public boolean addAll(Collection c) {
 		boolean changed = false;
 		
@@ -162,55 +121,6 @@ public class MaxFeaturesFeatureCollection implements FeatureCollection {
 		return true;
 	}
 
-
-	public boolean removeAll(Collection c) {
-		return delegate.removeAll ( c );
-	}
-
-	public boolean retainAll(Collection c) {
-		return delegate.retainAll( c );
-	}
-
-	public String getID() {
-		return delegate.getID();
-	}
-
-	public Object[] getAttributes(Object[] attributes) {
-		return delegate.getAttributes( attributes );
-	}
-
-	public Object getAttribute(String xPath) {
-		return delegate.getAttribute( xPath );
-	}
-
-	public Object getAttribute(int index) {
-		return delegate.getAttribute( index );
-	}
-
-	public void setAttribute(int position, Object val) throws IllegalAttributeException, ArrayIndexOutOfBoundsException {
-		delegate.setAttribute( position, val );
-	}
-
-	public int getNumberOfAttributes() {
-		return delegate.getNumberOfAttributes();
-	}
-
-	public void setAttribute(String xPath, Object attribute) throws IllegalAttributeException {
-		delegate.setAttribute( xPath, attribute );
-	}
-
-	public Geometry getDefaultGeometry() {
-		return delegate.getDefaultGeometry();
-	}
-	public Geometry getPrimaryGeometry() {
-		return delegate.getPrimaryGeometry();
-	}
-	public void setDefaultGeometry(Geometry geometry) throws IllegalAttributeException {
-		delegate.setDefaultGeometry( geometry );
-	}
-	public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
-		delegate.setPrimaryGeometry(geometry);
-	}
 	public ReferencedEnvelope getBounds() {
 		//calculate manually
 		return ReferencedEnvelope.reference( DataUtilities.bounds( this ) );

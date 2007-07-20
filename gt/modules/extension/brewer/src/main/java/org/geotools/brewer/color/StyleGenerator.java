@@ -218,14 +218,14 @@ public class StyleGenerator {
             defaultStroke = sb.createStroke(Color.BLACK, 1, opacity);
         }
 
-        if ((geometryAttrType.getType() == MultiPolygon.class)
-                || (geometryAttrType.getType() == Polygon.class)) {
+        if ((geometryAttrType.getBinding() == MultiPolygon.class)
+                || (geometryAttrType.getBinding() == Polygon.class)) {
             Fill fill = sb.createFill(color, opacity);
             symb = sb.createPolygonSymbolizer(defaultStroke, fill);
-        } else if (geometryAttrType.getType() == LineString.class) {
+        } else if (geometryAttrType.getBinding() == LineString.class) {
             symb = sb.createLineSymbolizer(color);
-        } else if ((geometryAttrType.getType() == MultiPoint.class)
-                || (geometryAttrType.getType() == Point.class)) {
+        } else if ((geometryAttrType.getBinding() == MultiPoint.class)
+                || (geometryAttrType.getBinding() == Point.class)) {
             Fill fill = sb.createFill(color, opacity);
             Mark square = sb.createMark(StyleBuilder.MARK_SQUARE, fill, defaultStroke);
             Graphic graphic = sb.createGraphic(null, square, null); //, 1, 4, 0);

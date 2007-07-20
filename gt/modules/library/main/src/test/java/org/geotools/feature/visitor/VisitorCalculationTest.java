@@ -334,7 +334,7 @@ public class VisitorCalculationTest extends DataTestCase {
     
     public void testQuantileList() throws Exception {
         FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
-        Expression expr = factory.property(ft.getAttributeType(0).getName());
+        Expression expr = factory.property(ft.getAttributeType(0).getLocalName());
         QuantileListVisitor visitor = new QuantileListVisitor(expr, 2);
         fc.accepts(visitor, null);
         List[] qResult = (List[]) visitor.getResult().getValue();
@@ -345,7 +345,7 @@ public class VisitorCalculationTest extends DataTestCase {
 
     public void testStandardDeviation() throws Exception {
     	FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
-    	Expression expr = factory.property(ft3.getAttributeType(0).getName());
+    	Expression expr = factory.property(ft3.getAttributeType(0).getLocalName());
     	AverageVisitor visit1 = new AverageVisitor(expr);
     	fc3.accepts(visit1, null);
     	double average = visit1.getResult().toDouble();

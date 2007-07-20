@@ -312,7 +312,7 @@ public class FeatureTypeTransformer extends TransformerBase {
          */
         protected void encode(AttributeType attribute)
             throws SAXException {
-            Class type = attribute.getType();
+            Class type = attribute.getBinding();
 
             if (Number.class.isAssignableFrom(type)) {
                 encodeNumber(attribute);
@@ -435,7 +435,7 @@ public class FeatureTypeTransformer extends TransformerBase {
             throws SAXException {
             AttributesImpl atts = createStandardAttributes(attribute);
 
-            Class type = attribute.getType();
+            Class type = attribute.getBinding();
 
             String typeString;
 
@@ -480,9 +480,9 @@ public class FeatureTypeTransformer extends TransformerBase {
             throws SAXException {
             AttributesImpl atts = createStandardAttributes(attribute);
 
-            if(java.sql.Date.class.isAssignableFrom(attribute.getType()))
+            if(java.sql.Date.class.isAssignableFrom(attribute.getBinding()))
                 atts.addAttribute("", "type", "type", "", "xs:date");
-            else if(java.sql.Time.class.isAssignableFrom(attribute.getType()))
+            else if(java.sql.Time.class.isAssignableFrom(attribute.getBinding()))
                 atts.addAttribute("", "type", "type", "", "xs:time");
             else
                 atts.addAttribute("", "type", "type", "", "xs:dateTime");
@@ -504,7 +504,7 @@ public class FeatureTypeTransformer extends TransformerBase {
             throws SAXException {
             AttributesImpl atts = createStandardAttributes(attribute);
 
-            Class type = attribute.getType();
+            Class type = attribute.getBinding();
 
             String typeString = "";
 
@@ -574,7 +574,7 @@ public class FeatureTypeTransformer extends TransformerBase {
             AttributeType attribute) {
             AttributesImpl atts = new AttributesImpl();
 
-            atts.addAttribute("", "name", "name", "", attribute.getName());
+            atts.addAttribute("", "name", "name", "", attribute.getLocalName());
 
             if (attribute.isNillable()) {
                 atts.addAttribute("", "minOccurs", "minOccurs", "", "0");

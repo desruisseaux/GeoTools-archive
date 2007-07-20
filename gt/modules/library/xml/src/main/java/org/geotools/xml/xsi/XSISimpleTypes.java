@@ -378,7 +378,7 @@ public class XSISimpleTypes {
         private static SimpleType instance = new Integer();
 
         /**
-         * @see org.geotools.xml.xsi.Type#getName()
+         * @see org.geotools.xml.xsi.Type#getLocalName()
          */
         public java.lang.String getName() {
             return "integer";
@@ -436,7 +436,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see org.geotools.xml.xsi.Type#getName()
+         * @see org.geotools.xml.xsi.Type#getLocalName()
          */
         public java.lang.String getName() {
             return "decimal";
@@ -487,7 +487,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see org.geotools.xml.xsi.Type#getName()
+         * @see org.geotools.xml.xsi.Type#getLocalName()
          */
         public java.lang.String getName() {
             return "negativeInteger";
@@ -535,7 +535,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see org.geotools.xml.xsi.Type#getName()
+         * @see org.geotools.xml.xsi.Type#getLocalName()
          */
         public java.lang.String getName() {
             return "nonNegativeInteger";
@@ -590,7 +590,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "positiveInteger";
@@ -637,7 +637,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "nonPositiveInteger";
@@ -684,7 +684,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "long";
@@ -731,7 +731,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "int";
@@ -778,7 +778,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "short";
@@ -825,7 +825,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "byte";
@@ -872,7 +872,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "unsignedLong";
@@ -919,7 +919,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "unsignedShort";
@@ -966,7 +966,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "unsignedInt";
@@ -1013,7 +1013,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "unsignedByte";
@@ -1060,7 +1060,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "float";
@@ -1107,7 +1107,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "double";
@@ -1154,7 +1154,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "date";
@@ -1217,7 +1217,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "dateTime";
@@ -1331,7 +1331,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "duration";
@@ -1455,7 +1455,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "gDay";
@@ -1506,7 +1506,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "gMonth";
@@ -1557,7 +1557,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "gMonthDay";
@@ -1609,7 +1609,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "gYear";
@@ -1660,7 +1660,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "gYearMonth";
@@ -1712,7 +1712,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "time";
@@ -1804,7 +1804,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "ID";
@@ -1850,7 +1850,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "IDREF";
@@ -1896,7 +1896,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "IDREFS";
@@ -1943,7 +1943,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "ENTITY";
@@ -1989,7 +1989,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "ENTITIES";
@@ -2036,7 +2036,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "NMTOKEN";
@@ -2082,7 +2082,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "NMTOKENS";
@@ -2129,7 +2129,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "NOTATION";
@@ -2175,7 +2175,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "string";
@@ -2221,7 +2221,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "normalizedString";
@@ -2268,7 +2268,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "token";
@@ -2315,7 +2315,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "QName";
@@ -2361,7 +2361,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "Name";
@@ -2407,7 +2407,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "NCName";
@@ -2453,7 +2453,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "boolean";
@@ -2500,7 +2500,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "anyURI";
@@ -2550,7 +2550,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "base64Binary";
@@ -2596,7 +2596,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "hexBinary";
@@ -2642,7 +2642,7 @@ public class XSISimpleTypes {
         }
 
         /**
-         * @see schema.SimpleType#getName()
+         * @see schema.SimpleType#getLocalName()
          */
         public java.lang.String getName() {
             return "language";

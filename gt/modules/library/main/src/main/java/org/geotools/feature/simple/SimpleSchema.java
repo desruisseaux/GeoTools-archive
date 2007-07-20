@@ -1,14 +1,18 @@
 package org.geotools.feature.simple;
 
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.GeometryAttributeType;
+
 import org.geotools.feature.type.SchemaImpl;
 import org.geotools.feature.type.TypeFactoryImpl;
 import org.geotools.feature.type.TypeName;
+import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.GeometryType;
+import org.opengis.feature.type.TypeFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -21,8 +25,7 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 /**
- * Schema containing a simple set of types for import into
- * the SimpleFeatureBuilder.
+ * Schema containing a set of "simple" types. 
  * <p>
  * These types represent a good choice for default java bindings, for data
  * sources that do not have specific or complicated needs. As such these
@@ -43,7 +46,7 @@ import com.vividsolutions.jts.geom.Polygon;
 public class SimpleSchema extends SchemaImpl {
    
 	//internal factory
-	private static SimpleTypeFactoryImpl factory = new SimpleTypeFactoryImpl();
+	private static TypeFactory factory = new TypeFactoryImpl();
 	
 	/** simple namespace */
     public static final String NAMESPACE = "http://www.geotools.org/simple";
@@ -107,9 +110,14 @@ public class SimpleSchema extends SchemaImpl {
     //
     // TEMPORAL
     //
-    /** DATE to Data.class */
+    /** DATE to Date.class */
     public static final AttributeType DATE = factory.createAttributeType(
         new TypeName(NAMESPACE,"date"), Date.class, false,
+        false,Collections.EMPTY_SET, (AttributeType) null, null
+    );
+    /** TIME to Time.class */
+    public static final AttributeType TIME = factory.createAttributeType(
+        new TypeName(NAMESPACE,"time"), Time.class, false,
         false,Collections.EMPTY_SET, (AttributeType) null, null
     );
     /**
@@ -118,7 +126,7 @@ public class SimpleSchema extends SchemaImpl {
      * Data and a Time like a timestamp.
      */    
     public static final AttributeType DATETIME = factory.createAttributeType(
-        new TypeName(NAMESPACE,"datetime"), Calendar.class, false,
+        new TypeName(NAMESPACE,"datetime"), Timestamp.class, false,
         false,Collections.EMPTY_SET, (AttributeType) null, null
     );
     
@@ -126,50 +134,50 @@ public class SimpleSchema extends SchemaImpl {
     // Geomtries
     //
     /** Geometry to Geometry.class */
-    public static final GeometryAttributeType GEOMETRY = factory.createGeometryType(
+    public static final GeometryType GEOMETRY = factory.createGeometryType(
         new TypeName(NAMESPACE,"geometry"), Geometry.class, null, false, false, 
         Collections.EMPTY_SET, (AttributeType) null, null
     );
     /** POINT (extends GEOMETRY) binds to Point.class */    
-    public static final GeometryAttributeType POINT = factory.createGeometryType(
+    public static final GeometryType POINT = factory.createGeometryType(
         new TypeName(NAMESPACE,"point"), Point.class, null, false, false, 
         Collections.EMPTY_SET, GEOMETRY, null
     );
     /** LINESTRING (extends GEOMETRY) binds to LineString.class */        
-    public static final GeometryAttributeType LINESTRING = factory.createGeometryType(
+    public static final GeometryType LINESTRING = factory.createGeometryType(
         new TypeName(NAMESPACE,"linestring"), LineString.class, null, false, 
         false, Collections.EMPTY_SET, GEOMETRY, null
     );
     /** LINEARRING (extends GEOMETRY) binds to LinearRing.class */            
-    public static final GeometryAttributeType LINEARRING = factory.createGeometryType(
+    public static final GeometryType LINEARRING = factory.createGeometryType(
         new TypeName(NAMESPACE,"linearring"), LinearRing.class, null, false, 
         false, Collections.EMPTY_SET, LINESTRING, null
     );
     /**  POLYGON (extends GEOMETRY) binds to Polygon.class */            
-    public static final GeometryAttributeType POLYGON = factory.createGeometryType(
+    public static final GeometryType POLYGON = factory.createGeometryType(
         new TypeName(NAMESPACE,"polygon"), Polygon.class, null, false, 
         false, Collections.EMPTY_SET, GEOMETRY, null
     );
     /**  MULTIGEOMETRY (extends GEOMETRY) binds to GeometryCollection.class */                
-    public static final GeometryAttributeType MULTIGEOMETRY = factory.createGeometryType(
+    public static final GeometryType MULTIGEOMETRY = factory.createGeometryType(
         new TypeName(NAMESPACE,"multigeometry"), GeometryCollection.class, null,
         false, false, Collections.EMPTY_SET, GEOMETRY, null
     );
     
     /**  MULTIPOINT (extends MULTIGEOMETRY) binds to MultiPoint.class */            
-    public static final GeometryAttributeType MULTIPOINT = factory.createGeometryType(
+    public static final GeometryType MULTIPOINT = factory.createGeometryType(
         new TypeName(NAMESPACE,"multipoint"), MultiPoint.class, null, false, false, 
         Collections.EMPTY_SET, MULTIGEOMETRY, null
     );
     
     /**  MULTILINESTRING (extends MULTIGEOMETRY) binds to MultiLineString.class */            
-    public static final GeometryAttributeType MULTILINESTRING = factory.createGeometryType(
+    public static final GeometryType MULTILINESTRING = factory.createGeometryType(
         new TypeName(NAMESPACE,"multilinestring"), MultiLineString.class, null, 
         false, false, Collections.EMPTY_SET, MULTIGEOMETRY, null
     );
     
     /** MULTIPOLYGON (extends MULTIGEOMETRY) binds to MultiPolygon.class */            
-    public static final GeometryAttributeType MULTIPOLYGON = factory.createGeometryType(
+    public static final GeometryType MULTIPOLYGON = factory.createGeometryType(
         new TypeName(NAMESPACE,"multipolygon"), MultiPolygon.class, null, false, 
         false, Collections.EMPTY_SET, MULTIGEOMETRY, null
     );
@@ -177,28 +185,28 @@ public class SimpleSchema extends SchemaImpl {
     public SimpleSchema() {
         super(NAMESPACE);
         
-        put(new TypeName(NAMESPACE,INTEGER.getName()),INTEGER);
-        put(new TypeName(NAMESPACE,DOUBLE.getName()),DOUBLE);
-        put(new TypeName(NAMESPACE,LONG.getName()),LONG);
-        put(new TypeName(NAMESPACE,FLOAT.getName()),FLOAT);
-        put(new TypeName(NAMESPACE,SHORT.getName()),SHORT);
-        put(new TypeName(NAMESPACE,BYTE.getName()),BYTE);
-        put(new TypeName(NAMESPACE,NUMBER.getName()),NUMBER);
-        put(new TypeName(NAMESPACE,STRING.getName()),STRING);
-        put(new TypeName(NAMESPACE,BOOLEAN.getName()),BOOLEAN);
-        put(new TypeName(NAMESPACE,DATE.getName()),DATE);
-        put(new TypeName(NAMESPACE,DATETIME.getName()),DATETIME);
+        put(INTEGER.getName(),INTEGER);
+        put(DOUBLE.getName(),DOUBLE);
+        put(LONG.getName(),LONG);
+        put(FLOAT.getName(),FLOAT);
+        put(SHORT.getName(),SHORT);
+        put(BYTE.getName(),BYTE);
+        put(NUMBER.getName(),NUMBER);
+        put(STRING.getName(),STRING);
+        put(BOOLEAN.getName(),BOOLEAN);
+        put(DATE.getName(),DATE);
+        put(DATETIME.getName(),DATETIME);
         
-        put(new TypeName(NAMESPACE,GEOMETRY.getName()),GEOMETRY);
-        put(new TypeName(NAMESPACE,POINT.getName()),POINT);
-        put(new TypeName(NAMESPACE,LINESTRING.getName()),LINESTRING);
-        put(new TypeName(NAMESPACE,LINEARRING.getName()),LINEARRING);
-        put(new TypeName(NAMESPACE,POLYGON.getName()),POLYGON);
-        put(new TypeName(NAMESPACE,MULTIGEOMETRY.getName()),MULTIGEOMETRY);
-        put(new TypeName(NAMESPACE,MULTIGEOMETRY.getName()),MULTIGEOMETRY);
-        put(new TypeName(NAMESPACE,MULTIPOINT.getName()),MULTIPOINT);
-        put(new TypeName(NAMESPACE,MULTILINESTRING.getName()),MULTILINESTRING);
-        put(new TypeName(NAMESPACE,MULTIPOLYGON.getName()),MULTIPOLYGON);
+        put(GEOMETRY.getName(),GEOMETRY);
+        put(POINT.getName(),POINT);
+        put(LINESTRING.getName(),LINESTRING);
+        put(LINEARRING.getName(),LINEARRING);
+        put(POLYGON.getName(),POLYGON);
+        put(MULTIGEOMETRY.getName(),MULTIGEOMETRY);
+        put(MULTIGEOMETRY.getName(),MULTIGEOMETRY);
+        put(MULTIPOINT.getName(),MULTIPOINT);
+        put(MULTILINESTRING.getName(),MULTILINESTRING);
+        put(MULTIPOLYGON.getName(),MULTIPOLYGON);
         
     }
 

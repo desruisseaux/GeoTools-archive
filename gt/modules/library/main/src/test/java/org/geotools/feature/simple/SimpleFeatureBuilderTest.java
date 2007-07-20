@@ -1,10 +1,9 @@
 package org.geotools.feature.simple;
 
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.DefaultFeatureTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -18,29 +17,28 @@ public class SimpleFeatureBuilderTest extends TestCase {
 	SimpleFeatureBuilder builder;
 	
 	protected void setUp() throws Exception {
-		AttributeType[] attributes = new AttributeType[] {
-			AttributeTypeFactory.newAttributeType( "point", Point.class ),
-			AttributeTypeFactory.newAttributeType( "integer", Integer.class ), 
-		};
+		SimpleTypeBuilder typeBuilder = new SimpleTypeBuilder();
+		typeBuilder.setName( "test" );
+		typeBuilder.add( "point", Point.class );
+		typeBuilder.add( "integer", Integer.class );
 		
-		FeatureType type = DefaultFeatureTypeFactory.newFeatureType( attributes, "test" );
-		builder = new SimpleFeatureBuilder( new SimpleFeatureFactoryImpl() );
-		builder.init();
-		builder.setType( type );
+		SimpleFeatureType featureType = typeBuilder.buildFeatureType();
 		
+		builder = new SimpleFeatureBuilder();
+		builder.setType( featureType );
 	}
 	
-	public void test() throws Exception {
+	public void testSanity() throws Exception {
 		GeometryFactory gf = new GeometryFactory();
 		builder.add( gf.createPoint( new Coordinate( 0, 0 ) ) );
 		builder.add( new Integer( 1 ) );
 		
-		Feature feature = builder.feature( "fid" );
+		SimpleFeature feature = builder.feature( "fid" );
 		assertNotNull( feature );
 		
 		assertEquals( 2, feature.getNumberOfAttributes() );
 		
-		assertTrue( gf.createPoint( new Coordinate( 0, 0) ).equals( (Geometry) feature.getAttribute( "point" ) ) );
-		assertEquals( new Integer( 1 ) , feature.getAttribute( "integer" ) );
+		assertTrue( gf.createPoint( new Coordinate( 0, 0) ).equals( (Geometry) feature.getValue( "point" ) ) );
+		assertEquals( new Integer( 1 ) , feature.getValue( "integer" ) );
 	}
 }

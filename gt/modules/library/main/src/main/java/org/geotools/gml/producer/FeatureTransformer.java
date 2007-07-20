@@ -612,7 +612,7 @@ public class FeatureTransformer extends TransformerBase {
         public void handleAttribute(AttributeType type, Object value) {
             try {
                 if (value != null) {
-                    String name = type.getName();
+                    String name = type.getLocalName();
 
                     //HACK: this should be user configurable, along with the
 

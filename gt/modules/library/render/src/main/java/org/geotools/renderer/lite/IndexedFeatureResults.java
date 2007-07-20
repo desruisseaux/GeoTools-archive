@@ -41,7 +41,6 @@ import com.vividsolutions.jts.index.strtree.STRtree;
  */
 public final class IndexedFeatureResults extends DataFeatureCollection {
 	STRtree index = new STRtree();
-	FeatureType schema;
 	Envelope bounds;
 	int count;
 	private Envelope queryBounds;
@@ -49,7 +48,7 @@ public final class IndexedFeatureResults extends DataFeatureCollection {
 	public IndexedFeatureResults(FeatureCollection results) throws IOException,
 			IllegalAttributeException {
 		// copy results attributes
-		this.schema = results.getSchema();
+		super(null,results.getSchema());
 		
 				
 		// load features into the index
@@ -62,7 +61,7 @@ public final class IndexedFeatureResults extends DataFeatureCollection {
 			Envelope env;
 			while (reader.hasNext()) {
 				f = reader.next();
-				env = f.getDefaultGeometry().getEnvelopeInternal();
+				env = f.getPrimaryGeometry().getEnvelopeInternal();
 				bounds.expandToInclude(env);
 				count++;
 				index.insert(env, f);
@@ -71,13 +70,6 @@ public final class IndexedFeatureResults extends DataFeatureCollection {
 			if(reader != null)
 				reader.close();
 		}
-	}
-
-	/**
-	 * @see org.geotools.data.FeatureResults#getSchema()
-	 */
-	public FeatureType getSchema() {
-		return this.schema;
 	}
 
 	/**
@@ -92,7 +84,7 @@ public final class IndexedFeatureResults extends DataFeatureCollection {
 			 * @see org.geotools.data.FeatureReader#getFeatureType()
 			 */
 			public FeatureType getFeatureType() {
-				return schema;
+				return getSchema();
 			}
 
 			/**

@@ -114,7 +114,7 @@ public class FeatureTableModel extends AbstractTableModel implements TableModel 
         }
         Feature firstFeature = featureTable.features().next();
         FeatureType firstType = firstFeature.getFeatureType();
-        return firstType.getAttributeType(col).getName();
+        return firstType.getAttributeType(col).getLocalName();
     }
 
     /**

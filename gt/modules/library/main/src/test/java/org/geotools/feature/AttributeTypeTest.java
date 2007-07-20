@@ -61,12 +61,12 @@ public class AttributeTypeTest extends TestCase {
     
     public void testGetName(){
         AttributeType type = AttributeTypeFactory.newAttributeType("testAttribute", Double.class);
-        assertEquals("testAttribute", type.getName());
+        assertEquals("testAttribute", type.getLocalName());
     }
     
     public void testGetType(){
         AttributeType type = AttributeTypeFactory.newAttributeType("testAttribute", Double.class);
-        assertEquals(Double.class, type.getType());
+        assertEquals(Double.class, type.getBinding());
     }
     
     

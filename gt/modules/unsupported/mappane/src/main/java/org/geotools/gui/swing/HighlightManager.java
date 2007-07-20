@@ -155,8 +155,8 @@ public class HighlightManager extends MouseMotionAdapter {
         this.highlightLayer = highlightLayer;
 
         if (this.highlightLayer != null) {
-            geomName = this.highlightLayer.getFeatureSource().getSchema().getDefaultGeometry()
-                                          .getName();
+            geomName = this.highlightLayer.getFeatureSource().getSchema().getPrimaryGeometry()
+                                          .getLocalName();
 
             if ((geomName == null) || (geomName == "")) {
                 geomName = "the_geom";

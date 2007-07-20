@@ -441,7 +441,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             Envelope envelope = null;
     		    	
         	FeatureType schema = getSchema(typeName);
-        	String geomName = schema.getDefaultGeometry().getName();
+        	String geomName = schema.getPrimaryGeometry().getLocalName();
         	
 	    	// optimization, postgis version >= 1.0 contains estimated_extent
             // function to query the stats of the table to determine the bbox,
@@ -781,8 +781,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         encoder.setSupportsGEOS(useGeos);
         encoder.setFIDMapper(typeHandler.getFIDMapper(typeName));
 
-        if (info.getSchema().getDefaultGeometry() != null) {
-            String geom = info.getSchema().getDefaultGeometry().getName();
+        if (info.getSchema().getPrimaryGeometry() != null) {
+            String geom = info.getSchema().getPrimaryGeometry().getLocalName();
             srid = info.getSRID(geom);
             encoder.setDefaultGeometry(geom);
         }
@@ -1131,7 +1131,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             crs = null;
         }
         
-        return AttributeTypeFactory.newAttributeType(columnName, type, nillable,  0, null, crs);
+        return AttributeTypeFactory.newAttributeType(columnName, type, nillable,  -1, null, crs);
     }
 
     private PostgisAuthorityFactory getPostgisAuthorityFactory() {
@@ -1194,7 +1194,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         
         //make sure the fid column doesn't already exist
         for (int i = 0; i < attributeType.length; i++) {
-        	if (attributeType[i].getName().equalsIgnoreCase(fidColumn)) {
+        	if (attributeType[i].getLocalName().equalsIgnoreCase(fidColumn)) {
                 String message = "The featuretype cannot contain the column "
                     + fidColumn + ", since this is used as the hidden FID column";
                 throw new IOException(message);
@@ -1269,7 +1269,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                     continue;
                 }
                 GeometryAttributeType geomAttribute = (GeometryAttributeType) attributeType[i];
-                String columnName = attributeType[i].getName();
+                String columnName = attributeType[i].getLocalName();
                 
                 CoordinateReferenceSystem refSys = geomAttribute
                     .getCoordinateSystem();
@@ -1303,7 +1303,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
                 //this construct seems unnecessary, since we already would
                 //pass over if this wasn't a geometry...
-                Class type = geomAttribute.getType();
+                Class type = geomAttribute.getBinding();
 
                 if (geomAttribute instanceof GeometryAttributeType) {
                     typeName = getGeometrySQLTypeName(type);
@@ -1390,7 +1390,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                     }
 
                 } else {
-                	LOGGER.warning("Error: " + geomAttribute.getName()+ " unknown type!!!");
+                	LOGGER.warning("Error: " + geomAttribute.getLocalName()+ " unknown type!!!");
                 }
 
                 
@@ -1399,11 +1399,11 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 sql = new StringBuffer("CREATE INDEX spatial_");
                 sql.append(tableName);
                 sql.append("_");
-                sql.append(attributeType[i].getName().toLowerCase());
+                sql.append(attributeType[i].getLocalName().toLowerCase());
                 sql.append(" ON ");
                 sql.append(sqlb.encodeTableName(tableName));
                 sql.append(" USING GIST (");
-                sql.append(sqlb.encodeColumnName(attributeType[i].getName()));
+                sql.append(sqlb.encodeColumnName(attributeType[i].getLocalName()));
                 sql.append(");");
                 
                 sqlStr = sql.toString();
@@ -1482,9 +1482,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
         for (int i = 0; i < attributeType.length; i++) {
             String typeName = null;
-            typeName = (String) CLASS_MAPPINGS.get(attributeType[i].getType());
+            typeName = (String) CLASS_MAPPINGS.get(attributeType[i].getBinding());
             if (typeName == null)
-            	typeName = (String) GEOM_CLASS_MAPPINGS.get(attributeType[i].getType());
+            	typeName = (String) GEOM_CLASS_MAPPINGS.get(attributeType[i].getBinding());
             	
             if (typeName != null) {
                 if (attributeType[i] instanceof GeometryAttributeType) {
@@ -1533,14 +1533,14 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                         + defaultValue.toString() + "'";
                 }
 
-                buf.append(" \"" + attributeType[i].getName() + "\" " + typeName + ",");
+                buf.append(" \"" + attributeType[i].getLocalName() + "\" " + typeName + ",");
 
             } else {
             	String msg;
             	if (attributeType[i] == null) {
             		msg = "AttributeType was null!";
             	} else {
-            		msg = "Type '" + attributeType[i].getType() + "' not supported!";
+            		msg = "Type '" + attributeType[i].getBinding() + "' not supported!";
             	}
                 throw (new IOException(msg));
             }

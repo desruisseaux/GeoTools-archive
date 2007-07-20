@@ -535,10 +535,10 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor2 {
         	if ( featureType != null ) {
         		AttributeType attributeType = (AttributeType) expression.evaluate( featureType );
             	if ( attributeType != null ) {
-            		out.write( escapeName( attributeType.getName() ) );
+            		out.write( escapeName( attributeType.getLocalName() ) );
             		
             		//provide context for a literal being compared to this attribute
-            		context = attributeType.getType(); 
+            		context = attributeType.getBinding(); 
             		return;
             	}
         	}

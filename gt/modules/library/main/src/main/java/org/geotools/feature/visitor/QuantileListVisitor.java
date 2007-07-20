@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.geotools.feature.Feature;
+import org.opengis.feature.type.FeatureCollectionType;
 import org.opengis.filter.expression.Expression;
 
 /**
@@ -48,6 +49,10 @@ public class QuantileListVisitor implements FeatureCalc {
 		this.bin = new ArrayList[bins];
 	}
 
+	public void init(FeatureCollectionType collection) {
+		//do nothing
+	}
+	
 	public CalcResult getResult() {
 	    if (bins == 0 || count == 0) return null;
         
@@ -84,6 +89,9 @@ public class QuantileListVisitor implements FeatureCalc {
 	}
 
 	public void visit(Feature feature) {
+        visit((org.opengis.feature.Feature)feature);
+    }
+    public void visit(org.opengis.feature.Feature feature) {
         Object value = expr.evaluate(feature);
 
         if (value == null) {

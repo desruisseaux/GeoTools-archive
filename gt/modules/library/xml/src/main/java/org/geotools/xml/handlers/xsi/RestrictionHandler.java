@@ -430,7 +430,7 @@ class EnumerationHandler extends FacetHandler {
     public final static String LOCALNAME = "enumeration";
 
     /**
-     * @see org.geotools.xml.XSIHandlers.FacetHandler#getType()
+     * @see org.geotools.xml.XSIHandlers.FacetHandler#getBinding()
      */
     public int getType() {
         return Facet.ENUMERATION;
@@ -456,7 +456,7 @@ class FractionDigitsHandler extends FacetHandler {
     public final static String LOCALNAME = "fractionDigits";
 
     /**
-     * @see org.geotools.xml.XSIHandlers.FacetHandler#getType()
+     * @see org.geotools.xml.XSIHandlers.FacetHandler#getBinding()
      */
     public int getType() {
         return Facet.FRACTIONDIGITS;
@@ -482,7 +482,7 @@ class LengthHandler extends FacetHandler {
     public final static String LOCALNAME = "length";
 
     /**
-     * @see org.geotools.xml.XSIHandlers.FacetHandler#getType()
+     * @see org.geotools.xml.XSIHandlers.FacetHandler#getBinding()
      */
     public int getType() {
         return Facet.LENGTH;
@@ -508,7 +508,7 @@ class MinInclusiveHandler extends FacetHandler {
     public final static String LOCALNAME = "minInclusive";
 
     /**
-     * @see org.geotools.xml.XSIHandlers.FacetHandler#getType()
+     * @see org.geotools.xml.XSIHandlers.FacetHandler#getBinding()
      */
     public int getType() {
         return Facet.MININCLUSIVE;
@@ -534,7 +534,7 @@ class MaxInclusiveHandler extends FacetHandler {
     public final static String LOCALNAME = "maxInclusive";
 
     /**
-     * @see org.geotools.xml.XSIHandlers.FacetHandler#getType()
+     * @see org.geotools.xml.XSIHandlers.FacetHandler#getBinding()
      */
     public int getType() {
         return Facet.MAXINCLUSIVE;
@@ -560,7 +560,7 @@ class MinExclusiveHandler extends FacetHandler {
     public final static String LOCALNAME = "minExclusive";
 
     /**
-     * @see org.geotools.xml.XSIHandlers.FacetHandler#getType()
+     * @see org.geotools.xml.XSIHandlers.FacetHandler#getBinding()
      */
     public int getType() {
         return Facet.MINEXCLUSIVE;
@@ -586,7 +586,7 @@ class MaxExclusiveHandler extends FacetHandler {
     public final static String LOCALNAME = "maxExclusive";
 
     /**
-     * @see org.geotools.xml.XSIHandlers.FacetHandler#getType()
+     * @see org.geotools.xml.XSIHandlers.FacetHandler#getBinding()
      */
     public int getType() {
         return Facet.MAXEXCLUSIVE;
@@ -612,7 +612,7 @@ class MinLengthHandler extends FacetHandler {
     public final static String LOCALNAME = "minLength";
 
     /**
-     * @see org.geotools.xml.XSIHandlers.FacetHandler#getType()
+     * @see org.geotools.xml.XSIHandlers.FacetHandler#getBinding()
      */
     public int getType() {
         return Facet.MINLENGTH;
@@ -638,7 +638,7 @@ class MaxLengthHandler extends FacetHandler {
     public final static String LOCALNAME = "maxLength";
 
     /**
-     * @see org.geotools.xml.XSIHandlers.FacetHandler#getType()
+     * @see org.geotools.xml.XSIHandlers.FacetHandler#getBinding()
      */
     public int getType() {
         return Facet.MAXLENGTH;
@@ -664,7 +664,7 @@ class PatternHandler extends FacetHandler {
     public final static String LOCALNAME = "pattern";
 
     /**
-     * @see org.geotools.xml.XSIHandlers.FacetHandler#getType()
+     * @see org.geotools.xml.XSIHandlers.FacetHandler#getBinding()
      */
     public int getType() {
         return Facet.PATTERN;
@@ -690,7 +690,7 @@ class TotalDigitsHandler extends FacetHandler {
     public final static String LOCALNAME = "totalDigits";
 
     /**
-     * @see org.geotools.xml.XSIHandlers.FacetHandler#getType()
+     * @see org.geotools.xml.XSIHandlers.FacetHandler#getBinding()
      */
     public int getType() {
         return Facet.TOTALDIGITS;

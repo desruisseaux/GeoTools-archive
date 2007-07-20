@@ -83,8 +83,8 @@ public class VPFFeatureReader
                 Feature joinRow = (Feature) rows.get(primaryFile);
     
                 try {
-                    int joinID = Integer.parseInt(joinRow.getAttribute(columnPair.column1.getName()).toString());
-                    rows.put(joinFile, getVPFFile(columnPair.column2).getRowFromId(columnPair.column2.getName(), joinID));
+                    int joinID = Integer.parseInt(joinRow.getAttribute(columnPair.column1.getLocalName()).toString());
+                    rows.put(joinFile, getVPFFile(columnPair.column2).getRowFromId(columnPair.column2.getLocalName(), joinID));
                 } catch (NullPointerException exc) {
                     // Non-matching joins - just put in a NULL
                     rows.put(joinFile, null);
@@ -201,7 +201,7 @@ public class VPFFeatureReader
             // I am thinking it is probably safer to look this up 
             // by column name than by position, but if it breaks,
             // it is easy enough to change
-            if (attributes[inx].getName().equals("id")) {
+            if (attributes[inx].getLocalName().equals("id")) {
                 value = row.getAttribute(inx);
                 if(value != null) {
                     featureId = value.toString(); 
@@ -219,7 +219,7 @@ public class VPFFeatureReader
         // Pass 2 - get the attributes, including the geometry
         for(int inx = 0; inx < attributes.length; inx++){
             try {
-                if (attributes[inx].getName().equals(AnnotationFeatureType.ANNOTATION_ATTRIBUTE_NAME)) {
+                if (attributes[inx].getLocalName().equals(AnnotationFeatureType.ANNOTATION_ATTRIBUTE_NAME)) {
                     try{
                         //TODO: are we sure this is the intended action? Hard-coding an attribute to "nam"?
                         currentFeature.setAttribute(inx, "nam");
@@ -233,7 +233,7 @@ public class VPFFeatureReader
                 secondFile = getVPFFile(column); 
                 Feature tempRow = (Feature) rows.get(secondFile);
                 if(tempRow != null){
-                    value = tempRow.getAttribute(column.getName());
+                    value = tempRow.getAttribute(column.getLocalName());
                     if (column.isAttemptLookup()){
                         try {
                             // Attempt to perform a lookup and conversion
@@ -245,7 +245,7 @@ public class VPFFeatureReader
                                 Feature intVdtRow = (Feature)intVdtIter.next();
                                 if(intVdtRow.getAttribute("table").toString().trim().equals(featureClassName) && 
                                         (Short.parseShort(intVdtRow.getAttribute("value").toString()) == Short.parseShort(value.toString()) &&
-                                        (intVdtRow.getAttribute("attribute").toString().trim().equals(column.getName())))){
+                                        (intVdtRow.getAttribute("attribute").toString().trim().equals(column.getLocalName())))){
                                     value = intVdtRow.getAttribute("description").toString().trim();
                                     break;
                                 }

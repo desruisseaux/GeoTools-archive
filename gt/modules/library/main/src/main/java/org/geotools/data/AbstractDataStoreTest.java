@@ -256,14 +256,14 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         assertEquals("attributes", 3, type.getAttributeCount());
 
         AttributeType[] a = type.getAttributeTypes();
-        assertEquals("a1", "name", a[0].getName());
-        assertEquals("a1", String.class, a[0].getType());
+        assertEquals("a1", "name", a[0].getLocalName());
+        assertEquals("a1", String.class, a[0].getBinding());
 
-        assertEquals("a2", "id", a[1].getName());
-        assertEquals("a2", Integer.class, a[1].getType());
+        assertEquals("a2", "id", a[1].getLocalName());
+        assertEquals("a2", Integer.class, a[1].getBinding());
 
-        assertEquals("a3", "geom", a[2].getName());
-        assertEquals("a3", MultiLineString.class, a[2].getType());
+        assertEquals("a3", "geom", a[2].getLocalName());
+        assertEquals("a3", MultiLineString.class, a[2].getBinding());
     }
 
     public void testGetFeatureTypes() {
@@ -1140,8 +1140,8 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
             assertEquals(type.getAttributeType(i), actual.getAttributeType(i));
         }
 
-        assertNull(type.getDefaultGeometry());
-        assertEquals(type.getDefaultGeometry(), actual.getDefaultGeometry());
+        assertNull(type.getPrimaryGeometry());
+        assertEquals(type.getPrimaryGeometry(), actual.getPrimaryGeometry());
         assertEquals(type, actual);
 
         Envelope b = half.getBounds();

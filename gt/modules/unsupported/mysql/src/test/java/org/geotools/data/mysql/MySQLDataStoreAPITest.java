@@ -578,7 +578,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
             AttributeType expectedAttribute = expected.getAttributeType(i);
             AttributeType actualAttribute = actual.getAttributeType(i);
             assertEquals(
-                "attribute " + expectedAttribute.getName(),
+                "attribute " + expectedAttribute.getLocalName(),
                 expectedAttribute,
                 actualAttribute);
         }
@@ -599,7 +599,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
             AttributeType expectedAttribute = expected.getAttributeType(i);
             AttributeType actualAttribute = actual.getAttributeType(i);
             assertEquals(
-                "attribute " + expectedAttribute.getName(),
+                "attribute " + expectedAttribute.getLocalName(),
                 expectedAttribute,
                 actualAttribute);
         }
@@ -1413,8 +1413,8 @@ public class MySQLDataStoreAPITest extends DataTestCase {
             assertEquals(type.getAttributeType(i), actual.getAttributeType(i));
         }
 
-        assertNull(type.getDefaultGeometry());
-        assertEquals(type.getDefaultGeometry(), actual.getDefaultGeometry());
+        assertNull(type.getPrimaryGeometry());
+        assertEquals(type.getPrimaryGeometry(), actual.getPrimaryGeometry());
         assertEquals(type, actual);
 
         Envelope b = half.getBounds();

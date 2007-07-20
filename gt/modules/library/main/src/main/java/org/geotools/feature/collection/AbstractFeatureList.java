@@ -94,14 +94,8 @@ public abstract class AbstractFeatureList extends AbstractResourceList implement
     public void setAttribute( String xPath, Object attribute ) throws IllegalAttributeException {
         state.setAttribute( xPath, attribute );
     }
-    public final Geometry getDefaultGeometry() {
-        return getPrimaryGeometry();
-    }
     public Geometry getPrimaryGeometry() {
     	return state.getDefaultGeometry();
-    }
-    public final void setDefaultGeometry( Geometry geometry ) throws IllegalAttributeException {
-    	setPrimaryGeometry(geometry);
     }
     public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
     	state.setDefaultGeometry( geometry );

@@ -55,7 +55,7 @@ public class PrimitiveDataFactory {
         String name = null;
 
         for (int i = 0; i < type.getAttributeCount(); i++) {
-            name = type.getAttributeType(i).getName();
+            name = type.getAttributeType(i).getLocalName();
             tmp.put(name, line.get(name));
         }
 
