@@ -43,7 +43,7 @@ public class H4VGroupTest extends TestCase {
 	
 	private String testFilePath;
 
-	private final static boolean PRINT_ANY_VGROUP = false;
+	private final static boolean PRINT_ANY_VGROUP = true;
 
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -159,11 +159,24 @@ public class H4VGroupTest extends TestCase {
 			return true;
 	}
 
+	/**
+	 * @param vgroupID
+	 * @param fileID
+	 * @param lev
+	 * @throws HDFException
+	 */
 	private void dumpVGroup(final int vgroupID, int fileID, int lev)
 			throws HDFException {
 		dumpVGroup(vgroupID, fileID, lev, true);
 	}
 
+	/**
+	 * @param vgroupID
+	 * @param fileID
+	 * @param lev
+	 * @param recursive
+	 * @throws HDFException
+	 */
 	private void dumpVGroup(final int vgroupID, int fileID, int lev,
 			boolean recursive) throws HDFException {
 		System.out.println("");

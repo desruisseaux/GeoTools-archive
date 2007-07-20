@@ -47,13 +47,13 @@ public class H4SDSTest extends TestCase {
 		super(string);
 	}
 
-	private final static boolean VISUALIZE_FIRST_CHUNK_VALUES = false;
+	private final static boolean VISUALIZE_FIRST_CHUNK_VALUES = true;
 
-	private final static boolean VISUALIZE_DIMENSION_SCALES_VALUES = false;
+	private final static boolean VISUALIZE_DIMENSION_SCALES_VALUES = true;
 
-	private final static boolean VISUALIZE_ATTRIBUTES = false;
+	private final static boolean VISUALIZE_ATTRIBUTES = true;
 
-	private final static boolean VISUALIZE_DIMENSIONS = false;
+	private final static boolean VISUALIZE_DIMENSIONS = true;
 
 	private String testFilePath;
 
@@ -107,6 +107,7 @@ public class H4SDSTest extends TestCase {
 			//
 			// //
 			assertNotSame(sdsInterfaceID, sdsInterfaceID1);
+			HDFLibrary.SDend(sdsInterfaceID1);
 
 			// obtain sds file information and print them out
 			status = HDFLibrary.SDfileinfo(sdsInterfaceID, sdsFileIinfo);
@@ -177,7 +178,7 @@ public class H4SDSTest extends TestCase {
 				// select the sds
 				//
 				// //
-				final int sdsID = HDFLibrary.SDselect(sdsInterfaceID, i);
+				int sdsID = HDFLibrary.SDselect(sdsInterfaceID, i);
 				assertNotSame(sdsID, HDFConstants.FAIL);
 
 				// //
@@ -205,6 +206,7 @@ public class H4SDSTest extends TestCase {
 				System.out.println("\tSDS Dataset reference "
 						+ HDFLibrary.SDidtoref(sdsID));
 				System.out.println("\tSDS Dataset identifier " + sdsID);
+				
 				System.out.println("\tSDS Dataset name " + name[0]);
 				System.out.println("\tSDS Dataset rank " + sdInfo[0]);
 				final int rank = sdInfo[0];

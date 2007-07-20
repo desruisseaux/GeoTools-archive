@@ -57,9 +57,9 @@ public class H4FileTest extends TestCase {
 		int fileID1 = -1, fileID2 = -1;
 		try {
 			fileID1 = HDFLibrary
-					.Hopen("d:\\work\\data\\hdf\\MODPM2007027121858.L3_000_EAST_MED.hdf");
+					.Hopen("E:/Work/data/HDF/TOVS_BROWSE_DAILY_AM_861031_NF.HDF");
 			fileID2 = HDFLibrary
-					.Hopen("d:\\work\\data\\hdf\\MODPM2007027121858.L3_000_EAST_MED.hdf");
+					.Hopen("E:/Work/data/HDF/TOVS_BROWSE_DAILY_AM_861031_NF.HDF");
 			assertNotSame(fileID1, fileID2);
 		} catch (HDFException e) {
 			e.printStackTrace();

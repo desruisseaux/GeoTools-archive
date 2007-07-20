@@ -41,9 +41,8 @@ public class H4GRImageTest extends TestCase {
 	
 	protected void setUp() throws Exception {
 		super.setUp();
-		testFilePath = "E:/work/data/hdf/MISR_AM1_CGLS_WIN_2005_F04_0017.hdf";
-		// testFilePath =
-		// "E:/work/data/hdf/MODPM2007027121858.L3_000_EAST_MED.hdf";
+		 testFilePath =
+		 "E:/work/data/hdf/TOVS_BROWSE_DAILY_AM_861031_NF.HDF";
 	}
 
 	public static void main(String[] args) {
@@ -122,7 +121,6 @@ public class H4GRImageTest extends TestCase {
 								+ Dataset.byteToString((byte[]) buf,
 										globGRAttrInfo[1])[0]);
 					}
-
 				} else
 					System.out.println("GR Interface Attribute " + ii
 							+ " value " + buf);
