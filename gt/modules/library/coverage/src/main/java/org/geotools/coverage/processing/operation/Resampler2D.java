@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2002, Institut de Recherche pour le Développement
+ *    (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -203,7 +203,10 @@ final class Resampler2D extends GridCoverage2D {
          */
         RenderingHints targetHints = ImageUtilities.getRenderingHints(sourceImage);
         if (targetHints == null) {
-            targetHints = new RenderingHints(hints);
+            targetHints = new RenderingHints(null);
+            if (hints != null) {
+            	targetHints.add(hints);	
+            }
         } else if (hints != null) {
             targetHints.add(hints);
         }

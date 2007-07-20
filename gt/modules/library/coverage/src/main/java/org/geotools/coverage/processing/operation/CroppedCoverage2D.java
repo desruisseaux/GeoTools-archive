@@ -97,7 +97,10 @@ final class CroppedCoverage2D extends GridCoverage2D {
 		RenderingHints targetHints = ImageUtilities
 				.getRenderingHints(sourceImage);
 		if (targetHints == null) {
-			targetHints = new RenderingHints(hints);
+			targetHints = new RenderingHints(null);
+			if (hints != null) {
+				targetHints.add(hints);
+			}
 		} else if (hints != null) {
 			targetHints.add(hints);
 		}

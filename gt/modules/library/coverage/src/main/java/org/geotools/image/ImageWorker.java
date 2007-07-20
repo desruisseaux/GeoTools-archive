@@ -249,7 +249,9 @@ public class ImageWorker {
     private ImageWorker fork(final RenderedImage image) {
         final ImageWorker worker = new ImageWorker(image);
         if (commonHints!=null && !commonHints.isEmpty()) {
-            worker.commonHints = new RenderingHints(commonHints);
+        	RenderingHints hints = new RenderingHints(null);
+        	hints.add(worker.commonHints);
+        	worker.commonHints = hints;
         }
         return worker;
     }
@@ -327,7 +329,7 @@ public class ImageWorker {
 
     /**
      * Set the <cite>region of interest</cite> (ROI). A {@code null} set the ROI to the whole
-     * {@linkplain #image}. The ROI is used by statistical méthods like {@link #getMinimums}
+     * {@linkplain #image}. The ROI is used by statistical mï¿½thods like {@link #getMinimums}
      * and {@link #getMaximums}.
      * 
      * @return This ImageWorker
@@ -415,7 +417,10 @@ public class ImageWorker {
 	public final RenderingHints getRenderingHints() {
         RenderingHints hints = ImageUtilities.getRenderingHints(image);
         if (hints == null) {
-            hints = new RenderingHints(commonHints);
+            hints = new RenderingHints(null);
+            if ( commonHints != null ) {
+            	hints.add(commonHints);
+            }
         } else if (commonHints != null) {
             hints.putAll(commonHints);
         }
