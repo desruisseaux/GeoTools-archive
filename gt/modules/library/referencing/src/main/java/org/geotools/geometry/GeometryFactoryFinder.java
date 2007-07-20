@@ -119,7 +119,7 @@ public class GeometryFactoryFinder {
         return completed;
     }
     
-    public static Precision getPercision(Hints hints) throws FactoryRegistryException {
+    public static Precision getPrecision(Hints hints) throws FactoryRegistryException {
         hints = addDefaultHints(hints);
         return (Precision) getServiceRegistry().getServiceProvider( Precision.class, null, hints, Hints.PRECISION );
     }
