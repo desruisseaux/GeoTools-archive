@@ -151,6 +151,22 @@ public class DoublePointArray extends AbstractList<Position> implements PointArr
 			}
 		}
 		return true;
+	}
+	public DirectPosition getDirectPosition(int index, DirectPosition dest) throws IndexOutOfBoundsException {
+		if (dest == null) {
+				dest = new DirectPositionImpl(get(index));
+		}
+		else {
+			assert(dest.getCoordinateReferenceSystem().equals(crs));
+			DirectPosition dp = new DirectPositionImpl(get(index));
+			for (int i=0; i < dp.getCoordinates().length; i++) {
+				dest.setOrdinate(i, dp.getOrdinate(i));
+			}
+		}
+		return dest;
+	}
+	public void setDirectPosition(int index, DirectPosition position) throws IndexOutOfBoundsException, UnsupportedOperationException {
+		this.setPosition(index, position);
 	}	
 	
 }

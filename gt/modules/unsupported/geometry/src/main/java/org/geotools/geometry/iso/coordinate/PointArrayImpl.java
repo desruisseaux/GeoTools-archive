@@ -85,7 +85,7 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
         
 		//CoordinateFactoryImpl coordFactory = this.getFeatGeomFactory().getCoordinateFactory();		
 		for (int i = 0; i < aPointArray.size(); i++) {
-            Position copy = new PositionImpl( aPointArray.getPosition(i, null) );
+            Position copy = new PositionImpl( aPointArray.getDirectPosition(i, null) );
 			add( copy );
 		}
         crs = getPosition(0).getPosition().getCoordinateReferenceSystem();
@@ -596,6 +596,23 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 		} else if (!crs.equals(other.crs))
 			return false;
 		return true;
+	}
+	public DirectPosition getDirectPosition(int index, DirectPosition dest) throws IndexOutOfBoundsException {
+		if (dest == null) {
+				dest = new DirectPositionImpl(get(index));
+		}
+		else {
+			assert(dest.getCoordinateReferenceSystem().equals(crs));
+			DirectPosition dp = new DirectPositionImpl(get(index));
+			for (int i=0; i < dp.getCoordinates().length; i++) {
+				dest.setOrdinate(i, dp.getOrdinate(i));
+			}
+		}
+		return dest;
+	}
+	public void setDirectPosition(int index, DirectPosition position) throws IndexOutOfBoundsException, UnsupportedOperationException {
+		this.setPosition(index, position);
+		
 	}
 
 
