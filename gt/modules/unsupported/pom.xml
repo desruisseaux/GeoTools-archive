@@ -103,7 +103,7 @@
   </profiles>
 
   <modules>
-    <module>arcsde</module>
+    <!--module>arcsde</module-->
     <module>coverageio</module>
     <module>coverageio-netcdf</module>
     <module>db2</module>
