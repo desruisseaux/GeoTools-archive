@@ -429,28 +429,15 @@ public class H4SDSTest extends TestCase {
 									predefinedAttributes,
 									HDFConstants.DFS_MAXLEN);
 							System.out
-									.println("\t\tSDS dataset dimension long_name "
+									.println("\t\tSDS dataset dimension predefined attribute long_name "
 											+ predefinedAttributes[0]);
 							System.out
-									.println("\t\tSDS dataset dimension unit "
+									.println("\t\tSDS dataset dimension predefined attribute unit "
 											+ predefinedAttributes[1]);
 							System.out
-									.println("\t\tSDS dataset dimension format "
+									.println("\t\tSDS dataset dimension predefined attribute format "
 											+ predefinedAttributes[2]);
 						}
-
-						// ////////////////////////////////////////////////////////////////
-						//
-						// SDS PREDEFINED attributes for this sds
-						//
-						// ////////////////////////////////////////////////////////////////
-						System.out.println("\t\t\t     ===      ");
-						printAttributeByName(dimensionID, "long_name",
-								"\t\tSDS dataset dimension ");
-						printAttributeByName(dimensionID, "units",
-								"\t\tSDS dataset dimension ");
-						printAttributeByName(dimensionID, "format",
-								"\t\tSDS dataset dimension ");
 
 						// //
 						//
