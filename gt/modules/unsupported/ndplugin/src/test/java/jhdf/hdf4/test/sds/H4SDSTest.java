@@ -29,6 +29,8 @@ import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.nio.ShortBuffer;
 
+import jhdf.hdf4.test.Utilities;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -139,6 +141,8 @@ public class H4SDSTest extends TestCase {
 						globSDSAttrName, globSDSAttrInfo));
 				System.out.println("SDS Interface Attribute " + ii + " name "
 						+ globSDSAttrName[0]);
+				System.out.println("SDS Interface Attribute " + ii + " type "
+						+ HDFConstants.getType(globSDSAttrInfo[0]));
 				// mask off the litend bit
 				globSDSAttrInfo[0] = globSDSAttrInfo[0]
 						& (~HDFConstants.DFNT_LITEND);
@@ -156,9 +160,11 @@ public class H4SDSTest extends TestCase {
 										globSDSAttrInfo[1])[0]);
 					}
 
-				} else
-					System.out.println("SDS Interface Attribute " + ii
-							+ " value " + buf);
+				} else {
+					System.out.print("SDS Interface Attribute " + ii
+							+ " value ");
+					Utilities.printBuffer(buf, globSDSAttrInfo[0]);
+				}
 			}
 
 			// ////////////////////////////////////////////////////////////////
@@ -206,7 +212,7 @@ public class H4SDSTest extends TestCase {
 				System.out.println("\tSDS Dataset reference "
 						+ HDFLibrary.SDidtoref(sdsID));
 				System.out.println("\tSDS Dataset identifier " + sdsID);
-				
+
 				System.out.println("\tSDS Dataset name " + name[0]);
 				System.out.println("\tSDS Dataset rank " + sdInfo[0]);
 				final int rank = sdInfo[0];
@@ -339,10 +345,12 @@ public class H4SDSTest extends TestCase {
 												+ Dataset.byteToString(
 														(byte[]) buf,
 														SDSAttrInfo[1])[0]);
+							} else {
+								System.out.print("\tSDS Dataset Attribute "
+										+ ii + " value ");
+								Utilities.printBuffer(buf, SDSAttrInfo[0]);
 							}
-						} else
-							System.out.println("\tSDS Dataset Attribute " + ii
-									+ " value " + buf);
+						}
 					}
 
 					// ////////////////////////////////////////////////////////////////
@@ -480,12 +488,16 @@ public class H4SDSTest extends TestCase {
 															dimAttrInfo[1])[0]);
 								}
 
-							} else
-								System.out
-										.println("\t\tSDS Dimension Attribute "
-												+ ii + " value " + buf);
+								else {
+									System.out
+											.print("\t\tSDS Dimension Attribute "
+													+ ii + " value ");
+									Utilities.printBuffer(buf, dimAttrInfo[0]);
+								}
+							}
 						}
 					}
+
 				}
 				// //
 				//
@@ -611,9 +623,10 @@ public class H4SDSTest extends TestCase {
 							+ Dataset.byteToString((byte[]) buf,
 									SDSPredefAttrInfo[1])[0]);
 		} else {
-
+			System.out.print(message + " Attribute " + attributeName
+					+ " value ");
+			Utilities.printBuffer(buf, SDSPredefAttrInfo[0]);
 		}
-
 	}
 
 	/**

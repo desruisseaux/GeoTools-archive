@@ -20,6 +20,11 @@
  */
 package jhdf.hdf4.test.grimage;
 
+import jhdf.hdf4.test.Utilities;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+import junit.textui.TestRunner;
 import ncsa.hdf.hdflib.HDFChunkInfo;
 import ncsa.hdf.hdflib.HDFCompInfo;
 import ncsa.hdf.hdflib.HDFConstants;
@@ -27,22 +32,17 @@ import ncsa.hdf.hdflib.HDFException;
 import ncsa.hdf.hdflib.HDFLibrary;
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.h4.H4Datatype;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import junit.textui.TestRunner;
 
 public class H4GRImageTest extends TestCase {
 	private String testFilePath;
-	
+
 	public H4GRImageTest(String string) {
 		super(string);
 	}
-	
+
 	protected void setUp() throws Exception {
 		super.setUp();
-		 testFilePath =
-		 "E:/work/data/hdf/TOVS_BROWSE_DAILY_AM_861031_NF.HDF";
+		testFilePath = "E:/work/data/hdf/TOVS_BROWSE_DAILY_AM_861031_NF.HDF";
 	}
 
 	public static void main(String[] args) {
@@ -66,8 +66,7 @@ public class H4GRImageTest extends TestCase {
 			// file id, useless but nice to have :-)
 			//
 			// /////////////////////////////////////////////////////////////////
-			fileID = HDFLibrary
-					.Hopen(testFilePath);
+			fileID = HDFLibrary.Hopen(testFilePath);
 			assertNotSame(fileID, HDFConstants.FAIL);
 
 			// /////////////////////////////////////////////////////////////////
@@ -105,9 +104,12 @@ public class H4GRImageTest extends TestCase {
 						globGRAttrName, globGRAttrInfo));
 				System.out.println("GR Interface Attribute " + ii + " name "
 						+ globGRAttrName[0]);
+				System.out.println("GR Interface Attribute " + ii + " type "
+						+ HDFConstants.getType(globGRAttrInfo[0]));
 				// mask off the litend bit
 				globGRAttrInfo[0] = globGRAttrInfo[0]
 						& (~HDFConstants.DFNT_LITEND);
+
 				System.out.println("GR Interface Attribute " + ii + " dim "
 						+ globGRAttrInfo[1]);
 				Object buf = H4Datatype.allocateArray(globGRAttrInfo[0],
@@ -117,13 +119,17 @@ public class H4GRImageTest extends TestCase {
 				if (buf != null) {
 					if (globGRAttrInfo[0] == HDFConstants.DFNT_CHAR
 							|| globGRAttrInfo[0] == HDFConstants.DFNT_UCHAR8) {
-						System.out.println("GR Interface Attribute value "
+						System.out.println("GR Interface Attribute "
+								+ ii
+								+ " value "
 								+ Dataset.byteToString((byte[]) buf,
 										globGRAttrInfo[1])[0]);
+					} else {
+						System.out.println("GR Interface Attribute " + ii
+								+ " value " + buf);
+						Utilities.printBuffer(buf, globGRAttrInfo[0]);
 					}
-				} else
-					System.out.println("GR Interface Attribute " + ii
-							+ " value " + buf);
+				}
 			}
 			// ////////////////////////////////////////////////////////////////
 			//
@@ -150,8 +156,7 @@ public class H4GRImageTest extends TestCase {
 				final int grInfo[] = { 0, 0, 0, 0 };
 				final int dimSizes[] = { 0, 0 };
 				String name[] = { "" };
-				assertTrue(HDFLibrary
-						.GRgetiminfo(grID, name, grInfo, dimSizes));
+				assertTrue(HDFLibrary.GRgetiminfo(grID, name, grInfo, dimSizes));
 
 				System.out.println("");
 				final int index = HDFLibrary.GRreftoindex(grInterfaceID,
@@ -345,8 +350,8 @@ public class H4GRImageTest extends TestCase {
 				for (int ii = 0; ii < numGRimageAttributes; ii++) {
 					grImageAttrName[0] = "";
 					// get various info about this attribute
-					assertTrue(HDFLibrary.GRattrinfo(grID, ii,
-							grImageAttrName, grAttrInfo));
+					assertTrue(HDFLibrary.GRattrinfo(grID, ii, grImageAttrName,
+							grAttrInfo));
 					System.out.println("\tGR Image Attribute " + ii + " name "
 							+ grImageAttrName[0]);
 					// mask off the litend bit
@@ -360,13 +365,17 @@ public class H4GRImageTest extends TestCase {
 					if (buf != null) {
 						if (grAttrInfo[0] == HDFConstants.DFNT_CHAR
 								|| grAttrInfo[0] == HDFConstants.DFNT_UCHAR8) {
-							System.out.println("\tSDS Dataset Attribute value "
+							System.out.println("\tGR Image Attribute "
+									+ ii
+									+ " value "
 									+ Dataset.byteToString((byte[]) buf,
 											grAttrInfo[1])[0]);
+						} else {
+							System.out.print("\tGR Image Attribute " + ii
+									+ " value ");
+							Utilities.printBuffer(buf, grAttrInfo[0]);
 						}
-					} else
-						System.out.println("\tSDS Dataset Attribute " + ii
-								+ " value " + buf);
+					}
 				}
 
 				// ////////////////////////////////////////////////////////////////
