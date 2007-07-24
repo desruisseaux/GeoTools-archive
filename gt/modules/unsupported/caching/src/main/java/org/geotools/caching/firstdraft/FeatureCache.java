@@ -15,12 +15,10 @@
  */
 package org.geotools.caching.firstdraft;
 
+import org.opengis.filter.Filter;
 import org.geotools.data.FeatureStore;
-
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-
-import org.opengis.filter.Filter;
 
 
 public interface FeatureCache extends FeatureStore {

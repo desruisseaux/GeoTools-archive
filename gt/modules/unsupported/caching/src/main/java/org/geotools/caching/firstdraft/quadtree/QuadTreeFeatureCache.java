@@ -1,36 +1,44 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.caching.firstdraft.quadtree;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.Stack;
 import com.vividsolutions.jts.geom.Envelope;
-
+import org.opengis.filter.Filter;
 import org.geotools.caching.firstdraft.FeatureCache;
 import org.geotools.caching.firstdraft.FeatureCacheException;
 import org.geotools.caching.firstdraft.QueryTracker;
 import org.geotools.caching.firstdraft.spatialindex.spatialindex.Region;
 import org.geotools.caching.firstdraft.util.FilterSplitter;
 import org.geotools.caching.firstdraft.util.IndexUtilities;
-
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.store.EmptyFeatureCollection;
-
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
-
 import org.geotools.filter.spatial.BBOXImpl;
-
-import org.opengis.filter.Filter;
-
-import java.io.IOException;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.Stack;
 
 
 public class QuadTreeFeatureCache implements FeatureCache, QueryTracker {
@@ -124,8 +132,8 @@ public class QuadTreeFeatureCache implements FeatureCache, QueryTracker {
         return null;
     }
 
-    public void modifyFeatures(AttributeType[] type, Object[] value,
-        Filter filter) throws IOException {
+    public void modifyFeatures(AttributeType[] type, Object[] value, Filter filter)
+        throws IOException {
         // TODO Auto-generated method stub
     }
 
@@ -179,8 +187,7 @@ public class QuadTreeFeatureCache implements FeatureCache, QueryTracker {
      * TODO: move to AbstractFeatureCache
      */
     public FeatureCollection getFeatures(Query query) throws IOException {
-        if ((query.getTypeName() != null) &&
-                (query.getTypeName() != type.getTypeName())) {
+        if ((query.getTypeName() != null) && (query.getTypeName() != type.getTypeName())) {
             return new EmptyFeatureCollection(getSchema());
         }
 
@@ -228,15 +235,15 @@ public class QuadTreeFeatureCache implements FeatureCache, QueryTracker {
             match(r, v.lastNode, regions);
 
             /* v1
-            Stack regions = new Stack() ;
-            if (v.lastNode == null) {
-                    // Query is bigger than the known part of the universe
-                    Region unknown = intersection(r, (Region) tree.root.getShape()) ;
-                    regions.push(unknown) ;
-                    match(r, tree.root, regions) ;
-            } else {
-                    match(r, v.lastNode, regions) ;
-            }*/
+               Stack regions = new Stack() ;
+               if (v.lastNode == null) {
+                       // Query is bigger than the known part of the universe
+                       Region unknown = intersection(r, (Region) tree.root.getShape()) ;
+                       regions.push(unknown) ;
+                       match(r, tree.root, regions) ;
+               } else {
+                       match(r, v.lastNode, regions) ;
+               }*/
         }
 
         return null;
@@ -331,13 +338,10 @@ public class QuadTreeFeatureCache implements FeatureCache, QueryTracker {
     protected static Region intersection(final Region r1, final Region r2) {
         double xmin = (r1.getLow(0) > r2.getLow(0)) ? r1.getLow(0) : r2.getLow(0);
         double ymin = (r1.getLow(1) > r2.getLow(1)) ? r1.getLow(1) : r2.getLow(1);
-        double xmax = (r1.getHigh(0) < r2.getHigh(0)) ? r1.getHigh(0)
-                                                      : r2.getHigh(0);
-        double ymax = (r1.getHigh(1) < r2.getHigh(1)) ? r1.getHigh(1)
-                                                      : r2.getHigh(1);
+        double xmax = (r1.getHigh(0) < r2.getHigh(0)) ? r1.getHigh(0) : r2.getHigh(0);
+        double ymax = (r1.getHigh(1) < r2.getHigh(1)) ? r1.getHigh(1) : r2.getHigh(1);
 
-        return new Region(new double[] { xmin, ymin },
-            new double[] { xmax, ymax });
+        return new Region(new double[] { xmin, ymin }, new double[] { xmax, ymax });
     }
 
     public Query match(Query q) {

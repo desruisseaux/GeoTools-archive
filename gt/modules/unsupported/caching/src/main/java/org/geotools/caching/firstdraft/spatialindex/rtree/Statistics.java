@@ -28,9 +28,8 @@
 //    marioh@cs.ucr.edu
 package org.geotools.caching.firstdraft.spatialindex.rtree;
 
-import org.geotools.caching.firstdraft.spatialindex.spatialindex.*;
-
 import java.util.*;
+import org.geotools.caching.firstdraft.spatialindex.spatialindex.*;
 
 
 public class Statistics implements IStatistics, Cloneable {
@@ -123,18 +122,17 @@ public class Statistics implements IStatistics, Cloneable {
     }
 
     public String toString() {
-        String s = "Reads: " + m_reads + "\n" + "Writes: " + m_writes + "\n" +
-            "Hits: " + m_hits + "\n" + "Misses: " + m_misses + "\n" +
-            "Tree height: " + m_treeHeight + "\n" + "Number of data: " +
-            m_data + "\n" + "Number of nodes: " + m_nodes + "\n";
+        String s = "Reads: " + m_reads + "\n" + "Writes: " + m_writes + "\n" + "Hits: " + m_hits
+            + "\n" + "Misses: " + m_misses + "\n" + "Tree height: " + m_treeHeight + "\n"
+            + "Number of data: " + m_data + "\n" + "Number of nodes: " + m_nodes + "\n";
 
         for (int cLevel = 0; cLevel < m_treeHeight; cLevel++) {
-            s += ("Level " + cLevel + " pages: " +
-            ((Integer) m_nodesInLevel.get(cLevel)).intValue() + "\n");
+            s += ("Level " + cLevel + " pages: "
+            + ((Integer) m_nodesInLevel.get(cLevel)).intValue() + "\n");
         }
 
-        s += ("Splits: " + m_splits + "\n" + "Adjustments: " + m_adjustments +
-        "\n" + "Query results: " + m_queryResults);
+        s += ("Splits: " + m_splits + "\n" + "Adjustments: " + m_adjustments + "\n"
+        + "Query results: " + m_queryResults);
 
         return s;
     }

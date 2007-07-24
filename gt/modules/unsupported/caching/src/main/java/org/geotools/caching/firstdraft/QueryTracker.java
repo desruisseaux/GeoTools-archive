@@ -15,9 +15,8 @@
  */
 package org.geotools.caching.firstdraft;
 
-import org.geotools.data.Query;
-
 import org.opengis.filter.Filter;
+import org.geotools.data.Query;
 
 
 /** Records information about queries,

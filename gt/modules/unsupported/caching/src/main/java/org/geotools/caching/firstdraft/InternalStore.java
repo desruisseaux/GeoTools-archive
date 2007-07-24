@@ -15,9 +15,8 @@
  */
 package org.geotools.caching.firstdraft;
 
-import org.geotools.feature.Feature;
-
 import java.util.Collection;
+import org.geotools.feature.Feature;
 
 
 /** This is the interface for the FeatureIndex backend,

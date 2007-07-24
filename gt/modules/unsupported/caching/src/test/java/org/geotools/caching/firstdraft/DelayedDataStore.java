@@ -15,6 +15,8 @@
  */
 package org.geotools.caching.firstdraft;
 
+import java.io.IOException;
+import org.opengis.filter.Filter;
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
@@ -22,13 +24,8 @@ import org.geotools.data.FeatureWriter;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
-
-import org.opengis.filter.Filter;
-
-import java.io.IOException;
 
 
 /**
@@ -94,8 +91,8 @@ public class DelayedDataStore implements DataStore {
         return this.sourceDataStore.getFeatureWriter(arg0, arg1);
     }
 
-    public FeatureWriter getFeatureWriter(String arg0, Filter arg1,
-        Transaction arg2) throws IOException {
+    public FeatureWriter getFeatureWriter(String arg0, Filter arg1, Transaction arg2)
+        throws IOException {
         idle();
 
         return this.sourceDataStore.getFeatureWriter(arg0, arg1, arg2);
@@ -120,8 +117,7 @@ public class DelayedDataStore implements DataStore {
         return this.sourceDataStore.getTypeNames();
     }
 
-    public FeatureSource getView(Query arg0)
-        throws IOException, SchemaException {
+    public FeatureSource getView(Query arg0) throws IOException, SchemaException {
         idle();
 
         return this.sourceDataStore.getView(arg0);

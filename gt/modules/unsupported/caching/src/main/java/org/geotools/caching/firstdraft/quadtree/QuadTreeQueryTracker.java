@@ -1,21 +1,31 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.caching.firstdraft.quadtree;
-
-import org.geotools.caching.firstdraft.QueryTracker;
-import org.geotools.caching.firstdraft.spatialindex.spatialindex.Region;
-
-import org.geotools.data.DefaultQuery;
-import org.geotools.data.Query;
-
-import org.geotools.feature.FeatureType;
-
-import org.geotools.filter.FilterFactoryImpl;
-import org.geotools.filter.spatial.BBOXImpl;
-
-import org.opengis.filter.Filter;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Stack;
+import org.opengis.filter.Filter;
+import org.geotools.caching.firstdraft.QueryTracker;
+import org.geotools.caching.firstdraft.spatialindex.spatialindex.Region;
+import org.geotools.data.DefaultQuery;
+import org.geotools.data.Query;
+import org.geotools.feature.FeatureType;
+import org.geotools.filter.FilterFactoryImpl;
+import org.geotools.filter.spatial.BBOXImpl;
 
 
 public class QuadTreeQueryTracker implements QueryTracker {
@@ -69,9 +79,8 @@ public class QuadTreeQueryTracker implements QueryTracker {
 
                 while (!regions.isEmpty()) {
                     Region rg = (Region) regions.pop();
-                    Filter missing = ff.bbox(filter.getPropertyName(),
-                            rg.getLow(0), rg.getLow(1), rg.getHigh(0),
-                            rg.getHigh(1), filter.getSRS());
+                    Filter missing = ff.bbox(filter.getPropertyName(), rg.getLow(0), rg.getLow(1),
+                            rg.getHigh(0), rg.getHigh(1), filter.getSRS());
                     filters.add(missing);
                 }
 
@@ -80,8 +89,8 @@ public class QuadTreeQueryTracker implements QueryTracker {
                 FilterFactoryImpl ff = new FilterFactoryImpl();
                 Region rg = (Region) regions.pop();
 
-                return ff.bbox(filter.getPropertyName(), rg.getLow(0),
-                    rg.getLow(1), rg.getHigh(0), rg.getHigh(1), filter.getSRS());
+                return ff.bbox(filter.getPropertyName(), rg.getLow(0), rg.getLow(1), rg.getHigh(0),
+                    rg.getHigh(1), filter.getSRS());
             } else {
                 return Filter.EXCLUDE;
             }
@@ -281,13 +290,10 @@ public class QuadTreeQueryTracker implements QueryTracker {
     protected static Region intersection(final Region r1, final Region r2) {
         double xmin = (r1.getLow(0) > r2.getLow(0)) ? r1.getLow(0) : r2.getLow(0);
         double ymin = (r1.getLow(1) > r2.getLow(1)) ? r1.getLow(1) : r2.getLow(1);
-        double xmax = (r1.getHigh(0) < r2.getHigh(0)) ? r1.getHigh(0)
-                                                      : r2.getHigh(0);
-        double ymax = (r1.getHigh(1) < r2.getHigh(1)) ? r1.getHigh(1)
-                                                      : r2.getHigh(1);
+        double xmax = (r1.getHigh(0) < r2.getHigh(0)) ? r1.getHigh(0) : r2.getHigh(0);
+        double ymax = (r1.getHigh(1) < r2.getHigh(1)) ? r1.getHigh(1) : r2.getHigh(1);
 
-        return new Region(new double[] { xmin, ymin },
-            new double[] { xmax, ymax });
+        return new Region(new double[] { xmin, ymin }, new double[] { xmax, ymax });
     }
 
     protected static Region getRegion(BBOXImpl f) {

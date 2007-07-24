@@ -15,6 +15,8 @@
  */
 package org.geotools.caching.firstdraft.quadtree;
 
+import java.util.Stack;
+import java.util.logging.Logger;
 import org.geotools.caching.firstdraft.spatialindex.spatialindex.IData;
 import org.geotools.caching.firstdraft.spatialindex.spatialindex.INearestNeighborComparator;
 import org.geotools.caching.firstdraft.spatialindex.spatialindex.INodeCommand;
@@ -25,9 +27,6 @@ import org.geotools.caching.firstdraft.spatialindex.spatialindex.IStatistics;
 import org.geotools.caching.firstdraft.spatialindex.spatialindex.IVisitor;
 import org.geotools.caching.firstdraft.spatialindex.spatialindex.Region;
 import org.geotools.caching.firstdraft.spatialindex.storagemanager.PropertySet;
-
-import java.util.Stack;
-import java.util.logging.Logger;
 
 
 /** A QuadTree implementation, inspired by the shapefile quadtree in org.geotools.index.quadtree,
@@ -56,8 +55,7 @@ public class QuadTree implements ISpatialIndex {
      * Defaults to orginial value picked in org.geotools.index.quadtree.QuadTree
      */
     protected static final double SPLITRATIO = 0.55d;
-    protected static final Logger LOGGER = Logger.getLogger(
-            "org.geotools.caching.quadtree");
+    protected static final Logger LOGGER = Logger.getLogger("org.geotools.caching.quadtree");
 
     /**
      * First node of the tree, pointing recursively to all other nodes.
@@ -119,8 +117,7 @@ public class QuadTree implements ISpatialIndex {
                 }
 
                 for (int i = 0; i < current.numShapes; i++) {
-                    v.visitData(new Data(current.shapesData[i], null,
-                            current.shapesId[i]));
+                    v.visitData(new Data(current.shapesData[i], null, current.shapesId[i]));
                 }
 
                 current.visited = true;
@@ -194,8 +191,7 @@ public class QuadTree implements ISpatialIndex {
                 }
 
                 for (int i = 0; i < current.numShapes; i++) {
-                    v.visitData(new Data(current.shapesData[i], null,
-                            current.shapesId[i]));
+                    v.visitData(new Data(current.shapesData[i], null, current.shapesId[i]));
                 }
 
                 current.visited = true;
@@ -226,8 +222,7 @@ public class QuadTree implements ISpatialIndex {
         return false;
     }
 
-    public void nearestNeighborQuery(int k, IShape query, IVisitor v,
-        INearestNeighborComparator nnc) {
+    public void nearestNeighborQuery(int k, IShape query, IVisitor v, INearestNeighborComparator nnc) {
         // TODO Auto-generated method stub
     }
 
@@ -313,8 +308,8 @@ public class QuadTree implements ISpatialIndex {
         } else if (n.level > 0) { // we do not want the tree to grow much too tall
                                   // if level == 0, we will add data to this node rather than splitting
                                   /* Otherwise, consider creating four subnodes if could fit into
-            * them, and adding to the appropriate subnode.
-            */
+             * them, and adding to the appropriate subnode.
+             */
             n.split(SPLITRATIO);
             // recurse
             insertData(n, data, shape, id);
@@ -352,8 +347,7 @@ public class QuadTree implements ISpatialIndex {
                         } else {
                             current.level = current.parent.level - 1;
 
-                            for (int i = 0; i < current.getChildrenCount();
-                                    i++) {
+                            for (int i = 0; i < current.getChildrenCount(); i++) {
                                 nodes.add(0, current.getSubNode(i));
                             }
 
@@ -400,55 +394,40 @@ public class QuadTree implements ISpatialIndex {
         Region r = old.combinedRegion(regionToInclude);
 
         /* we actually make tiles a little bigger than how nodes do normally split
-               so we use a slightly smaller ratio */
+           so we use a slightly smaller ratio */
         double SPLITRATIO = QuadTree.SPLITRATIO - 0.02d;
 
         /*double xmin = (r.getLow(0) == old.getLow(0)) ? old.getLow(0) : old.getHigh(0) - (old.getHigh(0) - old.getLow(0))/SPLITRATIO ;
-                double ymin = (r.getLow(1) == old.getLow(1)) ? old.getLow(1) : old.getHigh(1) - (old.getHigh(1) - old.getLow(1))/SPLITRATIO ;
-            double xmax = (r.getHigh(0) == old.getHigh(0)) ? old.getHigh(0) : old.getLow(0) + (old.getHigh(0) - old.getLow(0))/SPLITRATIO ;
-                double ymax = (r.getHigh(1) == old.getHigh(1)) ? old.getHigh(1) : old.getLow(1) + (old.getHigh(1) - old.getLow(1))/SPLITRATIO ;
-                r = new Region(new double[] {xmin, ymin}, new double[] {xmax, ymax}) ;*/
+           double ymin = (r.getLow(1) == old.getLow(1)) ? old.getLow(1) : old.getHigh(1) - (old.getHigh(1) - old.getLow(1))/SPLITRATIO ;
+           double xmax = (r.getHigh(0) == old.getHigh(0)) ? old.getHigh(0) : old.getLow(0) + (old.getHigh(0) - old.getLow(0))/SPLITRATIO ;
+               double ymax = (r.getHigh(1) == old.getHigh(1)) ? old.getHigh(1) : old.getLow(1) + (old.getHigh(1) - old.getLow(1))/SPLITRATIO ;
+               r = new Region(new double[] {xmin, ymin}, new double[] {xmax, ymax}) ;*/
         if ((r.getLow(0) == old.getLow(0)) && (r.getLow(1) == old.getLow(1))) {
             double xmin = old.getLow(0);
             double ymin = old.getLow(1);
-            double xmax = old.getLow(0) +
-                ((old.getHigh(0) - old.getLow(0)) / SPLITRATIO);
-            double ymax = old.getLow(1) +
-                ((old.getHigh(1) - old.getLow(1)) / SPLITRATIO);
-            r = new Region(new double[] { xmin, ymin },
-                    new double[] { xmax, ymax });
-        } else if ((r.getLow(0) == old.getLow(0)) &&
-                (r.getHigh(1) == old.getHigh(1))) {
+            double xmax = old.getLow(0) + ((old.getHigh(0) - old.getLow(0)) / SPLITRATIO);
+            double ymax = old.getLow(1) + ((old.getHigh(1) - old.getLow(1)) / SPLITRATIO);
+            r = new Region(new double[] { xmin, ymin }, new double[] { xmax, ymax });
+        } else if ((r.getLow(0) == old.getLow(0)) && (r.getHigh(1) == old.getHigh(1))) {
             double xmin = old.getLow(0);
-            double ymin = old.getHigh(1) -
-                ((old.getHigh(1) - old.getLow(1)) / SPLITRATIO);
-            double xmax = old.getLow(0) +
-                ((old.getHigh(0) - old.getLow(0)) / SPLITRATIO);
+            double ymin = old.getHigh(1) - ((old.getHigh(1) - old.getLow(1)) / SPLITRATIO);
+            double xmax = old.getLow(0) + ((old.getHigh(0) - old.getLow(0)) / SPLITRATIO);
             double ymax = old.getHigh(1);
-            r = new Region(new double[] { xmin, ymin },
-                    new double[] { xmax, ymax });
-        } else if ((r.getHigh(0) == old.getHigh(0)) &&
-                (r.getHigh(1) == old.getHigh(1))) {
-            double xmin = old.getHigh(0) -
-                ((old.getHigh(0) - old.getLow(0)) / SPLITRATIO);
-            double ymin = old.getHigh(1) -
-                ((old.getHigh(1) - old.getLow(1)) / SPLITRATIO);
+            r = new Region(new double[] { xmin, ymin }, new double[] { xmax, ymax });
+        } else if ((r.getHigh(0) == old.getHigh(0)) && (r.getHigh(1) == old.getHigh(1))) {
+            double xmin = old.getHigh(0) - ((old.getHigh(0) - old.getLow(0)) / SPLITRATIO);
+            double ymin = old.getHigh(1) - ((old.getHigh(1) - old.getLow(1)) / SPLITRATIO);
             double xmax = old.getHigh(0);
             double ymax = old.getHigh(1);
-            r = new Region(new double[] { xmin, ymin },
-                    new double[] { xmax, ymax });
+            r = new Region(new double[] { xmin, ymin }, new double[] { xmax, ymax });
         } else {
-            assert ((r.getHigh(0) == old.getHigh(0)) &&
-            (r.getLow(1) == old.getLow(1)));
+            assert ((r.getHigh(0) == old.getHigh(0)) && (r.getLow(1) == old.getLow(1)));
 
-            double xmin = old.getHigh(0) -
-                ((old.getHigh(0) - old.getLow(0)) / SPLITRATIO);
+            double xmin = old.getHigh(0) - ((old.getHigh(0) - old.getLow(0)) / SPLITRATIO);
             double ymin = old.getLow(1);
             double xmax = old.getHigh(0);
-            double ymax = old.getLow(1) +
-                ((old.getHigh(1) - old.getLow(1)) / SPLITRATIO);
-            r = new Region(new double[] { xmin, ymin },
-                    new double[] { xmax, ymax });
+            double ymax = old.getLow(1) + ((old.getHigh(1) - old.getLow(1)) / SPLITRATIO);
+            r = new Region(new double[] { xmin, ymin }, new double[] { xmax, ymax });
         }
 
         if (r.contains(regionToInclude)) {

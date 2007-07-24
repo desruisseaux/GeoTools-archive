@@ -15,34 +15,6 @@
  */
 package org.geotools.caching.firstdraft.demo;
 
-import org.geotools.caching.firstdraft.impl.InMemoryDataCache;
-
-import org.geotools.data.FeatureSource;
-import org.geotools.data.shapefile.ShapefileDataStore;
-
-import org.geotools.factory.CommonFactoryFinder;
-
-import org.geotools.gui.swing.JMapPane;
-import org.geotools.gui.swing.PanAction;
-import org.geotools.gui.swing.ResetAction;
-import org.geotools.gui.swing.SelectAction;
-import org.geotools.gui.swing.ZoomInAction;
-import org.geotools.gui.swing.ZoomOutAction;
-
-import org.geotools.map.DefaultMapContext;
-import org.geotools.map.MapContext;
-
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
-
-import org.geotools.renderer.GTRenderer;
-import org.geotools.renderer.lite.StreamingRenderer;
-
-import org.geotools.styling.SLDParser;
-import org.geotools.styling.StyleFactory;
-
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.GridLayout;
@@ -54,14 +26,10 @@ import java.awt.event.HierarchyBoundsListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.InputMethodEvent;
 import java.awt.event.InputMethodListener;
-
 import java.io.File;
-
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import java.util.HashMap;
-
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -71,6 +39,25 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.WindowConstants;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.caching.firstdraft.impl.InMemoryDataCache;
+import org.geotools.data.FeatureSource;
+import org.geotools.data.shapefile.ShapefileDataStore;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.gui.swing.JMapPane;
+import org.geotools.gui.swing.PanAction;
+import org.geotools.gui.swing.ResetAction;
+import org.geotools.gui.swing.SelectAction;
+import org.geotools.gui.swing.ZoomInAction;
+import org.geotools.gui.swing.ZoomOutAction;
+import org.geotools.map.DefaultMapContext;
+import org.geotools.map.MapContext;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.renderer.GTRenderer;
+import org.geotools.renderer.lite.StreamingRenderer;
+import org.geotools.styling.SLDParser;
+import org.geotools.styling.StyleFactory;
 
 
 /**
@@ -169,13 +156,10 @@ public class CacheDemoApp implements ActionListener {
      * @param crs A new CRS for the mappnae.
      */
     public void setCRS(CoordinateReferenceSystem crs) {
-        mp.getContext()
-          .setAreaOfInterest(mp.getContext().getAreaOfInterest(), crs);
+        mp.getContext().setAreaOfInterest(mp.getContext().getAreaOfInterest(), crs);
         mp.setReset(true);
         mp.repaint();
-        mp_cached.getContext()
-                 .setAreaOfInterest(mp_cached.getContext().getAreaOfInterest(),
-            crs);
+        mp_cached.getContext().setAreaOfInterest(mp_cached.getContext().getAreaOfInterest(), crs);
         mp_cached.setReset(true);
         mp_cached.repaint();
     }
@@ -197,8 +181,7 @@ public class CacheDemoApp implements ActionListener {
         SLDParser stylereader = new SLDParser(factory, sld);
         org.geotools.styling.Style[] style = stylereader.readXML();
 
-        CoordinateReferenceSystem crs = fs.getSchema().getDefaultGeometry()
-                                          .getCoordinateSystem();
+        CoordinateReferenceSystem crs = fs.getSchema().getDefaultGeometry().getCoordinateSystem();
 
         if (crs == null) {
             crs = DefaultGeographicCRS.WGS84;
@@ -263,8 +246,7 @@ public class CacheDemoApp implements ActionListener {
             URL shape = aquireURL(pathname);
 
             if (shape == null) {
-                JOptionPane.showMessageDialog(frame,
-                    "could not find file \"" + pathname + "\"",
+                JOptionPane.showMessageDialog(frame, "could not find file \"" + pathname + "\"",
                     "Could not find file", JOptionPane.ERROR_MESSAGE);
                 System.err.println("Could not find shapefile: " + pathname);
 
@@ -276,10 +258,9 @@ public class CacheDemoApp implements ActionListener {
 
             if (sld == null) {
                 JOptionPane.showMessageDialog(frame,
-                    "could not find SLD file \"" + filepart + ".sld\"",
-                    "Could not find SLD file", JOptionPane.ERROR_MESSAGE);
-                System.err.println("Could not find sld file: " + filepart +
-                    ".sld");
+                    "could not find SLD file \"" + filepart + ".sld\"", "Could not find SLD file",
+                    JOptionPane.ERROR_MESSAGE);
+                System.err.println("Could not find sld file: " + filepart + ".sld");
 
                 return;
             }
@@ -317,8 +298,7 @@ public class CacheDemoApp implements ActionListener {
             URL sld = aquireURL(filepart + ".sld");
 
             if (sld == null) {
-                System.err.println("Could not find sld file: " + filepart +
-                    ".sld");
+                System.err.println("Could not find sld file: " + filepart + ".sld");
                 System.exit(1);
             }
 

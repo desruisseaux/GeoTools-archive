@@ -28,9 +28,8 @@
 //    marioh@cs.ucr.edu
 package org.geotools.caching.firstdraft.spatialindex.rtree;
 
-import org.geotools.caching.firstdraft.spatialindex.spatialindex.*;
-
 import java.util.*;
+import org.geotools.caching.firstdraft.spatialindex.spatialindex.*;
 
 
 public class Index extends Node {
@@ -183,8 +182,7 @@ public class Index extends Node {
             if (e.m_enlargement < me) {
                 me = e.m_enlargement;
                 best = cChild;
-            } else if ((e.m_enlargement == me) &&
-                    (e.m_oa < entries[best].m_oa)) {
+            } else if ((e.m_enlargement == me) && (e.m_oa < entries[best].m_oa)) {
                 best = cChild;
             }
         }
@@ -210,8 +208,7 @@ public class Index extends Node {
                         double f = e.m_combined.getIntersectingArea(m_pMBR[cChild]);
 
                         if (f != 0.0) {
-                            dif += (f -
-                            e.m_original.getIntersectingArea(m_pMBR[cChild]));
+                            dif += (f - e.m_original.getIntersectingArea(m_pMBR[cChild]));
                         }
                     }
                 } // for (cChild)
@@ -281,8 +278,7 @@ public class Index extends Node {
         }
     }
 
-    protected void adjustTree(Node n1, Node n2, Stack pathBuffer,
-        boolean[] overflowTable) {
+    protected void adjustTree(Node n1, Node n2, Stack pathBuffer, boolean[] overflowTable) {
         m_pTree.m_stats.m_adjustments++;
 
         // find entry pointing to old node;
@@ -318,8 +314,8 @@ public class Index extends Node {
 
         // No write necessary here. insertData will write the node if needed.
         //m_pTree.writeNode(this);
-        boolean adjusted = insertData(null, (Region) n2.m_nodeMBR.clone(),
-                n2.m_identifier, pathBuffer, overflowTable);
+        boolean adjusted = insertData(null, (Region) n2.m_nodeMBR.clone(), n2.m_identifier,
+                pathBuffer, overflowTable);
 
         // if n2 is contained in the node and there was no split or reinsert,
         // we need to adjust only if recalculation took place.

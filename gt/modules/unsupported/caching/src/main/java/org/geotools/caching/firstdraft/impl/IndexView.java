@@ -15,22 +15,17 @@
  */
 package org.geotools.caching.firstdraft.impl;
 
+import java.io.IOException;
 import com.vividsolutions.jts.geom.Envelope;
-
+import org.opengis.filter.Filter;
 import org.geotools.caching.firstdraft.FeatureIndex;
-
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
-
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
-
-import org.opengis.filter.Filter;
-
-import java.io.IOException;
 
 
 /** Associates a FeatureIndex with a query.

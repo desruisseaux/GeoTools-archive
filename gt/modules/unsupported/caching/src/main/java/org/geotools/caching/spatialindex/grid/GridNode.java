@@ -1,13 +1,34 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.caching.spatialindex.grid;
 
+import java.util.HashMap;
 import org.geotools.caching.spatialindex.Node;
 import org.geotools.caching.spatialindex.Region;
 import org.geotools.caching.spatialindex.Shape;
 import org.geotools.caching.spatialindex.grid.GridData;
 
-import java.util.HashMap;
 
-
+/** A node in the grid.
+ * Data objects are store in an array.
+ * Extra data about the node may be stored in node_data, which is a HashMap.
+ *
+ * @author Christophe Rousson, SoC 2007, CRG-ULAVAL
+ *
+ */
 public class GridNode implements Node {
     int id;
     Region mbr;
@@ -72,6 +93,11 @@ public class GridNode implements Node {
         return mbr;
     }
 
+    /** Insert new data in this node.
+     *
+     * @param id of data
+     * @param data
+     */
     protected void insertData(int id, GridData data) {
         if (num_data == data_ids.length) {
             int[] n_data_ids = new int[data_ids.length * 2];
@@ -87,6 +113,12 @@ public class GridNode implements Node {
         num_data++;
     }
 
+    /** Delete blindly data at the given index.
+     * Index is not the id of the data, the search should be performed by the Grid class,
+     * which determines the ids of data to delete, and then call this method.
+     *
+     * @param index
+     */
     protected void deleteData(int index) {
         if ((index < 0) || (index > (num_data - 1))) {
             throw new IndexOutOfBoundsException();

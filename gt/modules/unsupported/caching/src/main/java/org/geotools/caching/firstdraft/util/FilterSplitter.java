@@ -15,11 +15,12 @@
  */
 package org.geotools.caching.firstdraft.util;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Stack;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-
-import org.geotools.filter.FilterFactoryImpl;
-
 import org.opengis.filter.And;
 import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Filter;
@@ -50,11 +51,7 @@ import org.opengis.filter.spatial.Intersects;
 import org.opengis.filter.spatial.Overlaps;
 import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Stack;
+import org.geotools.filter.FilterFactoryImpl;
 
 
 /** The purpose of this class is to split any Filter into two filters :
@@ -223,8 +220,7 @@ public class FilterSplitter implements FilterVisitor {
                 "This splitter can not be used against a filter where different BBOX filters refer to different Geometry attributes.");
         }
 
-        Envelope e = new Envelope(f.getMinX(), f.getMaxX(), f.getMinY(),
-                f.getMaxY());
+        Envelope e = new Envelope(f.getMinX(), f.getMaxX(), f.getMinY(), f.getMaxY());
         envelopes.push(e);
 
         return null;
@@ -337,8 +333,8 @@ public class FilterSplitter implements FilterVisitor {
         if (e == null) {
             return Filter.INCLUDE;
         } else {
-            return new FilterFactoryImpl().bbox(geom, e.getMinX(), e.getMinY(),
-                e.getMaxX(), e.getMaxY(), srs);
+            return new FilterFactoryImpl().bbox(geom, e.getMinX(), e.getMinY(), e.getMaxX(),
+                e.getMaxY(), srs);
         }
     }
 

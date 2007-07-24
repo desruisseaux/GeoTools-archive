@@ -18,22 +18,18 @@ package org.geotools.caching.firstdraft;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import org.geotools.caching.firstdraft.util.FeatureMarshaller;
-import org.geotools.caching.firstdraft.util.Generator;
-
-import org.geotools.feature.DefaultFeature;
-import org.geotools.feature.Feature;
-import org.geotools.feature.IllegalAttributeException;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.geotools.caching.firstdraft.util.FeatureMarshaller;
+import org.geotools.caching.firstdraft.util.Generator;
+import org.geotools.feature.DefaultFeature;
+import org.geotools.feature.Feature;
+import org.geotools.feature.IllegalAttributeException;
 
 
 public class MarshallerXest extends TestCase {
@@ -147,7 +143,6 @@ public class MarshallerXest extends TestCase {
         }
 
         long stop = System.currentTimeMillis();
-        System.out.println("Elapsed time for 10000 features : " +
-            (stop - start) + " ms.");
+        System.out.println("Elapsed time for 10000 features : " + (stop - start) + " ms.");
     }
 }

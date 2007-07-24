@@ -15,17 +15,15 @@
  */
 package org.geotools.caching.firstdraft.quadtree;
 
-import org.geotools.caching.firstdraft.spatialindex.spatialindex.INode;
-import org.geotools.caching.firstdraft.spatialindex.spatialindex.IShape;
-import org.geotools.caching.firstdraft.spatialindex.spatialindex.Region;
-
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureIterator;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.geotools.caching.firstdraft.spatialindex.spatialindex.INode;
+import org.geotools.caching.firstdraft.spatialindex.spatialindex.IShape;
+import org.geotools.caching.firstdraft.spatialindex.spatialindex.Region;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 
 
 public class Node implements INode {

@@ -1,22 +1,32 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.caching;
 
+import java.io.IOException;
+import java.util.Set;
 import com.vividsolutions.jts.geom.Envelope;
-
+import org.opengis.filter.Filter;
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
-
-import org.opengis.filter.Filter;
-
-import java.io.IOException;
-
-import java.util.Set;
 
 
 public abstract class AbstractFeatureCache implements FeatureCache {
@@ -53,8 +63,8 @@ public abstract class AbstractFeatureCache implements FeatureCache {
         return null;
     }
 
-    public void modifyFeatures(AttributeType[] type, Object[] value,
-        Filter filter) throws IOException {
+    public void modifyFeatures(AttributeType[] type, Object[] value, Filter filter)
+        throws IOException {
         // TODO Auto-generated method stub
     }
 

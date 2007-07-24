@@ -1,12 +1,29 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.caching.firstdraft.quadtree;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import org.opengis.filter.Filter;
 import org.geotools.caching.firstdraft.quadtree.Node;
 import org.geotools.caching.firstdraft.quadtree.QuadTreeQueryTracker;
 import org.geotools.caching.firstdraft.spatialindex.spatialindex.IData;
@@ -14,20 +31,11 @@ import org.geotools.caching.firstdraft.spatialindex.spatialindex.INode;
 import org.geotools.caching.firstdraft.spatialindex.spatialindex.IVisitor;
 import org.geotools.caching.firstdraft.spatialindex.spatialindex.Region;
 import org.geotools.caching.firstdraft.util.Generator;
-
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.Query;
-
 import org.geotools.feature.FeatureType;
-
 import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.filter.spatial.BBOXImpl;
-
-import org.opengis.filter.Filter;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 
 public class QuadTreeQueryTrackerXest extends TestCase {
@@ -82,8 +90,8 @@ public class QuadTreeQueryTrackerXest extends TestCase {
             }
         }
 
-        System.out.println("Unchanged=" + unchanged + ", Optimized=" +
-            optimized + ", Empty=" + empty + ", Expanded=" + expanded);
+        System.out.println("Unchanged=" + unchanged + ", Optimized=" + optimized + ", Empty="
+            + empty + ", Expanded=" + expanded);
 
         //assertTrue(unchanged > 0);
         //assertTrue(optimized > 0);
@@ -109,8 +117,8 @@ public class QuadTreeQueryTrackerXest extends TestCase {
 
     public void testUnregister() {
         /*FilterFactoryImpl ff = new FilterFactoryImpl() ;
-            Filter f = ff.bbox(type.getTypeName(), 10, 20, 15, 25, "") ;
-            Query q = new DefaultQuery(type.getTypeName(), f) ; */
+           Filter f = ff.bbox(type.getTypeName(), 10, 20, 15, 25, "") ;
+           Query q = new DefaultQuery(type.getTypeName(), f) ; */
         createQuerySet(1);
 
         Query q = (Query) querySet.get(0);
@@ -163,8 +171,7 @@ public class QuadTreeQueryTrackerXest extends TestCase {
     private void createQuerySet(int numberOfQueries) {
         System.out.println("=== Creating Query Set");
 
-        Coordinate p = Generator.pickRandomPoint(new Coordinate(500, 500), 950,
-                950);
+        Coordinate p = Generator.pickRandomPoint(new Coordinate(500, 500), 950, 950);
         Coordinate last = p;
 
         for (int i = 0; i < numberOfQueries; i++) {
@@ -185,15 +192,12 @@ public class QuadTreeQueryTrackerXest extends TestCase {
             return UNCHANGED;
         }
 
-        if ((q1.getFilter() instanceof BBOXImpl) &&
-                (q2.getFilter() instanceof BBOXImpl)) {
+        if ((q1.getFilter() instanceof BBOXImpl) && (q2.getFilter() instanceof BBOXImpl)) {
             BBOXImpl bb = (BBOXImpl) q1.getFilter();
-            Envelope env1 = new Envelope(bb.getMinX(), bb.getMaxX(),
-                    bb.getMinY(), bb.getMaxY());
+            Envelope env1 = new Envelope(bb.getMinX(), bb.getMaxX(), bb.getMinY(), bb.getMaxY());
             bb = (BBOXImpl) q2.getFilter();
 
-            Envelope env2 = new Envelope(bb.getMinX(), bb.getMaxX(),
-                    bb.getMinY(), bb.getMaxY());
+            Envelope env2 = new Envelope(bb.getMinX(), bb.getMaxX(), bb.getMinY(), bb.getMaxY());
 
             if (env1.equals(env2)) {
                 return UNCHANGED;

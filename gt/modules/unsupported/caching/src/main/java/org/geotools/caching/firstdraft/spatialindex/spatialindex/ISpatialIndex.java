@@ -44,8 +44,8 @@ public interface ISpatialIndex {
 
     public void pointLocationQuery(final IShape query, final IVisitor v);
 
-    public void nearestNeighborQuery(int k, final IShape query,
-        final IVisitor v, INearestNeighborComparator nnc);
+    public void nearestNeighborQuery(int k, final IShape query, final IVisitor v,
+        INearestNeighborComparator nnc);
 
     public void nearestNeighborQuery(int k, final IShape query, final IVisitor v);
 

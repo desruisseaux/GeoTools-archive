@@ -16,7 +16,6 @@
 package org.geotools.caching.firstdraft.impl;
 
 import org.geotools.caching.firstdraft.CacheEntry;
-
 import org.geotools.feature.Feature;
 
 

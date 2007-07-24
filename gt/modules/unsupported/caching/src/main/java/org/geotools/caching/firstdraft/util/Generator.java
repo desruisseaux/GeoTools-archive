@@ -15,16 +15,18 @@
  */
 package org.geotools.caching.firstdraft.util;
 
+import java.net.URI;
+import java.util.Random;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
-
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.Query;
-
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.DefaultAttributeTypeFactory;
 import org.geotools.feature.Feature;
@@ -33,17 +35,8 @@ import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.type.GeometricAttributeType;
-
 import org.geotools.filter.FilterFactoryImpl;
-
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
-
-import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory;
-
-import java.net.URI;
-
-import java.util.Random;
 
 
 public class Generator {
@@ -61,9 +54,8 @@ public class Generator {
 
     private static FeatureType createFeatureType() {
         FeatureTypeBuilder builder = FeatureTypeBuilder.newInstance("test");
-        GeometricAttributeType geom = new GeometricAttributeType("geom",
-                Geometry.class, true, null, DefaultEngineeringCRS.GENERIC_2D,
-                Filter.INCLUDE);
+        GeometricAttributeType geom = new GeometricAttributeType("geom", Geometry.class, true,
+                null, DefaultEngineeringCRS.GENERIC_2D, Filter.INCLUDE);
         AttributeType dummydata = DefaultAttributeTypeFactory.newAttributeType("dummydata",
                 String.class);
         builder.addType(geom);
@@ -80,8 +72,7 @@ public class Generator {
         }
     }
 
-    private static LineString createRectangle(double x1, double y1, double x2,
-        double y2) {
+    private static LineString createRectangle(double x1, double y1, double x2, double y2) {
         double x_min = (x1 < x2) ? x1 : x2;
         double y_min = (y1 < y2) ? y1 : y2;
         double x_max = (x1 < x2) ? x2 : x1;
@@ -99,9 +90,8 @@ public class Generator {
     }
 
     public Feature createFeature(int i) {
-        Geometry g = createRectangle(xrange * rand.nextDouble(),
-                yrange * rand.nextDouble(), xrange * rand.nextDouble(),
-                yrange * rand.nextDouble());
+        Geometry g = createRectangle(xrange * rand.nextDouble(), yrange * rand.nextDouble(),
+                xrange * rand.nextDouble(), yrange * rand.nextDouble());
         String dummydata = "Id: " + i;
         Feature f = null;
 
@@ -114,23 +104,20 @@ public class Generator {
         }
     }
 
-    public static Coordinate pickRandomPoint(Coordinate center, double xrange,
-        double yrange) {
+    public static Coordinate pickRandomPoint(Coordinate center, double xrange, double yrange) {
         double x = (center.x - (xrange / 2)) + (xrange * rand.nextDouble());
         double y = (center.y - (yrange / 2)) + (yrange * rand.nextDouble());
 
         return new Coordinate(x, y);
     }
 
-    public static Query createBboxQuery(Coordinate center, double xrange,
-        double yrange) {
+    public static Query createBboxQuery(Coordinate center, double xrange, double yrange) {
         double x_min = center.x - (xrange / 2);
         double x_max = center.x + (xrange / 2);
         double y_min = center.y - (yrange / 2);
         double y_max = center.y + (yrange / 2);
-        Filter bb = filterFactory.bbox(type.getDefaultGeometry().getName(),
-                x_min, y_min, x_max, y_max,
-                type.getDefaultGeometry().getCoordinateSystem().toString());
+        Filter bb = filterFactory.bbox(type.getDefaultGeometry().getName(), x_min, y_min, x_max,
+                y_max, type.getDefaultGeometry().getCoordinateSystem().toString());
 
         return new DefaultQuery(type.getTypeName(), bb);
     }

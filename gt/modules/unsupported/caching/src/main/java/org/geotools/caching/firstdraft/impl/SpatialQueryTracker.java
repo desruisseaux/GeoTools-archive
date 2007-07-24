@@ -15,6 +15,9 @@
  */
 package org.geotools.caching.firstdraft.impl;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -22,28 +25,19 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
-
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
 import org.geotools.caching.firstdraft.QueryTracker;
-
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.Query;
-
 import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.filter.spatial.BBOXImpl;
-
 import org.geotools.index.Data;
 import org.geotools.index.DataDefinition;
 import org.geotools.index.LockTimeoutException;
 import org.geotools.index.TreeException;
 import org.geotools.index.rtree.*;
 import org.geotools.index.rtree.memory.MemoryPageStore;
-
-import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 
 
 /** First implementation of QueryTracker to handle BBox queries.
@@ -117,8 +111,7 @@ public class SpatialQueryTracker implements QueryTracker {
         BBOXImpl bb = (BBOXImpl) f;
 
         try {
-            Envelope env = new Envelope(bb.getMinX(), bb.getMaxX(),
-                    bb.getMinY(), bb.getMaxY());
+            Envelope env = new Envelope(bb.getMinX(), bb.getMaxX(), bb.getMinY(), bb.getMaxY());
             Geometry searchArea = getRectangle(env);
 
             // find matches in R-tree
@@ -148,9 +141,8 @@ public class SpatialQueryTracker implements QueryTracker {
             // searchArea may be some really complex geometry, with holes and patches.
             // get back to the envelope, to build a new query.
             Envelope se = searchArea.getEnvelopeInternal();
-            Filter newbb = filterFactory.bbox(bb.getPropertyName(),
-                    se.getMinX(), se.getMinY(), se.getMaxX(), se.getMaxY(),
-                    bb.getSRS());
+            Filter newbb = filterFactory.bbox(bb.getPropertyName(), se.getMinX(), se.getMinY(),
+                    se.getMaxX(), se.getMaxY(), bb.getSRS());
 
             return newbb;
         } catch (TreeException e) {
@@ -176,8 +168,7 @@ public class SpatialQueryTracker implements QueryTracker {
             BBOXImpl bb = (BBOXImpl) f;
 
             try {
-                Envelope env = new Envelope(bb.getMinX(), bb.getMaxX(),
-                        bb.getMinY(), bb.getMaxY());
+                Envelope env = new Envelope(bb.getMinX(), bb.getMaxX(), bb.getMinY(), bb.getMaxY());
                 Data d = new Data(df);
                 Integer key = new Integer(env.hashCode());
                 d.addValue(key);
@@ -203,8 +194,7 @@ public class SpatialQueryTracker implements QueryTracker {
     public void unregister(Filter f) {
         if (accepts(f)) {
             BBOXImpl bb = (BBOXImpl) f;
-            Envelope env = new Envelope(bb.getMinX(), bb.getMaxX(),
-                    bb.getMinY(), bb.getMaxY());
+            Envelope env = new Envelope(bb.getMinX(), bb.getMaxX(), bb.getMinY(), bb.getMaxY());
             unregister(env);
         }
     }
@@ -247,8 +237,7 @@ public class SpatialQueryTracker implements QueryTracker {
      */
     private static RTree createTree() {
         try {
-            PageStore ps = new MemoryPageStore(df, 8, 4,
-                    PageStore.SPLIT_QUADRATIC);
+            PageStore ps = new MemoryPageStore(df, 8, 4, PageStore.SPLIT_QUADRATIC);
             RTree tree = new RTree(ps);
 
             return tree;
@@ -276,10 +265,8 @@ public class SpatialQueryTracker implements QueryTracker {
      */
     private static Polygon getRectangle(Envelope e) {
         Coordinate[] coords = new Coordinate[] {
-                new Coordinate(e.getMinX(), e.getMinY()),
-                new Coordinate(e.getMaxX(), e.getMinY()),
-                new Coordinate(e.getMaxX(), e.getMaxY()),
-                new Coordinate(e.getMinX(), e.getMaxY()),
+                new Coordinate(e.getMinX(), e.getMinY()), new Coordinate(e.getMaxX(), e.getMinY()),
+                new Coordinate(e.getMaxX(), e.getMaxY()), new Coordinate(e.getMinX(), e.getMaxY()),
                 new Coordinate(e.getMinX(), e.getMinY())
             };
         CoordinateArraySequence seq = new CoordinateArraySequence(coords);

@@ -28,9 +28,8 @@
 //    marioh@cs.ucr.edu
 package org.geotools.caching.firstdraft.spatialindex.spatialindex;
 
-import org.geotools.caching.firstdraft.spatialindex.storagemanager.*;
-
 import java.io.*;
+import org.geotools.caching.firstdraft.spatialindex.storagemanager.*;
 
 
 public class SpatialIndex {
@@ -57,8 +56,8 @@ public class SpatialIndex {
     }
 
     public static IStorageManager createDiskStorageManager(PropertySet ps)
-        throws SecurityException, NullPointerException, IOException,
-            FileNotFoundException, IllegalArgumentException {
+        throws SecurityException, NullPointerException, IOException, FileNotFoundException,
+            IllegalArgumentException {
         IStorageManager sm = (IStorageManager) new DiskStorageManager(ps);
 
         return sm;

@@ -34,8 +34,7 @@ import java.util.*;
 public class RandomEvictionsBuffer extends Buffer {
     Random m_random = new Random();
 
-    public RandomEvictionsBuffer(IStorageManager sm, int capacity,
-        boolean bWriteThrough) {
+    public RandomEvictionsBuffer(IStorageManager sm, int capacity, boolean bWriteThrough) {
         super(sm, capacity, bWriteThrough);
     }
 

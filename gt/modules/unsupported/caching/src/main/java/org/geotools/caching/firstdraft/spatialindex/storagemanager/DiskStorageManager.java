@@ -29,7 +29,6 @@
 package org.geotools.caching.firstdraft.spatialindex.storagemanager;
 
 import java.io.*;
-
 import java.util.*;
 
 
@@ -43,8 +42,8 @@ public class DiskStorageManager implements IStorageManager {
     private byte[] m_buffer = null;
 
     public DiskStorageManager(PropertySet ps)
-        throws SecurityException, NullPointerException, IOException,
-            FileNotFoundException, IllegalArgumentException {
+        throws SecurityException, NullPointerException, IOException, FileNotFoundException,
+            IllegalArgumentException {
         Object var;
 
         // Open/Create flag.
@@ -53,8 +52,7 @@ public class DiskStorageManager implements IStorageManager {
 
         if (var != null) {
             if (!(var instanceof Boolean)) {
-                throw new IllegalArgumentException(
-                    "Property Overwrite must be a Boolean");
+                throw new IllegalArgumentException("Property Overwrite must be a Boolean");
             }
 
             bOverwrite = ((Boolean) var).booleanValue();
@@ -65,16 +63,14 @@ public class DiskStorageManager implements IStorageManager {
 
         if (var != null) {
             if (!(var instanceof String)) {
-                throw new IllegalArgumentException(
-                    "Property FileName must be a String");
+                throw new IllegalArgumentException("Property FileName must be a String");
             }
 
             File indexFile = new File((String) var + ".idx");
             File dataFile = new File((String) var + ".dat");
 
             // check if files exist.
-            if ((bOverwrite == false) &&
-                    (!indexFile.exists() || !dataFile.exists())) {
+            if ((bOverwrite == false) && (!indexFile.exists() || !dataFile.exists())) {
                 bOverwrite = true;
             }
 
@@ -103,8 +99,7 @@ public class DiskStorageManager implements IStorageManager {
             m_indexFile = new RandomAccessFile(indexFile, "rw");
             m_dataFile = new RandomAccessFile(dataFile, "rw");
         } else {
-            throw new IllegalArgumentException(
-                "Property FileName was not specified.");
+            throw new IllegalArgumentException("Property FileName was not specified.");
         }
 
         // find page size.
@@ -113,15 +108,13 @@ public class DiskStorageManager implements IStorageManager {
 
             if (var != null) {
                 if (!(var instanceof Integer)) {
-                    throw new IllegalArgumentException(
-                        "Property PageSize must be an Integer");
+                    throw new IllegalArgumentException("Property PageSize must be an Integer");
                 }
 
                 m_pageSize = ((Integer) var).intValue();
                 m_nextPage = 0;
             } else {
-                throw new IllegalArgumentException(
-                    "Property PageSize was not specified.");
+                throw new IllegalArgumentException("Property PageSize was not specified.");
             }
         } else {
             try {
