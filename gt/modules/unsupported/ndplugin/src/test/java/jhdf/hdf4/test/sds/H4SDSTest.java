@@ -234,18 +234,6 @@ public class H4SDSTest extends TestCase {
 				System.out.println("\tSDS Dataset is dimension scale "
 						+ isDimensionScale);
 
-				if (isDimensionScale) {
-					final int dimSize = dimSizes[0];
-					byte b[] = new byte[dimSize * typeSize];
-					int dimID = HDFLibrary.SDgetdimid(sdsID, 0);
-					assertTrue(dimID != HDFConstants.FAIL);
-					HDFLibrary.SDgetdimscale(dimID, b);
-					if (VISUALIZE_DIMENSION_SCALES_VALUES) {
-						System.out.print("\tDimension scale values\n\t");
-						printValues(b, dataTypeString, dimSize);
-					}
-					System.out.print("\n");
-				}
 				// //
 				//
 				// is empty?
@@ -310,7 +298,20 @@ public class H4SDSTest extends TestCase {
 						printValues(chunksToBread, dataTypeString, chunkValues);
 					}
 				}
-
+				if (isDimensionScale) {
+					final int dimSize = dimSizes[0];
+					byte b[] = new byte[dimSize * typeSize];
+					int dimID = HDFLibrary.SDgetdimid(sdsID, 0);
+					assertTrue(dimID != HDFConstants.FAIL);
+					HDFLibrary.SDgetdimscale(dimID, b);
+					if (VISUALIZE_DIMENSION_SCALES_VALUES) {
+						System.out.print("\tDimension scale values\n\t");
+						printValues(b, dataTypeString, dimSize);
+					}
+					System.out.print("\n");
+				}
+				else{
+				
 				// ////////////////////////////////////////////////////////////////
 				//
 				// SDS attributes for this sds
@@ -393,7 +394,7 @@ public class H4SDSTest extends TestCase {
 				// Dimension information
 				//
 				// ////////////////////////////////////////////////////////////////
-
+				}
 				if (VISUALIZE_DIMENSIONS) {
 					for (int r = 0; r < rank; r++) {
 						// get the id of the first dimension for this dataset
@@ -453,33 +454,56 @@ public class H4SDSTest extends TestCase {
 							// get various info about this attribute
 							assertTrue(HDFLibrary.SDattrinfo(dimensionID, ii,
 									dimAttrName, dimAttrInfo));
-							System.out.println("\t\tSDS Dimension Attribute "
-									+ ii + " name " + dimAttrName[0]);
-							// mask off the litend bit
-							dimAttrInfo[0] = dimAttrInfo[0]
-									& (~HDFConstants.DFNT_LITEND);
-							System.out.println("\t\tSDS Dimension Attribute "
-									+ ii + " dim " + dimAttrInfo[1]);
-							Object buf = H4Datatype.allocateArray(
-									dimAttrInfo[0], dimAttrInfo[1]);
-							assertTrue(HDFLibrary.SDreadattr(dimensionID, ii,
-									buf));
+							final String attrName = dimAttrName[0];
 
-							if (buf != null) {
-								if (dimAttrInfo[0] == HDFConstants.DFNT_CHAR
-										|| dimAttrInfo[0] == HDFConstants.DFNT_UCHAR8) {
-									System.out
-											.println("\t\tSDS Dimension Attribute value "
-													+ Dataset.byteToString(
-															(byte[]) buf,
-															dimAttrInfo[1])[0]);
-								}
+							// //
+							//
+							// The HDF user guide explicitly states that
+							// Predefined Attributes for Dimensions need to be
+							// read using specialized routines (SDgetdimstrs).
+							// So, I will skip a found attribute if it is a
+							// predefined one.
+							//
+							// //
+							boolean isPredef = false;
+							if (attrName.equals("long_name")
+									|| attrName.equals("units")
+									|| attrName.equals("format"))
+								isPredef = true;
+							if (!isPredef) {
+								System.out
+										.println("\t\tSDS Dimension Attribute "
+												+ ii + " name "
+												+ dimAttrName[0]);
 
-								else {
-									System.out
-											.print("\t\tSDS Dimension Attribute "
-													+ ii + " value ");
-									Utilities.printBuffer(buf, dimAttrInfo[0]);
+								// mask off the litend bit
+								dimAttrInfo[0] = dimAttrInfo[0]
+										& (~HDFConstants.DFNT_LITEND);
+								System.out
+										.println("\t\tSDS Dimension Attribute "
+												+ ii + " dim " + dimAttrInfo[1]);
+								Object buf = H4Datatype.allocateArray(
+										dimAttrInfo[0], dimAttrInfo[1]);
+								assertTrue(HDFLibrary.SDreadattr(dimensionID,
+										ii, buf));
+
+								if (buf != null) {
+									if (dimAttrInfo[0] == HDFConstants.DFNT_CHAR
+											|| dimAttrInfo[0] == HDFConstants.DFNT_UCHAR8) {
+										System.out
+												.println("\t\tSDS Dimension Attribute value "
+														+ Dataset.byteToString(
+																(byte[]) buf,
+																dimAttrInfo[1])[0]);
+									}
+
+									else {
+										System.out
+												.print("\t\tSDS Dimension Attribute "
+														+ ii + " value ");
+										Utilities.printBuffer(buf,
+												dimAttrInfo[0]);
+									}
 								}
 							}
 						}
@@ -509,7 +533,6 @@ public class H4SDSTest extends TestCase {
 				} catch (HDFException e) {
 					e.printStackTrace();
 				}
-
 		}
 	}
 
@@ -564,7 +587,7 @@ public class H4SDSTest extends TestCase {
 				SDSPredefAttrName[0]);
 		if (attributeIndex == HDFConstants.FAIL) {
 			System.out
-					.println(message + " " + attributeName + " not present. ");
+					.println(message + attributeName + " not present. ");
 			return;
 		}
 
@@ -576,9 +599,9 @@ public class H4SDSTest extends TestCase {
 		SDSPredefAttrName[0] = "";
 		assertTrue(HDFLibrary.SDattrinfo(sdsID, attributeIndex,
 				SDSPredefAttrName, SDSPredefAttrInfo));
-		System.out.println(message + " Attribute " + attributeName + " index "
+		System.out.println(message + attributeName + " index "
 				+ attributeIndex);
-		System.out.println(message + " Attribute " + attributeName + " type "
+		System.out.println(message + attributeName + " type "
 				+ HDFConstants.getType(SDSPredefAttrInfo[0]));
 		// mask off the litend bit
 		SDSPredefAttrInfo[0] = SDSPredefAttrInfo[0]
@@ -604,13 +627,12 @@ public class H4SDSTest extends TestCase {
 				|| SDSPredefAttrInfo[0] == HDFConstants.DFNT_UCHAR8) {
 			System.out
 					.println(message
-							+ " Attribute "
 							+ attributeName
 							+ " value "
 							+ Dataset.byteToString((byte[]) buf,
 									SDSPredefAttrInfo[1])[0]);
 		} else {
-			System.out.print(message + " Attribute " + attributeName
+			System.out.print(message + attributeName
 					+ " value ");
 			Utilities.printBuffer(buf, SDSPredefAttrInfo[0]);
 		}
