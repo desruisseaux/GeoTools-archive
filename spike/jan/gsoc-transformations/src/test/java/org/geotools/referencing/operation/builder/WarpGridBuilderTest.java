@@ -3,6 +3,7 @@
  */
 package org.geotools.referencing.operation.builder;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -12,7 +13,9 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
+import org.geotools.gce.image.WorldImageWriter;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
@@ -37,7 +40,8 @@ import org.opengis.referencing.operation.TransformException;
 public class WarpGridBuilderTest extends TestCase {
     private double tolerance = 0.05; //cm
     private CoordinateReferenceSystem crs = DefaultEngineeringCRS.GENERIC_2D;
-    private boolean show = false;
+    private boolean show = true;
+    private boolean write = false;
 
     /**
      * Run the suite from the command line.
@@ -91,19 +95,33 @@ public class WarpGridBuilderTest extends TestCase {
      * Test of TPDWarpGridBuilder
      *
      */
-    public void testIDWWarpGridBuilder() {
+    public void ttestIDWWarpGridBuilder() {
         try {
             // Envelope 20*20 km 
-            Envelope env = new Envelope2D(crs, 0, 0, 500, 500);
+            Envelope env = new Envelope2D(crs, 0, 0, 1000, 1000);
 
             // Generates 15 MappedPositions of approximately 2 m differences
-            List mp = generateMappedPositions(env, 10, 3, crs);
+            List mp = generateMappedPositions(env, 15, 1, crs);
 
-            WarpGridBuilder builder = new IDWGridBuilder(mp, 5, 5, env);
+            WarpGridBuilder builder = new IDWGridBuilder(mp, 4, 4, env);
 
+            GridCoverage2D dx  =  (new GridCoverageFactory()).create("idw - dx", builder.getDxGrid(), env);
+            GridCoverage2D dy =  (new GridCoverageFactory()).create("idw - dy", builder.getDyGrid(), env);
+                      
             if (show == true) {
-                (new GridCoverageFactory()).create("IDW - dx", builder.getDxGrid(), env).show();
-                (new GridCoverageFactory()).create("IDW - dy", builder.getDyGrid(), env).show();
+            	dx.show();
+            	dy.show();
+            	 }
+            
+            if (write == true) {
+            WorldImageWriter writerx = new WorldImageWriter((Object) (new File(
+            "/home/jezekjan/gsoc/geodata/idwdx.png")));
+  
+             writerx.write(dx, null);
+             WorldImageWriter writery = new WorldImageWriter((Object) (new File(
+             "/home/jezekjan/gsoc/geodata/idwdy.png")));
+   
+              writery.write(dy, null);
             }
 
             assertBuilder(builder);
@@ -121,10 +139,10 @@ public class WarpGridBuilderTest extends TestCase {
     public void testTPSWarpGridBuilder() {
         try {
            
-            Envelope env = new Envelope2D(crs, 0, 0, 500, 500);
+            Envelope env = new Envelope2D(crs, 0, 0, 1000, 1000);
 
             // Generates 15 MappedPositions of approximately 2 m differences
-            List mp = generateMappedPositions(env, 10, 3, crs);
+            List mp = generateMappedPositions(env, 15, 1, crs);
 
             GeneralMatrix M = new GeneralMatrix(3, 3);
             double[] m0 = { 1, 0, 0 };
@@ -137,17 +155,73 @@ public class WarpGridBuilderTest extends TestCase {
             WarpGridBuilder builder = new TPSGridBuilder(mp, 5, 5, env,
                     ProjectiveTransform.create(M));
 
+            GridCoverage2D dx  =  (new GridCoverageFactory()).create("tps - dx", builder.getDxGrid(), env);
+            GridCoverage2D dy =  (new GridCoverageFactory()).create("tps - dy", builder.getDyGrid(), env);
+                      
             if (show == true) {
-                (new GridCoverageFactory()).create("TPS- dx", builder.getDxGrid(), env).show();
-                (new GridCoverageFactory()).create("TPS - dy", builder.getDyGrid(), env).show();
-            }
+            	dx.show();
+            	dy.show();
+            	 }
             
-            String path = "/home/jezekjan/zkk.txt";
-            builder.getDeltaFile(0,path);
-
+            if (write == true) {
+            WorldImageWriter writerx = new WorldImageWriter((Object) (new File(
+            "/home/jezekjan/gsoc/geodata/tpsdx.png")));
+  
+             writerx.write(dx, null);
+             WorldImageWriter writery = new WorldImageWriter((Object) (new File(
+             "/home/jezekjan/gsoc/geodata/tpsdy.png")));
+   
+              writery.write(dy, null);
+            }
+                      
             assertBuilder(builder);
             assertInverse(builder);
             
+          
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public void testRSGridBuilder() {
+        try {
+           
+            Envelope env = new Envelope2D(crs, 0, 0, 1000, 1000);
+
+            // Generates 15 MappedPositions of approximately 2 m differences
+            List mp = generateMappedPositions(env, 15, 1, crs);
+
+            GeneralMatrix M = new GeneralMatrix(3, 3);
+            double[] m0 = { 1, 0, 0 };
+            double[] m1 = { 0, 1, 0 };
+            double[] m2 = { 0, 0, 1 };
+            M.setRow(0, m0);
+            M.setRow(1, m1);
+            M.setRow(2, m2);
+
+            WarpGridBuilder builder = new RSGridBuilder(mp, 5, 5, env,
+                    ProjectiveTransform.create(M));
+
+          
+            
+            GridCoverage2D rubberdx  =  (new GridCoverageFactory()).create("RubberSheet - dx", builder.getDxGrid(), env);
+            GridCoverage2D rubberdy =  (new GridCoverageFactory()).create("RubberSheet - dy", builder.getDyGrid(), env);
+                      
+            if (show == true) {
+            	rubberdx.show();
+            	rubberdy.show();
+            	 }
+            
+            if (write == true) {
+            WorldImageWriter writerx = new WorldImageWriter((Object) (new File(
+            "/home/jezekjan/gsoc/geodata/rubberdx.png")));
+  
+             writerx.write(rubberdx, null);
+             WorldImageWriter writery = new WorldImageWriter((Object) (new File(
+             "/home/jezekjan/gsoc/geodata/rubberdy.png")));
+   
+              writery.write(rubberdy, null);
+            }
+            assertBuilder(builder);  
           
         } catch (Exception e) {
             e.printStackTrace();
@@ -158,6 +232,8 @@ public class WarpGridBuilderTest extends TestCase {
     	   try {
                // Envelope 20*20 km 
                Envelope env = new Envelope2D(crs, 0, 0, 500, 500);
+               GeneralMatrix M = new GeneralMatrix(3, 3);
+           
 
                // Generates 15 MappedPositions of approximately 2 m differences
                List mp = generateMappedPositions(env, 15, 1, crs);
@@ -201,7 +277,7 @@ public class WarpGridBuilderTest extends TestCase {
             for (int i = 0; i < mp.size(); i++) {
                 Assert.assertEquals(0,
                     ((MappedPosition) mp.get(i)).getError(builder.getMathTransform(), null),
-                    tolerance);
+                    tolerance);                          
             }
         } catch (Exception e) {
             e.printStackTrace();

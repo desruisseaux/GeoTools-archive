@@ -157,9 +157,11 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
     protected MathTransform computeMathTransform() throws FactoryException {
         warpPositions = getGrid();
 
+        globalValues.WarpGridParameters.parameter("warpPositions").setValue(warpPositions);
+
         WarpGridTransform2D wt = (WarpGridTransform2D) (new WarpGridTransform2D.Provider())
             .createMathTransform(globalValues.getWarpGridParameters());
-
+                
         wt.setWorldtoGridTransform(this.worldToGrid);
 
         return wt;

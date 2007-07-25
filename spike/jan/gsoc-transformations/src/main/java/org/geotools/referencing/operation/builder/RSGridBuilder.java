@@ -7,6 +7,7 @@ import javax.vecmath.MismatchedSizeException;
 
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.operation.builder.algorithm.Quadrilateral;
+import org.geotools.referencing.operation.builder.algorithm.RubberSheetTransform;
 import org.geotools.referencing.operation.builder.algorithm.TriangulationException;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
@@ -40,8 +41,8 @@ public class RSGridBuilder extends WarpGridBuilder {
 		
 		super(vectors, dx, dy, envelope, realToGrid);
 		
-		DirectPosition p0 = new DirectPosition2D(envelope.getCoordinateReferenceSystem(),envelope.getLowerCorner().getOrdinate(0)-1.5,envelope.getLowerCorner().getOrdinate(1)-1.5);
-		DirectPosition p2 =new DirectPosition2D(envelope.getCoordinateReferenceSystem(),envelope.getUpperCorner().getOrdinate(0)+1.5,envelope.getUpperCorner().getOrdinate(1)+1.5);
+		DirectPosition p0 = new DirectPosition2D(envelope.getCoordinateReferenceSystem(),envelope.getLowerCorner().getOrdinate(0)-5.5,envelope.getLowerCorner().getOrdinate(1)-5.5);
+		DirectPosition p2 = new DirectPosition2D(envelope.getCoordinateReferenceSystem(),envelope.getUpperCorner().getOrdinate(0)+5.5,envelope.getUpperCorner().getOrdinate(1)+5.5);
 		
 		DirectPosition p1 = new DirectPosition2D(envelope.getCoordinateReferenceSystem(), p0.getOrdinate(0), p2.getOrdinate(1));
 		DirectPosition p3 = new DirectPosition2D(envelope.getCoordinateReferenceSystem(), p2.getOrdinate(0), p0.getOrdinate(1));
@@ -52,7 +53,7 @@ public class RSGridBuilder extends WarpGridBuilder {
 		
 	}
 
-	protected float[] computeWarpGrid(ParameterValueGroup values) {
+	protected float[] computeWarpGrid2(ParameterValueGroup values) {
 		  float[] warpPositions = (float[]) values.parameter("warpPositions").getValue();
 
 	        for (int i = 0; i <= values.parameter("yNumCells").intValue(); i++) {
@@ -75,10 +76,54 @@ public class RSGridBuilder extends WarpGridBuilder {
 	                + (2 * j) + 1] = (float) y;
 	            }
 	        }
+	        	     
 
 	        return warpPositions;
+	        
+	        
 	}
 	
+	private float[] generateSourcePoints(ParameterValueGroup values){
+		
+		float[] sourcePoints = ((float[]) values.parameter("warpPositions").getValue());
+
+        for (int i = 0; i <= values.parameter("yNumCells").intValue(); i++) {
+            for (int j = 0; j <= values.parameter("xNumCells").intValue(); j++) {
+               
+            	float x =  (j * values.parameter("xStep").intValue())
+                    + values.parameter("xStart").intValue();
+            	float y =  (i * values.parameter("yStep").intValue())
+                    + values.parameter("yStart").intValue();
+
+                sourcePoints[(i * ((1 + values.parameter("xNumCells").intValue()) * 2))
+                + (2 * j)] = (float) x;
+
+                sourcePoints[(i * ((1 + values.parameter("xNumCells").intValue()) * 2))
+                + (2 * j) + 1] = (float) y;
+            }
+        }
+        
+        return sourcePoints;
+        
+		
+	}
+	protected float[] computeWarpGrid(ParameterValueGroup values){	
+		
+		float[] source = generateSourcePoints(values);
+	
+		try {
+			rsBuilder.getMathTransform().transform(source, 0, source, 0, (source.length+1)/2);
+	
+		} catch (TransformException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (FactoryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return source;
+	}
 	private Point2D calculateShift(DirectPosition2D p){
 		Point2D shift = null;
 		try {

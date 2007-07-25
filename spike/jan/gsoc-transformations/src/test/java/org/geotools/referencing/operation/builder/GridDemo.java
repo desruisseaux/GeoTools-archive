@@ -5,6 +5,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.media.jai.RenderedOp;
 
@@ -33,25 +34,30 @@ import org.opengis.referencing.operation.MathTransform;
 
 public class GridDemo {
 	
-	static public List/*<MappedPositions>*/ generateMappedPositions(Envelope env, int number, double deltas){
-		List/*<MappedPositions>*/ vectors = new ArrayList();
-		double minx = env.getLowerCorner().getCoordinates()[0];
-		double miny = env.getLowerCorner().getCoordinates()[1];
-		
-		double maxx = env.getUpperCorner().getCoordinates()[0];
-		double maxy = env.getUpperCorner().getCoordinates()[1];
-		
-		for (int i = 0; i < number;i++){
-			double x = minx+Math.random()*(maxx-minx);
-			double y = miny+Math.random()*(maxy-miny);
-			vectors.add(
-					new MappedPosition(new DirectPosition2D(x , y),							                               
-		                              new DirectPosition2D(x+Math.random()*deltas-Math.random()*deltas,
-		                            		               y+Math.random()*deltas-Math.random()*deltas)));
-		}
-		
-		return vectors;
-	}
+	 private static List /*<MappedPositions>*/ generateMappedPositions(Envelope env, int number,
+		        double deltas, CoordinateReferenceSystem crs) {
+		        List /*<MappedPositions>*/ vectors = new ArrayList();
+		        double minx = env.getLowerCorner().getCoordinates()[0];
+		        double miny = env.getLowerCorner().getCoordinates()[1];
+
+		        double maxx = env.getUpperCorner().getCoordinates()[0];
+		        double maxy = env.getUpperCorner().getCoordinates()[1];
+
+		        final Random random = new Random(8578348921369L);
+
+		        for (int i = 0; i < number; i++) {
+		            double x = minx + (random.nextDouble() * (maxx - minx));
+		            double y = miny + (random.nextDouble() * (maxy - miny));
+		            vectors.add(new MappedPosition(new DirectPosition2D(crs, x, y),
+		                    new DirectPosition2D(crs,
+		                        (x + (random.nextDouble() * deltas)) - (random.nextDouble() * deltas),
+		                        (y + (random.nextDouble() * deltas)) - (random.nextDouble() * deltas))));
+		        }
+
+		        return vectors;
+		    }
+	 
+
 	static public GridCoverage2D generateCoverage2D(int row, int cells, Envelope env){
 		 float[][] raster = new float[row][cells];
 		for (int j = 0; j < row; j++) {
@@ -106,9 +112,9 @@ public class GridDemo {
            //coverage = GridCoverageExamples.getExample(0);
             
             System.out.println(coverage.getGridGeometry().getGridRange());
-            List vectors = generateMappedPositions(env,20, 0.1);
+            List vectors = generateMappedPositions(env,20, 0.1, env.getCoordinateReferenceSystem());
             
-            WarpGridBuilder gridBuilder = new TPSGridBuilder(vectors, 0.01,0.01, env, coverage.getGridGeometry().getGridToCRS().inverse());
+            WarpGridBuilder gridBuilder = new RSGridBuilder(vectors, 0.01,0.01, env, coverage.getGridGeometry().getGridToCRS().inverse());
               
             (new GridCoverageFactory()).create("DX",gridBuilder.getDxGrid(),coverage.getEnvelope()).show();
             (new GridCoverageFactory()).create("DY",gridBuilder.getDyGrid(),coverage.getEnvelope()).show();
