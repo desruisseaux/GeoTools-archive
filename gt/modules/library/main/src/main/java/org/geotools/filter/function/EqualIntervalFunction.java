@@ -43,7 +43,7 @@ public class EqualIntervalFunction extends ClassificationFunction {
         setName("EqualInterval");
     }
 
-    private Object calculate(FeatureCollection featureCollection) {
+    private RangedClassifier calculate(FeatureCollection featureCollection) {
         int classNum = getClasses();
         Comparable globalMin;
         Comparable globalMax;
@@ -74,7 +74,7 @@ public class EqualIntervalFunction extends ClassificationFunction {
 
     }
     
-    private Object calculateNumerical(int classNum, Comparable globalMin, Comparable globalMax) {
+    private RangedClassifier calculateNumerical(int classNum, Comparable globalMin, Comparable globalMax) {
         double slotWidth = (((Number) globalMax).doubleValue() - ((Number) globalMin).doubleValue()) / classNum;
         //size arrays
         Comparable[] localMin = new Comparable[classNum];
@@ -108,7 +108,7 @@ public class EqualIntervalFunction extends ClassificationFunction {
         return new RangedClassifier(localMin, localMax);
     }
     
-    private Object calculateNonNumerical(int classNum, FeatureCollection featureCollection) throws IOException {
+    private RangedClassifier calculateNonNumerical(int classNum, FeatureCollection featureCollection) throws IOException {
         //obtain of list of unique values, so we can enumerate
         UniqueVisitor uniqueVisit = new UniqueVisitor(getExpression());
         featureCollection.accepts(uniqueVisit, null);
@@ -154,7 +154,7 @@ public class EqualIntervalFunction extends ClassificationFunction {
         return new RangedClassifier(localMin, localMax);
     }
 
-    public Object evaluate( Object object ) {
+    public RangedClassifier evaluate( Object object ) {
         if (!(object instanceof FeatureCollection)) {
             return null;
         }

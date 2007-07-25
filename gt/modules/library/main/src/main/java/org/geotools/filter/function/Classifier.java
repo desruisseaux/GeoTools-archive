@@ -58,4 +58,11 @@ public abstract class Classifier {
      * @return the number of bins
      */
     public abstract int getSize();
+    
+    @Override
+    public String toString() {
+        StringBuffer buffer = new StringBuffer();
+        
+        return super.toString();
+    }
 }

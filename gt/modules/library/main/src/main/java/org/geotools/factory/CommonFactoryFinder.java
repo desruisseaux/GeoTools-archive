@@ -344,6 +344,7 @@ public final class CommonFactoryFinder {
     public static FilterFactory2 getFilterFactory2(Hints hints)
             throws FactoryRegistryException
     {
+        if( hints == null) hints = GeoTools.getDefaultHints();
         final Object h = hints.get(Hints.FILTER_FACTORY);
         if (!(h instanceof Class ? FilterFactory2.class.isAssignableFrom((Class) h)
                                  : h instanceof FilterFactory2))
