@@ -15,9 +15,15 @@
  */
 package org.geotools.maven.xmlcodegen;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.logging.Logger;
+
 import org.eclipse.xsd.XSDComplexTypeDefinition;
-import org.eclipse.xsd.XSDElementDeclaration;
-import org.eclipse.xsd.XSDFactory;
 import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.eclipse.xsd.XSDTypeDefinition;
@@ -26,33 +32,9 @@ import org.eclipse.xsd.util.XSDUtil;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.type.SchemaImpl;
-import org.geotools.graph.build.GraphGenerator;
-import org.geotools.graph.build.basic.BasicDirectedGraphGenerator;
-import org.geotools.graph.structure.Graph;
-import org.geotools.graph.structure.Graphable;
-import org.geotools.graph.traverse.GraphTraversal;
-import org.geotools.graph.traverse.GraphWalker;
-import org.geotools.graph.traverse.basic.BasicGraphTraversal;
-import org.geotools.graph.traverse.standard.DirectedDepthFirstTopologicalIterator;
-import org.geotools.graph.util.graph.CycleDetector;
-import org.geotools.graph.util.graph.DirectedCycleDetector;
 import org.geotools.xml.Schemas;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.Schema;
-import org.opengis.feature.type.TypeName;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.Stack;
-import java.util.logging.Logger;
 
 
 /**

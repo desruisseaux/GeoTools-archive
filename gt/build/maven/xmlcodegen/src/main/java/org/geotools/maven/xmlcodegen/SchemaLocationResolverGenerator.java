@@ -15,20 +15,17 @@
  */
 package org.geotools.maven.xmlcodegen;
 
-import org.eclipse.xsd.XSDInclude;
-import org.eclipse.xsd.XSDSchema;
-import org.eclipse.xsd.util.XSDUtil;
-import org.geotools.xml.Schemas;
 import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
+
+import org.eclipse.xsd.XSDInclude;
+import org.eclipse.xsd.XSDSchema;
+import org.geotools.xml.Schemas;
 
 
 /**

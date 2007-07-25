@@ -15,24 +15,20 @@
  */
 package org.geotools.maven.xmlcodegen;
 
-import org.eclipse.xsd.XSDAttributeDeclaration;
-import org.eclipse.xsd.XSDAttributeGroupDefinition;
-import org.eclipse.xsd.XSDAttributeUse;
-import org.eclipse.xsd.XSDElementDeclaration;
-import org.eclipse.xsd.XSDNamedComponent;
-import org.eclipse.xsd.XSDParticle;
-import org.eclipse.xsd.XSDSchema;
-import org.eclipse.xsd.XSDTypeDefinition;
-import org.geotools.xml.Schemas;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.eclipse.xsd.XSDAttributeDeclaration;
+import org.eclipse.xsd.XSDElementDeclaration;
+import org.eclipse.xsd.XSDNamedComponent;
+import org.eclipse.xsd.XSDSchema;
+import org.eclipse.xsd.XSDTypeDefinition;
+import org.geotools.xml.Schemas;
 
 
 /**

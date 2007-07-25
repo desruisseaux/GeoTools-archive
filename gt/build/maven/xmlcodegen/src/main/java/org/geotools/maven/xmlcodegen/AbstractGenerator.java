@@ -15,9 +15,6 @@
  */
 package org.geotools.maven.xmlcodegen;
 
-import org.eclipse.xsd.XSDSchema;
-import org.geotools.xml.Schemas;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -27,10 +24,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.logging.Logger;
+
+import org.eclipse.xsd.XSDSchema;
+import org.geotools.xml.Schemas;
 
 
 /**
