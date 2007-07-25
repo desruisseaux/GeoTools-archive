@@ -15,17 +15,16 @@
  */
 package org.geotools.referencing.operation.builder.algorithm;
 
-import org.geotools.geometry.DirectPosition2D;
-import org.geotools.referencing.operation.transform.AbstractMathTransform;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.util.HashMap;
+import java.util.Iterator;
+import org.opengis.geometry.DirectPosition;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.geometry.DirectPosition;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import org.geotools.geometry.DirectPosition2D;
+import org.geotools.referencing.operation.transform.AbstractMathTransform;
 
 
 /**
@@ -44,8 +43,13 @@ import java.util.Iterator;
  * @todo Consider moving this class to the {@linkplain
  *       org.geotools.referencing.operation.transform} package.
  */
-public class RubberSheetTransform extends AbstractMathTransform
-    implements MathTransform2D {
+public class RubberSheetTransform extends AbstractMathTransform implements MathTransform2D {
+    /**
+     * Helper variable to hold triangle. It is use for optimalization of searching in TIN for 
+     * triangle containing points that are transformed.
+     */
+    private TINTriangle previousTriangle = null;
+
     /**
      * The HashMap where the keys are the original {@link
      * Polygon} and values are {@link
@@ -76,88 +80,10 @@ public class RubberSheetTransform extends AbstractMathTransform
     /**
      * Gets the dimension of output points, which is 2.
      *
-     * @return imension of output points
+     * @return dimension of output points
      */
     public final int getTargetDimensions() {
         return 2;
-    }
-
-    /**
-     * The method for generating a Map of Triangles mapped to ArrayList
-     * of points within this triangle.
-     *
-     * @param arraySrcPts of source points
-     *
-     * @return HashMap of wher keys are triangles and values are  ArrayLists of
-     *         points within these triangles
-     */
-    private HashMap mapTrianglesToPoints(ArrayList arraySrcPts) {
-        HashMap trianglesToPoints = new HashMap();
-
-        for (Iterator i = trianglesToKeysMap.keySet().iterator(); i.hasNext();) {
-            TINTriangle triangle = (TINTriangle) i.next();
-            ArrayList pointsInTriangle = new ArrayList();
-
-            for (Iterator k = arraySrcPts.iterator(); k.hasNext();) {
-                DirectPosition p = ((DirectPosition) k.next());
-
-                if (triangle.containsOrIsVertex(p)) {
-                    pointsInTriangle.add(p);
-
-                    //arraySrcPts.remove(p);
-                }
-            }
-
-            trianglesToPoints.put(triangle, pointsInTriangle);
-        }
-
-        return trianglesToPoints;
-    }
-
-    /* (non-Javadoc)
-     * @see org.opengis.referencing.operation.MathTransform#transform(double[], int, double[], int, int)
-     */
-    public void transform(double[] srcPts, int srcOff, final double[] dstPts,
-        int dstOff, int numPts) throws TransformException {
-        ExtendedPosition ptSrc = null;
-
-        ArrayList arraySrcPts = new ArrayList();
-
-        while (--numPts >= 0) {
-            final DirectPosition coSrc = new DirectPosition2D(srcPts[srcOff++],
-                    srcPts[srcOff++]);
-            DirectPosition coDst = new DirectPosition2D(0, 0);
-            ptSrc = new ExtendedPosition(coSrc, coDst);
-
-            arraySrcPts.add(ptSrc);
-        }
-
-        HashMap trianglestoPoints = mapTrianglesToPoints((ArrayList) arraySrcPts);
-
-        // Circle goes trough each triangle
-        for (Iterator k = trianglestoPoints.keySet().iterator(); k.hasNext();) {
-            TINTriangle triangle = (TINTriangle) k.next();
-            AffineTransform AT = (AffineTransform) trianglesToKeysMap.get(triangle);
-
-            // Circle for transforming points within this triangle
-            for (Iterator j = ((ArrayList) trianglestoPoints.get(triangle))
-                    .iterator(); j.hasNext();) {
-                ExtendedPosition co = (ExtendedPosition) j.next();
-                Point2D ptS = new Point2D.Double(co.x, co.y);
-                Point2D ptD = new Point2D.Double();
-                AT.transform(ptS, ptD);
-
-                DirectPosition coDst = new DirectPosition2D(co
-                        .getCoordinateReferenceSystem(), ptD.getX(), ptD.getY());
-                co.setMappedposition(coDst);
-            }
-        }
-
-        for (Iterator j = arraySrcPts.iterator(); j.hasNext();) {
-            ExtendedPosition mc = (ExtendedPosition) j.next();
-            dstPts[dstOff++] = mc.getMappedposition().getCoordinates()[0];
-            dstPts[dstOff++] = mc.getMappedposition().getCoordinates()[1];
-        }
     }
 
     /**
@@ -174,8 +100,7 @@ public class RubberSheetTransform extends AbstractMathTransform
         final String lineSeparator = System.getProperty("line.separator", "\n");
         final StringBuffer buffer = new StringBuffer();
 
-        for (final Iterator i = trianglesToKeysMap.keySet().iterator();
-                i.hasNext();) {
+        for (final Iterator i = trianglesToKeysMap.keySet().iterator(); i.hasNext();) {
             TINTriangle trian = (TINTriangle) i.next();
             MathTransform mt = (MathTransform) trianglesToKeysMap.get(trian);
             buffer.append(trian.toString());
@@ -185,5 +110,53 @@ public class RubberSheetTransform extends AbstractMathTransform
         }
 
         return buffer.toString();
+    }
+
+    /* (non-Javadoc)
+     * @see org.opengis.referencing.operation.MathTransform#transform(double[], int, double[], int, int)
+     */
+    public void transform(double[] srcPts, int srcOff, final double[] dstPt, int dstOff, int numPts)
+        throws TransformException {
+        for (int i = srcOff; i < numPts; i++) {
+            Point2D pos = (Point2D) (new DirectPosition2D(srcPts[2 * i], srcPts[(2 * i) + 1]));
+
+            TINTriangle triangle = searchTriangle((DirectPosition) pos);
+
+            AffineTransform AT = (AffineTransform) trianglesToKeysMap.get(triangle);
+
+            Point2D dst = AT.transform(pos, null);
+
+            dstPt[2 * i] = dst.getX();
+            dstPt[(2 * i) + 1] = dst.getY();
+        }
+    }
+
+    /**
+     * Search the TIN for the triangle that contains p
+     * @param p Point of interest
+     * @return Triangle containing p
+     * @throws TransformException if points are outside the area of TIN.
+     */
+    private TINTriangle searchTriangle(DirectPosition p)
+        throws TransformException {
+        /* optimalization for finding triangles.
+         * Assuming the point are close to each other -
+         * so why not to check if next point is in the same triangle as previous one.
+         */
+        if ((previousTriangle != null) && previousTriangle.containsOrIsVertex(p)) {
+            return previousTriangle;
+        }
+
+        for (Iterator i = trianglesToKeysMap.keySet().iterator(); i.hasNext();) {
+            TINTriangle triangle = (TINTriangle) i.next();
+
+            if (triangle.containsOrIsVertex(p)) {
+                previousTriangle = triangle;
+
+                return triangle;
+            }
+        }
+
+        throw (new TransformException("Points are outside the scope"));
     }
 }
