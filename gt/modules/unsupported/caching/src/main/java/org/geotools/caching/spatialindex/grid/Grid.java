@@ -37,8 +37,8 @@ import org.geotools.caching.spatialindex.Visitor;
  *
  */
 public class Grid extends AbstractSpatialIndex {
-    int root_insertions = 0;
-    int MAX_INSERTION = 4;
+    protected int root_insertions = 0;
+    protected int MAX_INSERTION = 4;
 
     /** Constructor. Creates a new Grid covering space given by <code>mbr</code>
      * and with at least <code>capacity</code> nodes.
@@ -53,6 +53,9 @@ public class Grid extends AbstractSpatialIndex {
         root.split();
         this.stats.addToNodesCounter(root.capacity + 1); // root has root.capacity nodes, +1 for root itself :)
         this.root = root;
+    }
+
+    protected Grid() {
     }
 
     protected void visitData(Node n, Visitor v, Shape query, int type) {
@@ -147,7 +150,7 @@ public class Grid extends AbstractSpatialIndex {
         this.stats.addToDataCounter(1);
     }
 
-    void insertData(GridRootNode node, Object data, Shape shape, int id) {
+    protected void insertData(GridRootNode node, Object data, Shape shape, int id) {
         /*
          * This version inserts data in tile if tile contains data's MBR (ie shape),
          * otherwise inserts data at root node.
@@ -155,19 +158,18 @@ public class Grid extends AbstractSpatialIndex {
          * are inserted at root node, because they are likely to fall between two tiles,
          * rather thant in one and only one tile.
          *
-           int[] cursor = new int[this.dimension];
-           for (int i = 0; i < this.dimension; i++) {
-               cursor[i] = (int) ((shape.getMBR().getLow(i) - node.mbr.getLow(i)) / node.tiles_size);
-           }
-           int nextid = node.gridIndexToNodeId(cursor);
-           Node nextnode = node.getSubNode(nextid);
-           if (nextnode.getShape().contains(shape)) {
-               insertData(nextnode, data, shape, id);
-           } else {
-               insertData(this.root, data, shape, id);
-               root_insertions++;
-           }
-        
+             int[] cursor = new int[this.dimension];
+             for (int i = 0; i < this.dimension; i++) {
+                 cursor[i] = (int) ((shape.getMBR().getLow(i) - node.mbr.getLow(i)) / node.tiles_size);
+             }
+             int nextid = node.gridIndexToNodeId(cursor);
+             Node nextnode = node.getSubNode(nextid);
+             if (nextnode.getShape().contains(shape)) {
+                 insertData(nextnode, data, shape, id);
+             } else {
+                 insertData(this.root, data, shape, id);
+                 root_insertions++;
+             }
          */
 
         /* so we prefer this version :
@@ -207,7 +209,7 @@ public class Grid extends AbstractSpatialIndex {
      * @param mins
      * @param maxs
      */
-    void findMatchingTiles(Shape shape, int[] cursor, final int[] mins, final int[] maxs) {
+    protected void findMatchingTiles(Shape shape, int[] cursor, final int[] mins, final int[] maxs) {
         GridRootNode node = (GridRootNode) this.root;
 
         for (int i = 0; i < this.dimension; i++) {
@@ -224,7 +226,7 @@ public class Grid extends AbstractSpatialIndex {
      * @param maxs
      * @return <code>false</code> if cursor has reached maxs, <code>true</code> otherwise.
      */
-    boolean increment(int[] cursor, int[] mins, int[] maxs) {
+    protected static boolean increment(int[] cursor, int[] mins, int[] maxs) {
         int dims = cursor.length;
         boolean cont = true;
 

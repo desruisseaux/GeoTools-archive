@@ -13,24 +13,20 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.caching;
+package org.geotools.caching.grid;
 
-import java.io.IOException;
-import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.data.FeatureStore;
-import org.geotools.feature.FeatureCollection;
+import org.geotools.caching.spatialindex.Region;
+import org.geotools.caching.spatialindex.grid.GridNode;
 
 
-public interface FeatureCache extends FeatureStore {
-    public void clear();
+public class GridCacheNode extends GridNode {
+    boolean valid = false;
 
-    public void put(FeatureCollection fc, Envelope e) throws CacheOversizedException;
+    GridCacheNode(int id, GridCacheRootNode parent, Region mbr) {
+        super(id, parent, mbr);
+    }
 
-    public void put(FeatureCollection fc) throws CacheOversizedException;
-
-    public FeatureCollection get(Envelope e) throws IOException;
-
-    public FeatureCollection peek(Envelope e);
-
-    public void remove(Envelope e);
+    protected void clear() {
+        super.clear();
+    }
 }

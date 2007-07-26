@@ -19,27 +19,19 @@ import java.util.HashMap;
 import org.geotools.caching.spatialindex.Node;
 import org.geotools.caching.spatialindex.Region;
 import org.geotools.caching.spatialindex.Shape;
-import org.geotools.caching.spatialindex.grid.GridData;
 
 
-/** A node in the grid.
- * Data objects are store in an array.
- * Extra data about the node may be stored in node_data, which is a HashMap.
- *
- * @author Christophe Rousson, SoC 2007, CRG-ULAVAL
- *
- */
-public class GridNode implements Node {
+public abstract class AbstractGridNode implements Node {
     int id;
     Region mbr;
     boolean visited = false;
-    GridNode parent;
+    AbstractGridNode parent;
     HashMap node_data;
     int num_data;
     int[] data_ids;
     GridData[] data;
 
-    protected GridNode(int id, GridNode parent, Region mbr) {
+    AbstractGridNode(int id, AbstractGridNode parent, Region mbr) {
         this.id = id;
         this.mbr = new Region(mbr);
         this.parent = parent;
@@ -49,32 +41,8 @@ public class GridNode implements Node {
         this.data_ids = new int[10];
     }
 
-    public int getChildIdentifier(int index) throws IndexOutOfBoundsException {
-        throw new UnsupportedOperationException("GridNode have no children.");
-    }
-
-    public Shape getChildShape(int index) throws IndexOutOfBoundsException {
-        throw new UnsupportedOperationException("GridNode have no children.");
-    }
-
-    public int getChildrenCount() {
-        return 0;
-    }
-
-    public int getLevel() {
-        return 0;
-    }
-
-    public Node getSubNode(int index) throws IndexOutOfBoundsException {
-        throw new UnsupportedOperationException("GridNode have no children.");
-    }
-
     public boolean isIndex() {
-        return false;
-    }
-
-    public boolean isLeaf() {
-        return true;
+        return !isLeaf();
     }
 
     public boolean isVisited() {
@@ -131,14 +99,5 @@ public class GridNode implements Node {
 
         data[num_data - 1] = null;
         num_data--;
-    }
-
-    /** Erase all data referenced by this node.
-     *
-     */
-    protected void clear() {
-        this.num_data = 0;
-        this.data = new GridData[10];
-        this.data_ids = new int[10];
     }
 }

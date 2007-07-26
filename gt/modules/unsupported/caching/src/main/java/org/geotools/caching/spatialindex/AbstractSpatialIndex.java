@@ -130,8 +130,10 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
                     current.getSubNode(i).setVisited(false);
                 }
 
-                // visitData check for actual containement or intersection
-                visitData(current, v, query, type);
+                if (v.isDataVisitor()) { // skip if visitor does nothing with data
+                                         // visitData check for actual containement or intersection
+                    visitData(current, v, query, type);
+                }
 
                 current.setVisited(true);
             }

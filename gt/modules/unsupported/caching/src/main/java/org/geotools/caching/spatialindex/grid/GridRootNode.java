@@ -29,12 +29,12 @@ import org.geotools.caching.spatialindex.Shape;
  *
  */
 public class GridRootNode extends GridNode {
-    int capacity;
+    protected int capacity;
     int[] tiles_number;
     double tiles_size;
     ArrayList children;
 
-    GridRootNode(Region mbr, int capacity) {
+    protected GridRootNode(Region mbr, int capacity) {
         super(0, null, mbr);
         this.capacity = capacity;
         init();
@@ -74,7 +74,7 @@ public class GridRootNode extends GridNode {
     /** Creates the grid by appending children to this node.
      *
      */
-    void split() {
+    protected void split() {
         int dims = tiles_number.length;
         double[] pos = new double[dims];
         double[] nextpos = new double[dims];
@@ -87,10 +87,14 @@ public class GridRootNode extends GridNode {
 
         do {
             Region reg = new Region(pos, nextpos);
-            GridNode child = new GridNode(id, this, reg);
+            GridNode child = createNode(id, reg);
             this.children.add(child);
             id++;
         } while (increment(pos, nextpos));
+    }
+
+    protected GridNode createNode(int id, Region reg) {
+        return new GridNode(id, this, reg);
     }
 
     /** Computes sequentially the corner position of each tile in the grid.

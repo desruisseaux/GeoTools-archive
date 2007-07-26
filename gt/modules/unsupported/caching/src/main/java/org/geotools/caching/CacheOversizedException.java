@@ -15,22 +15,9 @@
  */
 package org.geotools.caching;
 
-import java.io.IOException;
-import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.data.FeatureStore;
-import org.geotools.feature.FeatureCollection;
-
-
-public interface FeatureCache extends FeatureStore {
-    public void clear();
-
-    public void put(FeatureCollection fc, Envelope e) throws CacheOversizedException;
-
-    public void put(FeatureCollection fc) throws CacheOversizedException;
-
-    public FeatureCollection get(Envelope e) throws IOException;
-
-    public FeatureCollection peek(Envelope e);
-
-    public void remove(Envelope e);
+public class CacheOversizedException extends FeatureCacheException {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 3498526657089279151L;
 }

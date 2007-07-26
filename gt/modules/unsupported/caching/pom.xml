@@ -100,7 +100,7 @@
         <artifactId>jalopy-maven-plugin</artifactId>
         <version>1.0-SNAPSHOT</version>
         <configuration>
-            <convention>target/jalopy-geotools.xml</convention>
+            <convention>resources/jalopy-geotools.xml</convention>
         </configuration>
         <executions>
           <execution>

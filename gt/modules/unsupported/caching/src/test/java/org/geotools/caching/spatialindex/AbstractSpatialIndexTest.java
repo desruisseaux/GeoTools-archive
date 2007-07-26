@@ -167,5 +167,9 @@ public abstract class AbstractSpatialIndexTest extends TestCase {
         public void visitNode(Node n) {
             visited_nodes++;
         }
+
+        public boolean isDataVisitor() {
+            return true;
+        }
     }
 }

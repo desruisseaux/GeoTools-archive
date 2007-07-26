@@ -84,7 +84,7 @@ public class QuadTreeQueryTracker implements QueryTracker {
                     filters.add(missing);
                 }
 
-                return ff.and(filters);
+                return ff.or(filters);
             } else if (regions.size() == 1) {
                 FilterFactoryImpl ff = new FilterFactoryImpl();
                 Region rg = (Region) regions.pop();

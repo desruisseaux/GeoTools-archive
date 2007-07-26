@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.caching.firstdraft.util;
+package org.geotools.caching.util;
 
 import java.net.URI;
 import java.util.Random;
@@ -40,42 +40,46 @@ import org.geotools.referencing.crs.DefaultEngineeringCRS;
 
 
 public class Generator {
-    private static final FeatureType type = createFeatureType();
-    private static final GeometryFactory gfact = new GeometryFactory();
-    private static final Random rand = new Random();
-    private static final FilterFactory filterFactory = new FilterFactoryImpl();
-    private final double xrange;
-    private final double yrange;
+    public static final FeatureType type;
+    private static final GeometryFactory gfact;
+    private static final Random rand;
+    private static final FilterFactory filterFactory;
 
-    public Generator(double xrange, double yrange) {
-        this.xrange = xrange;
-        this.yrange = yrange;
-    }
+    static {
+        gfact = new GeometryFactory();
+        rand = new Random();
+        filterFactory = new FilterFactoryImpl();
 
-    public static FeatureType createFeatureType() {
         FeatureTypeBuilder builder = FeatureTypeBuilder.newInstance("test");
         GeometricAttributeType geom = new GeometricAttributeType("geom", Geometry.class, true,
                 null, DefaultEngineeringCRS.GENERIC_2D, Filter.INCLUDE);
         AttributeType dummydata = DefaultAttributeTypeFactory.newAttributeType("dummydata",
                 String.class);
-        long time = System.currentTimeMillis();
         builder.addType(geom);
         builder.addType(dummydata);
         builder.setDefaultGeometry(geom);
         builder.setNamespace(URI.create("testStore"));
 
         try {
-            FeatureType type = builder.getFeatureType();
-            time = System.currentTimeMillis() - time;
-            System.out.println(time);
-
-            return type;
+            type = builder.getFeatureType();
         } catch (SchemaException e) {
             throw (RuntimeException) new RuntimeException().initCause(e);
         }
     }
 
-    private static LineString createRectangle(double x1, double y1, double x2, double y2) {
+    private final double xrange;
+    private final double yrange;
+    double meansize;
+    int max_vertices;
+
+    public Generator(double xrange, double yrange) {
+        this.xrange = xrange;
+        this.yrange = yrange;
+        this.max_vertices = 10;
+        this.meansize = Math.min(xrange, yrange) / 20;
+    }
+
+    static LineString createRectangle(double x1, double y1, double x2, double y2) {
         double x_min = (x1 < x2) ? x1 : x2;
         double y_min = (y1 < y2) ? y1 : y2;
         double x_max = (x1 < x2) ? x2 : x1;
@@ -92,9 +96,56 @@ public class Generator {
         return new LineString(cs, gfact);
     }
 
+    public void sort(double[] array) {
+        double tmp;
+
+        for (int i = 0; i < array.length; i++) {
+            tmp = array[i];
+
+            for (int j = i + 1; j < array.length; j++) {
+                if (array[j] < tmp) {
+                    array[i] = array[j];
+                    array[j] = tmp;
+                    tmp = array[i];
+                }
+            }
+        }
+    }
+
+    Geometry createGeometry() {
+        double center_x = meansize + (rand.nextDouble() * (xrange - (2 * meansize)));
+        double center_y = meansize + (rand.nextDouble() * (yrange - (2 * meansize)));
+        double size = rand.nextDouble() * 2 * meansize;
+        int n_vertices = 1 + rand.nextInt(max_vertices - 1);
+        double[] angles = new double[n_vertices];
+        double[] distances = new double[n_vertices];
+
+        for (int k = 0; k < n_vertices; k++) {
+            angles[k] = rand.nextDouble() * 2 * Math.PI;
+            distances[k] = rand.nextDouble() * size;
+        }
+
+        sort(angles);
+
+        Coordinate[] coords = new Coordinate[n_vertices + 1];
+
+        for (int k = 0; k < n_vertices; k++) {
+            double x = center_x + (distances[k] * Math.cos(angles[k]));
+            double y = center_y + (distances[k] * Math.sin(angles[k]));
+            coords[k] = new Coordinate(x, y);
+        }
+
+        coords[n_vertices] = coords[0];
+
+        CoordinateSequence cs = new CoordinateArraySequence(coords);
+
+        return new LineString(cs, gfact);
+    }
+
     public Feature createFeature(int i) {
-        Geometry g = createRectangle(xrange * rand.nextDouble(), yrange * rand.nextDouble(),
-                xrange * rand.nextDouble(), yrange * rand.nextDouble());
+        //Geometry g = createRectangle(xrange * rand.nextDouble(), yrange * rand.nextDouble(),
+        //        xrange * rand.nextDouble(), yrange * rand.nextDouble());
+        Geometry g = createGeometry();
         String dummydata = "Id: " + i;
         Feature f = null;
 
@@ -119,32 +170,24 @@ public class Generator {
         double x_max = center.x + (xrange / 2);
         double y_min = center.y - (yrange / 2);
         double y_max = center.y + (yrange / 2);
-        Filter bb = filterFactory.bbox(type.getDefaultGeometry().getName(), x_min, y_min, x_max,
-                y_max, type.getDefaultGeometry().getCoordinateSystem().toString());
+        Filter bb = filterFactory.bbox(type.getPrimaryGeometry().getLocalName(), x_min, y_min,
+                x_max, y_max, type.getPrimaryGeometry().getCoordinateSystem().toString());
 
         return new DefaultQuery(type.getTypeName(), bb);
     }
 
-    public FeatureType getFeatureType() {
-        return type;
+    public static Filter createBboxFilter(Coordinate center, double xrange, double yrange) {
+        double x_min = center.x - (xrange / 2);
+        double x_max = center.x + (xrange / 2);
+        double y_min = center.y - (yrange / 2);
+        double y_max = center.y + (yrange / 2);
+        Filter bb = filterFactory.bbox(type.getPrimaryGeometry().getLocalName(), x_min, y_min,
+                x_max, y_max, type.getPrimaryGeometry().getCoordinateSystem().toString());
+
+        return bb;
     }
 
-    public static void main(String[] args) {
-        if (args.length < 1) {
-            System.err.println("Usage : Generator number_of_data");
-            System.exit(0);
-        }
-
-        int numberOfObjects = Integer.parseInt(args[0]);
-        Generator gen = new Generator(1000, 1000);
-
-        for (int i = 0; i < numberOfObjects; i++) {
-            Feature f = gen.createFeature(i);
-            System.out.println(f);
-
-            Coordinate c = pickRandomPoint(new Coordinate(500, 500), 900, 900);
-            Query q = createBboxQuery(c, 100, 100);
-            System.out.println(q);
-        }
+    public FeatureType getFeatureType() {
+        return type;
     }
 }
