@@ -1,15 +1,23 @@
 package org.geotools.test;
 
 import java.io.PrintWriter;
+import java.sql.Array;
+import java.sql.Blob;
 import java.sql.CallableStatement;
+import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.NClob;
 import java.sql.PreparedStatement;
+import java.sql.SQLClientInfoException;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
+import java.sql.SQLXML;
 import java.sql.Savepoint;
 import java.sql.Statement;
+import java.sql.Struct;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Simple wrapper for which the only purpose is to count the number of
@@ -261,6 +269,83 @@ public class DataSourceWrapper implements javax.sql.DataSource {
         public void setTypeMap(Map arg0) throws SQLException {
             connection.setTypeMap(arg0);
         }
+
+		public Array createArrayOf(String arg0, Object[] arg1)
+				throws SQLException {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public Blob createBlob() throws SQLException {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public Clob createClob() throws SQLException {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public NClob createNClob() throws SQLException {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public SQLXML createSQLXML() throws SQLException {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public Struct createStruct(String arg0, Object[] arg1)
+				throws SQLException {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public Properties getClientInfo() throws SQLException {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public String getClientInfo(String arg0) throws SQLException {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public boolean isValid(int arg0) throws SQLException {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		public void setClientInfo(Properties arg0)
+				throws SQLClientInfoException {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public void setClientInfo(String arg0, String arg1)
+				throws SQLClientInfoException {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public boolean isWrapperFor(Class<?> iface) throws SQLException {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		public <T> T unwrap(Class<T> iface) throws SQLException {
+			// TODO Auto-generated method stub
+			return null;
+		}
         
     }
+    public boolean isWrapperFor(Class<?> type) throws SQLException {
+		throw new UnsupportedOperationException("unsupported java 6 method");
+	}
+
+	public <T> T unwrap(Class<T> type) throws SQLException {
+		throw new UnsupportedOperationException("unsupported java 6 method");
+	}
+	
 }

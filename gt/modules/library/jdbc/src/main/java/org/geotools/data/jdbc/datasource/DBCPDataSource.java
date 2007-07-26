@@ -21,4 +21,14 @@ public class DBCPDataSource extends AbstractManageableDataSource {
         ((BasicDataSource) wrapped).close();
     }
 
+	public boolean isWrapperFor(Class type) throws SQLException {
+		return false;
+		//return this.wrapped.isWrapperFor(type);
+	}
+
+	public Object unwrap(Class type) throws SQLException {
+		return null;
+		//return this.wrapped.unwrap(type);
+	}
+
 }
