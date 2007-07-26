@@ -70,7 +70,7 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
      * @param crs The coordinate reference system.
      * @throws MismatchedDimensionException if the CRS dimension is not valid.
      */
-    public ReferencedEnvelope(final CoordinateReferenceSystem crs)
+    public ReferencedEnvelope(CoordinateReferenceSystem crs)
         throws MismatchedDimensionException {
         this.crs = crs;
         checkCoordinateReferenceSystemDimension();
