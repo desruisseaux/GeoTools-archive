@@ -1365,6 +1365,10 @@ public class DataUtilities {
      * Creates a set of attribute names from the two input lists of names,
      * maintaining the order of the first list and appending the non repeated
      * names of the second.
+     * <p>
+     * In the case where both lists are <code>null</code>, <code>null</code> 
+     * is returned.
+     * </p>
      *
      * @param atts1 the first list of attribute names, who's order will be
      *        maintained
@@ -1376,6 +1380,11 @@ public class DataUtilities {
      */
     private static String[] joinAttributes(String[] atts1, String[] atts2) {
         String[] propNames = null;
+
+        if ( atts1 == null && atts2 == null ) {
+        	return null;
+        }
+        
         List atts = new LinkedList();
 
         if (atts1 != null) {
