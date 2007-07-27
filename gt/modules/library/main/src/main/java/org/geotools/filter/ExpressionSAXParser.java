@@ -254,7 +254,7 @@ public class ExpressionSAXParser {
      *       things working, and may be the best choice in the end, but it
      *       should be thought through more.
      */
-    public void message(String message) throws IllegalFilterException {
+    public void message(String message, boolean convertToNumber) throws IllegalFilterException {
         // TODO 2:
         // AT SOME POINT MUST MAKE THIS HANDLE A TYPED FEATURE
         // BY PASSING IT A FEATURE AND CHECKING ITS TYPE HERE
@@ -304,26 +304,32 @@ public class ExpressionSAXParser {
                 //  like filter?)
                 //HACK: This should also not use exception catching, it's 
                 //expensive and bad code practice.
-                try {
-                    Object temp = new Integer(message);
+                if (convertToNumber){
+	            	try {
+	                    Object temp = new Integer(message);
+	                    ((LiteralExpression) curExprssn).setLiteral(temp);
+	                    currentState = "complete";
+	                } catch (NumberFormatException nfe1) {
+	                    try {
+	                        Object temp = new Double(message);
+	                        ((LiteralExpression) curExprssn).setLiteral(temp);
+	                        currentState = "complete";
+	                    } catch (NumberFormatException nfe2) {
+	                        Object temp = message;
+	                        ((LiteralExpression) curExprssn).setLiteral(temp);
+	                        currentState = "complete";
+	                    }
+	                }
+                }else{
+                    Object temp = message;
                     ((LiteralExpression) curExprssn).setLiteral(temp);
                     currentState = "complete";
-                } catch (NumberFormatException nfe1) {
-                    try {
-                        Object temp = new Double(message);
-                        ((LiteralExpression) curExprssn).setLiteral(temp);
-                        currentState = "complete";
-                    } catch (NumberFormatException nfe2) {
-                        Object temp = message;
-                        ((LiteralExpression) curExprssn).setLiteral(temp);
-                        currentState = "complete";
-                    }
                 }
             } else if (expFactory != null) {
-                expFactory.message(message);
+                expFactory.message(message,convertToNumber);
             }
         } else if (expFactory != null) {
-            expFactory.message(message);
+            expFactory.message(message,convertToNumber);
         }
     }
 

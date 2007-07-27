@@ -79,6 +79,8 @@ public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
      * to be processed by endElement */
     private StringBuffer characters;
 
+    
+    private boolean convertLiteralToNumber = true;
     /**
      * Constructor with parent, which must implement GMLHandlerJTS.
      *
@@ -93,6 +95,18 @@ public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
         filterFactory = new FilterSAXParser();
         logicFactory = new LogicSAXParser();
         characters = new StringBuffer();
+    }
+    
+    /**
+     * Constructor with parent, which must implement GMLHandlerJTS.
+     *
+     * @param parent The parent of this filter, to recieve the filters created.
+     * @param schema The schema that the filter will be used against.
+     */
+    public FilterFilter(FilterHandler parent, FeatureType schema,boolean convertLiteralToNumber ) {
+        this(parent,schema);
+        this.convertLiteralToNumber = convertLiteralToNumber;
+       
     }
 
     /**
@@ -255,7 +269,7 @@ public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
                        filterFactory.setDistance(message, units);
                    } else {
                        LOGGER.finest("sending to expression factory: " + message);
-                       expressionFactory.message(message);
+                       expressionFactory.message(message,this.convertLiteralToNumber);
                    }
                } catch (IllegalFilterException ife) {
                    throw new SAXException(ife);
