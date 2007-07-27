@@ -1,13 +1,14 @@
 package org.geotools.referencing.factory.epsg;
 
+import javax.sql.DataSource;
+
+import junit.framework.TestCase;
 import net.sourceforge.groboutils.junit.v1.MultiThreadedTestRunner;
 import net.sourceforge.groboutils.junit.v1.TestRunnable;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.geotools.factory.Hints;
 import org.geotools.referencing.factory.epsg.HsqlDialectEpsgMediatorStressTest.ClientThread;
-import org.geotools.test.DataSourceWrapper;
-
-import junit.framework.TestCase;
 
 /**
  * Multi-threaded test to check that no connections are leaked by the EPSG
@@ -24,7 +25,8 @@ public class HsqlDialectEpsgMediatorConnectionLeakTest extends TestCase {
     final static boolean VERBOSE = false;
     
     HsqlDialectEpsgMediator mediator;
-    DataSourceWrapper datasource;
+    BasicDataSource datasource;
+    //DataSourceWrapper datasource;
     String[] codes;
     Hints hints;
     
@@ -32,7 +34,13 @@ public class HsqlDialectEpsgMediatorConnectionLeakTest extends TestCase {
         super.setUp();
         hints = new Hints(Hints.BUFFER_POLICY, "none");
         hints.put(Hints.AUTHORITY_MAX_ACTIVE, new Integer(MAX_WORKERS));
-        datasource = new DataSourceWrapper(HsqlEpsgDatabase.createDataSource(), VERBOSE);
+
+        final DataSource database = HsqlEpsgDatabase.createDataSource();
+        datasource = new BasicDataSource(){
+        	{
+        		this.dataSource = database;
+        	}        	
+        };
         mediator = new HsqlDialectEpsgMediator(80, hints, datasource);
         codes = HsqlDialectEpsgMediatorStressTest.getCodes();
     }
@@ -55,7 +63,7 @@ public class HsqlDialectEpsgMediatorConnectionLeakTest extends TestCase {
         }
         //destroy the mediator, check for open connections or exceptions
         mediator.dispose();
-        assertEquals(0, datasource.getConnectionsInUse());
+        assertEquals(0, datasource.getNumActive());
         assertEquals(0, exceptions);
     }
     

@@ -27,14 +27,11 @@ import javax.sql.DataSource;
 import net.sourceforge.groboutils.junit.v1.MultiThreadedTestRunner;
 import net.sourceforge.groboutils.junit.v1.TestRunnable;
 
-import oracle.jdbc.pool.OracleDataSource;
-
 import org.apache.commons.dbcp.BasicDataSource;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.factory.epsg.oracle.OracleOnlineTestCase;
-import org.geotools.test.DataSourceWrapper;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -53,7 +50,7 @@ public class OracleDialectEpsgMediatorStarvationOnlineStressTest extends
     OracleDialectEpsgMediator mediator;
     static String[] codes;
     Hints hints;
-    DataSourceWrapper wrappedDS;
+    BasicDataSource wrappedDS;
     
 //    protected void configure(OracleDataSource datasource) throws SQLException {
 //        
@@ -79,14 +76,14 @@ public class OracleDialectEpsgMediatorStarvationOnlineStressTest extends
         origional.setUrl( url );
         origional.setMaxActive(10);
         origional.setMaxIdle(1);        
-        return new DataSourceWrapper( origional, VERBOSE);
+        return origional;
     }
     
     protected void setUp() throws Exception {
         super.setUp();
         if( fixture == null ) return; // we are not online - skip test
         
-        wrappedDS = (DataSourceWrapper) datasource;
+        wrappedDS = (BasicDataSource) datasource;
         hints = new Hints(Hints.BUFFER_POLICY, "none");     
         hints.put(Hints.AUTHORITY_MAX_ACTIVE, new Integer(MAX_WORKERS));        
         
@@ -185,8 +182,8 @@ public class OracleDialectEpsgMediatorStarvationOnlineStressTest extends
         }        
         mediator.dispose();
         mediator = null;
-        assertEquals(3, wrappedDS.getMaxConnections());        
-        assertEquals(1, wrappedDS.getConnectionsInUse());
+        assertEquals(3, wrappedDS.getMaxActive());        
+        assertEquals(1, wrappedDS.getNumActive());
     }
     
     /**

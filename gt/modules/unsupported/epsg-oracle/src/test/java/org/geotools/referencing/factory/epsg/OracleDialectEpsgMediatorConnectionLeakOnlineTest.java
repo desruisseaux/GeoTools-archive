@@ -3,10 +3,10 @@ package org.geotools.referencing.factory.epsg;
 import net.sourceforge.groboutils.junit.v1.MultiThreadedTestRunner;
 import net.sourceforge.groboutils.junit.v1.TestRunnable;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.geotools.factory.Hints;
 import org.geotools.referencing.factory.epsg.OracleDialectEpsgMediatorOnlineStressTest.ClientThread;
 import org.geotools.referencing.factory.epsg.oracle.OracleOnlineTestCase;
-import org.geotools.test.DataSourceWrapper;
 
 /**
  * Multi-threaded test to check that no connections are leaked by the EPSG
@@ -23,7 +23,7 @@ public class OracleDialectEpsgMediatorConnectionLeakOnlineTest extends OracleOnl
     final static boolean VERBOSE = false;
     
     OracleDialectEpsgMediator mediator;
-    DataSourceWrapper wrappedDataSource;
+    BasicDataSource wrappedDataSource;
     String[] codes;
     Hints hints;
 
@@ -34,7 +34,11 @@ public class OracleDialectEpsgMediatorConnectionLeakOnlineTest extends OracleOnl
         if (datasource == null) {
             fail("no datasource available");
         }
-        wrappedDataSource = new DataSourceWrapper(datasource, VERBOSE);
+        wrappedDataSource = new BasicDataSource(){
+        	{
+        		this.dataSource = datasource;
+        	}        	
+        };
         mediator = new OracleDialectEpsgMediator(80, hints, wrappedDataSource);
         codes = OracleDialectEpsgMediatorOnlineStressTest.getCodes();
     }
@@ -57,7 +61,7 @@ public class OracleDialectEpsgMediatorConnectionLeakOnlineTest extends OracleOnl
         }
         //destroy the mediator, check for open connections or exceptions
         mediator.dispose();
-        assertEquals(0, wrappedDataSource.getConnectionsInUse());
+        assertEquals(0, wrappedDataSource.getNumActive());
         assertEquals(0, exceptions);
     }
     
