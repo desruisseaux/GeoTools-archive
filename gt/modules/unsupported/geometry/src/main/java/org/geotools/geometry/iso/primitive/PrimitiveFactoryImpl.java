@@ -19,9 +19,15 @@ package org.geotools.geometry.iso.primitive;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import org.geotools.factory.AbstractFactory;
+import org.geotools.factory.Factory;
+import org.geotools.factory.Hints;
+import org.geotools.geometry.GeometryFactoryFinder;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.LineSegmentImpl;
 import org.geotools.geometry.iso.coordinate.LineStringImpl;
@@ -52,7 +58,7 @@ import org.opengis.geometry.primitive.SurfacePatch;
  * @author Jackson Roehrig & Sanjay Jena
  * 
  */
-public class PrimitiveFactoryImpl implements PrimitiveFactory {
+public class PrimitiveFactoryImpl implements Factory, PrimitiveFactory {
 
 	// Factories should no longer need to know about each other or about any
 	// geometryFactory
@@ -60,14 +66,47 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
 	private CoordinateReferenceSystem crs;
 	private PositionFactory positionFactory;
 
+	/** Map of hints we used during construction, used by FactoryFinder/Registry madness */
+	private Map hintsWeUsed = new HashMap();
+	
+	/** Found! */
+	public PrimitiveFactoryImpl() {
+		// this is not expected to work - only be found by FactorySPI
+		// the GeometryFactory finder will need to call the Hints stuff below
+		System.out.println("Found!");
+	}
+	
+	/** Just the defaults, use GeometryFactoryFinder for the rest */
+	public PrimitiveFactoryImpl( Hints hints ) {
+		this.crs = (CoordinateReferenceSystem) hints.get( Hints.CRS );
+		if( crs == null ){
+			throw new NullPointerException("A CRS Hint is required in order to use PrimitiveFactoryImpl");
+		}
+		this.positionFactory = GeometryFactoryFinder.getPositionFactory(crs, hints);
+		
+		hintsWeUsed.put(Hints.CRS, crs );
+		hintsWeUsed.put(Hints.POSITION_FACTORY, positionFactory );
+	}
+
 	/**
 	 * @param crs
 	 */
 	public PrimitiveFactoryImpl(CoordinateReferenceSystem crs, PositionFactory positionFactory) {
 		this.crs = crs;
+		if( crs == null ){
+			throw new NullPointerException("A non null crs is required in order to use PrimitiveFactoryImpl");
+		}
 		this.positionFactory = positionFactory;
+
+		hintsWeUsed.put(Hints.CRS, crs );
+		hintsWeUsed.put(Hints.POSITION_FACTORY, positionFactory );
 	}
 
+	/** These are the hints we used */
+	public Map getImplementationHints() {
+		return Collections.unmodifiableMap( hintsWeUsed );
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
