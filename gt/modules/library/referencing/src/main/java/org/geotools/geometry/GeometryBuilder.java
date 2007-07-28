@@ -10,6 +10,7 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.Precision;
 import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.primitive.PrimitiveFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -49,6 +50,8 @@ public class GeometryBuilder /*implements PositionFactory*/ {
     private Precision precision;
     
     private PositionFactory positionFactory;
+
+    private PrimitiveFactory primitiveFactory;
     
     public GeometryBuilder( CoordinateReferenceSystem crs ){
         this.crs = crs;
@@ -85,11 +88,18 @@ public class GeometryBuilder /*implements PositionFactory*/ {
     
     public PositionFactory getPositionFactory() {
         if( positionFactory == null ){
-            positionFactory = GeometryFactoryFinder.getPositionFactory( crs, hints);
+            positionFactory = GeometryFactoryFinder.getPositionFactory( hints);
         }
         return positionFactory;
     }
 
+    public PrimitiveFactory getPrimitiveFactory() {
+        if( primitiveFactory == null ){
+            primitiveFactory = GeometryFactoryFinder.getPrimitiveFactory(  hints);
+        }
+        return primitiveFactory;
+    }
+    
     public DirectPosition createDirectPosition( double[] ordinates ) {
         return getPositionFactory().createDirectPosition( ordinates );
     }
@@ -104,21 +114,25 @@ public class GeometryBuilder /*implements PositionFactory*/ {
      * @param origional
      * @return PointArray
      */
-    public List createPositionList( Collection origional ) {
-        List list = getPositionFactory().createPositionList();
+    @SuppressWarnings("unchecked")
+    public List<Position> createPositionList( Collection<Position> origional ) {
+        List<Position> list = (List<Position>) getPositionFactory().createPositionList();
         list.addAll( origional );
         return list;
     }
     
-    public List createPositionList() {
+    @SuppressWarnings("unchecked")
+    public List<Position> createPositionList() {
         return getPositionFactory().createPositionList();
     }
 
-    public List createPositionList( double[] array, int start, int end ) {
+    @SuppressWarnings("unchecked")
+    public List<Position> createPositionList( double[] array, int start, int end ) {
         return getPositionFactory().createPositionList(array, start, end );
     }
 
-    public List createPositionList( float[] array, int start, int end ) {
+    @SuppressWarnings("unchecked")
+    public List<Position> createPositionList( float[] array, int start, int end ) {
         return getPositionFactory().createPositionList(array, start, end );
     }
 

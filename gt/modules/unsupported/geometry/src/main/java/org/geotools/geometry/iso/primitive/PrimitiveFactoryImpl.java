@@ -68,12 +68,10 @@ public class PrimitiveFactoryImpl implements Factory, PrimitiveFactory {
 
 	/** Map of hints we used during construction, used by FactoryFinder/Registry madness */
 	private Map hintsWeUsed = new HashMap();
-	
-	/** Found! */
+
+	/** FactorySPI entry point, makes use of ThreadLocal Hints stored by GeometryFactoryFinder */
 	public PrimitiveFactoryImpl() {
-		// this is not expected to work - only be found by FactorySPI
-		// the GeometryFactory finder will need to call the Hints stuff below
-		System.out.println("Found!");
+	    // do nothing just get found!
 	}
 	
 	/** Just the defaults, use GeometryFactoryFinder for the rest */
@@ -82,7 +80,7 @@ public class PrimitiveFactoryImpl implements Factory, PrimitiveFactory {
 		if( crs == null ){
 			throw new NullPointerException("A CRS Hint is required in order to use PrimitiveFactoryImpl");
 		}
-		this.positionFactory = GeometryFactoryFinder.getPositionFactory(crs, hints);
+		this.positionFactory = GeometryFactoryFinder.getPositionFactory(hints);
 		
 		hintsWeUsed.put(Hints.CRS, crs );
 		hintsWeUsed.put(Hints.POSITION_FACTORY, positionFactory );

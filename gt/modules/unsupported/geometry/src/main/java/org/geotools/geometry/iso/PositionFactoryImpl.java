@@ -16,11 +16,17 @@
 
 package org.geotools.geometry.iso;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.geotools.factory.Factory;
+import org.geotools.factory.Hints;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.DoublePointArray;
 import org.geotools.geometry.iso.coordinate.PointArrayImpl;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
@@ -44,21 +50,65 @@ import org.opengis.geometry.coordinate.Position;
  * 
  * @author Jody Garnett
  */
-public class PositionFactoryImpl implements PositionFactory {
-	private Precision precision;
+public class PositionFactoryImpl implements Factory, PositionFactory {
+	final private Precision precision;
+    final CoordinateReferenceSystem crs;
+	private Map hintsWeUsed = new HashMap();
 
+
+	/**
+	 * This is just here so FactorySPI can find us.
+	 * We have set it up with a default (undocumented) configuration
+	 * for testing!
+	 */
+	public PositionFactoryImpl() {
+	    this( DefaultGeographicCRS.WGS84, new PrecisionModel() );
+    }
+	/**
+	 * This is the constructor used by GeometryFactoryFinder when a user
+	 * requests a new instance.
+	 * The provided hints *must* be provided:
+	 * <ul>
+	 * <li>Hints.CRS
+	 * <li>Hints.PRECISION
+	 * </ul>
+	 * There is no default for these values - you must describe your data source
+	 * for us if we are to make useful Geometry object for you.
+	 * 
+	 * @param hints Hints (must include CRS and PRECISION)
+	 */
+	public PositionFactoryImpl(Hints hints) {
+	    this.crs = (CoordinateReferenceSystem) hints.get(Hints.CRS);
+        this.precision = new PrecisionModel();
+        
+        hintsWeUsed.put( Hints.CRS, crs );
+        hintsWeUsed.put( Hints.PRECISION, precision );
+    }
+	
 	public PositionFactoryImpl(CoordinateReferenceSystem crs) {
 		this(crs, new PrecisionModel(PrecisionType.DOUBLE));
-	}	
+	}
 	
 	public PositionFactoryImpl(CoordinateReferenceSystem crs,
 			Precision precision) {
 		assert( precision.getType() == PrecisionType.DOUBLE );
 		this.crs = crs;
 		this.precision = precision;
+		
+		hintsWeUsed.put( Hints.CRS, crs );
+        hintsWeUsed.put( Hints.PRECISION, precision );
 	}
-
-	final CoordinateReferenceSystem crs;
+	/**
+	 * Report back to FactoryRegistry about our configuration.
+	 * <p>
+	 * FactoryRegistry will check to make sure that there are no duplicates
+	 * created (so there will be only a "single" PositionFactory created
+	 * with this configuration).
+	 * </p>
+	 */
+    public Map getImplementationHints() {
+        return Collections.unmodifiableMap( hintsWeUsed );
+    }
 
 	public DirectPosition createDirectPosition(double[] coords)
 			throws MismatchedDimensionException {
