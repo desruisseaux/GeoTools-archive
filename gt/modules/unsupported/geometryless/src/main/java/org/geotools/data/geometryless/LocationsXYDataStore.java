@@ -22,6 +22,8 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.sql.DataSource;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
@@ -73,7 +75,7 @@ public class LocationsXYDataStore extends org.geotools.data.geometryless.JDBCDat
 
     private String geomName = null;
 
-    public LocationsXYDataStore(ConnectionPool connectionPool) throws IOException {
+    public LocationsXYDataStore(DataSource connectionPool) throws IOException {
         super(connectionPool);
     }
 
@@ -91,7 +93,7 @@ public class LocationsXYDataStore extends org.geotools.data.geometryless.JDBCDat
      * @throws IOException
      *             if the database cannot be properly accessed
      */
-    public LocationsXYDataStore(ConnectionPool connectionPool, String databaseSchemaName,
+    public LocationsXYDataStore(DataSource connectionPool, String databaseSchemaName,
             String namespace, String x, String y, String geomName) throws IOException {
         // databaseSchemaName can be null
         super(connectionPool, databaseSchemaName, namespace);

@@ -21,6 +21,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 
+import javax.sql.DataSource;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
@@ -63,7 +65,7 @@ public class BBOXDataStore extends org.geotools.data.geometryless.JDBCDataStore 
 
 
    
-    public BBOXDataStore(ConnectionPool connectionPool) throws IOException {
+    public BBOXDataStore(DataSource connectionPool) throws IOException {
         super(connectionPool);
     }
 
@@ -73,7 +75,7 @@ public class BBOXDataStore extends org.geotools.data.geometryless.JDBCDataStore 
      * @param databaseSchemaName the database schema.  Can be null.  See the comments for the parameter schemaPattern in {@link java.sql.DatabaseMetaData#getTables(String, String, String, String[]) DatabaseMetaData.getTables}, because databaseSchemaName behaves in the same way.
      * @throws IOException if the database cannot be properly accessed
      */
-    public BBOXDataStore(ConnectionPool connectionPool, String databaseSchemaName, String namespace , String xmin, String ymin,String xmax,String ymax , String geomName)    
+    public BBOXDataStore(DataSource connectionPool, String databaseSchemaName, String namespace , String xmin, String ymin,String xmax,String ymax , String geomName)    
         throws IOException {
         super(connectionPool, databaseSchemaName, namespace);
        this.XMinColumnName = xmin;

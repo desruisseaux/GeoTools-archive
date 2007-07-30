@@ -25,6 +25,7 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.GeometryAttributeType;
 // import org.geotools.filter.SQLEncoder;
 import org.geotools.data.jdbc.FilterToSQL;
+import org.opengis.feature.type.Name;
 
 /**
  * A Geometryless-specific instance of DefaultSQLBuilder, which supports geometries created form standard data types
@@ -78,7 +79,7 @@ public class GeometrylessSQLBuilder extends GeoAPISQLBuilder {
         }
 
         for (int i = 0; i < attributes.length; i++) {
-            String colName = attributes[i].getName();
+            Name colName = attributes[i].getName();
 
             LOGGER.finest(attributes[i].getName() + " isGeom: "
                 + (attributes[i] instanceof GeometryAttributeType) );
@@ -86,7 +87,7 @@ public class GeometrylessSQLBuilder extends GeoAPISQLBuilder {
             if (attributes[i] instanceof GeometryAttributeType) {
                 sql.append("AsText(" + attributes[i].getName() + ") AS " + attributes[i].getName());
             } else {
-                sql.append(colName);
+                sql.append(colName.getLocalPart());
             }
 
             if (i < (attributes.length - 1)) {

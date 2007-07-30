@@ -26,6 +26,7 @@ import org.geotools.data.sql.BypassSqlFeatureTypeHandler;
 import org.geotools.data.sql.BypassSqlSQLBuilder;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.GeometryAttributeType;
+import org.opengis.feature.type.Name;
 
 // import org.geotools.filter.SQLEncoder;
 
@@ -88,7 +89,7 @@ public class LocationsXYSQLBuilder extends BypassSqlSQLBuilder {
         }
 
         for (int i = 0; i < attributes.length; i++) {
-            String colName = attributes[i].getName();
+            Name colName = attributes[i].getName();
 
             LOGGER.finest(attributes[i].getName() + " isGeom: "
                     + (attributes[i] instanceof GeometryAttributeType));
@@ -101,7 +102,7 @@ public class LocationsXYSQLBuilder extends BypassSqlSQLBuilder {
                 // "AsText(" + attributes[i].getName() + ") AS " +
                 // attributes[i].getName());
             } else {
-                sql.append(colName);
+                sql.append(colName.getLocalPart());
             }
 
             if (i < (attributes.length - 1)) {

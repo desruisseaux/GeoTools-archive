@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.sql.DataSource;
+
 import net.sf.jsqlparser.statement.select.SelectBody;
 
 import org.geotools.data.DataSourceException;
@@ -95,7 +97,7 @@ public class JDBCDataStore extends org.geotools.data.jdbc.JDBCDataStore implemen
      * @see org.geotools.data.jdbc.ConnectionPool
      * @see org.geotools.data.mysql.MySQLConnectionFactory
      */
-    public JDBCDataStore(ConnectionPool connectionPool) throws IOException {
+    public JDBCDataStore(DataSource connectionPool) throws IOException {
         super(connectionPool, new JDBCDataStoreConfig());
     }
 
@@ -116,7 +118,7 @@ public class JDBCDataStore extends org.geotools.data.jdbc.JDBCDataStore implemen
      * @throws IOException
      *             if the database cannot be properly accessed
      */
-    public JDBCDataStore(ConnectionPool connectionPool, String databaseSchemaName)
+    public JDBCDataStore(DataSource connectionPool, String databaseSchemaName)
             throws IOException {
         this(connectionPool, databaseSchemaName, DEFAULT_NAMESPACE);
     }
@@ -138,7 +140,7 @@ public class JDBCDataStore extends org.geotools.data.jdbc.JDBCDataStore implemen
      * @throws IOException
      *             if the database cannot be properly accessed
      */
-    public JDBCDataStore(ConnectionPool connectionPool, String databaseSchemaName, String namespace)
+    public JDBCDataStore(DataSource connectionPool, String databaseSchemaName, String namespace)
             throws IOException {
         super(connectionPool, JDBCDataStoreConfig.createWithNameSpaceAndSchemaName(namespace,
                 databaseSchemaName));

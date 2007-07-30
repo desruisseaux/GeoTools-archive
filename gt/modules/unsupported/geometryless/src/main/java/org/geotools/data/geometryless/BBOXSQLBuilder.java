@@ -21,10 +21,12 @@ import java.util.logging.Logger;
 //import org.geotools.data.jdbc.DefaultSQLBuilder;
 import org.geotools.data.jdbc.GeoAPISQLBuilder;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
+
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.GeometryAttributeType;
 // import org.geotools.filter.SQLEncoder;
 import org.geotools.data.geometryless.filter.SQLEncoderBBOX;
+import org.opengis.feature.type.Name;
 
 
 /**
@@ -84,7 +86,7 @@ public class BBOXSQLBuilder extends GeoAPISQLBuilder {
         }
 
         for (int i = 0; i < attributes.length; i++) {
-            String colName = attributes[i].getName();
+            Name colName = attributes[i].getName();
 
             LOGGER.finest(attributes[i].getName() + " isGeom: "
                 + (attributes[i] instanceof GeometryAttributeType) );
@@ -95,7 +97,7 @@ public class BBOXSQLBuilder extends GeoAPISQLBuilder {
 
                 //"AsText(" + attributes[i].getName() + ") AS " + attributes[i].getName());
             } else {
-                sql.append(colName);
+                sql.append(colName.getLocalPart());
             }
 
             if (i < (attributes.length - 1)) {

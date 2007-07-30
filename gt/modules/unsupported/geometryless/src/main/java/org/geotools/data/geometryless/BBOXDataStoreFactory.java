@@ -22,9 +22,12 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.sql.DataSource;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.jdbc.ConnectionPool;
+import org.geotools.data.jdbc.datasource.DataSourceUtil;
 import org.geotools.factory.AbstractFactory;
 
 /**
@@ -260,7 +263,9 @@ public class BBOXDataStoreFactory extends AbstractFactory
         if (!canProcess(params)) {
             return null;
         }
-   JDBCConnectionFactory connFact = new JDBCConnectionFactory( urlprefix, driver  );
+        /*
+         * 
+         *    JDBCConnectionFactory connFact = new JDBCConnectionFactory( urlprefix, driver  );
 
  //  MySQLConnectionFactory connFact = new MySQLConnectionFactory(host,            Integer.parseInt(port), database);
            
@@ -286,15 +291,17 @@ public class BBOXDataStoreFactory extends AbstractFactory
         } catch (SQLException e) {
             throw new DataSourceException("Could not create connection", e);
         }
-
+*/
+        DataSource dataSource = DataSourceUtil.buildDefaultDataSource(urlprefix, driver, user, passwd, null);
+        
 	if (geom_name == null) {
 	    geom_name = GEOM_NAME_DEFAULT;
 	}
         if (namespace != null) {
-            return new BBOXDataStore(pool, schema, namespace, minxcolumn,
+            return new BBOXDataStore(dataSource, schema, namespace, minxcolumn,
                                             minycolumn,maxxcolumn,maxycolumn, geom_name);
         } else {
-            return new BBOXDataStore(pool);
+            return new BBOXDataStore(dataSource);
         }
     }
 

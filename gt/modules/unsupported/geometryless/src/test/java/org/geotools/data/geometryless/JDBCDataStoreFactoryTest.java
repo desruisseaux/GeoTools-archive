@@ -160,9 +160,9 @@ public class JDBCDataStoreFactoryTest extends TestCase {
         assertNotNull(fs);
         FeatureType schema = fs.getSchema();
         assertNotNull(schema);
-        GeometryAttributeType defaultGeometry = schema.getDefaultGeometry();
+        GeometryAttributeType defaultGeometry = (GeometryAttributeType) schema.getDefaultGeometry();
         assertNotNull("No default geometry: " + schema.toString(), defaultGeometry);
-        assertEquals("location", defaultGeometry.getName());
+        assertEquals("location", defaultGeometry.getName().getLocalPart());
         
         FeatureCollection features = fs.getFeatures();
         assertNotNull(features);

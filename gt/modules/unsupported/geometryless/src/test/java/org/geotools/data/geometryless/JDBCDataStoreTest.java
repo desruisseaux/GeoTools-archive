@@ -29,6 +29,8 @@ import java.util.PropertyResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.sql.DataSource;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -39,6 +41,7 @@ import org.geotools.data.SchemaNotFoundException;
 import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.ConnectionPoolManager;
+import org.geotools.data.jdbc.datasource.DataSourceUtil;
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
 import org.geotools.feature.FeatureType;
@@ -77,7 +80,7 @@ public class JDBCDataStoreTest extends TestCase {
     //private int srid = -1;
     private JDBCConnectionFactory connFactory;
     private JDBCDataStore dstore;
-    private ConnectionPool connPool;
+ //   private ConnectionPool connPool;
     //private PropertyIsEqualTo tFilter;
     private int addId = 32;
     // private org.geotools.filter.GeometryFilter geomFilter;
@@ -118,8 +121,8 @@ public class JDBCDataStoreTest extends TestCase {
            String dbschema = resource.getString("schema");
             local.put("schema", dbschema);
        
-           String Driver = resource.getString("driver");
-            local.put("driver", Driver);
+           String driver = resource.getString("driver");
+            local.put("driver", driver);
 
              String urlprefix = resource.getString("urlprefix");
             local.put("urlprefix", urlprefix);
@@ -129,7 +132,7 @@ public class JDBCDataStoreTest extends TestCase {
                 "The fixture.properties file needs to be configured for your own database");
         }
         
-        connFactory = new JDBCConnectionFactory(urlprefix, Driver);
+ /*       connFactory = new JDBCConnectionFactory(urlprefix, Driver);
 
         //connFactory = new PostgisConnectionFactory("localhost", "5432", 
         //   "testdb");
@@ -138,11 +141,15 @@ public class JDBCDataStoreTest extends TestCase {
 
         //LOGGER.info("set the login");
         //LOGGER.info("created new datasource");
+*/
         try {
-            LOGGER.fine("getting connection pool");
-            connPool = connFactory.getConnectionPool();
-            setupTestTable(connPool.getConnection());
-            dstore = new JDBCDataStore(connPool, dbschema, TEST_NS);
+            LOGGER.fine("getting data source");
+            DataSource dataSource = DataSourceUtil.buildDefaultDataSource(urlprefix, driver, user, password, null);
+            
+            /* connPool = connFactory.getConnectionPool();
+            */
+            setupTestTable(dataSource.getConnection());
+            dstore = new JDBCDataStore(dataSource, dbschema, TEST_NS);
 
             dstore.setFIDMapper(
                 "testset",

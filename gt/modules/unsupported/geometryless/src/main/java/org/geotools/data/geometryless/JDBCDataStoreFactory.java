@@ -24,7 +24,10 @@ import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
-import org.geotools.data.jdbc.ConnectionPool;
+import javax.sql.DataSource;
+// import org.geotools.data.jdbc.ConnectionPool;
+import org.geotools.data.jdbc.datasource.DataSourceUtil;
+import org.geotools.data.jdbc.datasource.ManageableDataSource;
 import org.geotools.data.sql.ViewRegisteringFactoryHelper;
 import org.geotools.factory.AbstractFactory;
 
@@ -220,7 +223,13 @@ public class JDBCDataStoreFactory extends AbstractFactory
         if (!canProcess(params)) {
             return null;
         }
-   JDBCConnectionFactory connFact = new JDBCConnectionFactory( urlprefix, driver );
+/*
+ * 
+ *   All this stuff replaced with the  DataSource implementation
+ *   
+ *   which is basically exactly the same pattern here...
+ *  
+ *   JDBCConnectionFactory connFact = new JDBCConnectionFactory( urlprefix, driver );
 
  //  MySQLConnectionFactory connFact = new MySQLConnectionFactory(host,            Integer.parseInt(port), database);
            
@@ -246,12 +255,15 @@ public class JDBCDataStoreFactory extends AbstractFactory
         } catch (SQLException e) {
             throw new DataSourceException("Could not create connection", e);
         }
+*/
 
+        DataSource dataSource = DataSourceUtil.buildDefaultDataSource(urlprefix, driver, user, passwd, null);
+        
         JDBCDataStore dataStore;
         if (namespace != null) {
-            dataStore = new JDBCDataStore(pool, schema, namespace);
+            dataStore = new JDBCDataStore(dataSource, schema, namespace);
         } else {
-            dataStore = new JDBCDataStore(pool);
+            dataStore = new JDBCDataStore(dataSource);
         }
         
         ViewRegisteringFactoryHelper.registerSqlViews(dataStore, params);
@@ -259,6 +271,8 @@ public class JDBCDataStoreFactory extends AbstractFactory
         return dataStore;
     }
 
+ 
+    
     /**
      * The datastore  cannot create a new database.
      *

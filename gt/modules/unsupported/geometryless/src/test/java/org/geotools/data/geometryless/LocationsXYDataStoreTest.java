@@ -29,6 +29,8 @@ import java.util.PropertyResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.sql.DataSource;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -39,12 +41,14 @@ import org.geotools.data.SchemaNotFoundException;
 import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.ConnectionPoolManager;
+import org.geotools.data.jdbc.datasource.DataSourceUtil;
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 //import org.opengis.filter.BinaryComparisonOperator;
+import org.opengis.feature.GeometryAttribute;
 import org.opengis.filter.PropertyIsEqualTo;
 
 import org.opengis.filter.expression.Expression;
@@ -126,8 +130,8 @@ public class LocationsXYDataStoreTest extends TestCase {
            String dbschema = resource.getString("schema");
             local.put("schema", dbschema);
                   
-                  String Driver = resource.getString("driver");
-            local.put("driver", Driver);
+                  String driver = resource.getString("driver");
+            local.put("driver", driver);
 
              String urlprefix = resource.getString("urlprefix");
             local.put("urlprefix", urlprefix);
@@ -140,21 +144,23 @@ public class LocationsXYDataStoreTest extends TestCase {
             throw new IllegalStateException(
                 "The fixture.properties file needs to be configured for your own database");
         }
-        
+  /*      
         connFactory = new JDBCConnectionFactory( urlprefix, Driver);
 
         //connFactory = new PostgisConnectionFactory("localhost", "5432", 
         //   "testdb");
         //LOGGER.info("created new db connection");
         connFactory.setLogin(user, password);
-
+*/
         //LOGGER.info("set the login");
         //LOGGER.info("created new datasource");
         try {
-            LOGGER.fine("getting connection pool");
-            connPool = connFactory.getConnectionPool();
-            setupTestTable(connPool.getConnection());
-            dstore = new LocationsXYDataStore(connPool, dbschema, TEST_NS, xcolumn, ycolumn, GEOM_NAME);
+           DataSource dataSource = DataSourceUtil.buildDefaultDataSource(urlprefix, driver, user, password, null);
+            
+            /* connPool = connFactory.getConnectionPool();
+            */
+            setupTestTable(dataSource.getConnection());
+            dstore = new LocationsXYDataStore(dataSource, dbschema, TEST_NS, xcolumn, ycolumn, GEOM_NAME);
 
             dstore.setFIDMapper(
                 "testset",
@@ -302,10 +308,10 @@ public class LocationsXYDataStoreTest extends TestCase {
     reader.close();
     
 	LOGGER.info("feature is: " + feature);
-	Geometry geom = feature.getDefaultGeometry();
+	GeometryAttribute geom = feature.getDefaultGeometry();
 	LOGGER.info("geometry is " + geom);
-	assertEquals(geom.getClass(), Point.class);
-	Point gPoint = (Point) geom;
+	assertEquals(geom.getType().getBinding(), Point.class);
+	Point gPoint = (Point) geom.get();
 	assertTrue(151.0 == gPoint.getX());
 	
     }

@@ -22,9 +22,12 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.sql.DataSource;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.jdbc.ConnectionPool;
+import org.geotools.data.jdbc.datasource.DataSourceUtil;
 import org.geotools.data.sql.ViewRegisteringFactoryHelper;
 import org.geotools.factory.AbstractFactory;
 
@@ -257,6 +260,10 @@ public class LocationsXYDataStoreFactory extends AbstractFactory implements
         if (!canProcess(params)) {
             return null;
         }
+        
+        /*
+         * 
+         
         JDBCConnectionFactory connFact = new JDBCConnectionFactory(urlprefix, driver);
 
         // MySQLConnectionFactory connFact = new MySQLConnectionFactory(host,
@@ -286,8 +293,12 @@ public class LocationsXYDataStoreFactory extends AbstractFactory implements
         if (geom_name == null) {
             geom_name = GEOM_NAME_DEFAULT;
         }
-
-        LocationsXYDataStore dataStore = new LocationsXYDataStore(pool, schema, namespace, xcolumn, ycolumn, geom_name);
+*/
+       DataSource dataSource = DataSourceUtil.buildDefaultDataSource(urlprefix, driver, user, passwd, null);
+        
+       
+        
+        LocationsXYDataStore dataStore = new LocationsXYDataStore(dataSource, schema, namespace, xcolumn, ycolumn, geom_name);
         
         ViewRegisteringFactoryHelper.registerSqlViews(dataStore, params);
         
@@ -322,7 +333,7 @@ public class LocationsXYDataStoreFactory extends AbstractFactory implements
     }
 
     public String getDisplayName() {
-        return "GeometrylessJDBC - locations from X,Y columns";
+        return "Geometryless JDBC source - implementing location from numeric X,Y columns";
     }
 
     // public DataSourceMetadataEnity createMetadata( Map params ) throws
