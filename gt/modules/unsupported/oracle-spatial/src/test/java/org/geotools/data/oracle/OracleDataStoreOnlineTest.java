@@ -95,6 +95,7 @@ public class OracleDataStoreOnlineTest extends TestCase {
         properties = new Properties();
         properties.load(this.getClass().getResourceAsStream("remote.properties"));
         schemaName = properties.getProperty("schema");
+        properties.put("dbtype", "oracle");
         
         dstore =  (OracleDataStore) DataStoreFinder.getDataStore(properties);
         conn = dstore.getConnection(Transaction.AUTO_COMMIT);

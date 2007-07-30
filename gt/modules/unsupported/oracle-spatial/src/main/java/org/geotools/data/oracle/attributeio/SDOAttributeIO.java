@@ -35,7 +35,14 @@ import org.geotools.data.oracle.sdo.GeometryConverter;
 import org.geotools.feature.AttributeType;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 /**
@@ -56,15 +63,18 @@ public class SDOAttributeIO implements AttributeIO {
 	// private AdapterSDO adapterSDO;
 	GeometryConverter converter;
 	private QueryData queryData;
+	private Class targetClazz;
+	private GeometryFactory geometryFactory; 
 
 	public SDOAttributeIO(AttributeType attributeType, QueryData queryData)
 			throws DataSourceException {
 		this.queryData = queryData;
-		GeometryFactory geometryFactory = null;
+		geometryFactory = null;
 		try {
 			String tableName = queryData.getFeatureTypeInfo()
 					.getFeatureTypeName();
 			String columnName = attributeType.getLocalName();
+			targetClazz = attributeType.getType();
 			LOGGER.fine("About to create Geometry convertor for " + tableName
 					+ "." + columnName);
 
@@ -123,6 +133,16 @@ public class SDOAttributeIO implements AttributeIO {
 			// geom = adapterJTS.exportGeometry(Geometry.class, sdoGeom);
 			
 			geom = converter.asGeometry( (STRUCT) struct );
+			// in Oracle you can have polygons in a column declared to be multipolygon, and so on...
+			// so we better convert geometries, since our feature model is not so lenient
+			if(targetClazz.equals(MultiPolygon.class) && geom instanceof Polygon)
+			    return geometryFactory.createMultiPolygon(new Polygon[] {(Polygon) geom});
+			else if(targetClazz.equals(MultiPoint.class) && geom instanceof Point)
+                return geometryFactory.createMultiPoint(new Point[] {(Point) geom});
+			else if(targetClazz.equals(MultiLineString.class) && geom instanceof LineString)
+                return geometryFactory.createMultiLineString(new LineString[] {(LineString) geom});
+			else if(targetClazz.equals(GeometryCollection.class))
+                return geometryFactory.createGeometryCollection(new Geometry[] {geom});
 			return geom;
 		} catch (SQLException e) {
 			String msg = "SQL Exception reading geometry column";
