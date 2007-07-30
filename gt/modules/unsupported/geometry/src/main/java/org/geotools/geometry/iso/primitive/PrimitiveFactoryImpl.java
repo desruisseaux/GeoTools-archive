@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.geotools.factory.AbstractFactory;
 import org.geotools.factory.Factory;
+import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeometryFactoryFinder;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
@@ -34,6 +35,7 @@ import org.geotools.geometry.iso.coordinate.LineStringImpl;
 import org.geotools.geometry.iso.coordinate.PointArrayImpl;
 import org.geotools.geometry.iso.coordinate.PositionImpl;
 import org.geotools.geometry.iso.coordinate.SurfacePatchImpl;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
@@ -60,30 +62,34 @@ import org.opengis.geometry.primitive.SurfacePatch;
  */
 public class PrimitiveFactoryImpl implements Factory, PrimitiveFactory {
 
-	// Factories should no longer need to know about each other or about any
-	// geometryFactory
-	// private FeatGeomFactoryImpl xgeometryFactory;
 	private CoordinateReferenceSystem crs;
 	private PositionFactory positionFactory;
 
-	/** Map of hints we used during construction, used by FactoryFinder/Registry madness */
-	private Map hintsWeUsed = new HashMap();
+	/** Map of hints we care about during construction, used by FactoryFinder/Registry madness */
+	private Map hintsWeCareAbout = new HashMap();
 
-	/** FactorySPI entry point, makes use of ThreadLocal Hints stored by GeometryFactoryFinder */
+	/** FactorySPI entry point */
 	public PrimitiveFactoryImpl() {
-	    // do nothing just get found!
+		this(null );
 	}
 	
 	/** Just the defaults, use GeometryFactoryFinder for the rest */
 	public PrimitiveFactoryImpl( Hints hints ) {
-		this.crs = (CoordinateReferenceSystem) hints.get( Hints.CRS );
-		if( crs == null ){
-			throw new NullPointerException("A CRS Hint is required in order to use PrimitiveFactoryImpl");
+		if (hints == null) {
+			this.crs = DefaultGeographicCRS.WGS84;
+			hints = GeoTools.getDefaultHints();
+	        hints.put(Hints.CRS, crs );
 		}
-		this.positionFactory = GeometryFactoryFinder.getPositionFactory(hints);
+		else {
+			this.crs = (CoordinateReferenceSystem) hints.get( Hints.CRS );
+			if( crs == null ){
+				throw new NullPointerException("A CRS Hint is required in order to use PrimitiveFactoryImpl");
+			}
+		}
 		
-		hintsWeUsed.put(Hints.CRS, crs );
-		hintsWeUsed.put(Hints.POSITION_FACTORY, positionFactory );
+		this.positionFactory = GeometryFactoryFinder.getPositionFactory(hints);
+		hintsWeCareAbout.put(Hints.CRS, crs );
+		hintsWeCareAbout.put(Hints.POSITION_FACTORY, positionFactory );
 	}
 
 	/**
@@ -94,15 +100,22 @@ public class PrimitiveFactoryImpl implements Factory, PrimitiveFactory {
 		if( crs == null ){
 			throw new NullPointerException("A non null crs is required in order to use PrimitiveFactoryImpl");
 		}
-		this.positionFactory = positionFactory;
+		if (positionFactory == null) {
+			Hints hints = GeoTools.getDefaultHints();
+	        hints.put(Hints.CRS, crs );
+			this.positionFactory = GeometryFactoryFinder.getPositionFactory(hints);
+		}
+		else {
+			this.positionFactory = positionFactory;
+		}
 
-		hintsWeUsed.put(Hints.CRS, crs );
-		hintsWeUsed.put(Hints.POSITION_FACTORY, positionFactory );
+		hintsWeCareAbout.put(Hints.CRS, crs );
+		hintsWeCareAbout.put(Hints.POSITION_FACTORY, positionFactory );
 	}
 
 	/** These are the hints we used */
 	public Map getImplementationHints() {
-		return Collections.unmodifiableMap( hintsWeUsed );
+		return Collections.unmodifiableMap( hintsWeCareAbout );
 	}
 	
 	/*

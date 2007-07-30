@@ -53,7 +53,7 @@ import org.opengis.geometry.coordinate.Position;
 public class PositionFactoryImpl implements Factory, PositionFactory {
 	final private Precision precision;
     final CoordinateReferenceSystem crs;
-	private Map hintsWeUsed = new HashMap();
+	private Map hintsWeCareAbout = new HashMap();
 
 
 	/**
@@ -62,7 +62,7 @@ public class PositionFactoryImpl implements Factory, PositionFactory {
 	 * for testing!
 	 */
 	public PositionFactoryImpl() {
-	    this( DefaultGeographicCRS.WGS84, new PrecisionModel() );
+	    this( (Hints)null );
     }
 	/**
 	 * This is the constructor used by GeometryFactoryFinder when a user
@@ -78,11 +78,17 @@ public class PositionFactoryImpl implements Factory, PositionFactory {
 	 * @param hints Hints (must include CRS and PRECISION)
 	 */
 	public PositionFactoryImpl(Hints hints) {
-	    this.crs = (CoordinateReferenceSystem) hints.get(Hints.CRS);
-        this.precision = new PrecisionModel();
+		if (hints == null) {
+		    this.crs =  DefaultGeographicCRS.WGS84;
+	        this.precision = new PrecisionModel();
+		}
+		else {
+			this.crs = (CoordinateReferenceSystem) hints.get(Hints.CRS);
+			this.precision = new PrecisionModel();
+		}
         
-        hintsWeUsed.put( Hints.CRS, crs );
-        hintsWeUsed.put( Hints.PRECISION, precision );
+        hintsWeCareAbout.put( Hints.CRS, crs );
+        hintsWeCareAbout.put( Hints.PRECISION, precision );
     }
 	
 	public PositionFactoryImpl(CoordinateReferenceSystem crs) {
@@ -95,8 +101,8 @@ public class PositionFactoryImpl implements Factory, PositionFactory {
 		this.crs = crs;
 		this.precision = precision;
 		
-		hintsWeUsed.put( Hints.CRS, crs );
-        hintsWeUsed.put( Hints.PRECISION, precision );
+		hintsWeCareAbout.put( Hints.CRS, crs );
+        hintsWeCareAbout.put( Hints.PRECISION, precision );
 	}
 	/**
 	 * Report back to FactoryRegistry about our configuration.
@@ -107,7 +113,7 @@ public class PositionFactoryImpl implements Factory, PositionFactory {
 	 * </p>
 	 */
     public Map getImplementationHints() {
-        return Collections.unmodifiableMap( hintsWeUsed );
+        return Collections.unmodifiableMap( hintsWeCareAbout );
     }
 
 	public DirectPosition createDirectPosition(double[] coords)

@@ -2,6 +2,8 @@ package org.geotools.geometry.iso.primitive;
 
 import org.geotools.geometry.GeometryBuilder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.primitive.PrimitiveFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -17,8 +19,11 @@ public class PrimitiveGeometryBuilderTest extends TestCase {
 		builder = new GeometryBuilder(crs_WGS84); 
 	}
 	
-	public void testBuildPoint() {
+	public void xtestBuildPoint() {
 		
+		PositionFactory posFactory = builder.getPositionFactory();
+		DirectPosition position = posFactory.createDirectPosition(new double[] { 48.44, -123.37, 0.0 });
+		System.out.println(position);
 //		PrimitiveFactory primitiveFactory = builder.getPrimitiveFactory();
 //		System.out.println(primitiveFactory);
 //		System.out.println(primitiveFactory.getCoordinateReferenceSystem());

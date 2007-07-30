@@ -27,7 +27,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Jody Garnett
  *
  */
-public class GeometryBuilder /*implements PositionFactory*/ {
+public class GeometryBuilder {
     /**
      * Hints used for the duration of this GeometryBuilder.
      */
