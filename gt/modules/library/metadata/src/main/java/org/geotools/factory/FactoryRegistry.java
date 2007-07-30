@@ -192,7 +192,7 @@ public class FactoryRegistry extends ServiceRegistry {
      * <b>Note:</b>
      * {@link #synchronizeIteratorProviders} should also be invoked once before this method.
      */
-    final Iterator getUnfilteredProviders(final Class category) {
+    final Iterator getUnfilteredProviders(final Class category) { //TODO: Use Hints to match Constructor
         if (!scanningCategories.isEmpty()) {
             /*
              * The 'scanningCategories' map is almost always empty, so we use the above 'isEmpty()'

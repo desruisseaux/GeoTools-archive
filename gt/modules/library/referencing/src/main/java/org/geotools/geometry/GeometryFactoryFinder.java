@@ -29,6 +29,7 @@ import org.opengis.geometry.aggregate.AggregateFactory;
 import org.opengis.geometry.complex.ComplexFactory;
 import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.geometry.primitive.PrimitiveFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.datum.DatumFactory;
 
 
@@ -86,9 +87,7 @@ public class GeometryFactoryFinder {
      *
     private static Hints addDefaultHints(final Hints hints) {
         final Hints completed = GeoTools.getDefaultHints();
-        if (hints != null) {
-            completed.add(hints);
-        }
+        completed.add(hints);
         return completed;
     }*/
     
@@ -110,16 +109,16 @@ public class GeometryFactoryFinder {
     public static GeometryFactory getGeometryFactory( Hints hints) throws FactoryRegistryException {
         return (GeometryFactory) getServiceRegistry().getServiceProvider( GeometryFactory.class, null, hints, Hints.GEOMETRY_FACTORY );
     }
-
-    /**
-     * An implementation of {@link GeometryFactory} for the provided crs.
-     * 
-     * @param hints A set of hints that *must* include a Hints.CRS key
-     * @return a GeometryFactory set up to work with the indicated CRS
-     * @throws FactoryRegistryException if no implementation was found or can be created for the
-     *         {@link DatumFactory} interface.
-     */
-    public static PrimitiveFactory getPrimitiveFactory( Hints hints ) {
+    
+    public static ComplexFactory getComplexFactory(Hints hints) throws FactoryRegistryException {
+        return (ComplexFactory) getServiceRegistry().getServiceProvider( ComplexFactory.class, null, hints, Hints.COMPLEX_FACTORY );
+    }
+    
+    public static AggregateFactory getAggregateFactory(Hints hints) throws FactoryRegistryException {
+        return (AggregateFactory) getServiceRegistry().getServiceProvider( AggregateFactory.class, null, hints, Hints.AGGREGATE_FACTORY );
+    }
+    
+    public static PrimitiveFactory getPrimitiveFactory(Hints hints) throws FactoryRegistryException {
         return (PrimitiveFactory) getServiceRegistry().getServiceProvider( PrimitiveFactory.class, null, hints, Hints.PRIMITIVE_FACTORY );
     }
     
