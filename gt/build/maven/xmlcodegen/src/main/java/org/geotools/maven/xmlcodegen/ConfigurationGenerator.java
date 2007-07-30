@@ -28,21 +28,39 @@ public class ConfigurationGenerator extends AbstractGenerator {
         
         //copy over all included schemas
         ArrayList includes = new ArrayList();
-        try {
-			includes.add(new File(new URI(schema.getSchemaLocation())));
+       
+        File file = null;
+		try {
+			file = findSchemaFile( schema.getSchemaLocation() );
 		} 
-        catch (URISyntaxException e) {
-        	logger.log( Level.SEVERE, "Error generating resolver", e );
+		catch (IOException e) {
+			logger.log(Level.SEVERE, "", e );
 		}
+		
+        if ( file != null ) {
+        	includes.add( file );
+        }
+        else {
+        	logger.log( Level.SEVERE, "Could not find: " + schema.getSchemaLocation() + " to copy." );        	
+        }
+        
         for (Iterator i = Schemas.getIncludes(schema).iterator(); i.hasNext();) {
             XSDInclude include = (XSDInclude) i.next();
             
-            try {
-				includes.add(new File(new URI(include.getSchemaLocation())));
-			} 
-            catch (URISyntaxException e) {
-            	logger.log( Level.SEVERE, "Error generating resolver", e );
-			}
+            file = null;
+    		try {
+    			file = findSchemaFile( include.getSchemaLocation() );
+    		} 
+    		catch (IOException e) {
+    			logger.log(Level.SEVERE, "", e );
+    		}
+    		
+            if ( file != null ) {
+            	includes.add( file );
+            }
+            else {
+            	logger.log( Level.SEVERE, "Could not find: " + include.getSchemaLocation() + " to copy." );        	
+            }
 		}
 
 		for (Iterator i = includes.iterator(); i.hasNext();) {

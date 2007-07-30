@@ -190,7 +190,7 @@ public class BindingGeneratorMojo extends AbstractGeneratorMojo {
 			slrg.setLocation( outputDirectory.getAbsolutePath() );
 			slrg.setOverwriting( overwriteExistingFiles );
 			slrg.setPackageBase( destinationPackage );
-			
+			slrg.setSchemaLookupDirectories(schemaLookupDirectories);
 			slrg.generate( xsdSchema );
 		}
 		
@@ -201,6 +201,7 @@ public class BindingGeneratorMojo extends AbstractGeneratorMojo {
 			cg.setLocation( outputDirectory.getAbsolutePath() );
 			cg.setOverwriting( overwriteExistingFiles );
 			cg.setPackageBase( destinationPackage );
+			cg.setSchemaLookupDirectories(schemaLookupDirectories);
 			cg.generate( xsdSchema );
 		}
 	}

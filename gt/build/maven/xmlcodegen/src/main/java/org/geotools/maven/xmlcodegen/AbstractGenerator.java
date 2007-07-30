@@ -55,6 +55,11 @@ public abstract class AbstractGenerator {
     boolean overwriting = false;
 
     /**
+     * lookup directories for schemas
+     */
+    File[] schemaLookupDirectories;
+    
+    /**
      * Sets the base package for generated classes.
      *
      * @param packageBase Dot seperate package name, or <code>null</code> for
@@ -96,6 +101,15 @@ public abstract class AbstractGenerator {
         this.overwriting = overwriting;
     }
 
+    /**
+     * Sets the directories to use when attempting to locate a schema via a 
+     * relative reference.
+     * 
+     * @param schemaLookupDirectories An array of directories.
+     */
+    public void setSchemaLookupDirectories(File[] schemaLookupDirectories) {
+		this.schemaLookupDirectories = schemaLookupDirectories;
+	}
    
     /**
      * Writes out a string to a file.
@@ -167,6 +181,32 @@ public abstract class AbstractGenerator {
         out.flush();
         out.close();
         in.close();
+    }
+    
+    /**
+     * Attempts to locate a schema file by name by iterating through 
+     * {@link #schemaLookupDirectories}.
+     * 
+     * @param path The path of the file.
+     * 
+     */
+    protected File findSchemaFile( String path ) throws IOException {
+    	File file = new File( path );
+    	if ( file.isAbsolute() ) {
+    		return file;
+    	}
+    	
+    	if ( schemaLookupDirectories != null ) {
+    		for ( int i = 0; i < schemaLookupDirectories.length; i++ ) {
+    			File dir = schemaLookupDirectories[i];
+    			file = new File( dir, path );
+    			if ( file.exists() ) {
+    				return file;
+    			}
+    		}
+    	}
+    	
+    	return null;
     }
 
     /**

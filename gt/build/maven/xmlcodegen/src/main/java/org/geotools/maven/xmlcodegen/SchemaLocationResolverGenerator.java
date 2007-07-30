@@ -44,27 +44,48 @@ public class SchemaLocationResolverGenerator extends AbstractGenerator {
         ArrayList includes = new ArrayList();
         ArrayList namespaces = new ArrayList();
 
+        File file = null;
         try {
-			includes.add(new File(new URI(schema.getSchemaLocation())));
-		} 
-        catch (URISyntaxException e1) {
-        	throw new RuntimeException ( e1 );
-		}
-        namespaces.add(schema.getTargetNamespace());
-
+        	file = findSchemaFile( schema.getSchemaLocation() );	
+        }
+        catch( Exception e ) {
+        	logger.log( Level.SEVERE, "", e );
+        }
+        
+        if ( file != null ) {
+        	includes.add(file);
+        	namespaces.add(schema.getTargetNamespace());
+        }
+        else {
+        	logger.log( Level.SEVERE, "Could not find: " + schema.getSchemaLocation() + " to copy." );
+        }
+        
         List included = Schemas.getIncludes(schema);
 
         for (Iterator i = included.iterator(); i.hasNext();) {
             XSDInclude include = (XSDInclude) i.next();
             
+            file = null;
             try {
-				includes.add(new File(new URI(include.getSchemaLocation())));
-			} 
-            catch (URISyntaxException e) {
-            	throw new RuntimeException( e );
+            	file = findSchemaFile( include.getSchemaLocation() );
+            }
+            catch( Exception e ) {
+            	logger.log( Level.SEVERE, "", e );
+            }
+            
+			if ( file != null ) {
+				includes.add(file);
+				if( include.getSchema() != null ) {
+					namespaces.add(include.getSchema().getTargetNamespace());	
+				}
+				else {
+					namespaces.add( schema.getTargetNamespace() );
+				}
 			}
-			 
-			namespaces.add(include.getSchema().getTargetNamespace());
+			else {
+				logger.log( Level.SEVERE, "Could not find: " + include.getSchemaLocation() + " to copy." );
+			}
+			
         }
 
         try {
