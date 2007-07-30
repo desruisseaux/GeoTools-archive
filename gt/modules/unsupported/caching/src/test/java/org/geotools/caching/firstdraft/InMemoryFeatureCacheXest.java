@@ -131,12 +131,12 @@ public class InMemoryFeatureCacheXest extends TestCase {
         Feature f = (Feature) data.get(0);
         FilterFactory ff = new FilterFactoryImpl();
         Envelope env = f.getBounds();
-        Filter bb = ff.bbox(type.getDefaultGeometry().getName(), env.getMinX(), env.getMinY(),
-                env.getMaxX(), env.getMaxY(), type.getDefaultGeometry().getName());
-        Filter globalbb = ff.bbox(type.getDefaultGeometry().getName(), 0, env.getMinY(),
+        Filter bb = ff.bbox(type.getPrimaryGeometry().getLocalName(), env.getMinX(), env.getMinY(),
+                env.getMaxX(), env.getMaxY(), type.getPrimaryGeometry().getLocalName());
+        Filter globalbb = ff.bbox(type.getPrimaryGeometry().getLocalName(), 0, env.getMinY(),
                 env.getMinX() + ((env.getMaxX() - env.getMinX()) / 2),
                 env.getMinY() + ((env.getMaxY() - env.getMinY()) / 2),
-                type.getDefaultGeometry().getName());
+                type.getPrimaryGeometry().getLocalName());
 
         Filter attfilter = ff.like(ff.property("dummydata"), "Id: 1*");
         Filter filter = ff.and(globalbb, attfilter);
@@ -147,9 +147,9 @@ public class InMemoryFeatureCacheXest extends TestCase {
         /*System.out.println(split[0]);
            System.out.println(split[1]);
            System.out.println(split[2]);*/
-        Filter newbb = ff.bbox(type.getDefaultGeometry().getName(), 0, env.getMinY(),
+        Filter newbb = ff.bbox(type.getPrimaryGeometry().getLocalName(), 0, env.getMinY(),
                 env.getMinX(), env.getMinY() + ((env.getMaxY() - env.getMinY()) / 2),
-                type.getDefaultGeometry().getName());
+                type.getPrimaryGeometry().getLocalName());
         assertEquals(split[0], globalbb);
         assertEquals(split[1], newbb);
         assertEquals(split[2], attfilter);
@@ -172,7 +172,7 @@ public class InMemoryFeatureCacheXest extends TestCase {
 
     public void testEviction() throws IOException {
         FilterFactory ff = new FilterFactoryImpl();
-        Filter all = ff.bbox(type.getDefaultGeometry().getName(), 0, 0, 1000, 1000, "srs");
+        Filter all = ff.bbox(type.getPrimaryGeometry().getLocalName(), 0, 0, 1000, 1000, "srs");
         FeatureCollection fc = cache.getFeatures(all);
         assertEquals(data.size(), fc.size());
         fc = cache.getFeatures(all);

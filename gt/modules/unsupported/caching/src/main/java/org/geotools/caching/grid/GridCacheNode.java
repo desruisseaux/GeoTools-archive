@@ -20,10 +20,8 @@ import org.geotools.caching.spatialindex.grid.GridNode;
 
 
 public class GridCacheNode extends GridNode {
-    boolean valid = false;
-
-    GridCacheNode(int id, GridCacheRootNode parent, Region mbr) {
-        super(id, parent, mbr);
+    GridCacheNode(GridCacheRootNode parent, Region mbr) {
+        super(parent, mbr);
     }
 
     protected void clear() {

@@ -13,23 +13,12 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.caching.grid;
+package org.geotools.caching.spatialindex;
 
-import org.geotools.caching.spatialindex.Data;
-import org.geotools.caching.spatialindex.Node;
-import org.geotools.caching.spatialindex.Visitor;
+public interface Storage {
+    public void put(Node n);
 
+    public void remove(NodeIdentifier id);
 
-class ValidatingVisitor implements Visitor {
-    public void visitData(Data d) {
-        // do nothing
-    }
-
-    public void visitNode(Node n) {
-        n.getIdentifier().setValid(true);
-    }
-
-    public boolean isDataVisitor() {
-        return false;
-    }
+    public Node get(NodeIdentifier id);
 }

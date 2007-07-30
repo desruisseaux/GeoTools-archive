@@ -29,7 +29,5 @@
 package org.geotools.caching.spatialindex;
 
 public interface Entry {
-    public int getIdentifier();
-
     public Shape getShape();
 } // IEntry

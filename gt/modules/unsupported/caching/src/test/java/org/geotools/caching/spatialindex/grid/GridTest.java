@@ -20,6 +20,7 @@ import junit.framework.TestSuite;
 import org.geotools.caching.spatialindex.AbstractSpatialIndex;
 import org.geotools.caching.spatialindex.AbstractSpatialIndexTest;
 import org.geotools.caching.spatialindex.Region;
+import org.geotools.caching.spatialindex.store.MemoryStorage;
 
 
 public class GridTest extends AbstractSpatialIndexTest {
@@ -30,13 +31,13 @@ public class GridTest extends AbstractSpatialIndexTest {
     }
 
     protected AbstractSpatialIndex createIndex() {
-        index = new Grid(new Region(universe), 100);
+        index = new Grid(new Region(universe), 100, new MemoryStorage());
 
         return index;
     }
 
-    /*public void testInsertion() {
-       super.testInsertion();
-       System.out.println("Root insertions = " + index.root_insertions) ;
-       }*/
+    public void testInsertion() {
+        super.testInsertion();
+        System.out.println("Root insertions = " + index.root_insertions);
+    }
 }

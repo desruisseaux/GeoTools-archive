@@ -18,7 +18,9 @@ package org.geotools.caching.spatialindex.grid;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import java.util.Iterator;
+import org.geotools.caching.spatialindex.NodeIdentifier;
 import org.geotools.caching.spatialindex.Region;
+import org.geotools.caching.spatialindex.store.MemoryStorage;
 
 
 public class GridRootNodeTest extends GridNodeTest {
@@ -35,8 +37,10 @@ public class GridRootNodeTest extends GridNodeTest {
     public void setUp() {
         mbr = new Region(new double[] { 0, 20 }, new double[] { 10, 30 });
         mbr3D = new Region(new double[] { 0, 20, 40 }, new double[] { 10, 30, 50 });
-        node = new GridRootNode(mbr, size);
-        node3D = new GridRootNode(mbr3D, size3D);
+
+        Grid index = new Grid(mbr, 100, new MemoryStorage());
+        node = new GridRootNode(index, mbr, size);
+        node3D = new GridRootNode(index, mbr3D, size3D);
         super.node = node;
     }
 
@@ -96,7 +100,7 @@ public class GridRootNodeTest extends GridNodeTest {
         double size = node.getShape().getArea() / node.capacity;
 
         for (Iterator it = node.children.iterator(); it.hasNext();) {
-            GridNode next = (GridNode) it.next();
+            NodeIdentifier next = (NodeIdentifier) it.next();
             assertTrue(node.getShape().intersects(next.getShape()));
             assertEquals(size, next.getShape().getArea(), 1e-2);
         }
@@ -109,7 +113,7 @@ public class GridRootNodeTest extends GridNodeTest {
         double size = node3D.getShape().getArea() / node3D.capacity;
 
         for (Iterator it = node3D.children.iterator(); it.hasNext();) {
-            GridNode next = (GridNode) it.next();
+            NodeIdentifier next = (NodeIdentifier) it.next();
             assertTrue(node3D.getShape().intersects(next.getShape()));
             assertEquals(size, next.getShape().getArea(), 1e-2);
         }

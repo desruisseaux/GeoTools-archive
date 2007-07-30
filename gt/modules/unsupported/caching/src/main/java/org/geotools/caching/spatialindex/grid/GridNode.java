@@ -17,7 +17,9 @@ package org.geotools.caching.spatialindex.grid;
 
 import java.util.HashMap;
 import org.geotools.caching.spatialindex.Node;
+import org.geotools.caching.spatialindex.NodeIdentifier;
 import org.geotools.caching.spatialindex.Region;
+import org.geotools.caching.spatialindex.RegionNodeIdentifier;
 import org.geotools.caching.spatialindex.Shape;
 import org.geotools.caching.spatialindex.grid.GridData;
 
@@ -30,7 +32,7 @@ import org.geotools.caching.spatialindex.grid.GridData;
  *
  */
 public class GridNode implements Node {
-    int id;
+    protected RegionNodeIdentifier id = null;
     Region mbr;
     boolean visited = false;
     GridNode parent;
@@ -39,8 +41,7 @@ public class GridNode implements Node {
     int[] data_ids;
     GridData[] data;
 
-    protected GridNode(int id, GridNode parent, Region mbr) {
-        this.id = id;
+    protected GridNode(GridNode parent, Region mbr) {
         this.mbr = new Region(mbr);
         this.parent = parent;
         this.node_data = new HashMap();
@@ -49,7 +50,8 @@ public class GridNode implements Node {
         this.data_ids = new int[10];
     }
 
-    public int getChildIdentifier(int index) throws IndexOutOfBoundsException {
+    public NodeIdentifier getChildIdentifier(int index)
+        throws IndexOutOfBoundsException {
         throw new UnsupportedOperationException("GridNode have no children.");
     }
 
@@ -65,10 +67,6 @@ public class GridNode implements Node {
         return 0;
     }
 
-    public Node getSubNode(int index) throws IndexOutOfBoundsException {
-        throw new UnsupportedOperationException("GridNode have no children.");
-    }
-
     public boolean isIndex() {
         return false;
     }
@@ -77,15 +75,11 @@ public class GridNode implements Node {
         return true;
     }
 
-    public boolean isVisited() {
-        return visited;
-    }
+    public NodeIdentifier getIdentifier() {
+        if (id == null) {
+            id = new RegionNodeIdentifier(this);
+        }
 
-    public void setVisited(boolean visited) {
-        this.visited = visited;
-    }
-
-    public int getIdentifier() {
         return id;
     }
 

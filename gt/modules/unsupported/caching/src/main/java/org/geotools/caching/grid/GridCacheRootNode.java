@@ -21,10 +21,8 @@ import org.geotools.caching.spatialindex.grid.GridRootNode;
 
 
 public class GridCacheRootNode extends GridRootNode {
-    boolean valid = false;
-
-    GridCacheRootNode(Region mbr, int capacity) {
-        super(mbr, capacity);
+    GridCacheRootNode(GridTracker grid, Region mbr, int capacity) {
+        super(grid, mbr, capacity);
     }
 
     protected void split() {
@@ -39,7 +37,7 @@ public class GridCacheRootNode extends GridRootNode {
         super.clear();
     }
 
-    protected GridNode createNode(int id, Region reg) {
-        return new GridCacheNode(id, this, reg);
+    protected GridNode createNode(Region reg) {
+        return new GridCacheNode(this, reg);
     }
 }

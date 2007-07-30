@@ -30,13 +30,11 @@ class InvalidatingVisitor implements Visitor {
     }
 
     public void visitNode(Node n) {
+        n.getIdentifier().setValid(false);
+
         if (n instanceof GridCacheNode) {
             GridCacheNode node = (GridCacheNode) n;
-            node.valid = false;
             node.clear();
-        } else if (n instanceof GridCacheRootNode) {
-            GridCacheRootNode node = (GridCacheRootNode) n;
-            node.valid = false;
         }
     }
 }

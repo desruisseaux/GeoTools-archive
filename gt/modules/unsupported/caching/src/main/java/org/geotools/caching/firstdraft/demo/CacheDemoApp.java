@@ -181,7 +181,7 @@ public class CacheDemoApp implements ActionListener {
         SLDParser stylereader = new SLDParser(factory, sld);
         org.geotools.styling.Style[] style = stylereader.readXML();
 
-        CoordinateReferenceSystem crs = fs.getSchema().getDefaultGeometry().getCoordinateSystem();
+        CoordinateReferenceSystem crs = fs.getSchema().getPrimaryGeometry().getCoordinateSystem();
 
         if (crs == null) {
             crs = DefaultGeographicCRS.WGS84;

@@ -28,7 +28,14 @@
 //    marioh@cs.ucr.edu
 package org.geotools.caching.spatialindex;
 
-public class Region implements Shape {
+import java.io.Serializable;
+
+
+public class Region implements Shape, Serializable {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 2627615073834425697L;
     private double[] m_pLow = null;
     private double[] m_pHigh = null;
     private volatile int hashCode = 0;

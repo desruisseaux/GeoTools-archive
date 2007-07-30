@@ -16,6 +16,7 @@
 package org.geotools.caching.spatialindex;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Stack;
 
 
@@ -38,7 +39,8 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
      * The node at the root of index.
      * All others nodes should be direct or indirect children of this one.
      */
-    protected Node root;
+    protected NodeIdentifier root;
+    protected Storage store;
 
     /**
      * Indexes can be n-dimensional, but queries and data should be consistent with regards to dimensions.
@@ -111,43 +113,46 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
      * TODO: remember child index where to search from on next passage
      */
     protected void rangeQuery(int type, Shape query, Visitor v) {
-        Node current = this.root;
+        NodeIdentifier current = this.root;
+        Node currentNode = null;
         current.setVisited(false);
 
         Stack nodes = new Stack();
 
         if (query.intersects(current.getShape())) {
-            nodes.push(current);
+            currentNode = readNode(current);
+            nodes.push(currentNode);
         }
 
         while (!nodes.isEmpty()) {
-            current = (Node) nodes.pop();
+            currentNode = (Node) nodes.pop();
+            current = currentNode.getIdentifier();
 
             if (!current.isVisited()) {
-                v.visitNode(current);
+                v.visitNode(currentNode);
 
-                for (int i = 0; i < current.getChildrenCount(); i++) {
-                    current.getSubNode(i).setVisited(false);
+                for (int i = 0; i < currentNode.getChildrenCount(); i++) {
+                    currentNode.getChildIdentifier(i).setVisited(false);
                 }
 
                 if (v.isDataVisitor()) { // skip if visitor does nothing with data
                                          // visitData check for actual containement or intersection
-                    visitData(current, v, query, type);
+                    visitData(currentNode, v, query, type);
                 }
 
                 current.setVisited(true);
             }
 
             // TODO: start from last child + 1 rather than from 0
-            for (int i = 0; i < current.getChildrenCount(); i++) {
-                Node child = current.getSubNode(i);
+            for (int i = 0; i < currentNode.getChildrenCount(); i++) {
+                NodeIdentifier child = currentNode.getChildIdentifier(i);
 
                 if (!child.isVisited()) {
                     if (query.intersects(child.getShape())) {
                         // we will go back to this one later to examine other children
-                        nodes.push(current);
+                        nodes.push(currentNode);
                         // meanwhile, we put one child at a time into stack, so we do not waste space
-                        nodes.push(child);
+                        nodes.push(readNode(child));
 
                         break;
                     } else {
@@ -181,11 +186,13 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
     }
 
     public void queryStrategy(QueryStrategy qs) {
-        Node current = this.root;
+        NodeIdentifier current = this.root;
+        Node currentNode = null;
 
         while (true) {
             boolean[] hasNext = new boolean[] { false };
-            current = qs.getNextNode(current, hasNext);
+            currentNode = readNode(current);
+            current = qs.getNextNode(currentNode, hasNext);
 
             if (hasNext[0] == false) {
                 break;
@@ -214,7 +221,7 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
      * @param id of data to delete
      * @return true if some data has been found and deleted.
      */
-    protected abstract boolean deleteData(Node n, Shape shape, int id);
+    protected abstract boolean deleteData(NodeIdentifier n, Shape shape, int id);
 
     public void insertData(Object data, Shape shape, int id) {
         if (shape.getDimension() != dimension) {
@@ -239,7 +246,7 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
      * @param shape of data
      * @param id of data
      */
-    protected abstract void insertData(Node n, Object data, Shape shape, int id);
+    protected abstract void insertData(NodeIdentifier n, Object data, Shape shape, int id);
 
     /** Insert new data with shape not contained in the current index.
      * Some indexes may require to recreate the root or the index,
@@ -253,6 +260,32 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
 
     public Statistics getStatistics() {
         return stats;
+    }
+
+    protected Node readNode(NodeIdentifier id) {
+        Node ret = store.get(id);
+        stats.stats_reads++;
+
+        for (Iterator it = readNodeCommands.iterator(); it.hasNext();) {
+            NodeCommand next = (NodeCommand) it.next();
+            next.execute(ret);
+        }
+
+        return ret;
+    }
+
+    protected void writeNode(Node node) {
+        store.put(node);
+        stats.stats_writes++;
+
+        for (Iterator it = writeNodeCommands.iterator(); it.hasNext();) {
+            NodeCommand next = (NodeCommand) it.next();
+            next.execute(node);
+        }
+    }
+
+    protected void deleteNode(NodeIdentifier id) {
+        store.remove(id);
     }
 
     /** Data structure to store statistics about the index.

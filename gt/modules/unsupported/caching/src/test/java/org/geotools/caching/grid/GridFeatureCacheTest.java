@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import org.opengis.feature.simple.SimpleFeatureCollection;
 import org.opengis.filter.Filter;
 import org.geotools.caching.AbstractFeatureCache;
 import org.geotools.caching.CacheOversizedException;
@@ -72,10 +73,10 @@ public class GridFeatureCacheTest extends TestCase {
     protected void setUp() {
         try {
             ds = new MemoryDataStore();
-            ds.createSchema(dataset.getFeatureType());
+            ds.createSchema(dataset.getSchema());
             ds.addFeatures(dataset);
             cache = new GridFeatureCache((FeatureStore) ds.getFeatureSource(
-                        dataset.getFeatureType().getTypeName()), 100, 1000);
+                        dataset.getSchema().getTypeName()), 100, 1000);
         } catch (FeatureCacheException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {

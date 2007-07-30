@@ -31,7 +31,10 @@ package org.geotools.caching.spatialindex;
 public interface Node extends Entry {
     public int getChildrenCount();
 
-    public int getChildIdentifier(int index) throws IndexOutOfBoundsException;
+    public NodeIdentifier getChildIdentifier(int index)
+        throws IndexOutOfBoundsException;
+
+    public NodeIdentifier getIdentifier();
 
     public Shape getChildShape(int index) throws IndexOutOfBoundsException;
 
@@ -40,10 +43,4 @@ public interface Node extends Entry {
     public boolean isIndex();
 
     public boolean isLeaf();
-
-    public void setVisited(boolean visited);
-
-    public boolean isVisited();
-
-    public Node getSubNode(int index) throws IndexOutOfBoundsException;
 } // INode

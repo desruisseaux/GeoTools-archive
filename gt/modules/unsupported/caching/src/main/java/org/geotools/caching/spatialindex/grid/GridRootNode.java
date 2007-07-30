@@ -17,7 +17,7 @@ package org.geotools.caching.spatialindex.grid;
 
 import java.util.ArrayList;
 import org.geotools.caching.spatialindex.AbstractSpatialIndex;
-import org.geotools.caching.spatialindex.Node;
+import org.geotools.caching.spatialindex.NodeIdentifier;
 import org.geotools.caching.spatialindex.Region;
 import org.geotools.caching.spatialindex.Shape;
 
@@ -29,13 +29,15 @@ import org.geotools.caching.spatialindex.Shape;
  *
  */
 public class GridRootNode extends GridNode {
+    Grid grid;
     protected int capacity;
     int[] tiles_number;
     double tiles_size;
-    ArrayList children;
+    ArrayList children; // list of NodeIdentifiers
 
-    protected GridRootNode(Region mbr, int capacity) {
-        super(0, null, mbr);
+    protected GridRootNode(Grid grid, Region mbr, int capacity) {
+        super(null, mbr);
+        this.grid = grid;
         this.capacity = capacity;
         init();
     }
@@ -87,14 +89,15 @@ public class GridRootNode extends GridNode {
 
         do {
             Region reg = new Region(pos, nextpos);
-            GridNode child = createNode(id, reg);
-            this.children.add(child);
+            GridNode child = createNode(reg);
+            this.grid.writeNode(child);
+            this.children.add(child.getIdentifier());
             id++;
         } while (increment(pos, nextpos));
     }
 
-    protected GridNode createNode(int id, Region reg) {
-        return new GridNode(id, this, reg);
+    protected GridNode createNode(Region reg) {
+        return new GridNode(this, reg);
     }
 
     /** Computes sequentially the corner position of each tile in the grid.
@@ -137,8 +140,9 @@ public class GridRootNode extends GridNode {
         return sb.toString();
     }
 
-    public int getChildIdentifier(int index) throws IndexOutOfBoundsException {
-        return getSubNode(index).getIdentifier();
+    public NodeIdentifier getChildIdentifier(int index)
+        throws IndexOutOfBoundsException {
+        return (NodeIdentifier) children.get(index);
     }
 
     public int getChildrenCount() {
@@ -146,15 +150,11 @@ public class GridRootNode extends GridNode {
     }
 
     public Shape getChildShape(int index) throws IndexOutOfBoundsException {
-        return getSubNode(index).getShape();
+        return getChildIdentifier(index).getShape();
     }
 
     public int getLevel() {
         return 1;
-    }
-
-    public Node getSubNode(int index) throws IndexOutOfBoundsException {
-        return (Node) children.get(index);
     }
 
     public boolean isIndex() {

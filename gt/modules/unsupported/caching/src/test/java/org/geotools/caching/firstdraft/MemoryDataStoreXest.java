@@ -830,34 +830,34 @@ public class MemoryDataStoreXest extends DataTestCase {
 
         FeatureWriter writer1 = data.getFeatureWriter("road", rd1Filter, t1);
         writer1.next()
-               .setDefaultGeometry(fac.createLineString(
+               .setPrimaryGeometry(fac.createLineString(
                 new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }));
         writer1.write();
 
         writer1.close();
 
         FeatureReader reader = data.getFeatureReader(new DefaultQuery("road", rd1Filter), t1);
-        Geometry geom1 = reader.next().getDefaultGeometry();
+        Geometry geom1 = reader.next().getPrimaryGeometry();
         reader.close();
         assertEquals(new Coordinate(0, 0), geom1.getCoordinates()[0]);
         assertEquals(new Coordinate(0, 1), geom1.getCoordinates()[1]);
 
         writer1 = data.getFeatureWriter("road", rd1Filter, t1);
         writer1.next()
-               .setDefaultGeometry(fac.createLineString(
+               .setPrimaryGeometry(fac.createLineString(
                 new Coordinate[] { new Coordinate(10, 0), new Coordinate(10, 1) }));
         writer1.write();
         writer1.close();
 
         reader = data.getFeatureReader(new DefaultQuery("road", rd1Filter), t1);
-        geom1 = reader.next().getDefaultGeometry();
+        geom1 = reader.next().getPrimaryGeometry();
         reader.close();
         assertEquals(new Coordinate(10, 0), geom1.getCoordinates()[0]);
         assertEquals(new Coordinate(10, 1), geom1.getCoordinates()[1]);
 
         FeatureWriter writer = data.getFeatureWriterAppend("road", t1);
         Feature feature = writer.next();
-        feature.setDefaultGeometry(fac.createLineString(
+        feature.setPrimaryGeometry(fac.createLineString(
                 new Coordinate[] { new Coordinate(20, 0), new Coordinate(20, 1) }));
         writer.write();
         writer.close();
@@ -865,20 +865,20 @@ public class MemoryDataStoreXest extends DataTestCase {
         FidFilter filter = FilterFactoryFinder.createFilterFactory().createFidFilter(feature.getID());
 
         reader = data.getFeatureReader(new DefaultQuery("road", filter), t1);
-        geom1 = reader.next().getDefaultGeometry();
+        geom1 = reader.next().getPrimaryGeometry();
         reader.close();
         assertEquals(new Coordinate(20, 0), geom1.getCoordinates()[0]);
         assertEquals(new Coordinate(20, 1), geom1.getCoordinates()[1]);
 
         writer1 = data.getFeatureWriter("road", filter, t1);
         writer1.next()
-               .setDefaultGeometry(fac.createLineString(
+               .setPrimaryGeometry(fac.createLineString(
                 new Coordinate[] { new Coordinate(30, 0), new Coordinate(30, 1) }));
         writer1.write();
         writer1.close();
 
         reader = data.getFeatureReader(new DefaultQuery("road", filter), t1);
-        geom1 = reader.next().getDefaultGeometry();
+        geom1 = reader.next().getPrimaryGeometry();
         reader.close();
         assertEquals(new Coordinate(30, 0), geom1.getCoordinates()[0]);
         assertEquals(new Coordinate(30, 1), geom1.getCoordinates()[1]);

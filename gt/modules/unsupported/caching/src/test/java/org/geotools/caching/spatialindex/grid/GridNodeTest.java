@@ -34,14 +34,14 @@ public class GridNodeTest extends TestCase {
 
     public void setUp() {
         mbr = new Region(new double[] { 0, 1 }, new double[] { 2, 3 });
-        node = new GridNode(0, null, mbr);
+        node = new GridNode(null, mbr);
     }
 
     public void testConstructor() {
         assertEquals(mbr, node.mbr);
         assertEquals(new Region(mbr), node.mbr);
 
-        GridNode child = new GridNode(1, node, mbr);
+        GridNode child = new GridNode(node, mbr);
         assertEquals(0, child.getLevel());
         assertEquals(node, child.parent);
         assertEquals(mbr, node.mbr);

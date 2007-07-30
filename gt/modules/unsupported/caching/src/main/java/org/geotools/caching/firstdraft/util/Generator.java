@@ -119,8 +119,8 @@ public class Generator {
         double x_max = center.x + (xrange / 2);
         double y_min = center.y - (yrange / 2);
         double y_max = center.y + (yrange / 2);
-        Filter bb = filterFactory.bbox(type.getDefaultGeometry().getName(), x_min, y_min, x_max,
-                y_max, type.getDefaultGeometry().getCoordinateSystem().toString());
+        Filter bb = filterFactory.bbox(type.getPrimaryGeometry().getLocalName(), x_min, y_min,
+                x_max, y_max, type.getPrimaryGeometry().getCoordinateSystem().toString());
 
         return new DefaultQuery(type.getTypeName(), bb);
     }

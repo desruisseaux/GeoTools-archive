@@ -27,6 +27,7 @@ import org.geotools.caching.CacheOversizedException;
 import org.geotools.caching.FeatureCacheException;
 import org.geotools.caching.FeatureCollectingVisitor;
 import org.geotools.caching.spatialindex.Region;
+import org.geotools.caching.spatialindex.store.MemoryStorage;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
 import org.geotools.feature.Feature;
@@ -58,7 +59,7 @@ public class GridFeatureCache extends AbstractFeatureCache {
             throw new FeatureCacheException(e);
         }
 
-        tracker = new GridTracker(convert(universe), indexcapacity);
+        tracker = new GridTracker(convert(universe), indexcapacity, new MemoryStorage());
     }
 
     protected Filter match(BBOXImpl sr) {

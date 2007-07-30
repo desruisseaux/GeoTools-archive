@@ -16,23 +16,26 @@
 package org.geotools.caching.grid;
 
 import java.util.Stack;
+import org.geotools.caching.spatialindex.NodeIdentifier;
 import org.geotools.caching.spatialindex.Region;
+import org.geotools.caching.spatialindex.Storage;
 import org.geotools.caching.spatialindex.grid.Grid;
-import org.geotools.caching.spatialindex.grid.GridRootNode;
 
 
 public class GridTracker extends Grid {
-    public GridTracker(Region mbr, int capacity) {
+    public GridTracker(Region mbr, int capacity, Storage store) {
         this.dimension = mbr.getDimension();
+        this.store = store;
 
-        GridCacheRootNode root = new GridCacheRootNode(mbr, capacity);
+        GridCacheRootNode root = new GridCacheRootNode(this, mbr, capacity);
         root.split();
+        writeNode(root);
         this.stats.addToNodesCounter(root.getCapacity() + 1); // root has root.capacity nodes, +1 for root itself :)
-        this.root = root;
+        this.root = root.getIdentifier();
     }
 
-    GridCacheRootNode getRoot() {
-        return (GridCacheRootNode) this.root;
+    NodeIdentifier getRoot() {
+        return this.root;
     }
 
     Stack searchMissingTiles(Region search) { // search must be within root mbr !
@@ -40,17 +43,19 @@ public class GridTracker extends Grid {
         Stack missing = new Stack();
         boolean foundValid = false;
 
-        if (!getRoot().valid) {
+        if (!this.root.isValid()) {
             int[] cursor = new int[this.dimension];
             int[] mins = new int[this.dimension];
             int[] maxs = new int[this.dimension];
             findMatchingTiles(search, cursor, mins, maxs);
 
-            do {
-                int nextid = getRoot().gridIndexToNodeId(cursor);
-                GridCacheNode nextnode = (GridCacheNode) getRoot().getSubNode(nextid);
+            GridCacheRootNode root = (GridCacheRootNode) readNode(this.root);
 
-                if (!nextnode.valid) {
+            do {
+                int nextid = root.gridIndexToNodeId(cursor);
+                NodeIdentifier nextnode = root.getChildIdentifier(nextid);
+
+                if (!nextnode.isValid()) {
                     missing.add(nextnode.getShape());
                 } else if (!foundValid) {
                     foundValid = true;
@@ -69,11 +74,13 @@ public class GridTracker extends Grid {
     }
 
     public void flush() {
-        GridCacheRootNode oldroot = (GridCacheRootNode) this.root;
+        GridCacheRootNode oldroot = (GridCacheRootNode) readNode(this.root);
         int capacity = oldroot.getCapacity();
         Region mbr = new Region((Region) oldroot.getShape());
-        GridCacheRootNode root = new GridCacheRootNode(mbr, capacity);
-        this.root = root;
+        GridCacheRootNode root = new GridCacheRootNode(this, mbr, capacity);
+        deleteNode(this.root);
+        writeNode(root);
+        this.root = root.getIdentifier();
         this.stats.reset();
         root.split();
         this.stats.addToNodesCounter(root.getCapacity() + 1);
