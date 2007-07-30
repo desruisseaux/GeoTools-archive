@@ -92,11 +92,11 @@ public final class BoundingBoxes {
                 }
                 envelope = CRS.transform(operation, envelope);
             }
-            box.setWestBoundLongitude(envelope.getMinimum(0));
-            box.setEastBoundLongitude(envelope.getMaximum(0));
-            box.setSouthBoundLatitude(envelope.getMinimum(1));
-            box.setNorthBoundLatitude(envelope.getMaximum(1));
         }
+        box.setWestBoundLongitude(envelope.getMinimum(0));
+        box.setEastBoundLongitude(envelope.getMaximum(0));
+        box.setSouthBoundLatitude(envelope.getMinimum(1));
+        box.setNorthBoundLatitude(envelope.getMaximum(1));
     }
 
     /**

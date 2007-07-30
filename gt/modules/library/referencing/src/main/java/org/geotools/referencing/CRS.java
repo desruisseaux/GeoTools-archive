@@ -62,6 +62,7 @@ import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.IdentifiedObjectFinder;
+import org.geotools.referencing.operation.transform.IdentityTransform;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
@@ -904,6 +905,10 @@ public final class CRS {
                                                   boolean lenient)
             throws FactoryException
     {
+        if (equalsIgnoreMetadata(sourceCRS, targetCRS)) {
+            // Slight optimization in order to avoid the overhead of loading the full referencing engine.
+            return IdentityTransform.create(sourceCRS.getCoordinateSystem().getDimension());
+        }
         return getCoordinateOperationFactory(lenient).createOperation(sourceCRS, targetCRS).getMathTransform();
     }
 

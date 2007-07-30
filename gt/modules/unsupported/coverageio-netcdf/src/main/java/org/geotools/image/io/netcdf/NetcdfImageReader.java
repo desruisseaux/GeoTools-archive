@@ -16,8 +16,6 @@
  */
 package org.geotools.image.io.netcdf;
 
-// J2SE dependencies
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -34,7 +32,6 @@ import javax.imageio.ImageReadParam;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.metadata.IIOMetadata;
 
-// NetCDF dependencies
 import ucar.nc2.Variable;
 import ucar.ma2.Array;
 import ucar.ma2.Range;
@@ -46,13 +43,11 @@ import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.dataset.VariableDS;
 import ucar.nc2.util.CancelTask;
 
-// Geotools dependencies
 import org.geotools.util.NumberRange;
 import org.geotools.image.io.PaletteFactory;
 import org.geotools.image.io.FileImageReader;
 import org.geotools.image.io.SampleConverter;
 import org.geotools.image.io.IntegerConverter;
-import org.geotools.image.io.metadata.GeographicMetadata;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -714,8 +709,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
         protected int paletteSize;
 
         /**
-         * Constructs a service provider for the specified variable names. The first name
-         * is assigned to image index 0, the second name to image index 1, <cite>etc.</cite>.
+         * Constructs a service provider.
          */
         public Spi() {
             super("NetCDF", "image/x-netcdf");
