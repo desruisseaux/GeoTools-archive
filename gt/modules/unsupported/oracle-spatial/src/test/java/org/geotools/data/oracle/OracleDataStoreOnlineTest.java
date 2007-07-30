@@ -214,6 +214,17 @@ public class OracleDataStoreOnlineTest extends TestCase {
                         "NULL,NULL))");
 
     	
+    	// two simple lines
+    	st.execute("INSERT INTO ORA_TEST_LINES VALUES ('line1',50,2," +
+	                "MDSYS.SDO_GEOMETRY(2002,82465,NULL," +
+	                "SDO_ELEM_INFO_ARRAY(1,2,1),"+
+	                "SDO_ORDINATE_ARRAY(0,0, 10, 10)))");
+	       
+	st.execute("INSERT INTO ORA_TEST_LINES VALUES ('line2',100,4," +
+	                "MDSYS.SDO_GEOMETRY(2002,82465,NULL," +
+	                "SDO_ELEM_INFO_ARRAY(1,2,1),"+
+	                "SDO_ORDINATE_ARRAY(25,25, 25, 30)))");
+    	
     }
 
     public void testGetFeatureTypes() throws IOException {
@@ -446,13 +457,61 @@ public class OracleDataStoreOnlineTest extends TestCase {
         assertEquals("NAME", ft.getAttributeType(0).getLocalName());        
     }
     
-    public void testBounds(){
-    	if( conn == null ) return;    	    	
-    	Envelope extent = dstore.getEnvelope("ORA_TEST_POINTS");
-    	assertNotNull( extent );
-    	assertTrue( extent instanceof ReferencedEnvelope );
-    	ReferencedEnvelope envelope = (ReferencedEnvelope) extent;
-    	assertFalse( envelope.isNull() );
+    public void testBoundsWgs84() throws IOException {
+        if( conn == null ) return;              
+        Envelope extent = dstore.getEnvelope("ORA_TEST_POINTS");
+        assertNotNull( extent );
+        assertTrue( extent instanceof ReferencedEnvelope );
+        ReferencedEnvelope envelope = (ReferencedEnvelope) extent;
+        assertFalse( envelope.isNull() );
+        
+        Envelope extent2 = dstore.getFeatureSource("ORA_TEST_POINTS").getBounds();
+        assertEquals(extent, extent2);
+     }
+     
+    public void testBoundsWgs84Filter() throws Exception {
+        if( conn == null ) return;
+        
+        // build a bbox filter
+        GeometryFilter filter = filterFactory.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
+        // had to reduce the envelope a little, Oracle has trobles with bbox that span the whole earth
+        Expression right = filterFactory.createBBoxExpression(new Envelope(-10, 21, -10, 11));
+        Expression left = filterFactory.createAttributeExpression(dstore.getSchema("ORA_TEST_POINTS"), "SHAPE");
+        filter.addLeftGeometry(left);
+        filter.addRightGeometry(right);
+        
+        Envelope extent = dstore.getFeatureSource("ORA_TEST_POINTS").getBounds(new DefaultQuery("ORA_TEST_POINTS", filter));
+        assertNotNull( extent );
+        assertTrue( extent instanceof ReferencedEnvelope );
+        ReferencedEnvelope envelope = (ReferencedEnvelope) extent;
+        assertEquals(new Envelope(10, 20, 10, 10), new Envelope(envelope));
+    }
+    
+    public void testBoundsProjected(){
+        if( conn == null ) return;              
+        Envelope extent = dstore.getEnvelope("ORA_TEST_LINES");
+        assertNotNull( extent );
+        assertTrue( extent instanceof ReferencedEnvelope );
+        ReferencedEnvelope envelope = (ReferencedEnvelope) extent;
+        assertFalse( envelope.isNull() );
+    }
+    
+    public void testBoundsProjectedFilter() throws IOException {
+        if( conn == null ) return;
+        
+        // build a bbox filter
+        GeometryFilter filter = filterFactory.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
+        // had to reduce the envelope a little, Oracle has trobles with bbox that span the whole earth
+        Expression right = filterFactory.createBBoxExpression(new Envelope(-10, 21, -10, 21));
+        Expression left = filterFactory.createAttributeExpression(dstore.getSchema("ORA_TEST_LINES"), "SHAPE");
+        filter.addLeftGeometry(left);
+        filter.addRightGeometry(right);
+        
+        Envelope extent = dstore.getFeatureSource("ORA_TEST_LINES").getBounds(new DefaultQuery("ORA_TEST_LINES", filter));
+        assertNotNull( extent );
+        assertTrue( extent instanceof ReferencedEnvelope );
+        ReferencedEnvelope envelope = (ReferencedEnvelope) extent;
+        assertEquals(new Envelope(0, 10, 0, 10), new Envelope(envelope));
     }
     
     public void testGeometryType() throws IOException {

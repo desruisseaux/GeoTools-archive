@@ -22,21 +22,28 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.sql.DataSource;
-
+import oracle.jdbc.OracleConnection;
 import oracle.sql.ARRAY;
 import oracle.sql.Datum;
 import oracle.sql.STRUCT;
 
 import org.geotools.data.DataSourceException;
+import org.geotools.data.DataUtilities;
+import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureSource;
+import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.DefaultSQLBuilder;
 import org.geotools.data.jdbc.FeatureTypeInfo;
 import org.geotools.data.jdbc.JDBCDataStore;
@@ -46,21 +53,31 @@ import org.geotools.data.jdbc.JDBCUtils;
 import org.geotools.data.jdbc.QueryData;
 import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
+import org.geotools.data.jdbc.datasource.DataSourceFinder;
+import org.geotools.data.jdbc.datasource.UnWrapper;
 import org.geotools.data.oracle.attributeio.SDOAttributeIO;
 import org.geotools.data.oracle.referencing.OracleAuthorityFactory;
+import org.geotools.data.oracle.sdo.GeometryConverter;
 import org.geotools.data.oracle.sdo.TT;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.GeometryAttributeType;
+import org.geotools.feature.SchemaException;
 import org.geotools.filter.SQLEncoder;
+import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.SQLEncoderOracle;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
+import org.opengis.filter.Filter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.GeodeticCRS;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.io.ParseException;
 
 /**
  * @author Sean Geoghegan, Defence Science and Technology Organisation.
@@ -330,59 +347,14 @@ public class OracleDataStore extends JDBCDataStore {
      * </p>
      * @return null as a generic implementation is not provided.
      */
-    public Envelope getEnvelope( String typeName ){
-    	Connection conn = null;
-    	try {
-    		conn= getConnection( Transaction.AUTO_COMMIT );
-	    	Statement st = conn.createStatement();
-	    	st.execute("SELECT srid,diminfo FROM USER_SDO_GEOM_METADATA where TABLE_NAME = '"+typeName+"'");    	
-	    	ResultSet set = st.getResultSet();    	
-	    	set.next();
-	    	
-	    	int srid = set.getInt( 1 );
-//	    	CoordinateReferenceSystem crs = determineCRS( srid );
-            CoordinateReferenceSystem crs = CRS.decode("EPSG:" + srid);
-	    	ARRAY array= (ARRAY) set.getObject(2);    	
-	    	Datum data[] = array.getOracleArray();
-	    	
-	    	double minx = Double.NaN;
-	    	double miny = Double.NaN;
-	    	double maxx = Double.NaN;
-	    	double maxy = Double.NaN;
-	    	
-	    	for( int i =0; i<data.length; i++){
-	    		Datum datum = data[i]; 
-	    		System.out.println( datum.getClass() );
-	    		STRUCT diminfo = (STRUCT) datum;
-	    		Datum info[] = diminfo.getOracleAttributes();
-	    		String ord = info[0].stringValue();
-	    		double min = info[1].doubleValue();
-	    		double max = info[2].doubleValue();
-  	    	    // TODO use this for accurate JTS PercisionModel!	    		
-	    		// double precision = info[3].doubleValue();
-	    		if( "X".equalsIgnoreCase( ord )){
-	    			minx = min; maxx= max;
-	    		}
-	    		if( "Y".equalsIgnoreCase( ord )){
-	    			miny = min; maxy= max;
-	    		}    		
-	    	}
-	    	Envelope extent = new Envelope(minx,maxx, miny,maxy );
-	    	ReferencedEnvelope ref = new ReferencedEnvelope( extent, crs );
-	    	return ref;
-	    }
-    	catch( Exception erp ){
-    		LOGGER.log(Level.WARNING, "Exception occurred computing the bbox", erp);
-    		return null;
-    	}
-	    finally{
-	    	if( conn != null ){	    		
-	    		try {
-					conn.close();
-				} catch (SQLException e) {
-				}
-	    	}
-	    }
+
+    public Envelope getEnvelope(String typeName) {
+        try {
+            return bounds(new DefaultQuery(typeName));
+        } catch(IOException e) {
+            LOGGER.log(Level.WARNING, "Could not compute feature type bounds", e);
+            return null;
+        }
     }
     
     /** This is used by helper classes to hammer sql back to the database */
@@ -432,4 +404,197 @@ public class OracleDataStore extends JDBCDataStore {
     		t.close();
     	}
     }
+    
+    /**
+     * Default implementation based on getFeatureReader and getFeatureWriter.
+     *
+     * <p>
+     * We should be able to optimize this to only get the RowSet once
+     * </p>
+     *
+     * @see org.geotools.data.DataStore#getFeatureSource(java.lang.String)
+     */
+    public FeatureSource getFeatureSource(String typeName) throws IOException {
+        if (!typeHandler.getFIDMapper(typeName).isVolatile()
+                || allowWriteOnVolatileFIDs) {
+            if (getLockingManager() != null) {
+                // Use default JDBCFeatureLocking that delegates all locking
+                // the getLockingManager
+                //
+                return new OracleFeatureLocking(this, getSchema(typeName));
+            } else {
+                // subclass should provide a FeatureLocking implementation
+                // but for now we will simply forgo all locking
+                return new OracleFeatureStore(this, getSchema(typeName));
+            }
+        } else {
+            return new OracleFeatureSource(this, getSchema(typeName));
+        }
+    }
+    
+    /**
+     * This is (unfortunately) a copy and paste from PostgisFeatureStore, I simply did not
+     * know a better place to put this...
+     * @param query
+     * @return
+     * @throws IOException
+     */
+    protected ReferencedEnvelope bounds(Query query) throws IOException {
+        Filter filter = query.getFilter();
+
+        if (filter == Filter.EXCLUDE) {
+            return new ReferencedEnvelope(new Envelope(), query.getCoordinateSystem());
+        }
+
+        FeatureType schema = getSchema(query.getTypeName());
+        SQLBuilder sqlBuilder = getSqlBuilder(schema.getTypeName());
+
+        Filter postQueryFilter = sqlBuilder.getPostQueryFilter(query.getFilter());
+        if (postQueryFilter != null && !postQueryFilter.equals(Filter.INCLUDE)) {
+            // this would require postprocessing the filter
+            // so we cannot optimize
+            return null;
+        }
+
+        Connection conn = null;
+        try {
+            conn = getConnection(Transaction.AUTO_COMMIT);
+
+            Envelope retEnv = new Envelope();
+            Filter preFilter = sqlBuilder.getPreQueryFilter(query.getFilter());
+            AttributeType[] attributeTypes = schema.getAttributeTypes();
+            FeatureType schemaNew = schema;
+            if (!query.retrieveAllProperties()) {
+                try {
+                    schemaNew = DataUtilities.createSubType(schema, query.getPropertyNames());
+                    if (schemaNew.getDefaultGeometry() == null) // does the sub-schema have a
+                                                                // geometry in it?
+                    {
+                        // uh-oh better get one!
+                        if (schema.getDefaultGeometry() != null) // does the entire schema have a
+                                                                    // geometry in it?
+                        {
+                            // buff-up the sub-schema so it has the default geometry in it.
+                            ArrayList al = new ArrayList(Arrays.asList(query.getPropertyNames()));
+                            al.add(schema.getDefaultGeometry().getName());
+                            schemaNew = DataUtilities.createSubType(schema, (String[]) al
+                                    .toArray(new String[1]));
+                        }
+                    }
+                } catch (SchemaException e1) {
+                    throw new DataSourceException("Could not create subtype", e1);
+                }
+            }
+            // at this point, the query should have a geometry in it.
+            // BUT, if there's no geometry in the table, then the query will not (obviously) have a
+            // geometry in it.
+
+            attributeTypes = schemaNew.getAttributeTypes();
+
+            for (int j = 0, n = schemaNew.getAttributeCount(); j < n; j++) {
+                if (Geometry.class.isAssignableFrom(attributeTypes[j].getType())) // same as
+                                                                                    // .isgeometry()
+                                                                                    // - see new
+                                                                                    // featuretype
+                                                                                    // javadoc
+                {
+                    String attName = attributeTypes[j].getName();
+                    Envelope curEnv = getEnvelope(conn, schemaNew, attName, sqlBuilder, filter);
+
+                    if (curEnv == null) {
+                        return null;
+                    }
+
+                    retEnv.expandToInclude(curEnv);
+                }
+            }
+
+            LOGGER.finer("returning bounds " + retEnv);
+
+            if ((schemaNew != null) && (schemaNew.getDefaultGeometry() != null))
+                return new ReferencedEnvelope(retEnv, schemaNew.getDefaultGeometry()
+                        .getCoordinateSystem());
+            if (query.getCoordinateSystem() != null)
+                return new ReferencedEnvelope(retEnv, query.getCoordinateSystem());
+            return new ReferencedEnvelope(retEnv, null);
+        } catch (SQLException sqlException) {
+            JDBCUtils.close(conn, Transaction.AUTO_COMMIT, sqlException);
+            conn = null;
+            throw new DataSourceException("Could not count " + query.getHandle(), sqlException);
+        } catch (SQLEncoderException e) {
+            // could not encode count
+            // but at least we did not break the connection
+            return null;
+        } catch (ParseException parseE) {
+            String message = "Could not read geometry: " + parseE.getMessage();
+
+            return null;
+        } finally {
+            JDBCUtils.close(conn, Transaction.AUTO_COMMIT, null);
+        }
+    }
+    
+    protected Envelope getEnvelope(
+        Connection conn,
+        FeatureType schema,
+        String geomName,
+        SQLBuilder sqlBuilder,
+        Filter filter)
+        throws SQLException, SQLEncoderException, IOException, ParseException {
+        
+        StringBuffer sql = new StringBuffer();
+        GeometryAttributeType gat = (GeometryAttributeType) schema.getAttributeType(geomName);
+        // from the Oracle docs: "The SDO_TUNE.EXTENT_OF function has better performance than the
+        // SDO_AGGR_MBR function if the data is non-geodetic and if a spatial index is defined
+        // on the geometry column; however, the SDO_TUNE.EXTENT_OF function is limited to
+        // two-dimensional geometries, whereas the SDO_AGGR_MBR function is not".
+        // And also: "In addition, the SDO_TUNE.EXTENT_OF function computes the extent for all
+        // geometries in a table; by contrast, the SDO_AGGR_MBR function can operate on
+        // subsets of rows. The SDO_TUNE.EXTENT_OF function returns NULL if the data is inconsistent."
+        // Long story short: under restrictive conditions SDO_TUNE.EXTENT_OF works, but we have
+        // to be prepared to fall back on SDO_AGGR_MBR.
+        List queries = new ArrayList();
+        if(Filter.INCLUDE.equals(filter) && !(gat.getCoordinateSystem() instanceof GeodeticCRS)) {
+            sql.append("SELECT SDO_TUNE.EXTENT_OF('").append(schema.getTypeName()).append("', '");
+            sql.append(geomName).append("') from dual");
+            queries.add(sql.toString());
+            sql = new StringBuffer();
+        } 
+        sql.append("SELECT SDO_AGGR_MBR(").append(geomName).append(") ");
+        sqlBuilder.sqlFrom(sql, schema.getTypeName());
+        sqlBuilder.sqlWhere(sql, filter);
+        queries.add(sql.toString());
+      
+        LOGGER.fine("SQL: " + sql);
+
+        // loop over the (eventual) two sql statements, so that if the first does not provide
+        // an answer, we fall back on the second
+        Statement statement = null;
+        ResultSet results = null;
+        Envelope result = null;
+        for (Iterator it = queries.iterator(); it.hasNext();) {
+            String query = (String) it.next();
+            try {
+                statement = conn.createStatement();
+                results = statement.executeQuery(query);
+                
+                results.next();
+                
+                Geometry geom = null;
+                Object struct = results.getObject(1);
+                UnWrapper unwrapper = DataSourceFinder.getUnWrapper(conn);
+                OracleConnection oraConn = (OracleConnection) unwrapper.unwrap(conn);
+                GeometryConverter converter = new GeometryConverter(oraConn, new GeometryFactory());
+                geom = converter.asGeometry( (STRUCT) struct );
+                
+                // Oracle may return a point, a line or a polygon
+                if(geom != null)
+                    return geom.getEnvelopeInternal();
+            } finally {
+                JDBCUtils.close(results);
+                JDBCUtils.close(statement);
+            }
+        }
+        return result;
+    }   
 }
