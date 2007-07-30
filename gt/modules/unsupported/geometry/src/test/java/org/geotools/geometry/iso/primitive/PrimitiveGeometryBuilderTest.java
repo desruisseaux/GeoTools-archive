@@ -19,11 +19,11 @@ public class PrimitiveGeometryBuilderTest extends TestCase {
 		builder = new GeometryBuilder(crs_WGS84); 
 	}
 	
-	public void xtestBuildPoint() {
+	public void testBuildPoint() {
 		
-		PositionFactory posFactory = builder.getPositionFactory();
-		DirectPosition position = posFactory.createDirectPosition(new double[] { 48.44, -123.37, 0.0 });
-		System.out.println(position);
+//		PositionFactory posFactory = builder.getPositionFactory();
+//		DirectPosition position = posFactory.createDirectPosition(new double[] { 48.44, -123.37, 0.0 });
+//		System.out.println(position);
 //		PrimitiveFactory primitiveFactory = builder.getPrimitiveFactory();
 //		System.out.println(primitiveFactory);
 //		System.out.println(primitiveFactory.getCoordinateReferenceSystem());
