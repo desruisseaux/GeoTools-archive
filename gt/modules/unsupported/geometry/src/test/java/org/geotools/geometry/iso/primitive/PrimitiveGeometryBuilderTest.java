@@ -21,12 +21,15 @@ public class PrimitiveGeometryBuilderTest extends TestCase {
 	
 	public void testBuildPoint() {
 		
-//		PositionFactory posFactory = builder.getPositionFactory();
-//		DirectPosition position = posFactory.createDirectPosition(new double[] { 48.44, -123.37, 0.0 });
-//		System.out.println(position);
-//		PrimitiveFactory primitiveFactory = builder.getPrimitiveFactory();
-//		System.out.println(primitiveFactory);
-//		System.out.println(primitiveFactory.getCoordinateReferenceSystem());
-//		primitiveFactory.createPoint(new double[] { 48.44, -123.37, 0.0 });
+		// test positionfactory
+		PositionFactory posFactory = builder.getPositionFactory();
+		DirectPosition position = posFactory.createDirectPosition(new double[] { 48.44, -123.37 });
+		System.out.println(position);
+		
+		// test primitivefactory
+		PrimitiveFactory primitiveFactory = builder.getPrimitiveFactory();
+		System.out.println(primitiveFactory);
+		System.out.println(primitiveFactory.getCoordinateReferenceSystem());
+		primitiveFactory.createPoint(new double[] { 48.44, -123.37 });
 	}
 }
