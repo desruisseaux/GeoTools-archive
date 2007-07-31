@@ -72,10 +72,10 @@ public final class TerrainBlockImpl
     {
         final TerrainMesh terrainMesh = new TerrainMesh( myNumberOfGridsPerSide,
                                                          myNumberOfGridsPerSide,
-                                                         myQuadTreeNode.getX1(),
-                                                         myQuadTreeNode.getY1(),
-                                                         myQuadTreeNode.getX2(),
-                                                         myQuadTreeNode.getY2(),
+                                                         myQuadTreeNode.getBounds().getX1(),
+                                                         myQuadTreeNode.getBounds().getY1(),
+                                                         myQuadTreeNode.getBounds().getX2(),
+                                                         myQuadTreeNode.getBounds().getY2(),
                                                          0 );
 
         terrainMesh.setTextureImage( myMapImage );

@@ -1,5 +1,7 @@
 package org.geotools.renderer3d.utils.quadtree;
 
+import org.geotools.renderer3d.utils.BoundingRectangle;
+
 import java.util.Collection;
 import java.util.Set;
 
@@ -32,6 +34,10 @@ public interface QuadTreeNode
      */
     void removeElement( QuadTreeElement element );
 
+    /**
+     * @return the axis aligned bounding rectangle for this node.
+     */
+    BoundingRectangle getBounds();
 
     /**
      * @return the highest parent node.
@@ -62,29 +68,12 @@ public interface QuadTreeNode
     void getElements( double x1, double y1, double x2, double y2, Collection elementOutputCollection );
 
     /**
-     * @return true if the specified located object is inside this QuadTreeNode area.
-     */
-    boolean isInside( LocatedDoublePrecisionObject locatedObject );
-
-    /**
      * Only called from other quad tree nodes, should not be called by client code.
      *
      * @param childNodeToRemove      the child node to remove
      * @param elementsToMoveToParent the elements of the child node to add to this node
      */
     void removeChildNode( final QuadTreeNode childNodeToRemove, final Set elementsToMoveToParent );
-
-    double getCenterX();
-
-    double getCenterY();
-
-    double getX1();
-
-    double getY1();
-
-    double getX2();
-
-    double getY2();
 
     /**
      * @return the data object associated with this quad tree node, or null if none available.

@@ -505,6 +505,23 @@ public final class MathUtils
         return rolledValue;
     }
 
+
+    /**
+     * @return True if (x,y) is inside the axis aligned rectangle defined by the points (x1,y1) and (x2,y2), false otherwise.
+     */
+    public static boolean isInsideRectangle( final double x,
+                                             final double y,
+                                             final double x1,
+                                             final double y1,
+                                             final double x2,
+                                             final double y2 )
+    {
+        return x >= x1 &&
+               x < x2 &&
+               y >= y1 &&
+               y < y2;
+    }
+
     //======================================================================
     // Protected Methods
 

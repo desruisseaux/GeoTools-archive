@@ -1,5 +1,8 @@
 package org.geotools.renderer3d.utils.quadtree;
 
+import org.geotools.renderer3d.utils.BoundingRectangle;
+import org.geotools.renderer3d.utils.BoundingRectangleImpl;
+import org.geotools.renderer3d.utils.MathUtils;
 import org.geotools.renderer3d.utils.ParameterChecker;
 
 import java.util.Collection;
@@ -8,8 +11,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * REFACTOR: Refactor to use a bounding box?
- *
  * @author Hans Häggström
  */
 public class QuadTreeNodeImpl
@@ -20,13 +21,10 @@ public class QuadTreeNodeImpl
     // Private Fields
 
     private final QuadTree myQuadTree;
+    private final BoundingRectangle myBoundingRectangle;
 
     private QuadTreeNode[] myChildren = null;
     private QuadTreeNode myParent = null;
-    private double myX1;
-    private double myY1;
-    private double myX2;
-    private double myY2;
     private Set myElements = null;
 
     private Object myNodeData = null;
@@ -39,16 +37,15 @@ public class QuadTreeNodeImpl
 
     public QuadTreeNodeImpl( QuadTree quadTree, double centerX, double centerY, double radius )
     {
-        ParameterChecker.checkNotNull( quadTree, "quadTree" );
+        this( quadTree,
+              centerX - radius,
+              centerY - radius,
+              centerX + radius,
+              centerY + radius );
+
         ParameterChecker.checkPositiveNonZeroNormalNumber( radius, "radius" );
         ParameterChecker.checkNormalNumber( centerX, "centerX" );
         ParameterChecker.checkNormalNumber( centerY, "centerY" );
-
-        myQuadTree = quadTree;
-        myX1 = centerX - radius;
-        myX2 = centerX + radius;
-        myY1 = centerY - radius;
-        myY2 = centerY + radius;
     }
 
 
@@ -58,17 +55,22 @@ public class QuadTreeNodeImpl
                              final double x2,
                              final double y2 )
     {
+        this( quadTree, new BoundingRectangleImpl( x1, y1, x2, y2 ) );
+    }
+
+    public QuadTreeNodeImpl( final QuadTree quadTree,
+                             BoundingRectangle boundingRectangle )
+    {
         ParameterChecker.checkNotNull( quadTree, "quadTree" );
-        ParameterChecker.checkNormalNumber( x1, "x1" );
-        ParameterChecker.checkNormalNumber( y1, "y1" );
-        ParameterChecker.checkNormalNumber( x2, "x2" );
-        ParameterChecker.checkNormalNumber( y2, "y2" );
+        ParameterChecker.checkNotNull( boundingRectangle, "boundingRectangle" );
+        if ( boundingRectangle.isEmpty() )
+        {
+            throw new IllegalArgumentException( "The bounding rectangle '" + boundingRectangle +
+                                                "' specified for the QuadTreeNode should not be empty." );
+        }
 
         myQuadTree = quadTree;
-        myX1 = x1;
-        myY1 = y1;
-        myX2 = x2;
-        myY2 = y2;
+        myBoundingRectangle = boundingRectangle;
     }
 
     //----------------------------------------------------------------------
@@ -78,7 +80,7 @@ public class QuadTreeNodeImpl
     {
         ParameterChecker.checkNotNull( element, "element" );
 
-        if ( isInside( element ) )
+        if ( myBoundingRectangle.isInside( element ) )
         {
             if ( hasBeenSplit() )
             {
@@ -133,6 +135,11 @@ public class QuadTreeNodeImpl
         }
     }
 
+    public BoundingRectangle getBounds()
+    {
+        return myBoundingRectangle;
+    }
+
 
     public QuadTreeNode getRootNode()
     {
@@ -158,7 +165,7 @@ public class QuadTreeNodeImpl
                              Collection elementOutputCollection )
     {
         // Check overlap
-        if ( overlaps( x1, y1, x2, y2 ) )
+        if ( myBoundingRectangle.overlaps( x1, y1, x2, y2 ) )
         {
             // Check our own element
             if ( myElements != null )
@@ -167,9 +174,9 @@ public class QuadTreeNodeImpl
                 {
                     final QuadTreeElement element = (QuadTreeElement) it.next();
 
-                    if ( isInsideCoordinates( element.getX(),
-                                              element.getY(),
-                                              x1, y1, x2, y2 ) )
+                    if ( MathUtils.isInsideRectangle( element.getX(),
+                                                      element.getY(),
+                                                      x1, y1, x2, y2 ) )
                     {
                         elementOutputCollection.add( element );
                     }
@@ -190,12 +197,6 @@ public class QuadTreeNodeImpl
                 }
             }
         }
-    }
-
-
-    public boolean isInside( final LocatedDoublePrecisionObject locatedObject )
-    {
-        return isInsideCoordinates( locatedObject.getX(), locatedObject.getY(), myX1, myY1, myX2, myY2 );
     }
 
 
@@ -240,42 +241,6 @@ public class QuadTreeNodeImpl
     }
 
 
-    public double getCenterX()
-    {
-        return ( myX1 + myX2 ) / 2;
-    }
-
-
-    public double getCenterY()
-    {
-        return ( myY1 + myY2 ) / 2;
-    }
-
-
-    public double getX1()
-    {
-        return myX1;
-    }
-
-
-    public double getY1()
-    {
-        return myY1;
-    }
-
-
-    public double getX2()
-    {
-        return myX2;
-    }
-
-
-    public double getY2()
-    {
-        return myY2;
-    }
-
-
     public Object getNodeData()
     {
         // Lazy creation
@@ -295,23 +260,6 @@ public class QuadTreeNodeImpl
 
     //----------------------------------------------------------------------
     // Other Public Methods
-
-    /**
-     * @param x1
-     * @param y1
-     * @param x2
-     * @param y2
-     *
-     * @return true if the specified rectangle overlaps this quad tree node.
-     */
-    public boolean overlaps( final double x1, final double y1,
-                             final double x2, final double y2 )
-    {
-        return x2 > myX1 &&
-               x1 < myX2 &&
-               y2 > myY1 &&
-               y1 < myY2;
-    }
 
     //======================================================================
     // Private Methods
@@ -337,56 +285,31 @@ public class QuadTreeNodeImpl
 
     private void addElementToChildNode( final QuadTreeElement element )
     {
-        final double elementX = element.getX();
-        final double elementY = element.getY();
-
-        final double xc = getCenterX();
-        final double yc = getCenterY();
-
-        if ( isInsideCoordinates( elementX, elementY, myX1, myY1, xc, yc ) )
-        {
-            addElementToChildNode( 0, myX1, myY1, xc, yc, element );
-        }
-        else if ( isInsideCoordinates( elementX, elementY, myX1, yc, xc, myY2 ) )
-        {
-            addElementToChildNode( 1, myX1, yc, xc, myY2, element );
-        }
-        else if ( isInsideCoordinates( elementX, elementY, xc, myY1, myX2, yc ) )
-        {
-            addElementToChildNode( 2, xc, myY1, myX2, yc, element );
-        }
-        else if ( isInsideCoordinates( elementX, elementY, xc, yc, myX2, myY2 ) )
-        {
-            addElementToChildNode( 3, xc, yc, myX2, myY2, element );
-        }
-        else
+        // Get the subquadrant that the element is inside
+        final int subquadrant = myBoundingRectangle.getSubquadrantAt( element );
+        if ( subquadrant < 0 )
         {
             // Should not happen:
             throw new IllegalStateException( "Element '" + element + "' is not inside any child node of '" + this +
                                              "', although it is inside it." );
         }
-    }
 
-
-    private void addElementToChildNode( final int index,
-                                        final double x1,
-                                        final double y1,
-                                        final double x2,
-                                        final double y2,
-                                        final QuadTreeElement element )
-    {
+        // Create children array if needed
         if ( myChildren == null )
         {
             //noinspection unchecked
             myChildren = new QuadTreeNode[4];
         }
 
-        if ( myChildren[ index ] == null )
+        // Create the subnode if needed
+        if ( myChildren[ subquadrant ] == null )
         {
-            myChildren[ index ] = new QuadTreeNodeImpl( myQuadTree, x1, y1, x2, y2 );
+            final BoundingRectangle rectangle = myBoundingRectangle.createSubquadrantBoundingRectangle( subquadrant );
+            myChildren[ subquadrant ] = new QuadTreeNodeImpl( myQuadTree, rectangle );
         }
 
-        myChildren[ index ].addElement( element );
+        // Add element to the subnode
+        myChildren[ subquadrant ].addElement( element );
     }
 
 
@@ -409,20 +332,6 @@ public class QuadTreeNodeImpl
     }
 
 
-    private boolean isInsideCoordinates( final double x,
-                                         final double y,
-                                         final double x1,
-                                         final double y1,
-                                         final double x2,
-                                         final double y2 )
-    {
-        return x >= x1 &&
-               x < x2 &&
-               y >= y1 &&
-               y < y2;
-    }
-
-
     private void splitNode()
     {
         for ( Iterator it = myElements.iterator(); it.hasNext(); )
@@ -437,65 +346,20 @@ public class QuadTreeNodeImpl
 
     private void createNewParent( final QuadTreeElement element )
     {
-        // Calculate parent node coordinates
-        final double elementX = element.getX();
-        final double elementY = element.getY();
-        final double centerX = getCenterX();
-        final double centerY = getCenterY();
+        // Calcualte which direction the parent should expand into (towards the element)
+        final int parentSubsector = myBoundingRectangle.getSubsectorAt( element );
 
-        final double xSize = myX2 - myX1;
-        final double ySize = myY2 - myY1;
+        // Create a new parent
+        final BoundingRectangle boundingRectangle = myBoundingRectangle.createParentBoundingRectangle( parentSubsector );
+        final QuadTreeNodeImpl parentNode = new QuadTreeNodeImpl( myQuadTree, boundingRectangle );
 
-        double x1 = myX1;
-        double y1 = myY1;
-        double x2 = myX2 + xSize;
-        double y2 = myY2 + ySize;
-        if ( elementX <= centerX )
-        {
-            x1 = myX1 - xSize;
-            x2 = myX2;
-        }
-        if ( elementY <= centerY )
-        {
-            y1 = myY1 - ySize;
-            y2 = myY2;
-        }
-
-        // Create a new parent, with the sibling nodes in the direction of where the element to be added is supposed to be.
-        final QuadTreeNodeImpl parentNode = new QuadTreeNodeImpl( myQuadTree, x1, y1, x2, y2 );
-
-        // Add this node as one of the children of the parent node
-        final int childNodeIndex = calculateChildNodeIndex( elementX, centerX, elementY, centerY );
-
-        //noinspection unchecked
+        // Add this node as a child of the parent node (in the opposite corner of where we expanded)
+        final int childSubquadrant = myBoundingRectangle.getOppositeSubquadrant( parentSubsector );
         parentNode.myChildren = new QuadTreeNode[4];
-        parentNode.myChildren[ childNodeIndex ] = this;
+        parentNode.myChildren[ childSubquadrant ] = this;
 
         // Notify model that we have a new root node
         myQuadTree.setRootNode( parentNode );
-    }
-
-
-    private int calculateChildNodeIndex( final double elementX,
-                                         final double centerX,
-                                         final double elementY,
-                                         final double centerY )
-    {
-        int childNodeIndex = 0;
-        if ( elementX <= centerX )
-        {
-            childNodeIndex = 1;
-        }
-        if ( elementY <= centerY )
-        {
-            childNodeIndex = 2;
-
-            if ( elementX <= centerX )
-            {
-                childNodeIndex = 3;
-            }
-        }
-        return childNodeIndex;
     }
 
 

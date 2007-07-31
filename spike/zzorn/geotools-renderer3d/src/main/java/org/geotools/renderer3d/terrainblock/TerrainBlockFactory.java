@@ -32,7 +32,7 @@ public final class TerrainBlockFactory
     }
 
     //----------------------------------------------------------------------
-    // NodeDataFactory ImplementationK
+    // NodeDataFactory ImplementationK}}
 
     //======================================================================
     // Public Methods
@@ -40,6 +40,8 @@ public final class TerrainBlockFactory
     public Object createNodeDataObject( final QuadTreeNode node )
     {
         return new TerrainBlockImpl( node, myNumberOfGridsPerSide );
+
+        //Coverage
 
         // TODO: First assign the block the texture (and elevation?) of the correct sub-quadrant of the parent node
         // (or an eight of the grandparent and so on, if the parent hasn't rendered yet), and start rendering the
