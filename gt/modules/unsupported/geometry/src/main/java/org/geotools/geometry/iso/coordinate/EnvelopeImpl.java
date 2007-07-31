@@ -18,14 +18,13 @@
 package org.geotools.geometry.iso.coordinate;
 
 import org.geotools.geometry.iso.DimensionModel;
-import org.geotools.geometry.iso.PositionFactoryImpl;
 import org.geotools.geometry.iso.UnsupportedDimensionException;
 import org.geotools.geometry.iso.util.algorithmND.AlgoRectangleND;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.coordinate.Position;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * An envlope represents the bounding box of a geometric object.

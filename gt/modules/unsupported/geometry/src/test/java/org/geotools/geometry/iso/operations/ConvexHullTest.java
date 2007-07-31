@@ -4,11 +4,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.GeometryBuilder;
 import org.geotools.geometry.iso.aggregate.MultiCurveImpl;
 import org.geotools.geometry.iso.aggregate.MultiPointImpl;
 import org.geotools.geometry.iso.aggregate.MultiSurfaceImpl;
-import org.geotools.geometry.iso.coordinate.LineStringImpl;
 import org.geotools.geometry.iso.io.wkt.ParseException;
 import org.geotools.geometry.iso.io.wkt.WKTReader;
 import org.geotools.geometry.iso.primitive.CurveImpl;
@@ -31,13 +30,13 @@ import junit.framework.TestCase;
 
 public class ConvexHullTest extends TestCase {
 
-	private FeatGeomFactoryImpl factory = null;
+	private GeometryBuilder builder = null;
 	private CoordinateReferenceSystem crs = null;
 
 	public void testMain() {
 		
 		// === 2D ===
-		this.factory = FeatGeomFactoryImpl.getDefault2D();
+		this.builder = new GeometryBuilder(DefaultGeographicCRS.WGS84);
 		this.crs = DefaultGeographicCRS.WGS84;
 		
 		// Test Points, MultiPoints and CompositePoints
@@ -91,7 +90,7 @@ public class ConvexHullTest extends TestCase {
 		points.add(this.createPointFromWKT("POINT(570 240)"));
 		points.add(this.createPointFromWKT("POINT(570 240)"));
 		points.add(this.createPointFromWKT("POINT(650 240)"));
-		MultiPointImpl mp = (MultiPointImpl) this.factory.getAggregateFactory().createMultiPoint(points);
+		MultiPointImpl mp = (MultiPointImpl) this.builder.getAggregateFactory().createMultiPoint(points);
 		
 		CurveImpl line = this.createCurveFromWKT("CURVE(130 240, 650 240)");
 		
@@ -341,7 +340,7 @@ public class ConvexHullTest extends TestCase {
 		points.add(this.createPointC());
 		points.add(this.createPointD());
 		points.add(this.createPointX());
-		return (MultiPointImpl) this.factory.getAggregateFactory().createMultiPoint(points);
+		return (MultiPointImpl) this.builder.getAggregateFactory().createMultiPoint(points);
 	}
 
 
@@ -373,7 +372,7 @@ public class ConvexHullTest extends TestCase {
 		curves.add(this.createCurveB());
 		curves.add(this.createCurveC());
 		curves.add(this.createCurveD());
-		return (MultiCurveImpl) this.factory.getAggregateFactory().createMultiCurve(curves);
+		return (MultiCurveImpl) this.builder.getAggregateFactory().createMultiCurve(curves);
 	}
 
 
@@ -398,7 +397,7 @@ public class ConvexHullTest extends TestCase {
 		Set<OrientableSurface> surfaces = new HashSet<OrientableSurface>();
 		surfaces.add(this.createSurfaceAwithTwoHoles());
 		surfaces.add(this.createSurfaceBwithoutHole());
-		return (MultiSurfaceImpl) this.factory.getAggregateFactory().createMultiSurface(surfaces);
+		return (MultiSurfaceImpl) this.builder.getAggregateFactory().createMultiSurface(surfaces);
 	}
 
 	

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import junit.framework.TestCase;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.GeometryBuilder;
 import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.coordinate.PositionImpl;
 import org.geotools.geometry.iso.io.wkt.ParseException;
@@ -19,12 +19,12 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class IsSimpleOperationTest extends TestCase {
 
-	private FeatGeomFactoryImpl factory = null;
+	private GeometryBuilder builder = null;
 	private CoordinateReferenceSystem crs;
 
 	public void testMain() {
 		
-		this.factory = FeatGeomFactoryImpl.getDefault2D();
+		this.builder = new GeometryBuilder(DefaultGeographicCRS.WGS84);
 		this.crs = DefaultGeographicCRS.WGS84;
 		
 		// Test Curves
@@ -38,12 +38,12 @@ public class IsSimpleOperationTest extends TestCase {
 		
 		// (c1)
 		// Curve is not simple, cause it has self-intersections
-		CurveImpl curve = this.createCurveA(this.factory);
+		CurveImpl curve = this.createCurveA(this.builder);
 		assertTrue(!curve.isSimple());
 
 		// (c2)
 		// Curve is simple, cause it has no self-intersections
-		curve = this.createCurveB(this.factory);
+		curve = this.createCurveB(this.builder);
 		assertTrue(curve.isSimple());
 		
 		// (c3)
@@ -71,20 +71,20 @@ public class IsSimpleOperationTest extends TestCase {
 	private void _testSurfaces() {
 
 		// Surface with hole that does not touch the surface shell - is simple
-		SurfaceImpl surface1 = this.createSurfaceAHoleNotTouchesShell(this.factory);
+		SurfaceImpl surface1 = this.createSurfaceAHoleNotTouchesShell(this.builder);
 		assertTrue(surface1.isSimple());
 
 		// Surface with hole that touches the surface shell - is NOT simple
-		SurfaceImpl surface2 = this.createSurfaceAHoleTouchesShell(this.factory);
+		SurfaceImpl surface2 = this.createSurfaceAHoleTouchesShell(this.builder);
 		assertTrue(!surface2.isSimple());
 	}
 
 
 
-	private CurveImpl createCurveA(FeatGeomFactoryImpl aGeomFactory) {
+	private CurveImpl createCurveA(GeometryBuilder builder) {
 
-		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
-		PrimitiveFactoryImpl tPrimFactory = aGeomFactory.getPrimitiveFactory();
+		GeometryFactoryImpl tCoordFactory = (GeometryFactoryImpl) builder.getGeometryFactory();
+		PrimitiveFactoryImpl tPrimFactory = (PrimitiveFactoryImpl) builder.getPrimitiveFactory();
 		
 		// Self-Intersecting Curve
 		// CURVE(30 20, 10 50, 100 120, 100 70, 10 140)
@@ -107,10 +107,10 @@ public class IsSimpleOperationTest extends TestCase {
 		
 	}
 
-	private CurveImpl createCurveB(FeatGeomFactoryImpl aGeomFactory) {
+	private CurveImpl createCurveB(GeometryBuilder builder) {
 
-		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
-		PrimitiveFactoryImpl tPrimFactory = aGeomFactory.getPrimitiveFactory();
+		GeometryFactoryImpl tCoordFactory = (GeometryFactoryImpl) builder.getGeometryFactory();
+		PrimitiveFactoryImpl tPrimFactory = (PrimitiveFactoryImpl) builder.getPrimitiveFactory();
 		
 		// Non-Self-Intersecting Curve
 		// CURVE(30 20, 10 50, 100 70, 100 120, 10 140)
@@ -176,12 +176,12 @@ public class IsSimpleOperationTest extends TestCase {
 		return this.createCurveFromWKT(wktCurve1);
 	}
 
-	private SurfaceImpl createSurfaceAHoleNotTouchesShell(FeatGeomFactoryImpl aGeomFactory) {
+	private SurfaceImpl createSurfaceAHoleNotTouchesShell(GeometryBuilder builder) {
 		String wktSurface1 = "SURFACE ((10 90, 30 50, 70 30, 120 40, 150 70, 150 120, 100 150, 30 140, 10 90), (90 60, 110 100, 120 90, 100 60, 90 60))";
 		return this.createSurfaceFromWKT(crs, wktSurface1);
 	}
 
-	private SurfaceImpl createSurfaceAHoleTouchesShell(FeatGeomFactoryImpl aGeomFactory) {
+	private SurfaceImpl createSurfaceAHoleTouchesShell(GeometryBuilder builder) {
 		String wktSurface1 = "SURFACE ((10 90, 30 50, 70 30, 120 40, 150 70, 150 120, 100 150, 30 140, 10 90), (30 140, 60 140, 60 130, 40 120, 30 140))";
 		return this.createSurfaceFromWKT(crs, wktSurface1);
 	}

@@ -22,7 +22,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.PositionFactoryImpl;
 import org.geotools.geometry.iso.PrecisionModel;
 import org.geotools.geometry.iso.UnsupportedDimensionException;
@@ -52,13 +51,10 @@ import org.geotools.geometry.iso.util.algorithm2D.ConvexHull;
 import org.geotools.geometry.iso.util.algorithmND.CentroidLine;
 import org.geotools.geometry.iso.util.algorithmND.CentroidPoint;
 import org.geotools.referencing.CRS;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.Boundary;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
+import org.opengis.geometry.Geometry;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.Precision;
@@ -70,7 +66,10 @@ import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.OrientableSurface;
 import org.opengis.geometry.primitive.Primitive;
 import org.opengis.geometry.primitive.Ring;
-import org.opengis.geometry.Geometry;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
 /**
  * 
@@ -115,18 +114,6 @@ public abstract class GeometryImpl implements Geometry {
 
 	public GeometryImpl(CoordinateReferenceSystem coordinateReferenceSystem) {
 		this( coordinateReferenceSystem, new PrecisionModel() );
-	}
-
-	/**
-	 * Return the root factory
-	 * 
-	 * @deprecated This is not a good idea, not all implementations will have FeatGeomFactoryImpl
-	 * @return FeatGeomFactoryImpl The root factory
-	 */
-	public FeatGeomFactoryImpl getFeatGeometryFactory() {
-		throw new UnsupportedOperationException("No FeatGeomImpl");
-		// Return the root factory
-		//return this.factory;
 	}
 	
 	

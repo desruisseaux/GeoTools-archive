@@ -17,8 +17,15 @@
 
 package org.geotools.geometry.iso.aggregate;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
+import org.geotools.factory.Factory;
+import org.geotools.factory.Hints;
+import org.geotools.geometry.iso.PrecisionModel;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.aggregate.AggregateFactory;
 import org.opengis.geometry.aggregate.MultiCurve;
 import org.opengis.geometry.aggregate.MultiPoint;
@@ -33,17 +40,64 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 /**
  * 
  */
-public class AggregateFactoryImpl implements AggregateFactory {
+public class AggregateFactoryImpl implements Factory, AggregateFactory {
 
 	//private FeatGeomFactoryImpl geometryFactory;
 	private CoordinateReferenceSystem crs;
+	
+	private Map hintsWeCareAbout = new HashMap();
+	
+	/**
+	 * This is just here so FactorySPI can find us.
+	 * We have set it up with a default (undocumented) configuration
+	 * for testing!
+	 */
+	public AggregateFactoryImpl() {
+	    this( (Hints)null );
+    }
+	
+	/**
+	 * This is the constructor used by GeometryFactoryFinder when a user
+	 * requests a new instance.
+	 * The provided hints *must* be provided:
+	 * <ul>
+	 * <li>Hints.CRS
+	 * </ul>
+	 * There is no default for these values - you must describe your data source
+	 * for us if we are to make useful Geometry object for you.
+	 * 
+	 * @param hints Hints (must include CRS)
+	 */
+	public AggregateFactoryImpl(Hints hints) {
+		if (hints == null) {
+		    this.crs =  DefaultGeographicCRS.WGS84;
+		}
+		else {
+			this.crs = (CoordinateReferenceSystem) hints.get(Hints.CRS);
+		}
+        
+        hintsWeCareAbout.put( Hints.CRS, crs );
+    }
 
 	/**
 	 * @param crs
 	 */
 	public AggregateFactoryImpl(CoordinateReferenceSystem crs) {
 		this.crs = crs;
+		hintsWeCareAbout.put( Hints.CRS, crs );
 	}
+	
+	/**
+	 * Report back to FactoryRegistry about our configuration.
+	 * <p>
+	 * FactoryRegistry will check to make sure that there are no duplicates
+	 * created (so there will be only a "single" PositionFactory created
+	 * with this configuration).
+	 * </p>
+	 */
+    public Map getImplementationHints() {
+        return Collections.unmodifiableMap( hintsWeCareAbout );
+    }		
 	
 	/**
 	 * Creates a MultiPrimitive by a set of Primitives.

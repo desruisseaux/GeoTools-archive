@@ -28,10 +28,10 @@ import org.geotools.geometry.iso.root.GeometryImpl;
 import org.opengis.geometry.Boundary;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
+import org.opengis.geometry.Geometry;
 import org.opengis.geometry.aggregate.MultiPrimitive;
 import org.opengis.geometry.complex.Complex;
 import org.opengis.geometry.primitive.Primitive;
-import org.opengis.geometry.Geometry;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 

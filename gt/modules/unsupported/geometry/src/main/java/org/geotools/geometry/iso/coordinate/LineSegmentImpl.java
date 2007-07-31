@@ -20,9 +20,9 @@ package org.geotools.geometry.iso.coordinate;
 
 import org.geotools.geometry.iso.util.DoubleOperation;
 import org.geotools.geometry.iso.util.algorithmND.AlgoPointND;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.LineSegment;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * 

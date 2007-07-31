@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.geotools.geometry.iso.primitive.RingImpl;
 import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Geometry;
 import org.opengis.geometry.aggregate.MultiCurve;
 import org.opengis.geometry.aggregate.MultiPoint;
 import org.opengis.geometry.aggregate.MultiPrimitive;
@@ -38,7 +39,6 @@ import org.opengis.geometry.primitive.Primitive;
 import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.primitive.Surface;
 import org.opengis.geometry.primitive.SurfaceBoundary;
-import org.opengis.geometry.Geometry;
 
 public class GeometryToWKTString {
 	

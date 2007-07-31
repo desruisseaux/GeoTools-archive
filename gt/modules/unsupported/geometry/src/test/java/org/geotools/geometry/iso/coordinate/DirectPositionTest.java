@@ -2,7 +2,8 @@ package org.geotools.geometry.iso.coordinate;
 
 import junit.framework.TestCase;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.GeometryBuilder;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.GeometryFactory;
 
@@ -11,13 +12,17 @@ import org.opengis.geometry.coordinate.GeometryFactory;
  *
  */
 public class DirectPositionTest extends TestCase {
-	GeometryFactory gf;
+	GeometryFactory gf2D;
+	GeometryFactory gf3D;
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         
-        FeatGeomFactoryImpl tGeomFactory = FeatGeomFactoryImpl.getDefault3D();        
-        gf = tGeomFactory.getGeometryFactoryImpl();
+        GeometryBuilder builder = new GeometryBuilder(DefaultGeographicCRS.WGS84); 
+        gf2D = builder.getGeometryFactory();
+        builder.setCoordianteReferenceSystem(DefaultGeographicCRS.WGS84_3D);
+        gf3D = builder.getGeometryFactory();
+        
     }
 
 	public void testDirectPosition() {
@@ -30,7 +35,7 @@ public class DirectPositionTest extends TestCase {
 		double resultCoords[];
 		
 		// Creating a DP
-		DirectPosition dp1 = gf.createDirectPosition(coords1);
+		DirectPosition dp1 = gf3D.createDirectPosition(coords1);
 		
 		// getCoordinates()
 		resultCoords = dp1.getCoordinates();

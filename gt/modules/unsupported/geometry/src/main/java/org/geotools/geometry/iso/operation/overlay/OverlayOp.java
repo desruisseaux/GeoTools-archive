@@ -21,11 +21,13 @@
 package org.geotools.geometry.iso.operation.overlay;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.UnsupportedDimensionException;
+import org.geotools.geometry.iso.aggregate.AggregateFactoryImpl;
 import org.geotools.geometry.iso.operation.GeometryGraphOperation;
 import org.geotools.geometry.iso.root.GeometryImpl;
 import org.geotools.geometry.iso.topograph2D.Coordinate;
@@ -41,10 +43,11 @@ import org.geotools.geometry.iso.topograph2D.PlanarGraph;
 import org.geotools.geometry.iso.topograph2D.Position;
 import org.geotools.geometry.iso.util.Assert;
 import org.geotools.geometry.iso.util.algorithm2D.PointLocator;
+import org.opengis.geometry.Geometry;
 import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.OrientableSurface;
 import org.opengis.geometry.primitive.Point;
-import org.opengis.geometry.Geometry;
+import org.opengis.geometry.primitive.Primitive;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
@@ -579,9 +582,102 @@ public class OverlayOp extends GeometryGraphOperation {
 //		geomList.addAll(resultPolyList);
 
 		// build the most specific geometry possible
-		FeatGeomFactoryImpl gf = new FeatGeomFactoryImpl(crs);
-		return gf.createGeometry(
+		//FeatGeomFactoryImpl gf = new FeatGeomFactoryImpl(crs);
+		return createGeometry(
 				resultPolyList, resultLineList, resultPointList);
 	}
 
+	/**
+	 * Creates a new Geometry object appropriate to the input Primitives. The
+	 * method will return a Primitive object, if one list contains only one
+	 * element and the rest is empty. In all other cases, that is that exist
+	 * more than one Primitive in the lists, the method will return a Complex
+	 * object.
+	 * 
+	 * @param aSurfaces
+	 *            List of Surfaces
+	 * @param aCurves
+	 *            List of Curves
+	 * @param aPoints
+	 *            List of Points
+	 * @return a Geometry instance.
+	 * That is a Point/Curve/Surface if the parameters only contain one point or one curve or one surface.
+	 * It is a MultiPoint/MultiCurve/MultiSurface if the parameters contain one list with more than two entries and the other two lists are empty.
+	 * Or it is a MultiPrimitive if the parameters contain a mixture of points, curves and surfaces.
+	 */
+	public GeometryImpl createGeometry(List<OrientableSurface> aSurfaces,
+			List<OrientableCurve> aCurves, List<Point> aPoints) {
+
+		int nS = aSurfaces.size();
+		int nC = aCurves.size();
+		int nP = aPoints.size();
+		AggregateFactoryImpl aggregateFactory = new AggregateFactoryImpl(crs);
+		
+		if (nS + nC + nP == 0)
+			// Return null if the sets are empty
+			return null;
+			//throw new IllegalArgumentException("All Sets are empty");
+
+		
+		if (nS == 0) {
+			
+			if (nC == 0) {
+				
+				// Surfaces empty, Curves empty, Points not empty
+				if (nP == 1) {
+					
+					// POINT
+					return (GeometryImpl) aPoints.get(0);
+					
+				} else {
+					
+					// MULTIPOINT
+					return (GeometryImpl) aggregateFactory.createMultiPoint(new HashSet(aPoints));
+					
+				}
+			} else if (nP == 0) {
+				
+				// Surfaces empty, Curves not empty, Points empty
+				if (nC == 1) {
+					
+					// CURVE
+					
+					return (GeometryImpl) aCurves.get(0);
+				} else {
+					
+					// MULTICURVE
+					return (GeometryImpl) aggregateFactory.createMultiCurve(new HashSet(aCurves));
+				}
+			}
+
+		} else {
+			
+			if (nC == 0 && nP == 0) {
+				
+				if (nS == 1) {
+					
+					// SURFACE
+					return (GeometryImpl) aSurfaces.get(0);
+					
+				} else {
+					
+					// MULTISURFACE
+					return (GeometryImpl) aggregateFactory.createMultiSurface(new HashSet(aSurfaces));
+					
+				}
+				
+			}
+
+		}
+		
+		// All other cases: MULTIPRIMITIVE
+		Set<Primitive> tPrimitives = new HashSet<Primitive>();
+		tPrimitives.addAll(aSurfaces);
+		tPrimitives.addAll(aCurves);
+		tPrimitives.addAll(aPoints);
+		
+		return (GeometryImpl) aggregateFactory.createMultiPrimitive(tPrimitives);
+
+	}	
+	
 }

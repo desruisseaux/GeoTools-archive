@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.geotools.geometry.Geometry;
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.PositionFactoryImpl;
 import org.geotools.geometry.iso.PrecisionModel;
 import org.geotools.geometry.iso.aggregate.AggregateFactoryImpl;
@@ -62,7 +61,6 @@ public class PicoSurfaceTest extends TestCase {
 		
 		// Teach Container about Factory Implementations we want to use
 		container.registerComponentImplementation(PositionFactoryImpl.class);
-		container.registerComponentImplementation(FeatGeomFactoryImpl.class);
 		container.registerComponentImplementation(AggregateFactoryImpl.class);
 		container.registerComponentImplementation(ComplexFactoryImpl.class);
 		container.registerComponentImplementation(GeometryFactoryImpl.class);

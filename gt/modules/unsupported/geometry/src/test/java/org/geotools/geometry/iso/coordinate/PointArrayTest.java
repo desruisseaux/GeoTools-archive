@@ -5,7 +5,8 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.GeometryBuilder;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.PointArray;
 import org.opengis.geometry.coordinate.Position;
@@ -14,16 +15,16 @@ public class PointArrayTest extends TestCase {
 
 	public void testMain() {
 		
-		FeatGeomFactoryImpl tGeomFactory = FeatGeomFactoryImpl.getDefault2D();
+		GeometryBuilder builder = new GeometryBuilder(DefaultGeographicCRS.WGS84);
 		
-		this._test1(tGeomFactory);
+		this._test1(builder);
 		
 	}
 	
 	
-	private void _test1(FeatGeomFactoryImpl aGeomFactory) {
+	private void _test1(GeometryBuilder builder) {
 		
-		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
+		GeometryFactoryImpl tCoordFactory = (GeometryFactoryImpl) builder.getGeometryFactory();
 		
 		PositionImpl p1 = new PositionImpl(tCoordFactory.createDirectPosition(new double[]{-50,  0}));
 		PositionImpl p2 = new PositionImpl(tCoordFactory.createDirectPosition(new double[]{-30,  30}));

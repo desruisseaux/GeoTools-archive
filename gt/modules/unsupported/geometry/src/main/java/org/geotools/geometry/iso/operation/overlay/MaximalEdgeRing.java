@@ -23,7 +23,6 @@ package org.geotools.geometry.iso.operation.overlay;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.topograph2D.DirectedEdge;
 import org.geotools.geometry.iso.topograph2D.DirectedEdgeStar;
 import org.geotools.geometry.iso.topograph2D.EdgeRing;

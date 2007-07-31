@@ -34,7 +34,6 @@ import org.geotools.geometry.iso.coordinate.PositionImpl;
 import org.geotools.geometry.iso.io.GeometryToString;
 import org.geotools.geometry.iso.operation.IsSimpleOp;
 import org.geotools.geometry.iso.operation.Merger;
-import org.geotools.geometry.iso.util.Assert;
 import org.geotools.geometry.iso.util.DoubleOperation;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;

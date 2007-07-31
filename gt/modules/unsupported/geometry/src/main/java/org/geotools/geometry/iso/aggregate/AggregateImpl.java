@@ -20,8 +20,8 @@ package org.geotools.geometry.iso.aggregate;
 import java.util.Set;
 
 import org.geotools.geometry.iso.root.GeometryImpl;
-import org.opengis.geometry.aggregate.Aggregate;
 import org.opengis.geometry.Geometry;
+import org.opengis.geometry.aggregate.Aggregate;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**

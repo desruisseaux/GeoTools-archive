@@ -5,7 +5,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.GeometryBuilder;
 import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.coordinate.LineStringImpl;
 import org.geotools.geometry.iso.coordinate.PositionImpl;
@@ -13,6 +13,7 @@ import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.LineSegment;
 import org.opengis.geometry.coordinate.PointArray;
@@ -29,17 +30,17 @@ public class LineStringLineSegmentTest extends TestCase {
 	
 	public void testMain() {
 		
-		FeatGeomFactoryImpl tGeomFactory = FeatGeomFactoryImpl.getDefault2D();
+		GeometryBuilder builder = new GeometryBuilder(DefaultGeographicCRS.WGS84);
 		
-		this._testLineString1(tGeomFactory);
+		this._testLineString1(builder);
 		
 	}
 	
 	
-	private void _testLineString1(FeatGeomFactoryImpl aGeomFactory) {
+	private void _testLineString1(GeometryBuilder builder) {
 		
-		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
-		PrimitiveFactoryImpl tPrimFactory = aGeomFactory.getPrimitiveFactory();
+		GeometryFactoryImpl tCoordFactory = (GeometryFactoryImpl) builder.getGeometryFactory();
+		PrimitiveFactoryImpl tPrimFactory = (PrimitiveFactoryImpl) builder.getPrimitiveFactory();
 		
 		PositionImpl p1 = new PositionImpl(tCoordFactory.createDirectPosition(new double[]{-50,  0}));
 		PositionImpl p2 = new PositionImpl(tCoordFactory.createDirectPosition(new double[]{-30,  30}));

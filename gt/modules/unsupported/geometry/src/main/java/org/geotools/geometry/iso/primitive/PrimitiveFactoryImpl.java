@@ -24,7 +24,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.geotools.factory.AbstractFactory;
 import org.geotools.factory.Factory;
 import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
@@ -36,9 +35,6 @@ import org.geotools.geometry.iso.coordinate.PointArrayImpl;
 import org.geotools.geometry.iso.coordinate.PositionImpl;
 import org.geotools.geometry.iso.coordinate.SurfacePatchImpl;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.cs.AxisDirection;
-import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
@@ -55,6 +51,9 @@ import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.primitive.SolidBoundary;
 import org.opengis.geometry.primitive.SurfaceBoundary;
 import org.opengis.geometry.primitive.SurfacePatch;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.cs.CoordinateSystemAxis;
 
 /**
  * @author Jackson Roehrig & Sanjay Jena

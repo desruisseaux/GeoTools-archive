@@ -2,11 +2,12 @@ package org.geotools.geometry.iso.coordinate;
 
 import junit.framework.TestCase;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.GeometryBuilder;
 import org.geotools.geometry.iso.UnsupportedDimensionException;
 import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 
 /**
  * @author sanjay
@@ -16,15 +17,14 @@ public class EnvelopeTest extends TestCase {
 	
 	public void testMain() {
 		
-		FeatGeomFactoryImpl tGeomFactory = FeatGeomFactoryImpl.getDefault2D();
-		
-		this._testEnvelope1(tGeomFactory);
+		GeometryBuilder builder = new GeometryBuilder(DefaultGeographicCRS.WGS84); 
+		this._testEnvelope1(builder);
 		
 	}	
 
-	private void _testEnvelope1(FeatGeomFactoryImpl aGeomFactory) {
+	private void _testEnvelope1(GeometryBuilder builder) {
 		
-		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
+		GeometryFactoryImpl tCoordFactory = (GeometryFactoryImpl) builder.getGeometryFactory();
 
 		
 		// CoordinateFactory.createDirectPosition(double[])

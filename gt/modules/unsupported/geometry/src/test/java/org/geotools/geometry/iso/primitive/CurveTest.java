@@ -5,7 +5,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.GeometryBuilder;
 import org.geotools.geometry.iso.PositionFactoryImpl;
 import org.geotools.geometry.iso.PrecisionModel;
 import org.geotools.geometry.iso.aggregate.AggregateFactoryImpl;
@@ -41,9 +41,9 @@ public class CurveTest extends TestCase {
 	
 	public void testMain() {
 		
-		FeatGeomFactoryImpl tGeomFactory = FeatGeomFactoryImpl.getDefault2D();
+		GeometryBuilder builder = new GeometryBuilder(DefaultGeographicCRS.WGS84);
 		
-		this._testCurve(tGeomFactory);
+		this._testCurve(builder);
 		
 	}
 	
@@ -58,7 +58,6 @@ public class CurveTest extends TestCase {
 		
 		// Teach Container about Factory Implementations we want to use
 		container.registerComponentImplementation(PositionFactoryImpl.class);
-		container.registerComponentImplementation(FeatGeomFactoryImpl.class);
 		container.registerComponentImplementation(AggregateFactoryImpl.class);
 		container.registerComponentImplementation(ComplexFactoryImpl.class);
 		container.registerComponentImplementation(GeometryFactoryImpl.class);
@@ -96,10 +95,10 @@ public class CurveTest extends TestCase {
 		return new CurveImpl( positionA.getCoordinateReferenceSystem(), segments );	
 	}
 	
-	private void _testCurve(FeatGeomFactoryImpl aGeomFactory) {
+	private void _testCurve(GeometryBuilder builder) {
 		
-		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
-		PrimitiveFactoryImpl tPrimFactory = aGeomFactory.getPrimitiveFactory();
+		GeometryFactoryImpl tCoordFactory = (GeometryFactoryImpl) builder.getGeometryFactory();
+		PrimitiveFactoryImpl tPrimFactory = (PrimitiveFactoryImpl) builder.getPrimitiveFactory();
 		
 		PositionImpl p1 = new PositionImpl(tCoordFactory.createDirectPosition(new double[]{-50,  0}));
 		PositionImpl p2 = new PositionImpl(tCoordFactory.createDirectPosition(new double[]{-30,  30}));

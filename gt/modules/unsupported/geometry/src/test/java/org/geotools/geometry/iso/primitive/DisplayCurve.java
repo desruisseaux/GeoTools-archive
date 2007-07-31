@@ -2,7 +2,7 @@ package org.geotools.geometry.iso.primitive;
 
 import java.util.ArrayList;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.GeometryBuilder;
 import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.coordinate.PositionImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
@@ -13,6 +13,7 @@ import org.opengis.geometry.primitive.CurveSegment;
 import org.opengis.geometry.primitive.OrientableCurve;
 
 import org.geotools.geometry.visualization.PaintGMObject;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 
 
 public class DisplayCurve {
@@ -21,17 +22,17 @@ public class DisplayCurve {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		FeatGeomFactoryImpl tGeomFactory = FeatGeomFactoryImpl.getDefault2D();
+		GeometryBuilder builder = new GeometryBuilder(DefaultGeographicCRS.WGS84_3D);
 		
 		//this._testTriangle1(tGeomFactory);
-		_testRing1(tGeomFactory);
+		_testRing1(builder);
 		
 	}
 
-	private static void _testRing1(FeatGeomFactoryImpl aGeomFactory) {
+	private static void _testRing1(GeometryBuilder builder) {
 
-		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
-		PrimitiveFactoryImpl tPrimFactory = aGeomFactory.getPrimitiveFactory();
+		GeometryFactoryImpl tCoordFactory = (GeometryFactoryImpl) builder.getGeometryFactory();
+		PrimitiveFactoryImpl tPrimFactory = (PrimitiveFactoryImpl) builder.getPrimitiveFactory();
 		
 		/* Defining Positions for LineStrings */
 		ArrayList<Position> line1 = new ArrayList<Position>();

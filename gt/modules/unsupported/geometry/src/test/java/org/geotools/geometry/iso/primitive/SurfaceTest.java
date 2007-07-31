@@ -5,12 +5,13 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.GeometryBuilder;
 import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.Triangle;
 import org.opengis.geometry.primitive.Ring;
@@ -25,21 +26,21 @@ public class SurfaceTest extends TestCase {
 	
 	public void testMain() {
 		
-		FeatGeomFactoryImpl tGeomFactory = FeatGeomFactoryImpl.getDefault2D();
+		GeometryBuilder builder = new GeometryBuilder(DefaultGeographicCRS.WGS84);
 		
 		// Creates by SurfaceBoundary
-		this._testSurface2(tGeomFactory);
+		this._testSurface2(builder);
 
 		// Created by Patches
-		this._testSurface1(tGeomFactory);
+		this._testSurface1(builder);
 		
 		
 	}
 
-	private List<Triangle> _testTriangle1(FeatGeomFactoryImpl aGeomFactory) {
+	private List<Triangle> _testTriangle1(GeometryBuilder builder) {
 		
-		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
-		PrimitiveFactoryImpl tPrimFactory = aGeomFactory.getPrimitiveFactory();
+		GeometryFactoryImpl tCoordFactory = (GeometryFactoryImpl) builder.getGeometryFactory();
+		PrimitiveFactoryImpl tPrimFactory = (PrimitiveFactoryImpl) builder.getPrimitiveFactory();
 
 		ArrayList<double[][]> tDoubleList = new ArrayList<double[][]>();
 		tDoubleList.add(new double[][]{{0,0},{100,100},{0, 100}});
@@ -64,11 +65,11 @@ public class SurfaceTest extends TestCase {
 	 * Create a surface on basis of SurfacePatches (Triangles)
 	 * @param aGeomFactory
 	 */
-	private void _testSurface1(FeatGeomFactoryImpl aGeomFactory) {
+	private void _testSurface1(GeometryBuilder builder) {
 
-		PrimitiveFactoryImpl tPrimFactory = aGeomFactory.getPrimitiveFactory();
+		PrimitiveFactoryImpl tPrimFactory = (PrimitiveFactoryImpl) builder.getPrimitiveFactory();
 		
-		List<? extends SurfacePatch> triangleList = this._testTriangle1(aGeomFactory);
+		List<? extends SurfacePatch> triangleList = this._testTriangle1(builder);
 		
 		List<SurfacePatch> surfacePatches1 = (List<SurfacePatch>)triangleList;
 
@@ -80,10 +81,10 @@ public class SurfaceTest extends TestCase {
 
 	}
 
-	public Surface _testSurface2(FeatGeomFactoryImpl aGeomFactory) {
+	public Surface _testSurface2(GeometryBuilder builder) {
 		
-		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
-		PrimitiveFactoryImpl tPrimFactory = aGeomFactory.getPrimitiveFactory();
+		GeometryFactoryImpl tCoordFactory = (GeometryFactoryImpl) builder.getGeometryFactory();
+		PrimitiveFactoryImpl tPrimFactory = (PrimitiveFactoryImpl) builder.getPrimitiveFactory();
 
 		List<DirectPosition> directPositionList = new ArrayList<DirectPosition>();
 		directPositionList.add(tCoordFactory.createDirectPosition(new double[] {20, 10}));

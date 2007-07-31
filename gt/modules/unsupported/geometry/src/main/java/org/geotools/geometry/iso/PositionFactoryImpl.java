@@ -27,7 +27,6 @@ import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.DoublePointArray;
 import org.geotools.geometry.iso.coordinate.PointArrayImpl;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.geometry.PositionFactory;
@@ -35,6 +34,7 @@ import org.opengis.geometry.Precision;
 import org.opengis.geometry.PrecisionType;
 import org.opengis.geometry.coordinate.PointArray;
 import org.opengis.geometry.coordinate.Position;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * Default implementation of PositionFactory that stores contents using double.

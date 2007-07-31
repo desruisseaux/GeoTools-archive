@@ -5,12 +5,13 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.geotools.geometry.iso.complex.ComplexFactoryImpl;
-import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
+import org.geotools.geometry.GeometryBuilder;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.complex.ComplexFactory;
 import org.opengis.geometry.complex.CompositeSurface;
+import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.geometry.primitive.OrientableSurface;
 import org.opengis.geometry.primitive.Surface;
 
@@ -19,18 +20,18 @@ public class CompositeSurfaceTest extends TestCase {
 	
 	public void testMain() {
 		
-		FeatGeomFactoryImpl tGeomFactory = FeatGeomFactoryImpl.getDefault2D();
+		GeometryBuilder builder = new GeometryBuilder(DefaultGeographicCRS.WGS84); 
 		
-		this._testCompositeSurface(tGeomFactory);
+		this._testCompositeSurface(builder);
 		
 	}
 	
 	
-	private void _testCompositeSurface(FeatGeomFactoryImpl aGeomFactory) {
+	private void _testCompositeSurface(GeometryBuilder builder) {
 		
-		ComplexFactoryImpl complf = aGeomFactory.getComplexFactory();
-		PrimitiveFactoryImpl pf = aGeomFactory.getPrimitiveFactory();
-		GeometryFactoryImpl cf = aGeomFactory.getGeometryFactoryImpl();
+		ComplexFactory complf = builder.getComplexFactory();
+		PrimitiveFactoryImpl pf = (PrimitiveFactoryImpl) builder.getPrimitiveFactory();
+		GeometryFactory cf = builder.getGeometryFactory();
 
 		List<DirectPosition> directPositionList = new ArrayList<DirectPosition>();
 		directPositionList.add(cf.createDirectPosition(new double[] {20, 10}));

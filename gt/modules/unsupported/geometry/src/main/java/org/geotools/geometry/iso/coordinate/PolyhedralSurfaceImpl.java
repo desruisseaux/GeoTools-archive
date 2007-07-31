@@ -19,7 +19,6 @@ package org.geotools.geometry.iso.coordinate;
 
 import java.util.List;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.opengis.geometry.coordinate.Polygon;
@@ -57,8 +56,7 @@ public class PolyhedralSurfaceImpl extends SurfaceImpl implements
 	 * @param factory
 	 * @param boundary
 	 */
-	public PolyhedralSurfaceImpl(FeatGeomFactoryImpl factory,
-			SurfaceBoundaryImpl boundary) {
+	public PolyhedralSurfaceImpl(SurfaceBoundaryImpl boundary) {
 		super(boundary);
 	}
 	

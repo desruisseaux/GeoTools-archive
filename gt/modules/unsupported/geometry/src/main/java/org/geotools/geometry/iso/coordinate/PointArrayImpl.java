@@ -26,11 +26,11 @@ import java.util.ListIterator;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.util.DoubleOperation;
 import org.geotools.geometry.iso.util.algorithmND.AlgoPointND;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.LineSegment;
 import org.opengis.geometry.coordinate.PointArray;
 import org.opengis.geometry.coordinate.Position;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * Many of the geometric constructs in this International Standard require the

@@ -9,6 +9,9 @@ import org.geotools.referencing.CRS;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.Precision;
+import org.opengis.geometry.aggregate.AggregateFactory;
+import org.opengis.geometry.complex.ComplexFactory;
+import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.primitive.PrimitiveFactory;
 import org.opengis.referencing.FactoryException;
@@ -50,8 +53,10 @@ public class GeometryBuilder {
     private Precision precision;
     
     private PositionFactory positionFactory;
-
     private PrimitiveFactory primitiveFactory;
+    private AggregateFactory aggregateFactory;
+    private ComplexFactory complexFactory;
+    private GeometryFactory geometryFactory;
     
     public GeometryBuilder( CoordinateReferenceSystem crs ){
         this.crs = crs;
@@ -75,8 +80,14 @@ public class GeometryBuilder {
     public void setCoordianteReferenceSystem( CoordinateReferenceSystem crs ) {
         if( this.crs != crs ){
             positionFactory = null;
+            primitiveFactory = null;
+            aggregateFactory = null;
+            complexFactory = null;
+            geometryFactory = null;
         }
-        this.crs = crs;        
+        this.crs = crs;      
+        hints.remove(Hints.CRS);
+        hints.put( Hints.CRS, crs );
     }
 
     public Precision getPrecision() {
@@ -99,6 +110,27 @@ public class GeometryBuilder {
         }
         return primitiveFactory;
     }
+    
+    public AggregateFactory getAggregateFactory() {
+        if( aggregateFactory == null ){
+        	aggregateFactory = GeometryFactoryFinder.getAggregateFactory(  hints);
+        }
+        return aggregateFactory;
+    }
+    
+    public GeometryFactory getGeometryFactory() {
+        if( geometryFactory == null ){
+        	geometryFactory = GeometryFactoryFinder.getGeometryFactory(  hints);
+        }
+        return geometryFactory;
+    }
+    
+    public ComplexFactory getComplexFactory() {
+        if( complexFactory == null ){
+        	complexFactory = GeometryFactoryFinder.getComplexFactory(  hints);
+        }
+        return complexFactory;
+    }    
     
     public DirectPosition createDirectPosition( double[] ordinates ) {
         return getPositionFactory().createDirectPosition( ordinates );

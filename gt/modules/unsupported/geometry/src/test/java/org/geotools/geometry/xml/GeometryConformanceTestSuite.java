@@ -25,10 +25,11 @@ import java.util.Properties;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.GeometryBuilder;
 import org.geotools.geometry.iso.primitive.PointImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
 import org.geotools.geometry.text.WKTParser;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.test.TestData;
 import org.opengis.geometry.Boundary;
 import org.opengis.geometry.aggregate.MultiPrimitive;
@@ -181,10 +182,10 @@ public class GeometryConformanceTestSuite extends TestSuite {
                         	op.setExpectedResult( point );
                         }
                         else { // try parsing this thing as WKT
-                            FeatGeomFactoryImpl default2D = FeatGeomFactoryImpl.getDefault2D();
-                            GeometryFactory geomFact = default2D.getGeometryFactory();
-                            PrimitiveFactory primFact = default2D.getPrimitiveFactory();
-                            WKTParser wktFactory = new WKTParser(geomFact, primFact, null, default2D.getAggregateFactory());
+                        	GeometryBuilder builder = new GeometryBuilder(DefaultGeographicCRS.WGS84);
+                            GeometryFactory geomFact = builder.getGeometryFactory();
+                            PrimitiveFactory primFact = builder.getPrimitiveFactory();
+                            WKTParser wktFactory = new WKTParser(geomFact, primFact, null, builder.getAggregateFactory());
                             try {
                                 Object expectedResult = wktFactory.parse(operationValue);
                                 op.setExpectedResult(expectedResult);

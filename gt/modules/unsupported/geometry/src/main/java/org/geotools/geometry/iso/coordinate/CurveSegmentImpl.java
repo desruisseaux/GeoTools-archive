@@ -24,7 +24,6 @@ import org.geotools.geometry.iso.primitive.PointImpl;
 import org.geotools.geometry.iso.util.DoubleOperation;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
-import org.opengis.geometry.coordinate.ParamForPoint;
 import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.primitive.CurveInterpolation;
 import org.opengis.geometry.primitive.CurveSegment;

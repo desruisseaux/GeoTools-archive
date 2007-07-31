@@ -19,14 +19,13 @@ package org.geotools.geometry.iso.coordinate;
 
 import java.util.Arrays;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.util.DoubleOperation;
 import org.geotools.geometry.iso.util.algorithmND.AlgoPointND;
 import org.geotools.referencing.CRS;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.geometry.coordinate.Position;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * @author Jackson Roehrig & Sanjay Jena
@@ -49,15 +48,6 @@ public class DirectPositionImpl implements DirectPosition {
      * Coordinate Reference System used to determine meaning of above coordinates
      */
 	private CoordinateReferenceSystem crs;
-
-	/**
-	 * Creates a direct Position initializing all ordiante values with 0.0
-	 * @deprecated Please use new DirectPosition( factory.getCoordianteReferenceSystem() );
-	 * @param factory
-	 */
-	public DirectPositionImpl(FeatGeomFactoryImpl factory) {
-        this( factory.getCoordinateReferenceSystem() );
-    }
     
     public DirectPositionImpl( CoordinateReferenceSystem crs ){
 		final int N = crs.getCoordinateSystem().getDimension();
@@ -130,17 +120,6 @@ public class DirectPositionImpl implements DirectPosition {
 		this.crs = crs;
 		assert (5 == crs.getCoordinateSystem().getDimension());
 		this.coordinate = new double[] { x, y, z, m };
-	}
-
-	/**
-	 * The Feature Geometry Factory can be accessed through this getter-method.
-	 * Hereby Coordinate classes get possibility to get the factory´s instance.
-	 * TODO I don´t know if this is a clear design, but it works for now. (SJ)
-	 * @deprecated We no longer pass or store a factory to this class
-	 * @return GeometryFactoryImpl
-	 */
-	private FeatGeomFactoryImpl XgetGeometryFactory() {
-		return null; //this.factory;
 	}
 
 	/*

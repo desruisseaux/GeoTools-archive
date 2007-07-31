@@ -5,7 +5,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.GeometryBuilder;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
@@ -33,18 +33,18 @@ public class BoundaryTest extends TestCase {
 	
 	public void testMain() {
 		
-		FeatGeomFactoryImpl tGeomFactory = FeatGeomFactoryImpl.getDefault2D();
+		GeometryBuilder builder = new GeometryBuilder(DefaultGeographicCRS.WGS84);
 		this.crs = DefaultGeographicCRS.WGS84;
 		
-		this._testCurveBoundary1(tGeomFactory);
-		this._testSurfaceBoundary1(tGeomFactory);
+		this._testCurveBoundary1(builder);
+		this._testSurfaceBoundary1(builder);
 		
 	}
 
-	private void _testCurveBoundary1(FeatGeomFactoryImpl aGeomFactory) {
+	private void _testCurveBoundary1(GeometryBuilder builder) {
 
-		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
-		PrimitiveFactoryImpl tPrimitiveFactory = aGeomFactory.getPrimitiveFactory();
+		GeometryFactoryImpl tCoordFactory = (GeometryFactoryImpl) builder.getGeometryFactory();
+		PrimitiveFactoryImpl tPrimitiveFactory = (PrimitiveFactoryImpl) builder.getPrimitiveFactory();
 		
 		DirectPositionImpl dp1 = tCoordFactory.createDirectPosition(new double[] {0, 0});
 		DirectPositionImpl dp2 = tCoordFactory.createDirectPosition(new double[] {100, 100});
@@ -108,10 +108,10 @@ public class BoundaryTest extends TestCase {
 		assertFalse(b2.hashCode() == ((CurveBoundaryImpl) curveBoundary1).hashCode());
 	}
 
-	private void _testSurfaceBoundary1(FeatGeomFactoryImpl aGeomFactory) {
+	private void _testSurfaceBoundary1(GeometryBuilder builder) {
 
-		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
-		PrimitiveFactoryImpl tPrimFactory = aGeomFactory.getPrimitiveFactory();
+		GeometryFactoryImpl tCoordFactory = (GeometryFactoryImpl) builder.getGeometryFactory();
+		PrimitiveFactoryImpl tPrimFactory = (PrimitiveFactoryImpl) builder.getPrimitiveFactory();
 
 		/* Defining Positions for LineStrings */
 		ArrayList<Position> line1 = new ArrayList<Position>();

@@ -20,7 +20,6 @@ package org.geotools.geometry.iso.coordinate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.opengis.geometry.primitive.SurfacePatch;
 
@@ -170,11 +169,11 @@ public class TinImpl extends TriangulatedSurfaceImpl {
 	 * @param maxLength
 	 * @param triangles
 	 */
-	public TinImpl(FeatGeomFactoryImpl factory, SurfaceBoundaryImpl surfBdry,
+	public TinImpl(SurfaceBoundaryImpl surfBdry,
 			ArrayList<PositionImpl> post, ArrayList<LineStringImpl> stopLines,
 			ArrayList<LineStringImpl> breakLines, double maxLength,
 			ArrayList<TriangleImpl> triangles) {
-		super(factory, surfBdry);
+		super(surfBdry);
 		this.controlPoint = post;
 		this.breakLines = breakLines;
 		this.stopLines = stopLines;
@@ -189,11 +188,11 @@ public class TinImpl extends TriangulatedSurfaceImpl {
 	 * @param breakLines
 	 * @param maxLength
 	 */
-	public TinImpl(FeatGeomFactoryImpl factory, PositionImpl[] post,
+	public TinImpl(PositionImpl[] post,
 			LineStringImpl[] stopLines, LineStringImpl[] breakLines,
 			double maxLength) {
 		/* Call super class; Triangles will be set later */
-		super(factory);
+		super(null);
 
 		this.controlPoint = new ArrayList<PositionImpl>();
 		this.breakLines = new ArrayList<LineStringImpl>();

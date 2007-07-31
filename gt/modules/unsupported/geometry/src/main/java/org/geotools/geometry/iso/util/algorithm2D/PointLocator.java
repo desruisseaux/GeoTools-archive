@@ -34,6 +34,8 @@ import org.geotools.geometry.iso.topograph2D.util.CoordinateArrays;
 import org.opengis.geometry.Geometry;
 import org.opengis.geometry.primitive.Primitive;
 
+import com.vividsolutions.jts.geom.LinearRing;
+
 /**
  * Computes the topological relationship ({@link Location}) of a single point
  * to a {@link Geometry}. The algorithm obeys the SFS Boundary Determination

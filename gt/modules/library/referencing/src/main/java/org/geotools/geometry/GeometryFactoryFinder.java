@@ -29,7 +29,6 @@ import org.opengis.geometry.aggregate.AggregateFactory;
 import org.opengis.geometry.complex.ComplexFactory;
 import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.geometry.primitive.PrimitiveFactory;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.datum.DatumFactory;
 
 
@@ -50,7 +49,7 @@ public class GeometryFactoryFinder {
     /**
      * Do not allows any instantiation of this class.
      */
-    GeometryFactoryFinder() {
+    private GeometryFactoryFinder() {
         // singleton
     }
 
@@ -91,11 +90,11 @@ public class GeometryFactoryFinder {
         return completed;
     }*/
     
-    public static Precision getPrecision(Hints hints) throws FactoryRegistryException {
+    public static synchronized Precision getPrecision(Hints hints) throws FactoryRegistryException {
         return (Precision) getServiceRegistry().getServiceProvider( Precision.class, null, hints, Hints.PRECISION );
     }
     
-    public static PositionFactory getPositionFactory( Hints hints) throws FactoryRegistryException {
+    public static synchronized PositionFactory getPositionFactory( Hints hints) throws FactoryRegistryException {
         return (PositionFactory) getServiceRegistry().getServiceProvider( PositionFactory.class, null, hints, Hints.POSITION_FACTORY );
     }
     /**
@@ -106,19 +105,19 @@ public class GeometryFactoryFinder {
      * @throws FactoryRegistryException if no implementation was found or can be created for the
      *         {@link DatumFactory} interface.
      */
-    public static GeometryFactory getGeometryFactory( Hints hints) throws FactoryRegistryException {
+    public static synchronized GeometryFactory getGeometryFactory( Hints hints) throws FactoryRegistryException {
         return (GeometryFactory) getServiceRegistry().getServiceProvider( GeometryFactory.class, null, hints, Hints.GEOMETRY_FACTORY );
     }
     
-    public static ComplexFactory getComplexFactory(Hints hints) throws FactoryRegistryException {
+    public static synchronized ComplexFactory getComplexFactory(Hints hints) throws FactoryRegistryException {
         return (ComplexFactory) getServiceRegistry().getServiceProvider( ComplexFactory.class, null, hints, Hints.COMPLEX_FACTORY );
     }
     
-    public static AggregateFactory getAggregateFactory(Hints hints) throws FactoryRegistryException {
+    public static synchronized AggregateFactory getAggregateFactory(Hints hints) throws FactoryRegistryException {
         return (AggregateFactory) getServiceRegistry().getServiceProvider( AggregateFactory.class, null, hints, Hints.AGGREGATE_FACTORY );
     }
     
-    public static PrimitiveFactory getPrimitiveFactory(Hints hints) throws FactoryRegistryException {
+    public static synchronized PrimitiveFactory getPrimitiveFactory(Hints hints) throws FactoryRegistryException {
         return (PrimitiveFactory) getServiceRegistry().getServiceProvider( PrimitiveFactory.class, null, hints, Hints.PRIMITIVE_FACTORY );
     }
     

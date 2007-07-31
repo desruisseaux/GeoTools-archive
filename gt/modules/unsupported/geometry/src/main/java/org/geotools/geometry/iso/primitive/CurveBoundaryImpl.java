@@ -19,7 +19,6 @@ package org.geotools.geometry.iso.primitive;
 
 import java.util.Set;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.complex.Complex;

@@ -19,19 +19,24 @@ package org.geotools.geometry.iso.coordinate;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.factory.Factory;
+import org.geotools.factory.GeoTools;
+import org.geotools.factory.Hints;
+import org.geotools.geometry.GeometryFactoryFinder;
 import org.geotools.geometry.iso.aggregate.MultiPrimitiveImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
-import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.geometry.iso.util.Assert;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
@@ -63,6 +68,7 @@ import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.primitive.Surface;
 import org.opengis.geometry.primitive.SurfaceBoundary;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * convenience methods to create objects of the coordinate geometry package
@@ -71,7 +77,7 @@ import org.opengis.geometry.primitive.SurfaceBoundary;
  * @author Jackson Roehrig & Sanjay Jena
  * 
  */
-public class GeometryFactoryImpl implements GeometryFactory {
+public class GeometryFactoryImpl implements Factory, GeometryFactory {
 
 	// **************************************************************************
 	// **************************************************************************
@@ -82,14 +88,53 @@ public class GeometryFactoryImpl implements GeometryFactory {
 	//private FeatGeomFactoryImpl geometryFactory;
 	private CoordinateReferenceSystem crs;
 	private PositionFactory positionFactory;
+	private Map hintsWeCareAbout = new HashMap();
 
+	/** FactorySPI entry point */
+	public GeometryFactoryImpl() {
+		this((Hints)null );
+	}
+	
+	/** Just the defaults, use GeometryFactoryFinder for the rest */
+	public GeometryFactoryImpl( Hints hints ) {
+		if (hints == null) {
+			this.crs = DefaultGeographicCRS.WGS84;
+			hints = GeoTools.getDefaultHints();
+	        hints.put(Hints.CRS, crs );
+		}
+		else {
+			this.crs = (CoordinateReferenceSystem) hints.get( Hints.CRS );
+			if( crs == null ){
+				throw new NullPointerException("A CRS Hint is required in order to use GeometryFactoryImpl");
+			}
+		}
+		
+		this.positionFactory = GeometryFactoryFinder.getPositionFactory(hints);
+		hintsWeCareAbout.put(Hints.CRS, crs );
+		hintsWeCareAbout.put(Hints.POSITION_FACTORY, positionFactory );
+	}
+	
 	/**
 	 * @param crs
 	 */
 	public GeometryFactoryImpl(CoordinateReferenceSystem crs, PositionFactory pf) {
 		this.crs = crs;
 		this.positionFactory = pf;
+		hintsWeCareAbout.put(Hints.CRS, crs );
+		hintsWeCareAbout.put(Hints.POSITION_FACTORY, positionFactory );
 	}
+	
+	/**
+	 * Report back to FactoryRegistry about our configuration.
+	 * <p>
+	 * FactoryRegistry will check to make sure that there are no duplicates
+	 * created (so there will be only a "single" PositionFactory created
+	 * with this configuration).
+	 * </p>
+	 */
+    public Map getImplementationHints() {
+        return Collections.unmodifiableMap( hintsWeCareAbout );
+    }	
 
 	/* (non-Javadoc)
 	 * @see org.opengis.geometry.coordinate.Factory#getCoordinateReferenceSystem()

@@ -2,7 +2,6 @@ package org.geotools.geometry.iso.primitive;
 
 import junit.framework.TestCase;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.PositionFactoryImpl;
 import org.geotools.geometry.iso.PrecisionModel;
 import org.geotools.geometry.iso.aggregate.AggregateFactoryImpl;
@@ -74,7 +73,6 @@ public class PrimitiveFactoryTest extends TestCase {
 		
 		// Teach Container about Factory Implementations we want to use
 		container.registerComponentImplementation(PositionFactoryImpl.class);
-		container.registerComponentImplementation(FeatGeomFactoryImpl.class);
 		container.registerComponentImplementation(AggregateFactoryImpl.class);
 		container.registerComponentImplementation(ComplexFactoryImpl.class);
 		container.registerComponentImplementation(GeometryFactoryImpl.class);

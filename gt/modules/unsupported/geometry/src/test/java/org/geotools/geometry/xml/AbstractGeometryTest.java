@@ -5,8 +5,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.GeometryBuilder;
 import org.geotools.geometry.iso.root.GeometryImpl;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.geometry.coordinate.LineString;
@@ -42,9 +43,9 @@ public abstract class AbstractGeometryTest extends TestCase {
      * @throws FactoryException
      */
     public void setUp() throws FactoryException {
-        FeatGeomFactoryImpl factories = FeatGeomFactoryImpl.getDefault2D();       
-        gFact = factories.getGeometryFactory();
-        pFact = factories.getPrimitiveFactory();
+    	GeometryBuilder builder = new GeometryBuilder(DefaultGeographicCRS.WGS84);       
+        gFact = builder.getGeometryFactory();
+        pFact = builder.getPrimitiveFactory();
     }
 
 

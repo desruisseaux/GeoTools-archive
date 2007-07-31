@@ -5,7 +5,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.GeometryBuilder;
 import org.geotools.geometry.iso.complex.CompositePointImpl;
 import org.geotools.geometry.iso.complex.CompositeSurfaceImpl;
 import org.geotools.geometry.iso.io.wkt.ParseException;
@@ -24,7 +24,7 @@ public class RelateOperatorsTest extends TestCase {
 	private static final boolean F = false;
 	private static final boolean T = true;
 
-	private FeatGeomFactoryImpl factory = FeatGeomFactoryImpl.getDefault2D();
+	private GeometryBuilder builder = new GeometryBuilder(DefaultGeographicCRS.WGS84);
 	private CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
 	
 	private PointImpl pointA = this.createPointA();
@@ -629,14 +629,14 @@ public class RelateOperatorsTest extends TestCase {
 	
 	private CompositePointImpl createCompositePointFromWKT(String aWKTpoint) {
 		PointImpl point = this.createPointFromWKT(aWKTpoint);
-		return (CompositePointImpl) this.factory.getComplexFactory().createCompositePoint(point);
+		return (CompositePointImpl) this.builder.getComplexFactory().createCompositePoint(point);
 	}
 	
 	private CompositeSurfaceImpl createCompositeSurfaceFromWKT(String aWKTsurface) {
 		SurfaceImpl surf = this.createSurfaceFromWKT(aWKTsurface);
 		List<OrientableSurface> surfList = new ArrayList<OrientableSurface>();
 		surfList.add(surf);
-		return (CompositeSurfaceImpl) this.factory.getComplexFactory().createCompositeSurface(surfList);
+		return (CompositeSurfaceImpl) this.builder.getComplexFactory().createCompositeSurface(surfList);
 	}
 
 	

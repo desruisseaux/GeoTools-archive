@@ -21,7 +21,6 @@ package org.geotools.geometry.iso.coordinate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.opengis.geometry.coordinate.Polygon;
 import org.opengis.geometry.coordinate.Triangle;
@@ -49,23 +48,19 @@ public class TriangulatedSurfaceImpl extends PolyhedralSurfaceImpl implements
 			List<Polygon> triangles) {
 		super(crs, triangles);
 	}
-
+	
 	/**
-	 * Constructor without arguments Triangle Patches have to be setted after
-	 * 
-	 * @param factory
+	 *
 	 */
-	public TriangulatedSurfaceImpl(FeatGeomFactoryImpl factory) {
-		super(factory, (SurfaceBoundaryImpl) null);
+	public TriangulatedSurfaceImpl() {
+		super((SurfaceBoundaryImpl) null);
 	}
 
 	/**
-	 * @param factory
 	 * @param boundary
 	 */
-	public TriangulatedSurfaceImpl(FeatGeomFactoryImpl factory,
-			SurfaceBoundaryImpl boundary) {
-		super(factory, boundary);
+	public TriangulatedSurfaceImpl(SurfaceBoundaryImpl boundary) {
+		super(boundary);
 	}
 
 	/**

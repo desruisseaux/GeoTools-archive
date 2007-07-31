@@ -2,8 +2,9 @@ package org.geotools.geometry.iso.coordinate;
 
 import junit.framework.TestCase;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.GeometryBuilder;
 import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.coordinate.LineSegment;
@@ -13,15 +14,15 @@ public class GeometryFactoryTest extends TestCase {
 	
 	public void testMain() {
 		
-		FeatGeomFactoryImpl tGeomFactory = FeatGeomFactoryImpl.getDefault3D();
+		GeometryBuilder builder = new GeometryBuilder(DefaultGeographicCRS.WGS84_3D);
 		
-		this._testCoordinateObjects(tGeomFactory);
+		this._testCoordinateObjects(builder);
 		
 	}	
 
-	private void _testCoordinateObjects(FeatGeomFactoryImpl aFactory) {
+	private void _testCoordinateObjects(GeometryBuilder builder) {
 		
-		GeometryFactoryImpl cf = aFactory.getGeometryFactoryImpl();
+		GeometryFactoryImpl cf = (GeometryFactoryImpl) builder.getGeometryFactory();
 		
 		// public DirectPositionImpl createDirectPosition();
 		DirectPosition dp1 = cf.createDirectPosition();

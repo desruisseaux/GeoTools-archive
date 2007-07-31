@@ -3,7 +3,7 @@ package org.geotools.geometry.iso.primitive;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.GeometryBuilder;
 import org.geotools.geometry.iso.PositionFactoryImpl;
 import org.geotools.geometry.iso.PrecisionModel;
 import org.geotools.geometry.iso.aggregate.AggregateFactoryImpl;
@@ -22,10 +22,14 @@ import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.Precision;
 import org.opengis.geometry.complex.Complex;
 import org.opengis.geometry.complex.CompositeCurve;
+import org.opengis.geometry.coordinate.GeometryFactory;
+import org.opengis.geometry.coordinate.LineString;
 import org.opengis.geometry.coordinate.ParamForPoint;
 import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.primitive.Curve;
 import org.opengis.geometry.primitive.CurveBoundary;
 import org.opengis.geometry.primitive.CurveSegment;
+import org.opengis.geometry.primitive.PrimitiveFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.picocontainer.PicoContainer;
 import org.picocontainer.defaults.DefaultPicoContainer;
@@ -36,9 +40,9 @@ public class PicoCurveTest extends TestCase {
 	
 	public void testMain() {
 		
-		FeatGeomFactoryImpl tGeomFactory = FeatGeomFactoryImpl.getDefault2D();
+		GeometryBuilder builder = new GeometryBuilder(DefaultGeographicCRS.WGS84);
 		
-		this._testCurve(tGeomFactory);
+		this._testCurve(builder);
 		
 	}
 	
@@ -53,7 +57,6 @@ public class PicoCurveTest extends TestCase {
 		
 		// Teach Container about Factory Implementations we want to use
 		container.registerComponentImplementation(PositionFactoryImpl.class);
-		container.registerComponentImplementation(FeatGeomFactoryImpl.class);
 		container.registerComponentImplementation(AggregateFactoryImpl.class);
 		container.registerComponentImplementation(ComplexFactoryImpl.class);
 		container.registerComponentImplementation(GeometryFactoryImpl.class);
@@ -91,10 +94,10 @@ public class PicoCurveTest extends TestCase {
 		return new CurveImpl( positionA.getCoordinateReferenceSystem(), segments );	
 	}
 	
-	private void _testCurve(FeatGeomFactoryImpl aGeomFactory) {
+	private void _testCurve(GeometryBuilder builder) {
 		
-		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
-		PrimitiveFactoryImpl tPrimFactory = aGeomFactory.getPrimitiveFactory();
+		GeometryFactoryImpl tCoordFactory = (GeometryFactoryImpl) builder.getGeometryFactory();
+		PrimitiveFactoryImpl tPrimFactory = (PrimitiveFactoryImpl) builder.getPrimitiveFactory();
 		
 		PositionImpl p1 = new PositionImpl(tCoordFactory.createDirectPosition(new double[]{-50,  0}));
 		PositionImpl p2 = new PositionImpl(tCoordFactory.createDirectPosition(new double[]{-30,  30}));
@@ -333,5 +336,34 @@ public class PicoCurveTest extends TestCase {
 		CurveImpl curve3 = createCurve(positionA, positionC);
 		assertFalse(curve.equals((Object) curve3));
 		
+	}
+	
+	public void testCurveAgain() {
+
+		GeometryBuilder builder = new GeometryBuilder(DefaultGeographicCRS.WGS84);
+		PositionFactory posF = builder.getPositionFactory();
+		PrimitiveFactory primF = builder.getPrimitiveFactory();
+		GeometryFactory geomF = builder.getGeometryFactory();		
+
+//		 create directpositions
+		DirectPosition start = posF.createDirectPosition(new double[]{ 48.44, -123.37 });
+		DirectPosition middle = posF.createDirectPosition(new double[]{ 47, -122 });
+		DirectPosition end = posF.createDirectPosition(new double[]{ 46.5, -121.5 });
+
+//		 add directpositions to a list
+		ArrayList<Position> positions = new ArrayList<Position>();
+		positions .add(start);
+		positions.add(middle);
+		positions.add(end);
+
+//		 create linestring from directpositions
+		LineString line = geomF.createLineString(positions);
+
+//		 create curvesegments from line
+		ArrayList<CurveSegment> segs = new ArrayList<CurveSegment>();
+		segs.add(line);
+
+//		 create curve
+		Curve curve = primF.createCurve(segs);		
 	}
 }

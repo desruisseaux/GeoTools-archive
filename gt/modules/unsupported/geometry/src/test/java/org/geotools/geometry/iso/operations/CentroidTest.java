@@ -5,7 +5,7 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.GeometryBuilder;
 import org.geotools.geometry.iso.aggregate.MultiCurveImpl;
 import org.geotools.geometry.iso.aggregate.MultiPointImpl;
 import org.geotools.geometry.iso.aggregate.MultiSurfaceImpl;
@@ -22,13 +22,13 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class CentroidTest extends TestCase {
 	
-	private FeatGeomFactoryImpl factory = null;
+	private GeometryBuilder builder = null;
 	private CoordinateReferenceSystem crs = null;
 
 	public void testMain() {
 		
 		// === 2D ===
-		this.factory = FeatGeomFactoryImpl.getDefault2D();
+		this.builder = new GeometryBuilder(DefaultGeographicCRS.WGS84);
 		this.crs = DefaultGeographicCRS.WGS84;
 		
 		// Test Points and MultiPoints
@@ -42,7 +42,7 @@ public class CentroidTest extends TestCase {
 
 		
 		// === 3D ===
-		this.factory = FeatGeomFactoryImpl.getDefault3D();
+		this.builder.setCoordianteReferenceSystem(DefaultGeographicCRS.WGS84_3D);
 		this.crs = DefaultGeographicCRS.WGS84_3D;
 		
 		// Test Points and MultiPoints
@@ -284,7 +284,7 @@ public class CentroidTest extends TestCase {
 		points.add(this.createPointA3D());
 		points.add(this.createPointB3D());
 		points.add(this.createPointC3D());
-		return (MultiPointImpl) this.factory.getAggregateFactory().createMultiPoint(points);
+		return (MultiPointImpl) this.builder.getAggregateFactory().createMultiPoint(points);
 	}
 	
 	
@@ -319,7 +319,7 @@ public class CentroidTest extends TestCase {
 		curves.add(this.createCurveB());
 		curves.add(this.createCurveC());
 		curves.add(this.createCurveD());
-		return (MultiCurveImpl) this.factory.getAggregateFactory().createMultiCurve(curves);
+		return (MultiCurveImpl) this.builder.getAggregateFactory().createMultiCurve(curves);
 	}
 
 	private SurfaceImpl createSurfaceAwithoutHole() {
@@ -352,7 +352,7 @@ public class CentroidTest extends TestCase {
 		Set<OrientableSurface> surfaces = new HashSet<OrientableSurface>();
 		surfaces.add(this.createSurfaceAwithoutHole());
 		surfaces.add(this.createSurfaceBwithoutHole());
-		return (MultiSurfaceImpl) this.factory.getAggregateFactory().createMultiSurface(surfaces);
+		return (MultiSurfaceImpl) this.builder.getAggregateFactory().createMultiSurface(surfaces);
 	}
 
 

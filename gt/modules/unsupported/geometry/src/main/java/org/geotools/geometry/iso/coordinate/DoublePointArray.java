@@ -21,10 +21,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.geotools.geometry.iso.util.DoubleOperation;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.PointArray;
 import org.opengis.geometry.coordinate.Position;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * This implementation is a "fast" wrapper over top of a double array.

@@ -1,7 +1,9 @@
 package org.geotools.geometry.iso.complex;
 
 import java.util.ArrayList;
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+
+import junit.framework.TestCase;
+
 import org.geotools.geometry.iso.PositionFactoryImpl;
 import org.geotools.geometry.iso.PrecisionModel;
 import org.geotools.geometry.iso.aggregate.AggregateFactoryImpl;
@@ -25,8 +27,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.picocontainer.PicoContainer;
 import org.picocontainer.defaults.DefaultPicoContainer;
 
-import junit.framework.TestCase;
-
 public class PicoCompositeCurveTest extends TestCase {
 
 	public void testMain() {
@@ -48,7 +48,6 @@ public class PicoCompositeCurveTest extends TestCase {
 		
 		// Teach Container about Factory Implementations we want to use
 		container.registerComponentImplementation(PositionFactoryImpl.class);
-		container.registerComponentImplementation(FeatGeomFactoryImpl.class);
 		container.registerComponentImplementation(AggregateFactoryImpl.class);
 		container.registerComponentImplementation(ComplexFactoryImpl.class);
 		container.registerComponentImplementation(GeometryFactoryImpl.class);

@@ -3,13 +3,14 @@ package org.geotools.geometry.iso.primitive;
 import junit.framework.TestCase;
 
 import org.geotools.filter.GeometryFilterImpl;
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.GeometryBuilder;
 import org.geotools.geometry.iso.PositionFactoryImpl;
 import org.geotools.geometry.iso.PrecisionModel;
 import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.complex.Complex;
 import org.opengis.geometry.complex.CompositePoint;
@@ -26,9 +27,9 @@ public class PointTest extends TestCase {
 	
 	public void testMain() {
 		
-		FeatGeomFactoryImpl tGeomFactory = FeatGeomFactoryImpl.getDefault2D();
+		GeometryBuilder builder = new GeometryBuilder(DefaultGeographicCRS.WGS84);
 		
-		this._testPoint(tGeomFactory);
+		this._testPoint(builder);
 		
 	}
 	
@@ -36,7 +37,6 @@ public class PointTest extends TestCase {
 		CoordinateReferenceSystem crs = CRS.decode( "EPSG:4326");		
 		assertNotNull( crs );
 
-		FeatGeomFactoryImpl geometryFactory = new FeatGeomFactoryImpl(crs);
 		PositionFactory positionFactory = new PositionFactoryImpl(crs, new PrecisionModel());
 		PrimitiveFactory primitiveFactory = new PrimitiveFactoryImpl(crs, positionFactory); // null;
 		
@@ -49,10 +49,10 @@ public class PointTest extends TestCase {
 		assertSame( crs, point.getCoordinateReferenceSystem() );		
 	}
 	
-	private void _testPoint(FeatGeomFactoryImpl aGeomFactory) {
+	private void _testPoint(GeometryBuilder builder) {
 		
-		GeometryFactoryImpl tCoordFactory = aGeomFactory.getGeometryFactoryImpl();
-		PrimitiveFactoryImpl tPrimFactory = aGeomFactory.getPrimitiveFactory();
+		GeometryFactoryImpl tCoordFactory = (GeometryFactoryImpl) builder.getGeometryFactory();
+		PrimitiveFactoryImpl tPrimFactory = (PrimitiveFactoryImpl) builder.getPrimitiveFactory();
 		
 		double[] coord = new double[]{10, 32000};
 		Point p1 = tPrimFactory.createPoint(coord);
