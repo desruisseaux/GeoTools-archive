@@ -36,9 +36,9 @@ import java.util.Iterator;
  * Exercise DB2FeatureSource
  *
  * @author David Adler - IBM Corporation
- * @source $URL$
+ * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/db2/src/test/java/org/geotools/data/db2/DB2FeatureSourceTest.java $
  */
-public class DB2FeatureSourceTest extends DB2TestCase {
+public class DB2FeatureSourceOnlineTest extends AbstractDB2OnlineTestCase {
     private DB2DataStore dataStore = null;
     private Envelope placesEnv1 = new Envelope(-74.15, -74.1, 42.0, 42.02);
     private Envelope placesEnv2 = new Envelope(-74.15, -74.12, 42.0, 42.01);
@@ -172,7 +172,7 @@ public class DB2FeatureSourceTest extends DB2TestCase {
         featureSource = dataStore.getFeatureSource("Roads");
 
         String schemaFound = featureSource.getSchema().toString();
-        String schemaCompare = "DefaultFeatureType [name=Roads , namespace=Test , abstract=false , types=(DefaultAttributeType [name=ID , type=class java.lang.Integer , nillable=true, min=1, max=1],DefaultAttributeType [name=Name , type=class java.lang.String , nillable=true, min=0, max=0],DefaultAttributeType [name=Length , type=class java.lang.Double , nillable=true, min=0, max=0],DefaultAttributeType [name=Geom , type=class com.vividsolutions.jts.geom.LineString , nillable=true, min=0, max=0],)]";
+        String schemaCompare = "DefaultFeatureType[name=Test:Roads, binding=interface java.util.Collection, abstrsct= false, identified=true, restrictions=null, superType=null, schema=[DefaultAttributeType [name=ID , type=org.geotools.feature.type.AttributeTypeImpl[name=ID, binding=class java.lang.Integer, abstrsct=, false, identified=false, restrictions=[Filter.INCLUDE], superType=null] , nillable=true, min=1, max=1], DefaultAttributeType [name=Name , type=org.geotools.feature.type.AttributeTypeImpl[name=Name, binding=class java.lang.String, abstrsct=, false, identified=false, restrictions=[Filter.INCLUDE], superType=null] , nillable=true, min=0, max=1], DefaultAttributeType [name=Length , type=org.geotools.feature.type.AttributeTypeImpl[name=Length, binding=class java.lang.Double, abstrsct=, false, identified=false, restrictions=[Filter.INCLUDE], superType=null] , nillable=true, min=0, max=1], DefaultAttributeType [name=Geom , type=org.geotools.feature.type.GeometryTypeImpl[name=Geom, binding=class com.vividsolutions.jts.geom.LineString, abstrsct=, false, identified=false, restrictions=[[ length([Geom]) <= 0 ]], superType=null] , nillable=true, min=0, max=1]]]";
         System.out.println("schema: " + schemaFound);
         assertEquals("schema mismatch", schemaCompare, schemaFound);
     }

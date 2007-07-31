@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) Copyright IBM Corporation, 2005. All rights reserved.
+ *    (C) Copyright IBM Corporation, 2005-2007. All rights reserved.
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,11 +24,13 @@ import java.sql.Connection;
  * Exercise DB2SpatialCatalog.
  *
  * @author David Adler - IBM Corporation
- * @source $URL$
+ * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/db2/src/test/java/org/geotools/data/db2/DB2SpatialCatalogTest.java $
  */
-public class DB2SpatialCatalogTest extends DB2TestCase {
+public class DB2SpatialCatalogOnlineTest extends AbstractDB2OnlineTestCase {
     private Connection conn;
     private DB2SpatialCatalog catalog;
+    private String tabSchema = null;
+    private String dbUrl = null;
 
     /**
      * Setup gets a database connection that will be live for the duration of
@@ -38,7 +40,9 @@ public class DB2SpatialCatalogTest extends DB2TestCase {
      */
     public void setUp() throws Exception {
         super.setUp();
-        conn = getLocalConnection();
+        conn = getConnection();
+        tabSchema = getDataStore().getTableSchema();
+        dbUrl = getDataStore().getDbURL();
     }
 
     /**
@@ -60,29 +64,29 @@ public class DB2SpatialCatalogTest extends DB2TestCase {
         DB2SpatialCatalog.reset(); // Force reset in case other tests may have set static variables
 
         // Test that an initial call with a null connection fails		
-        catalog = DB2SpatialCatalog.getInstance(getDbURL(), tabSchema, null);
+        catalog = DB2SpatialCatalog.getInstance(dbUrl, tabSchema, null);
         assertNull("Catalog not created with valid parameter supplied", catalog);
 
         // Test that an initial call with a valid connection is successful
-        catalog = DB2SpatialCatalog.getInstance(getDbURL(), tabSchema, conn);
+        catalog = DB2SpatialCatalog.getInstance(dbUrl, tabSchema, conn);
         assertEquals("Catalog toString not expected",
-            getDbURL() + "-" + tabSchema, catalog.toString());
+            dbUrl + "-" + tabSchema, catalog.toString());
 
         //	Test that an initial call with a null connection is successful
-        catalog = DB2SpatialCatalog.getInstance(getDbURL(), tabSchema, conn);
-        assertEquals("Catalog not found", getDbURL() + "-" + tabSchema,
+        catalog = DB2SpatialCatalog.getInstance(dbUrl, tabSchema, conn);
+        assertEquals("Catalog not found", dbUrl + "-" + tabSchema,
             catalog.toString());
 
         //		Test that an initial call with a valid connection but undefined
         //  schema name is successful.  Does this make sense?
         String notFoundSchema = "WillNotBeFound";
-        catalog = DB2SpatialCatalog.getInstance(getDbURL(), notFoundSchema, conn);
-        assertEquals(getDbURL() + "-" + notFoundSchema, catalog.toString());
+        catalog = DB2SpatialCatalog.getInstance(dbUrl, notFoundSchema, conn);
+        assertEquals(dbUrl + "-" + notFoundSchema, catalog.toString());
     }
 
     public void testGetSRID() throws Exception {
         // Get a catalog - this shouldn't fail
-        catalog = DB2SpatialCatalog.getInstance(getDbURL(), tabSchema, conn);
+        catalog = DB2SpatialCatalog.getInstance(dbUrl, tabSchema, conn);
 
         int srid = catalog.getSRID(tabSchema, "Places", "Geom");
         assertEquals(1, srid);
@@ -108,13 +112,14 @@ public class DB2SpatialCatalogTest extends DB2TestCase {
 
     public void testGetGeomType() throws Exception {
         // Get a catalog - this shouldn't fail
-        catalog = DB2SpatialCatalog.getInstance(getDbURL(), tabSchema, conn);
+        catalog = DB2SpatialCatalog.getInstance(dbUrl, tabSchema, conn);
 
         String typeFound = catalog.getDB2GeometryTypeName(tabSchema, "Places",
                 "Geom");
         assertEquals("ST_POLYGON", typeFound);
 
-        String typeNotFound = "yes";
+        @SuppressWarnings("unused")
+		String typeNotFound = "yes";
 
         try {
             typeNotFound = catalog.getDB2GeometryTypeName(tabSchema, "Places",
@@ -140,7 +145,7 @@ public class DB2SpatialCatalogTest extends DB2TestCase {
 
     public void testGetTypes() throws Exception {
         // Get a catalog - this shouldn't fail
-        catalog = DB2SpatialCatalog.getInstance(getDbURL(), tabSchema, conn);
+        catalog = DB2SpatialCatalog.getInstance(dbUrl, tabSchema, conn);
 
         int foundCount = 0;
         String[] typeNames = catalog.getTypeNames();

@@ -24,9 +24,9 @@ import java.sql.SQLException;
  * Exercise DB2CoordinateSystem.
  *
  * @author David Adler - IBM Corporation
- * @source $URL$
+ * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/db2/src/test/java/org/geotools/data/db2/DB2CoordinateSystemTest.java $
  */
-public class DB2CoordinateSystemTest extends DB2TestCase {
+public class DB2CoordinateSystemOnlineTest extends AbstractDB2OnlineTestCase {
     private Connection conn;
 
     /**
@@ -37,7 +37,7 @@ public class DB2CoordinateSystemTest extends DB2TestCase {
      */
     public void setUp() throws Exception {
         super.setUp();
-        conn = getLocalConnection();
+        conn = getConnection();
     }
 
     /**
@@ -64,7 +64,8 @@ public class DB2CoordinateSystemTest extends DB2TestCase {
         int invalidSrid = -1;
 
         try {
-            DB2CoordinateSystem cs = new DB2CoordinateSystem(conn, invalidSrid);
+            @SuppressWarnings("unused")
+			DB2CoordinateSystem cs = new DB2CoordinateSystem(conn, invalidSrid);
             fail("DB2CoordinateSystem constructor sucessful for invalid srid "
                 + invalidSrid);
         } catch (SQLException e) {

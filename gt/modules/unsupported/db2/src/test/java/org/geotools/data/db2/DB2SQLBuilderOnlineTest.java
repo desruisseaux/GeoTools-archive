@@ -47,7 +47,7 @@ import java.util.Set;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/db2/src/test/java/org/geotools/data/db2/DB2SQLBuilderTest.java $
  */
-public class DB2SQLBuilderTest extends DB2TestCase {
+public class DB2SQLBuilderOnlineTest extends AbstractDB2OnlineTestCase {
 	private DB2SQLBuilder sqlBuilder = null;
 
 	private DB2DataStore dataStore = null;
@@ -67,7 +67,6 @@ public class DB2SQLBuilderTest extends DB2TestCase {
 	}
 
 	public void testFidFilter() throws SQLEncoderException, IOException {
-		String typeName = "Places";
 		FeatureSource fs = dataStore.getFeatureSource("Places");
 		FeatureType ft = fs.getSchema();
 		FilterFactory ff2 = CommonFactoryFinder.getFilterFactory(null);

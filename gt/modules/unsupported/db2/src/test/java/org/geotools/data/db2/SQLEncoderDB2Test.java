@@ -16,10 +16,10 @@
  */
 package org.geotools.data.db2;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
+
+import junit.framework.TestCase;
 
 import org.geotools.data.db2.filter.SQLEncoderDB2;
 import org.geotools.data.jdbc.FilterToSQLException;
@@ -55,8 +55,8 @@ import com.vividsolutions.jts.io.WKTReader;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/db2/src/test/java/org/geotools/data/db2/SQLEncoderDB2Test.java $
  */
-public class SQLEncoderDB2Test extends DB2TestCase {
-	private static Map DB2_SPATIAL_PREDICATES = new HashMap();
+public class SQLEncoderDB2Test extends TestCase {
+//	private static Map DB2_SPATIAL_PREDICATES = new HashMap();
 
 	private SQLEncoderDB2 encoder;
 

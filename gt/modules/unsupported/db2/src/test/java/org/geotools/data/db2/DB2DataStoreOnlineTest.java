@@ -16,17 +16,14 @@
  */
 package org.geotools.data.db2;
 
-import org.geotools.data.jdbc.JDBCDataStoreConfig;
-import java.io.IOException;
-
 
 /**
  * Exercise DB2DataStore.
  *
  * @author David Adler - IBM Corporation
- * @source $URL$
+ * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/db2/src/test/java/org/geotools/data/db2/DB2DataStoreTest.java $
  */
-public class DB2DataStoreTest extends DB2TestCase {
+public class DB2DataStoreOnlineTest extends AbstractDB2OnlineTestCase {
     /**
      * Setup gets a database connection that will be live for the duration of
      * all tests.
@@ -35,7 +32,6 @@ public class DB2DataStoreTest extends DB2TestCase {
      */
     public void setUp() throws Exception {
         super.setUp();
-        pool = getLocalConnectionPool();
     }
 
     /**
@@ -48,25 +44,9 @@ public class DB2DataStoreTest extends DB2TestCase {
         super.tearDown();
     }
 
-    public void testNewDBDataStore() throws Exception {
-        JDBCDataStoreConfig config = new JDBCDataStoreConfig(tabSchema,
-                tabSchema, 100000);
-
-        try {
-            DB2DataStore dataStore = new DB2DataStore(null, config, getDbURL());
-            fail("new DB2DataStore should have failed for null connection pool");
-        } catch (IOException e) {
-        }
-
-        DB2DataStore dataStore = null;
-
-        try {
-            dataStore = new DB2DataStore(pool, config, getDbURL());
-        } catch (IOException e) {
-            fail("new DB2DataStore shouldn't have failed");
-        }
-
-        assertEquals(getDbURL(), dataStore.getDbURL());
+    public void testTableSchema() throws Exception {
+    	String tableSchema = getDataStore().getTableSchema();
+        assertEquals(tableSchema, "Test");
     }
 
     public void testEntity() throws Exception {

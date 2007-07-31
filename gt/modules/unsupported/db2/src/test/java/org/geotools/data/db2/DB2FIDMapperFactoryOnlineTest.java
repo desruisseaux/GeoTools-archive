@@ -30,9 +30,9 @@ import java.sql.SQLException;
  * Exercise DB2FIDMapperFactory.
  *
  * @author David Adler - IBM Corporation
- * @source $URL$
+ * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/db2/src/test/java/org/geotools/data/db2/DB2FIDMapperFactoryTest.java $
  */
-public class DB2FIDMapperFactoryTest extends DB2TestCase {
+public class DB2FIDMapperFactoryOnlineTest extends AbstractDB2OnlineTestCase {
     public void testMappers() throws Exception {
         String catalog = null;
         String schema = "Test";
@@ -48,7 +48,7 @@ public class DB2FIDMapperFactoryTest extends DB2TestCase {
         fm1.equals(fm2);
 //        assertEquals(new TypedFIDMapper(new BasicFIDMapper("IDCOL", 12), "FIDVCHARPRIKEY"), ds.getFIDMapper("FIDVCHARPRIKEY"));
 
-        conn = getLocalConnection();
+        conn = getConnection();
         tableName = "FIDAUTOINC";
         fm = fmFact.getMapper(catalog, schema, tableName, conn);
         wrapperDesc = fm.toString();
@@ -56,43 +56,35 @@ public class DB2FIDMapperFactoryTest extends DB2TestCase {
         assertEquals(tableName, wrapperDesc,
             "Wrapped:class org.geotools.data.db2.DB2AutoIncrementFIDMapper:1:IDCOL:4:0:0:false:true:");
 
-        conn = getLocalConnection();
         tableName = "FIDCHARPRIKEY";
         fm = fmFact.getMapper(catalog, schema, tableName, conn);
         wrapperDesc = fm.toString();
         assertEquals(tableName, wrapperDesc,
             "Wrapped:class org.geotools.data.jdbc.fidmapper.BasicFIDMapper:1:IDCOL:12:15:0:true:false:");
 
-        conn = getLocalConnection();
         tableName = "FIDNOPRIKEY";
         fm = fmFact.getMapper(catalog, schema, tableName, conn);
         wrapperDesc = fm.toString();
         assertEquals(tableName, wrapperDesc,
             "Wrapped:class org.geotools.data.db2.DB2NullFIDMapper:0::false:false:");
 
-        conn = getLocalConnection();
         tableName = "FIDINTPRIKEY";
         fm = fmFact.getMapper(catalog, schema, tableName, conn);
         wrapperDesc = fm.toString();
         assertEquals(tableName, wrapperDesc,
             "Wrapped:class org.geotools.data.jdbc.fidmapper.MaxIncFIDMapper:1:IDCOL:4:0:0:true:false:");
 
-        conn = getLocalConnection();
         tableName = "FIDVCHARPRIKEY";
         fm = fmFact.getMapper(catalog, schema, tableName, conn);
         wrapperDesc = fm.toString();
         assertEquals(tableName, wrapperDesc,
             "Wrapped:class org.geotools.data.jdbc.fidmapper.BasicFIDMapper:1:IDCOL:12:17:0:true:false:");
 
-        conn = getLocalConnection();
         tableName = "FIDMCOLPRIKEY";
         fm = fmFact.getMapper(catalog, schema, tableName, conn);
         wrapperDesc = fm.toString();
         assertEquals(tableName, wrapperDesc,
             "Wrapped:class org.geotools.data.jdbc.fidmapper.MultiColumnFIDMapper:2:IDCOL1:1:11:0:true:false:");
-
-        // Don't know why, but DefaultFIDFactory.getPkColumnInfo closes the connection
-        conn = getLocalConnection();
 
         try {
             tableName = "NoTable";

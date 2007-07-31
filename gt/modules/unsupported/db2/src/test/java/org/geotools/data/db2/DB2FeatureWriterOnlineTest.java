@@ -34,9 +34,9 @@ import java.io.IOException;
  * Exercise DB2FeatureWriter.
  *
  * @author David Adler - IBM Corporation
- * @source $URL$
+ * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/db2/src/test/java/org/geotools/data/db2/DB2FeatureWriterTest.java $
  */
-public class DB2FeatureWriterTest extends DB2TestCase {
+public class DB2FeatureWriterOnlineTest extends AbstractDB2OnlineTestCase {
     private DB2DataStore dataStore = null;
 
     /**
@@ -51,8 +51,6 @@ public class DB2FeatureWriterTest extends DB2TestCase {
 
     public void testRemove() throws IOException {
         try {
-            DB2FeatureStore fs = (DB2FeatureStore) dataStore.getFeatureSource(
-                    "Roads");
             Transaction trans = null;
             trans = new DefaultTransaction("trans1");
 
@@ -64,7 +62,7 @@ public class DB2FeatureWriterTest extends DB2TestCase {
                 System.out.println(f);
                 fw.remove();
             }
-
+            fw.close();
             trans.commit();
             trans.close();
         } catch (Exception e) {
@@ -98,7 +96,7 @@ public class DB2FeatureWriterTest extends DB2TestCase {
                 System.out.println(f);
                 fw.write();
             }
-
+            fw.close();
             trans.commit();
             trans.close();
         } catch (Exception e) {
@@ -128,7 +126,7 @@ public class DB2FeatureWriterTest extends DB2TestCase {
                 System.out.println(f);
                 fw.write();
             }
-
+            fw.close();
             trans.commit();
             trans.close();
         } catch (Exception e) {
@@ -155,7 +153,8 @@ public class DB2FeatureWriterTest extends DB2TestCase {
     		f.setAttribute(3,line3); 
     		f.toString();
             System.out.println(f);
-            fw.write();           
+            fw.write();   
+            fw.close();
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -176,7 +175,8 @@ public class DB2FeatureWriterTest extends DB2TestCase {
     		f.setAttribute(1,polygon); 
     		f.toString();
             System.out.println(f);
-            fw.write();           
+            fw.write();      
+            fw.close();
         } catch (Exception e) {
             System.out.println(e);
         }

@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) Copyright IBM Corporation, 2005. All rights reserved.
+ *    (C) Copyright IBM Corporation, 2005-2007. All rights reserved.
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -25,9 +25,9 @@ import java.util.Map;
  * Exercise DB2DataStoreFactory.
  *
  * @author David Adler - IBM Corporation
- * @source $URL$
+ * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/db2/src/test/java/org/geotools/data/db2/DB2DataStoreFactoryTest.java $
  */
-public class DB2DataStoreFactoryTest extends DB2TestCase {
+public class DB2DataStoreFactoryOnlineTest extends AbstractDB2OnlineTestCase {
     DB2DataStoreFactory factory = new DB2DataStoreFactory();
 
     public void setUp() throws Exception {
@@ -45,24 +45,26 @@ public class DB2DataStoreFactoryTest extends DB2TestCase {
     public void testCreateDataStore() {
         // Should succeed
         try {
-            DB2DataStore dataStore = (DB2DataStore) factory.createDataStore(allParams);
+            @SuppressWarnings("unused")
+			DB2DataStore dataStore = (DB2DataStore) factory.createDataStore(getParams());
         } catch (IOException e) {
             fail("createDataStore failed:" + e);
         }
 
         // Should fail if dbtype is not "DB2"
         try {
-            Map params = copyParams(allParams);
+            Map<String, String> params = getParams();  // always returns a new copy
             params.put("dbtype", "nodb");
 
-            DB2DataStore dataStore = (DB2DataStore) factory.createDataStore(params);
+            @SuppressWarnings("unused")
+			DB2DataStore dataStore = (DB2DataStore) factory.createDataStore(params);
             fail("createDataStore succeeded with invalid dbtype parameter");
         } catch (IOException e) {
             // We should come here as a result
         }
         // Should default schema to the user if schema is null
         try {
-            Map params = copyParams(allParams);
+            Map<String, String> params = getParams();
             params.put("tabschema", null);
 
             DB2DataStore dataStore = (DB2DataStore) factory.createDataStore(params);
@@ -74,7 +76,7 @@ public class DB2DataStoreFactoryTest extends DB2TestCase {
 
     // Should default schema to the user if schema is blank
     try {
-        Map params = copyParams(allParams);
+        Map<String, String> params = getParams();
         params.put("tabschema", "");
 
         DB2DataStore dataStore = (DB2DataStore) factory.createDataStore(params);
@@ -85,7 +87,7 @@ public class DB2DataStoreFactoryTest extends DB2TestCase {
     }  
     // Should convert schema to uppercase
     try {
-        Map params = copyParams(allParams);
+        Map<String, String> params = getParams();
         params.put("tabschema", "sde");
 
         DB2DataStore dataStore = (DB2DataStore) factory.createDataStore(params);
@@ -96,7 +98,7 @@ public class DB2DataStoreFactoryTest extends DB2TestCase {
     }
     // Should leave schema in mixed case
     try {
-        Map params = copyParams(allParams);
+        Map<String, String> params = getParams();
         params.put("tabschema", "\"Test\"");
 
         DB2DataStore dataStore = (DB2DataStore) factory.createDataStore(params);
@@ -110,7 +112,8 @@ public class DB2DataStoreFactoryTest extends DB2TestCase {
     public void testCreateNewDataStore() {
         // Should fail
         try {
-            DB2DataStore dataStore = (DB2DataStore) factory.createNewDataStore(allParams);
+            @SuppressWarnings("unused")
+			DB2DataStore dataStore = (DB2DataStore) factory.createNewDataStore(getParams());
             fail("createNewDataStore didn't fail");
         } catch (UnsupportedOperationException e) {
             // We should come here as a result
@@ -131,7 +134,7 @@ public class DB2DataStoreFactoryTest extends DB2TestCase {
 
         try {
             for (i = 0; i < params.length; i++) {
-                params[0].lookUp(allParams);
+                params[0].lookUp(getParams());
             }
         } catch (IOException e) {
             // should never get here
@@ -139,7 +142,7 @@ public class DB2DataStoreFactoryTest extends DB2TestCase {
         }
 
         // test for missing parameter
-        Map paramMap = copyParams(allParams);
+        Map paramMap = getParams();
         paramMap.remove("dbtype");
 
         try {
@@ -154,53 +157,53 @@ public class DB2DataStoreFactoryTest extends DB2TestCase {
     }
 
     public void testCanProcess() {
-        Map params;
+        Map<String, String> params;
 
         // Make sure it succeeds for all good parameters
-        params = copyParams(allParams);
+        params = getParams();
         assertTrue("all parameters valid - should have succeeded",
             factory.canProcess(params));
 
         // Should fail if "database" parameter is missing
-        params = copyParams(allParams);
+        params = getParams();
         params.remove("database");
         assertFalse("database parameter is required", factory.canProcess(params));
 
         // Should fail if "dbtype" parameter is not "db2"
-        params = copyParams(allParams);
+        params = getParams();
         params.put("dbtype", "nodb");
         assertFalse("dbtype parameter is required", factory.canProcess(params));
 
         // Should succeed if "dbname" parameter is not lowercase
-        params = copyParams(allParams);
+        params = getParams();
         params.put("dbtype", "DB2");
         assertTrue("should succeed with uppercase DB2 as dbtype",
             factory.canProcess(params));
 
         // Should fail if "host" parameter is missing
-        params = copyParams(allParams);
+        params = getParams();
         params.remove("host");
         assertFalse("host parameter is required", factory.canProcess(params));
 
         // Should fail if "port" parameter is missing
-        params = copyParams(allParams);
+        params = getParams();
         params.remove("port");
         assertFalse("port parameter is required", factory.canProcess(params));
 
         // Should succeed if "user" parameter is missing - not sure if it should be mandatory
-        params = copyParams(allParams);
+        params = getParams();
         params.remove("user");
         assertTrue("user parameter should be optional",
             factory.canProcess(params));
 
         // Should succeed if "passwd" parameter is missing - not sure if it should be mandatory
-        params = copyParams(allParams);
+        params = getParams();
         params.remove("passwd");
         assertTrue("passwd parameter should be optional",
             factory.canProcess(params));
 
         // Should fail if "user" parameter is missing - not sure if it should be mandatory
-        params = copyParams(allParams);
+        params = getParams();
         params.remove("tabschema");
         assertTrue("tabschema parameter should be optional",
             factory.canProcess(params));
