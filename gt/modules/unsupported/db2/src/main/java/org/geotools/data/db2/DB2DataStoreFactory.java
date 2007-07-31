@@ -51,19 +51,19 @@ public class DB2DataStoreFactory extends AbstractDataStoreFactory
     // check whether the DB2 JDBC library is in the classpath
     private static final String DRIVER_CLASS = DRIVERNAME;
     private static boolean isAvailable = false;
-    private static final Param DBTYPE = new Param("dbtype", String.class,
+    public static final Param DBTYPE = new Param("dbtype", String.class,
             "must be 'DB2'", true, "DB2");
-    private static final Param HOST = new Param("host", String.class,
+    public static final Param HOST = new Param("host", String.class,
             "DB2 host machine", true, "localhost");
-    private static final Param PORT = new Param("port", Integer.class,
+    public static final Param PORT = new Param("port", Integer.class,
             "DB2 connection port", true, new Integer(50000));
-    private static final Param DATABASE = new Param("database", String.class,
+    public static final Param DATABASE = new Param("database", String.class,
             "database name", true);
-    private static final Param USER = new Param("user", String.class,
+    public static final Param USER = new Param("user", String.class,
             "user name to login as", false);
-    private static final Param PASSWD = new Param("passwd", String.class,
+    public static final Param PASSWD = new Param("passwd", String.class,
             "password used to login", false);
-    private static final Param TABSCHEMA = new Param("tabschema", String.class,
+    public static final Param TABSCHEMA = new Param("tabschema", String.class,
             "default table schema", false);
     public static final Param MAXCONN = new Param("max connections", Integer.class,
             "maximum number of open connections", false, new Integer(10));
@@ -164,7 +164,13 @@ public class DB2DataStoreFactory extends AbstractDataStoreFactory
      * Returns the JDBC url used for connecting to a specific database
      */
     public static String getJDBCUrl(String host, int port, String database) {
-        return "jdbc:db2://" + host + ":" + port + "/" + database;
+    	String url = null;
+    	if (port == 0) {
+    		url = "jdbc:db2:" + database;
+    	} else {
+    		url = "jdbc:db2://" + host + ":" + port + "/" + database;
+    	}
+        return url;
     }
 
     /**

@@ -65,9 +65,10 @@ public class DB2SQLBuilder extends GeoAPISQLBuilder {
      * @param tableSchema table schema to qualify table names
      * @param featureType the feature type to be used by this SQL builder
      */
-    public DB2SQLBuilder(FilterToSQL encoder, String tableSchema, FeatureType featureType) {
+    public DB2SQLBuilder(FilterToSQL encoder, String tableSchema, FeatureType featureType, FIDMapper mapper) {
         super(encoder, featureType, null);
         this.tableSchema = tableSchema;
+        this.mapper = mapper;
         this.tableName = featureType.getTypeName();
     }
     

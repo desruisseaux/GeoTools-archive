@@ -23,6 +23,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import org.geotools.data.DataSourceException;
+import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.EmptyFeatureReader;
@@ -79,14 +80,14 @@ import javax.sql.DataSource;
  * @author David Adler - IBM Corporation
  * @source $URL$
  */
-public class DB2DataStore extends JDBCDataStore {
+public class DB2DataStore extends JDBCDataStore implements DataStore{
     private static final Logger LOGGER = Logger.getLogger(
             "org.geotools.data.db2");
 
     /**
      * List of all the DB2 geometry type names and the corresponding JTS class
      */
-    private static final Map DB2_GEOM_TYPE_MAPPING = new HashMap();
+    private static final Map<String, Class<?>> DB2_GEOM_TYPE_MAPPING = new HashMap<String, Class<?>>();
 
     /**
      * Populate list of geometry classes supported by DB2
@@ -146,7 +147,9 @@ public class DB2DataStore extends JDBCDataStore {
             throw new IOException("DB2SpatialCatalog create failed");
         }
     }
-
+    public DataSource getDataSource() {
+        return dataSource;
+    }
     /**
      * Handles DB2-specific geometry types.  If it isn't one, just let the
      * parent method handle it.
@@ -316,7 +319,7 @@ public class DB2DataStore extends JDBCDataStore {
 
         // We should probably get the table schema name from the feature type
         // information - not sure that it exists there.
-        return new DB2SQLBuilder((FilterToSQL) encoder, getTableSchema(), info.getSchema());
+        return new DB2SQLBuilder((FilterToSQL) encoder, getTableSchema(), info.getSchema(), mapper);
     }
 
     /**
