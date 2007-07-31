@@ -492,13 +492,13 @@ public class OracleDataStore extends JDBCDataStore {
             attributeTypes = schemaNew.getAttributeTypes();
 
             for (int j = 0, n = schemaNew.getAttributeCount(); j < n; j++) {
-                if (Geometry.class.isAssignableFrom(attributeTypes[j].getType())) // same as
+                if (Geometry.class.isAssignableFrom(attributeTypes[j].getBinding())) // same as
                                                                                     // .isgeometry()
                                                                                     // - see new
                                                                                     // featuretype
                                                                                     // javadoc
                 {
-                    String attName = attributeTypes[j].getName();
+                    String attName = attributeTypes[j].getLocalName();
                     Envelope curEnv = getEnvelope(conn, schemaNew, attName, sqlBuilder, filter);
 
                     if (curEnv == null) {
@@ -512,7 +512,7 @@ public class OracleDataStore extends JDBCDataStore {
             LOGGER.finer("returning bounds " + retEnv);
 
             if ((schemaNew != null) && (schemaNew.getDefaultGeometry() != null))
-                return new ReferencedEnvelope(retEnv, schemaNew.getDefaultGeometry()
+                return new ReferencedEnvelope(retEnv, schemaNew.getPrimaryGeometry()
                         .getCoordinateSystem());
             if (query.getCoordinateSystem() != null)
                 return new ReferencedEnvelope(retEnv, query.getCoordinateSystem());
