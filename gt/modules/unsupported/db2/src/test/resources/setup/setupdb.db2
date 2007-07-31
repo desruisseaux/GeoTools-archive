@@ -1,4 +1,4 @@
-  create database geotools;
+create database geotools using codeset UTF-8 territory US;
 update db cfg for geotools using APPLHEAPSZ 2048;
 update db cfg for geotools using APP_CTL_HEAP_SZ 2048;
 update db cfg for geotools using LOGPRIMARY 10;
