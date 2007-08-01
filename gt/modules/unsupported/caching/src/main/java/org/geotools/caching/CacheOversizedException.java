@@ -20,4 +20,16 @@ public class CacheOversizedException extends FeatureCacheException {
      *
      */
     private static final long serialVersionUID = 3498526657089279151L;
+
+    public CacheOversizedException() {
+        super();
+    }
+
+    public CacheOversizedException(Throwable t) {
+        super(t);
+    }
+
+    public CacheOversizedException(String message) {
+        super(message);
+    }
 }

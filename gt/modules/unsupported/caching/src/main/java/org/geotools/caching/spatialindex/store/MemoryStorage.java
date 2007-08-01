@@ -15,7 +15,7 @@
  */
 package org.geotools.caching.spatialindex.store;
 
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import org.geotools.caching.spatialindex.Node;
 import org.geotools.caching.spatialindex.NodeIdentifier;
 import org.geotools.caching.spatialindex.Storage;
@@ -28,17 +28,27 @@ import org.geotools.caching.spatialindex.Storage;
  *
  */
 public class MemoryStorage implements Storage {
-    public LinkedHashMap map = new LinkedHashMap(); // TODO change visibility
+    HashMap<NodeIdentifier, Node> map;
+
+    public MemoryStorage(int capacity) {
+        this.map = new HashMap<NodeIdentifier, Node>(capacity);
+    }
 
     public Node get(NodeIdentifier id) {
-        return (Node) map.get(id);
+        return map.get(id);
     }
 
     public void put(Node n) {
-        map.put(n.getIdentifier(), n);
+        if (!map.containsKey(n.getIdentifier())) {
+            map.put(n.getIdentifier(), n);
+        }
     }
 
     public void remove(NodeIdentifier id) {
         map.remove(id);
+    }
+    
+    public void clear() {
+    	map.clear() ;
     }
 }

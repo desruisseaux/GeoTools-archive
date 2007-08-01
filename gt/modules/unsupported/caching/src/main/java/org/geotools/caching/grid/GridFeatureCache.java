@@ -26,8 +26,10 @@ import org.geotools.caching.AbstractFeatureCache;
 import org.geotools.caching.CacheOversizedException;
 import org.geotools.caching.FeatureCacheException;
 import org.geotools.caching.FeatureCollectingVisitor;
+import org.geotools.caching.spatialindex.Node;
+import org.geotools.caching.spatialindex.NodeCommand;
 import org.geotools.caching.spatialindex.Region;
-import org.geotools.caching.spatialindex.store.MemoryStorage;
+import org.geotools.caching.spatialindex.Storage;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
 import org.geotools.feature.Feature;
@@ -40,6 +42,10 @@ import org.geotools.filter.spatial.BBOXImpl;
 public class GridFeatureCache extends AbstractFeatureCache {
     GridTracker tracker;
     int max_tiles = 10;
+    int capacity;
+
+    //int evictions = 0 ;
+    //int puts = 0 ;
 
     /**
      * @param FeatureStore from which to cache features
@@ -47,7 +53,7 @@ public class GridFeatureCache extends AbstractFeatureCache {
      * @param capacity = max number of features to cache
      * @throws FeatureCacheException
      */
-    public GridFeatureCache(FeatureStore fs, int indexcapacity, int capacity)
+    public GridFeatureCache(FeatureStore fs, int indexcapacity, int capacity, Storage store)
         throws FeatureCacheException {
         super(fs);
 
@@ -59,7 +65,10 @@ public class GridFeatureCache extends AbstractFeatureCache {
             throw new FeatureCacheException(e);
         }
 
-        tracker = new GridTracker(convert(universe), indexcapacity, new MemoryStorage());
+        this.tracker = new GridTracker(convert(universe), indexcapacity, store);
+        this.capacity = capacity;
+
+        //this.tracker.addWriteNodeCommand(new EvictOnWriteCommand()) ;
     }
 
     protected Filter match(BBOXImpl sr) {
@@ -71,7 +80,7 @@ public class GridFeatureCache extends AbstractFeatureCache {
         if (missing.size() > max_tiles) {
             return sr;
         } else if (missing.size() > 1) {
-            ArrayList filters = new ArrayList(missing.size());
+            ArrayList<Filter> filters = new ArrayList<Filter>(missing.size());
 
             while (!missing.isEmpty()) {
                 Region rg = (Region) missing.pop();
@@ -97,7 +106,7 @@ public class GridFeatureCache extends AbstractFeatureCache {
      */
     protected List match(Envelope e) {
         Region search = convert(e);
-        ArrayList missing = new ArrayList();
+        ArrayList<Envelope> missing = new ArrayList<Envelope>();
 
         if (!this.tracker.getRoot().getShape().contains(search)) { // query is outside of root mbr
                                                                    // we limit our search to the inside of the root mbr
@@ -156,7 +165,19 @@ public class GridFeatureCache extends AbstractFeatureCache {
     }
 
     public void put(FeatureCollection fc) throws CacheOversizedException {
-        //TODO: test for size
+        if (fc.size() > this.capacity) {
+            throw new CacheOversizedException("Cannot cache collection of size " + fc.size()
+                + " (capacity = " + capacity + " )");
+        }
+
+        //puts++ ;
+        while (tracker.getStatistics().getNumberOfData() > (capacity - fc.size())) {
+            tracker.policy.evict();
+
+            //evictions++ ;
+            //System.out.println("Put #" + puts + " > number of evictions = " + evictions) ;
+        }
+
         FeatureIterator it = fc.features();
 
         while (it.hasNext()) {
@@ -172,7 +193,8 @@ public class GridFeatureCache extends AbstractFeatureCache {
     }
 
     protected void register(Envelope e) {
-        ValidatingVisitor v = new ValidatingVisitor();
-        this.tracker.containmentQuery(convert(e), v);
+        Region r = convert(e);
+        ValidatingVisitor v = new ValidatingVisitor(r);
+        this.tracker.containmentQuery(r, v);
     }
 }

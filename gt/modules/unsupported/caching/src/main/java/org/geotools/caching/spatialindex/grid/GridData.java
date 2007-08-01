@@ -24,7 +24,7 @@ import org.geotools.caching.spatialindex.Shape;
  * @author Christophe Rousson, SoC 2007, CRG-ULAVAL
  *
  */
-class GridData implements Data {
+public class GridData implements Data {
     int id;
     Shape shape;
     Object data;

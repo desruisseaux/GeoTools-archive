@@ -33,7 +33,7 @@ public class GridRootNode extends GridNode {
     protected int capacity;
     int[] tiles_number;
     double tiles_size;
-    ArrayList children; // list of NodeIdentifiers
+    ArrayList<NodeIdentifier> children; // list of NodeIdentifiers
 
     protected GridRootNode(Grid grid, Region mbr, int capacity) {
         super(null, mbr);
@@ -70,7 +70,7 @@ public class GridRootNode extends GridNode {
         }
         assert (newcapacity >= capacity);
         capacity = newcapacity;
-        children = new ArrayList(capacity);
+        children = new ArrayList<NodeIdentifier>(capacity);
     }
 
     /** Creates the grid by appending children to this node.
@@ -135,7 +135,7 @@ public class GridRootNode extends GridNode {
 
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append("GridNode: capacity:" + capacity + ", MBR:" + mbr);
+        sb.append("GridRootNode: capacity:" + capacity + ", MBR:" + mbr);
 
         return sb.toString();
     }

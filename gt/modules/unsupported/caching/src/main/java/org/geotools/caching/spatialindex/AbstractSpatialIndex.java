@@ -263,7 +263,18 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
     }
 
     protected Node readNode(NodeIdentifier id) {
-        Node ret = store.get(id);
+        Node ret;
+        /*if (id == this.root) {
+           if (this.rootNode == null) {
+                   ret = store.get(id);
+                   this.rootNode = ret ;
+           } else {
+                   return rootNode ;
+           }
+           } else {
+                   ret = store.get(id);
+           }*/
+        ret = store.get(id);
         stats.stats_reads++;
 
         for (Iterator it = readNodeCommands.iterator(); it.hasNext();) {
@@ -336,6 +347,16 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
             stats_writes = 0;
             stats_nodes = 0;
             stats_data = 0;
+        }
+
+        public String toString() {
+            StringBuffer sb = new StringBuffer();
+            sb.append("Reads = " + stats_reads);
+            sb.append(" ; Writes = " + stats_writes);
+            sb.append(" ; Nodes = " + stats_nodes);
+            sb.append(" ; Data = " + stats_data);
+
+            return sb.toString();
         }
     }
 }

@@ -20,6 +20,9 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -29,6 +32,12 @@ import org.geotools.caching.AbstractFeatureCache;
 import org.geotools.caching.CacheOversizedException;
 import org.geotools.caching.FeatureCacheException;
 import org.geotools.caching.FeatureCollectingVisitor;
+import org.geotools.caching.spatialindex.AbstractSpatialIndex;
+import org.geotools.caching.spatialindex.Data;
+import org.geotools.caching.spatialindex.Node;
+import org.geotools.caching.spatialindex.Shape;
+import org.geotools.caching.spatialindex.Visitor;
+import org.geotools.caching.spatialindex.store.MemoryStorage;
 import org.geotools.caching.util.Generator;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.memory.MemoryDataStore;
@@ -41,10 +50,11 @@ import org.geotools.filter.spatial.BBOXImpl;
 public class GridFeatureCacheTest extends TestCase {
     static FeatureCollection dataset;
     static int numdata = 100;
-    static List filterset;
+    static List<Filter> filterset;
     static Filter unitsquarefilter;
     static Envelope unitsquare;
-    static int numfilters = 10;
+    static int numfilters = 100;
+    static boolean testEviction_holistic = false;
 
     static {
         Generator gen = new Generator(1, 1);
@@ -55,7 +65,7 @@ public class GridFeatureCacheTest extends TestCase {
             dataset.add(f);
         }
 
-        filterset = new ArrayList(numfilters);
+        filterset = new ArrayList<Filter>(numfilters);
 
         for (int i = 0; i < numfilters; i++) {
             Coordinate point = Generator.pickRandomPoint(new Coordinate(0.5, 0.5), 0.5, 0.5);
@@ -76,7 +86,7 @@ public class GridFeatureCacheTest extends TestCase {
             ds.createSchema(dataset.getSchema());
             ds.addFeatures(dataset);
             cache = new GridFeatureCache((FeatureStore) ds.getFeatureSource(
-                        dataset.getSchema().getTypeName()), 100, 1000);
+                        dataset.getSchema().getTypeName()), 100, 1000, new MemoryStorage(100));
         } catch (FeatureCacheException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
@@ -104,7 +114,7 @@ public class GridFeatureCacheTest extends TestCase {
         List matches = cache.match(e);
         assertEquals(1, matches.size());
         assertTrue(((Envelope) matches.get(0)).contains(e));
-        cache.register(e);
+        cache.register((Envelope) matches.get(0));
         matches = cache.match(e);
         assertTrue(matches.isEmpty());
         cache.remove(e);
@@ -137,7 +147,31 @@ public class GridFeatureCacheTest extends TestCase {
     }
 
     public void testOversized() {
-        // TODO
+        FeatureCollection fc = null;
+        boolean pass = false;
+
+        try {
+            cache = new GridFeatureCache((FeatureStore) ds.getFeatureSource(
+                        dataset.getSchema().getTypeName()), 100, 10, new MemoryStorage(100));
+            fc = cache.get(unitsquare); // should not cause CacheOversizedException
+            assertEquals(dataset.size(), fc.size());
+
+            List matches = cache.match(unitsquare);
+            assertFalse(matches.isEmpty()); // but cache should not have registered oversized query
+            pass = true;
+            cache.put(dataset); // must cause CacheOversizedException
+        } catch (CacheOversizedException e) {
+            //e.printStackTrace();
+            assertTrue("CacheOversizedException raised where unexpected", pass);
+
+            return;
+        } catch (FeatureCacheException e) {
+            fail(e.toString());
+        } catch (IOException e) {
+            fail(e.toString());
+        }
+
+        fail("did not get expected CacheOversizedException");
     }
 
     public void testGetFeatures() throws IOException {
@@ -163,7 +197,62 @@ public class GridFeatureCacheTest extends TestCase {
         assertEquals(dataset.getBounds(), env);
     }
 
-    public void testEviction() {
-        // TODO:
+    public void testEviction() throws IOException, FeatureCacheException {
+        cache = new GridFeatureCache((FeatureStore) ds.getFeatureSource(
+                    dataset.getSchema().getTypeName()), 100, numdata / 2, new MemoryStorage(100));
+
+        for (int i = 0; i < 11; i++) {
+            for (int j = 0; j < 11; j++) {
+                Filter f = Generator.createBboxFilter(new Coordinate(i * 0.1, j * 0.1), 0.1, 0.1);
+                Collection c = cache.getFeatures(f);
+                Collection control = ds.getFeatureSource(dataset.getSchema().getTypeName())
+                                       .getFeatures(f);
+                assertEquals(control.size(), c.size());
+
+                if (!testEviction_holistic && (cache.tracker.getEvictions() > 10)) { // wait to generate a faire amount of evictions,
+                                                                                     // and see everything is still working
+
+                    return;
+                }
+            }
+        }
+
+        System.out.println(cache.tracker.getStatistics());
+
+        if (!testEviction_holistic) {
+            fail("Did not got enough evictions : " + cache.tracker.getEvictions());
+        }
+    }
+
+    class PrintingVisitor implements Visitor {
+        public boolean isDataVisitor() {
+            return true;
+        }
+
+        public void visitData(Data d) {
+            System.out.println("    " + d.getData());
+        }
+
+        public void visitNode(Node n) {
+            System.out.println(n + " is " + n.getIdentifier().isValid() + " and has "
+                + n.getDataCount() + " data :");
+        }
+    }
+
+    class CountingVisitor implements Visitor {
+        int data = 0;
+        int nodes = 0;
+
+        public boolean isDataVisitor() {
+            return true;
+        }
+
+        public void visitData(Data d) {
+            data++;
+        }
+
+        public void visitNode(Node n) {
+            nodes++;
+        }
     }
 }

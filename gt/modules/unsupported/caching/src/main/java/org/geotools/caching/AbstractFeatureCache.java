@@ -29,6 +29,7 @@ import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Not;
 import org.opengis.filter.Or;
 import org.opengis.filter.spatial.BBOX;
+import org.geotools.caching.spatialindex.NodeIdentifier;
 import org.geotools.caching.spatialindex.Region;
 import org.geotools.caching.util.BBoxFilterSplitter;
 import org.geotools.data.DataStore;
@@ -161,7 +162,7 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
         throws IOException {
         if (filter instanceof BBOXImpl) {
             //return _getFeatures((BBOXImpl) filter) ;
-            return get(extractEnvelope((BBOXImpl) filter));
+            return get(extractEnvelope((BBOXImpl) filter)).subCollection(filter);
         } else {
             throw new UnsupportedOperationException("Cannot handle given filter :" + filter);
 

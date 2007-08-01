@@ -16,6 +16,7 @@
 package org.geotools.caching.grid;
 
 import org.geotools.caching.spatialindex.Region;
+import org.geotools.caching.spatialindex.grid.GridData;
 import org.geotools.caching.spatialindex.grid.GridNode;
 
 
@@ -24,7 +25,13 @@ public class GridCacheNode extends GridNode {
         super(parent, mbr);
     }
 
-    protected void clear() {
-        super.clear();
+    @Override
+    protected boolean insertData(int id, GridData data) {
+        if (!getIdentifier().isValid()) { // FIXME: do not insert same data mutiple times
+
+            return super.insertData(id, data);
+        }
+
+        return false;
     }
 }

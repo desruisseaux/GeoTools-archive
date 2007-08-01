@@ -15,7 +15,6 @@
  */
 package org.geotools.caching.spatialindex.grid;
 
-import java.util.Iterator;
 import org.geotools.caching.firstdraft.spatialindex.storagemanager.PropertySet;
 import org.geotools.caching.spatialindex.AbstractSpatialIndex;
 import org.geotools.caching.spatialindex.Node;
@@ -24,7 +23,6 @@ import org.geotools.caching.spatialindex.Region;
 import org.geotools.caching.spatialindex.Shape;
 import org.geotools.caching.spatialindex.Storage;
 import org.geotools.caching.spatialindex.Visitor;
-import org.geotools.caching.spatialindex.store.MemoryStorage;
 
 
 /** A grid implementation of SpatialIndex.
@@ -83,7 +81,7 @@ public class Grid extends AbstractSpatialIndex {
         int capacity = oldroot.capacity;
         Region mbr = new Region(oldroot.mbr);
         GridRootNode root = new GridRootNode(this, mbr, capacity);
-        deleteNode(this.root);
+        this.store.clear() ;
         writeNode(root);
         this.root = root.getIdentifier();
         this.stats.reset();
@@ -154,8 +152,11 @@ public class Grid extends AbstractSpatialIndex {
 
     protected void _insertData(NodeIdentifier n, Object data, Shape shape, int id) {
         GridNode node = (GridNode) readNode(n);
-        node.insertData(id, new GridData(id, shape, data));
-        this.stats.addToDataCounter(1);
+
+        if (node.insertData(id, new GridData(id, shape, data))) {
+            writeNode(node);
+            this.stats.addToDataCounter(1);
+        }
     }
 
     protected void insertData(NodeIdentifier n, Object data, Shape shape, int id) {
@@ -166,18 +167,18 @@ public class Grid extends AbstractSpatialIndex {
          * are inserted at root node, because they are likely to fall between two tiles,
          * rather thant in one and only one tile.
          *
-               int[] cursor = new int[this.dimension];
-               for (int i = 0; i < this.dimension; i++) {
-                   cursor[i] = (int) ((shape.getMBR().getLow(i) - node.mbr.getLow(i)) / node.tiles_size);
-               }
-               int nextid = node.gridIndexToNodeId(cursor);
-               Node nextnode = node.getSubNode(nextid);
-               if (nextnode.getShape().contains(shape)) {
-                   insertData(nextnode, data, shape, id);
-               } else {
-                   insertData(this.root, data, shape, id);
-                   root_insertions++;
-               }
+                 int[] cursor = new int[this.dimension];
+                 for (int i = 0; i < this.dimension; i++) {
+                     cursor[i] = (int) ((shape.getMBR().getLow(i) - node.mbr.getLow(i)) / node.tiles_size);
+                 }
+                 int nextid = node.gridIndexToNodeId(cursor);
+                 Node nextnode = node.getSubNode(nextid);
+                 if (nextnode.getShape().contains(shape)) {
+                     insertData(nextnode, data, shape, id);
+                 } else {
+                     insertData(this.root, data, shape, id);
+                     root_insertions++;
+                 }
          */
 
         /* so we prefer this version :

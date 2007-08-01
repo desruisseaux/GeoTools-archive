@@ -31,6 +31,8 @@ package org.geotools.caching.spatialindex;
 public interface Node extends Entry {
     public int getChildrenCount();
 
+    public int getDataCount();
+
     public NodeIdentifier getChildIdentifier(int index)
         throws IndexOutOfBoundsException;
 

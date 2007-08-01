@@ -17,16 +17,25 @@ package org.geotools.caching.grid;
 
 import org.geotools.caching.spatialindex.Data;
 import org.geotools.caching.spatialindex.Node;
+import org.geotools.caching.spatialindex.Region;
 import org.geotools.caching.spatialindex.Visitor;
 
 
 class ValidatingVisitor implements Visitor {
+    Region region;
+
+    public ValidatingVisitor(Region r) {
+        this.region = r;
+    }
+
     public void visitData(Data d) {
         // do nothing
     }
 
     public void visitNode(Node n) {
-        n.getIdentifier().setValid(true);
+        if (region.contains(n.getShape())) {
+            n.getIdentifier().setValid(true);
+        }
     }
 
     public boolean isDataVisitor() {

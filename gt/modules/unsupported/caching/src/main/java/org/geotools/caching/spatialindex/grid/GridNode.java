@@ -92,7 +92,7 @@ public class GridNode implements Node {
      * @param id of data
      * @param data
      */
-    protected void insertData(int id, GridData data) {
+    protected boolean insertData(int id, GridData data) {
         if (num_data == data_ids.length) {
             int[] n_data_ids = new int[data_ids.length * 2];
             GridData[] n_data = new GridData[this.data.length * 2];
@@ -105,6 +105,8 @@ public class GridNode implements Node {
         data_ids[num_data] = id;
         this.data[num_data] = data;
         num_data++;
+
+        return true;
     }
 
     /** Delete blindly data at the given index.
@@ -130,9 +132,20 @@ public class GridNode implements Node {
     /** Erase all data referenced by this node.
      *
      */
-    protected void clear() {
+    public void clear() {
         this.num_data = 0;
         this.data = new GridData[10];
         this.data_ids = new int[10];
+    }
+
+    public int getDataCount() {
+        return this.num_data;
+    }
+
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("GridNode: MBR:" + mbr);
+
+        return sb.toString();
     }
 }

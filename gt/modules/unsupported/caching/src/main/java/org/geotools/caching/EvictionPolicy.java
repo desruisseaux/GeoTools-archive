@@ -13,14 +13,13 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.caching.spatialindex;
+package org.geotools.caching;
 
-public interface Storage {
-    public void put(Node n);
+import org.geotools.caching.spatialindex.NodeIdentifier;
 
-    public void remove(NodeIdentifier id);
 
-    public Node get(NodeIdentifier id);
-    
-    public void clear() ;
+public interface EvictionPolicy {
+    public void evict();
+
+    public void access(NodeIdentifier node);
 }
