@@ -7,6 +7,11 @@ import java.awt.event.MouseEvent;
 
 /**
  * Implements a panning gesture for the 3D renderer.
+ * <p/>
+ * Pan / move across map with left mouse button drag (will actually move camera along the left/right,
+ * up/down axes of the camera). (A single left mouse button click will select / click on an item on map).
+ * The drag has some inertia, so a quick drag will move the camera faster than a slow one.
+ * The camera is kept above the ground level at all times though.
  *
  * @author Hans Häggström
  */
@@ -33,8 +38,11 @@ public final class PanGesture
 
     public void mousePressed( final MouseEvent e )
     {
-        myOldX = e.getX();
-        myOldY = e.getY();
+        if ( isMouseButtonPressed( e, MouseEvent.BUTTON1_DOWN_MASK ) )
+        {
+            myOldX = e.getX();
+            myOldY = e.getY();
+        }
     }
 
     //----------------------------------------------------------------------
@@ -42,24 +50,29 @@ public final class PanGesture
 
     public void mouseDragged( final MouseEvent e )
     {
-        final Camera camera = getCamera();
-
-        if ( camera != null )
+        if ( isMouseButtonPressed( e, MouseEvent.BUTTON1_DOWN_MASK ) )
         {
-            final int currentX = e.getX();
-            final int currentY = e.getY();
+            final Camera camera = getCamera();
+            if ( camera != null )
+            {
+                final int currentX = e.getX();
+                final int currentY = e.getY();
 
-            final float deltaX = ( currentX - myOldX ) * SCALE;
-            final float deltaY = ( currentY - myOldY ) * SCALE;
+                final float deltaX = ( currentX - myOldX ) * SCALE;
+                final float deltaY = ( currentY - myOldY ) * SCALE;
 
-            final Vector3f newLocation = new Vector3f( camera.getLocation() );
-            newLocation.x -= deltaX;
-            newLocation.y += deltaY;
+                // TODO: Add inertia and acceleration
+                // TODO: Add ground collision detection and keep the camera above ground.
 
-            camera.setLocation( newLocation );
+                final Vector3f newLocation = new Vector3f( camera.getLocation() );
+                newLocation.scaleAdd( deltaX, camera.getLeft(), newLocation );
+                newLocation.scaleAdd( deltaY, camera.getUp(), newLocation );
 
-            myOldX = currentX;
-            myOldY = currentY;
+                camera.setLocation( newLocation );
+
+                myOldX = currentX;
+                myOldY = currentY;
+            }
         }
     }
 

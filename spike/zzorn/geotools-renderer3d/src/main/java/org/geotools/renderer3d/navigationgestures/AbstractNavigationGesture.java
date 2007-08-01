@@ -3,11 +3,14 @@ package org.geotools.renderer3d.navigationgestures;
 import com.jme.renderer.Camera;
 
 import javax.swing.event.MouseInputAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
 
 /**
  * Contains common functionality for navigationGestureListeners.
+ * <p/>
+ * REFACTOR: Include common features of Pan and Rotate gestures here or into a common superclass for them.
  *
  * @author Hans Häggström
  */
@@ -58,4 +61,8 @@ public abstract class AbstractNavigationGesture
         }
     }
 
+    protected boolean isMouseButtonPressed( final MouseEvent e, final int buttonDownMask )
+    {
+        return ( e.getModifiersEx() & buttonDownMask ) != 0;
+    }
 }

@@ -7,6 +7,7 @@ import com.jmex.awt.JMECanvas;
 import org.geotools.renderer3d.navigationgestures.CameraAccessor;
 import org.geotools.renderer3d.navigationgestures.NavigationGesture;
 import org.geotools.renderer3d.navigationgestures.PanGesture;
+import org.geotools.renderer3d.navigationgestures.RotateGesture;
 import org.geotools.renderer3d.utils.ParameterChecker;
 
 import java.awt.Canvas;
@@ -75,6 +76,7 @@ public final class Canvas3D
 
         // Add default navigation gestures
         addNavigationGesture( new PanGesture() );
+        addNavigationGesture( new RotateGesture() );
     }
 
     //----------------------------------------------------------------------
