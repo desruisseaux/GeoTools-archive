@@ -1,5 +1,6 @@
 package org.geotools.data.db2;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.HashMap;
@@ -12,12 +13,17 @@ import javax.sql.DataSource;
 import org.geotools.test.OnlineTestCase;
 
 public abstract class AbstractDB2OnlineTestCase extends OnlineTestCase {
-    protected DB2DataStore ds;
+    protected DB2DataStore ds = null;
 
     protected String getFixtureId() {
             return "db2.localType4";
     }
-    
+    public void setUp() throws Exception {
+    	super.setUp();
+    	if (ds == null) {
+    		throw new IOException("DB2 Data Store not available");
+    	}
+    }
     public Connection getConnection() throws Exception {
     	DataSource d =  ds.getDataSource();
         return d.getConnection();
