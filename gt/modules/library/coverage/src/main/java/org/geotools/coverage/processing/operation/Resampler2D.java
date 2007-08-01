@@ -447,7 +447,7 @@ final class Resampler2D extends GridCoverage2D {
          */
         double[] background = null;
         if (operation == null) {
-            if (allSteps instanceof AffineTransform) {
+            if (allSteps instanceof AffineTransform && (automaticGG || automaticGR)) {
                 if (automaticGG) {
                     background = null;// we won't use it
                     // Cheapest approach: just update 'gridToCRS'.
@@ -474,12 +474,13 @@ final class Resampler2D extends GridCoverage2D {
                     return targetCoverage;
                 }
                 // More general approach: apply the affine transform.
-//              if (automaticGR) {
+                if (automaticGR) {
                     operation = "Affine";
                     // prepare the values for the background
                     background = CoverageUtilities.getBackgroundValues(sourceCoverage);
                     final AffineTransform affine = (AffineTransform) allSteps.inverse();
                     paramBlk = paramBlk.add(affine).add(interpolation).add(background);
+                }
             } else {
                 /*
                  * General case: construct the warp transform.
