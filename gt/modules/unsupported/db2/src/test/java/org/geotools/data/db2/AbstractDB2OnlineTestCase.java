@@ -51,7 +51,9 @@ public abstract class AbstractDB2OnlineTestCase extends OnlineTestCase {
     }
     protected void connect() throws Exception {
         ds = (DB2DataStore) new DB2DataStoreFactory().createDataStore(getParams());
-
+        if (ds == null) {
+        	throw (new Exception("Datastore not found"));
+        }
         resetTables();
 
 

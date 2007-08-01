@@ -108,6 +108,9 @@ public class DB2DataStoreFactory extends AbstractDataStoreFactory
         if (!canProcess(params)) {
             throw new IOException("Invalid parameters");
         }
+        if (!isAvailable()) {
+        	throw new IOException("DB2 Driver not available");
+        }
 
         String host = (String) HOST.lookUp(params);
         String user = (String) USER.lookUp(params);
