@@ -516,7 +516,7 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
         }
         if (super.equals(object, compareMetadata)) {
             final DefaultEllipsoid that = (DefaultEllipsoid) object;
-            return this.ivfDefinitive == that.ivfDefinitive &&
+            return (!compareMetadata || this.ivfDefinitive == that.ivfDefinitive) &&
                    Double.doubleToLongBits(this.semiMajorAxis)     == Double.doubleToLongBits(that.semiMajorAxis)     &&
                    Double.doubleToLongBits(this.semiMinorAxis)     == Double.doubleToLongBits(that.semiMinorAxis)     &&
                    Double.doubleToLongBits(this.inverseFlattening) == Double.doubleToLongBits(that.inverseFlattening) &&
