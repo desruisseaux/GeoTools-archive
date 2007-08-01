@@ -18,6 +18,29 @@
                     <target>1.5</target>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <executable>java</executable>
+                    <arguments>
+                        <argument>-Djava.library.path=lib/lwjgl-1.0/native/win32</argument>
+                        <argument>-classpath</argument>
+                        <!-- automatically creates the classpath using all project dependencies,
+                             also adding the project build directory -->
+                        <classpath/>
+                        <argument>org.geotools.renderer3d.example.Show3DMapExample</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -73,6 +96,29 @@
             <artifactId>jai_imageio</artifactId>
             <version>1.1</version>
         </dependency>
+
+        <dependency>
+            <groupId>jme</groupId>
+            <artifactId>jme</artifactId>
+            <version>0.11</version>
+        </dependency>
+        <dependency>
+            <groupId>jme</groupId>
+            <artifactId>jme-awt</artifactId>
+            <version>0.11</version>
+        </dependency>
+        <dependency>
+            <groupId>jme</groupId>
+            <artifactId>jme-gamestates</artifactId>
+            <version>0.11</version>
+        </dependency>
+
+        <dependency>
+            <groupId>lwjgl</groupId>
+            <artifactId>lwjgl</artifactId>
+            <version>1.0</version>
+        </dependency>
+
 
     </dependencies>
 
