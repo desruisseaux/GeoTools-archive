@@ -15,6 +15,7 @@
  */
 package org.geotools.filter;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.factory.Hints;
@@ -134,7 +135,8 @@ public class AttributeExpressionImpl extends DefaultExpression
    
    public void setPropertyName(String attPath) {
 	   LOGGER.entering("ExpressionAttribute", "setAttributePath", attPath);
-       LOGGER.finest("schema: " + schema + "\n\nattribute: " + attPath);
+	   if(LOGGER.isLoggable(Level.FINEST))
+	       LOGGER.finest("schema: " + schema + "\n\nattribute: " + attPath);
 
        if (schema != null) {
            if (schema.hasAttributeType(attPath)) {
@@ -230,17 +232,20 @@ public class AttributeExpressionImpl extends DefaultExpression
             AttributeExpressionImpl expAttr = (AttributeExpressionImpl) obj;
 
             boolean isEqual = (expAttr.getType() == this.expressionType);
-            LOGGER.finest("expression type match:" + isEqual + "; in:"
+            if(LOGGER.isLoggable(Level.FINEST))
+                LOGGER.finest("expression type match:" + isEqual + "; in:"
                 + expAttr.getType() + "; out:" + this.expressionType);
             isEqual = (expAttr.attPath != null)
                 ? (isEqual && expAttr.attPath.equals(this.attPath))
                 : (isEqual && (this.attPath == null));
-            LOGGER.finest("attribute match:" + isEqual + "; in:"
+            if(LOGGER.isLoggable(Level.FINEST))
+                LOGGER.finest("attribute match:" + isEqual + "; in:"
                 + expAttr.getAttributePath() + "; out:" + this.attPath);
             isEqual = (expAttr.schema != null)
                 ? (isEqual && expAttr.schema.equals(this.schema))
                 : (isEqual && (this.schema == null));
-            LOGGER.finest("schema match:" + isEqual + "; in:" + expAttr.schema
+            if(LOGGER.isLoggable(Level.FINEST))
+                LOGGER.finest("schema match:" + isEqual + "; in:" + expAttr.schema
                 + "; out:" + this.schema);
 
             return isEqual;
