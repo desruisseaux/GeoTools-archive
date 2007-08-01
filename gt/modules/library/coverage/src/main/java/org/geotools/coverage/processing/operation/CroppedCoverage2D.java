@@ -269,7 +269,7 @@ final class CroppedCoverage2D extends GridCoverage2D {
 		// ////////////////////////////////////////////////////////////////////
 		if (intersectionEnvelope.isEmpty())
 			return null;
-		if (intersectionEnvelope.equals(oldEnvelope, scaleFactor / 2.0))
+		if (intersectionEnvelope.equals(oldEnvelope, scaleFactor / 2.0, false))
 			return new GridGeometry2D(oldGR, oldEnvelope);
 
 		// ////////////////////////////////////////////////////////////////////

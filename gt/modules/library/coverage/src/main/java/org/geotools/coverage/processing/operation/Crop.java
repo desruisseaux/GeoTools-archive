@@ -168,7 +168,7 @@ public class Crop extends Operation2D {
 		// do we need to do something
 		if (!intersectionEnvelope.equals(sourceEnvelope, XAffineTransform
 				.getScale((AffineTransform)((GridGeometry2D) source.getGridGeometry())
-						.getGridToCRS2D()) / 2.0)) {
+						.getGridToCRS2D()) / 2.0, false)) {
 			envelopeParameter.setValue(intersectionEnvelope.clone());
 			return CroppedCoverage2D
 					.create(parameters,
