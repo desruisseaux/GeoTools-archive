@@ -46,13 +46,24 @@ public class Show3DMapExample
         mapView2D.setCursor( new Cursor( Cursor.MOVE_CURSOR ) );
 
         // Build and show the rest of the UI
-        createUi( mapView3D, mapView2D );
+        createUi( wrapInTitledPanel( mapView3D, "3D map renderer" ),
+                  wrapInTitledPanel( mapView2D, "2D JMapPanel view" ) );
     }
 
     //======================================================================
     // Private Methods
 
-    private static void createUi( final Component view3D, final JMapPane view2D )
+    private static JPanel wrapInTitledPanel( Component component, final String title )
+    {
+        final JPanel panel = new JPanel( new BorderLayout() );
+        panel.add( component, BorderLayout.CENTER );
+        panel.add( new JLabel( title ), BorderLayout.NORTH );
+
+        return panel;
+    }
+
+
+    private static void createUi( final Component view3D, final JComponent view2D )
     {
         final JPanel mainPanel = new JPanel( new BorderLayout() );
 

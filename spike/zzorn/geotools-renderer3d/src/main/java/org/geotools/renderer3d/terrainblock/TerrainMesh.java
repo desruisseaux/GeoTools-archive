@@ -456,8 +456,14 @@ public final class TerrainMesh
 
         final Vector3f position = new Vector3f( xPos, yPos, zPos );
         final Vector3f normal = new Vector3f( 0, 0, 1 );
-        final ColorRGBA color = new ColorRGBA( DEFAULT_ANISO_LEVEL,
-                                               DEFAULT_ANISO_LEVEL, DEFAULT_ANISO_LEVEL, DEFAULT_ANISO_LEVEL );
+/*
+        final ColorRGBA color = new ColorRGBA( 1.0f,1.0f, 1.0f, 1.0f );
+*/
+        // DEBUG:
+        final ColorRGBA color = new ColorRGBA( (float) Math.random(),
+                                               (float) Math.random(),
+                                               (float) Math.random(),
+                                               1.0f );
         final Vector2f textureCoordinate = new Vector2f( textureXPos, textureYPos );
 
         BufferUtils.setInBuffer( position, myVertexes, index );
