@@ -106,13 +106,12 @@
     <!--         -DartifactId=db2jcc_license_cu -Dversion=8.2 -Dpackaging=jar -->
     <!--         -Dfile=d:\sqllib\java\db2jcc_license_cu.jar (or similar)     -->
     <!--                                                           -->
-    <!--
     <dependency>
       <groupId>com.ibm</groupId>
       <artifactId>db2jcc_dummy</artifactId>
       <version>8.2.1</version>
     </dependency>
-    -->
+    <!--
     <dependency>
       <groupId>com.ibm</groupId>
       <artifactId>db2jcc</artifactId>
@@ -125,6 +124,7 @@
       <version>8.2</version>
       <scope>provided</scope>
     </dependency>
+    -->
   </dependencies>
 
 
