@@ -4,10 +4,8 @@ import com.jme.renderer.Camera;
 import com.jme.scene.Spatial;
 import com.jme.system.DisplaySystem;
 import com.jmex.awt.JMECanvas;
-import org.geotools.renderer3d.navigationgestures.CameraAccessor;
-import org.geotools.renderer3d.navigationgestures.NavigationGesture;
-import org.geotools.renderer3d.navigationgestures.PanGesture;
-import org.geotools.renderer3d.navigationgestures.RotateGesture;
+import org.geotools.renderer3d.navigationgestures.*;
+import org.geotools.renderer3d.utils.CursorChangerImpl;
 import org.geotools.renderer3d.utils.ParameterChecker;
 
 import java.awt.Canvas;
@@ -52,6 +50,8 @@ public final class Canvas3D
     private Canvas myCanvas = null;
     private CanvasRenderer myCanvasRenderer = null;
 
+    private final CursorChangerImpl myCursorChanger = new CursorChangerImpl();
+
     //======================================================================
     // Private Constants
 
@@ -77,6 +77,7 @@ public final class Canvas3D
         // Add default navigation gestures
         addNavigationGesture( new PanGesture() );
         addNavigationGesture( new RotateGesture() );
+        addNavigationGesture( new MoveGesture() );
     }
 
     //----------------------------------------------------------------------
@@ -147,10 +148,7 @@ public final class Canvas3D
     {
         if ( myCanvas != null )
         {
-            myCanvas.addMouseMotionListener( navigationGesture );
-            myCanvas.addMouseListener( navigationGesture );
-            myCanvas.addMouseWheelListener( navigationGesture );
-            navigationGesture.setCameraAccessor( myCameraAccessor );
+            navigationGesture.init( myCanvas, myCursorChanger, myCameraAccessor );
         }
     }
 
@@ -159,10 +157,7 @@ public final class Canvas3D
     {
         if ( myCanvas != null )
         {
-            myCanvas.removeMouseMotionListener( navigationGesture );
-            myCanvas.removeMouseListener( navigationGesture );
-            myCanvas.removeMouseWheelListener( navigationGesture );
-            navigationGesture.setCameraAccessor( null );
+            navigationGesture.deInit();
         }
     }
 
@@ -175,6 +170,7 @@ public final class Canvas3D
         // Create the 3D canvas
         myCanvas = DisplaySystem.getDisplaySystem( "lwjgl" ).createCanvas( width, height );
         myCanvas.setMinimumSize( new Dimension( 0, 0 ) ); // Make sure it is shrinkable
+        myCursorChanger.setComponent( myCanvas );
         final JMECanvas jmeCanvas = ( (JMECanvas) myCanvas );
 
         // Set the renderer that renders the canvas contents

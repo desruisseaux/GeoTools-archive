@@ -3,6 +3,7 @@ package org.geotools.renderer3d.navigationgestures;
 import com.jme.math.Vector3f;
 import com.jme.renderer.Camera;
 
+import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 
 /**
@@ -12,68 +13,47 @@ import java.awt.event.MouseEvent;
  * up/down axes of the camera). (A single left mouse button click will select / click on an item on map).
  * The drag has some inertia, so a quick drag will move the camera faster than a slow one.
  * The camera is kept above the ground level at all times though.
+ * <p/>
+ * Also scale pan amount by altitude.
  *
  * @author Hans Häggström
  */
 public final class PanGesture
-        extends AbstractNavigationGesture
+        extends AbstractDragGesture
 {
-
-    //======================================================================
-    // Private Fields
-
-    private int myOldX = 0;
-    private int myOldY = 0;
 
     //======================================================================
     // Private Constants
 
-    private static final float SCALE = 0.1f;
+    private static final float DEFAULT_PAN_SENSITIVITY = 0.1f;
 
     //======================================================================
     // Public Methods
 
     //----------------------------------------------------------------------
-    // MouseListener Implementation
+    // Constructors
 
-    public void mousePressed( final MouseEvent e )
+    public PanGesture()
     {
-        if ( isMouseButtonPressed( e, MouseEvent.BUTTON1_DOWN_MASK ) )
-        {
-            myOldX = e.getX();
-            myOldY = e.getY();
-        }
+        super( DEFAULT_PAN_SENSITIVITY, MouseEvent.BUTTON3, InputEvent.BUTTON3_DOWN_MASK );
     }
 
-    //----------------------------------------------------------------------
-    // MouseMotionListener Implementation
+    //======================================================================
+    // Protected Methods
 
-    public void mouseDragged( final MouseEvent e )
+    protected void applyDragGesture( final Camera camera, final float deltaX, final float deltaY )
     {
-        if ( isMouseButtonPressed( e, MouseEvent.BUTTON1_DOWN_MASK ) )
-        {
-            final Camera camera = getCamera();
-            if ( camera != null )
-            {
-                final int currentX = e.getX();
-                final int currentY = e.getY();
+        final float altitudeFactor = getAltitudeFactor();
 
-                final float deltaX = ( currentX - myOldX ) * SCALE;
-                final float deltaY = ( currentY - myOldY ) * SCALE;
+        // TODO: Add inertia and acceleration
+        // TODO: Add ground collision detection and keep the camera above ground.
 
-                // TODO: Add inertia and acceleration
-                // TODO: Add ground collision detection and keep the camera above ground.
+        final Vector3f newLocation = new Vector3f( camera.getLocation() );
 
-                final Vector3f newLocation = new Vector3f( camera.getLocation() );
-                newLocation.scaleAdd( deltaX, camera.getLeft(), newLocation );
-                newLocation.scaleAdd( deltaY, camera.getUp(), newLocation );
+        newLocation.scaleAdd( -deltaX * altitudeFactor, camera.getLeft(), newLocation );
+        newLocation.scaleAdd( -deltaY * altitudeFactor, camera.getUp(), newLocation );
 
-                camera.setLocation( newLocation );
-
-                myOldX = currentX;
-                myOldY = currentY;
-            }
-        }
+        camera.setLocation( newLocation );
     }
 
 }

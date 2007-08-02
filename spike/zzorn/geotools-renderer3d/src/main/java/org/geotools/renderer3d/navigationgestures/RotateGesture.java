@@ -4,6 +4,7 @@ import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jme.renderer.Camera;
 
+import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 
 /**
@@ -15,7 +16,7 @@ import java.awt.event.MouseEvent;
  * @author Hans Häggström
  */
 public final class RotateGesture
-        extends AbstractNavigationGesture
+        extends AbstractDragGesture
 {
 
     //======================================================================
@@ -23,68 +24,47 @@ public final class RotateGesture
 
     private Quaternion myRotation = new Quaternion( 0, 0, 0, 1 );
     private Quaternion myDirection = new Quaternion( 0, 0, 0, 1 );
-    private int myOldX = 0;
-    private int myOldY = 0;
 
     //======================================================================
     // Private Constants
 
-    private static final float SCALE = 0.1f;
     private static final Vector3f Z_AXIS = new Vector3f( 0, 0, 1 );
+    private static final float DEFAULT_ROTATION_SENSITIVITY = 0.01f;
 
     //======================================================================
     // Public Methods
 
     //----------------------------------------------------------------------
-    // MouseListener Implementation
+    // Constructors
 
-    public void mousePressed( final MouseEvent e )
+    public RotateGesture()
     {
-        if ( isMouseButtonPressed( e, MouseEvent.BUTTON3_DOWN_MASK ) )
-        {
-            myOldX = e.getX();
-            myOldY = e.getY();
-        }
+        super( DEFAULT_ROTATION_SENSITIVITY, MouseEvent.BUTTON1, InputEvent.BUTTON1_DOWN_MASK );
     }
 
-    //----------------------------------------------------------------------
-    // MouseMotionListener Implementation
+    //======================================================================
+    // Protected Methods
 
-
-    public void mouseDragged( final MouseEvent e )
+    protected void applyDragGesture( final Camera camera, final float deltaX, final float deltaY )
     {
-        if ( isMouseButtonPressed( e, MouseEvent.BUTTON3_DOWN_MASK ) )
-        {
-            final Camera camera = getCamera();
-            if ( camera != null )
-            {
-                final int currentX = e.getX();
-                final int currentY = e.getY();
+        // Get quaternion from camera
+        final Vector3f left = camera.getLeft();
+        final Vector3f up = camera.getUp();
+        final Vector3f forward = camera.getDirection();
+        myDirection.fromAxes( left, up, forward );
 
-                final float deltaX = ( currentX - myOldX ) * SCALE;
-                final float deltaY = ( currentY - myOldY ) * SCALE;
+        // TODO: Block rotation so that it is not possible to turn upside down
 
-                // Get quaternion from camera
-                final Vector3f left = camera.getLeft();
-                final Vector3f up = camera.getUp();
-                final Vector3f forward = camera.getDirection();
-                myDirection.fromAxes( left, up, forward );
+        // Apply rotation to around current position
+        myRotation.fromAngleNormalAxis( deltaY, left );
+        myRotation.mult( myDirection, myDirection );
+        myRotation.fromAngleNormalAxis( -deltaX, Z_AXIS );
+        myRotation.mult( myDirection, myDirection );
 
-                // Apply rotation to around current position
-                myRotation.fromAngleNormalAxis( deltaY * SCALE, left );
-                myRotation.mult( myDirection, myDirection );
-                myRotation.fromAngleNormalAxis( -deltaX * SCALE, Z_AXIS );
-                myRotation.mult( myDirection, myDirection );
+        // Apply new direction to camera
+        camera.setAxes( myDirection );
 
-                // Apply new direction to camera
-                camera.setAxes( myDirection );
-
-                // TODO: Stabilize the left, up, and forward vectors so that they stay orthogonal despite rotation rounding errors.
-
-                myOldX = currentX;
-                myOldY = currentY;
-            }
-        }
+        // TODO: Stabilize the left, up, and forward vectors so that they stay orthogonal despite rotation rounding errors.
     }
 
 }
