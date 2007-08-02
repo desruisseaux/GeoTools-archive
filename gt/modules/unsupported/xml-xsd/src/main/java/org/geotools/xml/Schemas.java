@@ -858,7 +858,7 @@ public class Schemas {
 
         while (!queue.isEmpty()) {
             schema = (XSDSchema) queue.removeFirst();
-
+            
             List contents = schema.getContents();
 
             for (Iterator itr = contents.iterator(); itr.hasNext();) {
@@ -871,7 +871,13 @@ public class Schemas {
                         includes.add(include);
                         added.add(include.getSchemaLocation());
 
-                        queue.addLast(include.getIncorporatedSchema());
+                        if ( include.getIncorporatedSchema() != null ) {
+                        	queue.addLast(include.getIncorporatedSchema());	
+                        }
+                        else {
+                        	LOGGER.fine( "include: " + include + " resulted in null schema");
+                        }
+                        
                     }
                 }
             }
