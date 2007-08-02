@@ -21,6 +21,6 @@ public interface Storage {
     public void remove(NodeIdentifier id);
 
     public Node get(NodeIdentifier id);
-    
-    public void clear() ;
+
+    public void clear();
 }

@@ -26,11 +26,9 @@ import org.geotools.caching.AbstractFeatureCache;
 import org.geotools.caching.CacheOversizedException;
 import org.geotools.caching.FeatureCacheException;
 import org.geotools.caching.FeatureCollectingVisitor;
-import org.geotools.caching.spatialindex.Node;
-import org.geotools.caching.spatialindex.NodeCommand;
 import org.geotools.caching.spatialindex.Region;
 import org.geotools.caching.spatialindex.Storage;
-import org.geotools.data.FeatureStore;
+import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
@@ -53,7 +51,7 @@ public class GridFeatureCache extends AbstractFeatureCache {
      * @param capacity = max number of features to cache
      * @throws FeatureCacheException
      */
-    public GridFeatureCache(FeatureStore fs, int indexcapacity, int capacity, Storage store)
+    public GridFeatureCache(FeatureSource fs, int indexcapacity, int capacity, Storage store)
         throws FeatureCacheException {
         super(fs);
 
@@ -165,13 +163,15 @@ public class GridFeatureCache extends AbstractFeatureCache {
     }
 
     public void put(FeatureCollection fc) throws CacheOversizedException {
-        if (fc.size() > this.capacity) {
+        int size = fc.size();
+
+        if (size > this.capacity) {
             throw new CacheOversizedException("Cannot cache collection of size " + fc.size()
                 + " (capacity = " + capacity + " )");
         }
 
         //puts++ ;
-        while (tracker.getStatistics().getNumberOfData() > (capacity - fc.size())) {
+        while (tracker.getStatistics().getNumberOfData() > (capacity - size)) { // was capacity - fc.size()
             tracker.policy.evict();
 
             //evictions++ ;
@@ -196,5 +196,16 @@ public class GridFeatureCache extends AbstractFeatureCache {
         Region r = convert(e);
         ValidatingVisitor v = new ValidatingVisitor(r);
         this.tracker.containmentQuery(r, v);
+    }
+
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("GridFeatureCache [");
+        sb.append(" Source = " + this.fs);
+        sb.append(" Capacity = " + this.capacity);
+        sb.append(" Nodes = " + this.tracker.stats.getNumberOfNodes());
+        sb.append(" ]");
+
+        return sb.toString();
     }
 }

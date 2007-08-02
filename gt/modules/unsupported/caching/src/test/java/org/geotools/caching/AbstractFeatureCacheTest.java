@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.caching.grid;
+package org.geotools.caching;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -47,14 +47,13 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.filter.spatial.BBOXImpl;
 
 
-public class GridFeatureCacheTest extends TestCase {
-    static FeatureCollection dataset;
-    static int numdata = 100;
-    static List<Filter> filterset;
-    static Filter unitsquarefilter;
-    static Envelope unitsquare;
-    static int numfilters = 100;
-    static boolean testEviction_holistic = false;
+public abstract class AbstractFeatureCacheTest extends TestCase {
+    protected static FeatureCollection dataset;
+    protected static int numdata = 100;
+    protected static List<Filter> filterset;
+    public final static Filter unitsquarefilter;
+    public final static Envelope unitsquare;
+    protected static int numfilters = 100;
 
     static {
         Generator gen = new Generator(1, 1);
@@ -77,22 +76,24 @@ public class GridFeatureCacheTest extends TestCase {
         unitsquare = AbstractFeatureCache.extractEnvelope((BBOXImpl) unitsquarefilter);
     }
 
-    MemoryDataStore ds;
-    GridFeatureCache cache;
+    protected MemoryDataStore ds;
+    protected AbstractFeatureCache cache;
 
     protected void setUp() {
         try {
             ds = new MemoryDataStore();
             ds.createSchema(dataset.getSchema());
             ds.addFeatures(dataset);
-            cache = new GridFeatureCache((FeatureStore) ds.getFeatureSource(
-                        dataset.getSchema().getTypeName()), 100, 1000, new MemoryStorage(100));
+            cache = createInstance(1000);
         } catch (FeatureCacheException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
+    protected abstract AbstractFeatureCache createInstance(int capacity)
+        throws FeatureCacheException, IOException;
 
     public void testExtractEnvelope() {
         BBOXImpl filter = (BBOXImpl) Generator.createBboxFilter(new Coordinate(0.1, 0.9), 0.2, 0.3);
@@ -102,10 +103,6 @@ public class GridFeatureCacheTest extends TestCase {
     }
 
     public void testConvert() {
-    }
-
-    public static Test suite() {
-        return new TestSuite(GridFeatureCacheTest.class);
     }
 
     public void testRegister() {
@@ -123,13 +120,7 @@ public class GridFeatureCacheTest extends TestCase {
         assertTrue(((Envelope) matches.get(0)).contains(e));
     }
 
-    public void testPut() throws CacheOversizedException {
-        cache.put(dataset);
-
-        FeatureCollectingVisitor v = new FeatureCollectingVisitor(dataset.getFeatureType());
-        cache.tracker.intersectionQuery(AbstractFeatureCache.convert(unitsquare), v);
-        assertEquals(dataset.size(), v.getCollection().size());
-    }
+    public abstract void testPut() throws CacheOversizedException;
 
     public void testPeek() throws CacheOversizedException {
         cache.put(dataset);
@@ -151,8 +142,7 @@ public class GridFeatureCacheTest extends TestCase {
         boolean pass = false;
 
         try {
-            cache = new GridFeatureCache((FeatureStore) ds.getFeatureSource(
-                        dataset.getSchema().getTypeName()), 100, 10, new MemoryStorage(100));
+            cache = createInstance(10);
             fc = cache.get(unitsquare); // should not cause CacheOversizedException
             assertEquals(dataset.size(), fc.size());
 
@@ -197,32 +187,7 @@ public class GridFeatureCacheTest extends TestCase {
         assertEquals(dataset.getBounds(), env);
     }
 
-    public void testEviction() throws IOException, FeatureCacheException {
-        cache = new GridFeatureCache((FeatureStore) ds.getFeatureSource(
-                    dataset.getSchema().getTypeName()), 100, numdata / 2, new MemoryStorage(100));
-
-        for (int i = 0; i < 11; i++) {
-            for (int j = 0; j < 11; j++) {
-                Filter f = Generator.createBboxFilter(new Coordinate(i * 0.1, j * 0.1), 0.1, 0.1);
-                Collection c = cache.getFeatures(f);
-                Collection control = ds.getFeatureSource(dataset.getSchema().getTypeName())
-                                       .getFeatures(f);
-                assertEquals(control.size(), c.size());
-
-                if (!testEviction_holistic && (cache.tracker.getEvictions() > 10)) { // wait to generate a faire amount of evictions,
-                                                                                     // and see everything is still working
-
-                    return;
-                }
-            }
-        }
-
-        System.out.println(cache.tracker.getStatistics());
-
-        if (!testEviction_holistic) {
-            fail("Did not got enough evictions : " + cache.tracker.getEvictions());
-        }
-    }
+    public abstract void testEviction() throws IOException, FeatureCacheException;
 
     class PrintingVisitor implements Visitor {
         public boolean isDataVisitor() {
@@ -239,7 +204,7 @@ public class GridFeatureCacheTest extends TestCase {
         }
     }
 
-    class CountingVisitor implements Visitor {
+    public class CountingVisitor implements Visitor {
         int data = 0;
         int nodes = 0;
 

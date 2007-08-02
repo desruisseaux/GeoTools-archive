@@ -29,13 +29,13 @@ import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Not;
 import org.opengis.filter.Or;
 import org.opengis.filter.spatial.BBOX;
-import org.geotools.caching.spatialindex.NodeIdentifier;
 import org.geotools.caching.spatialindex.Region;
 import org.geotools.caching.util.BBoxFilterSplitter;
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureEvent;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
@@ -64,44 +64,44 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
         caps.addType(BBOX.class);
     }
 
-    protected FeatureStore fs;
+    protected FeatureSource fs;
+    protected int source_hits = 0;
+    protected int source_feature_reads = 0;
 
-    public AbstractFeatureCache(FeatureStore fs) {
+    public AbstractFeatureCache(FeatureSource fs) {
         this.fs = fs;
         fs.addFeatureListener(this);
     }
 
-    public Set addFeatures(FeatureCollection collection)
-        throws IOException {
-        return this.fs.addFeatures(collection);
-    }
-
-    public Transaction getTransaction() {
-        return this.fs.getTransaction();
-    }
-
-    public void modifyFeatures(AttributeType[] type, Object[] value, Filter filter)
-        throws IOException {
-        this.fs.modifyFeatures(type, value, filter);
-    }
-
-    public void modifyFeatures(AttributeType type, Object value, Filter filter)
-        throws IOException {
-        this.fs.modifyFeatures(type, value, filter);
-    }
-
-    public void removeFeatures(Filter filter) throws IOException {
-        this.fs.removeFeatures(filter);
-    }
-
-    public void setFeatures(FeatureReader reader) throws IOException {
-        this.fs.setFeatures(reader);
-    }
-
-    public void setTransaction(Transaction transaction) {
-        this.fs.setTransaction(transaction);
-    }
-
+    /*
+     * Interface FeatureStore : not more needed in this read-only version
+     *
+     *
+    
+       public Set addFeatures(FeatureCollection collection)
+           throws IOException {
+           return this.fs.addFeatures(collection);
+       }
+       public Transaction getTransaction() {
+           return this.fs.getTransaction();
+       }
+       public void modifyFeatures(AttributeType[] type, Object[] value, Filter filter)
+           throws IOException {
+           this.fs.modifyFeatures(type, value, filter);
+       }
+       public void modifyFeatures(AttributeType type, Object value, Filter filter)
+           throws IOException {
+           this.fs.modifyFeatures(type, value, filter);
+       }
+       public void removeFeatures(Filter filter) throws IOException {
+           this.fs.removeFeatures(filter);
+       }
+       public void setFeatures(FeatureReader reader) throws IOException {
+           this.fs.setFeatures(reader);
+       }
+       public void setTransaction(Transaction transaction) {
+           this.fs.setTransaction(transaction);
+       } */
     public void addFeatureListener(FeatureListener listener) {
         this.fs.addFeatureListener(listener);
     }
@@ -250,6 +250,8 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
                 Filter filter = ff.bbox(geometryname, m.getMinX(), m.getMinY(), m.getMaxX(),
                         m.getMaxY(), srs);
                 fromSource = this.fs.getFeatures(filter);
+                source_hits++;
+                source_feature_reads += fromSource.size();
 
                 try {
                     put(fromSource, e);
@@ -277,6 +279,8 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
 
         Filter filter = ff.or(filters);
         fromSource = this.fs.getFeatures(filter);
+        source_hits++;
+        source_feature_reads += fromSource.size();
 
         try {
             put(fromSource); // add new data to cache - will raise an exception if cache is oversized 
@@ -302,6 +306,8 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
     protected abstract List match(Envelope e);
 
     protected abstract void register(BBOXImpl f);
+
+    protected abstract void register(Envelope e);
 
     public static Envelope extractEnvelope(BBOXImpl filter) {
         return new Envelope(filter.getMinX(), filter.getMaxX(), filter.getMinY(), filter.getMaxY());
@@ -342,5 +348,13 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
         } else {
             throw new UnsupportedOperationException("Do not know how to handle this filter" + f);
         }
+    }
+
+    public String sourceAccessStats() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("Source hits = " + source_hits);
+        sb.append(" ; Feature reads = " + source_feature_reads);
+
+        return sb.toString();
     }
 }

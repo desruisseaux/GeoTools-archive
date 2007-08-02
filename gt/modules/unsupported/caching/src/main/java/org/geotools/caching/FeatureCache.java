@@ -17,11 +17,11 @@ package org.geotools.caching;
 
 import java.io.IOException;
 import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.data.FeatureStore;
+import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureCollection;
 
 
-public interface FeatureCache extends FeatureStore {
+public interface FeatureCache extends FeatureSource {
     public void clear();
 
     public void put(FeatureCollection fc, Envelope e) throws CacheOversizedException;

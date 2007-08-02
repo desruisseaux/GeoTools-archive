@@ -91,7 +91,7 @@ public class GridTracker extends Grid implements EvictableTree {
         int capacity = oldroot.getCapacity();
         Region mbr = new Region((Region) oldroot.getShape());
         GridCacheRootNode root = new GridCacheRootNode(this, mbr, capacity);
-        this.store.clear() ;
+        this.store.clear();
         writeNode(root);
         this.root = root.getIdentifier();
         this.stats.reset();

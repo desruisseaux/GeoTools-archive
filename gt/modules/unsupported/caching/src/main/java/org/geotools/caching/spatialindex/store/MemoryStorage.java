@@ -47,8 +47,8 @@ public class MemoryStorage implements Storage {
     public void remove(NodeIdentifier id) {
         map.remove(id);
     }
-    
+
     public void clear() {
-    	map.clear() ;
+        map.clear();
     }
 }
