@@ -19,6 +19,9 @@ import org.geotools.data.DataStoreFactorySpi.Param;
  */
 public class DBCPDataSourceFactory extends AbstractDataSourceFactorySpi {
 
+    public static final Param DSTYPE = new Param("dstype", String.class,
+            "Must be DBCP", false);
+    
     public static final Param USERNAME = new Param("username", String.class,
             "User name to login as", false);
 
@@ -37,11 +40,15 @@ public class DBCPDataSourceFactory extends AbstractDataSourceFactorySpi {
     public static final Param MAXIDLE = new Param("maxIdle", Integer.class,
             "The maximum number of idle connections in the pool", true);
 
-    private static final Param[] PARAMS = new Param[] { DRIVERCLASS, JDBC_URL, USERNAME, PASSWORD,
+    private static final Param[] PARAMS = new Param[] { DSTYPE, DRIVERCLASS, JDBC_URL, USERNAME, PASSWORD,
             MAXACTIVE, MAXIDLE };
 
     public DataSource createDataSource(Map params) throws IOException {
         return createNewDataSource(params);
+    }
+    
+    public boolean canProcess(Map params) {
+        return super.canProcess(params) && "DBCP".equals(params.get("dstype"));
     }
 
     public DataSource createNewDataSource(Map params) throws IOException {

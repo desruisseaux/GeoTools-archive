@@ -18,6 +18,7 @@ public class DataSourceFinderTest extends TestCase {
         DataSourceFinder.scanForPlugins();
         
         Map map = new HashMap();
+        map.put(DBCPDataSourceFactory.DSTYPE.key, "DBCP");
         map.put(DBCPDataSourceFactory.DRIVERCLASS.key, "org.h2.Driver");
         map.put(DBCPDataSourceFactory.JDBC_URL.key, "jdbc:h2:mem:test_mem");
         map.put(DBCPDataSourceFactory.USERNAME.key, "admin");

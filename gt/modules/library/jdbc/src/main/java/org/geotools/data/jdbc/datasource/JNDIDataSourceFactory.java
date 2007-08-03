@@ -15,14 +15,21 @@ import org.geotools.factory.GeoTools;
  *
  */
 public class JNDIDataSourceFactory extends AbstractDataSourceFactorySpi {
+    
+    public static final Param DSTYPE = new Param("dstype", String.class,
+            "Must be JNDI", false);
 
     public static final Param JNDI_REFNAME = new Param("jdniReferenceName", String.class,
             "The path where the connection pool must be located", true);
 
-    private static final Param[] PARAMS = new Param[] { JNDI_REFNAME };
+    private static final Param[] PARAMS = new Param[] { DSTYPE, JNDI_REFNAME };
 
     public DataSource createDataSource(Map params) throws IOException {
         return createNewDataSource(params);
+    }
+    
+    public boolean canProcess(Map params) {
+        return super.canProcess(params) && "JNDI".equals(params.get("dstype"));
     }
 
     public DataSource createNewDataSource(Map params) throws IOException {
