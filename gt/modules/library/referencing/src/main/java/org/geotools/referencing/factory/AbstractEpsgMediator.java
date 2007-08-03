@@ -20,8 +20,10 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
+import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.util.SimpleInternationalString;
@@ -48,6 +50,45 @@ public abstract class AbstractEpsgMediator extends AbstractAuthorityMediator {
 
     protected DataSource datasource;
     
+    /**
+     * No argument constructor - must not fail for factory finder registration.
+     * @param hints
+     * @throws FactoryException
+     */
+    public AbstractEpsgMediator() {
+    }
+    
+    public AbstractEpsgMediator(Hints hints ) throws FactoryException {
+        this( hints, lookupDataSource( hints ));
+    }
+    /**
+     * We expect the EPSG_DATASOURCE to provide a DataSource.
+     * Either:
+     * <ul>
+     * <li>A name we can use to look up the DataSource in the initial context
+     * <li>An actual DataSource instance
+     * </ul>
+     * 
+     * @param hints
+     * @return DataSource
+     */
+    private static DataSource lookupDataSource( Hints hints ) throws FactoryException {
+        Object hint = hints.get(Hints.EPSG_DATA_SOURCE);
+        if( hint instanceof DataSource ){
+            return (DataSource) hint;
+        }
+        else if ( hint instanceof String){
+            String name = (String) hint;
+            InitialContext context;
+            try {
+                context = GeoTools.getInitialContext( hints );
+                return (DataSource) context.lookup( name );                
+            } catch (Exception e) {
+                throw new FactoryException( "EPSG_DATA_SOURCE '"+name+"' not found:"+e, e );
+            }            
+        }
+        throw new FactoryException( "EPSG_DATA_SOURCE must be provided");
+    }
     public AbstractEpsgMediator(Hints hints, DataSource datasource) {
         super(PRIORITY,hints);
         

@@ -20,6 +20,7 @@ import javax.sql.DataSource;
 import org.geotools.factory.Hints;
 import org.geotools.referencing.factory.AbstractCachedAuthorityFactory;
 import org.geotools.referencing.factory.AbstractEpsgMediator;
+import org.opengis.referencing.FactoryException;
 
 /**
  * Mediator which delegates the creation of referencing objects to the
@@ -29,11 +30,17 @@ import org.geotools.referencing.factory.AbstractEpsgMediator;
  */
 public class OracleDialectEpsgMediator extends AbstractEpsgMediator {
 
-    Hints hints;
+    Hints config;
+    public OracleDialectEpsgMediator() throws FactoryException {
+    }
     
+    public OracleDialectEpsgMediator(Hints hints ) throws FactoryException {
+        super(hints);
+        config = hints;
+    }
     public OracleDialectEpsgMediator(int priority, Hints hints, DataSource datasource) {
         super(hints, datasource);
-        this.hints = hints;
+        config = hints;
     }
     
     /**
@@ -49,12 +56,13 @@ public class OracleDialectEpsgMediator extends AbstractEpsgMediator {
                  new Integer(2),
                  new Object[] {
                      Hints.AUTHORITY_MIN_EVICT_IDLETIME, new Integer(1 * 60 * 1000),
-                     Hints.BUFFER_POLICY, "none"
+                     Hints.BUFFER_POLICY, "none",
+                     Hints.EPSG_DATA_SOURCE, datasource
                  }
              ),
              datasource
          );
-        //TODO: change to weak cache!
+        config = new Hints(  Hints.EPSG_DATA_SOURCE, datasource );
     }
 
 
@@ -80,7 +88,7 @@ public class OracleDialectEpsgMediator extends AbstractEpsgMediator {
      * Creates an instance that can be returned by the pool.
      */
     protected AbstractCachedAuthorityFactory makeWorker() throws Exception {
-        OracleDialectEpsgFactory factory = new OracleDialectEpsgFactory(hints, datasource);
+        OracleDialectEpsgFactory factory = new OracleDialectEpsgFactory( config, datasource);
         return factory;
     }
 
