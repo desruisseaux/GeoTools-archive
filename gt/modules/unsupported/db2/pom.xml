@@ -90,41 +90,18 @@
 
     <!-- The IBM DB2 JDBC driver.                                  -->
     <!--                                                           -->
-    <!-- By default, Geotools uses a dummy driver because the real -->
-    <!-- driver is not free software.                              -->
-    <!--                                                           -->
-    <!-- When the real DB2 JDBC drivers are not available, use the -->
-    <!-- first <dependency block.                                  -->
-    <!--                                                           -->
-    <!-- When the real drivers *are* available:                    -->
-    <!--   comment out the first block and uncomment the next 2    -->
-    <!--   Run the commands:                                      '-->
-    <!--     mvn install:install-file -Dgroupid=com.ibm            -->
-    <!--         -DartifactId=db2jcc -Dversion=8.2 -Dpackaging=jar -->
-    <!--         -Dfile=d:\sqllib\java\db2jcc.jar (or similar)     -->
-    <!--     mvn install:install-file -Dgroupid=com.ibm            -->
-    <!--         -DartifactId=db2jcc_license_cu -Dversion=8.2 -Dpackaging=jar -->
-    <!--         -Dfile=d:\sqllib\java\db2jcc_license_cu.jar (or similar)     -->
-    <!--                                                           -->
-    <dependency>
-      <groupId>com.ibm</groupId>
-      <artifactId>db2jcc_dummy</artifactId>
-      <version>8.2.1</version>
-    </dependency>
-    <!--
     <dependency>
       <groupId>com.ibm</groupId>
       <artifactId>db2jcc</artifactId>
-      <version>8.2</version>
+      <version>9</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.ibm</groupId>
       <artifactId>db2jcc_license_cu</artifactId>
-      <version>8.2</version>
+      <version>9</version>
       <scope>provided</scope>
     </dependency>
-    -->
   </dependencies>
 
 
