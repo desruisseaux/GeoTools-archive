@@ -1,5 +1,6 @@
 package org.geotools.renderer3d.terrainblock;
 
+import com.jme.math.Vector3f;
 import com.jme.scene.Spatial;
 
 /**
@@ -13,4 +14,10 @@ public interface TerrainBlock
      * @return the 3D node containing this terrain block.
      */
     Spatial getSpatial();
+
+    /**
+     * @return the center of the block at local ground level.
+     */
+    Vector3f getCenter();
+
 }

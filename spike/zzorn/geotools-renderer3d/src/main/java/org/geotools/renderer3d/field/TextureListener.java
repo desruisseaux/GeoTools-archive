@@ -17,8 +17,8 @@ public interface TextureListener
      *                The texture image should not be modified after calling this method, as it will be moved to the
      *                3D card in the OpenGL thread.
      *                <p/>
-     *                NOTE: This makes it harder to reuse memory while rendering pictures, it would be nice if the TextureProvider could
-     *                reuse the same image for the next request.
+     *                NOTE: This makes it harder to reuse memory while rendering pictures, it would be nice if the
+     *                TextureProvider could reuse the same image for the next request.
      *                Maybe another call-callback when the image is no longer needed?  Or maybe it isn't a big issue.
      */
     void onTextureReady( BoundingRectangle area, BufferedImage texture );

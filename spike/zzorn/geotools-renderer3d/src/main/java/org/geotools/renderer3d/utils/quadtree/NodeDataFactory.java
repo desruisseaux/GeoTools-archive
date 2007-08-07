@@ -2,10 +2,12 @@ package org.geotools.renderer3d.utils.quadtree;
 
 /**
  * Creates the data object for a quad tree node, when needed.
+ * <p/>
+ * N is the type of a data object associated with each QuadTreeNode.
  *
  * @author Hans Häggström
  */
-public interface NodeDataFactory
+public interface NodeDataFactory<N>
 {
     /**
      * Creates the data object for a quad tree node.
@@ -16,6 +18,6 @@ public interface NodeDataFactory
      *
      * @return the data object for the node.  May be null.
      */
-    Object createNodeDataObject( QuadTreeNode node);
+    N createNodeDataObject( QuadTreeNode<N> node );
 
 }

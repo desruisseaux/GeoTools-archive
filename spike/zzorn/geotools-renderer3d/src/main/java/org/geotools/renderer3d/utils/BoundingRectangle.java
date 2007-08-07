@@ -1,7 +1,5 @@
 package org.geotools.renderer3d.utils;
 
-import org.geotools.renderer3d.utils.quadtree.LocatedDoublePrecisionObject;
-
 /**
  * An axis aligned, rectangular region in 3D rendering space, aligned along the ground plane.
  *
@@ -49,6 +47,11 @@ public interface BoundingRectangle
      * @return true if the specified coordinate is inside this bounding rectangle.
      */
     boolean isInside( double x, double y );
+
+    /**
+     * @return true if this BoundingRectangle covers the area defined by the centerpoint and the radius, false otherwise.
+     */
+    boolean isInside( double x, double y, double radius );
 
     /**
      * @return true if the bounding rectangle has no area because the corners lie on
@@ -156,4 +159,20 @@ public interface BoundingRectangle
      * @return the subquadrant index for the subquadrant that is opposite to the specified subquadrant.
      */
     int getOppositeSubquadrant( int subquadrant );
+
+    /**
+     * @return the side length along the x axis
+     */
+    double getSizeX();
+
+    /**
+     * @return the side length along the y axis
+     */
+    double getSizeY();
+
+    /**
+     * @return the average side length ((sizeX+sizeY)/2)
+     */
+    double getSizeAveraged();
+
 }

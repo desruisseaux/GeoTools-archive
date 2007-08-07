@@ -1,7 +1,5 @@
 package org.geotools.renderer3d.utils;
 
-import org.geotools.renderer3d.utils.quadtree.LocatedDoublePrecisionObject;
-
 /**
  * An immutable BoundingRectangle.
  *
@@ -114,6 +112,15 @@ public final class BoundingRectangleImpl
     public boolean isInside( double x, double y )
     {
         return MathUtils.isInsideRectangle( x, y, myX1, myY1, myX2, myY2 );
+    }
+
+
+    public boolean isInside( final double x, final double y, final double radius )
+    {
+        return x >= myX1 + radius &&
+               x < myX2 - radius &&
+               y >= myY1 + radius &&
+               y < myY2 - radius;
     }
 
 
@@ -258,6 +265,24 @@ public final class BoundingRectangleImpl
     public int getOppositeSubquadrant( int subquadrant )
     {
         return ( subquadrant + 2 ) % 4; // Roll around.  0=>2, 1=>3, 2=>0, 3=>1.
+    }
+
+
+    public double getSizeX()
+    {
+        return myX2 - myX1;
+    }
+
+
+    public double getSizeY()
+    {
+        return myY2 - myY1;
+    }
+
+
+    public double getSizeAveraged()
+    {
+        return 0.5 * ( getSizeX() + getSizeY() );
     }
 
     //----------------------------------------------------------------------

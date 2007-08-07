@@ -1,19 +1,41 @@
 package org.geotools.renderer3d;
 
+import com.jme.math.Vector3f;
+import com.jme.renderer.Camera;
 import com.jme.scene.Node;
 import com.jme.scene.Spatial;
 import org.geotools.map.MapContext;
+import org.geotools.renderer3d.field.MapTextureProvider;
 import org.geotools.renderer3d.navigationgestures.NavigationGesture;
 import org.geotools.renderer3d.terrainblock.TerrainBlock;
 import org.geotools.renderer3d.terrainblock.TerrainBlockFactory;
 import org.geotools.renderer3d.utils.ParameterChecker;
 import org.geotools.renderer3d.utils.canvas3d.Canvas3D;
+import org.geotools.renderer3d.utils.canvas3d.FrameListener;
 import org.geotools.renderer3d.utils.quadtree.QuadTree;
 import org.geotools.renderer3d.utils.quadtree.QuadTreeImpl;
+import org.geotools.renderer3d.utils.quadtree.QuadTreeListener;
+import org.geotools.renderer3d.utils.quadtree.QuadTreeNode;
 
+import java.awt.Color;
 import java.awt.Component;
 
 /**
+ * TODO: Keeps track of all the terrain blocks, calculate the size/distance ratio for them when the camera moves.
+ * The size is the length of a side of a terrain block in meters.
+ * The distance is the distance from the camera to its center point (on the ground elevation surface) in meters.
+ * (NOTE: All values and thresholds can be stored as squares to avoid a square root computation)
+ * <ul>
+ * <li>If some expanded terrain block is too far away and too small (size/distance under some threshold), collapse it
+ * <li>If some collapsed terrain block is too close and too big (size/distance over some threshold), and it is above the minimum terrain block size, expand it
+ * <li>If the size/distance ratio for the root node is under some threshold, create a parent, in the direction of the camera
+ * </ul>
+ * <p/>
+ * TODO: Add expand, collapse, and extendRoot methods to the terrain blocks, and a keepExpanded flag to the QuadTreeNode.
+ * TODO: Maybe add a generic data object that can be associated with quad tree nodes also, and a way to visit those for
+ * a quad tree node and all its sub nodes.  That would allow the camera checks.  There could also be a clear subtree
+ * method that removes the data objects from a subtree.
+ *
  * @author Hans Häggström
  */
 public final class Renderer3DImpl
@@ -25,16 +47,23 @@ public final class Renderer3DImpl
 
     private final Canvas3D myCanvas3D = new Canvas3D();
     private final TerrainBlockFactory myTerrainBlockFactory;
+    private final int myTextureSize;
+    private final double myVisibilityDistance;
+
+    private final Vector3f myPreviousCameraPosition = new Vector3f();
 
     private MapContext myMapContext = null;
-    private QuadTree myQuadTree;
+    private QuadTree<TerrainBlock> myQuadTree;
     private Node myTerrainNode = null;
+    private Spatial myRootSpatial;
 
     //======================================================================
     // Private Constants
 
     private static final int DEFAULT_START_RADIUS_M = 100;
     private static final int DEFAULT_TERRAIN_BLOCK_SIZE_IN_GRIDS = 32;
+    private static final int DEFAULT_TEXTURE_SIZE = 64;
+    private static final double DEFAULT_VISIBILITY_DISTANCE = 10000.0;
 
     //======================================================================
     // Public Methods
@@ -83,7 +112,8 @@ public final class Renderer3DImpl
     public Renderer3DImpl( final MapContext mapContextToRender,
                            final double startRadius_m )
     {
-        this( mapContextToRender, startRadius_m, DEFAULT_TERRAIN_BLOCK_SIZE_IN_GRIDS );
+        this( mapContextToRender, startRadius_m, DEFAULT_TERRAIN_BLOCK_SIZE_IN_GRIDS, DEFAULT_TEXTURE_SIZE,
+              DEFAULT_VISIBILITY_DISTANCE );
     }
 
 
@@ -93,19 +123,55 @@ public final class Renderer3DImpl
      * @param mapContextToRender      the map context that is used to get the layers to render in the 3D view.
      * @param startRadius_m           the length of each side in the first quad tree nodes created.
      * @param terrainBlockSizeInGrids number of grid cells along the side of a TerrainBlock.
+     * @param textureSize             the size to use for the texture for each terrain block, per side, in pixels.
+     * @param visibilityDistance      distance that there should be terrain visible in each direction from the camera,
+     *                                in display units (TODO: Check if meters?)
      */
     public Renderer3DImpl( final MapContext mapContextToRender,
                            final double startRadius_m,
-                           final int terrainBlockSizeInGrids )
+                           final int terrainBlockSizeInGrids,
+                           final int textureSize,
+                           final double visibilityDistance )
     {
         ParameterChecker.checkNotNull( mapContextToRender, "mapContextToRender" );
         ParameterChecker.checkPositiveNonZeroNormalNumber( startRadius_m, "startRadius_m" );
         ParameterChecker.checkPositiveNonZeroInteger( terrainBlockSizeInGrids, "terrainBlockSizeInGrids" );
+        ParameterChecker.checkPositiveNonZeroInteger( textureSize, "textureSize" );
+        ParameterChecker.checkPositiveNonZeroNormalNumber( visibilityDistance, "visibilityDistance" );
 
         myMapContext = mapContextToRender;
+        myTextureSize = textureSize;
+        myVisibilityDistance = visibilityDistance;
 
-        myTerrainBlockFactory = new TerrainBlockFactory( terrainBlockSizeInGrids );
-        myQuadTree = new QuadTreeImpl( startRadius_m, myTerrainBlockFactory );
+        myCanvas3D.setViewDistance( (float) myVisibilityDistance );
+
+        final MapTextureProvider mapTextureProvider = new MapTextureProvider( mapContextToRender, Color.WHITE );
+
+/*
+        // DEBUG
+        final TextureProvider mapTextureProvider = new DummyTextureProvider();
+*/
+
+        myTerrainBlockFactory = new TerrainBlockFactory( terrainBlockSizeInGrids,
+                                                         mapTextureProvider,
+                                                         myTextureSize );
+
+        myQuadTree = new QuadTreeImpl<TerrainBlock>( startRadius_m, myTerrainBlockFactory );
+
+        myQuadTree.addQuadTreeListener( new QuadTreeListener<TerrainBlock>()
+        {
+
+            public void onRootChanged( final QuadTreeNode<TerrainBlock> newRoot )
+            {
+                if ( myTerrainNode != null )
+                {
+                    update3DModel();
+                }
+            }
+
+        } );
+
+        initExpansionAndCollapsionHandler();
     }
 
     //----------------------------------------------------------------------
@@ -124,7 +190,7 @@ public final class Renderer3DImpl
             myMapContext = mapContext;
 
             // Clear the old quadtree and start building a new one, with the data from the new context.
-            myQuadTree = new QuadTreeImpl( DEFAULT_START_RADIUS_M, myTerrainBlockFactory );
+            myQuadTree = new QuadTreeImpl<TerrainBlock>( DEFAULT_START_RADIUS_M, myTerrainBlockFactory );
         }
     }
 
@@ -162,30 +228,117 @@ public final class Renderer3DImpl
         myCanvas3D.removeAllNavigationGestures();
     }
 
+
+    public void addFrameListener( final FrameListener addedFrameListener )
+    {
+        myCanvas3D.addFrameListener( addedFrameListener );
+    }
+
+
+    public boolean removeFrameListener( final FrameListener removedFrameListener )
+    {
+        return myCanvas3D.removeFrameListener( removedFrameListener );
+    }
+
     //======================================================================
     // Private Methods
+
+    private void initExpansionAndCollapsionHandler()
+    {
+        addFrameListener( new FrameListener()
+        {
+
+            public void onFrame( final double secondsSinceLastFrame )
+            {
+                final Camera camera = myCanvas3D.getCamera();
+                if ( camera != null )
+                {
+                    final Vector3f currentCameraPosition = camera.getLocation();
+                    if ( !currentCameraPosition.equals( myPreviousCameraPosition ) )
+                    {
+                        // Grow quad tree if necessary
+                        myQuadTree.getRootNode().growToInclude( currentCameraPosition.x,
+                                                                currentCameraPosition.y,
+                                                                myVisibilityDistance );
+
+                        // Go through quad tree nodes, recalculate their size/distance ratios,
+                        // and expand or collapse them as needed.
+                        checkNode( myQuadTree.getRootNode(), currentCameraPosition );
+
+                        myPreviousCameraPosition.set( currentCameraPosition );
+                    }
+                }
+            }
+
+        } );
+    }
+
+
+    private void checkNode( QuadTreeNode<TerrainBlock> node, final Vector3f currentCameraPosition )
+    {
+        // TODO: Would be best not to get node data, so we do not initiate it when it is not needed.
+        final TerrainBlock terrainBlock = node.getNodeData();
+
+        if ( terrainBlock != null )
+        {
+            // Calculate size/distance
+            final double size = node.getBounds().getSizeAveraged();
+            final double squaredSize = size * size;
+            final double squaredDistance = terrainBlock.getCenter().distanceSquared( currentCameraPosition );
+            final double comparsionFactor = squaredSize / squaredDistance;
+
+            // Expand if needed, and if the node is larger than the minimum node size
+            if ( comparsionFactor > 2 && size > 5 )
+            {
+                node.setExpanded( true );
+            }
+
+            // Collapse if needed
+            if ( comparsionFactor < 1 )
+            {
+                node.setExpanded( false );
+            }
+
+            // Recursively call children, if it has them
+            final int num = node.getNumberOfChildren();
+            for ( int i = 0; i < num; i++ )
+            {
+                final QuadTreeNode<TerrainBlock> child = node.getChild( i );
+                if ( child != null )
+                {
+                    checkNode( child, currentCameraPosition );
+                }
+            }
+        }
+    }
+
 
     private void initializeTerrainNodeIfNeeded()
     {
         if ( myTerrainNode == null )
         {
-            myTerrainNode = createTerrainNode();
+            myTerrainNode = new Node();
+
+            update3DModel();
 
             myCanvas3D.set3DNode( myTerrainNode );
         }
     }
 
-//======================================================================
-    // Private Methods
 
-    private Node createTerrainNode()
+    private void update3DModel()
     {
-        final Node node = new Node();
+        if ( myRootSpatial != null )
+        {
+            myTerrainNode.detachChild( myRootSpatial );
+        }
 
-        final TerrainBlock terrainBlock = (TerrainBlock) myQuadTree.getRootNode().getNodeData();
-        node.attachChild( terrainBlock.getSpatial() );
+        myRootSpatial = myQuadTree.getRootNode().getNodeData().getSpatial();
 
-        return node;
+        if ( myRootSpatial != null )
+        {
+            myTerrainNode.attachChild( myRootSpatial );
+        }
     }
 
 }

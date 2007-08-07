@@ -2,6 +2,8 @@ package org.geotools.renderer3d.field;
 
 import org.geotools.renderer3d.utils.BoundingRectangle;
 
+import java.awt.image.BufferedImage;
+
 /**
  * Something that provides ground texture data for requested areas.
  * The textures may be loaded in the background in a separate thread.
@@ -16,9 +18,8 @@ public interface TextureProvider
      * Provide the texture to the specified listener when ready.
      *
      * @param area            the world area to create the texture for. TODO: What units are the coordinates given in?
-     * @param textureWidth    width of the texture to retrieve
-     * @param textureHeight   height of the texture to retrieve
+     * @param buffer          the image to render the texture to.
      * @param textureListener a listener that should be called back when the texture is ready.
      */
-    void requestTexture( BoundingRectangle area, int textureWidth, int textureHeight, TextureListener textureListener );
+    void requestTexture( BoundingRectangle area, BufferedImage buffer, TextureListener textureListener );
 }
