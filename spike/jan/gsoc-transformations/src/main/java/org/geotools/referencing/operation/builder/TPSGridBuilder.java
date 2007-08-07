@@ -17,14 +17,16 @@ package org.geotools.referencing.operation.builder;
 
 import java.awt.geom.Point2D;
 import java.util.List;
-import org.opengis.geometry.DirectPosition;
-import org.opengis.geometry.Envelope;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
+
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.transform.IdentityTransform;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.NoSuchIdentifierException;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -54,7 +56,7 @@ public class TPSGridBuilder extends WarpGridBuilder {
      * @throws TransformException
      */
     public TPSGridBuilder(List vectors, double dx, double dy, Envelope env)
-        throws TransformException {
+        throws TransformException, NoSuchIdentifierException {
         this(vectors, dx, dy, env, IdentityTransform.create(2));
     }
 
@@ -69,7 +71,7 @@ public class TPSGridBuilder extends WarpGridBuilder {
      * @throws TransformException
      */
     public TPSGridBuilder(List vectors, double dx, double dy, Envelope envelope,
-        MathTransform realToGrid) throws TransformException {
+        MathTransform realToGrid) throws TransformException, NoSuchIdentifierException {
         super(vectors, dx, dy, envelope, realToGrid);
 
         L = new GeneralMatrix(number + 3, number + 3);
@@ -79,7 +81,7 @@ public class TPSGridBuilder extends WarpGridBuilder {
         fillOsubMatrix();
     }
 
-    protected float[] computeWarpGrid(ParameterValueGroup WarpParams) {
+    protected float[] computeWarpGrid(ParameterValueGroup WarpParams) throws TransformException {
         L.invert();
 
         GeneralMatrix V = fillVMatrix(0);
@@ -128,7 +130,7 @@ public class TPSGridBuilder extends WarpGridBuilder {
      * @param p position where we want the value
      * @return calculated shift
      */
-    private double calculateTPSFunction(GeneralMatrix v, Point2D p) {
+    private double calculateTPSFunction (GeneralMatrix v, Point2D p) throws TransformException {
         double a1 = v.getElement(v.getNumRow() - 3, 0);
         double a2 = v.getElement(v.getNumRow() - 2, 0);
         double a3 = v.getElement(v.getNumRow() - 1, 0);
@@ -176,7 +178,7 @@ public class TPSGridBuilder extends WarpGridBuilder {
     /**
      * Fill K submatrix (<a href="http://elonen.iki.fi/code/tpsdemo/index.html"> see more here</a>)       
      */
-    private void fillKsubMatrix() {
+    private void fillKsubMatrix() throws TransformException {
         double alfa = 0;
 
         for (int i = 0; i < number; i++) {
@@ -195,7 +197,7 @@ public class TPSGridBuilder extends WarpGridBuilder {
     /**
      * Fill L submatrix (<a href="http://elonen.iki.fi/code/tpsdemo/index.html"> see more here</a>)   
      */
-    private void fillPsubMatrix() {
+    private void fillPsubMatrix() throws TransformException{
         for (int i = 0; i < number; i++) {
             L.setElement(i, i, 0);
 
@@ -227,12 +229,11 @@ public class TPSGridBuilder extends WarpGridBuilder {
      * @param dim 0 for dx, 1 for dy.
      * @return V Matrix
      */
-    private GeneralMatrix fillVMatrix(int dim) {
+    private GeneralMatrix fillVMatrix(int dim) throws TransformException {
         V = new GeneralMatrix(number + 3, 1);
 
         for (int i = 0; i < number; i++) {
-            MappedPosition mp = ((MappedPosition) getGridMappedPositions().get(i));
-            //  V.setElement(i, 0, mp.getDelta(dim));
+            MappedPosition mp = ((MappedPosition) getGridMappedPositions().get(i));           
             V.setElement(i, 0, mp.getSource().getOrdinate(dim) - mp.getTarget().getOrdinate(dim));
         }
 

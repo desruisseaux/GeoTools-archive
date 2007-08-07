@@ -1,3 +1,18 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.referencing.operation.builder;
 
 import java.awt.image.RenderedImage;
@@ -18,6 +33,7 @@ import org.geotools.coverage.processing.DefaultProcessor;
 import org.geotools.coverage.processing.Operations;
 import org.geotools.factory.Hints;
 import org.geotools.gce.image.WorldImageReader;
+import org.geotools.gce.image.WorldImageWriter;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultDerivedCRS;
@@ -25,7 +41,7 @@ import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.operation.DefaultOperationMethod;
-import org.geotools.referencing.operation.transform.AbstractMathTransform;
+import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -33,120 +49,130 @@ import org.opengis.referencing.operation.MathTransform;
 
 
 public class GridDemo {
-	
-	 private static List /*<MappedPositions>*/ generateMappedPositions(Envelope env, int number,
-		        double deltas, CoordinateReferenceSystem crs) {
-		        List /*<MappedPositions>*/ vectors = new ArrayList();
-		        double minx = env.getLowerCorner().getCoordinates()[0];
-		        double miny = env.getLowerCorner().getCoordinates()[1];
+    private static List /*<MappedPositions>*/ generateMappedPositions(Envelope env, int number,
+        double deltas, CoordinateReferenceSystem crs) {
+        List /*<MappedPositions>*/ vectors = new ArrayList();
+        double minx = env.getLowerCorner().getCoordinates()[0];
+        double miny = env.getLowerCorner().getCoordinates()[1];
 
-		        double maxx = env.getUpperCorner().getCoordinates()[0];
-		        double maxy = env.getUpperCorner().getCoordinates()[1];
+        double maxx = env.getUpperCorner().getCoordinates()[0];
+        double maxy = env.getUpperCorner().getCoordinates()[1];
 
-		        final Random random = new Random(8578348921369L);
+        final Random random = new Random(8578348921369L);
 
-		        for (int i = 0; i < number; i++) {
-		            double x = minx + (random.nextDouble() * (maxx - minx));
-		            double y = miny + (random.nextDouble() * (maxy - miny));
-		            vectors.add(new MappedPosition(new DirectPosition2D(crs, x, y),
-		                    new DirectPosition2D(crs,
-		                        (x + (random.nextDouble() * deltas)) - (random.nextDouble() * deltas),
-		                        (y + (random.nextDouble() * deltas)) - (random.nextDouble() * deltas))));
-		        }
+        for (int i = 0; i < number; i++) {
+            double x = minx + (random.nextDouble() * (maxx - minx));
+            double y = miny + (random.nextDouble() * (maxy - miny));
+            vectors.add(new MappedPosition(new DirectPosition2D(crs, x, y),
+                    new DirectPosition2D(crs,
+                        (x + (random.nextDouble() * deltas)) - (random.nextDouble() * deltas),
+                        (y + (random.nextDouble() * deltas)) - (random.nextDouble() * deltas))));
+        }
 
-		        return vectors;
-		    }
-	 
+        return vectors;
+    }
 
-	static public GridCoverage2D generateCoverage2D(int row, int cells, Envelope env){
-		 float[][] raster = new float[row][cells];
-		for (int j = 0; j < row; j++) {
-            for (int i = 0; i < cells; i++) {                
-               	raster[j][i]=0;
+    static public GridCoverage2D generateCoverage2D(int row, int cells, Envelope env) {
+        float[][] raster = new float[row][cells];
+
+        for (int j = 0; j < row; j++) {
+            for (int i = 0; i < cells; i++) {
+                raster[j][i] = 0;
             }
         }
-		for (int j = 1; j < row-1; j=j+20) {
-            for (int i = 1; i < cells-1; i++) {                
-               	raster[j][i]=100;
-               	raster[j+1][i]=60;
-            	raster[j-1][i]=60;
-            }
-        }
-		for (int j = 1; j < row-1; j++) {
-            for (int i = 1; i < cells-1; i=i+20) {                
-               	raster[j][i]=100;
-              	raster[j][i+1]=60;
-            	raster[j][i-1]=60;
-            	
-            }
-        }
-		
-		GridCoverage2D cov = (new GridCoverageFactory()).create("name", raster, env);
 
-		return cov;
-		
-	}
+        for (int j = 1; j < (row - 1); j = j + 20) {
+            for (int i = 1; i < (cells - 1); i++) {
+                raster[j][i] = 100;
+                raster[j + 1][i] = 60;
+                raster[j - 1][i] = 60;
+            }
+        }
+
+        for (int j = 1; j < (row - 1); j++) {
+            for (int i = 1; i < (cells - 1); i = i + 20) {
+                raster[j][i] = 100;
+                raster[j][i + 1] = 60;
+                raster[j][i - 1] = 60;
+            }
+        }
+
+        GridCoverage2D cov = (new GridCoverageFactory()).create("name", raster, env);
+
+        return cov;
+    }
+
     public static void main(String[] args) {
-     
         CoordinateReferenceSystem realCRS = null;
 
-  
         try {
             //  MathTransform2D realToGrid = gridShift.getMathTransform();
             realCRS = DefaultGeographicCRS.WGS84;
-            CoordinateReferenceSystem  crs = DefaultEngineeringCRS.CARTESIAN_2D;
+
+            CoordinateReferenceSystem crs = DefaultEngineeringCRS.CARTESIAN_2D;
             List mp = new ArrayList();
-       
+
             GridCoverageFactory factory = FactoryFinder.getGridCoverageFactory(null);
 
             URL url = null;
 
-             url = new File("/home/jezekjan/gsoc/geodata/p1010099.tif").toURL();             
-             
-           // url = new File("/media/sda5/Dokumenty/geodata/rasters/Mane_3_1_4.tif").toURL();
+            url = new File("/home/jezekjan/gsoc/geodata/p1010099.tif").toURL();
+
+            // url = new File("/media/sda5/Dokumenty/geodata/rasters/Mane_3_1_4.tif").toURL();
             WorldImageReader reader = new WorldImageReader(url);
-            Operations operations = new Operations(null);                               
-            GridCoverage2D coverage = (GridCoverage2D)reader.read(null);
+            Operations operations = new Operations(null);
+            GridCoverage2D coverage = (GridCoverage2D) reader.read(null);
             Envelope env = coverage.getEnvelope();
-            
-           //coverage = GridCoverageExamples.getExample(0);
-            
-            System.out.println(coverage.getGridGeometry().getGridRange());
-            List vectors = generateMappedPositions(env,20, 0.1, env.getCoordinateReferenceSystem());
-            
-            WarpGridBuilder gridBuilder = new RSGridBuilder(vectors, 0.01,0.01, env, coverage.getGridGeometry().getGridToCRS().inverse());
-              
-            (new GridCoverageFactory()).create("DX",gridBuilder.getDxGrid(),coverage.getEnvelope()).show();
-            (new GridCoverageFactory()).create("DY",gridBuilder.getDyGrid(),coverage.getEnvelope()).show();
+
+            //coverage = GridCoverageExamples.getExample(0);
+
+            //   List vectors = generateMappedPositions(env,15, 0.58, DefaultEngineeringCRS.CARTESIAN_2D);
+            List vectors = generateMappedPositions(env, 15, 0.058,
+                    env.getCoordinateReferenceSystem());
+
          
-            MathTransform  trans = gridBuilder.getMathTransform();
-                 
-   //////******************New reference System***************************///////
+            //  System.out.println(env.getCoordinateReferenceSystem().getCoordinateSystem().getClass());
+            //  WarpGridBuilder gridBuilder = new TPSGridBuilder(vectors, 0.01,0.01, env, coverage.getGridGeometry().getGridToCRS().inverse());
+
+            // System.out.println(DefaultEngineeringCRS.CARTESIAN_2D.getCoordinateSystem().getClass().isAssignableFrom(DefaultCartesianCS.class));            
+
+            //    MathTransformBuilder gridBuilder = new AffineTransformBuilder(vectors);//, env);                  
+            WarpGridBuilder gridBuilder = new TPSGridBuilder(vectors, 0.01, 0.01, env,
+                    coverage.getGridGeometry().getGridToCRS().inverse());
             
-            CoordinateReferenceSystem gridCRS = new DefaultDerivedCRS("gridCRS",
-                    new DefaultOperationMethod(
-                 		  trans),
-                 		   coverage.getCoordinateReferenceSystem(),
-                 		   trans,
-                     DefaultCartesianCS.GENERIC_2D);
-           
           
-   //////******************Show Source***************************///////
-                    
-           // coverage.show();
-            
-            Envelope envelope = CRS.transform(coverage.getGridGeometry().getGridToCRS().inverse(),coverage.getEnvelope());
-             
-            GridCoverage2D target1 = projectTo((GridCoverage2D)coverage,  gridCRS, (GridGeometry2D)coverage.getGridGeometry(), null, false);
-           
+            new DefaultOperationMethod((MathTransform)gridBuilder.getMathTransform());
+
+            (new GridCoverageFactory()).create("DX", gridBuilder.getDxGrid(), coverage.getEnvelope())
+             .show();
+            (new GridCoverageFactory()).create("DY", gridBuilder.getDyGrid(), coverage.getEnvelope())
+             .show();
+
+            MathTransform trans = gridBuilder.getMathTransform();
+
+            System.out.println(trans.getSourceDimensions());
+            System.out.println(trans.getTargetDimensions());
+
+            //////******************New reference System***************************///////
+            CoordinateReferenceSystem gridCRS = new DefaultDerivedCRS("gridCRS",
+                    new DefaultOperationMethod(trans), coverage.getCoordinateReferenceSystem(),
+                    trans, DefaultCartesianCS.GENERIC_2D);
+
+            //////******************Show Source***************************///////
+
+            // coverage.show();
+            Envelope envelope = CRS.transform(coverage.getGridGeometry().getGridToCRS().inverse(),
+                    coverage.getEnvelope());
+
+            GridCoverage2D target1 = projectTo((GridCoverage2D) coverage, gridCRS,
+                    (GridGeometry2D) coverage.getGridGeometry(), null, false);
+
             target1.show();
-         
-/*
-         WorldImageWriter writer = new WorldImageWriter((Object) (new File(
-                      "/home/jezekjan/gsoc/geodata/p.tif")));
-            
-           writer.write(target1, null);*/
-           
+
+            WorldImageWriter writer = new WorldImageWriter((Object) (new File(
+                        "/home/jezekjan/gsoc/geodata/p.tif")));
+
+            writer.write(target1, null);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -154,11 +180,10 @@ public class GridDemo {
     }
 
     private static GridCoverage2D projectTo(final GridCoverage2D coverage,
-        final CoordinateReferenceSystem targetCRS,
-        final GridGeometry2D geometry, final Hints hints,
-        final boolean useGeophysics) {
-        final AbstractProcessor processor = (hints != null)
-            ? new DefaultProcessor(hints) : AbstractProcessor.getInstance();
+        final CoordinateReferenceSystem targetCRS, final GridGeometry2D geometry,
+        final Hints hints, final boolean useGeophysics) {
+        final AbstractProcessor processor = (hints != null) ? new DefaultProcessor(hints)
+                                                            : AbstractProcessor.getInstance();
         final String arg1;
         final Object value1;
         final String arg2;
@@ -183,12 +208,11 @@ public class GridDemo {
         }
 
         GridCoverage2D projected = coverage.geophysics(useGeophysics);
-        final ParameterValueGroup param = processor.getOperation("Resample")
-                                                   .getParameters();
+        final ParameterValueGroup param = processor.getOperation("Resample").getParameters();
         param.parameter("Source").setValue(projected);
         param.parameter(arg1).setValue(value1);
         param.parameter(arg2).setValue(value2);
-      
+
         projected = (GridCoverage2D) processor.doOperation(param);
 
         final RenderedImage image = projected.getRenderedImage();
@@ -198,14 +222,12 @@ public class GridDemo {
 
         if (image instanceof RenderedOp) {
             operation = ((RenderedOp) image).getOperationName();
-            AbstractProcessor.LOGGER.fine("Applied \"" + operation +
-                "\" JAI operation.");
+            AbstractProcessor.LOGGER.fine("Applied \"" + operation + "\" JAI operation.");
         }
-        
-                
-        
-           // Viewer.show(projected, operation);
+
+        // Viewer.show(projected, operation);
         return projected;
-       // return operation;
+
+        // return operation;
     }
 }

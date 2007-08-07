@@ -19,12 +19,14 @@ import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import org.opengis.geometry.Envelope;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
+
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.operation.transform.IdentityTransform;
+import org.opengis.geometry.Envelope;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.NoSuchIdentifierException;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
 
 
@@ -47,7 +49,7 @@ public class IDWGridBuilder extends WarpGridBuilder {
      * @throws TransformException 
      */
     public IDWGridBuilder(List vectors, double dx, double dy, Envelope env)
-        throws TransformException {
+        throws TransformException, NoSuchIdentifierException {
         super(vectors, dx, dy, env, IdentityTransform.create(2));
     }
 
@@ -62,11 +64,11 @@ public class IDWGridBuilder extends WarpGridBuilder {
      * @throws TransformException
      */
     public IDWGridBuilder(List vectors, double dx, double dy, Envelope envelope,
-        MathTransform realToGrid) throws TransformException {
+        MathTransform realToGrid) throws TransformException, NoSuchIdentifierException {
         super(vectors, dx, dy, envelope, realToGrid);
     }
     
-    protected float[] computeWarpGrid(ParameterValueGroup WarpParams) {
+    protected float[] computeWarpGrid(ParameterValueGroup WarpParams) throws TransformException{
         float[] warpPositions = (float[]) WarpParams.parameter("warpPositions").getValue();
 
         for (int i = 0; i <= WarpParams.parameter("yNumCells").intValue(); i++) {
@@ -99,7 +101,7 @@ public class IDWGridBuilder extends WarpGridBuilder {
      * @param p position where we requaired the shift to be calculated
      * @return x and y shifts as Point2D
      */
-    private Point2D calculateShift(Point2D p) {
+    private Point2D calculateShift(Point2D p) throws TransformException{
         double maxdist = 500000;
 
         HashMap nearest = getNearestMappedPositions(p, maxdist);
@@ -144,7 +146,7 @@ public class IDWGridBuilder extends WarpGridBuilder {
      *
      * @todo consider some indexing mechanism for finding the nearest positions
      */
-    private HashMap getNearestMappedPositions(Point2D p, double maxdistance) {
+    private HashMap getNearestMappedPositions(Point2D p, double maxdistance) throws TransformException {
         HashMap nearest = new HashMap();
         MappedPosition mp = null;
 
