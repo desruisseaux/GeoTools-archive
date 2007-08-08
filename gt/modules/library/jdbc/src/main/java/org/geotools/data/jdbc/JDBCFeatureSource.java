@@ -20,6 +20,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collections;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
@@ -363,4 +365,11 @@ public class JDBCFeatureSource implements FeatureSource {
     protected void close(Statement statement) {
         JDBCUtils.close(statement);
     }
+    
+    /**
+     * By default, no Hints are supported
+     */
+     public Set getSupportedHints() {
+            return Collections.EMPTY_SET;
+     }
 }

@@ -69,7 +69,7 @@ public final class Hints extends RenderingHints {
      * A set of system-wide hints to use by default.
      */
     private static final Hints GLOBAL = new Hints(Collections.EMPTY_MAP);
-
+    
     /**
      * {@code true} if {@link #scanSystemProperties} needs to be invoked.
      */

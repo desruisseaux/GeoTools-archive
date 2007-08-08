@@ -67,6 +67,7 @@ import org.geotools.filter.IllegalFilterException;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.Decimator;
 import org.geotools.geometry.jts.JTS;
+import org.geotools.geometry.jts.LiteCoordinateSequenceFactory;
 import org.geotools.geometry.jts.LiteShape2;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContext;
@@ -861,6 +862,7 @@ public final class StreamingRenderer implements GTRenderer {
 			}
 		}
 		query.setCoordinateSystem(featCrs);
+		query.setHints(new Hints(Hints.JTS_COORDINATE_SEQUENCE_FACTORY, new LiteCoordinateSequenceFactory()));
 
 		if (isMemoryPreloadingEnabled()) {
 			// TODO: attache a feature listener, we must erase the memory cache

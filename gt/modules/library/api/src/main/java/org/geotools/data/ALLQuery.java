@@ -17,9 +17,12 @@ package org.geotools.data;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collections;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.factory.GeoTools;
+import org.geotools.factory.Hints;
 
 
 /**
@@ -159,5 +162,12 @@ class ALLQuery implements Query {
      */
     public SortBy[] getSortBy() {
         return SortBy.UNSORTED;
+    }
+
+    /**
+     * Returns an empty Hints set
+     */
+    public Hints getHints() {
+        return new Hints(Collections.EMPTY_MAP);
     }
 }

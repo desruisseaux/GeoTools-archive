@@ -20,6 +20,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
@@ -30,6 +31,7 @@ import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
+import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
@@ -80,7 +82,9 @@ public class QueryData implements AttributeReader, AttributeWriter {
     boolean lastNext;
 
     protected FeatureListenerManager listenerManager;
-
+    
+    protected Hints hints;
+    
     /**
      * Creates a new QueryData object.
      * 
@@ -94,6 +98,22 @@ public class QueryData implements AttributeReader, AttributeWriter {
     public QueryData(FeatureTypeInfo featureTypeInfo, JDBC1DataStore parentDataStore,
             Connection connection, Statement statement, ResultSet resultSet, Transaction transaction)
             throws IOException {
+        this(featureTypeInfo, parentDataStore, connection, statement, resultSet, transaction, null);
+    }
+
+    /**
+     * Creates a new QueryData object.
+     * 
+     * @param featureTypeInfo
+     * @param parentDataStore
+     * @param connection
+     * @param statement
+     * @param resultSet
+     * @param transaction
+     */
+    public QueryData(FeatureTypeInfo featureTypeInfo, JDBC1DataStore parentDataStore,
+            Connection connection, Statement statement, ResultSet resultSet, Transaction transaction, Hints hints)
+            throws IOException {
         this.featureTypeInfo = featureTypeInfo;
         this.mapper = featureTypeInfo.getFIDMapper();
         this.baseIndex = mapper.getColumnCount() + 1;
@@ -103,6 +123,7 @@ public class QueryData implements AttributeReader, AttributeWriter {
         this.transaction = transaction;
         this.fidAttributes = new Object[mapper.getColumnCount()];
         this.listenerManager = parentDataStore.listenerManager;
+        this.hints = hints;
 
         AttributeType[] attributeTypes = featureTypeInfo.getSchema().getAttributeTypes();
 
@@ -372,5 +393,12 @@ public class QueryData implements AttributeReader, AttributeWriter {
             close();
         }
         super.finalize();
+    }
+    
+    public Hints getHints() {
+        if(hints == null) {
+            hints = new Hints(Collections.EMPTY_MAP);
+        }
+        return hints;
     }
 }

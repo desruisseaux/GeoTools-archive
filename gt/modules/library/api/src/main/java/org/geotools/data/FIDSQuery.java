@@ -20,6 +20,8 @@ import java.util.Arrays;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.factory.GeoTools;
+import org.geotools.factory.Hints;
 
 
 /**
@@ -161,5 +163,12 @@ class FIDSQuery implements Query {
      */
     public SortBy[] getSortBy() {
         return SortBy.UNSORTED;
+    }
+
+    /**
+     * Returns the GeoTools default hints {@link GeoTools#getDefaultHints()}
+     */
+    public Hints getHints() {
+        return GeoTools.getDefaultHints();
     }
 }

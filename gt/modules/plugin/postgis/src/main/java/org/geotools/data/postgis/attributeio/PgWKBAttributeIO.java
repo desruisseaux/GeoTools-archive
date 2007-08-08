@@ -23,10 +23,15 @@ import java.sql.Types;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
+import org.geotools.factory.Hints;
 import org.geotools.geometry.jts.LiteCoordinateSequenceFactory;
 
+import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
+import com.vividsolutions.jts.geom.DefaultCoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.PrecisionModel;
+import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
 import com.vividsolutions.jts.io.WKBReader;
 import com.vividsolutions.jts.io.WKBWriter;
 
@@ -40,9 +45,27 @@ import com.vividsolutions.jts.io.WKBWriter;
  */
 public class PgWKBAttributeIO implements AttributeIO {
     private boolean useByteArray;
+    private GeometryFactory gf;
 
     public PgWKBAttributeIO(boolean useByteArray) {
         this.useByteArray = useByteArray;
+    }
+    
+    public PgWKBAttributeIO(boolean useByteArray, Hints hints) {
+        this.useByteArray = useByteArray;
+        // setup the geometry factory according to the hints
+        gf = (GeometryFactory) hints.get(Hints.JTS_GEOMETRY_FACTORY);
+        if(gf == null) {
+            PrecisionModel pm =  (PrecisionModel) hints.get(Hints.JTS_PRECISION_MODEL);
+            if(pm == null)
+                pm = new PrecisionModel();
+            Integer SRID = (Integer) hints.get(Hints.JTS_SRID);
+            int srid = SRID == null ? 0 : SRID.intValue();
+            CoordinateSequenceFactory csFactory = (CoordinateSequenceFactory) hints.get(Hints.JTS_COORDINATE_SEQUENCE_FACTORY);
+            if(csFactory == null)
+                csFactory = CoordinateArraySequenceFactory.instance();
+            gf = new GeometryFactory(pm, srid, csFactory);
+        }
     }
 
     /**
@@ -60,15 +83,6 @@ public class PgWKBAttributeIO implements AttributeIO {
             return (byte) (c - 'a' + 10);
         }
     }
-
-//    static Coordinate[] cs = new Coordinate[2];
-//    {
-//        cs[0] = new Coordinate(-100,30);
-//        cs[1] = new Coordinate(-101,31);
-//    }
-//    static Geometry g_temp = (Geometry) new LineString(cs,new PrecisionModel(),4326);
-
-    static GeometryFactory gf = new GeometryFactory(new LiteCoordinateSequenceFactory() );
 
     /**
      * This method will convert a String of hex characters that represent  the
@@ -93,16 +107,9 @@ public class PgWKBAttributeIO implements AttributeIO {
     	if (wkbBytes == null)  //DJB: null value from database --> null geometry (the same behavior as WKT).  NOTE: sending back a GEOMETRYCOLLECTION(EMPTY) is also a possibility, but this is not the same as NULL
     		return null;
     	try {
-    		//return g_temp; // for testing only!
-    		WKBReader wkbr = new WKBReader(  );
-       		//WKBReader wkbr = new WKBReader( );
-
-    		Geometry g= wkbr.read(wkbBytes);
-    		return g;
-    		//return new WKBReader().read(wkbBytes);
-    	}
-    	catch (Exception e)
-    	{
+    		WKBReader wkbr = new WKBReader(gf);
+    		return wkbr.read(wkbBytes);
+    	} catch (Exception e) {
     		throw new DataSourceException("An exception occurred while parsing WKB data", e);
     	}
 

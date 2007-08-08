@@ -58,6 +58,7 @@ import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
 import org.geotools.data.view.DefaultView;
 import org.geotools.factory.FactoryRegistryException;
+import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
@@ -624,7 +625,7 @@ public abstract class JDBC1DataStore implements DataStore {
 		((DefaultQuery) query).setFilter(originalFilter);
 		
 		QueryData queryData = executeQuery(typeInfo, typeName, sqlQuery, trans,
-				false);
+				false, query.getHints());
 
 		FeatureType schema;
 
@@ -815,6 +816,22 @@ public abstract class JDBC1DataStore implements DataStore {
 	 */
 	protected abstract AttributeIO getGeometryAttributeIO(AttributeType type,
 			QueryData queryData) throws IOException;
+	
+	/**
+	 * See the full version with hints support
+	 * @param featureTypeInfo
+	 * @param tableName
+	 * @param sqlQuery
+	 * @param transaction
+	 * @param forWrite
+	 * @return
+	 * @throws IOException
+	 */
+	protected QueryData executeQuery(FeatureTypeInfo featureTypeInfo,
+                String tableName, String sqlQuery, Transaction transaction,
+                boolean forWrite) throws IOException {
+	    return executeQuery(featureTypeInfo, tableName, sqlQuery, transaction, forWrite, null);
+	}
 
 	/**
 	 * Executes the SQL Query.
@@ -858,8 +875,10 @@ public abstract class JDBC1DataStore implements DataStore {
 	 *            The Transaction is included here for handling transaction
 	 *            connections at a later stage. It is not currently used.
 	 * @param forWrite
+	 * @param hints the {@link Query} hints
 	 *
 	 * @return The QueryData object that contains the resources for the query.
+	 * 
 	 *
 	 * @throws IOException
 	 * @throws DataSourceException
@@ -871,7 +890,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	 */
 	protected QueryData executeQuery(FeatureTypeInfo featureTypeInfo,
 			String tableName, String sqlQuery, Transaction transaction,
-			boolean forWrite) throws IOException {
+			boolean forWrite, Hints hints) throws IOException {
 		LOGGER.fine("About to execute query: " + sqlQuery);
 
 		Connection conn = null;
@@ -888,7 +907,7 @@ public abstract class JDBC1DataStore implements DataStore {
 			rs = statement.executeQuery(sqlQuery);
 
 			return new QueryData(featureTypeInfo, this, conn, statement, rs,
-					transaction);
+					transaction, hints);
 		} catch (SQLException e) {
 			// if an error occurred we close the resources
 			String msg = "Error Performing SQL query: " + sqlQuery;
@@ -1527,7 +1546,7 @@ public abstract class JDBC1DataStore implements DataStore {
 
 		QueryData queryData = executeQuery(typeHandler
 				.getFeatureTypeInfo(typeName), typeName, sqlQuery, transaction,
-				true);
+				true, null);
 		FeatureReader reader = createFeatureReader(info.getSchema(),
 				postFilter, queryData);
 		FeatureWriter writer = createFeatureWriter(reader, queryData);

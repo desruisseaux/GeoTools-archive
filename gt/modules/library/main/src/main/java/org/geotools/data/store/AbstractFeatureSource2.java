@@ -1,6 +1,8 @@
 package org.geotools.data.store;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -142,5 +144,12 @@ public abstract class AbstractFeatureSource2 implements FeatureSource {
 	 */
 	protected FeatureCollection reproject( FeatureCollection features, CoordinateReferenceSystem source, CoordinateReferenceSystem target ) {
 		return new ReprojectingFeatureCollection( features, source, target );
+	}
+	
+	/**
+	* By default, no Hints are supported
+	*/
+	public Set getSupportedHints() {
+	       return Collections.EMPTY_SET;
 	}
 }

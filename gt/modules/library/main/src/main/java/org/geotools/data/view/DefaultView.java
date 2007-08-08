@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
@@ -550,5 +551,9 @@ public class DefaultView implements FeatureSource {
         } catch (IOException e) {
             return 0;
         }
+    }
+    
+    public Set getSupportedHints() {
+        return source.getSupportedHints();
     }
 }

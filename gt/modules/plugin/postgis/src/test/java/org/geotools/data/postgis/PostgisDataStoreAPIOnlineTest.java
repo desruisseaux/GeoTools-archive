@@ -40,6 +40,7 @@ import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
 import org.geotools.data.postgis.fidmapper.OIDFidMapper;
+import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
@@ -60,12 +61,17 @@ import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.function.FilterFunction_geometryType;
 import org.geotools.filter.function.math.FilterFunction_ceil;
+import org.geotools.geometry.jts.LiteCoordinateSequence;
+import org.geotools.geometry.jts.LiteCoordinateSequenceFactory;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.PrecisionModel;
 
 /**
  * This class tests the PostgisDataStoreAPI, against the same tests as MemoryDataStore.
@@ -459,7 +465,38 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         assertCovered(roadFeatures, reader("road"));
         assertEquals(3, count(reader("road")));
     }
-
+    
+    public void testGeometryFactoryHintsGF() throws IOException {
+        FeatureSource fs = data.getFeatureSource("road");
+        assertTrue(fs.getSupportedHints().contains(Hints.JTS_GEOMETRY_FACTORY));
+        
+        DefaultQuery q = new DefaultQuery("road");
+        GeometryFactory gf = new GeometryFactory(new LiteCoordinateSequenceFactory());
+        Hints hints = new Hints(Hints.JTS_GEOMETRY_FACTORY, gf);
+        q.setHints(hints);
+        FeatureIterator it = fs.getFeatures(q).features();
+        Feature f = it.next();
+        it.close();
+        
+        LineString ls = (LineString) f.getPrimaryGeometry();
+        assertTrue(ls.getCoordinateSequence() instanceof LiteCoordinateSequence);
+    }
+    
+    public void testGeometryFactoryHintsCS() throws IOException {
+        FeatureSource fs = data.getFeatureSource("road");
+        assertTrue(fs.getSupportedHints().contains(Hints.JTS_COORDINATE_SEQUENCE_FACTORY));
+        
+        DefaultQuery q = new DefaultQuery("road");
+        Hints hints = new Hints(Hints.JTS_COORDINATE_SEQUENCE_FACTORY, new LiteCoordinateSequenceFactory());
+        q.setHints(hints);
+        FeatureIterator it = fs.getFeatures(q).features();
+        Feature f = it.next();
+        it.close();
+        
+        LineString ls = (LineString) f.getPrimaryGeometry();
+        assertTrue(ls.getCoordinateSequence() instanceof LiteCoordinateSequence);
+    }
+    
     public void testGetFeatureReaderFilterPrePost() throws IOException, IllegalFilterException {
         Transaction t = new DefaultTransaction();
         FeatureReader reader;

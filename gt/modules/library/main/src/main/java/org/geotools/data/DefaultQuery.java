@@ -17,8 +17,10 @@ package org.geotools.data;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import org.geotools.factory.Hints;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -69,6 +71,9 @@ public class DefaultQuery implements Query {
     
     /** The version according to WFS 1.0 and 1.1 specs */
     private String version;
+    
+    /** The hints to be used during query execution */
+    private Hints hints;
     
     /** 
     /**
@@ -155,6 +160,7 @@ public class DefaultQuery implements Query {
       this.coordinateSystem = query.getCoordinateSystem();
       this.coordinateSystemReproject = query.getCoordinateSystemReproject();
       this.version = query.getVersion();
+      this.hints = query.getHints();
     }
     
     /**
@@ -517,15 +523,29 @@ public class DefaultQuery implements Query {
      * </p>
      */
     public SortBy[] getSortBy() {
-		return sortBy;
-	}   
+        return sortBy;
+    }   
     
     /**
      * Sets the sort by information.
      * 
      */
     public void setSortBy(SortBy[] sortBy) {
-		this.sortBy = sortBy;
-	}
+        this.sortBy = sortBy;
+    }
+    
+    public Hints getHints() {
+        if(hints == null)
+            hints = new Hints(Collections.EMPTY_MAP);
+        return hints;
+    }
+    
+    /**
+     * Sets the query hints
+     * @param hints
+     */
+    public void setHints(Hints hints) {
+        this.hints = hints;
+    }
     
 }

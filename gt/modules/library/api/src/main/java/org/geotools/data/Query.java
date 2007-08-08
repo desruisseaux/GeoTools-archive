@@ -19,6 +19,7 @@ import java.net.URI;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.factory.Hints;
 
 
 /**
@@ -302,4 +303,19 @@ public interface Query {
      * @return SortBy array or order of application
      */
     SortBy[] getSortBy();
+
+    /**
+     * Specifies some hints to drive the query execution and results build-up.
+     * Hints examples can be the GeometryFactory to be used, a generalization
+     * distance to be applied right in the data store, to data store specific
+     * things such as the fetch size to be used in JDBC queries.
+     * The set of hints supported can be fetched by calling
+     * {@links FeatureSource#getSupportedHints()}.
+     * Depending on the actual values of the hints, the data store is free to ignore them.
+     * No mechanism is in place, at the moment, to figure out which hints where
+     * actually used during the query execution.
+     * @return the Hints the data store should try to use when executing the query
+     *         (eventually empty but never null).
+     */
+    Hints getHints();
 }

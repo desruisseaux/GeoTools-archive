@@ -16,8 +16,10 @@
 package org.geotools.data;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.geotools.data.crs.ForceCoordinateSystemFeatureResults;
@@ -292,5 +294,12 @@ public abstract class AbstractFeatureSource implements FeatureSource {
             }
             return ((AbstractDataStore) dataStore).getCount( namedQuery(query))+delta;
         }
+    }
+    
+    /**
+     * By default, no Hints are supported
+     */
+    public Set getSupportedHints() {
+        return Collections.EMPTY_SET;
     }
 }

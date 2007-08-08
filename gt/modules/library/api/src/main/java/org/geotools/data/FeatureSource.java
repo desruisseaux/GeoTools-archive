@@ -15,7 +15,9 @@
  */
 package org.geotools.data;
 
+import java.awt.RenderingHints;
 import java.io.IOException;
+import java.util.Set;
 import com.vividsolutions.jts.geom.Envelope;
 import org.opengis.filter.Filter;
 import org.geotools.feature.FeatureCollection;
@@ -221,4 +223,14 @@ public interface FeatureSource {
      * @throws IOException if there are errors getting the count
      */
     int getCount(Query query) throws IOException;
+
+    /**
+     * Returns the set of hints this {@link FeatureSource} is able to support.<p>
+     * Hints are to be specified in the {@link Query}, for each data access where they
+     * may be required.<br>
+     * Depending on the actual value provide by the user, the {@link FeatureSource}
+     * may decide not to honor the hint.
+     * @return a set of {@link RenderingHints#Key} objects (eventually empty, never null).
+     */
+    public Set /*<RenderingHints.Key>*/ getSupportedHints();
 }

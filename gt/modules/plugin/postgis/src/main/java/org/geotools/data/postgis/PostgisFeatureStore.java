@@ -22,7 +22,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
@@ -36,6 +39,7 @@ import org.geotools.data.jdbc.JDBCUtils;
 import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
@@ -1012,4 +1016,16 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 
         return retEnv;
     }	
+    
+    public Set getSupportedHints() {
+        PostgisDataStore ds = (PostgisDataStore) getDataStore();
+        if(ds.isWKBEnabled()) {
+            HashSet set = new HashSet();
+            set.add(Hints.JTS_COORDINATE_SEQUENCE_FACTORY);
+            set.add(Hints.JTS_GEOMETRY_FACTORY);
+            return set;
+        } else {
+            return Collections.EMPTY_SET;
+        }
+    }
 }

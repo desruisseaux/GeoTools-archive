@@ -1,6 +1,7 @@
 package org.geotools.data.postgis;
 
 import java.io.IOException;
+import java.util.Set;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureListener;
@@ -69,6 +70,10 @@ public class WrappingPostgisFeatureSource implements FeatureSource {
 
     public FeatureType getSchema() {
         return wrapped.getSchema();
+    }
+    
+    public Set getSupportedHints() {
+        return wrapped.getSupportedHints();
     }
 
 }

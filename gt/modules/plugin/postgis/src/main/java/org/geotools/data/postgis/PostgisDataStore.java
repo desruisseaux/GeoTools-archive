@@ -1804,7 +1804,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     protected AttributeIO getGeometryAttributeIO(AttributeType type,
         QueryData queryData) {
         if (WKBEnabled) {
-            return new PgWKBAttributeIO(isByteaEnabled());
+            return new PgWKBAttributeIO(isByteaEnabled(), queryData.getHints());
         } else {
             return new WKTAttributeIO();
         }
