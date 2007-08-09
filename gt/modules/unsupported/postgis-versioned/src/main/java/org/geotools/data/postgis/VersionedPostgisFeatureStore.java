@@ -42,6 +42,7 @@ import org.geotools.data.VersioningFeatureStore;
 import org.geotools.data.postgis.fidmapper.VersionedFIDMapper;
 import org.geotools.data.store.EmptyFeatureCollection;
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
@@ -463,6 +464,18 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         DefaultQuery q = new DefaultQuery(query);
         q.setTypeName(schema.getTypeName());
         return q;
+    }
+    
+    public Set getSupportedHints() {
+    	VersionedPostgisDataStore ds = (VersionedPostgisDataStore) getDataStore();
+        if(ds.wrapped.isWKBEnabled()) {
+            HashSet set = new HashSet();
+            set.add(Hints.JTS_COORDINATE_SEQUENCE_FACTORY);
+            set.add(Hints.JTS_GEOMETRY_FACTORY);
+            return set;
+        } else {
+            return Collections.EMPTY_SET;
+        }
     }
 
 }
