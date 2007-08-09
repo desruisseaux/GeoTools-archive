@@ -46,4 +46,12 @@ public abstract class AbstractManageableDataSource implements ManageableDataSour
     public void setLogWriter(PrintWriter out) throws SQLException {
         wrapped.setLogWriter(out);
     }
+    
+    public boolean isWrapperFor(Class c) throws SQLException {
+		return false;
+	}
+
+	public Object unwrap(Class arg0) throws SQLException {
+		throw new SQLException("This implementation cannot unwrap anything");
+	}
 }
