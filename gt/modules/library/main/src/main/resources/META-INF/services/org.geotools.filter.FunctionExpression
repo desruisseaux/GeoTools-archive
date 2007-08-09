@@ -71,6 +71,7 @@ org.geotools.filter.function.FilterFunction_strIndexOf
 org.geotools.filter.function.FilterFunction_strLastIndexOf
 org.geotools.filter.function.FilterFunction_strLength
 org.geotools.filter.function.FilterFunction_strMatches
+org.geotools.filter.function.FilterFunction_strReplace
 org.geotools.filter.function.FilterFunction_strSubstring
 org.geotools.filter.function.FilterFunction_strSubstringStart
 org.geotools.filter.function.FilterFunction_strTrim
