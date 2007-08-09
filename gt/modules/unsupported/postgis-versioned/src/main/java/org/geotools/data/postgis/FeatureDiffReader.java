@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
@@ -47,6 +48,8 @@ import org.opengis.filter.sort.SortOrder;
  * 
  */
 public class FeatureDiffReader {
+	/** The logger for the postgis module. */
+    protected static final Logger LOGGER = Logger.getLogger("org.geotools.data.postgis");
 
     private FeatureReader fvReader;
 
@@ -317,6 +320,7 @@ public class FeatureDiffReader {
     }
 
     protected void finalize() throws Throwable {
+    	LOGGER.warning("There's code leaaving the feature diff readers open!");
         close();
     }
 
