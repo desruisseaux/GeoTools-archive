@@ -99,7 +99,6 @@
          <module>jpox</module>
          <module>geomedia</module>
          <module>db2</module>
-         <module>vpf</module>
        </modules>
      </profile>
   </profiles>
@@ -126,6 +125,7 @@
     <module>xml-filter</module>
     <module>mappane</module>
     <module>coveragetools</module>
+    <module>vpf</module>
   </modules>
 
 </project>
