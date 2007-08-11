@@ -1,11 +1,13 @@
 package org.geotools.renderer3d.terrainblock;
 
+import com.jme.image.Texture;
 import com.jme.math.Vector3f;
 import com.jme.scene.Node;
 import com.jme.scene.Spatial;
 import org.geotools.renderer3d.field.TextureListener;
 import org.geotools.renderer3d.utils.BoundingRectangle;
 import org.geotools.renderer3d.utils.ParameterChecker;
+import org.geotools.renderer3d.utils.Pool;
 import org.geotools.renderer3d.utils.quadtree.NodeListener;
 import org.geotools.renderer3d.utils.quadtree.QuadTreeNode;
 
@@ -37,9 +39,11 @@ public final class TerrainBlockImpl
 
     private TerrainMesh myTerrainMesh = null;
     private Node myTerrain3DNode = null;
-    private Image myMapImage = null;
+    private BufferedImage myMapImage = null;
 
     private boolean myDelted = false;
+    private final Pool<Texture> myTexturePool;
+    private final Pool<BufferedImage> myTextureImagePool;
 
     //======================================================================
     // Public Methods
@@ -50,13 +54,24 @@ public final class TerrainBlockImpl
     /**
      * @param quadTreeNode
      * @param numberOfGridsPerSide number of grid cells along the side of the TerrainBlock.
+     * @param texturePool
+     * @param textureImagePool
      */
-    public TerrainBlockImpl( final QuadTreeNode<TerrainBlock> quadTreeNode, final int numberOfGridsPerSide )
+    public TerrainBlockImpl( final QuadTreeNode<TerrainBlock> quadTreeNode,
+                             final int numberOfGridsPerSide,
+                             final Pool<Texture> texturePool,
+                             final Pool<BufferedImage> textureImagePool )
     {
         ParameterChecker.checkNotNull( quadTreeNode, "quadTreeNode" );
+        ParameterChecker.checkPositiveNonZeroInteger( numberOfGridsPerSide, "numberOfGridsPerSide" );
+        ParameterChecker.checkNotNull( texturePool, "texturePool" );
+        ParameterChecker.checkNotNull( textureImagePool, "textureImagePool" );
 
         myQuadTreeNode = quadTreeNode;
         myNumberOfGridsPerSide = numberOfGridsPerSide;
+        myTexturePool = texturePool;
+        myTextureImagePool = textureImagePool;
+
         myCenter = new Vector3f( (float) quadTreeNode.getBounds().getCenterX(),
                                  (float) quadTreeNode.getBounds().getCenterY(),
                                  0 ); // TODO: Get ground height at center.
@@ -114,8 +129,8 @@ public final class TerrainBlockImpl
         {
             myTerrainMesh = createTerrainMesh();
         }
-        final TerrainMesh terrainMesh = myTerrainMesh;
-        return terrainMesh;
+
+        return myTerrainMesh;
     }
 
 
@@ -148,15 +163,17 @@ public final class TerrainBlockImpl
     }
 
 
-    public void setMapImage( final Image mapImage )
+    public void setMapImage( final BufferedImage mapImage )
     {
         checkIfDeleted();
-
-        myMapImage = mapImage;
 
         if ( myTerrainMesh != null )
         {
             myTerrainMesh.setTextureImage( mapImage );
+        }
+        else
+        {
+            myMapImage = mapImage;
         }
     }
 
@@ -180,9 +197,11 @@ public final class TerrainBlockImpl
                                                          myQuadTreeNode.getBounds().getY1(),
                                                          myQuadTreeNode.getBounds().getX2(),
                                                          myQuadTreeNode.getBounds().getY2(),
-                                                         0 );
+                                                         0,
+                                                         myTextureImagePool );
 
         terrainMesh.setTextureImage( myMapImage );
+        myMapImage = null;
 
 /* // DEBUG
         terrainMesh.setRandomColors();
@@ -215,6 +234,8 @@ public final class TerrainBlockImpl
             for ( Spatial childNodeSpatial : myChildNodeSpatials )
             {
                 myTerrain3DNode.detachChild( childNodeSpatial );
+
+                // REFACTOR: Collect discarded meshes (or TerrainBlocks?) and reuse them through a pool system.
             }
             myChildNodeSpatials.clear();
 

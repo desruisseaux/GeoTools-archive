@@ -1,6 +1,9 @@
 package org.geotools.renderer3d.terrainblock;
 
+import com.jme.image.Texture;
 import org.geotools.renderer3d.field.TextureProvider;
+import org.geotools.renderer3d.utils.Pool;
+import org.geotools.renderer3d.utils.PoolItemFactory;
 import org.geotools.renderer3d.utils.quadtree.NodeDataFactory;
 import org.geotools.renderer3d.utils.quadtree.QuadTreeNode;
 
@@ -25,6 +28,9 @@ public final class TerrainBlockFactory
     private final TextureProvider myTextureProvider;
     private final int myTextureSize;
 
+    private final Pool<BufferedImage> myTextureImagePool;
+    private final Pool<Texture> myTexturePool;
+
     //======================================================================
     // Public Methods
 
@@ -43,6 +49,22 @@ public final class TerrainBlockFactory
         myNumberOfGridsPerSide = numberOfGridsPerSide;
         myTextureProvider = textureProvider;
         myTextureSize = textureSize;
+
+        myTextureImagePool = new Pool<BufferedImage>( new PoolItemFactory<BufferedImage>()
+        {
+            public BufferedImage create()
+            {
+                return new BufferedImage( myTextureSize, myTextureSize, BufferedImage.TYPE_4BYTE_ABGR );
+            }
+        } );
+
+        myTexturePool = new Pool<Texture>( new PoolItemFactory<Texture>()
+        {
+            public Texture create()
+            {
+                return null;
+            }
+        } );
     }
 
     //----------------------------------------------------------------------
@@ -56,7 +78,10 @@ public final class TerrainBlockFactory
         System.out.println( "TerrainBlockFactory.createNodeDataObject" );
         System.out.println( "node.getBounds() = " + node.getBounds() );
 
-        final TerrainBlockImpl terrainBlock = new TerrainBlockImpl( node, myNumberOfGridsPerSide );
+        final TerrainBlockImpl terrainBlock = new TerrainBlockImpl( node,
+                                                                    myNumberOfGridsPerSide,
+                                                                    myTexturePool,
+                                                                    myTextureImagePool );
 
         // TODO: First assign the block the texture (and elevation?) of the correct sub-quadrant of the parent node
         // (or an eight of the grandparent and so on, if the parent hasn't rendered yet), and start rendering the
@@ -65,7 +90,7 @@ public final class TerrainBlockFactory
         // Note that data retrieval / rendering can be very slow, as it can be e.g. fetched over the network.
 
         // Create texture
-        final BufferedImage buffer = new BufferedImage( myTextureSize, myTextureSize, BufferedImage.TYPE_INT_ARGB );
+        final BufferedImage buffer = myTextureImagePool.getItem();
         final Graphics graphics = buffer.getGraphics();
         graphics.setColor( Color.BLUE );
         graphics.fillRect( 0, 0, myTextureSize, myTextureSize );

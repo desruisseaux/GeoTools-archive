@@ -5,7 +5,8 @@ import com.jme.renderer.Camera;
 import com.jme.scene.Node;
 import com.jme.scene.Spatial;
 import org.geotools.map.MapContext;
-import org.geotools.renderer3d.field.MapTextureProvider;
+import org.geotools.renderer3d.field.DummyTextureProvider;
+import org.geotools.renderer3d.field.TextureProvider;
 import org.geotools.renderer3d.navigationgestures.NavigationGesture;
 import org.geotools.renderer3d.terrainblock.TerrainBlock;
 import org.geotools.renderer3d.terrainblock.TerrainBlockFactory;
@@ -17,7 +18,6 @@ import org.geotools.renderer3d.utils.quadtree.QuadTreeImpl;
 import org.geotools.renderer3d.utils.quadtree.QuadTreeListener;
 import org.geotools.renderer3d.utils.quadtree.QuadTreeNode;
 
-import java.awt.Color;
 import java.awt.Component;
 
 /**
@@ -145,12 +145,12 @@ public final class Renderer3DImpl
 
         myCanvas3D.setViewDistance( (float) myVisibilityDistance );
 
-        final MapTextureProvider mapTextureProvider = new MapTextureProvider( mapContextToRender, Color.WHITE );
-
 /*
+        final MapTextureProvider mapTextureProvider = new MapTextureProvider( mapContextToRender, Color.WHITE );
+*/
+
         // DEBUG
         final TextureProvider mapTextureProvider = new DummyTextureProvider();
-*/
 
         myTerrainBlockFactory = new TerrainBlockFactory( terrainBlockSizeInGrids,
                                                          mapTextureProvider,

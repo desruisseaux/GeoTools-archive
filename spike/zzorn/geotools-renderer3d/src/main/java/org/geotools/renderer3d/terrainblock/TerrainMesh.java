@@ -13,6 +13,7 @@ import com.jme.util.geom.BufferUtils;
 import org.geotools.renderer3d.utils.ImageUtils;
 import org.geotools.renderer3d.utils.MathUtils;
 import org.geotools.renderer3d.utils.ParameterChecker;
+import org.geotools.renderer3d.utils.Pool;
 
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -52,7 +53,7 @@ public final class TerrainMesh
     private final int mySizeY_vertices;
     private final int mySizeX_vertices;
 
-    private Image myTextureImage;
+    private BufferedImage myTextureImage;
 
     private boolean myTextureUpdateNeeded = false;
 
@@ -64,6 +65,8 @@ public final class TerrainMesh
     private static final BufferedImage PLACEHOLDER_PICTURE = ImageUtils.createPlaceholderPicture( 128, 128 );
     private static final float DEFAULT_ANISO_LEVEL = 1.0f;
     private static final int DEFAULT_TEXTURE_IMAGE_FORMAT = com.jme.image.Image.GUESS_FORMAT_NO_S3TC;
+    private TextureState myTextureState;
+    private final Pool<BufferedImage> myTextureImagePool;
 
     //======================================================================
     // Public Methods
@@ -72,13 +75,14 @@ public final class TerrainMesh
     // Constructors
 
     /**
-     * @param sizeXCells Number of grid cells along the X side.
-     * @param sizeYCells Number of grid cells along the Y side.
-     * @param x1         first world coordinate.
-     * @param y1         first world coordinate.
-     * @param x2         second world coordinate.  Should be larger than the first.
-     * @param y2         second world coordinate.  Should be larger than the first.
-     * @param z          the default height level.
+     * @param sizeXCells       Number of grid cells along the X side.
+     * @param sizeYCells       Number of grid cells along the Y side.
+     * @param x1               first world coordinate.
+     * @param y1               first world coordinate.
+     * @param x2               second world coordinate.  Should be larger than the first.
+     * @param y2               second world coordinate.  Should be larger than the first.
+     * @param z                the default height level.
+     * @param textureImagePool a pool to return texture images to when they have been applied to a texture.
      */
     public TerrainMesh( final int sizeXCells,
                         final int sizeYCells,
@@ -86,7 +90,8 @@ public final class TerrainMesh
                         final double y1,
                         final double x2,
                         final double y2,
-                        final double z )
+                        final double z,
+                        final Pool<BufferedImage> textureImagePool )
     {
         // JME seems to need an unique identifier for each node.  NOTE: Not thread safe.
         super( "TerrainMesh_" + theTerrainMeshCounter++ );
@@ -101,6 +106,7 @@ public final class TerrainMesh
         ParameterChecker.checkLargerThan( x2, "x2", x1, "x1" );
         ParameterChecker.checkLargerThan( y2, "y2", y1, "y1" );
         ParameterChecker.checkNormalNumber( z, "z" );
+        ParameterChecker.checkNotNull( textureImagePool, "textureImagePool" );
 
         // Assign fields from parameters
         // Cells are the rectangular areas between four normal surface vertices.  Does not include the rectangles in the downturned skirt.
@@ -114,6 +120,7 @@ public final class TerrainMesh
         myX2 = x2;
         myY2 = y2;
         myZ = z;
+        myTextureImagePool = textureImagePool;
 
         mySkirtSize = calculateSkirtSize();
 
@@ -155,6 +162,9 @@ public final class TerrainMesh
         if ( myTextureUpdateNeeded )
         {
             initTexture( myTextureImage, r );
+
+            myTextureImagePool.addItem( myTextureImage );
+            myTextureImage = null;
         }
 
         super.draw( r );
@@ -166,7 +176,7 @@ public final class TerrainMesh
      *
      * @param textureImage the image to create a texture from.  If null, a placeholder texture is created.
      */
-    public void setTextureImage( Image textureImage )
+    public void setTextureImage( BufferedImage textureImage )
     {
         if ( myTextureImage != textureImage )
         {
@@ -514,18 +524,27 @@ public final class TerrainMesh
             textureImage = PLACEHOLDER_PICTURE;
         }
 
-        final TextureState myTextureState = renderer.createTextureState();
+        if ( myTextureState != null )
+        {
+            myTextureState.removeTexture( 0 );
+        }
+        else
+        {
+            myTextureState = renderer.createTextureState();
+        }
+
+        // REFACTOR: Create the texture just on the first call, and just change the texture after that.
 
         final Texture texture = TextureManager.loadTexture( textureImage,
                                                             Texture.MM_LINEAR,
-                                                            Texture.FM_NEAREST,
+                                                            Texture.FM_LINEAR,
                                                             DEFAULT_ANISO_LEVEL,
                                                             DEFAULT_TEXTURE_IMAGE_FORMAT,
-                                                            true );
+                                                            false );
 
 /*
         // Activate mip-mapping
-        texture.setMipmapState( Texture.MM_NEAREST_LINEAR );
+        texture.setMipmapState( Texture.MM_LINEAR );
 */
 
         // Clamp texture at edges (no wrapping)
