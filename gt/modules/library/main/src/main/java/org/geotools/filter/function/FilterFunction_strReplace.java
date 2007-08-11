@@ -35,7 +35,7 @@ public class FilterFunction_strReplace extends FunctionExpressionImpl implements
         String arg0;
         String arg1;
         String arg2;
-        Boolean arg3;
+        Boolean arg3 = null;
 
         try { // attempt to get value and perform conversion
             arg0 = (String) getExpression(0).evaluate(feature, String.class); // extra
@@ -77,9 +77,11 @@ public class FilterFunction_strReplace extends FunctionExpressionImpl implements
             // strings
         } catch (Exception e) // probably a type error
         {
-            arg3 = false;
         }
-
-        return StaticGeometry.strReplace(arg0, arg1, arg2, arg3);
+        
+        if ( arg3 == null ) {
+            arg3 = Boolean.FALSE;
+        }
+        return StaticGeometry.strReplace(arg0, arg1, arg2, arg3.booleanValue());
     }
 }

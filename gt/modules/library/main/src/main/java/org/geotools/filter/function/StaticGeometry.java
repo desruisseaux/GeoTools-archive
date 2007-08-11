@@ -399,20 +399,6 @@ import com.vividsolutions.jts.io.WKTReader;
      
  	//--------------------------------------------------------------------------
   	//JAVA String functions
-
-     static public String strReplace(String s1, String target,String replacement, boolean all )
-     {
-        if( all ){
-            Pattern compile = Pattern.compile(target.toString(), Pattern.LITERAL);
-            Matcher matcher = compile.matcher(s1);
-            return matcher.replaceAll(Matcher.quoteReplacement(replacement.toString()));
-        }
-        else {
-            Pattern compile = Pattern.compile(target.toString(), Pattern.LITERAL);
-            Matcher matcher = compile.matcher(s1);
-            return matcher.replaceFirst(Matcher.quoteReplacement(replacement.toString()));
-        }
-     }
      static public String strConcat(String s1,String s2)
      {
      	return s1+s2;
@@ -453,8 +439,16 @@ import com.vividsolutions.jts.io.WKTReader;
      	return s1.matches(s2);
      }
      
-     
-     
+     static public String strReplace(String s1, String s2, String s3, boolean bAll)
+     {
+         if (bAll) {  
+             return s1.replaceAll(s2, s3);
+         }
+         else { 
+             return s1.replaceFirst (s2, s3);
+         }
+     }
+
      static public String strSubstring(String s1,int beg, int end)
      {
      	return s1.substring(beg,end);
@@ -469,7 +463,7 @@ import com.vividsolutions.jts.io.WKTReader;
      {
      	return s1.trim();
      }
-     
+
  
  	//--------------------------------------------------------------------------
   	//data type xform
