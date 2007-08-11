@@ -47,6 +47,9 @@ public class SimpleFeatureCollectionTypeImpl extends FeatureCollectionTypeImpl
 		return Collections.singletonList(memberOf);
 	}
 
+	public Set getMemberTypes() {
+	    return Collections.unmodifiableSet( MEMBERS );
+	}
 	public SimpleFeatureType getMemberType() {
 		if (MEMBERS.isEmpty())
 			return null;

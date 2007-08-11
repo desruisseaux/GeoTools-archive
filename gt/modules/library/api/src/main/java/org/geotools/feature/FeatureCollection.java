@@ -19,6 +19,9 @@ import java.io.IOException;
 import java.util.Iterator;
 import com.vividsolutions.jts.geom.Geometry;
 import org.opengis.feature.simple.SimpleFeatureCollection;
+import org.opengis.feature.simple.SimpleFeatureCollectionType;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 import org.geotools.data.collection.ResourceCollection;
@@ -96,6 +99,14 @@ import org.geotools.util.ProgressListener;
  * @deprecated use {@link SimpleFeatureCollection}.
  */
 public interface FeatureCollection extends ResourceCollection, Feature, SimpleFeatureCollection {
+    /**
+     * Re-apply type narrowing that was stripped from our geoapi interface
+     */
+    SimpleFeatureCollectionType getType();
+
+    /** Re-apply type narrowing that was stripped from our geoapi interface */
+    SimpleFeatureType getMemberType();
+
     /**
      * Obtain a FeatureIterator of the Features within this collection.
      * <p>
@@ -264,7 +275,7 @@ public interface FeatureCollection extends ResourceCollection, Feature, SimpleFe
      *  </p>
      * @return FeatureType describing the "common" schema to all child features of this collection
      */
-    FeatureType getSchema();
+    org.geotools.feature.FeatureType getSchema();
 
     /**
      * Will visit the contents of the feature collection.
@@ -315,5 +326,5 @@ public interface FeatureCollection extends ResourceCollection, Feature, SimpleFe
      * collection.subCollection( myFilter ).sort( "bar" ).sort("foo")
      * @param order
      */
-    public FeatureList sort(SortBy order);
+    public FeatureCollection sort(SortBy order);
 }

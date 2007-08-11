@@ -52,14 +52,14 @@ public class AttributeImpl implements Attribute {
 		TYPE = type;
 		ID = id;
 		
-		set(content);
+		setValue(content);
 	}
 
 	public String getID() {
 		return ID;
 	}
 
-	public Object get() {
+	public Object getValue() {
 		return content;
 	}
 
@@ -95,7 +95,7 @@ public class AttributeImpl implements Attribute {
 	 *             Attribute does not passes the restrictions imposed by its
 	 *             AttributeType
 	 */
-	public void set(Object newValue) throws IllegalArgumentException,
+	public void setValue(Object newValue) throws IllegalArgumentException,
 			IllegalStateException {
 
 		newValue = parse(newValue);

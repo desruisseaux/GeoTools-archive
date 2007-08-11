@@ -17,6 +17,8 @@ package org.geotools.feature;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -79,6 +81,28 @@ public class DefaultFeatureType extends SimpleFeatureTypeImpl implements Feature
             throws SchemaException, NullPointerException {
         this( typeName, toURI(namespace ), types, superTypes, defaultGeom );
     }
+    public DefaultFeatureType(String typeName, URI namespace,
+            Collection types, Collection superTypes, GeometryAttributeType defaultGeom)
+            throws NullPointerException {
+        this(  namespace != null ? new TypeName( namespace.toString(), typeName ) : new TypeName( FeatureTypes.DEFAULT_NAMESPACE.toString(), typeName ),
+                types, superTypes, defaultGeom );
+    }
+    private static final <T> List<T> toList( Collection<T> collection ){
+        if( collection == null ){
+            return new ArrayList<T>();
+        }
+        else {
+            return new ArrayList<T>(collection);
+        }
+    }
+    private static final FeatureType[] toFeatureTypes( Collection types ){
+        if( types == null ){
+            return new FeatureType[0];
+        }
+        else {
+            return (FeatureType[]) types.toArray( new FeatureType[types.size()]);
+        }
+    }
     /**
      * Constructs a new DefaultFeatureType.
      *
@@ -95,20 +119,18 @@ public class DefaultFeatureType extends SimpleFeatureTypeImpl implements Feature
      * @throws SchemaException For problems making the FeatureType.
      * @throws NullPointerException If typeName is null.
      */
-    public DefaultFeatureType(String typeName, URI namespace,
+    public DefaultFeatureType( TypeName name,
         Collection types, Collection superTypes, GeometryAttributeType defaultGeom)
         throws NullPointerException {
-    	super( namespace != null ? new TypeName( namespace.toString(), typeName ) : new TypeName( FeatureTypes.DEFAULT_NAMESPACE.toString(), typeName ), 
-    			(List)types, defaultGeom, null, null, null );
+    	super( name, (List)types, defaultGeom, null, null, null );
     	
-        if (typeName == null) {
-            throw new NullPointerException(typeName);
+        if (name == null) {
+            throw new NullPointerException("Name required");
         }
 
 //        this.typeName = typeName;
 //        this.namespace = namespace == null ? FeatureTypes.DEFAULT_NAMESPACE : namespace;
-        this.ancestors = (FeatureType[]) superTypes.toArray(new FeatureType[superTypes
-                .size()]);
+        this.ancestors = toFeatureTypes( superTypes );
 //
 //        Collection attributes = new java.util.ArrayList( types );
 //        for (int i = 0, ii = ancestors.length; i < ii; i++) {

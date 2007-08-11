@@ -29,30 +29,28 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
-
 /**
  * Provides testing for a special type of Feature a Simple Feature wrapped in
- * Complex clothing.  Specifically DefaultFeature.WrappedComplex.  It should
- * return Lists for all of its get Attributes, since that's what a complex
- * feature does.
- *
+ * Complex clothing. Specifically DefaultFeature.WrappedComplex. It should return
+ * Lists for all of its get Attributes, since that's what a complex feature does.
+ * 
  * @author Chris Holmes, TOPP
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/library/main/src/test/java/org/geotools/feature/FeatureWrappedComplexTest.java $
  */
 public class FeatureWrappedComplexTest extends TestCase {
     /** The logger for the default core module. */
-    private static final Logger LOGGER = Logger.getLogger(
-            "org.geotools.feature");
+    private static final Logger LOGGER = Logger.getLogger("org.geotools.feature");
 
     /** Feature on which to preform tests */
     private Feature testFeature = null;
     TestSuite suite = null;
 
-    public FeatureWrappedComplexTest(String testName) {
+    public FeatureWrappedComplexTest( String testName ) {
         super(testName);
     }
 
-    public static void main(String[] args) {
+    public static void main( String[] args ) {
         org.geotools.util.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         junit.textui.TestRunner.run(suite());
     }
@@ -64,14 +62,14 @@ public class FeatureWrappedComplexTest extends TestCase {
     }
 
     public void setUp() {
-        SimpleFeature feature = (SimpleFeature) SampleFeatureFixtures
-            .createFeature();
-        //testFeature = feature.toComplex(); //this isn't in the api...yet.
+        SimpleFeature feature = (SimpleFeature) SampleFeatureFixtures.createFeature();
+        //  testFeature = feature.toComplex(); //this isn't in the api...yet.
+        
         try {
-	testFeature = new DefaultFeature.ComplexWrapper(feature);
-	} catch (IllegalAttributeException iae) {
-	    throw new RuntimeException("programming error with wrapper");
-	}
+            testFeature = new DefaultFeature.ComplexWrapper(feature);
+        } catch (IllegalAttributeException iae) {
+            throw new RuntimeException("programming error with wrapper");
+        }
     }
 
     public void testAttributeAccess() throws Exception {
@@ -82,8 +80,7 @@ public class FeatureWrappedComplexTest extends TestCase {
             f.setAttribute(1244, Collections.singletonList("x"));
             fail("not out of bounds");
         } catch (ArrayIndexOutOfBoundsException aioobe) {
-        }
-        catch (IndexOutOfBoundsException aioobe) {
+        } catch (IndexOutOfBoundsException aioobe) {
         }
 
         try {
@@ -130,9 +127,9 @@ public class FeatureWrappedComplexTest extends TestCase {
         Object[] complexAtts = wrapped.getAttributes(null);
         List curAttList = null;
 
-        //we're starting at 1 because of the annoying equals with geometries, 
-        //and I don't want to figure out where the util method is...
-        for (int i = 1; i < complexAtts.length; i++) {
+        // we're starting at 1 because of the annoying equals with geometries,
+        // and I don't want to figure out where the util method is...
+        for( int i = 1; i < complexAtts.length; i++ ) {
             assertTrue(complexAtts[i] instanceof List);
             curAttList = (List) complexAtts[i];
             assertEquals(1, curAttList.size());
@@ -158,12 +155,12 @@ public class FeatureWrappedComplexTest extends TestCase {
             testFeature.setAttribute("testGeometry", singleNewData);
             fail("a wrapped string should not be able to set a geometry");
         } catch (Exception e) {
-            //e.printStackTrace();
+            // e.printStackTrace();
             assertTrue(e instanceof IllegalAttributeException);
         }
     }
 
     public void testEquals() throws Exception {
-        //todo
+        // todo
     }
 }

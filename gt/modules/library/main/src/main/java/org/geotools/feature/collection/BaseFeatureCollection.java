@@ -1,23 +1,15 @@
 package org.geotools.feature.collection;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.CollectionListener;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypes;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.simple.SimpleFeatureCollectionImpl;
 import org.geotools.feature.simple.SimpleFeatureCollectionTypeImpl;
-import org.geotools.feature.type.TypeName;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureCollectionType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -66,7 +58,7 @@ public abstract class BaseFeatureCollection extends SimpleFeatureCollectionImpl
 	 * @param memberType The type of the members of the collection.
 	 */
     protected BaseFeatureCollection( String id, FeatureType memberType ){
-    	super( new BaseFeatureCollectionFeatureType(memberType), id );
+    	super( new BaseFeatureCollectionType(memberType), id );
     }
     
     /**
@@ -121,8 +113,12 @@ public abstract class BaseFeatureCollection extends SimpleFeatureCollectionImpl
         return values.toArray( attributes );
 	}
 
-	public FeatureType getFeatureType() {
-		return (FeatureType) getType();
+	@Override
+	public SimpleFeatureCollectionType getType() {
+	    return (SimpleFeatureCollectionType) super.getType();
+	}
+	public BaseFeatureCollectionType getFeatureType() {
+		return (BaseFeatureCollectionType) getType();
 	}
 
 	public Geometry getPrimaryGeometry() {
@@ -146,89 +142,5 @@ public abstract class BaseFeatureCollection extends SimpleFeatureCollectionImpl
 	 */
 	public ReferencedEnvelope getBounds() {
 		throw new UnsupportedOperationException("subclasses should override");
-	}
-	
-    /**
-     * Extension of {@link SimpleFeatureCollectionTypeImpl} which implements 
-     * {@link Feature}.
-     * <p>
-     * This type is completely empty in that it contains no attribute types.
-     * </p>
-     * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
-     *
-     */
-	static class BaseFeatureCollectionFeatureType extends SimpleFeatureCollectionTypeImpl 
-		implements org.geotools.feature.FeatureType {
-
-		public BaseFeatureCollectionFeatureType(FeatureType memberType) {
-			super( new TypeName(FeatureTypes.DEFAULT_NAMESPACE.toString(), "AbstractFeatureColletionType"), memberType, null );
-		}
-		
-		public Feature create(Object[] attributes) throws IllegalAttributeException {
-			return create(attributes,null);
-		}
-
-		public Feature create(Object[] attributes, String featureID) throws IllegalAttributeException {
-			throw new UnsupportedOperationException("Types of feature collection do not support feature creation");
-		}
-
-		public Feature duplicate(Feature feature) throws IllegalAttributeException {
-			throw new UnsupportedOperationException("Types of feature collection do not support feature creation");
-		}
-
-		public int find(AttributeType type) {
-			return find( type.getLocalName() );
-		}
-
-		public int find(String attName) {
-			return indexOf(attName);
-		}
-
-		public FeatureType[] getAncestors() {
-			return new FeatureType[]{};
-		}
-
-		public AttributeType getAttributeType(String xPath) {
-			return (AttributeType) getAttribute(name);
-		}
-
-		public AttributeType getAttributeType(int position) {
-			return (AttributeType) getAttribute(position);
-		}
-
-		public AttributeType[] getAttributeTypes() {
-			return new AttributeType[]{};
-		}
-
-		public URI getNamespace() {
-			try {
-				return new URI(getName().getNamespaceURI());
-			} 
-			catch (URISyntaxException e) {
-				//cant happen
-				return null;
-			}
-		}
-
-		public GeometryAttributeType getPrimaryGeometry() {
-			return (GeometryAttributeType) getDefaultGeometry();
-		}
-
-		public String getTypeName() {
-			return getName().getLocalPart();
-		}
-
-		public boolean hasAttributeType(String xPath) {
-			return indexOf(xPath) != -1;
-		}
-
-		public boolean isDescendedFrom(URI nsURI, String typeName) {
-			return false;
-		}
-
-		public boolean isDescendedFrom(FeatureType type) {
-			return false;
-		}
-
 	}
 }

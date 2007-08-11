@@ -475,7 +475,7 @@ public class Types {
      */
     public static void validate(Attribute attribute) throws IllegalAttributeException {
 
-        validate(attribute, attribute.get());
+        validate(attribute, attribute.getValue());
     }
 
     /**
@@ -566,11 +566,11 @@ public class Types {
                     return fatt.getID();
                 }
 
-                public Object get() {
-                    return fatt.get();
+                public Object getValue() {
+                    return fatt.getValue();
                 }
 
-                public void set(Object newValue) throws IllegalArgumentException {
+                public void setValue(Object newValue) throws IllegalArgumentException {
                     throw new UnsupportedOperationException("Modification is not supported");
                 }
 

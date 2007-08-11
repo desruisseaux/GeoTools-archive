@@ -41,179 +41,196 @@ import org.geotools.util.ProgressListener;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
- *
- * @author  jamesm
- * @source $URL$
+ * @author jamesm
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/library/main/src/test/java/org/geotools/feature/MockFeatureCollection.java $
  */
 public class MockFeatureCollection implements org.geotools.feature.FeatureCollection {
-    
+
     /** Creates a new instance of MockFeatureCollection */
     public MockFeatureCollection() {
     }
-    
-    public void addListener(CollectionListener listener) {
+
+    public void addListener( CollectionListener listener ) {
     }
-    
+
     public FeatureIterator features() {
         return null;
     }
-    
+
     public ReferencedEnvelope getBounds() {
         return null;
     }
-    
-    public void removeListener(CollectionListener listener) {
-       
+
+    public void removeListener( CollectionListener listener ) {
+
     }
-    
-    public boolean add(Object o) {
+
+    public boolean add( Object o ) {
         return false;
     }
-    
-    public boolean addAll(java.util.Collection c) {
+
+    public boolean addAll( java.util.Collection c ) {
         return false;
     }
-    
+
     public void clear() {
     }
-    
-    public boolean contains(Object o) {
+
+    public boolean contains( Object o ) {
         return false;
     }
-    
-    public boolean containsAll(java.util.Collection c) {
+
+    public boolean containsAll( java.util.Collection c ) {
         return false;
     }
-    
-    public boolean equals(Object o) {
+
+    public boolean equals( Object o ) {
         return false;
     }
-    
+
     public int hashCode() {
         return 0;
     }
-    
+
     public boolean isEmpty() {
         return false;
     }
-    
+
     public java.util.Iterator iterator() {
         return null;
     }
-    
-    public boolean remove(Object o) {
+
+    public boolean remove( Object o ) {
         return false;
     }
-    
-    public boolean removeAll(java.util.Collection c) {
+
+    public boolean removeAll( java.util.Collection c ) {
         return false;
     }
-    
-    public boolean retainAll(java.util.Collection c) {
+
+    public boolean retainAll( java.util.Collection c ) {
         return false;
     }
-    
+
     public int size() {
         return 0;
     }
-    
+
     public Object[] toArray() {
         return null;
     }
-    
-    public Object[] toArray(Object[] a) {
+
+    public Object[] toArray( Object[] a ) {
         return null;
     }
 
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.FeatureCollection#getFeatureType()
-	 */
-	public FeatureType getFeatureType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.geotools.feature.FeatureCollection#getFeatureType()
+     */
+    public FeatureType getFeatureType() {
 
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.Feature#getParent()
-	 */
-	public FeatureCollection getParent() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        return null;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.Feature#setParent(org.geotools.feature.FeatureCollection)
-	 */
-	public void setParent(FeatureCollection collection) {
-		// TODO Auto-generated method stub
-		
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.geotools.feature.Feature#getParent()
+     */
+    public FeatureCollection getParent() {
 
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.Feature#getID()
-	 */
-	public String getID() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        return null;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.Feature#getAttributes(java.lang.Object[])
-	 */
-	public Object[] getAttributes(Object[] attributes) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.geotools.feature.Feature#setParent(org.geotools.feature.FeatureCollection)
+     */
+    public void setParent( FeatureCollection collection ) {
 
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.Feature#getAttribute(java.lang.String)
-	 */
-	public Object getAttribute(String xPath) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    }
 
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.Feature#getAttribute(int)
-	 */
-	public Object getAttribute(int index) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.geotools.feature.Feature#getID()
+     */
+    public String getID() {
 
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.Feature#setAttribute(int, java.lang.Object)
-	 */
-	public void setAttribute(int position, Object val) throws IllegalAttributeException, ArrayIndexOutOfBoundsException {
-		// TODO Auto-generated method stub
-		
-	}
+        return null;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.Feature#getNumberOfAttributes()
-	 */
-	public int getNumberOfAttributes() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.geotools.feature.Feature#getAttributes(java.lang.Object[])
+     */
+    public Object[] getAttributes( Object[] attributes ) {
 
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.Feature#setAttribute(java.lang.String, java.lang.Object)
-	 */
-	public void setAttribute(String xPath, Object attribute) throws IllegalAttributeException {
-		// TODO Auto-generated method stub
-		
-	}
+        return null;
+    }
 
-	public Geometry getPrimaryGeometry() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.geotools.feature.Feature#getAttribute(java.lang.String)
+     */
+    public Object getAttribute( String xPath ) {
 
-	public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
-		// TODO Auto-generated method stub
-		
-	}
+        return null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.geotools.feature.Feature#getAttribute(int)
+     */
+    public Object getAttribute( int index ) {
+
+        return null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.geotools.feature.Feature#setAttribute(int, java.lang.Object)
+     */
+    public void setAttribute( int position, Object val ) throws IllegalAttributeException,
+            ArrayIndexOutOfBoundsException {
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.geotools.feature.Feature#getNumberOfAttributes()
+     */
+    public int getNumberOfAttributes() {
+
+        return 0;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.geotools.feature.Feature#setAttribute(java.lang.String, java.lang.Object)
+     */
+    public void setAttribute( String xPath, Object attribute ) throws IllegalAttributeException {
+
+    }
+
+    public Geometry getPrimaryGeometry() {
+
+        return null;
+    }
+
+    public void setPrimaryGeometry( Geometry geometry ) throws IllegalAttributeException {
+
+    }
 
     public FeatureType getSchema() {
         return null;
@@ -236,181 +253,174 @@ public class MockFeatureCollection implements org.geotools.feature.FeatureCollec
 
     public void close( FeatureIterator iterator ) {
     }
-    
-    public void accepts(FeatureVisitor visitor, ProgressListener progress ) throws IOException {        
+
+    public void accepts( FeatureVisitor visitor, ProgressListener progress ) throws IOException {
     }
 
-	public FeatureCollection subCollection(Filter filter) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public FeatureCollection subCollection( Filter filter ) {
 
-	public FeatureList sort(SortBy order) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        return null;
+    }
 
-	public void purge() {
-		// TODO Auto-generated method stub
-		
-	}
+    public FeatureCollection sort( SortBy order ) {
 
-	public Object getDefaultGeometryValue() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        return null;
+    }
 
-	public AttributeType getType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public void purge() {
 
-	public List getTypes() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    }
 
-	public Object getValue(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public Object getDefaultGeometryValue() {
 
-	public Object getValue(int index) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        return null;
+    }
 
-	public List getValues() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public SimpleFeatureCollectionType getType() {
+        return null;
+    }
 
-	public Object operation(String name, Object parameters) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public List getTypes() {
 
-	public void setDefaultGeometryValue(Object geometry) {
-		// TODO Auto-generated method stub
-		
-	}
+        return null;
+    }
 
-	public void setValue(String name, Object value) {
-		// TODO Auto-generated method stub
-		
-	}
+    public Object getValue( String name ) {
 
-	public void setValue(int index, Object value) {
-		// TODO Auto-generated method stub
-		
-	}
+        return null;
+    }
 
-	public void setValues(List values) {
-		// TODO Auto-generated method stub
-		
-	}
+    public Object getValue( int index ) {
 
-	public void setValues(Object[] values) {
-		// TODO Auto-generated method stub
-		
-	}
+        return null;
+    }
 
-	public CoordinateReferenceSystem getCRS() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public List getValues() {
 
-	public GeometryAttribute getDefaultGeometry() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        return null;
+    }
 
-	public Object getUserData(Object key) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public Object operation( String name, Object parameters ) {
 
-	public void putUserData(Object key, Object value) {
-		// TODO Auto-generated method stub
-		
-	}
+        return null;
+    }
 
-	public void setCRS(CoordinateReferenceSystem crs) {
-		// TODO Auto-generated method stub
-		
-	}
+    public void setDefaultGeometryValue( Object geometry ) {
 
-	public void setDefaultGeometry(GeometryAttribute geometryAttribute) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
 
-	public Collection associations() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public void setValue( String name, Object value ) {
 
-	public Collection attributes() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    }
 
-	public Object get() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public void setValue( int index, Object value ) {
 
-	public List get(Name name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    }
 
-	public AttributeDescriptor getDescriptor() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public void setValues( List values ) {
 
-	public void set(Object newValue) throws IllegalArgumentException {
-		// TODO Auto-generated method stub
-		
-	}
+    }
 
-	public boolean nillable() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    public void setValues( Object[] values ) {
 
-	public Object operation(Name name, List parameters) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    }
 
-	public PropertyDescriptor descriptor() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public CoordinateReferenceSystem getCRS() {
 
-	public Name name() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        return null;
+    }
 
-	public SimpleFeatureCollectionType getFeatureCollectionType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public GeometryAttribute getDefaultGeometry() {
 
-	public SimpleFeatureType getMemberType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        return null;
+    }
 
-	public Collection memberTypes() {
-		return Collections.EMPTY_SET;
-	}
-	
-	public void accepts(org.opengis.feature.FeatureVisitor visitor, org.opengis.util.ProgressListener progress) {
-		// TODO Auto-generated method stub
-		
-	}
+    public Object getUserData( Object key ) {
+
+        return null;
+    }
+
+    public void putUserData( Object key, Object value ) {
+
+    }
+
+    public void setCRS( CoordinateReferenceSystem crs ) {
+
+    }
+
+    public void setDefaultGeometry( GeometryAttribute geometryAttribute ) {
+
+    }
+
+    public Collection associations() {
+
+        return null;
+    }
+
+    public Collection attributes() {
+
+        return null;
+    }
+
+    public Object getValue() {
+
+        return null;
+    }
+
+    public List get( Name name ) {
+
+        return null;
+    }
+
+    public AttributeDescriptor getDescriptor() {
+
+        return null;
+    }
+
+    public void setValue( Object newValue ) throws IllegalArgumentException {
+
+    }
+    public void setValue( List values ) {
+
+    }
+    public boolean nillable() {
+
+        return false;
+    }
+
+    public Object operation( Name name, List parameters ) {
+
+        return null;
+    }
+
+    public PropertyDescriptor descriptor() {
+
+        return null;
+    }
+
+    public Name name() {
+
+        return null;
+    }
+
+    public SimpleFeatureCollectionType getFeatureCollectionType() {
+        return null;
+    }
+
+    public List getAttributes() {
+        return null;
+    }
+    public SimpleFeatureType getMemberType() {
+
+        return null;
+    }
+
+    public Collection memberTypes() {
+        return Collections.EMPTY_SET;
+    }
+
+    public void accepts( org.opengis.feature.FeatureVisitor visitor,
+            org.opengis.util.ProgressListener progress ) {
+
+    }
 }

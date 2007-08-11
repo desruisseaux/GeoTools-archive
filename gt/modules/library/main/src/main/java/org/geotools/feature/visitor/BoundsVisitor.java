@@ -42,7 +42,7 @@ public class BoundsVisitor implements FeatureCalc {
     }
     
     public void visit(org.opengis.feature.Feature feature) {
-    	 Geometry geom = (Geometry) feature.getDefaultGeometry().get();
+    	 Geometry geom = (Geometry) feature.getDefaultGeometry().getValue();
          Envelope bbox = geom.getEnvelopeInternal();
 
          bounds.expandToInclude(bbox);

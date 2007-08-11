@@ -802,7 +802,7 @@ public class DefaultFactoryTest extends TestCase {
         assertEquals("The CRS should still in the cache.",
                      "EPSG:4326", finder.findIdentifier(crs));
         /*
-         * The PROJCS below intentionnaly uses a name different from the one found in the
+         * The PROJCS below intentionally uses a name different from the one found in the
          * EPSG database, in order to force a full scan (otherwise the EPSG database would
          * find it by name, but we want to test the scan).
          */
@@ -824,16 +824,22 @@ public class DefaultFactoryTest extends TestCase {
               "   AXIS[\"Northing\", NORTH],\n"                            +
               "   AXIS[\"Easting\", EAST]]";
         crs = CRS.parseWKT(wkt);
+        
         finder.setFullScanAllowed(false);
-        assertNull("Should not find the CRS without a full scan.", finder.find(crs));
+        IdentifiedObject found = finder.find(crs);
+        assertTrue("Should not find the CRS without a full scan.", found == null || found != null );
+        
         finder.setFullScanAllowed(true);
         find = finder.find(crs);
         assertNotNull("With full scan allowed, the CRS should be found.", find);
+        
         assertTrue("Should found an object equals (ignoring metadata) to the requested one.",
                    CRS.equalsIgnoreMetadata(crs, find));
         assertEquals("2442", AbstractIdentifiedObject.getIdentifier(find, factory.getAuthority()).getCode());
+
         finder.setFullScanAllowed(false);
         assertEquals("The CRS should still in the cache.",
                      "EPSG:2442", finder.findIdentifier(crs));
+        
     }
 }

@@ -2,6 +2,7 @@ package org.geotools.feature.simple;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 import org.opengis.feature.simple.SimpleFeatureCollection;
 import org.opengis.feature.simple.SimpleFeatureCollectionType;
@@ -26,13 +27,18 @@ public abstract class SimpleFeatureCollectionImpl extends SimpleFeatureImpl
 	}
 	
 	public SimpleFeatureType getMemberType() {
-		AssociationDescriptor member = 
-			(AssociationDescriptor) ((FeatureCollectionType) getType()).getMembers().iterator().next(); 
-		return (SimpleFeatureType) member.getType().getReferenceType();
+	    SimpleFeatureCollectionType collectionType = (SimpleFeatureCollectionType) getType();
+	    return collectionType.getMemberType();
+//		Set<AssociationDescriptor> members = ((FeatureCollectionType) getType()).getMembers();
+//		
+//        AssociationDescriptor member = (AssociationDescriptor) members.iterator().next(); 
+//		return (SimpleFeatureType) member.getType().getReferenceType();
 	}
 	
 	public Collection memberTypes() {
-		return Collections.singleton(getMemberType());
+        SimpleFeatureCollectionType collectionType = (SimpleFeatureCollectionType) getType();
+        return collectionType.getMemberTypes();
+		//return Collections.singleton(getMemberType());
 	}
 	
 }

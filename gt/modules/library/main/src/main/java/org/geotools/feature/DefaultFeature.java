@@ -751,13 +751,19 @@ public class DefaultFeature extends SimpleFeatureImpl
 
             setAttribute(idx, attribute);
         }
-
+        /**
+         * Takes the raw arrayof values provided and returns them as a bunch
+         * of Singleton Lists.
+         * @param values
+         * @param schema
+         * @return
+         */
         static List wrapValuesComplex( Object[] values, DefaultFeatureType schema ) {
         	ArrayList atts = new ArrayList(values.length);
         	for ( int i = 0; i < values.length; i++ ) {
         		atts.add(
     				new AttributeImpl( wrapInList(values[i]), schema.getAttribute(i),null) {
-    					public void set(Object newValue) throws IllegalArgumentException, IllegalStateException {
+    					public void setValue(Object newValue) throws IllegalArgumentException, IllegalStateException {
     						 newValue = parse(newValue);
     						 content = newValue;
     					}
@@ -767,8 +773,7 @@ public class DefaultFeature extends SimpleFeatureImpl
     					}
     				}
     			);
-        	}
-        	
+        	}        	
         	return atts;
         }
         

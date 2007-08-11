@@ -98,7 +98,7 @@ public abstract class FilterAbstract implements org.opengis.filter.Filter
         //so, lacking a better way of doing so, I'm putting this
         //check here
         if(value instanceof org.opengis.feature.Attribute){
-            value = ((org.opengis.feature.Attribute)value).get();
+            value = ((org.opengis.feature.Attribute)value).getValue();
         }
         return value;
 	}

@@ -25,6 +25,8 @@ package org.geotools.filter.function;
 
 
 import java.util.Collection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 import com.vividsolutions.jts.operation.polygonize.Polygonizer;
@@ -397,7 +399,20 @@ import com.vividsolutions.jts.io.WKTReader;
      
  	//--------------------------------------------------------------------------
   	//JAVA String functions
-     
+
+     static public String strReplace(String s1, String target,String replacement, boolean all )
+     {
+        if( all ){
+            Pattern compile = Pattern.compile(target.toString(), Pattern.LITERAL);
+            Matcher matcher = compile.matcher(s1);
+            return matcher.replaceAll(Matcher.quoteReplacement(replacement.toString()));
+        }
+        else {
+            Pattern compile = Pattern.compile(target.toString(), Pattern.LITERAL);
+            Matcher matcher = compile.matcher(s1);
+            return matcher.replaceFirst(Matcher.quoteReplacement(replacement.toString()));
+        }
+     }
      static public String strConcat(String s1,String s2)
      {
      	return s1+s2;

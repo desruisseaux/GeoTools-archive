@@ -11,7 +11,6 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.collection.DelegateFeatureReader;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureList;
 import org.geotools.feature.collection.DecoratingFeatureCollection;
 import org.geotools.feature.collection.DelegateFeatureIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -61,7 +60,7 @@ public class MaxFeaturesFeatureCollection extends DecoratingFeatureCollection
 		throw new UnsupportedOperationException();
 	}
 
-	public FeatureList sort(SortBy order) {
+	public FeatureCollection sort(SortBy order) {
 		throw new UnsupportedOperationException();
 	}
 

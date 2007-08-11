@@ -351,153 +351,105 @@ public class TransactionStateDiff implements State {
     public static final Feature NULL=new Feature( ){
 
 		public Object getAttribute(String arg0) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		public Object getAttribute(int arg0) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		public Object[] getAttributes(Object[] arg0) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		public ReferencedEnvelope getBounds() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		public Geometry getPrimaryGeometry() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 		
 		public FeatureType getFeatureType() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		public String getID() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		public int getNumberOfAttributes() {
-			// TODO Auto-generated method stub
 			return 0;
 		}
 
-		public FeatureCollection getParent() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		public void setAttribute(int arg0, Object arg1) throws IllegalAttributeException, ArrayIndexOutOfBoundsException {
-			// TODO Auto-generated method stub
-			
+		public void setAttribute(int arg0, Object arg1) throws IllegalAttributeException, ArrayIndexOutOfBoundsException {			
 		}
 
 		public void setAttribute(String arg0, Object arg1) throws IllegalAttributeException {
-			// TODO Auto-generated method stub
-			
 		}
 
 		public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
-			// TODO Auto-generated method stub
-			
-		}
-
-		public void setParent(FeatureCollection arg0) {
-			// TODO Auto-generated method stub
-			
 		}
 
 		public Object getDefaultGeometryValue() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		public AttributeType getType() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		public List getTypes() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		public Object getValue(String name) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		public Object getValue(int index) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		public List getValues() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		public Object operation(String name, Object parameters) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
-		public void setDefaultGeometryValue(Object geometry) {
-			// TODO Auto-generated method stub
-			
+		public void setDefaultGeometryValue(Object geometry) {			
 		}
 
 		public void setValue(String name, Object value) {
-			// TODO Auto-generated method stub
-			
 		}
 
 		public void setValue(int index, Object value) {
-			// TODO Auto-generated method stub
-			
 		}
 
 		public void setValues(List values) {
-			// TODO Auto-generated method stub
-			
 		}
 
 		public void setValues(Object[] values) {
-			// TODO Auto-generated method stub
-			
 		}
 
 		public CoordinateReferenceSystem getCRS() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		public GeometryAttribute getDefaultGeometry() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		public Object getUserData(Object key) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		public void putUserData(Object key, Object value) {
-			// TODO Auto-generated method stub
-			
 		}
 
 		public void setCRS(CoordinateReferenceSystem crs) {
-			// TODO Auto-generated method stub
-			
 		}
 
 		public void setDefaultGeometry(GeometryAttribute geometryAttribute) {
@@ -554,6 +506,26 @@ public class TransactionStateDiff implements State {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+        public List getAttributes() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public Object getValue() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public void setValue( List values ) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        public void setValue( Object values ) {
+            // TODO Auto-generated method stub
+            
+        }
     	
     };
 

@@ -14,7 +14,6 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureList;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.collection.DecoratingFeatureCollection;
@@ -72,7 +71,7 @@ public class FilteringFeatureCollection extends DecoratingFeatureCollection impl
 		throw new UnsupportedOperationException();
 	}
 
-	public FeatureList sort(SortBy order) {
+	public FeatureCollection sort(SortBy order) {
 		throw new UnsupportedOperationException();
 	}
 

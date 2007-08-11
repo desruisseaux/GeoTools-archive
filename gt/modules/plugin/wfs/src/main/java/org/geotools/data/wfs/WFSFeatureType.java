@@ -820,4 +820,8 @@ class WFSFeatureType implements FeatureType {
 
         
     }
+
+    public List getAttributes() {
+        return delegate.getAttributes();
+    }
 }

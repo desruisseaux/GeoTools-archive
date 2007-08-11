@@ -28,7 +28,6 @@ import org.geotools.feature.CollectionListener;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureList;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.simple.SimpleFeatureCollectionImpl;
@@ -211,7 +210,7 @@ public class SubFeatureCollection extends BaseFeatureCollection implements Featu
 		return this;
 	}
 
-	public FeatureList sort(SortBy order) {
+	public FeatureCollection sort(SortBy order) {
 		return null;
 	}
 

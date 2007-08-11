@@ -53,6 +53,7 @@ import org.geotools.feature.type.GeometricAttributeType;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.visitor.DefaultFilterVisitor;
 import org.geotools.referencing.CRS;
+import org.opengis.feature.simple.SimpleFeatureCollection;
 import org.opengis.filter.And;
 import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Filter;
@@ -906,6 +907,22 @@ public class DataUtilities {
     /**
      * Copies the provided features into a FeatureCollection.
      * <p>
+     * Often used when gathering a FeatureCollection into memory.
+     * 
+     * @param features FeatureCollection
+     * @return FeatureCollection
+     */
+    public static SimpleFeatureCollection collection( List<Feature> list ) {
+        FeatureCollection collection = FeatureCollections.newCollection();
+        for ( Feature feature : list ){
+            collection.add( list );
+        }
+        return collection;
+    }
+    
+    /**
+     * Copies the provided features into a FeatureCollection.
+     * <p>
      * Often used when gathering features for FeatureStore:<pre><code>
      * featureStore.addFeatures( DataUtilities.collection(feature));
      * </code></pre>
@@ -1116,7 +1133,6 @@ public class DataUtilities {
 
     /**
      * Utility method for FeatureType construction.
-     * 
      * <p>
      * Will parse a String of the form: <i>"name:Type,name2:Type2,..."</i>
      * </p>
@@ -1212,11 +1228,13 @@ public class DataUtilities {
     }
 
     /**
-     * Record typeSpec for the provided featureType
+     * A "quick" String representation of a FeatureType.
+     * <p>
+     * This string represenation may be used with createType( name, spec ).
+     * </p>
+     * @param featureType FeatureType to represent
      *
-     * @param featureType DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @return The string "specification" for the featureType
      */
     public static String spec(FeatureType featureType) {
         AttributeType[] types = featureType.getAttributeTypes();

@@ -88,12 +88,12 @@ public class GeometryAttributeImpl extends AttributeImpl implements
 				+ " cannot parse " + value);
 	}
 
-	public Object /*Geometry*/ get() {
-		return (Geometry) super.get();
+	public Object /*Geometry*/ getValue() {
+		return (Geometry) super.getValue();
 	}
 
-	public void set(Geometry geometry) {
-		super.set(geometry);
+	public void setValue(Geometry geometry) {
+		super.setValue(geometry);
 	}
 
 	/**
@@ -113,7 +113,7 @@ public class GeometryAttributeImpl extends AttributeImpl implements
 	public synchronized BoundingBox getBounds() {
 		if( bounds == null ){
 			ReferencedEnvelope bbox = new ReferencedEnvelope(crs);
-			Geometry geom = (Geometry) get();
+			Geometry geom = (Geometry) getValue();
 			if (geom != null) {
 				bbox.expandToInclude(geom.getEnvelopeInternal());
 			}

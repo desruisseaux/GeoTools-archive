@@ -46,10 +46,19 @@ public class ComplexAttributeImpl implements ComplexAttribute {
         TYPE = type;
         ID = id;
 
-        this.properties = new ArrayList/* <Property> */();
-        set(properties);
+        this.properties = toPropertList( properties );
+        //setValue(properties); // properties *are* our value
     }
-
+    final List<Property> toPropertList( Collection properties ){
+        if( properties == null ){
+            // create with the expected size so that simple feature is happey
+            return new ArrayList( TYPE.getProperties().size() );
+        }
+        else {
+            return new ArrayList( properties );
+        }
+    }
+    
     public ComplexAttributeImpl(Collection properties, AttributeDescriptor desc,
             String id) {
         this(properties, (ComplexType) desc.getType(), id);
@@ -85,7 +94,7 @@ public class ComplexAttributeImpl implements ComplexAttribute {
         return true;
     }
 
-    public Object get() {
+    public Object getValue() {
         return Collections.unmodifiableList(properties);
     }
 
@@ -107,7 +116,7 @@ public class ComplexAttributeImpl implements ComplexAttribute {
         return Collections.unmodifiableList(associations);
     }
 
-    public Collection attributes() {
+    public List attributes() {
         if (attributes == null) {
             synchronized (this) {
                 if (attributes == null) {
@@ -156,7 +165,7 @@ public class ComplexAttributeImpl implements ComplexAttribute {
      */
     protected synchronized List/* <AttributeType> */types() {
         if (types == null) {
-            types = createTypesView((List) get());
+            types = createTypesView((List) getValue());
         }
         return types;
     }
@@ -207,7 +216,7 @@ public class ComplexAttributeImpl implements ComplexAttribute {
 
     public synchronized List/* <Object> */values() {
         if (values == null) {
-            values = createValuesView((List) get());
+            values = createValuesView((List) getValue());
         }
         return values;
     }
@@ -218,13 +227,13 @@ public class ComplexAttributeImpl implements ComplexAttribute {
         return new AbstractList/* <Object> */() {
             // @Override
             public Object get(int index) {
-                return ((Attribute) source.get(index)).get();
+                return ((Attribute) source.get(index)).getValue();
             }
 
             // @Override
             public Object set(int index, Object value) {
-                Object replaced = ((Attribute) source.get(index)).get();
-                ((Attribute) source.get(index)).set(value);
+                Object replaced = ((Attribute) source.get(index)).getValue();
+                ((Attribute) source.get(index)).setValue(value);
                 return replaced;
             }
 
@@ -237,7 +246,7 @@ public class ComplexAttributeImpl implements ComplexAttribute {
             public Object /* AttributeType */remove(int index) {
                 Attribute removed = (Attribute) source.remove(index);
                 if (removed != null) {
-                    return removed.get();
+                    return removed.getValue();
                 }
                 return null;
             }
@@ -260,12 +269,12 @@ public class ComplexAttributeImpl implements ComplexAttribute {
         };
     }
 
-    public void set(Object newValue) {
+    public void setValue(Object newValue) {
 
         if (newValue == null) {
             properties.clear();
         } else {
-            properties = new ArrayList((Collection) newValue);
+            properties = new ArrayList( (Collection) newValue );
         }
 
         // reset "views"
@@ -288,7 +297,7 @@ public class ComplexAttributeImpl implements ComplexAttribute {
             for (Iterator itr = properties.iterator(); itr.hasNext();) {
                 Attribute attribute = (Attribute) itr.next();
                 if (attribute.getType().equals(type)) {
-                    got.add(attribute.get());
+                    got.add(attribute.getValue());
                 }
             }
             return got;
@@ -296,7 +305,7 @@ public class ComplexAttributeImpl implements ComplexAttribute {
             for (Iterator itr = properties.iterator(); itr.hasNext();) {
                 Attribute attribute = (Attribute) itr.next();
                 if (attribute.getType().equals(type)) {
-                    return attribute.get();
+                    return attribute.getValue();
                 }
             }
             return null;

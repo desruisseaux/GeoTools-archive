@@ -21,8 +21,6 @@ import org.opengis.feature.type.TypeName;
 import org.opengis.filter.Filter;
 import org.geotools.catalog.GeoResourceInfo;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureList;
-
 
 /**
  * Class is used to provide data access for ContentDataStore.
@@ -102,7 +100,7 @@ public abstract class Content {
      * @param order List<SortBy> used to determine sort order
      * @return subset of content
      */
-    public abstract FeatureList sorted(ContentState state, Filter filter, List order);
+    public abstract FeatureCollection sorted(ContentState state, Filter filter, List order);
 
     /**
      * FeatureCollection optimized for read-only access.

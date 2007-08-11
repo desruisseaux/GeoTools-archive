@@ -1,6 +1,8 @@
 package org.geotools.demo.main;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -61,19 +63,19 @@ public class FeatureCollectionExampleTest extends TestCase {
         super.setUp();
         GeometryFactory geomFactory = new GeometryFactory();
         
-        features = FeatureCollections.newCollection("internal");
-        
-        FeatureType type = DataUtilities.createType("location","geom:Point,name:String,age:Integer");        
-        
+        FeatureType type = DataUtilities.createType("location","geom:Point,name:String,age:Integer");
+        List<Feature> list = new ArrayList<Feature>();
         Point point1 = geomFactory.createPoint( new Coordinate(40,50));
         feature1 = type.create( new Object[]{ point1, "name1", 17} );
-        features.add( feature1 );
+        list.add( feature1 );
         
         Point point2 = geomFactory.createPoint( new Coordinate(30,45));
-        features.add( type.create( new Object[]{ point2, "name2",24} ) );
+        list.add( type.create( new Object[]{ point2, "name2",24} ) );
         
         Point point3 = geomFactory.createPoint( new Coordinate(35,46));
-        features.add( type.create( new Object[]{ point3, "name2",24} ) );
+        list.add( type.create( new Object[]{ point3, "name2",24} ) );
+        
+        features = DataUtilities.collection( list );        
     }
     /**
      * You can create using a normal constructor ... but it is not recommended.
@@ -93,7 +95,7 @@ public class FeatureCollectionExampleTest extends TestCase {
         Point point1 = geomFactory.createPoint( new Coordinate(40,50));
         Point point2 = geomFactory.createPoint( new Coordinate(30,45));
         
-        SimpleFeatureCollection collection = FeatureCollections.newCollection("internal");
+        FeatureCollection collection = FeatureCollections.newCollection("internal");
         
         FeatureType type = DataUtilities.createType("location","geom:Point,name:String");        
         collection.add( type.create( new Object[]{ point1, "name1"} ) );

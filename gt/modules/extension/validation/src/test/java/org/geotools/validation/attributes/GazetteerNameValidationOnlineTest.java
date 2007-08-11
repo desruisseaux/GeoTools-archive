@@ -69,7 +69,7 @@ public class GazetteerNameValidationOnlineTest extends TestCase {
 	public GazetteerNameValidationOnlineTest(String s){super(s);}
 	
 	public void XtestValidate() {
-		class testFeature implements Feature{
+		class TestFeature implements Feature {
 			Map attrs = new HashMap();
 			public FeatureCollection getParent(){return null;}
 			public void setParent(FeatureCollection collection){}
@@ -88,119 +88,133 @@ public class GazetteerNameValidationOnlineTest extends TestCase {
 			public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException{}
 			public ReferencedEnvelope getBounds(){return null;}
 			public Object getDefaultGeometryValue() {
-				// TODO Auto-generated method stub
+				
 				return null;
 			}
 			public AttributeType getType() {
-				// TODO Auto-generated method stub
+				
 				return null;
 			}
 			public List getTypes() {
-				// TODO Auto-generated method stub
+				
 				return null;
 			}
 			public Object getValue(String name) {
-				// TODO Auto-generated method stub
+				
 				return null;
 			}
 			public Object getValue(int index) {
-				// TODO Auto-generated method stub
+				
 				return null;
 			}
 			public List getValues() {
-				// TODO Auto-generated method stub
+				
 				return null;
 			}
 			public Object operation(String name, Object parameters) {
-				// TODO Auto-generated method stub
+				
 				return null;
 			}
 			public void setDefaultGeometryValue(Object geometry) {
-				// TODO Auto-generated method stub
+				
 				
 			}
 			public void setValue(String name, Object value) {
-				// TODO Auto-generated method stub
+				
 				
 			}
 			public void setValue(int index, Object value) {
-				// TODO Auto-generated method stub
+				
 				
 			}
 			public void setValues(List values) {
-				// TODO Auto-generated method stub
+				
 				
 			}
 			public void setValues(Object[] values) {
-				// TODO Auto-generated method stub
+				
 				
 			}
 			public CoordinateReferenceSystem getCRS() {
-				// TODO Auto-generated method stub
+				
 				return null;
 			}
 			public GeometryAttribute getDefaultGeometry() {
-				// TODO Auto-generated method stub
+				
 				return null;
 			}
 			public Object getUserData(Object key) {
-				// TODO Auto-generated method stub
+				
 				return null;
 			}
 			public void putUserData(Object key, Object value) {
-				// TODO Auto-generated method stub
+				
 				
 			}
 			public void setCRS(CoordinateReferenceSystem crs) {
-				// TODO Auto-generated method stub
+				
 				
 			}
 			public void setDefaultGeometry(GeometryAttribute geometryAttribute) {
-				// TODO Auto-generated method stub
+				
 				
 			}
 			public Collection associations() {
-				// TODO Auto-generated method stub
+				
 				return null;
 			}
 			public Collection attributes() {
-				// TODO Auto-generated method stub
+				
 				return null;
 			}
 			public Object get() {
-				// TODO Auto-generated method stub
+				
 				return null;
 			}
 			public List get(Name name) {
-				// TODO Auto-generated method stub
+				
 				return null;
 			}
 			public AttributeDescriptor getDescriptor() {
-				// TODO Auto-generated method stub
+				
 				return null;
 			}
 			public void set(Object newValue) throws IllegalArgumentException {
-				// TODO Auto-generated method stub
+				
 				
 			}
 			public boolean nillable() {
-				// TODO Auto-generated method stub
+				
 				return false;
 			}
 			public Object operation(Name name, List parameters) {
-				// TODO Auto-generated method stub
+				
 				return null;
 			}
 			public PropertyDescriptor descriptor() {
-				// TODO Auto-generated method stub
+				
 				return null;
 			}
 			public Name name() {
-				// TODO Auto-generated method stub
+				
 				return null;
 			}
+            public List getAttributes() {
+                
+                return null;
+            }
+            public Object getValue() {
+                
+                return null;
+            }
+            public void setValue( List values ) {
+                
+            }
+            public void setValue( Object values ) {
+                
+            }
 		}
-		Feature f = new testFeature();
+		Feature f = new TestFeature();
 		try{f.setAttribute("CityName","Vancouver");}catch(Exception e){}
 		GazetteerNameValidation gnv = new GazetteerNameValidation();
 		gnv.setAttributeName("CityName");

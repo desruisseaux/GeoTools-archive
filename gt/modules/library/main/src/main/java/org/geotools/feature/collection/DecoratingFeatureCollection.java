@@ -9,7 +9,6 @@ import java.util.List;
 import org.geotools.feature.CollectionListener;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureList;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.visitor.FeatureVisitor;
@@ -72,7 +71,9 @@ public class DecoratingFeatureCollection implements FeatureCollection {
 	public Collection attributes() {
 		return delegate.attributes();
 	}
-
+    public List getAttributes() {
+        return delegate.getAttributes();
+    }
 	public void clear() {
 		delegate.clear();
 	}
@@ -105,8 +106,8 @@ public class DecoratingFeatureCollection implements FeatureCollection {
 		return delegate.features();
 	}
 
-	public Object get() {
-		return delegate.get();
+	public Object getValue() {
+		return delegate.getValue();
 	}
 
 	public List get(Name name) {
@@ -177,7 +178,7 @@ public class DecoratingFeatureCollection implements FeatureCollection {
 		return delegate.getSchema();
 	}
 
-	public AttributeType getType() {
+	public SimpleFeatureCollectionType getType() {
 		return delegate.getType();
 	}
 
@@ -253,10 +254,12 @@ public class DecoratingFeatureCollection implements FeatureCollection {
 		return delegate.retainAll(c);
 	}
 
-	public void set(Object newValue) throws IllegalArgumentException {
-		delegate.set(newValue);
+	public void setValue(Object newValue) throws IllegalArgumentException {
+		delegate.setValue(newValue);
 	}
-
+	public void setValue(List newList) throws IllegalArgumentException {
+        delegate.setValue(newList);
+    }
 	public void setAttribute(int position, Object val) throws IllegalAttributeException, ArrayIndexOutOfBoundsException {
 		delegate.setAttribute(position, val);
 	}
@@ -301,7 +304,7 @@ public class DecoratingFeatureCollection implements FeatureCollection {
 		return delegate.size();
 	}
 
-	public FeatureList sort(SortBy order) {
+	public FeatureCollection sort(SortBy order) {
 		return delegate.sort(order);
 	}
 

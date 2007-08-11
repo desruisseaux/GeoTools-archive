@@ -36,7 +36,6 @@ import org.geotools.feature.DefaultFeatureType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureList;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
@@ -656,7 +655,7 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
      * @return FeatureList sorted according to provided order
 
      */
-    public FeatureList sort(SortBy order) {
+    public FeatureCollection sort(SortBy order) {
     	if( order instanceof SortBy2){
     		SortBy2 advanced = (SortBy2) order;
     		return sort( advanced );
@@ -673,7 +672,7 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
      * @param order GeoTools SortBy
      * @return FeatureList sorted according to provided order
      */
-    public FeatureList sort(SortBy2 order ){
+    public FeatureCollection sort(SortBy2 order ){
     	return null;
     }    
 }

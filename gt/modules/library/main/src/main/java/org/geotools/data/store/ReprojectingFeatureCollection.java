@@ -12,7 +12,6 @@ import org.geotools.feature.CollectionListener;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureList;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
@@ -179,7 +178,7 @@ public class ReprojectingFeatureCollection extends DecoratingFeatureCollection
         return filter;
     }
 
-    public FeatureList sort(SortBy order) {
+    public FeatureCollection sort(SortBy order) {
         // return new ReprojectingFeatureList( delegate.sort( order ), target );
         throw new UnsupportedOperationException("Not yet");
     }

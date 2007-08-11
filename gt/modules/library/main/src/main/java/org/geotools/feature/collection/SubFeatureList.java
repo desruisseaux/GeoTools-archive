@@ -31,7 +31,6 @@ import org.geotools.data.collection.ResourceList;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureList;
 import org.geotools.filter.FilterFactoryFinder;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
@@ -40,7 +39,7 @@ import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
 
-public class SubFeatureList extends SubFeatureCollection implements FeatureList, RandomFeatureAccess {
+public class SubFeatureList extends SubFeatureCollection implements RandomFeatureAccess {
     List sort; 
     List index;
     
@@ -214,8 +213,8 @@ public class SubFeatureList extends SubFeatureCollection implements FeatureList,
      * is maintained and only indexed once.
      * </p>
      */
-    public FeatureList subList(Filter subfilter) {
-        return new SubFeatureList( this, subfilter );
+    public FeatureCollection subList(Filter subfilter) {
+        return new SubFeatureCollection( this, subfilter );
     }
     //
     // RandomFeatureAccess
@@ -243,15 +242,5 @@ public class SubFeatureList extends SubFeatureCollection implements FeatureList,
             return random.removeFeatureMember( id );            
         }
         return (Feature) remove( position );
-    }
-    //
-    // FeatureList
-    //
-    public List subList( int fromIndex, int toIndex ) {
-        return new SubFeatureList( this, index().subList( fromIndex, toIndex ));
-    }
-    public FeatureList sort( SortBy order ) {
-        return super.sort(order);
-    }
-   
+    }   
 }

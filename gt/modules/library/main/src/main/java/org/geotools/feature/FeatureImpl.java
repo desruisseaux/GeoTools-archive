@@ -210,7 +210,7 @@ public class FeatureImpl extends ComplexAttributeImpl implements Feature {
 			sb.append(att.getDescriptor().getName().getLocalPart());
 			if( !(att instanceof ComplexAttribute)){
 				sb.append('=');
-				sb.append(att.get());
+				sb.append(att.getValue());
 			}
 			if( itr.hasNext()) sb.append(",");
 		}

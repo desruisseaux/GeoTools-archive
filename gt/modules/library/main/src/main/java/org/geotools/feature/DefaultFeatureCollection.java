@@ -783,9 +783,9 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
      * @return FeatureList sorted according to provided order
      * 
      */
-    public FeatureList sort(SortBy order) {
+    public FeatureCollection sort(SortBy order) {
     	if( order == SortBy.NATURAL_ORDER ){
-    		// return new FeatureListImpl( this );
+    		return this;
     	}
     	if( order instanceof SortBy2){
     		SortBy2 advanced = (SortBy2) order;
@@ -803,9 +803,9 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
      * @param order GeoTools SortBy
      * @return FeatureList sorted according to provided order
      */
-    public FeatureList sort(SortBy2 order ){
+    public FeatureCollection sort(SortBy2 order ){
     	if( order == SortBy.NATURAL_ORDER ){
-    		// forward
+    		return this;
     	}
     	else if ( order == SortBy.REVERSE_ORDER ){
     		// backwards

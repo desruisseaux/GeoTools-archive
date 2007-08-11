@@ -1178,4 +1178,8 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
 	public int indexOf(String name) {
 		return featureType.indexOf(name);
 	}
+
+    public List getAttributes() {
+        return (List) attributes();
+    }
 }

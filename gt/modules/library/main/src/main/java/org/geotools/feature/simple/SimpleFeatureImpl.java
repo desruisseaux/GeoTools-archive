@@ -40,7 +40,7 @@ public class SimpleFeatureImpl extends FeatureImpl implements SimpleFeature {
             AttributeType type = att.getType();
             String attName = type.getName().getLocalPart();
             if (attName.equals(name)) {
-                return att.get();
+                return att.getValue();
             }
         }
         return null;
@@ -54,7 +54,7 @@ public class SimpleFeatureImpl extends FeatureImpl implements SimpleFeature {
         for (Iterator itr = super.properties.iterator(); itr.hasNext();) {
             Attribute att = (Attribute) itr.next();
             if (att.getType().equals(type)) {
-                return att.get();
+                return att.getValue();
             }
         }
         throw new Error();
@@ -68,7 +68,7 @@ public class SimpleFeatureImpl extends FeatureImpl implements SimpleFeature {
      */
     public Object getValue(int index) {
         Attribute att = (Attribute) super.properties.get(index);
-        return att == null ? null : att.get();
+        return att == null ? null : att.getValue();
         // return values().get(index);
     }
 
@@ -96,10 +96,10 @@ public class SimpleFeatureImpl extends FeatureImpl implements SimpleFeature {
      * @param value
      */
     public void setValue(int index, Object value) {
-        List/* <Attribute> */contents = (List) get();
+        List/* <Attribute> */contents = (List) getValue();
         Attribute attribute = (Attribute) contents.get(index);
-        attribute.set(value);
-        this.set(contents);
+        attribute.setValue(value);
+        this.setValue(contents);
     }
 
     public void setValues(List values) {
@@ -113,7 +113,7 @@ public class SimpleFeatureImpl extends FeatureImpl implements SimpleFeature {
     }
     
     public List getAttributes() {
-        return (List) get();
+        return attributes();
     }
 
     public int getNumberOfAttributes() {
@@ -129,16 +129,24 @@ public class SimpleFeatureImpl extends FeatureImpl implements SimpleFeature {
     }
     
     public Object getDefaultGeometryValue() {
-        return getDefaultGeometry() != null ? getDefaultGeometry().get() : null;
+        return getDefaultGeometry() != null ? getDefaultGeometry().getValue() : null;
     }
 
     public void setDefaultGeometryValue(Object geometry) {
         if (getDefaultGeometry() != null) {
-            getDefaultGeometry().set(geometry);
+            getDefaultGeometry().setValue(geometry);
         }
     }
 
     public Object operation(String arg0, Object arg1) {
         throw new UnsupportedOperationException("operation not supported yet");
     }
+
+    public void setValue( List values ) {
+        setValue( (Object) values );        
+    }
+//
+//    public void setValue( Object values ) {
+//        
+//    }
 }

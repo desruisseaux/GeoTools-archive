@@ -228,6 +228,10 @@ public class FilterFactoryImpl implements FilterFactory {
         return bbox( name, minx, miny, maxx, maxy, srs );
     }
 
+    public BBOX bbox( Expression geometry, BoundingBox bounds ) {
+        return bbox( geometry, bounds.getMinX(), bounds.getMinY(), bounds.getMaxX(), bounds.getMaxY(), bounds.getCoordinateReferenceSystem().getName().toString() );
+    }
+    
     public BBOX bbox(Expression e, double minx, double miny, double maxx, double maxy, String srs) {
         
         PropertyName name = null;

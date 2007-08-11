@@ -94,21 +94,19 @@
      <profile>
        <id>archive</id>
        <modules>
+         <module>arcsde</module>
          <module>hsql</module>
          <module>jpox</module>
          <module>geomedia</module>
+         <module>db2</module>
+         <module>vpf</module>
        </modules>
      </profile>
-
   </profiles>
 
   <modules>
-    <!--module>arcsde</module-->
     <module>coverageio</module>
     <module>coverageio-netcdf</module>
-    <!--
-    <module>db2</module>
-    -->
     <module>directory</module>
     <module>epsg-oracle</module>    
     <module>gml</module>
@@ -121,7 +119,6 @@
     <module>postgis-versioned</module>
     <module>tiger</module>
     <module>tile</module>
-    <module>vpf</module>
     <module>xml-sld</module>
     <module>xml-xsd</module>
     <module>xml-gml2</module>
