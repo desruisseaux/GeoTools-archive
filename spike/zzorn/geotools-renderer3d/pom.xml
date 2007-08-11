@@ -32,7 +32,7 @@
                 <configuration>
                     <executable>java</executable>
                     <arguments>
-                        <argument>-Djava.library.path=lib/lwjgl-1.0/native/win32</argument>
+                        <argument>-Djava.library.path=lib/lwjgl-1.0/native</argument>
                         <argument>-classpath</argument>
                         <!-- automatically creates the classpath using all project dependencies,
                              also adding the project build directory -->
