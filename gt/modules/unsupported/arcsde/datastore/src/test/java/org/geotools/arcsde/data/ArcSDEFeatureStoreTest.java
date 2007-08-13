@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
+import org.geotools.arcsde.ArcSDEDataStoreFactory;
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTransaction;
@@ -69,6 +70,8 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         super.setUp();
         this.testData = new TestData();
         this.testData.setUp();
+        if (ArcSDEDataStoreFactory.JSDE_CLIENT_VERSION == ArcSDEDataStoreFactory.JSDE_VERSION_DUMMY)
+            throw new RuntimeException("Don't run the test-suite with the dummy jar.  Make sure the real ArcSDE jars are on your classpath.");
     }
 
     /**

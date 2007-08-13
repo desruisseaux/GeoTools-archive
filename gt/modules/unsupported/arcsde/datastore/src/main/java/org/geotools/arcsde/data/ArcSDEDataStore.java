@@ -82,8 +82,7 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class ArcSDEDataStore extends AbstractDataStore {
     /** DOCUMENT ME! */
-    private static final Logger LOGGER = Logger.getLogger(ArcSDEDataStore.class.getPackage()
-            .getName());
+    private static final Logger LOGGER = Logger.getLogger(ArcSDEDataStore.class.getName());
 
     private static final String DEFAULT_NAMESPACE = "http://www.geotools.org/sde";
 
@@ -704,9 +703,6 @@ public class ArcSDEDataStore extends AbstractDataStore {
                 sdeQuery.close();
             }
             LOGGER.log(Level.SEVERE, t.getMessage(), t);
-            if (LOGGER.isLoggable(Level.FINE)) {
-                t.printStackTrace();
-            }
             throw new DataSourceException("Problem with feature reader: " + t.getMessage(), t);
         }
 
@@ -716,11 +712,11 @@ public class ArcSDEDataStore extends AbstractDataStore {
     /**
      * 
      */
-    public FeatureReader getFeatureReader(Query query, Transaction transaction) throws IOException {
+    /*public FeatureReader getFeatureReader(Query query, Transaction transaction) throws IOException {
         String typeName = query.getTypeName();
 
         return getFeatureReader(typeName, query);
-    }
+    }*/
 
     /**
      * GR: if a subclass supports filtering, it should override this method to
@@ -758,10 +754,19 @@ public class ArcSDEDataStore extends AbstractDataStore {
                 layer = connectionPool.getSdeLayer(typeName);
                 qInfo = null;
             }
+            
+            ArcSDEPooledConnection conn = null;
+            FIDReader fidReader;
+            try {
+                conn = connectionPool.getConnection();
+                fidReader = FIDReader.getFidReader(conn, layer);
+            } finally {
+                if (conn != null) conn.close();
+            }
 
             FeatureType schema = getSchema(typeName);
             ArcSDEQuery.FilterSet filters = ArcSDEQuery.createFilters(layer, schema, filter, qInfo,
-                    getViewSelectStatement(typeName), null);
+                    getViewSelectStatement(typeName), fidReader);
 
             Filter result = filters.getUnsupportedFilter();
 
@@ -1014,7 +1019,7 @@ public class ArcSDEDataStore extends AbstractDataStore {
         LOGGER.fine("getBounds");
 
         Envelope ev;
-        if (query == null || query.getFilter().equals(Filter.EXCLUDE)) {
+        if (query == null || query.getFilter().equals(Filter.INCLUDE)) {
             LOGGER.fine("getting bounds of entire layer.  Using optimized SDE call.");
             // we're really asking for a bounds of the WHOLE layer,
             // let's just ask SDE metadata for that, rather than doing an
@@ -1027,7 +1032,12 @@ public class ArcSDEDataStore extends AbstractDataStore {
             ev = ArcSDEQuery.calculateQueryExtent(this, query);
         }
 
-        LOGGER.fine("bounds: " + ev);
+        if (LOGGER.isLoggable(Level.FINE)) {
+            if (ev != null)
+                LOGGER.fine("ArcSDE optimized getBounds call returned: " + ev);
+            else
+                LOGGER.fine("ArcSDE couldn't process all filters in this query, so optimized getBounds() returns null.");
+        }
 
         return ev;
     }

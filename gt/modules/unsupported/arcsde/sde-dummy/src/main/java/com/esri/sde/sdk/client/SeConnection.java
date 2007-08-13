@@ -8,7 +8,7 @@ public class SeConnection {
 	
 	public void commitTransaction() throws SeException {}
 	public void rollbackTransaction() throws SeException {}
-	public void setTransactionAutoCommit(int i) {}
+	public int setTransactionAutoCommit(int i) { return -1;}
 	public void startTransaction() {}
 	public String getDatabaseName() throws SeException { return null; }
 	public String getUser() throws SeException { return null; }

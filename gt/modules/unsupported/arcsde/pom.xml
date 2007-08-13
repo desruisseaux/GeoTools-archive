@@ -24,8 +24,8 @@
   <name>ArcSDE plugin</name>
   <url>http://maven.geotools.fr/reports/modules/unsupported/arcsde/</url>
   <scm>
-    <connection> scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/arcsde/ </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/arcsde/</url>
+    <connection> scm:svn:http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/arcsde/ </connection>
+    <url>http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/arcsde/</url>
   </scm>
   <description> Root project for arcsde plugin. </description>
   <licenses>

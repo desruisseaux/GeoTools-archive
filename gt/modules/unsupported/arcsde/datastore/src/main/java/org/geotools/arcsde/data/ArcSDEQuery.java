@@ -16,12 +16,16 @@
  */
 package org.geotools.arcsde.data;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,13 +38,16 @@ import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
+import org.geotools.data.DefaultQuery;
 import org.geotools.data.Query;
 import org.geotools.data.jdbc.FilterToSQLException;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
+import org.geotools.filter.visitor.DefaultFilterVisitor;
 import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor;
 import org.opengis.filter.Filter;
+import org.opengis.filter.expression.PropertyName;
 
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeExtent;
@@ -64,8 +71,7 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 class ArcSDEQuery {
     /** Shared package's logger */
-    private static final Logger LOGGER = Logger.getLogger(ArcSDEQuery.class.getPackage()
-                                                                           .getName());
+    private static final Logger LOGGER = Logger.getLogger(ArcSDEQuery.class.getName());
 
     /**
      * The connection to the ArcSDE server obtained when first created the
@@ -182,69 +188,71 @@ class ArcSDEQuery {
         final SeLayer sdeLayer;
         final SeQueryInfo definitionQuery;
 
-        if (isInprocessView) {
-            fidReader = FIDReader.NULL_READER;
-            definitionQuery = store.getViewQueryInfo(typeName);
-            //the first table has to be the main layer
-            String layerName;
-            try{
-                layerName = definitionQuery.getConstruct().getTables()[0];
-                //@REVISIT: HACK HERE!, look how to get rid of alias in query info, or
-                //better stop using queryinfo as definition query and use the PlainSelect,
-                //then construct the query info dynamically when needed?
-                if(layerName.indexOf(" AS") > 0){
-                    layerName = layerName.substring(0, layerName.indexOf(" AS"));
-                }
-            }catch(SeException e){
-                throw new DataSourceException("shouldn't happen: " + e.getMessage(), e);
-            }
-            sdeLayer = pool.getSdeLayer(conn, layerName);
-        } else {
-            definitionQuery = null;
-            sdeLayer = pool.getSdeLayer(conn, typeName);
-            fidReader = FIDReader.getFidReader(conn, sdeLayer);
-        }
-
-        //query can establish a subset of properties to retrieve, or do not
-        //specify which properties.
-        String[] queryProperies = query.getPropertyNames();
-
-        //guess which properties needs actually be retrieved.
-        List queryColumns = getQueryColumns(queryProperies, schema);
-
-        /*Simple*/FeatureType querySchema = null;
-
-        //TODO: create attributes with namespace when switching to GeoAPI FM
-//        String ns = store.getNamespace() == null? null : store.getNamespace().toString();
-//        AttributeName[] attNames = new AttributeName[queryColumns.size()];
-//
-//        for (int i = 0; i < queryColumns.size(); i++) {
-//            String colName = (String) queryColumns.get(i);
-//            attNames[i] = new org.geotools.util.AttributeName(ns, colName);
-//        }
-
-        String[] attNames = new String[queryColumns.size()];
-
-        for (int i = 0; i < queryColumns.size(); i++) {
-            String colName = (String) queryColumns.get(i);
-            attNames[i] = colName;
-        }
-
         try {
-            //create the resulting feature type for the real attributes to retrieve
-            querySchema = DataUtilities.createSubType(schema, attNames);
-        } catch (SchemaException ex) {
-            throw new DataSourceException(
-                "Some requested attributes do not match the table schema: "
-                + ex.getMessage(), ex);
+            if (isInprocessView) {
+                fidReader = FIDReader.NULL_READER;
+                definitionQuery = store.getViewQueryInfo(typeName);
+                //the first table has to be the main layer
+                String layerName;
+                try{
+                    layerName = definitionQuery.getConstruct().getTables()[0];
+                    //@REVISIT: HACK HERE!, look how to get rid of alias in query info, or
+                    //better stop using queryinfo as definition query and use the PlainSelect,
+                    //then construct the query info dynamically when needed?
+                    if(layerName.indexOf(" AS") > 0){
+                        layerName = layerName.substring(0, layerName.indexOf(" AS"));
+                    }
+                }catch(SeException e){
+                    throw new DataSourceException("shouldn't happen: " + e.getMessage(), e);
+                }
+                sdeLayer = pool.getSdeLayer(conn, layerName);
+            } else {
+                definitionQuery = null;
+                //sdeLayer = pool.getSdeLayer(conn, typeName);
+                sdeLayer = pool.getSdeLayer(typeName);
+                fidReader = FIDReader.getFidReader(conn, sdeLayer);
+            }
+    
+            //guess which properties needs actually be retrieved.
+            List queryColumns = getQueryColumns(query, schema);
+    
+            /*Simple*/FeatureType querySchema = null;
+    
+            //TODO: create attributes with namespace when switching to GeoAPI FM
+    //        String ns = store.getNamespace() == null? null : store.getNamespace().toString();
+    //        AttributeName[] attNames = new AttributeName[queryColumns.size()];
+    //
+    //        for (int i = 0; i < queryColumns.size(); i++) {
+    //            String colName = (String) queryColumns.get(i);
+    //            attNames[i] = new org.geotools.util.AttributeName(ns, colName);
+    //        }
+    
+            String[] attNames = (String[])queryColumns.toArray(new String[queryColumns.size()]);
+    
+            try {
+                //create the resulting feature type for the real attributes to retrieve
+                querySchema = DataUtilities.createSubType(schema, attNames);
+            } catch (SchemaException ex) {
+                throw new DataSourceException(
+                    "Some requested attributes do not match the table schema: "
+                    + ex.getMessage(), ex);
+            }
+    
+            //create the set of filters to work over
+            ArcSDEQuery.FilterSet filterSet = createFilters(sdeLayer, querySchema, 
+                    filter, definitionQuery, store.getViewSelectStatement(typeName), fidReader);
+    
+            sdeQuery = new ArcSDEQuery(conn, querySchema, filterSet, fidReader);
+        } catch (Throwable t) {
+            //something went wrong while creating this connection.  Be sure and close out the
+            //ArcSDE connection that we opened up.
+            conn.close();
+            if (t instanceof IOException) {
+                throw (IOException)t;
+            } else {
+                throw new DataSourceException("Error while creating ArcSDE Connection" + t.getMessage(), t);
+            }
         }
-
-        //create the set of filters to work over
-        ArcSDEQuery.FilterSet filterSet = createFilters(sdeLayer, querySchema, 
-                filter, definitionQuery, store.getViewSelectStatement(typeName), fidReader);
-
-        sdeQuery = new ArcSDEQuery(conn, querySchema, filterSet, fidReader);
-
         return sdeQuery;
     }
 
@@ -267,25 +275,49 @@ class ArcSDEQuery {
      *
      * @throws DataSourceException DOCUMENT ME!
      */
-    private static List /*<String>*/ getQueryColumns(String[] queryColumns,
-        FeatureType schema) throws DataSourceException {
-        List columNames;
+    private static List /*<String>*/ getQueryColumns(Query query,
+        final FeatureType schema) throws DataSourceException {
+        final HashSet columnNames;
+        
+        String[] queryColumns = query.getPropertyNames();
 
         if ((queryColumns == null) || (queryColumns.length == 0)) {
             List attNames = Arrays.asList(schema.getAttributeTypes());
 
-            columNames = new ArrayList(attNames.size());
+            columnNames = new HashSet(attNames.size());
 
             for (Iterator it = attNames.iterator(); it.hasNext();) {
                 AttributeType att = (AttributeType) it.next();
                 String attName = att.getLocalName();
-                columNames.add(attName);
+                //de namespace-ify the names
+                if (attName.indexOf(":") != -1) {
+                    attName = attName.substring(attName.indexOf(":") + 1);
+                }
+                columnNames.add(attName);
             }
         } else {
-            columNames = Arrays.asList(queryColumns);
+            columnNames = new HashSet();
+            columnNames.addAll(Arrays.asList(queryColumns));
         }
-
-        return columNames;
+        
+        Filter f = query.getFilter();
+        if (f != null) {
+            Set s = new HashSet();
+            f.accept(new DefaultFilterVisitor() {
+                public Object visit(PropertyName expr, Object data) {
+                    String attName = expr.getPropertyName();
+                    if (attName.indexOf(":") != -1) {
+                        attName = attName.substring(attName.indexOf(":") + 1);
+                    }
+                    columnNames.add(attName);
+                    return data;
+                }
+            }, s);
+        }
+        
+        List ret = new ArrayList();
+        ret.addAll(columnNames);
+        return ret;
     }
 
     /**
@@ -526,7 +558,26 @@ class ArcSDEQuery {
      */
     public static Envelope calculateQueryExtent(ArcSDEDataStore ds, Query query)
         throws IOException {
+        FeatureType queryFt = ds.getSchema(query.getTypeName());
+        HashSet pnames = new HashSet();
+        pnames.addAll(Arrays.asList(query.getPropertyNames()));
+        if (!pnames.contains(queryFt.getPrimaryGeometry().getLocalName())) {
+            //we're calculating the bounds, so we'd better be sure and add the spatial
+            //column to the query's propertynames
+            pnames.add(queryFt.getPrimaryGeometry().getLocalName());
+            DefaultQuery realQuery = new DefaultQuery(query);
+            realQuery.setPropertyNames(Arrays.asList(pnames.toArray(new String[pnames.size()])));
+            query = realQuery;
+        }
+        
+        
         ArcSDEQuery boundsQuery = createQuery(ds, query);
+        if (boundsQuery.getFilters().getUnsupportedFilter() != Filter.INCLUDE) {
+            //there's a non-sde-db compatible filter in-play here.  We can't really
+            //do an optimized calcQueryExtent in this case.  Have to return null.
+            boundsQuery.close();
+            return null;
+        }
         Envelope queryExtent;
         try{
             queryExtent = boundsQuery.calculateQueryExtent();
@@ -559,22 +610,36 @@ class ArcSDEQuery {
             String[] columns = { aFieldName };
 
             SeQuery countQuery = null;
+            
+            if (filters.getUnsupportedFilter() == Filter.INCLUDE) {
+                //there's nothing to filter post-db, so we're clear to do the result count
+                //by sending a query to the db and completely trusting the result.
 
-            try {
-                countQuery = createSeQueryForQueryInfo(connection);
-                SeQueryInfo qInfo = filters.getQueryInfo(columns);
-
-                SeTable.SeTableStats tableStats = countQuery
+                try {
+                    countQuery = createSeQueryForQueryInfo(connection);
+                    SeQueryInfo qInfo = filters.getQueryInfo(columns);
+                    
+                    
+                    SeTable.SeTableStats tableStats = countQuery
                     .calculateTableStatistics(aFieldName,
                         SeTable.SeTableStats.SE_COUNT_STATS, qInfo, 0);
-
-                this.resultCount = tableStats.getCount();
-            } catch (SeException e) {
-                LOGGER.severe("Error calculating result cout with SQL where clause: " + this.filters.getSeSqlConstruct().getWhere());
-                throw new DataSourceException("Calculating result count: "
-                    + e.getSeError().getErrDesc(), e);
-            } finally {
-                close(countQuery);
+    
+                    this.resultCount = tableStats.getCount();
+                } catch (SeException e) {
+                    if (LOGGER.isLoggable(Level.FINE)) {
+                        LOGGER.fine("Error calculating result cout with SQL where clause: " + this.filters.getSeSqlConstruct().getWhere());
+                    }
+                    //why throw an exception here?  Just return -1 and let the caller deal with it...
+                    //throw new DataSourceException("Calculating result count: " + e.getSeError().getErrDesc(), e);
+                } finally {
+                    close(countQuery);
+                }
+            
+            } else {
+                //well, we've got to filter the results after the query, so
+                //let's not do that twice.  -1 is the best anyone will get
+                //on this one...
+                LOGGER.fine("Non-supported ArcSDE filters included in this query.  Can't pre-calculate result count.");
             }
         }
 
@@ -612,22 +677,18 @@ class ArcSDEQuery {
             LOGGER.fine("got extent: " + extent + ", built envelope: "
                 + envelope);
         } catch (SeException ex) {
-            // //////////////////////
             SeSqlConstruct sqlCons = this.filters.getSeSqlConstruct();
             String sql = (sqlCons == null) ? null : sqlCons.getWhere();
-            LOGGER.log(Level.SEVERE,
+            if (ex.getSeError().getSdeError() == -288) {
+                //gah, the dreaded 'LOGFILE SYSTEM TABLES DO NOT EXIST' error.
+                //this error is worthless.  Make it quiet, at least.
+                LOGGER.severe("ArcSDE is complaining that your 'LOGFILE SYSTEM TABLES DO NOT EXIST'.  This is an ignorable error.");
+            } else {
+                LOGGER.log(Level.SEVERE,
                 "***********************\n" + ex.getSeError().getErrDesc()
                 + "\nfilter: " + this.filters.getGeometryFilter() + "\nSQL: "
                 + sql, ex);
-
-            // ///////////////////////
-            ex.printStackTrace();
-        /*
-         * temporary work around until we found the source of the problem
-         * for which Brock is getting a DATABASE LEVEL ERROR OCCURED
-            throw new DataSourceException("Can't consult the query extent: "
-                + ex.getSeError().getErrDesc(), ex);
-        */
+            }
         } finally {
             close(extentQuery);
         }
@@ -1130,7 +1191,7 @@ class ArcSDEQuery {
          */
         public SeFilter[] getSpatialFilters() throws DataSourceException {
             if (this.sdeSpatialFilters == null) {
-                GeometryEncoderSDE geometryEncoder = new GeometryEncoderSDE(this.sdeLayer);
+                GeometryEncoderSDE geometryEncoder = new GeometryEncoderSDE(this.sdeLayer, featureType);
 
                 try {
                     geometryEncoder.encode(getGeometryFilter());

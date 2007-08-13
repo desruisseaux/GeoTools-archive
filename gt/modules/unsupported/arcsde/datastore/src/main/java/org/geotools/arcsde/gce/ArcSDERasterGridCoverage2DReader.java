@@ -53,6 +53,7 @@ import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.data.DataSourceException;
 import org.geotools.factory.Hints;
+import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.parameter.Parameter;
@@ -65,7 +66,11 @@ import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.BoundingBox;
+import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 
 import com.esri.sde.sdk.client.SeColumnDefinition;
@@ -121,7 +126,7 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
     private ArcSDEPyramid pyramidInfo;
 
     /** size in pixels of each tile 
-        @deprecated **/
+        @deprecated -- use pyramidInfo.getLevel(x).getTileWidth(),getTileHeight()**/
     private int tileWidth, tileHeight;
 
     /** Local copy of the javax.imageio.ImageReader subclass for reading from this ArcSDE Raster Source **/
@@ -266,11 +271,28 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
         ArcSDEPooledConnection scon = null;
         try {
             
-            LOGGER.info("Creating coverage out of request: imagesize -- " + requestedDim + "  envelope -- " + requestedEnvelope);
+            if (LOGGER.isLoggable(Level.INFO))
+                LOGGER.info("Creating coverage out of request: imagesize -- " + requestedDim + "  envelope -- " + requestedEnvelope);
+            
             ReferencedEnvelope reqEnv = new ReferencedEnvelope(
         		requestedEnvelope.getMinimum(0), requestedEnvelope.getMaximum(0),
         		requestedEnvelope.getMinimum(1), requestedEnvelope.getMaximum(1),
         		requestedEnvelope.getCoordinateReferenceSystem());
+            
+            final CoordinateReferenceSystem nativeCRS = pyramidInfo.getPyramidLevel(0).getEnvelope().getCoordinateReferenceSystem();
+            if (!CRS.equalsIgnoreMetadata(nativeCRS, reqEnv.getCoordinateReferenceSystem())) {
+                //we're being reprojected.  We'll need to reproject reqEnv into our native coordsys
+                try {
+                    ReferencedEnvelope origReqEnv = reqEnv;
+                    reqEnv = reqEnv.transform(nativeCRS, true);                    
+                } catch (FactoryException fe) {
+                    //unable to reproject?
+                    throw new DataSourceException("Unable to find a reprojection from requested coordsys to native coordsys for this request", fe);
+                } catch (TransformException te) {
+                    throw new DataSourceException("Unable to perform reprojection from requested coordsys to native coordsys for this request", te);
+                }
+            }
+            
             int level = 0;
             if (forcedLevel != null) {
                 level = forcedLevel.intValue();

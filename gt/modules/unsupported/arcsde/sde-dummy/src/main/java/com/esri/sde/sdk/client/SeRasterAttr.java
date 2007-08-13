@@ -18,7 +18,7 @@ public class SeRasterAttr {
     public int getTilesPerColByLevel(int i) { return -1; }
     public int getNumBands() { return -1; }
     public SeRasterBand getBandInfo(int i) { return null; }
-    public Long getRasterColumnId() { return null; }
+    public SeObjectId getRasterColumnId() { return null; }
     public SeExtent getExtent() throws SeException { return null; }
     
 }

@@ -49,6 +49,7 @@ public class ArcSDEPooledConnection extends SeConnection {
 				config.getUserPassword());
 		this.config = config;
 		this.pool = pool;
+		this.setConcurrency(SeConnection.SE_UNPROTECTED_POLICY);
 	}
 	
 	/**

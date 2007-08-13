@@ -32,6 +32,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.geotools.arcsde.ArcSDEDataStoreFactory;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
@@ -130,6 +131,8 @@ public class ArcSDEDataStoreTest extends TestCase {
     private static void oneTimeSetUp() throws IOException {
         testData = new TestData();
         testData.setUp();
+        if (ArcSDEDataStoreFactory.JSDE_CLIENT_VERSION == ArcSDEDataStoreFactory.JSDE_VERSION_DUMMY)
+            throw new RuntimeException("Don't run the test-suite with the dummy jar.  Make sure the real ArcSDE jars are on your classpath.");
     }
 
     private static void oneTimeTearDown() {

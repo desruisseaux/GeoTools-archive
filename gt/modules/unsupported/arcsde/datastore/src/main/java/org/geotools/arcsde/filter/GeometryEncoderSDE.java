@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 import org.geotools.arcsde.data.ArcSDEGeometryBuilder;
 import org.geotools.arcsde.data.ArcSDEGeometryBuildingException;
 import org.geotools.data.DataSourceException;
+import org.geotools.feature.FeatureType;
 import org.geotools.filter.FilterCapabilities;
 import org.opengis.filter.And;
 import org.opengis.filter.ExcludeFilter;
@@ -106,6 +107,8 @@ public class GeometryEncoderSDE implements FilterVisitor {
 
     /** DOCUMENT ME! */
     private SeLayer sdeLayer;
+    
+    private FeatureType featureType;
 
     /**
      */
@@ -115,8 +118,9 @@ public class GeometryEncoderSDE implements FilterVisitor {
 
     /**
      */
-    public GeometryEncoderSDE(SeLayer layer) {
+    public GeometryEncoderSDE(SeLayer layer, FeatureType featureType) {
         this.sdeLayer = layer;
+        this.featureType = featureType;
     }
 
     /**
@@ -258,8 +262,17 @@ public class GeometryEncoderSDE implements FilterVisitor {
    
         // Should probably assert that attExpr's property name is equal to
         // spatialCol...
-        String spatialCol = this.sdeLayer.getSpatialColumn();
-        if (!propertyExpr.getPropertyName().equalsIgnoreCase(spatialCol)) {
+        
+        //HACK:  we want to support <namespace>:SHAPE, but current FM doesn't
+        //support it.  I guess we should try stripping the prefix and seeing if that
+        //matches...
+        final String spatialCol = featureType.getPrimaryGeometry().getLocalName();
+        final String rawPropName = propertyExpr.getPropertyName();
+        String localPropName = rawPropName;
+        if (rawPropName.indexOf(":") != -1) {
+            localPropName = rawPropName.substring(rawPropName.indexOf(":") + 1);
+        }
+        if (!rawPropName.equalsIgnoreCase(spatialCol) && !localPropName.equalsIgnoreCase(spatialCol)) {
             throw new DataSourceException("When querying against a spatial " +
                     "column, your property name must match the spatial" +
                     " column name.You used '" +

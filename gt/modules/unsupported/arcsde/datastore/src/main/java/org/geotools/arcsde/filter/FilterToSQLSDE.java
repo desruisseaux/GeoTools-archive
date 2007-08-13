@@ -44,32 +44,30 @@ import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.PropertyIsNull;
 import org.opengis.filter.expression.PropertyName;
 
-
 /**
  * Encodes an attribute filter into a SQL WHERE statement for arcsde.
  * 
  * <p>
  * Although not all filters support is coded yet, the strategy to filtering
  * queries for ArcSDE datasources is separated in two parts, the SQL where
- * clause construction, provided here and the  spatial filters (or spatial
- * constraints, in SDE vocabulary) provided by
- * <code>GeometryEncoderSDE</code>; mirroring the java SDE api approach for
- * easy programing
+ * clause construction, provided here and the spatial filters (or spatial
+ * constraints, in SDE vocabulary) provided by <code>GeometryEncoderSDE</code>;
+ * mirroring the java SDE api approach for easy programing
  * </p>
- *
+ * 
  * @author Saul Farber
  * @author Gabriel Roldan
- *
+ * 
  * @see org.geotools.data.sde.GeometryEncoderSDE
- * @source $URL$
+ * @source $URL:
+ *         http://gtsvn.refractions.net/geotools/branches/2.4.x/modules/unsupported/arcsde/datastore/src/main/java/org/geotools/arcsde/filter/FilterToSQLSDE.java $
  */
-public class FilterToSQLSDE extends FilterToSQL
-    implements FilterVisitor {
+public class FilterToSQLSDE extends FilterToSQL implements FilterVisitor {
     /** Standard java logger */
     private static Logger LOGGER = Logger.getLogger("org.geotools.filter");
 
     private String layerQualifiedName;
-    
+
     private String layerFidFieldName;
 
     /** DOCUMENT ME! */
@@ -83,18 +81,19 @@ public class FilterToSQLSDE extends FilterToSQL
 
     /**
      * 
-     * @param layerQName full qualified name of the ArcSDE layer
-     * @param layerFidColName name of the column that holds fids
+     * @param layerQName
+     *            full qualified name of the ArcSDE layer
+     * @param layerFidColName
+     *            name of the column that holds fids
      * @param ft
      * @param definitionQuery
      */
-    public FilterToSQLSDE(String layerQName, String layerFidColName, FeatureType ft,
-            PlainSelect definitionQuery) {
+    public FilterToSQLSDE(String layerQName, String layerFidColName, FeatureType ft, PlainSelect definitionQuery) {
         this.layerQualifiedName = layerQName;
         this.layerFidFieldName = layerFidColName;
         this.featureType = ft;
         this.definitionQuery = definitionQuery;
-        
+
         if (definitionQuery != null) {
             attributeNames = new HashMap();
 
@@ -105,57 +104,56 @@ public class FilterToSQLSDE extends FilterToSQL
                 item = (SelectItem) it.next();
 
                 if (!(item instanceof SelectExpressionItem)) {
-                    String msg = "for item '" + item
-                        + "': only SelectExpressionItems should be in query at this stage."
-                        + " AllColumns and AllTableColumns instances should be resolved to their list "
-                        + " of column names at view registration time.";
+                    String msg = "for item '" + item + "': only SelectExpressionItems should be in query at this stage." + " AllColumns and AllTableColumns instances should be resolved to their list " + " of column names at view registration time.";
                     LOGGER.severe(msg);
                     throw new IllegalStateException(msg);
                 }
-                SelectExpressionItem colDef = (SelectExpressionItem)item;
+                SelectExpressionItem colDef = (SelectExpressionItem) item;
                 String alias = colDef.getAlias();
-                if(alias == null){
-                    if(!(colDef.getExpression() instanceof Column)){
-                        throw new RuntimeException(
-                                "if select item is not a plain column an alias should be provided: " +
-                                colDef);
+                if (alias == null) {
+                    if (!(colDef.getExpression() instanceof Column)) {
+                        throw new RuntimeException("if select item is not a plain column an alias should be provided: " + colDef);
                     }
-                    Column column = (Column)colDef.getExpression();
+                    Column column = (Column) colDef.getExpression();
                     alias = column.getColumnName();
                 }
-                
+
                 attributeNames.put(alias, colDef);
             }
         }
     }
-    
+
     /**
-     * Returns the full qualifed name of sql expression that is registered as the 
-     * source of the attribute named <code>alias</code>.
+     * Returns the full qualifed name of sql expression that is registered as
+     * the source of the attribute named <code>alias</code>.
      * 
      * @param alias
      * @return
      */
-    public String getColumnDefinition(String alias){
+    public String getColumnDefinition(String alias) {
         final String encodedColumnDefinition;
-        if(this.definitionQuery != null){
-            //its an inprocess view
-            SelectExpressionItem colDef = (SelectExpressionItem)attributeNames.get(alias);
-            //String alias = colDef.getAlias();
+        if (this.definitionQuery != null) {
+            // its an inprocess view
+            SelectExpressionItem colDef = (SelectExpressionItem) attributeNames.get(alias);
+            // String alias = colDef.getAlias();
             String sqlExpression = String.valueOf(colDef);
-            
-            //encodedColumnDefinition = sqlExpression + " AS " + alias;
+
+            // encodedColumnDefinition = sqlExpression + " AS " + alias;
             encodedColumnDefinition = sqlExpression;
-        }else{
+        } else {
+            if (alias.indexOf(":") != -1) {
+                // we've got to 'de-namespaceify' this attribute, if neccesary
+                alias = alias.substring(alias.indexOf(":") + 1);
+            }
             encodedColumnDefinition = layerQualifiedName + "." + alias;
         }
         return encodedColumnDefinition;
     }
-    
+
     /**
      * Overrides the superclass implementation to indicate that we support
      * pushing FeatureId filters down into the data store.
-     *
+     * 
      * @return DOCUMENT ME!
      */
     protected FilterCapabilities createFilterCapabilities() {
@@ -175,11 +173,14 @@ public class FilterToSQLSDE extends FilterToSQL
 
     /**
      * overriden just to avoid the "WHERE" keyword
-     *
-     * @param out DOCUMENT ME!
-     * @param filter DOCUMENT ME!
-     *
-     * @throws GeoAPIFilterToSQLEncoderException DOCUMENT ME!
+     * 
+     * @param out
+     *            DOCUMENT ME!
+     * @param filter
+     *            DOCUMENT ME!
+     * 
+     * @throws GeoAPIFilterToSQLEncoderException
+     *             DOCUMENT ME!
      */
     public void encode(Filter filter) throws FilterToSQLException {
         if (getCapabilities().fullySupports(filter)) {
@@ -192,10 +193,12 @@ public class FilterToSQLSDE extends FilterToSQL
     /**
      * This only exists the fulfill the interface - unless There is a way of
      * determining the FID column in the database...
-     *
-     * @param filter the Fid Filter.
-     *
-     * @throws RuntimeException DOCUMENT ME!
+     * 
+     * @param filter
+     *            the Fid Filter.
+     * 
+     * @throws RuntimeException
+     *             DOCUMENT ME!
      */
     public Object visit(Id filter, Object unused) {
         long[] fids = ArcSDEAdapter.getNumericFids(filter.getIdentifiers());
@@ -218,8 +221,10 @@ public class FilterToSQLSDE extends FilterToSQL
                     sb.append(", ");
                 }
                 if (i == 999) {
-                    sb.deleteCharAt(sb.length()-1); // delete the trailing space
-                    sb.deleteCharAt(sb.length()-1); // delete the trailing comma
+                    sb.deleteCharAt(sb.length() - 1); // delete the trailing
+                                                        // space
+                    sb.deleteCharAt(sb.length() - 1); // delete the trailing
+                                                        // comma
                     sb.append(")) OR (" + fidField + " IN(");
                 }
             }
@@ -236,8 +241,7 @@ public class FilterToSQLSDE extends FilterToSQL
         }
         return unused;
     }
-    
-    
+
     /**
      * Writes the SQL for the attribute Expression.
      * 
@@ -254,15 +258,15 @@ public class FilterToSQLSDE extends FilterToSQL
     public Object visit(PropertyName expression, Object extraData) throws RuntimeException {
         LOGGER.finer("exporting PropertyName");
         final String attName = expression.getPropertyName();
-        
-        final String encodedColumnDefinition = getColumnDefinition(attName); 
-        
+
+        final String encodedColumnDefinition = getColumnDefinition(attName);
+
         try {
-            out.write(encodedColumnDefinition);            
+            out.write(encodedColumnDefinition);
         } catch (java.io.IOException ioe) {
             throw new RuntimeException("IO problems writing attribute exp", ioe);
         }
-        
+
         return extraData;
-    }    
+    }
 }

@@ -108,7 +108,13 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
     
     private static void determineJsdeVersion() {
         try {
+            //you need to uncomment line 2 and comment line 1 to make the
+            //tests run in Eclipse with the ArcSDE jarfiles on the classpath.
+            //1) 
             int i = GeoToolsDummyAPI.DUMMY_API_VERSION;
+            
+            //2)
+            //if (1==1) throw new Exception();
             JSDE_CLIENT_VERSION = JSDE_VERSION_DUMMY;
         } catch (Throwable t) {
             //good, we're not using the Dummy API placeholder.
@@ -119,19 +125,25 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
                 LOGGER.info("Using ArcSDE API version 9.2 (or higher)");
             } catch (Throwable t2) {
                 //we're using 9.1 or 9.0.
-                //perhaps I am the hack-master.
-                int[] projcss = PeFactory.projcsCodelist();
-                if (projcss.length == 16380) {
-                    JSDE_CLIENT_VERSION = JSDE_VERSION_91;
-                    LOGGER.info("Using ArcSDE API version 9.1");
-                } else {
+                try {
+                    int[] projcss = PeFactory.projcsCodelist();
+                    if (projcss.length == 16380) {
+                        //perhaps I am the hack-master.
+                        JSDE_CLIENT_VERSION = JSDE_VERSION_91;
+                        LOGGER.info("Using ArcSDE API version 9.1");
+                    } else {
+                        JSDE_CLIENT_VERSION = JSDE_VERSION_90;
+                        LOGGER.info("Using ArcSDE API version 9.0 (or an earlier 8.x version)");
+                    }
+                } catch (Throwable crap) {
+                    //not sure what happened here...  This next line is
+                    //un-intelligent.
                     JSDE_CLIENT_VERSION = JSDE_VERSION_90;
-                    LOGGER.info("Using ArcSDE API version 9.0 (or an earlier 8.x version)");
                 }
             }
         }
     }
-    
+
     /** factory of connection pools to different SDE databases */
     private static final ArcSDEConnectionPoolFactory poolFactory = ArcSDEConnectionPoolFactory
             .getInstance();
@@ -194,15 +206,12 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
         
         ArcSDEDataStore sdeDStore = null;
         ArcSDEConnectionConfig config = new ArcSDEConnectionConfig(params);
+        ArcSDEConnectionPool connPool = poolFactory.createPool(config);
         
         //check to see if our sdk is compatible with this arcsde instance
-        SeConnection conn = null;
+        ArcSDEPooledConnection conn = null;
         try {
-            conn = new SeConnection(config.getServerName(),
-                config.getPortNumber().intValue(),
-                config.getDatabaseName(),
-                config.getUserName(),
-                config.getUserPassword());
+            conn = connPool.getConnection();
             SeRelease releaseInfo = conn.getRelease();
             int majVer = releaseInfo.getMajor();
             int minVer = releaseInfo.getMinor();
@@ -218,25 +227,10 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
                         "9.2 or higher.  See http://docs.codehaus.org/display/GEOTOOLS/ArcSDE+Plugin\n" +
                         "**************************\n\n");
             }
-            
-            conn.close();
-            conn = null;
-            
-        } catch (SeException se) {
-            throw new DataSourceException(se);
         } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (Exception e) {
-                    //meh...nothing to do about it now.
-                }
-                conn = null;
-            }
+            if (conn != null) conn.close();
         }
-        
-        ArcSDEConnectionPool connPool = poolFactory.createPool(config);
-        
+	
         String namespaceUri = config.getNamespaceUri();
         if (namespaceUri == null) {
             sdeDStore = new ArcSDEDataStore(connPool);

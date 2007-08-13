@@ -17,6 +17,8 @@
 package org.geotools.arcsde.data;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,12 +33,15 @@ import java.util.logging.Logger;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.DataSourceException;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.DefaultFeatureTypeFactory;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.GeometryAttributeType;
-import org.geotools.feature.simple.SimpleTypeBuilder;
-import org.geotools.feature.simple.SimpleTypeFactoryImpl;
+import org.geotools.feature.SchemaException;
+
 import org.geotools.feature.type.DefaultFeatureTypeBuilder;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.opengis.filter.identity.FeatureId;
@@ -394,17 +399,28 @@ public class ArcSDEAdapter {
 
     private static FeatureType createSchema(String typeName, String namespace, List properties) {
         // TODO: use factory lookup mechanism once its in place
-        DefaultFeatureTypeBuilder builder = new DefaultFeatureTypeBuilder();
-
+        FeatureTypeBuilder builder = CommonFactoryFinder.getFeatureTypeFactory(null);
+        
         builder.setName(typeName);
-        builder.setNamespaceURI(namespace);
+        try {
+            builder.setNamespace(new URI(namespace));
+        } 
+        catch (URISyntaxException e) {
+            LOGGER.warning("Illegal namespace uri: " + namespace );
+        }
+        
         for (Iterator it = properties.iterator(); it.hasNext();) {
             AttributeType attType = (AttributeType) it.next();
-            builder.add(attType.getLocalName(),attType.getBinding());
-            
+            builder.addType(attType);
         }
 
-        FeatureType type = (FeatureType) builder.buildFeatureType();
+        FeatureType type;
+        try {
+            type = builder.getFeatureType();
+        } 
+        catch (SchemaException e) {
+            throw new RuntimeException(e);
+        }
 
         return type;
     }

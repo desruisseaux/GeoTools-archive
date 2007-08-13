@@ -31,9 +31,9 @@
   
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/arcsde/sde-dummy/
+      scm:svn:http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/arcsde/sde-dummy/
     </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/arcsde/sde-dummy/</url>
+    <url>http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/arcsde/sde-dummy/</url>
   </scm>
   
   <description>

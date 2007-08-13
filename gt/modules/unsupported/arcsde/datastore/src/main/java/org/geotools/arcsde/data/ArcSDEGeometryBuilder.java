@@ -88,8 +88,7 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public abstract class ArcSDEGeometryBuilder {
 	/** DOCUMENT ME! */
-	private static final Logger LOGGER = Logger.getLogger(ArcSDEGeometryBuilder.class
-			.getPackage().getName());
+	private static final Logger LOGGER = Logger.getLogger(ArcSDEGeometryBuilder.class.getName());
 
 	/** specialized geometry builders classes by it's geometry type */
 	private static final Map builders = new HashMap();

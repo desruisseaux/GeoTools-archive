@@ -17,6 +17,7 @@
 package org.geotools.arcsde.pool;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -29,6 +30,8 @@ import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.geotools.data.DataSourceException;
+
+import sun.rmi.runtime.GetThreadPoolAction;
 
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
@@ -77,8 +80,7 @@ import com.esri.sde.sdk.client.SeTable;
  */
 public class ArcSDEConnectionPool {
     /** package's logger */
-    protected static final Logger LOGGER = Logger.getLogger(ArcSDEConnectionPool.class.getPackage()
-            .getName());
+    protected static final Logger LOGGER = Logger.getLogger(ArcSDEConnectionPool.class.getName());
 
     /** DOCUMENT ME! */
     protected static final Level INFO_LOG_LEVEL = Level.WARNING;
@@ -138,7 +140,7 @@ public class ArcSDEConnectionPool {
         long maxWait = config.getConnTimeOut().longValue();
 
         this.pool = new GenericObjectPool(seConnectionFactory, maxConnections, exhaustedAction,
-                maxWait);
+                maxWait, true, true);
         LOGGER.info("Created ArcSDE connection pool for " + config);
 
         ArcSDEPooledConnection[] preload = new ArcSDEPooledConnection[minConnections];
@@ -228,7 +230,8 @@ public class ArcSDEConnectionPool {
         }
 
         try {
-            return (ArcSDEPooledConnection) this.pool.borrowObject();
+            ArcSDEPooledConnection ret = (ArcSDEPooledConnection) this.pool.borrowObject();
+            return ret;
         } catch (NoSuchElementException e) {
             LOGGER.log(Level.WARNING, "Out of connections: " + e.getMessage(), e);
             throw new UnavailableArcSDEConnectionException(this.pool.getNumActive(), this.config);
@@ -285,22 +288,49 @@ public class ArcSDEConnectionPool {
         }
     }
 
-    public synchronized SeLayer getSdeLayer(String typeName) throws NoSuchElementException,
+    public SeLayer getSdeLayer(String typeName) throws NoSuchElementException,
             IOException {
-        ArcSDEPooledConnection conn;
-        SeLayer layer;
+        ArcSDEPooledConnection conn = null;
+        SeLayer layer = null;
 
-        try {
-            conn = getConnection();
-        } catch (UnavailableArcSDEConnectionException e) {
-            throw new DataSourceException(e);
+        for (int i = 0; i < 3; i++) {
+            //randomly ArcSDE craps out doing this.  Catch the nullpointer exception
+            //and try again, I guess.
+            try {
+                try {
+                    conn = getConnection();
+                } catch (UnavailableArcSDEConnectionException e) {
+                    throw new DataSourceException(e);
+                }
+                try {
+                    layer = getSdeLayer(conn, typeName);
+                } finally {
+                    conn.close();
+                }
+            
+            } catch (NullPointerException npe) {
+                LOGGER.warning("ArcSDE failed strangely when trying to fetch layer with typename '" + typeName + "' and connection " + conn);
+                markConnectionAsFailed(conn);
+            }
         }
-        try {
-            layer = getSdeLayer(conn, typeName);
-        } finally {
-            conn.close();
+        if (layer == null) {
+            throw new DataSourceException("Failed to fetch ArcSDE Layer " + typeName);
+        } else {
+            return layer;
         }
-        return layer;
+    }
+    
+    /**
+     * Sometimes (and largely without reason) ArcSDEPooledConnections (really their underlying SeConnection objects)
+     * just poop out.  They start behaving strangely, or not behaving at all.  You can tell the pool that a particular
+     * SeConnection has 'Failed' using this method, and it will do its best to get it out of the pool as soon as you
+     * release your hold on it.
+     * 
+     * @param conn
+     */
+    public synchronized void markConnectionAsFailed(ArcSDEPooledConnection conn) {
+        LOGGER.warning("ArcSDE connection '" + conn + "' has been marked as failed.  Current pool state is " + getAvailableCount() + " avail/" + this.getPoolSize() + " total");
+        seConnectionFactory.markObjectInvalid(conn);
     }
 
     /**
@@ -488,6 +518,8 @@ public class ArcSDEConnectionPool {
     class SeConnectionFactory extends BasePoolableObjectFactory {
         /** DOCUMENT ME! */
         private ArcSDEConnectionConfig config;
+        
+        private ArrayList invalidConnections = new ArrayList();
 
         /**
          * Creates a new SeConnectionFactory object.
@@ -499,7 +531,10 @@ public class ArcSDEConnectionPool {
             super();
             this.config = config;
         }
-
+        
+        public void markObjectInvalid(Object o) {
+            invalidConnections.add(o);
+        }
         /**
          * Called whenever a new instance is needed.
          * 
@@ -553,6 +588,9 @@ public class ArcSDEConnectionPool {
             boolean valid = !conn.isClosed();
             // MAKE PROPER VALIDITY CHECK HERE as for GEOT-1273
             if (valid) {
+                if (invalidConnections.contains(obj))
+                    valid = false;
+                
                 try {
                     LOGGER.finest("Validating SDE Connection");
                     String user = conn.getUser();
