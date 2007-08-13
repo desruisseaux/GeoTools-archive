@@ -55,7 +55,7 @@ public class OracleFeatureLocking extends JDBCFeatureLocking {
      * @throws IOException DOCUMENT ME!
      */
     public Envelope getBounds(Query query) throws IOException {
-        if(query.getTypeName() == null) {
+        if(!getSchema().getTypeName().equals(query)) {
             query = new DefaultQuery(query);
             ((DefaultQuery) query).setTypeName(getSchema().getTypeName());
         }
