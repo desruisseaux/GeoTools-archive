@@ -7,13 +7,22 @@ import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.referencing.CRS;
 import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.geometry.MismatchedReferenceSystemException;
 import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.Precision;
 import org.opengis.geometry.aggregate.AggregateFactory;
 import org.opengis.geometry.complex.ComplexFactory;
 import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.geometry.coordinate.Position;
+import org.opengis.geometry.primitive.Curve;
+import org.opengis.geometry.primitive.Point;
 import org.opengis.geometry.primitive.PrimitiveFactory;
+import org.opengis.geometry.primitive.Ring;
+import org.opengis.geometry.primitive.Solid;
+import org.opengis.geometry.primitive.SolidBoundary;
+import org.opengis.geometry.primitive.Surface;
+import org.opengis.geometry.primitive.SurfaceBoundary;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -167,5 +176,138 @@ public class GeometryBuilder {
     public List<Position> createPositionList( float[] array, int start, int end ) {
         return getPositionFactory().createPositionList(array, start, end );
     }
+
+	public Curve createCurve(List segments) throws MismatchedReferenceSystemException, MismatchedDimensionException {
+		if (segments == null)
+			throw new NullPointerException();
+
+		// A curve will be created
+		// - The curve will be set as parent curves for the Curve segments
+		// - Start and end params for the CurveSegments will be set
+		return getPrimitiveFactory().createCurve(segments);
+	}
+
+	public Point createPoint(double[] coordinates) throws MismatchedDimensionException {
+		if (coordinates == null)
+			throw new NullPointerException();
+		if (coordinates.length != this.getCoordinateReferenceSystem().getCoordinateSystem().getDimension())
+			throw new MismatchedDimensionException();
+
+		return getPrimitiveFactory().createPoint(coordinates);
+	}
+
+//	public Point createPoint(Position position) throws MismatchedReferenceSystemException, MismatchedDimensionException {
+//		if (position == null) {
+//			throw new NullPointerException();
+//		}
+//		if (position.getPosition().getDimension() != this.getCoordinateReferenceSystem().getCoordinateSystem().getDimension()) {
+//			throw new MismatchedDimensionException();
+//		}
+//		DirectPositionImpl copy = (DirectPositionImpl) getPositionFactory().createDirectPosition(position.getPosition().getCoordinates());
+//		return getPrimitiveFactory().createPoint(copy);
+//	}
+
+//	public Primitive createPrimitive(Envelope envelope) throws MismatchedReferenceSystemException, MismatchedDimensionException {
+//		LineSegment segment = processBoundsToSegment(envelope);		
+//		return processSegmentToPrimitive( envelope, segment, 1 );	
+//	}
+//	
+//	private PrimitiveImpl processSegmentToPrimitive(Envelope bounds, LineSegment segment, int dimension) {
+//		CoordinateSystemAxis axis = crs.getCoordinateSystem().getAxis( dimension );
+//		
+//		if( axis.getDirection() == AxisDirection.OTHER ){
+//			return processSegmentToPrimitive( bounds, segment, dimension+1 );
+//		}
+//		RingImpl ring = processBoundsToRing( bounds, segment, dimension );
+//		return processRingToPrimitive( bounds, ring, dimension+1 );				
+//	}
+//	
+//	public RingImpl processBoundsToRing( Envelope bounds, LineSegment segment, final int D ){
+//		DirectPosition one =  getPositionFactory().createDirectPosition(segment.getStartPoint().getCoordinates()); //new DirectPositionImpl( segment.getStartPoint() );
+//		one.setOrdinate( D, bounds.getMinimum(D) );
+//		
+//		DirectPosition two =  getPositionFactory().createDirectPosition(segment.getEndPoint().getCoordinates()); //new DirectPositionImpl( segment.getEndPoint() );
+//		two.setOrdinate( D, bounds.getMinimum(D) );
+//		
+//		DirectPosition three =  getPositionFactory().createDirectPosition(two.getCoordinates()); //new DirectPositionImpl( two );
+//		three.setOrdinate( D, bounds.getMaximum(D) );
+//		
+//		DirectPosition four =  getPositionFactory().createDirectPosition(one.getCoordinates()); //new DirectPositionImpl( one );
+//		four.setOrdinate( D, bounds.getMaximum(D) );
+//		
+//		LineSegment edge1 = new LineSegmentImpl( one, two, 0.0 );
+//		LineSegment edge2 = new LineSegmentImpl( two, three, 0.0 );
+//		LineSegment edge3 = new LineSegmentImpl( three, four, 0.0 );
+//		LineSegment edge4 = new LineSegmentImpl( four, one, 0.0 );
+//		
+//		List<OrientableCurve> edges = new ArrayList<OrientableCurve>();
+//		edges.add( new CurveImpl( edge1 ));
+//		edges.add( new CurveImpl( edge2 ));
+//		edges.add( new CurveImpl( edge3 ));
+//		edges.add( new CurveImpl( edge4 ));
+//		return new RingImpl( edges );
+//	}
+//	
+//	@SuppressWarnings("unchecked")
+//	private PrimitiveImpl processRingToPrimitive(Envelope bounds, RingImpl ring, int dimension) {
+//		int D = crs.getCoordinateSystem().getDimension();
+//		if( dimension == D ){ // create Surface from ring and return			
+//			SurfaceBoundary boundary = new SurfaceBoundaryImpl( crs, ring, Collections.EMPTY_LIST );
+//			return new SurfaceImpl( boundary );
+//		}		
+//		CoordinateSystemAxis axis = crs.getCoordinateSystem().getAxis( dimension );
+//		if( axis.getDirection() == AxisDirection.OTHER ){
+//			return processRingToPrimitive( bounds, ring, dimension+1 );
+//		}
+//		return processRingToVolumne( bounds, ring, dimension+1 );
+//	}
+//	
+//	private PrimitiveImpl processRingToVolumne(Envelope bounds, RingImpl ring, int i) {
+//		// go into a volume
+//		throw new UnsupportedOperationException("Not yet 3D");
+//	}
+//	
+//	public LineSegment processBoundsToSegment( Envelope bounds ){
+//		final int D=0;
+//		CoordinateReferenceSystem crs = bounds.getCoordinateReferenceSystem();
+//		CoordinateSystemAxis axis = crs.getCoordinateSystem().getAxis( D );
+//		
+//		DirectPosition positionA = getPositionFactory().createDirectPosition(null); //new DirectPositionImpl(crs);
+//		DirectPosition positionB = getPositionFactory().createDirectPosition(null); //new DirectPositionImpl(crs);		
+//		if( axis.getDirection() != AxisDirection.OTHER ){
+//			positionA.setOrdinate(D, bounds.getMinimum(D) );
+//			positionB.setOrdinate(D, bounds.getMaximum(D) );
+//		}		
+//		PointArrayImpl array = new PointArrayImpl(crs );
+//		array.add( positionA );
+//		array.add( positionB );
+//		
+//		return new LineSegmentImpl( array, 0.0 );
+//	}
+
+	public Ring createRing(List curves) throws MismatchedReferenceSystemException, MismatchedDimensionException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Solid createSolid(SolidBoundary boundary) throws MismatchedReferenceSystemException, MismatchedDimensionException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Surface createSurface(List surfaces) throws MismatchedReferenceSystemException, MismatchedDimensionException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Surface createSurface(SurfaceBoundary boundary) throws MismatchedReferenceSystemException, MismatchedDimensionException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public SurfaceBoundary createSurfaceBoundary(Ring exterior, List interiors) throws MismatchedReferenceSystemException, MismatchedDimensionException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

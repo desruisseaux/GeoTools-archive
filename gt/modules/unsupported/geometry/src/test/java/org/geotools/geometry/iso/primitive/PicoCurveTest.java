@@ -1,6 +1,7 @@
 package org.geotools.geometry.iso.primitive;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.geotools.geometry.GeometryBuilder;
@@ -25,6 +26,7 @@ import org.opengis.geometry.complex.CompositeCurve;
 import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.geometry.coordinate.LineString;
 import org.opengis.geometry.coordinate.ParamForPoint;
+import org.opengis.geometry.coordinate.PointArray;
 import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.primitive.Curve;
 import org.opengis.geometry.primitive.CurveBoundary;
@@ -365,5 +367,19 @@ public class PicoCurveTest extends TestCase {
 
 //		 create curve
 		Curve curve = primF.createCurve(segs);		
+		
+		// get points from curve
+		List<CurveSegment> segs2 = curve.getSegments();
+		Iterator<CurveSegment> iter = segs2.iterator();
+		PointArray samplePoints = null;
+		while (iter.hasNext()) {
+			if (samplePoints == null) {
+				samplePoints = iter.next().getSamplePoints();
+			}
+			else {
+				samplePoints.addAll(iter.next().getSamplePoints());
+			}
+		}
+		
 	}
 }

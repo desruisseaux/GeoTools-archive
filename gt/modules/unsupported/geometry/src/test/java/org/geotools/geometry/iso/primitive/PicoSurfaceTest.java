@@ -1,6 +1,8 @@
 package org.geotools.geometry.iso.primitive;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.geotools.geometry.Geometry;
@@ -19,9 +21,18 @@ import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.Precision;
 import org.opengis.geometry.TransfiniteSet;
 import org.opengis.geometry.coordinate.GeometryFactory;
+import org.opengis.geometry.coordinate.LineString;
+import org.opengis.geometry.coordinate.PointArray;
+import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.coordinate.Triangle;
+import org.opengis.geometry.primitive.Curve;
+import org.opengis.geometry.primitive.CurveSegment;
+import org.opengis.geometry.primitive.OrientableCurve;
+import org.opengis.geometry.primitive.Point;
+import org.opengis.geometry.primitive.Primitive;
 import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.primitive.Surface;
+import org.opengis.geometry.primitive.SurfaceBoundary;
 import org.opengis.geometry.primitive.SurfacePatch;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.picocontainer.PicoContainer;
@@ -254,6 +265,61 @@ public class PicoSurfaceTest extends TestCase {
 		assertNotNull(patch.getInterpolation());
 		assertTrue(surface.equals(patch.getSurface()));
 		assertNotNull(patch.getNumDerivativesOnBoundary());
+		
+		
+		
+//		 create a list of connected directpositions
+		List<Position> dps = new ArrayList<Position>();
+		dps.add(aGeomFactory.createDirectPosition( new double[] {20, 10} ));
+		dps.add(aGeomFactory.createDirectPosition( new double[] {40, 10} ));
+		dps.add(aGeomFactory.createDirectPosition( new double[] {50, 40} ));
+		dps.add(aGeomFactory.createDirectPosition( new double[] {30, 50} ));
+		dps.add(aGeomFactory.createDirectPosition( new double[] {10, 30} ));
+		dps.add(aGeomFactory.createDirectPosition( new double[] {20, 10} ));
+
+//		 create linestring from directpositions
+		LineString line = aGeomFactory.createLineString(dps);
+
+//		 create curvesegments from line
+		ArrayList<CurveSegment> segs = new ArrayList<CurveSegment>();
+		segs.add(line);
+
+//		 Create list of OrientableCurves that make up the surface
+		OrientableCurve curve = tPrimFactory.createCurve(segs);
+		List<OrientableCurve> orientableCurves = new ArrayList<OrientableCurve>();
+		orientableCurves.add(curve);
+
+//		 create the interior ring and a list of empty interior rings (holes)
+		Ring extRing = tPrimFactory.createRing(orientableCurves);
+		List<Ring> intRings = new ArrayList<Ring>();
+
+//		 create the surfaceboundary from the rings
+		SurfaceBoundary sb = tPrimFactory.createSurfaceBoundary(extRing, intRings);
+				
+//		 create the surface
+		Surface surface22 = tPrimFactory.createSurface(sb);		
+		
+		// get rings
+		SurfaceBoundary sb2 = (SurfaceBoundary) surface22.getBoundary();
+		Ring exterior = sb2.getExterior();
+		List<Ring> interiors2 = sb2.getInteriors();
+		Collection<? extends Primitive> extCurve = exterior.getElements();
+		Iterator<? extends Primitive> iter = extCurve.iterator();
+		PointArray samplePoints = null;
+		while (iter.hasNext()) {
+			Curve curve2 = (Curve) iter.next();
+			List<CurveSegment> segs2 = curve2.getSegments();
+			Iterator<CurveSegment> iter2 = segs2.iterator();
+			while (iter2.hasNext()) {
+				if (samplePoints == null) {
+					samplePoints = iter2.next().getSamplePoints();
+				}
+				else {
+					samplePoints.addAll(iter2.next().getSamplePoints());
+				}
+			}
+		}
+		
 	}
 
 }
