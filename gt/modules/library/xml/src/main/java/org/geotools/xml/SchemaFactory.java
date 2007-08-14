@@ -800,7 +800,7 @@ public class SchemaFactory {
          * @see schema.Schema#includesURI(java.net.URI)
          */
         public boolean includesURI(URI uri1) {
-            if (uri1 == null) {
+            if (uri1 == null || this.uri == null) {
                 return false;
             }
 
