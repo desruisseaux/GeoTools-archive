@@ -104,7 +104,7 @@ public final class Logging {
         if (f.getSourceFormat() == null) {
             // Set the source format only if the user didn't specified
             // an explicit one in the jre/lib/logging.properties file.
-            f.setSourceFormat("class:long");
+            f.setSourceFormat("class:short");
         }
     }
 

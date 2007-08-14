@@ -107,13 +107,18 @@ public final class OptionalDependencies {
      * it here (for now) because it is used in some module that don't want to depend on widgets.
      */
     public static MutableTreeNode xmlToSwing(final Node node) {
-        final DefaultMutableTreeNode root = createTreeNode(node.getNodeName(), node, true);
+        String label = node.getNodeName();
+        final String value = node.getNodeValue();
+        if (value != null) {
+            label += "=\"" + value + '"';
+        }
+        final DefaultMutableTreeNode root = createTreeNode(label, node, true);
         final NamedNodeMap attributes = node.getAttributes();
         final int length = attributes.getLength();
         for (int i=0; i<length; i++) {
             final Node attribute = attributes.item(i);
             if (attribute != null) {
-                String label = attribute.getNodeName() + "=\"" + attribute.getNodeValue() + '"';
+                label = attribute.getNodeName() + "=\"" + attribute.getNodeValue() + '"';
                 root.add(createTreeNode(label, attribute, false));
             }
         }

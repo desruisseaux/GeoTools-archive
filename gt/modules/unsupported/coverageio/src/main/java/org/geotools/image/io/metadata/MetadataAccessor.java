@@ -36,6 +36,7 @@ import org.w3c.dom.NodeList;
 
 // Geotools dependencies
 import org.geotools.util.LoggedFormat;
+import org.geotools.resources.XMath;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -345,42 +346,110 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
     }
 
     /**
-     * Returns the user object associated with the {@linkplain #selectChild selected element},
-     * or {@code null} if none. This is the only {@code get} method that doesn't parse the
-     * {@link #getString} value.
+     * Returns the {@linkplain IIOMetadataNode#getUserObject user object} associated with the
+     * {@linkplain #selectChild selected element}, or {@code null} if none. If no user object
+     * is defined for the element, then the {@linkplain Node#getNodeValue node value} is returned
+     * as a fallback. This is consistent with {@link #setUserObject} implementation, and allows
+     * some parsing of nodes that are not {@link IIOMetadataNode} instances.
+     * <p>
+     * The {@code getUserObject} methods are the only ones to not parse the value returned by
+     * {@link #getString}.
      *
      * @return The user object, or {@code null} if none.
      *
+     * @see #getUserObject(Class)
      * @see #setUserObject
      */
     protected Object getUserObject() {
         final Element element = currentElement();
         if (element instanceof IIOMetadataNode) {
-            return ((IIOMetadataNode) element).getUserObject();
-        } else {
-            return null;
+            final Object candidate = ((IIOMetadataNode) element).getUserObject();
+            if (candidate != null) {
+                return candidate;
+            }
         }
+        /*
+         * getNodeValue() returns a String. We use it as a fallback, but in typical
+         * IIOMetadataNode usage this value is not used (according its javadoc), so
+         * it will often be null.
+         */
+        return element.getNodeValue();
     }
 
     /**
-     * Sets the user object associated with the {@linkplain #selectChild selected element}.
-     * This is the only {@code set} method that doesn't invoke {@link #setString} with a
-     * formatted value.
+     * Returns the user object associated as an instance of the specified class. If the value
+     * returned by {@link #getUserObject()} is not of the expected type, then this method will
+     * tries to parse it as a string.
+     *
+     * @param  type The expected class.
+     * @return The user object, or {@code null} if none.
+     * @throws ClassCastException if the user object can not be casted to the specified type.
+     *
+     * @see #getUserObject()
+     * @see #setUserObject
+     */
+    protected Object /*T*/ getUserObject(Class/*<T>*/ type) throws ClassCastException {
+        type = XMath.primitiveToWrapper(type);
+        Object value = getUserObject();
+        if (value instanceof CharSequence) {
+            if (Number.class.isAssignableFrom(type)) {
+                value = XMath.valueOf(type, value.toString());
+            } else {
+                final Class component = XMath.primitiveToWrapper(type.getComponentType());
+                if (Double.class.equals(component)) {
+                    value = parseSequence(value.toString(), false, false);
+                } else if (Integer.class.equals(component)) {
+                    value = parseSequence(value.toString(), false, true);
+                }
+            }
+        }
+        return value; // TODO: use type.cast with Java 5.
+    }
+
+    /**
+     * Sets the {@linkplain IIOMetadataNode#setUserObject user object} associated with the
+     * {@linkplain #selectChild selected element}. This is the only {@code set} method that
+     * doesn't invoke {@link #setString} with a formatted value.
+     * <p>
+     * If the specified value is formattable (i.e. is a {@linkplain CharSequence character
+     * sequence}, a {@linkplain Number number} or an array of the above), then this method
+     * also {@linkplain IIOMetadataNode#setNodeValue sets the node value} as a string. This
+     * is mostly a convenience for formatting purpose since {@link IIOMetadataNode} don't
+     * use the node value. But it may help some libraries that are not designed to work with
+     * with user objects, since they are particular to Image I/O metadata.
      *
      * @param  value The user object, or {@code null} if none.
      * @throws UnsupportedImplementationException if the selected element is not an instance of
      *         {@link IIOMetadataNode}.
      *
-     * @see #getUserObject
+     * @see #getUserObject()
      */
     protected void setUserObject(final Object value) throws UnsupportedImplementationException {
         final Element element = currentElement();
+        final String asText;
+        if (isFormattable(value)) {
+            asText = value.toString();
+        } else if (value!=null && isFormattable(value.getClass().getComponentType())) {
+            asText = formatSequence(value);
+        } else {
+            asText = null;
+        }
         if (element instanceof IIOMetadataNode) {
             ((IIOMetadataNode) element).setUserObject(value);
-        } else {
+        } else if (value!=null && asText==null) {
             throw new UnsupportedImplementationException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
                     Utilities.getShortClassName(element), Utilities.getShortName(IIOMetadataNode.class)));
         }
+        element.setNodeValue(asText);
+    }
+
+    /**
+     * Returns {@code true} if the specified value can be formatted as a text.
+     * We allows formatting only for reasonably cheap objects, for example a
+     * Number but not a CoordinateReferenceSystem.
+     */
+    private static boolean isFormattable(final Object value) {
+        return (value instanceof CharSequence) || (value instanceof Number);
     }
 
     /**
@@ -499,7 +568,7 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
      * @return The attribute values, or {@code null} if none.
      */
     protected int[] getIntegers(final String attribute, final boolean unique) {
-        return (int[]) getSequence(attribute, unique, true);
+        return (int[]) parseSequence(getString(attribute), unique, true);
     }
 
     /**
@@ -510,7 +579,7 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
      * @param value     The attribute value.
      */
     protected void setIntegers(final String attribute, final int[] values) {
-        setSequence(attribute, values);
+        setString(attribute, formatSequence(values));
     }
 
     /**
@@ -557,7 +626,7 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
      * @return The attribute values, or {@code null} if none.
      */
     protected double[] getDoubles(final String attribute, final boolean unique) {
-        return (double[]) getSequence(attribute, unique, false);
+        return (double[]) parseSequence(getString(attribute), unique, false);
     }
 
     /**
@@ -568,25 +637,24 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
      * @param value     The attribute value.
      */
     protected void setDoubles(final String attribute, final double[] values) {
-        setSequence(attribute, values);
+        setString(attribute, formatSequence(values));
     }
 
     /**
      * Implementation of {@link #getIntegers} and {@link #getDoubles} methods.
      *
-     * @param  attribute The attribute to fetch  (e.g. {@code "fillValues"}).
+     * @param  sequence The sequence to parse.
      * @param  unique {@code true} if duplicated values should be collapsed into unique values,
      *         or {@code false} for preserving duplicated values.
      * @param  integers {@code true} for parsing as {@code int}, or {@code false} for parsing as
      *         {@code double}.
      * @return The attribute values, or {@code null} if none.
      */
-    private Object getSequence(final String attribute, final boolean unique, final boolean integers) {
-        final String sequence = getString(attribute);
+    private Object parseSequence(final String sequence, final boolean unique, final boolean integers) {
         if (sequence == null) {
             return null;
         }
-        final Collection/*<Double>*/ numbers;
+        final Collection/*<Number>*/ numbers;
         if (unique) {
             numbers = new LinkedHashSet();
         } else {
@@ -623,12 +691,12 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
     }
 
     /**
-     * Implementation of {@link #setIntegers} and {@link #setDoubles} methods.
+     * Formats a sequence for {@link #setIntegers} and {@link #setDoubles} implementations.
      *
-     * @param attribute The attribute name.
-     * @param value     The attribute value.
+     * @param  value The attribute value.
+     * @return The formatted sequence.
      */
-    private void setSequence(final String attribute, final Object values) {
+    private static String formatSequence(final Object values) {
         String text = null;
         if (values != null) {
             final StringBuffer buffer = new StringBuffer();
@@ -641,7 +709,7 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
             }
             text = buffer.toString();
         }
-        setString(attribute, text);
+        return text;
     }
 
     /**

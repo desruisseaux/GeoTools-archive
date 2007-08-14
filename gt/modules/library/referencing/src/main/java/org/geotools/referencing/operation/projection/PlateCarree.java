@@ -127,7 +127,7 @@ public class PlateCarree extends EquidistantCylindrical {
                 new NamedIdentifier(Citations.GEOTIFF,  "CT_Equirectangular")
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,       SEMI_MINOR,
-                                  CENTRAL_MERIDIAN,
+                CENTRAL_MERIDIAN,
                 FALSE_EASTING,    FALSE_NORTHING
             });
 

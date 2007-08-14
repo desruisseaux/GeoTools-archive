@@ -346,7 +346,7 @@ public class PaletteFactory {
         do {
             factory.getAvailableNames(names);
             factory = factory.parent;
-        } while (parent != null);
+        } while (factory != null);
         return (String[]) names.toArray(new String[names.size()]);
     }
 

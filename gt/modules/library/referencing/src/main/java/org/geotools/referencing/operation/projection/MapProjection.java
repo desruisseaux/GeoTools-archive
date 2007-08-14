@@ -89,6 +89,13 @@ public abstract class MapProjection extends AbstractMathTransform
     private static final double EPSILON = 1E-6;
 
     /**
+     * Maximum difference allowed when comparing longitudes or latitudes in degrees.
+     * This tolerance do not apply to angle in radians. A tolerance of 1E-4 is about
+     * 10 kilometers.
+     */
+    private static final double ANGLE_TOLERANCE = 1E-4;
+
+    /**
      * Difference allowed in iterative computations.
      */
     private static final double ITERATION_TOLERANCE = 1E-10;
@@ -589,7 +596,7 @@ public abstract class MapProjection extends AbstractMathTransform
      * Checks if inverse transform using spherical formulas produces the same result
      * than ellipsoidal formulas. This method is invoked during assertions only.
      * <p>
-     * <strong>Note:</strong> this method ignore the longitude if the latitude is
+     * <strong>Note:</strong> this method ignores the longitude if the latitude is
      * at a pole, because in such case the longitude is meanless.
      *
      * @param longitude The longitude computed by spherical formulas, in radians.
@@ -737,11 +744,11 @@ public abstract class MapProjection extends AbstractMathTransform
         final double x = ptSrc.getX();
         final double y = ptSrc.getY();
         // Note: the following tests should not fails for NaN values.
-        if (x<Longitude.MIN_VALUE-EPSILON || x>Longitude.MAX_VALUE+EPSILON) {
+        if (x < (Longitude.MIN_VALUE - ANGLE_TOLERANCE) || x > (Longitude.MAX_VALUE + ANGLE_TOLERANCE)) {
             throw new PointOutsideEnvelopeException(Errors.format(
                     ErrorKeys.LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)));
         }
-        if (y<Latitude.MIN_VALUE-EPSILON || y>Latitude.MAX_VALUE+EPSILON) {
+        if (y < (Latitude.MIN_VALUE - ANGLE_TOLERANCE) || y > (Latitude.MAX_VALUE + ANGLE_TOLERANCE)) {
             throw new PointOutsideEnvelopeException(Errors.format(
                     ErrorKeys.LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)));
         }
@@ -920,11 +927,11 @@ public abstract class MapProjection extends AbstractMathTransform
             ptDst.setLocation(x,y);
 
             // Note: the following tests should not fails for NaN values.
-            if (x<Longitude.MIN_VALUE-EPSILON || x>Longitude.MAX_VALUE+EPSILON) {
+            if (x < (Longitude.MIN_VALUE - ANGLE_TOLERANCE) || x > (Longitude.MAX_VALUE + ANGLE_TOLERANCE)) {
                 throw new PointOutsideEnvelopeException(Errors.format(
                         ErrorKeys.LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)));
             }
-            if (y<Latitude.MIN_VALUE-EPSILON || y>Latitude.MAX_VALUE+EPSILON) {
+            if (y < (Latitude.MIN_VALUE - ANGLE_TOLERANCE) || y > (Latitude.MAX_VALUE + ANGLE_TOLERANCE)) {
                 throw new PointOutsideEnvelopeException(Errors.format(
                         ErrorKeys.LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)));
             }
