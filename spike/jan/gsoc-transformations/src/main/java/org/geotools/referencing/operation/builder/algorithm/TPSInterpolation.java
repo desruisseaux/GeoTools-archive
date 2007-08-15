@@ -63,9 +63,9 @@ public class TPSInterpolation extends AbstractInterpolation {
     }
 
     @Override
-    public float getGridValue(DirectPosition p) {
+    public float getValue(DirectPosition p) {
         // TODO Auto-generated method stub
-        return -calculateTPSFunction(result, p);
+        return calculateTPSFunction(result, p);
     }
 
     /**

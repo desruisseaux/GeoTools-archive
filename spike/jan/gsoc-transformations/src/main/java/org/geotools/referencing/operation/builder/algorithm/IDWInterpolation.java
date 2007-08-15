@@ -47,7 +47,7 @@ public class IDWInterpolation extends AbstractInterpolation {
         super(positions);
     }
 
-    public float getGridValue(DirectPosition p) {
+    public float getValue(DirectPosition p) {
         return calculateValue(p);
     }
 

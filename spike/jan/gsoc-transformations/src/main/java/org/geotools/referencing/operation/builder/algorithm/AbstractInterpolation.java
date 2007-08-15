@@ -80,7 +80,7 @@ public abstract class AbstractInterpolation {
      * Returns interpolated value in position of specified point
      * @return interpolated value
      */
-    abstract protected float getGridValue(DirectPosition p);
+    abstract protected float getValue(DirectPosition p);
 
     /**
      * Returns array of float of interpolated grid values.
@@ -89,11 +89,12 @@ public abstract class AbstractInterpolation {
      * @return Values of grid coordinates
      */
     private float[] buildGrid() {
+    	
         gridValues = new float[(xNumCells + 1) * (yNumCells + 1)];
 
         for (int i = 0; i <= yNumCells; i++) {
             for (int j = 0; j <= xNumCells; j++) {
-                gridValues[(i * (1 + xNumCells)) + j] = getGridValue(new DirectPosition2D(env.getLowerCorner()
+                gridValues[(i * (1 + xNumCells)) + j] = getValue(new DirectPosition2D(env.getLowerCorner()
                                                                                              .getOrdinate(0)
                             + (j * dx), env.getLowerCorner().getOrdinate(1) + (i * dy)));
             }

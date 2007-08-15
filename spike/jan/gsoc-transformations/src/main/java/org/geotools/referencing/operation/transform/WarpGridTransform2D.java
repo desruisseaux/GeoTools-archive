@@ -164,7 +164,7 @@ public class WarpGridTransform2D extends WarpTransform2D {
     }
 
     public void transform(double[] srcPts, int srcOff, double[] dstPts, int dstOff, int numPts)
-        throws TransformException {
+         {
         // TODO Auto-generated method stub
         //transformToGrid(srcPts, srcOff, srcPts, srcOff, numPts, false);
         double[] helperPts = srcPts.clone();
