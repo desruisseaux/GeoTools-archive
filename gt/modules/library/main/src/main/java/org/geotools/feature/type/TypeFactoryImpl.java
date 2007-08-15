@@ -122,10 +122,8 @@ public class TypeFactoryImpl implements TypeFactory {
 	public ComplexType createComplexType(TypeName name, Collection schema,
 			boolean isIdentifiable, boolean isAbstract, Set restrictions,
 			AttributeType superType, InternationalString description) {
-
-		throw new UnsupportedOperationException();
-//		return new ComplexTypeImpl(name, schema, isIdentifiable, isAbstract,
-//				restrictions, superType, description);
+	    return new ComplexTypeImpl(name, schema, isIdentifiable, isAbstract,
+				restrictions, superType, description);
 	}
 
 //	public GeometryAttributeType createGeometryType( 
