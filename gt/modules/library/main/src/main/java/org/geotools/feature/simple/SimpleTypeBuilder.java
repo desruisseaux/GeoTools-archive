@@ -48,7 +48,7 @@ import org.opengis.util.InternationalString;
  *  builder.minOccurs(0).maxOccurs(2).nillable(false).add("doubleProperty",Double.class);
  *  
  *  //build the type
- *  SimpleFeatureType featureType = builder.feature();
+ *  SimpleFeatureType featureType = builder.buildFeatureType();
  *  </code>
  * </pre>
  * </p>
