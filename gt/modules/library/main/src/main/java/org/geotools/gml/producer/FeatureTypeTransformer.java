@@ -576,7 +576,7 @@ public class FeatureTypeTransformer extends TransformerBase {
 
             atts.addAttribute("", "name", "name", "", attribute.getLocalName());
 
-            if (attribute.isNillable()) {
+            if (attribute.isNillable() && attribute.getMinOccurs() == 0) {
                 atts.addAttribute("", "minOccurs", "minOccurs", "", "0");
 
                 atts.addAttribute("", "nillable", "nillable", "", "true");
