@@ -100,7 +100,7 @@ public class XSTimeBinding implements SimpleBinding {
         throws Exception {
         DatatypeConverter.setDatatypeConverter(DatatypeConverterImpl.theInstance);
 
-        return DatatypeConverter.parseDate((String) value);
+        return DatatypeConverter.parseTime((String) value);
     }
 
     /**
@@ -112,6 +112,6 @@ public class XSTimeBinding implements SimpleBinding {
     public String encode(Object object, String value) {
         Calendar calendar = (Calendar) object;
 
-        return DatatypeConverter.printDate(calendar);
+        return DatatypeConverter.printTime(calendar);
     }
 }
