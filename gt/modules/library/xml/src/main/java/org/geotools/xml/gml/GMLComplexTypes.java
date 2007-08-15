@@ -2750,14 +2750,12 @@ public class GMLComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            ComplexType t = (element.getType() instanceof ComplexType)
-                ? (ComplexType) element.getType() : null;
-
-            while ((t != null) && (t != this))
-                t = (t.getParent() instanceof ComplexType)
-                    ? (ComplexType) t.getParent() : null;
-
-            return ((t != null) && (value instanceof Geometry));
+            //since bounds is a derived attibute in our feature model and not 
+            // an attribute which is modelled explicitly in feature types, there
+            // might not be an element around for it, so we dont require that 
+            // there be one and simply check that the value being encoded is a 
+            // geometry
+            return value instanceof Geometry;
         }
 
         /**
@@ -2796,12 +2794,24 @@ public class GMLComplexTypes {
                 return;
             }
 
-            output.startElement(GMLSchema.NAMESPACE, element.getName(), ai);
-
+            //we handle the case for a null element, see canEncode for details
+            if (element != null) {
+                output.startElement(GMLSchema.NAMESPACE, element.getName(), ai);
+            }
+            else { 
+                output.startElement(GMLSchema.NAMESPACE, "Box", ai);
+            }
+            
 //            Coordinate[] coords = g.getCoordinates();
             Envelope e = g.getEnvelopeInternal();
             encodeCoords(elements[1], e, output);
-            output.endElement(GMLSchema.NAMESPACE, element.getName());
+            
+            if (element != null) {
+                output.endElement(GMLSchema.NAMESPACE, element.getName());
+            }
+            else { 
+                output.endElement(GMLSchema.NAMESPACE, "Box");
+            }
         }
     }
 
