@@ -1,5 +1,7 @@
 package org.geotools.renderer3d.utils.quadtree;
 
+import org.geotools.renderer3d.utils.BoundingRectangle;
+
 /**
  * A quadtree datastructure for fast geometrical look-up of nodes in a certain area.
  * <p/>
@@ -50,4 +52,8 @@ public interface QuadTree<N>
      * @param removedQuadTreeListener should not be null, and should be present.
      */
     void removeQuadTreeListener( QuadTreeListener<N> removedQuadTreeListener );
+
+    void releaseQuadTreeNode( final QuadTreeNode<N> node );
+
+    QuadTreeNode<N> createQuadTreeNode( final BoundingRectangle bounds, final QuadTreeNode<N> parentNode );
 }

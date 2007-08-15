@@ -62,7 +62,7 @@ public final class Renderer3DImpl
 
     private static final int DEFAULT_START_RADIUS_M = 100;
     private static final int DEFAULT_TERRAIN_BLOCK_SIZE_IN_GRIDS = 32;
-    private static final int DEFAULT_TEXTURE_SIZE = 64;
+    private static final int DEFAULT_TEXTURE_SIZE = 128;
     private static final double DEFAULT_VISIBILITY_DISTANCE = 10000.0;
 
     //======================================================================

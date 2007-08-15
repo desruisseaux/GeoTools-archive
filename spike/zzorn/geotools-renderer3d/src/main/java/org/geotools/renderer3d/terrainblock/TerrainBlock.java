@@ -20,4 +20,8 @@ public interface TerrainBlock
      */
     Vector3f getCenter();
 
+    /**
+     * Called from the constructor, and when a TerrainBlock is being re-used.
+     */
+    void updateDerivedData();
 }

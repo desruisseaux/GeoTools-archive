@@ -20,4 +20,11 @@ public interface NodeDataFactory<N>
      */
     N createNodeDataObject( QuadTreeNode<N> node );
 
+    /**
+     * Called when a node is reused, and the corresponding data object could also be reused (or just re-calculated).
+     *
+     * @param node     the reused node.  The node will have its bounding box and parent set.
+     * @param nodeData
+     */
+    N reuseNodeDataObject( final QuadTreeNode<N> node, final N nodeData );
 }

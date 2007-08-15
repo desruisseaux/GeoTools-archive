@@ -23,6 +23,8 @@ public final class TerrainBlockFactory
     //======================================================================
     // Private Fields
 
+    //======================================================================
+    // Private Fields
     private final int myNumberOfGridsPerSide;
 
     private final TextureProvider myTextureProvider;
@@ -52,32 +54,33 @@ public final class TerrainBlockFactory
 
         myTextureImagePool = new Pool<BufferedImage>( new PoolItemFactory<BufferedImage>()
         {
+
             public BufferedImage create()
             {
                 return new BufferedImage( myTextureSize, myTextureSize, BufferedImage.TYPE_4BYTE_ABGR );
             }
+
         } );
 
         myTexturePool = new Pool<Texture>( new PoolItemFactory<Texture>()
         {
+
             public Texture create()
             {
                 return null;
             }
+
         } );
     }
 
     //----------------------------------------------------------------------
-    // NodeDataFactory ImplementationK}}
+    // NodeDataFactory Implementation
 
-    //======================================================================
-    // Public Methods
+    //----------------------------------------------------------------------
+    // NodeDataFactory ImplementationK}}
 
     public TerrainBlock createNodeDataObject( final QuadTreeNode<TerrainBlock> node )
     {
-        System.out.println( "TerrainBlockFactory.createNodeDataObject" );
-        System.out.println( "node.getBounds() = " + node.getBounds() );
-
         final TerrainBlockImpl terrainBlock = new TerrainBlockImpl( node,
                                                                     myNumberOfGridsPerSide,
                                                                     myTexturePool,
@@ -106,6 +109,21 @@ public final class TerrainBlockFactory
         myTextureProvider.requestTexture( node.getBounds(), buffer, terrainBlock );
 
         return terrainBlock;
+    }
+
+
+    public TerrainBlock reuseNodeDataObject( final QuadTreeNode<TerrainBlock> node,
+                                             final TerrainBlock existingTerrainBlock )
+    {
+        if ( existingTerrainBlock == null )
+        {
+            return createNodeDataObject( node );
+        }
+        else
+        {
+            existingTerrainBlock.updateDerivedData();
+            return existingTerrainBlock;
+        }
     }
 
 }

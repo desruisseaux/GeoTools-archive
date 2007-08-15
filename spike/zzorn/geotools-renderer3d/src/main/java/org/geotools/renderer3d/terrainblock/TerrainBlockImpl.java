@@ -31,7 +31,10 @@ public final class TerrainBlockImpl
     // Private Fields
 
     private final int myNumberOfGridsPerSide;
-    private final Vector3f myCenter;
+    private final Pool<Texture> myTexturePool;
+    private final Pool<BufferedImage> myTextureImagePool;
+
+    private Vector3f myCenter;
 
     private QuadTreeNode<TerrainBlock> myQuadTreeNode;
 
@@ -42,8 +45,6 @@ public final class TerrainBlockImpl
     private BufferedImage myMapImage = null;
 
     private boolean myDelted = false;
-    private final Pool<Texture> myTexturePool;
-    private final Pool<BufferedImage> myTextureImagePool;
 
     //======================================================================
     // Public Methods
@@ -72,11 +73,58 @@ public final class TerrainBlockImpl
         myTexturePool = texturePool;
         myTextureImagePool = textureImagePool;
 
-        myCenter = new Vector3f( (float) quadTreeNode.getBounds().getCenterX(),
-                                 (float) quadTreeNode.getBounds().getCenterY(),
-                                 0 ); // TODO: Get ground height at center.
+        updateDerivedData();
 
         myQuadTreeNode.addNodeListener( this );
+    }
+
+    //----------------------------------------------------------------------
+    // NodeListener Implementation
+
+    public void onDeleted( QuadTreeNode<TerrainBlock> quadTreeNode )
+    {
+        checkIfDeleted();
+
+        if ( myTerrain3DNode != null )
+        {
+            myTerrain3DNode.detachAllChildren();
+        }
+
+        myQuadTreeNode = null;
+        myMapImage = null;
+        myTerrainMesh = null;
+        myTerrain3DNode = null;
+
+        myDelted = true;
+    }
+
+
+    public void onCollapsed( QuadTreeNode<TerrainBlock> quadTreeNode )
+    {
+        if ( myTerrain3DNode != null )
+        {
+            for ( Spatial childNodeSpatial : myChildNodeSpatials )
+            {
+                myTerrain3DNode.detachChild( childNodeSpatial );
+            }
+            myChildNodeSpatials.clear();
+
+            myTerrain3DNode.attachChild( getOrCreateTerrainMesh() );
+        }
+    }
+
+
+    public void onExpanded( QuadTreeNode<TerrainBlock> quadTreeNode )
+    {
+        if ( myTerrain3DNode != null )
+        {
+            if ( myTerrainMesh != null )
+            {
+                myTerrain3DNode.detachChild( myTerrainMesh );
+            }
+
+            attachChildNodeSpatials();
+        }
     }
 
     //----------------------------------------------------------------------
@@ -104,41 +152,31 @@ public final class TerrainBlockImpl
         return myTerrain3DNode;
     }
 
-    private void attachChildNodeSpatials()
-    {
-        myChildNodeSpatials.clear();
-        for ( int i = 0; i < myQuadTreeNode.getNumberOfChildren(); i++ )
-        {
-            final QuadTreeNode<TerrainBlock> child = myQuadTreeNode.getChild( i );
-            if ( child != null )
-            {
-                final TerrainBlock childBlock = child.getNodeData();
-                if ( childBlock != null )
-                {
-                    final Spatial childSpatial = childBlock.getSpatial();
-                    myChildNodeSpatials.add( childSpatial );
-                    myTerrain3DNode.attachChild( childSpatial );
-                }
-            }
-        }
-    }
-
-    private TerrainMesh getOrCreateTerrainMesh()
-    {
-        if ( myTerrainMesh == null )
-        {
-            myTerrainMesh = createTerrainMesh();
-        }
-
-        return myTerrainMesh;
-    }
-
 
     public Vector3f getCenter()
     {
         checkIfDeleted();
 
         return myCenter;
+    }
+
+
+    public void updateDerivedData()
+    {
+        final BoundingRectangle bounds = myQuadTreeNode.getBounds();
+        myCenter = new Vector3f( (float) bounds.getCenterX(),
+                                 (float) bounds.getCenterY(),
+                                 0 ); // TODO: Get ground height at center.
+
+        if ( myTerrainMesh != null )
+        {
+            myTerrainMesh.updateBounds( bounds.getX1(), bounds.getY1(), bounds.getX2(), bounds.getY2() );
+            myTerrainMesh.setTextureImage( myMapImage );
+            myMapImage = null;
+        }
+
+        // Make sure the node is collapsed
+        onCollapsed( myQuadTreeNode );
     }
 
     //----------------------------------------------------------------------
@@ -180,6 +218,37 @@ public final class TerrainBlockImpl
     //======================================================================
     // Private Methods
 
+    private void attachChildNodeSpatials()
+    {
+        myChildNodeSpatials.clear();
+        for ( int i = 0; i < myQuadTreeNode.getNumberOfChildren(); i++ )
+        {
+            final QuadTreeNode<TerrainBlock> child = myQuadTreeNode.getChild( i );
+            if ( child != null )
+            {
+                final TerrainBlock childBlock = child.getNodeData();
+                if ( childBlock != null )
+                {
+                    final Spatial childSpatial = childBlock.getSpatial();
+                    myChildNodeSpatials.add( childSpatial );
+                    myTerrain3DNode.attachChild( childSpatial );
+                }
+            }
+        }
+    }
+
+
+    private TerrainMesh getOrCreateTerrainMesh()
+    {
+        if ( myTerrainMesh == null )
+        {
+            myTerrainMesh = createTerrainMesh();
+        }
+
+        return myTerrainMesh;
+    }
+
+
     private void checkIfDeleted()
     {
         if ( myDelted )
@@ -210,50 +279,5 @@ public final class TerrainBlockImpl
         return terrainMesh;
     }
 
-    public void onDeleted( QuadTreeNode<TerrainBlock> quadTreeNode )
-    {
-        checkIfDeleted();
-
-        if ( myTerrain3DNode != null )
-        {
-            myTerrain3DNode.detachAllChildren();
-        }
-
-        myQuadTreeNode = null;
-        myMapImage = null;
-        myTerrainMesh = null;
-        myTerrain3DNode = null;
-
-        myDelted = true;
-    }
-
-    public void onCollapsed( QuadTreeNode<TerrainBlock> quadTreeNode )
-    {
-        if ( myTerrain3DNode != null )
-        {
-            for ( Spatial childNodeSpatial : myChildNodeSpatials )
-            {
-                myTerrain3DNode.detachChild( childNodeSpatial );
-
-                // REFACTOR: Collect discarded meshes (or TerrainBlocks?) and reuse them through a pool system.
-            }
-            myChildNodeSpatials.clear();
-
-            myTerrain3DNode.attachChild( getOrCreateTerrainMesh() );
-        }
-    }
-
-    public void onExpanded( QuadTreeNode<TerrainBlock> quadTreeNode )
-    {
-        if ( myTerrain3DNode != null )
-        {
-            if ( myTerrainMesh != null )
-            {
-                myTerrain3DNode.detachChild( myTerrainMesh );
-            }
-
-            attachChildNodeSpatials();
-        }
-    }
 }
 

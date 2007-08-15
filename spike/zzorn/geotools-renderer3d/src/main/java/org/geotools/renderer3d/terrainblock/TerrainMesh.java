@@ -34,10 +34,10 @@ public final class TerrainMesh
 
     private static int theTerrainMeshCounter = 0;
 
-    private final double myX1;
-    private final double myY1;
-    private final double myX2;
-    private final double myY2;
+    private double myX1;
+    private double myY1;
+    private double myX2;
+    private double myY2;
     private final double myZ;
     private final double mySkirtSize;
     private final FloatBuffer myVertexes;
@@ -99,12 +99,6 @@ public final class TerrainMesh
         // Check parameters
         ParameterChecker.checkPositiveNonZeroInteger( sizeXCells, "sizeXCells" );
         ParameterChecker.checkPositiveNonZeroInteger( sizeYCells, "sizeYCells" );
-        ParameterChecker.checkNormalNumber( x1, "x1" );
-        ParameterChecker.checkNormalNumber( y1, "y1" );
-        ParameterChecker.checkNormalNumber( x2, "x2" );
-        ParameterChecker.checkNormalNumber( y2, "y2" );
-        ParameterChecker.checkLargerThan( x2, "x2", x1, "x1" );
-        ParameterChecker.checkLargerThan( y2, "y2", y1, "y1" );
         ParameterChecker.checkNormalNumber( z, "z" );
         ParameterChecker.checkNotNull( textureImagePool, "textureImagePool" );
 
@@ -115,10 +109,6 @@ public final class TerrainMesh
         mySizeY_cells = sizeYCells;
         mySizeX_vertices = mySizeX_cells + 1 + 2;
         mySizeY_vertices = mySizeY_cells + 1 + 2;
-        myX1 = x1;
-        myY1 = y1;
-        myX2 = x2;
-        myY2 = y2;
         myZ = z;
         myTextureImagePool = textureImagePool;
 
@@ -136,11 +126,42 @@ public final class TerrainMesh
         myNormals = BufferUtils.createVector3Buffer( myNumberOfVertices );
         myIndices = BufferUtils.createIntBuffer( myNumberOfIndices );
 
-        // Put vertices in a grid formation in the correct place in the world
-        initializeVetices();
-
         // Stich together the vertices into triangles
         initializeIndices();
+
+        updateBounds( x1, y1, x2, y2 );
+    }
+
+
+    /**
+     * Updates the positon and covered area of the terrain mesh.
+     * <p/>
+     * Called from the constructor, as well as when a TerrainMesh is re-used.
+     *
+     * @param x1 first world coordinate.
+     * @param y1 first world coordinate.
+     * @param x2 second world coordinate.  Should be larger than the first.
+     * @param y2 second world coordinate.  Should be larger than the first.
+     */
+    public void updateBounds( final double x1,
+                              final double y1,
+                              final double x2,
+                              final double y2 )
+    {
+        ParameterChecker.checkNormalNumber( x1, "x1" );
+        ParameterChecker.checkNormalNumber( y1, "y1" );
+        ParameterChecker.checkNormalNumber( x2, "x2" );
+        ParameterChecker.checkNormalNumber( y2, "y2" );
+        ParameterChecker.checkLargerThan( x2, "x2", x1, "x1" );
+        ParameterChecker.checkLargerThan( y2, "y2", y1, "y1" );
+
+        myX1 = x1;
+        myY1 = y1;
+        myX2 = x2;
+        myY2 = y2;
+
+        // Put vertices in a grid formation in the correct place in the world
+        initializeVetices();
 
         // Initialize the TriMesh
         setVertexBuffer( 0, myVertexes );

@@ -93,7 +93,7 @@ public interface QuadTreeNode<N>
     /**
      * Removes / releases allocated resources of this node and all its child nodes.
      */
-    void delete();
+//    void delete();
 
     /**
      * @return true if this node covers the area defined by the centerpoint and the radius, false otherwise.
@@ -131,5 +131,27 @@ public interface QuadTreeNode<N>
      */
     void removeNodeListener(
             NodeListener<N> removedNodeListener );
+
+    /**
+     * Removes this node from its parent, and marks it as detached.  Detached nodes may later be reused by attaching them.
+     */
+    void detach();
+
+    /**
+     * Attaches this node to the specified parent.  Used when re-using detached nodes.
+     */
+    void attach( final BoundingRectangle bounds, QuadTreeNode<N> parent );
+
+    /**
+     * @return true if this node is attached (part of a quadtree), false if it is detached (not currently used).
+     */
+    boolean isAttached();
+
+    /**
+     * Expand this QuadTreeNode, and use the specified child node for the specified subquadrant.
+     * <p/>
+     * Called by the quad tree code when a new root node is created, should not be called from client code.
+     */
+    void expandWithChild( final int childSubquadrant, final QuadTreeNode<N> childNode );
 }
 

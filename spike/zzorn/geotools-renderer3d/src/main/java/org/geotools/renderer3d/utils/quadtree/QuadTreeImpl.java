@@ -1,8 +1,10 @@
 package org.geotools.renderer3d.utils.quadtree;
 
+import org.geotools.renderer3d.utils.BoundingRectangle;
 import org.geotools.renderer3d.utils.ParameterChecker;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -35,6 +37,10 @@ public class QuadTreeImpl<N>
             return null;
         }
 
+        public Object reuseNodeDataObject( final QuadTreeNode node, final Object nodeData )
+        {
+            return null;
+        }
     };
 
     //======================================================================
@@ -110,6 +116,39 @@ public class QuadTreeImpl<N>
         ParameterChecker.checkContained( removedQuadTreeListener, myListeners, "myListeners" );
 
         myListeners.remove( removedQuadTreeListener );
+    }
+
+
+    private final LinkedList<QuadTreeNode<N>> myQuadTreeNodePool = new LinkedList<QuadTreeNode<N>>();
+
+    public QuadTreeNode<N> createQuadTreeNode( final BoundingRectangle bounds,
+                                               final QuadTreeNode<N> parentNode )
+    {
+        final QuadTreeNode<N> quadTreeNode;
+        if ( myQuadTreeNodePool.isEmpty() )
+        {
+            quadTreeNode = new QuadTreeNodeImpl<N>( this, bounds, parentNode );
+            quadTreeNode.setNodeData( myNodeDataFactory.createNodeDataObject( quadTreeNode ) );
+        }
+        else
+        {
+            quadTreeNode = myQuadTreeNodePool.removeLast();
+            quadTreeNode.attach( bounds, parentNode );
+            quadTreeNode.setNodeData( myNodeDataFactory.reuseNodeDataObject( quadTreeNode,
+                                                                             quadTreeNode.getNodeData() ) );
+        }
+
+        return quadTreeNode;
+    }
+
+
+    public void releaseQuadTreeNode( final QuadTreeNode<N> node )
+    {
+        node.detach();
+
+        myQuadTreeNodePool.addLast( node );
+
+        // TODO: Notify node data factory about the detachment ??
     }
 
     //======================================================================
