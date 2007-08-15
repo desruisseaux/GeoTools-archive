@@ -15,7 +15,7 @@ public class BindingConfigurationTemplate
     return result;
   }
 
-  protected final String NL = nl == null ? (System.getProperties().getProperty("line.separator")) : nl;
+  public final String NL = nl == null ? (System.getProperties().getProperty("line.separator")) : nl;
   protected final String TEXT_1 = NL + "import org.geotools.xml.BindingConfiguration;" + NL + "import org.picocontainer.MutablePicoContainer;" + NL + "" + NL + "/**" + NL + " * Binding configuration for the ";
   protected final String TEXT_2 = " schema." + NL + " *" + NL + " * @generated" + NL + " */" + NL + "public final class ";
   protected final String TEXT_3 = "BindingConfiguration" + NL + "\timplements BindingConfiguration {" + NL + "" + NL + "" + NL + "\t/**" + NL + "\t * @generated modifiable" + NL + "\t */" + NL + "\tpublic void configure(MutablePicoContainer container) {" + NL + "\t";

@@ -1,8 +1,20 @@
 package org.geotools.maven.xmlcodegen;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.eclipse.xsd.XSDSchema;
+import org.opengis.feature.type.Schema;
 
 
 /**
@@ -25,6 +37,17 @@ public class SchemaGeneratorMojo extends AbstractGeneratorMojo {
 	 * @parameter expression="true"
 	 */
 	boolean includeSimpleTypes;
+	/**
+	 * Flag controlling wether complex types should be composed of geotools 
+	 * attribute descriptors which mirror the xml schema particles.
+	 * @parameter expression="true"
+	 */
+	boolean followComplexTypes;
+	/**
+	 * List of schema classes to use as imports
+	 * @parameter
+	 */
+	String[] imports;
 	
 	public void execute() throws MojoExecutionException, MojoFailureException {
     	XSDSchema schema = schema();
@@ -37,7 +60,68 @@ public class SchemaGeneratorMojo extends AbstractGeneratorMojo {
         generator.setSimpleTypes( includeSimpleTypes );
     	generator.setOverwriting( overwriteExistingFiles );
 		generator.setLocation( outputDirectory.getAbsolutePath() );
-        
+		generator.setFollowComplexTypes(followComplexTypes);
+		generator.setIncludes( includes );
+		
+		if (imports != null) {
+		    //build a url classload from dependencies
+		    List urls = new ArrayList();
+	        for ( Iterator d = project.getDependencies().iterator(); d.hasNext(); ) {
+	            Dependency dep = (Dependency) d.next();
+	            
+	            Artifact artifact = artifactFactory.createArtifact( 
+                    dep.getGroupId(), dep.getArtifactId(), dep.getVersion(), null, dep.getType()
+                );
+	            try {
+	                artifactResolver.resolve( artifact, remoteRepositories, localRepository );
+	                urls.add( artifact.getFile().toURL() );
+	            } 
+	            catch( Exception e ) {
+	                getLog().error( "Unable to resolve " + artifact.getId() );
+	            }
+	        }
+	        
+	        //add compiled classes to classloader
+	        try {
+	            urls.add( new File(project.getBuild().getOutputDirectory()).toURL() );    
+	        }
+	        catch( MalformedURLException e ) {
+	            getLog().error("Bad url: " + project.getBuild().getOutputDirectory() );
+	            return;
+	        }
+	        
+	        
+	        ClassLoader ext = 
+	            new URLClassLoader( (URL[]) urls.toArray( new URL[ urls.size() ] ), getClass().getClassLoader() );
+
+		    for ( int i = 0; i < imports.length; i++ ) {
+		        String schemaClassName = imports[i];
+		        Class schemaClass = null;
+		        try {
+                    schemaClass = ext.loadClass(schemaClassName);
+                } 
+		        catch (ClassNotFoundException e) {
+		            getLog().error("Could note load class: " + schemaClassName);
+                    return;
+		        }
+		        
+		        getLog().info("Loading import schema: " + schemaClassName);
+		        Schema gtSchema = null;
+		        try {
+                    gtSchema = (Schema) schemaClass.newInstance();
+                } 
+		        catch( Exception e ) {
+		            getLog().error("Could not insantiate class: " + schemaClass.getName());
+		            return;
+		        }
+		        
+		        if ( gtSchema != null ) {
+		            generator.addImport(gtSchema);
+		        }
+		    }
+		    
+		}
+		
         try {
 			generator.generate( );
 		} 

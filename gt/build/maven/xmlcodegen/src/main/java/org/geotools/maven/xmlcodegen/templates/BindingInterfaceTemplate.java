@@ -16,7 +16,7 @@ public class BindingInterfaceTemplate
     return result;
   }
 
-  protected final String NL = nl == null ? (System.getProperties().getProperty("line.separator")) : nl;
+  public final String NL = nl == null ? (System.getProperties().getProperty("line.separator")) : nl;
   protected final String TEXT_1 = NL + "import javax.xml.namespace.QName;" + NL + "" + NL + "/**" + NL + " * This interface contains the qualified names of all the types,elements, and " + NL + " * attributes in the ";
   protected final String TEXT_2 = " schema." + NL + " *" + NL + " * @generated" + NL + " */" + NL + "public interface ";
   protected final String TEXT_3 = " {" + NL + "" + NL + "\t/** @generated */" + NL + "\tpublic static final String NAMESPACE = \"";

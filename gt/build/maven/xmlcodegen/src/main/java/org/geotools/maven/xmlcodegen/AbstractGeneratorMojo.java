@@ -77,6 +77,14 @@ public abstract class AbstractGeneratorMojo extends AbstractMojo {
 	protected boolean overwriteExistingFiles;
 	
 	/**
+     * List of names of attributes, elements, and types to include, if unset all will
+     * be generated.
+     * 
+     * @parameter
+     */
+    protected String[] includes;
+	
+	/**
      * The currently executing project
      * 
      * @parameter expression="${project}"

@@ -15,26 +15,47 @@
  */
 package org.geotools.maven.xmlcodegen;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import org.eclipse.xsd.XSDComplexTypeDefinition;
+import org.eclipse.xsd.XSDElementDeclaration;
+import org.eclipse.xsd.XSDParticle;
 import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.eclipse.xsd.XSDTypeDefinition;
 import org.eclipse.xsd.util.XSDConstants;
 import org.eclipse.xsd.util.XSDUtil;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.type.SchemaImpl;
+import org.geotools.feature.type.TypeFactoryImpl;
+import org.geotools.feature.type.TypeName;
+import org.geotools.graph.build.GraphGenerator;
+import org.geotools.graph.build.basic.BasicDirectedGraphGenerator;
+import org.geotools.graph.structure.Graph;
+import org.geotools.graph.structure.Graphable;
+import org.geotools.graph.traverse.GraphTraversal;
+import org.geotools.graph.traverse.GraphWalker;
+import org.geotools.graph.traverse.basic.BasicGraphTraversal;
+import org.geotools.graph.traverse.standard.DirectedDepthFirstTopologicalIterator;
+import org.geotools.graph.util.graph.CycleDetector;
+import org.geotools.graph.util.graph.DirectedCycleDetector;
 import org.geotools.xml.Schemas;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.Schema;
+import org.opengis.feature.type.TypeFactory;
 
 
 /**
@@ -63,8 +84,7 @@ public class SchemaGenerator extends AbstractGenerator {
     /**
      * Factory used to build geotools types.
      */
-
-    //TypeFactory factory;
+    TypeFactory factory;
     /**
      * Flag indicating wether simple types should be processed.
      */
@@ -88,18 +108,24 @@ public class SchemaGenerator extends AbstractGenerator {
     HashMap /*<String,Schema>*/ imports;
 
     /**
+     * Set of names of types names to include in the generated output.
+     */
+    Set/*<String>*/ includes;
+    
+    /**
      * Logger
      */
     Logger logger = Logger.getLogger("org.geotools.xml");
 
-    public SchemaGenerator(XSDSchema schema /*, TypeFactory factory*/) {
+    public SchemaGenerator(XSDSchema schema) {
         this.schema = schema;
-        //this.factory = factory;
+        this.factory = new TypeFactoryImpl();
         types = new HashMap();
         simpleTypes = true;
         complexTypes = true;
         followComplexTypes = true;
         imports = new HashMap();
+        includes = new HashSet();
     }
 
     /**
@@ -137,6 +163,20 @@ public class SchemaGenerator extends AbstractGenerator {
         this.followComplexTypes = followComplexTypes;
     }
 
+    /**
+     * Sets the type names for which to include in the generated schema.
+     * 
+     */
+    public void setIncludes(String[] includes) {
+        if ( includes == null ) {
+            this.includes = Collections.EMPTY_SET;
+        }
+        else {
+            this.includes = new HashSet(Arrays.asList(includes));    
+        }
+        
+    }
+    
     /**
      * Provide an explicit mapping from an XSD type
      * @param namespace
@@ -214,7 +254,7 @@ public class SchemaGenerator extends AbstractGenerator {
      * Generates the Geotools schema from the XML schema.
      */
     public void generate() throws Exception {
-        List typeDefs = GeneratorUtils.allTypes( schema );
+        List typeDefs = GeneratorUtils.types( schema, includes );
 
         //process simple types
         if (simpleTypes) {
@@ -264,8 +304,7 @@ public class SchemaGenerator extends AbstractGenerator {
 
         for (Iterator itr = types.values().iterator(); itr.hasNext();) {
             AttributeType gtType = (AttributeType) itr.next();
-            gtSchema.put(new org.geotools.feature.Name(
-                    schema.getTargetNamespace(), gtType.getLocalName()), gtType);
+            gtSchema.put(gtType.getName(), gtType);
         }
 
         Object[] input = new Object[] {
@@ -290,83 +329,83 @@ public class SchemaGenerator extends AbstractGenerator {
      *  </p>
      */
 
-    //	public List sort() {
-    //		//build a directed graph representing dependencies among types
-    //		GraphGenerator gg = new BasicDirectedGraphGenerator();
-    //		
-    //		for (Iterator itr = types.values().iterator(); itr.hasNext();) {
-    //			AttributeType type = (AttributeType) itr.next();
-    //			AttributeType superType =  type.getSuper();
-    //			
-    //			if (superType != null) {
-    //				//add edge type -> parent
-    //				gg.add(new Object[]{type,superType});
-    //			}
-    //			
-    //			if (type instanceof ComplexType) {
-    //				ComplexType cType = (ComplexType) type;
-    //				
-    //				//add an edge for each descriptor
-    //				Collection atts = cType.attributes();
-    //				for (Iterator aitr = atts.iterator(); aitr.hasNext();) {
-    //					AttributeDescriptor ad = (AttributeDescriptor) aitr.next();
-    //					gg.add(new Object[]{type,ad.getType()});
-    //				}
-    //			}
-    //		}
-    //		
-    //		Graph graph = gg.getGraph();
-    //		
-    //		//test the graph for cycles
-    //		CycleDetector cycleDetector = new DirectedCycleDetector(graph);
-    //		if (cycleDetector.containsCycle()) {
-    //			logger.info("Cycle found");
-    //			return null;
-    //		}
-    //			 
-    //		
-    //		//no cycles, perform a topological sorting of the graph
-    //		DirectedDepthFirstTopologicalIterator iterator = 
-    //			new DirectedDepthFirstTopologicalIterator();
-    //		
-    //		final ArrayList sorted = new ArrayList();
-    //		GraphWalker walker = new GraphWalker() {
-    //			
-    //			public int visit(Graphable element, GraphTraversal traversal) {
-    //				AttributeType type = (AttributeType) element.getObject();
-    //				
-    //				//only add if in this schema
-    //				if (type.getName().getNamespaceURI().equals(schema.getTargetNamespace())) {
-    //					sorted.add(element.getObject());	
-    //				}
-    //				
-    //				return GraphTraversal.CONTINUE;
-    //			}
-    //			
-    //			public void finish() { }
-    //		};
-    //		
-    //		GraphTraversal traversal = 
-    //			new BasicGraphTraversal(graph,walker,iterator);
-    //		traversal.init();
-    //		traversal.traverse();
-    //		
-    //		assert sorted.size() == types.size();
-    //		Collections.reverse(sorted);
-    //		
-    //		return sorted;
-    //	}
+	public List sort() {
+		//build a directed graph representing dependencies among types
+		GraphGenerator gg = new BasicDirectedGraphGenerator();
+		
+		for (Iterator itr = types.values().iterator(); itr.hasNext();) {
+			AttributeType type = (AttributeType) itr.next();
+			AttributeType superType =  type.getSuper();
+			
+			if (superType != null) {
+				//add edge type -> parent
+				gg.add(new Object[]{type,superType});
+			}
+			
+			if (type instanceof ComplexType) {
+				ComplexType cType = (ComplexType) type;
+				
+				//add an edge for each descriptor
+				Collection atts = cType.attributes();
+				for (Iterator aitr = atts.iterator(); aitr.hasNext();) {
+					AttributeDescriptor ad = (AttributeDescriptor) aitr.next();
+					gg.add(new Object[]{type,ad.getType()});
+				}
+			}
+		}
+		
+		Graph graph = gg.getGraph();
+		
+		//test the graph for cycles
+		CycleDetector cycleDetector = new DirectedCycleDetector(graph);
+		if (cycleDetector.containsCycle()) {
+			logger.info("Cycle found");
+			return null;
+		}
+			 
+		
+		//no cycles, perform a topological sorting of the graph
+		DirectedDepthFirstTopologicalIterator iterator = 
+			new DirectedDepthFirstTopologicalIterator();
+		
+		final ArrayList sorted = new ArrayList();
+		GraphWalker walker = new GraphWalker() {
+			
+			public int visit(Graphable element, GraphTraversal traversal) {
+				AttributeType type = (AttributeType) element.getObject();
+				
+				//only add if in this schema
+				if (type.getName().getNamespaceURI().equals(schema.getTargetNamespace())) {
+					sorted.add(element.getObject());	
+				}
+				
+				return GraphTraversal.CONTINUE;
+			}
+			
+			public void finish() { }
+		};
+		
+		GraphTraversal traversal = 
+			new BasicGraphTraversal(graph,walker,iterator);
+		traversal.init();
+		traversal.traverse();
+		
+		assert sorted.size() == types.size();
+		Collections.reverse(sorted);
+		
+		return sorted;
+	}
 
-    //	private AttributeType createType(XSDTypeDefinition xsdType) {
-    //		if (xsdType instanceof XSDSimpleTypeDefinition) {
-    //			return createType((XSDSimpleTypeDefinition)xsdType);
-    //		}
-    //		else {
-    //			return createType((XSDComplexTypeDefinition)xsdType);
-    //		}
-    //	}
-    private AttributeType createType( /*XSDSimpleTypeDefinition*/
-        XSDTypeDefinition xsdType) {
+	private AttributeType createType(XSDTypeDefinition xsdType) {
+		if (xsdType instanceof XSDSimpleTypeDefinition) {
+			return createType((XSDSimpleTypeDefinition)xsdType);
+		}
+		else {
+			return createType((XSDComplexTypeDefinition)xsdType);
+		}
+	}
+	
+    private AttributeType createType( XSDSimpleTypeDefinition xsdType ) {
         if (types.containsKey(xsdType)) {
             return (AttributeType) types.get(xsdType);
         }
@@ -377,90 +416,98 @@ public class SchemaGenerator extends AbstractGenerator {
         }
 
         //first build super type
-//        AttributeType superType = null;
-//        XSDTypeDefinition baseType = xsdType.getBaseType();
-//
-//        if ((baseType != null) && !baseType.equals(xsdType)) {
-//            if (baseType.getName() != null) {
-//                //ignore unamed types
-//                //superType = createType((XSDSimpleTypeDefinition)baseType);
-//                superType = createType(baseType);
-//                assert superType != null;
-//            }
-//        }
+        AttributeType superType = null;
+        XSDTypeDefinition baseType = xsdType.getBaseType();
+
+        if ((baseType != null) && !baseType.equals(xsdType)) {
+            if (baseType.getName() != null) {
+                //ignore unamed types
+                //superType = createType((XSDSimpleTypeDefinition)baseType);
+                superType = createType(baseType);
+                assert superType != null;
+            }
+        }
 
         //TODO: actually derive valus from type
-        //		AttributeType gtType = factory.createAttributeType(
-        //			name(xsdType), Object.class, false, false, Collections.EMPTY_SET, 
-        //			superType, null
-        //		);
-        AttributeType gtType = AttributeTypeFactory.newAttributeType(xsdType
-                .getName(), Object.class);
+		AttributeType gtType = factory.createAttributeType(
+			typeName(xsdType), Object.class, false, false, Collections.EMPTY_SET, 
+			superType, null
+		);
         types.put(xsdType, gtType);
 
         return gtType;
     }
 
-    //	private AttributeType createType(XSDComplexTypeDefinition xsdType) {
-    //		//already processed?
-    //		if (types.containsKey(xsdType)) {
-    //			return (AttributeType) types.get(xsdType);
-    //		}
-    //		
-    //		//import?
-    //		if (!xsdType.getTargetNamespace().equals(schema.getTargetNamespace())) {
-    //			return findType(xsdType);
-    //		}
-    //		
-    //		//first build super type
-    //		AttributeType/*ComplexType*/ superType = null;
-    //		XSDTypeDefinition baseType = xsdType.getBaseType();
-    //		if (baseType != null && !baseType.equals(xsdType)) {
-    //			if (baseType.getName() != null) {
-    //				//ignore unamed types
-    //				superType = createType(/*(XSDComplexTypeDefinition)*/baseType);
-    //				assert superType != null;
-    //			}
-    //		}
-    //		
-    //		// now build child types
-    //		ArrayList properties = new ArrayList();
-    //		if (followComplexTypes) {
-    //			List children = Schemas.getChildElementDeclarations(xsdType);
-    //			for (Iterator itr = children.iterator(); itr.hasNext();) {
-    //				XSDElementDeclaration element = 
-    //					(XSDElementDeclaration) itr.next();
-    //				XSDTypeDefinition childType = element.getTypeDefinition();
-    //				
-    //				AttributeType gtType = createType(childType);
-    //				assert gtType != null;
-    //				
-    //				String uri = element.getTargetNamespace();
-    //				String name = element.getName();
-    //				
-    //				//TODO: minOccurs
-    //				//TODO: maxOccurs
-    //				//TODO: nillable
-    //				AttributeDescriptor ad = factory.createAttributeDescriptor(
-    //					gtType, new org.geotools.util.Name(uri,name),1,1,false
-    //				);
-    //				properties.add(ad);
-    //			}
-    //		}
-    //		
-    //		
-    //		//TODO: isIdentifiable
-    //		//TODO: restrictions
-    //		//TODO: description
-    //		ComplexType gtType = factory.createComplexType(
-    //			name(xsdType), properties, false, xsdType.isAbstract(), 
-    //			Collections.EMPTY_SET, superType, null
-    //		);
-    //		types.put(xsdType,gtType);
-    //		return gtType;
-    //	}
+	private AttributeType createType(XSDComplexTypeDefinition xsdType) {
+		//already processed?
+		if (types.containsKey(xsdType)) {
+			return (AttributeType) types.get(xsdType);
+		}
+		
+		//import?
+		if (!xsdType.getTargetNamespace().equals(schema.getTargetNamespace())) {
+			return findType(xsdType);
+		}
+		
+		//first build super type
+		AttributeType/*ComplexType*/ superType = null;
+		XSDTypeDefinition baseType = xsdType.getBaseType();
+		if (baseType != null && !baseType.equals(xsdType)) {
+			if (baseType.getName() != null) {
+				//ignore unamed types
+				superType = createType(/*(XSDComplexTypeDefinition)*/baseType);
+				assert superType != null;
+			}
+		}
+		
+		// now build child types
+		ArrayList properties = new ArrayList();
+		if (followComplexTypes) {
+			List children = Schemas.getChildElementParticles(xsdType, false);
+			for (Iterator itr = children.iterator(); itr.hasNext();) {
+			    XSDParticle particle = (XSDParticle) itr.next();
+				XSDElementDeclaration element = (XSDElementDeclaration) particle.getContent();
+				if (element.isElementDeclarationReference()) {
+				    element = element.getResolvedElementDeclaration();
+				}
+				
+				XSDTypeDefinition childType = element.getTypeDefinition();
+				
+				AttributeType gtType = createType(childType);
+				assert gtType != null;
+				
+				String uri = element.getTargetNamespace();
+				String name = element.getName();
+				
+				int minOccurs = particle.getMinOccurs();
+				int maxOccurs = particle.getMaxOccurs();
+				if (maxOccurs == -1) {
+				    maxOccurs = Integer.MAX_VALUE;
+				}
+				boolean isNillable = element.isNillable();
+				
+				//TODO: default value
+				AttributeDescriptor ad = factory.createAttributeDescriptor(
+					gtType, new org.geotools.feature.Name(uri,name),minOccurs, maxOccurs, isNillable, null
+				);
+				properties.add(ad);
+			}
+		}
+		
+		
+		//TODO: isIdentifiable
+		//TODO: restrictions
+		//TODO: description
+		ComplexType gtType = factory.createComplexType(
+			typeName(xsdType), properties, false, xsdType.isAbstract(), 
+			Collections.EMPTY_SET, superType, null
+		);
+		types.put(xsdType,gtType);
+		return gtType;
+	}
+	
     private AttributeType findType(XSDTypeDefinition xsdType) {
-        Name name = name(xsdType);
+        TypeName name = typeName(xsdType);
 
         if (imports != null) {
             for (Iterator itr = imports.values().iterator(); itr.hasNext();) {
@@ -480,6 +527,13 @@ public class SchemaGenerator extends AbstractGenerator {
      */
     private Name name(XSDTypeDefinition type) {
         return new org.geotools.feature.Name(type.getTargetNamespace(),
+            type.getName());
+    }
+    /**
+     * Convenience method for gettign the typeName of a type.
+     */
+    private TypeName typeName(XSDTypeDefinition type) {
+        return new org.geotools.feature.type.TypeName(type.getTargetNamespace(),
             type.getName());
     }
 

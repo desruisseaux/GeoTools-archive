@@ -84,14 +84,6 @@ public class BindingGeneratorMojo extends AbstractGeneratorMojo {
     boolean generateTypeBindings;
 	
     /**
-     * List of names of attributes, elements, and types to include, if unset all will
-     * be generated.
-     * 
-     * @parameter
-     */
-    String[] includes;
-    
-    /**
      * List of constructor arguments that should be supplied to generated bindings
      * 
      * @parameter

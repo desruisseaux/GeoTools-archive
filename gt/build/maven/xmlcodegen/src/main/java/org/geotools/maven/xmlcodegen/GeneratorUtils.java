@@ -3,6 +3,7 @@ package org.geotools.maven.xmlcodegen;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDParticle;
@@ -63,5 +64,32 @@ public class GeneratorUtils {
     	
     	types.addAll( anonymous );
     	return types;
+	}
+	
+	/**
+     * Returns all the types defined in <param>schema</param> whose names are 
+     * included in the specified set of names.
+     * <p>
+     * If <tt>names</tt> is null or empty all types are returned.
+     * </p>
+     * @param schema the schema.
+     * @param names the names of types to include.
+     * 
+     * @return A list of types, including anonymous complex types.
+     */
+	public static List types( XSDSchema schema, Set names ) {
+	    List allTypes = allTypes( schema );
+	    if ( names != null && !names.isEmpty() ) {
+	        for (Iterator t = allTypes.iterator(); t.hasNext(); ) {
+	            XSDTypeDefinition type = (XSDTypeDefinition) t.next();
+	            if ( type.getName() != null && names.contains(type.getName())) {
+	                continue;
+	            }
+	            
+	            t.remove();
+	        }
+	    }
+	    
+	    return allTypes;
 	}
 }

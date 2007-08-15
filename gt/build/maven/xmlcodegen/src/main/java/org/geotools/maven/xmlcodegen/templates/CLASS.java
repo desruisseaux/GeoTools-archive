@@ -17,7 +17,7 @@ public class CLASS
     return result;
   }
 
-  protected final String NL = nl == null ? (System.getProperties().getProperty("line.separator")) : nl;
+  public final String NL = nl == null ? (System.getProperties().getProperty("line.separator")) : nl;
   protected final String TEXT_1 = NL + "import org.geotools.xml.*;" + NL;
   protected final String TEXT_2 = NL + "import ";
   protected final String TEXT_3 = ";\t\t";
