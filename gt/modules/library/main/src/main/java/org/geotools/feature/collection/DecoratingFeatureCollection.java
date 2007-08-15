@@ -38,7 +38,10 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class DecoratingFeatureCollection implements FeatureCollection {
 
-	FeatureCollection delegate;
+    /**
+     * the delegate
+     */
+	protected FeatureCollection delegate;
 
 	protected DecoratingFeatureCollection(FeatureCollection delegate) {
 		this.delegate = delegate;
