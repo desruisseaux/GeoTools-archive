@@ -16,6 +16,7 @@ import org.geotools.feature.Name;
 import org.geotools.feature.type.AssociationDescriptorImpl;
 import org.geotools.feature.type.AssociationTypeImpl;
 import org.geotools.feature.type.TypeName;
+import org.geotools.resources.Utilities;
 import org.opengis.feature.simple.SimpleFeatureCollectionType;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AssociationType;
@@ -119,4 +120,23 @@ public class BaseFeatureCollectionType extends DefaultFeatureType
 		return false;
 	}
 
+	public boolean equals(Object other) {
+	    if ( other instanceof BaseFeatureCollectionType ) {
+	        if ( super.equals( other ) ) {
+	            return Utilities.equals( memberType, ((BaseFeatureCollectionType)other).memberType);
+	        }
+	    }
+	    
+	    return false;
+	}
+	
+	
+	public int hashCode() {
+	    int hash = super.hashCode();
+	    if ( memberType != null ) {
+	        hash ^= memberType.hashCode();
+	    }
+	    
+	    return hash;
+	}
 }
