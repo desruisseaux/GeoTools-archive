@@ -159,15 +159,7 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
         Object metaData ){
             
         if( Geometry.class.isAssignableFrom( clazz) && metaData instanceof CoordinateReferenceSystem ){
-            LengthFunction length = (LengthFunction) ff.function("LengthFunction",
-                    new Expression[] { ff.property(name) });
-            Filter cf = null;
-            try {
-                cf = ff.lessOrEqual(length, ff.literal(fieldLength));
-            } catch (IllegalFilterException e) {
-                // TODO something
-            }
-            Filter f = cf == null ? Filter.EXCLUDE : cf;
+            Filter f = length(fieldLength,name);
             return new GeometricAttributeType(name,clazz,isNillable,minOccurs(isNillable),1, defaultValue, (CoordinateReferenceSystem) metaData,f);
         }
         return createAttributeType( name, clazz, isNillable, fieldLength, defaultValue );
