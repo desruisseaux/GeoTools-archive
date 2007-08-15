@@ -34,6 +34,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * another FeatureCollection and override the relevant methods. 
  * </p>
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
+ * @since 2.5
  *
  */
 public class DecoratingFeatureCollection implements FeatureCollection {
