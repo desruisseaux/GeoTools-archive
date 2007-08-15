@@ -130,6 +130,18 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.geotools.maven</groupId>
+        <artifactId>gt2-xmlcodegen</artifactId>
+        <configuration>
+          <schemaLocation>feature.xsd</schemaLocation>
+          <schemaSourceDirectory>${basedir}/src/main/resources/org/geotools/gml2/</schemaSourceDirectory>
+          <imports>
+            <import>org.geotools.xs.XSSchema</import>
+          </imports>
+        </configuration>
+      </plugin>
+
     </plugins>
   </build>
   

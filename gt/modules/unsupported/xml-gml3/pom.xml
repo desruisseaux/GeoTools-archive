@@ -123,22 +123,29 @@
           </execution>
         </executions>
       </plugin>
-			<plugin>
+      <plugin>
         <groupId>org.geotools.maven</groupId>
         <artifactId>gt2-xmlcodegen</artifactId>
-				<configuration>
+        <configuration>
           <schemaLocation>gml.xsd</schemaLocation>
-					<schemaSourceDirectory>/home/jdeolive/devel/geotools/trunk/modules/unsupported/xml-gml3/src/main/resources/org/geotools/gml3/bindings</schemaSourceDirectory>
+	  <schemaSourceDirectory>${basedir}/src/main/resources/org/geotools/gml3/bindings</schemaSourceDirectory>
           <schemaLookupDirectories>
             <schemaLookupDirectory>/home/jdeolive/devel/geotools/trunk/modules/unsupported/xml-xsd/src/main/resources/org/geotools/xlink/bindings/</schemaLookupDirectory>
             <schemaLookupDirectory>/home/jdeolive/devel/geotools/trunk/modules/unsupported/xml-gml3/src/main/resources/org/geotools/gml3/bindings/smil</schemaLookupDirectory>
           </schemaLookupDirectories>
           <generateConfiguration>false</generateConfiguration>
-					<generateBindingConfiguration>false</generateBindingConfiguration>
+	  <generateBindingConfiguration>false</generateBindingConfiguration>
           <generateBindingInterface>false</generateBindingInterface>
           <generateSchemaLocationResolver>false</generateSchemaLocationResolver>
+          <imports>
+            <import>org.geotools.xs.XSSchema</import>
+            <import>org.geotools.gml3.smil.SMIL20Schema</import>
+            <import>org.geotools.gml3.smil.SMIL20LANGSchema</import>
+          </imports>
+          <followComplexTypes>true</followComplexTypes>
           <includes>
-						<include>GeometryPropertyType</include>
+	      <include>AbstractFeatureType</include>
+	      <include>AbstractFeatureCollectionType</include>
           </includes>
         </configuration>
       </plugin>
