@@ -16,6 +16,7 @@
 package org.geotools.filter;
 
 import java.lang.reflect.Field;
+import java.util.Calendar;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -69,6 +70,10 @@ public class FilterTest extends TestCase {
 
     /** Test suite for this test case */
     TestSuite suite = null;
+
+    private Calendar calDateTime;
+    private Calendar calTime;
+    private Calendar calDate;
 
     /**
      * Constructor with test name.
@@ -146,6 +151,14 @@ public class FilterTest extends TestCase {
                 String.class);
         AttributeType stringAttribute2 = AttributeTypeFactory.newAttributeType("testString2",
                 String.class);
+        AttributeType dateAttribute = AttributeTypeFactory.newAttributeType("date",
+                java.sql.Date.class);
+        AttributeType timeAttribute = AttributeTypeFactory.newAttributeType("time",
+                java.sql.Time.class);
+        AttributeType dateTimeAttribute1 = AttributeTypeFactory.newAttributeType("datetime1",
+                java.util.Date.class);
+        AttributeType dateTimeAttribute2 = AttributeTypeFactory.newAttributeType("datetime2",
+                java.sql.Timestamp.class);
 
         // Builds the schema
 	FeatureTypeFactory feaTypeFactory = FeatureTypeFactory.newInstance("test");
@@ -174,6 +187,10 @@ public class FilterTest extends TestCase {
         //LOGGER.finer("added double to feature type");
        feaTypeFactory.addType(stringAttribute);
        feaTypeFactory.addType(stringAttribute2);
+       feaTypeFactory.addType(dateAttribute);
+       feaTypeFactory.addType(timeAttribute);
+       feaTypeFactory.addType(dateTimeAttribute1);
+       feaTypeFactory.addType(dateTimeAttribute2);
        
        testSchema = feaTypeFactory.getFeatureType();
 
@@ -185,7 +202,7 @@ public class FilterTest extends TestCase {
         coords[2] = new Coordinate(5, 6);
 
         // Builds the test feature
-        Object[] attributes = new Object[11];
+        Object[] attributes = new Object[15];
         GeometryFactory gf = new GeometryFactory(new PrecisionModel());
         attributes[0] = gf.createLineString(coords);
         attributes[1] = new Boolean(true);
@@ -198,6 +215,21 @@ public class FilterTest extends TestCase {
         attributes[8] = new Double(100000.5);
         attributes[9] = "test string data";
         attributes[10] = "cow $10";
+        
+        // setup date ones
+        calDate = Calendar.getInstance();
+        calDate.clear();
+        calDate.set(2007, 7, 15);
+        calTime = Calendar.getInstance();
+        calTime.clear();
+        calTime.set(Calendar.HOUR_OF_DAY, 12);
+        calDateTime = Calendar.getInstance();
+        calDateTime.clear();
+        calDateTime.set(2007, 7, 15, 12, 00, 00);
+        attributes[11] = new java.sql.Date(calDate.getTimeInMillis());
+        attributes[12] = new java.sql.Time(calTime.getTimeInMillis());
+        attributes[13] = calDateTime.getTime();
+        attributes[14] = new java.sql.Timestamp(calDateTime.getTimeInMillis());
 
         // Creates the feature itself
         //FlatFeatureFactory factory = new FlatFeatureFactory(testSchema);
@@ -241,6 +273,32 @@ public class FilterTest extends TestCase {
             FilterType.COMPARE_GREATER_THAN_EQUAL, true, true, false);
         compareNumberRunner(testAttribute,
             FilterType.COMPARE_LESS_THAN_EQUAL, false, true, true);
+        
+        // test all date permutations, with string/date conversion included
+        testAttribute = new AttributeExpressionImpl(testSchema, "date");
+        compareSqlDateRunner(testAttribute, FilterType.COMPARE_EQUALS,
+                false, true, false);
+        compareSqlDateRunner(testAttribute, FilterType.COMPARE_GREATER_THAN,
+                true, false, false);
+        compareSqlDateRunner(testAttribute, FilterType.COMPARE_LESS_THAN,
+                false, false, true);
+        compareSqlDateRunner(testAttribute, FilterType.COMPARE_GREATER_THAN_EQUAL,
+                true, true, false);
+        compareSqlDateRunner(testAttribute, FilterType.COMPARE_LESS_THAN_EQUAL,
+                false, true, true);
+        
+        // test all date permutations, with string/date conversion included
+        testAttribute = new AttributeExpressionImpl(testSchema, "time");
+        compareSqlTimeRunner(testAttribute, FilterType.COMPARE_EQUALS,
+                false, true, false);
+        compareSqlTimeRunner(testAttribute, FilterType.COMPARE_GREATER_THAN,
+                true, false, false);
+        compareSqlTimeRunner(testAttribute, FilterType.COMPARE_LESS_THAN,
+                false, false, true);
+        compareSqlTimeRunner(testAttribute, FilterType.COMPARE_GREATER_THAN_EQUAL,
+                true, true, false);
+        compareSqlTimeRunner(testAttribute, FilterType.COMPARE_LESS_THAN_EQUAL,
+                false, true, true);
 
         // Set up the string test.
         testAttribute = new AttributeExpressionImpl(testSchema, "testString");
@@ -276,8 +334,9 @@ public class FilterTest extends TestCase {
 	testLiteral = new LiteralExpressionImpl("blorg");
         filter.addRightValue(testLiteral);
 	assertTrue(!filter.contains(testFeature));
-
     }
+    
+    
 	
 
     /**
@@ -314,6 +373,96 @@ public class FilterTest extends TestCase {
         assertEquals(filter.contains(testFeature), test2);
 
         testLiteral = new LiteralExpressionImpl(new Integer(1003));
+        filter.addRightValue(testLiteral);
+
+        //LOGGER.finer( filter.toString());            
+        //LOGGER.finer( "contains feature: " + filter.contains(testFeature));
+        assertEquals(filter.contains(testFeature), test3);
+    }
+    
+    /**
+     * Helper class for the integer compare operators.
+     *
+     * @param testAttribute DOCUMENT ME!
+     * @param filterType DOCUMENT ME!
+     * @param test1 DOCUMENT ME!
+     * @param test2 DOCUMENT ME!
+     * @param test3 DOCUMENT ME!
+     *
+     * @throws IllegalFilterException If the constructed filter is not valid.
+     */
+    public void compareSqlDateRunner(Expression testAttribute,
+        short filterType, boolean test1, boolean test2, boolean test3)
+        throws IllegalFilterException {
+        CompareFilter filter = FilterFactoryFinder.createFilterFactory()
+                .createCompareFilter(filterType);
+        Expression testLiteral;
+        filter.addLeftValue(testAttribute);
+
+        Calendar calLocal = Calendar.getInstance();
+        calLocal.setTime(calDate.getTime());
+        calLocal.set(Calendar.DAY_OF_MONTH, calDateTime.get(Calendar.DAY_OF_MONTH) - 1);
+        testLiteral = new LiteralExpressionImpl(new java.sql.Date(calLocal.getTimeInMillis()).toString());
+        filter.addRightValue(testLiteral);
+
+        //LOGGER.finer( filter.toString());            
+        //LOGGER.finer( "contains feature: " + filter.contains(testFeature));
+        assertEquals(filter.contains(testFeature), test1);
+
+        testLiteral = new LiteralExpressionImpl(new java.sql.Date(calDate.getTimeInMillis()).toString());
+        filter.addRightValue(testLiteral);
+
+        //LOGGER.finer( filter.toString());            
+        //LOGGER.finer( "contains feature: " + filter.contains(testFeature));
+        assertEquals(filter.contains(testFeature), test2);
+
+        calLocal.set(Calendar.DAY_OF_MONTH, calDateTime.get(Calendar.DAY_OF_MONTH) + 1);
+        testLiteral = new LiteralExpressionImpl(new java.sql.Date(calLocal.getTimeInMillis()).toString());
+        filter.addRightValue(testLiteral);
+
+        //LOGGER.finer( filter.toString());            
+        //LOGGER.finer( "contains feature: " + filter.contains(testFeature));
+        assertEquals(filter.contains(testFeature), test3);
+    }
+    
+    /**
+     * Helper class for the integer compare operators.
+     *
+     * @param testAttribute DOCUMENT ME!
+     * @param filterType DOCUMENT ME!
+     * @param test1 DOCUMENT ME!
+     * @param test2 DOCUMENT ME!
+     * @param test3 DOCUMENT ME!
+     *
+     * @throws IllegalFilterException If the constructed filter is not valid.
+     */
+    public void compareSqlTimeRunner(Expression testAttribute,
+        short filterType, boolean test1, boolean test2, boolean test3)
+        throws IllegalFilterException {
+        CompareFilter filter = FilterFactoryFinder.createFilterFactory()
+                .createCompareFilter(filterType);
+        Expression testLiteral;
+        filter.addLeftValue(testAttribute);
+
+        Calendar calLocal = Calendar.getInstance();
+        calLocal.setTime(calTime.getTime());
+        calLocal.set(Calendar.HOUR_OF_DAY, calTime.get(Calendar.HOUR_OF_DAY) - 1);
+        testLiteral = new LiteralExpressionImpl(new java.sql.Time(calLocal.getTimeInMillis()).toString());
+        filter.addRightValue(testLiteral);
+
+        //LOGGER.finer( filter.toString());            
+        //LOGGER.finer( "contains feature: " + filter.contains(testFeature));
+        assertEquals(filter.contains(testFeature), test1);
+
+        testLiteral = new LiteralExpressionImpl(new java.sql.Time(calTime.getTimeInMillis()).toString());
+        filter.addRightValue(testLiteral);
+
+        //LOGGER.finer( filter.toString());            
+        //LOGGER.finer( "contains feature: " + filter.contains(testFeature));
+        assertEquals(filter.contains(testFeature), test2);
+
+        calLocal.set(Calendar.HOUR_OF_DAY, calTime.get(Calendar.HOUR_OF_DAY) + 1);
+        testLiteral = new LiteralExpressionImpl(new java.sql.Time(calLocal.getTimeInMillis()).toString());
         filter.addRightValue(testLiteral);
 
         //LOGGER.finer( filter.toString());            

@@ -20,6 +20,7 @@ import org.geotools.filter.expression.Value;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Literal;
 
 /**
  * 
@@ -75,6 +76,19 @@ public class IsEqualsToImpl extends CompareFilterImpl implements PropertyIsEqual
         if (value1.equals(value2)) {
             return true;
         }
+        
+        // if we are doing delayed evaluation of a literal, try conversions to the actual type
+        if(expression1 instanceof Literal && !(expression2 instanceof Literal)) {
+            Object v1 = new Value(value1).value(value2.getClass());
+            if(v1 != null && value2.equals(v1))
+                return true;
+        } else if (expression2 instanceof Literal && !(expression1 instanceof Literal)) {
+            Object v2 = new Value(value2).value(value1.getClass());
+            if(v2 != null && value1.equals(v2))
+                return true;
+        }
+        
+        // try the usual conversions then
         final boolean isNumeric1 = (value1 instanceof Number);
         final boolean isNumeric2 = (value2 instanceof Number);
         if ((isNumeric1 && isNumeric2) || (isNumeric1 && (value2 instanceof CharSequence))
