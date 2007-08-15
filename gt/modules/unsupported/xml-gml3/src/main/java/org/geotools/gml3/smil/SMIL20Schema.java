@@ -15,133 +15,21 @@
  */
 package org.geotools.gml3.smil;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.ComplexType;
+import org.geotools.feature.Name;
+import org.geotools.feature.type.AttributeDescriptorImpl;
+import org.geotools.feature.type.AttributeTypeImpl;
+import org.geotools.feature.type.ComplexTypeImpl;
 import org.geotools.feature.type.SchemaImpl;
+import org.geotools.feature.type.TypeName;
+import org.geotools.xs.XSSchema;
 
 
 public class SMIL20Schema extends SchemaImpl {
-    /**
-     * <p>
-     *  <pre>
-     *   <code>
-     *  &lt;complexType name="animateColorPrototype"&gt;
-     *      &lt;attributeGroup ref="smil20:animNamedTargetAttrs"/&gt;
-     *      &lt;attributeGroup ref="smil20:animAddAccumAttrs"/&gt;
-     *      &lt;attributeGroup ref="smil20:animValuesAttrs"/&gt;
-     *  &lt;/complexType&gt;
-     *
-     *    </code>
-     *   </pre>
-     * </p>
-     *
-     * @generated
-     */
-    public static final AttributeType ANIMATECOLORPROTOTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("animateColorPrototype", java.lang.Object.class);
-
-    /**
-     * <p>
-     *  <pre>
-     *   <code>
-     *  &lt;simpleType name="fillDefaultType"&gt;
-     *      &lt;restriction base="string"&gt;
-     *          &lt;enumeration value="remove"/&gt;
-     *          &lt;enumeration value="freeze"/&gt;
-     *          &lt;enumeration value="hold"/&gt;
-     *          &lt;enumeration value="auto"/&gt;
-     *          &lt;enumeration value="inherit"/&gt;
-     *          &lt;enumeration value="transition"/&gt;
-     *      &lt;/restriction&gt;
-     *  &lt;/simpleType&gt;
-     *
-     *    </code>
-     *   </pre>
-     * </p>
-     *
-     * @generated
-     */
-    public static final AttributeType FILLDEFAULTTYPE_TYPE = AttributeTypeFactory.newAttributeType("fillDefaultType",
-            java.lang.Object.class);
-
-    /**
-     * <p>
-     *  <pre>
-     *   <code>
-     *  &lt;complexType name="animatePrototype"&gt;
-     *      &lt;attributeGroup ref="smil20:animNamedTargetAttrs"/&gt;
-     *      &lt;attributeGroup ref="smil20:animAddAccumAttrs"/&gt;
-     *      &lt;attributeGroup ref="smil20:animValuesAttrs"/&gt;
-     *  &lt;/complexType&gt;
-     *
-     *    </code>
-     *   </pre>
-     * </p>
-     *
-     * @generated
-     */
-    public static final AttributeType ANIMATEPROTOTYPE_TYPE = AttributeTypeFactory.newAttributeType("animatePrototype",
-            java.lang.Object.class);
-
-    /**
-     * <p>
-     *  <pre>
-     *   <code>
-     *  &lt;complexType name="setPrototype"&gt;
-     *      &lt;attributeGroup ref="smil20:animNamedTargetAttrs"/&gt;
-     *      &lt;attributeGroup ref="smil20:animSetValuesAttrs"/&gt;
-     *  &lt;/complexType&gt;
-     *
-     *    </code>
-     *   </pre>
-     * </p>
-     *
-     * @generated
-     */
-    public static final AttributeType SETPROTOTYPE_TYPE = AttributeTypeFactory.newAttributeType("setPrototype",
-            java.lang.Object.class);
-
-    /**
-     * <p>
-     *  <pre>
-     *   <code>
-     *  &lt;simpleType name="syncBehaviorType"&gt;
-     *      &lt;restriction base="string"&gt;
-     *          &lt;enumeration value="canSlip"/&gt;
-     *          &lt;enumeration value="locked"/&gt;
-     *          &lt;enumeration value="independent"/&gt;
-     *          &lt;enumeration value="default"/&gt;
-     *      &lt;/restriction&gt;
-     *  &lt;/simpleType&gt;
-     *
-     *    </code>
-     *   </pre>
-     * </p>
-     *
-     * @generated
-     */
-    public static final AttributeType SYNCBEHAVIORTYPE_TYPE = AttributeTypeFactory.newAttributeType("syncBehaviorType",
-            java.lang.Object.class);
-
-    /**
-     * <p>
-     *  <pre>
-     *   <code>
-     *  &lt;simpleType name="nonNegativeDecimalType"&gt;
-     *      &lt;restriction base="decimal"&gt;
-     *          &lt;minInclusive value="0.0"/&gt;
-     *      &lt;/restriction&gt;
-     *  &lt;/simpleType&gt;
-     *
-     *    </code>
-     *   </pre>
-     * </p>
-     *
-     * @generated
-     */
-    public static final AttributeType NONNEGATIVEDECIMALTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("nonNegativeDecimalType", java.lang.Object.class);
-
     /**
      * <p>
      *  <pre>
@@ -161,8 +49,9 @@ public class SMIL20Schema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType RESTARTDEFAULTTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("restartDefaultType", java.lang.Object.class);
+    public static final AttributeType RESTARTDEFAULTTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+                "http://www.w3.org/2001/SMIL20/", "restartDefaultType"), java.lang.Object.class,
+            false, false, Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
 
     /**
      * <p>
@@ -185,8 +74,114 @@ public class SMIL20Schema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType FILLTIMINGATTRSTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("fillTimingAttrsType", java.lang.Object.class);
+    public static final AttributeType FILLTIMINGATTRSTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+                "http://www.w3.org/2001/SMIL20/", "fillTimingAttrsType"), java.lang.Object.class,
+            false, false, Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
+
+    /**
+     * <p>
+     *  <pre>
+     *   <code>
+     *  &lt;complexType name="animateMotionPrototype"&gt;
+     *      &lt;attributeGroup ref="smil20:animAddAccumAttrs"/&gt;
+     *      &lt;attributeGroup ref="smil20:animValuesAttrs"/&gt;
+     *      &lt;attribute name="origin" type="string" use="optional"/&gt;
+     *  &lt;/complexType&gt;
+     *
+     *    </code>
+     *   </pre>
+     * </p>
+     *
+     * @generated
+     */
+    public static final ComplexType ANIMATEMOTIONPROTOTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+                "http://www.w3.org/2001/SMIL20/", "animateMotionPrototype"),
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+
+    /**
+     * <p>
+     *  <pre>
+     *   <code>
+     *  &lt;complexType name="animateColorPrototype"&gt;
+     *      &lt;attributeGroup ref="smil20:animNamedTargetAttrs"/&gt;
+     *      &lt;attributeGroup ref="smil20:animAddAccumAttrs"/&gt;
+     *      &lt;attributeGroup ref="smil20:animValuesAttrs"/&gt;
+     *  &lt;/complexType&gt;
+     *
+     *    </code>
+     *   </pre>
+     * </p>
+     *
+     * @generated
+     */
+    public static final ComplexType ANIMATECOLORPROTOTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+                "http://www.w3.org/2001/SMIL20/", "animateColorPrototype"), Collections.EMPTY_LIST,
+            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+
+    /**
+     * <p>
+     *  <pre>
+     *   <code>
+     *  &lt;simpleType name="nonNegativeDecimalType"&gt;
+     *      &lt;restriction base="decimal"&gt;
+     *          &lt;minInclusive value="0.0"/&gt;
+     *      &lt;/restriction&gt;
+     *  &lt;/simpleType&gt;
+     *
+     *    </code>
+     *   </pre>
+     * </p>
+     *
+     * @generated
+     */
+    public static final AttributeType NONNEGATIVEDECIMALTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+                "http://www.w3.org/2001/SMIL20/", "nonNegativeDecimalType"),
+            java.lang.Object.class, false, false, Collections.EMPTY_SET, XSSchema.DECIMAL_TYPE, null);
+
+    /**
+     * <p>
+     *  <pre>
+     *   <code>
+     *  &lt;simpleType name="fillDefaultType"&gt;
+     *      &lt;restriction base="string"&gt;
+     *          &lt;enumeration value="remove"/&gt;
+     *          &lt;enumeration value="freeze"/&gt;
+     *          &lt;enumeration value="hold"/&gt;
+     *          &lt;enumeration value="auto"/&gt;
+     *          &lt;enumeration value="inherit"/&gt;
+     *          &lt;enumeration value="transition"/&gt;
+     *      &lt;/restriction&gt;
+     *  &lt;/simpleType&gt;
+     *
+     *    </code>
+     *   </pre>
+     * </p>
+     *
+     * @generated
+     */
+    public static final AttributeType FILLDEFAULTTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+                "http://www.w3.org/2001/SMIL20/", "fillDefaultType"), java.lang.Object.class,
+            false, false, Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
+
+    /**
+     * <p>
+     *  <pre>
+     *   <code>
+     *  &lt;complexType name="animatePrototype"&gt;
+     *      &lt;attributeGroup ref="smil20:animNamedTargetAttrs"/&gt;
+     *      &lt;attributeGroup ref="smil20:animAddAccumAttrs"/&gt;
+     *      &lt;attributeGroup ref="smil20:animValuesAttrs"/&gt;
+     *  &lt;/complexType&gt;
+     *
+     *    </code>
+     *   </pre>
+     * </p>
+     *
+     * @generated
+     */
+    public static final ComplexType ANIMATEPROTOTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+                "http://www.w3.org/2001/SMIL20/", "animatePrototype"), Collections.EMPTY_LIST,
+            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -207,8 +202,9 @@ public class SMIL20Schema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType RESTARTTIMINGTYPE_TYPE = AttributeTypeFactory.newAttributeType("restartTimingType",
-            java.lang.Object.class);
+    public static final AttributeType RESTARTTIMINGTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+                "http://www.w3.org/2001/SMIL20/", "restartTimingType"), java.lang.Object.class,
+            false, false, Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
 
     /**
      * <p>
@@ -229,17 +225,40 @@ public class SMIL20Schema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType SYNCBEHAVIORDEFAULTTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("syncBehaviorDefaultType", java.lang.Object.class);
+    public static final AttributeType SYNCBEHAVIORDEFAULTTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+                "http://www.w3.org/2001/SMIL20/", "syncBehaviorDefaultType"),
+            java.lang.Object.class, false, false, Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
 
     /**
      * <p>
      *  <pre>
      *   <code>
-     *  &lt;complexType name="animateMotionPrototype"&gt;
-     *      &lt;attributeGroup ref="smil20:animAddAccumAttrs"/&gt;
-     *      &lt;attributeGroup ref="smil20:animValuesAttrs"/&gt;
-     *      &lt;attribute name="origin" type="string" use="optional"/&gt;
+     *  &lt;simpleType name="syncBehaviorType"&gt;
+     *      &lt;restriction base="string"&gt;
+     *          &lt;enumeration value="canSlip"/&gt;
+     *          &lt;enumeration value="locked"/&gt;
+     *          &lt;enumeration value="independent"/&gt;
+     *          &lt;enumeration value="default"/&gt;
+     *      &lt;/restriction&gt;
+     *  &lt;/simpleType&gt;
+     *
+     *    </code>
+     *   </pre>
+     * </p>
+     *
+     * @generated
+     */
+    public static final AttributeType SYNCBEHAVIORTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+                "http://www.w3.org/2001/SMIL20/", "syncBehaviorType"), java.lang.Object.class,
+            false, false, Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
+
+    /**
+     * <p>
+     *  <pre>
+     *   <code>
+     *  &lt;complexType name="setPrototype"&gt;
+     *      &lt;attributeGroup ref="smil20:animNamedTargetAttrs"/&gt;
+     *      &lt;attributeGroup ref="smil20:animSetValuesAttrs"/&gt;
      *  &lt;/complexType&gt;
      *
      *    </code>
@@ -248,33 +267,32 @@ public class SMIL20Schema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ANIMATEMOTIONPROTOTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("animateMotionPrototype", java.lang.Object.class);
+    public static final ComplexType SETPROTOTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+                "http://www.w3.org/2001/SMIL20/", "setPrototype"), Collections.EMPTY_LIST, false,
+            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
 
     public SMIL20Schema() {
         super("http://www.w3.org/2001/SMIL20/");
 
-        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/", "animateColorPrototype"),
-            ANIMATECOLORPROTOTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/", "fillDefaultType"),
-            FILLDEFAULTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/", "animatePrototype"),
-            ANIMATEPROTOTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/", "setPrototype"),
-            SETPROTOTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/", "syncBehaviorType"),
-            SYNCBEHAVIORTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/", "nonNegativeDecimalType"),
-            NONNEGATIVEDECIMALTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/", "restartDefaultType"),
+        put(new TypeName("http://www.w3.org/2001/SMIL20/", "restartDefaultType"),
             RESTARTDEFAULTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/", "fillTimingAttrsType"),
+        put(new TypeName("http://www.w3.org/2001/SMIL20/", "fillTimingAttrsType"),
             FILLTIMINGATTRSTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/", "restartTimingType"),
-            RESTARTTIMINGTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/",
-                "syncBehaviorDefaultType"), SYNCBEHAVIORDEFAULTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/", "animateMotionPrototype"),
+        put(new TypeName("http://www.w3.org/2001/SMIL20/", "animateMotionPrototype"),
             ANIMATEMOTIONPROTOTYPE_TYPE);
+        put(new TypeName("http://www.w3.org/2001/SMIL20/", "animateColorPrototype"),
+            ANIMATECOLORPROTOTYPE_TYPE);
+        put(new TypeName("http://www.w3.org/2001/SMIL20/", "nonNegativeDecimalType"),
+            NONNEGATIVEDECIMALTYPE_TYPE);
+        put(new TypeName("http://www.w3.org/2001/SMIL20/", "fillDefaultType"), FILLDEFAULTTYPE_TYPE);
+        put(new TypeName("http://www.w3.org/2001/SMIL20/", "animatePrototype"),
+            ANIMATEPROTOTYPE_TYPE);
+        put(new TypeName("http://www.w3.org/2001/SMIL20/", "restartTimingType"),
+            RESTARTTIMINGTYPE_TYPE);
+        put(new TypeName("http://www.w3.org/2001/SMIL20/", "syncBehaviorDefaultType"),
+            SYNCBEHAVIORDEFAULTTYPE_TYPE);
+        put(new TypeName("http://www.w3.org/2001/SMIL20/", "syncBehaviorType"),
+            SYNCBEHAVIORTYPE_TYPE);
+        put(new TypeName("http://www.w3.org/2001/SMIL20/", "setPrototype"), SETPROTOTYPE_TYPE);
     }
 }
