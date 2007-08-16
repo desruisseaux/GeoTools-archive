@@ -22,8 +22,16 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 
-
+/**
+ * Implementation of TPS Interpolation based on thin plate spline (TPS) algorithm
+ *
+ * @see <A HREF="http://elonen.iki.fi/code/tpsdemo/index.html">Pages about TPS</A>
+ *
+ * @author jezekjan
+ *
+ */
 public class TPSInterpolation extends AbstractInterpolation {
+	
     /**Main matrix (according http://elonen.iki.fi/code/tpsdemo/index.html)*/
     private GeneralMatrix L;
 
@@ -32,10 +40,23 @@ public class TPSInterpolation extends AbstractInterpolation {
 
     /** Helper constant for generating matrix dimensions*/
     private final int number = super.getPositions().size();
-    private GeneralMatrix result;
+    
+    private final GeneralMatrix result;
 
     public TPSInterpolation(HashMap positions) {
-        super(positions);
+    	super(positions);
+    	  L = new GeneralMatrix(number + 3, number + 3);
+
+          fillKsubMatrix();
+          fillPsubMatrix();
+          fillOsubMatrix();
+
+          L.invert();
+
+          GeneralMatrix V = fillVMatrix(0);
+          result = new GeneralMatrix(number + 3, 1);
+          result.mul(L, V);
+        
     }
 
     /**

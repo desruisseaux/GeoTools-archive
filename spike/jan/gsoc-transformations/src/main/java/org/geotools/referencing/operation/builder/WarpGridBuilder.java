@@ -20,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import javax.vecmath.MismatchedSizeException;
@@ -119,6 +120,23 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
         }
 
         return localpositions;
+    }
+    
+    /**
+     * Converts MappedPosition to HashMap where Source Points are key and delta in proper 
+     * dimension is value
+     * @param dim delta dimension (0 - dx, 1 - dy) 
+     * @return Map 
+     * @throws TransformException
+     */
+    protected HashMap buildPositionsMap(int dim) throws TransformException{
+    	HashMap poitnsToDeltas = new HashMap();
+    	for(Iterator i = this.getGridMappedPositions().iterator(); i.hasNext();){
+    		MappedPosition mp = ((MappedPosition)i.next());
+    		poitnsToDeltas.put(mp.getSource(), mp.getSource().getCoordinates()[dim]-
+    				                           mp.getTarget().getCoordinates()[dim]);   	
+    	}
+    	return poitnsToDeltas;
     }
 
     /**

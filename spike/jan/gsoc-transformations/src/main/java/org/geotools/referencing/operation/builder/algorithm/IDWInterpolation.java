@@ -18,10 +18,9 @@ package org.geotools.referencing.operation.builder.algorithm;
 import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.Iterator;
-
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 
 
 /**
@@ -31,6 +30,9 @@ import org.opengis.geometry.Envelope;
  *
  */
 public class IDWInterpolation extends AbstractInterpolation {
+    /**Max distance to take points into account */
+    private double maxDist = 0;
+
     /**
      *
      * @param positions HashMap containing {@link org.opengis.geometry.DirectPosition} as
@@ -43,8 +45,30 @@ public class IDWInterpolation extends AbstractInterpolation {
         super(positions, dx, dy, envelope);
     }
 
+    /**
+     * Constructs Interpolation from specified positions and its values.
+     * @param positions
+     */
     public IDWInterpolation(HashMap positions) {
         super(positions);
+    }
+
+    /** 
+     * Returns max distance that defines when the point are taken into account
+     * during interpolation.
+     * @return max distance (when 0 than all points are taken)
+     */
+    public double getMaxDist() {
+        return maxDist;
+    }
+
+    /**
+     * Sets max distance that defines when the point are taken into account
+     * during interpolation (when 0 than all points are taken - 0 is the default).
+     * @param maxDist max distance 
+     */
+    public void setMaxDist(double maxDist) {
+        this.maxDist = maxDist;
     }
 
     public float getValue(DirectPosition p) {
@@ -69,16 +93,19 @@ public class IDWInterpolation extends AbstractInterpolation {
         for (Iterator i = this.getPositions().keySet().iterator(); i.hasNext();) {
             source = (DirectPosition) i.next();
 
-            if ((source != null)
-                    || source.getCoordinateReferenceSystem().getClass()
-                                 .isAssignableFrom(DefaultGeographicCRS.class)) {
-                dist = ((DefaultGeographicCRS) source.getCoordinateReferenceSystem()).distance(p
-                        .getCoordinates(), source.getCoordinates()).doubleValue();
-            } else {
-                dist = ((Point2D) p).distance((Point2D) source);
-            }
+            /**
+             *  @todo - calculate elipsoidal distance/             
+             */
+            /* if ((source != null)
+               || source.getCoordinateReferenceSystem().getClass()
+                            .isAssignableFrom(DefaultGeographicCRS.class)) {
+               dist = ((DefaultGeographicCRS) source.getCoordinateReferenceSystem()).distance(p
+                       .getCoordinates(), source.getCoordinates()).doubleValue();
+               } else {*/
+            dist = ((Point2D) p).distance((Point2D) source);
 
-            if ((dist < maxdistance)) {
+            //}
+            if (((dist != 0) || (dist < maxdistance))) {
                 nearest.put(source, new Double(dist));
             }
         }
@@ -87,9 +114,17 @@ public class IDWInterpolation extends AbstractInterpolation {
     }
 
     private float calculateValue(DirectPosition p) {
-        double maxdist = 500000;
+        return calculateValue(p, getMaxDist());
+    }
 
-        HashMap nearest = getNearestPositions(p, maxdist);
+    /**
+     * Computes value at point {@link p} from points that are not farer than {@link maxDistance}
+     * @param p
+     * @param maxDist
+     * @return
+     */
+    private float calculateValue(DirectPosition p, double maxDist) {
+        HashMap nearest = getNearestPositions(p, maxDist);
 
         float value;
         double sumdValue = 0;
