@@ -17,6 +17,8 @@
 
 package org.geotools.geometry.iso.coordinate;
 
+import java.io.Serializable;
+
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.opengis.geometry.Envelope;
@@ -30,7 +32,7 @@ import org.opengis.geometry.primitive.SurfacePatch;
  * The multiplicity of the association "Segmentation" (Figure 12) specifies that
  * each GM_SurfacePatch shall be in at most one GM_Surface.
  */
-public abstract class SurfacePatchImpl implements SurfacePatch {
+public abstract class SurfacePatchImpl implements SurfacePatch, Serializable {
 
 	/**
 	 * The attribute "interpolation" determines the surface interpolation

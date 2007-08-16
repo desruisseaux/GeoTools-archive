@@ -17,6 +17,7 @@
 
 package org.geotools.geometry.iso.root;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -92,7 +93,7 @@ import org.opengis.referencing.operation.TransformException;
  * @author Jackson Roehrig & Sanjay Jena
  */
 
-public abstract class GeometryImpl implements Geometry {
+public abstract class GeometryImpl implements Geometry, Serializable  {
 
 	private boolean mutable = true;
 	

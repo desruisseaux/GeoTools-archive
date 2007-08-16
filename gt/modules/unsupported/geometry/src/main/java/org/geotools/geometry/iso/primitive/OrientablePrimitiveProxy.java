@@ -18,6 +18,7 @@
 
 package org.geotools.geometry.iso.primitive;
 
+import java.io.Serializable;
 import java.util.Set;
 
 import org.opengis.geometry.DirectPosition;
@@ -42,7 +43,7 @@ import org.opengis.referencing.operation.TransformException;
  * @author roehrig
  * 
  */
-public class OrientablePrimitiveProxy implements OrientablePrimitive {
+public class OrientablePrimitiveProxy implements OrientablePrimitive, Serializable {
 	/**
 	 * Oriented Association Each Primitive of dimension 1 or 2 is associated to
 	 * two GM_OrientablePrimitives, one for each possible orientation.

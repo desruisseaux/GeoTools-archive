@@ -18,6 +18,8 @@
 
 package org.geotools.geometry.iso.coordinate;
 
+import java.io.Serializable;
+
 import org.geotools.geometry.iso.primitive.CurveBoundaryImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
@@ -35,7 +37,7 @@ import org.opengis.geometry.primitive.CurveSegment;
  * 
  * @author Jackson Roehrig & Sanjay Jena
  */
-public abstract class CurveSegmentImpl implements CurveSegment {
+public abstract class CurveSegmentImpl implements CurveSegment, Serializable {
 
 	/**
 	 * 

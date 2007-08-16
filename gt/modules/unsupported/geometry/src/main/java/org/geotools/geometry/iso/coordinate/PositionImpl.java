@@ -17,6 +17,8 @@
 
 package org.geotools.geometry.iso.coordinate;
 
+import java.io.Serializable;
+
 import org.geotools.geometry.iso.primitive.PointImpl;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.Position;
@@ -34,7 +36,7 @@ import org.opengis.geometry.primitive.Point;
  * indirect.isNotNull}
  */
 
-public class PositionImpl implements Position {
+public class PositionImpl implements Position, Serializable {
 
 	// The Position is either represented by a DirectPosition or Point
 	private Object position = null;

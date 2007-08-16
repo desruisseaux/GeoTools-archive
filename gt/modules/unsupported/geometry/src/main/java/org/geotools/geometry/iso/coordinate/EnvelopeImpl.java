@@ -17,6 +17,8 @@
 
 package org.geotools.geometry.iso.coordinate;
 
+import java.io.Serializable;
+
 import org.geotools.geometry.iso.DimensionModel;
 import org.geotools.geometry.iso.UnsupportedDimensionException;
 import org.geotools.geometry.iso.util.algorithmND.AlgoRectangleND;
@@ -30,7 +32,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * An envlope represents the bounding box of a geometric object.
  * Regardless to the dimension, the envelope can be encoded by two <code>DirectPosition</code>s. 
  */
-public class EnvelopeImpl implements Envelope {
+public class EnvelopeImpl implements Envelope, Serializable {
     static final int X = 0;
     static final int Y = 1;
     static final int Z = 2;

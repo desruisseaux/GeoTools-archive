@@ -17,6 +17,7 @@
 
 package org.geotools.geometry.iso.coordinate;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 import org.geotools.geometry.iso.util.DoubleOperation;
@@ -31,7 +32,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Jackson Roehrig & Sanjay Jena
  * 
  */
-public class DirectPositionImpl implements DirectPosition {
+public class DirectPositionImpl implements DirectPosition, Serializable {
 
 	/**
 	 * The attribute "coordinate" is a sequence of Numbers that hold the
