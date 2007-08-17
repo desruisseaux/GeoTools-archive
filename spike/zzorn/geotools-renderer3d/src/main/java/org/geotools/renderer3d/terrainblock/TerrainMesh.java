@@ -8,8 +8,10 @@ import com.jme.renderer.ColorRGBA;
 import com.jme.renderer.Renderer;
 import com.jme.scene.TriMesh;
 import com.jme.scene.state.TextureState;
+import com.jme.util.TextureKey;
 import com.jme.util.TextureManager;
 import com.jme.util.geom.BufferUtils;
+import com.jmex.awt.swingui.ImageGraphics;
 import org.geotools.renderer3d.utils.ImageUtils;
 import org.geotools.renderer3d.utils.MathUtils;
 import org.geotools.renderer3d.utils.ParameterChecker;
@@ -67,6 +69,8 @@ public final class TerrainMesh
     private static final int DEFAULT_TEXTURE_IMAGE_FORMAT = com.jme.image.Image.GUESS_FORMAT_NO_S3TC;
     private TextureState myTextureState;
     private final Pool<BufferedImage> myTextureImagePool;
+    private Texture myTexture;
+    private ImageGraphics myTextureGraphics;
 
     //======================================================================
     // Public Methods
@@ -199,11 +203,8 @@ public final class TerrainMesh
      */
     public void setTextureImage( BufferedImage textureImage )
     {
-        if ( myTextureImage != textureImage )
-        {
-            myTextureImage = textureImage;
-            myTextureUpdateNeeded = true;
-        }
+        myTextureImage = textureImage;
+        myTextureUpdateNeeded = true;
     }
 
     //======================================================================
@@ -545,36 +546,56 @@ public final class TerrainMesh
             textureImage = PLACEHOLDER_PICTURE;
         }
 
-        if ( myTextureState != null )
+        if ( myTextureState == null )
         {
-            myTextureState.removeTexture( 0 );
+            // First texture
+            myTextureGraphics = ImageGraphics.createInstance( textureImage.getWidth( null ),
+                                                              textureImage.getHeight( null ),
+                                                              0 );
+
+            myTextureGraphics.drawImage( textureImage, 0, 0, null );
+            myTextureGraphics.update();
+
+            final TextureKey tkey = new TextureKey( null, Texture.MM_NONE, Texture.FM_LINEAR,
+                                                    DEFAULT_ANISO_LEVEL, false, DEFAULT_TEXTURE_IMAGE_FORMAT );
+            tkey.setFileType( "" + textureImage.hashCode() );
+
+            myTexture = TextureManager.loadTexture( null, tkey, myTextureGraphics.getImage() );
+
+            myTextureState = renderer.createTextureState();
+            // Clamp texture at edges (no wrapping)
+            myTexture.setWrap( Texture.WM_ECLAMP_S_ECLAMP_T );
+
+            myTextureState.setTexture( myTexture, 0 );
+
+            setRenderState( myTextureState );
+            updateRenderState();
         }
         else
         {
-            myTextureState = renderer.createTextureState();
+
+            // Update of texture
+
+//            myTextureState.setNeedsRefresh( true );
+            myTextureGraphics.drawImage( textureImage, 0, 0, null );
+            myTextureGraphics.update( myTexture );
+/*
+            myTextureState.deleteAll();
+            TextureManager.l
+            myTexture.getImage().
+                    myTexture.setImage( TextureManager.loadImage( textureImage, false ) );
+
+            ImageGraphics
+*/
         }
 
         // REFACTOR: Create the texture just on the first call, and just change the texture after that.
-
-        final Texture texture = TextureManager.loadTexture( textureImage,
-                                                            Texture.MM_LINEAR,
-                                                            Texture.FM_LINEAR,
-                                                            DEFAULT_ANISO_LEVEL,
-                                                            DEFAULT_TEXTURE_IMAGE_FORMAT,
-                                                            false );
 
 /*
         // Activate mip-mapping
         texture.setMipmapState( Texture.MM_LINEAR );
 */
 
-        // Clamp texture at edges (no wrapping)
-        texture.setWrap( Texture.WM_ECLAMP_S_ECLAMP_T );
-
-        myTextureState.setTexture( texture, 0 );
-
-        setRenderState( myTextureState );
-        updateRenderState();
 
         myTextureUpdateNeeded = false;
     }

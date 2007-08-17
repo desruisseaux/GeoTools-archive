@@ -79,6 +79,8 @@ public final class Pool<T>
     public synchronized void addItem( T item )
     {
         myPool.addFirst( new WeakReference<T>( item ) );
+
+        System.out.println( "myPool.size() = " + myPool.size() );
     }
 
 }

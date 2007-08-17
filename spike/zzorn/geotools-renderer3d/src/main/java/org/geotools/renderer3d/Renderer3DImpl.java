@@ -4,9 +4,11 @@ import com.jme.math.Vector3f;
 import com.jme.renderer.Camera;
 import com.jme.scene.Node;
 import com.jme.scene.Spatial;
+import com.jme.util.LoggingSystem;
 import org.geotools.map.MapContext;
-import org.geotools.renderer3d.field.DummyTextureProvider;
+import org.geotools.renderer3d.field.DummyTextureRenderer;
 import org.geotools.renderer3d.field.TextureProvider;
+import org.geotools.renderer3d.field.TextureProviderImpl;
 import org.geotools.renderer3d.navigationgestures.NavigationGesture;
 import org.geotools.renderer3d.terrainblock.TerrainBlock;
 import org.geotools.renderer3d.terrainblock.TerrainBlockFactory;
@@ -19,6 +21,7 @@ import org.geotools.renderer3d.utils.quadtree.QuadTreeListener;
 import org.geotools.renderer3d.utils.quadtree.QuadTreeNode;
 
 import java.awt.Component;
+import java.util.logging.Level;
 
 /**
  * TODO: Keeps track of all the terrain blocks, calculate the size/distance ratio for them when the camera moves.
@@ -64,6 +67,9 @@ public final class Renderer3DImpl
     private static final int DEFAULT_TERRAIN_BLOCK_SIZE_IN_GRIDS = 32;
     private static final int DEFAULT_TEXTURE_SIZE = 128;
     private static final double DEFAULT_VISIBILITY_DISTANCE = 10000.0;
+    private static final double MINIMUM_NODE_SIZE_M = 50;
+    private static final double EXPANSION_THRESHOLD = 2.0;
+    private static final double COLLAPSING_THRESHOLD = 1.5;
 
     //======================================================================
     // Public Methods
@@ -146,11 +152,11 @@ public final class Renderer3DImpl
         myCanvas3D.setViewDistance( (float) myVisibilityDistance );
 
 /*
-        final MapTextureProvider mapTextureProvider = new MapTextureProvider( mapContextToRender, Color.WHITE );
+        final MapTextureRenderer mapTextureProvider = new MapTextureRenderer( mapContextToRender, Color.WHITE );
 */
 
         // DEBUG
-        final TextureProvider mapTextureProvider = new DummyTextureProvider();
+        final TextureProvider mapTextureProvider = new TextureProviderImpl( new DummyTextureRenderer() );
 
         myTerrainBlockFactory = new TerrainBlockFactory( terrainBlockSizeInGrids,
                                                          mapTextureProvider,
@@ -170,6 +176,9 @@ public final class Renderer3DImpl
             }
 
         } );
+
+        // Filter out internal trace info and debug data from JME (for some reason they use INFO level for that)
+        LoggingSystem.getLoggingSystem().setLevel( Level.WARNING );
 
         initExpansionAndCollapsionHandler();
     }
@@ -276,7 +285,6 @@ public final class Renderer3DImpl
 
     private void checkNode( QuadTreeNode<TerrainBlock> node, final Vector3f currentCameraPosition )
     {
-        // TODO: Would be best not to get node data, so we do not initiate it when it is not needed.
         final TerrainBlock terrainBlock = node.getNodeData();
 
         if ( terrainBlock != null )
@@ -288,13 +296,13 @@ public final class Renderer3DImpl
             final double comparsionFactor = squaredSize / squaredDistance;
 
             // Expand if needed, and if the node is larger than the minimum node size
-            if ( comparsionFactor > 2 && size > 5 )
+            if ( comparsionFactor > EXPANSION_THRESHOLD && size > MINIMUM_NODE_SIZE_M )
             {
                 node.setExpanded( true );
             }
 
             // Collapse if needed
-            if ( comparsionFactor < 1 )
+            if ( comparsionFactor < COLLAPSING_THRESHOLD )
             {
                 node.setExpanded( false );
             }

@@ -2,6 +2,7 @@ package org.geotools.renderer3d.terrainblock;
 
 import com.jme.math.Vector3f;
 import com.jme.scene.Spatial;
+import org.geotools.renderer3d.field.TextureListener;
 
 /**
  * A square area of ground, containing the data required for the 3D view, at some resolution.
@@ -9,6 +10,7 @@ import com.jme.scene.Spatial;
  * @author Hans Häggström
  */
 public interface TerrainBlock
+        extends TextureListener
 {
     /**
      * @return the 3D node containing this terrain block.

@@ -114,6 +114,7 @@ public final class QuadTreeNodeImpl<N>
         // Lazy creation
         if ( myNodeData == null )
         {
+            System.out.println( "QuadTreeNodeImpl.getNodeData LAZY CREATION " );
             myNodeData = myQuadTree.getNodeDataFactory().createNodeDataObject( this );
         }
 
@@ -240,6 +241,7 @@ public final class QuadTreeNodeImpl<N>
     {
         checkNodeIsAttached();
 
+
         if ( isRootNode() )
         {
             // Calcualte which direction the new parent should expand into
@@ -261,6 +263,7 @@ public final class QuadTreeNodeImpl<N>
         {
             getRootNode().grow( x, y );
         }
+
     }
 
 
@@ -383,6 +386,7 @@ public final class QuadTreeNodeImpl<N>
 
     public void delete()
     {
+        System.out.println( "QuadTreeNodeImpl.delete" );
         myNodeData = null;
         myParent = null;
 

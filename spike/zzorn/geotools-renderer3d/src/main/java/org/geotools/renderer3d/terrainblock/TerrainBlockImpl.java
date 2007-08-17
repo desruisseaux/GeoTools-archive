@@ -4,7 +4,6 @@ import com.jme.image.Texture;
 import com.jme.math.Vector3f;
 import com.jme.scene.Node;
 import com.jme.scene.Spatial;
-import org.geotools.renderer3d.field.TextureListener;
 import org.geotools.renderer3d.utils.BoundingRectangle;
 import org.geotools.renderer3d.utils.ParameterChecker;
 import org.geotools.renderer3d.utils.Pool;
@@ -24,7 +23,7 @@ import java.util.List;
  * @author Hans Häggström
  */
 public final class TerrainBlockImpl
-        implements TerrainBlock, TextureListener, NodeListener<TerrainBlock>
+        implements TerrainBlock, NodeListener<TerrainBlock>
 {
 
     //======================================================================
@@ -83,6 +82,8 @@ public final class TerrainBlockImpl
 
     public void onDeleted( QuadTreeNode<TerrainBlock> quadTreeNode )
     {
+        throw new UnsupportedOperationException( "This method was removed." );
+/*
         checkIfDeleted();
 
         if ( myTerrain3DNode != null )
@@ -96,6 +97,7 @@ public final class TerrainBlockImpl
         myTerrain3DNode = null;
 
         myDelted = true;
+*/
     }
 
 
