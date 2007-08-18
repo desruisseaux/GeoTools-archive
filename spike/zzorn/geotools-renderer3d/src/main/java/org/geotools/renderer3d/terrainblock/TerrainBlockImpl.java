@@ -1,16 +1,18 @@
 package org.geotools.renderer3d.terrainblock;
 
-import com.jme.image.Texture;
 import com.jme.math.Vector3f;
 import com.jme.scene.Node;
 import com.jme.scene.Spatial;
+import org.geotools.renderer3d.provider.texture.impl.TextureListener;
+import org.geotools.renderer3d.provider.texture.impl.TextureProvider;
 import org.geotools.renderer3d.utils.BoundingRectangle;
 import org.geotools.renderer3d.utils.ParameterChecker;
-import org.geotools.renderer3d.utils.Pool;
 import org.geotools.renderer3d.utils.quadtree.NodeListener;
 import org.geotools.renderer3d.utils.quadtree.QuadTreeNode;
 
-import java.awt.Image;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +32,26 @@ public final class TerrainBlockImpl
     // Private Fields
 
     private final int myNumberOfGridsPerSide;
-    private final Pool<Texture> myTexturePool;
-    private final Pool<BufferedImage> myTextureImagePool;
+    private final BufferedImage myTextureImage;
+
+    private final TextureProvider myTextureProvider;
+    private final TextureListener myTextureListener = new TextureListener()
+    {
+
+        public void onTextureReady( final BoundingRectangle area, final BufferedImage texture )
+        {
+            // The texture has been calculated to the image instance we hold in this terrain block,
+            // so just apply it to the terrain mesh if it has been created already.
+            if ( myTerrainMesh != null )
+            {
+                myTerrainMesh.setTextureImage( myTextureImage );
+            }
+
+            myHasCalculatedTextureImage = true;
+        }
+
+    };
+    private final int myTextureSize;
 
     private Vector3f myCenter;
 
@@ -41,9 +61,8 @@ public final class TerrainBlockImpl
 
     private TerrainMesh myTerrainMesh = null;
     private Node myTerrain3DNode = null;
-    private BufferedImage myMapImage = null;
 
-    private boolean myDelted = false;
+    private boolean myHasCalculatedTextureImage = false;
 
     //======================================================================
     // Public Methods
@@ -54,23 +73,25 @@ public final class TerrainBlockImpl
     /**
      * @param quadTreeNode
      * @param numberOfGridsPerSide number of grid cells along the side of the TerrainBlock.
-     * @param texturePool
-     * @param textureImagePool
+     * @param textureSize
+     * @param textureProvider
      */
     public TerrainBlockImpl( final QuadTreeNode<TerrainBlock> quadTreeNode,
                              final int numberOfGridsPerSide,
-                             final Pool<Texture> texturePool,
-                             final Pool<BufferedImage> textureImagePool )
+                             final int textureSize,
+                             final TextureProvider textureProvider )
     {
         ParameterChecker.checkNotNull( quadTreeNode, "quadTreeNode" );
         ParameterChecker.checkPositiveNonZeroInteger( numberOfGridsPerSide, "numberOfGridsPerSide" );
-        ParameterChecker.checkNotNull( texturePool, "texturePool" );
-        ParameterChecker.checkNotNull( textureImagePool, "textureImagePool" );
+        ParameterChecker.checkPositiveNonZeroInteger( textureSize, "textureSize" );
+        ParameterChecker.checkNotNull( textureProvider, "textureProvider" );
 
         myQuadTreeNode = quadTreeNode;
         myNumberOfGridsPerSide = numberOfGridsPerSide;
-        myTexturePool = texturePool;
-        myTextureImagePool = textureImagePool;
+        myTextureProvider = textureProvider;
+        myTextureSize = textureSize;
+
+        myTextureImage = allocateTextureImage( textureSize );
 
         updateDerivedData();
 
@@ -79,27 +100,6 @@ public final class TerrainBlockImpl
 
     //----------------------------------------------------------------------
     // NodeListener Implementation
-
-    public void onDeleted( QuadTreeNode<TerrainBlock> quadTreeNode )
-    {
-        throw new UnsupportedOperationException( "This method was removed." );
-/*
-        checkIfDeleted();
-
-        if ( myTerrain3DNode != null )
-        {
-            myTerrain3DNode.detachAllChildren();
-        }
-
-        myQuadTreeNode = null;
-        myMapImage = null;
-        myTerrainMesh = null;
-        myTerrain3DNode = null;
-
-        myDelted = true;
-*/
-    }
-
 
     public void onCollapsed( QuadTreeNode<TerrainBlock> quadTreeNode )
     {
@@ -134,8 +134,6 @@ public final class TerrainBlockImpl
 
     public Spatial getSpatial()
     {
-        checkIfDeleted();
-
         if ( myTerrain3DNode == null )
         {
             myTerrain3DNode = new Node();
@@ -157,68 +155,152 @@ public final class TerrainBlockImpl
 
     public Vector3f getCenter()
     {
-        checkIfDeleted();
-
         return myCenter;
     }
 
 
     public void updateDerivedData()
     {
+        // Remove previous texture request, if found
+        myTextureProvider.cancelRequest( myTextureListener );
+
+        // Update center
         final BoundingRectangle bounds = myQuadTreeNode.getBounds();
         myCenter = new Vector3f( (float) bounds.getCenterX(),
                                  (float) bounds.getCenterY(),
                                  0 ); // TODO: Get ground height at center.
 
+        // Copy a chunk of a previously calculated parent block texture to the texture of this block
+        initializeTextureFromParentTexture();
+
+        // Update terrain mesh if present
         if ( myTerrainMesh != null )
         {
             myTerrainMesh.updateBounds( bounds.getX1(), bounds.getY1(), bounds.getX2(), bounds.getY2() );
-            myTerrainMesh.setTextureImage( myMapImage );
-            myMapImage = null;
+            myTerrainMesh.setTextureImage( myTextureImage );
         }
 
         // Make sure the node is collapsed
         onCollapsed( myQuadTreeNode );
-    }
 
-    //----------------------------------------------------------------------
-    // TextureListener Implementation
-
-    public void onTextureReady( final BoundingRectangle area, final BufferedImage texture )
-    {
-        if ( !myDelted )
-        {
-            setMapImage( texture );
-        }
-    }
-
-    //----------------------------------------------------------------------
-    // Other Public Methods
-
-    public Image getMapImage()
-    {
-        checkIfDeleted();
-
-        return myMapImage;
+        // Request texture for terrain block
+        myTextureProvider.requestTexture( bounds, myTextureImage, myTextureListener );
     }
 
 
-    public void setMapImage( final BufferedImage mapImage )
+    public BufferedImage getTextureImage()
     {
-        checkIfDeleted();
+        return myTextureImage;
+    }
 
-        if ( myTerrainMesh != null )
-        {
-            myTerrainMesh.setTextureImage( mapImage );
-        }
-        else
-        {
-            myMapImage = mapImage;
-        }
+
+    public boolean hasCalculatedTextureImage()
+    {
+        return myHasCalculatedTextureImage;
+    }
+
+    public void clearPicture()
+    {
+        fillTextureImageWithLoadingGraphics();
     }
 
     //======================================================================
     // Private Methods
+
+    private void initializeTextureFromParentTexture()
+    {
+        fillTextureImageWithLoadingGraphics();
+        myHasCalculatedTextureImage = false;
+
+/*
+        final BoundingRectangle textureBounds = new BoundingRectangleImpl( 0, 0, myTextureSize, myTextureSize );
+        initializeTextureFromParentTexture( myQuadTreeNode, textureBounds );
+*/
+    }
+
+
+    /**
+     * Recursive function.  Gets the texture from a smaller part of the parents parent texture,
+     * if parent doesn't have a calculated texture, and so on.
+     */
+    private void initializeTextureFromParentTexture( final QuadTreeNode<TerrainBlock> node,
+                                                     final BoundingRectangle textureBounds )
+    {
+        final QuadTreeNode<TerrainBlock> parentNode = node.getParent();
+        if ( parentNode == null )
+        {
+            // Not even the root had a calculated texture yet, use placeholder graphics
+            fillTextureImageWithLoadingGraphics();
+        }
+        else
+        {
+            // Calculate the texture area to get from the parent:
+            final int quadrant = parentNode.getIndexOfChild( node );
+            if ( quadrant >= 0 )
+            {
+
+                final BoundingRectangle parentTextureSourceArea = textureBounds.createSubquadrantBoundingRectangle(
+                        quadrant );
+
+                final TerrainBlock parentBlock = parentNode.getNodeData();
+                if ( parentBlock.hasCalculatedTextureImage() )
+                {
+                    // Copy the texture for the section that this terrain block occupies from the parent texture
+                    final BufferedImage parentImage = parentBlock.getTextureImage();
+
+                    final Graphics2D graphics = (Graphics2D) myTextureImage.getGraphics();
+                    graphics.drawImage( parentImage,
+                                        0, 0, myTextureImage.getWidth(), myTextureImage.getHeight(),
+                                        (int) parentTextureSourceArea.getX1(),
+                                        (int) parentTextureSourceArea.getY1(),
+                                        (int) parentTextureSourceArea.getX2(),
+                                        (int) parentTextureSourceArea.getY2(),
+                                        null );
+                }
+                else
+                {
+                    // The parent had no calculated texture, so see if its parent has.
+                    initializeTextureFromParentTexture( parentNode, textureBounds );
+                }
+            }
+            else
+            {
+                fillTextureImageWithLoadingGraphics();
+            }
+        }
+    }
+
+
+    private void fillTextureImageWithLoadingGraphics()
+    {
+        final Graphics graphics = myTextureImage.getGraphics();
+
+        // Background color
+        graphics.setColor( Color.GRAY );
+        graphics.fillRect( 0, 0, myTextureImage.getWidth(), myTextureImage.getHeight() );
+
+        // Text
+        graphics.setColor( Color.BLACK );
+        graphics.drawString( "Rendering Texture", 0, myTextureImage.getHeight() / 2 );
+    }
+
+
+    private BufferedImage allocateTextureImage( final int textureSize )
+    {
+        // Try to allocate the texture space, if we are out of memory just use null (a placeholder texture will be used)
+        BufferedImage mapImage;
+        try
+        {
+            mapImage = new BufferedImage( textureSize, textureSize, BufferedImage.TYPE_4BYTE_ABGR );
+        }
+        catch ( OutOfMemoryError e )
+        {
+            mapImage = null;
+        }
+
+        return mapImage;
+    }
+
 
     private void attachChildNodeSpatials()
     {
@@ -251,32 +333,22 @@ public final class TerrainBlockImpl
     }
 
 
-    private void checkIfDeleted()
-    {
-        if ( myDelted )
-        {
-            throw new IllegalStateException( "Can not access a deleted TerrainBlock anymore." );
-        }
-    }
-
-
     private TerrainMesh createTerrainMesh()
     {
+/*
+        final float z = 0;
+*/
+        // DEBUG
+        final float z = (float) ( Math.random() * 100 );
         final TerrainMesh terrainMesh = new TerrainMesh( myNumberOfGridsPerSide,
                                                          myNumberOfGridsPerSide,
                                                          myQuadTreeNode.getBounds().getX1(),
                                                          myQuadTreeNode.getBounds().getY1(),
                                                          myQuadTreeNode.getBounds().getX2(),
                                                          myQuadTreeNode.getBounds().getY2(),
-                                                         0,
-                                                         myTextureImagePool );
+                                                         z );
 
-        terrainMesh.setTextureImage( myMapImage );
-        myMapImage = null;
-
-/* // DEBUG
-        terrainMesh.setRandomColors();
-*/
+        terrainMesh.setTextureImage( myTextureImage );
 
         return terrainMesh;
     }

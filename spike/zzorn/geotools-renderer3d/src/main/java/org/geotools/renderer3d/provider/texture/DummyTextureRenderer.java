@@ -1,4 +1,4 @@
-package org.geotools.renderer3d.field;
+package org.geotools.renderer3d.provider.texture;
 
 import org.geotools.renderer3d.utils.BoundingRectangle;
 import org.geotools.renderer3d.utils.MathUtils;
@@ -52,16 +52,14 @@ public final class DummyTextureRenderer
                              height / 2 );
 
         // Simulate calculation delay:
-/*
-        pauseRandomTime( 1000 );
-*/
+        pauseRandomTime( 10, 2 );
     }
 
-    private void pauseRandomTime( final int maxMsToPause )
+    private void pauseRandomTime( final int maxMsToPause, final int addition )
     {
         try
         {
-            Thread.sleep( (long) ( maxMsToPause * Math.random() ) );
+            Thread.sleep( (long) ( maxMsToPause * Math.random() + addition ) );
         }
         catch ( InterruptedException e )
         {

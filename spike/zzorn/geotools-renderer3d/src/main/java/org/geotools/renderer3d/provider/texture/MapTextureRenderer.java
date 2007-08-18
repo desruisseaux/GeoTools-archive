@@ -1,4 +1,4 @@
-package org.geotools.renderer3d.field;
+package org.geotools.renderer3d.provider.texture;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContext;

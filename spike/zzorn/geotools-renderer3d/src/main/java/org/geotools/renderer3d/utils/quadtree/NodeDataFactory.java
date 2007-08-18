@@ -27,4 +27,12 @@ public interface NodeDataFactory<N>
      * @param nodeData
      */
     N reuseNodeDataObject( final QuadTreeNode<N> node, final N nodeData );
+
+    /**
+     * Called when the quad tree node containing the specified data object is released and put into the pool for
+     * recycling.
+     *
+     * @param nodeData
+     */
+    void onDataObjectUnused( final N nodeData );
 }

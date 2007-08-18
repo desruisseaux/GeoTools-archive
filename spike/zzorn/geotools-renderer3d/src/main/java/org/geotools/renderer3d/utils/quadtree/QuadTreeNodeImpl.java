@@ -31,6 +31,7 @@ public final class QuadTreeNodeImpl<N>
     // Private Constants
 
     private static final int NUMBER_OF_SUBNODES = 4;
+    private static final BoundingRectangleImpl ORIGO_BOUNDING_RECTANGLE = new BoundingRectangleImpl( 0, 0, 10 );
 
     //======================================================================
     // Public Methods
@@ -114,7 +115,6 @@ public final class QuadTreeNodeImpl<N>
         // Lazy creation
         if ( myNodeData == null )
         {
-            System.out.println( "QuadTreeNodeImpl.getNodeData LAZY CREATION " );
             myNodeData = myQuadTree.getNodeDataFactory().createNodeDataObject( this );
         }
 
@@ -241,7 +241,6 @@ public final class QuadTreeNodeImpl<N>
     {
         checkNodeIsAttached();
 
-
         if ( isRootNode() )
         {
             // Calcualte which direction the new parent should expand into
@@ -250,11 +249,12 @@ public final class QuadTreeNodeImpl<N>
             // Create a new parent
             final BoundingRectangle parentBounds = myBoundingRectangle.createParentBoundingRectangle( parentSubsector );
             final QuadTreeNode<N> parentNode = myQuadTree.createQuadTreeNode( parentBounds, null );
-            myParent = parentNode;
 
             // Add this node as a child of the parent node (in the opposite corner of where we expanded)
             final int childSubquadrant = myBoundingRectangle.getOppositeSubquadrant( parentSubsector );
             parentNode.expandWithChild( childSubquadrant, this );
+
+            myParent = parentNode;
 
             // Notify model that we have a new root node
             myQuadTree.setRootNode( parentNode );
@@ -263,7 +263,6 @@ public final class QuadTreeNodeImpl<N>
         {
             getRootNode().grow( x, y );
         }
-
     }
 
 
@@ -315,13 +314,10 @@ public final class QuadTreeNodeImpl<N>
     {
         checkNodeIsAttached();
 
-        if ( !myAttached )
-        {
-            throw new IllegalStateException( "A node that was already detached was attempted to be detached" );
-        }
-
         myParent = null;
         myAttached = false;
+        myChildren = null;
+        myBoundingRectangle = ORIGO_BOUNDING_RECTANGLE;
     }
 
 
@@ -361,16 +357,19 @@ public final class QuadTreeNodeImpl<N>
             }
 
             // Create child nodes
+            if ( childSubquadrant >= 0 )
+            {
+                myChildren[ childSubquadrant ] = childNode;
+            }
             for ( int i = 0; i < NUMBER_OF_SUBNODES; i++ )
             {
-                if ( i == childSubquadrant )
+                if ( i != childSubquadrant )
                 {
-                    myChildren[ i ] = childNode;
-                }
-                else if ( myChildren[ i ] == null )
-                {
-                    final BoundingRectangle rectangle = myBoundingRectangle.createSubquadrantBoundingRectangle( i );
-                    myChildren[ i ] = myQuadTree.createQuadTreeNode( rectangle, this );
+                    if ( myChildren[ i ] == null )
+                    {
+                        final BoundingRectangle rectangle = myBoundingRectangle.createSubquadrantBoundingRectangle( i );
+                        myChildren[ i ] = myQuadTree.createQuadTreeNode( rectangle, this );
+                    }
                 }
             }
 
@@ -381,19 +380,24 @@ public final class QuadTreeNodeImpl<N>
         }
     }
 
-    //----------------------------------------------------------------------
-    // Other Public Methods
 
-    public void delete()
+    public QuadTreeNode<N> getParent()
     {
-        System.out.println( "QuadTreeNodeImpl.delete" );
-        myNodeData = null;
-        myParent = null;
+        return myParent;
+    }
 
-        for ( NodeListener<N> nodeListener : myNodeListeners )
+
+    public int getIndexOfChild( final QuadTreeNode<N> childNode )
+    {
+        for ( int i = 0; i < myChildren.length; i++ )
         {
-            nodeListener.onDeleted( this );
+            if ( childNode == myChildren[ i ] )
+            {
+                return i;
+            }
         }
+
+        return -1;
     }
 
     //======================================================================
@@ -439,10 +443,10 @@ public final class QuadTreeNodeImpl<N>
         {
             myExpanded = false;
 
-            // Delete all child nodes
-            for ( int i = 0; i < NUMBER_OF_SUBNODES; i++ )
+            if ( myChildren != null )
             {
-                if ( myChildren != null )
+                // Delete all child nodes
+                for ( int i = 0; i < NUMBER_OF_SUBNODES; i++ )
                 {
                     final QuadTreeNode<N> child = myChildren[ i ];
                     if ( child != null )
@@ -451,6 +455,7 @@ public final class QuadTreeNodeImpl<N>
 
                         myQuadTree.releaseQuadTreeNode( child );
                     }
+                    myChildren[ i ] = null;
                 }
             }
 

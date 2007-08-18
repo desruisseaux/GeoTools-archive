@@ -1,4 +1,4 @@
-package org.geotools.renderer3d.field;
+package org.geotools.renderer3d.provider.height;
 
 import org.geotools.renderer3d.utils.BoundingRectangle;
 

@@ -41,6 +41,11 @@ public class QuadTreeImpl<N>
         {
             return null;
         }
+
+        public void onDataObjectUnused( final Object nodeData )
+        {
+
+        }
     };
 
     //======================================================================
@@ -127,13 +132,11 @@ public class QuadTreeImpl<N>
         final QuadTreeNode<N> quadTreeNode;
         if ( myQuadTreeNodePool.isEmpty() )
         {
-            System.out.println( "QuadTreeImpl.createQuadTreeNode POOL WAS EMPTY" );
             quadTreeNode = new QuadTreeNodeImpl<N>( this, bounds, parentNode );
             quadTreeNode.setNodeData( myNodeDataFactory.createNodeDataObject( quadTreeNode ) );
         }
         else
         {
-            System.out.println( "QuadTreeImpl.createQuadTreeNode POOL USED - POOL SIZE: " + myQuadTreeNodePool.size() );
             quadTreeNode = myQuadTreeNodePool.removeLast();
             quadTreeNode.attach( bounds, parentNode );
             quadTreeNode.setNodeData( myNodeDataFactory.reuseNodeDataObject( quadTreeNode,
@@ -146,11 +149,13 @@ public class QuadTreeImpl<N>
 
     public void releaseQuadTreeNode( final QuadTreeNode<N> node )
     {
+        final N nodeData = node.getNodeData();
+
+        myNodeDataFactory.onDataObjectUnused( nodeData );
+
         node.detach();
 
         myQuadTreeNodePool.addLast( node );
-
-        // TODO: Notify node data factory about the detachment ??
     }
 
     //======================================================================

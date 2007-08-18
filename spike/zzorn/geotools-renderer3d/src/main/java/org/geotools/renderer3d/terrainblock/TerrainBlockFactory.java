@@ -1,15 +1,8 @@
 package org.geotools.renderer3d.terrainblock;
 
-import com.jme.image.Texture;
-import org.geotools.renderer3d.field.TextureProvider;
-import org.geotools.renderer3d.utils.Pool;
-import org.geotools.renderer3d.utils.PoolItemFactory;
+import org.geotools.renderer3d.provider.texture.impl.TextureProvider;
 import org.geotools.renderer3d.utils.quadtree.NodeDataFactory;
 import org.geotools.renderer3d.utils.quadtree.QuadTreeNode;
-
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 
 /**
  * Creates terrain blocks for areas specified by quad tree nodes.
@@ -30,11 +23,6 @@ public final class TerrainBlockFactory
     private final TextureProvider myTextureProvider;
     private final int myTextureSize;
 
-    private final Pool<BufferedImage> myTextureImagePool;
-    private final Pool<Texture> myTexturePool;
-
-    private static int theNumberOfBLocks = 0;
-
     //======================================================================
     // Public Methods
 
@@ -54,25 +42,6 @@ public final class TerrainBlockFactory
         myTextureProvider = textureProvider;
         myTextureSize = textureSize;
 
-        myTextureImagePool = new Pool<BufferedImage>( new PoolItemFactory<BufferedImage>()
-        {
-
-            public BufferedImage create()
-            {
-                return new BufferedImage( myTextureSize, myTextureSize, BufferedImage.TYPE_4BYTE_ABGR );
-            }
-
-        } );
-
-        myTexturePool = new Pool<Texture>( new PoolItemFactory<Texture>()
-        {
-
-            public Texture create()
-            {
-                return null;
-            }
-
-        } );
     }
 
     //----------------------------------------------------------------------
@@ -83,36 +52,10 @@ public final class TerrainBlockFactory
 
     public TerrainBlock createNodeDataObject( final QuadTreeNode<TerrainBlock> node )
     {
-        System.out.println( "TerrainBlockFactory.createNodeDataObject - Creating a new Block --------" );
         final TerrainBlockImpl terrainBlock = new TerrainBlockImpl( node,
                                                                     myNumberOfGridsPerSide,
-                                                                    myTexturePool,
-                                                                    myTextureImagePool );
-
-        // TODO: First assign the block the texture (and elevation?) of the correct sub-quadrant of the parent node
-        // (or an eight of the grandparent and so on, if the parent hasn't rendered yet), and start rendering the
-        // texture of the node in a rendering thread.  When it is rendered, create a new texture from the rendered image
-        // and assign it to the node.  Same with retrieving the elevation data.
-        // Note that data retrieval / rendering can be very slow, as it can be e.g. fetched over the network.
-
-        // Create texture
-        final BufferedImage buffer = myTextureImagePool.getItem();
-        final Graphics graphics = buffer.getGraphics();
-        graphics.setColor( Color.BLUE );
-        graphics.fillRect( 0, 0, myTextureSize, myTextureSize );
-        graphics.setColor( Color.WHITE );
-        graphics.drawRect( 0, 0, myTextureSize - 1, myTextureSize - 1 );
-
-        // TODO: Get texture of parent block, and copy the correct area of it to this terrain block texture
-        // TODO: If no parent is available, create a placeholder image
-
-        terrainBlock.setMapImage( buffer );
-
-        // Create texture for terrain block
-        myTextureProvider.requestTexture( node.getBounds(), buffer, terrainBlock );
-
-        theNumberOfBLocks++;
-        System.out.println( "theNumberOfBLocks = " + theNumberOfBLocks );
+                                                                    myTextureSize,
+                                                                    myTextureProvider );
 
         return terrainBlock;
     }
@@ -121,21 +64,25 @@ public final class TerrainBlockFactory
     public TerrainBlock reuseNodeDataObject( final QuadTreeNode<TerrainBlock> node,
                                              final TerrainBlock existingTerrainBlock )
     {
-        System.out.println( "theNumberOfBLocks = " + theNumberOfBLocks );
         if ( existingTerrainBlock == null )
         {
-            System.out.println( "TerrainBlockFactory.reuseNodeDataObject CALLED WITH NO EXISITNG TERRAIN BLOCK" );
             return createNodeDataObject( node );
         }
         else
         {
+
             existingTerrainBlock.updateDerivedData();
 
-            // Create texture for terrain block
-            final BufferedImage buffer = myTextureImagePool.getItem();
-            myTextureProvider.requestTexture( node.getBounds(), buffer, existingTerrainBlock );
-
             return existingTerrainBlock;
+        }
+    }
+
+    public void onDataObjectUnused( final TerrainBlock nodeData )
+    {
+        // DEBUG
+        if ( nodeData != null )
+        {
+            nodeData.clearPicture();
         }
     }
 

@@ -153,5 +153,17 @@ public interface QuadTreeNode<N>
      * Called by the quad tree code when a new root node is created, should not be called from client code.
      */
     void expandWithChild( final int childSubquadrant, final QuadTreeNode<N> childNode );
+
+    /**
+     * @return the parent node of this QuadTreeNode, or null if this node is the root node.
+     */
+    QuadTreeNode<N> getParent();
+
+    /**
+     * @param childNode a child node to get the position of in the parent
+     *
+     * @return the index of the specified child node, or -1 if the specified node is not a child.
+     */
+    int getIndexOfChild( final QuadTreeNode<N> childNode );
 }
 

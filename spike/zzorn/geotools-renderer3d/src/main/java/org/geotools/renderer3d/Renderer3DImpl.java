@@ -6,10 +6,10 @@ import com.jme.scene.Node;
 import com.jme.scene.Spatial;
 import com.jme.util.LoggingSystem;
 import org.geotools.map.MapContext;
-import org.geotools.renderer3d.field.DummyTextureRenderer;
-import org.geotools.renderer3d.field.TextureProvider;
-import org.geotools.renderer3d.field.TextureProviderImpl;
 import org.geotools.renderer3d.navigationgestures.NavigationGesture;
+import org.geotools.renderer3d.provider.texture.DummyTextureRenderer;
+import org.geotools.renderer3d.provider.texture.impl.TextureProvider;
+import org.geotools.renderer3d.provider.texture.impl.TextureProviderImpl;
 import org.geotools.renderer3d.terrainblock.TerrainBlock;
 import org.geotools.renderer3d.terrainblock.TerrainBlockFactory;
 import org.geotools.renderer3d.utils.ParameterChecker;
@@ -63,7 +63,7 @@ public final class Renderer3DImpl
     //======================================================================
     // Private Constants
 
-    private static final int DEFAULT_START_RADIUS_M = 100;
+    private static final int DEFAULT_START_RADIUS_M = 1000;
     private static final int DEFAULT_TERRAIN_BLOCK_SIZE_IN_GRIDS = 32;
     private static final int DEFAULT_TEXTURE_SIZE = 128;
     private static final double DEFAULT_VISIBILITY_DISTANCE = 10000.0;
@@ -152,7 +152,7 @@ public final class Renderer3DImpl
         myCanvas3D.setViewDistance( (float) myVisibilityDistance );
 
 /*
-        final MapTextureRenderer mapTextureProvider = new MapTextureRenderer( mapContextToRender, Color.WHITE );
+        final TextureProvider mapTextureProvider = new TextureProviderImpl( new MapTextureRenderer( mapContextToRender, Color.WHITE ) );
 */
 
         // DEBUG

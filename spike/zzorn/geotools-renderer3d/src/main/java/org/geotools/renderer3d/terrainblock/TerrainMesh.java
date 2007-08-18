@@ -8,6 +8,9 @@ import com.jme.renderer.ColorRGBA;
 import com.jme.renderer.Renderer;
 import com.jme.scene.TriMesh;
 import com.jme.scene.state.TextureState;
+import com.jme.system.DisplaySystem;
+import com.jme.util.GameTaskQueue;
+import com.jme.util.GameTaskQueueManager;
 import com.jme.util.TextureKey;
 import com.jme.util.TextureManager;
 import com.jme.util.geom.BufferUtils;
@@ -15,12 +18,12 @@ import com.jmex.awt.swingui.ImageGraphics;
 import org.geotools.renderer3d.utils.ImageUtils;
 import org.geotools.renderer3d.utils.MathUtils;
 import org.geotools.renderer3d.utils.ParameterChecker;
-import org.geotools.renderer3d.utils.Pool;
 
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.concurrent.Callable;
 
 /**
  * A rectangular terrain elevation mesh.
@@ -55,6 +58,8 @@ public final class TerrainMesh
     private final int mySizeY_vertices;
     private final int mySizeX_vertices;
 
+    private Renderer myRenderer = null;
+
     private BufferedImage myTextureImage;
 
     private boolean myTextureUpdateNeeded = false;
@@ -68,7 +73,6 @@ public final class TerrainMesh
     private static final float DEFAULT_ANISO_LEVEL = 1.0f;
     private static final int DEFAULT_TEXTURE_IMAGE_FORMAT = com.jme.image.Image.GUESS_FORMAT_NO_S3TC;
     private TextureState myTextureState;
-    private final Pool<BufferedImage> myTextureImagePool;
     private Texture myTexture;
     private ImageGraphics myTextureGraphics;
 
@@ -79,14 +83,13 @@ public final class TerrainMesh
     // Constructors
 
     /**
-     * @param sizeXCells       Number of grid cells along the X side.
-     * @param sizeYCells       Number of grid cells along the Y side.
-     * @param x1               first world coordinate.
-     * @param y1               first world coordinate.
-     * @param x2               second world coordinate.  Should be larger than the first.
-     * @param y2               second world coordinate.  Should be larger than the first.
-     * @param z                the default height level.
-     * @param textureImagePool a pool to return texture images to when they have been applied to a texture.
+     * @param sizeXCells Number of grid cells along the X side.
+     * @param sizeYCells Number of grid cells along the Y side.
+     * @param x1         first world coordinate.
+     * @param y1         first world coordinate.
+     * @param x2         second world coordinate.  Should be larger than the first.
+     * @param y2         second world coordinate.  Should be larger than the first.
+     * @param z          the default height level.
      */
     public TerrainMesh( final int sizeXCells,
                         final int sizeYCells,
@@ -94,8 +97,7 @@ public final class TerrainMesh
                         final double y1,
                         final double x2,
                         final double y2,
-                        final double z,
-                        final Pool<BufferedImage> textureImagePool )
+                        final double z )
     {
         // JME seems to need an unique identifier for each node.  NOTE: Not thread safe.
         super( "TerrainMesh_" + theTerrainMeshCounter++ );
@@ -104,7 +106,6 @@ public final class TerrainMesh
         ParameterChecker.checkPositiveNonZeroInteger( sizeXCells, "sizeXCells" );
         ParameterChecker.checkPositiveNonZeroInteger( sizeYCells, "sizeYCells" );
         ParameterChecker.checkNormalNumber( z, "z" );
-        ParameterChecker.checkNotNull( textureImagePool, "textureImagePool" );
 
         // Assign fields from parameters
         // Cells are the rectangular areas between four normal surface vertices.  Does not include the rectangles in the downturned skirt.
@@ -114,7 +115,6 @@ public final class TerrainMesh
         mySizeX_vertices = mySizeX_cells + 1 + 2;
         mySizeY_vertices = mySizeY_cells + 1 + 2;
         myZ = z;
-        myTextureImagePool = textureImagePool;
 
         mySkirtSize = calculateSkirtSize();
 
@@ -182,29 +182,35 @@ public final class TerrainMesh
     //----------------------------------------------------------------------
     // Other Public Methods
 
-    public void draw( final Renderer r )
-    {
-        if ( myTextureUpdateNeeded )
-        {
-            initTexture( myTextureImage, r );
-
-            myTextureImagePool.addItem( myTextureImage );
-            myTextureImage = null;
-        }
-
-        super.draw( r );
-    }
-
 
     /**
      * Creates a texture from the specified image and applies it to this Terrainmesh.
      *
      * @param textureImage the image to create a texture from.  If null, a placeholder texture is created.
      */
-    public void setTextureImage( BufferedImage textureImage )
+    public void setTextureImage( final BufferedImage textureImage )
     {
-        myTextureImage = textureImage;
-        myTextureUpdateNeeded = true;
+/*
+        if ( myRenderer == null )
+        {
+            myTextureImage = textureImage;
+            myTextureUpdateNeeded = true;
+        }
+        else
+        {
+            initTexture( textureImage, myRenderer );
+        }
+*/
+
+        GameTaskQueueManager.getManager().getQueue( GameTaskQueue.UPDATE ).enqueue( new Callable<Object>()
+        {
+            public Object call() throws Exception
+            {
+                final Renderer renderer = DisplaySystem.getDisplaySystem().getRenderer();
+                initTexture( textureImage, renderer );
+                return null;
+            }
+        } );
     }
 
     //======================================================================
@@ -548,6 +554,7 @@ public final class TerrainMesh
 
         if ( myTextureState == null )
         {
+            System.out.println( "TerrainMesh.initTexture NULL STATE" );
             // First texture
             myTextureGraphics = ImageGraphics.createInstance( textureImage.getWidth( null ),
                                                               textureImage.getHeight( null ),
@@ -556,7 +563,7 @@ public final class TerrainMesh
             myTextureGraphics.drawImage( textureImage, 0, 0, null );
             myTextureGraphics.update();
 
-            final TextureKey tkey = new TextureKey( null, Texture.MM_NONE, Texture.FM_LINEAR,
+            final TextureKey tkey = new TextureKey( null, Texture.MM_LINEAR, Texture.FM_LINEAR,
                                                     DEFAULT_ANISO_LEVEL, false, DEFAULT_TEXTURE_IMAGE_FORMAT );
             tkey.setFileType( "" + textureImage.hashCode() );
 
@@ -574,11 +581,13 @@ public final class TerrainMesh
         else
         {
 
+            System.out.println( "TerrainMesh.initTexture REUSE STATE" );
             // Update of texture
 
 //            myTextureState.setNeedsRefresh( true );
             myTextureGraphics.drawImage( textureImage, 0, 0, null );
             myTextureGraphics.update( myTexture );
+            updateRenderState();
 /*
             myTextureState.deleteAll();
             TextureManager.l

@@ -1,4 +1,4 @@
-package org.geotools.renderer3d.field;
+package org.geotools.renderer3d.provider.texture.impl;
 
 import org.geotools.renderer3d.utils.BoundingRectangle;
 
@@ -22,4 +22,12 @@ public interface TextureProvider
      * @param textureListener a listener that should be called back when the texture is ready.
      */
     void requestTexture( BoundingRectangle area, BufferedImage buffer, TextureListener textureListener );
+
+    /**
+     * Cancels the first found request with the specified listener.
+     * The request is canceled even if it is already being rendered.
+     *
+     * @param textureListener the listener to cancel a texture request for.
+     */
+    void cancelRequest( final TextureListener textureListener );
 }

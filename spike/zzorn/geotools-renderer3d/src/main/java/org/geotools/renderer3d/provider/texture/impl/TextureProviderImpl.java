@@ -1,5 +1,6 @@
-package org.geotools.renderer3d.field;
+package org.geotools.renderer3d.provider.texture.impl;
 
+import org.geotools.renderer3d.provider.texture.TextureRenderer;
 import org.geotools.renderer3d.utils.BoundingRectangle;
 import org.geotools.renderer3d.utils.ParameterChecker;
 
@@ -24,7 +25,9 @@ public final class TextureProviderImpl
     // Private Fields
 
     private final TextureRenderer myTextureRenderer;
-    private final List<TextureJob> myPaintJobs = new LinkedList<TextureJob>();
+    private final List<TextureJob> myTextureJobs = new LinkedList<TextureJob>();
+    private TextureJob myCurrentJob = null;
+    private boolean myCurrentJobWasCanceled = false;
 
     //======================================================================
     // Public Methods
@@ -53,7 +56,11 @@ public final class TextureProviderImpl
 
                     myTextureRenderer.renderArea( paintJob.getArea(), paintJob.getBuffer() );
 
-                    notifyListener( paintJob );
+                    if ( !myCurrentJobWasCanceled )
+                    {
+                        notifyListener( paintJob );
+                    }
+                    myCurrentJobWasCanceled = false;
                 }
             }
 
@@ -69,10 +76,44 @@ public final class TextureProviderImpl
                                 final BufferedImage buffer,
                                 final TextureListener textureListener )
     {
-        synchronized ( myPaintJobs )
+/*
+        // DEBUG
+        myTextureRenderer.renderArea( area, buffer );
+        textureListener.onTextureReady( area, buffer );
+*/
+
+        synchronized ( myTextureJobs )
         {
-            myPaintJobs.add( new TextureJob( area, buffer, textureListener ) );
-            myPaintJobs.notifyAll();
+            myTextureJobs.add( new TextureJob( area, buffer, textureListener ) );
+            myTextureJobs.notifyAll();
+        }
+    }
+
+    public void cancelRequest( final TextureListener textureListener )
+    {
+        synchronized ( myTextureJobs )
+        {
+            TextureJob textureJobToRemove = null;
+            for ( TextureJob textureJob : myTextureJobs )
+            {
+                if ( textureJob.getTextureListener() == textureListener )
+                {
+                    textureJobToRemove = textureJob;
+                    break;
+                }
+            }
+
+            if ( textureJobToRemove != null )
+            {
+                myTextureJobs.remove( textureJobToRemove );
+            }
+            else if ( myCurrentJob != null && myCurrentJob.getTextureListener() == textureListener )
+            {
+                myCurrentJobWasCanceled = true;
+
+                // myTextureRenderer.cancelRendering(); // TODO: This could be implemented to speed up things a bit when
+                // jobs are canceled, but there's some possibilities that it cancels the next job instead, so left out for now.
+            }
         }
     }
 
@@ -104,13 +145,15 @@ public final class TextureProviderImpl
 
         while ( paintJob == null )
         {
-            synchronized ( myPaintJobs )
+            synchronized ( myTextureJobs )
             {
-                while ( myPaintJobs.isEmpty() )
+                myCurrentJob = null;
+
+                while ( myTextureJobs.isEmpty() )
                 {
                     try
                     {
-                        myPaintJobs.wait();
+                        myTextureJobs.wait();
                     }
                     catch ( InterruptedException e )
                     {
@@ -118,11 +161,13 @@ public final class TextureProviderImpl
                     }
                 }
 
-                if ( !myPaintJobs.isEmpty() )
+                if ( !myTextureJobs.isEmpty() )
                 {
-                    paintJob = myPaintJobs.get( 0 );
-                    myPaintJobs.remove( paintJob );
+                    paintJob = myTextureJobs.get( 0 );
+                    myTextureJobs.remove( paintJob );
                 }
+
+                myCurrentJob = paintJob;
             }
         }
 

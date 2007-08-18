@@ -1,4 +1,4 @@
-package org.geotools.renderer3d.field;
+package org.geotools.renderer3d.provider.texture.impl;
 
 import org.geotools.renderer3d.utils.BoundingRectangle;
 
