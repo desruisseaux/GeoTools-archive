@@ -64,29 +64,29 @@ public class GeometryAttributeImpl extends AttributeImpl implements
 	 * public GeometryFactory getGeometryFactory() { return geometryFactory; }
 	 */
 
-	protected Object parse(Object value) throws IllegalArgumentException {
-		if (value == null) {
-			return value;
-		}
-
-		if (value instanceof Geometry) {
-			return value;
-		}
-
-		if (value instanceof String) {
-			String wkt = (String) value;
-			WKTReader reader = new WKTReader();
-			try {
-				return reader.read(wkt);
-			} catch (com.vividsolutions.jts.io.ParseException pe) {
-				throw new IllegalArgumentException("Could not parse the "
-						+ "string: " + wkt + " to well known text");
-			}
-		}
-		// consider wkb/gml support?
-		throw new IllegalArgumentException(getClass().getName()
-				+ " cannot parse " + value);
-	}
+//	protected Object parse(Object value) throws IllegalArgumentException {
+//		if (value == null) {
+//			return value;
+//		}
+//
+//		if (value instanceof Geometry) {
+//			return value;
+//		}
+//
+//		if (value instanceof String) {
+//			String wkt = (String) value;
+//			WKTReader reader = new WKTReader();
+//			try {
+//				return reader.read(wkt);
+//			} catch (com.vividsolutions.jts.io.ParseException pe) {
+//				throw new IllegalArgumentException("Could not parse the "
+//						+ "string: " + wkt + " to well known text");
+//			}
+//		}
+//		// consider wkb/gml support?
+//		throw new IllegalArgumentException(getClass().getName()
+//				+ " cannot parse " + value);
+//	}
 
 	public Object /*Geometry*/ getValue() {
 		return (Geometry) super.getValue();
