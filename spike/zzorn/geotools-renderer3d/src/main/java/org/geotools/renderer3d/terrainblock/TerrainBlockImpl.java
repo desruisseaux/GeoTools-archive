@@ -335,11 +335,7 @@ public final class TerrainBlockImpl
 
     private TerrainMesh createTerrainMesh()
     {
-/*
         final float z = 0;
-*/
-        // DEBUG
-        final float z = (float) ( Math.random() * 100 );
         final TerrainMesh terrainMesh = new TerrainMesh( myNumberOfGridsPerSide,
                                                          myNumberOfGridsPerSide,
                                                          myQuadTreeNode.getBounds().getX1(),

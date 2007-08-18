@@ -27,6 +27,11 @@ public final class BoundingRectangleImpl
     private final double myCenterY;
 
     //======================================================================
+    // Private Constants
+
+    private static final int[] OPPOSING_SUBQUADRANT = new int[]{ 3, 2, 1, 0 };
+
+    //======================================================================
     // Public Methods
 
     //----------------------------------------------------------------------
@@ -264,7 +269,9 @@ public final class BoundingRectangleImpl
 
     public int getOppositeSubquadrant( int subquadrant )
     {
-        return ( subquadrant + 2 ) % 4; // Roll around.  0=>2, 1=>3, 2=>0, 3=>1.
+        ParameterChecker.checkIntegerInRange( subquadrant, "subquadrant", 0, 4 );
+
+        return OPPOSING_SUBQUADRANT[ subquadrant ];
     }
 
 
