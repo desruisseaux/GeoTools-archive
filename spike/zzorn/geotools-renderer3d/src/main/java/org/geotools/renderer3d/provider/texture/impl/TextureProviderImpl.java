@@ -76,17 +76,17 @@ public final class TextureProviderImpl
                                 final BufferedImage buffer,
                                 final TextureListener textureListener )
     {
-/*
         // DEBUG
         myTextureRenderer.renderArea( area, buffer );
         textureListener.onTextureReady( area, buffer );
-*/
 
+/*
         synchronized ( myTextureJobs )
         {
             myTextureJobs.add( new TextureJob( area, buffer, textureListener ) );
             myTextureJobs.notifyAll();
         }
+*/
     }
 
     public void cancelRequest( final TextureListener textureListener )

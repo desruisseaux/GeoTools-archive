@@ -19,7 +19,6 @@ import org.geotools.renderer3d.utils.ImageUtils;
 import org.geotools.renderer3d.utils.MathUtils;
 import org.geotools.renderer3d.utils.ParameterChecker;
 
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -39,10 +38,6 @@ public final class TerrainMesh
 
     private static int theTerrainMeshCounter = 0;
 
-    private double myX1;
-    private double myY1;
-    private double myX2;
-    private double myY2;
     private final double myZ;
     private final double mySkirtSize;
     private final FloatBuffer myVertexes;
@@ -58,11 +53,19 @@ public final class TerrainMesh
     private final int mySizeY_vertices;
     private final int mySizeX_vertices;
 
+    private double myX1;
+    private double myY1;
+    private double myX2;
+    private double myY2;
+
     private Renderer myRenderer = null;
 
     private BufferedImage myTextureImage;
 
     private boolean myTextureUpdateNeeded = false;
+    private TextureState myTextureState;
+    private Texture myTexture;
+    private ImageGraphics myTextureGraphics;
 
     //======================================================================
     // Private Constants
@@ -72,9 +75,6 @@ public final class TerrainMesh
     private static final BufferedImage PLACEHOLDER_PICTURE = ImageUtils.createPlaceholderPicture( 128, 128 );
     private static final float DEFAULT_ANISO_LEVEL = 1.0f;
     private static final int DEFAULT_TEXTURE_IMAGE_FORMAT = com.jme.image.Image.GUESS_FORMAT_NO_S3TC;
-    private TextureState myTextureState;
-    private Texture myTexture;
-    private ImageGraphics myTextureGraphics;
 
     //======================================================================
     // Public Methods
@@ -136,6 +136,8 @@ public final class TerrainMesh
         updateBounds( x1, y1, x2, y2 );
     }
 
+    //----------------------------------------------------------------------
+    // Other Public Methods
 
     /**
      * Updates the positon and covered area of the terrain mesh.
@@ -179,9 +181,6 @@ public final class TerrainMesh
         updateModelBound();
     }
 
-    //----------------------------------------------------------------------
-    // Other Public Methods
-
 
     /**
      * Creates a texture from the specified image and applies it to this Terrainmesh.
@@ -201,15 +200,18 @@ public final class TerrainMesh
             initTexture( textureImage, myRenderer );
         }
 */
+//        textureImage.getGraphics().fillOval( 0,0, 100, 100 );
 
         GameTaskQueueManager.getManager().getQueue( GameTaskQueue.UPDATE ).enqueue( new Callable<Object>()
         {
+
             public Object call() throws Exception
             {
                 final Renderer renderer = DisplaySystem.getDisplaySystem().getRenderer();
                 initTexture( textureImage, renderer );
                 return null;
             }
+
         } );
     }
 
@@ -545,8 +547,9 @@ public final class TerrainMesh
     }
 
 
-    private void initTexture( Image textureImage, final Renderer renderer )
+    private void initTexture( BufferedImage textureImage, final Renderer renderer )
     {
+        // The texture can be null e.g. if we ran out of memory
         if ( textureImage == null )
         {
             textureImage = PLACEHOLDER_PICTURE;
@@ -554,60 +557,62 @@ public final class TerrainMesh
 
         if ( myTextureState == null )
         {
-            System.out.println( "TerrainMesh.initTexture NULL STATE" );
-            // First texture
+            // First time initializations:
+
+            // Create JME Image Renderer
             myTextureGraphics = ImageGraphics.createInstance( textureImage.getWidth( null ),
                                                               textureImage.getHeight( null ),
                                                               0 );
-
             myTextureGraphics.drawImage( textureImage, 0, 0, null );
             myTextureGraphics.update();
 
-            final TextureKey tkey = new TextureKey( null, Texture.MM_LINEAR, Texture.FM_LINEAR,
-                                                    DEFAULT_ANISO_LEVEL, false, DEFAULT_TEXTURE_IMAGE_FORMAT );
-            tkey.setFileType( "" + textureImage.hashCode() );
+            // Create texture
+            myTexture = TextureManager.loadTexture( null,
+                                                    createTextureKey( textureImage.hashCode() ),
+                                                    myTextureGraphics.getImage() );
 
-            myTexture = TextureManager.loadTexture( null, tkey, myTextureGraphics.getImage() );
+            // Make sure this texture is not cached, as we will be updating it when the TerrainMesh is re-used
+            TextureManager.releaseTexture( myTexture );
 
-            myTextureState = renderer.createTextureState();
             // Clamp texture at edges (no wrapping)
             myTexture.setWrap( Texture.WM_ECLAMP_S_ECLAMP_T );
+            myTexture.setMipmapState( Texture.MM_LINEAR_LINEAR );
 
+            // Create texture render state
+            myTextureState = renderer.createTextureState();
+            myTextureState.setEnabled( true );
             myTextureState.setTexture( myTexture, 0 );
-
             setRenderState( myTextureState );
             updateRenderState();
         }
         else
         {
+            // Release the previously reserved textures, so that they don't take up space on the 3D card
+            // NOTE: Maybe this also forces JME to re-upload the changed texture?
+            myTextureState.deleteAll( true );
 
-            System.out.println( "TerrainMesh.initTexture REUSE STATE" );
-            // Update of texture
-
-//            myTextureState.setNeedsRefresh( true );
+            // Update the JME Image used by the texture
             myTextureGraphics.drawImage( textureImage, 0, 0, null );
+            myTextureGraphics.update();
             myTextureGraphics.update( myTexture );
-            updateRenderState();
-/*
-            myTextureState.deleteAll();
-            TextureManager.l
-            myTexture.getImage().
-                    myTexture.setImage( TextureManager.loadImage( textureImage, false ) );
 
-            ImageGraphics
-*/
+            // Make sure this texture is not cached, as we will be updating it when the TerrainMesh is re-used
+            TextureManager.releaseTexture( myTexture );
+
+            // Smoother look at low viewing angles
+            myTexture.setMipmapState( Texture.MM_LINEAR_LINEAR );
         }
-
-        // REFACTOR: Create the texture just on the first call, and just change the texture after that.
-
-/*
-        // Activate mip-mapping
-        texture.setMipmapState( Texture.MM_LINEAR );
-*/
-
 
         myTextureUpdateNeeded = false;
     }
 
+
+    private TextureKey createTextureKey( final int imageHashcode )
+    {
+        final TextureKey tkey = new TextureKey( null, Texture.MM_LINEAR, Texture.FM_LINEAR,
+                                                DEFAULT_ANISO_LEVEL, false, DEFAULT_TEXTURE_IMAGE_FORMAT );
+        tkey.setFileType( "" + imageHashcode );
+        return tkey;
+    }
 
 }
