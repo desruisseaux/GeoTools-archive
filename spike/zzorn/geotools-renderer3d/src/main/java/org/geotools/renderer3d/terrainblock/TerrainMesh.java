@@ -1,6 +1,7 @@
 package org.geotools.renderer3d.terrainblock;
 
 import com.jme.bounding.BoundingBox;
+import com.jme.image.Image;
 import com.jme.image.Texture;
 import com.jme.math.Vector2f;
 import com.jme.math.Vector3f;
@@ -15,9 +16,7 @@ import com.jme.util.TextureKey;
 import com.jme.util.TextureManager;
 import com.jme.util.geom.BufferUtils;
 import com.jmex.awt.swingui.ImageGraphics;
-import org.geotools.renderer3d.utils.ImageUtils;
-import org.geotools.renderer3d.utils.MathUtils;
-import org.geotools.renderer3d.utils.ParameterChecker;
+import org.geotools.renderer3d.utils.*;
 
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
@@ -58,14 +57,15 @@ public final class TerrainMesh
     private double myX2;
     private double myY2;
 
-    private Renderer myRenderer = null;
-
-    private BufferedImage myTextureImage;
-
-    private boolean myTextureUpdateNeeded = false;
     private TextureState myTextureState;
     private Texture myTexture;
     private ImageGraphics myTextureGraphics;
+
+    private TextureState myPlaceholderTextureState = null;
+
+    private final Object myTextureStateLock = new Object();
+
+    private boolean myPlaceholderTextureInUse = false;
 
     //======================================================================
     // Private Constants
@@ -75,6 +75,13 @@ public final class TerrainMesh
     private static final BufferedImage PLACEHOLDER_PICTURE = ImageUtils.createPlaceholderPicture( 128, 128 );
     private static final float DEFAULT_ANISO_LEVEL = 1.0f;
     private static final int DEFAULT_TEXTURE_IMAGE_FORMAT = com.jme.image.Image.GUESS_FORMAT_NO_S3TC;
+    private static final BoundingRectangleImpl WHOLE_TEXTURE_AREA = new BoundingRectangleImpl( 0, 0, 1, 1 );
+    private static final Texture PLACEHOLDER_TEXTURE = TextureManager.loadTexture( PLACEHOLDER_PICTURE,
+                                                                                   Texture.MM_LINEAR_LINEAR,
+                                                                                   Texture.FM_LINEAR,
+                                                                                   1,
+                                                                                   Image.GUESS_FORMAT_NO_S3TC,
+                                                                                   false );
 
     //======================================================================
     // Public Methods
@@ -189,19 +196,6 @@ public final class TerrainMesh
      */
     public void setTextureImage( final BufferedImage textureImage )
     {
-/*
-        if ( myRenderer == null )
-        {
-            myTextureImage = textureImage;
-            myTextureUpdateNeeded = true;
-        }
-        else
-        {
-            initTexture( textureImage, myRenderer );
-        }
-*/
-//        textureImage.getGraphics().fillOval( 0,0, 100, 100 );
-
         GameTaskQueueManager.getManager().getQueue( GameTaskQueue.UPDATE ).enqueue( new Callable<Object>()
         {
 
@@ -213,6 +207,50 @@ public final class TerrainMesh
             }
 
         } );
+    }
+
+
+    /**
+     * @return the texture that this TerrainMesh is currently using, or null if it is using a placeholder texture.
+     */
+    public Texture getTexture()
+    {
+        return myTexture;
+    }
+
+
+    public void setPlaceholderTexture( final Texture texture, final BoundingRectangle textureArea )
+    {
+        synchronized ( myTextureStateLock )
+        {
+            myPlaceholderTextureInUse = true;
+
+            if ( myTextureState != null )
+            {
+                // Update texture indexes
+                setTextureCoordinates( textureArea );
+
+                // Update the geometry
+                updateGeometricState( 0, true );
+
+                // Use placeholder if no texture specified
+                Texture textureToUse = texture;
+                if ( textureToUse == null )
+                {
+                    textureToUse = PLACEHOLDER_TEXTURE;
+                }
+
+                // Set the texture
+                myTextureState.setTexture( textureToUse );
+
+                updateRenderState();
+            }
+        }
+    }
+
+    public boolean isPlaceholderTextureInUse()
+    {
+        return myPlaceholderTextureInUse;
     }
 
     //======================================================================
@@ -549,61 +587,100 @@ public final class TerrainMesh
 
     private void initTexture( BufferedImage textureImage, final Renderer renderer )
     {
-        // The texture can be null e.g. if we ran out of memory
-        if ( textureImage == null )
+        synchronized ( myTextureStateLock )
         {
-            textureImage = PLACEHOLDER_PICTURE;
+            // The texture can be null e.g. if we ran out of memory
+            if ( textureImage == null )
+            {
+                textureImage = PLACEHOLDER_PICTURE;
+            }
+
+            // Remove any placeholder render state
+            if ( myPlaceholderTextureInUse )
+            {
+/*
+            clearRenderState( RenderState.RS_TEXTURE );
+*/
+/*
+            myPlaceholderTextureState.setEnabled( false );
+            myPlaceholderTextureState.setTexture( null );
+            myPlaceholderTextureState = null;
+*/
+                setTextureCoordinates( WHOLE_TEXTURE_AREA );
+/*
+*/
+            }
+
+            if ( myTextureGraphics == null )
+            {
+                // First time initializations:
+
+                // Create JME Image Renderer
+                myTextureGraphics = ImageGraphics.createInstance( textureImage.getWidth( null ),
+                                                                  textureImage.getHeight( null ),
+                                                                  0 );
+                myTextureGraphics.drawImage( textureImage, 0, 0, null );
+                myTextureGraphics.update();
+
+                // Create texture
+                myTexture = TextureManager.loadTexture( null,
+                                                        createTextureKey( textureImage.hashCode() ),
+                                                        myTextureGraphics.getImage() );
+
+                // Make sure this texture is not cached, as we will be updating it when the TerrainMesh is re-used
+                TextureManager.releaseTexture( myTexture );
+
+                // Clamp texture at edges (no wrapping)
+                myTexture.setWrap( Texture.WM_ECLAMP_S_ECLAMP_T );
+                myTexture.setMipmapState( Texture.MM_LINEAR_LINEAR );
+
+                if ( myPlaceholderTextureInUse )
+                {
+                    myTextureState.setTexture( myTexture, 0 );
+                }
+                else
+                {
+                    createTextureRenderState( renderer, myTexture );
+                }
+            }
+            else
+            {
+                // Release the previously reserved textures, so that they don't take up space on the 3D card
+                // NOTE: Maybe this also forces JME to re-upload the changed texture?
+                if ( !myPlaceholderTextureInUse )
+                {
+                    myTextureState.deleteAll( true );
+                }
+                else
+                {
+                    myTextureState.setTexture( myTexture, 0 );
+                    myTextureState.deleteAll( true );
+                }
+
+                // Update the JME Image used by the texture
+                myTextureGraphics.drawImage( textureImage, 0, 0, null );
+                myTextureGraphics.update();
+                myTextureGraphics.update( myTexture );
+
+                // Make sure this texture is not cached, as we will be updating it when the TerrainMesh is re-used
+                TextureManager.releaseTexture( myTexture );
+
+                // Smoother look at low viewing angles
+                myTexture.setMipmapState( Texture.MM_LINEAR_LINEAR );
+            }
+
+            myPlaceholderTextureInUse = false;
         }
+    }
 
-        if ( myTextureState == null )
-        {
-            // First time initializations:
 
-            // Create JME Image Renderer
-            myTextureGraphics = ImageGraphics.createInstance( textureImage.getWidth( null ),
-                                                              textureImage.getHeight( null ),
-                                                              0 );
-            myTextureGraphics.drawImage( textureImage, 0, 0, null );
-            myTextureGraphics.update();
-
-            // Create texture
-            myTexture = TextureManager.loadTexture( null,
-                                                    createTextureKey( textureImage.hashCode() ),
-                                                    myTextureGraphics.getImage() );
-
-            // Make sure this texture is not cached, as we will be updating it when the TerrainMesh is re-used
-            TextureManager.releaseTexture( myTexture );
-
-            // Clamp texture at edges (no wrapping)
-            myTexture.setWrap( Texture.WM_ECLAMP_S_ECLAMP_T );
-            myTexture.setMipmapState( Texture.MM_LINEAR_LINEAR );
-
-            // Create texture render state
-            myTextureState = renderer.createTextureState();
-            myTextureState.setEnabled( true );
-            myTextureState.setTexture( myTexture, 0 );
-            setRenderState( myTextureState );
-            updateRenderState();
-        }
-        else
-        {
-            // Release the previously reserved textures, so that they don't take up space on the 3D card
-            // NOTE: Maybe this also forces JME to re-upload the changed texture?
-            myTextureState.deleteAll( true );
-
-            // Update the JME Image used by the texture
-            myTextureGraphics.drawImage( textureImage, 0, 0, null );
-            myTextureGraphics.update();
-            myTextureGraphics.update( myTexture );
-
-            // Make sure this texture is not cached, as we will be updating it when the TerrainMesh is re-used
-            TextureManager.releaseTexture( myTexture );
-
-            // Smoother look at low viewing angles
-            myTexture.setMipmapState( Texture.MM_LINEAR_LINEAR );
-        }
-
-        myTextureUpdateNeeded = false;
+    private void createTextureRenderState( final Renderer renderer, final Texture texture )
+    {
+        myTextureState = renderer.createTextureState();
+        myTextureState.setEnabled( true );
+        myTextureState.setTexture( texture, 0 );
+        setRenderState( myTextureState );
+        updateRenderState();
     }
 
 
@@ -613,6 +690,40 @@ public final class TerrainMesh
                                                 DEFAULT_ANISO_LEVEL, false, DEFAULT_TEXTURE_IMAGE_FORMAT );
         tkey.setFileType( "" + imageHashcode );
         return tkey;
+    }
+
+
+    private void setTextureCoordinates( BoundingRectangle boundingRectangle )
+    {
+        if ( boundingRectangle == null )
+        {
+            boundingRectangle = WHOLE_TEXTURE_AREA;
+        }
+
+        for ( int y = 0; y < mySizeY_vertices; y++ )
+        {
+            for ( int x = 0; x < mySizeX_vertices; x++ )
+            {
+                final int index = calculateMeshIndex( x, y );
+
+                final float textureXPos = (float) MathUtils.interpolateClamp( x,
+                                                                              1,
+                                                                              mySizeX_vertices - 2,
+                                                                              boundingRectangle.getX1(),
+                                                                              boundingRectangle.getX2() );
+                final float textureYPos = (float) MathUtils.interpolateClamp( y,
+                                                                              1,
+                                                                              mySizeY_vertices - 2,
+                                                                              boundingRectangle.getY1(),
+                                                                              boundingRectangle.getY2() );
+
+                final Vector2f textureCoordinate = new Vector2f( textureXPos, textureYPos );
+
+                BufferUtils.setInBuffer( textureCoordinate, myTextureCoordinates, index );
+            }
+        }
+
+        setTextureBuffer( 0, myTextureCoordinates );
     }
 
 }

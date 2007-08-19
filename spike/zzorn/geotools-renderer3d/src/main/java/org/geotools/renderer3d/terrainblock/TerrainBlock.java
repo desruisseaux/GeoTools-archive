@@ -1,5 +1,6 @@
 package org.geotools.renderer3d.terrainblock;
 
+import com.jme.image.Texture;
 import com.jme.math.Vector3f;
 import com.jme.scene.Spatial;
 
@@ -32,4 +33,9 @@ public interface TerrainBlock
     boolean hasCalculatedTextureImage();
 
     void clearPicture();
+
+    /**
+     * @return the texture currently used by this block, or null if it is using a placeholder texture.
+     */
+    Texture getTexture();
 }

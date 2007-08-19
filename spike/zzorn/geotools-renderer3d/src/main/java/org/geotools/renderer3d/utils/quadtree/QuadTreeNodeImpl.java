@@ -107,6 +107,10 @@ public final class QuadTreeNodeImpl<N>
         }
     }
 
+    public boolean hasNodeData()
+    {
+        return myNodeData != null;
+    }
 
     public N getNodeData()
     {
@@ -249,6 +253,7 @@ public final class QuadTreeNodeImpl<N>
             // Create a new parent
             final BoundingRectangle parentBounds = myBoundingRectangle.createParentBoundingRectangle( parentSubsector );
             final QuadTreeNode<N> parentNode = myQuadTree.createQuadTreeNode( parentBounds, null );
+            myQuadTree.initnodedata( parentNode );
 
             // Add this node as a child of the parent node (in the opposite corner of where we expanded)
             final int childSubquadrant = myBoundingRectangle.getOppositeSubquadrant( parentSubsector );
@@ -258,6 +263,7 @@ public final class QuadTreeNodeImpl<N>
 
             // Notify model that we have a new root node
             myQuadTree.setRootNode( parentNode );
+
         }
         else
         {
@@ -357,19 +363,30 @@ public final class QuadTreeNodeImpl<N>
             }
 
             // Create child nodes
-            if ( childSubquadrant >= 0 )
-            {
-                myChildren[ childSubquadrant ] = childNode;
-            }
             for ( int i = 0; i < NUMBER_OF_SUBNODES; i++ )
+            {
+                if ( myChildren[ i ] != null )
+                {
+                    throw new IllegalStateException( "A newly expanded node should not have any children" );
+                }
+
+                if ( i == childSubquadrant )
+                {
+                    myChildren[ i ] = childNode;
+                }
+                else
+                {
+                    final BoundingRectangle rectangle = myBoundingRectangle.createSubquadrantBoundingRectangle( i );
+                    myChildren[ i ] = myQuadTree.createQuadTreeNode( rectangle, this );
+                }
+            }
+
+            // Init node data for the other children
+            for ( int i = 0; i < myChildren.length; i++ )
             {
                 if ( i != childSubquadrant )
                 {
-                    if ( myChildren[ i ] == null )
-                    {
-                        final BoundingRectangle rectangle = myBoundingRectangle.createSubquadrantBoundingRectangle( i );
-                        myChildren[ i ] = myQuadTree.createQuadTreeNode( rectangle, this );
-                    }
+                    myQuadTree.initnodedata( myChildren[ i ] );
                 }
             }
 

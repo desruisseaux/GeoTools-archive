@@ -20,6 +20,7 @@ import org.geotools.renderer3d.utils.quadtree.QuadTreeImpl;
 import org.geotools.renderer3d.utils.quadtree.QuadTreeListener;
 import org.geotools.renderer3d.utils.quadtree.QuadTreeNode;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.util.logging.Level;
 
@@ -156,7 +157,9 @@ public final class Renderer3DImpl
 */
 
         // DEBUG
-        final TextureProvider mapTextureProvider = new TextureProviderImpl( new DummyTextureRenderer() );
+        final TextureProvider mapTextureProvider = new TextureProviderImpl( new DummyTextureRenderer(),
+                                                                            textureSize,
+                                                                            Color.GRAY );
 
         myTerrainBlockFactory = new TerrainBlockFactory( terrainBlockSizeInGrids,
                                                          mapTextureProvider,

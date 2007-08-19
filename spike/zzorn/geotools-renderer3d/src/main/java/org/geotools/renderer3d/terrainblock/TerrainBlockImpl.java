@@ -1,18 +1,19 @@
 package org.geotools.renderer3d.terrainblock;
 
+import com.jme.image.Texture;
 import com.jme.math.Vector3f;
 import com.jme.scene.Node;
 import com.jme.scene.Spatial;
 import org.geotools.renderer3d.provider.texture.impl.TextureListener;
 import org.geotools.renderer3d.provider.texture.impl.TextureProvider;
 import org.geotools.renderer3d.utils.BoundingRectangle;
+import org.geotools.renderer3d.utils.BoundingRectangleImpl;
 import org.geotools.renderer3d.utils.ParameterChecker;
 import org.geotools.renderer3d.utils.quadtree.NodeListener;
 import org.geotools.renderer3d.utils.quadtree.QuadTreeNode;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +64,12 @@ public final class TerrainBlockImpl
     private Node myTerrain3DNode = null;
 
     private boolean myHasCalculatedTextureImage = false;
+    private Texture myTempParentTextureToUse = null;
+
+    //======================================================================
+    // Private Constants
+
+    private static final BoundingRectangleImpl WHOLE_TEXTURE = new BoundingRectangleImpl( 0, 0, 1, 1 );
 
     //======================================================================
     // Public Methods
@@ -161,6 +168,8 @@ public final class TerrainBlockImpl
 
     public void updateDerivedData()
     {
+        myHasCalculatedTextureImage = false;
+
         // Remove previous texture request, if found
         myTextureProvider.cancelRequest( myTextureListener );
 
@@ -170,14 +179,15 @@ public final class TerrainBlockImpl
                                  (float) bounds.getCenterY(),
                                  0 ); // TODO: Get ground height at center.
 
-        // Copy a chunk of a previously calculated parent block texture to the texture of this block
-        initializeTextureFromParentTexture();
-
         // Update terrain mesh if present
         if ( myTerrainMesh != null )
         {
+            ///fillTextureImageWithLoadingGraphics();
             myTerrainMesh.updateBounds( bounds.getX1(), bounds.getY1(), bounds.getX2(), bounds.getY2() );
-            myTerrainMesh.setTextureImage( myTextureImage );
+//            myTerrainMesh.setTextureImage( myTextureImage );
+
+            // Copy a chunk of a previously calculated parent block texture to the texture of this block
+            initializeTextureFromParentTexture();
         }
 
         // Make sure the node is collapsed
@@ -196,12 +206,28 @@ public final class TerrainBlockImpl
 
     public boolean hasCalculatedTextureImage()
     {
-        return myHasCalculatedTextureImage;
+        return myTerrainMesh != null &&
+               !myTerrainMesh.isPlaceholderTextureInUse() &&
+               myHasCalculatedTextureImage;
     }
+
 
     public void clearPicture()
     {
         fillTextureImageWithLoadingGraphics();
+    }
+
+
+    public Texture getTexture()
+    {
+        if ( myTerrainMesh != null )
+        {
+            return myTerrainMesh.getTexture();
+        }
+        else
+        {
+            return null;
+        }
     }
 
     //======================================================================
@@ -209,64 +235,62 @@ public final class TerrainBlockImpl
 
     private void initializeTextureFromParentTexture()
     {
-        fillTextureImageWithLoadingGraphics();
-        myHasCalculatedTextureImage = false;
+        myTempParentTextureToUse = null;
+        final BoundingRectangle area = calculatePlaceholderTextureAndArea( myQuadTreeNode );
 
-/*
-        final BoundingRectangle textureBounds = new BoundingRectangleImpl( 0, 0, myTextureSize, myTextureSize );
-        initializeTextureFromParentTexture( myQuadTreeNode, textureBounds );
-*/
+        setPlaceholderTexture( myTempParentTextureToUse, area );
     }
 
 
     /**
-     * Recursive function.  Gets the texture from a smaller part of the parents parent texture,
-     * if parent doesn't have a calculated texture, and so on.
+     * Recursive function to calculate the area and texture to use.
+     *
+     * @return the area to use of the myTempParentTextureToUse, or null if no parent texture is available to use.
      */
-    private void initializeTextureFromParentTexture( final QuadTreeNode<TerrainBlock> node,
-                                                     final BoundingRectangle textureBounds )
+    private BoundingRectangle calculatePlaceholderTextureAndArea( final QuadTreeNode<TerrainBlock> node )
     {
-        final QuadTreeNode<TerrainBlock> parentNode = node.getParent();
-        if ( parentNode == null )
+        if ( node == null )
         {
-            // Not even the root had a calculated texture yet, use placeholder graphics
-            fillTextureImageWithLoadingGraphics();
+            // No texture even in root
+            myTempParentTextureToUse = null;
+            return null;
         }
         else
         {
-            // Calculate the texture area to get from the parent:
-            final int quadrant = parentNode.getIndexOfChild( node );
-            if ( quadrant >= 0 )
+            final TerrainBlock block = node.getNodeData();
+            final Texture texture = block.getTexture();
+            if ( block.hasCalculatedTextureImage() && texture != null )
             {
-
-                final BoundingRectangle parentTextureSourceArea = textureBounds.createSubquadrantBoundingRectangle(
-                        quadrant );
-
-                final TerrainBlock parentBlock = parentNode.getNodeData();
-                if ( parentBlock.hasCalculatedTextureImage() )
-                {
-                    // Copy the texture for the section that this terrain block occupies from the parent texture
-                    final BufferedImage parentImage = parentBlock.getTextureImage();
-
-                    final Graphics2D graphics = (Graphics2D) myTextureImage.getGraphics();
-                    graphics.drawImage( parentImage,
-                                        0, 0, myTextureImage.getWidth(), myTextureImage.getHeight(),
-                                        (int) parentTextureSourceArea.getX1(),
-                                        (int) parentTextureSourceArea.getY1(),
-                                        (int) parentTextureSourceArea.getX2(),
-                                        (int) parentTextureSourceArea.getY2(),
-                                        null );
-                }
-                else
-                {
-                    // The parent had no calculated texture, so see if its parent has.
-                    initializeTextureFromParentTexture( parentNode, textureBounds );
-                }
+                // Found texture in current node, use it.
+                myTempParentTextureToUse = texture;
+                return WHOLE_TEXTURE;
             }
             else
             {
-                fillTextureImageWithLoadingGraphics();
+                // Get area and texture from parent
+                final QuadTreeNode<TerrainBlock> parentNode = node.getParent();
+                final BoundingRectangle area = calculatePlaceholderTextureAndArea( parentNode );
+
+                if ( area == null )
+                {
+                    return null;
+                }
+                else
+                {
+                    // Calculate location of this node in the parent area
+                    final int quadrant = parentNode.getIndexOfChild( node );
+                    return area.createSubquadrantBoundingRectangle( quadrant );
+                }
             }
+        }
+    }
+
+
+    private void setPlaceholderTexture( final Texture texture, final BoundingRectangle textureArea )
+    {
+        if ( myTerrainMesh != null )
+        {
+            myTerrainMesh.setPlaceholderTexture( texture, textureArea );
         }
     }
 
@@ -344,7 +368,11 @@ public final class TerrainBlockImpl
                                                          myQuadTreeNode.getBounds().getY2(),
                                                          z );
 
+        fillTextureImageWithLoadingGraphics();
         terrainMesh.setTextureImage( myTextureImage );
+
+        // Copy a chunk of a previously calculated parent block texture to the texture of this block
+        initializeTextureFromParentTexture();
 
         return terrainMesh;
     }

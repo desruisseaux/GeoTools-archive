@@ -56,4 +56,6 @@ public interface QuadTree<N>
     void releaseQuadTreeNode( final QuadTreeNode<N> node );
 
     QuadTreeNode<N> createQuadTreeNode( final BoundingRectangle bounds, final QuadTreeNode<N> parentNode );
+
+    void initnodedata( QuadTreeNode<N> quadTreeNode );
 }

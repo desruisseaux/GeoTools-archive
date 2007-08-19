@@ -133,19 +133,30 @@ public class QuadTreeImpl<N>
         if ( myQuadTreeNodePool.isEmpty() )
         {
             quadTreeNode = new QuadTreeNodeImpl<N>( this, bounds, parentNode );
-            quadTreeNode.setNodeData( myNodeDataFactory.createNodeDataObject( quadTreeNode ) );
         }
         else
         {
             quadTreeNode = myQuadTreeNodePool.removeLast();
             quadTreeNode.attach( bounds, parentNode );
-            quadTreeNode.setNodeData( myNodeDataFactory.reuseNodeDataObject( quadTreeNode,
-                                                                             quadTreeNode.getNodeData() ) );
         }
 
         return quadTreeNode;
     }
 
+    public void initnodedata( final QuadTreeNode<N> quadTreeNode )
+    {
+        final N nodeData;
+        if ( quadTreeNode.hasNodeData() )
+        {
+            nodeData = myNodeDataFactory.reuseNodeDataObject( quadTreeNode, quadTreeNode.getNodeData() );
+        }
+        else
+        {
+            nodeData = myNodeDataFactory.createNodeDataObject( quadTreeNode );
+        }
+
+        quadTreeNode.setNodeData( nodeData );
+    }
 
     public void releaseQuadTreeNode( final QuadTreeNode<N> node )
     {

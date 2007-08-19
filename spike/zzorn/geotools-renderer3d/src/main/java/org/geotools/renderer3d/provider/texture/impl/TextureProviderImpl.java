@@ -5,6 +5,8 @@ import org.geotools.renderer3d.utils.BoundingRectangle;
 import org.geotools.renderer3d.utils.ParameterChecker;
 
 import javax.swing.*;
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,8 +14,6 @@ import java.util.List;
 /**
  * The default texture provider, will render the textures in a separate thread and call the texture listener on the
  * swing thread when a texture has been rendered.
- * <p/>
- * TODO: A way to cancel a rendering, by passing a reference to the TextureListener.
  *
  * @author Hans Häggström
  */
@@ -28,6 +28,9 @@ public final class TextureProviderImpl
     private final List<TextureJob> myTextureJobs = new LinkedList<TextureJob>();
     private TextureJob myCurrentJob = null;
     private boolean myCurrentJobWasCanceled = false;
+    private final int myTextureSize;
+    private final BufferedImage myRenderBufer;
+    private final Color myBackgroundColor;
 
     //======================================================================
     // Public Methods
@@ -38,11 +41,17 @@ public final class TextureProviderImpl
     /**
      * @param textureRenderer the renderer to use for rendering the textures.
      */
-    public TextureProviderImpl( final TextureRenderer textureRenderer )
+    public TextureProviderImpl( final TextureRenderer textureRenderer, int textureSize, Color backgroundColor )
     {
         ParameterChecker.checkNotNull( textureRenderer, "textureRenderer" );
+        ParameterChecker.checkPositiveNonZeroInteger( textureSize, "textureSize" );
+        ParameterChecker.checkNotNull( backgroundColor, "backgroundColor" );
 
+        myTextureSize = textureSize;
         myTextureRenderer = textureRenderer;
+        myBackgroundColor = backgroundColor;
+
+        myRenderBufer = new BufferedImage( textureSize, textureSize, BufferedImage.TYPE_4BYTE_ABGR );
 
         // Start a thread that handles texture painting jobs
         final Thread renderThread = new Thread( new Runnable()
@@ -54,19 +63,34 @@ public final class TextureProviderImpl
                 {
                     final TextureJob paintJob = getNextJob();
 
-                    myTextureRenderer.renderArea( paintJob.getArea(), paintJob.getBuffer() );
+                    clearToColor( paintJob.getBuffer(), myBackgroundColor );
+                    myTextureRenderer.renderArea( paintJob.getArea(), myRenderBufer );
 
-                    if ( !myCurrentJobWasCanceled )
+                    synchronized ( myTextureJobs )
                     {
-                        notifyListener( paintJob );
+                        if ( !myCurrentJobWasCanceled )
+                        {
+                            // Copy image from the render buffer to the final desination
+                            final Graphics graphics = paintJob.getBuffer().getGraphics();
+                            graphics.drawImage( myRenderBufer, 0, 0, null );
+
+                            notifyListener( paintJob );
+                        }
+                        myCurrentJobWasCanceled = false;
                     }
-                    myCurrentJobWasCanceled = false;
                 }
             }
 
         } );
         renderThread.setDaemon( true );
         renderThread.start();
+    }
+
+    private void clearToColor( final BufferedImage image, final Color backgroundColor )
+    {
+        final Graphics graphics = image.getGraphics();
+        graphics.setColor( backgroundColor );
+        graphics.fillRect( 0, 0, myTextureSize, myTextureSize );
     }
 
     //----------------------------------------------------------------------
@@ -76,17 +100,11 @@ public final class TextureProviderImpl
                                 final BufferedImage buffer,
                                 final TextureListener textureListener )
     {
-        // DEBUG
-        myTextureRenderer.renderArea( area, buffer );
-        textureListener.onTextureReady( area, buffer );
-
-/*
         synchronized ( myTextureJobs )
         {
             myTextureJobs.add( new TextureJob( area, buffer, textureListener ) );
             myTextureJobs.notifyAll();
         }
-*/
     }
 
     public void cancelRequest( final TextureListener textureListener )

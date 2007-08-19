@@ -165,5 +165,10 @@ public interface QuadTreeNode<N>
      * @return the index of the specified child node, or -1 if the specified node is not a child.
      */
     int getIndexOfChild( final QuadTreeNode<N> childNode );
+
+    /**
+     * @return true if this QuadTreeNode has any Node Data attached to it, false if not.
+     */
+    boolean hasNodeData();
 }
 
