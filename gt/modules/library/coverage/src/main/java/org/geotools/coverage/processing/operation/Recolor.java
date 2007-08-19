@@ -66,7 +66,7 @@ public final class Recolor extends IndexColorOperation {
             true);       // Parameter is mandatory
 
     /**
-     * Construct a new "Recolor" operation.
+     * Constructs a new "Recolor" operation.
      */
     public Recolor() {
         super(new DefaultParameterDescriptorGroup(Citations.GEOTOOLS, "Recolor",
@@ -74,7 +74,7 @@ public final class Recolor extends IndexColorOperation {
     }
 
     /**
-     * Transform the supplied RGB colors.
+     * Transforms the supplied RGB colors.
      */
     protected GridSampleDimension transformColormap(final int[] ARGB, final int band,
             final GridSampleDimension sampleDimension, final ParameterValueGroup parameters)

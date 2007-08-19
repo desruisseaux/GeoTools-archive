@@ -32,7 +32,6 @@ import javax.imageio.ImageReadParam;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.metadata.IIOMetadata;
 
-import ucar.nc2.Variable;
 import ucar.ma2.Array;
 import ucar.ma2.Range;
 import ucar.ma2.DataType;
@@ -42,8 +41,10 @@ import ucar.nc2.dataset.CoordSysBuilder;
 import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.dataset.VariableDS;
 import ucar.nc2.util.CancelTask;
+import ucar.nc2.Dimension;
+import ucar.nc2.Variable;
+import ucar.nc2.VariableIF;
 
-import org.geotools.util.NumberRange;
 import org.geotools.image.io.PaletteFactory;
 import org.geotools.image.io.FileImageReader;
 import org.geotools.image.io.SampleConverter;
@@ -107,7 +108,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
     private NetcdfDataset file;
 
     /**
-     * The name of the {@linkplain Variable variable} to be read in a NetCDF file.
+     * The name of the {@linkplain Variable variables} to be read in a NetCDF file.
      * The first name is assigned to image index 0, the second name to image index 1,
      * <cite>etc.</cite>.
      */
@@ -129,11 +130,6 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
      * The converter for sample values.
      */
     private final SampleConverter converter;
-
-    /**
-     * The ranges for each image index, or {@code null} if unknown.
-     */
-    private NumberRange[] ranges;
 
     /**
      * The last error from the NetCDF library.
@@ -168,11 +164,43 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
     }
 
     /**
+     * Returns the names of the variables to be read. The first name is assigned to image
+     * index 0, the second name to image index 1, <cite>etc.</cite>. In other words a call
+     * to <code>{@linkplain #read(int) read}(imageIndex)</code> will read the variable names
+     * {@code variables[imageIndex]} where {@code variables} is the value returned by this
+     * method.
+     * <p>
+     * The sequence of variable to be read can be changed by a call to {@link #setVariables}.
+     *
+     * @return The name of the variables to be read.
+     * @throws IOException if the NetCDF file can not be read.
+     */
+    public String[] getVariables() throws IOException {
+        if (variableNames == null) {
+            ensureFileOpen();
+        }
+        return (String[]) variableNames.clone();
+    }
+
+    /**
+     * Sets the name of the {@linkplain Variable variables} to be read in a NetCDF file.
+     * The first name is assigned to image index 0, the second name to image index 1,
+     * <cite>etc.</cite>.
+     * <p>
+     * If {@code variableNames} is set to {@code null} (which is the default), then the
+     * variables will be inferred from the content of the NetCDF file.
+     */
+    public void setVariables(final String[] variableNames) {
+        this.variableNames = (variableNames != null) ? (String[]) variableNames.clone() : null;
+    }
+
+    /**
      * Returns the number of images available from the current input source.
      *
      * @throws IllegalStateException if the input source has not been set.
      * @throws IOException if an error occurs reading the information from the input source.
      */
+    //@Override
     public int getNumImages(final boolean allowSearch) throws IllegalStateException, IOException {
         ensureFileOpen();
         // TODO: consider returning the actual number of images in the file.
@@ -196,79 +224,6 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
     }
 
     /**
-     * Returns the range of values. The default implementation scans the file content.
-     */
-    public NumberRange getExpectedRange(final int imageIndex, final int bandIndex) throws IOException {
-        checkImageIndex(imageIndex);
-        if (ranges == null) {
-            ranges = new NumberRange[imageIndex + 1];
-        } else if (ranges.length <= imageIndex) {
-            ranges = (NumberRange[]) XArray.resize(ranges, imageIndex + 1);
-        }
-        NumberRange range = ranges[imageIndex];
-        if (range == null) {
-            ranges[imageIndex] = range = computeExpectedRange(imageIndex);
-        }
-        return range;
-    }
-
-    /**
-     * Computes the range of values.
-     */
-    private NumberRange computeExpectedRange(final int imageIndex) throws IOException {
-        prepareVariable(imageIndex);
-        final DataType    type = variable.getDataType();
-        final Array      array = variable.read();
-        final IndexIterator it = array.getIndexIterator();
-        if (type.equals(DataType.BYTE)) {
-            byte min = Byte.MAX_VALUE;
-            byte max = Byte.MIN_VALUE;
-            while (it.hasNext()) {
-                final byte value = (byte) converter.convert(it.getByteNext());
-                if (value < min) min = value;
-                if (value > max) max = value;
-            }
-            if (min < max) {
-                return new NumberRange(min, max);
-            }
-        } else if (type.equals(DataType.SHORT) || type.equals(DataType.INT)) {
-            int min = Integer.MAX_VALUE;
-            int max = Integer.MIN_VALUE;
-            while (it.hasNext()) {
-                final int value = converter.convert(it.getIntNext());
-                if (value < min) min = value;
-                if (value > max) max = value;
-            }
-            if (min < max) {
-                return new NumberRange(min, max);
-            }
-        } else if (type.equals(DataType.FLOAT)) {
-            float min = Float.POSITIVE_INFINITY;
-            float max = Float.NEGATIVE_INFINITY;
-            while (it.hasNext()) {
-                final float value = converter.convert(it.getFloatNext());
-                if (value < min) min = value;
-                if (value > max) max = value;
-            }
-            if (min < max) {
-                return new NumberRange(min, max);
-            }
-        } else {
-            double min = Double.POSITIVE_INFINITY;
-            double max = Double.NEGATIVE_INFINITY;
-            while (it.hasNext()) {
-                final double value = converter.convert(it.getDoubleNext());
-                if (value < min) min = value;
-                if (value > max) max = value;
-            }
-            if (min < max) {
-                return new NumberRange(min, max);
-            }
-        }
-        return null;
-    }
-
-    /**
      * Ensures that metadata are loaded.
      */
     private void ensureMetadataLoaded() throws IOException {
@@ -281,6 +236,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
     /**
      * Returns the metadata associated with the input source as a whole.
      */
+    //@Override
     public IIOMetadata getStreamMetadata() throws IOException {
         if (streamMetadata == null && !ignoreMetadata) {
             ensureFileOpen();
@@ -293,6 +249,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
     /**
      * Returns the metadata associated with the image at the specified index.
      */
+    //@Override
     public IIOMetadata getImageMetadata(final int imageIndex) throws IOException {
         if (imageMetadata == null && !ignoreMetadata) {
             prepareVariable(imageIndex);
@@ -331,6 +288,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
      * @return The data type.
      * @throws IOException If an error occurs reading the format information from the input source.
      */
+    //@Override
     public int getRawDataType(final int imageIndex) throws IOException {
         prepareVariable(imageIndex);
         final DataType type = variable.getDataType();
@@ -361,32 +319,31 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
      * @return Parameters which may be used to control the decoding process using a set
      *         of default settings.
      */
+    //@Override
     public ImageReadParam getDefaultReadParam() {
         final ImageReadParam param = super.getDefaultReadParam();
         param.setSourceBands     (DEFAULT_BANDS);
         param.setDestinationBands(DEFAULT_BANDS);
         return param;
     }
-    
+
     /**
-     * Test if the current variable in the list is a dimension of an other variable in the list.
-     * If it the case, this variable will be omitted and this function will return true.
-     * If not, the current variable is a {@code sample dimension} and the function will return
-     * false.
-     *
-     * @param index The index in the list for the variable to test.
-     * @param listVar The list of variables.
-     * @return True if the selected variables is a dimension for an other variable in the list. 
-     * False otherwise.
+     * Returns {@code true} if the specified variable is a dimension of an other variable.
+     * Such dimensions will be excluded from the list returned by {@link #getVariables}.
+     * 
+     * @param  candidate The variable to test.
+     * @param  variables The list of variables.
+     * @return {@code true} if the specified variable is a dimension of an other variable.
      */
-    private boolean isPresentInOtherVarDimension(final int index, final List listVar) {
-        final VariableDS reference = (VariableDS) listVar.get(index);
-        for (int i=0; i<listVar.size(); i++) {
-            // One does not compare the same element in the list.
-            if (i != index) {
-                final VariableDS var = (VariableDS) listVar.get(i);
-                for (int j=0; j<var.getDimensions().size(); j++) {
-                    if (var.getDimension(j).getName().equals(reference.getName())) {
+    private static boolean isDimension(final VariableIF candidate, final List variables) {
+        final String name = candidate.getName();
+        final int size = variables.size();
+        for (int i=0; i<size; i++) {
+            final VariableIF var = (VariableIF) variables.get(i);
+            if (var != candidate) {
+                Dimension dim;
+                for (int d=0; (dim=var.getDimension(d)) != null; d++) {
+                    if (dim.getName().equals(name)) {
                         return true;
                     }
                 }                
@@ -394,9 +351,10 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
         }
         return false;
     }
-    
+
     /**
      * Ensures that the NetCDF file is open, but do not load any variable yet.
+     * Variable will be read by {@link #prepareVariable} only.
      */
     private void ensureFileOpen() throws IOException {
         if (file == null) {
@@ -415,29 +373,23 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
             }
             if (variableNames == null) {
                 /*
-                 * ListVar is a list that contains all the variables found in the NetcdfDataset.
-                 * The list result is composed by variables that are not a {@code dimension} for an 
-                 * other variable in the list of variables.
-                 * For example, "longitude" may be a variable found in the NetcdfDataset. But it
-                 * also is a {@code Dimension} for the variable "temperature". So we don't keep this
-                 * variable. On the other hand, "temperature" is not a {@code Dimension} for any other
-                 * variables, we keep it as a good value.
+                 * Gets a list of every variables found in the NetcdfDataset and copies the names
+                 * in a filtered list which exclude every variable that are dimension of an other
+                 * variable. For example "longitude" may be a variable found in the NetcdfDataset,
+                 * but is declared only because it is needed as a dimension for the "temperature"
+                 * variable. The "longitude" variable is usually not of direct interest to the user
+                 * (the interresting variable is "temperature"), so we exclude it.
                  */
-                List listVar = file.getVariables();
-                List result = new ArrayList();
-                for (int i=0; i<listVar.size(); i++) {
-                    if (!isPresentInOtherVarDimension(i, listVar)) {
-                        result.add(((VariableDS)listVar.get(i)).getName());
+                final List variables = file.getVariables();
+                final String[] filtered = new String[variables.size()];
+                int count = 0;
+                for (int i=0; i<filtered.length; i++) {
+                    final VariableIF candidate = (VariableIF) variables.get(i);
+                    if (!isDimension(candidate, variables)) {
+                        filtered[count++] = candidate.getName();
                     }
                 }
-                /*
-                 * The method java.util.List.toArray(<T> a) takes an array in parameter that has to
-                 * be not null, because it will test the length of this array to determine if it has
-                 * to create a new array or use the specified one.
-                 * So we have to instanciate it, giving the right length for this array. 
-                 */
-                variableNames = new String[result.size()];
-                result.toArray(variableNames);
+                variableNames = (String[]) XArray.resize(filtered, count);
             }
         }
     }
@@ -629,7 +581,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
 
     /**
      * Invoked by the NetCDF library during read operation in order to check if the task has
-     * been canceled.
+     * been canceled. Users should not invoke this method directly.
      */
     public boolean isCancel() {
         return abortRequested();
@@ -637,27 +589,21 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
 
     /**
      * Invoked by the NetCDF library when an error occured during the read operation.
+     * Users should not invoke this method directly.
      */
     public void setError(final String message) {
         lastError = message;
     }
-    
-    /**
-     *
-     */
-    public void setVariables(final String[] var) {
-        variableNames = var;
-    }
-    
+
     /**
      * Closes the NetCDF file.
      */
+    //@Override
     protected void close() throws IOException {
         metadataLoaded = false;
         streamMetadata = null;
         imageMetadata  = null;
         lastError      = null;
-        ranges         = null;
         variable       = null;
         if (file != null) {
             file.close();
@@ -775,7 +721,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
             if (paletteName == null) {
                 return super.getForcedImageType(imageIndex);
             }
-            return PaletteFactory.getDefault().getPalettePadValueFirst(paletteName, paletteSize).
+            return PaletteFactory.getDefault(null).getPalettePadValueFirst(paletteName, paletteSize).
                     getImageTypeSpecifier();
         }
     }

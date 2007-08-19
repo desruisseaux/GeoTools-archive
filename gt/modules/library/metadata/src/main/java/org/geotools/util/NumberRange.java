@@ -32,6 +32,9 @@ import org.geotools.resources.XMath;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @todo Apply covariant return type on {@link #getMinValue} and {@link #getMaxValue}
+ *       when we will be allowed to compile for J2SE 1.5.
  */
 public class NumberRange extends Range {
     /**
@@ -193,45 +196,69 @@ public class NumberRange extends Range {
      * Constructs an inclusive range of {@link Comparable} objects.
      * This constructor is used by {@link RangeSet#newRange} only.
      *
-     * @param classe The element class, usually one of {@link Byte}, {@link Short},
-     *               {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
+     * @param type The element class, usually one of {@link Byte}, {@link Short},
+     *             {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
      * @param minimum The minimum value, inclusive.
      * @param maximum The maximum value, <strong>inclusive</strong>.
      */
-    NumberRange(final Class classe, final Comparable minimum, final Comparable maximum) {
-        super(classe, minimum, maximum);
+    NumberRange(final Class type, final Comparable minimum, final Comparable maximum) {
+        super(type, minimum, maximum);
     }
 
     /**
      * Constructs an inclusive range of {@link Number} objects.
      *
-     * @param classe The element class, usually one of {@link Byte}, {@link Short},
-     *               {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
+     * @param type The element class, usually one of {@link Byte}, {@link Short},
+     *             {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
      * @param minimum The minimum value, inclusive.
      * @param maximum The maximum value, <strong>inclusive</strong>.
      */
-    public NumberRange(final Class classe, final Number minimum, final Number maximum) {
-        super(classe, (Comparable)minimum, (Comparable)maximum);
+    public NumberRange(final Class type, final Number minimum, final Number maximum) {
+        super(type, (Comparable)minimum, (Comparable)maximum);
     }
 
     /**
      * Constructs a range of {@link Number} objects.
      *
-     * @param classe The element class, usually one of {@link Byte}, {@link Short},
-     *               {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
+     * @param type The element class, usually one of {@link Byte}, {@link Short},
+     *             {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
      * @param minimum The minimum value.
      * @param isMinIncluded Defines whether the minimum value is included in the Range.
      * @param maximum The maximum value.
      * @param isMaxIncluded Defines whether the maximum value is included in the Range.
      */
-    public NumberRange(final Class classe, final Number minimum, final boolean isMinIncluded,
-                                           final Number maximum, final boolean isMaxIncluded)
+    public NumberRange(final Class type, final Number minimum, final boolean isMinIncluded,
+                                         final Number maximum, final boolean isMaxIncluded)
     {
-        super(classe, (Comparable)minimum, isMinIncluded, (Comparable)maximum, isMaxIncluded);
+        super(type, (Comparable)minimum, isMinIncluded, (Comparable)maximum, isMaxIncluded);
     }
 
     /**
-     * Wrap the specified {@link Range} in a {@code NumberRange} object. If the specified
+     * Constructs a range with the same values than the specified range,
+     * casted to the specified type.
+     *
+     * @param type The element class, usually one of {@link Byte}, {@link Short},
+     *             {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
+     * @param range The range to copy. The elements must be {@link Number} instances.
+     */
+    NumberRange(final Class type, final Range range) {
+        this(type, ClassChanger.cast((Number)range.getMinValue(), type), range.isMinIncluded(),
+                   ClassChanger.cast((Number)range.getMaxValue(), type), range.isMaxIncluded());
+    }
+
+    /**
+     * Constructs a range with the same type and the same values than the specified range.
+     * This is a copy constructor.
+     *
+     * @param range The range to copy. The elements must be {@link Number} instances.
+     */
+    private NumberRange(final Range range) {
+        this(range.getElementClass(), (Number)range.getMinValue(), range.isMinIncluded(),
+                                      (Number)range.getMaxValue(), range.isMaxIncluded());
+    }
+
+    /**
+     * Wraps the specified {@link Range} in a {@code NumberRange} object. If the specified
      * range is already an instance of {@code NumberRange}, then it is returned unchanged.
      *
      * @param  range The range to wrap
@@ -241,29 +268,28 @@ public class NumberRange extends Range {
         if (range instanceof NumberRange) {
             return (NumberRange) range;
         }
-        return new NumberRange(range.getElementClass(),
-                               (Number)range.getMinValue(), range.isMinIncluded(),
-                               (Number)range.getMaxValue(), range.isMaxIncluded());
+        return new NumberRange(range);
     }
 
     /**
-     * Cast this range to the specified type.
-     *
-     * @param  type The class to cast to. Must be one of {@link Byte}, {@link Short},
-     *              {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
-     * @return The casted range, or {@code this}.
+     * Casts the specified range to the specified type. If this class is associated to a unit of
+     * measurement, then this method convert the {@code range} units to the same units than this
+     * instance. This method is overriden by {@link MeasurementRange} only in the way described
+     * above.
+     * 
+     * @param type The class to cast to. Must be one of {@link Byte}, {@link Short},
+     *             {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
+     * @return The casted range, or {@code range} if no cast is needed.
      */
-    private static NumberRange cast(final Range r, final Class type) {
-        if (r==null || type.equals(r.getElementClass())) {
-            return wrap(r);
+    NumberRange convertAndCast(final Range range, final Class type) {
+        if (type.equals(range.getElementClass())) {
+            return wrap(range);
         }
-        return new NumberRange(type,
-                               ClassChanger.cast((Number)r.getMinValue(), type), r.isMinIncluded(),
-                               ClassChanger.cast((Number)r.getMaxValue(), type), r.isMaxIncluded());
+        return new NumberRange(type, range);
     }
 
     /**
-     * Cast this range to the specified type.
+     * Casts this range to the specified type.
      *
      * @param  type The class to cast to. Must be one of {@link Byte}, {@link Short},
      *              {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
@@ -271,12 +297,13 @@ public class NumberRange extends Range {
      *         the specified type.
      */
     public NumberRange castTo(final Class type) {
-        return cast(this, type);
+        return convertAndCast(this, type);
     }
 
     /**
      * Returns {@code true} if the specified value is within this range.
      */
+    //@Override
     public boolean contains(final Comparable value) {
         return contains((Number) value);
     }
@@ -299,9 +326,10 @@ public class NumberRange extends Range {
     /**
      * Returns true if the supplied range is fully contained within this range.
      */
+    //@Override
     public boolean contains(final Range range) {
         final Class type = ClassChanger.getWidestClass(getElementClass(), range.getElementClass());
-        return castTo(type)._contains(cast(range, type));
+        return castTo(type)._contains(convertAndCast(range, type));
     }
 
     /**
@@ -314,9 +342,10 @@ public class NumberRange extends Range {
     /**
      * Returns true if this range intersects the given range.
      */
+    //@Override
     public boolean intersects(final Range range) {
         final Class type = ClassChanger.getWidestClass(getElementClass(), range.getElementClass());
-        return castTo(type)._intersects(cast(range, type));
+        return castTo(type)._intersects(convertAndCast(range, type));
     }
 
     /**
@@ -334,9 +363,10 @@ public class NumberRange extends Range {
      *       will be available. We should then search for NumberRange.warp(...) in all
      *       client classes; some 'warp' may no longer be needed.
      */
+    //@Override
     public Range union(final Range range) {
         final Class type = ClassChanger.getWidestClass(getElementClass(), range.getElementClass());
-        return wrap(castTo(type)._union(cast(range, type)));
+        return wrap(castTo(type)._union(convertAndCast(range, type)));
     }
 
     /**
@@ -354,20 +384,21 @@ public class NumberRange extends Range {
      *       will be available. We should then search for NumberRange.warp(...) in all
      *       client classes; some 'warp' may no longer be needed.
      */
+    //@Override
     public Range intersect(final Range range) {
         Class type = ClassChanger.getWidestClass(getElementClass(), range.getElementClass());
-        final Range result = castTo(type)._intersect(cast(range, type));
+        final Range result = castTo(type)._intersect(convertAndCast(range, type));
         /*
          * Use a finer type capable to holds the result (since the intersection may have
          * reduced the range), but not finer than the finest type of the ranges used in
          * the intersection calculation.
          */
         type = ClassChanger.getFinestClass(getElementClass(), range.getElementClass());
-        return cast(result,
-                    ClassChanger.getWidestClass(type, 
-                    ClassChanger.getWidestClass(
-                    ClassChanger.getFinestClass(((Number)result.getMinValue()).doubleValue()),
-                    ClassChanger.getFinestClass(((Number)result.getMaxValue()).doubleValue()))));
+        return convertAndCast(result,
+                ClassChanger.getWidestClass(type, 
+                ClassChanger.getWidestClass(
+                ClassChanger.getFinestClass(((Number)result.getMinValue()).doubleValue()),
+                ClassChanger.getFinestClass(((Number)result.getMaxValue()).doubleValue()))));
     }
 
     /**
@@ -379,11 +410,15 @@ public class NumberRange extends Range {
 
     /**
      * Returns the range of values that are in this range but not in the given range.
+     *
+     * @todo Consider changing the return type to {@code NumberRange} when we will be allowed
+     *       to compile for J2SE 1.5.
      */
+    //@Override
     public Range[] subtract(final Range range) {
         Class type = ClassChanger.getWidestClass(getElementClass(), range.getElementClass());
-        final Range[] result = castTo(type)._subtract(cast(range, type));
-        if (result!=null) {
+        final Range[] result = castTo(type)._subtract(convertAndCast(range, type));
+        if (result != null) {
             for (int i=0; i<result.length; i++) {
                 result[i] = wrap(result[i]);
             }

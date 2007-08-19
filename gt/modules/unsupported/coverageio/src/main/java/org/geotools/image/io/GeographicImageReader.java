@@ -358,7 +358,8 @@ public abstract class GeographicImageReader extends ImageReader {
         }
         final int bandIndex = 0; // TODO
         final int dataType = getRawDataType(imageIndex);
-        final NumberRange range = getExpectedRange(imageIndex, bandIndex);
+        final GeographicMetadata parser = getGeographicMetadata(imageIndex);
+        final NumberRange range = (parser != null) ? parser.getBand(bandIndex).getValidRange() : null;
         return GeographicImageReadParam.getImageTypeSpecifier(dataType, range, numDstBand);
     }
 
@@ -377,31 +378,6 @@ public abstract class GeographicImageReader extends ImageReader {
     public int getRawDataType(final int imageIndex) throws IOException {
         checkImageIndex(imageIndex);
         return DataBuffer.TYPE_FLOAT;
-    }
-
-    /**
-     * Returns the expected range of values for a band. Implementation
-     * may read image data, or just returns some raisonable range. The
-     * default implementation try to get this informations from image
-     * metadata.
-     *
-     * @param  imageIndex The image index.
-     * @param  bandIndex The band index. Valid index goes from {@code 0} inclusive
-     *         to {@code getNumBands(imageIndex)} exclusive. Index are independent
-     *         of any {@link ImageReadParam#setSourceBands} setting.
-     * @return The expected range of values, or {@code null} if unknow.
-     * @throws IOException If an error occurs reading the data information from the input source.
-     *
-     * @deprecated Consider removing this method.
-     */
-    public NumberRange getExpectedRange(final int imageIndex, final int bandIndex)
-            throws IOException
-    {
-        final GeographicMetadata parser = getGeographicMetadata(imageIndex);
-        if (parser != null) {
-            return parser.getBand(imageIndex).getValidRange();
-        }
-        return null;
     }
 
     /**

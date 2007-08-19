@@ -16,7 +16,6 @@
  */
 package org.geotools.image.io.text;
 
-// J2SE and JAI dependencies
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -34,15 +33,13 @@ import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.spi.ImageReaderSpi;
+import javax.imageio.metadata.IIOMetadata;
 
-// Geotools dependencies
 import org.geotools.io.LineFormat;
-import org.geotools.util.NumberRange;
 import org.geotools.resources.XArray;
-import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Descriptions;
 import org.geotools.resources.i18n.DescriptionKeys;
+import org.geotools.image.io.metadata.GeographicMetadata;
 
 
 /**
@@ -55,12 +52,12 @@ import org.geotools.resources.i18n.DescriptionKeys;
  */
 public class TextMatrixImageReader extends TextImageReader {
     /**
-     * The matrix data.
+     * The matrix data loaded by {@link #load} method.
      */
     private float[] data;
 
     /**
-     * The image width. This number has no signification if {@link #data} is null.
+     * The image width. This number is valid only if {@link #data} is non-null.
      */
     private int width;
 
@@ -81,11 +78,6 @@ public class TextMatrixImageReader extends TextImageReader {
      * signification if {@link #data} is null.
      */
     private boolean completed;
-
-    /**
-     * The cached range.
-     */
-    private NumberRange range;
 
     /**
      * Constructs a new image reader storing pixels as {@link DataBuffer#TYPE_FLOAT}.
@@ -110,7 +102,7 @@ public class TextMatrixImageReader extends TextImageReader {
         if (all) {
             processImageStarted(imageIndex);
         }
-        float[] values = (data!=null) ? new float[width] : null;
+        float[] values = (data != null) ? new float[width] : null;
         int     offset = width*height;
 
         final BufferedReader input = getReader();
@@ -142,8 +134,7 @@ public class TextMatrixImageReader extends TextImageReader {
             offset = newOffset;
             height++;
             /*
-             * If only one line was requested, try
-             * to guess the expected height.
+             * If only one line was requested, try to guess the expected height.
              */
             if (!all) {
                 final long streamLength = getStreamLength(imageIndex, imageIndex+1);
@@ -183,7 +174,7 @@ public class TextMatrixImageReader extends TextImageReader {
      */
     public int getWidth(final int imageIndex) throws IOException {
         checkImageIndex(imageIndex);
-        if (data==null) {
+        if (data == null) {
             load(imageIndex, false);
         }
         return width;
@@ -200,10 +191,41 @@ public class TextMatrixImageReader extends TextImageReader {
      */
     public int getHeight(final int imageIndex) throws IOException {
         checkImageIndex(imageIndex);
-        if (data==null || !completed) {
+        if (data == null || !completed) {
             load(imageIndex, true);
         }
         return height;
+    }
+
+    /**
+     * Returns metadata associated with the given image.
+     * Calling this method may force loading of full image.
+     *
+     * @param  imageIndex The image index.
+     * @return The metadata, or {@code null} if none.
+     * @throws IOException If an error occurs reading the data information from the input source.
+     */
+    //@Override
+    public IIOMetadata getImageMetadata(final int imageIndex) throws IOException {
+        checkImageIndex(imageIndex);
+        if (!ignoreMetadata) {
+            if (data == null || !completed) {
+                load(imageIndex, true);
+            }
+            float minimum = Float.POSITIVE_INFINITY;
+            float maximum = Float.NEGATIVE_INFINITY;
+            for (int i=0; i<data.length; i++) {
+                final float value = data[i];
+                if (value < minimum) minimum = value;
+                if (value > maximum) maximum = value;
+            }
+            if (minimum < maximum) {
+                final GeographicMetadata metadata = new GeographicMetadata(this);
+                metadata.getBand(0).setValidRange(minimum, maximum);
+                return metadata;
+            }
+        }
+        return null;
     }
 
     /**
@@ -265,7 +287,7 @@ public class TextMatrixImageReader extends TextImageReader {
         /*
          * Read data if it was not already done.
          */
-        if (data==null || !completed) {
+        if (data == null || !completed) {
             if (load(imageIndex, true)) {
                 return null;
             }
@@ -309,39 +331,11 @@ public class TextMatrixImageReader extends TextImageReader {
     }
 
     /**
-     * Returns the expected range of values for a band.
-     * Calling this method may force loading of full image.
-     *
-     * @param  imageIndex The image index.
-     * @param  bandIndex The band index.
-     * @return The expected range of values, or {@code null} if unknow.
-     * @throws IOException If an error occurs reading the data information from the input source.
-     */
-    public NumberRange getExpectedRange(final int imageIndex, final int bandIndex) throws IOException {
-        checkBandIndex(imageIndex, bandIndex);
-        if (range == null) {
-            load(imageIndex, true);
-            float minimum = Float.POSITIVE_INFINITY;
-            float maximum = Float.NEGATIVE_INFINITY;
-            for (int i=0; i<data.length; i++) {
-                final float value = data[i];
-                if (value < minimum) minimum = value;
-                if (value > maximum) maximum = value;
-            }
-            if (minimum < maximum) {
-                range = new NumberRange(minimum, maximum);
-            }
-        }
-        return range;
-    }
-
-    /**
      * Closes the input stream and disposes the resources that was specific to that stream.
      */
     //@Override
     public void close() throws IOException {
         completed      = false;
-        range          = null;
         data           = null;
         width          = 0;
         height         = 0;

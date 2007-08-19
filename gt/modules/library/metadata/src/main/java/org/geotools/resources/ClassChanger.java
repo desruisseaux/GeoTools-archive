@@ -117,12 +117,13 @@ public abstract class ClassChanger {
     /**
      * Returns a string representation for this class changer.
      */
+    //@Override
     public String toString() {
         return "ClassChanger["+source.getName()+"\u00A0\u21E8\u00A0"+target.getName()+']';
     }
 
     /**
-     * Register a new transformation. All registered {@link ClassChanger} will
+     * Registers a new transformation. All registered {@link ClassChanger} will
      * be taken in account by the {@link #toNumber} method. The example below
      * register a transformation for the {@link Date} class:
      *
@@ -228,7 +229,7 @@ public abstract class ClassChanger {
     }
 
     /**
-     * Wrap the specified number as an instance of the specified classe.
+     * Wraps the specified number as an instance of the specified classe.
      * For example <code>toComparable(Date.class,&nbsp;new&nbsp;Long(time))</code>
      * is equivalent to <code>new&nbsp;Date(time)</code>. There is of course no
      * point to use this method if the destination class is know at compile time.
@@ -252,7 +253,7 @@ public abstract class ClassChanger {
     }
 
     /**
-     * Convert a wrapper class to a primitive class. For example this method converts
+     * Converts a wrapper class to a primitive class. For example this method converts
      * <code>{@linkplain Double}.class</code> to <code>Double.{@linkplain Double#TYPE TYPE}</code>.
      *
      * @param  c The wrapper class.
@@ -272,7 +273,7 @@ public abstract class ClassChanger {
     }
 
     /**
-     * Convert a primitive class to a wrapper class. For example this method converts
+     * Converts a primitive class to a wrapper class. For example this method converts
      * <code>Double.{@linkplain Double#TYPE TYPE}</code> to <code>{@linkplain Double}.class</code>.
      *
      * @param  c The primitive class.
@@ -292,8 +293,10 @@ public abstract class ClassChanger {
     }
 
     /**
-     * Cast the number to the specified class. The class must by one of {@link Byte},
+     * Casts the number to the specified class. The class must by one of {@link Byte},
      * {@link Short}, {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
+     *
+     * @todo Use {@code valueOf} when we will be allowed to compile for J2SE 1.5.
      */
     public static Number cast(final Number n, final Class c) {
         if (n!=null && !n.getClass().equals(c)) {

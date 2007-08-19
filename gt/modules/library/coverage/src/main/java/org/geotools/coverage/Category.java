@@ -138,12 +138,12 @@ public class Category implements Serializable {
      */
     public static final Category TRUE = new Category(
             Vocabulary.formatInternational(VocabularyKeys.TRUE), Color.WHITE, true);
-    
+
     /**
      * The category name.
      */
     private final InternationalString name;
-    
+
     /**
      * The minimal sample value (inclusive). This category is made of all values
      * in the range {@code minimum} to {@code maximum} inclusive.
@@ -153,7 +153,7 @@ public class Category implements Serializable {
      * For qualitative categories, the geophysics value is one of {@code NaN} values.
      */
     final double minimum;
-    
+
     /**
      * The maximal sample value (inclusive). This category is made of all values
      * in the range {@code minimum} to {@code maximum} inclusive.
@@ -190,19 +190,19 @@ public class Category implements Serializable {
      * to the {@link Category} object that own it.
      */
     final Category inverse;
-    
+
     /**
      * Codes ARGB des couleurs de la catégorie. Les couleurs par
      * défaut seront un gradient allant du noir au blanc opaque.
      */
     private final int[] ARGB;
-    
+
     /**
      * Codes ARGB par défaut. On utilise un exemplaire unique
      * pour toutes les création d'objets {@link Category}.
      */
     private static final int[] DEFAULT = {0xFF000000, 0xFFFFFFFF};
-    
+
     /**
      * A set of default category colors.
      */
@@ -210,7 +210,7 @@ public class Category implements Serializable {
         Color.BLUE,    Color.RED,   Color.ORANGE, Color.YELLOW,     Color.PINK,
         Color.MAGENTA, Color.GREEN, Color.CYAN,   Color.LIGHT_GRAY, Color.GRAY
     };
-    
+
     /**
      * Constructs a qualitative category for a boolean value.
      *
@@ -224,7 +224,7 @@ public class Category implements Serializable {
     {
         this(name, new Color[]{color}, sample ? BYTE_0 : BYTE_1, LinearTransform1D.IDENTITY);
     }
-    
+
     /**
      * Constructs a qualitative category for sample value {@code sample}.
      *
@@ -240,7 +240,7 @@ public class Category implements Serializable {
         assert minimum == sample : minimum;
         assert maximum == sample : maximum;
     }
-    
+
     /**
      * Constructs a qualitative category for sample value {@code sample}.
      *
@@ -256,7 +256,7 @@ public class Category implements Serializable {
         assert Double.doubleToRawLongBits(minimum) == Double.doubleToRawLongBits(sample) : minimum;
         assert Double.doubleToRawLongBits(maximum) == Double.doubleToRawLongBits(sample) : maximum;
     }
-    
+
     /**
      * Constructs a qualitative category for sample value {@code sample}.
      */
@@ -268,7 +268,7 @@ public class Category implements Serializable {
         assert Double.isNaN(inverse.minimum) : inverse.minimum;
         assert Double.isNaN(inverse.maximum) : inverse.maximum;
     }
-    
+
     /**
      * Constructs a quantitative category for samples in the specified range.
      *
@@ -284,7 +284,7 @@ public class Category implements Serializable {
     {
         this(name, new Color[] {color}, sampleValueRange, (MathTransform1D) null);
     }
-    
+
     /**
      * Constructs a quantitative category for sample values ranging from {@code lower}
      * inclusive to {@code upper} exclusive. Sample values are converted into geophysics
@@ -321,7 +321,7 @@ public class Category implements Serializable {
              new NumberRange(Integer.class, new Integer(lower), true,
                                             new Integer(upper), false), scale, offset);
     }
-    
+
     /**
      * Constructs a quantitative category for sample values in the specified range.
      * Sample values are converted into geophysics values using the following linear
@@ -370,7 +370,7 @@ public class Category implements Serializable {
                                                "offset", new Double(offset)));
         }
     }
-    
+
     /**
      * Constructs a quantitative category mapping samples to geophysics values in the specified
      * range. Sample values in the {@code sampleValueRange} will be mapped to geophysics
@@ -436,7 +436,7 @@ public class Category implements Serializable {
     {
         this(name, toARGB(colors), sampleValueRange, sampleToGeophysics);
     }
-    
+
     /**
      * Constructs a category with the specified math transform.  This private constructor is
      * used for both qualitative and quantitative category constructors.    It also used by
@@ -637,7 +637,7 @@ public class Category implements Serializable {
         assert (direction >= -1) && (direction <= +1) : direction;
         return XMath.rool(type, ((Number)number).doubleValue(), direction);
     }
-    
+
     /**
      * Returns a NaN number for the specified category number. Valid NaN numbers have
      * bit fields ranging from {@code 0x7f800001} through {@code 0x7fffffff}
@@ -664,7 +664,7 @@ public class Category implements Serializable {
             throw new IndexOutOfBoundsException(Integer.toHexString(index));
         }
     }
-    
+
     /**
      * Convert an array of colors to an array of ARGB values.
      * If {@code colors} is null, then a default array
@@ -696,14 +696,14 @@ public class Category implements Serializable {
         }
         return toARGB(new Color[] {color});
     }
-    
+
     /**
      * Returns the category name.
      */
     public InternationalString getName() {
         return name;
     }
-    
+
     /**
      * Returns the set of colors for this category.
      * Change to the returned array will not affect
@@ -742,7 +742,7 @@ public class Category implements Serializable {
     public MathTransform1D getSampleToGeophysics() {
         return isQuantitative() ? transform : null;
     }
-    
+
     /**
      * Returns {@code true} if this category is quantitative. A quantitative category
      * has a non-null {@link #getSampleToGeophysics() sampleToGeophysics} transform.
@@ -753,27 +753,29 @@ public class Category implements Serializable {
     public boolean isQuantitative() {
         return !Double.isNaN(inverse.minimum) && !Double.isNaN(inverse.maximum);
     }
-    
+
     /**
-     * Returns a category for the same range of sample values but
-     * a different color palette.
+     * Returns a category for the same range of sample values but a different color palette.
+     * The array given in argument may have any length; colors will be interpolated as needed.
+     * An array of length 1 means that an uniform color should be used for all sample values.
+     * An array of length 0 or a {@code null} array means that some default colors should be
+     * used (usually a gradient from opaque black to opaque white).
      *
-     * @param colors A set of colors for the new category. This array may have
-     *               any length; colors will be interpolated as needed. An array
-     *               of length 1 means that an uniform color should be used for
-     *               all sample values. An array of length 0 or a {@code null}
-     *               array means that some default colors should be used (usually
-     *               a gradient from opaque black to opaque white).
+     * @param colors A set of colors for the new category. 
      * @return A category with the new color palette, or {@code this}
      *         if the new colors are identical to the current ones.
      */
     public Category recolor(final Color[] colors) {
+        // GeophysicsCategory overrides this method in such
+        // a way that the case below should never occurs.
         assert !(this instanceof GeophysicsCategory) : this;
         final int[] newARGB = toARGB(colors);
         if (Arrays.equals(ARGB, newARGB)) {
             return this;
         }
-        assert range!=null; // May be null only for GeophysicsCategory, which overrides this method.
+        // The range can be null only for GeophysicsCategory cases. Because
+        // the later override this method, the case below should never occurs.
+        assert range != null : this;
         final Category newCategory = new Category(name, newARGB, range, getSampleToGeophysics());
         newCategory.inverse.range = inverse.range; // Share a common instance.
         return newCategory;
@@ -837,7 +839,7 @@ public class Category implements Serializable {
     public Category geophysics(final boolean geo) {
         return geo ? inverse : this;
     }
-    
+
     /**
      * Returns a hash value for this category.
      * This value need not remain consistent between
@@ -846,7 +848,7 @@ public class Category implements Serializable {
     public int hashCode() {
         return name.hashCode();
     }
-    
+
     /**
      * Compares the specified object with
      * this category for equality.
@@ -881,7 +883,7 @@ public class Category implements Serializable {
         }
         return false;
     }
-    
+
     /**
      * Returns a string representation of this category.
      * The returned string is implementation dependent.
@@ -912,7 +914,7 @@ public class Category implements Serializable {
         buffer.append("])");
         return buffer.toString();
     }
-    
+
     /**
      * Makes sure that an argument is non-null.
      *

@@ -24,7 +24,6 @@ import javax.imageio.ImageReadParam;
 
 // Geotools dependencies
 import org.geotools.io.LineFormat;
-import org.geotools.util.NumberRange;
 import org.geotools.resources.XArray;
 
 
@@ -63,13 +62,6 @@ final class TestReader extends TextImageReader {
      */
     public int getHeight(int imageIndex) {
         return 0;
-    }
-
-    /**
-     * Returns an infinite range of values.
-     */
-    public NumberRange getExpectedRange(final int imageIndex, final int bandIndex) {
-        return new NumberRange(Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY);
     }
 
     /**

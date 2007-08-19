@@ -16,7 +16,6 @@
  */
 package org.geotools.image.io.text;
 
-// J2SE dependencies
 import java.awt.image.DataBuffer;
 import java.io.*; // Many imports, including some for javadoc only.
 import java.net.URL;
@@ -26,7 +25,6 @@ import java.util.Locale;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 
-// Geotools dependencies
 import org.geotools.io.LineFormat;
 import org.geotools.image.io.StreamImageReader;
 import org.geotools.resources.i18n.Vocabulary;

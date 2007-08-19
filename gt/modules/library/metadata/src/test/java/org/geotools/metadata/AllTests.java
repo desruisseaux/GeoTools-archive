@@ -55,10 +55,11 @@ public final class AllTests {
         suite.addTest(org.geotools.util     .MonolineFormatterTest      .suite());
         suite.addTest(org.geotools.util     .InternationalStringTest    .suite());
         suite.addTest(org.geotools.util     .VersionTest                .suite());
+        suite.addTest(org.geotools.util     .MeasurementRangeTest       .suite());
         suite.addTest(org.geotools.util     .RangeSetTest               .suite());
         suite.addTest(org.geotools.util     .DisjointSetTest            .suite());
         suite.addTest(org.geotools.util     .KeySortedListTest          .suite());
-        suite.addTest(org.geotools.util     .CanonicalSetTest            .suite());
+        suite.addTest(org.geotools.util     .CanonicalSetTest           .suite());
         suite.addTest(org.geotools.util     .WeakValueHashMapTest       .suite());
         suite.addTest(org.geotools.util     .SoftValueHashMapTest       .suite());
         suite.addTest(org.geotools.math     .GeometryTest               .suite());

@@ -16,11 +16,9 @@
  */
 package org.geotools.image.io.text;
 
-// J2SE and JAI dependencies
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.WritableRaster;
@@ -35,16 +33,17 @@ import javax.imageio.IIOException;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.spi.ImageReaderSpi;
 
-// Geotools dependencies
 import org.geotools.io.LineFormat;
-import org.geotools.util.NumberRange;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Descriptions;
 import org.geotools.resources.i18n.DescriptionKeys;
+import org.geotools.image.io.metadata.ImageGeometry;
+import org.geotools.image.io.metadata.GeographicMetadata;
 
 
 /**
@@ -220,7 +219,7 @@ public class TextRecordImageReader extends TextImageReader {
      * @param  imageIndex The index of the image to be queried.
      * @throws IOException If an error occurs reading the from the input source.
      */
-    public int getColumnX(final int imageIndex) throws IOException {
+    protected int getColumnX(final int imageIndex) throws IOException {
         return (originatingProvider instanceof Spi) ? ((Spi)originatingProvider).xColumn : 0;
     }
 
@@ -233,7 +232,7 @@ public class TextRecordImageReader extends TextImageReader {
      * @param  imageIndex The index of the image to be queried.
      * @throws IOException If an error occurs reading the from the input source.
      */
-    public int getColumnY(final int imageIndex) throws IOException {
+    protected int getColumnY(final int imageIndex) throws IOException {
         return (originatingProvider instanceof Spi) ? ((Spi)originatingProvider).yColumn : 1;
     }
 
@@ -281,7 +280,7 @@ public class TextRecordImageReader extends TextImageReader {
      */
     public int getNumBands(final int imageIndex) throws IOException {
         return getRecords(imageIndex).getColumnCount() -
-                (getColumnX(imageIndex)==getColumnY(imageIndex) ? 1 : 2);
+                (getColumnX(imageIndex) == getColumnY(imageIndex) ? 1 : 2);
     }
 
     /**
@@ -307,77 +306,49 @@ public class TextRecordImageReader extends TextImageReader {
     }
 
     /**
-     * Returns the smallest bounding box containing the full image in user coordinates.
-     * The default implementation search for minimum and maximum values in <var>x</var>
-     * and <var>y</var> columns (as returned by {@link #getColumnX} and {@link #getColumnY})
-     * and returns a rectangle containing <code>(xmin-dx/2,&nbsp;ymin-dy/2)</code>) and
-     * <code>(xmax+dx/2,&nbsp;ymax+dy/2)</code>) points, where <var>dx</var> and
-     * <var>dy</var> are grid cell width and height (i.e. the smallest interval between
-     * <var>x</var> and <var>y</var> values).
+     * Returns metadata associated with the given image.
+     * Calling this method may force loading of full image.
      *
-     * @param  imageIndex the index of the image to be queried.
-     * @return Image bounds in user coordinates.
-     * @throws IOException If an error occurs reading the width information from the input source.
+     * @param  imageIndex The image index.
+     * @return The metadata, or {@code null} if none.
+     * @throws IOException If an error occurs reading the data information from the input source.
      */
-    public Rectangle2D getLogicalBounds(final int imageIndex) throws IOException {
-        final float    tolerance = getGridTolerance();
+    //@Override
+    public IIOMetadata getImageMetadata(final int imageIndex) throws IOException {
+        checkImageIndex(imageIndex);
+        if (ignoreMetadata) {
+            return null;
+        }
+        final GeographicMetadata metadata = new GeographicMetadata(null);
+        final ImageGeometry geometry = metadata.getGeometry();
+        /*
+         * Computes the smallest bounding box containing the full image in user coordinates.
+         * This implementation searchs for minimum and maximum values in x and y columns as
+         * returned by getColumnX() and getColumnY(). Reminder: xmax and ymax are INCLUSIVE
+         * in the code below, as well as (width-1) and (height-1).
+         */
+        final float tolerance    = getGridTolerance();
         final RecordList records = getRecords(imageIndex);
         final int xColumn        = getColumnX(imageIndex);
         final int yColumn        = getColumnY(imageIndex);
+        final int width          = records.getPointCount(xColumn, tolerance);
+        final int height         = records.getPointCount(yColumn, tolerance);
         final double xmin        = records.getMinimum(xColumn);
         final double ymin        = records.getMinimum(yColumn);
-        final double width       = records.getMaximum(xColumn)-xmin;
-        final double height      = records.getMaximum(yColumn)-ymin;
-        final double dx          = width /(records.getPointCount(xColumn, tolerance)-1);
-        final double dy          = height/(records.getPointCount(yColumn, tolerance)-1);
-        return new Rectangle2D.Double(xmin-0.5*dx, ymin-0.5*dy, width+dx, height+dy);
-    }
-
-    /**
-     * Returns an {@link AffineTransform} for transforming pixel coordinates to logical coordinates.
-     * Pixel coordinates are usually integer values with (0,0) at the image's upper-left corner,
-     * while logical coordinates are floating point values at the pixel's upper-left corner. The
-     * later is consistent with <a href="http://java.sun.com/products/java-media/jai/">Java
-     * Advanced Imaging</a> convention. In order to get logical values at the pixel center,
-     * a translation must be apply once as below:
-     *
-     * <blockquote><pre>
-     * AffineTransform tr = getTransform(imageIndex);
-     * tr.translate(0.5, 0.5);
-     * </pre></blockquote>
-     *
-     * The default implementation computes the affine transform from {@link #getLogicalBounds},
-     * {@link #getWidth} and {@link #getHeight}.
-     *
-     * @param  imageIndex the index of the image to be queried.
-     * @return A transform mapping pixel coordinates to logical coordinates.
-     * @throws IOException if an I/O operation failed.
-     */
-    public AffineTransform getTransform(final int imageIndex) throws IOException {
-        final Rectangle2D bounds = getLogicalBounds(imageIndex);
-        final int          width = getWidth        (imageIndex);
-        final int         height = getHeight       (imageIndex);
-        final double  pixelWidth = bounds.getWidth()/ (width-1);
-        final double pixelHeight = bounds.getHeight()/(height-1);
-        return new AffineTransform(pixelWidth, 0, 0, -pixelHeight,
-                                   bounds.getMinX()-0.5*pixelWidth,
-                                   bounds.getMaxY()+0.5*pixelHeight);
-    }
-
-    /**
-     * Returns the range of values for the specified band.
-     *
-     * @param  imageIndex The image index.
-     * @param  band       The band index. Valid index goes from {@code 0} inclusive
-     *         to {@code getNumBands(imageIndex)} exclusive. Index are independent
-     *         of any {@link ImageReadParam#setSourceBands} setting.
-     * @return The expected range of values, or {@code null} if unknow.
-     * @throws IOException If an error occurs reading the data information from the input source.
-     */
-    public NumberRange getExpectedRange(final int imageIndex, final int band) throws IOException {
-        final int         column = getColumn(imageIndex, band);
-        final RecordList records = getRecords(imageIndex);
-        return new NumberRange(records.getMinimum(column), records.getMaximum(column));
+        final double xmax        = records.getMaximum(xColumn);
+        final double ymax        = records.getMaximum(yColumn);
+        geometry.addCoordinateRange(0, width-1,  xmin, xmax);
+        geometry.addCoordinateRange(0, height-1, ymin, ymax);
+        geometry.setPixelOrientation("center");
+        /*
+         * Now adds the valid range of sample values for each band.
+         */
+        final int numBands = records.getColumnCount() - (xColumn == yColumn ? 1 : 2);
+        for (int band=0; band<numBands; band++) {
+            final int column = getColumn(imageIndex, band);
+            metadata.getBand(band).setValidRange(records.getMinimum(column), records.getMaximum(column));
+        }
+        return metadata;
     }
 
     /**
@@ -516,7 +487,7 @@ public class TextRecordImageReader extends TextImageReader {
                         throw new IIOException(getPositionString(Errors.format(
                                                ErrorKeys.FILE_HAS_TOO_FEW_DATA)));
                     }
-                    if (data==null) {
+                    if (data == null) {
                         data = new RecordList[imageIndex+1];
                     } else if (data.length <= imageIndex) {
                         data = (RecordList[]) XArray.resize(data, imageIndex+1);
@@ -533,9 +504,9 @@ public class TextRecordImageReader extends TextImageReader {
          * demandée. Une exception sera lancée si ces données n'ont pas été
          * conservées.
          */
-        if (data!=null && imageIndex<data.length) {
+        if (data != null && imageIndex < data.length) {
             final RecordList records = data[imageIndex];
-            if (records!=null) {
+            if (records != null) {
                 return records;
             }
         }
@@ -551,13 +522,13 @@ public class TextRecordImageReader extends TextImageReader {
      * @throws IOException if an error occurs during reading.
      */
     public BufferedImage read(final int imageIndex, final ImageReadParam param) throws IOException {
-        final float        tolerance = getGridTolerance();
-        final int            xColumn = getColumnX(imageIndex);
-        final int            yColumn = getColumnY(imageIndex);
-        final RecordList     records = getRecords(imageIndex);
-        final int              width = records.getPointCount(xColumn, tolerance);
-        final int             height = records.getPointCount(yColumn, tolerance);
-        final int        numSrcBands = records.getColumnCount() - (xColumn==yColumn ? 1 : 2);
+        final float    tolerance = getGridTolerance();
+        final int        xColumn = getColumnX(imageIndex);
+        final int        yColumn = getColumnY(imageIndex);
+        final RecordList records = getRecords(imageIndex);
+        final int          width = records.getPointCount(xColumn, tolerance);
+        final int         height = records.getPointCount(yColumn, tolerance);
+        final int    numSrcBands = records.getColumnCount() - (xColumn==yColumn ? 1 : 2);
         /*
          * Extract user's parameters
          */

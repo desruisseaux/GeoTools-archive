@@ -127,9 +127,9 @@ abstract class IndexColorOperation extends Operation2D {
     }
 
     /**
-     * Transform the supplied RGB colors. This method is automatically invoked
+     * Transforms the supplied RGB colors. This method is automatically invoked
      * by {@link #doOperation(ParameterList)} for each band in the source
-     * {@link GridCoverage}. The {@code ARGB} array contains the ARGB values
+     * {@link GridCoverage2D}. The {@code ARGB} array contains the ARGB values
      * from the current source and should be overridden with new ARGB values
      * for the destination image.
      * 
@@ -138,12 +138,11 @@ abstract class IndexColorOperation extends Operation2D {
      * @param band
      *            The band number, from 0 to the number of bands in the image -1.
      * @param sampleDimension
-     *            The sample dimension of band <code>band</code>.
+     *            The sample dimension of band {@code band}.
      * @param parameters
      *            The user-supplied parameters.
-     * @return A sample dimension identical to <code>sampleDimension</code>
-     *         except for the colors. Subclasses may conservatively returns
-     *         <code>sampleDimension</code>.
+     * @return A sample dimension identical to {@code sampleDimension} except for the
+     *         colors. Subclasses may conservatively returns {@code sampleDimension}.
      */
     protected abstract GridSampleDimension transformColormap(final int[] ARGB, final int band,
             final GridSampleDimension sampleDimension, final ParameterValueGroup parameters);
