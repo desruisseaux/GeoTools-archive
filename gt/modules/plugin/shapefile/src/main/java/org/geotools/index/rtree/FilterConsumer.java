@@ -27,6 +27,7 @@ import org.geotools.filter.Expression;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterVisitor;
+import org.geotools.filter.Filters;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LikeFilter;
@@ -136,7 +137,7 @@ public class FilterConsumer implements FilterVisitor {
             Iterator list = filter.getFilterIterator();
 
             while (list.hasNext()) {
-                ((AbstractFilter) list.next()).accept(this);
+                Filters.accept((org.opengis.filter.Filter)list.next(),this);
             }
 
             break;

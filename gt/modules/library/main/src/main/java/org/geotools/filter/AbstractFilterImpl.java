@@ -42,7 +42,7 @@ public abstract class AbstractFilterImpl
      */
     public Filter or(org.opengis.filter.Filter filter) {
         try {
-        	return (Filter) factory.or(this,(Filter)filter);
+        	return (Filter) factory.or(this,filter);
         } catch (IllegalFilterException ife) {
             return (Filter) filter;
         }

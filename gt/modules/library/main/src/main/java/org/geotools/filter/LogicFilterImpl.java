@@ -252,11 +252,11 @@ public abstract class LogicFilterImpl extends BinaryLogicAbstract implements Log
         } else if (filterType == LOGIC_AND) {
             operator = " AND ";
         } else if (filterType == LOGIC_NOT) {
-            return "NOT " + ((Filter) iterator.next()).toString();
+            return "NOT " + iterator.next().toString();
         }
 
         while (iterator.hasNext()) {
-            returnString = returnString + ((Filter) iterator.next()).toString();
+            returnString = returnString + iterator.next().toString();
 
             if (iterator.hasNext()) {
                 returnString = returnString + operator;

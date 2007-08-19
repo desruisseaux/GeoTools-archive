@@ -188,7 +188,7 @@ public class SQLEncoderMySQLTest extends TestCase {
         SQLEncoderMySQL encoder = new SQLEncoderMySQL();
         encoder.setSRID(2356);
 
-        String out = encoder.encode((AbstractFilter) gf);
+        String out = encoder.encode(gf);
         LOGGER.fine("Resulting SQL filter is \n" + out);
 
         //assertEquals("WHERE \"testGeometry\" && GeometryFromText('POLYGON"
@@ -205,7 +205,7 @@ public class SQLEncoderMySQLTest extends TestCase {
         SQLEncoderMySQL encoder = new SQLEncoderMySQL(2346);
         encoder.setDefaultGeometry("testGeometry");
 
-        String out = encoder.encode((AbstractFilter) gf);
+        String out = encoder.encode(gf);
         LOGGER.fine("Resulting SQL filter is \n" + out);
 
         //assertEquals(out,
@@ -238,7 +238,7 @@ public class SQLEncoderMySQLTest extends TestCase {
                 new Double(5)));
 
         SQLEncoderMySQL encoder = new SQLEncoderMySQL(2346);
-        String out = encoder.encode((AbstractFilter) compFilter);
+        String out = encoder.encode(compFilter);
         LOGGER.fine("Resulting SQL filter is \n" + out);
 
         //assertEquals(out, "WHERE \"testInteger\" = 5.0");
@@ -257,7 +257,7 @@ public class SQLEncoderMySQLTest extends TestCase {
 
         try {
             SQLEncoderMySQL encoder = new SQLEncoderMySQL(2346);
-            String out = encoder.encode((AbstractFilter) gf);
+            String out = encoder.encode(gf);
             LOGGER.fine("out is " + out);
         } catch (SQLEncoderException e) {
             LOGGER.fine(e.getMessage());

@@ -300,11 +300,11 @@ public class FilterCapabilities {
 
         if (AbstractFilter.isLogicFilter(filterType)) {
             Iterator filters = ((LogicFilter) filter).getFilterIterator();
-            Filter testFilter = null;
+            org.opengis.filter.Filter testFilter = null;
 
             //short testFtype = 0;
             while (filters.hasNext()) {
-                testFilter = (Filter) filters.next();
+                testFilter = (org.opengis.filter.Filter) filters.next();
 
                 if (!(this.fullySupports(testFilter))) {
                     supports = false;

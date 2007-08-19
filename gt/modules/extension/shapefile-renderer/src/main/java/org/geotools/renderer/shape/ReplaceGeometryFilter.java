@@ -26,6 +26,7 @@ import org.geotools.filter.Expression;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterVisitor;
+import org.geotools.filter.Filters;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LikeFilter;
@@ -86,8 +87,8 @@ public class ReplaceGeometryFilter implements FilterVisitor {
         Iterator iter = filter.getFilterIterator();
 
         while (iter.hasNext()) {
-            Filter f = (Filter) iter.next();
-            f.accept(this);
+            org.opengis.filter.Filter f = (org.opengis.filter.Filter) iter.next();
+            Filters.accept(f, this);
         }
     }
 

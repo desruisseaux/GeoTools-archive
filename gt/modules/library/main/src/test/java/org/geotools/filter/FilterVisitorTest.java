@@ -89,13 +89,13 @@ public class FilterVisitorTest extends TestCase implements FilterVisitor {
 
             if (filter.getFilterType() == AbstractFilter.LOGIC_NOT) {
                
-                ((AbstractFilter) list.next()).accept(this);
+                Filters.accept((org.opengis.filter.Filter) list.next(),this);
+                
 
             } else { //AND or OR
               
                 while (list.hasNext()) {
-                    ((AbstractFilter) list.next()).accept(this);
-
+                    Filters.accept((org.opengis.filter.Filter)list.next(),this);
                 }
 
             }

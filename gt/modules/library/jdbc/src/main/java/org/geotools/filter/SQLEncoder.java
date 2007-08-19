@@ -388,13 +388,14 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor2 {
 
             if (filter.getFilterType() == AbstractFilter.LOGIC_NOT) {
                 out.write(" NOT (");
-                ((AbstractFilter) list.next()).accept(this);
+                Filters.accept((org.opengis.filter.Filter) list.next(),this);
+                
                 out.write(")");
             } else { //AND or OR
                 out.write("(");
 
                 while (list.hasNext()) {
-                    ((AbstractFilter) list.next()).accept(this);
+                    Filters.accept((org.opengis.filter.Filter) list.next(),this);
 
                     if (list.hasNext()) {
                         out.write(" " + type + " ");

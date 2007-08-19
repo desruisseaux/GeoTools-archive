@@ -191,7 +191,7 @@ public class SQLEncoderPostgisTest extends TestCase {
         encoder.setLooseBbox(true);
         encoder.setSRID(2356);
 
-        String out = encoder.encode((AbstractFilter) gf);
+        String out = encoder.encode(gf);
         LOGGER.fine("Resulting SQL filter is \n" + out);
         assertEquals("WHERE \"testGeometry\" && GeometryFromText('POLYGON"
             + " ((0 0, 0 300, 300 300, 300 0, 0 0))'" + ", 2356)", out);
@@ -207,7 +207,7 @@ public class SQLEncoderPostgisTest extends TestCase {
         SQLEncoderPostgis encoder = new SQLEncoderPostgis(2346);
         encoder.setDefaultGeometry("testGeometry");
 
-        String out = encoder.encode((AbstractFilter) gf);
+        String out = encoder.encode(gf);
         LOGGER.fine("Resulting SQL filter is \n" + out);
         assertEquals(out,
             "WHERE GeometryFromText("
@@ -225,7 +225,7 @@ public class SQLEncoderPostgisTest extends TestCase {
         encoder.setFIDMapper(new TypedFIDMapper(
                 new BasicFIDMapper("gid", 255, true), "road"));
 
-        String out = encoder.encode((AbstractFilter) fidFilter);
+        String out = encoder.encode(fidFilter);
         LOGGER.fine("Resulting SQL filter is \n" + out);
         assertEquals(out, "WHERE (\"gid\" = '345')");
     }
@@ -238,7 +238,7 @@ public class SQLEncoderPostgisTest extends TestCase {
                 new Double(5)));
 
         SQLEncoderPostgis encoder = new SQLEncoderPostgis(2346);
-        String out = encoder.encode((AbstractFilter) compFilter);
+        String out = encoder.encode(compFilter);
         LOGGER.fine("Resulting SQL filter is \n" + out);
         assertEquals(out, "WHERE \"testInteger\" = 5.0");
     }
@@ -256,7 +256,7 @@ public class SQLEncoderPostgisTest extends TestCase {
 
         try {
             SQLEncoderPostgis encoder = new SQLEncoderPostgis(2346);
-            String out = encoder.encode((AbstractFilter) gf);
+            String out = encoder.encode(gf);
             LOGGER.fine("out is " + out);
             fail("This filter type is supposed to be unsupported");
         } catch (SQLEncoderException e) {

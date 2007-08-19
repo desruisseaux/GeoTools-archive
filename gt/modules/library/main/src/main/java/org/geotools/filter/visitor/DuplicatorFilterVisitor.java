@@ -28,6 +28,7 @@ import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterVisitor2;
+import org.geotools.filter.Filters;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
@@ -220,16 +221,16 @@ public class DuplicatorFilterVisitor extends AbstractFilterVisitor implements Fi
     	
     	List subFilters = new ArrayList();
     	while (iterator.hasNext()) {
-    		Filter subFilter = (Filter) iterator.next();
-    		subFilter.accept(this);
-    		subFilters.add((Filter) pages.pop());
+    		org.opengis.filter.Filter subFilter = (org.opengis.filter.Filter) iterator.next();
+    		Filters.accept(subFilter,this);
+    		subFilters.add(pages.pop());
     	}
 
     	try {
     		copy = ff.createLogicFilter(filter.getFilterType());
     		Iterator copyIterator = subFilters.iterator();
     		while (copyIterator.hasNext()) {
-    			copy.addFilter((Filter) copyIterator.next());
+    			copy.addFilter((org.opengis.filter.Filter) copyIterator.next());
     		}
 		} catch (IllegalFilterException erp) {
             throw new RuntimeException(erp);

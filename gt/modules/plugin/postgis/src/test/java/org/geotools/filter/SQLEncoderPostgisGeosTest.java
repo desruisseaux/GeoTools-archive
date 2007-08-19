@@ -190,7 +190,7 @@ public void test1() throws Exception {
     encoder.setLooseBbox(true);
     encoder.setSRID(2356);
 
-    String out = encoder.encode((AbstractFilter) gf);
+    String out = encoder.encode(gf);
     LOGGER.fine("Resulting SQL filter is \n" + out);
     assertEquals("WHERE \"testGeometry\" && GeometryFromText('POLYGON"
         + " ((0 0, 0 300, 300 300, 300 0, 0 0))'" + ", 2356)", out);
@@ -206,7 +206,7 @@ public void test2() throws Exception {
     SQLEncoderPostgisGeos encoder = new SQLEncoderPostgisGeos(2346);
     encoder.setDefaultGeometry("testGeometry");
 
-    String out = encoder.encode((AbstractFilter) gf);
+    String out = encoder.encode(gf);
     LOGGER.fine("Resulting SQL filter is \n" + out);
     assertEquals(out,
         "WHERE GeometryFromText('POLYGON ((10 10, 10 300, 300 300, 300 10, 10 10))', 2346) && \"testGeometry\" AND intersects(GeometryFromText('POLYGON ((10 10, 10 300, 300 300, 300 10, 10 10))', 2346), \"testGeometry\")");
@@ -234,7 +234,7 @@ public void test3() throws Exception {
             new Double(5)));
 
     SQLEncoderPostgisGeos encoder = new SQLEncoderPostgisGeos(2346);
-    String out = encoder.encode((AbstractFilter) compFilter);
+    String out = encoder.encode(compFilter);
     LOGGER.fine("Resulting SQL filter is \n" + out);
     assertEquals(out, "WHERE \"testInteger\" = 5.0");
 }
@@ -250,7 +250,7 @@ public void test4() throws Exception{
     SQLEncoderPostgisGeos encoder = new SQLEncoderPostgisGeos(2346);
     encoder.setDefaultGeometry("testGeometry");
 
-    String out = encoder.encode((AbstractFilter) gf);
+    String out = encoder.encode(gf);
     
     LOGGER.fine("Resulting SQL filter is \n" + out);
     assertEquals(out,
@@ -270,7 +270,7 @@ public void testException() throws Exception {
 
     try {
         SQLEncoderPostgisGeos encoder = new SQLEncoderPostgisGeos(2346);
-        String out = encoder.encode((AbstractFilter) gf);
+        String out = encoder.encode(gf);
         LOGGER.fine("out is " + out);
         fail("This filter type should not be supported at the moment?");
     } catch (SQLEncoderException e) {

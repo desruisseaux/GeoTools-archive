@@ -126,7 +126,7 @@ public class FilterTransformer extends TransformerBase {
             java.util.Iterator list = filter.getFilterIterator();
             
             while (list.hasNext()) {
-                ((AbstractFilter) list.next()).accept(this);
+                Filters.accept((org.opengis.filter.Filter)list.next(),this);
             }
             
             end(type);

@@ -252,7 +252,7 @@ public class LogicSAXParser {
                 Iterator iterator = subFilters.iterator();
 
                 while (iterator.hasNext()) {
-                    filter.addFilter((Filter) iterator.next());
+                    filter.addFilter((org.opengis.filter.Filter) iterator.next());
                 }
             }
 

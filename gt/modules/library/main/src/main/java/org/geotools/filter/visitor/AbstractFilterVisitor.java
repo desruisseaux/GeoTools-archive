@@ -24,6 +24,7 @@ import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
+import org.geotools.filter.Filters;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LikeFilter;
@@ -388,8 +389,7 @@ public class AbstractFilterVisitor implements org.geotools.filter.FilterVisitor,
      */
     public void visit(LogicFilter filter) {
         for (Iterator it = filter.getFilterIterator(); it.hasNext();) {
-            org.geotools.filter.Filter f = (Filter) it.next();
-            f.accept(this);
+            Filters.accept((org.opengis.filter.Filter)it.next(),this);
         }
     }
 
