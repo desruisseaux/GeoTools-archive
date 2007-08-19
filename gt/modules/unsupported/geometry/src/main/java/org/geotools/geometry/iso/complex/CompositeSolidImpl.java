@@ -37,8 +37,9 @@ import org.opengis.geometry.complex.Complex;
  * 
  */
 public class CompositeSolidImpl extends CompositeImpl<SolidImpl> {
+    private static final long serialVersionUID = -1998244006251493858L;
 
-	/**
+    /**
 	 * The association role Composition::generator associates this
 	 * CompositeSolid to the primitive Solids in its generating set, that is,
 	 * the solids that form the core of this complex. CompositeSolid::generator :

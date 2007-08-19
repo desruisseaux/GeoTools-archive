@@ -37,8 +37,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class SurfaceBoundaryImpl extends PrimitiveBoundaryImpl implements
 		SurfaceBoundary {
+    private static final long serialVersionUID = -1357747117053853492L;
 
-	/**
+    /**
 	 * A SurfaceBoundary consists of some number of Rings, corresponding to the
 	 * various components of its boundary. In the normal 2D case, one of these
 	 * rings is distinguished as being the exterior boundary. In a general

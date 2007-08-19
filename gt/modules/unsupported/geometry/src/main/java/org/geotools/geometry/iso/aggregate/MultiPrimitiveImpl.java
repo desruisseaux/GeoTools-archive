@@ -17,15 +17,14 @@
 
 package org.geotools.geometry.iso.aggregate;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.SortedSet;
 
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.geometry.iso.io.GeometryToString;
-import org.geotools.geometry.iso.primitive.PrimitiveImpl;
-import org.geotools.geometry.iso.root.GeometryImpl;
-import org.opengis.geometry.Boundary;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.Geometry;
@@ -36,69 +35,15 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 public class MultiPrimitiveImpl extends AggregateImpl implements MultiPrimitive {
+    private static final long serialVersionUID = -8667095513075575773L;
 
-	/**
+    /**
 	 * Creates a MultiPrimitive by a set of Primitives.
 	 * @param crs
 	 * @param primitives Set of Primitives which shall be contained by the MultiPrimitive
 	 */
 	public MultiPrimitiveImpl(CoordinateReferenceSystem crs, Set<? extends Primitive> primitives) {
 		super(crs, primitives);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#clone()
-	 */
-	public GeometryImpl clone() throws CloneNotSupportedException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getBoundary()
-	 */
-	public Boundary getBoundary() {
-		
-		// union the various primitives together and return the boundary of that
-		Boundary boundary = null;
-		Iterator iterator = this.elements.iterator();
-		while (iterator.hasNext()) {
-			PrimitiveImpl p = (PrimitiveImpl) iterator.next();
-			if (boundary == null) {
-				boundary = p.getBoundary();
-			}
-			else {
-				if (p.getBoundary() != null) {
-					boundary.union(p.getBoundary());
-				}
-			}
-		}
-		
-		return boundary;
-		
-		
-		//return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getDimension(org.opengis.geometry.coordinate.DirectPosition)
-	 */
-	public int getDimension(DirectPosition point) {
-		if (point != null) {
-			return point.getDimension();
-		}
-		else {
-			// return the largest dimension of all the contained elements in this collection
-			int maxD = 0;
-			Set<Primitive> elem = this.getElements();
-			Iterator<Primitive> iterator = elem.iterator();
-			while (iterator.hasNext()) {
-				Geometry prim = iterator.next();
-				int D = prim.getDimension(null);
-				if (D > maxD) maxD = D;
-			}
-			return maxD;
-		}
 	}
 
 	/* (non-Javadoc)
@@ -114,17 +59,9 @@ public class MultiPrimitiveImpl extends AggregateImpl implements MultiPrimitive 
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.geometry.coordinate.aggregate.Aggregate#getElements()
-	 */
-	public Set getElements() {
-		return super.elements;
-	}
-
-	/* (non-Javadoc)
 	 * @see org.opengis.geometry.coordinate.root.Geometry#isSimple()
 	 */
 	public boolean isSimple() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -132,7 +69,6 @@ public class MultiPrimitiveImpl extends AggregateImpl implements MultiPrimitive 
 	 * @see org.opengis.geometry.coordinate.root.Geometry#getMaximalComplex()
 	 */
 	public Set<Complex> getMaximalComplex() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -141,7 +77,7 @@ public class MultiPrimitiveImpl extends AggregateImpl implements MultiPrimitive 
 	 */
 	public DirectPosition getRepresentativePoint() {
 		// Return the representative point of the first primitive in this aggregate
-		Iterator elementIter = this.elements.iterator();
+		Iterator<? extends Primitive> elementIter = getElements().iterator();
 		return ((Geometry)elementIter.next()).getRepresentativePoint();
 	}
 	
@@ -152,4 +88,10 @@ public class MultiPrimitiveImpl extends AggregateImpl implements MultiPrimitive 
 		return GeometryToString.getString(this);
 	}
 
+	/* (non-Javadoc)
+     * @see org.geotools.geometry.featgeom.aggregate.MultiPrimitiveImpl#getElements()
+     */
+    public Set<? extends Primitive> getElements() {
+        return Collections.checkedSet( (Set<Primitive>) super.elements, Primitive.class );
+    }
 }

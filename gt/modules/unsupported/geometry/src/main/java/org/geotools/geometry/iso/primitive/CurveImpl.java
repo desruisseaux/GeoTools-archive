@@ -89,8 +89,9 @@ import org.opengis.referencing.operation.TransformException;
  * 
  */
 public class CurveImpl extends OrientableCurveImpl implements Curve {
+    private static final long serialVersionUID = -9117646009629975742L;
 
-	/**
+    /**
 	 * The association "segmentation" lists the CurveSegments of Curve, each of
 	 * which defines the direct position of points along a portion of the curve.
 	 * The order of the CurveSegments is the order in which they are used to

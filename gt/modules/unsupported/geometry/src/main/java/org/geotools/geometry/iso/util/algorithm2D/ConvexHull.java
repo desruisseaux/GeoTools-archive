@@ -135,7 +135,7 @@ public class ConvexHull {
 			}
 		} else if (geom instanceof MultiPrimitiveImpl) {
 			positions = new HashSet<PointImpl>();
-			Iterator<Primitive> iterator = ((MultiPrimitiveImpl)geom).getElements().iterator();
+			Iterator<? extends Primitive> iterator = ((MultiPrimitiveImpl)geom).getElements().iterator();
 			while (iterator.hasNext()) {
 				PrimitiveImpl prim = ((PrimitiveImpl)iterator.next());
 				

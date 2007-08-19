@@ -511,8 +511,8 @@ public abstract class GeometryImpl implements Geometry, Serializable  {
 			// get the centroid point of each element in this multiprimitive that matches
 			// the maxD dimension and return the average of the centroid points
 			CentroidPoint cp = new CentroidPoint(this.crs);
-			Set<Primitive> elems = ((MultiPrimitiveImpl)this).getElements();
-			Iterator<Primitive> iter = elems.iterator();
+			Set<? extends Primitive> elems = ((MultiPrimitiveImpl)this).getElements();
+			Iterator<? extends Primitive> iter = elems.iterator();
 			while (iter.hasNext()) {
 				Geometry prim = iter.next();
 				if (prim.getDimension(null) == maxD) {

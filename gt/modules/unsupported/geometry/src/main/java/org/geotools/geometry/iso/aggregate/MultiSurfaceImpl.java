@@ -17,17 +17,19 @@
 
 package org.geotools.geometry.iso.aggregate;
 
+import java.util.Collections;
 import java.util.Set;
 
 import org.opengis.geometry.Boundary;
 import org.opengis.geometry.aggregate.MultiSurface;
 import org.opengis.geometry.primitive.OrientableSurface;
+import org.opengis.geometry.primitive.Point;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class MultiSurfaceImpl extends MultiPrimitiveImpl implements MultiSurface {
+    private static final long serialVersionUID = -8409899769039201012L;
 
-	
-	/**
+    /**
 	 * Creates a MultiSurface by a set of Curves.
 	 * @param crs
 	 * @param surfaces Set of Surfaces which shall be contained by the MultiSurface
@@ -43,22 +45,14 @@ public class MultiSurfaceImpl extends MultiPrimitiveImpl implements MultiSurface
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.geotools.geometry.featgeom.aggregate.MultiPrimitiveImpl#getBoundary()
-	 */
-	public Boundary getBoundary() {
-		// TODO Auto-generated method stub
-		// We shall return a set of Rings, but in which boundary object?!
-		return null;
-	}
-	
 
 	/* (non-Javadoc)
 	 * @see org.geotools.geometry.featgeom.aggregate.MultiPrimitiveImpl#getElements()
 	 */
 	public Set<OrientableSurface> getElements() {
-		return (Set<OrientableSurface>) super.elements;
+		//return (Set<OrientableSurface>) super.elements;
+        return Collections.checkedSet( (Set<OrientableSurface>) super.elements, OrientableSurface.class );
+	    	    
 	}
 
 }

@@ -34,8 +34,9 @@ import org.opengis.geometry.primitive.SolidBoundary;
  * 
  */
 public class SolidImpl extends PrimitiveImpl implements Solid {
-
-	/**
+    private static final long serialVersionUID = 9203406429631890989L;
+    
+    /**
 	 * 
 	 */
 	protected Envelope envelope;

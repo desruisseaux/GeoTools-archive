@@ -46,8 +46,10 @@ import org.opengis.geometry.primitive.SurfaceBoundary;
  */
 public class CompositeSurfaceImpl extends CompositeImpl<OrientableSurfaceImpl>
 		implements CompositeSurface {
+    private static final long serialVersionUID = 1764508224739439610L;
 
-	/**
+
+    /**
 	 * Generator The association role Composition::generator associates this
 	 * CompositeSurface to the primitive Surfaces and OrientableSurfaces in its
 	 * generating set, a list of the Surfaces that form the core of this

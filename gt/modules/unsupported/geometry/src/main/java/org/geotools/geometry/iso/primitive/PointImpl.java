@@ -48,8 +48,9 @@ import org.opengis.referencing.operation.TransformException;
  */
 
 public class PointImpl extends PrimitiveImpl implements Point {
-
-	/**
+    private static final long serialVersionUID = -1750949790172649244L;
+    
+    /**
 	 * The attribute "position" is the DirectPosition of this Point.
 	 * 
 	 * Point::position : DirectPosition

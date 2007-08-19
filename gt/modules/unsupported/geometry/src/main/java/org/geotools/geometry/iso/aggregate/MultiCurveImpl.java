@@ -17,16 +17,18 @@
 
 package org.geotools.geometry.iso.aggregate;
 
+import java.util.Collections;
 import java.util.Set;
+import java.util.SortedSet;
 
-import org.opengis.geometry.Boundary;
 import org.opengis.geometry.aggregate.MultiCurve;
 import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class MultiCurveImpl extends MultiPrimitiveImpl implements MultiCurve {
+    private static final long serialVersionUID = 4330751150560384300L;
 
-	/**
+    /**
 	 * Creates a MultiCurve by a set of Curves.
 	 * @param crs
 	 * @param curves Set of Curves which shall be contained by the MultiCurve
@@ -39,24 +41,16 @@ public class MultiCurveImpl extends MultiPrimitiveImpl implements MultiCurve {
 	 * @see org.opengis.geometry.coordinate.aggregate.MultiCurve#length()
 	 */
 	public double length() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.geotools.geometry.featgeom.aggregate.MultiPrimitiveImpl#getBoundary()
-	 */
-	public Boundary getBoundary() {
-		// TODO Auto-generated method stub
-		// We shall return a set of points, but in which boundary object?!
-		return null;
+	    return 0;
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.geotools.geometry.featgeom.aggregate.MultiPrimitiveImpl#getElements()
 	 */
-	public Set<OrientableCurve> getElements() {
-		return (Set<OrientableCurve>) super.elements;
+	@SuppressWarnings("unchecked")
+    public Set<OrientableCurve> getElements() {
+	    return (Set<OrientableCurve>)
+	       Collections.checkedSet( (Set<OrientableCurve>) elements, OrientableCurve.class ); 
 	}
 
 }

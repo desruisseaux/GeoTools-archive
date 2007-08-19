@@ -36,8 +36,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class SolidBoundaryImpl extends PrimitiveBoundaryImpl implements
 		SolidBoundary {
+    private static final long serialVersionUID = 113485181749545137L;
 
-	/**
+    /**
 	 * SolidBoundaries are similar to SurfaceBoundaries. In normal 3-dimensional
 	 * Euclidean space, one shell is distinguished as the exterior. In the more
 	 * general case, this is not always possible.

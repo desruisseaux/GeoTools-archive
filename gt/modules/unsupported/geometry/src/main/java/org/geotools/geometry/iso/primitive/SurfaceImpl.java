@@ -67,8 +67,9 @@ import org.opengis.referencing.operation.TransformException;
  * @author Jackson Roehrig & Sanjay Jena
  */
 public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
+    private static final long serialVersionUID = 2431540523002962079L;
 
-	/**
+    /**
 	 * The "Segmentation" association relates this Surface to a set of
 	 * SurfacePatches that shall be joined together to form this Surface.
 	 * Depending on the interpolation method, the set of patches may require

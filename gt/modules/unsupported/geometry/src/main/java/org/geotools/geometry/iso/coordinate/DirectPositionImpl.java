@@ -33,8 +33,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  */
 public class DirectPositionImpl implements DirectPosition, Serializable {
+    private static final long serialVersionUID = 2327211794986364062L;
 
-	/**
+    /**
 	 * The attribute "coordinate" is a sequence of Numbers that hold the
 	 * coordinate of this position in the specified reference system.
 	 * DirectPosition2D::coordinate : Sequence<Number>

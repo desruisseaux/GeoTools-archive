@@ -17,9 +17,9 @@
 
 package org.geotools.geometry.iso.aggregate;
 
+import java.util.Collections;
 import java.util.Set;
 
-import org.opengis.geometry.Boundary;
 import org.opengis.geometry.aggregate.MultiPoint;
 import org.opengis.geometry.primitive.Point;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -29,8 +29,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  */
 public class MultiPointImpl extends MultiPrimitiveImpl implements MultiPoint {
+    private static final long serialVersionUID = -1251341764107281100L;
 
-	/**
+    /**
 	 * Creates a MultiPoint by a set of Points.
 	 * @param crs
 	 * @param points Set of Points which shall be contained by the MultiPoint
@@ -38,20 +39,15 @@ public class MultiPointImpl extends MultiPrimitiveImpl implements MultiPoint {
 	public MultiPointImpl(CoordinateReferenceSystem crs, Set<Point> points) {
 		super(crs, points);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.geotools.geometry.featgeom.aggregate.MultiPrimitiveImpl#getBoundary()
-	 */
-	public Boundary getBoundary() {
-		// Points don´t have a Boundary, so don´t have MultiPoints
-		return null;
-	}
+
 	
 	/* (non-Javadoc)
 	 * @see org.geotools.geometry.featgeom.aggregate.MultiPrimitiveImpl#getElements()
 	 */
-	public Set<Point> getElements() {
-		return (Set<Point>) super.elements;
+	@SuppressWarnings("unchecked")
+    public Set<Point> getElements() {
+		//return (Set<Point>) super.elements;
+	    return Collections.checkedSet( (Set<Point>) super.elements, Point.class );
 	}
 
 }

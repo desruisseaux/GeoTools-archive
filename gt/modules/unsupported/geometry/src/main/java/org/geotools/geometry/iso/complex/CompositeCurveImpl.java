@@ -54,8 +54,8 @@ import org.opengis.geometry.primitive.Primitive;
  */
 public class CompositeCurveImpl extends CompositeImpl<OrientableCurveImpl>
 		implements CompositeCurve {
-
-	protected EnvelopeImpl envelope = null;
+    private static final long serialVersionUID = -5774107742557426260L;
+    protected EnvelopeImpl envelope = null;
 
 	/**
 	 * The association role Composition::generator associates this

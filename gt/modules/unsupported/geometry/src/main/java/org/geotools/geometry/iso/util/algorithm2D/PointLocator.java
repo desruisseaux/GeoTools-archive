@@ -111,7 +111,7 @@ public class PointLocator {
 		} else if (geom instanceof SurfaceImpl) {
 			updateLocationInfo(locate(p, (SurfaceImpl) geom));
 		} else if (geom instanceof MultiPrimitiveImpl) {
-			Iterator<Primitive> iterator = ((MultiPrimitiveImpl)geom).getElements().iterator();
+			Iterator<? extends Primitive> iterator = ((MultiPrimitiveImpl)geom).getElements().iterator();
 			while (iterator.hasNext()) {
 				PrimitiveImpl prim = ((PrimitiveImpl)iterator.next());
 				updateLocationInfo(locate(p, prim));

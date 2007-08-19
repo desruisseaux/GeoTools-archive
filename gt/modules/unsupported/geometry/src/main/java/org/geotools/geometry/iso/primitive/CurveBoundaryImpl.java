@@ -33,8 +33,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class CurveBoundaryImpl extends PrimitiveBoundaryImpl implements
 		CurveBoundary {
+    private static final long serialVersionUID = -3093563492516992268L;
 
-	/**
+    /**
 	 * 
 	 * startPoint, endPoint A CurveBoundary contains two Point references.
 	 * 

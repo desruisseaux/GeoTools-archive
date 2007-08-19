@@ -41,6 +41,7 @@ import org.opengis.geometry.primitive.CurveInterpolation;
  * @author Jackson Roehrig & Sanjay Jena
  */
 public class LineStringImpl extends CurveSegmentImpl implements LineString {
+    private static final long serialVersionUID = -4463400288452707656L;
 
     /**
      * The controlPoints of a LineString are a sequence of positions between which the curve is

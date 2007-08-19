@@ -37,8 +37,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Jackson Roehrig & Sanjay Jena
  */
 public class CompositePointImpl extends CompositeImpl<PointImpl> implements CompositePoint {
+    private static final long serialVersionUID = 3391515492110694489L;
 
-	public CompositePointImpl(PointImpl generator) {
+    public CompositePointImpl(PointImpl generator) {
 		this( generator.getCoordinateReferenceSystem(), generator );
 	}
 	/**
