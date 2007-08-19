@@ -51,8 +51,8 @@ public final class DummyTextureRenderer
                              width / 8,
                              height / 2 );
 
-        // Simulate calculation delay:
-        pauseRandomTime( 300, 100 );
+        // Simulate calculation / loading delay:
+        pauseRandomTime( 50, 20 );
     }
 
     private void pauseRandomTime( final int maxMsToPause, final int addition )

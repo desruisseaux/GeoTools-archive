@@ -634,13 +634,11 @@ public final class TerrainMesh
                 myTexture.setWrap( Texture.WM_ECLAMP_S_ECLAMP_T );
                 myTexture.setMipmapState( Texture.MM_LINEAR_LINEAR );
 
+                createTextureRenderState( renderer, myTexture );
+
                 if ( myPlaceholderTextureInUse )
                 {
                     myTextureState.setTexture( myTexture, 0 );
-                }
-                else
-                {
-                    createTextureRenderState( renderer, myTexture );
                 }
             }
             else

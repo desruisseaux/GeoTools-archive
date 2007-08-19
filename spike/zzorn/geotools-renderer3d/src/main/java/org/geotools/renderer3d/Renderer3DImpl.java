@@ -64,10 +64,10 @@ public final class Renderer3DImpl
     //======================================================================
     // Private Constants
 
-    private static final int DEFAULT_START_RADIUS_M = 1000;
+    private static final int DEFAULT_START_RADIUS_M = 10000;
     private static final int DEFAULT_TERRAIN_BLOCK_SIZE_IN_GRIDS = 32;
     private static final int DEFAULT_TEXTURE_SIZE = 128;
-    private static final double DEFAULT_VISIBILITY_DISTANCE = 10000.0;
+    private static final double DEFAULT_VISIBILITY_DISTANCE = 100000.0;
     private static final double MINIMUM_NODE_SIZE_M = 50;
     private static final double EXPANSION_THRESHOLD = 2.0;
     private static final double COLLAPSING_THRESHOLD = 1.5;

@@ -47,6 +47,7 @@ public final class RotateGesture
 
     protected void applyDragGesture( final Camera camera, final float deltaX, final float deltaY )
     {
+
         // Get quaternion from camera
         final Vector3f left = camera.getLeft();
         final Vector3f up = camera.getUp();

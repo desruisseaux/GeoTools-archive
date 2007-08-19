@@ -61,14 +61,20 @@ public abstract class AbstractDragGesture
                 // Calculate mouse movement
                 final int currentX = e.getX();
                 final int currentY = e.getY();
-                final float deltaX = ( currentX - myOldX ) * getSensitivity();
-                final float deltaY = ( currentY - myOldY ) * getSensitivity();
+                final int deltaXInt = currentX - myOldX;
+                final int deltaYInt = currentY - myOldY;
 
-                // Do the drag bussiness logic
-                applyDragGesture( camera, deltaX, deltaY );
+                if ( deltaXInt != 0 || deltaYInt != 0 )
+                {
+                    final float deltaX = deltaXInt * getSensitivity();
+                    final float deltaY = deltaYInt * getSensitivity();
 
-                // Reset mouse position
-                setMousePos( myOldX, myOldY );
+                    // Do the drag bussiness logic
+                    applyDragGesture( camera, deltaX, deltaY );
+
+                    // Reset mouse position
+                    setMousePos( myOldX, myOldY );
+                }
             }
         }
     }
