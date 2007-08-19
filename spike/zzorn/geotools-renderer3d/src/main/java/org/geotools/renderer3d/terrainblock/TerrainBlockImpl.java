@@ -70,6 +70,7 @@ public final class TerrainBlockImpl
     // Private Constants
 
     private static final BoundingRectangleImpl WHOLE_TEXTURE = new BoundingRectangleImpl( 0, 0, 1, 1 );
+    private static final BoundingRectangleImpl WHOLE_TEXTURE_FLIPPED_ALONG_Y = new BoundingRectangleImpl( 0, 1, 1, 0 );
 
     //======================================================================
     // Public Methods

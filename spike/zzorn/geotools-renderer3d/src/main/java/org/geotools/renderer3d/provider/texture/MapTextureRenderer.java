@@ -27,6 +27,10 @@ public final class MapTextureRenderer
     private final MapContext myMap;
     private final StreamingRenderer myStreamingRenderer = new StreamingRenderer();
     private final Color myBackgroundColor;
+    private final double myScaleX;
+    private final double myScaleY;
+    private final double myTranslateX;
+    private final double myTranslateY;
 
     //======================================================================
     // Public Methods
@@ -46,6 +50,12 @@ public final class MapTextureRenderer
         myMap = map;
         myBackgroundColor = backgroundColor;
 
+        myScaleX = 0.001;
+        myScaleY = 0.001;
+        myTranslateX = -100;
+        myTranslateY = 30;
+
+
         myStreamingRenderer.setContext( map );
         myStreamingRenderer.setInteractive( false );
         myStreamingRenderer.setJava2DHints( new RenderingHints( RenderingHints.KEY_ANTIALIASING,
@@ -61,20 +71,39 @@ public final class MapTextureRenderer
         final int height = target.getHeight();
 
         final Graphics2D graphics = (Graphics2D) target.getGraphics();
-        graphics.setColor( myBackgroundColor );
 
+        // Clear to color
+        graphics.setColor( myBackgroundColor );
         graphics.fillRect( 0, 0, width, height );
+
+        final BoundingRectangle transformedArea = area.transform( myTranslateX, myTranslateY, myScaleX, myScaleY );
 
         // Create the source and destination areas
         final Rectangle targetArea = new Rectangle( width, height );
-        final ReferencedEnvelope sourceArea = new ReferencedEnvelope( area.getX1(),
-                                                                      area.getX2(),
-                                                                      area.getY1(),
-                                                                      area.getY2(),
+        final ReferencedEnvelope sourceArea = new ReferencedEnvelope( transformedArea.getX1(),
+                                                                      transformedArea.getX2(),
+                                                                      transformedArea.getY1(),
+                                                                      transformedArea.getY2(),
                                                                       myMap.getCoordinateReferenceSystem() );
 
         // Render
         myStreamingRenderer.paint( graphics, targetArea, sourceArea );
+
+/*
+        graphics.setColor( Color.BLACK );
+        graphics.drawRect( 0,0,width-1, height-1 );
+*/
+
+/*
+        try
+        {
+            Thread.sleep( 100);
+        }
+        catch ( InterruptedException e )
+        {
+            
+        }
+*/
     }
 
 }

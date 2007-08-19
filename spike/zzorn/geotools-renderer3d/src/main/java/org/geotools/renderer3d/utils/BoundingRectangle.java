@@ -175,4 +175,14 @@ public interface BoundingRectangle
      */
     double getSizeAveraged();
 
+    /**
+     * @param translationX amount to move the rectangle along x axis, after scaling.
+     * @param translationY amount to move the rectangle along y axis, after scaling.
+     * @param scaleX       amount to scale the rectangle along the x axis.
+     * @param scaleY       amount to scale the rectangle along the y axis.
+     *
+     * @return a scaled and translated copy of this Bounding rectangle
+     */
+    BoundingRectangle transform( double translationX, double translationY, double scaleX, double scaleY );
+
 }

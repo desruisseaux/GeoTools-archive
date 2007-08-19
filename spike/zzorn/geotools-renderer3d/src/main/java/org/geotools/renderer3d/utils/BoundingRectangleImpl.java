@@ -292,6 +292,19 @@ public final class BoundingRectangleImpl
         return 0.5 * ( getSizeX() + getSizeY() );
     }
 
+    public BoundingRectangle transform( final double translationX,
+                                        final double translationY,
+                                        final double scaleX,
+                                        final double scaleY )
+    {
+        return new BoundingRectangleImpl( ( myX1 ) * scaleX + translationX,
+                                          ( myY1 ) * scaleY + translationY,
+                                          ( myX2 ) * scaleX + translationX,
+                                          ( myY2 ) * scaleY + translationY,
+                                          ( myCenterX ) * scaleX + translationX,
+                                          ( myCenterY ) * scaleY + translationY );
+    }
+
     //----------------------------------------------------------------------
     // Caononical Methods
 

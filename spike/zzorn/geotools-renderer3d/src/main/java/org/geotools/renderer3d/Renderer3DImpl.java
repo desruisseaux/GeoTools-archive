@@ -7,7 +7,7 @@ import com.jme.scene.Spatial;
 import com.jme.util.LoggingSystem;
 import org.geotools.map.MapContext;
 import org.geotools.renderer3d.navigationgestures.NavigationGesture;
-import org.geotools.renderer3d.provider.texture.DummyTextureRenderer;
+import org.geotools.renderer3d.provider.texture.MapTextureRenderer;
 import org.geotools.renderer3d.provider.texture.impl.TextureProvider;
 import org.geotools.renderer3d.provider.texture.impl.TextureProviderImpl;
 import org.geotools.renderer3d.terrainblock.TerrainBlock;
@@ -64,7 +64,6 @@ public final class Renderer3DImpl
     //======================================================================
     // Private Constants
 
-    private static final int DEFAULT_START_RADIUS_M = 10000;
     private static final int DEFAULT_TERRAIN_BLOCK_SIZE_IN_GRIDS = 32;
     private static final int DEFAULT_TEXTURE_SIZE = 128;
     private static final double DEFAULT_VISIBILITY_DISTANCE = 100000.0;
@@ -83,18 +82,18 @@ public final class Renderer3DImpl
      */
     public Renderer3DImpl()
     {
-        this( DEFAULT_START_RADIUS_M );
+        this( DEFAULT_VISIBILITY_DISTANCE );
     }
 
 
     /**
      * Creates a new Renderer3D.
      *
-     * @param startRadius_m the length of each side in the first quad tree nodes created.
+     * @param visibilityDistance_m distance that should be visible, in meters.
      */
-    public Renderer3DImpl( final double startRadius_m )
+    public Renderer3DImpl( final double visibilityDistance_m )
     {
-        this( null, startRadius_m );
+        this( null, visibilityDistance_m );
     }
 
 
@@ -105,22 +104,22 @@ public final class Renderer3DImpl
      */
     public Renderer3DImpl( final MapContext mapContextToRender )
     {
-        this( mapContextToRender, DEFAULT_START_RADIUS_M );
+        this( mapContextToRender, DEFAULT_VISIBILITY_DISTANCE );
     }
 
 
     /**
      * Creates a new Renderer3D.
      *
-     * @param mapContextToRender the map context that is used to get the layers to render in the 3D view.
-     * @param startRadius_m      the length of each side in the first quad tree nodes created.
-     *                           number of grid cells along the side of a TerrainBlock.
+     * @param mapContextToRender   the map context that is used to get the layers to render in the 3D view.
+     * @param visibilityDistance_m distance that should be visible, in meters.
      */
     public Renderer3DImpl( final MapContext mapContextToRender,
-                           final double startRadius_m )
+                           final double visibilityDistance_m )
     {
-        this( mapContextToRender, startRadius_m, DEFAULT_TERRAIN_BLOCK_SIZE_IN_GRIDS, DEFAULT_TEXTURE_SIZE,
-              DEFAULT_VISIBILITY_DISTANCE );
+        this( mapContextToRender,
+              new MapTextureRenderer( mapContextToRender, Color.WHITE ),
+              DEFAULT_TERRAIN_BLOCK_SIZE_IN_GRIDS, DEFAULT_TEXTURE_SIZE, visibilityDistance_m );
     }
 
 
@@ -128,44 +127,43 @@ public final class Renderer3DImpl
      * Creates a new Renderer3D.
      *
      * @param mapContextToRender      the map context that is used to get the layers to render in the 3D view.
-     * @param startRadius_m           the length of each side in the first quad tree nodes created.
+     * @param textureRenderer         the renderer that renders chunks of the ground texture on request.
      * @param terrainBlockSizeInGrids number of grid cells along the side of a TerrainBlock.
      * @param textureSize             the size to use for the texture for each terrain block, per side, in pixels.
-     * @param visibilityDistance      distance that there should be terrain visible in each direction from the camera,
-     *                                in display units (TODO: Check if meters?)
+     * @param visibilityDistance_m    distance that there should be terrain visible in each direction from the camera,
+     *                                in display units (TODO: CHECK: meters?).
      */
     public Renderer3DImpl( final MapContext mapContextToRender,
-                           final double startRadius_m,
+                           final MapTextureRenderer textureRenderer,
                            final int terrainBlockSizeInGrids,
-                           final int textureSize,
-                           final double visibilityDistance )
+                           final int textureSize, final double visibilityDistance_m )
     {
         ParameterChecker.checkNotNull( mapContextToRender, "mapContextToRender" );
-        ParameterChecker.checkPositiveNonZeroNormalNumber( startRadius_m, "startRadius_m" );
         ParameterChecker.checkPositiveNonZeroInteger( terrainBlockSizeInGrids, "terrainBlockSizeInGrids" );
         ParameterChecker.checkPositiveNonZeroInteger( textureSize, "textureSize" );
-        ParameterChecker.checkPositiveNonZeroNormalNumber( visibilityDistance, "visibilityDistance" );
+        ParameterChecker.checkPositiveNonZeroNormalNumber( visibilityDistance_m, "visibilityDistance_m" );
 
-        myMapContext = mapContextToRender;
         myTextureSize = textureSize;
-        myVisibilityDistance = visibilityDistance;
+        myVisibilityDistance = visibilityDistance_m;
 
         myCanvas3D.setViewDistance( (float) myVisibilityDistance );
 
-/*
-        final TextureProvider mapTextureProvider = new TextureProviderImpl( new MapTextureRenderer( mapContextToRender, Color.WHITE ) );
-*/
+        final TextureProvider mapTextureProvider = new TextureProviderImpl( textureRenderer,
+                                                                            textureSize,
+                                                                            Color.WHITE );
 
+/*
         // DEBUG
         final TextureProvider mapTextureProvider = new TextureProviderImpl( new DummyTextureRenderer(),
                                                                             textureSize,
                                                                             Color.GRAY );
+*/
 
         myTerrainBlockFactory = new TerrainBlockFactory( terrainBlockSizeInGrids,
                                                          mapTextureProvider,
                                                          myTextureSize );
 
-        myQuadTree = new QuadTreeImpl<TerrainBlock>( startRadius_m, myTerrainBlockFactory );
+        setMapContext( mapContextToRender );
 
         myQuadTree.addQuadTreeListener( new QuadTreeListener<TerrainBlock>()
         {
@@ -202,7 +200,7 @@ public final class Renderer3DImpl
             myMapContext = mapContext;
 
             // Clear the old quadtree and start building a new one, with the data from the new context.
-            myQuadTree = new QuadTreeImpl<TerrainBlock>( DEFAULT_START_RADIUS_M, myTerrainBlockFactory );
+            myQuadTree = new QuadTreeImpl<TerrainBlock>( myVisibilityDistance / 1000, myTerrainBlockFactory );
         }
     }
 

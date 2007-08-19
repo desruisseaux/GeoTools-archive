@@ -45,6 +45,7 @@ public final class DummyTextureRenderer
             graphics.drawLine( x, 0, x, height );
         }
 
+        // Write tile coordinate and draw a border
         graphics.setColor( Color.WHITE );
         graphics.drawRect( 0, 0, width - 1, height - 1 );
         graphics.drawString( "x:" + area.getCenterX() + ", y:" + area.getCenterY(),

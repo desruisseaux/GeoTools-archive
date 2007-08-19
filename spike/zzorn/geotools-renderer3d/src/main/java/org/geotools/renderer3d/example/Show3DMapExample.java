@@ -1,11 +1,21 @@
 package org.geotools.renderer3d.example;
 
+import org.geotools.data.FeatureSource;
+import org.geotools.data.shapefile.ShapefileDataStore;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.gui.swing.JMapPane;
+import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.renderer3d.Renderer3D;
 import org.geotools.renderer3d.Renderer3DImpl;
 import org.geotools.renderer3d.utils.canvas3d.FrameListener;
+import org.geotools.styling.BasicLineStyle;
+import org.geotools.styling.SLDParser;
+import org.geotools.styling.Style;
+import org.geotools.styling.StyleFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import javax.swing.*;
 import java.awt.BorderLayout;
@@ -14,6 +24,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.net.URL;
 
 /**
  * An example of using the 3D map.
@@ -32,8 +43,12 @@ public class Show3DMapExample
     public static void main( String[] args ) throws IOException
     {
         // Create some data
+/*
         final ExampleDataGenerator exampleDataGenerator = new ExampleDataGenerator();
         final MapContext exampleMap = exampleDataGenerator.createExampleMap();
+*/
+        final MapContext exampleMap = createContextFromShapefile( new URL( "file:example_data/us/states.shp" ),
+                                                                  new URL( "file:example_data/styles/default_line.sld" ) );
 
         // Create a 3D renderer
         final Renderer3D renderer3D = new Renderer3DImpl( exampleMap );
@@ -152,6 +167,58 @@ public class Show3DMapExample
         } );
 
         return menuBar;
+    }
+
+
+    private static MapContext createContextFromShapefile( final URL shape )
+            throws IOException
+    {
+        return createContextFromShapefile( shape, null );
+    }
+
+    private static MapContext createContextFromShapefile( final URL shape, final URL sld )
+            throws IOException
+    {
+        return loadShapefile( shape, loadStyle( sld ) );
+    }
+
+    private static Style loadStyle( final URL sld )
+            throws IOException
+    {
+        final Style style;
+        if ( sld != null )
+        {
+            final StyleFactory styleFactory = CommonFactoryFinder.getStyleFactory( null );
+            final SLDParser stylereader = new SLDParser( styleFactory, sld );
+            final Style[] styles = stylereader.readXML();
+
+            style = styles[ 0 ];
+        }
+        else
+        {
+            style = new BasicLineStyle();
+        }
+        return style;
+    }
+
+    private static MapContext loadShapefile( final URL shape, final Style style )
+            throws IOException
+    {
+        final ShapefileDataStore shapefileDataStore = new ShapefileDataStore( shape );
+
+        final FeatureSource featureSource = shapefileDataStore.getFeatureSource();
+
+        CoordinateReferenceSystem crs = featureSource.getSchema().getDefaultGeometry().getCoordinateSystem();
+        if ( crs == null )
+        {
+            crs = DefaultGeographicCRS.WGS84;
+        }
+
+        final MapContext context = new DefaultMapContext( crs );
+        context.addLayer( featureSource, style );
+        context.getLayerBounds();
+
+        return context;
     }
 
 }

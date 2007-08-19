@@ -3,6 +3,7 @@ package org.geotools.renderer3d.utils.canvas3d;
 import com.jme.renderer.Camera;
 import com.jme.renderer.Renderer;
 import com.jme.scene.Spatial;
+import com.jme.scene.state.CullState;
 import com.jme.system.DisplaySystem;
 import com.jmex.awt.JMECanvas;
 import com.jmex.awt.SimpleCanvasImpl;
@@ -503,6 +504,13 @@ public final class Canvas3D
         @Override
         public void simpleSetup()
         {
+            // Remove the back faces when rendering
+            // REFACTOR: Actually the terrain is backwards at the moment, the camera is 'under' it.  Flip it around at some point.
+            final CullState cullState = DisplaySystem.getDisplaySystem().getRenderer().createCullState();
+            cullState.setCullMode( CullState.CS_FRONT );
+            rootNode.setRenderState( cullState );
+
+
             if ( myCanvasRootNode != null )
             {
                 rootNode.attachChild( myCanvasRootNode );

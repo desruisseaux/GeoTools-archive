@@ -141,6 +141,8 @@ public final class TerrainMesh
         initializeIndices();
 
         updateBounds( x1, y1, x2, y2 );
+
+
     }
 
     //----------------------------------------------------------------------
@@ -530,7 +532,7 @@ public final class TerrainMesh
 
         // Stretch the texture across the terrain mesh, and have downturned edges have the same color as the edge
         final float textureXPos = (float) MathUtils.interpolateClamp( x, 1, mySizeX_vertices - 2, 0, 1 );
-        final float textureYPos = (float) MathUtils.interpolateClamp( y, 1, mySizeY_vertices - 2, 0, 1 );
+        final float textureYPos = (float) MathUtils.interpolateClamp( y, 1, mySizeY_vertices - 2, 1, 0 );
 
         final Vector3f position = new Vector3f( xPos, yPos, zPos );
         final Vector3f normal = new Vector3f( 0, 0, 1 );
@@ -712,8 +714,8 @@ public final class TerrainMesh
                 final float textureYPos = (float) MathUtils.interpolateClamp( y,
                                                                               1,
                                                                               mySizeY_vertices - 2,
-                                                                              boundingRectangle.getY1(),
-                                                                              boundingRectangle.getY2() );
+                                                                              boundingRectangle.getY2(),
+                                                                              boundingRectangle.getY1() );
 
                 final Vector2f textureCoordinate = new Vector2f( textureXPos, textureYPos );
 
