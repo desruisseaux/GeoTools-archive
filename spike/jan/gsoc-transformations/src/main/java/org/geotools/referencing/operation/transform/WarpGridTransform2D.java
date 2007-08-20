@@ -164,32 +164,25 @@ public class WarpGridTransform2D extends WarpTransform2D {
     }
 
     public void transform(double[] srcPts, int srcOff, double[] dstPts, int dstOff, int numPts)
-         {
+         throws TransformException{
         // TODO Auto-generated method stub
         //transformToGrid(srcPts, srcOff, srcPts, srcOff, numPts, false);
         double[] helperPts = srcPts.clone();
 
-        try {
+        
             if (worldToGrid != null) {
                 worldToGrid.transform(helperPts, srcOff, helperPts, srcOff, numPts);
             }
-        } catch (TransformException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+       
 
-        super.transform(helperPts, srcOff, dstPts, dstOff, numPts);
+        
+			super.transform(helperPts, srcOff, dstPts, dstOff, numPts);
+		
 
-        try {
+        
             if (worldToGrid != null) {
                 worldToGrid.inverse().transform(dstPts, dstOff, dstPts, dstOff, numPts);
             }
-        } catch (NoninvertibleTransformException e) {
-            e.printStackTrace();
-        } catch (TransformException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
 
     public void transform(float[] srcPts, int srcOff, float[] dstPts, int dstOff, int numPts) {
@@ -332,7 +325,7 @@ public class WarpGridTransform2D extends WarpTransform2D {
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
+        public static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                     new NamedIdentifier(Citations.GEOTOOLS, "Warp Grid")
                 },
                 new ParameterDescriptor[] {

@@ -23,7 +23,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.vecmath.MismatchedSizeException;
+
+import org.geotools.geometry.DirectPosition2D;
+import org.geotools.geometry.Envelope2D;
+import org.geotools.parameter.ParameterGroup;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.operation.transform.ConcatenatedTransform;
+import org.geotools.referencing.operation.transform.WarpGridTransform2D;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.geometry.MismatchedReferenceSystemException;
@@ -32,14 +42,6 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchIdentifierException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.geotools.geometry.DirectPosition2D;
-import org.geotools.geometry.Envelope2D;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.operation.DefaultMathTransformFactory;
-import org.geotools.referencing.operation.transform.ConcatenatedTransform;
-import org.geotools.referencing.operation.transform.WarpGridTransform2D;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -64,7 +66,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
     /**
      * Envelope for generated Grid
      */
-    Envelope envelope;
+    private Envelope envelope;
 
     /**
      * List of Mapped Positions in ggrid coordinates
@@ -105,7 +107,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
             MismatchedReferenceSystemException, TransformException, NoSuchIdentifierException {
         this.worldToGrid = realToGrid;
 
-        globalValues = new GridParamValues(envelope, realToGrid, dx, dy);
+        this.globalValues = new GridParamValues(envelope, realToGrid, dx, dy);
 
         super.setMappedPositions(vectors);
 
@@ -389,23 +391,26 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 
             /* Transforms dx, dy and envelope to grid system */
             dxdy = CRS.transform(trans, dxdy);
-            env = CRS.transform(trans, env);
+            Envelope gridEnv = CRS.transform(trans, env);
 
-            final DefaultMathTransformFactory factory = new DefaultMathTransformFactory();
-            WarpGridParameters = factory.getDefaultParameters("Warp Grid");
-            WarpGridParameters.parameter("xStart").setValue((int) (env.getMinimum(0) + 0.5));
-            WarpGridParameters.parameter("yStart").setValue((int) (env.getMinimum(1) + 0.5));
+            //final DefaultMathTransformFactory factory = new DefaultMathTransformFactory();
+            //WarpGridTransform2D.Provider.
+            WarpGridParameters = new ParameterGroup(WarpGridTransform2D.Provider.PARAMETERS);
+            //WarpGridParameters = factory.getDefaultParameters("Warp Grid");
+            WarpGridParameters.parameter("xStart").setValue((int) (gridEnv.getMinimum(0) + 0.5));
+            WarpGridParameters.parameter("yStart").setValue((int) (gridEnv.getMinimum(1) + 0.5));
             WarpGridParameters.parameter("xStep").setValue((int) Math.ceil(dxdy.getLength(0)));
             WarpGridParameters.parameter("yStep").setValue((int) Math.ceil(dxdy.getLength(1)));
             WarpGridParameters.parameter("xNumCells")
-                              .setValue((int) Math.ceil(env.getLength(0) / dxdy.getLength(0)));
+                              .setValue((int) Math.ceil(gridEnv.getLength(0) / dxdy.getLength(0)));
             WarpGridParameters.parameter("yNumCells")
-                              .setValue((int) Math.ceil(env.getLength(1) / dxdy.getLength(1)));
+                              .setValue((int) Math.ceil(gridEnv.getLength(1) / dxdy.getLength(1)));
 
             WarpGridParameters.parameter("warpPositions")
                               .setValue(new float[2 * (WarpGridParameters.parameter("xNumCells")
                                                                          .intValue() + 1) * (WarpGridParameters.parameter(
                     "yNumCells").intValue() + 1)]);
+            
         }
 
         /**
@@ -415,7 +420,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
         public void setGridWarpPostions(float[] warpPos) {
             WarpGridParameters.parameter("warpPositions").setValue(warpPos);
         }
-
+      
         /**
          * Returns warp grid positions.
          * @return warp grid positions
@@ -424,4 +429,56 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
             return WarpGridParameters;
         }
     }
+
+	public int getHeight() {
+		return globalValues.getWarpGridParameters().parameter("yNumCells").intValue();  
+		
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+		
+	    try {
+			this.globalValues = new GridParamValues(envelope, worldToGrid, this.envelope.getLength(0)/width, this.envelope.getLength(1)/height);
+		} catch (NoSuchIdentifierException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		this.dxgrid=null;
+		this.dygrid=null;
+		this.warpPositions = null;
+		 
+	}
+
+	public int getWidth() {
+		return globalValues.getWarpGridParameters().parameter("xNumCells").intValue(); 		
+		
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+		 try {
+			 this.globalValues = new GridParamValues(envelope, worldToGrid, this.envelope.getLength(0)/width, this.envelope.getLength(1)/height);
+					} catch (NoSuchIdentifierException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (TransformException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			this.dxgrid=null;
+			this.dygrid=null;
+			this.warpPositions = null;
+	}
+
+	public Envelope getEnvelope() {
+		return envelope;
+	}
+
+	public void setEnvelope(Envelope envelope) {
+		this.envelope = envelope;
+	}
 }

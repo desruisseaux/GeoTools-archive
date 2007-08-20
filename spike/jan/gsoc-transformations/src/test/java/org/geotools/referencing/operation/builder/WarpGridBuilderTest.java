@@ -95,7 +95,7 @@ public class WarpGridBuilderTest extends TestCase {
      * Test of TPDWarpGridBuilder
      *
      */
-    public void ttestIDWWarpGridBuilder() {
+    public void testIDWWarpGridBuilder() {
         try {
             // Envelope 20*20 km 
             Envelope env = new Envelope2D(crs, 0, 0, 1000, 1000);
@@ -152,7 +152,7 @@ public class WarpGridBuilderTest extends TestCase {
             M.setRow(1, m1);
             M.setRow(2, m2);
 
-            WarpGridBuilder builder = new TPSGridBuilder(mp, 5, 5, env,
+            WarpGridBuilder builder = new TPSGridBuilder(mp, 3, 3, env,
                     ProjectiveTransform.create(M));
 
             GridCoverage2D dx  =  (new GridCoverageFactory()).create("tps - dx", builder.getDxGrid(), env);

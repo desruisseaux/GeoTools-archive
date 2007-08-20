@@ -15,9 +15,13 @@
  */
 package org.geotools.referencing.operation.builder.algorithm;
 
+import java.awt.image.DataBuffer;
+import java.awt.image.WritableRaster;
 import java.util.HashMap;
+import javax.media.jai.RasterFactory;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
+import org.opengis.referencing.operation.TransformException;
 import org.geotools.geometry.DirectPosition2D;
 
 
@@ -30,6 +34,7 @@ public abstract class AbstractInterpolation {
     private final int yNumCells;
     private float[] gridValues;
     private float[][] grid2D;
+    private WritableRaster raster;
 
     /**
      *
@@ -89,13 +94,12 @@ public abstract class AbstractInterpolation {
      * @return Values of grid coordinates
      */
     private float[] buildGrid() {
-    	
         gridValues = new float[(xNumCells + 1) * (yNumCells + 1)];
 
         for (int i = 0; i <= yNumCells; i++) {
             for (int j = 0; j <= xNumCells; j++) {
                 gridValues[(i * (1 + xNumCells)) + j] = getValue(new DirectPosition2D(env.getLowerCorner()
-                                                                                             .getOrdinate(0)
+                                                                                         .getOrdinate(0)
                             + (j * dx), env.getLowerCorner().getOrdinate(1) + (i * dy)));
             }
         }
@@ -113,6 +117,27 @@ public abstract class AbstractInterpolation {
         }
 
         return gridValues;
+    }
+
+    /**
+     *
+     * @return grid in the form of WritableRaster
+     */
+    public WritableRaster getRaster() {
+        if (raster == null) {
+            final float[] warpPositions = getGrid();
+
+            raster = RasterFactory.createBandedRaster(DataBuffer.TYPE_FLOAT, yNumCells + 1,
+                    xNumCells + 1, 1, null);
+
+            for (int i = 0; i <= yNumCells; i++) {
+                for (int j = 0; j <= xNumCells; j++) {
+                    raster.setSample(i, j, 0, warpPositions[(int) ((i * (xNumCells + 1)) + (j))]);
+                }
+            }
+        }
+
+        return raster;
     }
 
     /**
