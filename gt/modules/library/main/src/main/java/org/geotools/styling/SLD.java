@@ -60,6 +60,12 @@ public class SLD {
     /** <code>NOTFOUND</code> indicates int value was unavailable */
     public static final int NOTFOUND = Filters.NOTFOUND;
     public static final StyleBuilder builder = new StyleBuilder();
+    public static final double ALIGN_LEFT = 1.0;
+    public static final double ALIGN_CENTER = 0.5;
+    public static final double ALIGN_RIGHT = 0.0;
+    public static final double ALIGN_BOTTOM = 1.0;
+    public static final double ALIGN_MIDDLE = 0.5;
+    public static final double ALIGN_TOP = 0.0;
 
     /**
      * Retrieve linestring color from linesymbolizer if available.
@@ -1082,20 +1088,6 @@ public class SLD {
         return null;
     }
 
-    public static Font font(TextSymbolizer symbolizer) {
-        if (symbolizer == null) {
-            return null;
-        }
-
-        Font[] font = symbolizer.getFonts();
-
-        if ((font == null) || (font[0] == null)) {
-            return null;
-        }
-
-        return font[0];
-    }
-
     /**
      * Grabs the haloFill from the first TextSymbolizer.
      * 
@@ -1788,5 +1780,66 @@ SYMBOLIZER:
 	public static Color toColor(String htmlColor) {
 		return new Color(Integer.parseInt(htmlColor.substring(1), 16));
 	}
+
+    /**
+     * Grabs the font from the first TextSymbolizer.
+     * <p>
+     * If you are using something fun like symbols you 
+     * will need to do your own thing.
+     * </p>
+     * @param symbolizer Text symbolizer information.
+     * @return FontData[] of the font's fill, or null if unavailable.
+     */
+    public static Font font( TextSymbolizer symbolizer ) {
+        if(symbolizer == null) return null;
+        Font[] font = symbolizer.getFonts();
+        if(font == null || font[0] == null ) return null;
+        return font[0];
+    }
+
+    public static Style getDefaultStyle( StyledLayerDescriptor sld ) {
+        Style[] styles = styles(sld);
+        for (int i = 0; i < styles.length; i++) {
+            if (styles[i].isDefault()) {
+                return styles[i];
+            }
+        }
+        //no default, so just grab the first one
+        return styles[0];
+    }
+
+    public static boolean isSemanticTypeMatch( FeatureTypeStyle fts, String regex ) {
+        String[] identifiers = fts.getSemanticTypeIdentifiers();
+        for (int i = 0; i < identifiers.length; i++) {
+            if (identifiers[i].matches(regex)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Returns the min scale of the default rule, or 0 if none is set 
+     */
+    public static double minScale( FeatureTypeStyle fts ) {
+        if(fts == null || fts.getRules().length == 0)
+            return 0.0;
+    
+        Rule r = fts.getRules()[0]; 
+        return r.getMinScaleDenominator();
+    }
+
+    /**
+     * Returns the max scale of the default rule, or {@linkplain Double#NaN} if none is set 
+     */
+    public static double maxScale( FeatureTypeStyle fts ) {
+        if(fts == null || fts.getRules().length == 0)
+            return Double.NaN;
+    
+        Rule r = fts.getRules()[0]; 
+        return r.getMaxScaleDenominator();
+    }
+
+    public static PointPlacement getPlacement( double horizAlign, double vertAlign, double rotation ) {
+        return builder.createPointPlacement(horizAlign, vertAlign, rotation);
+    }
 
 }

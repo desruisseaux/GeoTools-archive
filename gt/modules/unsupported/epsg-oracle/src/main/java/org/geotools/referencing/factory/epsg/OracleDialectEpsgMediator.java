@@ -31,8 +31,13 @@ import org.opengis.referencing.FactoryException;
 public class OracleDialectEpsgMediator extends AbstractEpsgMediator {
 
     Hints config;
-    public OracleDialectEpsgMediator() throws FactoryException {
+    
+    /**
+     * No argument constructor - must not fail for factory finder registration.
+     */
+    public OracleDialectEpsgMediator() {
     }
+
     
     public OracleDialectEpsgMediator(Hints hints ) throws FactoryException {
         super(hints);
@@ -62,7 +67,7 @@ public class OracleDialectEpsgMediator extends AbstractEpsgMediator {
              ),
              datasource
          );
-        config = new Hints(  Hints.EPSG_DATA_SOURCE, datasource );
+        config = new Hints( Hints.EPSG_DATA_SOURCE, datasource );
     }
 
 
@@ -81,7 +86,6 @@ public class OracleDialectEpsgMediator extends AbstractEpsgMediator {
         OracleDialectEpsgFactory factory = (OracleDialectEpsgFactory) obj;
         factory.disconnect();
         factory.dispose();
-        factory = null;
     }
 
     /**
@@ -93,7 +97,7 @@ public class OracleDialectEpsgMediator extends AbstractEpsgMediator {
     }
 
     /**
-     * Uninitialize an instance to be returned to the pool.
+     * Uninitialized an instance to be returned to the pool.
      */
     protected void passivateWorker(AbstractCachedAuthorityFactory obj) throws Exception {
         // Each implementation has the choice of closing connections when they

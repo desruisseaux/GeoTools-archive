@@ -504,7 +504,7 @@ public final class Hints extends RenderingHints {
      * be used during heavy load. If the AUTHORITY_MAX_IDLE is set to 10,
      * connections will be immediately reclaimed until only 10 are open.
      * <p>
-     * When the amount of time specified by AUTHORITY_IDLE_WAIT
+     * When the amount of time specified by AUTHORITY_IDLE_WAIT is non zero
      * Max idle controls the maximum number of objects that can sit idle in the
      * pool at any time. When negative, there is no limit to the number of
      * objects that may be idle at one time.

@@ -37,6 +37,8 @@ import org.opengis.util.InternationalString;
 
 /**
  * Abstract implementation for EPSG (has a DataSource reference inside).
+ * <p>
+ * DataSource docs needed:
  * 
  * @author Cory Horner (Refractions Research)
  */
@@ -52,8 +54,6 @@ public abstract class AbstractEpsgMediator extends AbstractAuthorityMediator {
     
     /**
      * No argument constructor - must not fail for factory finder registration.
-     * @param hints
-     * @throws FactoryException
      */
     public AbstractEpsgMediator() {
     }

@@ -2,12 +2,13 @@ package org.geotools.demo.data;
 
 import java.awt.FileDialog;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileFilter;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
@@ -36,10 +37,15 @@ public class ShapefileRead {
 		File file;
 		if (args.length == 0){
 			JFileChooser chooser = new JFileChooser();
-			FileNameExtensionFilter filter = new FileNameExtensionFilter(
-			 "Shapefiles", "shp");
-			
-			chooser.setFileFilter(filter);
+			chooser.setFileFilter( new FileFilter(){
+                public boolean accept( File f ) {
+                    return f.isDirectory() || f.getPath().endsWith("shp") || f.getPath().endsWith("SHP");
+                }
+                public String getDescription() {
+                    return "Shapefiles";
+                }
+			    
+			});
 			int returnVal = chooser.showOpenDialog( null );
 			
 			if(returnVal != JFileChooser.APPROVE_OPTION) {
