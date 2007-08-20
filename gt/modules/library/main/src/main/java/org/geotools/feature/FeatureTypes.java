@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.feature.type.DefaultFeatureTypeBuilder;
 import org.geotools.feature.type.TypeName;
 import org.geotools.filter.LengthFunction;
 import org.geotools.geometry.jts.JTS;
@@ -142,10 +143,9 @@ public class FeatureTypes {
      */
     public static FeatureType transform( FeatureType schema, CoordinateReferenceSystem crs, boolean forceOnlyMissing)
             throws SchemaException {
-        FeatureTypeFactory factory = FeatureTypeFactory.newInstance(schema.getTypeName());
-
-        factory.setNamespace(schema.getNamespace());
-        factory.setName(schema.getTypeName());
+        DefaultFeatureTypeBuilder tb = new DefaultFeatureTypeBuilder();
+        tb.setName(schema.getTypeName());
+        tb.setNamespaceURI( schema.getNamespace() );
 
         GeometryAttributeType defaultGeometryType = null;
         for( int i = 0; i < schema.getAttributeCount(); i++ ) {
@@ -164,13 +164,13 @@ public class FeatureTypes {
                 if (defaultGeometryType == null || geometryType == schema.getPrimaryGeometry()) {
                     defaultGeometryType = forced;
                 }
-                factory.addType(forced);
+                tb.add(forced);
             } else {
-                factory.addType(attributeType);
+                tb.add(attributeType);
             }
         }
-        factory.setDefaultGeometry(defaultGeometryType);
-        return factory.getFeatureType();
+        tb.setDefaultGeometry(defaultGeometryType.getLocalName());
+        return tb.buildFeatureType();
     }
 
     /**
@@ -236,18 +236,17 @@ public class FeatureTypes {
     public static FeatureType newFeatureType( AttributeType[] types, String name, URI ns,
             boolean isAbstract, FeatureType[] superTypes, AttributeType defaultGeometry )
             throws FactoryConfigurationError, SchemaException {
-        FeatureTypeFactory factory = FeatureTypeFactory.newInstance(name);
-        factory.addTypes(types);
-        factory.setNamespace(ns);
-        factory.setAbstract(isAbstract);
-        if (defaultGeometry != null)
-            factory.setDefaultGeometry((GeometryAttributeType) defaultGeometry);
-
-        if (superTypes != null) {
-            factory.setSuperTypes(Arrays.asList(superTypes));
+        DefaultFeatureTypeBuilder tb = new DefaultFeatureTypeBuilder();
+        tb.setName(name);
+        if( ns != null ) {
+            tb.setNamespaceURI(ns.toString());
         }
-
-        return factory.getFeatureType();
+        tb.add(types);
+        if ( defaultGeometry != null ) {
+            tb.setDefaultGeometry(defaultGeometry.getLocalName());
+        }
+        
+        return (FeatureType) tb.buildFeatureType();
     }
 
     /**
@@ -266,20 +265,7 @@ public class FeatureTypes {
     public static FeatureType newFeatureType( AttributeType[] types, String name, URI ns,
             boolean isAbstract, FeatureType[] superTypes, GeometryAttributeType defaultGeometry )
             throws FactoryConfigurationError, SchemaException {
-        FeatureTypeFactory factory = FeatureTypeFactory.newInstance(name);
-        factory.addTypes(types);
-        factory.setNamespace(ns);
-        factory.setAbstract(isAbstract);
-
-        if (superTypes != null) {
-            factory.setSuperTypes(Arrays.asList(superTypes));
-        }
-
-        if (defaultGeometry != null) {
-            factory.setDefaultGeometry(defaultGeometry);
-        }
-
-        return factory.getFeatureType();
+        return newFeatureType(types,name,ns,isAbstract,superTypes,(AttributeType)defaultGeometry);
     }
 
     /**
