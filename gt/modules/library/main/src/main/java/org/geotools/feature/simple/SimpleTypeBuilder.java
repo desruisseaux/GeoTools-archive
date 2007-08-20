@@ -20,7 +20,7 @@ import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Schema;
 import org.opengis.feature.type.TypeFactory;
-import org.opengis.feature.type.TypeName;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
@@ -534,7 +534,7 @@ public class SimpleTypeBuilder {
 		}
 		
 		SimpleFeatureType built = factory.createSimpleFeatureType(
-			typeName(), attributes(), defaultGeometry, crs, restrictions(), description);
+			name(), attributes(), defaultGeometry, crs, restrictions(), description);
 		
 		init();
 		return built;
@@ -661,7 +661,7 @@ public class SimpleTypeBuilder {
 	 * </ol>
 	 * 
 	 */
-	protected TypeName typeName() {
+	protected Name name() {
 		if (local == null)
 			return null;
 		

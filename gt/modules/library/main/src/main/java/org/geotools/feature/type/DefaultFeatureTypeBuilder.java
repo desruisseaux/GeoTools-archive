@@ -10,7 +10,7 @@ import org.geotools.feature.simple.SimpleTypeBuilder;
 import org.geotools.feature.simple.SimpleTypeFactoryImpl;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.TypeName;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;

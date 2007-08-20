@@ -98,7 +98,7 @@ public class PropertyFeatureWriter implements FeatureWriter {
                 return live;
             }
             else {
-                fid = type.getTypeName()+"."+System.currentTimeMillis();
+                fid = type.getName()+"."+System.currentTimeMillis();
                 Object values[] = DataUtilities.defaultValues( type );
 
                 origional = null;                                            

@@ -7,19 +7,19 @@ import java.util.Set;
 
 import org.geotools.resources.Utilities;
 import org.opengis.feature.type.PropertyType;
-import org.opengis.feature.type.TypeName;
+import org.opengis.feature.type.Name;
 import org.opengis.util.InternationalString;
 
 public class PropertyTypeImpl implements PropertyType {
 
-	protected final TypeName name;
+	protected final Name name;
 	protected final boolean isAbstract;
 	protected final Set restrictions;
 	protected final InternationalString description;
 	protected final Map userData;
 	
 	public PropertyTypeImpl(
-		TypeName name, boolean isAbstract, Set restrictions, 
+		Name name, boolean isAbstract, Set restrictions, 
 		InternationalString description 
 	) {
 		if(name== null){
@@ -36,7 +36,7 @@ public class PropertyTypeImpl implements PropertyType {
 		this.userData = new HashMap();		
 	}
 	
-	public TypeName getName() {
+	public Name getName() {
 		return name;
 	}
 

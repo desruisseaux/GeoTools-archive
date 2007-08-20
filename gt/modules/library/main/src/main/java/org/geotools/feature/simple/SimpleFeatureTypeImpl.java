@@ -14,7 +14,7 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Name;
-import org.opengis.feature.type.TypeName;
+import org.opengis.feature.type.Name;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
 
@@ -30,14 +30,14 @@ public class SimpleFeatureTypeImpl extends FeatureTypeImpl implements
 	// list of types
 	List types = null;
 
-	public SimpleFeatureTypeImpl(TypeName name, List/*<AttributeDescriptor>*/ schema,
+	public SimpleFeatureTypeImpl(Name name, List/*<AttributeDescriptor>*/ schema,
 			AttributeDescriptor defaultGeometry, CoordinateReferenceSystem crs,
 			Set/* <Filter> */restrictions, InternationalString description) {
 		super(name, schema, defaultGeometry, crs, false, restrictions, null,
 				description);
 	}
 	
-	public SimpleFeatureTypeImpl(TypeName name, List/*<AttributeType>*/ typeList, AttributeType geometryType, CoordinateReferenceSystem crs, Set restrictions, InternationalString description) {
+	public SimpleFeatureTypeImpl(Name name, List/*<AttributeType>*/ typeList, AttributeType geometryType, CoordinateReferenceSystem crs, Set restrictions, InternationalString description) {
 		this( name, Descriptors.wrapAttributeTypes( typeList ),Descriptors.wrapAttributeType(geometryType) , crs, restrictions, description );
 		types = typeList;
 	}

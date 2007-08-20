@@ -12,7 +12,7 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.StructuralDescriptor;
-import org.opengis.feature.type.TypeName;
+import org.opengis.feature.type.Name;
 import org.opengis.util.InternationalString;
 
 /**
@@ -29,7 +29,7 @@ public class ComplexTypeImpl extends AttributeTypeImpl implements ComplexType {
 	protected Collection/*<AssociationDescriptor>*/ ASSOCIATIONS = null;
 	
 	public ComplexTypeImpl(
-		TypeName name, Collection properties, boolean identified, boolean isAbstract,
+		Name name, Collection properties, boolean identified, boolean isAbstract,
 		Set/*<Filter>*/ restrictions, AttributeType superType, InternationalString description
 	) {
 		

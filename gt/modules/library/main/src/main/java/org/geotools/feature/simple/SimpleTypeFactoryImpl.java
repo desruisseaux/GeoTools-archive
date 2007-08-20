@@ -8,7 +8,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.simple.SimpleTypeFactory;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
-import org.opengis.feature.type.TypeName;
+import org.opengis.feature.type.Name;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
 
@@ -25,7 +25,7 @@ public class SimpleTypeFactoryImpl /*extends TypeFactoryImpl*/ implements
 		super();
 	}
 
-	public SimpleFeatureType createSimpleFeatureType(TypeName name,
+	public SimpleFeatureType createSimpleFeatureType(Name name,
 			List schema, AttributeDescriptor defaultGeometry,
 			CoordinateReferenceSystem crs, Set restrictions,
 			InternationalString description) {
@@ -34,7 +34,7 @@ public class SimpleTypeFactoryImpl /*extends TypeFactoryImpl*/ implements
 	}
 
 	public SimpleFeatureCollectionType createSimpleFeatureCollectionType(
-			TypeName name, SimpleFeatureType member, InternationalString description) {
+			Name name, SimpleFeatureType member, InternationalString description) {
 		throw new UnsupportedOperationException();
 		//return new SimpleFeatureCollectionTypeImpl(name, member, description);
 	}

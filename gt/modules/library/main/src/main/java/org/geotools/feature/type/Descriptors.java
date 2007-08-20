@@ -10,7 +10,7 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.Name;
-import org.opengis.feature.type.TypeName;
+import org.opengis.feature.type.Name;
 
 /**
  * Helper methods for dealing with Descriptor.
@@ -489,7 +489,7 @@ public class Descriptors {
                 // this may be due to old api usage style, where
                 // only types had names
                 LOGGER.warning("node has no name set, try to fix! " + node);
-                TypeName name2 = node.getType().getName();
+                Name name2 = node.getType().getName();
                 if (null == name.getNamespaceURI()) {
                     if (name.getLocalPart().equals(nodeName.getLocalPart())) {
                         return node;

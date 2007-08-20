@@ -1,6 +1,5 @@
 package org.geotools.geometry;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.geotools.factory.GeoTools;
@@ -14,6 +13,7 @@ import org.opengis.geometry.Precision;
 import org.opengis.geometry.aggregate.AggregateFactory;
 import org.opengis.geometry.complex.ComplexFactory;
 import org.opengis.geometry.coordinate.GeometryFactory;
+import org.opengis.geometry.coordinate.PointArray;
 import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.primitive.Curve;
 import org.opengis.geometry.primitive.Point;
@@ -149,32 +149,16 @@ public class GeometryBuilder {
         return getPositionFactory().createPosition( position );
     }
 
-    /**
-     * Helper method allows you to take a raw collection of Position and
-     * convert it into a PointArray.
-     * @param origional
-     * @return PointArray
-     */
-    @SuppressWarnings("unchecked")
-    public List<Position> createPositionList( Collection<Position> origional ) {
-        List<Position> list = (List<Position>) getPositionFactory().createPositionList();
-        list.addAll( origional );
-        return list;
-    }
-    
-    @SuppressWarnings("unchecked")
-    public List<Position> createPositionList() {
-        return getPositionFactory().createPositionList();
+    public PointArray createPointArray() {
+        return getPositionFactory().createPointArray();
     }
 
-    @SuppressWarnings("unchecked")
-    public List<Position> createPositionList( double[] array, int start, int end ) {
-        return getPositionFactory().createPositionList(array, start, end );
+    public PointArray createPointArray( double[] array, int start, int end ) {
+        return getPositionFactory().createPointArray(array, start, end );
     }
 
-    @SuppressWarnings("unchecked")
-    public List<Position> createPositionList( float[] array, int start, int end ) {
-        return getPositionFactory().createPositionList(array, start, end );
+    public PointArray createPositionList( float[] array, int start, int end ) {
+        return getPositionFactory().createPointArray(array, start, end );
     }
 
 	public Curve createCurve(List segments) throws MismatchedReferenceSystemException, MismatchedDimensionException {

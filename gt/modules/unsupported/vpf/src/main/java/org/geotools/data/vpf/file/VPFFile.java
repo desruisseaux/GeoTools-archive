@@ -52,7 +52,7 @@ import org.geotools.filter.LiteralExpression;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Name;
-import org.opengis.feature.type.TypeName;
+import org.opengis.feature.type.Name;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
 

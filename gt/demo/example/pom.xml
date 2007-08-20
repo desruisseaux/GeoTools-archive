@@ -100,6 +100,17 @@
       <artifactId>gt2-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!--  GeoTools Plugins -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-postgis</artifactId>
+      <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-shapefile</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-wfs</artifactId>
@@ -107,7 +118,13 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-epsg-wkt</artifactId>
+      <artifactId>gt2-epsg-hsql</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!--  GeoTools Extentions -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-wms</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

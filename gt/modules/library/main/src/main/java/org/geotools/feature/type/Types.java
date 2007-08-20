@@ -19,7 +19,7 @@ import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
-import org.opengis.feature.type.TypeName;
+import org.opengis.feature.type.Name;
 import org.opengis.feature.xml.Choice;
 import org.opengis.feature.xml.ChoiceType;
 import org.opengis.feature.xml.Sequence;

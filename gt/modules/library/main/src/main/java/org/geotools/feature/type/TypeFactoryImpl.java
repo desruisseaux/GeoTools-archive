@@ -19,7 +19,7 @@ import org.opengis.feature.type.OperationDescriptor;
 import org.opengis.feature.type.OperationType;
 import org.opengis.feature.type.Schema;
 import org.opengis.feature.type.TypeFactory;
-import org.opengis.feature.type.TypeName;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.FilterFactory;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -92,7 +92,7 @@ public class TypeFactoryImpl implements TypeFactory {
 		return new AttributeDescriptorImpl(type, name, minOccurs, maxOccurs, isNillable,defaultValue);
 	}
 
-	public AssociationType createAssociationType(TypeName name,
+	public AssociationType createAssociationType(Name name,
 			AttributeType referenceType, boolean isIdentifiable,
 			boolean isAbstract, Set restrictions, AssociationType superType,
 			InternationalString description) {
@@ -111,7 +111,7 @@ public class TypeFactoryImpl implements TypeFactory {
 //		return AttributeTypeFactory.newAttributeType( name.getLocalPart(), binding, true, filter, null, null );
 //	}
 //	
-	public AttributeType createAttributeType(TypeName name, Class binding,
+	public AttributeType createAttributeType(Name name, Class binding,
 			boolean isIdentifiable, boolean isAbstract, Set restrictions,
 			AttributeType superType, InternationalString description) {
 
@@ -119,7 +119,7 @@ public class TypeFactoryImpl implements TypeFactory {
 				restrictions, superType, description);
 	}
 
-	public ComplexType createComplexType(TypeName name, Collection schema,
+	public ComplexType createComplexType(Name name, Collection schema,
 			boolean isIdentifiable, boolean isAbstract, Set restrictions,
 			AttributeType superType, InternationalString description) {
 	    return new ComplexTypeImpl(name, schema, isIdentifiable, isAbstract,
@@ -139,7 +139,7 @@ public class TypeFactoryImpl implements TypeFactory {
 //		);
 //	}
 	
-	public GeometryType createGeometryType(TypeName name, Class binding,
+	public GeometryType createGeometryType(Name name, Class binding,
 			CoordinateReferenceSystem crs, boolean isIdentifiable,
 			boolean isAbstract, Set restrictions, AttributeType superType,
 			InternationalString description) {
@@ -148,7 +148,7 @@ public class TypeFactoryImpl implements TypeFactory {
 				isAbstract, restrictions, superType, description);
 	}
 
-	public FeatureType createFeatureType(TypeName name, Collection schema,
+	public FeatureType createFeatureType(Name name, Collection schema,
 			AttributeDescriptor defaultGeometry, CoordinateReferenceSystem crs,
 			boolean isAbstract, Set restrictions, AttributeType superType,
 			InternationalString description) {
@@ -158,7 +158,7 @@ public class TypeFactoryImpl implements TypeFactory {
 //				isAbstract, restrictions, superType, description);
 	}
 
-	public FeatureCollectionType createFeatureCollectionType(TypeName name,
+	public FeatureCollectionType createFeatureCollectionType(Name name,
 			Collection properties, Collection members,
 			AttributeDescriptor defaultGeom, CoordinateReferenceSystem crs,
 			boolean isAbstract, Set restrictions, AttributeType superType,

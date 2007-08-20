@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.opengis.feature.simple.SimpleFeatureFactory;
 import org.opengis.feature.simple.SimpleTypeFactory;
-import org.opengis.feature.type.TypeName;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.geotools.data.DataStore;
@@ -150,7 +150,7 @@ public abstract class ContentDataStore implements DataStore {
         String[] names = new String[typeNames.size()];
 
         for (int i = 0; i < typeNames.size(); i++) {
-            TypeName typeName = (TypeName) typeNames.get(i);
+            Name typeName = (Name) typeNames.get(i);
             names[i] = typeName.getLocalPart();
         }
 
@@ -168,7 +168,7 @@ public abstract class ContentDataStore implements DataStore {
     }
 
     /**
-     * Delegates to {@link #getFeatureSource(TypeName, Transaction)}.
+     * Delegates to {@link #getFeatureSource(Name, Transaction)}.
      *
      * @see DataStore#getFeatureSource(String)
      */
@@ -190,7 +190,7 @@ public abstract class ContentDataStore implements DataStore {
      * @return The feature source for the name and transaction.
      *
      */
-    public final FeatureSource getFeatureSource(TypeName typeName, Transaction tx)
+    public final FeatureSource getFeatureSource(Name typeName, Transaction tx)
         throws IOException {
     	
         ContentEntry entry = ensureEntry(typeName);
@@ -313,7 +313,7 @@ public abstract class ContentDataStore implements DataStore {
     /**
      * Helper method to wrap a non-qualified name.
      */
-    final protected TypeName name(String typeName) {
+    final protected Name name(String typeName) {
         return new org.geotools.feature.type.TypeName(typeName);
     }
 
@@ -333,7 +333,7 @@ public abstract class ContentDataStore implements DataStore {
      *
      * @return The entry, or <code>null</code> if it does not exist.
      */
-    final protected ContentEntry entry(TypeName name) throws IOException {
+    final protected ContentEntry entry(Name name) throws IOException {
         ContentEntry entry = null;
 
         //do we already know about the entry
@@ -368,7 +368,7 @@ public abstract class ContentDataStore implements DataStore {
      * @throws IOException If hte entry does not exist, or if there was an error
      * looking it up.
      */
-    final protected ContentEntry ensureEntry(TypeName name)
+    final protected ContentEntry ensureEntry(Name name)
         throws IOException {
         ContentEntry entry = entry(name);
 

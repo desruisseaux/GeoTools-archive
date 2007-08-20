@@ -10,7 +10,7 @@ import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.GeometryType;
-import org.opengis.feature.type.TypeName;
+import org.opengis.feature.type.Name;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
 
@@ -28,7 +28,7 @@ public class FeatureTypeImpl extends ComplexTypeImpl implements FeatureType {
 	protected CoordinateReferenceSystem CRS;
 	
 	public FeatureTypeImpl(
-		TypeName name, Collection schema, AttributeDescriptor defaultGeom, 
+		Name name, Collection schema, AttributeDescriptor defaultGeom, 
 		CoordinateReferenceSystem crs, boolean isAbstract, 
 		Set/*<Filter>*/ restrictions, AttributeType superType, InternationalString description
 	) {

@@ -1,0 +1,84 @@
+package org.geotools.demo.data;
+
+import java.awt.FileDialog;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFinder;
+import org.geotools.data.FeatureSource;
+import org.geotools.factory.GeoTools;
+import org.opengis.feature.FeatureCollection;
+import org.opengis.feature.simple.SimpleFeature;
+
+import com.vividsolutions.jts.geom.Geometry;
+
+/**
+ * How to Read a Shapefile.
+ * <p>
+ * Please visit the GeoTools User Guide: <a
+ * href="http://docs.codehaus.org/display/GEOTDOC/04+How+to+Read+a+Shapefile">
+ * 
+ * @author Jody Garnett (Refractions Research)
+ * 
+ */
+public class ShapefileRead {
+
+	@SuppressWarnings("unchecked")
+	public static void main(String[] args) throws Exception {
+		System.out.println("Welcome to GeoTools:" + GeoTools.getVersion());
+		
+		File file;
+		if (args.length == 0){
+			JFileChooser chooser = new JFileChooser();
+			FileNameExtensionFilter filter = new FileNameExtensionFilter(
+			 "Shapefiles", "shp");
+			
+			chooser.setFileFilter(filter);
+			int returnVal = chooser.showOpenDialog( null );
+			
+			if(returnVal != JFileChooser.APPROVE_OPTION) {
+				System.exit(0);
+			}
+			System.out.println("You chose to open this file: " +
+			chooser.getSelectedFile().getName());			
+			file = chooser.getSelectedFile();
+		}
+		else {
+			file = new File( args[0] );
+		}
+		if (!file.exists())
+			System.exit(1);
+
+		Map connect = new HashMap();
+		connect.put("url", file.toURI().toURL());
+
+		DataStore dataStore = DataStoreFinder.getDataStore(connect);
+		String[] typeNames = dataStore.getTypeNames();
+		String typeName = typeNames[0];
+
+		System.out.println("Reading content " + typeName);
+
+		FeatureSource featureSource = dataStore.getFeatureSource(typeName);
+		FeatureCollection collection = featureSource.getFeatures();
+		
+		Iterator<SimpleFeature> iterator = (Iterator<SimpleFeature>) collection.iterator();
+		int length = 0;		
+		try {
+			while (iterator.hasNext()) {
+				SimpleFeature feature = iterator.next();
+				Geometry geometry = (Geometry ) feature.getDefaultGeometryValue();
+				
+				length += geometry.getLength();
+			}
+		} finally {
+			collection.close(iterator);
+		}
+		System.out.println("Total length " + length);
+	}
+}

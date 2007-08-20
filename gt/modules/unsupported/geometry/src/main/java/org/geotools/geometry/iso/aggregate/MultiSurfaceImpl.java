@@ -49,6 +49,7 @@ public class MultiSurfaceImpl extends MultiPrimitiveImpl implements MultiSurface
 	/* (non-Javadoc)
 	 * @see org.geotools.geometry.featgeom.aggregate.MultiPrimitiveImpl#getElements()
 	 */
+	@SuppressWarnings("unchecked")
 	public Set<OrientableSurface> getElements() {
 		//return (Set<OrientableSurface>) super.elements;
         return Collections.checkedSet( (Set<OrientableSurface>) super.elements, OrientableSurface.class );

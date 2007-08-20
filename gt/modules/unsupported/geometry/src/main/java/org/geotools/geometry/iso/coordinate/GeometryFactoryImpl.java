@@ -453,7 +453,7 @@ public class GeometryFactoryImpl implements Factory, GeometryFactory {
 		double startPar = 0.0;
 		for (List<double[]> coordList : coordLists) {
 			//List<Position> positions = cf.createPositions(coordList, null);
-			List<Position> positions = positionFactory.createPositionList();
+			PointArray positions = positionFactory.createPointArray();
 			for (double[] coords : coordList) {
 				positions.add(createPosition(coords));
 			}

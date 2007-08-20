@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.geotools.resources.Utilities;
 import org.opengis.feature.type.AttributeType;
-import org.opengis.feature.type.TypeName;
+import org.opengis.feature.type.Name;
 import org.opengis.util.InternationalString;
 
 /**
@@ -23,7 +23,7 @@ public class AttributeTypeImpl extends PropertyTypeImpl implements AttributeType
 	final protected AttributeType SUPER;
 
 	public AttributeTypeImpl(
-		TypeName name, Class binding, boolean identified, boolean isAbstract,
+		Name name, Class binding, boolean identified, boolean isAbstract,
 		Set/*<Filter>*/ restrictions, AttributeType superType, InternationalString description
 	) {
 		super(name, isAbstract, restrictions, description);

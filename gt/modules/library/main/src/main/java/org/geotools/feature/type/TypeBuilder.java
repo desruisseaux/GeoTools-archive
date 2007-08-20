@@ -22,7 +22,7 @@ import org.opengis.feature.type.PropertyType;
 import org.opengis.feature.type.Schema;
 import org.opengis.feature.type.StructuralDescriptor;
 import org.opengis.feature.type.TypeFactory;
-import org.opengis.feature.type.TypeName;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;

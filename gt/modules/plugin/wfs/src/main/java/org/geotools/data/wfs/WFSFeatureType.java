@@ -38,7 +38,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Name;
-import org.opengis.feature.type.TypeName;
+import org.opengis.feature.type.Name;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
 
@@ -252,7 +252,7 @@ class WFSFeatureType implements FeatureType {
 		return delegate.getDescription();
 	}
 
-	public TypeName getName() {
+	public Name getName() {
 		return delegate.getName();
 	}
 

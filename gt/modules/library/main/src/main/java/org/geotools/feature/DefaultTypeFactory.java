@@ -8,7 +8,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.simple.SimpleTypeFactory;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
-import org.opengis.feature.type.TypeName;
+import org.opengis.feature.type.Name;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
 
@@ -31,7 +31,7 @@ public class DefaultTypeFactory extends SimpleTypeFactoryImpl {
 	/**
 	 * Override which returns {@link DefaultFeatureType}.
 	 */
-	public SimpleFeatureType createSimpleFeatureType(TypeName name, List schema, AttributeDescriptor defaultGeometry, CoordinateReferenceSystem crs, Set restrictions, InternationalString description) {
+	public SimpleFeatureType createSimpleFeatureType(Name name, List schema, AttributeDescriptor defaultGeometry, CoordinateReferenceSystem crs, Set restrictions, InternationalString description) {
 		return new DefaultFeatureType(name,schema,defaultGeometry,crs,restrictions,description);
 	}
 }

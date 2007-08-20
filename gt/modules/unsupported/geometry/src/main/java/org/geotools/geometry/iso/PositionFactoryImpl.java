@@ -16,6 +16,8 @@
 
 package org.geotools.geometry.iso;
 
+import java.awt.RenderingHints;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -50,10 +52,12 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  * @author Jody Garnett
  */
-public class PositionFactoryImpl implements Factory, PositionFactory {
+public class PositionFactoryImpl implements Serializable, Factory, PositionFactory {
+	private static final long serialVersionUID = 1L;
 	final private Precision precision;
     final CoordinateReferenceSystem crs;
-	private Map hintsWeCareAbout = new HashMap();
+    
+	private Map<RenderingHints.Key, Object> hintsWeCareAbout = new HashMap<RenderingHints.Key, Object>();
 
 
 	/**
@@ -127,17 +131,17 @@ public class PositionFactoryImpl implements Factory, PositionFactory {
 		return new DirectPositionImpl(directPosition);
 	}
 
-	public List<Position> createPositionList() {
+	public PointArrayImpl createPointArray() {
 		return new PointArrayImpl(crs);
 	}
 
-	public List<Position> createPositionList(final double[] array,
+	public DoublePointArray createPointArray(final double[] array,
 			final int start, final int end) {
 		return new DoublePointArray(crs, array, start, end);
 	}
 
-	public List<Position> createPositionList(float[] array, int start, int end) {
-		PointArray pointArray = (PointArray) createPositionList();
+	public PointArray createPointArray(float[] array, int start, int end) {
+		PointArray pointArray = (PointArray) createPointArray();
 		int D = crs.getCoordinateSystem().getDimension();
 		if (D == 2) {
 			for (int i = start; i < end; i += D) {

@@ -5,7 +5,7 @@ import java.util.Set;
 import org.geotools.resources.Utilities;
 import org.opengis.feature.type.AssociationType;
 import org.opengis.feature.type.AttributeType;
-import org.opengis.feature.type.TypeName;
+import org.opengis.feature.type.Name;
 import org.opengis.util.InternationalString;
 
 public class AssociationTypeImpl extends PropertyTypeImpl implements AssociationType {

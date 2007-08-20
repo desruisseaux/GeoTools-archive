@@ -17,7 +17,7 @@ package org.geotools.data.store;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.opengis.feature.type.TypeName;
+import org.opengis.feature.type.Name;
 import org.geotools.data.Transaction;
 
 
@@ -35,7 +35,7 @@ public final class ContentEntry {
     /**
      * Qualified name of the entry.
      */
-    TypeName typeName;
+    Name typeName;
 
     /**
      * Map<Transaction,ContentState> state according to Transaction.
@@ -47,7 +47,7 @@ public final class ContentEntry {
      */
     ContentDataStore dataStore;
 
-    public ContentEntry(ContentDataStore dataStore, TypeName typeName) {
+    public ContentEntry(ContentDataStore dataStore, Name typeName) {
         this.typeName = typeName;
         this.dataStore = dataStore;
 
@@ -61,7 +61,7 @@ public final class ContentEntry {
     /**
      * Qualified name of the entry.
      */
-    public TypeName getName() {
+    public Name getName() {
         return typeName;
     }
 

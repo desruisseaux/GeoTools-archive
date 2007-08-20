@@ -99,8 +99,12 @@ public abstract class GeometryImpl implements Geometry, Serializable  {
 	
 	//protected FeatGeomFactoryImpl xfactory;
 
+	// TODO: Remove this and use positionFactory.getCoordinateReferenceSystem()
 	protected final CoordinateReferenceSystem crs;
+	
+	// TODO: Remove this and use positionFactory.getPrecision()	
 	protected final Precision percision;
+	
 	//protected final PrimitiveFactory primitiveFactory; // for making stuff like curve, point 
 	//protected final GeometryFactory geometryFactory; // geometry for Line etc...
 	protected final PositionFactory positionFactory; // for position and point array

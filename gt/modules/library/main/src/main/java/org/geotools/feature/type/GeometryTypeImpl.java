@@ -4,7 +4,7 @@ import java.util.Set;
 
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.GeometryType;
-import org.opengis.feature.type.TypeName;
+import org.opengis.feature.type.Name;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
 
@@ -21,7 +21,7 @@ public class GeometryTypeImpl extends AttributeTypeImpl implements GeometryType 
 	private CoordinateReferenceSystem CRS;
 
 	public GeometryTypeImpl(
-		TypeName name, Class binding, CoordinateReferenceSystem crs, 
+		Name name, Class binding, CoordinateReferenceSystem crs, 
 		boolean identified, boolean isAbstract, Set restrictions, 
 		AttributeType superType, InternationalString description
 	) {

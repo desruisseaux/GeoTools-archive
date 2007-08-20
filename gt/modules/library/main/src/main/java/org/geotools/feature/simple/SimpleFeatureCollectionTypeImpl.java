@@ -17,20 +17,20 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Name;
-import org.opengis.feature.type.TypeName;
+import org.opengis.feature.type.Name;
 import org.opengis.util.InternationalString;
 
 public class SimpleFeatureCollectionTypeImpl extends FeatureCollectionTypeImpl
 		implements SimpleFeatureCollectionType {
 
-	public SimpleFeatureCollectionTypeImpl(TypeName name,
+	public SimpleFeatureCollectionTypeImpl(Name name,
 			AssociationDescriptor member, Set restrictions,
 			InternationalString description) {
 		super(name, Collections.EMPTY_LIST, Collections.singleton(member), null, null,
 				false, restrictions, null, description);
 	}
 
-	public SimpleFeatureCollectionTypeImpl(TypeName name,
+	public SimpleFeatureCollectionTypeImpl(Name name,
 			SimpleFeatureType member, InternationalString description) {
 		super( name, Collections.EMPTY_LIST, members(member), null, member.getCRS(), false,
 				Collections.EMPTY_SET, null, description);

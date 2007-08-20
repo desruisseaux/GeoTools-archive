@@ -91,7 +91,8 @@ public class MultiPrimitiveImpl extends AggregateImpl implements MultiPrimitive 
 	/* (non-Javadoc)
      * @see org.geotools.geometry.featgeom.aggregate.MultiPrimitiveImpl#getElements()
      */
-    public Set<? extends Primitive> getElements() {
+    @SuppressWarnings("unchecked")
+	public Set<? extends Primitive> getElements() {
         return Collections.checkedSet( (Set<Primitive>) super.elements, Primitive.class );
     }
 }

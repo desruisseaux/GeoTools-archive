@@ -119,7 +119,7 @@ public class DefaultFeatureType extends SimpleFeatureTypeImpl implements Feature
      * @throws SchemaException For problems making the FeatureType.
      * @throws NullPointerException If typeName is null.
      */
-    public DefaultFeatureType( TypeName name,
+    public DefaultFeatureType( org.opengis.feature.type.Name name,
         Collection types, Collection superTypes, GeometryAttributeType defaultGeom)
         throws NullPointerException {
     	super( name, (List)types, defaultGeom, null, null, null );
@@ -162,7 +162,7 @@ public class DefaultFeatureType extends SimpleFeatureTypeImpl implements Feature
     }
     
     
-    public DefaultFeatureType(org.opengis.feature.type.TypeName name, List schema, AttributeDescriptor defaultGeometry, CoordinateReferenceSystem crs, Set restrictions, InternationalString description) {
+    public DefaultFeatureType(org.opengis.feature.type.Name name, List schema, AttributeDescriptor defaultGeometry, CoordinateReferenceSystem crs, Set restrictions, InternationalString description) {
 		super(name, schema, defaultGeometry, crs, restrictions, description);
 
 		this.ancestors = new FeatureType[0];

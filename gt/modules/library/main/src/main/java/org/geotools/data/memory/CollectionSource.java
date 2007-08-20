@@ -9,7 +9,7 @@ import java.util.List;
 import org.geotools.catalog.GeoResourceInfo;
 import org.geotools.data.Transaction;
 import org.opengis.feature.type.Name;
-import org.opengis.feature.type.TypeName;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.capability.FilterCapabilities;
 

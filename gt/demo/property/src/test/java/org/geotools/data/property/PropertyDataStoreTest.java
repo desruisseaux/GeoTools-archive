@@ -90,7 +90,7 @@ public class PropertyDataStoreTest extends TestCase {
         super.tearDown();                
     }
 
-    public void testGetTypeNames() {
+    public void testGetNames() {
         String names[] = store.getTypeNames();
         assertEquals( 1, names.length );
         assertEquals( "road", names[0] );                
@@ -99,7 +99,7 @@ public class PropertyDataStoreTest extends TestCase {
     public void testGetSchema() throws IOException {
         FeatureType type = store.getSchema( "road" );
         assertNotNull( type );
-        assertEquals( "road", type.getTypeName() );
+        assertEquals( "road", type.getName() );
         assertEquals( "propertyTestData", type.getNamespace().toString() );
         assertEquals( 2, type.getAttributeCount() );
         

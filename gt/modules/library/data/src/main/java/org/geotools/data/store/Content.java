@@ -17,7 +17,7 @@ package org.geotools.data.store;
 
 import java.io.IOException;
 import java.util.List;
-import org.opengis.feature.type.TypeName;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.geotools.catalog.GeoResourceInfo;
 import org.geotools.feature.FeatureCollection;
@@ -48,7 +48,7 @@ public abstract class Content {
      * @param typeName
      * @return entry representing the provided typeName
      */
-    public abstract ContentEntry entry(ContentDataStore dataStore, TypeName typeName);
+    public abstract ContentEntry entry(ContentDataStore dataStore, Name typeName);
 
     /**
      * Track per transaction state.
