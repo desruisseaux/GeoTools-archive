@@ -3,6 +3,7 @@ package org.geotools.feature.type;
 import java.util.List;
 import java.util.Set;
 
+import org.geotools.feature.AttributeType;
 import org.geotools.feature.DefaultAttributeType;
 import org.geotools.feature.DefaultFeatureType;
 import org.geotools.feature.GeometryAttributeType;
@@ -34,10 +35,32 @@ public class DefaultFeatureTypeBuilder extends SimpleTypeBuilder {
 		}
 	}
 	
+	/**
+	 * Additional api for adding an AttributeType directly.
+	 * 
+	 */
+	public void add(AttributeType type) {
+	    attributes().add(type);
+	}
+	public void add(AttributeType[] types) {
+	    if( types == null ) 
+	        return;
+	    
+	    for ( int i = 0; i < types.length; i++ ) {
+	        add(types[i]);
+	    }
+	}
+	
 	protected boolean isGeometry(AttributeDescriptor descriptor) {
 		return descriptor instanceof GeometryAttributeType;
 	}
 	
+	/**
+	 * Override to type narror to DefaultFeautreType.
+	 */
+	public DefaultFeatureType buildFeatureType() {
+	    return (DefaultFeatureType) super.buildFeatureType();
+	}
 	/**
 	 * Extension of {@link SimpleTypeFactoryImpl} which creates intances of 
 	 * {@link DefaultFeatureType}. 
