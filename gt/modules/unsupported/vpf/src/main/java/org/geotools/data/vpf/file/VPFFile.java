@@ -1163,7 +1163,7 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
 		return featureType.getDescription();
 	}
 
-	public TypeName getName() {
+	public Name getName() {
 		return featureType.getName();
 	}
 

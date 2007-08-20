@@ -376,7 +376,7 @@ public class VPFFeatureType implements FeatureType {
 		return featureClass.getDescription();
 	}
 
-	public TypeName getName() {
+	public Name getName() {
 		return featureClass.getName();
 	}
 

@@ -4,6 +4,7 @@ import java.util.*;
 import java.io.*;
 import org.geotools.xml.*;
 import org.geotools.maven.xmlcodegen.*;
+import org.opengis.feature.type.Name;
 import org.opengis.feature.type.Schema;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.TypeName;
@@ -121,7 +122,7 @@ public class SchemaClassTemplate
     
     for (Iterator itr = types.iterator(); itr.hasNext();) {
         AttributeType type = (AttributeType) itr.next();
-        TypeName name = type.getName();
+        Name name = type.getName();
 
         String uri = name.getNamespaceURI();
         String local = name.getLocalPart();
@@ -299,7 +300,7 @@ public class SchemaClassTemplate
     
     for (Iterator itr = types.iterator(); itr.hasNext();) {
         AttributeType type = (AttributeType) itr.next();
-        TypeName name = type.getName();
+        Name name = type.getName();
 
         String local = name.getLocalPart();
 
