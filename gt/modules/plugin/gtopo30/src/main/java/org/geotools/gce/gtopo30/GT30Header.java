@@ -104,18 +104,25 @@ final class GT30Header {
 		final String path = headerURL.getFile();
 		final File header = new File(java.net.URLDecoder.decode(path, "UTF-8"));
 
-		final BufferedReader reader = new BufferedReader(new FileReader(header));
-		propertyMap = initMap();
+		BufferedReader reader = null;
+		try {
+			reader = new BufferedReader(new FileReader(header));
+			propertyMap = initMap();
 
-		parseHeaderFile(this.propertyMap, reader);
+			parseHeaderFile(this.propertyMap, reader);
 
-		if (!fullPropertySet(this.propertyMap)) {
-			throw new IOException(
-					"Needed properties missing in GTOPO30 header file");
+			if (!fullPropertySet(this.propertyMap)) {
+				throw new IOException(
+						"Needed properties missing in GTOPO30 header file");
+			}
+		} catch (Exception e) {
+			if (reader != null)
+				try {
+					// freeing
+					reader.close();
+				} catch (Exception e1) {
+				}
 		}
-
-		// freeing
-		reader.close();
 	}
 
 	/**

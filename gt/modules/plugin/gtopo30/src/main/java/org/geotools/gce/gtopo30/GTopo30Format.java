@@ -177,6 +177,7 @@ public final class GTopo30Format extends AbstractGridFormat implements Format {
 		// trying to create a reader
 		try {
 			final GTopo30Reader reader = new GTopo30Reader(urlToUse);
+			reader.dispose();
 		} catch (IOException e) {
 			if (LOGGER.isLoggable(Level.FINE))
 				LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
