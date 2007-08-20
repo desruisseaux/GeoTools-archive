@@ -22,6 +22,7 @@ import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.FeatureCollectionType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.GeometryType;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * A builder used to construct an instanceof {@link org.opengis.feature.simple.SimpleFeature}.
@@ -71,6 +72,10 @@ public class SimpleFeatureBuilder  {
 	 * default geometry
 	 */
 	protected GeometryAttribute defaultGeometry;
+	/**
+	 * coordinate reference system
+	 */
+	protected CoordinateReferenceSystem crs;
 	
 	/**
 	 * Constructs the builder.
@@ -100,6 +105,9 @@ public class SimpleFeatureBuilder  {
     public void setType( SimpleFeatureCollectionType collectionType ){
     	//this.collectionType = collectionType;
     }
+    public void setCRS(CoordinateReferenceSystem crs) {
+        this.crs = crs;
+    }
 
     /**
      * Initialize the builder with the provided feature.
@@ -116,6 +124,7 @@ public class SimpleFeatureBuilder  {
 			add( feature.getValue( i ) );
 		}
 		defaultGeometry = feature.getDefaultGeometry();
+		crs = feature.getCRS();
 	}
     
     protected void init() {
@@ -186,6 +195,17 @@ public class SimpleFeatureBuilder  {
     public SimpleFeature feature(String id) {
     	SimpleFeature feature = factory.createSimpleFeature( attributes, featureType, id );
     	feature.setDefaultGeometry(defaultGeometry);
+    	
+    	//check for crs
+    	if ( crs != null ) {
+    	    feature.setCRS(crs);
+    	}
+    	else {
+    	    //if no crs set, use the one from the defaultGeometry type
+    	    if ( defaultGeometry != null ) {
+    	        feature.setCRS(defaultGeometry.getCRS());
+    	    }
+    	}
     	
     	init();
     	return feature;
