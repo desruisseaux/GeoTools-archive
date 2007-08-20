@@ -51,7 +51,7 @@ public class DefaultFeatureTypeBuilder extends SimpleTypeBuilder {
 	 */
 	private static class DefaultFeatureTypeFactory extends SimpleTypeFactoryImpl {
 
-		public SimpleFeatureType createSimpleFeatureType(TypeName name, List schema, AttributeDescriptor defaultGeometry, CoordinateReferenceSystem crs, Set restrictions, InternationalString description) {
+		public SimpleFeatureType createSimpleFeatureType(Name name, List schema, AttributeDescriptor defaultGeometry, CoordinateReferenceSystem crs, Set restrictions, InternationalString description) {
 			return new DefaultFeatureType(name,schema,defaultGeometry,crs,restrictions,description);
 		}
 	}
