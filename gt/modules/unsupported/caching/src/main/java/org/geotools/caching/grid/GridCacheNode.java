@@ -16,22 +16,32 @@
 package org.geotools.caching.grid;
 
 import org.geotools.caching.spatialindex.Region;
+import org.geotools.caching.spatialindex.grid.Grid;
 import org.geotools.caching.spatialindex.grid.GridData;
 import org.geotools.caching.spatialindex.grid.GridNode;
 
 
 public class GridCacheNode extends GridNode {
-    GridCacheNode(GridCacheRootNode parent, Region mbr) {
-        super(parent, mbr);
+    /**
+     *
+     */
+    private static final long serialVersionUID = -760685958776143228L;
+
+    protected GridCacheNode(Grid grid, Region mbr) {
+        super(grid, mbr);
     }
 
     @Override
-    protected boolean insertData(int id, GridData data) {
+    protected boolean insertData(GridData data) {
         if (!getIdentifier().isValid()) { // FIXME: do not insert same data mutiple times
 
-            return super.insertData(id, data);
+            return super.insertData(data);
         }
 
         return false;
+    }
+
+    protected GridData getData(int i) {
+        return this.data[i];
     }
 }

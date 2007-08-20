@@ -36,15 +36,16 @@ public class GridTracker extends Grid implements EvictableTree {
     public GridTracker(Region mbr, int capacity, Storage store) {
         this.dimension = mbr.getDimension();
         this.store = store;
+        store.setParent(this);
         this.policy = new LRUEvictionPolicy(this);
 
         GridCacheRootNode root = new GridCacheRootNode(this, mbr, capacity);
+        this.root = root.getIdentifier();
         root.split();
         writeNode(root);
         this.stats = new GridTrackerStatistics();
         super.stats = this.stats;
         this.stats.addToNodesCounter(root.getCapacity() + 1); // root has root.capacity nodes, +1 for root itself :)
-        this.root = root.getIdentifier();
     }
 
     NodeIdentifier getRoot() {

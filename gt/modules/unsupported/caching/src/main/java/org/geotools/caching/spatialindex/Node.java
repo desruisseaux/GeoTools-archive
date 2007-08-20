@@ -29,6 +29,8 @@
 package org.geotools.caching.spatialindex;
 
 public interface Node extends Entry {
+    public void init(SpatialIndex index);
+
     public int getChildrenCount();
 
     public int getDataCount();

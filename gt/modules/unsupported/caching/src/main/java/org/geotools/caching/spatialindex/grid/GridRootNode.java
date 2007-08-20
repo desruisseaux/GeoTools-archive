@@ -29,14 +29,36 @@ import org.geotools.caching.spatialindex.Shape;
  *
  */
 public class GridRootNode extends GridNode {
-    Grid grid;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 4675163856302389522L;
     protected int capacity;
-    int[] tiles_number;
-    double tiles_size;
+    protected int[] tiles_number;
+    protected double tiles_size;
     ArrayList<NodeIdentifier> children; // list of NodeIdentifiers
 
+    /**No-arg constructor for serialization purpose.
+     * Deserialized nodes must call init(Grid grid) before any other operation.
+     *
+     */
+    GridRootNode() {
+        super();
+    }
+
+    /** Create a not yet initialized root node.
+     *
+     * @param grid
+     * @param mbr
+     */
+    protected GridRootNode(Grid grid, Region mbr) {
+        super(grid, mbr);
+        this.grid = grid;
+        this.children = new ArrayList<NodeIdentifier>();
+    }
+
     protected GridRootNode(Grid grid, Region mbr, int capacity) {
-        super(null, mbr);
+        super(grid, mbr);
         this.grid = grid;
         this.capacity = capacity;
         init();
@@ -97,7 +119,7 @@ public class GridRootNode extends GridNode {
     }
 
     protected GridNode createNode(Region reg) {
-        return new GridNode(this, reg);
+        return new GridNode(grid, reg);
     }
 
     /** Computes sequentially the corner position of each tile in the grid.

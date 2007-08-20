@@ -116,7 +116,7 @@ public class Generator {
         double center_x = meansize + (rand.nextDouble() * (xrange - (2 * meansize)));
         double center_y = meansize + (rand.nextDouble() * (yrange - (2 * meansize)));
         double size = rand.nextDouble() * 2 * meansize;
-        int n_vertices = 1 + rand.nextInt(max_vertices - 1);
+        int n_vertices = 3 + rand.nextInt(max_vertices - 3);
         double[] angles = new double[n_vertices];
         double[] distances = new double[n_vertices];
 

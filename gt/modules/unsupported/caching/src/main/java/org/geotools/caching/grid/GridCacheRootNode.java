@@ -22,10 +22,28 @@ import org.geotools.caching.spatialindex.grid.GridRootNode;
 
 
 public class GridCacheRootNode extends GridRootNode {
-    GridCacheRootNode(GridTracker grid, Region mbr, int capacity) {
-        super(grid, mbr, capacity);
+    /**
+     *
+     */
+    private static final long serialVersionUID = 6955051761313024458L;
+    transient GridTracker grid;
+
+    /** Create a not yet initialized root node.
+     *
+     * @param grid
+     * @param mbr
+     */
+    GridCacheRootNode(GridTracker grid, Region mbr) {
+        super(grid, mbr);
+        this.grid = grid;
     }
 
+    GridCacheRootNode(GridTracker grid, Region mbr, int capacity) {
+        super(grid, mbr, capacity);
+        this.grid = grid;
+    }
+
+    @Override
     protected void split() {
         super.split();
     }
@@ -34,17 +52,42 @@ public class GridCacheRootNode extends GridRootNode {
         return super.capacity;
     }
 
-    protected GridNode createNode(Region reg) {
-        return new GridCacheNode(this, reg);
+    void setCapacity(int c) {
+        super.capacity = c;
+    }
+
+    int[] getTilesNumber() {
+        return super.tiles_number;
+    }
+
+    void setTilesNumber(int[] numb) {
+        super.tiles_number = numb;
+    }
+
+    double getTileSize() {
+        return super.tiles_size;
+    }
+
+    void setTileSize(double size) {
+        super.tiles_size = size;
     }
 
     @Override
-    protected boolean insertData(int id, GridData data) {
+    protected GridNode createNode(Region reg) {
+        return new GridCacheNode(grid, reg);
+    }
+
+    @Override
+    protected boolean insertData(GridData data) {
         if (!getIdentifier().isValid()) { // FIXME: do not insert same data mutiple times
 
-            return super.insertData(id, data);
+            return super.insertData(data);
         }
 
         return false;
+    }
+
+    protected GridData getData(int i) {
+        return this.data[i];
     }
 }

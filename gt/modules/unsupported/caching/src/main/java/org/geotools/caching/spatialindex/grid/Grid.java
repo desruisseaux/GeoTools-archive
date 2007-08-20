@@ -15,11 +15,13 @@
  */
 package org.geotools.caching.spatialindex.grid;
 
+import java.util.HashMap;
 import org.geotools.caching.firstdraft.spatialindex.storagemanager.PropertySet;
 import org.geotools.caching.spatialindex.AbstractSpatialIndex;
 import org.geotools.caching.spatialindex.Node;
 import org.geotools.caching.spatialindex.NodeIdentifier;
 import org.geotools.caching.spatialindex.Region;
+import org.geotools.caching.spatialindex.RegionNodeIdentifier;
 import org.geotools.caching.spatialindex.Shape;
 import org.geotools.caching.spatialindex.Storage;
 import org.geotools.caching.spatialindex.Visitor;
@@ -39,8 +41,9 @@ import org.geotools.caching.spatialindex.Visitor;
  *
  */
 public class Grid extends AbstractSpatialIndex {
-    protected int root_insertions = 0;
+    public int root_insertions = 0;
     protected int MAX_INSERTION = 4;
+    protected HashMap<RegionNodeIdentifier, RegionNodeIdentifier> node_ids = new HashMap<RegionNodeIdentifier, RegionNodeIdentifier>();
 
     /** Constructor. Creates a new Grid covering space given by <code>mbr</code>
      * and with at least <code>capacity</code> nodes.
@@ -50,13 +53,14 @@ public class Grid extends AbstractSpatialIndex {
      */
     public Grid(Region mbr, int capacity, Storage store) {
         this.store = store;
+        store.setParent(this);
         this.dimension = mbr.getDimension();
 
         GridRootNode root = new GridRootNode(this, mbr, capacity);
+        this.root = root.getIdentifier();
         root.split();
         writeNode(root);
         this.stats.addToNodesCounter(root.capacity + 1); // root has root.capacity nodes, +1 for root itself :)
-        this.root = root.getIdentifier();
     }
 
     protected Grid() {
@@ -121,7 +125,7 @@ public class Grid extends AbstractSpatialIndex {
         boolean ret = false;
 
         for (int i = 0; i < node.num_data; i++) {
-            if (node.data_ids[i] == id) {
+            if (node.data[i].id == id) {
                 node.deleteData(i);
                 this.stats.addToDataCounter(-1);
                 ret = true;
@@ -153,7 +157,7 @@ public class Grid extends AbstractSpatialIndex {
     protected void _insertData(NodeIdentifier n, Object data, Shape shape, int id) {
         GridNode node = (GridNode) readNode(n);
 
-        if (node.insertData(id, new GridData(id, shape, data))) {
+        if (node.insertData(new GridData(id, shape, data))) {
             writeNode(node);
             this.stats.addToDataCounter(1);
         }
@@ -167,18 +171,18 @@ public class Grid extends AbstractSpatialIndex {
          * are inserted at root node, because they are likely to fall between two tiles,
          * rather thant in one and only one tile.
          *
-                   int[] cursor = new int[this.dimension];
-                   for (int i = 0; i < this.dimension; i++) {
-                       cursor[i] = (int) ((shape.getMBR().getLow(i) - node.mbr.getLow(i)) / node.tiles_size);
-                   }
-                   int nextid = node.gridIndexToNodeId(cursor);
-                   Node nextnode = node.getSubNode(nextid);
-                   if (nextnode.getShape().contains(shape)) {
-                       insertData(nextnode, data, shape, id);
-                   } else {
-                       insertData(this.root, data, shape, id);
-                       root_insertions++;
-                   }
+                     int[] cursor = new int[this.dimension];
+                     for (int i = 0; i < this.dimension; i++) {
+                         cursor[i] = (int) ((shape.getMBR().getLow(i) - node.mbr.getLow(i)) / node.tiles_size);
+                     }
+                     int nextid = node.gridIndexToNodeId(cursor);
+                     Node nextnode = node.getSubNode(nextid);
+                     if (nextnode.getShape().contains(shape)) {
+                         insertData(nextnode, data, shape, id);
+                     } else {
+                         insertData(this.root, data, shape, id);
+                         root_insertions++;
+                     }
          */
 
         /* so we prefer this version :

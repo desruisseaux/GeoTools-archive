@@ -13,16 +13,24 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.caching.spatialindex;
+package org.geotools.caching.spatialindex.store;
 
-public interface Storage {
-    public void put(Node n);
+import org.geotools.caching.spatialindex.Region;
+import org.geotools.caching.spatialindex.grid.Grid;
+import org.geotools.caching.spatialindex.grid.GridNode;
 
-    public void remove(NodeIdentifier id);
 
-    public Node get(NodeIdentifier id);
+class TestNode extends GridNode {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 6760237342477762805L;
 
-    public void clear();
+    TestNode() {
+        super();
+    }
 
-    public void setParent(SpatialIndex index);
+    TestNode(Grid grid, Region mbr) {
+        super(grid, mbr);
+    }
 }

@@ -18,8 +18,10 @@ package org.geotools.caching.firstdraft.impl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import com.vividsolutions.jts.geom.Envelope;
 import org.opengis.filter.Filter;
 import org.geotools.caching.firstdraft.DataCache;
@@ -345,5 +347,9 @@ public class MemoryFeatureIndex implements FeatureIndex {
         } else {
             return q;
         }
+    }
+
+    public Set getSupportedHints() {
+        return new HashSet();
     }
 }

@@ -18,6 +18,7 @@ package org.geotools.caching.spatialindex.store;
 import java.util.HashMap;
 import org.geotools.caching.spatialindex.Node;
 import org.geotools.caching.spatialindex.NodeIdentifier;
+import org.geotools.caching.spatialindex.SpatialIndex;
 import org.geotools.caching.spatialindex.Storage;
 
 
@@ -50,5 +51,9 @@ public class MemoryStorage implements Storage {
 
     public void clear() {
         map.clear();
+    }
+
+    public void setParent(SpatialIndex index) {
+        // do nothing - we do not need back link for this storage
     }
 }

@@ -17,6 +17,7 @@ package org.geotools.caching.firstdraft.quadtree;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Stack;
@@ -374,5 +375,9 @@ public class QuadTreeFeatureCache implements FeatureCache, QueryTracker {
         // while stack not empty
         //     get node from stack
         //     if four invalid quadrants, make node an invalid leaf
+    }
+
+    public Set getSupportedHints() {
+        return new HashSet();
     }
 }

@@ -15,30 +15,25 @@
  */
 package org.geotools.caching;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import org.opengis.filter.Filter;
 import org.geotools.caching.grid.GridFeatureCache;
+import org.geotools.caching.spatialindex.store.DiskStorage;
 import org.geotools.caching.spatialindex.store.MemoryStorage;
 import org.geotools.caching.util.Generator;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
-import org.geotools.data.Query;
 import org.geotools.data.memory.MemoryDataStore;
-import org.geotools.data.wfs.WFSDataStore;
-import org.geotools.data.wfs.WFSDataStoreFactory;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.SchemaException;
 import org.geotools.filter.spatial.BBOXImpl;
 
 
@@ -101,23 +96,27 @@ public class BenchMark {
         control = (FeatureStore) ds.getFeatureSource(dataset.getSchema().getTypeName());
     }
 
-    void initRemoteControl() {
-        HashMap params = new HashMap();
-        WFSDataStoreFactory fact = new WFSDataStoreFactory();
-
-        try {
-            params.put(WFSDataStoreFactory.URL.key,
-                new URL("http://www2.dmsolutions.ca/cgi-bin/mswfs_gmap?version=1.0.0&request=getcapabilities&service=wfs"));
-
-            WFSDataStore source = (WFSDataStore) fact.createNewDataStore(params);
-            control = source.getFeatureSource("road");
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
+    //    import org.geotools.data.wfs.WFSDataStore;
+    //    import org.geotools.data.wfs.WFSDataStoreFactory;
+    //    import java.net.MalformedURLException;
+    //    import java.net.URL;
+    //
+    //    void initRemoteControl() {
+    //        HashMap params = new HashMap();
+    //        WFSDataStoreFactory fact = new WFSDataStoreFactory();
+    //
+    //        try {
+    //            params.put(WFSDataStoreFactory.URL.key,
+    //                new URL("http://www2.dmsolutions.ca/cgi-bin/mswfs_gmap?version=1.0.0&request=getcapabilities&service=wfs"));
+    //
+    //            WFSDataStore source = (WFSDataStore) fact.createNewDataStore(params);
+    //            control = source.getFeatureSource("road");
+    //        } catch (MalformedURLException e) {
+    //            e.printStackTrace();
+    //        } catch (IOException e) {
+    //            e.printStackTrace();
+    //        }
+    //    }
     QueryStatistics[] runQueries(FeatureSource fs) {
         QueryStatistics[] stats = new QueryStatistics[filterset.size()];
         Iterator<Filter> iter = filterset.iterator();
@@ -185,8 +184,11 @@ public class BenchMark {
                 }
             }
 
-            conform = conform
-                && (ds_stats[i].getNumberOfFeatures() == control_stats[i].getNumberOfFeatures());
+            if (ds_stats[i].getNumberOfFeatures() != control_stats[i].getNumberOfFeatures()) {
+                conform = false;
+                System.err.println("Query " + i + " : Got " + ds_stats[i].getNumberOfFeatures()
+                    + " features, expected " + control_stats[i].getNumberOfFeatures());
+            }
 
             /*System.out.println("Test: " + ds_stats[i].getNumberOfFeatures() + " features ; "
                + ds_stats[i].getExecutionTime() + " ms ; " + "Control: "
@@ -222,27 +224,30 @@ public class BenchMark {
         System.out.println("OK");
     }
 
-    public void remoteSetup() throws IOException {
-        System.out.print("Control (init) : ");
-        initRemoteControl();
-        System.out.println("OK");
-        System.out.print("FilterSet : ");
-        createFilterSet(control.getBounds());
-        System.out.println("OK");
-    }
-
+    //    public void remoteSetup() throws IOException {
+    //        System.out.print("Control (init) : ");
+    //        initRemoteControl();
+    //        System.out.println("OK");
+    //        System.out.print("FilterSet : ");
+    //        createFilterSet(control.getBounds());
+    //        System.out.println("OK");
+    //    }
     public static void main(String[] args) {
         BenchMark thisClass = new BenchMark();
 
         try {
             thisClass.localSetup();
             System.out.print("Sample (init) : ");
-            thisClass.sample = new AbstractFeatureCache[2];
+            thisClass.sample = new AbstractFeatureCache[4];
             thisClass.sample[0] = new GridFeatureCache(thisClass.control, 500, 1000,
                     new MemoryStorage(100));
             thisClass.sample[1] = new GridFeatureCache(thisClass.control, 500, 2500,
                     new MemoryStorage(100));
-            //			thisClass.sample[2] = new GridFeatureCache(thisClass.control, 60, 2000, new MemoryStorage(100) ) ;
+
+            DiskStorage storage = new DiskStorage(File.createTempFile("cache", ".tmp"), 1000);
+            thisClass.sample[2] = new GridFeatureCache(thisClass.control, 500, 1000, storage);
+            storage = new DiskStorage(File.createTempFile("cache", ".tmp"), 1000);
+            thisClass.sample[3] = new GridFeatureCache(thisClass.control, 500, 2500, storage);
             //			thisClass.sample[3] = new GridFeatureCache(thisClass.control, 60, 3000, new MemoryStorage(100) ) ;
             //			thisClass.sample[4] = new GridFeatureCache(thisClass.control, 60, 4000, new MemoryStorage(100) ) ;
             System.out.println("OK");

@@ -15,39 +15,63 @@
  */
 package org.geotools.caching.spatialindex.grid;
 
-import java.util.HashMap;
+import java.io.Serializable;
 import org.geotools.caching.spatialindex.Node;
 import org.geotools.caching.spatialindex.NodeIdentifier;
 import org.geotools.caching.spatialindex.Region;
 import org.geotools.caching.spatialindex.RegionNodeIdentifier;
 import org.geotools.caching.spatialindex.Shape;
+import org.geotools.caching.spatialindex.SpatialIndex;
 import org.geotools.caching.spatialindex.grid.GridData;
 
 
 /** A node in the grid.
- * Data objects are store in an array.
+ * Data objects are stored in an array.
  * Extra data about the node may be stored in node_data, which is a HashMap.
  *
  * @author Christophe Rousson, SoC 2007, CRG-ULAVAL
  *
  */
-public class GridNode implements Node {
-    protected RegionNodeIdentifier id = null;
+public class GridNode implements Node, Serializable {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 7786313461725794946L;
     Region mbr;
-    boolean visited = false;
-    GridNode parent;
-    HashMap node_data;
-    int num_data;
-    int[] data_ids;
-    GridData[] data;
 
-    protected GridNode(GridNode parent, Region mbr) {
+    //HashMap node_data;
+    int num_data;
+
+    //protected int[] data_ids;
+    protected GridData[] data;
+    transient protected RegionNodeIdentifier id = null;
+
+    //transient boolean visited = false;
+    transient protected Grid grid;
+
+    /**No-arg constructor for serialization purpose.
+     * Deserialized nodes must call init(Grid grid) before any other operation.
+     *
+     */
+    protected GridNode() {
+    }
+
+    protected GridNode(Grid grid, Region mbr) {
         this.mbr = new Region(mbr);
-        this.parent = parent;
-        this.node_data = new HashMap();
+        //this.parent = parent;
+        //this.node_data = new HashMap();
         this.num_data = 0;
         this.data = new GridData[10];
-        this.data_ids = new int[10];
+        //this.data_ids = new int[10];
+        this.grid = grid;
+    }
+
+    /**Post-deserialization initialization.
+     *
+     * @param grid
+     */
+    public void init(SpatialIndex grid) {
+        this.grid = (Grid) grid;
     }
 
     public NodeIdentifier getChildIdentifier(int index)
@@ -78,6 +102,12 @@ public class GridNode implements Node {
     public NodeIdentifier getIdentifier() {
         if (id == null) {
             id = new RegionNodeIdentifier(this);
+
+            if (grid.node_ids.containsKey(id)) {
+                id = grid.node_ids.get(id);
+            } else {
+                grid.node_ids.put(id, id);
+            }
         }
 
         return id;
@@ -92,17 +122,17 @@ public class GridNode implements Node {
      * @param id of data
      * @param data
      */
-    protected boolean insertData(int id, GridData data) {
-        if (num_data == data_ids.length) {
-            int[] n_data_ids = new int[data_ids.length * 2];
+    protected boolean insertData(GridData data) {
+        if (num_data == this.data.length) {
+            //int[] n_data_ids = new int[this.data.length * 2];
             GridData[] n_data = new GridData[this.data.length * 2];
-            System.arraycopy(data_ids, 0, n_data_ids, 0, num_data);
+            //System.arraycopy(data_ids, 0, n_data_ids, 0, num_data);
             System.arraycopy(this.data, 0, n_data, 0, num_data);
-            data_ids = n_data_ids;
+            //data_ids = n_data_ids;
             this.data = n_data;
         }
 
-        data_ids[num_data] = id;
+        //data_ids[num_data] = data.id;
         this.data[num_data] = data;
         num_data++;
 
@@ -111,7 +141,7 @@ public class GridNode implements Node {
 
     /** Delete blindly data at the given index.
      * Index is not the id of the data, the search should be performed by the Grid class,
-     * which determines the ids of data to delete, and then call this method.
+     * which determines the index of data to delete, and then call this method.
      *
      * @param index
      */
@@ -121,7 +151,7 @@ public class GridNode implements Node {
         }
 
         if (index < (num_data - 1)) {
-            data_ids[index] = data_ids[num_data - 1];
+            //data_ids[index] = data_ids[num_data - 1];
             data[index] = data[num_data - 1];
         }
 
@@ -135,7 +165,8 @@ public class GridNode implements Node {
     public void clear() {
         this.num_data = 0;
         this.data = new GridData[10];
-        this.data_ids = new int[10];
+
+        //this.data_ids = new int[10];
     }
 
     public int getDataCount() {

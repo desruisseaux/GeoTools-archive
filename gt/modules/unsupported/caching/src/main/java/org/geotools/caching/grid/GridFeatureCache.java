@@ -17,8 +17,10 @@ package org.geotools.caching.grid;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 import com.vividsolutions.jts.geom.Envelope;
 import org.opengis.filter.Filter;
@@ -207,5 +209,9 @@ public class GridFeatureCache extends AbstractFeatureCache {
         sb.append(" ]");
 
         return sb.toString();
+    }
+
+    public Set getSupportedHints() {
+        return new HashSet();
     }
 }

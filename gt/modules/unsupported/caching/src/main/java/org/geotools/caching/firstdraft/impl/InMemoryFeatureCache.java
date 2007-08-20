@@ -18,6 +18,7 @@ package org.geotools.caching.firstdraft.impl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -468,6 +469,10 @@ public class InMemoryFeatureCache implements FeatureCache {
 
     public int getEvictions() {
         return evictions;
+    }
+
+    public Set getSupportedHints() {
+        return new HashSet();
     }
 
     class EvictionQueryStrategy implements IQueryStrategy {

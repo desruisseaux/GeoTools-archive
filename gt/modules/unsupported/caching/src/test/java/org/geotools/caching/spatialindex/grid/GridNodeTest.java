@@ -34,33 +34,32 @@ public class GridNodeTest extends TestCase {
 
     public void setUp() {
         mbr = new Region(new double[] { 0, 1 }, new double[] { 2, 3 });
-        node = new GridNode(null, mbr);
+        node = new GridNode(new Grid(), mbr);
     }
 
     public void testConstructor() {
         assertEquals(mbr, node.mbr);
         assertEquals(new Region(mbr), node.mbr);
 
-        GridNode child = new GridNode(node, mbr);
+        GridNode child = new GridNode(new Grid(), mbr);
         assertEquals(0, child.getLevel());
-        assertEquals(node, child.parent);
         assertEquals(mbr, node.mbr);
         assertEquals(new Region(mbr), node.mbr);
     }
 
     void populate() {
         for (int i = 0; i < 10; i++) {
-            node.insertData(8, new GridData(8, mbr, data));
-            node.insertData(16, new GridData(16, mbr, data2));
+            node.insertData(new GridData(8, mbr, data));
+            node.insertData(new GridData(16, mbr, data2));
         }
     }
 
     public void testInsert() {
         populate();
         assertEquals(20, node.num_data);
-        assertEquals(8, node.data_ids[0]);
+        assertEquals(8, node.data[0].id);
         assertEquals(data2, node.data[1].getData());
-        assertEquals(8, node.data_ids[18]);
+        assertEquals(8, node.data[18].id);
         assertEquals(data2, node.data[19].getData());
     }
 
@@ -69,9 +68,9 @@ public class GridNodeTest extends TestCase {
         node.deleteData(14);
         node.deleteData(15);
         assertEquals(18, node.num_data);
-        assertEquals(8, node.data_ids[0]);
+        assertEquals(8, node.data[0].id);
         assertEquals(data2, node.data[1].getData());
-        assertEquals(16, node.data_ids[14]);
+        assertEquals(16, node.data[14].id);
         assertEquals(data, node.data[15].getData());
         assertEquals(null, node.data[19]);
 

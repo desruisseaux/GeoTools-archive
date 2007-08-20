@@ -78,30 +78,30 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
      *
      *
     
-       public Set addFeatures(FeatureCollection collection)
-           throws IOException {
-           return this.fs.addFeatures(collection);
-       }
-       public Transaction getTransaction() {
-           return this.fs.getTransaction();
-       }
-       public void modifyFeatures(AttributeType[] type, Object[] value, Filter filter)
-           throws IOException {
-           this.fs.modifyFeatures(type, value, filter);
-       }
-       public void modifyFeatures(AttributeType type, Object value, Filter filter)
-           throws IOException {
-           this.fs.modifyFeatures(type, value, filter);
-       }
-       public void removeFeatures(Filter filter) throws IOException {
-           this.fs.removeFeatures(filter);
-       }
-       public void setFeatures(FeatureReader reader) throws IOException {
-           this.fs.setFeatures(reader);
-       }
-       public void setTransaction(Transaction transaction) {
-           this.fs.setTransaction(transaction);
-       } */
+         public Set addFeatures(FeatureCollection collection)
+             throws IOException {
+             return this.fs.addFeatures(collection);
+         }
+         public Transaction getTransaction() {
+             return this.fs.getTransaction();
+         }
+         public void modifyFeatures(AttributeType[] type, Object[] value, Filter filter)
+             throws IOException {
+             this.fs.modifyFeatures(type, value, filter);
+         }
+         public void modifyFeatures(AttributeType type, Object value, Filter filter)
+             throws IOException {
+             this.fs.modifyFeatures(type, value, filter);
+         }
+         public void removeFeatures(Filter filter) throws IOException {
+             this.fs.removeFeatures(filter);
+         }
+         public void setFeatures(FeatureReader reader) throws IOException {
+             this.fs.setFeatures(reader);
+         }
+         public void setTransaction(Transaction transaction) {
+             this.fs.setTransaction(transaction);
+         } */
     public void addFeatureListener(FeatureListener listener) {
         this.fs.addFeatureListener(listener);
     }

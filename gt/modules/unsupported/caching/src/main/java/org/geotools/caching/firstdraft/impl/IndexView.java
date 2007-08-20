@@ -16,6 +16,8 @@
 package org.geotools.caching.firstdraft.impl;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import com.vividsolutions.jts.geom.Envelope;
 import org.opengis.filter.Filter;
 import org.geotools.caching.firstdraft.FeatureIndex;
@@ -132,5 +134,9 @@ public class IndexView implements FeatureSource {
     private Query restrict(Query q) {
         // TODO combine view query and new query
         return q;
+    }
+
+    public Set getSupportedHints() {
+        return new HashSet();
     }
 }

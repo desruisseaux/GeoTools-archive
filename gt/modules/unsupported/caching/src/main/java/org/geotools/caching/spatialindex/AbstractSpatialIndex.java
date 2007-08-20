@@ -40,6 +40,7 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
      * All others nodes should be direct or indirect children of this one.
      */
     protected NodeIdentifier root;
+    protected Node rootNode = null;
     protected Storage store;
 
     /**
@@ -117,7 +118,7 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
         Node currentNode = null;
         current.setVisited(false);
 
-        Stack nodes = new Stack();
+        Stack<Node> nodes = new Stack<Node>();
 
         if (query.intersects(current.getShape())) {
             currentNode = readNode(current);
@@ -264,16 +265,11 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
 
     protected Node readNode(NodeIdentifier id) {
         Node ret;
-        /*if (id == this.root) {
-           if (this.rootNode == null) {
-                   ret = store.get(id);
-                   this.rootNode = ret ;
-           } else {
-                   return rootNode ;
-           }
-           } else {
-                   ret = store.get(id);
-           }*/
+
+        if (id.equals(this.root)) {
+            return rootNode;
+        }
+
         ret = store.get(id);
         stats.stats_reads++;
 
@@ -286,6 +282,12 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
     }
 
     protected void writeNode(Node node) {
+        if (node.getIdentifier().equals(this.root)) {
+            this.rootNode = node;
+
+            return;
+        }
+
         store.put(node);
         stats.stats_writes++;
 

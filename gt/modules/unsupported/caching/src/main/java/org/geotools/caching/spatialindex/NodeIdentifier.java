@@ -31,7 +31,7 @@ import java.io.Serializable;
  *
  */
 public abstract class NodeIdentifier implements Serializable {
-    boolean visited = false;
+    transient boolean visited = false;
     boolean valid = false;
 
     public abstract Shape getShape();

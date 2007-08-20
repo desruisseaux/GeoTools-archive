@@ -28,6 +28,6 @@
 //    marioh@cs.ucr.edu
 package org.geotools.caching.spatialindex;
 
-public interface Data extends Entry {
-    public Object getData();
+public interface Data<E> extends Entry {
+    public E getData();
 } // IData

@@ -34,11 +34,12 @@ public class RegionNodeIdentifierTest extends TestCase {
     RegionNodeIdentifier id3;
 
     protected void setUp() {
+        Grid grid = new Grid();
         r1 = new Region(new double[] { 0, 0 }, new double[] { 1, 1 });
         r2 = new Region(new double[] { -1, -1 }, new double[] { -2, -2 });
-        node1 = new GridNode(null, r1);
-        node2 = new GridNode(null, r2);
-        node3 = new GridNode(null, r1);
+        node1 = new GridNode(grid, r1);
+        node2 = new GridNode(grid, r2);
+        node3 = new GridNode(grid, r1);
         id1 = new RegionNodeIdentifier(node1);
         id2 = new RegionNodeIdentifier(node2);
         id3 = new RegionNodeIdentifier(node3);
