@@ -1,5 +1,6 @@
 package org.geotools.feature.simple;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -233,6 +234,14 @@ public class SimpleTypeBuilder {
 	 */
 	public void setNamespaceURI(String namespaceURI) {
 		this.uri = namespaceURI;
+	}
+	public void setNamespaceURI(URI namespaceURI) {
+	    if ( namespaceURI != null ) {
+	        this.uri = namespaceURI.toString();
+	    }
+	    else {
+	        this.uri = null;
+	    }
 	}
 	/**
 	 * The namespace uri of the built type.
@@ -532,6 +541,16 @@ public class SimpleTypeBuilder {
 				}
 			}
 		}
+		
+		//check the crs
+		CoordinateReferenceSystem crs = this.crs;
+		if ( crs == null ) {
+		    //derive from defaultGeometry
+		    if ( defaultGeometry != null ) {
+		        crs = ((GeometryType)defaultGeometry.getType()).getCRS();
+		    }
+		}
+		
 		
 		SimpleFeatureType built = factory.createSimpleFeatureType(
 			name(), attributes(), defaultGeometry, crs, restrictions(), description);
