@@ -21,6 +21,7 @@ import java.util.Arrays;
 import org.geotools.factory.FactoryCreator;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.factory.FactoryRegistryException;
+import org.geotools.feature.type.DefaultFeatureTypeBuilder;
 
 
 /**
@@ -140,20 +141,8 @@ public abstract class FeatureTypeFactory extends FeatureTypeBuilder {
         public static FeatureType newFeatureType(AttributeType[] types,
             String name, URI ns, boolean isAbstract, FeatureType[] superTypes, GeometryAttributeType defaultGeometry)
             throws FactoryRegistryException, SchemaException {
-            FeatureTypeFactory factory = newInstance(name);
-            factory.addTypes(types);
-            factory.setNamespace(ns);
-            factory.setAbstract(isAbstract);
-
-            if (superTypes != null) {
-                factory.setSuperTypes(Arrays.asList(superTypes));
-            }
-            
-            if(defaultGeometry != null) {
-                factory.setDefaultGeometry(defaultGeometry);
-            }
-
-            return factory.getFeatureType();
+         
+            return FeatureTypes.newFeatureType(types, name, ns, isAbstract, superTypes, defaultGeometry);
         }
 
     /**
