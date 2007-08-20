@@ -61,5 +61,43 @@ public class PositionFactoryImpl implements PositionFactory {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public PointArray createPointArray(float[] array, int start, int end) {
+		PointArray pointArray = (PointArray) createPointArray();
+		int D = crs.getCoordinateSystem().getDimension();
+		if (D == 2) {
+			for (int i = start; i < end; i += D) {
+				double[] ordinates = new double[] { array[i], array[i + 1] };
+				pointArray.add(new DirectPositionImpl(crs, ordinates));
+			}
+		} else if (D == 3) {
+			for (int i = start; i < end; i += D) {
+				double[] ordinates = new double[] { array[i], array[i + 1],
+						array[i + 2] };
+				pointArray.add(new DirectPositionImpl(crs, ordinates));
+			}
+		} else {
+			for (int i = start; i < end; i += D) {
+				double[] ordinates = new double[D];
+				for (int o = 0; i < D; i++) {
+					ordinates[o] = array[i + o];
+				}
+				pointArray.add(new DirectPositionImpl(crs, ordinates));
+			}
+		}
+		return pointArray;
+	}
+	
+	public PointArray createPointArray(final double[] array,
+			final int start, final int end) {
+		PointArray pointArray = (PointArray) createPointArray();
+		for (int i=start; i<array.length && i <= end; i++) {
+			pointArray.add(array[i]);
+		}
+		return pointArray;
+	}
+	public PointArray createPointArray() {
+		return new PointArrayImpl(crs);
+	}
 
 }
