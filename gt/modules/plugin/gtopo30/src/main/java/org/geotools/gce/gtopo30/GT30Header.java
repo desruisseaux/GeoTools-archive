@@ -115,7 +115,7 @@ final class GT30Header {
 				throw new IOException(
 						"Needed properties missing in GTOPO30 header file");
 			}
-		} catch (Exception e) {
+		} finally {
 			if (reader != null)
 				try {
 					// freeing

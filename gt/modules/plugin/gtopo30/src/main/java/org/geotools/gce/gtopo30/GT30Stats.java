@@ -25,41 +25,39 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.util.StringTokenizer;
 
+
 /**
  * This class parses the STX GTopo30 statistics file and allows to retrieve its
  * contents
- * 
+ *
  * @author aaime
  * @author simone giannecchini
  * @author mkraemer
- * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/gtopo30/src/main/java/org/geotools/gce/gtopo30/GT30Stats.java $
+ * @source $URL$
  */
 final class GT30Stats {
-	/** Minimum value in the data file */
-	private int minimum;
+    /** Minimum value in the data file */
+    private int minimum;
 
-	/** Maximum value in the data file */
-	private int maximum;
+    /** Maximum value in the data file */
+    private int maximum;
 
-	/** Data file average value */
-	private double average;
+    /** Data file average value */
+    private double average;
 
-	/** Data file standard deviation */
-	private double stddev;
+    /** Data file standard deviation */
+    private double stddev;
 
-	/**
-	 * Creates a new instance of GT30Stats
-	 * 
-	 * @param statsURL
-	 *            URL pointing to the statistics (STX) file
-	 * 
-	 * @throws IOException
-	 *             if some problem occurs trying to read the file
-	 */
-	public GT30Stats(final URL statsURL) throws IOException {
-		final String path = statsURL.getFile();
-		final File stats = new File(java.net.URLDecoder.decode(path, "UTF-8"));
+    /**
+     * Creates a new instance of GT30Stats
+     *
+     * @param statsURL URL pointing to the statistics (STX) file
+     *
+     * @throws IOException if some problem occurs trying to read the file
+     */
+    public GT30Stats(final URL statsURL) throws IOException {
+        final String path = statsURL.getFile();
+        final File stats = new File(java.net.URLDecoder.decode(path, "UTF-8"));
 
 		BufferedReader reader = null;
 		try {
@@ -76,7 +74,7 @@ final class GT30Stats {
 			average = Double.parseDouble(stok.nextToken());
 			stddev = Double.parseDouble(stok.nextToken());
 
-		} finally {
+		}finally {
 			if (reader != null)
 				try {
 					// freeing
@@ -86,111 +84,107 @@ final class GT30Stats {
 		}
 	}
 
-	/**
-	 * Write this object to a stats file.
-	 * 
-	 * @param out
-	 */
-	public void writeTo(final OutputStream out) {
-		if (out == null) {
-			return;
-		}
+    /**
+     * Write this object to a stats file.
+     *
+     * @param out
+     */
+    public void writeTo(final OutputStream out) {
+        if (out == null) {
+            return;
+        }
 
-		final PrintWriter writer = new PrintWriter(out);
+        final PrintWriter writer = new PrintWriter(out);
 
-		// output fields
-		// band number
-		writer.println(1);
+        // output fields
+        //band number
+        writer.println(1);
 
-		// minimum
-		writer.print(minimum);
+        //minimum
+        writer.print(minimum);
 
-		// maximum
-		writer.println(maximum);
+        //maximum
+        writer.println(maximum);
 
-		// mean
-		writer.print(average);
+        //mean
+        writer.print(average);
 
-		// stddev
-		writer.println(stddev);
+        //stddev
+        writer.println(stddev);
 
-		writer.flush();
-		writer.close();
-	}
+        writer.flush();
+        writer.close();
+    }
 
-	/**
-	 * Returns the minimum value
-	 * 
-	 * @return the minimum value
-	 */
-	int getMin() {
-		return minimum;
-	}
+    /**
+     * Returns the minimum value
+     *
+     * @return the minimum value
+     */
+    int getMin() {
+        return minimum;
+    }
 
-	/**
-	 * Sets the minimum value
-	 * 
-	 * @param min
-	 *            the new minimum value
-	 */
-	void setMin(final int min) {
-		minimum = min;
-	}
+    /**
+     * Sets the minimum value
+     *
+     * @param min the new minimum value
+     */
+    void setMin(final int min) {
+        minimum = min;
+    }
 
-	/**
-	 * Returns the maximum value
-	 * 
-	 * @return the maximum value
-	 */
-	int getMax() {
-		return maximum;
-	}
+    /**
+     * Returns the maximum value
+     *
+     * @return the maximum value
+     */
+    int getMax() {
+        return maximum;
+    }
 
-	/**
-	 * Sets the maximum value
-	 * 
-	 * @param max
-	 *            the new maximum value
-	 */
-	void setMax(final int max) {
-		maximum = max;
-	}
+    /**
+     * Sets the maximum value
+     *
+     * @param max the new maximum value
+     */
+    void setMax(final int max) {
+        maximum = max;
+    }
 
-	/**
-	 * Returns the average value
-	 * 
-	 * @return the average value
-	 */
-	double getAverage() {
-		return average;
-	}
+    /**
+     * Returns the average value
+     *
+     * @return the average value
+     */
+    double getAverage() {
+        return average;
+    }
 
-	/**
-	 * Sets the average value
-	 * 
-	 * @param avg
-	 *            the new average value
-	 */
-	void setAverage(final double avg) {
-		average = avg;
-	}
+    /**
+     * Sets the average value
+     *
+     * @param avg the new average value
+     */
+    void setAverage(final double avg) {
+        average = avg;
+    }
 
-	/**
-	 * Returns the standard deviation
-	 * 
-	 * @return the standard deviation
-	 */
-	double getStdDev() {
-		return stddev;
-	}
+    /**
+     * Returns the standard deviation
+     *
+     * @return the standard deviation
+     */
+    double getStdDev() {
+        return stddev;
+    }
 
-	/**
-	 * Sets the standard deviation
-	 * 
-	 * @param sd
-	 *            the new value
-	 */
-	void setStdDev(final double sd) {
-		stddev = sd;
-	}
+    /**
+     * Sets the standard deviation
+     *
+     * @param sd the new value
+     */
+    void setStdDev(final double sd) {
+        stddev = sd;
+    }
 }

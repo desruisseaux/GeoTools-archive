@@ -529,10 +529,10 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 	 * @throws FactoryException
 	 */
 	private CoordinateReferenceSystem initCRS() {
+		BufferedReader reader = null;
 		try {
 			// getting a reader
-			final BufferedReader reader = new BufferedReader(new FileReader(
-					prjURL.getFile()));
+			reader = new BufferedReader(new FileReader(prjURL.getFile()));
 
 			// reading the first line to see if I need to read it all
 			final StringBuffer buffer = new StringBuffer(reader.readLine());
@@ -559,7 +559,7 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 					// should check them again
 
 					final CartesianCS cartCS = org.geotools.referencing.cs.DefaultCartesianCS.PROJECTED;
-					final MathTransformFactory mtFactory = org.geotools.referencing.ReferencingFactoryFinder
+					final MathTransformFactory mtFactory = org.geotools.referencing.FactoryFinder
 							.getMathTransformFactory(null);
 					final ParameterValueGroup parameters = mtFactory
 							.getDefaultParameters("Polar_Stereographic");
@@ -593,8 +593,14 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 		} catch (FactoryException e) {
 			// do nothing and return a default CRS but write down a message
 			LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+		} finally {
+			if (reader != null)
+				try {
+					// freeing
+					reader.close();
+				} catch (Exception e1) {
+				}
 		}
-
 		final CoordinateReferenceSystem crs = AbstractGridFormat
 				.getDefaultCRS();
 		LOGGER.info(new StringBuffer(
