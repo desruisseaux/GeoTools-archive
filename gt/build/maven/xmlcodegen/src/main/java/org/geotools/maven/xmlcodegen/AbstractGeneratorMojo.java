@@ -83,6 +83,12 @@ public abstract class AbstractGeneratorMojo extends AbstractMojo {
      * @parameter
      */
     protected String[] includes;
+    /**
+     * The prefix to use for the targetNamespace.
+     * 
+     * @parameter
+     */
+    protected String targetPrefix;
 	
 	/**
      * The currently executing project
@@ -295,6 +301,19 @@ public abstract class AbstractGeneratorMojo extends AbstractMojo {
 			getLog().error( e );
 			return null;
 		}	
+		
+		//set the target prefix if set
+        if (targetPrefix != null) {
+            xsdSchema.getQNamePrefixToNamespaceMap().put(targetPrefix,xsdSchema.getTargetNamespace());
+        }
+        
+        //do some sanity checks on the schema
+        if ( Schemas.getTargetPrefix(xsdSchema) == null ) {
+            String msg = "Unable to determine a prefix for the target namespace " +
+                "of the schema Either  include a mapping in the schema or manually " +
+                "specify one with the 'targetPrefix' parameter.";
+            throw new RuntimeException(msg);
+        }
 		
 		return xsdSchema;
     }
