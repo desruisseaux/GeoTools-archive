@@ -303,7 +303,7 @@ public class PointImpl extends PrimitiveImpl implements Point {
 	public Geometry transform(CoordinateReferenceSystem newCRS,
 			MathTransform transform) throws MismatchedDimensionException, TransformException {
 
-		PositionFactory newPositionFactory = new PositionFactoryImpl(newCRS, positionFactory.getPrecision());
+		PositionFactory newPositionFactory = new PositionFactoryImpl(newCRS, getPositionFactory().getPrecision());
 		PrimitiveFactory newPrimitiveFactory = new PrimitiveFactoryImpl(newCRS, newPositionFactory);
 		DirectPosition dp1 = new DirectPositionImpl(newCRS);
 		dp1 = transform.transform(((PointImpl)this).getPosition(), dp1);

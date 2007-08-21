@@ -469,7 +469,7 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 
 		// loop through each ring in this Surface and transform it to the new CRS, then
 		// use the new rings to build a new Surface and return that.
-		PrimitiveFactory primitiveFactory = new PrimitiveFactoryImpl(newCRS, positionFactory);
+		PrimitiveFactory primitiveFactory = new PrimitiveFactoryImpl(newCRS, getPositionFactory());
 		
 		List<RingImpl> currentRings = this.getBoundaryRings();
 		Iterator<RingImpl> iter = currentRings.iterator();

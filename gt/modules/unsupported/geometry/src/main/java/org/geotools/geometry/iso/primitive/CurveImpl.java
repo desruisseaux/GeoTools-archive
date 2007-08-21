@@ -945,8 +945,8 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 
 		// loop through each point in this curve and transform it to the new CRS, then
 		// use the new points to build a new curve and return that.
-		PrimitiveFactory primitiveFactory = new PrimitiveFactoryImpl(newCRS, positionFactory);
-		GeometryFactory geometryFactory = new GeometryFactoryImpl(newCRS, positionFactory);
+		PrimitiveFactory primitiveFactory = new PrimitiveFactoryImpl(newCRS, getPositionFactory());
+		GeometryFactory geometryFactory = new GeometryFactoryImpl(newCRS, getPositionFactory());
 		
 		DirectPositionImpl dp1 = null;
 		List<DirectPositionImpl> currentpositions = this.asDirectPositions();

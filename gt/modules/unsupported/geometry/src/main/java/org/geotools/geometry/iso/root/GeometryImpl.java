@@ -107,7 +107,7 @@ public abstract class GeometryImpl implements Geometry, Serializable  {
 	
 	//protected final PrimitiveFactory primitiveFactory; // for making stuff like curve, point 
 	//protected final GeometryFactory geometryFactory; // geometry for Line etc...
-	protected final PositionFactory positionFactory; // for position and point array
+	private transient PositionFactory positionFactory; // for position and point array
 	//protected final ComplexFactory complexFactory; // surface and friends
 
 		
@@ -438,7 +438,7 @@ public abstract class GeometryImpl implements Geometry, Serializable  {
 	 * @see org.opengis.geometry.coordinate.root.Geometry#getMbRegion()
 	 */
 	public Geometry getMbRegion() {
-		PrimitiveFactoryImpl primitiveFactory = new PrimitiveFactoryImpl(crs, positionFactory);
+		PrimitiveFactoryImpl primitiveFactory = new PrimitiveFactoryImpl(crs, getPositionFactory());
 		return primitiveFactory.createPrimitive( this.getEnvelope() );
 	}
 
@@ -1152,6 +1152,14 @@ public abstract class GeometryImpl implements Geometry, Serializable  {
 		} else {
 			throw new IllegalArgumentException("TransfiniteSet instance not supported.");
 		}
+	}
+
+	protected PositionFactory getPositionFactory() {
+		if( positionFactory == null ){
+			// we must of been transfered over a wire?
+			positionFactory = new PositionFactoryImpl(crs, percision );
+		}
+		return positionFactory;
 	}
 	
 	

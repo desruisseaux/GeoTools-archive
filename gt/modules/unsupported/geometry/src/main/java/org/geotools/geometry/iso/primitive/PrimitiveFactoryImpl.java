@@ -17,6 +17,7 @@
 
 package org.geotools.geometry.iso.primitive;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -59,8 +60,12 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
  * @author Jackson Roehrig & Sanjay Jena
  * 
  */
-public class PrimitiveFactoryImpl implements Factory, PrimitiveFactory {
+public class PrimitiveFactoryImpl implements Serializable, Factory, PrimitiveFactory {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private CoordinateReferenceSystem crs;
 	private PositionFactory positionFactory;
 
