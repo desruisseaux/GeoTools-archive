@@ -18,6 +18,8 @@ package org.geotools.caching.spatialindex.store;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -25,19 +27,26 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Properties;
 import java.util.TreeSet;
-import org.geotools.caching.grid.GridNodeMarshaller;
-import org.geotools.caching.grid.GridTracker;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.geotools.caching.spatialindex.Node;
 import org.geotools.caching.spatialindex.NodeIdentifier;
 import org.geotools.caching.spatialindex.SpatialIndex;
 import org.geotools.caching.spatialindex.Storage;
-import org.geotools.caching.spatialindex.grid.Grid;
-import org.geotools.feature.IllegalAttributeException;
 
 
 public class DiskStorage implements Storage {
+    public final static String DATA_FILE_PROPERTY = "DiskStorage.DataFile";
+    public final static String INDEX_FILE_PROPERTY = "DiskStorage.IndexFile";
+    public final static String PAGE_SIZE_PROPERTY = "DiskStorage.PageSize";
+    protected static Logger logger = Logger.getLogger("org.geotools.caching.spatialindex.store");
+    int stats_bytes = 0;
+    int stats_n = 0;
     private RandomAccessFile data_file;
+    private File dataFile;
+    private File indexFile;
     private int page_size;
     private int nextPage = 0;
     private TreeSet<Integer> emptyPages;
@@ -46,11 +55,29 @@ public class DiskStorage implements Storage {
     protected SpatialIndex parent;
 
     public DiskStorage(File f, int page_size) throws IOException {
+        this(f, page_size, new File(f.getCanonicalPath() + ".idx"));
+    }
+
+    public DiskStorage(File f, int page_size, File index_file)
+        throws IOException {
         data_file = new RandomAccessFile(f, "rw");
+        this.indexFile = index_file;
         this.page_size = page_size;
         emptyPages = new TreeSet<Integer>();
         pageIndex = new HashMap<NodeIdentifier, Entry>();
         buffer = new byte[page_size];
+    }
+
+    public DiskStorage(File f, File index_file) throws IOException {
+        data_file = new RandomAccessFile(f, "rw");
+        this.indexFile = index_file;
+
+        if (index_file.exists()) {
+            initializeFromIndex();
+            buffer = new byte[page_size];
+        } else {
+            throw new IOException(index_file + " does not exist !");
+        }
     }
 
     public void setParent(SpatialIndex parent) {
@@ -138,11 +165,14 @@ public class DiskStorage implements Storage {
             ObjectOutputStream oos = new ObjectOutputStream(baos);
             oos.writeObject(n);
             data = baos.toByteArray();
+            stats_bytes += data.length;
+            stats_n++;
             oos.close();
             baos.close();
         } catch (IOException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
+            logger.log(Level.SEVERE, "Cannot put data in DiskStorage : " + e1);
+
+            return;
         }
 
         Entry e = new Entry();
@@ -225,6 +255,53 @@ public class DiskStorage implements Storage {
             emptyPages.add(new Integer(e.pages.get(next)));
             next++;
         }
+    }
+
+    public void close() {
+        try {
+            FileOutputStream os = new FileOutputStream(indexFile);
+            ObjectOutputStream oos = new ObjectOutputStream(os);
+            oos.writeInt(this.page_size);
+            oos.writeInt(this.nextPage);
+            oos.writeObject(this.emptyPages);
+            oos.writeObject(this.pageIndex);
+            oos.close();
+            os.close();
+            data_file.close();
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Cannot close DiskStorage normally : " + e);
+        }
+    }
+
+    protected void initializeFromIndex() throws IOException {
+        FileInputStream is = new FileInputStream(indexFile);
+        ObjectInputStream ois = new ObjectInputStream(is);
+        this.page_size = ois.readInt();
+        this.nextPage = ois.readInt();
+
+        try {
+            this.emptyPages = (TreeSet<Integer>) ois.readObject();
+            this.pageIndex = (HashMap<NodeIdentifier, Entry>) ois.readObject();
+        } catch (ClassNotFoundException e) {
+            throw (IOException) new IOException().initCause(e);
+        } finally {
+            ois.close();
+            is.close();
+        }
+    }
+
+    public Properties getPropertySet() {
+        Properties pset = new Properties();
+
+        try {
+            pset.setProperty(DATA_FILE_PROPERTY, dataFile.getCanonicalPath());
+            pset.setProperty(INDEX_FILE_PROPERTY, indexFile.getCanonicalPath());
+            pset.setProperty(PAGE_SIZE_PROPERTY, "-1");
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Error while creating DiskStorage property set : " + e);
+        }
+
+        return pset;
     }
 
     class Entry {

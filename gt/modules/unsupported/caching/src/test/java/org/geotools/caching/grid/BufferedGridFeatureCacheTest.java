@@ -21,18 +21,19 @@ import java.io.File;
 import java.io.IOException;
 import org.geotools.caching.AbstractFeatureCache;
 import org.geotools.caching.FeatureCacheException;
-import org.geotools.caching.spatialindex.store.DiskStorage;
+import org.geotools.caching.spatialindex.store.BufferedDiskStorage;
 
 
-public class DiskGridFeatureCacheTest extends GridFeatureCacheTest {
+public class BufferedGridFeatureCacheTest extends GridFeatureCacheTest {
     public static Test suite() {
-        return new TestSuite(DiskGridFeatureCacheTest.class);
+        return new TestSuite(BufferedGridFeatureCacheTest.class);
     }
 
     @Override
     protected AbstractFeatureCache createInstance(int capacity)
         throws FeatureCacheException, IOException {
-        DiskStorage storage = new DiskStorage(File.createTempFile("cache", ".tmp"), 1000);
+        BufferedDiskStorage storage = new BufferedDiskStorage(File.createTempFile("cache", ".tmp"),
+                1000, 10);
         this.cache = new GridFeatureCache(ds.getFeatureSource(dataset.getSchema().getTypeName()),
                 100, capacity, storage);
 

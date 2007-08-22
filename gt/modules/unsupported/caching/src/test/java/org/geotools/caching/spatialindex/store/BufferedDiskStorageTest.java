@@ -13,31 +13,30 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.caching.spatialindex.grid;
+package org.geotools.caching.spatialindex.store;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import org.geotools.caching.spatialindex.AbstractSpatialIndex;
-import org.geotools.caching.spatialindex.AbstractSpatialIndexTest;
-import org.geotools.caching.spatialindex.Region;
-import org.geotools.caching.spatialindex.store.MemoryStorage;
+import java.io.File;
+import java.io.IOException;
+import org.geotools.caching.spatialindex.Storage;
 
 
-public class GridTest extends AbstractSpatialIndexTest {
-    Grid index;
-
+public class BufferedDiskStorageTest extends AbstractStorageTest {
     public static Test suite() {
-        return new TestSuite(GridTest.class);
+        return new TestSuite(BufferedDiskStorageTest.class);
     }
 
-    protected AbstractSpatialIndex createIndex() {
-        index = new Grid(new Region(universe), 100, new MemoryStorage());
+    @Override
+    Storage createStorage() {
+        try {
+            BufferedDiskStorage storage = new BufferedDiskStorage(File.createTempFile("cache",
+                        ".tmp"), 1000, 5);
+            storage.setParent(this.grid);
 
-        return index;
-    }
-
-    public void testInsertion() {
-        super.testInsertion();
-        System.out.println("Root insertions = " + index.root_insertions);
+            return storage;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

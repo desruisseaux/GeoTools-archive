@@ -87,19 +87,18 @@ public class GridTracker extends Grid implements EvictableTree {
         return missing;
     }
 
-    public void flush() {
-        GridCacheRootNode oldroot = (GridCacheRootNode) readNode(this.root);
-        int capacity = oldroot.getCapacity();
-        Region mbr = new Region((Region) oldroot.getShape());
-        GridCacheRootNode root = new GridCacheRootNode(this, mbr, capacity);
-        this.store.clear();
-        writeNode(root);
-        this.root = root.getIdentifier();
-        this.stats.reset();
-        root.split();
-        this.stats.addToNodesCounter(root.getCapacity() + 1);
-    }
-
+    //    public void flush() {
+    //        GridCacheRootNode oldroot = (GridCacheRootNode) readNode(this.root);
+    //        int capacity = oldroot.getCapacity();
+    //        Region mbr = new Region((Region) oldroot.getShape());
+    //        GridCacheRootNode root = new GridCacheRootNode(this, mbr, capacity);
+    //        this.store.clear();
+    //        this.root = root.getIdentifier();
+    //        root.split();
+    //        writeNode(root);
+    //        this.stats.reset();
+    //        this.stats.addToNodesCounter(root.getCapacity() + 1);
+    //    }
     public int getEvictions() {
         return stats.getEvictions();
     }

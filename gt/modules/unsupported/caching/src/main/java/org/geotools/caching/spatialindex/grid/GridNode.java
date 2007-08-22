@@ -165,6 +165,7 @@ public class GridNode implements Node, Serializable {
     public void clear() {
         this.num_data = 0;
         this.data = new GridData[10];
+        getIdentifier().setValid(false);
 
         //this.data_ids = new int[10];
     }

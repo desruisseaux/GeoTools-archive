@@ -49,7 +49,7 @@ public interface SpatialIndex {
     /** Empty the index.
      * @throws IllegalStateException
      */
-    public void flush() throws IllegalStateException;
+    public void clear() throws IllegalStateException;
 
     /** Insert new data in the index.
      * id is used to identify data, when several data have the same shape,

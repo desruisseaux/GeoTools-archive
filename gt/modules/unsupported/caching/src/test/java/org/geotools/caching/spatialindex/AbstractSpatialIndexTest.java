@@ -129,8 +129,8 @@ public abstract class AbstractSpatialIndexTest extends TestCase {
         // TODO: 
     }
 
-    public void testFlush() {
-        index.flush();
+    public void testClear() {
+        index.clear();
 
         HarvestingVisitor v = new HarvestingVisitor();
         Region query = new Region(new double[] { 0, 0 }, new double[] { 1, 1 });

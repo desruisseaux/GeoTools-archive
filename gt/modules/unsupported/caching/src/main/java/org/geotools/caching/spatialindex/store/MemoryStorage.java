@@ -16,6 +16,7 @@
 package org.geotools.caching.spatialindex.store;
 
 import java.util.HashMap;
+import java.util.Properties;
 import org.geotools.caching.spatialindex.Node;
 import org.geotools.caching.spatialindex.NodeIdentifier;
 import org.geotools.caching.spatialindex.SpatialIndex;
@@ -31,8 +32,8 @@ import org.geotools.caching.spatialindex.Storage;
 public class MemoryStorage implements Storage {
     HashMap<NodeIdentifier, Node> map;
 
-    public MemoryStorage(int capacity) {
-        this.map = new HashMap<NodeIdentifier, Node>(capacity);
+    public MemoryStorage() {
+        this.map = new HashMap<NodeIdentifier, Node>();
     }
 
     public Node get(NodeIdentifier id) {
@@ -55,5 +56,13 @@ public class MemoryStorage implements Storage {
 
     public void setParent(SpatialIndex index) {
         // do nothing - we do not need back link for this storage
+    }
+
+    public void close() {
+        // do nothing
+    }
+
+    public Properties getPropertySet() {
+        return new Properties(); // return empty property set
     }
 }

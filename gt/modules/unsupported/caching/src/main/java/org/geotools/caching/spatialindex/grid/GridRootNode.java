@@ -16,6 +16,7 @@
 package org.geotools.caching.spatialindex.grid;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import org.geotools.caching.spatialindex.AbstractSpatialIndex;
 import org.geotools.caching.spatialindex.NodeIdentifier;
 import org.geotools.caching.spatialindex.Region;
@@ -211,5 +212,16 @@ public class GridRootNode extends GridNode {
 
             return result;
         }
+    }
+
+    public void clear() {
+        //getIdentifier().setValid(false);
+        for (Iterator<NodeIdentifier> it = children.iterator(); it.hasNext();) {
+            GridNode child = (GridNode) grid.readNode(it.next());
+            child.clear();
+            grid.writeNode(child);
+        }
+
+        super.clear();
     }
 }

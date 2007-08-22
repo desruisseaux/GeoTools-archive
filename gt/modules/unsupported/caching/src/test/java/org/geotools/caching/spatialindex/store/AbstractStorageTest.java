@@ -32,7 +32,7 @@ public abstract class AbstractStorageTest extends TestCase {
 
     protected void setUp() {
         grid = new Grid(new Region(new double[] { 0, 0 }, new double[] { 1, 1 }), 10,
-                new MemoryStorage(100));
+                new MemoryStorage());
         n = new TestNode(grid, new Region(new double[] { 0, 0 }, new double[] { 1, 1 }));
         id = new RegionNodeIdentifier(n);
         store = createStorage();

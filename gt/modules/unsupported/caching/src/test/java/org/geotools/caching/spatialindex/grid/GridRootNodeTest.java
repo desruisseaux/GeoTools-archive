@@ -38,7 +38,7 @@ public class GridRootNodeTest extends GridNodeTest {
         mbr = new Region(new double[] { 0, 20 }, new double[] { 10, 30 });
         mbr3D = new Region(new double[] { 0, 20, 40 }, new double[] { 10, 30, 50 });
 
-        Grid index = new Grid(mbr, 100, new MemoryStorage(100));
+        Grid index = new Grid(mbr, 100, new MemoryStorage());
         node = new GridRootNode(index, mbr, size);
         node3D = new GridRootNode(index, mbr3D, size3D);
         super.node = node;

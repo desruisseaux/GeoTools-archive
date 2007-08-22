@@ -25,6 +25,8 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import org.opengis.filter.Filter;
 import org.geotools.caching.grid.GridFeatureCache;
+import org.geotools.caching.grid.GridInspector;
+import org.geotools.caching.spatialindex.store.BufferedDiskStorage;
 import org.geotools.caching.spatialindex.store.DiskStorage;
 import org.geotools.caching.spatialindex.store.MemoryStorage;
 import org.geotools.caching.util.Generator;
@@ -32,8 +34,10 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.feature.DefaultFeatureCollection;
+import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.filter.spatial.BBOXImpl;
 
 
@@ -184,10 +188,14 @@ public class BenchMark {
                 }
             }
 
+            //List<Filter> errors = new ArrayList<Filter>();
             if (ds_stats[i].getNumberOfFeatures() != control_stats[i].getNumberOfFeatures()) {
                 conform = false;
-                System.err.println("Query " + i + " : Got " + ds_stats[i].getNumberOfFeatures()
-                    + " features, expected " + control_stats[i].getNumberOfFeatures());
+
+                //                errors.add(filterset.get(i));
+                //                System.err.println("Query " + i + " : Got " + ds_stats[i].getNumberOfFeatures()
+                //                    + " features, expected " + control_stats[i].getNumberOfFeatures());
+                //                runErrorsAgain(errors);
             }
 
             /*System.out.println("Test: " + ds_stats[i].getNumberOfFeatures() + " features ; "
@@ -210,6 +218,90 @@ public class BenchMark {
             + ((100 * overheadCount) / (overheadCount + leverageCount)) + " %)");
         out.println("Mean leverage = " + meanLeverage + " ms. ("
             + ((100 * leverageCount) / (overheadCount + leverageCount)) + " %)");
+    }
+
+    void runErrorsAgain(List<Filter> errors) {
+        sample[0].clear();
+
+        for (Iterator<Filter> it = errors.iterator(); it.hasNext();) {
+            Filter next = it.next();
+
+            try {
+                GridInspector inspector = new GridInspector((GridFeatureCache) sample[0]);
+                inspector.checkFilterIsCached((BBOXImpl) next);
+
+                List<Envelope> list = inspector.getMatch((BBOXImpl) next);
+                FeatureCollection fc = sample[0].getFeatures(next);
+                FeatureCollection co = control.getFeatures(next);
+
+                if (fc.size() != co.size()) {
+                    List<Feature> missing = compare(fc, co);
+
+                    for (Iterator<Feature> mit = missing.iterator(); mit.hasNext();) {
+                        Feature f = mit.next();
+
+                        for (Iterator<Envelope> eit = list.iterator(); eit.hasNext();) {
+                            Envelope e = eit.next();
+                            Envelope against = AbstractFeatureCache.extractEnvelope((BBOXImpl) next);
+                            System.out.println("query enlarged : " + e.contains(against));
+
+                            FilterFactoryImpl ff = new FilterFactoryImpl();
+                            BBOXImpl tr = (BBOXImpl) ff.bbox("", e.getMinX(), e.getMinY(),
+                                    e.getMaxX(), e.getMaxY(), "");
+                            FeatureCollection dblco = control.getFeatures(tr);
+                            compare(dblco, co);
+                        }
+
+                        while (true) {
+                            sample[0].clear();
+                            inspector.findFeature(f);
+                            sample[0].getFeatures(next);
+                            inspector.findFeature(f);
+                        }
+                    }
+
+                    System.out.println(sample[0].sourceAccessStats());
+                }
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
+
+    List<Feature> compare(FeatureCollection fc, FeatureCollection co) {
+        System.out.println("Got " + fc.size() + " features, expected " + co.size());
+
+        List<Feature> ret = new ArrayList<Feature>();
+        FeatureIterator itco = co.features();
+
+        while (itco.hasNext()) {
+            Feature next = itco.next();
+            FeatureIterator itfc = fc.features();
+            boolean found = false;
+
+            while (itfc.hasNext()) {
+                Feature nextfc = itfc.next();
+
+                if (nextfc.equals(next)) {
+                    found = true;
+
+                    break;
+                }
+            }
+
+            if (!found) {
+                System.out.println("Not found : " + next.getID() + "," + next.getBounds()
+                    + " (size " + (next.getBounds().getWidth() * next.getBounds().getHeight()));
+                ret.add(next);
+            }
+
+            fc.close(itfc);
+        }
+
+        co.close(itco);
+
+        return ret;
     }
 
     public void localSetup() throws IOException {
@@ -238,16 +330,18 @@ public class BenchMark {
         try {
             thisClass.localSetup();
             System.out.print("Sample (init) : ");
-            thisClass.sample = new AbstractFeatureCache[4];
+            thisClass.sample = new AbstractFeatureCache[3];
             thisClass.sample[0] = new GridFeatureCache(thisClass.control, 500, 1000,
-                    new MemoryStorage(100));
+                    new MemoryStorage());
             thisClass.sample[1] = new GridFeatureCache(thisClass.control, 500, 2500,
-                    new MemoryStorage(100));
+                    new DiskStorage(File.createTempFile("cache", ".tmp"), 1000));
+            thisClass.sample[2] = new GridFeatureCache(thisClass.control, 500, 2500,
+                    new BufferedDiskStorage(File.createTempFile("cache", ".tmp"), 1000, 10));
 
-            DiskStorage storage = new DiskStorage(File.createTempFile("cache", ".tmp"), 1000);
-            thisClass.sample[2] = new GridFeatureCache(thisClass.control, 500, 1000, storage);
-            storage = new DiskStorage(File.createTempFile("cache", ".tmp"), 1000);
-            thisClass.sample[3] = new GridFeatureCache(thisClass.control, 500, 2500, storage);
+            //            DiskStorage storage = new DiskStorage(File.createTempFile("cache", ".tmp"), 1000);
+            //            thisClass.sample[2] = new GridFeatureCache(thisClass.control, 500, 1000, storage);
+            //            storage = new DiskStorage(File.createTempFile("cache", ".tmp"), 1000);
+            //            thisClass.sample[3] = new GridFeatureCache(thisClass.control, 500, 2500, storage);
             //			thisClass.sample[3] = new GridFeatureCache(thisClass.control, 60, 3000, new MemoryStorage(100) ) ;
             //			thisClass.sample[4] = new GridFeatureCache(thisClass.control, 60, 4000, new MemoryStorage(100) ) ;
             System.out.println("OK");
@@ -264,13 +358,13 @@ public class BenchMark {
                 System.out.println(thisClass.sample[i].sourceAccessStats());
             }
 
-            for (int i = thisClass.sample.length - 1; i >= 0; i--) {
-                System.out.print("Sample " + i + " (run inverse order) : ");
-                sample_stats[i] = thisClass.runQueries(thisClass.sample[i]);
-                System.out.println(thisClass.sample[i]);
-                thisClass.printResults(control_stats, sample_stats[i], System.out);
-                System.out.println(thisClass.sample[i].sourceAccessStats());
-            }
+            //            for (int i = thisClass.sample.length - 1; i >= 0; i--) {
+            //                System.out.print("Sample " + i + " (run inverse order) : ");
+            //                sample_stats[i] = thisClass.runQueries(thisClass.sample[i]);
+            //                System.out.println(thisClass.sample[i]);
+            //                thisClass.printResults(control_stats, sample_stats[i], System.out);
+            //                System.out.println(thisClass.sample[i].sourceAccessStats());
+            //            }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (FeatureCacheException e) {

@@ -132,7 +132,7 @@ public class GridFeatureCache extends AbstractFeatureCache {
     }
 
     public void clear() {
-        tracker.flush();
+        tracker.clear();
     }
 
     public FeatureCollection peek(Envelope e) {

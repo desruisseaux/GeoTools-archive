@@ -15,6 +15,9 @@
  */
 package org.geotools.caching.spatialindex;
 
+import java.util.Properties;
+
+
 public interface Storage {
     public void put(Node n);
 
@@ -25,4 +28,8 @@ public interface Storage {
     public void clear();
 
     public void setParent(SpatialIndex index);
+
+    public Properties getPropertySet();
+
+    public void close();
 }

@@ -44,7 +44,7 @@ public class GridFeatureCacheTest extends AbstractFeatureCacheTest {
     protected AbstractFeatureCache createInstance(int capacity)
         throws FeatureCacheException, IOException {
         this.cache = new GridFeatureCache((FeatureStore) ds.getFeatureSource(
-                    dataset.getSchema().getTypeName()), 100, capacity, new MemoryStorage(100));
+                    dataset.getSchema().getTypeName()), 100, capacity, new MemoryStorage());
 
         return this.cache;
     }
