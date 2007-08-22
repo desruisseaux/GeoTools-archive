@@ -55,11 +55,11 @@ public class RSGridBuilder extends WarpGridBuilder {
         super(vectors, dx, dy, envelope, realToGrid);
 
         DirectPosition p0 = new DirectPosition2D(envelope.getCoordinateReferenceSystem(),
-                envelope.getLowerCorner().getOrdinate(0) - 5.5,
-                envelope.getLowerCorner().getOrdinate(1) - 5.5);
+                envelope.getLowerCorner().getOrdinate(0) - envelope.getLength(0)*0.0001,
+                envelope.getLowerCorner().getOrdinate(1) - envelope.getLength(1)*0.0001);
         DirectPosition p2 = new DirectPosition2D(envelope.getCoordinateReferenceSystem(),
-                envelope.getUpperCorner().getOrdinate(0) + 5.5,
-                envelope.getUpperCorner().getOrdinate(1) + 5.5);
+                envelope.getUpperCorner().getOrdinate(0) + envelope.getLength(0)*0.0001,
+                envelope.getUpperCorner().getOrdinate(1) + envelope.getLength(1)*0.0001);
 
         DirectPosition p1 = new DirectPosition2D(envelope.getCoordinateReferenceSystem(),
                 p0.getOrdinate(0), p2.getOrdinate(1));

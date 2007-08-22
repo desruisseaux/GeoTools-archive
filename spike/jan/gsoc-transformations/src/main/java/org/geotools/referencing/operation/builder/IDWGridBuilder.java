@@ -16,15 +16,14 @@
 package org.geotools.referencing.operation.builder;
 
 import java.util.List;
-
-import org.geotools.geometry.DirectPosition2D;
-import org.geotools.referencing.operation.builder.algorithm.IDWInterpolation;
-import org.geotools.referencing.operation.transform.IdentityTransform;
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.NoSuchIdentifierException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
+import org.geotools.geometry.DirectPosition2D;
+import org.geotools.referencing.operation.builder.algorithm.IDWInterpolation;
+import org.geotools.referencing.operation.transform.IdentityTransform;
 
 
 /**
@@ -67,33 +66,9 @@ public class IDWGridBuilder extends WarpGridBuilder {
 
     protected float[] computeWarpGrid(ParameterValueGroup WarpParams)
         throws TransformException {
-        float[] warpPositions = (float[]) WarpParams.parameter("warpPositions").getValue();
-
         IDWInterpolation dxInterpolation = new IDWInterpolation(buildPositionsMap(0));
         IDWInterpolation dyInterpolation = new IDWInterpolation(buildPositionsMap(1));
 
-        for (int i = 0; i <= WarpParams.parameter("yNumCells").intValue(); i++) {
-            for (int j = 0; j <= WarpParams.parameter("xNumCells").intValue(); j++) {
-                DirectPosition2D p = (new DirectPosition2D(WarpParams.parameter("xStart").intValue()
-                        + (j * WarpParams.parameter("xStep").intValue()),
-                        WarpParams.parameter("yStart").intValue()
-                        + (i * WarpParams.parameter("yStep").intValue())));
-
-                double x = -dxInterpolation.getValue(p)
-                    + (j * WarpParams.parameter("xStep").intValue())
-                    + WarpParams.parameter("xStart").intValue();
-                double y = -dyInterpolation.getValue(p)
-                    + (i * WarpParams.parameter("yStep").intValue())
-                    + WarpParams.parameter("yStart").intValue();
-
-                warpPositions[(i * ((1 + WarpParams.parameter("xNumCells").intValue()) * 2))
-                + (2 * j)] = (float) x;
-
-                warpPositions[(i * ((1 + WarpParams.parameter("xNumCells").intValue()) * 2))
-                + (2 * j) + 1] = (float) y;
-            }
-        }
-
-        return warpPositions;
+        return computeWarpGrid(WarpParams, dxInterpolation, dyInterpolation);
     }
 }

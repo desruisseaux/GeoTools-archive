@@ -71,30 +71,6 @@ public class TPSGridBuilder extends WarpGridBuilder {
     	TPSInterpolation dxInterpolation = new TPSInterpolation(buildPositionsMap(0));
     	TPSInterpolation dyInterpolation = new TPSInterpolation(buildPositionsMap(1));
     	
-        float[] warpPositions = (float[]) WarpParams.parameter("warpPositions").getValue();
-
-        for (int i = 0; i <= WarpParams.parameter("yNumCells").intValue(); i++) {
-            for (int j = 0; j <= WarpParams.parameter("xNumCells").intValue(); j++) {
-                DirectPosition2D dp = new DirectPosition2D(WarpParams.parameter("xStart").intValue()
-                        + (j * WarpParams.parameter("xStep").intValue()),
-                        WarpParams.parameter("yStart").intValue()
-                        + (i * WarpParams.parameter("yStep").intValue()));
-
-                double x = -dxInterpolation.getValue(dp)
-                    + (j * WarpParams.parameter("xStep").intValue())
-                    + WarpParams.parameter("xStart").intValue();
-                double y = -dyInterpolation.getValue(dp)
-                    + (i * WarpParams.parameter("yStep").intValue())
-                    + WarpParams.parameter("yStart").intValue();
-
-                warpPositions[(i * ((1 + WarpParams.parameter("xNumCells").intValue()) * 2))
-                + (2 * j)] = (float) x;
-
-                warpPositions[(i * ((1 + WarpParams.parameter("xNumCells").intValue()) * 2))
-                + (2 * j) + 1] = (float) y;
-            }
-        }
-
-        return warpPositions;
+        return computeWarpGrid(WarpParams, dxInterpolation, dyInterpolation);    	      
     }
 }

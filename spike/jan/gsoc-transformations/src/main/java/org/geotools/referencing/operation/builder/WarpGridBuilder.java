@@ -30,6 +30,7 @@ import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.parameter.ParameterGroup;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.operation.builder.algorithm.AbstractInterpolation;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.WarpGridTransform2D;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -215,6 +216,34 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
      */
     abstract protected float[] computeWarpGrid(ParameterValueGroup values) throws TransformException;
 
+    protected float[] computeWarpGrid(ParameterValueGroup WarpParams, AbstractInterpolation dxInterp, AbstractInterpolation dyInterp) throws TransformException {
+    	
+        float[] warpPositions = (float[]) WarpParams.parameter("warpPositions").getValue();
+
+        for (int i = 0; i <= WarpParams.parameter("yNumCells").intValue(); i++) {
+            for (int j = 0; j <= WarpParams.parameter("xNumCells").intValue(); j++) {
+                DirectPosition2D dp = new DirectPosition2D(WarpParams.parameter("xStart").intValue()
+                        + (j * WarpParams.parameter("xStep").intValue()),
+                        WarpParams.parameter("yStart").intValue()
+                        + (i * WarpParams.parameter("yStep").intValue()));
+
+                double x = -dxInterp.getValue(dp)
+                    + (j * WarpParams.parameter("xStep").intValue())
+                    + WarpParams.parameter("xStart").intValue();
+                double y = -dyInterp.getValue(dp)
+                    + (i * WarpParams.parameter("yStep").intValue())
+                    + WarpParams.parameter("yStart").intValue();
+
+                warpPositions[(i * ((1 + WarpParams.parameter("xNumCells").intValue()) * 2))
+                + (2 * j)] = (float) x;
+
+                warpPositions[(i * ((1 + WarpParams.parameter("xNumCells").intValue()) * 2))
+                + (2 * j) + 1] = (float) y;
+            }
+        }
+
+        return warpPositions;
+    }
     /**
      * Returns array of warp grid positions. The array contains target positions
      * to original grid. The cells are enumerated in row-major order, that is, all

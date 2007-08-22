@@ -21,6 +21,7 @@ import java.util.HashMap;
 import javax.media.jai.RasterFactory;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.TransformException;
 import org.geotools.geometry.DirectPosition2D;
 
@@ -81,11 +82,6 @@ public abstract class AbstractInterpolation {
         //gridValues = new float[xNumCells*yNumCells];
     }
 
-    /**
-     * Returns interpolated value in position of specified point
-     * @return interpolated value
-     */
-    abstract protected float getValue(DirectPosition p);
 
     /**
      * Returns array of float of interpolated grid values.
@@ -160,7 +156,23 @@ public abstract class AbstractInterpolation {
 
         return grid2D;
     }
+    
+    /**
+     * Return interpolated value in position p
+     * @param p position where we want to compute the value
+     * @return the value at position p
+     */
+    public float intepolateValue(DirectPosition p){
+    	return getValue(p);
+    }
 
+    /**
+     * Real computation is performed here. Real algorithm has to be implemented her. 
+     * @param p position where we want to compute the value
+     * @return the value at position p
+     */
+    abstract public float getValue(DirectPosition p);
+    
     public double getDx() {
         return dx;
     }

@@ -23,9 +23,20 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.StringTokenizer;
 import java.util.prefs.Preferences;
+
 import javax.media.jai.Warp;
 import javax.media.jai.WarpGrid;
-import javax.media.jai.WarpPolynomial;
+
+import org.geotools.metadata.iso.citation.Citations;
+import org.geotools.parameter.DefaultParameterDescriptor;
+import org.geotools.parameter.Parameter;
+import org.geotools.parameter.ParameterGroup;
+import org.geotools.referencing.NamedIdentifier;
+import org.geotools.referencing.operation.MathTransformProvider;
+import org.geotools.resources.XArray;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
+import org.opengis.coverage.grid.GridRange;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.parameter.ParameterDescriptor;
@@ -38,17 +49,6 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.Transformation;
-import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.parameter.DefaultParameterDescriptor;
-import org.geotools.parameter.Parameter;
-import org.geotools.parameter.ParameterGroup;
-import org.geotools.referencing.NamedIdentifier;
-import org.geotools.referencing.operation.MathTransformProvider;
-import org.geotools.referencing.operation.builder.WarpGridBuilder;
-import org.geotools.referencing.operation.transform.WarpTransform2D.Provider;
-import org.geotools.resources.XArray;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -69,6 +69,9 @@ public class WarpGridTransform2D extends WarpTransform2D {
 
     /** warp position (Warp desn't offer getWarpPosition in the same format as needed)*/
     private final float[] warpPositions;
+    
+    
+    private float[] inversePos;
 
     /**
      *
@@ -249,7 +252,9 @@ public class WarpGridTransform2D extends WarpTransform2D {
      */
     private WarpGridTransform2D calculateInverse(int xStart, int xStep, int xNumCells, int yStart,
         int yStep, int yNumCells, float[] warpPositions) {
-        float[] inversePos = new float[warpPositions.length];
+    	
+    	if ( inversePos == null){
+        inversePos = new float[warpPositions.length];
 
         for (int i = 0; i <= yNumCells; i++) {
             for (int j = 0; j <= xNumCells; j++) {
@@ -261,6 +266,7 @@ public class WarpGridTransform2D extends WarpTransform2D {
             }
         }
 
+    	}
         WarpGridTransform2D wgt = new WarpGridTransform2D(xStart, xStep, xNumCells, yStart, yStep,
                 yNumCells, inversePos);
 
@@ -271,16 +277,36 @@ public class WarpGridTransform2D extends WarpTransform2D {
 
     public MathTransform inverse() throws NoninvertibleTransformException {
         // TODO Auto-generated method stub
-        if (inverse == null) {
+     //   if (inverse == null) {
             inverse = calculateInverse(((WarpGrid) getWarp()).getXStart(),
                     ((WarpGrid) getWarp()).getXStep(), ((WarpGrid) getWarp()).getXNumCells(),
                     ((WarpGrid) getWarp()).getYStart(), ((WarpGrid) getWarp()).getYStep(),
                     ((WarpGrid) getWarp()).getYNumCells(), warpPositions);
-        }
+       // }
 
         return inverse;
     }
 
+    /**
+     * Returns range of transformed data by searching max shift on each border of whole grid
+     * @return GridRange of transformed data
+     */
+    public GridRange getGridRange(){
+    	float top ;
+    	float buttom ;
+    	float left;
+    	float right;
+    	
+    	top = warpPositions[0];
+    	
+    	for (int i = 0; i < ((WarpGrid) getWarp()).getXNumCells()*2; i = i + 2){
+    		if (top < warpPositions[i]){
+    			top = warpPositions[i];
+    		}    	
+        }
+       return null;//new GridRange(null, null);
+
+    }
     /**
      *
      * The provider for the {@linkplain WarpGridTransform2D}. This provider constructs a JAI
