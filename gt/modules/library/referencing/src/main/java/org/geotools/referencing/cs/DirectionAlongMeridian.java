@@ -204,7 +204,7 @@ final class DirectionAlongMeridian implements Comparable, Serializable {
              */
             direction = findDirection(name);
             if (direction == null) {
-                direction = new AxisDirection(name);
+                direction = AxisDirection.valueOf(name);
             }
         }
         return direction;

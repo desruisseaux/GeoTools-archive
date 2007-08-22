@@ -195,7 +195,7 @@ public final class ParametersTest extends TestCase {
             // This is the expected exception.
             assertEquals("Test", exception.getParameterName());
         }
-        AxisDirection dummy = new AxisDirection("Dummy");
+        AxisDirection dummy = AxisDirection.valueOf("Dummy");
         try {
             param.setValue(dummy);
             fail("setValue(AxisDirection)");
