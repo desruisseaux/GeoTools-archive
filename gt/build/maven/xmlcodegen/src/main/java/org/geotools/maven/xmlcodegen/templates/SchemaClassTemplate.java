@@ -4,10 +4,9 @@ import java.util.*;
 import java.io.*;
 import org.geotools.xml.*;
 import org.geotools.maven.xmlcodegen.*;
-import org.opengis.feature.type.Name;
 import org.opengis.feature.type.Schema;
 import org.opengis.feature.type.AttributeType;
-import org.opengis.feature.type.TypeName;
+import org.opengis.feature.type.Name;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.apache.xml.serialize.*;
@@ -26,7 +25,7 @@ public class SchemaClassTemplate
 
   public final String NL = nl == null ? (System.getProperties().getProperty("line.separator")) : nl;
   protected final String TEXT_1 = "";
-  protected final String TEXT_2 = NL + NL + "import java.util.ArrayList;" + NL + "import java.util.Collections;" + NL + "import java.util.List;" + NL + "" + NL + "import org.opengis.feature.type.AttributeType;" + NL + "import org.opengis.feature.type.ComplexType;" + NL + "" + NL + "import org.geotools.feature.Name;" + NL + "import org.geotools.feature.type.AttributeDescriptorImpl;" + NL + "import org.geotools.feature.type.AttributeTypeImpl;" + NL + "import org.geotools.feature.type.ComplexTypeImpl;" + NL + "import org.geotools.feature.type.SchemaImpl;" + NL + "import org.geotools.feature.type.TypeName;" + NL;
+  protected final String TEXT_2 = NL + NL + "import java.util.ArrayList;" + NL + "import java.util.Collections;" + NL + "import java.util.List;" + NL + "" + NL + "import org.opengis.feature.type.AttributeType;" + NL + "import org.opengis.feature.type.ComplexType;" + NL + "" + NL + "import org.geotools.feature.Name;" + NL + "import org.geotools.feature.type.AttributeDescriptorImpl;" + NL + "import org.geotools.feature.type.AttributeTypeImpl;" + NL + "import org.geotools.feature.type.ComplexTypeImpl;" + NL + "import org.geotools.feature.type.SchemaImpl;" + NL + "import org.geotools.feature.type.Name;" + NL;
   protected final String TEXT_3 = NL + "import ";
   protected final String TEXT_4 = ";";
   protected final String TEXT_5 = NL + NL + "public class ";
@@ -45,7 +44,7 @@ public class SchemaClassTemplate
   protected final String TEXT_18 = ",";
   protected final String TEXT_19 = ",null" + NL + "                )" + NL + "            );";
   protected final String TEXT_20 = NL + "    }" + NL + "    public static final ComplexType ";
-  protected final String TEXT_21 = "_TYPE = " + NL + "        new ComplexTypeImpl(" + NL + "            new TypeName(\"";
+  protected final String TEXT_21 = "_TYPE = " + NL + "        new ComplexTypeImpl(" + NL + "            new Name(\"";
   protected final String TEXT_22 = "\",\"";
   protected final String TEXT_23 = "\"), ";
   protected final String TEXT_24 = "_TYPE_schema, ";
@@ -56,7 +55,7 @@ public class SchemaClassTemplate
   protected final String TEXT_29 = ", ";
   protected final String TEXT_30 = NL + "        );";
   protected final String TEXT_31 = NL + "    public static final ComplexType ";
-  protected final String TEXT_32 = "_TYPE = " + NL + "        new ComplexTypeImpl(" + NL + "            new TypeName(\"";
+  protected final String TEXT_32 = "_TYPE = " + NL + "        new ComplexTypeImpl(" + NL + "            new Name(\"";
   protected final String TEXT_33 = "\",\"";
   protected final String TEXT_34 = "\"), Collections.EMPTY_LIST, ";
   protected final String TEXT_35 = ",";
@@ -67,7 +66,7 @@ public class SchemaClassTemplate
   protected final String TEXT_40 = NL + "        );";
   protected final String TEXT_41 = NL + "    ";
   protected final String TEXT_42 = NL + "    public static final AttributeType ";
-  protected final String TEXT_43 = "_TYPE = " + NL + "        new AttributeTypeImpl(" + NL + "            new TypeName(\"";
+  protected final String TEXT_43 = "_TYPE = " + NL + "        new AttributeTypeImpl(" + NL + "            new Name(\"";
   protected final String TEXT_44 = "\",\"";
   protected final String TEXT_45 = "\"), ";
   protected final String TEXT_46 = ", ";
@@ -81,7 +80,7 @@ public class SchemaClassTemplate
   protected final String TEXT_54 = NL + NL + "    public ";
   protected final String TEXT_55 = "Schema() {" + NL + "        super(\"";
   protected final String TEXT_56 = "\");" + NL + "        ";
-  protected final String TEXT_57 = NL + "        put(new TypeName(\"";
+  protected final String TEXT_57 = NL + "        put(new Name(\"";
   protected final String TEXT_58 = "\",\"";
   protected final String TEXT_59 = "\"),";
   protected final String TEXT_60 = "_TYPE);";
