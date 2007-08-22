@@ -12,10 +12,13 @@ release.
 For this release the following modules comprise the geotools library:
 @REQUIRED@
 
-The following modules comprise the plug-ins and extensions:
+The following modules comprise the plug-ins,extensions, and demos:
 @PLUGIN@
 @EXTENTION@
 @DEMO@
+
+The following modules comprise the unsupported modules:
+@UNSUPPORTED@
 
 These optional jars typically provide support for specific data formats or
 sources, or provide specific additional functionality.
