@@ -33,6 +33,8 @@ import org.opengis.filter.Filter;
  * 
  * @author dzwiers
  * @source $URL$
+ * 
+ * @deprecated Will be removed from Geotools 2.6.
  */
 public class SetAttributeType extends AttributeDescriptorImpl 
 	implements AttributeType {

@@ -45,6 +45,8 @@ import java.util.Arrays;
  * @author dzwiers
  * @author Chris Holmes, TOPP
  * @source $URL$
+ * 
+ * @deprecated Will be removed in geotools 2.6.
  */
 public class ChoiceAttributeType extends AttributeDescriptorImpl implements AttributeType {
     

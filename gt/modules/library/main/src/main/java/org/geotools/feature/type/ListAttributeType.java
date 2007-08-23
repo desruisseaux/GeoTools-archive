@@ -31,6 +31,8 @@ import org.opengis.filter.Filter;
  * 
  * @author dzwiers
  * @source $URL$
+ * 
+ * @deprecated Will be removed in geootols 2.6.
  */
 public class ListAttributeType extends AttributeDescriptorImpl implements AttributeType {
 

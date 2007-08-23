@@ -38,6 +38,8 @@ import org.opengis.filter.Filter;
  * @author dzwiers
  *
  * @source $URL$
+ * 
+ * @deprecated Will be removed in geotools 2.6.
  */
 public class NestedAttributeType extends ListAttributeType {
 
