@@ -102,7 +102,8 @@ public class FeatureTypeTest extends DataTestCase {
       FeatureType[] supers = new FeatureType[1];
       supers[0] = FeatureTypeFactory.newFeatureType(null,"SillyThing",null,false);
       FeatureTypeFactory.newFeatureType(null,"BadFeature",null,true,supers);
-      fail("allowed bad super");
+      //JD: removing the restriction which prevents a super type from being non-abstract
+      //fail("allowed bad super");
     } catch (SchemaException se) {
       
     }
