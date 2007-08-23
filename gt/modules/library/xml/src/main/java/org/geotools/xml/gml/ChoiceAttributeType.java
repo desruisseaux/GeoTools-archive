@@ -13,6 +13,7 @@ import org.geotools.feature.GeometryAttributeType;
  * 
  * @author Jesse
  *
+ * @deprecated Will be removed in geotools 2.6.
  */
 interface ChoiceAttributeType extends AttributeType{
 	/**
