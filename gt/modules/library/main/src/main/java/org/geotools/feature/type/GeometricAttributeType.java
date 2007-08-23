@@ -99,35 +99,6 @@ public class GeometricAttributeType extends DefaultAttributeType implements org.
         return geometryFactory;
     }
 
-    public Object parse(Object value) throws IllegalArgumentException {
-        if (value == null) {
-            return value;
-        }
-
-        if (value instanceof Geometry) {
-            return value;
-        }
-        
-        if ( value instanceof Envelope ) {
-        	//convert enevelope to polygon
-        	return JTS.toGeometry( (Envelope) value );
-        }
-
-	if (value instanceof String) {
-	    String wkt = (String) value;
-	    WKTReader reader = new WKTReader();
-	    try {
-		return reader.read(wkt);
-	    } catch (com.vividsolutions.jts.io.ParseException pe) {
-		throw new IllegalArgumentException("Could not parse the " + 
-						   "string: " + wkt + 
-						   " to well known text");
-	    }
-	}
-        // consider wkb/gml support?
-        throw new IllegalArgumentException(
-            "AttributeGT.Geometric cannot parse " + value);
-    }
     
     public Object duplicate(Object o) throws IllegalAttributeException {
         if (o == null)
