@@ -32,21 +32,6 @@ public class TextualAttributeType extends DefaultAttributeType implements Primat
     }
     private Filter filter;
 
-    public Object parse(Object value) throws IllegalArgumentException {
-        if (value == null) {
-            return value;
-        }
-
-        // string is immutable, so lets keep it
-        if (value instanceof String) {
-            return value;
-        }
-
-        // other char sequences are not mutable, create a String from it.
-        // this also covers any other cases...
-        return value.toString();
-    }
-
     /**
      * Duplicate as a String
      *

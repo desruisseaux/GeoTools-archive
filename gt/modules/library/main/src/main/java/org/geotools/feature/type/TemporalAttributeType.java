@@ -44,39 +44,6 @@ public class TemporalAttributeType extends DefaultAttributeType implements Prima
     
     private Filter filter;
 
-    public Object parse(Object value) throws IllegalArgumentException {
-        if (value == null) {
-            return value;
-        }
-
-        if (getBinding().isAssignableFrom(value.getClass())) {
-            return value;
-        }
-
-        if (value instanceof Number) {
-            return new Date(((Number) value).longValue());
-        }
-
-        if (value instanceof java.util.Calendar) {
-            return ((java.util.Calendar) value).getTime();
-        }
-
-        //second to last restort, try the converters inteface 
-        //TODO: this single call should replace this entire routine
-        Object converted = Converters.convert( value, getBinding() );
-        if ( converted != null ) {
-        	return converted;
-        }
-        
-        //last resort
-        try {
-            return format.parse(value.toString());
-        } catch (java.text.ParseException pe) {
-            throw new IllegalArgumentException("unable to parse " + value
-                + " as Date");
-        }
-    }
-
     public Object duplicate(Object o) throws IllegalAttributeException {
         if (o == null) {
             return null;
