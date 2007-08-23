@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 
 import org.geotools.feature.simple.SimpleFeatureTypeImpl;
 import org.geotools.feature.type.TypeName;
+import org.geotools.resources.Utilities;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
@@ -51,7 +52,7 @@ public class DefaultFeatureType extends SimpleFeatureTypeImpl implements Feature
     //private final AttributeType[] types;
 
     /** The FeatureTypes this is descended from. */
-    private final FeatureType[] ancestors;
+    //private final FeatureType[] ancestors;
 
     /** The default geometry AttributeType. */
     //private final GeometryAttributeType defaultGeom;
@@ -95,13 +96,16 @@ public class DefaultFeatureType extends SimpleFeatureTypeImpl implements Feature
             return new ArrayList<T>(collection);
         }
     }
-    private static final FeatureType[] toFeatureTypes( Collection types ){
-        if( types == null ){
-            return new FeatureType[0];
+    private static final FeatureType toFeatureType( Collection types ){
+        if( types == null || types.isEmpty() ){
+            return null;
         }
-        else {
-            return (FeatureType[]) types.toArray( new FeatureType[types.size()]);
+        if ( types.size() > 1 ) {
+            throw new IllegalArgumentException("May only specify a single parent");
         }
+        
+        return (FeatureType) types.iterator().next();
+        
     }
     /**
      * Constructs a new DefaultFeatureType.
@@ -122,7 +126,7 @@ public class DefaultFeatureType extends SimpleFeatureTypeImpl implements Feature
     public DefaultFeatureType( org.opengis.feature.type.Name name,
         Collection types, Collection superTypes, GeometryAttributeType defaultGeom)
         throws NullPointerException {
-    	super( name, (List)types, defaultGeom, null, null, null );
+    	super( name, (List)types, defaultGeom, null,false, null, toFeatureType(superTypes), null );
     	
         if (name == null) {
             throw new NullPointerException("Name required");
@@ -130,7 +134,7 @@ public class DefaultFeatureType extends SimpleFeatureTypeImpl implements Feature
 
 //        this.typeName = typeName;
 //        this.namespace = namespace == null ? FeatureTypes.DEFAULT_NAMESPACE : namespace;
-        this.ancestors = toFeatureTypes( superTypes );
+//        this.ancestors = toFeatureTypes( superTypes );
 //
 //        Collection attributes = new java.util.ArrayList( types );
 //        for (int i = 0, ii = ancestors.length; i < ii; i++) {
@@ -162,10 +166,13 @@ public class DefaultFeatureType extends SimpleFeatureTypeImpl implements Feature
     }
     
     
-    public DefaultFeatureType(org.opengis.feature.type.Name name, List schema, AttributeDescriptor defaultGeometry, CoordinateReferenceSystem crs, Set restrictions, InternationalString description) {
-		super(name, schema, defaultGeometry, crs, restrictions, description);
+    public DefaultFeatureType(
+        org.opengis.feature.type.Name name, List schema, AttributeDescriptor defaultGeometry, 
+        CoordinateReferenceSystem crs, boolean isAbstract, Set restrictions, org.opengis.feature.simple.SimpleFeatureType superType, 
+        InternationalString description) {
+        
+		super(name, schema, defaultGeometry, crs,isAbstract, restrictions,superType, description);
 
-		this.ancestors = new FeatureType[0];
 		hashCode = computeHash();
 	}
 	/**
@@ -516,13 +523,26 @@ public class DefaultFeatureType extends SimpleFeatureTypeImpl implements Feature
      * @task HACK: if nsURI is null only typeName is tested.
      */
     public boolean isDescendedFrom(URI nsURI, String typeName1) {
-    	for (int i = 0, ii = ancestors.length; i < ii; i++) {
-            if (((nsURI == null)
-                    || ancestors[i].getNamespace().equals(nsURI))
-                    && ancestors[i].getTypeName().equals(typeName1)) {
-                return true;
+        FeatureType superType = (FeatureType) getSuper();
+        while( superType != null ) {
+            if ( nsURI == null ) {
+                //dont match on namespace
+                if ( Utilities.equals(superType.getTypeName(), typeName1) ) {
+                    return true;
+                }
             }
-        }        
+            else {
+                if ( Utilities.equals(superType.getNamespace(),nsURI) && 
+                        Utilities.equals(superType.getTypeName(), typeName1)) {
+                    return true;
+                }    
+            }
+            
+            
+            superType = (FeatureType) superType.getSuper();
+        }
+    	 
+        //one more effort, if no 
         return false;
     }
 
@@ -537,11 +557,12 @@ public class DefaultFeatureType extends SimpleFeatureTypeImpl implements Feature
             while (st.hasNext()) {
                 FeatureType ft = (FeatureType) st.next();
 
-                if (!ft.isAbstract()) {
-                    throw new SchemaException(
-                        "Abstract type cannot descend from no abstract type : "
-                        + ft);
-                }
+                //JD: removing this check, as its not the case in xml
+                //if (!ft.isAbstract()) {
+                //    throw new SchemaException(
+                //        "Abstract type cannot descend from no abstract type : "
+                //        + ft);
+                //}
             }
         }
 

@@ -24,6 +24,8 @@ import org.opengis.util.InternationalString;
  * will be removed in subsequent versions.
  * 
  * @since 2.5
+ * 
+ * TODO: move to static inner class of DefaultFeatureTypeBuilder.
  *
  */
 public class DefaultTypeFactory extends SimpleTypeFactoryImpl {
@@ -31,7 +33,11 @@ public class DefaultTypeFactory extends SimpleTypeFactoryImpl {
 	/**
 	 * Override which returns {@link DefaultFeatureType}.
 	 */
-	public SimpleFeatureType createSimpleFeatureType(Name name, List schema, AttributeDescriptor defaultGeometry, CoordinateReferenceSystem crs, Set restrictions, InternationalString description) {
-		return new DefaultFeatureType(name,schema,defaultGeometry,crs,restrictions,description);
+	public SimpleFeatureType createSimpleFeatureType(Name name, List schema,
+	        AttributeDescriptor defaultGeometry, CoordinateReferenceSystem crs,
+	        boolean isAbstract, Set restrictions, SimpleFeatureType superType,
+	        InternationalString description) {
+	    
+	    return new DefaultFeatureType(name,schema,defaultGeometry,crs,isAbstract,restrictions,superType,description);
 	}
 }
