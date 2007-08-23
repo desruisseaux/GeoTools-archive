@@ -26,6 +26,8 @@ import java.util.List;
  * @author Chris Holmes
  * @source $URL$
  * @version $Id$
+ * 
+ * @deprecated Will be removed in geotools 2.6
  */
 public class MultiAttributeType extends DefaultAttributeType {
     /** Number of instances of this attribute in the schema. */
@@ -150,26 +152,6 @@ public class MultiAttributeType extends DefaultAttributeType {
 
             throw new IllegalArgumentException(msg);
         }
-    }
-
-    /**
-     * If a single object is passed in then it is parsed into a list with just
-     * it as the element.  If an array is passed in then it is turned into a
-     * list.
-     *
-     * @param value the object to attempt parsing of.
-     *
-     * @return <code>value</code> converted to the preferred storage of this
-     *         <code>AttributeType</code>.  If no parsing was possible then
-     *         the same object is returned.
-     *
-     * @throws IllegalArgumentException if parsing is attempted and is
-     *         unsuccessful.
-     *
-     * @task REVISIT: implement this method as described in this comment.
-     */
-    public Object parse(Object value) throws IllegalArgumentException {
-        return value;
     }
 
     /**
