@@ -22,8 +22,10 @@ import java.util.Collections;
 
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
+import org.geotools.feature.Name;
 import org.geotools.feature.simple.SimpleFeatureTypeImpl;
 import org.geotools.feature.type.TypeName;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 
 /**
@@ -36,7 +38,7 @@ public class DummyFeatureType extends SimpleFeatureTypeImpl implements FeatureTy
     
     /** Creates a new instance of DummyFeatureType */
     public DummyFeatureType(String typeName) {
-    	super(new TypeName(typeName),Collections.EMPTY_LIST, (AttributeType) null, null, Collections.EMPTY_SET, null);
+    	super(new Name(typeName),Collections.EMPTY_LIST, (AttributeDescriptor) null, null, false, Collections.EMPTY_SET, null, null);
     }
     
     public org.geotools.feature.Feature create(Object[] attributes) throws org.geotools.feature.IllegalAttributeException {
