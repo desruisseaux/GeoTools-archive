@@ -27,6 +27,7 @@ import org.geotools.feature.type.DefaultFeatureTypeBuilder;
 import org.geotools.feature.type.TypeName;
 import org.geotools.filter.LengthFunction;
 import org.geotools.geometry.jts.JTS;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.PropertyIsLessThan;
@@ -70,6 +71,19 @@ public class FeatureTypes {
 		}
 		DEFAULT_NAMESPACE = uri;
 	}
+	
+	/** abstract base type for all feature types */
+    public final static FeatureType ABSTRACT_FEATURE_TYPE;
+    static {
+        FeatureType featureType = null;
+        try {
+            featureType = FeatureTypes.newFeatureType(null, "Feature",new URI("http://www.opengis.net/gml"), true);
+        }
+        catch(Exception e ) {
+            //shold not happen
+        }
+        ABSTRACT_FEATURE_TYPE = featureType;
+    }
 		
 	/** default feature collection name */
 	final public static TypeName DEFAULT_TYPENAME = 
@@ -146,7 +160,8 @@ public class FeatureTypes {
         DefaultFeatureTypeBuilder tb = new DefaultFeatureTypeBuilder();
         tb.setName(schema.getTypeName());
         tb.setNamespaceURI( schema.getNamespace() );
-
+        tb.setAbstract(schema.isAbstract());
+        
         GeometryAttributeType defaultGeometryType = null;
         for( int i = 0; i < schema.getAttributeCount(); i++ ) {
             AttributeType attributeType = schema.getAttributeType(i);
@@ -169,7 +184,12 @@ public class FeatureTypes {
                 tb.add(attributeType);
             }
         }
-        tb.setDefaultGeometry(defaultGeometryType.getLocalName());
+        if (schema.getPrimaryGeometry() != null) {
+            tb.setDefaultGeometry(schema.getPrimaryGeometry().getLocalName());
+        }
+        
+        tb.setSuperType((SimpleFeatureType) schema.getSuper());
+        
         return tb.buildFeatureType();
     }
 
@@ -238,14 +258,35 @@ public class FeatureTypes {
             throws FactoryConfigurationError, SchemaException {
         DefaultFeatureTypeBuilder tb = new DefaultFeatureTypeBuilder();
         tb.setName(name);
-        if( ns != null ) {
-            tb.setNamespaceURI(ns.toString());
-        }
+        tb.setNamespaceURI(ns);
+        tb.setAbstract(isAbstract);
         tb.add(types);
+        
         if ( defaultGeometry != null ) {
+            //make sure that the default geometry was one of the types specified
+            boolean add = true;
+            for ( int i = 0; i < types.length; i++ ) {
+                if (types[i] == defaultGeometry) {
+                    add = false;
+                    break;
+                }
+            }
+            if ( add ) {
+                tb.add(defaultGeometry);
+            }
             tb.setDefaultGeometry(defaultGeometry.getLocalName());
         }
-        
+        if ( superTypes != null && superTypes.length > 0) {
+            if ( superTypes.length > 1 ) {
+                throw new SchemaException("Can only specify a single super type");
+            }
+            tb.setSuperType(superTypes[0]);
+            
+        }
+        else {
+            //use the default super type
+            tb.setSuperType(ABSTRACT_FEATURE_TYPE);
+        }
         return (FeatureType) tb.buildFeatureType();
     }
 
