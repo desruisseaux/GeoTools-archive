@@ -32,15 +32,12 @@ public class SimpleFeatureTypeImpl extends FeatureTypeImpl implements
 
 	public SimpleFeatureTypeImpl(Name name, List/*<AttributeDescriptor>*/ schema,
 			AttributeDescriptor defaultGeometry, CoordinateReferenceSystem crs,
-			Set/* <Filter> */restrictions, InternationalString description) {
-		super(name, schema, defaultGeometry, crs, false, restrictions, null,
+			boolean isAbstract, Set/* <Filter> */restrictions, SimpleFeatureType superType, 
+			InternationalString description) {
+		super(name, schema, defaultGeometry, crs, isAbstract, restrictions, superType,
 				description);
 	}
 	
-	public SimpleFeatureTypeImpl(Name name, List/*<AttributeType>*/ typeList, AttributeType geometryType, CoordinateReferenceSystem crs, Set restrictions, InternationalString description) {
-		this( name, Descriptors.wrapAttributeTypes( typeList ),Descriptors.wrapAttributeType(geometryType) , crs, restrictions, description );
-		types = typeList;
-	}
 	
 	public List getAttributes() {
 		return (List) getProperties();

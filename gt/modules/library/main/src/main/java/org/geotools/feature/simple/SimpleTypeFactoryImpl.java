@@ -27,10 +27,11 @@ public class SimpleTypeFactoryImpl /*extends TypeFactoryImpl*/ implements
 
 	public SimpleFeatureType createSimpleFeatureType(Name name,
 			List schema, AttributeDescriptor defaultGeometry,
-			CoordinateReferenceSystem crs, Set restrictions,
+			CoordinateReferenceSystem crs, boolean isAbstract, 
+			Set restrictions, SimpleFeatureType superType, 
 			InternationalString description) {
 
-		return new SimpleFeatureTypeImpl(name,schema,defaultGeometry,crs,restrictions,description);
+		return new SimpleFeatureTypeImpl(name,schema,defaultGeometry,crs,isAbstract,restrictions,superType,description);
 	}
 
 	public SimpleFeatureCollectionType createSimpleFeatureCollectionType(
