@@ -16,10 +16,13 @@
 package org.geotools.feature;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import javax.swing.text.html.HTMLDocument.Iterator;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Factory;
@@ -62,8 +65,8 @@ import org.geotools.factory.Hints;
  * @version $Id$
  */
 public abstract class FeatureTypeBuilder extends FeatureTypes implements Factory {
-    /** The types that all features have. */
-    private static Set builtInTypes = null;
+    
+            
 
     /** If the base types have been initialized */
     private static boolean initialized;
@@ -207,10 +210,16 @@ public abstract class FeatureTypeBuilder extends FeatureTypes implements Factory
      */
     public final java.util.Collection getSuperTypes() {
         Set supers = (superTypes == null) ? new HashSet() : superTypes;
-        Set builtin = getBuiltinTypes();
-
-        if (builtin != null) {
-            supers.addAll(builtin);
+        
+        boolean add = true;
+        for ( java.util.Iterator s = supers.iterator(); s.hasNext(); ) {
+            FeatureType superType = (FeatureType) s.next();
+            if ( superType.isDescendedFrom(ABSTRACT_FEATURE_TYPE) ) {
+                add = false;
+            }
+        }
+        if ( add ) {
+            supers.add(ABSTRACT_FEATURE_TYPE);
         }
 
         return supers;
@@ -607,24 +616,6 @@ public abstract class FeatureTypeBuilder extends FeatureTypes implements Factory
             throw new IllegalArgumentException("Duplicate AttributeTypes "
                 + type);
         }
-    }
-
-    protected final Set getBuiltinTypes() {
-        if ((builtInTypes == null) && !initialized) {
-            builtInTypes = new HashSet();
-
-            try {
-                builtInTypes.add(FeatureTypes.newFeatureType(null, "Feature",
-                        new URI("http://www.opengis.net/gml"), true));
-                initialized = true;
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-
-            addBaseTypes(builtInTypes);
-        }
-
-        return builtInTypes;
     }
 
     protected void addBaseTypes(Set types) {
