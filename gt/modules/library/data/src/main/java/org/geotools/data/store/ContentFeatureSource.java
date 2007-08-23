@@ -28,7 +28,7 @@ import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.simple.SimpleTypeBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 
 
 /**
@@ -173,7 +173,7 @@ public abstract class ContentFeatureSource implements FeatureSource {
      * Creates a feature type for the entry.
      * <p>
      * An implementation of this method should create a new instance of
-     * {@link SimpleTypeBuilder}, injecting it with the factory provided by
+     * {@link SimpleFeatureTypeBuilder}, injecting it with the factory provided by
      * the datastore via. Example.
      * <pre>
      *   <code>

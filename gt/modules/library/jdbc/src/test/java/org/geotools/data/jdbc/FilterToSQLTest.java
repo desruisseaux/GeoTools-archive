@@ -27,7 +27,7 @@ import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.simple.SimpleFeatureFactoryImpl;
-import org.geotools.feature.simple.SimpleTypeBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.feature.simple.SimpleTypeFactoryImpl;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
