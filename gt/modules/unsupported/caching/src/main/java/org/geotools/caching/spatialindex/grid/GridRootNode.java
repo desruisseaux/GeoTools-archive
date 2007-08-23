@@ -37,7 +37,7 @@ public class GridRootNode extends GridNode {
     protected int capacity;
     protected int[] tiles_number;
     protected double tiles_size;
-    ArrayList<NodeIdentifier> children; // list of NodeIdentifiers
+    protected ArrayList<NodeIdentifier> children; // list of NodeIdentifiers
 
     /**No-arg constructor for serialization purpose.
      * Deserialized nodes must call init(Grid grid) before any other operation.

@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.RandomAccessFile;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -54,12 +55,13 @@ public class DiskStorage implements Storage {
     private byte[] buffer;
     protected SpatialIndex parent;
 
-    public DiskStorage(File f, int page_size) throws IOException {
+    private DiskStorage(File f, int page_size) throws IOException {
         this(f, page_size, new File(f.getCanonicalPath() + ".idx"));
     }
 
-    public DiskStorage(File f, int page_size, File index_file)
+    private DiskStorage(File f, int page_size, File index_file)
         throws IOException {
+        dataFile = f;
         data_file = new RandomAccessFile(f, "rw");
         this.indexFile = index_file;
         this.page_size = page_size;
@@ -68,7 +70,8 @@ public class DiskStorage implements Storage {
         buffer = new byte[page_size];
     }
 
-    public DiskStorage(File f, File index_file) throws IOException {
+    private DiskStorage(File f, File index_file) throws IOException {
+        dataFile = f;
         data_file = new RandomAccessFile(f, "rw");
         this.indexFile = index_file;
 
@@ -77,6 +80,63 @@ public class DiskStorage implements Storage {
             buffer = new byte[page_size];
         } else {
             throw new IOException(index_file + " does not exist !");
+        }
+    }
+
+    /** Factory method : create a new Storage of type DiskStorage.
+     * Valid properties are :
+     * <ul>
+     *   <li>DiskStorage.DATA_FILE_PROPERTY : filename (mandatory) ; overrides given file if index is not provided.
+     *   <li>DiskStorage.INDEX_FILE_PROPERTY : filename ;
+     *                                         if exists, must be a valid index file
+     *                                         and data file must be the valid data file associated with this index.
+     *   <li>DiskStorage.PAGE_SIZE_PROPERTY : int, required if INDEX_FILE does not exist, or is not provided.
+     * </ul>
+     * @param property set
+     * @return new instance of DiskStorage
+     */
+    public static Storage createInstance(Properties pset) {
+        try {
+            File f = new File(pset.getProperty(DATA_FILE_PROPERTY));
+
+            if (pset.containsKey(INDEX_FILE_PROPERTY)) {
+                File index = new File(pset.getProperty(INDEX_FILE_PROPERTY));
+
+                if (index.exists()) {
+                    return new DiskStorage(f, index);
+                } else {
+                    int page_size = Integer.parseInt(pset.getProperty(PAGE_SIZE_PROPERTY));
+
+                    return new DiskStorage(f, page_size, index);
+                }
+            } else {
+                int page_size = Integer.parseInt(pset.getProperty(PAGE_SIZE_PROPERTY));
+
+                return new DiskStorage(f, page_size);
+            }
+        } catch (IOException e) {
+            logger.log(Level.WARNING,
+                "DiskStorage : error occured when creating new instance : " + e);
+
+            return null;
+        } catch (NullPointerException e) {
+            throw new IllegalArgumentException("DiskStorage : invalid property set.");
+        }
+    }
+
+    /** Default factory method : create a new Storage of type DiskStorage,
+     * with page size set to default 1000 bytes, and data file is a new temporary file.
+     *
+     * @return new instance of DiskStorage with default parameters.
+     */
+    public static Storage createInstance() {
+        try {
+            return new DiskStorage(File.createTempFile("storage", ".tmp"), 1000);
+        } catch (IOException e) {
+            logger.log(Level.WARNING,
+                "DiskStorage : error occured when creating new instance : " + e);
+
+            return null;
         }
     }
 
@@ -175,7 +235,7 @@ public class DiskStorage implements Storage {
             return;
         }
 
-        Entry e = new Entry();
+        Entry e = new Entry(n.getIdentifier());
 
         if (pageIndex.containsKey(n.getIdentifier())) {
             Entry oldEntry = pageIndex.get(n.getIdentifier());
@@ -257,7 +317,7 @@ public class DiskStorage implements Storage {
         }
     }
 
-    public void close() {
+    public void flush() {
         try {
             FileOutputStream os = new FileOutputStream(indexFile);
             ObjectOutputStream oos = new ObjectOutputStream(os);
@@ -294,9 +354,10 @@ public class DiskStorage implements Storage {
         Properties pset = new Properties();
 
         try {
+            pset.setProperty(STORAGE_TYPE_PROPERTY, DiskStorage.class.getCanonicalName());
             pset.setProperty(DATA_FILE_PROPERTY, dataFile.getCanonicalPath());
             pset.setProperty(INDEX_FILE_PROPERTY, indexFile.getCanonicalPath());
-            pset.setProperty(PAGE_SIZE_PROPERTY, "-1");
+            pset.setProperty(PAGE_SIZE_PROPERTY, new Integer(page_size).toString());
         } catch (IOException e) {
             logger.log(Level.WARNING, "Error while creating DiskStorage property set : " + e);
         }
@@ -304,8 +365,26 @@ public class DiskStorage implements Storage {
         return pset;
     }
 
-    class Entry {
-        int length = 0;
-        ArrayList<Integer> pages = new ArrayList<Integer>();
+    public NodeIdentifier findUniqueInstance(NodeIdentifier id) {
+        if (pageIndex.containsKey(id)) {
+            return pageIndex.get(id).id;
+        } else {
+            return id;
+        }
+    }
+}
+
+
+class Entry implements Serializable {
+    /**
+     *
+     */
+    private static final long serialVersionUID = -9013786524696213884L;
+    int length = 0;
+    NodeIdentifier id;
+    ArrayList<Integer> pages = new ArrayList<Integer>();
+
+    Entry(NodeIdentifier id) {
+        this.id = id;
     }
 }

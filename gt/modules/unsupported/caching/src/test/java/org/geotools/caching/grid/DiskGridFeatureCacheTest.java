@@ -17,10 +17,10 @@ package org.geotools.caching.grid;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import java.io.File;
 import java.io.IOException;
 import org.geotools.caching.AbstractFeatureCache;
 import org.geotools.caching.FeatureCacheException;
+import org.geotools.caching.spatialindex.Storage;
 import org.geotools.caching.spatialindex.store.DiskStorage;
 
 
@@ -32,7 +32,7 @@ public class DiskGridFeatureCacheTest extends GridFeatureCacheTest {
     @Override
     protected AbstractFeatureCache createInstance(int capacity)
         throws FeatureCacheException, IOException {
-        DiskStorage storage = new DiskStorage(File.createTempFile("cache", ".tmp"), 1000);
+        Storage storage = DiskStorage.createInstance();
         this.cache = new GridFeatureCache(ds.getFeatureSource(dataset.getSchema().getTypeName()),
                 100, capacity, storage);
 

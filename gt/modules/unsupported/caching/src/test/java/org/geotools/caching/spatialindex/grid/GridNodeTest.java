@@ -18,6 +18,7 @@ package org.geotools.caching.spatialindex.grid;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import java.util.Iterator;
 import org.geotools.caching.spatialindex.Region;
 import org.geotools.caching.spatialindex.grid.GridData;
 
@@ -25,8 +26,8 @@ import org.geotools.caching.spatialindex.grid.GridData;
 public class GridNodeTest extends TestCase {
     GridNode node;
     Region mbr;
-    String data = "Sample data";
-    String data2 = "Sample data 2";
+    String data = "Sample data : ";
+    String data2 = "Sample data 2 : ";
 
     public static Test suite() {
         return new TestSuite(GridNodeTest.class);
@@ -49,18 +50,18 @@ public class GridNodeTest extends TestCase {
 
     void populate() {
         for (int i = 0; i < 10; i++) {
-            node.insertData(new GridData(8, mbr, data));
-            node.insertData(new GridData(16, mbr, data2));
+            node.insertData(new GridData(8, mbr, data + i));
+            node.insertData(new GridData(16, mbr, data2 + i));
         }
     }
 
     public void testInsert() {
         populate();
         assertEquals(20, node.num_data);
-        assertEquals(8, node.data[0].id);
-        assertEquals(data2, node.data[1].getData());
-        assertEquals(8, node.data[18].id);
-        assertEquals(data2, node.data[19].getData());
+        assertEquals(8, getId(node, 0));
+        assertEquals(data2 + 0, getData(node, 1));
+        assertEquals(8, getId(node, 18));
+        assertEquals(data2 + 9, getData(node, 19));
     }
 
     public void testDelete() {
@@ -68,11 +69,11 @@ public class GridNodeTest extends TestCase {
         node.deleteData(14);
         node.deleteData(15);
         assertEquals(18, node.num_data);
-        assertEquals(8, node.data[0].id);
-        assertEquals(data2, node.data[1].getData());
-        assertEquals(16, node.data[14].id);
-        assertEquals(data, node.data[15].getData());
-        assertEquals(null, node.data[19]);
+        assertEquals(8, getId(node, 0));
+        assertEquals(data2 + 0, getData(node, 1));
+        assertEquals(8, getId(node, 14));
+        assertEquals(data + 9, getData(node, 16));
+        assertEquals(null, getData(node, 19));
 
         try {
             node.deleteData(18);
@@ -80,5 +81,33 @@ public class GridNodeTest extends TestCase {
         } catch (IndexOutOfBoundsException e) {
             // expected
         }
+    }
+
+    Object getData(GridNode n, int index) {
+        if ((index < 0) || (index > (n.num_data - 1))) {
+            return null;
+        }
+
+        Iterator<GridData> it = n.data.iterator();
+
+        for (int i = 0; i < index; i++) {
+            it.next();
+        }
+
+        return it.next().getData();
+    }
+
+    int getId(GridNode n, int index) {
+        if ((index < 0) || (index > (n.num_data - 1))) {
+            return -1;
+        }
+
+        Iterator<GridData> it = n.data.iterator();
+
+        for (int i = 0; i < index; i++) {
+            it.next();
+        }
+
+        return it.next().id;
     }
 }

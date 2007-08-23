@@ -48,6 +48,10 @@ public final class RegionNodeIdentifier extends NodeIdentifier {
         }
     }
 
+    public RegionNodeIdentifier(Region r) {
+        this.shape = r;
+    }
+
     public Shape getShape() {
         return new Region(shape);
     }

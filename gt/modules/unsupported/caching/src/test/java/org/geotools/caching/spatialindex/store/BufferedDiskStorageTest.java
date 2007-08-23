@@ -17,8 +17,6 @@ package org.geotools.caching.spatialindex.store;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import java.io.File;
-import java.io.IOException;
 import org.geotools.caching.spatialindex.Storage;
 
 
@@ -29,14 +27,9 @@ public class BufferedDiskStorageTest extends AbstractStorageTest {
 
     @Override
     Storage createStorage() {
-        try {
-            BufferedDiskStorage storage = new BufferedDiskStorage(File.createTempFile("cache",
-                        ".tmp"), 1000, 5);
-            storage.setParent(this.grid);
+        Storage storage = BufferedDiskStorage.createInstance();
+        storage.setParent(this.grid);
 
-            return storage;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return storage;
     }
 }

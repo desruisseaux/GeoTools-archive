@@ -16,6 +16,8 @@
 package org.geotools.caching.spatialindex.grid;
 
 import java.io.Serializable;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import org.geotools.caching.spatialindex.Node;
 import org.geotools.caching.spatialindex.NodeIdentifier;
 import org.geotools.caching.spatialindex.Region;
@@ -43,7 +45,7 @@ public class GridNode implements Node, Serializable {
     int num_data;
 
     //protected int[] data_ids;
-    protected GridData[] data;
+    protected LinkedHashSet<GridData> data;
     transient protected RegionNodeIdentifier id = null;
 
     //transient boolean visited = false;
@@ -61,7 +63,7 @@ public class GridNode implements Node, Serializable {
         //this.parent = parent;
         //this.node_data = new HashMap();
         this.num_data = 0;
-        this.data = new GridData[10];
+        this.data = new LinkedHashSet<GridData>();
         //this.data_ids = new int[10];
         this.grid = grid;
     }
@@ -103,11 +105,12 @@ public class GridNode implements Node, Serializable {
         if (id == null) {
             id = new RegionNodeIdentifier(this);
 
-            if (grid.node_ids.containsKey(id)) {
-                id = grid.node_ids.get(id);
-            } else {
-                grid.node_ids.put(id, id);
-            }
+            //            if (grid.containsKey(id)) {
+            //                id = grid.node_ids.get(id);
+            //            } else {
+            //                grid.node_ids.put(id, id);
+            //            }
+            id = (RegionNodeIdentifier) grid.findUniqueInstance(id);
         }
 
         return id;
@@ -123,20 +126,14 @@ public class GridNode implements Node, Serializable {
      * @param data
      */
     protected boolean insertData(GridData data) {
-        if (num_data == this.data.length) {
-            //int[] n_data_ids = new int[this.data.length * 2];
-            GridData[] n_data = new GridData[this.data.length * 2];
-            //System.arraycopy(data_ids, 0, n_data_ids, 0, num_data);
-            System.arraycopy(this.data, 0, n_data, 0, num_data);
-            //data_ids = n_data_ids;
-            this.data = n_data;
+        if (this.data.contains(data)) {
+            return false;
+        } else {
+            this.data.add(data);
+            num_data++;
+
+            return true;
         }
-
-        //data_ids[num_data] = data.id;
-        this.data[num_data] = data;
-        num_data++;
-
-        return true;
     }
 
     /** Delete blindly data at the given index.
@@ -150,13 +147,21 @@ public class GridNode implements Node, Serializable {
             throw new IndexOutOfBoundsException();
         }
 
-        if (index < (num_data - 1)) {
-            //data_ids[index] = data_ids[num_data - 1];
-            data[index] = data[num_data - 1];
+        Iterator<GridData> it = data.iterator();
+
+        for (int i = 0; i < index; i++) {
+            it.next();
         }
 
-        data[num_data - 1] = null;
+        it.remove();
+
         num_data--;
+    }
+
+    protected void deleteData(GridData data) {
+        if (this.data.remove(data)) {
+            num_data--;
+        }
     }
 
     /** Erase all data referenced by this node.
@@ -164,7 +169,7 @@ public class GridNode implements Node, Serializable {
      */
     public void clear() {
         this.num_data = 0;
-        this.data = new GridData[10];
+        this.data.clear();
         getIdentifier().setValid(false);
 
         //this.data_ids = new int[10];

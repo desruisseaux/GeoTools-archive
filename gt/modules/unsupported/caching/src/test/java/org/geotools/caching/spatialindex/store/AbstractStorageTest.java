@@ -21,7 +21,6 @@ import org.geotools.caching.spatialindex.Region;
 import org.geotools.caching.spatialindex.RegionNodeIdentifier;
 import org.geotools.caching.spatialindex.Storage;
 import org.geotools.caching.spatialindex.grid.Grid;
-import org.geotools.caching.spatialindex.grid.GridNode;
 
 
 public abstract class AbstractStorageTest extends TestCase {
@@ -32,7 +31,7 @@ public abstract class AbstractStorageTest extends TestCase {
 
     protected void setUp() {
         grid = new Grid(new Region(new double[] { 0, 0 }, new double[] { 1, 1 }), 10,
-                new MemoryStorage());
+                MemoryStorage.createInstance());
         n = new TestNode(grid, new Region(new double[] { 0, 0 }, new double[] { 1, 1 }));
         id = new RegionNodeIdentifier(n);
         store = createStorage();
@@ -54,10 +53,13 @@ public abstract class AbstractStorageTest extends TestCase {
 
     public void testRemove() {
         store.put(n);
-        store.get(id);
+
+        Node g = store.get(id);
+        assertEquals(n.getIdentifier(), g.getIdentifier());
         store.remove(id);
-        store.get(id);
+        assertNull(store.get(id));
         store.put(n);
-        store.get(id);
+        g = store.get(id);
+        assertEquals(n.getIdentifier(), g.getIdentifier());
     }
 }

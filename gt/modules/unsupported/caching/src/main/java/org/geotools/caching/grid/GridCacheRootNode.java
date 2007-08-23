@@ -87,7 +87,7 @@ public class GridCacheRootNode extends GridRootNode {
         return false;
     }
 
-    protected GridData getData(int i) {
-        return this.data[i];
-    }
+    //    protected GridData getData(int i) {
+    //        return this.data[i];
+    //    }
 }

@@ -19,6 +19,8 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 import java.io.File;
 import java.io.IOException;
+import java.util.Properties;
+import org.geotools.caching.spatialindex.Node;
 import org.geotools.caching.spatialindex.Storage;
 
 
@@ -29,13 +31,25 @@ public class DiskStorageTest extends AbstractStorageTest {
 
     @Override
     Storage createStorage() {
-        try {
-            DiskStorage storage = new DiskStorage(File.createTempFile("cache", ".tmp"), 1000);
-            storage.setParent(this.grid);
+        Storage storage = DiskStorage.createInstance();
+        storage.setParent(this.grid);
 
-            return storage;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return storage;
+    }
+
+    public void testRecreation() {
+        testPut();
+        testRemove();
+
+        Properties pset = this.store.getPropertySet();
+        this.store.flush();
+        this.store = DiskStorage.createInstance(pset);
+        this.store.setParent(this.grid);
+
+        Node g = store.get(id);
+        assertEquals(n.getIdentifier(), g.getIdentifier());
+        store.remove(id);
+        g = store.get(id);
+        assertNull(g);
     }
 }

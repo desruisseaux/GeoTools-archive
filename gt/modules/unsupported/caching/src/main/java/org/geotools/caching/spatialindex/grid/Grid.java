@@ -15,16 +15,20 @@
  */
 package org.geotools.caching.spatialindex.grid;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import org.geotools.caching.firstdraft.spatialindex.storagemanager.PropertySet;
+import java.util.Iterator;
+import java.util.Properties;
 import org.geotools.caching.spatialindex.AbstractSpatialIndex;
 import org.geotools.caching.spatialindex.Node;
 import org.geotools.caching.spatialindex.NodeIdentifier;
 import org.geotools.caching.spatialindex.Region;
 import org.geotools.caching.spatialindex.RegionNodeIdentifier;
 import org.geotools.caching.spatialindex.Shape;
+import org.geotools.caching.spatialindex.SpatialIndex;
 import org.geotools.caching.spatialindex.Storage;
 import org.geotools.caching.spatialindex.Visitor;
+import org.geotools.caching.spatialindex.store.StorageFactory;
 
 
 /** A grid implementation of SpatialIndex.
@@ -41,9 +45,17 @@ import org.geotools.caching.spatialindex.Visitor;
  *
  */
 public class Grid extends AbstractSpatialIndex {
+    public static final String CAPACITY_PROPERTY = "Grid.Capacity";
+    public static final String ROOT_MBR_MINX_PROPERTY = "Grid.RootMbrMinX";
+    public static final String ROOT_MBR_MINY_PROPERTY = "Grid.RootMbrMinY";
+    public static final String ROOT_MBR_MAXX_PROPERTY = "Grid.RootMbrMaxX";
+    public static final String ROOT_MBR_MAXY_PROPERTY = "Grid.RootMbrMaxY";
+    private int capacity;
+    private Region mbr;
     public int root_insertions = 0;
     protected int MAX_INSERTION = 4;
-    protected HashMap<RegionNodeIdentifier, RegionNodeIdentifier> node_ids = new HashMap<RegionNodeIdentifier, RegionNodeIdentifier>();
+
+    //protected HashMap<RegionNodeIdentifier,RegionNodeIdentifier> node_ids = new HashMap<RegionNodeIdentifier,RegionNodeIdentifier>();
 
     /** Constructor. Creates a new Grid covering space given by <code>mbr</code>
      * and with at least <code>capacity</code> nodes.
@@ -52,6 +64,8 @@ public class Grid extends AbstractSpatialIndex {
      * @param capacity
      */
     public Grid(Region mbr, int capacity, Storage store) {
+        this.capacity = capacity;
+        this.mbr = mbr;
         this.store = store;
         store.setParent(this);
         this.dimension = mbr.getDimension();
@@ -66,11 +80,42 @@ public class Grid extends AbstractSpatialIndex {
     protected Grid() {
     }
 
+    public static SpatialIndex createInstance(Properties pset) {
+        Storage storage = StorageFactory.getInstance().createStorage(pset);
+        int capacity = Integer.parseInt(pset.getProperty(CAPACITY_PROPERTY));
+        double minx = Double.parseDouble(pset.getProperty(ROOT_MBR_MINX_PROPERTY));
+        double miny = Double.parseDouble(pset.getProperty(ROOT_MBR_MINY_PROPERTY));
+        double maxx = Double.parseDouble(pset.getProperty(ROOT_MBR_MAXX_PROPERTY));
+        double maxy = Double.parseDouble(pset.getProperty(ROOT_MBR_MAXY_PROPERTY));
+        Region mbr = new Region(new double[] { minx, miny }, new double[] { maxx, maxy });
+        Grid instance = new Grid();
+        instance.capacity = capacity;
+        instance.mbr = mbr;
+        instance.store = storage;
+        storage.setParent(instance);
+        instance.dimension = mbr.getDimension();
+        instance.root = instance.findUniqueInstance(new RegionNodeIdentifier(mbr));
+        instance.rootNode = instance.readNode(instance.root);
+
+        ArrayList<NodeIdentifier> children = ((GridRootNode) instance.rootNode).children;
+        ArrayList<NodeIdentifier> newchildren = new ArrayList<NodeIdentifier>(children.size());
+
+        for (Iterator<NodeIdentifier> it = children.iterator(); it.hasNext();) {
+            NodeIdentifier id = instance.findUniqueInstance(it.next());
+            newchildren.add(id);
+        }
+
+        ((GridRootNode) instance.rootNode).children = newchildren;
+        instance.stats.addToNodesCounter(((GridRootNode) instance.rootNode).capacity + 1);
+
+        return instance;
+    }
+
     protected void visitData(Node n, Visitor v, Shape query, int type) {
         GridNode node = (GridNode) n;
 
-        for (int i = 0; i < node.num_data; i++) {
-            GridData d = (GridData) node.data[i];
+        for (Iterator<GridData> it = node.data.iterator(); it.hasNext();) {
+            GridData d = it.next();
 
             if (((type == Grid.IntersectionQuery) && (query.intersects(d.getShape())))
                     || ((type == Grid.ContainmentQuery) && (query.contains(d.getShape())))) {
@@ -89,9 +134,16 @@ public class Grid extends AbstractSpatialIndex {
         this.stats.addToNodesCounter(root.capacity + 1);
     }
 
-    public PropertySet getIndexProperties() {
-        // TODO Auto-generated method stub
-        return null;
+    public Properties getIndexProperties() {
+        Properties pset = store.getPropertySet();
+        pset.setProperty(INDEX_TYPE_PROPERTY, Grid.class.getCanonicalName());
+        pset.setProperty(CAPACITY_PROPERTY, new Integer(capacity).toString());
+        pset.setProperty(ROOT_MBR_MINX_PROPERTY, new Double(mbr.getLow(0)).toString());
+        pset.setProperty(ROOT_MBR_MINY_PROPERTY, new Double(mbr.getLow(1)).toString());
+        pset.setProperty(ROOT_MBR_MAXX_PROPERTY, new Double(mbr.getHigh(0)).toString());
+        pset.setProperty(ROOT_MBR_MAXY_PROPERTY, new Double(mbr.getHigh(1)).toString());
+
+        return pset;
     }
 
     protected boolean deleteDataRecursively(NodeIdentifier nodeid, Shape shape, int id) {
@@ -120,9 +172,12 @@ public class Grid extends AbstractSpatialIndex {
         GridNode node = (GridNode) readNode(nodeid);
         boolean ret = false;
 
-        for (int i = 0; i < node.num_data; i++) {
-            if (node.data[i].id == id) {
-                node.deleteData(i);
+        for (Iterator<GridData> it = node.data.iterator(); it.hasNext();) {
+            GridData data = it.next();
+
+            if (data.id == id) {
+                it.remove();
+                node.num_data--;
                 this.stats.addToDataCounter(-1);
                 ret = true;
             }
@@ -167,18 +222,18 @@ public class Grid extends AbstractSpatialIndex {
          * are inserted at root node, because they are likely to fall between two tiles,
          * rather thant in one and only one tile.
          *
-                       int[] cursor = new int[this.dimension];
-                       for (int i = 0; i < this.dimension; i++) {
-                           cursor[i] = (int) ((shape.getMBR().getLow(i) - node.mbr.getLow(i)) / node.tiles_size);
-                       }
-                       int nextid = node.gridIndexToNodeId(cursor);
-                       Node nextnode = node.getSubNode(nextid);
-                       if (nextnode.getShape().contains(shape)) {
-                           insertData(nextnode, data, shape, id);
-                       } else {
-                           insertData(this.root, data, shape, id);
-                           root_insertions++;
-                       }
+                         int[] cursor = new int[this.dimension];
+                         for (int i = 0; i < this.dimension; i++) {
+                             cursor[i] = (int) ((shape.getMBR().getLow(i) - node.mbr.getLow(i)) / node.tiles_size);
+                         }
+                         int nextid = node.gridIndexToNodeId(cursor);
+                         Node nextnode = node.getSubNode(nextid);
+                         if (nextnode.getShape().contains(shape)) {
+                             insertData(nextnode, data, shape, id);
+                         } else {
+                             insertData(this.root, data, shape, id);
+                             root_insertions++;
+                         }
          */
 
         /* so we prefer this version :
@@ -273,5 +328,9 @@ public class Grid extends AbstractSpatialIndex {
 
     protected void writeNode(Node node) {
         super.writeNode(node);
+    }
+
+    public NodeIdentifier findUniqueInstance(NodeIdentifier id) {
+        return store.findUniqueInstance(id);
     }
 }

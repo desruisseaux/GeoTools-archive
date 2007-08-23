@@ -28,6 +28,7 @@
 //    marioh@cs.ucr.edu
 package org.geotools.caching.spatialindex;
 
+import java.util.Properties;
 import org.geotools.caching.firstdraft.spatialindex.storagemanager.PropertySet;
 
 
@@ -40,6 +41,8 @@ import org.geotools.caching.firstdraft.spatialindex.storagemanager.PropertySet;
  * Modified by Christophe Rousson
  */
 public interface SpatialIndex {
+    public static final String INDEX_TYPE_PROPERTY = "SpatialIndex.Type";
+
     /**
      * This constant is used to check if two doubles are nearly equal.
      * Copied from original code by Marios Hadjieleftheriou.
@@ -121,7 +124,7 @@ public interface SpatialIndex {
     /**
      * @return
      */
-    public PropertySet getIndexProperties();
+    public Properties getIndexProperties();
 
     /** Add a command to be executed before nodes are written.
      *
@@ -153,4 +156,10 @@ public interface SpatialIndex {
      * @return statistics about the index.
      */
     public Statistics getStatistics();
+
+    /** Cause pending write operations to happen immediatly.
+     * Use this method to persist the index before disposal.
+     *
+     */
+    public void flush();
 }

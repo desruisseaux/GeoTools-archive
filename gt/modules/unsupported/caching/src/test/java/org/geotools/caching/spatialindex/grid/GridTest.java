@@ -31,7 +31,7 @@ public class GridTest extends AbstractSpatialIndexTest {
     }
 
     protected AbstractSpatialIndex createIndex() {
-        index = new Grid(new Region(universe), 100, new MemoryStorage());
+        index = new Grid(new Region(universe), 100, MemoryStorage.createInstance());
 
         return index;
     }

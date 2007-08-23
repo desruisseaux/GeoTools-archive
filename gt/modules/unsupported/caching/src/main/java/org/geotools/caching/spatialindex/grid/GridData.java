@@ -54,12 +54,32 @@ public class GridData implements Data, Externalizable {
         return data;
     }
 
-    public int getIdentifier() {
-        return id;
-    }
-
     public Shape getShape() {
         return shape;
+    }
+
+    public int hashCode() {
+        int hash = 17;
+        hash = (37 * hash) + shape.hashCode();
+        hash = (37 * hash) + data.hashCode();
+
+        return hash;
+    }
+
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+
+        if (this == o) {
+            return true;
+        }
+
+        if (o instanceof GridData) {
+            return shape.equals(((GridData) o).shape) && data.equals(((GridData) o).data);
+        } else {
+            return false;
+        }
     }
 
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {

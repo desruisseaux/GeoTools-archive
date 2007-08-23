@@ -266,7 +266,7 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
     protected Node readNode(NodeIdentifier id) {
         Node ret;
 
-        if (id.equals(this.root)) {
+        if ((rootNode != null) && (id.equals(this.root))) {
             return rootNode;
         }
 
@@ -299,6 +299,11 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
 
     protected void deleteNode(NodeIdentifier id) {
         store.remove(id);
+    }
+
+    public void flush() {
+        store.put(this.rootNode);
+        store.flush();
     }
 
     /** Data structure to store statistics about the index.

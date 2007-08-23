@@ -30,19 +30,27 @@ import org.geotools.caching.spatialindex.Storage;
  *
  */
 public class MemoryStorage implements Storage {
-    HashMap<NodeIdentifier, Node> map;
+    HashMap<NodeIdentifier, NodeEntry> map;
 
-    public MemoryStorage() {
-        this.map = new HashMap<NodeIdentifier, Node>();
+    private MemoryStorage() {
+        this.map = new HashMap<NodeIdentifier, NodeEntry>();
+    }
+
+    public static Storage createInstance(Properties pset) {
+        return new MemoryStorage();
+    }
+
+    public static Storage createInstance() {
+        return new MemoryStorage();
     }
 
     public Node get(NodeIdentifier id) {
-        return map.get(id);
+        return map.get(id).node;
     }
 
     public void put(Node n) {
         if (!map.containsKey(n.getIdentifier())) {
-            map.put(n.getIdentifier(), n);
+            map.put(n.getIdentifier(), new NodeEntry(n.getIdentifier(), n));
         }
     }
 
@@ -58,11 +66,33 @@ public class MemoryStorage implements Storage {
         // do nothing - we do not need back link for this storage
     }
 
-    public void close() {
+    public void flush() {
         // do nothing
     }
 
     public Properties getPropertySet() {
-        return new Properties(); // return empty property set
+        Properties pset = new Properties();
+        pset.setProperty(STORAGE_TYPE_PROPERTY, MemoryStorage.class.getCanonicalName());
+
+        return pset;
+    }
+
+    public NodeIdentifier findUniqueInstance(NodeIdentifier id) {
+        if (map.containsKey(id)) {
+            return map.get(id).id;
+        } else {
+            return id;
+        }
+    }
+}
+
+
+class NodeEntry {
+    NodeIdentifier id;
+    Node node;
+
+    NodeEntry(NodeIdentifier id, Node node) {
+        this.id = id;
+        this.node = node;
     }
 }

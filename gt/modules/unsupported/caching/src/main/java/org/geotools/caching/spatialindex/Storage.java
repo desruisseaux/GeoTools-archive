@@ -19,6 +19,8 @@ import java.util.Properties;
 
 
 public interface Storage {
+    public static final String STORAGE_TYPE_PROPERTY = "Storage.Type";
+
     public void put(Node n);
 
     public void remove(NodeIdentifier id);
@@ -31,5 +33,7 @@ public interface Storage {
 
     public Properties getPropertySet();
 
-    public void close();
+    public void flush();
+
+    public NodeIdentifier findUniqueInstance(NodeIdentifier id);
 }

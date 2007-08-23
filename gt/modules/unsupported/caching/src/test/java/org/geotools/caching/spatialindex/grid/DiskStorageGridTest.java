@@ -17,11 +17,12 @@ package org.geotools.caching.spatialindex.grid;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import java.io.File;
 import java.io.IOException;
+import java.util.Properties;
 import org.geotools.caching.spatialindex.AbstractSpatialIndex;
 import org.geotools.caching.spatialindex.AbstractSpatialIndexTest;
 import org.geotools.caching.spatialindex.Region;
+import org.geotools.caching.spatialindex.Storage;
 import org.geotools.caching.spatialindex.store.DiskStorage;
 
 
@@ -34,13 +35,7 @@ public class DiskStorageGridTest extends AbstractSpatialIndexTest {
 
     @Override
     protected AbstractSpatialIndex createIndex() {
-        DiskStorage storage;
-
-        try {
-            storage = new DiskStorage(File.createTempFile("cache", ".tmp"), 1000);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Storage storage = DiskStorage.createInstance();
 
         index = new Grid(new Region(universe), 100, storage);
         storage.setParent(index);
@@ -51,5 +46,14 @@ public class DiskStorageGridTest extends AbstractSpatialIndexTest {
     public void testInsertion() {
         super.testInsertion();
         System.out.println("Root insertions = " + index.root_insertions);
+    }
+
+    public void testWarmStart() throws IOException {
+        Properties pset = index.getIndexProperties();
+        pset.store(System.out, "Grid property set");
+        index.flush();
+        index = (Grid) Grid.createInstance(pset);
+        super.index = index;
+        testIntersectionQuery();
     }
 }

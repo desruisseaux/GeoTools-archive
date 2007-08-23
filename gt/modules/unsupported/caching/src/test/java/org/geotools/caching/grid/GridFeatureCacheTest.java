@@ -19,7 +19,6 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Iterator;
 import com.vividsolutions.jts.geom.Coordinate;
 import org.opengis.filter.Filter;
 import org.geotools.caching.AbstractFeatureCache;
@@ -44,7 +43,8 @@ public class GridFeatureCacheTest extends AbstractFeatureCacheTest {
     protected AbstractFeatureCache createInstance(int capacity)
         throws FeatureCacheException, IOException {
         this.cache = new GridFeatureCache((FeatureStore) ds.getFeatureSource(
-                    dataset.getSchema().getTypeName()), 100, capacity, new MemoryStorage());
+                    dataset.getSchema().getTypeName()), 100, capacity,
+                MemoryStorage.createInstance());
 
         return this.cache;
     }

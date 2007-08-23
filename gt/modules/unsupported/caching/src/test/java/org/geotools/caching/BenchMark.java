@@ -15,7 +15,6 @@
  */
 package org.geotools.caching;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -332,11 +331,11 @@ public class BenchMark {
             System.out.print("Sample (init) : ");
             thisClass.sample = new AbstractFeatureCache[3];
             thisClass.sample[0] = new GridFeatureCache(thisClass.control, 500, 1000,
-                    new MemoryStorage());
+                    MemoryStorage.createInstance());
             thisClass.sample[1] = new GridFeatureCache(thisClass.control, 500, 2500,
-                    new DiskStorage(File.createTempFile("cache", ".tmp"), 1000));
+                    DiskStorage.createInstance());
             thisClass.sample[2] = new GridFeatureCache(thisClass.control, 500, 2500,
-                    new BufferedDiskStorage(File.createTempFile("cache", ".tmp"), 1000, 10));
+                    BufferedDiskStorage.createInstance());
 
             //            DiskStorage storage = new DiskStorage(File.createTempFile("cache", ".tmp"), 1000);
             //            thisClass.sample[2] = new GridFeatureCache(thisClass.control, 500, 1000, storage);
@@ -365,6 +364,9 @@ public class BenchMark {
             //                thisClass.printResults(control_stats, sample_stats[i], System.out);
             //                System.out.println(thisClass.sample[i].sourceAccessStats());
             //            }
+            for (int i = 0; i < thisClass.sample.length; i++) {
+                // TODO: close storage
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (FeatureCacheException e) {

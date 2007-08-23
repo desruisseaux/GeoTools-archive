@@ -41,7 +41,7 @@ public class GridCacheNode extends GridNode {
         return false;
     }
 
-    protected GridData getData(int i) {
-        return this.data[i];
-    }
+    //    protected GridData getData(int i) {
+    //        return this.data[i];
+    //    }
 }
