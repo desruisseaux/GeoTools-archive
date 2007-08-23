@@ -89,7 +89,7 @@ import org.opengis.util.InternationalString;
  * @author Justin Deolivera
  * @author Jody Garnett
  */
-public class SimpleTypeBuilder {
+public class SimpleFeatureTypeBuilder {
 	/**
 	 * factories
 	 */
@@ -136,13 +136,16 @@ public class SimpleTypeBuilder {
 	 * coordinate reference system of the type 
 	 */
 	protected CoordinateReferenceSystem crs;
+
+	/**
+	 * flag controlling if the type is abstract.
+	 */
+	protected boolean isAbstract = false;
 	
 	/**
-	 * MemberType for collection.
-	 * <p>
-	 * A simple feature collection can only represent one association.
+	 * the parent type.
 	 */
-	protected SimpleFeatureType memberType;
+	protected SimpleFeatureType superType;
 	
 	/**
 	 * attribute builder
@@ -152,7 +155,7 @@ public class SimpleTypeBuilder {
 	/**
 	 * Constructs the builder.
 	 */
-	public SimpleTypeBuilder() {
+	public SimpleFeatureTypeBuilder() {
 		this( new SimpleTypeFactoryImpl() );
 	}
 	
@@ -160,7 +163,7 @@ public class SimpleTypeBuilder {
 	 * Constructs the builder specifying the factory for creating feature and 
 	 * feature collection types.
 	 */
-	public SimpleTypeBuilder(SimpleTypeFactory factory) {
+	public SimpleFeatureTypeBuilder(SimpleTypeFactory factory) {
 		this.factory = factory;
 		
 		attributeBuilder = new AttributeTypeBuilder();
@@ -199,13 +202,8 @@ public class SimpleTypeBuilder {
 		restrictions().addAll(type.getRestrictions());
 
 		attributes = newList((List) type.attributes());
-		
-		if (type instanceof SimpleFeatureCollectionType) {
-			SimpleFeatureCollectionType collection = (SimpleFeatureCollectionType) type;
-			attributes = Collections.EMPTY_LIST; // will prevent any addition
-													// of attributes
-			this.memberType = collection.getMemberType();
-		}
+		isAbstract = type.isAbstract();
+		superType = (SimpleFeatureType) type.getSuper();
 	}
 
 	/**
@@ -225,8 +223,9 @@ public class SimpleTypeBuilder {
 		description = null;
 		restrictions = null;
 		attributes = null;
-		memberType = null;
 		crs = null;
+		isAbstract = false;
+		superType = null;
 	}
 	
 	/**
@@ -237,10 +236,10 @@ public class SimpleTypeBuilder {
 	}
 	public void setNamespaceURI(URI namespaceURI) {
 	    if ( namespaceURI != null ) {
-	        this.uri = namespaceURI.toString();
+	        setNamespaceURI( namespaceURI.toString() );
 	    }
 	    else {
-	        this.uri = null;
+	        setNamespaceURI( (String) null );
 	    }
 	}
 	/**
@@ -252,7 +251,7 @@ public class SimpleTypeBuilder {
 	/**
 	 * Sets the namespace uri of the built type.
 	 */
-	public SimpleTypeBuilder namespaceURI(String namespaceURI) {
+	public SimpleFeatureTypeBuilder namespaceURI(String namespaceURI) {
 		setNamespaceURI(namespaceURI);
 		return this;
 	}
@@ -332,6 +331,34 @@ public class SimpleTypeBuilder {
 	}
 	
 	/**
+	 * Sets the flag controlling if the resulting type is abstract.
+	 */
+	public void setAbstract(boolean isAbstract) {
+        this.isAbstract = isAbstract;
+    }
+	
+	/**
+	 * The flag controlling if the resulting type is abstract.
+	 */
+	public boolean isAbstract() {
+        return isAbstract;
+    }
+	
+	/**
+	 * Sets the super type of the built type.
+	 */
+	public void setSuperType(SimpleFeatureType superType) {
+        this.superType = superType;
+    }
+	/**
+	 * The super type of the built type.
+	 */
+	public SimpleFeatureType getSuperType() {
+        return superType;
+    }
+	
+	
+	/**
 	 * Specifies an attribute type binding.
 	 * <p>
 	 * This method is used to associate an attribute type with a java class. 
@@ -392,7 +419,7 @@ public class SimpleTypeBuilder {
 	 * This value is reset after a call to {@link #add(String, Class)}
 	 * </p>
 	 */
-	public SimpleTypeBuilder minOccurs( int minOccurs ) {
+	public SimpleFeatureTypeBuilder minOccurs( int minOccurs ) {
 		attributeBuilder.setMinOccurs(minOccurs);
 		return this;
 	}
@@ -402,7 +429,7 @@ public class SimpleTypeBuilder {
 	 * This value is reset after a call to {@link #add(String, Class)}
 	 * </p>
 	 */
-	public SimpleTypeBuilder maxOccurs( int maxOccurs ) {
+	public SimpleFeatureTypeBuilder maxOccurs( int maxOccurs ) {
 		attributeBuilder.setMaxOccurs(maxOccurs);
 		return this;
 	}
@@ -412,7 +439,7 @@ public class SimpleTypeBuilder {
 	 * This value is reset after a call to {@link #add(String, Class)}
 	 * </p>
 	 */
-	public SimpleTypeBuilder nillable( boolean isNillable ) {
+	public SimpleFeatureTypeBuilder nillable( boolean isNillable ) {
 		attributeBuilder.setNillable(isNillable);
 		return this;
 	}
@@ -422,7 +449,7 @@ public class SimpleTypeBuilder {
 	 * This value is reset after a call to {@link #add(String, Class)}
 	 * </p>
 	 */
-	public SimpleTypeBuilder restriction( Filter filter ) {
+	public SimpleFeatureTypeBuilder restriction( Filter filter ) {
 		attributeBuilder.addRestriction( filter );
 		return this;
 	}
@@ -432,7 +459,7 @@ public class SimpleTypeBuilder {
 	 * This value is reset after a call to {@link #add(String, Class)}
 	 * </p>
 	 */
-	public SimpleTypeBuilder description( String description ) {
+	public SimpleFeatureTypeBuilder description( String description ) {
 		attributeBuilder.setDescription( description );
 		return this;
 	}
@@ -442,7 +469,7 @@ public class SimpleTypeBuilder {
 	 * This value is reset after a call to {@link #add(String, Class)}
 	 * </p>
 	 */
-	public SimpleTypeBuilder defaultValue( Object defaultValue ) {
+	public SimpleFeatureTypeBuilder defaultValue( Object defaultValue ) {
 		attributeBuilder.setDefaultValue( defaultValue );
 		return this;
 	}
@@ -455,7 +482,7 @@ public class SimpleTypeBuilder {
 	 * This value is reset after a call to {@link #add(String, Class)}
 	 * </p>
 	 */
-	public SimpleTypeBuilder crs( CoordinateReferenceSystem crs ) {
+	public SimpleFeatureTypeBuilder crs( CoordinateReferenceSystem crs ) {
 		attributeBuilder.setCRS(crs);
 		return this;
 	}
@@ -529,6 +556,12 @@ public class SimpleTypeBuilder {
 					break;
 				}
 			}
+			
+			if (defaultGeometry == null) {
+			    String msg = "'" + this.defaultGeometry + " specified as default" +
+		    		" but could find no such attribute.";
+			    throw new IllegalArgumentException( msg );
+			}
 		}
 		
 		if ( defaultGeometry == null ) {
@@ -553,7 +586,8 @@ public class SimpleTypeBuilder {
 		
 		
 		SimpleFeatureType built = factory.createSimpleFeatureType(
-			name(), attributes(), defaultGeometry, crs, restrictions(), description);
+			name(), attributes(), defaultGeometry, crs, isAbstract, 
+			restrictions(), superType, description);
 		
 		init();
 		return built;
