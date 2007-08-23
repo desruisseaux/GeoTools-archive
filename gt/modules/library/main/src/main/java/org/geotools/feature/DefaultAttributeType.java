@@ -28,6 +28,7 @@ import java.util.Map;
 
 import org.geotools.feature.type.AttributeDescriptorImpl;
 import org.geotools.feature.type.AttributeTypeImpl;
+import org.geotools.util.Converters;
 
 import org.opengis.filter.Filter;
 import org.opengis.coverage.grid.GridCoverage;
@@ -315,8 +316,17 @@ public class DefaultAttributeType extends AttributeDescriptorImpl
      * @throws IllegalArgumentException if parsing is attempted and is
      *         unsuccessful.
      */
-    public Object parse(Object value) throws IllegalArgumentException {
-        return value;
+    public final Object parse(Object value) throws IllegalArgumentException {
+        if ( value == null || getBinding().isAssignableFrom(value.getClass()) ) {
+        	return value;
+        }
+        
+        Object parsed = Converters.convert(value, getBinding());
+        if( parsed == null ) {
+            throw new IllegalArgumentException("Could not convert " + parsed + " to type " + getBinding().getName() );
+        }
+        
+        return parsed;
     }
 
     /**
