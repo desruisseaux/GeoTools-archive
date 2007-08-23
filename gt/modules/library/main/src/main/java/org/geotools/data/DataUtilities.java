@@ -49,6 +49,7 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.type.DefaultFeatureTypeBuilder;
 import org.geotools.feature.type.GeometricAttributeType;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.visitor.DefaultFilterVisitor;
@@ -1164,16 +1165,10 @@ public class DataUtilities {
         String typeName = (split == -1) ? identification
                                         : identification.substring(split + 1);
 
-        FeatureTypeFactory typeFactory = FeatureTypeFactory.newInstance(typeName);
-        try {
-            if( namespace != null ){
-                typeFactory.setNamespace( new URI(namespace));
-            }
-        } catch (URISyntaxException badNamespace ) {
-            throw new SchemaException( badNamespace );            
-        }
-        typeFactory.setName(typeName);
-
+        DefaultFeatureTypeBuilder tb = new DefaultFeatureTypeBuilder();
+        tb.setName( typeName );
+        tb.setNamespaceURI(namespace);
+        
         String[] types = typeSpec.split(",");
         int geometryIndex = -1; // records * specified goemetry 
         AttributeType attributeType;
@@ -1186,7 +1181,7 @@ public class DataUtilities {
             }
 
             attributeType = createAttribute(types[i]);
-            typeFactory.addType(attributeType);
+            tb.add(attributeType);
 
             if ((geometryAttribute == null)
                     && attributeType instanceof GeometryAttributeType) {
@@ -1199,10 +1194,10 @@ public class DataUtilities {
         }
 
         if (geometryAttribute != null) {
-            typeFactory.setDefaultGeometry(geometryAttribute);
+            tb.setDefaultGeometry(geometryAttribute.getLocalName());
         }
 
-        return typeFactory.getFeatureType();
+        return tb.buildFeatureType();
     }
 
     /**
