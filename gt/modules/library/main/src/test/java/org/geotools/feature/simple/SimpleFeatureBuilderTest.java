@@ -17,7 +17,7 @@ public class SimpleFeatureBuilderTest extends TestCase {
 	SimpleFeatureBuilder builder;
 	
 	protected void setUp() throws Exception {
-		SimpleTypeBuilder typeBuilder = new SimpleTypeBuilder();
+		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
 		typeBuilder.setName( "test" );
 		typeBuilder.add( "point", Point.class );
 		typeBuilder.add( "integer", Integer.class );

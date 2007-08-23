@@ -24,7 +24,7 @@ public class SimpleTypeBuilderTest extends TestCase {
 
 	static final String URI = "gopher://localhost/test";
 	
-	SimpleTypeBuilder builder;
+	SimpleFeatureTypeBuilder builder;
 	
 	protected void setUp() throws Exception {
 		Schema schema = new SchemaImpl( "test" );
@@ -38,7 +38,7 @@ public class SimpleTypeBuilderTest extends TestCase {
 			typeFactory.createAttributeType( new TypeName( "test", "intType" ), Integer.class, false, false, Collections.EMPTY_SET, null, null);
 		schema.put( new Name( "test", "intType" ), intType );
 		
-		builder = new SimpleTypeBuilder( new SimpleTypeFactoryImpl() );
+		builder = new SimpleFeatureTypeBuilder( new SimpleTypeFactoryImpl() );
 		builder.setBindings(schema);
 	}
 	

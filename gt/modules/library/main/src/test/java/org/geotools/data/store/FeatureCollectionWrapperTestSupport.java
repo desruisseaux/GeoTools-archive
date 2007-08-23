@@ -9,7 +9,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureFactoryImpl;
 import org.geotools.feature.simple.SimpleSchema;
-import org.geotools.feature.simple.SimpleTypeBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.feature.simple.SimpleTypeFactoryImpl;
 import org.geotools.feature.type.DefaultFeatureTypeBuilder;
 import org.geotools.referencing.CRS;
