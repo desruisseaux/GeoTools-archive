@@ -106,18 +106,8 @@ public abstract class FeatureTypeFactory extends FeatureTypeBuilder {
     public static FeatureType newFeatureType(AttributeType[] types,
         String name, URI ns, boolean isAbstract, FeatureType[] superTypes, AttributeType defaultGeometry)
         throws FactoryRegistryException, SchemaException {
-        FeatureTypeFactory factory = newInstance(name);
-        factory.addTypes(types);
-        factory.setNamespace(ns);
-        factory.setAbstract(isAbstract);
-        if(defaultGeometry != null)
-            factory.setDefaultGeometry((GeometryAttributeType) defaultGeometry);
-
-        if (superTypes != null) {
-            factory.setSuperTypes(Arrays.asList(superTypes));
-        }
-
-        return factory.getFeatureType();
+        
+        return FeatureTypes.newFeatureType(types,name,ns,isAbstract,superTypes,defaultGeometry);
     }
     
     /**
