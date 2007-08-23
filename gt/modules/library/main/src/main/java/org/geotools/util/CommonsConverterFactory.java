@@ -19,6 +19,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.apache.commons.beanutils.ConvertUtils;
+import org.apache.commons.beanutils.converters.DoubleConverter;
+import org.apache.commons.beanutils.converters.IntegerConverter;
 import org.geotools.factory.Hints;
 
 /**
@@ -30,7 +32,11 @@ import org.geotools.factory.Hints;
  */
 public class CommonsConverterFactory implements ConverterFactory {
 	
-	//some additional converters 
+	//some additional converters
+    
+    /**
+     * converts a string to a uri.
+     */
 	static org.apache.commons.beanutils.Converter uri = new org.apache.commons.beanutils.Converter() {
 		public Object convert( Class target, Object value ) {
 			String string = (String) value;
@@ -42,8 +48,31 @@ public class CommonsConverterFactory implements ConverterFactory {
 			return null;
 		}
 	};
+	/**
+	 * converts a string to a number when the target class == Number, does so 
+	 * by delegating to the other numeric converters
+	 */
+	static org.apache.commons.beanutils.Converter number = new org.apache.commons.beanutils.Converter() {
+	    public Object convert(Class type, Object value) {
+	        String string = (String) value;
+	        Number parsed = null;
+	        try {
+	            //first try integer
+	            parsed = (Number) new IntegerConverter().convert(Integer.class, string);
+	        }
+	        catch(Exception e) {}
+	        
+	        if ( parsed == null ) {
+	            //try double
+	            parsed = (Number) new DoubleConverter().convert(Double.class,string);
+	        }
+	        
+	        return parsed;
+	    };
+	};
 	static {
 		ConvertUtils.register( uri, URI.class );
+		ConvertUtils.register( number, Number.class );
 	}
 	
 	
