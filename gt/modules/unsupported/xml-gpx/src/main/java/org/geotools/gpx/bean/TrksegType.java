@@ -8,13 +8,6 @@ package org.geotools.gpx.bean;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.AccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
-import org.geotools.gpx.bean.ExtensionsType;
-import org.geotools.gpx.bean.TrksegType;
-import org.geotools.gpx.bean.WptType;
 
 
 /**
@@ -41,14 +34,8 @@ import org.geotools.gpx.bean.WptType;
  *
  *
  */
-@XmlAccessorType(AccessType.FIELD)
-@XmlType(name = "trksegType", propOrder =  {
-    "trkpt", "extensions"}
-)
 public class TrksegType {
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected List<WptType> trkpt;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected ExtensionsType extensions;
 
     /**

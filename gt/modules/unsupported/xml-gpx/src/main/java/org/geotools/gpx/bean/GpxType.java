@@ -8,17 +8,6 @@ package org.geotools.gpx.bean;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.AccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
-import org.geotools.gpx.bean.ExtensionsType;
-import org.geotools.gpx.bean.GpxType;
-import org.geotools.gpx.bean.MetadataType;
-import org.geotools.gpx.bean.RteType;
-import org.geotools.gpx.bean.TrkType;
-import org.geotools.gpx.bean.WptType;
 
 
 /**
@@ -51,24 +40,13 @@ import org.geotools.gpx.bean.WptType;
  *
  *
  */
-@XmlAccessorType(AccessType.FIELD)
-@XmlType(name = "gpxType", propOrder =  {
-    "metadata", "wpt", "rte", "trk", "extensions"}
-)
 public class GpxType {
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected MetadataType metadata;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected List<WptType> wpt;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected List<RteType> rte;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected List<TrkType> trk;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected ExtensionsType extensions;
-    @XmlAttribute(required = true)
     protected String creator;
-    @XmlAttribute(required = true)
     protected String version;
 
     /**

@@ -6,12 +6,6 @@
 //
 package org.geotools.gpx.bean;
 
-import javax.xml.bind.annotation.AccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
-import org.geotools.gpx.bean.EmailType;
-
 
 /**
  *
@@ -35,12 +29,8 @@ import org.geotools.gpx.bean.EmailType;
  *
  *
  */
-@XmlAccessorType(AccessType.FIELD)
-@XmlType(name = "emailType")
 public class EmailType {
-    @XmlAttribute(required = true)
     protected String domain;
-    @XmlAttribute(required = true)
     protected String id;
 
     /**

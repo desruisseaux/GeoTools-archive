@@ -6,14 +6,6 @@
 //
 package org.geotools.gpx.bean;
 
-import javax.xml.bind.annotation.AccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
-import org.geotools.gpx.bean.EmailType;
-import org.geotools.gpx.bean.LinkType;
-import org.geotools.gpx.bean.PersonType;
-
 
 /**
  *
@@ -40,16 +32,9 @@ import org.geotools.gpx.bean.PersonType;
  *
  *
  */
-@XmlAccessorType(AccessType.FIELD)
-@XmlType(name = "personType", propOrder =  {
-    "name", "email", "link"}
-)
 public class PersonType {
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected String name;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected EmailType email;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected LinkType link;
 
     /**

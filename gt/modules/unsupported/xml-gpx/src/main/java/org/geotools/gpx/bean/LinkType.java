@@ -6,13 +6,6 @@
 //
 package org.geotools.gpx.bean;
 
-import javax.xml.bind.annotation.AccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
-import org.geotools.gpx.bean.LinkType;
-
 
 /**
  *
@@ -39,16 +32,9 @@ import org.geotools.gpx.bean.LinkType;
  *
  *
  */
-@XmlAccessorType(AccessType.FIELD)
-@XmlType(name = "linkType", propOrder =  {
-    "text", "type"}
-)
 public class LinkType {
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected String text;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected String type;
-    @XmlAttribute(required = true)
     protected String href;
 
     /**

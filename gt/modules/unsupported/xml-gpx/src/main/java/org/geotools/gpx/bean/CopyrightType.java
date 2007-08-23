@@ -6,13 +6,7 @@
 //
 package org.geotools.gpx.bean;
 
-import javax.xml.bind.annotation.AccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.XMLGregorianCalendar;
-import org.geotools.gpx.bean.CopyrightType;
 
 
 /**
@@ -41,16 +35,9 @@ import org.geotools.gpx.bean.CopyrightType;
  *
  *
  */
-@XmlAccessorType(AccessType.FIELD)
-@XmlType(name = "copyrightType", propOrder =  {
-    "year", "license"}
-)
 public class CopyrightType {
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected XMLGregorianCalendar year;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected String license;
-    @XmlAttribute(required = true)
     protected String author;
 
     /**

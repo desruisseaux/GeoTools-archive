@@ -9,11 +9,6 @@ package org.geotools.gpx.bean;
 import org.w3c.dom.Element;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.AccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAnyElement;
-import javax.xml.bind.annotation.XmlType;
-import org.geotools.gpx.bean.ExtensionsType;
 
 
 /**
@@ -39,12 +34,7 @@ import org.geotools.gpx.bean.ExtensionsType;
  *
  *
  */
-@XmlAccessorType(AccessType.FIELD)
-@XmlType(name = "extensionsType", propOrder =  {
-    "any"}
-)
 public class ExtensionsType {
-    @XmlAnyElement(lax = true)
     protected List<Object> any;
 
     /**

@@ -6,25 +6,7 @@
 //
 package org.geotools.gpx.bean;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlElementDecl;
-import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
-import org.geotools.gpx.bean.BoundsType;
-import org.geotools.gpx.bean.CopyrightType;
-import org.geotools.gpx.bean.EmailType;
-import org.geotools.gpx.bean.ExtensionsType;
-import org.geotools.gpx.bean.GpxType;
-import org.geotools.gpx.bean.LinkType;
-import org.geotools.gpx.bean.MetadataType;
-import org.geotools.gpx.bean.ObjectFactory;
-import org.geotools.gpx.bean.PersonType;
-import org.geotools.gpx.bean.PtType;
-import org.geotools.gpx.bean.PtsegType;
-import org.geotools.gpx.bean.RteType;
-import org.geotools.gpx.bean.TrkType;
-import org.geotools.gpx.bean.TrksegType;
-import org.geotools.gpx.bean.WptType;
 
 
 /**
@@ -41,7 +23,6 @@ import org.geotools.gpx.bean.WptType;
  * provided in this class.
  *
  */
-@XmlRegistry
 public class ObjectFactory {
     private final static QName _Gpx_QNAME = new QName("http://www.topografix.com/GPX/1/1", "gpx");
 
@@ -168,8 +149,8 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link GpxType }{@code >}}
      *
      */
-    @XmlElementDecl(namespace = "http://www.topografix.com/GPX/1/1", name = "gpx")
+/*    @XmlElementDecl(namespace = "http://www.topografix.com/GPX/1/1", name = "gpx")
     public JAXBElement<GpxType> createGpx(GpxType value) {
         return new JAXBElement<GpxType>(_Gpx_QNAME, GpxType.class, null, value);
-    }
+    }*/
 }

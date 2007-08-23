@@ -8,18 +8,7 @@ package org.geotools.gpx.bean;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.AccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.XMLGregorianCalendar;
-import org.geotools.gpx.bean.BoundsType;
-import org.geotools.gpx.bean.CopyrightType;
-import org.geotools.gpx.bean.ExtensionsType;
-import org.geotools.gpx.bean.LinkType;
-import org.geotools.gpx.bean.MetadataType;
-import org.geotools.gpx.bean.PersonType;
-
 
 /**
  *
@@ -53,28 +42,15 @@ import org.geotools.gpx.bean.PersonType;
  *
  *
  */
-@XmlAccessorType(AccessType.FIELD)
-@XmlType(name = "metadataType", propOrder =  {
-    "name", "desc", "author", "copyright", "link", "time", "keywords", "bounds", "extensions"}
-)
 public class MetadataType {
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected String name;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected String desc;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected PersonType author;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected CopyrightType copyright;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected List<LinkType> link;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected XMLGregorianCalendar time;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected String keywords;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected BoundsType bounds;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected ExtensionsType extensions;
 
     /**

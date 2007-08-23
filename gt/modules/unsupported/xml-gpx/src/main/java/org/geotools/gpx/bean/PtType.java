@@ -7,13 +7,7 @@
 package org.geotools.gpx.bean;
 
 import java.math.BigDecimal;
-import javax.xml.bind.annotation.AccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.XMLGregorianCalendar;
-import org.geotools.gpx.bean.PtType;
 
 
 /**
@@ -42,18 +36,10 @@ import org.geotools.gpx.bean.PtType;
  *
  *
  */
-@XmlAccessorType(AccessType.FIELD)
-@XmlType(name = "ptType", propOrder =  {
-    "ele", "time"}
-)
 public class PtType {
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected BigDecimal ele;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected XMLGregorianCalendar time;
-    @XmlAttribute(required = true)
     protected BigDecimal lat;
-    @XmlAttribute(required = true)
     protected BigDecimal lon;
 
     /**

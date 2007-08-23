@@ -8,12 +8,6 @@ package org.geotools.gpx.bean;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.AccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
-import org.geotools.gpx.bean.PtType;
-import org.geotools.gpx.bean.PtsegType;
 
 
 /**
@@ -39,12 +33,7 @@ import org.geotools.gpx.bean.PtsegType;
  *
  *
  */
-@XmlAccessorType(AccessType.FIELD)
-@XmlType(name = "ptsegType", propOrder =  {
-    "pt"}
-)
 public class PtsegType {
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected List<PtType> pt;
 
     /**

@@ -10,15 +10,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.AccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.XMLGregorianCalendar;
-import org.geotools.gpx.bean.ExtensionsType;
-import org.geotools.gpx.bean.LinkType;
-import org.geotools.gpx.bean.WptType;
 
 
 /**
@@ -64,52 +56,27 @@ import org.geotools.gpx.bean.WptType;
  *
  *
  */
-@XmlAccessorType(AccessType.FIELD)
-@XmlType(name = "wptType", propOrder =  {
-    "ele", "time", "magvar", "geoidheight", "name", "cmt", "desc", "src", "link", "sym", "type", "fix", "sat", "hdop", "vdop", "pdop", "ageofdgpsdata", "dgpsid", "extensions"}
-)
 public class WptType {
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected BigDecimal ele;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected XMLGregorianCalendar time;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected BigDecimal magvar;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected BigDecimal geoidheight;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected String name;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected String cmt;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected String desc;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected String src;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected List<LinkType> link;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected String sym;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected String type;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected String fix;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected BigInteger sat;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected BigDecimal hdop;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected BigDecimal vdop;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected BigDecimal pdop;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected BigDecimal ageofdgpsdata;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected BigInteger dgpsid;
-    @XmlElement(namespace = "http://www.topografix.com/GPX/1/1")
     protected ExtensionsType extensions;
-    @XmlAttribute(required = true)
     protected BigDecimal lat;
-    @XmlAttribute(required = true)
     protected BigDecimal lon;
 
     /**

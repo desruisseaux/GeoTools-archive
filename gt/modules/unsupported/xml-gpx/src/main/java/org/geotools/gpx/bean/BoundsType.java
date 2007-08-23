@@ -7,11 +7,6 @@
 package org.geotools.gpx.bean;
 
 import java.math.BigDecimal;
-import javax.xml.bind.annotation.AccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
-import org.geotools.gpx.bean.BoundsType;
 
 
 /**
@@ -38,16 +33,10 @@ import org.geotools.gpx.bean.BoundsType;
  *
  *
  */
-@XmlAccessorType(AccessType.FIELD)
-@XmlType(name = "boundsType")
 public class BoundsType {
-    @XmlAttribute(required = true)
     protected BigDecimal maxlat;
-    @XmlAttribute(required = true)
     protected BigDecimal maxlon;
-    @XmlAttribute(required = true)
     protected BigDecimal minlat;
-    @XmlAttribute(required = true)
     protected BigDecimal minlon;
 
     /**
