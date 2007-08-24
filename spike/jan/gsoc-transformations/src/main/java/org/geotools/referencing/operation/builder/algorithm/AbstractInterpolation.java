@@ -121,16 +121,14 @@ public abstract class AbstractInterpolation {
      */
     public WritableRaster getRaster() {
         if (raster == null) {
-            final float[] warpPositions = getGrid();
+            final float[] gridPositions = getGrid();
 
             raster = RasterFactory.createBandedRaster(DataBuffer.TYPE_FLOAT, yNumCells + 1,
                     xNumCells + 1, 1, null);
+            
+           
 
-            for (int i = 0; i <= yNumCells; i++) {
-                for (int j = 0; j <= xNumCells; j++) {
-                    raster.setSample(i, j, 0, warpPositions[(int) ((i * (xNumCells + 1)) + (j))]);
-                }
-            }
+            raster.setSamples(0, 0, yNumCells+1, xNumCells+1, 0, gridPositions);         
         }
 
         return raster;

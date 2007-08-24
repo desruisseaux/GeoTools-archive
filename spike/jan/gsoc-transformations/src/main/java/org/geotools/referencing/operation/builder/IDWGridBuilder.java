@@ -69,6 +69,6 @@ public class IDWGridBuilder extends WarpGridBuilder {
         IDWInterpolation dxInterpolation = new IDWInterpolation(buildPositionsMap(0));
         IDWInterpolation dyInterpolation = new IDWInterpolation(buildPositionsMap(1));
 
-        return computeWarpGrid(WarpParams, dxInterpolation, dyInterpolation);
+        return interpolateWarpGrid(WarpParams, dxInterpolation, dyInterpolation);
     }
 }

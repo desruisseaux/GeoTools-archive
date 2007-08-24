@@ -198,7 +198,7 @@ public class WarpGridBuilderTest extends TestCase {
             M.setRow(1, m1);
             M.setRow(2, m2);
 
-            WarpGridBuilder builder = new RSGridBuilder(mp, 5, 5, env,
+            WarpGridBuilder builder = new RSGridBuilder(mp, 3, 3, env,
                     ProjectiveTransform.create(M));
 
           

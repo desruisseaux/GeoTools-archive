@@ -83,7 +83,7 @@ public class TPSInterpolation extends AbstractInterpolation {
         result.mul(L, V);
     }
 
-    @Override
+    
     public float getValue(DirectPosition p) {
         // TODO Auto-generated method stub
         return calculateTPSFunction(result, p);

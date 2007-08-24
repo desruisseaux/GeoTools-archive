@@ -20,8 +20,11 @@ import java.util.List;
 import javax.vecmath.MismatchedSizeException;
 
 import org.geotools.geometry.DirectPosition2D;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.builder.algorithm.Quadrilateral;
 import org.geotools.referencing.operation.builder.algorithm.TriangulationException;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
@@ -29,6 +32,7 @@ import org.opengis.geometry.MismatchedReferenceSystemException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchIdentifierException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
@@ -54,21 +58,32 @@ public class RSGridBuilder extends WarpGridBuilder {
             MismatchedReferenceSystemException, TransformException, TriangulationException {
         super(vectors, dx, dy, envelope, realToGrid);
 
-        DirectPosition p0 = new DirectPosition2D(envelope.getCoordinateReferenceSystem(),
-                envelope.getLowerCorner().getOrdinate(0) - envelope.getLength(0)*0.0001,
-                envelope.getLowerCorner().getOrdinate(1) - envelope.getLength(1)*0.0001);
-        DirectPosition p2 = new DirectPosition2D(envelope.getCoordinateReferenceSystem(),
-                envelope.getUpperCorner().getOrdinate(0) + envelope.getLength(0)*0.0001,
-                envelope.getUpperCorner().getOrdinate(1) + envelope.getLength(1)*0.0001);
+        Envelope gridEnvelope = CRS.transform(worldToGrid, envelope);
+             
+        double enlarge = gridEnvelope.getLength(0)*0.01;
+        DirectPosition p0 = new DirectPosition2D(
+        		gridEnvelope.getLowerCorner().getOrdinate(0)-enlarge,
+        		gridEnvelope.getLowerCorner().getOrdinate(1)-enlarge);
+        
+        DirectPosition p2 = new DirectPosition2D(
+        		gridEnvelope.getUpperCorner().getOrdinate(0)+enlarge,
+        		gridEnvelope.getUpperCorner().getOrdinate(1)+enlarge);              
 
-        DirectPosition p1 = new DirectPosition2D(envelope.getCoordinateReferenceSystem(),
+        DirectPosition p1 = new DirectPosition2D(
                 p0.getOrdinate(0), p2.getOrdinate(1));
-        DirectPosition p3 = new DirectPosition2D(envelope.getCoordinateReferenceSystem(),
+        DirectPosition p3 = new DirectPosition2D(
                 p2.getOrdinate(0), p0.getOrdinate(1));
-
-        Quadrilateral quad = new Quadrilateral(p0, p1, p2, p3);
-
-        rsBuilder = new RubberSheetBuilder(vectors, quad);
+        
+        List gridMP = super.getGridMappedPositions();
+        CoordinateReferenceSystem crs = ((MappedPosition)gridMP.get(0)).getSource().getCoordinateReferenceSystem();
+        p0 = new DirectPosition2D(crs, p0.getOrdinate(0), p0.getOrdinate(1));
+        p1 = new DirectPosition2D(crs, p1.getOrdinate(0), p1.getOrdinate(1));
+        p2 = new DirectPosition2D(crs, p2.getOrdinate(0), p2.getOrdinate(1));
+        p3 = new DirectPosition2D(crs, p3.getOrdinate(0), p3.getOrdinate(1));
+        
+        
+        Quadrilateral quad = new Quadrilateral(p0, p1, p2, p3);  
+        rsBuilder = new RubberSheetBuilder(super.getGridMappedPositions(), quad);
     }
 
     /**
@@ -100,18 +115,16 @@ public class RSGridBuilder extends WarpGridBuilder {
      * Computes target grid.
      * @return computed target grid.
      */
-    protected float[] computeWarpGrid(ParameterValueGroup values) {
+    protected float[] computeWarpGrid(ParameterValueGroup values) throws FactoryException {
         float[] source = generateSourcePoints(values);
 
-        try {
-            rsBuilder.getMathTransform().transform(source, 0, source, 0, (source.length + 1) / 2);
-        } catch (TransformException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (FactoryException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+      
+      try {
+		rsBuilder.getMathTransform().transform(source, 0, source, 0, (source.length + 1) / 2);
+	} catch (TransformException e) {
+		  throw new FactoryException(Errors.format(ErrorKeys.CANT_TRANSFORM_VALID_POINTS), e);			       			
+	} 
+       
 
         return source;
     }   

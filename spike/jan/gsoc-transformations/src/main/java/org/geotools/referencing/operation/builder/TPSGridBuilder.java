@@ -71,6 +71,6 @@ public class TPSGridBuilder extends WarpGridBuilder {
     	TPSInterpolation dxInterpolation = new TPSInterpolation(buildPositionsMap(0));
     	TPSInterpolation dyInterpolation = new TPSInterpolation(buildPositionsMap(1));
     	
-        return computeWarpGrid(WarpParams, dxInterpolation, dyInterpolation);    	      
+        return interpolateWarpGrid(WarpParams, dxInterpolation, dyInterpolation);    	      
     }
 }
