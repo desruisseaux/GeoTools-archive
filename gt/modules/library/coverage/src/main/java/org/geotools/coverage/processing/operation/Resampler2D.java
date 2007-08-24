@@ -454,7 +454,7 @@ final class Resampler2D extends GridCoverage2D {
                     GridCoverage2D targetCoverage;
                     MathTransform mtr;
                     mtr = sourceGG.getGridToCRS();
-                    mtr = mtFactory.createConcatenatedTransform(mtr, allSteps.inverse());
+                    mtr = mtFactory.createConcatenatedTransform(mtr,  step2.inverse());
                     targetGG = new GridGeometry2D(sourceGG.getGridRange(), mtr, targetCRS);
                     /*
                      * Note: do NOT use the "GridGeometry2D(sourceGridRange,
