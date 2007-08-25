@@ -24,6 +24,7 @@ import javax.sql.DataSource;
 import java.util.Iterator;
 import java.util.Comparator;
 import java.util.Collections;
+import java.util.jar.Attributes.Name;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import javax.imageio.spi.ServiceRegistry;
@@ -98,7 +99,7 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
      *
      * @see #createDataSource
      */
-    public static final String DATASOURCE_NAME = "jdbc/EPSG"; //TODO: default should be provided by the Hint
+    public static final String DATASOURCE_NAME = "jdbc/EPSG";
 
     /**
      * {@code true} if automatic registration of {@link #datasourceName} is allowed.
@@ -177,13 +178,27 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
      */
     public ThreadedEpsgFactory(final Hints userHints, final int priority) {
         super(userHints, priority);
-        if (userHints != null) {
-            datasourceName = (String) userHints.get(Hints.EPSG_DATA_SOURCE);
+        
+        Object hint = userHints == null ? null : userHints.get( Hints.EPSG_DATA_SOURCE );
+            
+        if( hint == null ){
+            datasourceName = GeoTools.fixName( DATASOURCE_NAME );                
         }
-        if (datasourceName == null) {
-            datasourceName = DATASOURCE_NAME;
+        else if( hint instanceof String ){
+            datasourceName = GeoTools.fixName( datasourceName );            
         }
-        hints.put(Hints.EPSG_DATA_SOURCE, datasourceName);
+        else if (hint instanceof Name ){
+            Name name = (Name) hint;
+            hints.put( Hints.EPSG_DATA_SOURCE, name );
+            
+            datasourceName = GeoTools.fixName( name.toString() );            
+        }
+        else if ( hint instanceof DataSource ){
+            datasource = (DataSource) hint;
+            hints.put( Hints.EPSG_DATA_SOURCE, datasource );
+            
+            datasourceName = GeoTools.fixName( DATASOURCE_NAME );            
+        }        
         factories = FactoryGroup.createInstance(userHints);
         setTimeout(30*60*1000L); // Close the connection after at least 30 minutes of inactivity.
     }

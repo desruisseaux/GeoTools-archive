@@ -28,6 +28,8 @@ import java.util.TreeSet;
 import java.util.logging.Logger;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+
+import javax.naming.Name;
 import javax.sql.DataSource;
 
 // OpenGIS dependencies
@@ -1353,7 +1355,12 @@ public final class Hints extends RenderingHints {
 
     /**
      * Key for hints to be specified as a {@link javax.sql.DataSource}.
-     * The file may also be specified as a {@link String} object.
+     * The file may also be specified as a {@link String} or {@link Name} object.
+     * <p>
+     * Different JNDI implementations build up their name differently (so we may need
+     * to look for "jdbc:EPSG" in JBoss and "jdbc/EPSG" in Websphere. The
+     * InitialContext.combineNames( String, String ) should be used to put together
+     * your nam
      * 
      * @since 2.4
      * @source $URL$
@@ -1373,7 +1380,7 @@ public final class Hints extends RenderingHints {
          */
         //@Override
         public boolean isCompatibleValue(final Object value) {
-            return (value instanceof DataSource) || (value instanceof String);
+            return (value instanceof DataSource) || (value instanceof String) || (value instanceof Name);
         }        
     }
 }

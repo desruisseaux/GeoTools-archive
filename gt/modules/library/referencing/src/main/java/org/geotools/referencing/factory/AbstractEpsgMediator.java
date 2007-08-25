@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.geotools.factory.GeoTools;
@@ -72,7 +73,7 @@ public abstract class AbstractEpsgMediator extends AbstractAuthorityMediator {
      * @param hints
      * @return DataSource
      */
-    private static DataSource lookupDataSource( Hints hints ) throws FactoryException {
+    static DataSource lookupDataSource( Hints hints ) throws FactoryException {
         Object hint = hints.get(Hints.EPSG_DATA_SOURCE);
         if( hint instanceof DataSource ){
             return (DataSource) hint;
@@ -82,6 +83,7 @@ public abstract class AbstractEpsgMediator extends AbstractAuthorityMediator {
             InitialContext context;
             try {
                 context = GeoTools.getInitialContext( hints );
+                name = GeoTools.fixName( context, name );
                 return (DataSource) context.lookup( name );                
             } catch (Exception e) {
                 throw new FactoryException( "EPSG_DATA_SOURCE '"+name+"' not found:"+e, e );
@@ -89,10 +91,21 @@ public abstract class AbstractEpsgMediator extends AbstractAuthorityMediator {
         }
         throw new FactoryException( "EPSG_DATA_SOURCE must be provided");
     }
+
+
     public AbstractEpsgMediator(Hints hints, DataSource datasource) {
         super(PRIORITY,hints);
         
-        this.datasource = datasource;        
+        if( datasource != null ){
+            this.datasource = datasource;
+        }
+        else {
+            try {
+                this.datasource = lookupDataSource( hints );
+            } catch (FactoryException lookupFailed) {
+                throw (NullPointerException) new NullPointerException("DataSource not provided:"+lookupFailed).initCause(lookupFailed);
+            }
+        }
         hints.put(Hints.EPSG_DATA_SOURCE, this.datasource );
     }
     

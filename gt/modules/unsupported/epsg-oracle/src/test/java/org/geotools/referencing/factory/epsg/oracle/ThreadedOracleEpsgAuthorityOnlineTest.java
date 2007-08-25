@@ -1,6 +1,7 @@
 package org.geotools.referencing.factory.epsg.oracle;
 
 import javax.naming.Context;
+import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
 import org.geotools.factory.GeoTools;
@@ -22,8 +23,8 @@ public class ThreadedOracleEpsgAuthorityOnlineTest extends OracleOnlineTestCase 
         assertNotNull(crs);
     }
     public void testJNDIConfiguredProperlyForTest() throws Exception {
-        Context context = GeoTools.getInitialContext(null);
-        DataSource source = (DataSource) context.lookup("jdbc/EPSG");
+        InitialContext context = GeoTools.getInitialContext(null);
+        DataSource source = (DataSource) context.lookup( GeoTools.fixName(context,"jdbc/EPSG"));
         assertNotNull(source);
         assertSame(source, this.datasource);
     }

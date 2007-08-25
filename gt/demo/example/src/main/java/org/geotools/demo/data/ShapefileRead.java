@@ -1,8 +1,6 @@
 package org.geotools.demo.data;
 
-import java.awt.FileDialog;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -74,10 +72,10 @@ public class ShapefileRead {
 		FeatureCollection collection = featureSource.getFeatures();
 		
 		Iterator<SimpleFeature> iterator = (Iterator<SimpleFeature>) collection.iterator();
-		int length = 0;		
+		int length = 0;
 		try {
 			while (iterator.hasNext()) {
-				SimpleFeature feature = iterator.next();
+			    SimpleFeature feature = iterator.next();
 				Geometry geometry = (Geometry ) feature.getDefaultGeometryValue();
 				
 				length += geometry.getLength();

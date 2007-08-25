@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.swing.event.ChangeEvent;
@@ -404,5 +405,59 @@ public final class GeoTools {
             context = new InitialContext();
         }
         return context;
+    }
+    
+    public static String fixName( String name ) {
+        try {
+            return fixName( getInitialContext(null), name );
+        } catch (NamingException e) {
+            return name;
+        }
+    }
+    /**
+     * We need to that names defined for use in GeoTools end up being useful to the
+     * InitialContext in question.
+     * <p>
+     * Names may be strung togehter in a varity of ways depending on the implementation
+     * of InitialContext. In GeoTools we use "jdbc:EPSG" internally, but many implementaitons
+     * use the form "jdbc/EPSG". Calling this method before use will set you right.
+     * </p>
+     * @param context
+     * @param name Name of the form "jdbc:EPSG"
+     * @return name fixed up with InitialContext.composeName( string, string )
+     */
+    public static String fixName( InitialContext context, String name ) {
+        try {
+            if( context == null || name == null ) {
+                return name;
+            }
+            if( name.indexOf(':') != -1 ){
+                String fixed = null;
+                for( String part : name.split(":")){
+                    if( fixed == null ){
+                        fixed = part;
+                    }
+                    else {                   
+                        fixed = context.composeName( fixed, part );                    
+                    }
+                }
+                return fixed;
+            }
+            if( name.indexOf('/') != -1 ){
+                String fixed = null;
+                for( String part : name.split("/")){
+                    if( fixed == null ){
+                        fixed = part;
+                    }
+                    else {                   
+                        fixed = context.composeName( fixed, part );                    
+                    }
+                }
+                return fixed;
+            }
+            return name;
+        } catch (NamingException e) {
+            return name;
+        }
     }
 }
