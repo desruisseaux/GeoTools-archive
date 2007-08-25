@@ -31,6 +31,7 @@ public final class MapTextureRenderer
     private final double myScaleY;
     private final double myTranslateX;
     private final double myTranslateY;
+    private static final double DEFAULT_SCALE = 0.001;
 
     //======================================================================
     // Public Methods
@@ -41,8 +42,17 @@ public final class MapTextureRenderer
     /**
      * @param map             the map to render from
      * @param backgroundColor a color to fill the underlying map with.
+     * @param scaleX          amount to scale the map along x
+     * @param scaleY          amount to scale the map along y
+     * @param deltaX          amount to translate the map along x
+     * @param deltaY          amount to translate the map along y
      */
-    public MapTextureRenderer( final MapContext map, final Color backgroundColor )
+    public MapTextureRenderer( final MapContext map,
+                               final Color backgroundColor,
+                               final double scaleX,
+                               final double scaleY,
+                               final double deltaX,
+                               final double deltaY )
     {
         ParameterChecker.checkNotNull( map, "map" );
         ParameterChecker.checkNotNull( backgroundColor, "backgroundColor" );
@@ -50,16 +60,20 @@ public final class MapTextureRenderer
         myMap = map;
         myBackgroundColor = backgroundColor;
 
-        myScaleX = 0.001;
-        myScaleY = 0.001;
-        myTranslateX = -100;
-        myTranslateY = 30;
-
+        myScaleX = scaleX;
+        myScaleY = scaleY;
+        myTranslateX = deltaX;
+        myTranslateY = deltaY;
 
         myStreamingRenderer.setContext( map );
-        myStreamingRenderer.setInteractive( false );
+        myStreamingRenderer.setInteractive( true );
         myStreamingRenderer.setJava2DHints( new RenderingHints( RenderingHints.KEY_ANTIALIASING,
                                                                 RenderingHints.VALUE_ANTIALIAS_ON ) );
+    }
+
+    public MapTextureRenderer( final MapContext mapContextToRender, final Color color )
+    {
+        this( mapContextToRender, color, DEFAULT_SCALE, DEFAULT_SCALE, 0, 0 );
     }
 
     //----------------------------------------------------------------------
@@ -90,19 +104,9 @@ public final class MapTextureRenderer
         myStreamingRenderer.paint( graphics, targetArea, sourceArea );
 
 /*
+        // DEBUG:
         graphics.setColor( Color.BLACK );
         graphics.drawRect( 0,0,width-1, height-1 );
-*/
-
-/*
-        try
-        {
-            Thread.sleep( 100);
-        }
-        catch ( InterruptedException e )
-        {
-            
-        }
 */
     }
 

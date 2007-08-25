@@ -30,6 +30,7 @@ public final class BoundingRectangleImpl
     // Private Constants
 
     private static final int[] OPPOSING_SUBQUADRANT = new int[]{ 3, 2, 1, 0 };
+    private static final int[] Y_FLIPPED_SUBQUADRANT = new int[]{ 2, 3, 0, 1 };
 
     //======================================================================
     // Public Methods
@@ -272,6 +273,13 @@ public final class BoundingRectangleImpl
         ParameterChecker.checkIntegerInRange( subquadrant, "subquadrant", 0, 4 );
 
         return OPPOSING_SUBQUADRANT[ subquadrant ];
+    }
+
+    public int flipSubquadrantAcrossY( final int subquadrant )
+    {
+        ParameterChecker.checkIntegerInRange( subquadrant, "subquadrant", 0, 4 );
+
+        return Y_FLIPPED_SUBQUADRANT[ subquadrant ];
     }
 
 

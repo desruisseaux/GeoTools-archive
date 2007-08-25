@@ -161,6 +161,11 @@ public interface BoundingRectangle
     int getOppositeSubquadrant( int subquadrant );
 
     /**
+     * @return the subquadrant at the opposing side of the y axis from the input subquadrant.
+     */
+    int flipSubquadrantAcrossY( int subquadrant );
+
+    /**
      * @return the side length along the x axis
      */
     double getSizeX();

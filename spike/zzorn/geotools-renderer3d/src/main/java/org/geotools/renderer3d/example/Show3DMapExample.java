@@ -43,12 +43,13 @@ public class Show3DMapExample
     public static void main( String[] args ) throws IOException
     {
         // Create some data
-/*
+/* DEBUG:
         final ExampleDataGenerator exampleDataGenerator = new ExampleDataGenerator();
         final MapContext exampleMap = exampleDataGenerator.createExampleMap();
 */
-        final MapContext exampleMap = createContextFromShapefile( new URL( "file:example_data/us/states.shp" ),
-                                                                  new URL( "file:example_data/styles/default_line.sld" ) );
+
+        final MapContext exampleMap = createContextFromShapefile( new URL( "file:example_data/countries/countries.shp" ),
+                                                                  new URL( "file:example_data/simple_style.sld" ) );
 
         // Create a 3D renderer
         final Renderer3D renderer3D = new Renderer3DImpl( exampleMap );

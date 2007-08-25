@@ -279,7 +279,11 @@ public final class TerrainBlockImpl
                 else
                 {
                     // Calculate location of this node in the parent area
-                    final int quadrant = parentNode.getIndexOfChild( node );
+                    int quadrant = parentNode.getIndexOfChild( node );
+
+                    // Compensate for some texture flipping complications
+                    quadrant = area.flipSubquadrantAcrossY( quadrant );
+
                     return area.createSubquadrantBoundingRectangle( quadrant );
                 }
             }
