@@ -87,18 +87,14 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
       <artifactId>gt2-main</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt2-referencing</artifactId>
-      <version>${project.version}</version>
+      <exclusions>      
+        <exclusion>
+          <groupId>org.opengis</groupId>
+          <artifactId>geoapi-nogenerics</artifactId>
+        </exclusion>
+      </exclusions>      
     </dependency>
     <!--  GeoTools Plugins -->
     <dependency>
@@ -120,6 +116,12 @@
       <groupId>org.geotools</groupId>
       <artifactId>gt2-epsg-hsql</artifactId>
       <version>${project.version}</version>
+      <exclusions>      
+        <exclusion>
+          <groupId>org.opengis</groupId>
+          <artifactId>geoapi-nogenerics</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
@@ -138,7 +140,6 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
-
 
   <!-- =========================================================== -->
   <!--     Build Configuration                                     -->
