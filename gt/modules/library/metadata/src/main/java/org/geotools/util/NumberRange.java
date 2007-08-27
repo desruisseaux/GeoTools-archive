@@ -240,8 +240,9 @@ public class NumberRange extends Range {
      * @param type The element class, usually one of {@link Byte}, {@link Short},
      *             {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
      * @param range The range to copy. The elements must be {@link Number} instances.
+     * @throws ClassCastException if some elements are not instances of {@link Number}.
      */
-    NumberRange(final Class type, final Range range) {
+    NumberRange(final Class type, final Range range) throws ClassCastException {
         this(type, ClassChanger.cast((Number)range.getMinValue(), type), range.isMinIncluded(),
                    ClassChanger.cast((Number)range.getMaxValue(), type), range.isMaxIncluded());
     }
@@ -251,8 +252,11 @@ public class NumberRange extends Range {
      * This is a copy constructor.
      *
      * @param range The range to copy. The elements must be {@link Number} instances.
+     * @throws ClassCastException if some elements are not instances of {@link Number}.
+     *
+     * @since 2.4
      */
-    private NumberRange(final Range range) {
+    public NumberRange(final Range range) throws ClassCastException {
         this(range.getElementClass(), (Number)range.getMinValue(), range.isMinIncluded(),
                                       (Number)range.getMaxValue(), range.isMaxIncluded());
     }

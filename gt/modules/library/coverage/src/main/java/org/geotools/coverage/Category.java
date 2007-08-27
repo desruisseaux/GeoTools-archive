@@ -527,7 +527,7 @@ public class Category implements Serializable {
         this.name    = inverse.name;
         this.ARGB    = inverse.ARGB;
         if (!isQuantitative) {
-            minimum = maximum = toNaN((int) Math.round((inverse.minimum + inverse.maximum)/2));
+            minimum = maximum = XMath.toNaN((int) Math.round((inverse.minimum + inverse.maximum)/2));
             transform = createLinearTransform(0, inverse.minimum); // geophysics to sample
             return;
         }
@@ -639,33 +639,6 @@ public class Category implements Serializable {
     }
 
     /**
-     * Returns a NaN number for the specified category number. Valid NaN numbers have
-     * bit fields ranging from {@code 0x7f800001} through {@code 0x7fffffff}
-     * or {@code 0xff800001} through {@code 0xffffffff}. The standard {@link
-     * Float#NaN} has bit fields {@code 0x7fc00000}.
-     *
-     * @param  index The category number, from -2097152 to 2097151 inclusive. This number
-     *               doesn't need to matches sample values.    Different categories don't
-     *               need to use increasing,  different or contiguous numbers. This is up
-     *               to the user to manage his category numbers.  Category numbers may be
-     *               anything like 1 for "cloud", 2 for "ice", 3 for "land", etc.
-     * @return       The NaN value as a float. We limit ourself to the float type instead
-     *               of double because the underlying image storage type way be float.
-     * @throws IndexOutOfBoundsException if the specified index is out of bounds.
-     */
-    private static float toNaN(int index) throws IndexOutOfBoundsException {
-        index += 0x200000;
-        if (index>=0 && index<=0x3FFFFF) {
-            final float value = Float.intBitsToFloat(0x7FC00000 + index);
-            assert Float.isNaN(value) : value;
-            return value;
-        }
-        else {
-            throw new IndexOutOfBoundsException(Integer.toHexString(index));
-        }
-    }
-
-    /**
      * Convert an array of colors to an array of ARGB values.
      * If {@code colors} is null, then a default array
      * will be returned.
@@ -764,6 +737,8 @@ public class Category implements Serializable {
      * @param colors A set of colors for the new category. 
      * @return A category with the new color palette, or {@code this}
      *         if the new colors are identical to the current ones.
+     *
+     * @see org.geotools.coverage.processing.ColorMap#recolor
      */
     public Category recolor(final Color[] colors) {
         // GeophysicsCategory overrides this method in such

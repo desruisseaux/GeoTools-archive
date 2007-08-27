@@ -20,6 +20,8 @@ package org.geotools.coverage.processing;
 import java.util.Map;
 import java.util.Collection;
 import java.awt.RenderingHints;
+import java.awt.image.RenderedImage;
+import javax.media.jai.PlanarImage;
 
 // OpenGIS dependencies
 import org.opengis.coverage.Coverage;
@@ -30,6 +32,7 @@ import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
 import org.geotools.util.WeakValueHashMap;
+import org.geotools.coverage.grid.RenderedCoverage;
 
 
 /**
@@ -55,7 +58,7 @@ public class BufferedProcessor extends AbstractProcessor {
      * A set of {@link GridCoverage}s resulting from previous invocations to {@link #doOperation}.
      * Will be created only when first needed.
      */
-    private transient Map cache;
+    private transient Map/*<Coverage>*/ cache;
 
     /**
      * Creates a buffered processor backed by a {@linkplain DefaultProcessor default processor}
@@ -134,6 +137,20 @@ public class BufferedProcessor extends AbstractProcessor {
                 cache = new WeakValueHashMap();
             }
             final Coverage coverage = processor.doOperation(parameters);
+            if (coverage instanceof RenderedCoverage) {
+                final RenderedImage image = ((RenderedCoverage) coverage).getRenderedImage();
+                if (image instanceof PlanarImage) {
+                    /*
+                     * Adds a sink to the planar image in order to prevent GridCoverage2D.dispose
+                     * to dispose this image as long as it still in the cache. Note that the sink
+                     * is stored as a weak reference (as well as values in the cache map), so it
+                     * will not prevent the garbage collector to collect the coverage. However,
+                     * the current approach make GridCoverage2D.dispose(false) useless for cached
+                     * coverages. We may need to find a better mechanism later (GEOT-1041).
+                     */
+                    ((PlanarImage) image).addSink(cacheKey);
+                }
+            }
             cache.put(cacheKey, coverage);
             return coverage;
         }

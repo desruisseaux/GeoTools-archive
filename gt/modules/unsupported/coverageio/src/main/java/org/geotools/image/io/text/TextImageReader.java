@@ -16,7 +16,6 @@
  */
 package org.geotools.image.io.text;
 
-import java.awt.image.DataBuffer;
 import java.io.*; // Many imports, including some for javadoc only.
 import java.net.URL;
 import java.net.URLConnection;
@@ -50,13 +49,6 @@ import org.geotools.resources.i18n.VocabularyKeys;
  */
 public abstract class TextImageReader extends StreamImageReader {
     /**
-     * Type des images les plus proches du format de l'image. Ce type
-     * devrait être une des constantes {@link DataBuffer#TYPE_FLOAT},
-     * {@link DataBuffer#TYPE_DOUBLE} ou {@link DataBuffer#TYPE_INT}.
-     */
-    private final int rawImageType;
-
-    /**
      * {@link #input} as a reader, or {@code null} if none.
      *
      * @see #getReader
@@ -64,43 +56,12 @@ public abstract class TextImageReader extends StreamImageReader {
     private BufferedReader reader;
 
     /**
-     * Constructs a new image reader storing pixels as {@link DataBuffer#TYPE_FLOAT}.
+     * Constructs a new image reader.
      *
-     * @param provider The {@link ImageReaderSpi} that is invoking this constructor, or
-     *                 {@code null} if none.
+     * @param provider The provider that is invoking this constructor, or {@code null} if none.
      */
     protected TextImageReader(final ImageReaderSpi provider) {
-        this(provider, DataBuffer.TYPE_FLOAT);
-    }
-
-    /**
-     * Constructs a new image reader storing pixels in buffer of the specified type.
-     *
-     * @param provider The {@link ImageReaderSpi} that is invoking this constructor, or
-     *                 {@code null} if none.
-     * @param rawImageType The buffer type. It should be a constant from
-     *        {@link DataBuffer}. Common types are {@link DataBuffer#TYPE_INT},
-     *        {@link DataBuffer#TYPE_FLOAT} and {@link DataBuffer#TYPE_DOUBLE}.
-     */
-    protected TextImageReader(final ImageReaderSpi provider, final int rawImageType) {
         super(provider);
-        this.rawImageType = rawImageType;
-    }
-
-    /**
-     * Returns the data type which most closely represents the "raw"
-     * internal data of the image. Default implementation returns the
-     * {@code rawImageType} argument provided at construction time.
-     *
-     * @param  imageIndex The index of the image to be queried.
-     * @return The data type ({@code TYPE_FLOAT} by default).
-     * @throws IOException If an error occurs reading the format information
-     *         from the input source.
-     */
-    //@Override
-    public int getRawDataType(final int imageIndex) throws IOException {
-        checkImageIndex(imageIndex);
-        return rawImageType;
     }
 
     /**
@@ -153,6 +114,9 @@ public abstract class TextImageReader extends StreamImageReader {
      * @throws IOException If reading from the input stream failed.
      *
      * @see Spi#padValue
+     *
+     * @deprecated Should be specified in metadata instead, and implementations should use
+     *             {@code SampleConverter}.
      */
     protected double getPadValue(final int imageIndex) throws IOException {
         return (originatingProvider instanceof Spi) ? ((Spi) originatingProvider).padValue : Double.NaN;
@@ -374,9 +338,11 @@ public abstract class TextImageReader extends StreamImageReader {
         };
 
         /**
-         * Default list of file's extensions.
+         * Default list of file extensions.
          */
-        private static final String[] EXTENSIONS = new String[] {"txt","asc","dat"};
+        private static final String[] EXTENSIONS = new String[] {
+            "txt", "TXT", "asc", "ASC", "dat", "DAT"
+        };
 
         /**
          * Character encoding, or {@code null} for the default. This field is initially
@@ -406,37 +372,30 @@ public abstract class TextImageReader extends StreamImageReader {
          * @see TextImageReader#getPadValue
          * @see TextRecordImageReader#parseLine
          */
-        protected double padValue = Double.NaN;
+        protected double padValue;
 
         /**
-         * Constructs a new SPI for {@link TextImageReader}. This constructor
-         * initializes the following fields to default values:
+         * Constructs a quasi-blank {@code TextImageReader.Spi}. It is up to the subclass to
+         * initialize instance variables in order to provide working versions of all methods.
+         * This constructor provides the following defaults:
          *
          * <ul>
-         *   <li>Image format names ({@link #names}):
-         *       An array of lenght 1 containing the {@code name} argument.
+         *   <li>{@link #inputTypes} = {{@link File}, {@link URL}, {@link URLConnection},
+         *       {@link Reader}, {@link InputStream}, {@link ImageInputStream}, {@link String}}</li>
          *
-         *   <li>MIME type ({@link #MIMETypes}):
-         *       An array of length 1 containing the {@code mime} argument.
+         *   <li>{@link #suffixes} = {{@code "txt"}, {@code "asc"}, {@code "dat"}}
+         *       (lowercases and uppercases)</li>
          *
-         *   <li>File suffixes ({@link #suffixes}):
-         *       "{@code .txt}", "{@code .asc}" et "{@code .dat}"
-         *       (uppercase and lowercase).</li>
-         *
-         *   <li>Input types ({@link #inputTypes}):
-         *       {@link File}, {@link URL}, {@link Reader}, {@link InputStream} et {@link ImageInputStream}.</li>
+         *   <li>{@link #padValue} = {@link Double#NaN}</li>
          * </ul>
          *
-         * Others fields should be set by subclasses
-         * (usually in their constructors).
-         *
-         * @param name Format name, or {@code null} to let {@link #names} unset.
-         * @param mime MIME type, or {@code null} to let {@link #MIMETypes} unset.
+         * For efficienty reasons, the above fields are initialized to shared arrays. Subclasses
+         * can assign new arrays, but should not modify the default array content.
          */
-        public Spi(final String name, final String mime) {
-            super(name, mime);
-            suffixes   = EXTENSIONS;
+        public Spi() {
             inputTypes = INPUT_TYPES;
+            suffixes   = EXTENSIONS;
+            padValue   = Double.NaN;
         }
 
         /**

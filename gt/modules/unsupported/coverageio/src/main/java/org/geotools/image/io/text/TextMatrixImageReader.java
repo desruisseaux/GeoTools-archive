@@ -43,7 +43,9 @@ import org.geotools.image.io.metadata.GeographicMetadata;
 
 
 /**
- * An image decoder for matrix of floating-point numbers.
+ * An image decoder for matrix of floating-point numbers. The default implementation creates
+ * rasters of {@link DataBuffer#TYPE_FLOAT}. An easy way to change this type is to overwrite
+ * the {@link #getRawDataType} method.
  *
  * @since 2.4
  * @source $URL$
@@ -80,13 +82,12 @@ public class TextMatrixImageReader extends TextImageReader {
     private boolean completed;
 
     /**
-     * Constructs a new image reader storing pixels as {@link DataBuffer#TYPE_FLOAT}.
+     * Constructs a new image reader.
      *
-     * @param provider the {@link ImageReaderSpi} that is invoking this constructor,
-     *        or {@code null}.
+     * @param provider the provider that is invoking this constructor, or {@code null} if none.
      */
     protected TextMatrixImageReader(final ImageReaderSpi provider) {
-        super(provider, DataBuffer.TYPE_FLOAT);
+        super(provider);
     }
 
     /**
@@ -116,8 +117,8 @@ public class TextMatrixImageReader extends TextImageReader {
                 format.setLine(line);
                 values = format.getValues(values);
                 for (int i=values.length; --i>=0;) {
-                    if (values[i]==padValue) {
-                        values[i]=Float.NaN;
+                    if (values[i] == padValue) {
+                        values[i] = Float.NaN;
                     }
                 }
             } catch (ParseException exception) {
@@ -296,7 +297,7 @@ public class TextMatrixImageReader extends TextImageReader {
          * If a direct mapping is possible, perform it.
          */
         if (isDirect && (param==null || param.getDestination()==null)) {
-            final ImageTypeSpecifier type = getRawImageType(imageIndex, numDstBands);
+            final ImageTypeSpecifier type = getRawImageType(imageIndex, param, null); // TODO: use SampleConverter
             final SampleModel       model = type.getSampleModel().createCompatibleSampleModel(width,height);
             final DataBuffer       buffer = new DataBufferFloat(data, data.length);
             final WritableRaster   raster = Raster.createWritableRaster(model, buffer, null);
@@ -306,7 +307,7 @@ public class TextMatrixImageReader extends TextImageReader {
          * Copy data into a new image.
          */
         final int              dstBand = 0;
-        final BufferedImage      image = getDestination(param, getImageTypes(imageIndex), width, height);
+        final BufferedImage      image = getDestination(imageIndex, param, width, height, null); // TODO
         final WritableRaster dstRaster = image.getRaster();
         final Rectangle      dstRegion = new Rectangle();
         computeRegions(param, width, height, image, srcRegion, dstRegion);
@@ -347,17 +348,16 @@ public class TextMatrixImageReader extends TextImageReader {
 
 
     /**
-     * Service provider interface (SPI) for {@link TextMatrixImageReader}s.
-     * This SPI provides all necessary implementations for creating default
-     * {@link TextMatrixImageReader}. Subclasses only have to set some fields
-     * at construction time, e.g.:
+     * Service provider interface (SPI) for {@link TextMatrixImageReader}s. This SPI provides
+     * the necessary implementation for creating default {@link TextMatrixImageReader} using
+     * default locale and character set. Subclasses can set some fields at construction time
+     * in order to tune the reader to a particular environment, e.g.:
      *
      * <blockquote><pre>
-     * public final class MyCustomSpi extends TextMatrixImageReader.Spi
-     * {
-     *     public MyCustomSpi()
-     *     {
-     *         super("MyCustomFormat", "text/matrix");
+     * public final class MyCustomSpi extends TextMatrixImageReader.Spi {
+     *     public MyCustomSpi() {
+     *         {@link #names      names}      = new String[] {"myformat"};
+     *         {@link #MIMETypes  MIMETypes}  = new String[] {"text/x-mytype"};
      *         {@link #vendorName vendorName} = "Institut de Recherche pour le Développement";
      *         {@link #version    version}    = "1.0";
      *         {@link #locale     locale}     = Locale.US;
@@ -370,44 +370,45 @@ public class TextMatrixImageReader extends TextImageReader {
      * (Note: fields {@code vendorName} and {@code version} are only informatives).
      * There is no need to override any method in this example. However, developers
      * can gain more control by creating subclasses of {@link TextMatrixImageReader}
-     * <strong>and</strong> {@code Spi} and overriding some of their methods.
+     * and {@code Spi}.
      *
+     * @since 2.1
+     * @source $URL$
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     public static class Spi extends TextImageReader.Spi {
         /**
-         * Constructs a new SPI with name {@code "matrix"} and MIME type {@code "text/matrix"}.
+         * The format names for the default {@link TextMatrixImageReader} configuration.
          */
-        public Spi() {
-            this("matrix", "text/matrix");
-        }
+        private static final String[] NAMES = {"matrix"};
 
         /**
-         * Constructs a new SPI for {@link TextMatrixImageReader}. This
-         * constructor initialize the following fields to default values:
+         * The mime types for the default {@link TextMatrixImageReader} configuration.
+         */
+        private static final String[] MIME_TYPES = {"text/x-matrix"};
+
+        /**
+         * Constructs a default {@code TextMatrixImageReader.Spi}. This constructor
+         * provides the following defaults in addition to the defaults defined in the
+         * {@linkplain TextImageReader.Spi#Spi super-class constructor}:
          *
          * <ul>
-         *   <li>Image format names ({@link #names}):
-         *       An array of lenght 1 containing the {@code name} argument.
-         *
-         *   <li>MIME type ({@link #MIMETypes}):
-         *       An array of length 1 containing the {@code mime} argument.
-         *
-         *   <li>File suffixes ({@link #suffixes}):
-         *       "{@code .txt}", "{@code .asc}" et "{@code .dat}"
-         *       (uppercase and lowercase).</li>
-         *
-         *   <li>Input types ({@link #inputTypes}):
-         *       {@link java.io.File}, {@link java.net.URL}, {@link java.io.Reader},
-         *       {@link java.io.InputStream} et {@link javax.imageio.stream.ImageInputStream}.</li>
+         *   <li>{@link #names}           = {@code "matrix"}</li>
+         *   <li>{@link #MIMETypes}       = {@code "text/x-matrix"}</li>
+         *   <li>{@link #pluginClassName} = {@code "org.geotools.image.io.text.TextMatrixImageReader"}</li>
+         *   <li>{@link #vendorName}      = {@code "Geotools"}</li>
          * </ul>
          *
-         * @param name Format name, or {@code null} to let {@link #names} unset.
-         * @param mime MIME type, or {@code null} to let {@link #MIMETypes} unset.
+         * For efficienty reasons, the above fields are initialized to shared arrays. Subclasses
+         * can assign new arrays, but should not modify the default array content.
          */
-        public Spi(final String name, final String mime) {
-            super(name, mime);
+        public Spi() {
+            names           = NAMES;
+            MIMETypes       = MIME_TYPES;
             pluginClassName = "org.geotools.image.io.text.TextMatrixImageReader";
+            vendorName      = "Geotools";
+            version         = "2.4";
         }
 
         /**

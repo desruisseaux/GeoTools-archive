@@ -200,7 +200,7 @@ public class RawBinaryImageReadParam extends ImageReadParam {
             final int[] bankIndices = new int[numBands];
             final int[] bandOffsets = new int[numBands];
             for (int i=numBands; --i>=0;) bankIndices[i]=i;
-            if (GeographicImageReader.USE_JAI_MODEL) {
+            if (ContinuousPalette.USE_JAI_MODEL) {
                 sampleModel = new ComponentSampleModelJAI(targetDataType, width, height,
                                                           1, width, bankIndices, bandOffsets);
             } else {
@@ -259,7 +259,7 @@ public class RawBinaryImageReadParam extends ImageReadParam {
         if (numBands==1) {
             return ColorSpace.getInstance(ColorSpace.CS_GRAY);
         }
-        return new ScaledColorSpace(numBands, 0, 1);
+        return new ScaledColorSpace(numBands, 0, 0, 1);
     }
     
     /**

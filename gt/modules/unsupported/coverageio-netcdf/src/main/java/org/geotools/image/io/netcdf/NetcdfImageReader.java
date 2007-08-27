@@ -48,7 +48,7 @@ import ucar.nc2.VariableIF;
 import org.geotools.image.io.PaletteFactory;
 import org.geotools.image.io.FileImageReader;
 import org.geotools.image.io.SampleConverter;
-import org.geotools.image.io.IntegerConverter;
+import org.geotools.math.Statistics;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -127,11 +127,6 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
     private Variable variable;
 
     /**
-     * The converter for sample values.
-     */
-    private final SampleConverter converter;
-
-    /**
      * The last error from the NetCDF library.
      */
     private String lastError;
@@ -159,8 +154,6 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
      */
     public NetcdfImageReader(final Spi spi) {
         super(spi);
-        this.variableNames = null;
-        this.converter     = spi.converter;
     }
 
     /**
@@ -205,6 +198,45 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
         ensureFileOpen();
         // TODO: consider returning the actual number of images in the file.
         return variableNames.length;
+    }
+
+    /**
+     * Returns statistics about the sample values in the specified image. This is for informative
+     * purpose only and may be used when the {@linkplain #getImageMetadata metadata} do not provides
+     * useful information about valid minimum and maximum values. Note that this method requires a
+     * full scan of image data and may be slow.
+     *
+     * @param  imageIndex The index of the image to analyze.
+     * @return Statistics on the sample values in the given image.
+     * @throws IOException if an I/O error occured while reading the sample values.
+     */
+    public Statistics getStatistics(final int imageIndex) throws IOException {
+        final SampleConverter[] converters = new SampleConverter[1];
+        prepareVariable(imageIndex);
+        getRawImageType(imageIndex, null, converters);
+        final SampleConverter converter = first(converters);
+        final DataType    type = variable.getDataType();
+        final Array      array = variable.read();
+        final IndexIterator it = array.getIndexIterator();
+        final Statistics stats = new Statistics();
+        /*
+         * The SampleConverter.convert(...) method is overloaded with int, float and double
+         * argument types. Selects the most appropriate method according the NetCDF data type.
+         */
+        if (type.equals(DataType.LONG) || type.equals(DataType.DOUBLE)) {
+            while (it.hasNext()) {
+                stats.add(converter.convert(it.getDoubleNext()));
+            }
+        } else if (type.equals(DataType.FLOAT)) {
+            while (it.hasNext()) {
+                stats.add(converter.convert(it.getFloatNext()));
+            }
+        } else {
+            while (it.hasNext()) {
+                stats.add(converter.convert(it.getIntNext()));
+            }
+        }
+        return stats;
     }
 
     /**
@@ -289,7 +321,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
      * @throws IOException If an error occurs reading the format information from the input source.
      */
     //@Override
-    public int getRawDataType(final int imageIndex) throws IOException {
+    protected int getRawDataType(final int imageIndex) throws IOException {
         prepareVariable(imageIndex);
         final DataType type = variable.getDataType();
         if (DataType.BOOLEAN.equals(type) || DataType.BYTE.equals(type)) {
@@ -311,6 +343,18 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
             return DataBuffer.TYPE_DOUBLE;
         }
         return DataBuffer.TYPE_UNDEFINED;
+    }
+
+    /**
+     * Convenience method returning the first (and only) sample converter in the specified
+     * array, or a default converter if the specified array contains a null element.
+     */
+    private static SampleConverter first(final SampleConverter[] converters) {
+        SampleConverter converter = converters[0];
+        if (converter != null) {
+            converter = SampleConverter.IDENTITY;
+        }
+        return converter;
     }
 
     /**
@@ -451,11 +495,13 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
          * Gets the destination image of appropriate size. We create it now
          * since it is a convenient way to get the number of destination bands.
          */
+        final SampleConverter[] converters = new SampleConverter[1];
         final int            rank   = variable.getRank();
         final int            width  = variable.getDimension(rank - X_DIMENSION).getLength();
         final int            height = variable.getDimension(rank - Y_DIMENSION).getLength();
-        final BufferedImage  image  = getDestination(param, getImageTypes(imageIndex), width, height);
+        final BufferedImage  image  = getDestination(imageIndex, param, width, height, converters);
         final WritableRaster raster = image.getRaster();
+        final SampleConverter converter = first(converters);
         /*
          * Checks the band setting. If the NetCDF file is at least 3D, the
          * data along the 'z' dimension are considered as different bands.
@@ -615,13 +661,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
 
 
     /**
-     * The service provider for {@link NetcdfImageReader}. This class requires the list of
-     * {@linkplain Variable variables} to read. This list can be obtained by the following
-     * instruction:
-     *
-     * <blockquote>
-     * <code>java org.geotools.image.io.netcdf.Explorer</code> <var>fichier</var>
-     * </blockquote>
+     * The service provider for {@link NetcdfImageReader}.
      * 
      * @version $Id$
      * @author Antoine Hnawia
@@ -634,56 +674,38 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
         private static final String[] NAMES = new String[] {"netcdf", "NetCDF"};
 
         /**
+         * The mime types for the default {@link NetcdfImageReader} configuration.
+         */
+        private static final String[] MIME_TYPES = new String[] {"image/x-netcdf"};
+
+        /**
          * Default list of file's extensions.
          */
         private static final String[] SUFFIXES = new String[] {"nc", "NC"};
 
         /**
-         * The sample converter. Default to {@linkplain SampleConverter#IDENTITY identity}.
-         */
-        protected SampleConverter converter = SampleConverter.IDENTITY;
-
-        /**
-         * The name of a color palette to fetch from the {@linkplain PaletteFactory#getDefault
-         * default palette factory}, or {@code null} if none.
-         */
-        protected String paletteName;
-
-        /**
-         * The color palette size. Valid only if {@link #paletteName} is non-null.
-         */
-        protected int paletteSize;
-
-        /**
-         * Constructs a service provider.
+         * Constructs a default {@code NetcdfImageReader.Spi}. This constructor
+         * provides the following defaults in addition to the defaults defined
+         * in the super-class constructor:
+         *
+         * <ul>
+         *   <li>{@link #names}           = {@code "NetCDF"}</li>
+         *   <li>{@link #MIMETypes}       = {@code "image/x-netcdf"}</li>
+         *   <li>{@link #pluginClassName} = {@code "org.geotools.image.io.netcdf.NetcdfImageReader"}</li>
+         *   <li>{@link #vendorName}      = {@code "Geotools"}</li>
+         *   <li>{@link #suffixes}        = {{@code "nc"}, {@code "NC"}}</li>
+         * </ul>
+         *
+         * For efficienty reasons, the above fields are initialized to shared arrays. Subclasses
+         * can assign new arrays, but should not modify the default array content.
          */
         public Spi() {
-            super("NetCDF", "image/x-netcdf");
-            names            = NAMES;
-            suffixes         = SUFFIXES;
-            vendorName       = "Geotools";
-            version          = "2.4";
-            pluginClassName  = "org.geotools.image.io.netcdf.NetcdfImageReader";
-        }
-
-        /**
-         * Constructs a service provider for the specified variable name and color palette.
-         *
-         * @param palette  The name of a color palette to fetch from the
-         *                 {@linkplain PaletteFactory#getDefault default palette factory}.
-         * @param lower    The lowest sample value, inclusive.
-         * @param upper    The highest sample value, exclusive.
-         * @param padValue The pad value.
-         *
-         * @todo The pad value may be available in variable properties instead.
-         */
-        public Spi(final String palette, final int lower, 
-                   final int upper, final int padValue)
-        {
-            this();
-            paletteName = palette;
-            paletteSize = upper - lower;
-            converter   = new IntegerConverter(padValue, 1-lower);
+            names           = NAMES;
+            MIMETypes       = MIME_TYPES;
+            suffixes        = SUFFIXES;
+            pluginClassName = "org.geotools.image.io.netcdf.NetcdfImageReader";
+            vendorName      = "Geotools";
+            version         = "2.4";
         }
 
         /**
@@ -711,18 +733,6 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
          */
         public ImageReader createReaderInstance(final Object extension) throws IOException {
             return new NetcdfImageReader(this);
-        }
-
-        /**
-         * If a constant palette was specified to the constructor, returns a type specifier for it.
-         * Otherwise returns {@code null}.
-         */
-        public ImageTypeSpecifier getForcedImageType(final int imageIndex) throws IOException {
-            if (paletteName == null) {
-                return super.getForcedImageType(imageIndex);
-            }
-            return PaletteFactory.getDefault(null).getPalettePadValueFirst(paletteName, paletteSize).
-                    getImageTypeSpecifier();
         }
     }
 }

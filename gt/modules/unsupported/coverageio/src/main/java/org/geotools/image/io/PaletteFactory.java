@@ -16,10 +16,8 @@
  */
 package org.geotools.image.io;
 
-// J2SE dependencies
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.image.RenderedImage;
+import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
 import java.io.*;
 import java.net.URL;
@@ -27,15 +25,15 @@ import java.nio.charset.Charset;
 import java.text.ParseException;
 import javax.imageio.ImageReader;   // For javadoc
 import javax.imageio.IIOException;
+import javax.imageio.spi.ServiceRegistry;
 import java.util.*;
 
-// Geotools dependencies
 import org.geotools.io.DefaultFileFilter;
 import org.geotools.io.LineFormat;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.ResourceBundle;
+import org.geotools.resources.IndexedResourceBundle;
 import org.geotools.resources.image.ColorUtilities;
 import org.geotools.util.Logging;
 import org.geotools.util.CanonicalSet;
@@ -81,15 +79,17 @@ public class PaletteFactory {
     private static final String LIST_FILE = "list.txt";
 
     /**
-     * The default palette factories.
+     * The default palette factory.
      */
-    private static final Map/*<Locale,PaletteFactory>*/ defaultFactories = new HashMap();
+    private static PaletteFactory defaultFactory;
 
     /**
-     * The parent factory, or {@code null} if there is none. The parent factory
+     * The fallback factory, or {@code null} if there is none. The fallback factory
      * will be queried if a palette was not found in current factory.
+     * <p>
+     * This field should be considered as final. It is modified by {@link #addDefault} only.
      */
-    private final PaletteFactory parent;
+    private PaletteFactory fallback;
 
     /**
      * The class loader from which to load the palette definition files. If {@code null} and
@@ -128,77 +128,88 @@ public class PaletteFactory {
 
     /**
      * The locale to use for formatting error messages, or {@code null} for the current default.
+     * This locale is informative only; there is no garantee that this locale will be really used.
      */
-    private final Locale messageLocale;
+    private transient ThreadLocal/*<Locale>*/ warningLocales;
 
     /**
      * The set of palettes already created.
      */
-    private final CanonicalSet palettes = new CanonicalSet();
+    private final CanonicalSet/*<Palette>*/ palettes = new CanonicalSet();
 
     /**
      * The set of palettes protected from garbage collection. We protect a palette as long as it
      * holds a reference to a color model - this is necessary in order to prevent multiple creation
      * of the same {@link IndexColorModel}. The references are cleaned by {@link PaletteDisposer}.
      */
-    final Set protectedPalettes = new HashSet();
+    final Set protectedPalettes/*<Palette>*/ = new HashSet();
 
     /**
-     * Gets the default palette factory. This default instance search for
-     * {@code org/geotools/image/io/colors/*.pal} files where {@code '*'}
-     * are the names to be specified to {@link #getPalette} and similar methods.
-     *
-     * @deprecated Use {@link #getDefault(Locale)} instead.
+     * Gets the default palette factory. This method creates a default instance looking for
+     * {@code org/geotools/image/io/colors/*.pal} files where {@code '*'} is a palette name.
+     * Next, this method {@linkplain #scanForPlugins scan for plugins} using the default
+     * class loader. The result is cached for subsequent calls to this {@code getDefault()}
+     * method.
      */
-    public static PaletteFactory getDefault() {
-        return getDefault(null);
+    public synchronized static PaletteFactory getDefault() {
+        if (defaultFactory == null) {
+            defaultFactory = new PaletteFactory(
+            /* fallback factory */ null,
+            /* class loader     */ PaletteFactory.class,
+            /* root directory   */ new File("colors"),
+            /* extension        */ ".pal",
+            /* character set    */ Charset.forName("ISO-8859-1"),
+            /* locale           */ Locale.US);
+            scanForPlugins(null);
+        }
+        return defaultFactory;
     }
 
     /**
-     * Gets the default palette factory. This default instance search for
-     * {@code org/geotools/image/io/colors/*.pal} files where {@code '*'}
-     * are the names to be specified to {@link #getPalette} and similar methods.
+     * Lookups for additional palette factories on the classpath. The palette factories shall
+     * be declared in {@code META-INF/services/org.geotools.image.io.PaletteFactory} files.
+     * <p>
+     * Palette factories found are added to the chain of default factories. The next time that
+     * a <code>{@linkplain #getDefault()}.getPalette(...)</code> method will be invoked, the
+     * scanned factories will be tried first. If they can't create a given palette, then the
+     * Geotools default factory will be tried last.
+     * <p>
+     * It is usually not needed to invoke this method directly since it is invoked automatically
+     * by {@link #getDefault()} when first needed. This method may be useful when a specific class
+     * loader need to be used, or when the classpath content changed.
      *
-     * @param messageLocale The locale to use for formatting error messages, or {@code null}
-     *        for the default locale. This is typically the {@linkplain ImageReader#getLocale
-     *        image reader locale}.
+     * @param loader The class loader to use, or {@code null} for the default one.
      *
      * @since 2.4
      */
-    public static synchronized PaletteFactory getDefault(final Locale messageLocale) {
-        PaletteFactory factory = (PaletteFactory) defaultFactories.get(messageLocale);
-        if (factory == null) {
-            factory = new PaletteFactory(
-            /* parent factory */ null,
-            /* class loader   */ PaletteFactory.class,
-            /* root directory */ new File("colors"),
-            /* extension      */ ".pal",
-            /* character set  */ Charset.forName("ISO-8859-1"),
-            /* locale         */ Locale.US,
-            /* message locale */ messageLocale);
-            defaultFactories.put(messageLocale, factory);
+    public synchronized static void scanForPlugins(final ClassLoader loader) {
+        final Set/*<Class>*/ existings = new HashSet/*<Class>*/();
+        for (PaletteFactory p=getDefault(); p!=null; p=p.fallback) {
+            existings.add(p.getClass());
         }
-        return factory;
-    }
-
-    /**
-     * @deprecated Use the same constructor with one additional {@link Locale} argument.
-     */
-    public PaletteFactory(final PaletteFactory parent,
-                          final ClassLoader    loader,
-                          final File        directory,
-                                String      extension,
-                          final Charset       charset,
-                          final Locale         locale)
-    {
-        this(parent, loader, directory, extension, charset, locale, null);
+        final Iterator it = (loader == null) ?
+                ServiceRegistry.lookupProviders(PaletteFactory.class) :
+                ServiceRegistry.lookupProviders(PaletteFactory.class, loader);
+        while (it.hasNext()) {
+            /*
+             * Adds the scanned factory to the chain. There is no public method for doing that
+             * because PaletteFactory is quasi-immutable except for this method which modifies
+             * the fallback field. It is okay in this context since we just created the factory
+             * instance.
+             */
+            final PaletteFactory factory = (PaletteFactory) it.next();
+            if (existings.add(factory.getClass())) {
+                factory.fallback = defaultFactory;
+                defaultFactory = factory;
+            }
+        }
     }
 
     /**
      * Constructs a palette factory using an optional {@linkplain ClassLoader class loader}
      * for loading palette definition files.
      *
-     * @param parent    An optional parent factory, or {@code null} if there is none. The parent
+     * @param fallback  An optional fallback factory, or {@code null} if there is none. The fallback
      *                  factory will be queried if a palette was not found in the current factory.
      * @param loader    An optional class loader to use for loading the palette definition files.
      *                  If {@code null}, loading will occurs from the system current working
@@ -211,46 +222,24 @@ public class PaletteFactory {
      *                  appended to filename. It should starts with the {@code '.'} character.
      * @param charset   The charset to use for parsing files, or {@code null} for the default.
      * @param locale    The locale to use for parsing files, or {@code null} for the default.
-     * @param messageLocale The locale to use for formatting error messages, or {@code null}
-     *                  for the default locale. This is typically the
-     *                  {@linkplain ImageReader#getLocale image reader locale}.
-     *
-     * @since 2.4
      */
-    public PaletteFactory(final PaletteFactory parent,
+    public PaletteFactory(final PaletteFactory fallback,
                           final ClassLoader    loader,
-                          final File        directory,
-                                String      extension,
-                          final Charset       charset,
-                          final Locale         locale,
-                          final Locale  messageLocale)
+                          final File           directory,
+                                String         extension,
+                          final Charset        charset,
+                          final Locale         locale)
     {
         if (extension!=null && !extension.startsWith(".")) {
             extension = '.' + extension;
         }
-        this.parent        = parent;
-        this.classloader   = loader;
-        this.loader        = null;
-        this.directory     = directory;
-        this.extension     = extension;
-        this.charset       = charset;
-        this.locale        = locale;
-        this.messageLocale = messageLocale;
-    }
-
-    /**
-     * @deprecated Use the same constructor with one additional {@link Locale} argument.
-     *
-     * @since 2.2
-     */
-    public PaletteFactory(final PaletteFactory parent,
-                          final Class          loader,
-                          final File        directory,
-                                String      extension,
-                          final Charset       charset,
-                          final Locale         locale)
-    {
-        this(parent, loader, directory, extension, charset, locale, null);
+        this.fallback    = fallback;
+        this.classloader = loader;
+        this.loader      = null;
+        this.directory   = directory;
+        this.extension   = extension;
+        this.charset     = charset;
+        this.locale      = locale;
     }
 
     /**
@@ -260,7 +249,7 @@ public class PaletteFactory {
      * do not allow to load resources from a {@code ClassLoader} because it can load from the
      * root package).
      *
-     * @param parent    An optional parent factory, or {@code null} if there is none. The parent
+     * @param fallback  An optional fallback factory, or {@code null} if there is none. The fallback
      *                  factory will be queried if a palette was not found in the current factory.
      * @param loader    An optional class to use for loading the palette definition files.
      *                  If {@code null}, loading will occurs from the system current working
@@ -273,38 +262,81 @@ public class PaletteFactory {
      *                  appended to filename. It should starts with the {@code '.'} character.
      * @param charset   The charset to use for parsing files, or {@code null} for the default.
      * @param locale    The locale to use for parsing files. or {@code null} for the default.
-     * @param messageLocale The locale to use for formatting error messages, or {@code null}
-     *                  for the default locale. This is typically the
-     *                  {@linkplain ImageReader#getLocale image reader locale}.
      *
-     * @since 2.4
+     * @since 2.2
      */
-    public PaletteFactory(final PaletteFactory parent,
+    public PaletteFactory(final PaletteFactory fallback,
                           final Class          loader,
-                          final File        directory,
-                                String      extension,
-                          final Charset       charset,
-                          final Locale         locale,
-                          final Locale  messageLocale)
+                          final File           directory,
+                                String         extension,
+                          final Charset        charset,
+                          final Locale         locale)
     {
         if (extension!=null && !extension.startsWith(".")) {
             extension = '.' + extension;
         }
-        this.parent        = parent;
-        this.classloader   = null;
-        this.loader        = loader;
-        this.directory     = directory;
-        this.extension     = extension;
-        this.charset       = charset;
-        this.locale        = locale;
-        this.messageLocale = messageLocale;
+        this.fallback    = fallback;
+        this.classloader = null;
+        this.loader      = loader;
+        this.directory   = directory;
+        this.extension   = extension;
+        this.charset     = charset;
+        this.locale      = locale;
+    }
+
+    /**
+     * Sets the locale to use for formatting warning or error messages. This is typically the
+     * {@linkplain ImageReader#getLocale image reader locale}. This locale is informative only;
+     * there is no garantee that this locale will be really used.
+     * <p>
+     * This method sets the locale for the current thread only. It is safe to use this palette
+     * factory concurrently in many threads, each with their own locale.
+     *
+     * @param warningLocale The locale for warning or error messages, or {@code null} for the
+     *        default locale
+     *
+     * @since 2.4
+     */
+    public synchronized void setWarningLocale(final Locale warningLocale) {
+        if (warningLocales == null) {
+            if (warningLocale == null) {
+                return;
+            }
+            warningLocales = warningLocales();
+        }
+        // TODO: use 'remove' on warningLocale==null when we will be allowed to compile for J2SE 1.5.
+        warningLocales.set(warningLocale);
+    }
+
+    /**
+     * Gets the {@linkplain #warningLocales} from the fallback or create a new one. This
+     * method invokes itself recursively in order to assign the same {@link ThreadLocal}
+     * to every factories in the chain.
+     */
+    private synchronized ThreadLocal warningLocales() {
+        if (warningLocales == null) {
+            warningLocales = (fallback != null) ? fallback.warningLocales() : new ThreadLocal();
+        }
+        return warningLocales;
+    }
+
+    /**
+     * Returns the locale set by the last invocation to {@link #setWarningLocale} in the
+     * current thread.
+     *
+     * @since 2.4
+     */
+    public Locale getWarningLocale() {
+        final ThreadLocal warningLocales = this.warningLocales;
+        // Protected 'warningLocales' from changes so there is no need to synchronize.
+        return (warningLocales != null) ? (Locale) warningLocales.get() : null;
     }
 
     /**
      * Returns the resources for formatting error messages.
      */
-    final ResourceBundle getErrorResources() {
-        return Errors.getResources(messageLocale);
+    final IndexedResourceBundle getErrorResources() {
+        return Errors.getResources(getWarningLocale());
     }
 
     /**
@@ -318,7 +350,7 @@ public class PaletteFactory {
      * @param name The name of the resource to load, constructed as {@code directory} + {@code name}
      *             + {@code extension} where <var>directory</var> and <var>extension</var> were
      *             specified to the constructor, while {@code name} was given to the
-     *             {@link #getPalette(String) getPalette} method.
+     *             {@link #getPalette} method.
      * @return The input stream, or {@code null} if the resources was not found.
      *
      * @since 2.3
@@ -335,7 +367,7 @@ public class PaletteFactory {
 
     /**
      * Returns the list of available palette names. Any item in this list can be specified as
-     * argument to {@link #getPalette(String)}.
+     * argument to {@link #getPalette}.
      *
      * @return The list of available palette name, or {@code null} if this method
      *         is unable to fetch this information.
@@ -345,7 +377,7 @@ public class PaletteFactory {
         PaletteFactory factory = this;
         do {
             factory.getAvailableNames(names);
-            factory = factory.parent;
+            factory = factory.fallback;
         } while (factory != null);
         return (String[]) names.toArray(new String[names.size()]);
     }
@@ -512,7 +544,7 @@ public class PaletteFactory {
     private Color[] getColors(final LineNumberReader input, final String name) throws IOException {
         int values[] = null;
         final LineFormat reader = (locale!=null) ? new LineFormat(locale) : new LineFormat();
-        final List colors       = new ArrayList();
+        final List colors = new ArrayList();
         String line; while ((line=input.readLine()) != null) try {
             line = line.trim();
             if (line.length() == 0)        continue;
@@ -585,7 +617,9 @@ public class PaletteFactory {
     }
 
     /**
-     * Load colors from a definition file.
+     * Loads colors from a definition file. If no colors were found in the current palette
+     * factory and a fallback was specified at construction time, then the fallback will
+     * be queried.
      *
      * @param  name The palette's name to load. This name doesn't need to contains a path
      *              or an extension. Path and extension are set according value specified
@@ -597,7 +631,7 @@ public class PaletteFactory {
     public Color[] getColors(final String name) throws IOException {
         final LineNumberReader reader = getPaletteReader(name);
         if (reader == null) {
-            return (parent!=null) ? parent.getColors(name) : null;
+            return (fallback != null) ? fallback.getColors(name) : null;
         }
         final Color[] colors = getColors(reader, name);
         reader.close();
@@ -656,7 +690,7 @@ public class PaletteFactory {
         }
         final Color[] colors = getColors(name);
         if (colors == null) {
-            return (parent!=null) ? parent.getIndexColorModel(name, lower, upper) : null;
+            return (fallback!=null) ? fallback.getIndexColorModel(name, lower, upper) : null;
         }
         final int[] ARGB = new int[1 << ColorUtilities.getBitCount(upper)];
         ColorUtilities.expand(colors, ARGB, lower, upper);
@@ -676,27 +710,6 @@ public class PaletteFactory {
     }
 
     /**
-     * Returns the specified color palette as an image of the specified size.
-     * This is useful for looking visually at a color palette.
-     *
-     * @param  name The palette's name to load. This name doesn't need to contains a path
-     *              or an extension. Path and extension are set according value specified
-     *              at construction time.
-     * @param  size The image size. The palette will be vertical if
-     *              <code>size.{@linkplain Dimension#height height}</code> &gt;
-     *              <code>size.{@linkplain Dimension#width  width }</code>
-     *
-     * @since 2.3
-     *
-     * @deprecated Replaced by {@link Palette#getImage}.
-     */
-    public RenderedImage getImage(final String name, final Dimension size)
-            throws IOException
-    {
-        return getPalette(name, Math.max(size.width, size.height)).getImage(size);
-    }
-
-    /**
      * Returns the palette of the specified name and size. The palette's name doesn't need
      * to contains a directory path or an extension. Path and extension are set according
      * values specified at construction time.
@@ -708,7 +721,7 @@ public class PaletteFactory {
      * @since 2.4
      */
     public Palette getPalette(final String name, final int size) {
-        return getPalette(name, 0, size, size);
+        return getPalette(name, 0, size, size, 1, 0);
     }
 
     /**
@@ -721,7 +734,7 @@ public class PaletteFactory {
      * @since 2.4
      */
     public Palette getPalettePadValueFirst(final String name, final int size) {
-        return getPalette(name, 1, size, size);
+        return getPalette(name, 1, size, size, 1, 0);
     }
 
     /**
@@ -734,7 +747,7 @@ public class PaletteFactory {
      * @since 2.4
      */
     public Palette getPalettePadValueLast(final String name, final int size) {
-        return getPalette(name, 0, size-1, size);
+        return getPalette(name, 0, size-1, size, 1, 0);
     }
 
     /**
@@ -745,19 +758,47 @@ public class PaletteFactory {
      * The palette's name doesn't need to contains a directory path or an extension.
      * Path and extension are set according values specified at construction time.
      *
-     * @param  name The palette's name to load.
+     * @param name  The palette's name to load.
      * @param lower Index of the first valid element (inclusive) in the
      *              {@linkplain IndexColorModel index color model} to be created.
      * @param upper Index of the last valid element (exclusive) in the
      *              {@linkplain IndexColorModel index color model} to be created.
      * @param size  The size of the {@linkplain IndexColorModel index color model} to be created.
      *              This is the value to be returned by {@link IndexColorModel#getMapSize}.
+     * @param numBands    The number of bands (usually 1).
+     * @param visibleBand The band to use for color computations (usually 0).
      * @return The palette.
      *
      * @since 2.4
      */
-    public Palette getPalette(final String name, final int lower, final int upper, final int size) {
-        Palette palette = new Palette(this, name, lower, upper, size);
+    public Palette getPalette(final String name, final int lower, final int upper, final int size,
+                              final int numBands, final int visibleBand)
+    {
+        Palette palette = new IndexedPalette(this, name, lower, upper, size, numBands, visibleBand);
+        palette = (Palette) palettes.unique(palette);
+        return palette;
+    }
+
+    /**
+     * Creates a palette suitable for floating point values.
+     *
+     * @param name        The palette name.
+     * @param minimum     The minimal sample value expected.
+     * @param maximum     The maximal sample value expected.
+     * @param dataType    The data type as a {@link DataBuffer#TYPE_FLOAT}
+     *                    or {@link DataBuffer#TYPE_DOUBLE} constant.
+     * @param numBands    The number of bands (usually 1).
+     * @param visibleBand The band to use for color computations (usually 0).
+     *
+     * @since 2.4
+     *
+     * @todo Current implementation ignores the name and builds a gray scale in all cases.
+     *       Future version may improve on that.
+     */
+    public Palette getContinuousPalette(final String name, final float minimum, final float maximum,
+                                        final int dataType, final int numBands, final int visibleBand)
+    {
+        Palette palette = new ContinuousPalette(this, name, minimum, maximum, dataType, numBands, visibleBand);
         palette = (Palette) palettes.unique(palette);
         return palette;
     }

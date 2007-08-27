@@ -329,8 +329,28 @@ public class Operations {
      * @see org.geotools.coverage.processing.operation.Recolor
      *
      * @since 2.3
+     *
+     * @deprecated Parameter of type {@link Map} is deprecated. Please use the parameter of
+     *             type {@link ColorMap} instead.
      */
     public GridCoverage recolor(final GridCoverage source, final Map[] colorMaps)
+            throws CoverageProcessingException
+    {
+        return (GridCoverage) doOperation("Recolor", source, "ColorMaps", colorMaps);
+    }
+
+    /**
+     * Recolors a coverage to the specified color maps.
+     * 
+     * @param source    The source coverage.
+     * @param colorMaps The color maps to apply.
+     * @throws CoverageProcessingException if the operation can't be applied.
+     *
+     * @see org.geotools.coverage.processing.operation.Recolor
+     *
+     * @since 2.4
+     */
+    public GridCoverage recolor(final GridCoverage source, final ColorMap[] colorMaps)
             throws CoverageProcessingException
     {
         return (GridCoverage) doOperation("Recolor", source, "ColorMaps", colorMaps);

@@ -176,6 +176,11 @@ public final class ColorUtilities {
      * @param  numBands    The number of bands.
      * @param  visibleBand The band to display.
      * @return An index color model for the specified array.
+     *
+     * @todo Considerer caching previously created instances using weak references. Index color
+     *       model may be big (up to 256 kb), so it may be worth to cache big instances. NOTE:
+     *       IndexColorModel inherits a equals(Object) implementation from ColorModel, but do
+     *       not override it, so the definition is incomplete.
      */
     public static IndexColorModel getIndexColorModel(final int[] ARGB,
                                                      final int numBands,
@@ -185,9 +190,9 @@ public final class ColorUtilities {
         int  transparent = -1;
         final int length = ARGB.length;
         for (int i=0; i<length; i++) {
-            final int alpha = ARGB[i] & 0xFF000000;
+            final int alpha = (ARGB[i] & 0xFF000000);
             if (alpha != 0xFF000000) {
-                if (alpha==0x00000000 && transparent<0) {
+                if (alpha == 0x00000000 && transparent < 0) {
                     transparent = i;
                     continue;
                 }

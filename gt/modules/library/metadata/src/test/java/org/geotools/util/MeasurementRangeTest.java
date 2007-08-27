@@ -146,4 +146,12 @@ public class MeasurementRangeTest extends TestCase {
         assertEquals(new MeasurementRange(1500f, 2000f, SI.METER ), r1.intersect(r2));
         assertEquals(new MeasurementRange(1.5f,  2f,    KILOMETER), r2.intersect(r1));
     }
+
+    /**
+     * Tests {@link MeasurementRange#toString()} method.
+     */
+    public void testToString() {
+        final MeasurementRange range = new MeasurementRange(10, 20, SI.KILO(SI.METER));
+        assertEquals("[10.0, 20.0] km", range.toString());
+    }
 }

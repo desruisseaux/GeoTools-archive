@@ -455,6 +455,27 @@ public final class XMath {
     }
 
     /**
+     * Returns a {@link Float#NaN NaN} number for the specified index. Valid NaN numbers have
+     * bit fields ranging from {@code 0x7f800001} through {@code 0x7fffffff} or {@code 0xff800001}
+     * through {@code 0xffffffff}. The standard {@link Float#NaN} has bit fields {@code 0x7fc00000}.
+     *
+     * @param  index The index, from -2097152 to 2097151 inclusive.
+     * @return One of the legal {@link Float#NaN NaN} values as a float.
+     * @throws IndexOutOfBoundsException if the specified index is out of bounds.
+     */
+    public static float toNaN(int index) throws IndexOutOfBoundsException {
+        index += 0x200000;
+        if (index>=0 && index<=0x3FFFFF) {
+            final float value = Float.intBitsToFloat(0x7FC00000 + index);
+            assert Float.isNaN(value) : value;
+            return value;
+        }
+        else {
+            throw new IndexOutOfBoundsException(Integer.toHexString(index));
+        }
+    }
+
+    /**
      * Returns {@code true} if the specified {@code type} is one of real
      * number types. Real number types includes {@link Float} and {@link Double}.
      *

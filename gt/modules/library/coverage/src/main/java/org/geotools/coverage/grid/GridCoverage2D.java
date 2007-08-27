@@ -19,8 +19,6 @@
  */
 package org.geotools.coverage.grid;
 
-// J2SE dependencies
-import java.awt.Color;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.geom.Point2D;
@@ -31,20 +29,19 @@ import java.awt.image.renderable.RenderableImage;
 import java.io.IOException;
 import java.io.InvalidClassException;
 import java.io.InvalidObjectException;
-import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import javax.units.Unit;
-
-// JAI dependencies
-import javax.media.jai.ImageFunction;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.Interpolation;
 import javax.media.jai.InterpolationNearest;
@@ -60,36 +57,24 @@ import javax.media.jai.operator.RescaleDescriptor;
 import javax.media.jai.remote.SerializableRenderedImage;
 import javax.media.jai.util.CaselessStringKey;  // For javadoc
 
-// OpenGIS dependencies
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.PointOutsideCoverageException;
 import org.opengis.coverage.SampleDimension;
-import org.opengis.coverage.SampleDimensionType;  // For javadoc
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.coverage.grid.GridRange;
-import org.opengis.coverage.grid.InvalidRangeException;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.cs.AxisDirection;
-import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
-import org.opengis.util.Cloneable;
 
-// Geotools dependencies
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.AbstractCoverage;
 import org.geotools.coverage.processing.AbstractProcessor;
-import org.geotools.factory.Hints;
 import org.geotools.geometry.Envelope2D;
-import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.resources.XArray;
 import org.geotools.resources.coverage.CoverageUtilities;
 import org.geotools.resources.i18n.Errors;
@@ -183,6 +168,13 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * {@code true} is all sample in the image are geophysics values.
      */
     private final boolean isGeophysics;
+
+    /**
+     * {@code true} if this coverage has been disposed.
+     *
+     * @see #dispose
+     */
+    private transient boolean disposed;
 
     /**
      * The preferred encoding to use for serialization using the {@code writeObject} method,
@@ -680,6 +672,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * Returns grid data as a rendered image.
      */
     public RenderedImage getRenderedImage() {
+        ensureValid();
         return image;
     }
 
@@ -692,6 +685,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * @return A 2D view of this grid coverage as a renderable image.
      */
     public RenderableImage getRenderableImage(final int xAxis, final int yAxis) {
+        ensureValid();
         if (xAxis == gridGeometry.axisDimensionX  &&  yAxis == gridGeometry.axisDimensionY) {
             return new Renderable();
         } else {
@@ -704,6 +698,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      */
     //@Override
     public void show(String title, final int xAxis, final int yAxis) {
+        ensureValid();
         final GridCoverage2D displayable = geophysics(false);
         if (displayable != this) {
             displayable.show(title, xAxis, yAxis);
@@ -872,6 +867,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      *       sure that the range of transformed values doesn't contains 0.
      */
     protected GridCoverage2D createGeophysics(final boolean geo) {
+        ensureValid();
         /*
          * STEP 1 - Gets the source image and prepare the target sample dimensions.
          *          As a slight optimisation, we skip the "Null" operations since
@@ -1133,6 +1129,7 @@ testLinear: for (int i=0; i<numBands; i++) {
      * serializable rendered image} is created if it was not already done.
      */
     private void writeObject(final ObjectOutputStream out) throws IOException {
+        ensureValid();
         if (serializedImage == null) {
             RenderedImage source = image;
             while (source instanceof RenderedImageAdapter) {
@@ -1154,5 +1151,95 @@ testLinear: for (int i=0; i<numBands; i++) {
             }
         }
         out.defaultWriteObject();
+    }
+
+    /**
+     * Ensures that this coverage has not be {@linkplain #dispose disposed}.
+     */
+    private void ensureValid() throws IllegalStateException {
+        if (disposed) {
+            // TODO: localize.
+            throw new IllegalStateException("This coverage has been disposed.");
+        }
+    }
+
+    /**
+     * Provides a hint that a coverage will no longer be accessed from a reference in user space.
+     * This method {@linkplain PlanarImage#dispose disposes} the {@linkplain #image} only if at
+     * least one of the following conditions is true (otherwise this method do nothing):
+     * <p>
+     * <ul>
+     *   <li>{@code force} is {@code true}, <strong>or</strong></li>
+     *   <li>The underlying {@linkplain #image} has no {@linkplain PlanarImage#getSinks sinks}
+     *       other than the views (geophysics, display, <cite>etc.</cite>).</li>
+     * </ul>
+     * <p>
+     * This safety check helps to prevent the disposal of an {@linkplain #image} that still
+     * used in a JAI operation chain. It doesn't prevent the disposal in every cases however.
+     * When unsure about whatever a coverage is still in use or not, it is safer to not invoke
+     * this method and rely on the garbage collector instead.
+     * 
+     * @see PlanarImage#dispose
+     *
+     * @since 2.4
+     */
+    //@Override
+    public synchronized boolean dispose(final boolean force) {
+        if (disposed) {
+            // Recursive invocation of this method.
+            return true;
+        }
+        /*
+         * Checks if this coverage can be disposed. First we get the set of every sinks, which
+         * may or may not be RenderedImages. Then we remove every sinks that are geophysics or
+         * other views of this coverage. If there is no remaining sinks, we can process.
+         */
+        if (!force) {
+            Collection/*<?>*/ sinks = image.getSinks();
+            if (sinks != null) {
+                if (inverse != null) {
+                    sinks = new HashSet(sinks);
+                    sinks.remove(inverse.image);
+                    deepRemove(sinks, inverse.image);
+                }
+                if (!sinks.isEmpty()) {
+                    return false;
+                }
+            }
+        }
+        /*
+         * No remaining sinks; we can process. First, applies the same procedure on the other
+         * views (geophysics, display, etc.). If we were able to dispose the views, then we
+         * can really dispose this coverage.
+         */
+        disposed = true; // Must be set before to invoke inverse.dispose().
+        if (inverse != null && !inverse.dispose(force)) {
+            disposed = false; // Reset only on success, otherwise the coverage may be invalid.
+            return false;
+        }
+        image.dispose();
+        return super.dispose(force);
+    }
+
+    /**
+     * Removes from the specified collection the specified image and its dependencies.
+     * This method invokes itself recursively in order to scan down the sources tree.
+     */
+    private static void deepRemove(final Collection/*<?>*/ sinks, final RenderedImage image) {
+        /*
+         * The following must be unchecked, because PlanarImage.getSources()
+         * violates RenderedImage.getSources() contract on parameterized type.
+         */
+        //@SuppressWarning("unchecked")
+        final List sources = image.getSources();
+        if (sources != null) {
+            for (final Iterator it=sources.iterator(); it.hasNext();) {
+                final Object dependency = it.next();
+                sinks.remove(dependency);
+                if (dependency instanceof RenderedImage) {
+                    deepRemove(sinks, (RenderedImage) dependency);
+                }
+            }
+        }
     }
 }

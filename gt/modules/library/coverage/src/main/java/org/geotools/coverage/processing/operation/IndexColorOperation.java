@@ -15,29 +15,30 @@
  */
 package org.geotools.coverage.processing.operation;
 
-//J2SE dependencies
 import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
-import java.util.Arrays;
 
 import javax.media.jai.ImageLayout;
 import javax.media.jai.NullOpImage;
 import javax.media.jai.OpImage;
-import javax.media.jai.ParameterList;
 
-import org.geotools.coverage.FactoryFinder;
-import org.geotools.coverage.GridSampleDimension;
-import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.processing.Operation2D;
-import org.geotools.factory.Hints;
-import org.geotools.parameter.DefaultParameterDescriptorGroup;
-import org.geotools.resources.coverage.CoverageUtilities;
-import org.geotools.resources.image.ColorUtilities;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.parameter.ParameterValueGroup;
+
+import org.geotools.factory.Hints;
+import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.GridSampleDimension;
+import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.processing.Operation2D;
+import org.geotools.parameter.DefaultParameterDescriptorGroup;
+import org.geotools.resources.coverage.CoverageUtilities;
+import org.geotools.resources.image.ColorUtilities;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -77,43 +78,59 @@ abstract class IndexColorOperation extends Operation2D {
         final int visibleBand = CoverageUtilities.getVisibleBand(image);
         ColorModel model = image.getColorModel();
         boolean colorChanged = false;
-        final int numBands = bands.length;
-        for (int i=0; i<numBands; i++) {
+        for (int i=0; i<bands.length; i++) {
+            /*
+             * Extracts the ARGB codes from the IndexColorModel and invokes the
+             * transformColormap(...) method, which needs to be defined by subclasses.
+             */
             GridSampleDimension band = bands[i];
-            final ColorModel candidate = (i == visibleBand) ?
-                image.getColorModel() : band.getColorModel();
+            final ColorModel candidate = (i == visibleBand) ? image.getColorModel() : band.getColorModel();
             if (!(candidate instanceof IndexColorModel)) {
-                /*
-                 * Source don't use an index color model.
-                 */
-                // TODO: localize this message.
-                throw new IllegalArgumentException(
-                        "Current implementation requires IndexColorModel");
+                // Current implementation supports only sources that use an index color model.
+                throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
+                        Utilities.getShortClassName(candidate), Utilities.getShortName(IndexColorModel.class)));
             }
             final IndexColorModel colors = (IndexColorModel) candidate;
             final int mapSize = colors.getMapSize();
             final int[] ARGB = new int[mapSize];
             colors.getRGBs(ARGB);
             band = transformColormap(ARGB, i, band, parameters);
+            /*
+             * Checks if there is any change, either as a new GridSampleDimension instance or in
+             * the ARGB array. Note that if the new GridSampleDimension is equals to the old one,
+             * then the new one will be discarted since the old one is more likely to be a shared
+             * instance.
+             */
             if (!bands[i].equals(band)) {
                 bands[i] = band;
                 colorChanged = true;
             } else if (!colorChanged) {
-                final int[] original = new int[mapSize];
-                colors.getRGBs(original);
-                colorChanged = Arrays.equals(original, ARGB);
+                for (int j=0; j<mapSize; j++) {
+                    if (ARGB[j] != colors.getRGB(j)) {
+                        colorChanged = true;
+                        break;
+                    }
+                }
             }
-            if (i == visibleBand) {
-                model = ColorUtilities.getIndexColorModel(ARGB, numBands, visibleBand);
+            /*
+             * If we changed the color of the visible band, then create immediately a new
+             * color model for this band. The new color model will be given later to the
+             * image operator.
+             */
+            if (colorChanged && (i == visibleBand)) {
+                model = ColorUtilities.getIndexColorModel(ARGB, bands.length, visibleBand);
             }
         }
         if (!colorChanged) {
             return source;
         }
-        final int computeType = (image instanceof OpImage) ?
-                ((OpImage) image).getOperationComputeType() : OpImage.OP_COMPUTE_BOUND;
+        /*
+         * Gives the color model to the image layout and creates a new image using the Null
+         * operation, which merely propagates its first source along the operation chain
+         * unmodified (except for the ColorModel given in the layout in this case).
+         */
         final ImageLayout layout = new ImageLayout().setColorModel(model);
-        final RenderedImage newImage = new NullOpImage(image, layout, null, computeType);
+        final RenderedImage newImage = new NullOpImage(image, layout, null, OpImage.OP_COMPUTE_BOUND);
         final GridCoverage2D target = FactoryFinder.getGridCoverageFactory(null).create(
                     visual.getName(), newImage,
                     visual.getCoordinateReferenceSystem2D(),

@@ -287,7 +287,7 @@ public abstract class StreamImageReader extends GeographicImageReader {
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    public static abstract class Spi extends GeographicImageReader.Spi {
+    public static abstract class Spi extends ImageReaderSpi {
         /**
          * List of legal input types for {@link StreamImageReader}.
          */
@@ -301,28 +301,19 @@ public abstract class StreamImageReader extends GeographicImageReader {
         };
 
         /**
-         * Constructs a new SPI for {@link StreamImageReader}. This constructor
-         * initializes the following fields to default values:
+         * Constructs a quasi-blank {@code StreamImageReader.Spi}. It is up to the subclass to
+         * initialize instance variables in order to provide working versions of all methods.
+         * This constructor provides the following defaults:
          *
          * <ul>
-         *   <li>Image format names ({@link #names}):
-         *       An array of lenght 1 containing the {@code name} argument.
-         *
-         *   <li>MIME type ({@link #MIMETypes}):
-         *       An array of length 1 containing the {@code mime} argument.
-         *
-         *   <li>Input types ({@link #inputTypes}):
-         *       {@link File}, {@link URL}, {@link InputStream} et {@link ImageInputStream}.</li>
+         *   <li>{@link #inputTypes} = {{@link File}, {@link URL}, {@link URLConnection},
+         *       {@link InputStream}, {@link ImageInputStream}, {@link String}}</li>
          * </ul>
          *
-         * Others fields should be set by subclasses
-         * (usually in their constructors).
-         *
-         * @param name Format name, or {@code null} to let {@link #names} unset.
-         * @param mime MIME type, or {@code null} to let {@link #MIMETypes} unset.
+         * For efficienty reasons, the above fields are initialized to shared arrays. Subclasses
+         * can assign new arrays, but should not modify the default array content.
          */
-        public Spi(final String name, final String mime) {
-            super(name, mime);
+        public Spi() {
             inputTypes = INPUT_TYPES;
         }
     }

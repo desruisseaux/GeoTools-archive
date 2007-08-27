@@ -1286,9 +1286,10 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
     }
 
     /**
-     * Returns a string représentation of this coverage. This string is for
+     * Returns a string representation of this coverage. This string is for
      * debugging purpose only and may change in future version.
      */
+    //@Override
     public String toString() {
         final StringWriter buffer = new StringWriter();
         buffer.write(Utilities.getShortClassName(this));
@@ -1326,21 +1327,47 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
 
     /**
      * Provides a hint that a coverage will no longer be accessed from a reference in user space.
-     * The results are equivalent to those that occur when the program loses its last reference to
-     * this coverage, the garbage collector discovers this, and finalize is called. This can be used
-     * as a hint in situations where waiting for garbage collection would be overly conservative.
-     * The results of referencing a coverage after a call to {@code dispose()} are undefined.
-     * 
+     * This can be used as a hint in situations where waiting for garbage collection would be
+     * overly conservative. The results of referencing a coverage after a call to {@code dispose}
+     * are undefined, except if this method returned {@code false}.
+     * <p>
+     * This method can work in a <cite>conservative</cite> mode or a <cite>forced</cite> mode,
+     * determined by the {@code force} argument:
+     *
+     * <ul>
+     *   <li><p>If {@code force} is {@code false} (the recommanded value), this method may process
+     *   only under some conditions. For example a grid coverage may dispose its planar image only
+     *   if it has no {@linkplain PlanarImage#getSinks sinks}. This method returns {@code true} if
+     *   it disposed at least some resources, or {@code false} if this method vetoed against the
+     *   disposal. In the later case, no resources were disposed and this coverage can still be
+     *   used.</p></li>
+     *
+     *   <li><p>If {@code force} is {@code true}, then this method processes inconditionnally and
+     *   returns always {@code true}. This is a more risky behavior.</p></li>
+     * </ul>
+     *
+     * The conservative mode ({@code force = false}) performs its safety checks on a
+     * <cite>best-effort</cite> basis, with no guarantees. Therefore, it would be wrong to write
+     * a program that depended on the safety checks for its correctness. In case of doubt about
+     * whatever this coverage still in use or not, it is safer to rely on the garbage collector.
+     *
+     * @param  force {@code true} for forcing an inconditionnal disposal, or {@code false} for
+     *         performing a conservative disposal. The recommanded value is {@code false}.
+     * @return {@code true} if this method disposed at least some resources, or {@code false}
+     *         if this method vetoed against the disposal.
+     *
      * @see PlanarImage#dispose
+     *
+     * @since 2.4
+     */
+    public boolean dispose(boolean force) {
+        return true;
+    }
+
+    /**
+     * @deprecated Use {@link #dispose(boolean)} instead.
      */
     public void dispose() {
-        // To be overridden by subclasses.
-        //
-        // Note: implementing this method in GridCoverage is tricky. We must ensure that:
-        //
-        // 1) The PlanarImage is not used by somebody else (i.e. is not a user supplied
-        //    image, or the user didn't got a reference with getRenderedImage()).
-        // 2) If the image is the result of a GridCoverageProcessor operation,
-        //    it must removes itself from the WeakValueHashMap.
+        dispose(false);
     }
 }

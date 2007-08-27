@@ -16,31 +16,18 @@
  */
 package org.geotools.image.io;
 
-import java.awt.Transparency;
-import java.awt.color.ColorSpace;
-import java.awt.image.ColorModel;
-import java.awt.image.DataBuffer;
-import java.io.IOException;
 import java.util.Locale;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageReadParam;
-import javax.imageio.ImageTypeSpecifier;
-import javax.media.jai.ComponentSampleModelJAI;
-import javax.media.jai.util.Range;
 
-import org.geotools.resources.XArray;
-import org.geotools.resources.XMath;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.IndexedResourceBundle;
-import org.geotools.resources.image.ComponentColorModelJAI;
-import org.geotools.util.NumberRange;
 
 
 /**
- * Default parameters for {@link StreamImageReader}. This class provides convenience methods for
- * {@linkplain #setDestinationType setting the destination type} from expected minimum and maximum
- * values, and from a color palette.
+ * Default parameters for {@link GeographicImageReader}.
  *
  * @since 2.4
  * @source $URL$
@@ -49,24 +36,28 @@ import org.geotools.util.NumberRange;
  */
 public class GeographicImageReadParam extends ImageReadParam {
     /**
+     * The name of the default color palette to apply when none was explicitly specified.
+     *
+     * @see #getPaletteName
+     * @see #setPaletteName
+     */
+    public static final String DEFAULT_PALETTE_NAME = "rainbow";
+
+    /**
      * The name of the color palette.
      */
     private String palette;
 
     /**
-     * The range of valid values for every source bands.
+     * The band to display.
      */
-    private NumberRange[] sourceRanges;
+    private int visibleBand;
 
     /**
-     * The range of valid values for every destination bands.
+     * The locale for formatting error messages. Will be inferred from
+     * the {@linkplain ImageReader image reader} at construction time.
      */
-    private NumberRange[] destinationRanges;
-
-    /**
-     * The locale for formatting error messages.
-     */
-    private Locale locale;
+    private final Locale locale;
 
     /**
      * Creates a new, initially empty, set of parameters.
@@ -95,256 +86,86 @@ public class GeographicImageReadParam extends ImageReadParam {
     }
 
     /**
-     * Convenience method returning the destination band for the specified source band.
-     *
-     * @param band The source band number to be converted into a destination band number.
-     * @return The destination band number.
-     * @throws IllegalArgumentException if no destination band was found for the given source band.
+     * Returns the band to display in the target image. In theory, images backed by
+     * {@linkplain java.awt.image.IndexColorModel index color model} should have only
+     * ony band. But sometime we want to load additional bands as numerical data, in
+     * order to perform computations. In such case, we need to specify which band in
+     * the destination image will be used as an index for displaying the colors. The
+     * default value is 0.
      */
-    public int sourceToDestBand(final int band) {
-        ensureValidBand(band);
-        if (sourceBands == null) {
-            return (destinationBands != null) ? destinationBands[band] : band;
-        }
-        for (int i=0; i<sourceBands.length; i++) {
-            if (sourceBands[i] == band) {
-                return (destinationBands != null) ? destinationBands[i] : i;
-            }
-        }
-        throw new IllegalArgumentException(getErrorResources().getString(
-                ErrorKeys.BAD_BAND_NUMBER_$1, new Integer(band)));
+    public int getVisibleBand() {
+        return visibleBand;
     }
 
     /**
-     * Convenience method returning the source band for the specified destination band.
+     * Sets the band to make visible in the destination image.
      *
-     * @param band The destination band number to be converted into a source band number.
-     * @return The destination band number.
-     * @throws IllegalArgumentException if no source band was found for the given destination band.
+     * @param  visibleBand The band to make visible.
+     * @throws IllegalArgumentException if the specified band index is invalid.
      */
-    public int destToSourceBand(final int band) throws IllegalArgumentException {
-        ensureValidBand(band);
-        if (destinationBands == null) {
-            return (sourceBands != null) ? sourceBands[band] : band;
-        }
-        for (int i=0; i<destinationBands.length; i++) {
-            if (destinationBands[i] == band) {
-                return (sourceBands != null) ? sourceBands[i] : i;
-            }
-        }
-        throw new IllegalArgumentException(getErrorResources().getString(
-                ErrorKeys.BAD_BAND_NUMBER_$1, new Integer(band)));
+    public void setVisibleBand(final int visibleBand) throws IllegalArgumentException {
+        ensureValidBand(visibleBand);
+        this.visibleBand = visibleBand;
     }
 
     /**
-     * Sets the range of valid values expected for the specified band.
-     *
-     * @param ranges  The range array to update.
-     * @param band    The band number to update.
-     * @param range   The range of expected values.
+     * Returns a name of the color palette, or a {@linkplain #DEFAULT_PALETTE_NAME default name}
+     * if none were explicitly specified.
      */
-    private NumberRange[] setRange(NumberRange[] ranges, final int band, final NumberRange range) {
-        ensureValidBand(band);
-        if (ranges == null) {
-            ranges = new NumberRange[Math.max(band + 1, 4)];
-        } else if (ranges.length <= band) {
-            ranges = (NumberRange[]) XArray.resize(ranges, Math.max(ranges.length*2, band + 1));
-        }
-        ranges[band] = range;
-        return ranges;
+    final String getNonNullPaletteName() {
+        final String palette = getPaletteName();
+        return (palette != null) ? palette : DEFAULT_PALETTE_NAME;
     }
 
     /**
-     * Returns the range of valid values expected for the specified band.
-     *
-     * @param  ranges  The range array.
-     * @param  band The band number.
-     * @return The range of expected values, or {@code null} if none.
+     * Returns the name of the color palette to apply when creating an
+     * {@linkplain java.awt.image.IndexColorModel index color model}.
+     * This is the name specified by the last call to {@link #setPaletteName}.
      */
-    private NumberRange getRange(final NumberRange[] ranges, final int band) {
-        ensureValidBand(band);
-        return (ranges != null && band < ranges.length) ? ranges[band] : null;
+    public String getPaletteName() {
+        return palette;
     }
 
     /**
-     * Sets the range of valid values expected for the specified source band. The {@code band}
-     * argument is a source band number ignoring any {@link #setSourceBands} setting. In other
-     * words, this is the source band at the very begining of the "band number transformation
-     * chain".
-     * <p>
-     * The destination range corresponding to the same band can be set with
-     * <code>{@linkplain #setDestinationRange setDestinationRange}(@linkplain
-     * #sourceToDestBand sourceToDestBand}(band), destinationRange)</code>.
-     *
-     * @param band  The band number in the source image.
-     * @param range The range of expected values.
-     */
-    public void setSourceRange(final int band, final NumberRange range) {
-        sourceRanges = setRange(sourceRanges, band, range);
-    }
-
-    /**
-     * Returns the range of valid values expected for the specified source band. This is the value
-     * previously set by <code>{@linkplain #setSourceRange setSourceRange}(band, ...)</code>. If no
-     * such value was set, then this method returns the same range than the corresponding
-     * destination band (i.e. the conversion from source to destination pixel values is
-     * assumed an identity operation).
-     *
-     * @param  band The band number in the source image.
-     * @return The range of expected values, or {@code null} if none.
-     */
-    public NumberRange getSourceRange(int band) {
-        NumberRange range = getRange(sourceRanges, band);
-        if (range == null) {
-            band  = sourceToDestBand(band);
-            range = getRange(destinationRanges, band);
-        }
-        return range;
-    }
-
-    /**
-     * Sets the range of valid values expected for the specified destination band. The {@code band}
-     * argument is a destination band number taking in account the {@link #setDestinationBands}
-     * setting. In other words, this is the destination band at the very end of the "band number
-     * transformation chain".
-     * <p>
-     * The source range corresponding to the same band can be set with
-     * <code>{@linkplain #setSourceRange setSourceRange}(@linkplain
-     * #destToSourceBand destToSourceBand}(band), sourceRange)</code>.
-     *
-     * @param band  The band number in the source image.
-     * @param range The range of expected values.
-     */
-    public void setDestinationRange(final int band, final NumberRange range) {
-        sourceRanges = setRange(sourceRanges, band, range);
-    }
-
-    /**
-     * Returns the range of valid values expected for the specified destination band. This is the
-     * value previously set by <code>{@linkplain #setDestinationRange setDestinationRange}(band,
-     * ...)</code>. If no such value was set, then this method returns the same range than the
-     * corresponding source band (i.e. the conversion from source to destination pixel values is
-     * assumed an identity operation).
-     *
-     * @param  band The band number in the source image.
-     * @return The range of expected values, or {@code null} if none.
-     */
-    public NumberRange getDestinationRange(int band) {
-        NumberRange range = getRange(destinationRanges, band);
-        if (range == null) {
-            band  = destToSourceBand(band);
-            range = getRange(sourceRanges, band);
-        }
-        return range;
-    }
-
-    /**
-     * Set the color palette as one of the names provided by the
-     * {@linkplain PaletteFactory#getDefault default palette factory}.
+     * Sets the color palette as one of the {@linkplain PaletteFactory#getAvailableNames available
+     * names} provided by the {@linkplain PaletteFactory#getDefault default palette factory}. This
+     * name will be given by the {@link GeographicImageReader} default implementation to the
+     * {@linkplain PaletteFactory#getDefault default palette factory} for creating a
+     * {@linkplain javax.imageio.ImageTypeSpecifier image type specifier}.
      *
      * @see PaletteFactory#getAvailableNames
      */
-    public void setPalette(final String palette) {
+    public void setPaletteName(final String palette) {
         this.palette = palette;
     }
 
     /**
-     * Returns a grayscale color space for the specified range of values.
-     * This color space is suitable for floating point values.
-     *
-     * @param  range    The range of values, or {@code null} if unknown.
-     * @param  numBands The number of bands.
-     * @return A default color space scaled to fit data.
+     * Returns a string representation of this block of parameters.
      */
-    private static ColorSpace getColorSpace(final Range range, final int numBands) {
-        if (range != null) {
-            final Comparable minimum = range.getMinValue();
-            final Comparable maximum = range.getMaxValue();
-            if ((minimum instanceof Number) && (maximum instanceof Number)) {
-                final float minValue = ((Number) minimum).floatValue();
-                final float maxValue = ((Number) maximum).floatValue();
-                if (minValue < maxValue && !Float.isInfinite(minValue) &&
-                                           !Float.isInfinite(maxValue))
-                {
-                    return new ScaledColorSpace(numBands, minValue, maxValue);
+    //@Override
+    public String toString() {
+        final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(this));
+        buffer.append('[');
+        if (sourceRegion != null) {
+            buffer.append("sourceRegion=(").
+                    append(sourceRegion.x).append(':').append(sourceRegion.x + sourceRegion.width).append(',').
+                    append(sourceRegion.y).append(':').append(sourceRegion.y + sourceRegion.height).append("), ");
+        }
+        if (sourceXSubsampling != 1 || sourceYSubsampling != 1) {
+            buffer.append("subsampling=(").append(sourceXSubsampling).append(',').
+                    append(sourceYSubsampling).append("), ");
+        }
+        if (sourceBands != null) {
+            buffer.append("sourceBands={");
+            for (int i=0; i<sourceBands.length; i++) {
+                if (i != 0) {
+                    buffer.append(',');
                 }
+                buffer.append(sourceBands[i]);
             }
+            buffer.append("}, ");
         }
-        return ColorSpace.getInstance(ColorSpace.CS_GRAY);
-    }
-
-    /**
-     * Creates a grayscale image type for the specified range of values.
-     * The image type is suitable for floating point values.
-     *
-     * @param  dateType The data type as one of {@link DataBuffer} constants.
-     * @param  range    The range of values, or {@code null} if unknown.
-     * @param  numBands The number of bands.
-     * @return A default color space scaled to fit data.
-     */
-    static ImageTypeSpecifier getImageTypeSpecifier(final int dataType,
-            final Range range, final int numBands)
-    {
-        final int[] bankIndices = new int[numBands];
-        final int[] bandOffsets = new int[numBands];
-        for (int i=numBands; --i>=0;) {
-            bankIndices[i] = i;
-        }
-        final ColorSpace colorSpace = getColorSpace(range, numBands);
-        if (GeographicImageReader.USE_JAI_MODEL) {
-            final ColorModel cm = new ComponentColorModelJAI(
-                    colorSpace, null, false, false, Transparency.OPAQUE, dataType);
-            return new ImageTypeSpecifier(cm, new ComponentSampleModelJAI(
-                    dataType, 1, 1, 1, 1, bankIndices, bandOffsets));
-        } else {
-            return ImageTypeSpecifier.createBanded(
-                    colorSpace, bankIndices, bandOffsets, dataType, false, false);
-        }
-    }
-
-    /**
-     * Creates a image type for the specified range of values.
-     * The image type is suitable for floating point values.
-     */
-    static ImageTypeSpecifier getImageTypeSpecifier(final int dataType, final Range range,
-            final int numBands, final String paletteName, final boolean compact, final Locale messageLocale)
-            throws IOException
-    {
-        final int maxAllowed;
-        switch (dataType) {
-            default: {
-                return getImageTypeSpecifier(dataType, range, numBands);
-            }
-            case DataBuffer.TYPE_BYTE: {
-                maxAllowed = 0xFF;
-                break;
-            }
-            case DataBuffer.TYPE_USHORT: {
-                maxAllowed = 0xFFFF;
-                break;
-            }
-        }
-        int validMin = 0;
-        int validMax = maxAllowed;
-        if (range != null) {
-            final Comparable minimum = range.getMinValue();
-            final Comparable maximum = range.getMaxValue();
-            if (minimum instanceof Number) {
-                validMin = ((Number) minimum).intValue();
-                if (!range.isMinIncluded()) {
-                    validMin++; // Must be inclusive
-                }
-            }
-            if (maximum instanceof Number) {
-                validMax = ((Number) maximum).intValue();
-                if (range.isMaxIncluded()) {
-                    validMax++; // Must be exclusive
-                }
-            }
-        }
-        final PaletteFactory factory = PaletteFactory.getDefault(messageLocale);
-        final Palette palette = factory.getPalette(paletteName, validMin, validMax,
-                compact ? validMax : maxAllowed);
-        return palette.getImageTypeSpecifier();
+        buffer.append("palette=\"").append(palette).append("\", ").append(']');
+        return buffer.toString();
     }
 }

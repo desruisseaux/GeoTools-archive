@@ -16,13 +16,11 @@
  */
 package org.geotools.image.io;
 
-// J2SE dependencies
 import java.awt.image.IndexColorModel;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -62,36 +60,36 @@ public class PaletteTest extends TestCase {
      * Tests the argument check performed by constructor.
      */
     public void testConstructor() {
-        final PaletteFactory factory = PaletteFactory.getDefault(null);
-        assertEquals(100, new Palette(factory, "grayscale",    0, 100, 100).upper);
-        assertEquals( 50, new Palette(factory, "grayscale", -100,  50, 100).upper);
+        final PaletteFactory factory = PaletteFactory.getDefault();
+        assertEquals(100, new IndexedPalette(factory, "grayscale",    0, 100, 100, 1, 0).upper);
+        assertEquals( 50, new IndexedPalette(factory, "grayscale", -100,  50, 100, 1, 0).upper);
         try {
-            new Palette(factory, "grayscale", 0, 100, -100);
+            new IndexedPalette(factory, "grayscale", 0, 100, -100, 1, 0);
             fail("Should not accept negative size.");
         } catch (IllegalArgumentException e) {
             // This is the expected exception.
         }
         try {
-            new Palette(factory, "grayscale", 100, 50, 256);
+            new IndexedPalette(factory, "grayscale", 100, 50, 256, 1, 0);
             fail("Should not accept invalid range.");
         } catch (IllegalArgumentException e) {
             // This is the expected exception.
         }
-        assertEquals(40000, new Palette(factory, "grayscale", 1,  40000, 0xFFFF).upper);
+        assertEquals(40000, new IndexedPalette(factory, "grayscale", 1,  40000, 0xFFFF, 1, 0).upper);
         try {
-            new Palette(factory, "grayscale", -1,  40000, 0xFFFF);
+            new IndexedPalette(factory, "grayscale", -1,  40000, 0xFFFF, 1, 0);
             fail("Should not accept value out of range.");
         } catch (IllegalArgumentException e) {
             // This is the expected exception.
         }
         try {
-            new Palette(factory, "grayscale", 1,  70000, 0xFFFF);
+            new IndexedPalette(factory, "grayscale", 1,  70000, 0xFFFF, 1, 0);
             fail("Should not accept value out of range.");
         } catch (IllegalArgumentException e) {
             // This is the expected exception.
         }
         try {
-            new Palette(factory, "grayscale", -40000,  0, 0xFFFF);
+            new IndexedPalette(factory, "grayscale", -40000,  0, 0xFFFF, 1, 0);
             fail("Should not accept value out of range.");
         } catch (IllegalArgumentException e) {
             // This is the expected exception.
@@ -102,7 +100,7 @@ public class PaletteTest extends TestCase {
      * Tests {@link PaletteFactory#getAvailableNames}.
      */
     public void testAvailableNames() {
-        final List names = Arrays.asList(PaletteFactory.getDefault(null).getAvailableNames());
+        final List names = Arrays.asList(PaletteFactory.getDefault().getAvailableNames());
         assertFalse(names.isEmpty());
         assertTrue (names.contains("rainbow"));
         assertTrue (names.contains("grayscale"));
@@ -114,7 +112,7 @@ public class PaletteTest extends TestCase {
      * Tests the cache.
      */
     public void testCache() {
-        final PaletteFactory factory = PaletteFactory.getDefault(null);
+        final PaletteFactory factory = PaletteFactory.getDefault();
         final Palette first  = factory.getPalettePadValueFirst("rainbow", 100);
         final Palette second = factory.getPalettePadValueFirst("bell",    100);
         final Palette third  = factory.getPalettePadValueFirst("rainbow", 100);
@@ -127,7 +125,7 @@ public class PaletteTest extends TestCase {
      * Tests the color model.
      */
     public void testColorModel() throws IOException {
-        final PaletteFactory  factory = PaletteFactory.getDefault(null);
+        final PaletteFactory  factory = PaletteFactory.getDefault();
         final Palette         palette = factory.getPalettePadValueFirst("rainbow", 100);
         final IndexColorModel icm     = (IndexColorModel) palette.getColorModel();
         assertEquals(100, icm.getMapSize());

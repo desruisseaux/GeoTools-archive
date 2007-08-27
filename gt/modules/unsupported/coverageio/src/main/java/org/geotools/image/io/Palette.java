@@ -17,32 +17,29 @@
  */
 package org.geotools.image.io;
 
-// J2SE dependencies
+import java.awt.image.*;
+import java.awt.Dimension;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.image.*;
-import javax.imageio.ImageTypeSpecifier;
-import javax.imageio.IIOException;
-import javax.swing.JFrame;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.FileNotFoundException;
+import javax.imageio.IIOException;
+import javax.imageio.ImageTypeSpecifier;
+import javax.swing.JFrame;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.image.ColorUtilities;
 
 
 /**
- * A set of RGB colors created by a {@linkplain PaletteFactory palette factory} from a name.
- * A palette can creates an {@linkplain IndexColorModel index color model} or an {@linkplain
- * ImageTypeSpecifier image type specifier} from the RGB colors. The color model is retained
- * by the palette as a {@linkplain WeakReference weak reference} (<strong>not</strong> as a
- * {@linkplain java.lang.ref.SoftReference soft reference}) because it may consume up to 256
- * kb. The purpose of the weak reference is to share existing instances in order to reduce
+ * A set of RGB colors created by a {@linkplain PaletteFactory palette factory} from
+ * a {@linkplain #name}. A palette can creates a {@linkplain ColorModel color model}
+ * (often {@linkplain IndexColorModel indexed}) or an {@linkplain ImageTypeSpecifier
+ * image type specifier} from the RGB colors. The color model is retained by the palette
+ * as a {@linkplain WeakReference weak reference} (<strong>not</strong> as a {@linkplain
+ * java.lang.ref.SoftReference soft reference}) because it may consume up to 256 kilobytes.
+ * The purpose of the weak reference is to share existing instances in order to reduce
  * memory usage; the purpose is not to provide caching.
  *
  * @since 2.4
@@ -51,13 +48,7 @@ import org.geotools.resources.image.ColorUtilities;
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  */
-public class Palette {
-    /**
-     * The maximal palette size, corresponding to the maximum value for unsigned 16 bits integer.
-     * DO NOT EDIT: this value <strong>MUST</strong> be {@code 0xFFFF}.
-     */
-    private static final int MAX_SIZE = 0xFFFF;
-
+public abstract class Palette {
     /**
      * The originating factory.
      */
@@ -66,36 +57,21 @@ public class Palette {
     /**
      * The name of this palette.
      */
-    private final String name;
+    protected final String name;
 
     /**
-     * Index of the first valid element (inclusive) in the {@linkplain IndexColorModel
-     * index color model} to be created. Pixels in the range 0 inclusive to {@code lower}
-     * exclusive will be reserved for "no data" values.
-     * <p>
-     * Strictly speaking, this index should be non-negative because {@link IndexColorModel}
-     * do not supports negative index. However this {@code Palette} implementation accepts
-     * negative values provided that {@link #upper} is not greater than {@value Short#MAX_VALUE}.
-     * If this condition holds, then {@code Palette} will transpose negative values as positive
-     * values in the range {@code 0x80000} to {@code 0xFFFF} inclusive. Be aware that such
-     * approach consume the maximal amount of memory, i.e. 256 kilobytes for each color model.
+     * The number of bands in the {@linkplain ColorModel color model}.
+     * The value is 1 in the vast majority of cases.
      */
-    protected final int lower;
+    protected final int numBands;
 
     /**
-     * Index of the last valid element (exclusive) in the {@linkplain IndexColorModel
-     * index color model} to be created. Pixels in the range {@code upper} inclusive
-     * to {@link #size} exclusive will be reserved for "no data" values. This value
-     * is always greater than {@link #lower} (note that it may be negative).
+     * The band to display, in the range 0 inclusive to {@link #numBands} exclusive.
+     * This is used when an image contains more than one band but only one band can
+     * be used for computing the colors to display. For example {@link IndexColorModel}
+     * works on only one band.
      */
-    protected final int upper;
-
-    /**
-     * The size of the {@linkplain IndexColorModel index color model} to be created.
-     * This is the value to be returned by {@link IndexColorModel#getMapSize}. This
-     * value is always positive.
-     */
-    private final int size;
+    protected final int visibleBand;
 
     /**
      * The sample model to be given to {@link ImageTypeSpecifier}.
@@ -119,49 +95,31 @@ public class Palette {
     private transient Reference/*<ImageTypeSpecifier>*/ specifier;
 
     /**
-     * Creates a palette with the specified name and size. The RGB colors will be distributed
-     * in the range {@code lower} inclusive to {@code upper} exclusive. Remaining pixel values
-     * (if any) will be left to a black or transparent color by default.
+     * Creates a palette with the specified name.
      *
-     * @param factory The originating factory.
-     * @param name    The palette name.
-     * @param lower   Index of the first valid element (inclusive) in the
-     *                {@linkplain IndexColorModel index color model} to be created.
-     * @param upper   Index of the last valid element (exclusive) in the
-     *                {@linkplain IndexColorModel index color model} to be created.
-     * @param size    The size of the {@linkplain IndexColorModel index color model} to be created.
-     *                This is the value to be returned by {@link IndexColorModel#getMapSize}.
+     * @param factory     The originating factory.
+     * @param name        The palette name.
+     * @param numBands    The number of bands (usually 1) to assign to {@link #numBands}.
+     * @param visibleBand The visible band (usually 0) to assign to {@link #visibleBand}.
      */
     protected Palette(final PaletteFactory factory, final String name,
-                      final int lower, final int upper, int size)
+                      final int numBands, final int visibleBand)
     {
-        this.factory = factory;
         if (factory == null) {
             // Can't use factory.getErrorResources() here.
             throw new IllegalArgumentException(Errors.format(
                     ErrorKeys.NULL_ARGUMENT_$1, "factory"));
         }
-        final int minAllowed, maxAllowed;
-        if (lower < 0) {
-            minAllowed = Short.MIN_VALUE;
-            maxAllowed = Short.MAX_VALUE;
-            size       = (size <= 0xFF) ? 0xFF : MAX_SIZE;
-            // 'size' must be FF or FFFF in order to rool negative values.
-        } else {
-            minAllowed = 0;
-            maxAllowed = MAX_SIZE;
-        }
-        ensureInsideBounds(lower, minAllowed, maxAllowed);
-        ensureInsideBounds(upper, minAllowed, maxAllowed);
-        ensureInsideBounds(size,  upper,      MAX_SIZE  );
-        if (lower >= upper) {
+        if (name == null) {
             throw new IllegalArgumentException(factory.getErrorResources().getString(
-                    ErrorKeys.BAD_RANGE_$2, new Integer(lower), new Integer(upper)));
+                    ErrorKeys.NULL_ARGUMENT_$1, "name"));
         }
-        this.name  = name;
-        this.lower = lower;
-        this.upper = upper;
-        this.size  = size;
+        ensureInsideBounds(numBands, 0, 255); // This maximal value is somewhat arbitrary.
+        ensureInsideBounds(visibleBand, 0, numBands-1);
+        this.factory     = factory;
+        this.name        = name.trim();
+        this.numBands    = numBands;
+        this.visibleBand = visibleBand;
     }
 
     /**
@@ -169,7 +127,7 @@ public class Palette {
      *
      * @throws IllegalArgumentException if the specified values are outside the bounds.
      */
-    private void ensureInsideBounds(final int value, final int min, final int max)
+    final void ensureInsideBounds(final int value, final int min, final int max)
             throws IllegalArgumentException
     {
         if (value < min || value > max) {
@@ -180,34 +138,19 @@ public class Palette {
     }
 
     /**
-     * Creates and returns ARGB values for the {@linkplain IndexColorModel index color model} to be
-     * created. This method is invoked automatically the first time the color model is required, or
-     * when it need to be rebuilt.
-     *
-     * @throws  FileNotFoundException If the RGB values need to be read from a file and this file
-     *                                (typically inferred from {@link #name}) is not found.
-     * @throws  IOException           If an other find of I/O error occured.
-     * @throws  IIOException          If an other kind of error prevent this method to complete.
+     * Returns the scale from <cite>normalized values</cite> (values in the range [0..1])
+     * to values in the range of this palette.
      */
-    protected int[] createARGB() throws IOException {
-        final Color[] colors = factory.getColors(name);
-        if (colors == null) {
-            throw new FileNotFoundException(factory.getErrorResources().getString(
-                    ErrorKeys.FILE_DOES_NOT_EXIST_$1, name));
-        }
-        final int[] ARGB = new int[size];
-        if (lower >= 0) {
-            ColorUtilities.expand(colors, ARGB, lower, upper);
-        } else {
-            ColorUtilities.expand(colors, ARGB, 0, upper - lower);
-            final int negativeStart = size + lower;
-            final int negativeCount = -lower;
-            final int[] negatives = new int[negativeCount];
-            System.arraycopy(ARGB, 0, negatives, 0, negativeCount);
-            System.arraycopy(ARGB, negativeCount, ARGB, 0, negativeStart);
-            System.arraycopy(negatives, 0, ARGB, negativeStart, negativeCount);
-        }
-        return ARGB;
+    double getScale() {
+        return 1;
+    }
+
+    /**
+     * Returns the offset from <cite>normalized values</cite> (values in the range [0..1])
+     * to values in the range of this palette.
+     */
+    double getOffset() {
+        return 0;
     }
 
     /**
@@ -230,18 +173,19 @@ public class Palette {
     }
 
     /**
-     * Returns the image type specifier for this palette. This method tries to reuse existing
-     * color model if possible, since it may consume a significant amount of memory.
+     * Returns the image type specifier for this palette.
      *
      * @throws  FileNotFoundException If the RGB values need to be read from a file and this file
      *          (typically inferred from {@link #name}) is not found.
      * @throws  IOException  If an other find of I/O error occured.
      * @throws  IIOException If an other kind of error prevent this method to complete.
      */
-    public synchronized ImageTypeSpecifier getImageTypeSpecifier() throws IOException {
-        /*
-         * First checks the weak references.
-         */
+    public abstract ImageTypeSpecifier getImageTypeSpecifier() throws IOException;
+
+    /**
+     * Returns the image type specifier from the cache, or {@code null}.
+     */
+    final ImageTypeSpecifier queryCache() {
         if (specifier != null) {
             final ImageTypeSpecifier candidate = (ImageTypeSpecifier) specifier.get();
             if (candidate != null) {
@@ -256,49 +200,16 @@ public class Palette {
                 return its;
             }
         }
-        /*
-         * Nothing reacheable. Rebuild the specifier.
-         */
-        final int[] ARGB = createARGB();
-        final byte[] A = new byte[ARGB.length];
-        final byte[] R = new byte[ARGB.length];
-        final byte[] G = new byte[ARGB.length];
-        final byte[] B = new byte[ARGB.length];
-        for (int i=0; i<ARGB.length; i++) {
-            int code = ARGB[i];
-            B[i] = (byte) ((code       ) & 0xFF);
-            G[i] = (byte) ((code >>>= 8) & 0xFF);
-            R[i] = (byte) ((code >>>= 8) & 0xFF);
-            A[i] = (byte) ((code >>>= 8) & 0xFF);
-        }
-        final int bits = ColorUtilities.getBitCount(ARGB.length);
-        final int type = (bits <= 8) ? DataBuffer.TYPE_BYTE : DataBuffer.TYPE_USHORT;
-        final boolean packed = (bits==1 || bits==2 || bits==4);
-        final boolean dense  = (packed || bits==8 || bits==16);
-        final ImageTypeSpecifier its;
-        if (dense && (1 << bits) == ARGB.length) {
-            its = ImageTypeSpecifier.createIndexed(R,G,B,A, bits, type);
-        } else {
-            /*
-             * The "ImageTypeSpecifier.createIndexed(...)" method is too strict. The IndexColorModel
-             * constructor is more flexible. This block mimic the "ImageTypeSpecifier.createIndexed"
-             * work without the constraints imposed by "createIndexed". Being more flexible consume
-             * less memory for the color palette, since we don't force it to be 64 kb in the USHORT
-             * data type case.
-             */
-            final IndexColorModel colors = new IndexColorModel(bits, ARGB.length, R,G,B,A);
-            final SampleModel samples;
-            if (packed) {
-                samples = new MultiPixelPackedSampleModel(type, 1, 1, bits);
-            } else {
-                samples = new PixelInterleavedSampleModel(type, 1, 1, 1, 1, new int[1]);
-            }
-            its = new ImageTypeSpecifier(colors, samples);
-        }
+        return null;
+    }
+
+    /**
+     * Puts the specified image specifier in the cache.
+     */
+    final void cache(final ImageTypeSpecifier its) {
         samples   = its.getSampleModel();
         colors    = new PaletteDisposer.Reference(this, its.getColorModel());
         specifier = new WeakReference/*<ImageTypeSpecifier>*/(its);
-        return its;
     }
 
     /**
@@ -332,9 +243,10 @@ public class Palette {
         }
         final int xmax = xmin + width;
         final int ymax = ymin + height;
-        final double scale = (double)(upper - lower) / (double)width;
+        final double scale  = getScale() / width;
+        final double offset = getOffset();
         for (int x=xmin; x<xmax; x++) {
-            final int value = lower + (int) Math.round(scale * (x-xmin));
+            final double value = offset + scale*(x-xmin);
             for (int y=ymin; y<ymax; y++) {
                 if (horizontal) {
                     raster.setSample(x, y, 0, value);
@@ -364,7 +276,7 @@ public class Palette {
      */
     //@Override
     public int hashCode() {
-        return name.hashCode() + 37*(lower + 37*(upper + 37*size));
+        return name.hashCode() + 37*numBands + 17*visibleBand;
     }
 
     /**
@@ -372,24 +284,18 @@ public class Palette {
      */
     //@Override
     public boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
         if (object != null && getClass().equals(object.getClass())) {
             final Palette that = (Palette) object;
-            return this.lower == that.lower &&
-                   this.upper == that.upper &&
-                   this.size  == that.size  &&
+            return this.numBands    == that.numBands    &&
+                   this.visibleBand == that.visibleBand &&
                    Utilities.equals(this.name, that.name);
+            /*
+             * Note: we do not compare PaletteFactory on purpose, since two instances could be
+             * identical except for the locale to use for formatting error messages.   Because
+             * Palettes are used as keys in the PaletteFactory.palettes pool, we don't want to
+             * get duplicated palettes only because they format error messages differently.
+             */
         }
         return false;
-    }
-
-    /**
-     * Returns a string representation of this palette. Used for debugging purpose only.
-     */
-    //@Override
-    public String toString() {
-        return name + " [" + lower + "..." + (upper-1) + "] size=" + size;
     }
 }

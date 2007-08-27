@@ -569,7 +569,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
 
     /**
      * Returns an identifier according the given authority. This method first checks all
-     * {@link #getIdentifiers identifiers} in their iteration order. It returns the first
+     * {@linkplain #getIdentifiers identifiers} in their iteration order. It returns the first
      * identifier with an {@linkplain ReferenceIdentifier#getAuthority authority} citation
      * {@linkplain Citations#identifierMatches(Citation,Citation) matching} the specified
      * authority.
@@ -632,8 +632,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
 
     /**
      * Returns this object's name according the given authority. This method checks first the
-     * {@linkplain #getName() primary name}, then all {@link #getAlias() alias} in their iteration
-     * order.
+     * {@linkplain #getName() primary name}, then all {@linkplain #getAlias() alias} in their
+     * iteration order.
      *
      * <ul>
      *   <li><p>If the name or alias implements the {@link ReferenceIdentifier} interface,
@@ -979,8 +979,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * Returns a hash value for this identified object. {@linkplain #getName() Name},
      * {@linkplain #getIdentifiers identifiers} and {@linkplain #getRemarks remarks}
      * are not taken in account. In other words, two identified objects will return
-     * the same hash value if they are equal in the sense of
-     * <code>{@link #equals(AbstractIdentifiedObject,boolean) equals}(AbstractIdentifiedObject,
+     * the same hash value if they are equal in the sense of <code>{@linkplain
+     * #equals(AbstractIdentifiedObject,boolean) equals}(AbstractIdentifiedObject,
      * <strong>false</strong>)</code>.
      *
      * @return The hash code value. This value doesn't need to be the same
