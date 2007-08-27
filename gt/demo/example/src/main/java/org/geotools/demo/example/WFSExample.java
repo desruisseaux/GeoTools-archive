@@ -2,8 +2,10 @@ package org.geotools.demo.example;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,6 +26,7 @@ import org.geotools.geometry.jts.JTS;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.identity.Identifier;
 import org.opengis.filter.spatial.Intersects;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -138,7 +141,9 @@ public class WFSExample {
 
 		FeatureStore store = (FeatureStore) source;
 		store.setTransaction( t );
-		Filter filter = ff.id( Collections.singleton( ff.featureId(fid)));
+		Set<Identifier> ids = new HashSet<Identifier>();
+		ids.add( ff.featureId(fid) );
+		Filter filter = ff.id( ids );
 		try {
 			store.removeFeatures( filter );
 		}

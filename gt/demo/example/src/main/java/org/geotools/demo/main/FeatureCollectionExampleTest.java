@@ -133,7 +133,6 @@ public class FeatureCollectionExampleTest extends TestCase {
         CoordinateReferenceSystem crs = features.getMemberType().getCRS();
         final BoundingBox bounds = new ReferencedEnvelope( crs );
         
-        Iterator<SimpleFeature> iterator = features.iterator();
         features.accepts( new AbstractFeatureVisitor(){
             public void visit( org.opengis.feature.Feature feature ) {
                 bounds.include( feature.getBounds() );
@@ -147,10 +146,10 @@ public class FeatureCollectionExampleTest extends TestCase {
         CoordinateReferenceSystem crs = features.getMemberType().getCRS();
         BoundingBox bounds = new ReferencedEnvelope( crs );
         
-        Iterator<SimpleFeature> iterator = features.iterator();
+        Iterator iterator = features.iterator();
         try {
             while( iterator.hasNext()){
-                SimpleFeature feature = iterator.next();
+                SimpleFeature feature = (SimpleFeature) iterator.next();
                 bounds.include( feature.getBounds() );
             }
         }
@@ -162,11 +161,11 @@ public class FeatureCollectionExampleTest extends TestCase {
     /** Important when working with real data */
     public void testIteratorSafe(){
         int count = 0;
-        Iterator<SimpleFeature> iterator = features.iterator();
+        Iterator iterator = features.iterator();
         try {
             while( iterator.hasNext()){
                 try {
-                    SimpleFeature feature = iterator.next();
+                    SimpleFeature feature = (SimpleFeature) iterator.next();
                     count++;
                 }
                 catch( RuntimeException dataProblem ){

@@ -33,9 +33,12 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * Regardless to the dimension, the envelope can be encoded by two <code>DirectPosition</code>s. 
  */
 public class EnvelopeImpl implements Envelope, Serializable {
+    private static final long serialVersionUID = -6397319034308589090L;
+    
     static final int X = 0;
     static final int Y = 1;
     static final int Z = 2;
+    
 	// protected DirectPositionImpl pMin = null; // Lower Corner (Left bottom)
 	private DirectPosition pMin = null; // Lower Corner (Left bottom)
 

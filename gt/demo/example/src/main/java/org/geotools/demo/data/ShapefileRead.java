@@ -12,6 +12,7 @@ import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.factory.GeoTools;
+import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureCollection;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -71,12 +72,12 @@ public class ShapefileRead {
 		FeatureSource featureSource = dataStore.getFeatureSource(typeName);
 		FeatureCollection collection = featureSource.getFeatures();
 		
-		Iterator<SimpleFeature> iterator = (Iterator<SimpleFeature>) collection.iterator();
+		Iterator<Feature> iterator = (Iterator<Feature>) collection.iterator();
 		int length = 0;
 		try {
 			while (iterator.hasNext()) {
-			    SimpleFeature feature = iterator.next();
-				Geometry geometry = (Geometry ) feature.getDefaultGeometryValue();
+			    Feature feature = (Feature) iterator.next();
+				Geometry geometry = (Geometry ) feature.getDefaultGeometry().getValue();
 				
 				length += geometry.getLength();
 			}

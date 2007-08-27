@@ -171,13 +171,39 @@ public class GeometryBuilder {
 		return getPrimitiveFactory().createCurve(segments);
 	}
 
-	public Point createPoint(double[] coordinates) throws MismatchedDimensionException {
-		if (coordinates == null)
-			throw new NullPointerException();
-		if (coordinates.length != this.getCoordinateReferenceSystem().getCoordinateSystem().getDimension())
-			throw new MismatchedDimensionException();
+	/**
+	 * Create a point with the provided ordinates.
+	 * @param ord1
+	 * @param ord2
+	 * @return createPoint( new double[]{ ord1, ord2})
+	 */
+	public Point createPoint( double ord1, double ord2 ){
+	    return createPoint( new double[]{ ord1, ord2});
+	}
+	/**
+	 * Create a point with the provided ordinates.
+	 * @param ord1
+	 * @param ord2
+	 * @param ord3
+	 * @return createPoint( new double[]{ ord1, ord2, ord3 })
+	 */
+	public Point createPoint( double ord1, double ord2, double ord3 ){
+        return createPoint( new double[]{ ord1, ord2, ord3 });
+    }
+	/**
+	 * Create a point with the provided ordinates
+	 * @param ordinates
+	 * @return getPrimitiveFactory().createPoint(coordinates)
+	 * @throws MismatchedDimensionException
+	 */
+	public Point createPoint(double[] ordinates) throws MismatchedDimensionException {
+		if (ordinates == null)
+			throw new NullPointerException("Ordinates required to create a point");
+		int dimension = this.getCoordinateReferenceSystem().getCoordinateSystem().getDimension();
+        if (ordinates.length != dimension)
+			throw new MismatchedDimensionException("Create point requires "+dimension+" ordinates ("+ordinates.length+" provided");
 
-		return getPrimitiveFactory().createPoint(coordinates);
+		return getPrimitiveFactory().createPoint(ordinates);
 	}
 
 //	public Point createPoint(Position position) throws MismatchedReferenceSystemException, MismatchedDimensionException {

@@ -58,7 +58,7 @@ public class ParameterExample {
         
     }
     
-    static class Status extends CodeList {
+    static class Status extends CodeList<Status> {
         private static final long serialVersionUID = 0L;        
         static ArrayList values = new ArrayList();
         static Status GOOD = new Status("GOOD");
