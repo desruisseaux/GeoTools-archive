@@ -60,14 +60,14 @@ public class ParameterExample {
     
     static class Status extends CodeList<Status> {
         private static final long serialVersionUID = 0L;        
-        static ArrayList values = new ArrayList();
+        static ArrayList<Status> values = new ArrayList<Status>();
         static Status GOOD = new Status("GOOD");
         static Status BAD = new Status("BAD");
-        static Status UGLY = new Status("UGLY");        
+        static Status UGLY = new Status("UGLY");
         private Status( String name){
             super( name, values );
         }
-        public CodeList[] family() {
+        public Status[] family() {
             return (Status[]) values.toArray( new Status[ values.size()]);
         }
     }
