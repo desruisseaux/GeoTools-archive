@@ -45,6 +45,7 @@ public class GMLAbstractGeometryTypeBindingTest extends GMLTestSupport {
         p.setUserData(CRS.decode("EPSG:4326"));
 
         Document doc = encode(p, GML.Point);
-        assertEquals("EPSG:4326", doc.getDocumentElement().getAttribute("srsName"));
+        assertEquals("http://www.opengis.net/gml/srs/epsg.xml#4326",
+            doc.getDocumentElement().getAttribute("srsName"));
     }
 }

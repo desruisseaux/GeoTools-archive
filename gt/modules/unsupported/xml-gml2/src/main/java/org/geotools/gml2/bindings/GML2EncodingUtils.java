@@ -18,6 +18,7 @@ package org.geotools.gml2.bindings;
 import java.util.Iterator;
 import org.opengis.metadata.Identifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.metadata.iso.citation.Citations;
 
 
 /**
@@ -35,7 +36,10 @@ public class GML2EncodingUtils {
         for (Iterator i = crs.getIdentifiers().iterator(); i.hasNext();) {
             Identifier id = (Identifier) i.next();
 
-            return "EPSG:" + id.getCode();
+            //return "EPSG:" + id.getCode();
+            if ((id.getAuthority() != null) && id.getAuthority().equals(Citations.EPSG)) {
+                return "http://www.opengis.net/gml/srs/epsg.xml#" + id.getCode();
+            }
         }
 
         return null;
