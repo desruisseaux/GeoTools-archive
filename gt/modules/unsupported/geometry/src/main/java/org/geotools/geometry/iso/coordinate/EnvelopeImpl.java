@@ -135,11 +135,7 @@ public class EnvelopeImpl implements Envelope, Serializable {
 	 * @see org.opengis.geometry.coordinate.Envelope#getCenter(int)
 	 */
 	public double getCenter(int dimension) {
-		// TODO semantic JR, SJ
-		// TODO implementation
-		// TODO test
-		// TODO documentation
-		return 0;
+		return (pMax.getOrdinate(dimension)-pMin.getOrdinate(dimension))/2;
 	}
 
 	/*
@@ -148,11 +144,7 @@ public class EnvelopeImpl implements Envelope, Serializable {
 	 * @see org.opengis.geometry.coordinate.Envelope#getLength(int)
 	 */
 	public double getLength(int dimension) {
-		// TODO semantic JR, SJ
-		// TODO implementation
-		// TODO test
-		// TODO documentation
-		return 0;
+		return (pMax.getOrdinate(dimension)-pMin.getOrdinate(dimension));
 	}
 
 	/*
