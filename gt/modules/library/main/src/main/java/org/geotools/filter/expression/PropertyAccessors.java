@@ -18,11 +18,19 @@ public class PropertyAccessors {
     
     static {
         FACTORY_CACHE = new ArrayList();
-        Iterator factories = FactoryRegistry
-                .lookupProviders(PropertyAccessorFactory.class);
-        while (factories.hasNext()) {
-            FACTORY_CACHE.add(factories.next());
-        }
+
+        // add the simple feature property accessor factory first for performance
+        // reasons
+        FACTORY_CACHE.add( new SimpleFeaturePropertyAccessorFactory());
+         Iterator factories = FactoryRegistry
+                 .lookupProviders(PropertyAccessorFactory.class);
+         while (factories.hasNext()) {
+            Object factory = factories.next();
+            if ( factory instanceof SimpleFeaturePropertyAccessorFactory )
+                continue;
+            
+            FACTORY_CACHE.add(factory);
+         }
     }
     
     /**
