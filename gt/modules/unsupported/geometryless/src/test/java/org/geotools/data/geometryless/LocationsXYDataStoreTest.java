@@ -311,7 +311,7 @@ public class LocationsXYDataStoreTest extends TestCase {
 	GeometryAttribute geom = feature.getDefaultGeometry();
 	LOGGER.info("geometry is " + geom);
 	assertEquals(geom.getType().getBinding(), Point.class);
-	Point gPoint = (Point) geom.get();
+	Point gPoint = (Point) geom.getValue();
 	assertTrue(151.0 == gPoint.getX());
 	
     }
