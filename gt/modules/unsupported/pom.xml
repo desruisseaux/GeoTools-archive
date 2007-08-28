@@ -46,31 +46,6 @@
 
 
   <profiles>
-     <!-- ================================================== -->
-     <!--     Modules included for Java 5 build              -->
-     <!-- ================================================== -->
-     <profile>
-       <id>java5</id>
-       <activation>
-           <jdk>1.5</jdk>
-       </activation>
-       <modules>
-        <module>geometry</module>
-       </modules>
-     </profile>
-
-     <!-- ================================================== -->
-     <!--     Modules included for Java 6 build              -->
-     <!-- ================================================== -->
-     <profile>
-       <id>java6</id>
-       <activation>
-           <jdk>1.6</jdk>
-       </activation>
-       <modules>
-        <module>geometry</module>
-       </modules>
-     </profile>
      
      <!-- ================================================== -->
      <!--     Modules not yet included in the build          -->
@@ -94,11 +69,9 @@
      <profile>
        <id>archive</id>
        <modules>
-         <module>arcsde</module>
          <module>hsql</module>
          <module>jpox</module>
          <module>geomedia</module>
-         <module>db2</module>
        </modules>
      </profile>
   </profiles>
@@ -114,9 +87,7 @@
     <module>jts-wrapper</module>
     <module>mif</module>
     <module>mysql</module>
-    <!--
     <module>oracle-spatial</module>    
-    -->
     <module>postgis-versioned</module>
     <module>tiger</module>
     <module>tile</module>

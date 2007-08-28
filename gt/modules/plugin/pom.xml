@@ -84,13 +84,16 @@
   <!--     Modules included in the build                           -->
   <!-- =========================================================== --> 
   <modules>
-    <!--module>arcgrid</module--> <!-- Java 1.4 and Java 5 only -->
+    <module>arcgrid</module>
+    <module>arcsde</module>
+    <module>db2</module>
     <module>epsg-access</module>
     <module>epsg-extension</module>
     <module>epsg-hsql</module>
     <module>epsg-postgresql</module>
     <module>epsg-wkt</module>
     <module>geotiff</module>
+    <module>geometry</module>
     <module>gtopo30</module>
     <module>image</module>
     <module>imagemosaic</module>

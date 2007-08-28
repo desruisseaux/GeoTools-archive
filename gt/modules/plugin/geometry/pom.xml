@@ -15,17 +15,9 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-unsupported</artifactId>
+    <artifactId>gt2-plugin</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
-  
-  <!--
-  <properties>
-    <allow.test.skip>true</allow.test.skip>
-    <allow.test.failure.ignore>true</allow.test.failure.ignore>
-    <maven.test.skip>true</maven.test.skip>
-  </properties>
-  -->
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
