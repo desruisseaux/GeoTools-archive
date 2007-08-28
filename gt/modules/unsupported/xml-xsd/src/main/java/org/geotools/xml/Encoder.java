@@ -128,6 +128,9 @@ public class Encoder {
 	/** output format */
 	private OutputFormat outputFormat;
 	
+	/** namespace aware */
+	private boolean namespaceAware = true;
+	
 	/**
 	 * Logger logger;
 	 */
@@ -144,6 +147,19 @@ public class Encoder {
 	public Encoder(Configuration configuration) {
 		this( configuration, configuration.schema() );
 	}
+	
+	/**
+	 * Sets wether the encoder should be namespace aware.
+	 * <p>
+	 * Warning that setting this to <code>false</code> will result in no 
+	 * namespace prefixes on encoded elements and attributes, and no schema
+	 * declarations on the root element.document;
+	 * </p>
+	 * @param namespaces
+	 */
+	public void setNamespaceAware(boolean namespaceAware) {
+	    this.namespaceAware = namespaceAware;
+    }
 	
 	/**
 	 * Creates an encoder from a configuration and a specific schema 
@@ -167,7 +183,7 @@ public class Encoder {
 		//create the context
 		context = new DefaultPicoContainer();
 		
-		//register hte binding factory in the context
+		//register the binding factory in the context
 		BindingFactory bindingFactory = new BindingFactoryImpl( bindingLoader );
         context.registerComponentInstance( bindingFactory );
         
@@ -291,28 +307,30 @@ public class Encoder {
 			serializer = new XMLSerializer( out, new OutputFormat() );	
 		}
 		
-		serializer.setNamespaces( true );
+		serializer.setNamespaces( namespaceAware );
 		serializer.startDocument();
 		
-		//write out all the namespace prefix value mappings
-		for (Iterator itr = schema.getQNamePrefixToNamespaceMap()
-			.entrySet().iterator(); itr.hasNext();) {
-			
-			Map.Entry entry = (Map.Entry)itr.next();
-			String pre = (String) entry.getKey();
-			String ns = (String) entry.getValue();
-			
-			if( XSDUtil.SCHEMA_FOR_SCHEMA_URI_2001.equals( ns ) ) 
-				continue;
-			
-			serializer.startPrefixMapping(pre,ns);
-			serializer.endPrefixMapping(pre);
-			
-			namespaces.declarePrefix( pre != null ? pre : "" , ns );
-		}
-		//ensure a default namespace prefix set
-		if ( namespaces.getURI( "" ) == null ) {
-			namespaces.declarePrefix( "", schema.getTargetNamespace() );
+		if ( namespaceAware ) {
+    		//write out all the namespace prefix value mappings
+    		for (Iterator itr = schema.getQNamePrefixToNamespaceMap()
+    			.entrySet().iterator(); itr.hasNext();) {
+    			
+    			Map.Entry entry = (Map.Entry)itr.next();
+    			String pre = (String) entry.getKey();
+    			String ns = (String) entry.getValue();
+    			
+    			if( XSDUtil.SCHEMA_FOR_SCHEMA_URI_2001.equals( ns ) ) 
+    				continue;
+    			
+    			serializer.startPrefixMapping(pre,ns);
+    			serializer.endPrefixMapping(pre);
+    			
+    			namespaces.declarePrefix( pre != null ? pre : "" , ns );
+    		}
+    		//ensure a default namespace prefix set
+    		if ( namespaces.getURI( "" ) == null ) {
+    			namespaces.declarePrefix( "", schema.getTargetNamespace() );
+    		}
 		}
 		
 		//create the document
@@ -651,11 +669,18 @@ public class Encoder {
 		
 		String qName = element.getLocalName();
 		
-		uri = uri != null ? uri : namespaces.getURI( "" );
-		qName = namespaces.getPrefix( uri ) + ":" + qName;
+		NamespaceSupport namespaces = this.namespaces;
+		if ( namespaceAware ) {
+		    uri = uri != null ? uri : namespaces.getURI( "" );
+	        qName = namespaces.getPrefix( uri ) + ":" + qName;
+	    }
+		else {
+		    uri = "";
+		    namespaces = null;
+		}
 		
 		DOMAttributes atts = new DOMAttributes(element.getAttributes(), namespaces );
-		serializer.startElement(uri,local,qName,atts);
+        serializer.startElement(uri,local,qName,atts);
 		
 		//write out any text
 		for (int i = 0; i < element.getChildNodes().getLength(); i++) {
@@ -677,9 +702,9 @@ public class Encoder {
 		
 		//push a new context for children, declaring the default prefix to be the one of this 
 		// element
-		namespaces.pushContext();
+		this.namespaces.pushContext();
 		if ( uri != null ) {
-			namespaces.declarePrefix( "", uri );	
+			this.namespaces.declarePrefix( "", uri );	
 		}
 	}
 	
@@ -777,11 +802,14 @@ public class Encoder {
 
 		public String getQName(int index) {
 			Node n = atts.item(index);
-			String uri = n.getNamespaceURI();
-			String prefix = uri != null ? namespaces.getPrefix( uri ) : null;
 			
-			if ( prefix != null ) {
-				return prefix + ":" + n.getLocalName();
+			if ( namespaces != null ) {
+			    String uri = n.getNamespaceURI();
+	            String prefix = uri != null ? namespaces.getPrefix( uri ) : null;
+	            
+	            if ( prefix != null ) {
+	                return prefix + ":" + n.getLocalName();
+	            }			    
 			}
 			
 			return n.getLocalName();
