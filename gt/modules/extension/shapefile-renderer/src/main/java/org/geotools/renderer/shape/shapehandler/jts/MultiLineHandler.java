@@ -19,13 +19,14 @@ package org.geotools.renderer.shape.shapehandler.jts;
 import java.awt.Rectangle;
 
 import org.geotools.data.shapefile.shp.ShapeType;
+import org.geotools.geometry.jts.LiteCoordinateSequence;
+import org.geotools.geometry.jts.LiteCoordinateSequenceFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.impl.PackedCoordinateSequenceFactory;
 
 
 /**
@@ -37,7 +38,7 @@ import com.vividsolutions.jts.geom.impl.PackedCoordinateSequenceFactory;
  * @source $URL$
  */
 public class MultiLineHandler extends org.geotools.renderer.shape.shapehandler.simple.MultiLineHandler {
-    static final GeometryFactory factory=new GeometryFactory();
+    private static final GeometryFactory factory=new GeometryFactory(new LiteCoordinateSequenceFactory());
     
     public MultiLineHandler(ShapeType type, Envelope env,
             MathTransform mt, boolean hasOpacity, Rectangle screenSize) throws TransformException {
@@ -48,7 +49,7 @@ public class MultiLineHandler extends org.geotools.renderer.shape.shapehandler.s
         
         LineString[] ls=new LineString[transformed.length];
         for (int i = 0; i < transformed.length; i++) {
-            ls[i]=factory.createLineString(PackedCoordinateSequenceFactory.DOUBLE_FACTORY.create(transformed[i], 2));
+            ls[i]=factory.createLineString(new LiteCoordinateSequence(transformed[i]));
         }
         
         return factory.createMultiLineString(ls);

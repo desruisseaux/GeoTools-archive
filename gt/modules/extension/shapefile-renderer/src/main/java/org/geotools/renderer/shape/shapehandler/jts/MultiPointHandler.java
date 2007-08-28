@@ -17,8 +17,11 @@
 package org.geotools.renderer.shape.shapehandler.jts;
 
 import java.awt.Rectangle;
+import java.util.Iterator;
 
 import org.geotools.data.shapefile.shp.ShapeType;
+import org.geotools.geometry.jts.LiteCoordinateSequence;
+import org.geotools.geometry.jts.LiteCoordinateSequenceFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
@@ -38,7 +41,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  */
 public class MultiPointHandler extends org.geotools.renderer.shape.shapehandler.simple.MultiPointHandler{
 
-    private static final GeometryFactory factory=new GeometryFactory();
+    private static final GeometryFactory factory=new GeometryFactory(new LiteCoordinateSequenceFactory());
     
     public MultiPointHandler(ShapeType type, Envelope env, Rectangle screenSize, 
             MathTransform mt, boolean hasOpacity) throws TransformException {
@@ -46,7 +49,12 @@ public class MultiPointHandler extends org.geotools.renderer.shape.shapehandler.
     }
     
     protected Object createGeometry(ShapeType type, Envelope geomBBox, double[][] transformed) {
-        return factory.createMultiPoint(new MultiPointCoodinateSequence(transformed));
+        double[] coords = new double[transformed.length * 2];
+        for (int i = 0; i < transformed.length; i++) {
+            coords[i * 2] = transformed[i][0];
+            coords[i * 2 + 1] = transformed[i][1];
+        }
+        return factory.createMultiPoint(new LiteCoordinateSequence(coords));
     }
 
     private static class MultiPointCoodinateSequence implements CoordinateSequence{

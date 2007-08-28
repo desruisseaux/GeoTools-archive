@@ -17,6 +17,8 @@
 package org.geotools.renderer.shape.shapehandler.jts;
 
 import org.geotools.data.shapefile.shp.ShapeType;
+import org.geotools.geometry.jts.LiteCoordinateSequence;
+import org.geotools.geometry.jts.LiteCoordinateSequenceFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
@@ -38,7 +40,7 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class PolygonHandler extends org.geotools.renderer.shape.shapehandler.simple.PolygonHandler{
     private static final LinearRing[] HOLES=new LinearRing[0];
-    private static final GeometryFactory factory=new GeometryFactory();
+    private static final GeometryFactory factory=new GeometryFactory(new LiteCoordinateSequenceFactory());
     public PolygonHandler(ShapeType type, Envelope env, 
             MathTransform mt, boolean hasOpacity) throws TransformException {
         super(type, env, mt, hasOpacity);
@@ -48,7 +50,7 @@ public class PolygonHandler extends org.geotools.renderer.shape.shapehandler.sim
     protected Object createGeometry(ShapeType type, Envelope geomBBox, double[][] transformed) {
         Polygon[] poly=new Polygon[transformed.length];
         for (int i = 0; i < transformed.length; i++) {
-            LinearRing ring = factory.createLinearRing(new PolygonCoodinateSequence(transformed[i]));
+            LinearRing ring = factory.createLinearRing(new LiteCoordinateSequence(transformed[i]));
             poly[i]=factory.createPolygon(ring,HOLES);
         }
         

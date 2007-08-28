@@ -19,6 +19,8 @@ package org.geotools.renderer.shape.shapehandler.jts;
 import java.awt.Rectangle;
 
 import org.geotools.data.shapefile.shp.ShapeType;
+import org.geotools.geometry.jts.LiteCoordinateSequence;
+import org.geotools.geometry.jts.LiteCoordinateSequenceFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
@@ -37,7 +39,7 @@ import com.vividsolutions.jts.geom.impl.PackedCoordinateSequenceFactory;
  *         http://svn.geotools.org/geotools/branches/2.2.x/ext/shaperenderer/src/org/geotools/renderer/shape/PointHandler.java $
  */
 public class PointHandler extends org.geotools.renderer.shape.shapehandler.simple.PointHandler{
-    private static final GeometryFactory factory=new GeometryFactory();
+    private static final GeometryFactory factory=new GeometryFactory(new LiteCoordinateSequenceFactory());
     
     public PointHandler(ShapeType type, Envelope env, Rectangle screenSize, 
             MathTransform mt, boolean hasOpacity) throws TransformException {
@@ -45,7 +47,7 @@ public class PointHandler extends org.geotools.renderer.shape.shapehandler.simpl
     }
 
     protected Object createGeometry(ShapeType type, Envelope geomBBox, double[][] transformed) {
-        return factory.createPoint(PackedCoordinateSequenceFactory.DOUBLE_FACTORY.create(transformed[0],2));
+        return factory.createPoint(new LiteCoordinateSequence(transformed[0]));
     }
     
 }
