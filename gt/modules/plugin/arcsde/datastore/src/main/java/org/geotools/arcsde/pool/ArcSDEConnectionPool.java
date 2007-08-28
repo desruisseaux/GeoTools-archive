@@ -31,8 +31,6 @@ import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.geotools.data.DataSourceException;
 
-import sun.rmi.runtime.GetThreadPoolAction;
-
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeInstance;
