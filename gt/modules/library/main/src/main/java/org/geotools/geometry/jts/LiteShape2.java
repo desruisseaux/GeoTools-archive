@@ -133,10 +133,9 @@ public final class LiteShape2 implements Shape, Cloneable {
 		} 
 		else  // this doesnt normally happen -- dont bother optimizing.
 		{
+		        // if we have a transform a decimation span can be detected, so try to decimate anyways
 			if (mathTransform != null && !mathTransform.isIdentity())
 				new Decimator(mathTransform.inverse()).decimate(this.geometry);
-			else
-				new Decimator(null).decimate(this.geometry);
 			if (geometry != null)
 				transformGeometry(geometry);
 		}
@@ -159,15 +158,15 @@ public final class LiteShape2 implements Shape, Cloneable {
 	}
 	private final  Geometry cloneGeometryLCS(Point geom) 
 	{
-		return getGeometryFactory().createPoint(  new LiteCoordinateSequence(  (double[]) ((LiteCoordinateSequence) geom.getCoordinateSequence()).getArray().clone()      ) );
+	    return getGeometryFactory().createPoint(new LiteCoordinateSequence((LiteCoordinateSequence) geom.getCoordinateSequence()));
 	}
 	private final  Geometry cloneGeometryLCS(LineString geom) 
 	{
-		return getGeometryFactory().createLineString(  new LiteCoordinateSequence( (double[])  ((LiteCoordinateSequence) geom.getCoordinateSequence()).getArray().clone()  ) );
+		return getGeometryFactory().createLineString(new LiteCoordinateSequence((LiteCoordinateSequence) geom.getCoordinateSequence()));
 	}
 	private final  Geometry cloneGeometryLCS(LinearRing geom) 
 	{
-		return getGeometryFactory().createLinearRing(  new LiteCoordinateSequence( (double[])  ((LiteCoordinateSequence) geom.getCoordinateSequence()).getArray().clone()  ) );
+		return getGeometryFactory().createLinearRing(new LiteCoordinateSequence((LiteCoordinateSequence) geom.getCoordinateSequence()));
 	}
 	
 	private final Geometry cloneGeometryLCS(Geometry geom) 
@@ -283,9 +282,8 @@ public final class LiteShape2 implements Shape, Cloneable {
 			LiteCoordinateSequence seq = (LiteCoordinateSequence) ((LineString) geometry)
 					.getCoordinateSequence();
 			double[] coords = seq.getArray();
-			double[] newCoords = new double[coords.length];
-			mathTransform.transform(coords, 0, newCoords, 0, seq.size());
-			seq.setArray(newCoords);
+			mathTransform.transform(coords, 0, coords, 0, seq.size());
+			seq.setArray(coords);
 		}
 	}
 

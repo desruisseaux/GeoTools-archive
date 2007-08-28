@@ -92,6 +92,20 @@ public class LiteCoordinateSequence extends PackedCoordinateSequence{
     	this.dimension=2;
     	coords = new double[size * this.dimension];
     }
+    
+    /**
+     * Copy constructor
+     * @param seq
+     */
+    public LiteCoordinateSequence(LiteCoordinateSequence seq) {
+        // a trivial benchmark can show that cloning arrays like this is actually faster
+        // than calling clone on the array.
+        this.dimension = seq.dimension;
+        double[] orig = seq.getArray();
+        this.coords = new double[orig.length];
+        System.arraycopy(orig, 0, coords, 0, coords.length);
+        
+    }
 
     /**
      * @see com.vividsolutions.jts.geom.CoordinateSequence#getCoordinate(int)
