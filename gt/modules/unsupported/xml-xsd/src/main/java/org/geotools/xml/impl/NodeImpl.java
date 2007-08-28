@@ -23,7 +23,6 @@ import java.util.List;
 import org.geotools.xml.InstanceComponent;
 import org.geotools.xml.Node;
 
-
 public class NodeImpl implements Node {
     private InstanceComponent component;
     private Object value;
@@ -403,6 +402,38 @@ public class NodeImpl implements Node {
         }
 
         return matches;
+    }
+    
+    public Object getAttributeValue(String name, Object defaultValue) {
+        Object o = getAttributeValue(name);
+        if ( o == null ) {
+            o = defaultValue;
+        }
+        return o;
+    }
+
+    public Object getAttributeValue(Class clazz, Object defaultValue) {
+        Object o = getAttributeValue(clazz);
+        if ( o == null ) {
+            o = defaultValue;
+        }
+        return o;
+    }
+
+    public Object getChildValue(String name, Object defaultValue) {
+        Object o = getChildValue(name);
+        if ( o == null ) {
+            o = defaultValue;
+        }
+        return o;
+    }
+
+    public Object getChildValue(Class clazz, Object defaultValue) {
+        Object o = getChildValue(clazz);
+        if ( o == null ) {
+            o = defaultValue;
+        }
+        return o;
     }
     
     //additional methods, not part of public api

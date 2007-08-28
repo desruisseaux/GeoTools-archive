@@ -107,7 +107,7 @@ public interface Node {
     /**
      * Returns a node corresponding to a child element which has a parsed value
      * which is an instance of <code>clazz</code>. This method returns the
-     * first such node it finds an dno order is guarenteed, it is providedd
+     * first such node it finds and no order is guarenteed, it is providedd
      * for convenience. This method returns <code>null</codee> if it finds no
      * such child mathing the above criteria.
      *
@@ -140,10 +140,29 @@ public interface Node {
      * list of all values matching name use {@link #getChildValues(String)}.
      * </p>
      *
-     * @return the value of the child with the given name, or null if the child
-     * does not exist.
+     * @param name The name of the child which parsed content is to be retrived.
+     * 
+     * @return the value of the child with the given name, or <code>null</code>
+     * if the child does not exist.
      */
     Object getChildValue(String name);
+
+    /**
+     * Helper method for access to child's parsed contents by element name.returning 
+     * a <tt>defaultValue</tt> when no such value is present
+     * <p>
+     * In the event that the node has multiple children mathing <code>name</name>
+     * the first encountered is returned, there is no guarantee of order. For a
+     * list of all values matching name use {@link #getChildValues(String)}.
+     * </p>
+     *
+     * @param name The name of the child which parsed content is to be retrived.
+     * @param defaultValue A defaultValue to return, if no such child found.
+     * 
+     * @return the value of the child with the given name, or
+     * <code>defaultValue</code> if the child does not exist.
+     */
+    Object getChildValue(String name, Object defaultValue);
 
     /**
      * Helper method for access to child's parsed contents by class.
@@ -154,11 +173,30 @@ public interface Node {
      * use {@link #getChildValues(Class)}.
      * </p>
      *
+     * @param clazz The class of parsed child value.
+     *
      * @return the value of the child which is an instance of <code>clazz</code>,
-     * or null if no such child exists.
-     * @param clazz
+     * or <code>null</code> if no such child exists.
      */
     Object getChildValue(Class clazz);
+
+    /**
+     * Helper method for access to child's parsed contents by class, returning a 
+     * <tt>defaultValue</tt> when no such value is present
+     * <p>
+     * In the event that the node has multiple children which are instances of
+     * <code>clazz</code>, the first is returned, there is no guarantee of
+     * order. For a list of all values which are instances of <code>clazz</code>
+     * use {@link #getChildValues(Class)}.
+     * </p>
+     *
+     * @param clazz The class of parsed child value.
+     * @param defaultValue A defaultValue to return, if no such child found.
+     * 
+     * @return the value of the child which is an instance of <code>clazz</code>,
+     * or <code>defaultValue</code> if no such child exists.
+     */
+    Object getChildValue(Class clazz, Object defaultValue);
 
     /**
      * Helper method for access to the set of parse child values with the
@@ -256,6 +294,21 @@ public interface Node {
     Object getAttributeValue(String name);
 
     /**
+     * Helper method for access to the parsed value of the attribute with
+     * the specified name, returning a <code>defaultValue</code> when no such 
+     * attribute is present
+     *
+     * @param name The name of the attribute in which to retreive the parsed
+     * value from.
+     * @param defaultValue A defaultValue to return, if no such attribute
+     * found.
+     *
+     * @return the parsed value of the attribute matching the criteria, or
+     * <code>defaultValue</code> if no such attribute is found.
+     */
+    Object getAttributeValue(String name, Object defaultValue);
+
+    /**
      * Helper method for access to the parsed value of the attribute whose
      * parsed value is an instance of <code>clazz</code>. In the event that the
      * node contains multple attributes matching the above criteria, the first
@@ -268,6 +321,23 @@ public interface Node {
      * <code>null</code> if no such attribute is found.
      */
     Object getAttributeValue(Class clazz);
+
+    /**
+     * Helper method for access to the parsed value of the attribute whose
+     * parsed value is an instance of <code>clazz</code>, returning a 
+     * <code>defaultValue</code> when no such attribute is present. In the event 
+     * that the node contains multple attributes matching the above criteria, the 
+     * first encountered is returned, with no guaratnee of order. For all values
+     * matching this criteria use {@link #getAttributeValues(Class)}.
+     *
+     * @param clazz The class of parsed attribute values.
+     * @param defaultValue A defaultValue to return, if no such attribute
+     * found.
+     *
+     * @return the parsed value of the attribute matching the criteria, or
+     * <code>defaultValue</code> if no such attribute is found.
+     */
+    Object getAttributeValue(Class clazz, Object defaultValue);
 
     /**
      * Helper method for access ot the parsed values of attribute nodes whose
