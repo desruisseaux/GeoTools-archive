@@ -17,6 +17,7 @@ package org.geotools.geometry.jts;
 
 import java.awt.Rectangle;
 
+import org.geotools.referencing.operation.matrix.AffineTransform2D;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
@@ -97,6 +98,11 @@ public final class Decimator {
 	 */
 	public Decimator(MathTransform screenToWorld) {
 		this(screenToWorld, new Rectangle()); // do at (0,0)
+	}
+	
+	public Decimator(double spanx, double spany) {
+	    this.spanx = spanx;
+	    this.spany = spany;
 	}
 
 	public final void decimateTransformGeneralize(Geometry geometry,
@@ -198,105 +204,86 @@ public final class Decimator {
 			MathTransform transform) throws TransformException {
 		// decimates before XFORM
 		int ncoords = seq.size();
-		double originalOrds[] = seq.getXYArray(); // 2*#of points
+		double coords[] = seq.getXYArray(); // 2*#of points
 
 		if (ncoords < 2) {
 			if (ncoords == 1) // 1 coordinate -- just xform it
 			{
-				double[] newCoordsXformed2 = new double[2];
-				transform.transform(originalOrds, 0, newCoordsXformed2, 0, 1);
-				seq.setArray(newCoordsXformed2);
+				// double[] newCoordsXformed2 = new double[2];
+				transform.transform(coords, 0, coords, 0, 1);
+				seq.setArray(coords);
 				return;
 			} else
 				return; // ncoords =0
 		}
 
-		// unfortunately, we have to keep things in double precion until after
-		// the transform or we could move things.
-		double[] allCoords = new double[ncoords * 2]; // preallocate -- might
-		// not be full (throw
-		// away Z)
-
-		allCoords[0] = originalOrds[0]; // allways have 1st one
-		allCoords[1] = originalOrds[1];
-
 		int actualCoords = 1;
-		double lastX = allCoords[0];
-		double lastY = allCoords[1];
+		double lastX = coords[0];
+		double lastY = coords[1];
 		for (int t = 1; t < (ncoords - 1); t++) {
 			// see if this one should be added
-			double x = originalOrds[t * 2];
-			double y = originalOrds[t * 2 + 1];
+			double x = coords[t * 2];
+			double y = coords[t * 2 + 1];
 			if ((Math.abs(x - lastX) > spanx) || (Math.abs(y - lastY)) > spany) {
-				allCoords[actualCoords * 2] = x;
-				allCoords[actualCoords * 2 + 1] = y;
+				coords[actualCoords * 2] = x;
+				coords[actualCoords * 2 + 1] = y;
 				lastX = x;
 				lastY = y;
 				actualCoords++;
 			}
 		}
-		allCoords[actualCoords * 2] = originalOrds[(ncoords - 1) * 2];
 		// always have last one
-		allCoords[actualCoords * 2 + 1] = originalOrds[(ncoords - 1) * 2 + 1];
+		coords[actualCoords * 2] = coords[(ncoords - 1) * 2];
+		coords[actualCoords * 2 + 1] = coords[(ncoords - 1) * 2 + 1];
 		actualCoords++;
 
-		double[] newCoordsXformed;
 		// DO THE XFORM
-		if ((transform == null) || (transform.isIdentity())) // no actual
-		// xform
-		{
-			newCoordsXformed = allCoords;
+		if ((transform == null) || (transform.isIdentity())) {
+		    // no actual xform
 		} else {
-			newCoordsXformed = new double[actualCoords * 2];
-			transform
-					.transform(allCoords, 0, newCoordsXformed, 0, actualCoords);
+		    transform.transform(coords, 0, coords, 0, actualCoords);
 		}
-
-		// GENERALIZE -- we should be in screen space so spanx=spany=1.0
-
-		// unfortunately, we have to keep things in double precion until after
-		// the transform or we could move things.
-		double[] finalCoords = new double[ncoords * 2]; // preallocate -- might
-		// not be full (throw
-		// away Z)
-
-		finalCoords[0] = newCoordsXformed[0]; // allways have 1st one
-		finalCoords[1] = newCoordsXformed[1];
 
 		int actualCoordsGen = 1;
-		lastX = newCoordsXformed[0];
-		lastY = newCoordsXformed[1];
-
-		for (int t = 1; t < (actualCoords - 1); t++) {
-			// see if this one should be added
-			double x = newCoordsXformed[t * 2];
-			double y = newCoordsXformed[t * 2 + 1];
-			if ((Math.abs(x - lastX) > 0.75) || (Math.abs(y - lastY)) > 0.75) // 0.75
-			// instead of 1 just because it tends to look nicer for slightly
-			// more work. magic number.
-			{
-				finalCoords[actualCoordsGen * 2] = x;
-				finalCoords[actualCoordsGen * 2 + 1] = y;
-				lastX = x;
-				lastY = y;
-				actualCoordsGen++;
-			}
+		if(!(transform instanceof AffineTransform2D)) {
+        		// GENERALIZE again -- we should be in screen space so spanx=spany=1.0
+        		for (int t = 1; t < (actualCoords - 1); t++) {
+        			// see if this one should be added
+        			double x = coords[t * 2];
+        			double y = coords[t * 2 + 1];
+        			if ((Math.abs(x - lastX) > 0.75) || (Math.abs(y - lastY)) > 0.75) // 0.75
+        			// instead of 1 just because it tends to look nicer for slightly
+        			// more work. magic number.
+        			{
+        			    coords[actualCoordsGen * 2] = x;
+        			    coords[actualCoordsGen * 2 + 1] = y;
+        				lastX = x;
+        				lastY = y;
+        				actualCoordsGen++;
+        			}
+        		}
+        		// always have last one
+        		coords[actualCoordsGen * 2] = coords[(actualCoords - 1) * 2];
+        		coords[actualCoordsGen * 2 + 1] = coords[(actualCoords - 1) * 2 + 1];
+        		actualCoordsGen++;
+		} else {
+		    actualCoordsGen = actualCoords;
 		}
-		finalCoords[actualCoordsGen * 2] = newCoordsXformed[(actualCoords - 1) * 2];
-		// always have last one
-		finalCoords[actualCoordsGen * 2 + 1] = newCoordsXformed[(actualCoords - 1) * 2 + 1];
-		actualCoordsGen++;
 
 		// stick back in
-		double[] seqDouble = new double[2 * actualCoordsGen];
-		System.arraycopy(finalCoords, 0, seqDouble, 0, actualCoordsGen * 2);
-		seq.setArray(seqDouble);
+		if(actualCoordsGen * 2 < coords.length) {
+		    double[] seqDouble = new double[2 * actualCoordsGen];
+		    System.arraycopy(coords, 0, seqDouble, 0, actualCoordsGen * 2);
+		    seq.setArray(seqDouble);
+		} else {
+		    seq.setArray(coords);
+		}
 	}
 
 	private void decimate(LiteCoordinateSequence seq) {
-		double[] coords = seq.getArray();
-		int numDoubles = coords.length;
+		double[] coords = seq.getXYArray();
 		int dim = seq.getDimension();
+		int numDoubles = coords.length;
 		int readDoubles = 0;
 		double prevx, currx, prevy, curry, diffx, diffy;
 		for (int currentDoubles = 0; currentDoubles < numDoubles; currentDoubles += dim) {
@@ -316,9 +303,11 @@ public final class Decimator {
 						currentDoubles);
 			}
 		}
-		double[] newCoords = new double[readDoubles];
-		System.arraycopy(coords, 0, newCoords, 0, readDoubles);
-		seq.setArray(newCoords);
+		if(readDoubles < numDoubles) {
+		    double[] newCoords = new double[readDoubles];
+		    System.arraycopy(coords, 0, newCoords, 0, readDoubles);
+		    seq.setArray(newCoords);
+		}
 	}
 
 	/**
