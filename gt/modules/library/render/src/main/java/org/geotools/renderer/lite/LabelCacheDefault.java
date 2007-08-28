@@ -42,6 +42,7 @@ import java.util.Set;
 import javax.media.jai.util.Range;
 
 import org.geotools.feature.Feature;
+import org.geotools.geometry.jts.Decimator;
 import org.geotools.geometry.jts.LiteShape2;
 import org.geotools.renderer.style.SLDStyleFactory;
 import org.geotools.renderer.style.TextStyle2D;
@@ -676,6 +677,9 @@ public final class LabelCacheDefault implements LabelCache {
 	 * @param polygon
 	 */
 	private Polygon simplifyPoly(Polygon polygon) {
+	    if(polygon.getNumInteriorRing() == 0)
+	        return polygon;
+	    
 		LineString outer = polygon.getExteriorRing();
 		if (outer.getStartPoint().distance(outer.getEndPoint()) != 0) {
 			List clist = new ArrayList(Arrays.asList(outer.getCoordinates()));
@@ -1082,6 +1086,11 @@ public final class LabelCacheDefault implements LabelCache {
 			return line.getFactory().createMultiLineString(lns);
 		}
 		try {
+		        // the representative geometry does not need to be accurate, let's
+                        // simplify it further before doing the overlay to reduce the overlay cost
+                        Decimator d = new Decimator(10, 10);
+                        d.decimate(line);
+                        line.geometryChanged();
 			clip = EnhancedPrecisionOp.intersection(line, bbox);
 		} catch (Exception e) {
 			// TODO: should try to expand the bounding box and re-do the
@@ -1220,6 +1229,11 @@ public final class LabelCacheDefault implements LabelCache {
 		}
 
 		try {
+		        // the representative geometry does not need to be accurate, let's
+	                // simplify it further before doing the overlay to reduce the overlay cost
+	                Decimator d = new Decimator(10, 10);
+	                d.decimate(poly);
+	                poly.geometryChanged();
 			clip = EnhancedPrecisionOp.intersection(poly, bbox);
 		} catch (Exception e) {
 			// TODO: should try to expand the bounding box and re-do the
