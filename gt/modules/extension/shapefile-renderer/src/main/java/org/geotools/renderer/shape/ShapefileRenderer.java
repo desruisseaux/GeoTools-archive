@@ -1267,13 +1267,11 @@ public class ShapefileRenderer implements GTRenderer {
             ReferencedEnvelope bbox = envelope;
 
             try {
-                ShapefileDataStore ds = (ShapefileDataStore) currLayer.getFeatureSource()
-                        .getDataStore();
+                GeometryAttributeType geom = currLayer.getFeatureSource().getSchema().getPrimaryGeometry();
                 
                 CoordinateReferenceSystem dataCRS;
                 if( getForceCRSHint()==null )
-                	dataCRS = ds.getSchema().getPrimaryGeometry()
-                        .getCoordinateSystem();
+                	dataCRS = geom.getCoordinateSystem();
                 else
                 	dataCRS=getForceCRSHint();
                 
@@ -1300,6 +1298,7 @@ public class ShapefileRenderer implements GTRenderer {
                 }
 
                 // dbfheader must be set so that the attributes required for theming can be read in.
+                ShapefileDataStore ds = (ShapefileDataStore) currLayer.getFeatureSource().getDataStore();
                 dbfheader = getDBFHeader(ds);
 
                 // graphics.setTransform(transform);
