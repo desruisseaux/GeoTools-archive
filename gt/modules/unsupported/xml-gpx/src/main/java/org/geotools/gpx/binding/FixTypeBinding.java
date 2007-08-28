@@ -16,8 +16,10 @@
 package org.geotools.gpx.binding;
 
 import javax.xml.namespace.QName;
+
 import org.geotools.gpx.bean.ObjectFactory;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractSimpleBinding;
+import org.geotools.xml.InstanceComponent;
 
 
 /**
@@ -81,6 +83,19 @@ public class FixTypeBinding extends AbstractSimpleBinding {
         throws Exception {
         String fixType = (String) value;
 
+        if (!"none".equals(value) && !"2d".equals(value) && !"3d".equals(value)
+                && !"dgps".equals(value) && !"pps".equals(value)) {
+            throw new IllegalArgumentException(
+                "FixType can only be one of (none, 2d, 3d, dgps, pps), not: " + fixType);
+        }
+
+        return fixType;
+    }
+    
+    @Override
+    public String encode(Object object, String value) throws Exception {
+        String fixType = (String) object;
+        
         if (!"none".equals(value) && !"2d".equals(value) && !"3d".equals(value)
                 && !"dgps".equals(value) && !"pps".equals(value)) {
             throw new IllegalArgumentException(

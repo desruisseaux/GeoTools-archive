@@ -16,11 +16,14 @@
 package org.geotools.gpx.binding;
 
 import javax.xml.namespace.QName;
+
 import org.geotools.gpx.bean.ExtensionsType;
 import org.geotools.gpx.bean.GpxType;
 import org.geotools.gpx.bean.MetadataType;
 import org.geotools.gpx.bean.ObjectFactory;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -140,5 +143,33 @@ public class GpxTypeBinding extends AbstractComplexBinding {
         gpx.getTrk().addAll(node.getChildValues("trk"));
 
         return gpx;
+    }
+    
+    @Override
+    public Object getProperty(Object object, QName name) throws Exception {
+        GpxType gpx = (GpxType) object;
+        
+        if("creator".equals(name.getLocalPart()))
+            return gpx.getCreator();
+        
+        if("metadata".equals(name.getLocalPart()))
+            return gpx.getMetadata();
+        
+        if("version".equals(name.getLocalPart()))
+            return gpx.getVersion();
+        
+        if("extensions".equals(name.getLocalPart()))
+            return gpx.getExtensions();
+        
+        if("wpt".equals(name.getLocalPart()))
+            return gpx.getWpt();
+        
+        if("rte".equals(name.getLocalPart()))
+            return gpx.getRte();
+        
+        if("trk".equals(name.getLocalPart()))
+            return gpx.getTrk();
+        
+        return null;
     }
 }

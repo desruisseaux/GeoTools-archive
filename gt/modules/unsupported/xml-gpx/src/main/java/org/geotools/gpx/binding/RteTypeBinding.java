@@ -15,12 +15,14 @@
  */
 package org.geotools.gpx.binding;
 
-import java.math.BigInteger;
 import javax.xml.namespace.QName;
+
 import org.geotools.gpx.bean.ExtensionsType;
 import org.geotools.gpx.bean.ObjectFactory;
 import org.geotools.gpx.bean.RteType;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -147,11 +149,49 @@ public class RteTypeBinding extends AbstractComplexBinding {
         route.setDesc((String) node.getChildValue("desc"));
         route.setSrc((String) node.getChildValue("src"));
         route.getLink().addAll(node.getChildValues("link"));
-        route.setNumber((BigInteger) node.getChildValue("number"));
+        route.setNumber((Integer) node.getChildValue("number", -1));
         route.setType((String) node.getChildValue("type"));
         route.setExtensions((ExtensionsType) node.getChildValue("extensions"));
         route.getRtept().addAll(node.getChildValues("rtept"));
 
         return route;
+    }
+    
+    @Override
+    public Object getProperty(Object object, QName name) throws Exception {
+        RteType route = (RteType) object;
+        
+        if("name".equals(name.getLocalPart()))
+            return route.getName();
+        
+        if("cmt".equals(name.getLocalPart()))
+            return route.getCmt();
+        
+        if("desc".equals(name.getLocalPart()))
+            return route.getDesc();
+        
+        if("src".equals(name.getLocalPart()))
+            return route.getSrc();
+        
+        if("link".equals(name.getLocalPart()))
+            return route.getLink();
+        
+        if("number".equals(name.getLocalPart())) {
+            if(route.getNumber() == -1)
+                return null;
+            else
+                return route.getNumber();
+        }
+        
+        if("type".equals(name.getLocalPart()))
+            return route.getType();
+        
+        if("extensions".equals(name.getLocalPart()))
+            return route.getExtensions();
+        
+        if("rtept".equals(name.getLocalPart()))
+            return route.getRtept();
+        
+        return null;
     }
 }

@@ -16,10 +16,13 @@
 package org.geotools.gpx.binding;
 
 import javax.xml.namespace.QName;
+
 import org.geotools.gpx.bean.ExtensionsType;
 import org.geotools.gpx.bean.ObjectFactory;
 import org.geotools.gpx.bean.TrksegType;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -97,5 +100,18 @@ public class TrksegTypeBinding extends AbstractComplexBinding {
         trackSeg.setExtensions((ExtensionsType) node.getChildValue("extensions"));
 
         return trackSeg;
+    }
+    
+    @Override
+    public Object getProperty(Object object, QName name) throws Exception {
+        TrksegType trackSeg = (TrksegType) object;
+        
+        if("trkpt".equals(name.getLocalPart()))
+            return trackSeg.getTrkpt();
+        
+        if("extensions".equals(name.getLocalPart()))
+            return trackSeg.getExtensions();
+
+        return null;
     }
 }

@@ -6,8 +6,7 @@
 //
 package org.geotools.gpx.bean;
 
-import java.math.BigDecimal;
-import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.Calendar;
 
 
 /**
@@ -37,10 +36,10 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *
  */
 public class PtType {
-    protected BigDecimal ele;
-    protected XMLGregorianCalendar time;
-    protected BigDecimal lat;
-    protected BigDecimal lon;
+    protected double ele;
+    protected Calendar time;
+    protected double lat;
+    protected double lon;
 
     /**
      * Gets the value of the ele property.
@@ -50,7 +49,7 @@ public class PtType {
      *     {@link BigDecimal }
      *
      */
-    public BigDecimal getEle() {
+    public double getEle() {
         return ele;
     }
 
@@ -62,7 +61,7 @@ public class PtType {
      *     {@link BigDecimal }
      *
      */
-    public void setEle(BigDecimal value) {
+    public void setEle(double value) {
         this.ele = value;
     }
 
@@ -74,7 +73,7 @@ public class PtType {
      *     {@link XMLGregorianCalendar }
      *
      */
-    public XMLGregorianCalendar getTime() {
+    public Calendar getTime() {
         return time;
     }
 
@@ -86,7 +85,7 @@ public class PtType {
      *     {@link XMLGregorianCalendar }
      *
      */
-    public void setTime(XMLGregorianCalendar value) {
+    public void setTime(Calendar value) {
         this.time = value;
     }
 
@@ -98,7 +97,7 @@ public class PtType {
      *     {@link BigDecimal }
      *
      */
-    public BigDecimal getLat() {
+    public double getLat() {
         return lat;
     }
 
@@ -110,7 +109,7 @@ public class PtType {
      *     {@link BigDecimal }
      *
      */
-    public void setLat(BigDecimal value) {
+    public void setLat(double value) {
         this.lat = value;
     }
 
@@ -122,7 +121,7 @@ public class PtType {
      *     {@link BigDecimal }
      *
      */
-    public BigDecimal getLon() {
+    public double getLon() {
         return lon;
     }
 
@@ -134,7 +133,7 @@ public class PtType {
      *     {@link BigDecimal }
      *
      */
-    public void setLon(BigDecimal value) {
+    public void setLon(double value) {
         this.lon = value;
     }
 }

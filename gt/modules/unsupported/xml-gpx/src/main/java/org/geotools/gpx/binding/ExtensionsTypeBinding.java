@@ -16,9 +16,12 @@
 package org.geotools.gpx.binding;
 
 import javax.xml.namespace.QName;
+
 import org.geotools.gpx.bean.ExtensionsType;
 import org.geotools.gpx.bean.ObjectFactory;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -87,4 +90,6 @@ public class ExtensionsTypeBinding extends AbstractComplexBinding {
         // TODO somehow I should pack the extension into this bean...
         return et;
     }
+    
+    // TODO encode...
 }

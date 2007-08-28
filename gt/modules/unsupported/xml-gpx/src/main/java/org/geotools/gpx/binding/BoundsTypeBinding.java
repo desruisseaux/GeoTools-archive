@@ -15,11 +15,13 @@
  */
 package org.geotools.gpx.binding;
 
-import java.math.BigDecimal;
 import javax.xml.namespace.QName;
+
 import org.geotools.gpx.bean.BoundsType;
 import org.geotools.gpx.bean.ObjectFactory;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -104,11 +106,30 @@ public class BoundsTypeBinding extends AbstractComplexBinding {
         throws Exception {
         BoundsType bounds = factory.createBoundsType();
 
-        bounds.setMinlat((BigDecimal) node.getAttributeValue("minlat"));
-        bounds.setMinlon((BigDecimal) node.getAttributeValue("minlon"));
-        bounds.setMaxlat((BigDecimal) node.getAttributeValue("maxlat"));
-        bounds.setMaxlon((BigDecimal) node.getAttributeValue("maxlon"));
+        bounds.setMinlat((Double) node.getAttributeValue("minlat"));
+        bounds.setMinlon((Double) node.getAttributeValue("minlon"));
+        bounds.setMaxlat((Double) node.getAttributeValue("maxlat"));
+        bounds.setMaxlon((Double) node.getAttributeValue("maxlon"));
 
         return bounds;
+    }
+    
+    @Override
+    public Object getProperty(Object object, QName name) throws Exception {
+        BoundsType bounds = (BoundsType) object;
+        
+        if("minlat".equals(name.getLocalPart()))
+            return bounds.getMinlat();
+        
+        if("minlon".equals(name.getLocalPart()))
+            return bounds.getMinlon();
+        
+        if("maxlat".equals(name.getLocalPart()))
+            return bounds.getMaxlat();
+        
+        if("maxlon".equals(name.getLocalPart()))
+            return bounds.getMaxlon();
+        
+        return null;
     }
 }

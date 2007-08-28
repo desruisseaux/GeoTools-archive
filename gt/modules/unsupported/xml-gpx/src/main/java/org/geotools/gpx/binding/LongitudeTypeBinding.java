@@ -15,10 +15,11 @@
  */
 package org.geotools.gpx.binding;
 
-import java.math.BigDecimal;
 import javax.xml.namespace.QName;
+
 import org.geotools.gpx.bean.ObjectFactory;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractSimpleBinding;
+import org.geotools.xml.InstanceComponent;
 
 
 /**
@@ -66,7 +67,7 @@ public class LongitudeTypeBinding extends AbstractSimpleBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return BigDecimal.class;
+        return Double.class;
     }
 
     /**
@@ -77,12 +78,23 @@ public class LongitudeTypeBinding extends AbstractSimpleBinding {
      */
     public Object parse(InstanceComponent instance, Object value)
         throws Exception {
-        BigDecimal lon = (BigDecimal) value;
+        Double lon = (Double) value;
 
-        if ((lon.doubleValue() >= 180) || (lon.doubleValue() < -180)) {
+        if ((lon >= 180) || (lon < -180)) {
             throw new IllegalArgumentException("Longitude over 180 or under -180 degrees: " + lon);
         }
 
         return lon;
+    }
+    
+    @Override
+    public String encode(Object object, String value) throws Exception {
+        Double lon = (Double) object;
+
+        if ((lon >= 180) || (lon < -180)) {
+            throw new IllegalArgumentException("Longitude over 180 or under -180 degrees: " + lon);
+        }
+
+        return lon.toString();
     }
 }

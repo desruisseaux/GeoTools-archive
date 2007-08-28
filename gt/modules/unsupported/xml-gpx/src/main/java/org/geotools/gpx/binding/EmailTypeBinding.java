@@ -16,9 +16,12 @@
 package org.geotools.gpx.binding;
 
 import javax.xml.namespace.QName;
+
 import org.geotools.gpx.bean.EmailType;
 import org.geotools.gpx.bean.ObjectFactory;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -93,5 +96,18 @@ public class EmailTypeBinding extends AbstractComplexBinding {
         email.setDomain((String) node.getAttributeValue("domain"));
 
         return email;
+    }
+    
+    @Override
+    public Object getProperty(Object object, QName name) throws Exception {
+        EmailType email = (EmailType) object;
+        
+        if("id".equals(name.getLocalPart()))
+            return email.getId();
+
+        if("domain".equals(name.getLocalPart()))
+            return email.getDomain();
+        
+        return null;
     }
 }

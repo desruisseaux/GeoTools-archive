@@ -15,10 +15,11 @@
  */
 package org.geotools.gpx.binding;
 
-import java.math.BigDecimal;
 import javax.xml.namespace.QName;
+
 import org.geotools.gpx.bean.ObjectFactory;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractSimpleBinding;
+import org.geotools.xml.InstanceComponent;
 
 
 /**
@@ -66,7 +67,7 @@ public class DegreesTypeBinding extends AbstractSimpleBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return BigDecimal.class;
+        return Double.class;
     }
 
     /**
@@ -77,12 +78,24 @@ public class DegreesTypeBinding extends AbstractSimpleBinding {
      */
     public Object parse(InstanceComponent instance, Object value)
         throws Exception {
-        BigDecimal deg = (BigDecimal) value;
+        Double deg = (Double) value;
 
-        if ((deg.doubleValue() < 0) || (deg.doubleValue() >= 360)) {
+        if ((deg < 0) || (deg >= 360)) {
             throw new IllegalArgumentException("degree value out of bounds [0..360): " + value);
         }
 
         return deg;
     }
+
+    @Override
+    public String encode(Object object, String value) throws Exception {
+        Double deg = (Double) object;
+
+        if ((deg < 0) || (deg >= 360)) {
+            throw new IllegalArgumentException("degree value out of bounds [0..360): " + value);
+        }
+       
+        return deg.toString(); // TODO: I guess we dont want full precision, so cutting the decimals would be fine.
+    }
+    
 }

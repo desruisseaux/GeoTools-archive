@@ -7,8 +7,8 @@
 package org.geotools.gpx.bean;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 /**
  *
@@ -48,17 +48,13 @@ public class MetadataType {
     protected PersonType author;
     protected CopyrightType copyright;
     protected List<LinkType> link;
-    protected XMLGregorianCalendar time;
+    protected Calendar time;
     protected String keywords;
     protected BoundsType bounds;
     protected ExtensionsType extensions;
 
     /**
      * Gets the value of the name property.
-     *
-     * @return
-     *     possible object is
-     *     {@link String }
      *
      */
     public String getName() {
@@ -68,10 +64,6 @@ public class MetadataType {
     /**
      * Sets the value of the name property.
      *
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *
      */
     public void setName(String value) {
         this.name = value;
@@ -79,10 +71,6 @@ public class MetadataType {
 
     /**
      * Gets the value of the desc property.
-     *
-     * @return
-     *     possible object is
-     *     {@link String }
      *
      */
     public String getDesc() {
@@ -92,10 +80,6 @@ public class MetadataType {
     /**
      * Sets the value of the desc property.
      *
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *
      */
     public void setDesc(String value) {
         this.desc = value;
@@ -103,10 +87,6 @@ public class MetadataType {
 
     /**
      * Gets the value of the author property.
-     *
-     * @return
-     *     possible object is
-     *     {@link PersonType }
      *
      */
     public PersonType getAuthor() {
@@ -116,10 +96,6 @@ public class MetadataType {
     /**
      * Sets the value of the author property.
      *
-     * @param value
-     *     allowed object is
-     *     {@link PersonType }
-     *
      */
     public void setAuthor(PersonType value) {
         this.author = value;
@@ -128,10 +104,6 @@ public class MetadataType {
     /**
      * Gets the value of the copyright property.
      *
-     * @return
-     *     possible object is
-     *     {@link CopyrightType }
-     *
      */
     public CopyrightType getCopyright() {
         return copyright;
@@ -139,10 +111,6 @@ public class MetadataType {
 
     /**
      * Sets the value of the copyright property.
-     *
-     * @param value
-     *     allowed object is
-     *     {@link CopyrightType }
      *
      */
     public void setCopyright(CopyrightType value) {
@@ -182,33 +150,21 @@ public class MetadataType {
     /**
      * Gets the value of the time property.
      *
-     * @return
-     *     possible object is
-     *     {@link XMLGregorianCalendar }
-     *
      */
-    public XMLGregorianCalendar getTime() {
+    public Calendar getTime() {
         return time;
     }
 
     /**
      * Sets the value of the time property.
      *
-     * @param value
-     *     allowed object is
-     *     {@link XMLGregorianCalendar }
-     *
      */
-    public void setTime(XMLGregorianCalendar value) {
+    public void setTime(Calendar value) {
         this.time = value;
     }
 
     /**
      * Gets the value of the keywords property.
-     *
-     * @return
-     *     possible object is
-     *     {@link String }
      *
      */
     public String getKeywords() {
@@ -218,10 +174,6 @@ public class MetadataType {
     /**
      * Sets the value of the keywords property.
      *
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *
      */
     public void setKeywords(String value) {
         this.keywords = value;
@@ -229,10 +181,6 @@ public class MetadataType {
 
     /**
      * Gets the value of the bounds property.
-     *
-     * @return
-     *     possible object is
-     *     {@link BoundsType }
      *
      */
     public BoundsType getBounds() {
@@ -242,10 +190,6 @@ public class MetadataType {
     /**
      * Sets the value of the bounds property.
      *
-     * @param value
-     *     allowed object is
-     *     {@link BoundsType }
-     *
      */
     public void setBounds(BoundsType value) {
         this.bounds = value;
@@ -254,10 +198,6 @@ public class MetadataType {
     /**
      * Gets the value of the extensions property.
      *
-     * @return
-     *     possible object is
-     *     {@link ExtensionsType }
-     *
      */
     public ExtensionsType getExtensions() {
         return extensions;
@@ -265,10 +205,6 @@ public class MetadataType {
 
     /**
      * Sets the value of the extensions property.
-     *
-     * @param value
-     *     allowed object is
-     *     {@link ExtensionsType }
      *
      */
     public void setExtensions(ExtensionsType value) {

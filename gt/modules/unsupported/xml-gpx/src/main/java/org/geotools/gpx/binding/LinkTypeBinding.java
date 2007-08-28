@@ -16,9 +16,12 @@
 package org.geotools.gpx.binding;
 
 import javax.xml.namespace.QName;
+
 import org.geotools.gpx.bean.LinkType;
 import org.geotools.gpx.bean.ObjectFactory;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -104,5 +107,21 @@ public class LinkTypeBinding extends AbstractComplexBinding {
         link.setHref((String) node.getChildValue("href"));
 
         return link;
+    }
+    
+    @Override
+    public Object getProperty(Object object, QName name) throws Exception {
+        LinkType link = (LinkType) object;
+        
+        if("text".equals(name.getLocalPart()))
+            return link.getText();
+        
+        if("type".equals(name.getLocalPart()))
+            return link.getType();
+        
+        if("href".equals(name.getLocalPart()))
+            return link.getHref();
+        
+        return null;
     }
 }

@@ -15,14 +15,16 @@
  */
 package org.geotools.gpx.binding;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.Calendar;
+
 import javax.xml.namespace.QName;
+
 import org.geotools.gpx.bean.ExtensionsType;
 import org.geotools.gpx.bean.ObjectFactory;
 import org.geotools.gpx.bean.WptType;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -232,10 +234,10 @@ public class WptTypeBinding extends AbstractComplexBinding {
         throws Exception {
         WptType wpt = factory.createWptType();
 
-        wpt.setEle((BigDecimal) node.getChildValue("ele"));
-        wpt.setTime((XMLGregorianCalendar) node.getChildValue("time"));
-        wpt.setMagvar((BigDecimal) node.getChildValue("magvar"));
-        wpt.setGeoidheight((BigDecimal) node.getChildValue("geoidheight"));
+        wpt.setEle((Double) node.getChildValue("ele", Double.NaN));
+        wpt.setTime((Calendar) node.getChildValue("time"));
+        wpt.setMagvar((Double) node.getChildValue("magvar", Double.NaN));
+        wpt.setGeoidheight((Double) node.getChildValue("geoidheight", Double.NaN));
         wpt.setName((String) node.getChildValue("name"));
         wpt.setCmt((String) node.getChildValue("cmt"));
         wpt.setDesc((String) node.getChildValue("desc"));
@@ -244,16 +246,130 @@ public class WptTypeBinding extends AbstractComplexBinding {
         wpt.setSym((String) node.getChildValue("sym"));
         wpt.setType((String) node.getChildValue("type"));
         wpt.setFix((String) node.getChildValue("fix"));
-        wpt.setSat((BigInteger) node.getChildValue("sat"));
-        wpt.setHdop((BigDecimal) node.getChildValue("hdop"));
-        wpt.setVdop((BigDecimal) node.getChildValue("vdop"));
-        wpt.setPdop((BigDecimal) node.getChildValue("pdop"));
-        wpt.setAgeofdgpsdata((BigDecimal) node.getChildValue("ageofdgpsdata"));
-        wpt.setDgpsid((BigInteger) node.getChildValue("dgpsid"));
+        wpt.setSat((Integer) node.getChildValue("sat", -1));
+        wpt.setHdop((Double) node.getChildValue("hdop", Double.NaN));
+        wpt.setVdop((Double) node.getChildValue("vdop", Double.NaN));
+        wpt.setPdop((Double) node.getChildValue("pdop", Double.NaN));
+        wpt.setAgeofdgpsdata((Double) node.getChildValue("ageofdgpsdata", Double.NaN));
+        wpt.setDgpsid((Integer) node.getChildValue("dgpsid", -1));
         wpt.setExtensions((ExtensionsType) node.getChildValue("extensions"));
-        wpt.setLon((BigDecimal) node.getAttributeValue("lon"));
-        wpt.setLat((BigDecimal) node.getAttributeValue("lat"));
+        wpt.setLon((Double) node.getAttributeValue("lon", Double.NaN));
+        wpt.setLat((Double) node.getAttributeValue("lat", Double.NaN));
 
         return wpt;
+    }
+    
+    @Override
+    public Object getProperty(Object object, QName name) throws Exception {
+        WptType wpt = (WptType) object;
+        
+        if("ele".equals(name.getLocalPart())) {
+            if(Double.isNaN(wpt.getEle()))
+                return null;
+            else
+                return wpt.getEle();
+        }
+        
+        if("time".equals(name.getLocalPart()))
+            return wpt.getTime();
+        
+        if("magvar".equals(name.getLocalPart())) {
+            if(Double.isNaN(wpt.getMagvar()))
+                return null;
+            else
+                return wpt.getMagvar();
+        }
+        
+        if("geoidheight".equals(name.getLocalPart())) {
+            if(Double.isNaN(wpt.getGeoidheight()))
+                return null;
+            else
+                return wpt.getGeoidheight();
+        }
+        
+        if("name".equals(name.getLocalPart()))
+            return wpt.getName();
+        
+        if("cmt".equals(name.getLocalPart()))
+            return wpt.getCmt();
+        
+        if("desc".equals(name.getLocalPart()))
+            return wpt.getDesc();
+        
+        if("src".equals(name.getLocalPart()))
+            return wpt.getSrc();
+        
+        if("link".equals(name.getLocalPart()))
+            return wpt.getLink();
+        
+        if("sym".equals(name.getLocalPart()))
+            return wpt.getSym();
+        
+        if("type".equals(name.getLocalPart()))
+            return wpt.getType();
+        
+        if("fix".equals(name.getLocalPart()))
+            return wpt.getFix();
+        
+        if("sat".equals(name.getLocalPart())) {
+            if(wpt.getSat() == -1)
+                return null;
+            else
+                return wpt.getSat();
+        }
+        
+        if("hdop".equals(name.getLocalPart())) {
+            if(Double.isNaN(wpt.getHdop()))
+                return null;
+            else
+                return wpt.getHdop();
+        }
+        
+        if("vdop".equals(name.getLocalPart())) {
+            if(Double.isNaN(wpt.getVdop()))
+                return null;
+            else
+                return wpt.getVdop();
+        }
+        
+        if("pdop".equals(name.getLocalPart())) {
+            if(Double.isNaN(wpt.getPdop()))
+                return null;
+            else
+                return wpt.getPdop();
+        }
+        
+        if("ageofdgpsdata".equals(name.getLocalPart())) {
+            if(Double.isNaN(wpt.getAgeofdgpsdata()))
+                return null;
+            else
+                return wpt.getAgeofdgpsdata();
+        }
+        
+        if("dgpsid".equals(name.getLocalPart())) {
+            if(wpt.getDgpsid() == -1)
+                return null;
+            else
+                return wpt.getDgpsid();
+        }
+        
+        if("extensions".equals(name.getLocalPart()))
+            return wpt.getExtensions();
+        
+        if("lon".equals(name.getLocalPart())) {
+            if(Double.isNaN(wpt.getLon()))
+                return null;
+            else
+                return wpt.getLon();
+        }
+        
+        if("lat".equals(name.getLocalPart())) {
+            if(Double.isNaN(wpt.getLat()))
+                return null;
+            else
+                return wpt.getLat();
+        }
+        
+        return null;
     }
 }

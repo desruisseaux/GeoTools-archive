@@ -15,13 +15,14 @@
  */
 package org.geotools.gpx.binding;
 
-import java.math.BigInteger;
 import javax.xml.namespace.QName;
+
 import org.geotools.gpx.bean.ExtensionsType;
 import org.geotools.gpx.bean.ObjectFactory;
-import org.geotools.gpx.bean.RteType;
 import org.geotools.gpx.bean.TrkType;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -148,11 +149,49 @@ public class TrkTypeBinding extends AbstractComplexBinding {
         track.setDesc((String) node.getChildValue("desc"));
         track.setSrc((String) node.getChildValue("src"));
         track.getLink().addAll(node.getChildValues("link"));
-        track.setNumber((BigInteger) node.getChildValue("number"));
+        track.setNumber((Integer) node.getChildValue("number", -1));
         track.setType((String) node.getChildValue("type"));
         track.setExtensions((ExtensionsType) node.getChildValue("extensions"));
         track.getTrkseg().addAll(node.getChildValues("trkseg"));
 
         return track;
+    }
+    
+    @Override
+    public Object getProperty(Object object, QName name) throws Exception {
+        TrkType track = (TrkType) object;
+        
+        if("name".equals(name.getLocalPart()))
+            return track.getName();
+        
+        if("cmt".equals(name.getLocalPart()))
+            return track.getCmt();
+        
+        if("desc".equals(name.getLocalPart()))
+            return track.getDesc();
+        
+        if("src".equals(name.getLocalPart()))
+            return track.getSrc();
+        
+        if("link".equals(name.getLocalPart()))
+            return track.getLink();
+        
+        if("number".equals(name.getLocalPart())) {
+            if(track.getNumber() == -1)
+                return null;
+            else
+                return track.getNumber();
+        }
+        
+        if("type".equals(name.getLocalPart()))
+            return track.getType();
+        
+        if("extensions".equals(name.getLocalPart()))
+            return track.getExtensions();
+        
+        if("trkseg".equals(name.getLocalPart()))
+            return track.getTrkseg();
+        
+        return null;
     }
 }

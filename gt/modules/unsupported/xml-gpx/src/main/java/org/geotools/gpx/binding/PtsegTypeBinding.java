@@ -16,10 +16,13 @@
 package org.geotools.gpx.binding;
 
 import javax.xml.namespace.QName;
+
 import org.geotools.gpx.bean.ObjectFactory;
 import org.geotools.gpx.bean.PtType;
 import org.geotools.gpx.bean.PtsegType;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -89,5 +92,15 @@ public class PtsegTypeBinding extends AbstractComplexBinding {
         ptseg.getPt().addAll(node.getChildValues(PtType.class));
 
         return ptseg;
+    }
+    
+    @Override
+    public Object getProperty(Object object, QName name) throws Exception {
+        PtsegType ptseg = (PtsegType) object;
+        
+        if("pt".equals(name.getLocalPart()))
+            return ptseg.getPt();
+        
+        return null;
     }
 }

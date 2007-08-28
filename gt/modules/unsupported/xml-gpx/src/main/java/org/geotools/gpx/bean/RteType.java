@@ -6,7 +6,6 @@
 //
 package org.geotools.gpx.bean;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +47,7 @@ public class RteType {
     protected String desc;
     protected String src;
     protected List<LinkType> link;
-    protected BigInteger number;
+    protected int number;
     protected String type;
     protected ExtensionsType extensions;
     protected List<WptType> rtept;
@@ -187,7 +186,7 @@ public class RteType {
      *     {@link BigInteger }
      *
      */
-    public BigInteger getNumber() {
+    public int getNumber() {
         return number;
     }
 
@@ -199,7 +198,7 @@ public class RteType {
      *     {@link BigInteger }
      *
      */
-    public void setNumber(BigInteger value) {
+    public void setNumber(int value) {
         this.number = value;
     }
 

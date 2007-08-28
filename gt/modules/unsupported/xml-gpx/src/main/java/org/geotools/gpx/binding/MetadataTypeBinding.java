@@ -15,15 +15,19 @@
  */
 package org.geotools.gpx.binding;
 
-import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.Calendar;
+
 import javax.xml.namespace.QName;
+
 import org.geotools.gpx.bean.BoundsType;
 import org.geotools.gpx.bean.CopyrightType;
 import org.geotools.gpx.bean.ExtensionsType;
 import org.geotools.gpx.bean.MetadataType;
 import org.geotools.gpx.bean.ObjectFactory;
 import org.geotools.gpx.bean.PersonType;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -152,11 +156,45 @@ public class MetadataTypeBinding extends AbstractComplexBinding {
         metadata.setAuthor((PersonType) node.getChildValue("author"));
         metadata.setCopyright((CopyrightType) node.getChildValue("copyright"));
         metadata.getLink().addAll(node.getChildValues("link"));
-        metadata.setTime((XMLGregorianCalendar) node.getChildValue("time"));
+        metadata.setTime((Calendar) node.getChildValue("time"));
         metadata.setKeywords((String) node.getChildValue("keywords"));
         metadata.setBounds((BoundsType) node.getChildValue("bounds"));
         metadata.setExtensions((ExtensionsType) node.getChildValue("extensions"));
 
         return metadata;
+    }
+    
+    @Override
+    public Object getProperty(Object object, QName name) throws Exception {
+        MetadataType metadata = (MetadataType) object;
+        
+        if("name".equals(name.getLocalPart()))
+            return metadata.getName();
+        
+        if("desc".equals(name.getLocalPart()))
+            return metadata.getDesc();
+        
+        if("author".equals(name.getLocalPart()))
+            return metadata.getAuthor();
+        
+        if("copyright".equals(name.getLocalPart()))
+            return metadata.getCopyright();
+        
+        if("link".equals(name.getLocalPart()))
+            return metadata.getLink();
+        
+        if("time".equals(name.getLocalPart()))
+            return metadata.getTime();
+        
+        if("keywords".equals(name.getLocalPart()))
+            return metadata.getKeywords();
+        
+        if("bounds".equals(name.getLocalPart()))
+            return metadata.getBounds();
+        
+        if("extensions".equals(name.getLocalPart()))
+            return metadata.getExtensions();
+        
+        return null;
     }
 }

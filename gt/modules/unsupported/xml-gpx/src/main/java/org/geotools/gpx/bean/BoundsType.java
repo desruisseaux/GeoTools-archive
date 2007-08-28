@@ -6,8 +6,6 @@
 //
 package org.geotools.gpx.bean;
 
-import java.math.BigDecimal;
-
 
 /**
  *
@@ -34,104 +32,72 @@ import java.math.BigDecimal;
  *
  */
 public class BoundsType {
-    protected BigDecimal maxlat;
-    protected BigDecimal maxlon;
-    protected BigDecimal minlat;
-    protected BigDecimal minlon;
+    protected double maxlat;
+    protected double maxlon;
+    protected double minlat;
+    protected double minlon;
 
     /**
      * Gets the value of the maxlat property.
      *
-     * @return
-     *     possible object is
-     *     {@link BigDecimal }
-     *
      */
-    public BigDecimal getMaxlat() {
+    public double getMaxlat() {
         return maxlat;
     }
 
     /**
      * Sets the value of the maxlat property.
      *
-     * @param value
-     *     allowed object is
-     *     {@link BigDecimal }
-     *
      */
-    public void setMaxlat(BigDecimal value) {
+    public void setMaxlat(double value) {
         this.maxlat = value;
     }
 
     /**
      * Gets the value of the maxlon property.
      *
-     * @return
-     *     possible object is
-     *     {@link BigDecimal }
-     *
      */
-    public BigDecimal getMaxlon() {
+    public double getMaxlon() {
         return maxlon;
     }
 
     /**
      * Sets the value of the maxlon property.
      *
-     * @param value
-     *     allowed object is
-     *     {@link BigDecimal }
-     *
      */
-    public void setMaxlon(BigDecimal value) {
+    public void setMaxlon(double value) {
         this.maxlon = value;
     }
 
     /**
      * Gets the value of the minlat property.
      *
-     * @return
-     *     possible object is
-     *     {@link BigDecimal }
-     *
      */
-    public BigDecimal getMinlat() {
+    public double getMinlat() {
         return minlat;
     }
 
     /**
      * Sets the value of the minlat property.
      *
-     * @param value
-     *     allowed object is
-     *     {@link BigDecimal }
-     *
      */
-    public void setMinlat(BigDecimal value) {
+    public void setMinlat(double value) {
         this.minlat = value;
     }
 
     /**
      * Gets the value of the minlon property.
      *
-     * @return
-     *     possible object is
-     *     {@link BigDecimal }
-     *
      */
-    public BigDecimal getMinlon() {
+    public double getMinlon() {
         return minlon;
     }
 
     /**
      * Sets the value of the minlon property.
      *
-     * @param value
-     *     allowed object is
-     *     {@link BigDecimal }
-     *
      */
-    public void setMinlon(BigDecimal value) {
+    public void setMinlon(double value) {
         this.minlon = value;
     }
 }

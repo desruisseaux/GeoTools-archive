@@ -6,7 +6,6 @@
 //
 package org.geotools.gpx.bean;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,17 +47,13 @@ public class TrkType {
     protected String desc;
     protected String src;
     protected List<LinkType> link;
-    protected BigInteger number;
+    protected int number;
     protected String type;
     protected ExtensionsType extensions;
     protected List<TrksegType> trkseg;
 
     /**
      * Gets the value of the name property.
-     *
-     * @return
-     *     possible object is
-     *     {@link String }
      *
      */
     public String getName() {
@@ -68,10 +63,6 @@ public class TrkType {
     /**
      * Sets the value of the name property.
      *
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *
      */
     public void setName(String value) {
         this.name = value;
@@ -79,10 +70,6 @@ public class TrkType {
 
     /**
      * Gets the value of the cmt property.
-     *
-     * @return
-     *     possible object is
-     *     {@link String }
      *
      */
     public String getCmt() {
@@ -92,10 +79,6 @@ public class TrkType {
     /**
      * Sets the value of the cmt property.
      *
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *
      */
     public void setCmt(String value) {
         this.cmt = value;
@@ -103,10 +86,6 @@ public class TrkType {
 
     /**
      * Gets the value of the desc property.
-     *
-     * @return
-     *     possible object is
-     *     {@link String }
      *
      */
     public String getDesc() {
@@ -116,10 +95,6 @@ public class TrkType {
     /**
      * Sets the value of the desc property.
      *
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *
      */
     public void setDesc(String value) {
         this.desc = value;
@@ -128,10 +103,6 @@ public class TrkType {
     /**
      * Gets the value of the src property.
      *
-     * @return
-     *     possible object is
-     *     {@link String }
-     *
      */
     public String getSrc() {
         return src;
@@ -139,10 +110,6 @@ public class TrkType {
 
     /**
      * Sets the value of the src property.
-     *
-     * @param value
-     *     allowed object is
-     *     {@link String }
      *
      */
     public void setSrc(String value) {
@@ -182,33 +149,21 @@ public class TrkType {
     /**
      * Gets the value of the number property.
      *
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *
      */
-    public BigInteger getNumber() {
+    public int getNumber() {
         return number;
     }
 
     /**
      * Sets the value of the number property.
      *
-     * @param value
-     *     allowed object is
-     *     {@link BigInteger }
-     *
      */
-    public void setNumber(BigInteger value) {
+    public void setNumber(int value) {
         this.number = value;
     }
 
     /**
      * Gets the value of the type property.
-     *
-     * @return
-     *     possible object is
-     *     {@link String }
      *
      */
     public String getType() {
@@ -218,10 +173,6 @@ public class TrkType {
     /**
      * Sets the value of the type property.
      *
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *
      */
     public void setType(String value) {
         this.type = value;
@@ -230,10 +181,6 @@ public class TrkType {
     /**
      * Gets the value of the extensions property.
      *
-     * @return
-     *     possible object is
-     *     {@link ExtensionsType }
-     *
      */
     public ExtensionsType getExtensions() {
         return extensions;
@@ -241,10 +188,6 @@ public class TrkType {
 
     /**
      * Sets the value of the extensions property.
-     *
-     * @param value
-     *     allowed object is
-     *     {@link ExtensionsType }
      *
      */
     public void setExtensions(ExtensionsType value) {

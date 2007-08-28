@@ -6,7 +6,7 @@
 //
 package org.geotools.gpx.bean;
 
-import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.Calendar;
 
 
 /**
@@ -36,7 +36,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *
  */
 public class CopyrightType {
-    protected XMLGregorianCalendar year;
+    protected Calendar year;
     protected String license;
     protected String author;
 
@@ -48,7 +48,7 @@ public class CopyrightType {
      *     {@link XMLGregorianCalendar }
      *
      */
-    public XMLGregorianCalendar getYear() {
+    public Calendar getYear() {
         return year;
     }
 
@@ -60,7 +60,7 @@ public class CopyrightType {
      *     {@link XMLGregorianCalendar }
      *
      */
-    public void setYear(XMLGregorianCalendar value) {
+    public void setYear(Calendar value) {
         this.year = value;
     }
 

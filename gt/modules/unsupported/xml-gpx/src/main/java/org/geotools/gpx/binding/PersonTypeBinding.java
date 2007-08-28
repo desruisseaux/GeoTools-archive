@@ -16,11 +16,14 @@
 package org.geotools.gpx.binding;
 
 import javax.xml.namespace.QName;
+
 import org.geotools.gpx.bean.EmailType;
 import org.geotools.gpx.bean.LinkType;
 import org.geotools.gpx.bean.ObjectFactory;
 import org.geotools.gpx.bean.PersonType;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -106,5 +109,21 @@ public class PersonTypeBinding extends AbstractComplexBinding {
         person.setLink((LinkType) node.getChildValue("link"));
 
         return person;
+    }
+    
+    @Override
+    public Object getProperty(Object object, QName name) throws Exception {
+        PersonType person = (PersonType) object;
+        
+        if("name".equals(name.getLocalPart()))
+            return person.getName();
+        
+        if("email".equals(name.getLocalPart()))
+            return person.getEmail();
+        
+        if("link".equals(name.getLocalPart()))
+            return person.getLink();
+        
+        return null;
     }
 }

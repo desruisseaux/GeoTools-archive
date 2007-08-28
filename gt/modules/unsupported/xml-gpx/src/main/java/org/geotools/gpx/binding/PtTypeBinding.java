@@ -15,12 +15,15 @@
  */
 package org.geotools.gpx.binding;
 
-import java.math.BigDecimal;
-import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.Calendar;
+
 import javax.xml.namespace.QName;
+
 import org.geotools.gpx.bean.ObjectFactory;
 import org.geotools.gpx.bean.PtType;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -108,11 +111,30 @@ public class PtTypeBinding extends AbstractComplexBinding {
         throws Exception {
         PtType point = factory.createPtType();
 
-        point.setLon((BigDecimal) node.getAttribute("lon"));
-        point.setLat((BigDecimal) node.getAttribute("lat"));
-        point.setEle((BigDecimal) node.getChildValue("ele"));
-        point.setTime((XMLGregorianCalendar) node.getChildValue("time"));
+        point.setLon((Double) node.getAttributeValue("lon"));
+        point.setLat((Double) node.getAttributeValue("lat"));
+        point.setEle((Double) node.getChildValue("ele"));
+        point.setTime((Calendar) node.getChildValue("time"));
 
         return point;
+    }
+    
+    @Override
+    public Object getProperty(Object object, QName name) throws Exception {
+        PtType point = (PtType) object;
+        
+        if("lon".equals(name.getLocalPart()))
+            return point.getLon();
+        
+        if("lat".equals(name.getLocalPart()))
+            return point.getLat();
+        
+        if("ele".equals(name.getLocalPart()))
+            return point.getEle();
+        
+        if("time".equals(name.getLocalPart()))
+            return point.getTime();
+        
+        return null;
     }
 }

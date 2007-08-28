@@ -15,11 +15,15 @@
  */
 package org.geotools.gpx.binding;
 
-import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.Calendar;
+
 import javax.xml.namespace.QName;
+
 import org.geotools.gpx.bean.CopyrightType;
 import org.geotools.gpx.bean.ObjectFactory;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -102,9 +106,26 @@ public class CopyrightTypeBinding extends AbstractComplexBinding {
         CopyrightType copyright = factory.createCopyrightType();
 
         copyright.setAuthor((String) node.getChildValue("author"));
-        copyright.setYear((XMLGregorianCalendar) node.getChildValue("year"));
+        copyright.setYear((Calendar) node.getChildValue("year"));
         copyright.setLicense((String) node.getChildValue("license"));
 
         return copyright;
     }
+
+    @Override
+    public Object getProperty(Object object, QName name) throws Exception {
+        CopyrightType cpy = (CopyrightType) object;
+        
+        if("author".equals(name.getLocalPart()))
+            return cpy.getAuthor();
+        
+        if("year".equals(name.getLocalPart()))
+            return cpy.getYear();
+        
+        if("license".equals(name.getLocalPart()))
+            return cpy.getLicense();
+        
+        return null;
+    }
+    
 }

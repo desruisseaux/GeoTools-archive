@@ -15,10 +15,11 @@
  */
 package org.geotools.gpx.binding;
 
-import java.math.BigInteger;
 import javax.xml.namespace.QName;
+
 import org.geotools.gpx.bean.ObjectFactory;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractSimpleBinding;
+import org.geotools.xml.InstanceComponent;
 
 
 /**
@@ -66,7 +67,7 @@ public class DgpsStationTypeBinding extends AbstractSimpleBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return BigInteger.class;
+        return Integer.class;
     }
 
     /**
@@ -77,12 +78,23 @@ public class DgpsStationTypeBinding extends AbstractSimpleBinding {
      */
     public Object parse(InstanceComponent instance, Object value)
         throws Exception {
-        BigInteger dgpsid = (BigInteger) value;
+        Integer dgpsid = (Integer) value;
 
         if ((dgpsid.intValue() < 0) || (dgpsid.intValue() > 1023)) {
             throw new IllegalArgumentException("dgpsid must be within 0 and 1023: " + dgpsid);
         }
 
         return dgpsid;
+    }
+    
+    @Override
+    public String encode(Object object, String value) throws Exception {
+        Integer dgpsid = (Integer) object;
+        
+        if ((dgpsid.intValue() < 0) || (dgpsid.intValue() > 1023)) {
+            throw new IllegalArgumentException("dgpsid must be within 0 and 1023: " + dgpsid);
+        }
+
+        return dgpsid.toString();
     }
 }
