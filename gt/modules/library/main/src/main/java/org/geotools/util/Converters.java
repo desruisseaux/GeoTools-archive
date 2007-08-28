@@ -39,7 +39,7 @@ public final class Converters {
 	/**
 	 * Cached list of converter factories
 	 */
-	static List factories;
+	static Collection factories;
 	
     /**
      * The service registry for this manager.
@@ -148,6 +148,8 @@ public final class Converters {
 	 * @since 2.4 
 	 */
 	static Collection factories() {
-		return getConverterFactories(GeoTools.getDefaultHints());
+	    if(factories == null)
+		factories = getConverterFactories(GeoTools.getDefaultHints());
+	    return factories;
 	}
 }
