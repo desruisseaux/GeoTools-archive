@@ -82,7 +82,7 @@ public class IsBetweenImpl extends CompareFilterImpl implements BetweenFilter {
 		Comparable lc = comparable( l );
 		Comparable uc = comparable( u );
 		
-		return lc.compareTo( o ) == -1 && uc.compareTo( o ) == 1;
+		return lc.compareTo( o ) <= 0 && uc.compareTo( o ) >= 0;
 	}
 
 	public Object accept(FilterVisitor visitor, Object extraData) {
