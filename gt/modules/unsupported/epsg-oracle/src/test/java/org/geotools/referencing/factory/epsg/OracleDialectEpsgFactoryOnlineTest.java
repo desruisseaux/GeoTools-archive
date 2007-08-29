@@ -27,7 +27,7 @@ public class OracleDialectEpsgFactoryOnlineTest extends OracleOnlineTestCase {
     
     protected void connect() throws Exception {
         super.connect();
-        Hints hints = new Hints(Hints.BUFFER_POLICY, "none");     
+        Hints hints = new Hints(Hints.CACHE_POLICY, "none");     
         factory = new OracleDialectEpsgFactory(hints, datasource.getConnection());
     }
     

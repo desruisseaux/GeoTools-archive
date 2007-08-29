@@ -166,8 +166,8 @@ public final class ObjectCaches {
     public static ObjectCache create( Hints hints )
             throws FactoryRegistryException {
         if( hints == null ) hints = GeoTools.getDefaultHints();
-        String policy = (String) hints.get(Hints.BUFFER_POLICY);
-        int limit = Hints.BUFFER_LIMIT.toValue(hints);
+        String policy = (String) hints.get(Hints.CACHE_POLICY);
+        int limit = Hints.CACHE_LIMIT.toValue(hints);
         return create( policy, limit );
     }
     /**

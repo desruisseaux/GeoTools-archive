@@ -84,7 +84,7 @@ public class OracleDialectEpsgMediatorStarvationOnlineStressTest extends
         if( fixture == null ) return; // we are not online - skip test
         
         wrappedDS = (BasicDataSource) datasource;
-        hints = new Hints(Hints.BUFFER_POLICY, "none");     
+        hints = new Hints(Hints.CACHE_POLICY, "none");     
         hints.put(Hints.AUTHORITY_MAX_ACTIVE, new Integer(MAX_WORKERS));        
         
         mediator = new OracleDialectEpsgMediator(80, hints, datasource);
@@ -137,7 +137,7 @@ public class OracleDialectEpsgMediatorStarvationOnlineStressTest extends
             System.out.println("Throughput: " + (1000 * totalRuns / new Long(totalTime).doubleValue()) + " Hz");
             System.out.println("Min: " + minTime);
             System.out.println("Max: " + maxTime);
-            System.out.println("BUFFER_POLICY: " + hints.get(Hints.BUFFER_POLICY).toString());
+            System.out.println("BUFFER_POLICY: " + hints.get(Hints.CACHE_POLICY).toString());
             System.out.println("# CRS codes: " + codes.length);
             //append results to file
             StringBuffer sb = new StringBuffer();
@@ -147,7 +147,7 @@ public class OracleDialectEpsgMediatorStarvationOnlineStressTest extends
             sb.append(", ");
             sb.append(ITERATIONS);
             sb.append(", ");
-            sb.append(hints.get(Hints.BUFFER_POLICY).toString());
+            sb.append(hints.get(Hints.CACHE_POLICY).toString());
             sb.append(", ");
             sb.append(totalTime / totalRuns);
             sb.append(", ");

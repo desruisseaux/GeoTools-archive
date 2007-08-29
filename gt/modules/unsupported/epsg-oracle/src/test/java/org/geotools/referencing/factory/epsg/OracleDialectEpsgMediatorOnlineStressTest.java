@@ -47,7 +47,7 @@ public class OracleDialectEpsgMediatorOnlineStressTest extends
     
     protected void connect() throws Exception {
         super.connect();
-        hints = new Hints(Hints.BUFFER_POLICY, "none");     
+        hints = new Hints(Hints.CACHE_POLICY, "none");     
         hints.put(Hints.AUTHORITY_MAX_ACTIVE, new Integer(MAX_WORKERS));
         if (datasource == null) {
             fail("no datasource available");
@@ -94,7 +94,7 @@ public class OracleDialectEpsgMediatorOnlineStressTest extends
             System.out.println("Throughput: " + (1000 * totalRuns / new Long(totalTime).doubleValue()) + " Hz");
             System.out.println("Min: " + minTime);
             System.out.println("Max: " + maxTime);
-            System.out.println("BUFFER_POLICY: " + hints.get(Hints.BUFFER_POLICY).toString());
+            System.out.println("BUFFER_POLICY: " + hints.get(Hints.CACHE_POLICY).toString());
             System.out.println("# CRS codes: " + codes.length);
             //append results to file
             StringBuffer sb = new StringBuffer();
@@ -104,7 +104,7 @@ public class OracleDialectEpsgMediatorOnlineStressTest extends
             sb.append(", ");
             sb.append(ITERATIONS);
             sb.append(", ");
-            sb.append(hints.get(Hints.BUFFER_POLICY).toString());
+            sb.append(hints.get(Hints.CACHE_POLICY).toString());
             sb.append(", ");
             sb.append(totalTime / totalRuns);
             sb.append(", ");

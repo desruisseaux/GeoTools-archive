@@ -25,7 +25,7 @@ public class OracleDialectEpsgMediatorOnlineTest extends OracleOnlineTestCase {
     
     protected void connect() throws Exception {
         super.connect();
-        Hints hints = new Hints(Hints.BUFFER_POLICY, "none");     
+        Hints hints = new Hints(Hints.CACHE_POLICY, "none");     
         mediator = new OracleDialectEpsgMediator(80, hints, datasource);
     }
     

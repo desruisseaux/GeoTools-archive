@@ -27,7 +27,7 @@ public class HsqlDialectEpsgMediatorTest extends TestCase {
         super.setUp();
         if( factory == null ){
             DataSource datasource = HsqlEpsgDatabase.createDataSource();
-            Hints hints = new Hints( Hints.BUFFER_POLICY, "default" );     
+            Hints hints = new Hints( Hints.CACHE_POLICY, "default" );     
             factory = new HsqlDialectEpsgMediator(80, hints, datasource);            
         }
         if( finder == null ){

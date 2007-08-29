@@ -29,7 +29,7 @@ public class OracleDialectEpsgMediatorConnectionLeakOnlineTest extends OracleOnl
 
     protected void connect() throws Exception {
         super.connect();
-        hints = new Hints(Hints.BUFFER_POLICY, "none");     
+        hints = new Hints(Hints.CACHE_POLICY, "none");     
         hints.put(Hints.AUTHORITY_MAX_ACTIVE, new Integer(MAX_WORKERS));
         if (datasource == null) {
             fail("no datasource available");

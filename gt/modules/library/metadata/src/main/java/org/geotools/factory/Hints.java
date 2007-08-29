@@ -450,16 +450,17 @@ public final class Hints extends RenderingHints {
      * <p>
      * <ul>
      *   <li>{@code "weak"} for holding values through {@linkplain java.lang.ref.WeakReference
-     *       weak references}. This option do not actually cache the objects since the garbage
+     *       weak references}. This option does not actually cache the objects since the garbage
      *       collector cleans weak references aggressively, but it allows sharing the instances
      *       already created and still in use.</li>
+     *   <li>{@code "fixed") for holding a fixed number of values specified by CACHE_LIMIT
      *   <li>{@code "all"} for holding values through strong references.</li>
      *   <li>{@code "none"} for disabling the cache.</li>
      * </ul>
      *
      * @since 2.4
      */
-    public static final OptionKey BUFFER_POLICY = new OptionKey("weak", "all", "fixed","none","default");
+    public static final OptionKey CACHE_POLICY = new OptionKey("weak", "all", "fixed","none","default");
 
     /**
      * The recommended maximum number of referencing objects to hold in a
@@ -467,10 +468,10 @@ public final class Hints extends RenderingHints {
      *
      * @since 2.4
      */
-    public static final IntegerKey BUFFER_LIMIT = new IntegerKey(50);
+    public static final IntegerKey CACHE_LIMIT = new IntegerKey(50);
 
     /**
-     * The maximum number of active AuthorityFactories. 
+     * The maximum number of active AuthorityFactories (default 2). 
      * <p>
      * This hint is treated as an absolute LIMIT for AbstractAuthorityMediator 
      * instances such as as HsqlDialectEpsgMediator. As such this will be the
@@ -480,7 +481,10 @@ public final class Hints extends RenderingHints {
      * <p>
      * When this limit it reached, code will be forced to block while waiting
      * for a connection to become available.
-     *
+     * <p>
+     * When this value is non positive their is no limit to the number of
+     * active authority factories deployed!
+     * 
      * @since 2.4
      */
     public static final IntegerKey AUTHORITY_MAX_ACTIVE = new IntegerKey(2);
@@ -490,7 +494,16 @@ public final class Hints extends RenderingHints {
      * removing objects.  This value is also used by 
      * AUTHORITY_SOFTMIN_EVICT_IDLETIME to keep this many idle workers
      * around.
-     * 
+     * <p>
+     * In practice this value indicates the number of database connections
+     * the application will hold open "just in case". 
+     * <p>
+     * Recomendations:
+     * <ul>
+     * <li>Desktop Application: 1
+     * <li>Server Application: 2-3
+     * </ul>
+     * To agree with J2EE conventions you will want this value to be zero.
      * @since 2.4
      */
     public static final IntegerKey AUTHORITY_MIN_IDLE = new IntegerKey(1);
@@ -505,6 +518,7 @@ public final class Hints extends RenderingHints {
      * If AUTHORITY_MAX_ACTIVE is set to 20, up to twenty connections will
      * be used during heavy load. If the AUTHORITY_MAX_IDLE is set to 10,
      * connections will be immediately reclaimed until only 10 are open.
+     * As these 10 remain idle for AUTHORITY_
      * <p>
      * When the amount of time specified by AUTHORITY_IDLE_WAIT is non zero
      * Max idle controls the maximum number of objects that can sit idle in the

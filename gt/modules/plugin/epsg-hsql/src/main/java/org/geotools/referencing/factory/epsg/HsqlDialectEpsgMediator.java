@@ -67,7 +67,7 @@ public class HsqlDialectEpsgMediator extends AbstractEpsgMediator {
                  new Integer(1),
                  new Object[] {
                      Hints.AUTHORITY_MIN_EVICT_IDLETIME, new Integer(20 * 60 * 1000),
-                     Hints.BUFFER_POLICY, "none"
+                     Hints.CACHE_POLICY, "none"
                  }
              ),
              datasource

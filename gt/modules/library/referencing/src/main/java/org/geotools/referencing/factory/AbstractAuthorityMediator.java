@@ -75,7 +75,7 @@ import org.opengis.util.InternationalString;
 
 /**
  * An authority mediator that consults (a possibily shared) cache before delegating the generation
- * of the content to an authority factory.
+ * of the content to a "worker" authority factory.
  * </p>
  * The behaviour of the {@code createFoo(String)} methods first looks if a previously created object
  * exists for the given code. If such an object exists, it is returned directly. The testing of the
@@ -84,7 +84,12 @@ import org.opengis.util.InternationalString;
  * If the object is not yet created, the definition is delegated to the appropriate
  * {@code createFoo} method of the factory, which will cache the result for next time.
  * <p>
- * This object is responsible for using a provided {{ObjectCache}}.
+ * This object is responsible for maintaining an {{ObjectCache}} of "workers" based on the following:
+ * <ul>
+ * <li>Hints.AUTHORITY_MAX_ACTIVE (default 2) - indicates the maximum number of worker created, if non
+ * positive the number of workers is unbounded.
+ * <li>Hints.
+ * </ul>
  * </p>
  * 
  * @since 2.4
@@ -364,923 +369,348 @@ public abstract class AbstractAuthorityMediator extends AbstractAuthorityFactory
     public CoordinateReferenceSystem createCoordinateReferenceSystem( String code )
             throws FactoryException {
         final String key = toKey(code);
-        CoordinateReferenceSystem crs = (CoordinateReferenceSystem) cache.get(key);
-        if (crs == null) {
-            try {
-                cache.writeLock(key);
-                crs = (CoordinateReferenceSystem) cache.peek(key);
-                if (crs == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        crs = worker.createCoordinateReferenceSystem(code);
-                        cache.put(key, crs);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return crs;
+        return createWith( key, new WorkerSafeRunnable(){
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createCoordinateReferenceSystem(key);
+			}
+    	});
     }
+    
 
-    public DerivedCRS createDerivedCRS( String code ) throws FactoryException {
-        final String key = toKey(code);
-        DerivedCRS crs = (DerivedCRS) cache.get(key);
-        if (crs == null) {
-            try {
-                cache.writeLock(key);
-                crs = (DerivedCRS) cache.peek(key);
-                if (crs == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        crs = worker.createDerivedCRS(code);
-                        cache.put(key, crs);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return crs;
-    }
-
-    public EngineeringCRS createEngineeringCRS( String code ) throws FactoryException {
-        final String key = toKey(code);
-        EngineeringCRS crs = (EngineeringCRS) cache.get(key);
-        if (crs == null) {
-            try {
-                cache.writeLock(key);
-                crs = (EngineeringCRS) cache.peek(key);
-                if (crs == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        crs = worker.createEngineeringCRS(code);
-                        cache.put(key, crs);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return crs;
-    }
+    public DerivedCRS createDerivedCRS(String code) throws FactoryException {
+		final String key = toKey(code);
+		return createWith(key, new WorkerSafeRunnable() {
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createEngineeringCRS(key);
+			}
+		});
+	}
 
     public GeocentricCRS createGeocentricCRS( String code ) throws FactoryException {
         final String key = toKey(code);
-        GeocentricCRS crs = (GeocentricCRS) cache.get(key);
-        if (crs == null) {
-            try {
-                cache.writeLock(key);
-                crs = (GeocentricCRS) cache.peek(key);
-                if (crs == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        crs = worker.createGeocentricCRS(code);
-                        cache.put(key, crs);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return crs;
+		return createWith(key, new WorkerSafeRunnable() {
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createGeocentricCRS(key);
+			}
+		});
     }
 
     public GeographicCRS createGeographicCRS( String code ) throws FactoryException {
         final String key = toKey(code);
-        GeographicCRS crs = (GeographicCRS) cache.get(key);
-        if (crs == null) {
-            try {
-                cache.writeLock(key);
-                crs = (GeographicCRS) cache.peek(key);
-                if (crs == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        crs = worker.createGeographicCRS(code);
-                        cache.put(key, crs);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return crs;
+        return createWith(key, new WorkerSafeRunnable(){
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createGeographicCRS(key);
+			}        	
+        });
     }
 
     public ImageCRS createImageCRS( String code ) throws FactoryException {
         final String key = toKey(code);
-        ImageCRS crs = (ImageCRS) cache.get(key);
-        if (crs == null) {
-            try {
-                cache.writeLock(key);
-                crs = (ImageCRS) cache.peek(key);
-                if (crs == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        crs = worker.createImageCRS(code);
-                        cache.put(key, crs);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return crs;
+        return createWith(key, new WorkerSafeRunnable(){
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createImageCRS(key);
+			}        	
+        });
     }
 
     public ProjectedCRS createProjectedCRS( String code ) throws FactoryException {
         final String key = toKey(code);
-        ProjectedCRS crs = (ProjectedCRS) cache.get(key);
-        if (crs == null) {
-            try {
-                cache.writeLock(key);
-                crs = (ProjectedCRS) cache.peek(key);
-                if (crs == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        crs = worker.createProjectedCRS(code);
-                        cache.put(key, crs);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return crs;
+        return createWith(key, new WorkerSafeRunnable(){
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createProjectedCRS(key);
+			}        	
+        });
     }
-
     public TemporalCRS createTemporalCRS( String code ) throws FactoryException {
         final String key = toKey(code);
-        TemporalCRS crs = (TemporalCRS) cache.get(key);
-        if (crs == null) {
-            try {
-                cache.writeLock(key);
-                crs = (TemporalCRS) cache.peek(key);
-                if (crs == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        crs = worker.createTemporalCRS(code);
-                        cache.put(key, crs);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return crs;
+        return createWith(key, new WorkerSafeRunnable(){
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createTemporalCRS(key);
+			}        	
+        });
     }
 
-    public VerticalCRS createVerticalCRS( String code ) throws FactoryException {
-        final String key = toKey(code);
-        VerticalCRS crs = (VerticalCRS) cache.get(key);
-        if (crs == null) {
-            try {
-                cache.writeLock(key);
-                crs = (VerticalCRS) cache.peek(key);
-                if (crs == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        crs = worker.createVerticalCRS(code);
-                        cache.put(key, crs);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return crs;
-    }
+    
+    public VerticalCRS createVerticalCRS(String code) throws FactoryException {
+		final String key = toKey(code);
+		return createWith(key, new WorkerSafeRunnable() {
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createVerticalCRS(key);
+			}
+		});
+	}
 
     //
     // CSAuthority
     //
     public CartesianCS createCartesianCS( String code ) throws FactoryException {
         final String key = toKey(code);
-        CartesianCS cs = (CartesianCS) cache.get(key);
-        if (cs == null) {
-            try {
-                cache.writeLock(key);
-                cs = (CartesianCS) cache.peek(key);
-                if (cs == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        cs = worker.createCartesianCS(code);
-                        cache.put(key, cs);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return cs;
+		return createWith(key, new WorkerSafeRunnable() {
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createCartesianCS(key);
+			}
+		});        
     }
 
     public CoordinateSystem createCoordinateSystem( String code ) throws FactoryException {
         final String key = toKey(code);
-        CoordinateSystem cs = (CoordinateSystem) cache.get(key);
-        if (cs == null) {
-            try {
-                cache.writeLock(key);
-                cs = (CoordinateSystem) cache.peek(key);
-                if (cs == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        cs = worker.createCoordinateSystem(code);
-                        cache.put(key, cs);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return cs;
+		return createWith(key, new WorkerSafeRunnable() {
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createCoordinateSystem(key);
+			}
+		});
     }
-
+    
     // sample implemenation with get/test
     public CoordinateSystemAxis createCoordinateSystemAxis( String code ) throws FactoryException {
         final String key = toKey(code);
-        CoordinateSystemAxis axis = (CoordinateSystemAxis) cache.get(key);
-        if (axis == null) {
-            try {
-                cache.writeLock(key);
-                axis = (CoordinateSystemAxis) cache.peek(key);
-                if (axis == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        axis = worker.createCoordinateSystemAxis(code);
-                        cache.put(key, axis);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return axis;
+		return createWith(key, new WorkerSafeRunnable() {
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createCoordinateSystemAxis(key);
+			}
+		});
     }
 
     public CylindricalCS createCylindricalCS( String code ) throws FactoryException {
         final String key = toKey(code);
-        CylindricalCS cs = (CylindricalCS) cache.get(key);
-        if (cs == null) {
-            try {
-                cache.writeLock(key);
-                cs = (CylindricalCS) cache.peek(key);
-                if (cs == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        cs = worker.createCylindricalCS(code);
-                        cache.put(key, cs);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return cs;
+		return createWith(key, new WorkerSafeRunnable() {
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createCylindricalCS(key);
+			}
+		});
     }
 
     public EllipsoidalCS createEllipsoidalCS( String code ) throws FactoryException {
         final String key = toKey(code);
-        EllipsoidalCS cs = (EllipsoidalCS) cache.get(key);
-        if (cs == null) {
-            try {
-                cache.writeLock(key);
-                cs = (EllipsoidalCS) cache.peek(key);
-                if (cs == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        cs = worker.createEllipsoidalCS(code);
-                        cache.put(key, cs);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return cs;
+		return createWith(key, new WorkerSafeRunnable() {
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createEllipsoidalCS(key);
+			}
+		});
     }
 
     public PolarCS createPolarCS( String code ) throws FactoryException {
         final String key = toKey(code);
-        PolarCS cs = (PolarCS) cache.get(key);
-        if (cs == null) {
-            try {
-                cache.writeLock(key);
-                cs = (PolarCS) cache.peek(key);
-                if (cs == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        cs = worker.createPolarCS(code);
-                        cache.put(key, cs);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return cs;
-    }
+		return createWith(key, new WorkerSafeRunnable() {
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createPolarCS(key);
+			}
+		});
+    }        
 
     public SphericalCS createSphericalCS( String code ) throws FactoryException {
         final String key = toKey(code);
-        SphericalCS cs = (SphericalCS) cache.get(key);
-        if (cs == null) {
-            try {
-                cache.writeLock(key);
-                cs = (SphericalCS) cache.peek(key);
-                if (cs == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        cs = worker.createSphericalCS(code);
-                        cache.put(key, cs);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return cs;
+		return createWith(key, new WorkerSafeRunnable() {
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createSphericalCS(key);
+			}
+		});
     }
-
+    
     public TimeCS createTimeCS( String code ) throws FactoryException {
         final String key = toKey(code);
-        TimeCS cs = (TimeCS) cache.get(key);
-        if (cs == null) {
-            try {
-                cache.writeLock(key);
-                cs = (TimeCS) cache.peek(key);
-                if (cs == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        cs = worker.createTimeCS(code);
-                        cache.put(key, cs);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return cs;
+		return createWith(key, new WorkerSafeRunnable() {
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createTimeCS(key);
+			}
+		});
     }
 
     public Unit createUnit( String code ) throws FactoryException {
         final String key = toKey(code);
-        Unit unit = (Unit) cache.get(key);
-        if (unit == null) {
-            try {
-                cache.writeLock(key);
-                unit = (Unit) cache.peek(key);
-                if (unit == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        unit = worker.createUnit(code);
-                        cache.put(key, unit);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return unit;
+		return createWith(key, new WorkerSafeRunnable() {
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createUnit(key);
+			}
+		});
     }
 
     public VerticalCS createVerticalCS( String code ) throws FactoryException {
         final String key = toKey(code);
-        VerticalCS cs = (VerticalCS) cache.get(key);
-        if (cs == null) {
-            try {
-                cache.writeLock(key);
-                cs = (VerticalCS) cache.peek(key);
-                if (cs == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        cs = worker.createVerticalCS(code);
-                        cache.put(key, cs);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return cs;
-    }
+		return createWith(key, new WorkerSafeRunnable() {
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createVerticalCS(key);
+			}
+		});
+    }        
 
     //
     // DatumAuthorityFactory
     //
     public Datum createDatum( String code ) throws FactoryException {
         final String key = toKey(code);
-        Datum datum = (Datum) cache.get(key);
-        if (datum == null) {
-            try {
-                cache.writeLock(key);
-                datum = (Datum) cache.peek(key);
-                if (datum == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        datum = worker.createDatum(code);
-                        cache.put(key, datum);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return datum;
+		return createWith(key, new WorkerSafeRunnable() {
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createDatum(key);
+			}
+		});
     }
 
     public Ellipsoid createEllipsoid( String code ) throws FactoryException {
         final String key = toKey(code);
-        Ellipsoid ellipsoid = (Ellipsoid) cache.get(key);
-        if (ellipsoid == null) {
-            try {
-                cache.writeLock(key);
-                ellipsoid = (Ellipsoid) cache.peek(key);
-                if (ellipsoid == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        ellipsoid = worker.createEllipsoid(code);
-                        cache.put(key, ellipsoid);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return ellipsoid;
+		return createWith(key, new WorkerSafeRunnable() {
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createEllipsoid(key);
+			}
+		});
     }
 
     public EngineeringDatum createEngineeringDatum( String code ) throws FactoryException {
         final String key = toKey(code);
-        EngineeringDatum datum = (EngineeringDatum) cache.get(key);
-        if (datum == null) {
-            try {
-                cache.writeLock(key);
-                datum = (EngineeringDatum) cache.peek(key);
-                if (datum == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        datum = worker.createEngineeringDatum(code);
-                        cache.put(key, datum);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return datum;
+		return createWith(key, new WorkerSafeRunnable() {
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createEngineeringDatum(key);
+			}
+		});
     }
 
     public GeodeticDatum createGeodeticDatum( String code ) throws FactoryException {
         final String key = toKey(code);
-        GeodeticDatum datum = (GeodeticDatum) cache.get(key);
-        if (datum == null) {
-            try {
-                cache.writeLock(key);
-                datum = (GeodeticDatum) cache.peek(key);
-                if (datum == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        datum = worker.createGeodeticDatum(code);
-                        cache.put(key, datum);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return datum;
+		return createWith(key, new WorkerSafeRunnable() {
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createGeodeticDatum(key);
+			}
+		});
     }
 
     public ImageDatum createImageDatum( String code ) throws FactoryException {
         final String key = toKey(code);
-        ImageDatum datum = (ImageDatum) cache.get(key);
-        if (datum == null) {
-            try {
-                cache.writeLock(key);
-                datum = (ImageDatum) cache.peek(key);
-                if (datum == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        datum = worker.createImageDatum(code);
-                        cache.put(key, datum);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return datum;
+		return createWith(key, new WorkerSafeRunnable() {
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createImageDatum(key);
+			}
+		});
     }
 
     public PrimeMeridian createPrimeMeridian( String code ) throws FactoryException {
         final String key = toKey(code);
-        PrimeMeridian datum = (PrimeMeridian) cache.get(key);
-        if (datum == null) {
-            try {
-                cache.writeLock(key);
-                datum = (PrimeMeridian) cache.peek(key);
-                if (datum == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        datum = worker.createPrimeMeridian(code);
-                        cache.put(key, datum);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return datum;
+		return createWith(key, new WorkerSafeRunnable() {
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createPrimeMeridian(key);
+			}
+		});
     }
 
     public TemporalDatum createTemporalDatum( String code ) throws FactoryException {
         final String key = toKey(code);
-        TemporalDatum datum = (TemporalDatum) cache.get(key);
-        if (datum == null) {
-            try {
-                cache.writeLock(key);
-                datum = (TemporalDatum) cache.peek(key);
-                if (datum == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        datum = worker.createTemporalDatum(code);
-                        cache.put(key, datum);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return datum;
-    }
+		return createWith(key, new WorkerSafeRunnable() {
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createTemporalDatum(key);
+			}
+		});
+    }        
 
     public VerticalDatum createVerticalDatum( String code ) throws FactoryException {
         final String key = toKey(code);
-        VerticalDatum datum = (VerticalDatum) cache.get(key);
-        if (datum == null) {
-            try {
-                cache.writeLock(key);
-                datum = (VerticalDatum) cache.peek(key);
-                if (datum == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        datum = worker.createVerticalDatum(code);
-                        cache.put(key, datum);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return datum;
+		return createWith(key, new WorkerSafeRunnable() {
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createVerticalDatum(key);
+			}
+		});
     }
 
     public CoordinateOperation createCoordinateOperation( String code ) throws FactoryException {
         final String key = toKey(code);
-        CoordinateOperation operation = (CoordinateOperation) cache.get(key);
-        if (operation == null) {
-            try {
-                cache.writeLock(key);
-                operation = (CoordinateOperation) cache.peek(key);
-                if (operation == null) {
-                    AbstractCachedAuthorityFactory worker = null;
-                    try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        operation = worker.createCoordinateOperation(code);
-                        cache.put(key, operation);
-                    } catch (FactoryException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new FactoryException(e);
-                    } finally {
-                        try {
-                            getPool().returnObject(worker);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
-                        }
-                    }
-                }
-            } finally {
-                cache.writeUnLock(key);
-            }
-        }
-        return operation;
+		return createWith(key, new WorkerSafeRunnable() {
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createCoordinateOperation(key);
+			}
+		});
     }
-
+    
     public synchronized Set/* <CoordinateOperation> */createFromCoordinateReferenceSystemCodes(
             final String sourceCode, final String targetCode ) throws FactoryException {
 
         final Object key = ObjectCaches.toKey(getAuthority(), sourceCode, targetCode);
-        Set operations = (Set) cache.get(key);
-        if (operations == null) {
+		return createWith(key, new WorkerSafeRunnable() {
+			public Object run(AbstractCachedAuthorityFactory worker)
+					throws FactoryException {
+				return worker.createFromCoordinateReferenceSystemCodes(sourceCode, targetCode);
+			}
+		});
+    }        
+
+    /**
+     * This method is used to cut down the amount of try/catch/finally code
+     * needed when working with the cache and workers.
+     * <p>
+     * This code brings together two try/catch/finally blocks.
+     * 
+     * For cache management:<pre><code>
+     *  T value = (T) cache.get(key);
+     *  if (value == null) {
+     *      try {
+     *          cache.writeLock(key);
+     *          value = (T) cache.peek(key);
+     *          if (value == null) {
+     *          	....generate value....
+     *              cache.put( key, value );
+     *          }
+     *      } finally {
+     *          cache.writeUnLock(key);
+     *      }            	
+     *  }
+     * </code></pre>
+     * And worker management when generating values:<pre><code>
+     * AbstractCachedAuthorityFactory worker = null;
+     * try {
+     *  worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();            
+     *  value = (T) runner.run( worker );
+     * } catch (FactoryException e) {
+     *     throw e;
+     * } catch (Exception e) {
+     *     throw new FactoryException(e);
+     * } finally {
+     *     try {
+     *         getPool().returnObject(worker);
+     *     } catch (Exception e) {
+     *         LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
+     *     }
+     * }
+     * </code></pre>
+     * 
+     * @param key Used to look in the cache
+     * @param runner Used to generate a value in the case of a cache miss
+     * @return value from either the cache or generated
+     */
+    protected <T> T createWith( Object key, WorkerSafeRunnable runner ) throws FactoryException {
+        T value = (T) cache.get(key);
+        if (value == null) {
             try {
                 cache.writeLock(key);
-                operations = (Set) cache.peek(key);
-                if (operations == null) {
-                    AbstractCachedAuthorityFactory worker = null;
+                value = (T) cache.peek(key);
+                if (value == null) {
+                	AbstractCachedAuthorityFactory worker = null;
                     try {
-                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();
-                        operations = worker.createFromCoordinateReferenceSystemCodes(sourceCode,
-                                targetCode);
-                        cache.put(key, operations);
+                        worker = (AbstractCachedAuthorityFactory) getPool().borrowObject();            
+                        value = (T) runner.run( worker );
                     } catch (FactoryException e) {
                         throw e;
                     } catch (Exception e) {
@@ -1292,14 +722,23 @@ public abstract class AbstractAuthorityMediator extends AbstractAuthorityFactory
                             LOGGER.log(Level.WARNING, "Unable to return worker " + e, e);
                         }
                     }
+                    cache.put(key, value);                    
                 }
             } finally {
                 cache.writeUnLock(key);
-            }
+            }            	
         }
-        return operations;
+        return value;
     }
-
+    /**
+     * An interface describing a portion of work for which a worker is needed.
+     * <p>
+     * The worker is borrowed from the pool 
+     */
+    protected abstract class WorkerSafeRunnable {
+    	public abstract Object run( AbstractCachedAuthorityFactory worker ) throws FactoryException;
+    }
+    
     public String getBackingStoreDescription() throws FactoryException {
         AbstractCachedAuthorityFactory worker = null;
         try {

@@ -35,7 +35,7 @@ public class ThreadedHsqlEpsgFactoryTest extends TestCase {
         if( factory == null ){
             DataSource datasource = HsqlEpsgDatabase.createDataSource();
             
-            Hints hints = new Hints(Hints.BUFFER_POLICY, "weak");
+            Hints hints = new Hints(Hints.CACHE_POLICY, "weak");
             factory = (ThreadedHsqlEpsgFactory) ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG", null );
         }
         if( finder == null ){

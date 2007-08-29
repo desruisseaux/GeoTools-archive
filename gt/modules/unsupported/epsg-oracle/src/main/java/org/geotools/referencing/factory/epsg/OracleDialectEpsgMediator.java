@@ -61,7 +61,7 @@ public class OracleDialectEpsgMediator extends AbstractEpsgMediator {
                  new Integer(2),
                  new Object[] {
                      Hints.AUTHORITY_MIN_EVICT_IDLETIME, new Integer(1 * 60 * 1000),
-                     Hints.BUFFER_POLICY, "none",
+                     Hints.CACHE_POLICY, "none",
                      Hints.EPSG_DATA_SOURCE, datasource
                  }
              ),
