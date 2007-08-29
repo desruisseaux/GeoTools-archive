@@ -87,7 +87,7 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
      * The wrappers around each elements in {@link #parameters}. Will be created by
      * {@link #createElements} only when first needed.
      */
-    private transient List/*<ParameterValue>*/ values;
+    protected transient List/*<ParameterValue>*/ values;
 
     /**
      * A view of {@link #values} as an immutable list. Will be constructed only when first
@@ -98,7 +98,10 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
      * values().get(i).setValue(myValue);
      * </pre></blockquote>
      */
-    private transient List/*<ParameterValue>*/ asList;
+    protected transient List/*<ParameterValue>*/ asList;
+    
+    /**Lock to guard the lazy creation of the list parameters*/
+    protected final int[] lock= new int[1];
 
     /**
      * Constructs a parameter group for the specified descriptor.
@@ -133,7 +136,7 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
      * inconditionnally and most not requires synchronization for proper working of the
      * {@link #clone} method.
      */
-    private void createElements() {
+    protected void createElements() {
         final ImagingParameterDescriptors descriptor = (ImagingParameterDescriptors) this.descriptor;
         final List   descriptors = descriptor.descriptors();
         final Set parameterNames = descriptor.getParameterNames();
@@ -188,10 +191,12 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
      * parameters found in the {@linkplain #parameters underlying parameter list}. In addition, it
      * may contains sources found in the JAI's {@linkplain OperationDescriptor operation descriptor}.
      */
-    public synchronized List values() {
-        if (asList == null) {
-            createElements();
-        }
+    public List values() {
+        synchronized (lock) {
+        	if (values == null) {
+                createElements();
+            }
+		}
         return asList;
     }
 
@@ -204,14 +209,17 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
      * @return The parameter value for the given identifier code.
      * @throws ParameterNotFoundException if there is no parameter value for the given identifier code.
      */
-    public synchronized ParameterValue parameter(String name)
+    public ParameterValue parameter(String name)
             throws ParameterNotFoundException
     {
         ensureNonNull("name", name);
         name = name.trim();
-        if (values == null) {
-            createElements();
-        }
+        synchronized (lock) {
+        	if (values == null) {
+                createElements();
+            }
+		}
+        
         final int size = values.size();
         for (int i=0; i<size; i++) {
             final ParameterValue value = (ParameterValue) values.get(i);

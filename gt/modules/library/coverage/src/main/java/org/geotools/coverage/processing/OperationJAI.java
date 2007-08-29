@@ -18,11 +18,10 @@ package org.geotools.coverage.processing;
 
 // J2SE dependencies and extensions
 import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
 import java.awt.image.ColorModel;
 import java.awt.image.RenderedImage;
 import java.io.Serializable;
-import java.io.IOException;
-import java.net.URL;
 import java.util.Map;
 import java.util.Arrays;
 import java.util.Locale;
@@ -35,11 +34,14 @@ import javax.media.jai.JAI;
 import javax.media.jai.OperationRegistry;
 import javax.media.jai.OperationDescriptor;
 import javax.media.jai.ParameterBlockJAI;
+import javax.media.jai.ROI;
+import javax.media.jai.ROIShape;
 import javax.media.jai.registry.RenderedRegistryMode;
 
 // OpenGIS dependencies
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.processing.OperationNotFoundException;
+import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -48,6 +50,7 @@ import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.InternationalString;
 
@@ -58,11 +61,13 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.InvalidGridGeometryException;
 import org.geotools.factory.Hints;
+import org.geotools.geometry.jts.LiteShape2;
 import org.geotools.parameter.ImagingParameters;
 import org.geotools.parameter.ImagingParameterDescriptors;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.operation.transform.DimensionFilter;
+import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.image.jai.Registry;
 import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
@@ -73,6 +78,9 @@ import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.util.AbstractInternationalString;
 import org.geotools.util.NumberRange;
+
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
@@ -111,6 +119,7 @@ import org.geotools.util.NumberRange;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Simone Giannecchini
  */
 public class OperationJAI extends Operation2D {
     /**
@@ -121,7 +130,7 @@ public class OperationJAI extends Operation2D {
     /**
      * The rendered mode for JAI operation.
      */
-    private static final String RENDERED_MODE = RenderedRegistryMode.MODE_NAME;
+    protected static final String RENDERED_MODE = RenderedRegistryMode.MODE_NAME;
 
     /**
      * Index of the source {@link GridCoverage2D} to use as a model. The destination grid coverage
@@ -132,7 +141,7 @@ public class OperationJAI extends Operation2D {
      * expecting more than one source, the choice of a primary source is somewhat arbitrary.
      * This constant is used merely as a flag for spotting those places in the code.
      */
-    private static final int PRIMARY_SOURCE_INDEX = 0;
+    protected static final int PRIMARY_SOURCE_INDEX = 0;
 
     /**
      * The JAI's operation descriptor.
@@ -147,7 +156,7 @@ public class OperationJAI extends Operation2D {
      * @param operation JAI operation name (e.g. {@code "GradientMagnitude"}).
      * @throws OperationNotFoundException if no JAI descriptor was found for the given name.
      */
-    public OperationJAI(final String operation) throws OperationNotFoundException {
+    protected OperationJAI(final String operation) throws OperationNotFoundException {
         this(getOperationDescriptor(operation));
     }
 
@@ -157,7 +166,7 @@ public class OperationJAI extends Operation2D {
      *
      * @param operation The JAI operation descriptor.
      */
-    public OperationJAI(final OperationDescriptor operation) {
+    protected OperationJAI(final OperationDescriptor operation) {
         this(operation, new ImagingParameterDescriptors(operation));
     }
 
@@ -200,24 +209,38 @@ public class OperationJAI extends Operation2D {
      * @return The operation descriptor for the given name.
      * @throws OperationNotFoundException if no JAI descriptor was found for the given name.
      */
-    private static OperationDescriptor getOperationDescriptor(final String name)
+    protected final static OperationDescriptor getOperationDescriptor(final String name)
             throws OperationNotFoundException
     {
         final OperationRegistry registry = JAI.getDefaultInstance().getOperationRegistry();
-        OperationDescriptor operation;
-        do {
-            operation = (OperationDescriptor) registry.getDescriptor(RENDERED_MODE, name);
-            if (operation != null) {
-                return operation;
-            }
-        } while (name.startsWith("org.geotools.") && Registry.registerGeotoolsServices(registry));
+        OperationDescriptor operation=(OperationDescriptor) registry.getDescriptor(RENDERED_MODE, name);
+        if (operation != null) {
+            return operation;
+        }
+        if (name.startsWith("org.geotools.")) {
+			if (registry.getDescriptor(RENDERED_MODE, "org.geotools.Combine") == null)
+				try {
+					// try and register our operations
+					Registry.registerGeotoolsServices(registry);
+				} catch (Exception e) {
+
+				}
+
+			// try to get it again
+			operation = (OperationDescriptor) registry.getDescriptor(
+					RENDERED_MODE, name);
+			if (operation != null) {
+				return operation;
+			}
+
+		}
         throw new OperationNotFoundException(Errors.format(ErrorKeys.OPERATION_NOT_FOUND_$1, name));
     }
 
     /**
      * Ensures that the specified class is assignable to {@link RenderedImage}.
      */
-    private static final void ensureRenderedImage(final Class classe)
+    protected static final void ensureRenderedImage(final Class classe)
             throws IllegalArgumentException
     {
         if (!RenderedImage.class.isAssignableFrom(classe)) {
@@ -287,35 +310,21 @@ public class OperationJAI extends Operation2D {
          * user-supplied parameters. However, we peform an unconditional copy instead because
          * some operations (e.g. "GradientMagnitude") may change the values.
          */
-        final ParameterBlockJAI block;
-        if (true) {
-            final ImagingParameters copy = (ImagingParameters) descriptor.createValue();
-            block = (ParameterBlockJAI) copy.parameters;
-            org.geotools.parameter.Parameters.copy(parameters, copy);
-        }
+        final ParameterBlockJAI block=prepareParameters(parameters);
+
         /*
          * Extracts the source grid coverages now as an array. The sources will be set in the
          * ParameterBlockJAI (as RenderedImages) later, after the reprojection performed in the
          * next block.
          */
-        Boolean  requireGeophysicsType = null;
         final String[]     sourceNames = operation.getSourceNames();
         final GridCoverage2D[] sources = new GridCoverage2D[sourceNames.length];
-        final boolean computeOnGeophysicsValues = computeOnGeophysicsValues(parameters);
-        for (int i=0; i<sourceNames.length; i++) {
-            GridCoverage2D source = (GridCoverage2D) parameters.parameter(sourceNames[i]).getValue();
-            if (computeOnGeophysicsValues) {
-                final GridCoverage2D old = source;
-                source = source.geophysics(true);
-                if (i == PRIMARY_SOURCE_INDEX) {
-                    requireGeophysicsType = Boolean.valueOf(old == source);
-                }
-            }
-            sources[i] = source;
-        }
+        Boolean  requireGeophysicsType = extractSources(parameters, sourceNames, sources);
+        
+        
         /*
          * Ensures that all coverages use the same CRS and has the same 'gridToCRS' relationship.
-         * After the reprojection, the method still checks all CRS in case the user overridden the
+         * After the reprojection, the method still checks all CRS in case the user overrided the
          * {@link #resampleToCommonGeometry} method.
          */
         resampleToCommonGeometry(sources, null, null, hints);
@@ -337,11 +346,87 @@ public class OperationJAI extends Operation2D {
          * Applies the operation. This delegates the work to the chain of 'deriveXXX' methods.
          */
         coverage = deriveGridCoverage(sources, new Parameters(crs, gridToCRS, block, hints));
-        if (requireGeophysicsType != null) {
-            coverage = coverage.geophysics(requireGeophysicsType.booleanValue());
-        }
-        return coverage;
+        return postProcessResult(requireGeophysicsType, coverage);
     }
+
+	/**
+	 * @param requireGeophysicsType
+	 *            is a {@link Boolean} that tells me if I have to change the
+	 *            "geo-view" for the provided {@link GridCoverage2D}.
+	 * @param coverage
+	 *            {@link GridCoverage2D} which we have prepare for a successive
+	 *            operation or for the final user.
+	 * @return the prepared {@link GridCoverage2D}.
+	 * @since 2.4
+	 * @author Simone Giannecchini
+	 */
+	protected GridCoverage2D postProcessResult(Boolean requireGeophysicsType,
+			GridCoverage2D coverage) {
+		if (requireGeophysicsType != null) {
+			coverage = coverage
+					.geophysics(requireGeophysicsType.booleanValue());
+		}
+		return coverage;
+	}
+
+	/**
+	 * Extracts and prepares ths sources for this {@link OperationJAI}, taking
+	 * into account the ned for going to the geophysics view of the data in case
+	 * this operation requires so.
+	 * 
+	 * <p>
+	 * The side effect of this method is to fill the array of neede source as well as to change their "geo-view".
+	 * 
+	 * @param parameters that will control this operation.
+	 * @param sourceNames names of the parameters that compose the provided {@link ParameterValueGroup}.
+	 * @param sources is an array that contains all the {@link GridCoverage2D} to be used as sources for this operation.
+	 * @return a {@link Boolean} that tells me if I have to change the "geo-view" for this coverage.
+	 * @throws ParameterNotFoundException
+	 * @since 2.4
+	 * @author Simone Giannecchini
+	 */
+	protected Boolean extractSources(final ParameterValueGroup parameters,
+			 final String[] sourceNames,
+			final GridCoverage2D[] sources) throws ParameterNotFoundException {
+		Boolean requireGeophysicsType=null;
+	    final boolean computeOnGeophysicsValues = computeOnGeophysicsValues(parameters);
+		for (int i = 0; i < sourceNames.length; i++) {
+			GridCoverage2D source = (GridCoverage2D) parameters.parameter(
+					sourceNames[i]).getValue();
+			if (computeOnGeophysicsValues) {
+				final GridCoverage2D old = source;
+				source = source.geophysics(true);
+				if (i == PRIMARY_SOURCE_INDEX) {
+					requireGeophysicsType = Boolean.valueOf(old == source);
+				}
+			}
+			sources[i] = source;
+		}
+		return requireGeophysicsType;
+	}
+
+	/**
+	 * Copies parameter values from the ParameterValues object to the
+	 * ParameterBlockJAI, except the sources. Note: it would be possible to use
+	 * the ParameterBlockJAI in the user-supplied parameters. However, we peform
+	 * an unconditional copy instead because some operations (e.g.
+	 * "GradientMagnitude") may change the values.
+	 * 
+	 * @param parameters
+	 *            the {@link ParameterValueGroup} to be copied
+	 * @return a clone of the provided {@link ParameterValueGroup}.
+	 * @since 2.4
+	 * @author Simone Giannecchini
+	 */
+	protected ParameterBlockJAI prepareParameters(
+			final ParameterValueGroup parameters) {
+		final ParameterBlockJAI block;
+		final ImagingParameters copy = (ImagingParameters) descriptor
+				.createValue();
+		block = (ParameterBlockJAI) copy.parameters;
+		org.geotools.parameter.Parameters.copy(parameters, copy);
+		return block;
+	}
 
     /**
      * Returns a sub-coordinate reference system for the specified dimension range.
@@ -353,7 +438,7 @@ public class OperationJAI extends Operation2D {
      * @return The sub-coordinate system, or {@code null} if {@code lower} is equals to {@code upper}.
      * @throws InvalidGridGeometryException if the CRS can't be separated.
      */
-    private static CoordinateReferenceSystem getSubCRS(final CoordinateReferenceSystem crs,
+	protected static CoordinateReferenceSystem getSubCRS(final CoordinateReferenceSystem crs,
                                                        final int lower, final int upper)
             throws InvalidGridGeometryException
     {
@@ -371,7 +456,7 @@ public class OperationJAI extends Operation2D {
      * Ensures that the source and target dimensions are the same. This method is for internal
      * use by {@link #resampleToCommonGeometry}.
      */
-    private static void ensureStableDimensions(final DimensionFilter filter)
+	protected static void ensureStableDimensions(final DimensionFilter filter)
             throws InvalidGridGeometryException
     {
         final int[] source = filter.getSourceDimensions(); Arrays.sort(source);
@@ -640,6 +725,7 @@ public class OperationJAI extends Operation2D {
         final CoordinateReferenceSystem crs = primarySource.getCoordinateReferenceSystem();
         final MathTransform           toCRS = primarySource.getGridGeometry().getGridToCRS();
         final RenderedImage            data = createRenderedImage(parameters.parameters, hints);
+        final Map 			     properties = getProperties(data,crs,name,toCRS,sources,parameters);
         return getFactory(parameters.hints)
                 .create(name,        // The grid coverage name
                         data,        // The underlying data
@@ -647,15 +733,44 @@ public class OperationJAI extends Operation2D {
                         toCRS,       // The grid transform (may not be 2D).
                         sampleDims,  // The sample dimensions
                         sources,     // The source grid coverages.
-                        null);       // Properties
+                        properties);       // Properties
     }
 
     /**
-     * Returns the index of the quantitative category, providing that there is one and only one
-     * quantitative category. If {@code categories} contains 0, 2 or more quantative category,
-     * then this method returns {@code -1}.
-     */
-    private static int getQuantitative(final Category[] categories) {
+	 * Prepares the properties that this {@link OperationJAI} will produce.
+	 * 
+	 * @param data
+	 *            the {@link RenderedImage} to extract properties for.
+	 * @param crs
+	 *            for the coverage this {@link OperationJAI} will produce.
+	 * @param name
+	 *            for the coverage this {@link OperationJAI} will produce.
+	 * @param toCRS
+	 *            {@link MathTransform} for the coverage this
+	 *            {@link OperationJAI} will produce.
+	 * @param sources
+	 *            for the coverage this {@link OperationJAI} will produce.
+	 * @param parameters
+	 *            that were used by this {@link OperationJAI}.
+	 * @return a {@link Map} with the properties generated by this
+	 *         {@link OperationJAI} or null if we haven't any.
+	 * @since 2.4
+	 * @author Simone Giannecchini
+	 */
+	protected Map getProperties(RenderedImage data,
+			CoordinateReferenceSystem crs, InternationalString name,
+			MathTransform toCRS, GridCoverage2D[] sources, Parameters parameters) {
+		return null;
+	}
+
+
+		
+	/**
+	 * Returns the index of the quantitative category, providing that there is
+	 * one and only one quantitative category. If {@code categories} contains 0,
+	 * 2 or more quantative category, then this method returns {@code -1}.
+	 */
+    protected static int getQuantitative(final Category[] categories) {
         int index = -1;
         for (int i=0; i<categories.length; i++) {
             if (categories[i].isQuantitative()) {
@@ -944,7 +1059,7 @@ public class OperationJAI extends Operation2D {
      * @param  hints The rendering hints, or {@code null} if none.
      * @return The JAI instance to use (never {@code null}).
      */
-    public static JAI getJAI(final RenderingHints hints) {
+    public final static JAI getJAI(final RenderingHints hints) {
         if (hints != null) {
             final Object value = hints.get(Hints.JAI_INSTANCE);
             if (value instanceof JAI) {
@@ -954,9 +1069,42 @@ public class OperationJAI extends Operation2D {
         return JAI.getDefaultInstance();
     }
 
+//    /**
+//	 * 
+//	 * @param polygon
+//	 * @param worldToGridTransform
+//	 * @return
+//	 * @throws FactoryException
+//	 * @throws TransformException
+//	 */
+//	public final static ROI polygonToRoi(final Polygon polygon,
+//			final MathTransform worldToGridTransform) throws TransformException,
+//			FactoryException {
+//
+//		return new ROIShape(new LiteShape2(polygon, worldToGridTransform, null, false));
+//	}
+//	
+//    /**
+//	 * 
+//	 * @param polygon
+//	 * @param transform
+//	 * @return
+//	 * @throws FactoryException
+//	 * @throws TransformException
+//	 */
+//	public final static ROI polygonToRoi(final Polygon polygon,
+//			final AffineTransform worldToGridTransform) throws TransformException,
+//			FactoryException {
+//
+//		return polygonToRoi(polygon, ProjectiveTransform.create(worldToGridTransform));
+//	}
+//	
+
+
+	
     /**
-     * Compares the specified object with this operation for equality.
-     */
+	 * Compares the specified object with this operation for equality.
+	 */
     public boolean equals(final Object object) {
         if (object == this) {
             // Slight optimisation
