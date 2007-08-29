@@ -226,28 +226,27 @@ public class LiteralExpressionImpl extends DefaultExpression
     public boolean equals(Object obj) {
         if (obj instanceof LiteralExpressionImpl) {
             LiteralExpressionImpl expLit = (LiteralExpressionImpl) obj;
-            boolean isEqual = (expLit.getType() == this.expressionType);
+            // This is a problem.  The Expression with type String of "2.0"
+            // should be equals to the Expression with type Integer of "2.0"
+            // Same thing with doubles and integers (as noted in the javadocs)
+            /*boolean isEqual = (expLit.getType() == this.expressionType);
 
             if (!isEqual) {
                 return false;
-            }
+            }*/
 
             if ((expLit == null) && (this.literal == null)) {
                 return true;
             }
 
             if (expressionType == LITERAL_GEOMETRY) {
-                return ((Geometry) this.literal).equals((Geometry) expLit
-                    .getLiteral());
+                return ((Geometry) this.literal).equals((Geometry) expLit.evaluate(null, Geometry.class));
             } else if (expressionType == LITERAL_INTEGER) {
-                return ((Integer) this.literal).equals((Integer) expLit
-                    .getLiteral());
+                return ((Integer) this.literal).equals((Integer) expLit.evaluate(null, Integer.class));
             } else if (expressionType == LITERAL_STRING) {
-                return ((String) this.literal).equals((String) expLit
-                    .getLiteral());
+                return ((String) this.literal).equals((String) expLit.evaluate(null, String.class));
             } else if (expressionType == LITERAL_DOUBLE) {
-                return ((Double) this.literal).equals((Double) expLit
-                    .getLiteral());
+                return ((Double) this.literal).equals((Double) expLit.evaluate(null, Double.class));
             } else {
                 return true;
             }

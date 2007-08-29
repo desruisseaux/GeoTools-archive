@@ -201,31 +201,8 @@ public final class ExpressionDOMParser {
                 String nodeValue = kid.getNodeValue();
                 LOGGER.finer("processing " + nodeValue);
 
-                //                System.out.println("Node value is: " + nodeValue);
-                // see if it's an int
                 try {
-                    try {
-                        Integer intLit = new Integer(nodeValue);
-                        LOGGER.finer("An integer");
-
-                        return ff.createLiteralExpression(intLit);
-                    } catch (NumberFormatException e) {
-                        /* really empty */
-                    }
-
-                    // A double?
-                    try {
-                        Double doubleLit = new Double(nodeValue);
-                        LOGGER.finer("A double");
-
-                        return ff.createLiteralExpression(doubleLit);
-                    } catch (NumberFormatException e) {
-                        /* really empty */
-                    }
-
-                    // must be a string (or we have a problem)
-                    LOGGER.finer("defaulting to string");
-
+                    //always store internal values as strings.  We might lose info otherwise.
                     return ff.createLiteralExpression(nodeValue);
                 } catch (IllegalFilterException ife) {
                     LOGGER.finer("Unable to build expression " + ife);

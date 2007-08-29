@@ -150,9 +150,11 @@ public class BetweenFilterImpl extends CompareFilterImpl
 		
 		return (left <= mid) && (right >= mid);
 	    */
-	    Object leftObj = eval(expression1, feature);
-	    Object rightObj = eval(expression2, feature);
-	    Object middleObj = eval(middleValue, feature);
+        Object middleObj = eval(middleValue, feature);
+        //evaluate the between wrt the class of the middle object
+	    Object leftObj = eval(expression1, feature, middleObj.getClass());
+	    Object rightObj = eval(expression2, feature, middleObj.getClass());
+	    
 	    
 	    if (leftObj instanceof Number &&
 		middleObj instanceof Number &&

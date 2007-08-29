@@ -43,8 +43,10 @@ public class NumericConverterFactory implements ConverterFactory {
 
 	public Converter createConverter(Class source, Class target, Hints hints) {
 	
-		//check if source is a number
-		if ( !( Number.class.isAssignableFrom( source ) ) ) 
+		//check if source is a number or a string.  We can't convert to a number
+	    // from anything else.
+		if ( !(Number.class.isAssignableFrom( source )) &&
+		     !(String.class.isAssignableFrom( source )) ) 
 			return null;
 		
 		//check if target is one of supported
@@ -56,7 +58,8 @@ public class NumericConverterFactory implements ConverterFactory {
 			BigInteger.class.equals( target ) || 
 			BigDecimal.class.equals( target ) || 
 			Double.class.equals( target ) || 
-			Float.class.equals( target )
+			Float.class.equals( target ) ||
+			Number.class.equals( target )
 		) {
 			return new NumericConverter();
 		}
@@ -67,37 +70,60 @@ public class NumericConverterFactory implements ConverterFactory {
 	class NumericConverter implements Converter {
 
 		public Object convert(Object source, Class target) throws Exception {
-			Number s = (Number) source;
-			
-			//integral
-			if ( Long.class.equals( target ) ) {
-				return new Long( s.longValue() );
-			}
-			if ( Integer.class.equals( target ) ) {
-				return new Integer( s.intValue() );
-			}
-			if ( Short.class.equals( target ) ) {
-				return new Short( s.shortValue() );
-			}
-			if ( Byte.class.equals( target ) ) {
-				return new Byte( s.byteValue() );
-			}
-			if ( BigInteger.class.equals( target ) ) {
-				return BigInteger.valueOf( s.longValue() );
-			}
-		
-			//floating point
-			if ( Double.class.equals( target ) ) {
-				return new Double( s.doubleValue() );
-			}
-			if ( Float.class.equals( target ) ) {
-				return new Float( s.floatValue() );
-			}
-			if ( BigDecimal.class.equals( target ) ) {
-				return new BigDecimal( s.doubleValue() );
-			}
-			
-			return null;
+		    if (source instanceof Number) {
+    			Number s = (Number) source;
+    			
+    			//integral
+    			if ( Long.class.equals( target ) ) {
+    				return new Long( s.longValue() );
+    			}
+    			if ( Integer.class.equals( target ) ) {
+    				return new Integer( s.intValue() );
+    			}
+    			if ( Short.class.equals( target ) ) {
+    				return new Short( s.shortValue() );
+    			}
+    			if ( Byte.class.equals( target ) ) {
+    				return new Byte( s.byteValue() );
+    			}
+    			if ( BigInteger.class.equals( target ) ) {
+    				return BigInteger.valueOf( s.longValue() );
+    			}
+    		
+    			//floating point
+    			if ( Double.class.equals( target ) ) {
+    				return new Double( s.doubleValue() );
+    			}
+    			if ( Float.class.equals( target ) ) {
+    				return new Float( s.floatValue() );
+    			}
+    			if ( BigDecimal.class.equals( target ) ) {
+    				return new BigDecimal( s.doubleValue() );
+    			}
+		    } else if (source instanceof String) {
+		        String s = (String) source;
+		        try {
+		            return new Integer(s);
+		        } catch (Exception e) {
+		        }
+		        
+		        try {
+                    return new Double(s);
+                } catch (Exception e) {
+                }
+                
+                try {
+                    return new BigInteger(s);
+                } catch (Exception e) {
+                }
+                
+                try {
+                    return new BigDecimal(s);
+                } catch (Exception e) {
+                }
+		    }
+		    //nothing matched.  Return null.
+		    return null;
 		}
 	}
 
