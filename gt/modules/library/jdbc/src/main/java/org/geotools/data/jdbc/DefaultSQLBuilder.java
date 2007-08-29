@@ -115,7 +115,7 @@ public class DefaultSQLBuilder implements SQLBuilder {
      *         on the result set.
      */
     public Filter getPostQueryFilter(Filter filter) {
-    	if (filter != null && ( lastFilter == null || !filter.equals(lastFilter) ) ) {
+    	if (filter != null && ( lastFilter == null || filter != lastFilter) ) {
     		splitFilter(filter);
     	}
     	return lastPostFilter;
