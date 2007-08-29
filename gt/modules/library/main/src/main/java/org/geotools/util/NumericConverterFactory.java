@@ -100,26 +100,80 @@ public class NumericConverterFactory implements ConverterFactory {
     			if ( BigDecimal.class.equals( target ) ) {
     				return new BigDecimal( s.doubleValue() );
     			}
+    			
+    			if (Number.class.equals( target )) {
+    			    try {
+                        return new Integer(s.toString());
+                    } catch (Exception e) {
+                    }
+                    
+                    try {
+                        return new BigInteger(s.toString());
+                    } catch (Exception e) {
+                    }
+                    
+                    try {
+                        return new Double(s.toString());
+                    } catch (Exception e) {
+                    }
+                    
+                    try {
+                        return new BigDecimal(s.toString());
+                    } catch (Exception e) {
+                    }
+    			}
 		    } else if (source instanceof String) {
 		        String s = (String) source;
-		        try {
-		            return new Integer(s);
-		        } catch (Exception e) {
-		        }
 		        
-		        try {
-                    return new Double(s);
-                } catch (Exception e) {
+		        //textual
+                if ( Long.class.equals( target ) ) {
+                    return new Long(s);
                 }
-                
-                try {
+                if ( Integer.class.equals( target ) ) {
+                    return new Integer(s);
+                }
+                if ( Short.class.equals( target ) ) {
+                    return new Short(s);
+                }
+                if ( Byte.class.equals( target ) ) {
+                    return new Byte(s);
+                }
+                if ( BigInteger.class.equals( target ) ) {
                     return new BigInteger(s);
-                } catch (Exception e) {
+                }
+            
+                //floating point
+                if ( Double.class.equals( target ) ) {
+                    return new Double(s);
+                }
+                if ( Float.class.equals( target ) ) {
+                    return new Float(s);
+                }
+                if ( BigDecimal.class.equals( target ) ) {
+                    return new BigDecimal(s);
                 }
                 
-                try {
-                    return new BigDecimal(s);
-                } catch (Exception e) {
+                //fallback.  If you ask for Number, you get our 'best guess'
+                if (Number.class.equals( target )) {
+                    try {
+                        return new Integer(s);
+                    } catch (Exception e) {
+                    }
+                    
+                    try {
+                        return new BigInteger(s);
+                    } catch (Exception e) {
+                    }
+                    
+                    try {
+                        return new Double(s);
+                    } catch (Exception e) {
+                    }
+                    
+                    try {
+                        return new BigDecimal(s);
+                    } catch (Exception e) {
+                    }
                 }
 		    }
 		    //nothing matched.  Return null.
