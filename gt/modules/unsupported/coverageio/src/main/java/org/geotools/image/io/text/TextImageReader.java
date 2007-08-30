@@ -65,10 +65,10 @@ public abstract class TextImageReader extends StreamImageReader {
     }
 
     /**
-     * Returns the character set to uses for decoding the string from the input stream.
-     * The default implementation returns the character set specified to the {@link Spi}
-     * object given to this {@code TextImageReader} constructor. Subclasses may override
-     * this method if they want to detect the character encoding in some other way.
+     * Returns the character set to use for decoding the string from the input stream. The default
+     * implementation returns the {@linkplain Spi#charset character set} specified to the
+     * {@link Spi} object given to this {@code TextImageReader} constructor. Subclasses can
+     * override this method if they want to detect the character encoding in some other way.
      *
      * @param  input The input stream.
      * @return The character encoding, or {@code null} for the platform default encoding.
@@ -107,7 +107,7 @@ public abstract class TextImageReader extends StreamImageReader {
      * {@link TextRecordImageReader#getColumnY y} values, if any.
      * <p>
      * The default implementation returns the pad value specified to the {@link Spi} object given
-     * to this {@code TextImageReader} constructor. Subclasses may override this method if they
+     * to this {@code TextImageReader} constructor. Subclasses can override this method if they
      * want to detect the pad value in some other way.
      *
      * @param  imageIndex the index of the image to be queried.
@@ -346,8 +346,8 @@ public abstract class TextImageReader extends StreamImageReader {
 
         /**
          * Character encoding, or {@code null} for the default. This field is initially
-         * {@code null}. A value shall be set by subclasses decoding files using some
-         * specific character encoding.
+         * {@code null}. A value shall be set by subclasses if the files to be decoded
+         * use some specific character encoding.
          *
          * @see TextImageReader#getCharset
          */
@@ -456,7 +456,7 @@ public abstract class TextImageReader extends StreamImageReader {
 
         /**
          * Returns {@code true} if the specified row length is valid. If unsure, this methods
-         * may conservatively returns {@code false}. The default implementation always returns
+         * can conservatively returns {@code false}. The default implementation always returns
          * {@code true}.
          */
         boolean isValidColumnCount(final int count) {

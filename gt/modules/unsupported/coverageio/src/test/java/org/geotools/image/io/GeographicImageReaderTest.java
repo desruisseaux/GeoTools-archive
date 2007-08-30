@@ -37,7 +37,7 @@ import junit.framework.TestSuite;
  */
 public class GeographicImageReaderTest extends TestCase {
     /**
-     * Run the suit from the command line.
+     * Run the suite from the command line.
      */
     public static void main(final String[] args) {
         org.geotools.util.Logging.GEOTOOLS.forceMonolineConsoleOutput();

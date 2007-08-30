@@ -424,7 +424,7 @@ public class TextMatrixImageReader extends TextImageReader {
         }
 
         /**
-         * Returns an instance of the ImageReader implementation associated
+         * Returns an instance of the {@code ImageReader} implementation associated
          * with this service provider.
          *
          * @param  extension An optional extension object, which may be null.

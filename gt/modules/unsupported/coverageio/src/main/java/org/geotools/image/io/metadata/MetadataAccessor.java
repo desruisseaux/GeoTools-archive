@@ -507,12 +507,12 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
     final void setEnum(final String attribute, String value, final Collection enums) {
         if (value != null) {
             value = value.replace('_', ' ').trim();
-        }
-        for (final Iterator it=enums.iterator(); it.hasNext();) {
-            final String e = (String) it.next();
-            if (value.equalsIgnoreCase(e)) {
-                value = e;
-                break;
+            for (final Iterator it=enums.iterator(); it.hasNext();) {
+                final String e = (String) it.next();
+                if (value.equalsIgnoreCase(e)) {
+                    value = e;
+                    break;
+                }
             }
         }
         setString(attribute, value);

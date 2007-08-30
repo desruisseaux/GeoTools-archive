@@ -21,7 +21,6 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import javax.imageio.ImageReader;
-import javax.imageio.ImageTypeSpecifier;    // For javadoc
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 

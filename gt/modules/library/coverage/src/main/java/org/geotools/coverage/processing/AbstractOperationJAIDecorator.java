@@ -13,6 +13,8 @@ import org.geotools.parameter.ImagingParameterDescriptorsDecorator;
  * 
  * @author Simone Giannecchini, GeoSolutions.
  * 
+ * @deprecated Users should avoid this class, since it is likely to be merged with
+ *             {@link OperationJAI} later.
  */
 public abstract class AbstractOperationJAIDecorator extends OperationJAI {
 

@@ -38,7 +38,10 @@ import org.opengis.parameter.ParameterDescriptor;
  * 
  * @author Simone Giannecchini, GeoSolutions.
  * @since 2.4.x
- * 
+ *
+ * @deprecated Users should avoid this class, since it is likely to be merged with
+ *             {@link ImagingParameterDescriptors} later.
+ *
  */
 public class ImagingParameterDescriptorsDecorator extends
 		ImagingParameterDescriptors {

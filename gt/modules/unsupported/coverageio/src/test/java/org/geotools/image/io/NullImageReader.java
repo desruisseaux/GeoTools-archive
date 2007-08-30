@@ -35,7 +35,7 @@ import org.geotools.image.io.metadata.GeographicMetadata;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class NullImageReader extends GeographicImageReader {
+final class NullImageReader extends GeographicImageReader {
     /**
      * The data type to be returned by {@link #getRawDataType}.
      */

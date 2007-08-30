@@ -17,6 +17,7 @@
 package org.geotools.image.io;
 
 import java.util.Set;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Collections;
 import java.util.logging.Level;
@@ -28,6 +29,7 @@ import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.SampleModel;
 import java.awt.image.BufferedImage;
+import java.awt.image.IndexColorModel; // For javadoc
 
 import java.io.IOException;
 import javax.imageio.ImageReader;
@@ -48,7 +50,7 @@ import org.geotools.image.io.metadata.Band;
 
 
 /**
- * Base class for reader of geographic images. The default implementation assumes that only one
+ * Base class for readers of geographic images. The default implementation assumes that only one
  * {@linkplain ImageTypeSpecifier image type} is supported (as opposed to the arbitrary number
  * allowed by the standard {@link ImageReader}). It also provides a default image type built
  * automatically from a color palette and a range of valid values.
@@ -93,18 +95,7 @@ public abstract class GeographicImageReader extends ImageReader {
     /**
      * The logger to use for events related to this image reader.
      */
-    public static final Logger LOGGER = Logger.getLogger("org.geotools.image.io");
-
-    /**
-     * If the distance between the minimum or maximum value and the "fill values" is greater
-     * than {@value}, collapses the fill values to 0 and offsets the remaining values to the
-     * range starting at 1. This is mostly an optimization for avoiding unecessary large index
-     * color models, since the range between the minimum or maximum value and the fill values
-     * is wasted space. We conservatively define a large threshold in order to reduce the amount
-     * of cases were the users may be surprised by the compactage. This optimization can be
-     * disabled by setting the threshold to a very large value like {@link Integer#MAX_VALUE}.
-     */
-    private static final int COMPACTAGE_THRESHOLD = 1024;
+    static final Logger LOGGER = Logger.getLogger("org.geotools.image.io");
 
     /**
      * Metadata for each images, or {@code null} if not yet created.
@@ -343,22 +334,23 @@ public abstract class GeographicImageReader extends ImageReader {
      *
      * <ol>
      *   <li><p>The {@linkplain Band#getValidRange range of expected values} and the
-     *       {@linkplain Band#getNoDataValues pad values} are extracted from the
+     *       {@linkplain Band#getNoDataValues no-data values} are extracted from the
      *       {@linkplain #getGeographicMetadata geographic metadata}, if any.</p></li>
      *
      *   <li><p>If the given {@code parameters} argument is an instance of {@link GeographicImageReadParam},
      *       then the user-supplied {@linkplain GeographicImageReadParam#getPaletteName palette name}
      *       is fetched. Otherwise or if no palette name was explicitly set, then this method default
-     *       to {@value GeographicImageReadParam#DEFAULT_PALETTE_NAME}. The palette name will be used
-     *       in order to {@linkplain PaletteFactory#getColors read a predefined set of colors} (as
-     *       RGB values) to be given to the {@linkplain IndexColorModel index color model}.</p></li>
+     *       to {@value org.geotools.image.io.GeographicImageReadParam#DEFAULT_PALETTE_NAME}. The
+     *       palette name will be used in order to {@linkplain PaletteFactory#getColors read a
+     *       predefined set of colors} (as RGB values) to be given to the
+     *       {@linkplain IndexColorModel index color model}.</p></li>
      *
      *   <li><p>If the {@linkplain #getRawDataType raw data type} is {@link DataBuffer#TYPE_FLOAT
      *       TYPE_FLOAT} or {@link DataBuffer#TYPE_DOUBLE TYPE_DOUBLE}, then this method builds
      *       a {@linkplain PaletteFactory#getContinuousPalette continuous palette} suitable for
      *       the range fetched at step 1. The data are assumed <cite>geophysics</cite> values
      *       rather than some packed values. Consequently, the {@linkplain SampleConverter sample
-     *       converters} will replace pad values by {@linkplain Float#NaN NaN} with no other
+     *       converters} will replace no-data values by {@linkplain Float#NaN NaN} with no other
      *       changes.</p></li>
      *
      *   <li><p>Otherwise, if the {@linkplain #getRawDataType raw data type} is a unsigned integer type
@@ -366,24 +358,26 @@ public abstract class GeographicImageReader extends ImageReader {
      *       then this method builds an {@linkplain PaletteFactory#getPalette indexed palette} (i.e. a
      *       palette backed by an {@linkplain IndexColorModel index color model}) with just the minimal
      *       {@linkplain IndexColorModel#getMapSize size} needed for containing fully the range and the
-     *       pad values fetched at step 1. The data are assumed <cite>packed</cite> values rather than
-     *       geophysics values. Consequently, the {@linkplain SampleConverter sample converters} will
-     *       be the {@linkplain SampleConverter#IDENTITY identity converter} except in the following
-     *       cases:
+     *       no-data values fetched at step 1. The data are assumed <cite>packed</cite> values rather
+     *       than geophysics values. Consequently, the {@linkplain SampleConverter sample converters}
+     *       will be the {@linkplain SampleConverter#IDENTITY identity converter} except in the
+     *       following cases:
      *       <ul>
      *         <li>The {@linkplain Band#getValidRange range of valid values} is outside the range
      *             allowed by the {@linkplain #getRawDataType raw data type} (e.g. the range of
-     *             valid values contains negative integers).</li>
-     *         <li>At least one {@linkplain Band#getNoDataValues pad value} is outside the range
-     *             of values allowed by the {@linkplain #getRawDataType raw data type}.</li>
-     *         <li>At least one {@linkplain Band#getNoDataValues pad value} is far away from the
+     *             valid values contains negative integers). In this case, the sample converter
+     *             will shift the values to a strictly positive range and replace no-data values
+     *             by 0.</li>
+     *         <li>At least one {@linkplain Band#getNoDataValues no-data value} is outside the range
+     *             of values allowed by the {@linkplain #getRawDataType raw data type}. In this case,
+     *             this method will try to only replace the no-data values by 0, without shifting
+     *             the valid values if this shift can be avoided.</li>
+     *         <li>At least one {@linkplain Band#getNoDataValues no-data value} is far away from the
      *             {@linkplain Band#getValidRange range of valid values} (for example 9999 while
-     *             the range of valid values is [0..255]).</li>
+     *             the range of valid values is [0..255]). The meaning of "far away" is determined
+     *             by the {@link #collapseNoDataValues collapseNoDataValues} method.</li>
      *       </ul>
-     *       In the first case, the sample converter will shift the values to a strictly positive
-     *       range and replace pad values by 0. In the last cases, this method will try to only
-     *       replace the pad values by 0, without shifting the valid values if this shift can be
-     *       avoided.</p></li>
+     *       </p></li>
      *
      *   <li><p>Otherwise, if the {@linkplain #getRawDataType raw data type} is a signed integer
      *       type like {@link DataBuffer#TYPE_SHORT TYPE_SHORT}, then this method builds an
@@ -394,12 +388,11 @@ public abstract class GeographicImageReader extends ImageReader {
      *       supported by the {@linkplain IndexColorModel index color model}.</p></li>
      * </ol>
      *
-     * <b>Overriding this method</b>
-     * Subclasses may override this method when a constant color {@linkplain Palette palette}
-     * is wanted for a all images of some specific type, for example for all <cite>Sea Surface
-     * Temperature</cite> (SST) from the same provider. A constant color palette facilitate the
-     * visual comparaison of different images at different time. The example below creates such
-     * hard-coded objects from constant values.
+     * <h3>Overriding this method</h3>
+     * Subclasses may override this method when a constant color {@linkplain Palette palette} is
+     * wanted for all images in a series, for example for all <cite>Sea Surface Temperature</cite>
+     * (SST) from the same provider. A constant color palette facilitates the visual comparaison
+     * of different images at different time. The example below creates hard-coded objects:
      *
      * <blockquote><code>
      * int minimum    = -2000; // </code>minimal expected value<code><br>
@@ -431,6 +424,7 @@ public abstract class GeographicImageReader extends ImageReader {
      *              If an error occurs while reading the format information from the input source.
      *
      * @see #getRawDataType
+     * @see #collapseNoDataValues
      * @see #getDestination(int, ImageReadParam, int, int, SampleConverter[])
      */
     protected ImageTypeSpecifier getRawImageType(final int               imageIndex,
@@ -531,7 +525,7 @@ public abstract class GeographicImageReader extends ImageReader {
                     }
                 }
                 final Band band = metadata.getBand(bandIndex);
-                final double[] fillValues = band.getNoDataValues();
+                final double[] nodataValues = band.getNoDataValues();
                 final NumberRange range = band.getValidRange();
                 final double minimum, maximum;
                 if (range != null) {
@@ -555,59 +549,75 @@ public abstract class GeographicImageReader extends ImageReader {
                     bandIndex = targetBands[bandIndex];
                 }
                 /*
-                 * For floating point types, replaces pad values by NaN because the floating point
-                 * numbers are typically used for geophysics data, so the raster is likely to be a
-                 * "geophysics" view for GridCoverage2D. All other values are stored "as is"
-                 * without any offset.
+                 * For floating point types, replaces no-data values by NaN because the floating
+                 * point numbers are typically used for geophysics data, so the raster is likely
+                 * to be a "geophysics" view for GridCoverage2D. All other values are stored "as
+                 * is" without any offset.
                  *
                  * For integer types, if the range of values from the source data file fits into
                  * the range of values allowed by the destination raster, we will use an identity
                  * converter. If the only required conversion is a shift from negative to positive
-                 * values, creates an offset converter with pad values collapsed to 0.
+                 * values, creates an offset converter with no-data values collapsed to 0.
                  */
                 final SampleConverter converter;
                 if (isFloat) {
-                    converter = SampleConverter.createPadValuesMask(fillValues);
+                    converter = SampleConverter.createPadValuesMask(nodataValues);
                 } else {
                     final boolean rangeContainsZero = (minimum <= 0 && maximum >= 0);
                     boolean collapsePadValues = false;
-                    if (fillValues != null) {
-                        for (int j=0; j<fillValues.length; j++) {
-                            double t = fillValues[j];
-                            if (bandIndex == visibleBand && t > maximumFillValue) {
-                                maximumFillValue = t;
-                            }
-                            if (t < floor || t > ceil) {
-                                collapsePadValues = true;
-                                continue;
-                            }
+                    if (nodataValues != null && nodataValues.length != 0) {
+                        final double[] sorted = (double[]) nodataValues.clone();
+                        Arrays.sort(sorted);
+                        double minFill = sorted[0];
+                        double maxFill = minFill;
+                        int indexMax = sorted.length;
+                        while (--indexMax!=0 && Double.isNaN(maxFill = sorted[indexMax]));
+                        assert minFill <= maxFill || Double.isNaN(minFill) : maxFill;
+                        if (bandIndex == visibleBand && maxFill > maximumFillValue) {
+                            maximumFillValue = maxFill;
+                        }
+                        if (minFill < floor || maxFill > ceil) {
+                            // At least one fill value is outside the range of acceptable values.
+                            collapsePadValues = true;
+                        } else if (minimum >= 0) {
                             /*
-                             * Arbitrary optimization of memory usage: if there is a "large" empty
-                             * space between the range of valid values and a pad value, collapses the
-                             * pad values in order to avoid wasting the empty space. The threshold is
-                             * arbitrary. Note that we don't perform this compactage if the range
-                             * contains negative values, because no compactage is possible in this
-                             * case (the IndexColorModel will consume 256 kilobytes anyway).
+                             * Arbitrary optimization of memory usage:  if there is a "large" empty
+                             * space between the range of valid values and a no-data value, then we
+                             * may (at subclass implementors choice) collapse the no-data values to
+                             * zero in order to avoid wasting the empty space.  Note that we do not
+                             * perform this collapse if the valid range contains negative values
+                             * because it would not save any memory. We do not check the no-data
+                             * values between 0 and 'minimum' for the same reason.
                              */
-                            if (minimum >= 0) {
-                                t = Math.max(Math.abs(minimum-t), Math.abs(t-maximum)); // May be NaN.
-                                if (t > COMPACTAGE_THRESHOLD) { // Must exclude the NaN case.
-                                    collapsePadValues = true;
+                            int k = Arrays.binarySearch(sorted, maximum);
+                            if (k >= 0) k++; // We want the first element greater than maximum.
+                            else k = ~k; // Really ~ operator, not -
+                            if (k <= indexMax) {
+                                double unusedSpace = Math.max(sorted[k] - maximum - 1, 0);
+                                while (++k <= indexMax) {
+                                    final double delta = sorted[k] - sorted[k-1] - 1;
+                                    if (delta > 0) {
+                                        unusedSpace += delta;
+                                    }
+                                }
+                                final int unused = (int) Math.round(unusedSpace);
+                                if (unused >= 1) {
+                                    collapsePadValues = collapseNoDataValues(sorted, unused);
                                 }
                             }
                         }
                     }
                     if (minimum < floor || maximum > ceil) {
                         // The range of valid values is outside the range allowed by raw data type.
-                        converter = SampleConverter.createOffset(1 - minimum, fillValues);
+                        converter = SampleConverter.createOffset(1 - minimum, nodataValues);
                     } else if (collapsePadValues) {
                         if (rangeContainsZero) {
-                            // We need to collapse the pad values to 0, but it cause a clash
+                            // We need to collapse the no-data values to 0, but it causes a clash
                             // with the range of valid values. So we also shift the later.
-                            converter = SampleConverter.createOffset(1 - minimum, fillValues);
+                            converter = SampleConverter.createOffset(1 - minimum, nodataValues);
                         } else {
-                            // We need to collapse the pad values and there is no clash.
-                            converter = SampleConverter.createPadValuesMask(fillValues);
+                            // We need to collapse the no-data values and there is no clash.
+                            converter = SampleConverter.createPadValuesMask(nodataValues);
                         }
                     } else {
                         converter = SampleConverter.IDENTITY;
@@ -625,9 +635,9 @@ public abstract class GeographicImageReader extends ImageReader {
         /*
          * Creates a color palette suitable for the range of values in the visible band.
          * The case for floating points is the simpliest: we should not have any offset,
-         * at most a replacement of pad values. In the case of integer values, we must
-         * make sure that the indexed color map is large enough for containing both the
-         * highest data value and the highest pad value.
+         * at most a replacement of no-data values. In the case of integer values, we
+         * must make sure that the indexed color map is large enough for containing both
+         * the highest data value and the highest no-data value.
          */
         if (visibleRange == null) {
             visibleRange = (allRanges != null) ? allRanges : new NumberRange(floor, ceil);
@@ -657,7 +667,7 @@ public abstract class GeographicImageReader extends ImageReader {
 
     /**
      * Returns the data type which most closely represents the "raw" internal data of the image.
-     * It should be a constant from {@link DataBuffer}. The default {@code GeographicImageReader}
+     * It should be one of {@link DataBuffer} constants. The default {@code GeographicImageReader}
      * implementation works better with the following types:
      *
      * {@link DataBuffer#TYPE_BYTE   TYPE_BYTE},
@@ -665,22 +675,22 @@ public abstract class GeographicImageReader extends ImageReader {
      * {@link DataBuffer#TYPE_USHORT TYPE_USHORT} and
      * {@link DataBuffer#TYPE_FLOAT  TYPE_FLOAT}.
      *
-     * The default implementation returns {@code TYPE_FLOAT} in every cases.
+     * The default implementation returns {@link DataBuffer#TYPE_FLOAT TYPE_FLOAT} in every cases.
      * <p>
-     * <strong>Handling of negative integer values</strong><br>
+     * <h3>Handling of negative integer values</h3>
      * If the raw internal data contains negative values but this method still declares a unsigned
-     * integer type ({@link DataBuffer#TYPE_BYTE} or {@link DataBuffer#TYPE_USHORT}), then the
-     * values will be translated in order to fit in the range of strictly positive values. For
-     * example if the raw internal data range from -23000 to +23000, then there is a choice:
+     * integer type ({@link DataBuffer#TYPE_BYTE TYPE_BYTE} or {@link DataBuffer#TYPE_USHORT TYPE_USHORT}),
+     * then the values will be translated in order to fit in the range of strictly positive values.
+     * For example if the raw internal data range from -23000 to +23000, then there is a choice:
      *
      * <ul>
      *   <li><p>If this method returns {@link DataBuffer#TYPE_SHORT}, then the data will be
      *       stored "as is" without transformation. However the {@linkplain IndexColorModel
      *       index color model} will have the maximal length allowed by 16 bits integers, with
-     *       positive values in the [0 .. {@value Short#MAX_VALUE}] range and negative values
-     *       wrapped in the [32768 .. 65535] range in two's complement binary form. The results
-     *       is a color model consuming 256 kilobytes in every cases. The space not used by the
-     *       [-23000 .. +23000] range (in the above example) is lost.</p></li>
+     *       positive values in the [0 .. {@value java.lang.Short#MAX_VALUE}] range and negative
+     *       values wrapped in the [32768 .. 65535] range in two's complement binary form. The
+     *       results is a color model consuming 256 kilobytes in every cases. The space not used
+     *       by the [-23000 .. +23000] range (in the above example) is lost.</p></li>
      *
      *   <li><p>If this method returns {@link DataBuffer#TYPE_USHORT}, then the data will be
      *       translated to the smallest strictly positive range that can holds the data
@@ -698,6 +708,31 @@ public abstract class GeographicImageReader extends ImageReader {
     protected int getRawDataType(final int imageIndex) throws IOException {
         checkImageIndex(imageIndex);
         return DataBuffer.TYPE_FLOAT;
+    }
+
+    /**
+     * Returns {@code true} if the no-data values should be collapsed to 0 in order to save memory.
+     * This method is invoked automatically by the {@link #getRawImageType(int, ImageReadParam,
+     * SampleConverter[]) getRawImageType} method when it detected some unused space between the
+     * {@linkplain Band#getValidRange range of valid values} and at least one
+     * {@linkplain Band#getNoDataValues no-data value}.
+     * <p>
+     * The default implementation returns {@code false} in all cases, thus avoiding arbitrary
+     * choice. Subclasses can override this method with some arbitrary threashold, as in the
+     * example below:
+     *
+     * <blockquote><pre>
+     * return unusedSpace >= 1024;
+     * </pre></blockquote>
+     *
+     * @param nodataValues
+     *              The {@linkplain Arrays#sort(double[]) sorted}
+     *              {@linkplain Band#getNoDataValues no-data values} (never null and never empty).
+     * @param unusedSpace
+     *              The largest amount of unused space outside the range of valid values.
+     */
+    protected boolean collapseNoDataValues(final double[] nodataValues, final int unusedSpace) {
+        return false;
     }
 
     /**
@@ -822,7 +857,7 @@ public abstract class GeographicImageReader extends ImageReader {
      *       {@link IIOReadWarningListener#warningOccurred warningOccurred} method is
      *       invoked for each of them and the log record is <strong>not</strong> logged.</li>
      *
-     *   <li>Otherwise, the log record is sent to the {@linkplain #LOGGER logger}.</li>
+     *   <li>Otherwise, the log record is sent to the {@code "org.geotools.image.io"} logger.</li>
      * </ul>
      *
      * Subclasses may override this method if more processing is wanted, or for

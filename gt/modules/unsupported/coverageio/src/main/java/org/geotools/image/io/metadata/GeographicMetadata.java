@@ -16,28 +16,27 @@
  */
 package org.geotools.image.io.metadata;
 
-// J2SE dependencies
 import java.text.Format;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageWriter;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.metadata.IIOMetadataNode;
 import javax.imageio.metadata.IIOInvalidTreeException;
-import javax.imageio.event.IIOReadWarningListener;
 import org.w3c.dom.Node;
 
-// Geotools dependencies
 import org.geotools.util.LoggedFormat;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.OptionalDependencies;
 import org.geotools.image.io.GeographicImageReader;
+import org.geotools.image.io.GeographicImageWriter;
 
 
 /**
@@ -94,10 +93,34 @@ public class GeographicMetadata extends IIOMetadata {
     /**
      * Creates a default metadata instance. This constructor defines no standard or native format.
      * The only format defined is the {@linkplain GeographicMetadataFormat geographic} one.
+     */
+    public GeographicMetadata() {
+        this((Object) null);
+    }
+
+    /**
+     * Creates a default metadata instance for the given reader.
      *
      * @param reader The source image reader, or {@code null} if none.
      */
     public GeographicMetadata(final ImageReader reader) {
+        this((Object) reader);
+    }
+
+    /**
+     * Creates a default metadata instance for the given writer.
+     *
+     * @param writer The target image writer, or {@code null} if none.
+     */
+    public GeographicMetadata(final ImageWriter writer) {
+        this((Object) writer);
+    }
+
+    /**
+     * Creates a default metadata instance. This constructor defines no standard or native format.
+     * The only format defined is the {@linkplain GeographicMetadataFormat geographic} one.
+     */
+    private GeographicMetadata(final Object owner) {
         super(false, // Can not return or accept a DOM tree using the standard metadata format.
               null,  // There is no native metadata format.
               null,  // There is no native metadata format.
@@ -107,7 +130,7 @@ public class GeographicMetadata extends IIOMetadata {
               new String[] {
                   "org.geotools.image.io.metadata.GeographicMetadataFormat"
               });
-        owner = reader;
+        this.owner = owner;
     }
 
     /**
@@ -313,8 +336,8 @@ public class GeographicMetadata extends IIOMetadata {
     /**
      * Invoked when a warning occured. This method is invoked when some inconsistency has
      * been detected in the geographic metadata. The default implementation delegates to
-     * {@link GeographicImageReader#warningOccurred} if possible, or sent the record to
-     * the {@link GeographicImageReader#LOGGER} otherwise.
+     * {@link GeographicImageReader#warningOccurred} if possible, or send the record to
+     * the {@code "org.geotools.image.io.metadata"} logger otherwise.
      * <p>
      * Subclasses may override this method if more processing is wanted, or for
      * throwing exception if some warnings should be considered as fatal errors.
@@ -322,8 +345,10 @@ public class GeographicMetadata extends IIOMetadata {
     protected void warningOccurred(final LogRecord record) {
         if (owner instanceof GeographicImageReader) {
             ((GeographicImageReader) owner).warningOccurred(record);
+        } else if (owner instanceof GeographicImageWriter) {
+            ((GeographicImageWriter) owner).warningOccurred(record);
         } else {
-            GeographicImageReader.LOGGER.log(record);
+            Logger.getLogger("org.geotools.image.io.metadata").log(record);
         }
     }
 

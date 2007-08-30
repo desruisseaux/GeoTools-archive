@@ -65,7 +65,7 @@ public class GeographicMetadataTest extends TestCase {
             // TODO: this test doesn't seem to work with J2SE 1.4.
             //       Try again when we will be allowed to target J2SE 1.5.
         }
-        final GeographicMetadata metadata = new GeographicMetadata(null);
+        final GeographicMetadata metadata = new GeographicMetadata();
         final Collection formats = Arrays.asList(metadata.getMetadataFormatNames());
         assertTrue(formats.contains(GeographicMetadataFormat.FORMAT_NAME));
         final IIOMetadataFormat format = metadata.getMetadataFormat(GeographicMetadataFormat.FORMAT_NAME);
@@ -81,7 +81,7 @@ public class GeographicMetadataTest extends TestCase {
      * Tests the setting of values in the metadata object.
      */
     public void testSetting() {
-        final GeographicMetadata metadata = new GeographicMetadata(null);
+        final GeographicMetadata metadata = new GeographicMetadata();
         final ImageReferencing referencing = metadata.getReferencing();
         referencing.addAxis("latitude",  "north", "degrees");
         referencing.addAxis("longitude", "east",  "degrees");

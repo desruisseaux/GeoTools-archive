@@ -287,7 +287,7 @@ public class TextRecordImageReader extends TextImageReader {
         if (ignoreMetadata) {
             return null;
         }
-        final GeographicMetadata metadata = new GeographicMetadata(null);
+        final GeographicMetadata metadata = new GeographicMetadata(this);
         final ImageGeometry geometry = metadata.getGeometry();
         /*
          * Computes the smallest bounding box containing the full image in user coordinates.
