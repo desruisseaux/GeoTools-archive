@@ -22,6 +22,7 @@ import java.awt.color.ColorSpace;
 import java.awt.image.DataBuffer;
 import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
+import java.math.BigInteger;
 import java.util.Arrays;
 
 // Geotools dependencies
@@ -66,7 +67,7 @@ public final class ColorUtilities {
      * @throws IllegalArgumentException if {@coder}, {@code g}, {@code b}
      *         or {@code a} are outside of the range 0 to 255, inclusive.
      */
-    public static int getIntFromColor(int r, int g, int b, int a) {
+    public final static int getIntFromColor(int r, int g, int b, int a) {
         return ((a & 0xFF) << 24) |
                ((r & 0xFF) << 16) |
                ((g & 0xFF) <<  8) |
@@ -89,7 +90,7 @@ public final class ColorUtilities {
      *         or {@code null} if the {@code lower} and {@code upper} index
      *         are out of {@code palette} bounds.
      */
-    public static Color[] subarray(final Color[] palette, int lower, int upper) {
+    public final static Color[] subarray(final Color[] palette, int lower, int upper) {
         if (palette != null) {
             lower = Math.max(lower, 0);
             upper = Math.min(upper, palette.length);
@@ -115,7 +116,7 @@ public final class ColorUtilities {
      * @param lower  Index (inclusive) of the first element of {@code ARGB} to change.
      * @param upper  Index (exclusive) of the last  element of {@code ARGB} to change.
      */
-    public static void expand(final Color[] colors, final int[] ARGB,
+    public final static void expand(final Color[] colors, final int[] ARGB,
                               final int lower, final int upper)
     {
         switch (colors.length) {
@@ -144,12 +145,36 @@ public final class ColorUtilities {
                       (round(B+delta*(C1.getBlue ()-B)) <<  0);
         }
     }
-
+	/**
+	 * Copy {@code colors} into array {@code ARGB} from index {@code lower}
+	 * inclusive to index {@code upper} exclusive. If {@code upper-lower} is not
+	 * equals to the length of {@code colors} array, then colors will be
+	 * interpolated.
+	 * 
+	 * @param colors
+	 *            Colors to copy into the {@code ARGB} array.
+	 * @param ARGB
+	 *            Array of integer to write ARGB values to.
+	 * @param lower
+	 *            Index (inclusive) of the first element of {@code ARGB} to
+	 *            change.
+	 * @param upper
+	 *            Index (exclusive) of the last element of {@code ARGB} to
+	 *            change.
+	 * @param bits
+	 */
+	public static BigInteger expand(final Color[] colors, final int[] ARGB,
+			final int lower, final int upper, BigInteger bits) {
+		for (int i = lower; i < upper; i++)
+			bits = bits.setBit(i);
+		ColorUtilities.expand(colors, ARGB, lower, upper);
+		return bits;
+	}
     /**
      * Round a float value and clamp the
      * result between 0 and 255 inclusive.
      */
-    private static int round(final double value) {
+    public final static int round(final double value) {
         return Math.min(Math.max((int)Math.round(value),0),255);
     }
 
@@ -159,12 +184,12 @@ public final class ColorUtilities {
      * returned color model will be opaque. Otherwise, if the specified array has
      * one and only one color with alpha value of 0, the returned color model will
      * have only this transparent color. Otherwise, the returned color model will
-     * be translucide.
+     * be translucent.
      *
      * @param  ARGB An array of ARGB values.
      * @return An index color model for the specified array.
      */
-    public static IndexColorModel getIndexColorModel(final int[] ARGB) {
+    public final static IndexColorModel getIndexColorModel(final int[] ARGB) {
         return getIndexColorModel(ARGB, 1, 0);
     }
 
@@ -182,7 +207,7 @@ public final class ColorUtilities {
      *       IndexColorModel inherits a equals(Object) implementation from ColorModel, but do
      *       not override it, so the definition is incomplete.
      */
-    public static IndexColorModel getIndexColorModel(final int[] ARGB,
+    public final static IndexColorModel getIndexColorModel(final int[] ARGB,
                                                      final int numBands,
                                                      final int visibleBand)
     {
@@ -209,14 +234,13 @@ public final class ColorUtilities {
                                                  type, numBands, visibleBand);
         }
     }
-
-    /**
+	/**
      * Returns a bit count for an {@link IndexColorModel} mapping {@code mapSize} colors.
      * It is guaranteed that the following relation is hold:
      *
      * <center><pre>(1 << getBitCount(mapSize)) >= mapSize</pre></center>
      */
-    public static int getBitCount(final int mapSize) {
+    public final static int getBitCount(final int mapSize) {
         int max = mapSize - 1;
         if (max <= 1) {
             return 1;
@@ -236,7 +260,7 @@ public final class ColorUtilities {
      * of {@code mapSize} colors. This method returns
      * {@link DataBuffer#TYPE_BYTE} or {@link DataBuffer#TYPE_USHORT}.
      */
-    private static int getTransferType(final int mapSize) {
+    public final static int getTransferType(final int mapSize) {
         return (mapSize <= 256) ? DataBuffer.TYPE_BYTE : DataBuffer.TYPE_USHORT;
     }
 
@@ -245,7 +269,7 @@ public final class ColorUtilities {
      * in place. This method returns {@code color} for convenience.
      * Reference: http://www.brucelindbloom.com/index.html?ColorDifferenceCalc.html
      */
-    private static float[] XYZtoLAB(final float[] color) {
+    public final static float[] XYZtoLAB(final float[] color) {
         color[0] /= 0.9642;   // Other refeference: 0.95047;
         color[1] /= 1.0000;   //                    1.00000;
         color[2] /= 0.8249;   //                    1.08883;
@@ -267,7 +291,7 @@ public final class ColorUtilities {
      * Computes the distance E (CIE 1994) between two colors in LAB color space.
      * Reference: http://www.brucelindbloom.com/index.html?ColorDifferenceCalc.html
      */
-    private static float colorDistance(final float[] lab1, final float[] lab2) {
+    public final static float colorDistance(final float[] lab1, final float[] lab2) {
         if (false) {
             // Compute distance using CIE94 formula.
             // NOTE: this formula sometime fails because of negative
@@ -302,7 +326,7 @@ public final class ColorUtilities {
      * @param  colors The color model in which to look for a transparent color.
      * @return The index of a transparent color, or 0.
      */
-    public static int getTransparentPixel(final IndexColorModel colors) {
+    public final static int getTransparentPixel(final IndexColorModel colors) {
         int index = colors.getTransparentPixel();
         if (index < 0) {
             index = 0;
@@ -342,7 +366,7 @@ public final class ColorUtilities {
      *         {@linkplain #getTransparentPixel transparent} pixel), or -1 if none.
      * @return The index of the color, or 0.
      */
-    public static int getColorIndex(final IndexColorModel colors,
+    public final static int getColorIndex(final IndexColorModel colors,
                                     final Color color,
                                     final int exclude)
     {
@@ -378,7 +402,7 @@ public final class ColorUtilities {
      * as a fallback when the sample model is not available. This method uses some heuristic rules
      * for guessing the number of bands, so the return value may not be exact in all cases.
      */
-    public static int getNumBands(final ColorModel model) {
+    public final static int getNumBands(final ColorModel model) {
         if (model instanceof IndexColorModel) {
             if (model instanceof MultiBandsIndexColorModel) {
                 return ((MultiBandsIndexColorModel) model).numBands;
@@ -398,7 +422,7 @@ public final class ColorUtilities {
      *         should not be taken in account during the check for gray color.
      * @return {@code true} if the palette is grayscale, {@code false} otherwise.
      */
-    public static boolean isGrayPalette(final IndexColorModel icm, boolean ignoreTransparents) {
+    public final static boolean isGrayPalette(final IndexColorModel icm, boolean ignoreTransparents) {
         if (!icm.hasAlpha()) {
             // We will not check transparent pixels if there is none in the color model.
             ignoreTransparents = false;
