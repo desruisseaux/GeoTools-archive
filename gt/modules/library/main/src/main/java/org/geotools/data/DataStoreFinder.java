@@ -84,25 +84,44 @@ public final class DataStoreFinder {
     public static synchronized DataStore getDataStore(Map params) throws IOException {
         Iterator ps = getServiceRegistry().getServiceProviders(DataStoreFactorySpi.class);
         DataStoreFactorySpi fac;
+        
+        IOException canProcessButNotAvailable = null;
         while (ps.hasNext()) {
         	fac = (DataStoreFactorySpi) ps.next();
         	boolean canProcess = false;
             try {
                 canProcess = fac.canProcess(params);
             } catch (Throwable t) {
-                LOGGER.log( Level.WARNING, "Could not acquire "+fac.getDescription()+":"+t, t );                
-                // Protect against DataStores that don't carefully
-                // code canProcess
+                LOGGER.log( Level.WARNING, "Problem asking "+fac.getDisplayName()+" if it can process request:"+t, t );                
+                // Protect against DataStores that don't carefully code canProcess
                 continue;
             }
             if (canProcess) {
-                if( fac.isAvailable()){
-                    return fac.createDataStore(params);
+                boolean isAvailable = false;
+                try {
+                    isAvailable = fac.isAvailable();
+                } catch (Throwable t) {
+                    LOGGER.log( Level.WARNING, "Difficulity checking if "+fac.getDisplayName()+" is available:"+t, t );                
+                    // Protect against DataStores that don't carefully code isAvailable
+                    continue;
+                }                
+                if( isAvailable ){
+                    try {
+                        return fac.createDataStore(params);
+                    }
+                    catch (IOException couldNotConnect ){
+                        canProcessButNotAvailable = couldNotConnect;
+                        LOGGER.log( Level.WARNING, fac.getDisplayName()+" should be used, but could not connect", couldNotConnect );                                                
+                    }
                 }
-                else {
-                    throw new IOException( fac.getDisplayName()+" should be used, but is not availble. Have you installed the required drivers or jar files?");
+                else {                    
+                    canProcessButNotAvailable = new IOException( fac.getDisplayName()+" should be used, but is not availble. Have you installed the required drivers or jar files?");
+                    LOGGER.log( Level.WARNING, fac.getDisplayName()+" should be used, but is not availble", canProcessButNotAvailable );
                 }
             }
+        }
+        if( canProcessButNotAvailable != null ){
+            throw canProcessButNotAvailable;
         }
         return null;
     }
