@@ -83,7 +83,7 @@ public abstract class AbstractEpsgMediator extends AbstractAuthorityMediator {
             InitialContext context;
             try {
                 context = GeoTools.getInitialContext( hints );
-                name = GeoTools.fixName( context, name );
+                //name = GeoTools.fixName( context, name );
                 return (DataSource) context.lookup( name );                
             } catch (Exception e) {
                 throw new FactoryException( "EPSG_DATA_SOURCE '"+name+"' not found:"+e, e );

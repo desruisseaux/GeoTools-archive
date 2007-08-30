@@ -24,7 +24,9 @@ public class ThreadedOracleEpsgAuthorityOnlineTest extends OracleOnlineTestCase 
     }
     public void testJNDIConfiguredProperlyForTest() throws Exception {
         InitialContext context = GeoTools.getInitialContext(null);
-        DataSource source = (DataSource) context.lookup( GeoTools.fixName(context,"jdbc/EPSG"));
+        String name = "jdbc/EPSG";
+        //name = GeoTools.fixName(context,"jdbc/EPSG");        
+        DataSource source = (DataSource) context.lookup( name);
         assertNotNull(source);
         assertSame(source, this.datasource);
     }

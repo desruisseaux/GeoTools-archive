@@ -82,7 +82,8 @@ public class OracleOnlineTestCase extends OnlineTestCase {
         env.put(Context.INITIAL_CONTEXT_FACTORY, "org.osjava.sj.memory.MemoryContextFactory");
         
         InitialContext context = new InitialContext(env);
-        String name = GeoTools.fixName(context, "jdbc/EPSG");        
+        String name = "jdbc/EPSG";
+        //String name = GeoTools.fixName(context, "jdbc/EPSG");        
         // System.out.println(name);
         context.bind(name, source);
         

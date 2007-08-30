@@ -89,22 +89,22 @@
 
     <!--                                                           -->
     <!-- To use for real:                                          -->
-    <!--   download the ojdbc14.jar driver from oracle             -->
-    <!--   copy ojdbc14.jar to                                     -->
-    <!--      ~/.m2/repository/oracle/jars/ojdbc/14/ojdbc-14.jar   -->
+    <!--   Download the ojdbc14.jar driver from oracle and install -->
+    <!--   into maven:                                             -->
+    <!--       mvn install:install-file -Dfile=ojdbc14.jar         -->
+    <!--           -DgroupId=com.oracle -DartifactId=ojdbc14       -->
+    <!--           -Dversion=10.2.0 -Dpackaging=jar                -->
     <!--                                                           -->
-    <!--   And set the "oracle.jdbc" property to "true"            -->
-    <!--   your ~/.m2/settings.xml file.                           -->
+    <!--   You can then supply -Doracle=true on the command line   -->
     <!--                                                           -->
-    <!--   During that build, the test cases will try and connect  -->
-    <!--   to an oracle server on localhost; alternatively, an     -->
-    <!--   alternative server can be indicated in a XXX.properties -->
-    <!--   file.                                                   -->
+    <!--   You will need to update a "fixture" with connection     -->
+    <!--   information in:                                         -->
+    <!--         HOME/.geotools/epsg/oracle/oracle.properties      -->
     <profile>
         <id>oracle.jdbc-true</id>
         <activation>
            <property>
-              <name>oracle.jdbc</name>
+              <name>oracle</name>
            </property>           
         </activation>
         <dependencies>
@@ -123,7 +123,7 @@
         <id>oracle.jdbc-false</id>
         <activation>
            <property>
-              <name>!oracle.jdbc</name>
+              <name>!oracle</name>
            </property>
         </activation>
         <dependencies>

@@ -182,22 +182,30 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
         Object hint = userHints == null ? null : userHints.get( Hints.EPSG_DATA_SOURCE );
             
         if( hint == null ){
-            datasourceName = GeoTools.fixName( DATASOURCE_NAME );                
+          datasourceName = DATASOURCE_NAME;
+          //datasourceName = GeoTools.fixName( DATASOURCE_NAME );
+          
+          hints.put(Hints.EPSG_DATA_SOURCE, datasourceName);
         }
         else if( hint instanceof String ){
-            datasourceName = GeoTools.fixName( datasourceName );            
+            datasourceName = (String) hint;
+            //datasourceName = GeoTools.fixName( datasourceName );            
+            
+            hints.put(Hints.EPSG_DATA_SOURCE, datasourceName);
         }
         else if (hint instanceof Name ){
             Name name = (Name) hint;
             hints.put( Hints.EPSG_DATA_SOURCE, name );
             
-            datasourceName = GeoTools.fixName( name.toString() );            
+            datasourceName = name.toString();
+            //datasourceName = GeoTools.fixName( name.toString() );
         }
         else if ( hint instanceof DataSource ){
             datasource = (DataSource) hint;
             hints.put( Hints.EPSG_DATA_SOURCE, datasource );
             
-            datasourceName = GeoTools.fixName( DATASOURCE_NAME );            
+            datasourceName = DATASOURCE_NAME;
+            //datasourceName = GeoTools.fixName( DATASOURCE_NAME );            
         }        
         factories = FactoryGroup.createInstance(userHints);
         setTimeout(30*60*1000L); // Close the connection after at least 30 minutes of inactivity.

@@ -15,6 +15,9 @@
  */
 package org.geotools.referencing.factory.epsg;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.geotools.factory.Hints;
 import org.geotools.referencing.factory.epsg.oracle.OracleOnlineTestCase;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -25,8 +28,14 @@ public class OracleDialectEpsgMediatorOnlineTest extends OracleOnlineTestCase {
     
     protected void connect() throws Exception {
         super.connect();
-        Hints hints = new Hints(Hints.CACHE_POLICY, "none");     
-        mediator = new OracleDialectEpsgMediator(80, hints, datasource);
+        Map config = new HashMap();
+        config.put( Hints.CACHE_POLICY,"none");
+        //config.put( Hints.EPSG_DATA_SOURCE, datasource );
+        config.put( Hints.EPSG_DATA_SOURCE, "jdbc/EPSG" );
+        Hints hints = new Hints( config );
+        mediator = new OracleDialectEpsgMediator( hints );
+        
+        //mediator = new OracleDialectEpsgMediator(80, hints, datasource);
     }
     
     public void testCreation() throws Exception {
