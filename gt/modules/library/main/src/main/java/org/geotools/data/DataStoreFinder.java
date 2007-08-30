@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 
 import org.geotools.factory.FactoryCreator;
 import org.geotools.factory.FactoryRegistry;
+import org.opengis.referencing.FactoryException;
 
 
 /**
@@ -81,27 +82,44 @@ public final class DataStoreFinder {
      *         attached to the specified resource without errors.
      */
     public static synchronized DataStore getDataStore(Map params) throws IOException {
-        Iterator ps = getAvailableDataStores();
+        Iterator ps = getServiceRegistry().getServiceProviders(DataStoreFactorySpi.class);
         DataStoreFactorySpi fac;
         while (ps.hasNext()) {
         	fac = (DataStoreFactorySpi) ps.next();
-
+        	boolean canProcess = false;
             try {
-                if (fac.canProcess(params)) {
-                    return fac.createDataStore(params);
-                }
+                canProcess = fac.canProcess(params);
             } catch (Throwable t) {
-            	/** The logger for the filter module. */
-                LOGGER.log( Level.WARNING, "Could not acquire "+fac.getDescription()+":"+t, t );            	
+                LOGGER.log( Level.WARNING, "Could not acquire "+fac.getDescription()+":"+t, t );                
                 // Protect against DataStores that don't carefully
                 // code canProcess
-                
+                continue;
+            }
+            if (canProcess) {
+                if( fac.isAvailable()){
+                    return fac.createDataStore(params);
+                }
+                else {
+                    throw new IOException( fac.getDisplayName()+" should be used, but is not availble. Have you installed the required drivers or jar files?");
+                }
             }
         }
-
         return null;
     }
 
+    /**
+     * Finds all implemtaions of DataStoreFactory which have registered using
+     * the services mechanism, regardless weather it has the appropriate
+     * libraries on the classpath.
+     * 
+     * @return An iterator over all discovered datastores which have registered
+     *         factories
+     */
+    public static synchronized Iterator getAllDataStores() {
+        Set availableDS = new HashSet(5);
+        return getServiceRegistry().getServiceProviders(DataStoreFactorySpi.class);        
+    }
+    
     /**
      * Finds all implemtaions of DataStoreFactory which have registered using
      * the services mechanism, and that have the appropriate libraries on the
