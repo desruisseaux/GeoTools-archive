@@ -16,6 +16,7 @@
 package org.geotools.data;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -38,6 +39,18 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
     implements FeatureStore {
     /** Current Transaction this FeatureSource is opperating against */
     protected Transaction transaction = Transaction.AUTO_COMMIT;
+    
+    public AbstractFeatureStore() {
+        // just to keep the default constructor around
+    }
+    
+    /**
+     * This constructors allows to set the supported hints 
+     * @param hints
+     */
+    public AbstractFeatureStore(Set hints) {
+        super(hints);
+    }
 
     /**
      * Retrieve the Transaction this FeatureSource is opperating against.

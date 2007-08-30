@@ -17,6 +17,7 @@ package org.geotools.data;
 
 import java.io.IOException;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
@@ -57,6 +58,18 @@ import org.opengis.filter.Filter;
 public abstract class AbstractFeatureLocking extends AbstractFeatureStore
     implements FeatureLocking {
     FeatureLock featureLock = FeatureLock.TRANSACTION;
+    
+    public AbstractFeatureLocking() {
+        // just to keep the default constructor around
+    }
+    
+    /**
+     * This constructors allows to set the supported hints 
+     * @param hints
+     */
+    public AbstractFeatureLocking(Set hints) {
+        super(hints);
+    }
 
     /**
      * Provide a FeatureLock for locking opperations to opperate against.

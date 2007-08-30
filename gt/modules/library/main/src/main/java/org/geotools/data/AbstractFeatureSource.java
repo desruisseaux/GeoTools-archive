@@ -17,6 +17,7 @@ package org.geotools.data;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -73,6 +74,20 @@ import com.vividsolutions.jts.geom.Envelope;
 public abstract class AbstractFeatureSource implements FeatureSource {
     /** The logger for the filter module. */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.data");
+    
+    protected Set hints = Collections.EMPTY_SET;
+    
+    public AbstractFeatureSource() {
+        // just to keep the default constructor around
+    }
+    
+    /**
+     * This constructors allows to set the supported hints 
+     * @param hints
+     */
+    public AbstractFeatureSource(Set hints) {
+        this.hints = Collections.unmodifiableSet(new HashSet(hints));
+    }
     
     /**
      * Retrieve the Transaction this FeatureSource is operating against.
@@ -300,6 +315,6 @@ public abstract class AbstractFeatureSource implements FeatureSource {
      * By default, no Hints are supported
      */
     public Set getSupportedHints() {
-        return Collections.EMPTY_SET;
+        return hints;
     }
 }

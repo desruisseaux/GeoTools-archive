@@ -790,7 +790,7 @@ public class ShapefileRenderer implements GTRenderer {
                 try {
                     labelCache.put(layerId,(TextSymbolizer) symbolizers[m], 
                             feature, 
-                            new LiteShape2(feature.getPrimaryGeometry(), null, null, false),
+                            new LiteShape2(feature.getPrimaryGeometry(), null, null, false, false),
                             scaleRange);
                 } catch (Exception e) {
                     fireErrorEvent(e);
@@ -799,7 +799,7 @@ public class ShapefileRenderer implements GTRenderer {
                 try {
                     Style2D style = styleFactory.createStyle(feature, symbolizers[m], scaleRange);
                     if( isJTS ){
-                        painter.paint(graphics, new LiteShape2((Geometry) geom, null, null, false), style, scaleDenominator);
+                        painter.paint(graphics, new LiteShape2((Geometry) geom, null, null, false, false), style, scaleDenominator);
                     }else{
                         painter.paint(graphics, getShape((SimpleGeometry) geom), style, scaleDenominator);
                     }

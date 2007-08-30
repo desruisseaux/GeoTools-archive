@@ -532,7 +532,7 @@ public final class LabelCacheDefault implements LabelCache {
 												glyphBounds.width / 2.0, -1.0
 														* glyphBounds.height
 														/ 2.0)), null, null,
-								false);
+								false, false);
 
 						// labels should always draw, so we'll just force this
 						// one to draw by setting it's min/max scale to 0<10 and

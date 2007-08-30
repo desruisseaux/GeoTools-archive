@@ -30,6 +30,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
@@ -106,6 +107,28 @@ public class LiteShapeTest extends TestCase {
 		assertFalse(lineShape
 				.intersects(new Rectangle2D.Double(55, 55, 3, 100)));
 	}
+	
+	public void testCloning() throws TransformException, FactoryException {
+	    LiteCoordinateSequenceFactory csFac = new LiteCoordinateSequenceFactory();
+        GeometryFactory geomFac = new GeometryFactory(csFac);
+        CoordinateSequence cs = csFac.create(4, 2);
+        cs.setOrdinate(0, 0, 10);
+        cs.setOrdinate(0, 1, 10);
+        cs.setOrdinate(1, 0, 12);
+        cs.setOrdinate(1, 1, 12);
+        cs.setOrdinate(2, 0, 14);
+        cs.setOrdinate(2, 1, 12);
+        cs.setOrdinate(3, 0, 30);
+        cs.setOrdinate(3, 1, 10);
+        
+	    LineString ls = geomFac.createLineString(cs);
+	    LineString copy = (LineString) ls.clone();
+	    LiteShape2 ltCloning = new LiteShape2(ls, ProjectiveTransform.create(AffineTransform.getScaleInstance(10, 10)), new Decimator(4,4), true);
+	    assertTrue(ls.equals(copy));
+	    
+	    LiteShape2 ltNotCloning = new LiteShape2(ls, ProjectiveTransform.create(AffineTransform.getScaleInstance(10, 10)), new Decimator(4,4), true, false);
+	    assertFalse(ls.equals(copy));
+	}
 
 	private LineString makeSampleLineString(final GeometryFactory geomFac,
 			double xoff, double yoff) {
@@ -146,4 +169,5 @@ public class LiteShapeTest extends TestCase {
 		}
 		return null;
 	}
+	
 }

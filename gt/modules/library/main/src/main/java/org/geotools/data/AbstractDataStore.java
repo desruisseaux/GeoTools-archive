@@ -16,8 +16,10 @@
 package org.geotools.data;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -248,7 +250,7 @@ public abstract class AbstractDataStore implements DataStore {
 
         if (isWriteable) {
             if (lockingManager != null)
-                return new AbstractFeatureLocking() {
+                return new AbstractFeatureLocking(getSupportedHints()) {
                     public DataStore getDataStore() {
                         return AbstractDataStore.this;
                     }
@@ -266,7 +268,7 @@ public abstract class AbstractDataStore implements DataStore {
                         return featureType;
                     }
                 };
-                return new AbstractFeatureStore() {
+                return new AbstractFeatureStore(getSupportedHints()) {
                     public DataStore getDataStore() {
                         return AbstractDataStore.this;
                     }
@@ -285,7 +287,7 @@ public abstract class AbstractDataStore implements DataStore {
                     }
                 };
         }
-            return new AbstractFeatureSource() {
+            return new AbstractFeatureSource(getSupportedHints()) {
                 public DataStore getDataStore() {
                     return AbstractDataStore.this;
                 }
@@ -593,5 +595,14 @@ public abstract class AbstractDataStore implements DataStore {
      */
     protected int getCount(Query query) throws IOException{
         return -1; // too expensive
+    }
+    
+    /**
+     * If you are using the automated FeatureSource/Store/Locking creation, this method
+     * allows for the specification of the supported hints. 
+     * @return
+     */
+    protected Set getSupportedHints() {
+        return Collections.EMPTY_SET;
     }
 }

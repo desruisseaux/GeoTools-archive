@@ -170,7 +170,8 @@ public class LiteCoordinateSequence extends PackedCoordinateSequence{
 	 * @param coords2
 	 */
 	public void setArray(double[] coords2) {
-		coords=coords2;
+		coords = coords2;
+		coordRef = null;
 	}
 	
 	/**

@@ -32,9 +32,12 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.nio.charset.Charset;
 import org.geotools.data.AbstractAttributeIO;
 import org.geotools.data.AbstractFeatureLocking;
@@ -67,6 +70,7 @@ import org.geotools.data.shapefile.shp.ShapefileHeader;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.data.shapefile.shp.ShapefileWriter;
 import org.geotools.data.shapefile.shp.xml.ShpXmlFileReader;
+import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
@@ -113,6 +117,13 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class ShapefileDataStore extends AbstractFileDataStore {
     public static final Charset DEFAULT_STRING_CHARSET = Charset.forName("ISO-8859-1");
+    
+    /**
+     * The query hints we do support
+     */
+    private static final Set HINTS = Collections.unmodifiableSet(
+            new HashSet(Arrays.asList(new Object[] {
+            Hints.FEATURE_DETACHED})));
     
     protected final URL shpURL;
     protected final URL dbfURL;
@@ -923,6 +934,8 @@ public class ShapefileDataStore extends AbstractFileDataStore {
 
         // TODO should we just return the layer? matches the javadocs
     }
+    
+    
 
     /**
      * @see org.geotools.data.DataStore#getFeatureSource(java.lang.String)
@@ -933,7 +946,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         
         if (isWriteable) {
             if (getLockingManager() != null) {
-                return new AbstractFeatureLocking() {
+                return new AbstractFeatureLocking(HINTS) {
                         public DataStore getDataStore() {
                             return ShapefileDataStore.this;
                         }
@@ -958,7 +971,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                     };
             }
 
-            return new AbstractFeatureStore() {
+            return new AbstractFeatureStore(HINTS) {
                     public DataStore getDataStore() {
                         return ShapefileDataStore.this;
                     }
@@ -982,7 +995,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                 };
         }
 
-        return new AbstractFeatureSource() {
+        return new AbstractFeatureSource(HINTS) {
                 public DataStore getDataStore() {
                     return ShapefileDataStore.this;
                 }

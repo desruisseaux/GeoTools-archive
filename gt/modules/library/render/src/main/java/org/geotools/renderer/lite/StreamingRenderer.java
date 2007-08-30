@@ -1733,7 +1733,7 @@ public final class StreamingRenderer implements GTRenderer {
 				// some shapes may be too close to projection boundaries to
 				// get transformed, try to be lenient
 				try {
-					shape = getTransformedShape(g, sa.getXform());
+					shape = getTransformedShape(g, sa.getXform(), currLayer.getFeatureSource().getSupportedHints().contains(Hints.FEATURE_DETACHED));
 				} catch (TransformException te) {
                                         LOGGER.log(Level.FINE, te.getLocalizedMessage(), te);
 					fireErrorEvent(te);
@@ -1767,10 +1767,10 @@ public final class StreamingRenderer implements GTRenderer {
 	 * @throws FactoryException
 	 */
 	private final LiteShape2 getTransformedShape(Geometry g,
-			MathTransform2D transform) throws TransformException,
+			MathTransform2D transform, boolean clone) throws TransformException,
 			FactoryException {
 
-		return new LiteShape2(g, transform, getDecimator(transform), false);
+		return new LiteShape2(g, transform, getDecimator(transform), false, clone);
 	}
 
 	private HashMap decimators = new HashMap();

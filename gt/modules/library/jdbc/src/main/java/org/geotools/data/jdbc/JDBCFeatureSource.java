@@ -20,7 +20,9 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -31,6 +33,7 @@ import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.SQLEncoderException;
@@ -366,10 +369,15 @@ public class JDBCFeatureSource implements FeatureSource {
         JDBCUtils.close(statement);
     }
     
+    private static final Set BASE_HINTS = Collections.unmodifiableSet(
+            new HashSet(Arrays.asList(new Object[] {
+            Hints.FEATURE_DETACHED})));
+    
     /**
-     * By default, no Hints are supported
+     * By default, only detached feature is supported
      */
+    
      public Set getSupportedHints() {
-            return Collections.EMPTY_SET;
+            return BASE_HINTS;
      }
 }

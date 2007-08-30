@@ -104,7 +104,7 @@ public final class Hints extends RenderingHints {
      */
     public static final ClassKey JTS_COORDINATE_SEQUENCE_FACTORY = new ClassKey(
             "com.vividsolutions.jts.geom.CoordinateSequenceFactory");
-
+    
     /**
      * The {@link com.vividsolutions.jts.geom.PrecisionModel} instance to use.
      * 
@@ -231,6 +231,15 @@ public final class Hints extends RenderingHints {
      * @since 2.4
      */
     public static final Key FEATURE_TYPE_FACTORY_NAME = new Key(String.class);
+    
+    /**
+     * Whether the features returned by the feature collections should be considered detached from the
+     * datastore, that is, they are updatable without altering the backing store (makes sense only 
+     * if features are kept in memory or if there is some transparent persistent mechanism in place, 
+     * such as the Hibernate one) 
+     * @since 2.4
+     */
+    public static final Key FEATURE_DETACHED = new Key(Boolean.class);
 
     /**
      * The {@link org.geotools.styling.StyleFactory} instance to use.

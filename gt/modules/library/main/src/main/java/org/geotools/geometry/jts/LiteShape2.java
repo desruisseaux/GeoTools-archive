@@ -90,6 +90,29 @@ public final class LiteShape2 implements Shape, Cloneable {
 		this(geom, mathTransform, decimator, generalize);
 		this.maxDistance = maxDistance;
 	}
+	
+	/**
+         * Creates a new LiteShape object.
+         * 
+         * @param geom -
+         *            the wrapped geometry
+         * @param mathTransform -
+         *            the transformation applied to the geometry in order to get to
+         *            the shape points
+         * @param decimator -
+         *            
+         * @param generalize -
+         *            set to true if the geometry need to be generalized during
+         *            rendering
+         * 
+         * @throws TransformException
+         * @throws FactoryException
+         */
+        public LiteShape2(Geometry geom, MathTransform mathTransform,
+                        Decimator decimator, boolean generalize) throws TransformException,
+                        FactoryException {
+                this(geom, mathTransform, decimator, generalize, true);
+        }
 
 	/**
 	 * Creates a new LiteShape object.
@@ -104,37 +127,32 @@ public final class LiteShape2 implements Shape, Cloneable {
 	 * @param generalize -
 	 *            set to true if the geometry need to be generalized during
 	 *            rendering
+	 *            
+	 * @param clone - if clone is false the original geometry may be modified directly, if true it will be
+	 *                cloned to make sure the original remains untouched
 	 * 
 	 * @throws TransformException
 	 * @throws FactoryException
 	 */
 	public LiteShape2(Geometry geom, MathTransform mathTransform,
-			Decimator decimator, boolean generalize) throws TransformException,
+			Decimator decimator, boolean generalize, boolean clone) throws TransformException,
 			FactoryException {
-		if (geom != null)
-		{
-			
-		//we clone because it we're going to be modifing the coordinate sequence, which is not supposed to happen.
-			// it logically possible that the geometry could be used at a later stage in the rendering system, so we
-			// better not mess with it!
-			if (geom.getFactory().getCoordinateSequenceFactory() instanceof LiteCoordinateSequenceFactory)
-				this.geometry = cloneGeometryLCS(geom);  // optimized version
-			else
-				this.geometry = cloneGeometry(geom);
-			
-			//this.geometry = (Geometry) getGeometryFactory().createGeometry(geom);
-			
+		if (geom != null) {
+		    if(!clone && geom.getFactory().getCoordinateSequenceFactory() instanceof LiteCoordinateSequenceFactory)
+		        this.geometry = geom;
+		    else
+    			if (geom.getFactory().getCoordinateSequenceFactory() instanceof LiteCoordinateSequenceFactory)
+    				this.geometry = cloneGeometryLCS(geom);  // optimized version
+    			else
+    				this.geometry = cloneGeometry(geom);
 		}
 
 		this.mathTransform = mathTransform;
-		if (decimator != null) 
-		{
+		if (decimator != null) {
 			decimator.decimateTransformGeneralize(this.geometry,this.mathTransform);
-		} 
-		else  // this doesnt normally happen -- dont bother optimizing.
-		{
+		} else {
 		        // if we have a transform a decimation span can be detected, so try to decimate anyways
-			if (mathTransform != null && !mathTransform.isIdentity())
+			if (mathTransform != null && !mathTransform.isIdentity() && generalize)
 				new Decimator(mathTransform.inverse()).decimate(this.geometry);
 			if (geometry != null)
 				transformGeometry(geometry);
