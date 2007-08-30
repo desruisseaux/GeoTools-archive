@@ -2,7 +2,6 @@ package org.geotools.demo.data;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.JFileChooser;
@@ -12,9 +11,10 @@ import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.factory.GeoTools;
+import org.geotools.feature.collection.AbstractFeatureVisitor;
+import org.geotools.gui.swing.ProgressWindow;
 import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureCollection;
-import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -29,7 +29,6 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class ShapefileRead {
 
-	@SuppressWarnings("unchecked")
 	public static void main(String[] args) throws Exception {
 		System.out.println("Welcome to GeoTools:" + GeoTools.getVersion());
 		
@@ -42,25 +41,26 @@ public class ShapefileRead {
                 }
                 public String getDescription() {
                     return "Shapefiles";
-                }
-			    
+                }			    
 			});
 			int returnVal = chooser.showOpenDialog( null );
 			
 			if(returnVal != JFileChooser.APPROVE_OPTION) {
 				System.exit(0);
 			}
-			System.out.println("You chose to open this file: " +
-			chooser.getSelectedFile().getName());			
 			file = chooser.getSelectedFile();
+			
+			System.out.println("You chose to open this file: " +
+					file.getName());								
 		}
 		else {
 			file = new File( args[0] );
 		}
-		if (!file.exists())
+		if (!file.exists()){
 			System.exit(1);
-
-		Map connect = new HashMap();
+		}
+		
+		Map<String,Object> connect = new HashMap<String,Object>();
 		connect.put("url", file.toURI().toURL());
 
 		DataStore dataStore = DataStoreFinder.getDataStore(connect);
@@ -72,18 +72,16 @@ public class ShapefileRead {
 		FeatureSource featureSource = dataStore.getFeatureSource(typeName);
 		FeatureCollection collection = featureSource.getFeatures();
 		
-		Iterator<Feature> iterator = (Iterator<Feature>) collection.iterator();
-		int length = 0;
-		try {
-			while (iterator.hasNext()) {
-			    Feature feature = (Feature) iterator.next();
-				Geometry geometry = (Geometry ) feature.getDefaultGeometry().getValue();
-				
+		class DistanceVisitor extends AbstractFeatureVisitor {
+			int length =0;
+			public void visit(Feature feature) {
+				Geometry geometry = (Geometry) feature.getDefaultGeometry().getValue();
 				length += geometry.getLength();
 			}
-		} finally {
-			collection.close(iterator);
-		}
-		System.out.println("Total length " + length);
+		};
+		DistanceVisitor distance = new DistanceVisitor();
+		
+		collection.accepts( distance, new ProgressWindow(null));
+		System.out.println("Total length " + distance.length );
 	}
 }
