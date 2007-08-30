@@ -351,7 +351,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
      */
     private static SampleConverter first(final SampleConverter[] converters) {
         SampleConverter converter = converters[0];
-        if (converter != null) {
+        if (converter == null) {
             converter = SampleConverter.IDENTITY;
         }
         return converter;
