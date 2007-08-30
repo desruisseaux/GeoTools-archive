@@ -77,11 +77,15 @@ public class FirstProject {
         featureStore.setTransaction(transaction);
         try {
             featureStore.addFeatures(collection);
-            transaction.close();
+            transaction.commit();
         } catch (Exception problem) {
             problem.printStackTrace();
             transaction.rollback();
         }
+        finally {
+            transaction.close();
+        }
+        System.exit(0);
     }
 
     private static File getNewShapeFile(File file) {
