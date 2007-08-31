@@ -58,13 +58,13 @@ public abstract class TextImageWriter extends StreamImageWriter {
 
     /**
      * Number of digits to check after the last one, as 10<sup>-n</sup>. The default value is
-     * 1E-2. This means that if the two digits immediately after the last one are 0, we will
-     * consider that we have reached the intented precision.
+     * 1E-1. This means that if the digit immediately after the last one is 0, we will consider
+     * that we have reached the intented precision.
      *
      * For adjusting the number of digits to check after the last one, just put this number
-     * as a negative power in place of the "-2" above.
+     * as a negative power in place of the "-1" above.
      */
-    private static final double DELTA_THRESHOLD = 1E-2;
+    private static final double DELTA_THRESHOLD = 1E-1;
 
     /**
      * The maximum value found during the last call to {@link #createNumberFormat}.

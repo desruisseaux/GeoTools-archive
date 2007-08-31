@@ -20,30 +20,32 @@ package org.geotools.parameter;
 import java.util.Map;
 import java.util.Set;
 import java.util.List;
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 // JAI dependencies
+import javax.media.jai.util.Range;
 import javax.media.jai.ParameterList;
+import javax.media.jai.ParameterListDescriptor;
 import javax.media.jai.ParameterListImpl;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.OperationDescriptor;
+import javax.media.jai.EnumeratedParameter;
 
 // OpenGIS dependencies
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.InvalidParameterNameException;
-import org.opengis.util.GenericName;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.UnmodifiableArrayList;
 import org.geotools.referencing.AbstractIdentifiedObject;
 
 
@@ -84,24 +86,16 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
     public final ParameterList parameters;
 
     /**
-     * The wrappers around each elements in {@link #parameters}. Will be created by
-     * {@link #createElements} only when first needed.
-     */
-    private transient List/*<ParameterValue>*/ values;
-
-    /**
-     * A view of {@link #values} as an immutable list. Will be constructed only when first
-     * needed. Note that while this list may be immutable, <strong>elements</strong> in this
-     * list stay modifiable. The goal is to allows the following idiom:
+     * The wrappers around each elements in {@link #parameters} as an immutable list.
+     * Will be created by {@link #createElements} only when first needed.  Note that
+     * while this list may be immutable, <strong>elements</strong> in this list stay
+     * modifiable. The goal is to allows the following idiom:
      *
      * <blockquote><pre>
      * values().get(i).setValue(myValue);
      * </pre></blockquote>
-     *
-     * @todo This field should be private. It is not for now for {@link ImagingParameterDescriptor}
-     *       needs, but may become private again later.
      */
-    transient List/*<ParameterValue>*/ asList;
+    private List/*<ParameterValue>*/ values;
 
     /**
      * Constructs a parameter group for the specified descriptor.
@@ -132,47 +126,116 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
     }
 
     /**
-     * Creates and fill the {@link #values} list. Note: this method must creates elements
+     * Returns {@code true} if the specified OGC descriptor is compatible with the specified
+     * JAI descriptor. Note that the JAI descriptor is allowed to be less strict than the OGC
+     * one. This is okay because {@link ImagingParameter} will keep a reference to the stricter
+     * OGC descriptor, which can be used for performing a strict check if we wish.
+     *
+     * @param descriptor
+     *              The OGC descriptor.
+     * @param listDescriptor
+     *              The JAI descriptor.
+     * @param names
+     *              The array returned by {@code listDescriptor.getParamNames()},
+     *              obtained once for ever by the caller for efficienty.
+     * @param types
+     *              The array returned by {@code listDescriptor.getParamClasses()},
+     *              obtained once for ever by the caller for efficienty.
+     * @param names
+     *              The array returned by {@code listDescriptor.getEnumeratedParameterNames()},
+     *              obtained once for ever by the caller for efficienty.
+     */
+    private static boolean compatible(final ParameterDescriptor     descriptor,
+                                      final ParameterListDescriptor listDescriptor,
+                                      final String[] names, final Class[] types,
+                                      final String[] enumerated)
+    {
+        final String name = descriptor.getName().getCode().trim();
+        Class type = null;
+        if (names != null) {
+            for (int i=0; i<names.length; i++) {
+                if (name.equalsIgnoreCase(names[i])) {
+                    type = types[i];
+                    break;
+                }
+            }        
+        }
+        if (type == null || !type.isAssignableFrom(descriptor.getValueClass())) {
+            return false;
+        }
+        final Range range = listDescriptor.getParamValueRange(name);
+        if (range != null) {
+            Comparable c;
+            c = descriptor.getMinimumValue();
+            if (c!=null && !range.contains(c)) {
+                return false;
+            }
+            c = descriptor.getMaximumValue();
+            if (c!=null && !range.contains(c)) {
+                return false;
+            }
+        }
+        if (enumerated != null) {
+            for (int i=0; i<enumerated.length; i++) {
+                if (name.equalsIgnoreCase(enumerated[i])) {
+                    final EnumeratedParameter[] restrictions;
+                    restrictions = listDescriptor.getEnumeratedParameterValues(name);
+                    final Set valids = descriptor.getValidValues();
+                    if (valids == null || !Arrays.asList(restrictions).containsAll(valids)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Creates and fills the {@link #values} list. Note: this method must creates elements
      * inconditionnally and most not requires synchronization for proper working of the
      * {@link #clone} method.
+     *
+     * @return The array which is backing {@link #values}. This array is returned only in order
+     *         to allow {@link #clone} to modify the values right after the clone. In other cases,
+     *         this array should be discarted.
      */
-    void createElements() {
+    private ParameterValue[] createElements() {
         final ImagingParameterDescriptors descriptor = (ImagingParameterDescriptors) this.descriptor;
-        final List   descriptors = descriptor.descriptors();
-        final Set parameterNames = descriptor.getParameterNames();
-        values = new ArrayList(descriptors.size());
-        for (final Iterator it=descriptors.iterator(); it.hasNext();) {
-            final ParameterDescriptor d = (ParameterDescriptor) it.next();
-            String name = d.getName().getCode().trim().toLowerCase();
+        final ParameterListDescriptor listDescriptor = parameters.getParameterListDescriptor();
+        final String[]    names       = listDescriptor.getParamNames();
+        final Class[]     types       = listDescriptor.getParamClasses();
+        final String[]    enumerated  = listDescriptor.getEnumeratedParameterNames();
+        final List        descriptors = descriptor.descriptors();
+        final ParameterValue[] values = new ParameterValue[descriptors.size()];
+        for (int i=0; i<values.length; i++) {
+            final ParameterDescriptor d = (ParameterDescriptor) descriptors.get(i);
             final ParameterValue value;
-            if (parameterNames.contains(name)) {
+            if (compatible(d, listDescriptor, names, types, enumerated)) {
                 /*
-                 * Uses 'parameters' as the backing store.
+                 * Found a parameter which is a member of the JAI ParameterList, and the
+                 * type matches the expected one. Uses 'parameters' as the backing store.
                  */
                 value = new ImagingParameter(d, parameters);
             } else {
                 /*
-                 * In theory, we should uses ParameterBlock sources. However, we can't because
+                 * In theory, we should use ParameterBlock sources. However, we can't because
                  * the type is not the same: JAI operations typically expect a RenderedImage
                  * source, while coverage operations typically expect a GridCoverage source.
                  * The value will be stored separatly, and the coverage framework will need
                  * to handle it itself.
                  */
-                value = new Parameter(d);
+                value = (ParameterValue) d.createValue();
             }
-            values.add(value);
+            values[i] = value;
         }
         /*
          * Checks for name clashes.
          */
-        final int size = values.size();
-        for (int j=0; j<size; j++) {
-            final String name;
-            name = ((ParameterValue) values.get(j)).getDescriptor().getName().getCode().trim();
-            for (int i=0; i<size; i++) {
+        for (int j=0; j<values.length; j++) {
+            final String name = values[j].getDescriptor().getName().getCode().trim();
+            for (int i=0; i<values.length; i++) {
                 if (i != j) {
-                    final ParameterDescriptor d = (ParameterDescriptor)
-                                                ((ParameterValue) values.get(i)).getDescriptor();
+                    final ParameterDescriptor d = (ParameterDescriptor) values[i].getDescriptor();
                     if (AbstractIdentifiedObject.nameMatches(d, name)) {
                         throw new InvalidParameterNameException(Errors.format(
                                 ErrorKeys.PARAMETER_NAME_CLASH_$4,
@@ -183,7 +246,8 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
                 }
             }
         }
-        asList = Collections.unmodifiableList(values);
+        this.values = new UnmodifiableArrayList(values);
+        return values;
     }
 
     /**
@@ -192,10 +256,11 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
      * may contains sources found in the JAI's {@linkplain OperationDescriptor operation descriptor}.
      */
     public synchronized List values() {
-        if (asList == null) {
+        if (values == null) {
             createElements();
         }
-        return asList;
+        assert ((ParameterDescriptorGroup) descriptor).descriptors().size() == values.size() : values;
+        return values;
     }
 
     /**
@@ -210,9 +275,7 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
     public synchronized ParameterValue parameter(String name) throws ParameterNotFoundException {
         ensureNonNull("name", name);
         name = name.trim();
-        if (values == null) {
-            createElements();
-        }
+        final List values = values();
         final int size = values.size();
         for (int i=0; i<size; i++) {
             final ParameterValue value = (ParameterValue) values.get(i);
@@ -284,12 +347,22 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
             e.initCause(exception);
             throw e;
         }
+        /*
+         * Most elements in the values list are ImagingParameter instances, which are backed by the
+         * ParameterList.  If the list was already created, we need to overwrite it with a new list
+         * filled with ImagingParameter instances that reference the cloned ParameterList. The call
+         * to createElements() do this job while preserving the parameter values since we cloned the
+         * ParameterList first.
+         *
+         * We can not just set the list to null and wait for it to be lazily created, because not
+         * all elements are ImagingParameter instances. Those that are not need to be cloned.
+         */
         if (copy.values != null) {
-            copy.createElements();
-            for (int i=values.size(); --i>=0;) {
-                final ParameterValue value = (ParameterValue) values.get(i);
-                if (value instanceof Parameter) {
-                    copy.values.set(i, (ParameterValue) value.clone());
+            final ParameterValue[] cloned = copy.createElements();
+            assert values.size() == cloned.length : values;
+            for (int i=0; i<cloned.length; i++) {
+                if (!(cloned[i] instanceof ImagingParameter)) {
+                    cloned[i] = (ParameterValue) ((ParameterValue) values.get(i)).clone();
                 }
             }
         }

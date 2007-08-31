@@ -7,7 +7,7 @@ import javax.media.jai.JAI;
 import javax.media.jai.OperationDescriptor;
 
 import org.geotools.coverage.processing.operation.Histogram;
-import org.geotools.parameter.ImagingParameterDescriptorsDecorator;
+import org.geotools.parameter.ImagingParameterDescriptors;
 
 /**
  * 
@@ -49,7 +49,7 @@ public abstract class AbstractOperationJAIDecorator extends OperationJAI {
 	 */
 	protected AbstractOperationJAIDecorator(
 			OperationDescriptor operationDescriptor,
-			ImagingParameterDescriptorsDecorator decorator) {
+			ImagingParameterDescriptors decorator) {
 		super(operationDescriptor, decorator);
 		
 	}
@@ -60,10 +60,10 @@ public abstract class AbstractOperationJAIDecorator extends OperationJAI {
 
 	protected static Map REPLACED_DESCRIPTORS;
 
-	protected static ImagingParameterDescriptorsDecorator prepareParams(
+	protected static ImagingParameterDescriptors prepareParams(
 			String name) {
-		return new ImagingParameterDescriptorsDecorator(
-				getOperationDescriptor(name), REPLACED_DESCRIPTORS);
+		return new ImagingParameterDescriptors(
+				getOperationDescriptor(name), REPLACED_DESCRIPTORS.values());
 	}
 
 }

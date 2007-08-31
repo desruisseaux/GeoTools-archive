@@ -30,7 +30,7 @@ import javax.media.jai.operator.HistogramDescriptor;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.processing.AbstractStatisticsOperationJAI;
 import org.geotools.coverage.processing.OperationJAI;
-import org.geotools.parameter.ImagingParameterDescriptorsDecorator;
+import org.geotools.parameter.ImagingParameterDescriptors;
 import org.opengis.coverage.processing.OperationNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -76,7 +76,8 @@ import org.opengis.util.InternationalString;
  */
 public class Histogram extends AbstractStatisticsOperationJAI {
 
-	public Histogram(OperationDescriptor operationDescriptor, ImagingParameterDescriptorsDecorator decorator) {
+	public Histogram(OperationDescriptor operationDescriptor,
+			ImagingParameterDescriptors decorator) {
 		super(operationDescriptor, decorator);
 	}
 

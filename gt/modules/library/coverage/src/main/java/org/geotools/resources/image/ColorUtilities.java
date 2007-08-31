@@ -107,7 +107,7 @@ public final class ColorUtilities {
     }
 
     /**
-     * Copy {@code colors} into array {@code ARGB} from index {@code lower}
+     * Copies {@code colors} into array {@code ARGB} from index {@code lower}
      * inclusive to index {@code upper} exclusive. If {@code upper-lower} is not
      * equals to the length of {@code colors} array, then colors will be interpolated.
      *
@@ -147,37 +147,7 @@ public final class ColorUtilities {
     }
 
     /**
-     * Copy {@code colors} into array {@code ARGB} from index {@code lower}
-     * inclusive to index {@code upper} exclusive. If {@code upper-lower} is not
-     * equals to the length of {@code colors} array, then colors will be
-     * interpolated.
-     * 
-     * @param colors
-     *            Colors to copy into the {@code ARGB} array.
-     * @param ARGB
-     *            Array of integer to write ARGB values to.
-     * @param lower
-     *            Index (inclusive) of the first element of {@code ARGB} to
-     *            change.
-     * @param upper
-     *            Index (exclusive) of the last element of {@code ARGB} to
-     *            change.
-     * @param bits
-     *
-     * @deprecated This method seems to mix unrelated tasks!
-     */
-    public static BigInteger expand(final Color[] colors, final int[] ARGB,
-                                    final int lower, final int upper, BigInteger bits)
-    {
-        for (int i=lower; i<upper; i++) {
-            bits = bits.setBit(i);
-        }
-        ColorUtilities.expand(colors, ARGB, lower, upper);
-        return bits;
-    }
-
-    /**
-     * Round a float value and clamp the result between 0 and 255 inclusive.
+     * Rounds a float value and clamp the result between 0 and 255 inclusive.
      */
     public static int roundByte(final double value) {
         return (int) Math.min(Math.max(Math.round(value), 0), 255);

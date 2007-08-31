@@ -27,11 +27,16 @@ import org.geotools.resources.XMath;
  * <p>
  * <ul>
  *   <li>Replace "<cite>nodata</cite>" values (typically a fixed value like 9999 or
- *       {@value Short#MAX_VALUE}) to {@link Float#NaN NaN} if the target type is
+ *       {@value Short#MAX_VALUE}) by {@link Float#NaN NaN} if the target type is
  *       {@code float} or {@code double}, or 0 if the target type is an integer.</li>
  *   <li>Replace <em>signed</em> integers by <em>unsigned</em> integers, by applying
  *       an offset to the values.</li>
  * </ul>
+ * <p>
+ * Note that pad values are replaced by 0 in the integer case, not by an arbitrary number,
+ * because 0 is the result of {@code (int) NaN} cast. While not mandatory, this property
+ * make some mathematics faster during conversions between <cite>geophysics</cite> and
+ * <cite>display</cite> views in the coverage module.
  * <p>
  * There is no scaling because this class is not for <cite>samples to geophysics values</cite>
  * conversions (except the replacement of pad values by {@link Double#NaN NaN}). This class is

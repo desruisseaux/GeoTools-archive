@@ -53,6 +53,7 @@ import org.opengis.util.InternationalString;
 // Geotools dependencies
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
+import org.geotools.coverage.grid.ViewType;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.InvalidGridGeometryException;
@@ -125,17 +126,6 @@ public class OperationJAI extends Operation2D {
     protected static final String RENDERED_MODE = RenderedRegistryMode.MODE_NAME;
 
     /**
-     * Index of the source {@link GridCoverage2D} to use as a model. The destination grid coverage
-     * will reuse the same coordinate reference system, envelope and qualitative categories than
-     * this primary source.
-     * <p>
-     * For operations expecting only one source, there is no ambiguity. But for operations
-     * expecting more than one source, the choice of a primary source is somewhat arbitrary.
-     * This constant is used merely as a flag for spotting those places in the code.
-     */
-    protected static final int PRIMARY_SOURCE_INDEX = 0;
-
-    /**
      * The JAI's operation descriptor.
      */
     protected final OperationDescriptor operation;
@@ -200,7 +190,7 @@ public class OperationJAI extends Operation2D {
      *
      * @since 2.4
      */
-    protected final static OperationDescriptor getOperationDescriptor(final String name)
+    protected static OperationDescriptor getOperationDescriptor(final String name)
             throws OperationNotFoundException
     {
         final OperationRegistry registry = JAI.getDefaultInstance().getOperationRegistry();
@@ -261,62 +251,6 @@ public class OperationJAI extends Operation2D {
     }
 
     /**
-     * Extracts and prepares the sources for this {@link OperationJAI}, taking into account the
-     * need for going to the geophysics view of the data in case this operation requires so.
-     * <p>
-     * The side effect of this method is to fill the array of needed sources as well
-     * as to change their "geo-view".
-     * 
-     * @param parameters  Parameters that will control this operation.
-     * @param sourceNames Names of the parameters that compose the provided 
-     *                    {@link ParameterValueGroup}.
-     * @param sources     The {@link GridCoverage2D} to be used as sources for this operation.
-     * @return            A {@link Boolean} that tells if we have changed the "geo-view" for
-     *                    this coverage.
-     *
-     * @throws ParameterNotFoundException if a required source has not been found.
-     */
-    private Boolean extractSources(final ParameterValueGroup parameters,
-                                   final String[] sourceNames,
-                                   final GridCoverage2D[] sources)
-            throws ParameterNotFoundException
-    {
-        Boolean requireGeophysicsType = null;
-        final boolean computeOnGeophysicsValues = computeOnGeophysicsValues(parameters);
-        for (int i=0; i<sourceNames.length; i++) {
-            GridCoverage2D source = (GridCoverage2D) parameters.parameter(sourceNames[i]).getValue();
-            if (computeOnGeophysicsValues) {
-                final GridCoverage2D old = source;
-                source = source.geophysics(true);
-                if (i == PRIMARY_SOURCE_INDEX) {
-                    requireGeophysicsType = Boolean.valueOf(old == source);
-                }
-            }
-            sources[i] = source;
-        }
-        return requireGeophysicsType;
-    }
-
-    /**
-     * Returns {@code true} if grid coverage content should be converted from sample values
-     * to geophysics value before to apply an operation. This method is invoked automatically
-     * by {@link #doOperation doOperation}. If this method returns {@code true}, then the
-     * computation will be performed on the <cite>geophysics</cite> view as returned by
-     * <code>{@linkplain GridCoverage2D#geophysics GridCoverage2D.geophysics}(true)</code>.
-     * If this method returns {@code false}, then the view will <strong>not</strong> be changed
-     * before the operation is applied (i.e. the {@code geophysics} method is not invoked at all).
-     * The default implementation always returns {@code true}.
-     *
-     * @param  parameters The parameters supplied by the user to the {@code doOperation} method.
-     * @return {@code true} if this operation should be applied on geophysics values.
-     *
-     * @see GridCoverage2D#geophysics
-     */
-    protected boolean computeOnGeophysicsValues(final ParameterValueGroup parameters) {
-        return true;
-    }
-
-    /**
      * Applies a process operation to a grid coverage.
      * The default implementation performs the following steps:
      *
@@ -360,7 +294,7 @@ public class OperationJAI extends Operation2D {
          */
         final String[]     sourceNames = operation.getSourceNames();
         final GridCoverage2D[] sources = new GridCoverage2D[sourceNames.length];
-        Boolean  requireGeophysicsType = extractSources(parameters, sourceNames, sources);
+        ViewType     primarySourceType = extractSources(parameters, sourceNames, sources);
         /*
          * Ensures that all coverages use the same CRS and has the same 'gridToCRS' relationship.
          * After the reprojection, the method still checks all CRS in case the user overridden the
@@ -385,23 +319,24 @@ public class OperationJAI extends Operation2D {
          * Applies the operation. This delegates the work to the chain of 'deriveXXX' methods.
          */
         coverage = deriveGridCoverage(sources, new Parameters(crs, gridToCRS, block, hints));
-        return postProcessResult(requireGeophysicsType, coverage);
+        return postProcessResult(coverage, primarySourceType);
     }
 
     /**
      * Post processing on the coverage resulting from JAI operation.
      *
-     * @param requireGeophysicsType
-     *            Tells if we have to change the "geo-view" for the provided {@link GridCoverage2D}.
      * @param coverage
-     *            {@link GridCoverage2D} which we have prepare for a successive
-     *            operation or for the final user.
+     *            {@link GridCoverage2D} resulting from the operation.
+     * @param primarySourceType
+     *            Tells if we have to change the "geo-view" for the provided {@link GridCoverage2D}.
      *
      * @return the prepared {@link GridCoverage2D}.
      */
-    private static GridCoverage2D postProcessResult(Boolean requireGeophysicsType, GridCoverage2D coverage) {
-        if (requireGeophysicsType != null) {
-            coverage = coverage.geophysics(requireGeophysicsType.booleanValue());
+    private static GridCoverage2D postProcessResult(GridCoverage2D coverage,
+            final ViewType primarySourceType)
+    {
+        if (primarySourceType != null) {
+            coverage = coverage.geophysics(ViewType.GEOPHYSICS.equals(primarySourceType));
         }
         return coverage;
     }

@@ -16,31 +16,29 @@
  */
 package org.geotools.parameter;
 
-// J2SE dependencies
-import java.util.Map;
+import java.util.List;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.logging.Logger;
-import java.awt.image.RenderedImage;
-
-// JAI dependencies
 import javax.media.jai.JAI;
+import javax.media.jai.ParameterList;
+import javax.media.jai.OperationDescriptor;
+import javax.media.jai.OperationRegistry;
 import javax.media.jai.RegistryElementDescriptor;
 import javax.media.jai.registry.RenderedRegistryMode;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
 import org.opengis.util.GenericName;
-import org.opengis.metadata.citation.Citation;
-import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.GeneralParameterDescriptor;
 
-// Geotools dependencies
+import org.geotools.TestData;
 import org.geotools.metadata.iso.citation.Citations;
 
 
@@ -50,6 +48,7 @@ import org.geotools.metadata.iso.citation.Citations;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Simone Giannecchini
  */
 public final class ImagingParametersTest extends TestCase {
     /**
@@ -128,7 +127,7 @@ public final class ImagingParametersTest extends TestCase {
         /*
          * Tests clone. Requires J2SE 1.5 or above.
          */
-        if (System.getProperty("java.version").compareTo("1.5") >= 0) {
+        if (!TestData.isBaseJavaPlatform()) {
             final ImagingParameters copy = (ImagingParameters) values.clone();
             assertNotSame("clone", values, copy);
             assertNotSame("clone", values.parameters, copy.parameters);
@@ -138,9 +137,6 @@ public final class ImagingParametersTest extends TestCase {
                 assertEquals("clone", values.parameters, copy.parameters);
                 assertEquals("clone", values, copy);
             }
-        } else {
-            Logger.getLogger("org.geotools.parameter")
-                       .fine("Clone test skipped for pre-1.5 Java version.");
         }
     }
 
@@ -150,5 +146,55 @@ public final class ImagingParametersTest extends TestCase {
      */
     private static void assertLocalized(final String name, final CharSequence title) {
         assertTrue(name, title instanceof ImagingParameterDescription);
+    }
+
+    /**
+     * Tests the wrapper with a parameter overriden.
+     */
+    public void testExtensions() {
+        /*
+         * The parameter descriptor for the subsampling.
+         */
+        final ParameterDescriptor SPATIAL_SUBSAMPLING_X =
+                new DefaultParameterDescriptor(Citations.OGC, "xPeriod",
+                    Double.class,    // Value class (mandatory)
+                    null,            // Array of valid values
+                    null,            // Default value
+                    new Double(0),   // Minimal value
+                    null,            // Maximal value
+                    null,            // Unit of measure
+                    false);          // Parameter is optional
+
+        // Gets the descriptors for extrema  JAI operation
+        final OperationRegistry registry = JAI.getDefaultInstance().getOperationRegistry();
+        final OperationDescriptor operation = (OperationDescriptor) registry
+                        .getDescriptor(RenderedRegistryMode.MODE_NAME, "Extrema");
+
+        // Gets the ImagingParameterDescriptors to replace xPeriod
+        final List replacingDescriptors = new ArrayList(1);
+        replacingDescriptors.add(SPATIAL_SUBSAMPLING_X);
+        final ImagingParameterDescriptors ripd =
+                new ImagingParameterDescriptors(operation, replacingDescriptors);
+
+        // Sets the parameter we want to override
+        final ParameterValueGroup rip = (ParameterValueGroup) ripd.createValue();
+        assertSame(ripd, rip.getDescriptor());
+        final ParameterValue p = rip.parameter("xPeriod");
+        assertSame(SPATIAL_SUBSAMPLING_X, p.getDescriptor());
+
+        // Note that we are supposed to use spatial coordinates for this value we are seeting here. 
+        p.setValue(new Double(2.3));
+        assertTrue(p.toString().startsWith("xPeriod = 2.3"));
+
+        // Tests direct access to the parameter list.
+        final ParameterList pl = ((ImagingParameters) rip).parameters;
+        assertSame(pl, pl.setParameter("xPeriod", 2));
+        assertSame(pl, pl.setParameter("yPeriod", 2));
+        assertEquals(2, pl.getIntParameter("xPeriod"));
+        assertEquals(2, pl.getIntParameter("yPeriod"));
+        assertEquals("Setting 'xPeriod' on ParameterList should have no effect on ParameterValue.",
+                     2.3, p.doubleValue(), 1E-6);
+        assertEquals("'yPeriod' should still backed by the ParameterList.",
+                     2, rip.parameter("yPeriod").intValue());
     }
 }

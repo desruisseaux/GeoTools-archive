@@ -31,8 +31,7 @@ import javax.media.jai.operator.ExtremaDescriptor;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.processing.AbstractOperationJAIDecorator;
 import org.geotools.coverage.processing.AbstractStatisticsOperationJAI;
-import org.geotools.coverage.processing.OperationJAI;
-import org.geotools.parameter.ImagingParameterDescriptorsDecorator;
+import org.geotools.parameter.ImagingParameterDescriptors;
 import org.opengis.coverage.processing.OperationNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -109,7 +108,8 @@ public class Extrema extends AbstractStatisticsOperationJAI {
 	 * @param operationDescriptor
 	 * @param decorator
 	 */
-	public Extrema(OperationDescriptor operationDescriptor, ImagingParameterDescriptorsDecorator decorator) {
+	public Extrema(OperationDescriptor operationDescriptor,
+			ImagingParameterDescriptors decorator) {
 		super(operationDescriptor, decorator);
 
 	}

@@ -38,7 +38,7 @@ import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.parameter.DefaultParameterDescriptor;
-import org.geotools.parameter.ImagingParameterDescriptorsDecorator;
+import org.geotools.parameter.ImagingParameterDescriptors;
 import org.geotools.parameter.ImagingParameters;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
@@ -126,7 +126,7 @@ public abstract class AbstractStatisticsOperationJAI extends
 	 */
 	public AbstractStatisticsOperationJAI(
 			OperationDescriptor operationDescriptor,
-			ImagingParameterDescriptorsDecorator decorator) {
+			ImagingParameterDescriptors decorator) {
 		super(operationDescriptor, decorator);
 	}
 

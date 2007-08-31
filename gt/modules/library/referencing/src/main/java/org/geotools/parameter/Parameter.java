@@ -72,6 +72,8 @@ public class Parameter extends AbstractParameter implements ParameterValue {
 
     /**
      * Frequently used values. <strong>Must</strong> be in increasing order.
+     *
+     * @todo To be removed when we will be allowed to compile for J2SE 1.5.
      */
     private static final int[] CACHED_VALUES = {
         -360, -180, -90, -45, -30, -4, -3, -2, -1, 0, +1, +2, +3, +4, +30, +45, +90, +180, +360
