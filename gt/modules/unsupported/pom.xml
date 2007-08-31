@@ -98,8 +98,8 @@
     <module>xml-filter</module>
     <module>mappane</module>
     <module>coveragetools</module>
-<!-- <module>xml-gpx</module> -->
-<!-- <module>gpx</module> -->
+    <module>xml-gpx</module>
+    <module>gpx</module>
     <module>vpf</module>
   </modules>
 
