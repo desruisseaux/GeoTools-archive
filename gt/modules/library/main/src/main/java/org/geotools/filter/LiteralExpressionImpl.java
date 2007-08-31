@@ -188,16 +188,48 @@ public class LiteralExpressionImpl extends DefaultExpression
      * @param feature Required by the interface but not used.
      *
      * @return the literal held by this expression.  Ignores the passed in
-     *         feature.
+     *         feature.  The literal held by this expression is almost invariably
+     *         a java.lang.String (so that no leading-zeros are lost during a string->
+     *         Class conversion.  This method will attempt to form the internal
+     *         String into a Integer, Double or BigInteger, before failing and
+     *         defaulting to a String.  To speed things up significantly, use the
+     *         evaluate(Object, Class) method so that we don't have to guess
+     *         at what you expect back from this evaluate method!
      *
      * @throws IllegalArgumentException Feature does not match declared schema.
      */
     public Object evaluate(Feature feature)
     	throws IllegalArgumentException {
-    	return literal;
+    	return evaluate((Object)feature);
     }
 
     public Object evaluate(Object feature) {
+        //hrm.  Well, now that' we're always storing the internals of 
+        //Literals as strings, we need to be slightly smart about how we
+        //return what's inside.  Some (err, lots) of code relies on this
+        //method to return an instance of the correct TYPE.  I guess we should
+        //try and be somewhat smart about this.
+        
+        //ASSERTION: literal is always a string.
+        if (literal.getClass() != String.class) {
+            return literal;
+        }
+        String s = (String)literal;
+        try {
+            return new Integer(s);
+        } catch (Exception e) {
+        }
+        
+        try {
+            return new Double(s);
+        } catch (Exception e) {
+        }
+        
+        try {
+            return new BigInteger(s);
+        } catch (Exception e) {
+        }
+        
         return literal;
     }
 
