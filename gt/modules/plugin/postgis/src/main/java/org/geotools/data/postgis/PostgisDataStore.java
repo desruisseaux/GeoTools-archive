@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -66,6 +67,8 @@ import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
 import org.geotools.data.postgis.attributeio.PgWKBAttributeIO;
 import org.geotools.data.postgis.fidmapper.PostgisFIDMapperFactory;
 import org.geotools.data.postgis.referencing.PostgisAuthorityFactory;
+import org.geotools.factory.GeoTools;
+import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
@@ -1804,7 +1807,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     protected AttributeIO getGeometryAttributeIO(AttributeType type,
         QueryData queryData) {
         if (WKBEnabled) {
-            return new PgWKBAttributeIO(isByteaEnabled(), queryData.getHints());
+            Hints hints = queryData != null ? queryData.getHints() : GeoTools.getDefaultHints();
+            return new PgWKBAttributeIO(isByteaEnabled(), hints);
         } else {
             return new WKTAttributeIO();
         }

@@ -367,6 +367,17 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
 
         assertEquals(expected, actual);
     }
+    
+    public void testGetSchemaRoadUnregisteredGeomColumn() throws Exception {
+        Connection conn = pool.getConnection();
+        conn.setAutoCommit(true);
+        Statement st = conn.createStatement();
+        int deleted = st.executeUpdate("DELETE FROM geometry_columns WHERE f_table_name = 'road' and f_table_schema = '" + f.schema + "'");
+        assertEquals(1, deleted);
+        
+        testGetSchemaRoad();
+    }
+
 
     public void testGetSchemaRiver() throws IOException {
         FeatureType expected = riverType;
