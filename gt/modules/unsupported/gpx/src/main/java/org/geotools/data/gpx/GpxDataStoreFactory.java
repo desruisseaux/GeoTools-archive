@@ -17,27 +17,31 @@ package org.geotools.data.gpx;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.FileDataStoreFactorySpi;
+import org.xml.sax.SAXException;
 
 
 public class GpxDataStoreFactory implements FileDataStoreFactorySpi {
     public static final Param URLP = new Param("url", URL.class, "url to a .gpx file");
-    public static final Param NAMESPACEP = new Param("namespace", URI.class,
-            "uri to a the namespace", false); //not required
+    public static final Param NAMESPACEP = new Param("namespace", String.class, "uri to a the namespace", false);
+    
     private Map liveStores = new HashMap();
 
     /**
      * @see org.geotools.data.dir.FileDataStoreFactorySpi#canProcess(java.net.URL)
      */
     public boolean canProcess(URL f) {
-        return f.getFile().toUpperCase().endsWith("GPX");
+        return f.getFile().toUpperCase().endsWith(".GPX");
     }
 
     /**
@@ -118,10 +122,17 @@ public class GpxDataStoreFactory implements FileDataStoreFactorySpi {
         try {
             url = (URL) URLP.lookUp(params);
 
-            URI namespace = (URI) NAMESPACEP.lookUp(params);
+            String namespace = (String) NAMESPACEP.lookUp(params);
             ds = new GpxDataStore(url, namespace);
-        } catch (MalformedURLException mue) {
-            throw new DataSourceException("Unable to attatch datastore to " + url, mue);
+            
+        } catch (MalformedURLException e) {
+            throw new DataSourceException("Unable to attatch datastore to " + url, e);
+        } catch (SAXException e) {
+            throw new DataSourceException("Unable to attatch datastore to " + url, e);
+        } catch (ParserConfigurationException e) {
+            throw new DataSourceException("Unable to attatch datastore to " + url, e);
+        } catch (URISyntaxException e) {
+            throw new DataSourceException("Unable to attatch datastore to " + url, e);
         }
 
         return ds;

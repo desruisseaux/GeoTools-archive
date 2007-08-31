@@ -45,7 +45,8 @@ public class GpxTest extends TestCase {
 
         assertTrue("point type should be supported", typeSet.contains(GpxDataStore.TYPE_NAME_POINT));
         assertTrue("track type should be supported", typeSet.contains(GpxDataStore.TYPE_NAME_TRACK));
-
+        assertTrue("track type should be supported", typeSet.contains(GpxDataStore.TYPE_NAME_ROUTE));
+        
         FeatureSource points = ds.getFeatureSource(GpxDataStore.TYPE_NAME_POINT);
 
         // exactly 1 "point" in thest file;
