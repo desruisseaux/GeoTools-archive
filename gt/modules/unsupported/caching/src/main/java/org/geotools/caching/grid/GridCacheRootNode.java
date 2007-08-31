@@ -77,15 +77,15 @@ public class GridCacheRootNode extends GridRootNode {
         return new GridCacheNode(grid, reg);
     }
 
-    @Override
-    protected boolean insertData(GridData data) {
-        if (!getIdentifier().isValid()) { // FIXME: do not insert same data mutiple times
-
-            return super.insertData(data);
-        }
-
-        return false;
-    }
+    //    @Override
+    //    protected boolean insertData(GridData data) {
+    //        if (getIdentifier().isValid()) {
+    //
+    //            return super.insertData(data);
+    //        }
+    //
+    //        return false;
+    //    }
 
     //    protected GridData getData(int i) {
     //        return this.data[i];

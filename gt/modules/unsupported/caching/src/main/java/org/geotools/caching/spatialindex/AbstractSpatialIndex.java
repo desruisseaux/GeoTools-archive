@@ -27,11 +27,6 @@ import java.util.Stack;
  *
  */
 public abstract class AbstractSpatialIndex implements SpatialIndex {
-    //public static final int RtreeVariantQuadratic = 1;
-    //public static final int RtreeVariantLinear = 2;
-    //public static final int RtreeVariantRstar = 3;
-    //public static final int PersistentIndex = 1;
-    //public static final int PersistentLeaf = 2;
     public static final int ContainmentQuery = 1;
     public static final int IntersectionQuery = 2;
 
@@ -50,9 +45,9 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
      */
     protected int dimension;
     protected Region infiniteRegion;
-    protected ArrayList writeNodeCommands = new ArrayList();
-    protected ArrayList readNodeCommands = new ArrayList();
-    protected ArrayList deleteNodeCommands = new ArrayList();
+    protected ArrayList<NodeCommand> writeNodeCommands = new ArrayList<NodeCommand>();
+    protected ArrayList<NodeCommand> readNodeCommands = new ArrayList<NodeCommand>();
+    protected ArrayList<NodeCommand> deleteNodeCommands = new ArrayList<NodeCommand>();
     protected ThisStatistics stats = new ThisStatistics();
 
     public void addDeleteNodeCommand(NodeCommand nc) {
@@ -302,7 +297,10 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
     }
 
     public void flush() {
-        store.put(this.rootNode);
+        if (this.rootNode != null) {
+            store.put(this.rootNode);
+        }
+
         store.flush();
     }
 

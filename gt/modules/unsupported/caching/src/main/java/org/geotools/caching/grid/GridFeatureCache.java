@@ -132,24 +132,56 @@ public class GridFeatureCache extends AbstractFeatureCache {
     }
 
     public void clear() {
-        tracker.clear();
+        lock.writeLock().lock();
+
+        try {
+            tracker.clear();
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     public FeatureCollection peek(Envelope e) {
         FeatureCollectingVisitor v = new FeatureCollectingVisitor(this.getSchema());
-        this.tracker.intersectionQuery(convert(e), v);
+        lock.readLock().lock();
+
+        try {
+            this.tracker.intersectionQuery(convert(e), v);
+        } finally {
+            lock.readLock().unlock();
+        }
 
         return v.getCollection();
     }
 
     public void put(FeatureCollection fc, Envelope e) throws CacheOversizedException {
-        put(fc);
-        register(e);
+        isOversized(fc);
+        lock.writeLock().lock();
+
+        try {
+            register(e);
+            put(fc);
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
+    protected void isOversized(FeatureCollection fc) throws CacheOversizedException {
+        if (fc.size() > this.capacity) {
+            throw new CacheOversizedException("Cannot cache collection of size " + fc.size()
+                + " (capacity = " + capacity + " )");
+        }
     }
 
     public void remove(Envelope e) {
         InvalidatingVisitor v = new InvalidatingVisitor();
-        this.tracker.intersectionQuery(convert(e), v);
+        lock.writeLock().lock();
+
+        try {
+            this.tracker.intersectionQuery(convert(e), v);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     public Envelope getBounds() throws IOException {
@@ -167,27 +199,29 @@ public class GridFeatureCache extends AbstractFeatureCache {
     public void put(FeatureCollection fc) throws CacheOversizedException {
         int size = fc.size();
 
-        if (size > this.capacity) {
-            throw new CacheOversizedException("Cannot cache collection of size " + fc.size()
-                + " (capacity = " + capacity + " )");
-        }
-
+        isOversized(fc);
         //puts++ ;
-        while (tracker.getStatistics().getNumberOfData() > (capacity - size)) { // was capacity - fc.size()
-            tracker.policy.evict();
+        lock.writeLock().lock();
 
-            //evictions++ ;
-            //System.out.println("Put #" + puts + " > number of evictions = " + evictions) ;
+        try {
+            while (tracker.getStatistics().getNumberOfData() > (capacity - size)) { // was capacity - fc.size()
+                tracker.policy.evict();
+
+                //evictions++ ;
+                //System.out.println("Put #" + puts + " > number of evictions = " + evictions) ;
+            }
+
+            FeatureIterator it = fc.features();
+
+            while (it.hasNext()) {
+                Feature f = it.next();
+                this.tracker.insertData(f, convert(f.getBounds()), f.hashCode());
+            }
+
+            fc.close(it);
+        } finally {
+            lock.writeLock().unlock();
         }
-
-        FeatureIterator it = fc.features();
-
-        while (it.hasNext()) {
-            Feature f = it.next();
-            this.tracker.insertData(f, convert(f.getBounds()), f.hashCode());
-        }
-
-        fc.close(it);
     }
 
     protected void register(BBOXImpl f) {

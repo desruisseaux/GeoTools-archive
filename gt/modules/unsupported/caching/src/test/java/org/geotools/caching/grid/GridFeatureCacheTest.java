@@ -84,6 +84,13 @@ public class GridFeatureCacheTest extends AbstractFeatureCacheTest {
         FeatureCollectingVisitor v = new FeatureCollectingVisitor(dataset.getFeatureType());
         cache.tracker.intersectionQuery(AbstractFeatureCache.convert(unitsquare), v);
 
+        //assertEquals(0, v.getCollection().size());
+        cache.register(unitsquare);
+        cache.put(dataset);
+
+        v = new FeatureCollectingVisitor(dataset.getFeatureType());
+        cache.tracker.intersectionQuery(AbstractFeatureCache.convert(unitsquare), v);
+
         assertEquals(dataset.size(), v.getCollection().size());
     }
 }

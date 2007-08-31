@@ -192,8 +192,9 @@ public class BenchMark {
                 conform = false;
 
                 //                errors.add(filterset.get(i));
-                //                System.err.println("Query " + i + " : Got " + ds_stats[i].getNumberOfFeatures()
-                //                    + " features, expected " + control_stats[i].getNumberOfFeatures());
+                System.err.println("Query " + i + " : Got " + ds_stats[i].getNumberOfFeatures()
+                    + " features, expected " + control_stats[i].getNumberOfFeatures());
+
                 //                runErrorsAgain(errors);
             }
 

@@ -32,6 +32,7 @@ import org.geotools.caching.spatialindex.store.MemoryStorage;
 public class GridTracker extends Grid implements EvictableTree {
     GridTrackerStatistics stats;
     EvictionPolicy policy;
+    boolean doRecordAccess = true;
 
     public GridTracker(Region mbr, int capacity, Storage store) {
         this.dimension = mbr.getDimension();
@@ -114,7 +115,9 @@ public class GridTracker extends Grid implements EvictableTree {
 
     @Override
     protected Node readNode(NodeIdentifier id) {
-        policy.access(id);
+        if (doRecordAccess) {
+            policy.access(id);
+        }
 
         return super.readNode(id);
     }
@@ -122,7 +125,14 @@ public class GridTracker extends Grid implements EvictableTree {
     @Override
     protected void writeNode(Node node) {
         super.writeNode(node);
-        policy.access(node.getIdentifier());
+
+        if (doRecordAccess) {
+            policy.access(node.getIdentifier());
+        }
+    }
+
+    void setDoRecordAccess(boolean b) {
+        doRecordAccess = b;
     }
 
     class GridTrackerStatistics extends ThisStatistics {

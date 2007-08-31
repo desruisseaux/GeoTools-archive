@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.vividsolutions.jts.geom.Envelope;
@@ -34,11 +34,8 @@ import org.geotools.caching.util.BBoxFilterSplitter;
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureEvent;
 import org.geotools.data.FeatureListener;
-import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
-import org.geotools.data.Transaction;
 import org.geotools.data.store.EmptyFeatureCollection;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureCollection;
@@ -67,6 +64,7 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
     protected FeatureSource fs;
     protected int source_hits = 0;
     protected int source_feature_reads = 0;
+    protected ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     public AbstractFeatureCache(FeatureSource fs) {
         this.fs = fs;
@@ -78,30 +76,30 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
      *
      *
     
-             public Set addFeatures(FeatureCollection collection)
-                 throws IOException {
-                 return this.fs.addFeatures(collection);
-             }
-             public Transaction getTransaction() {
-                 return this.fs.getTransaction();
-             }
-             public void modifyFeatures(AttributeType[] type, Object[] value, Filter filter)
-                 throws IOException {
-                 this.fs.modifyFeatures(type, value, filter);
-             }
-             public void modifyFeatures(AttributeType type, Object value, Filter filter)
-                 throws IOException {
-                 this.fs.modifyFeatures(type, value, filter);
-             }
-             public void removeFeatures(Filter filter) throws IOException {
-                 this.fs.removeFeatures(filter);
-             }
-             public void setFeatures(FeatureReader reader) throws IOException {
-                 this.fs.setFeatures(reader);
-             }
-             public void setTransaction(Transaction transaction) {
-                 this.fs.setTransaction(transaction);
-             } */
+               public Set addFeatures(FeatureCollection collection)
+                   throws IOException {
+                   return this.fs.addFeatures(collection);
+               }
+               public Transaction getTransaction() {
+                   return this.fs.getTransaction();
+               }
+               public void modifyFeatures(AttributeType[] type, Object[] value, Filter filter)
+                   throws IOException {
+                   this.fs.modifyFeatures(type, value, filter);
+               }
+               public void modifyFeatures(AttributeType type, Object value, Filter filter)
+                   throws IOException {
+                   this.fs.modifyFeatures(type, value, filter);
+               }
+               public void removeFeatures(Filter filter) throws IOException {
+                   this.fs.removeFeatures(filter);
+               }
+               public void setFeatures(FeatureReader reader) throws IOException {
+                   this.fs.setFeatures(reader);
+               }
+               public void setTransaction(Transaction transaction) {
+                   this.fs.setTransaction(transaction);
+               } */
     public void addFeatureListener(FeatureListener listener) {
         this.fs.addFeatureListener(listener);
     }
@@ -213,14 +211,15 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
             FeatureCollection fromSource = this.fs.getFeatures(notcached);
 
             try {
+                //            	 get notice we discovered some new part of the universe
+                register(notcached);
                 // add new data to cache - will raise an exception if cache is oversized 
                 put(fromCache);
-                // get notice we discovered some new part of the universe
-                register(notcached);
             } catch (UnsupportedOperationException e) {
                 logger.log(Level.WARNING, "Adding data to cache : " + e.toString());
             } catch (CacheOversizedException e) {
                 logger.log(Level.INFO, "Adding data to cache : " + e.toString());
+                remove(extractEnvelope((BBOXImpl) notcached));
             }
 
             // merge result sets
@@ -230,18 +229,47 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
         }
     }
 
-    public FeatureCollection get(Envelope e) throws IOException {
-        List notcached = match(e);
+    public FeatureCollection get(Envelope e) throws IOException { // TODO: read lock
+
         FeatureCollection fromCache;
         FeatureCollection fromSource;
         String geometryname = fs.getSchema().getPrimaryGeometry().getLocalName();
         String srs = fs.getSchema().getPrimaryGeometry().getCoordinateSystem().toString();
 
+        //      acquire R-lock
+        lock.readLock().lock();
+
+        List notcached = match(e);
+
         if (notcached.isEmpty()) { // everything in cache
                                    // return result from cache
+            fromCache = peek(e);
+            // release R-lock
+            lock.readLock().unlock();
 
-            return peek(e);
-        } else if (notcached.size() == 1) {
+            return fromCache;
+        }
+
+        // release R-lock
+        lock.readLock().unlock();
+        // got a miss from cache, need to get more data
+        // acquire W-lock
+        lock.writeLock().lock();
+        notcached = match(e); // check again because another thread may have inserted data in between
+
+        if (notcached.isEmpty()) {
+            // acquire R-lock
+            lock.readLock().lock();
+            // release W-lock
+            lock.writeLock().unlock();
+            fromCache = peek(e);
+            // release R-lock
+            lock.readLock().unlock();
+
+            return fromCache;
+        }
+
+        if (notcached.size() == 1) {
             Envelope m = (Envelope) notcached.get(0);
 
             if (m == e) { // nothing in cache
@@ -258,6 +286,9 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
                 } catch (CacheOversizedException e1) {
                     logger.log(Level.INFO, "Adding data to cache : " + e1);
                 }
+
+                // release W-lock
+                lock.writeLock().unlock();
 
                 return fromSource;
             }
@@ -283,14 +314,17 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
         source_feature_reads += fromSource.size();
 
         try {
-            put(fromSource); // add new data to cache - will raise an exception if cache is oversized 
+            isOversized(fromSource);
             register(filter); // get notice we discovered some new part of the universe
+            put(fromSource); // add new data to cache - will raise an exception if cache is oversized 
         } catch (UnsupportedOperationException e1) {
             logger.log(Level.WARNING, "Adding data to cache : " + e1.toString());
         } catch (CacheOversizedException e1) {
             logger.log(Level.INFO, "Adding data to cache : " + e1.toString());
         }
 
+        // release W-lock
+        lock.writeLock().unlock();
         // merge result sets before returning
         fromCache.addAll(fromSource);
 
@@ -308,6 +342,9 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
     protected abstract void register(BBOXImpl f);
 
     protected abstract void register(Envelope e);
+
+    protected abstract void isOversized(FeatureCollection fc)
+        throws CacheOversizedException;
 
     public static Envelope extractEnvelope(BBOXImpl filter) {
         return new Envelope(filter.getMinX(), filter.getMaxX(), filter.getMinY(), filter.getMaxY());
@@ -356,5 +393,21 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
         sb.append(" ; Feature reads = " + source_feature_reads);
 
         return sb.toString();
+    }
+
+    public void readLock() {
+        lock.readLock().lock();
+    }
+
+    public void readUnLock() {
+        lock.readLock().unlock();
+    }
+
+    public void writeLock() {
+        lock.writeLock().lock();
+    }
+
+    public void writeUnLock() {
+        lock.writeLock().unlock();
     }
 }

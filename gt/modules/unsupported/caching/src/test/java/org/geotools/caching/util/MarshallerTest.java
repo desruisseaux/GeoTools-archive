@@ -18,15 +18,27 @@ package org.geotools.caching.util;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import org.xml.sax.SAXException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import javax.xml.transform.TransformerException;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.gml.producer.FeatureTypeTransformer;
+import org.geotools.xml.SchemaFactory;
+import org.geotools.xml.gml.GMLComplexTypes;
+import org.geotools.xml.schema.Schema;
 
 
 public class MarshallerTest extends TestCase {
@@ -59,6 +71,36 @@ public class MarshallerTest extends TestCase {
         //System.out.println(f) ;
         //System.out.println(newf);
         assertTrue(f.equals(newf));
+
+        //        for (Iterator<SimpleFeatureType> it = m.types.values().iterator(); it.hasNext();) {
+        //        	SimpleFeatureType next = it.next();
+        //        	System.out.println(next);
+        //        	FeatureTypeTransformer t = new FeatureTypeTransformer();
+        //        	try {
+        //        		t.setIndentation(5);
+        ////        		t.setOmitXMLDeclaration(true);
+        ////        		FileOutputStream fos = new FileOutputStream("/tmp/schema.xml");
+        ////        		fos.write("<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\">\n".getBytes());
+        //				t.transform(next, System.out);
+        ////				fos.write("</xs:schema>".getBytes());
+        ////				fos.close();
+        //				FileInputStream fis = new FileInputStream("/tmp/schema.xml");
+        //				Schema schema = SchemaFactory.getInstance(null, fis); // "http://www.w3.org/2001/XMLSchema"
+        //				System.out.println(GMLComplexTypes.createFeatureType(schema.getComplexTypes()[0]));
+        //				fis.close();
+        //			} catch (TransformerException e) {
+        //				// TODO Auto-generated catch block
+        //				e.printStackTrace();
+        //			} catch (SAXException e) {
+        //				// TODO Auto-generated catch block
+        //				e.printStackTrace();
+        ////			} catch (URISyntaxException e) {
+        ////				// TODO Auto-generated catch block
+        ////				e.printStackTrace();
+        //			} catch (NullPointerException e) {
+        //				e.printStackTrace();
+        //			}
+        //        }
     }
 
     /** Marshall and unmarshall same DefaultFeature many times.

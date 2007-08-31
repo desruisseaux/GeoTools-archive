@@ -126,6 +126,10 @@ public abstract class AbstractFeatureCacheTest extends TestCase {
         cache.put(dataset);
 
         FeatureCollection fc = cache.peek(unitsquare);
+        //        assertEquals(0, fc.size());
+        cache.register(unitsquare);
+        cache.put(dataset);
+        fc = cache.peek(unitsquare);
         assertEquals(dataset.size(), fc.size());
     }
 

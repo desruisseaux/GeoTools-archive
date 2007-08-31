@@ -33,8 +33,7 @@ public class GridCacheNode extends GridNode {
 
     @Override
     protected boolean insertData(GridData data) {
-        if (!getIdentifier().isValid()) { // FIXME: do not insert same data mutiple times
-
+        if (getIdentifier().isValid()) {
             return super.insertData(data);
         }
 

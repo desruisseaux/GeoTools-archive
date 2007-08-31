@@ -20,6 +20,7 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -220,37 +221,42 @@ public class SimpleFeatureMarshaller {
 
         return att;
     }
+}
 
-    public class TypeKey {
-        int typeHash;
-        String typeName;
 
-        public TypeKey(SimpleFeatureType type) {
-            this.typeHash = type.hashCode();
-            this.typeName = type.getName().getURI();
+class TypeKey implements Serializable {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 3939840339831295334L;
+    int typeHash;
+    String typeName;
+
+    public TypeKey(SimpleFeatureType type) {
+        this.typeHash = type.hashCode();
+        this.typeName = type.getName().getURI();
+    }
+
+    public TypeKey(int hash, String name) {
+        this.typeHash = hash;
+        this.typeName = name;
+    }
+
+    public int hashCode() {
+        return typeHash;
+    }
+
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
         }
 
-        public TypeKey(int hash, String name) {
-            this.typeHash = hash;
-            this.typeName = name;
-        }
+        if (o instanceof TypeKey) {
+            TypeKey key = (TypeKey) o;
 
-        public int hashCode() {
-            return typeHash;
-        }
-
-        public boolean equals(Object o) {
-            if (o == this) {
-                return true;
-            }
-
-            if (o instanceof TypeKey) {
-                TypeKey key = (TypeKey) o;
-
-                return (typeHash == key.typeHash) && (typeName.equals(key.typeName));
-            } else {
-                return false;
-            }
+            return (typeHash == key.typeHash) && (typeName.equals(key.typeName));
+        } else {
+            return false;
         }
     }
 }

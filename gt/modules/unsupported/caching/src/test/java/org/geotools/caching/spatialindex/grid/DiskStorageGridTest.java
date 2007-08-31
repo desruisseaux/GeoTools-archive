@@ -23,9 +23,10 @@ import org.geotools.caching.spatialindex.AbstractSpatialIndex;
 import org.geotools.caching.spatialindex.AbstractSpatialIndexTest;
 import org.geotools.caching.spatialindex.Region;
 import org.geotools.caching.spatialindex.Storage;
-import org.geotools.caching.spatialindex.store.DiskStorage;
+import org.geotools.caching.spatialindex.store.BufferedDiskStorage;
 
 
+//import org.geotools.caching.spatialindex.store.DiskStorage;
 public class DiskStorageGridTest extends AbstractSpatialIndexTest {
     Grid index;
 
@@ -35,10 +36,9 @@ public class DiskStorageGridTest extends AbstractSpatialIndexTest {
 
     @Override
     protected AbstractSpatialIndex createIndex() {
-        Storage storage = DiskStorage.createInstance();
-
+        Storage storage = BufferedDiskStorage.createInstance();
+        //        Storage storage = DiskStorage.createInstance();
         index = new Grid(new Region(universe), 100, storage);
-        storage.setParent(index);
 
         return index;
     }
