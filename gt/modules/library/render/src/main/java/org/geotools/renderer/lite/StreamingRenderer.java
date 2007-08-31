@@ -1733,7 +1733,7 @@ public final class StreamingRenderer implements GTRenderer {
 				// some shapes may be too close to projection boundaries to
 				// get transformed, try to be lenient
 				try {
-					shape = getTransformedShape(g, sa.getXform(), currLayer.getFeatureSource().getSupportedHints().contains(Hints.FEATURE_DETACHED));
+					shape = getTransformedShape(g, sa.getXform(), !currLayer.getFeatureSource().getSupportedHints().contains(Hints.FEATURE_DETACHED));
 				} catch (TransformException te) {
                                         LOGGER.log(Level.FINE, te.getLocalizedMessage(), te);
 					fireErrorEvent(te);
