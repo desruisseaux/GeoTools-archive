@@ -15,6 +15,8 @@
  */
 package org.geotools.filter;
 
+import java.math.BigInteger;
+
 import org.geotools.feature.Feature;
 import org.opengis.filter.expression.ExpressionVisitor;
 
