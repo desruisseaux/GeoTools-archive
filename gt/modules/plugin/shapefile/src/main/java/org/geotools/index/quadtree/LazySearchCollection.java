@@ -75,5 +75,20 @@ public class LazySearchCollection extends AbstractCollection implements
 			}
 		}
 	}
+	
+	public boolean isEmpty() {
+	    Iterator iter = iterator();
+	    boolean isEmtpy = true;
+        try{
+            isEmtpy = !iter.hasNext();
+        }finally{
+            try {
+                tree.close(iter);
+            } catch (StoreException e) {
+                Logger.getLogger("org.geotools.index.quadtree").severe("Couldn't close iterator");
+            }
+        }
+        return isEmtpy;
+	}
 
 }
