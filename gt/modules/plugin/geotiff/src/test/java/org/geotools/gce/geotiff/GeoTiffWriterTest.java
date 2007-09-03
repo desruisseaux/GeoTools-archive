@@ -152,12 +152,6 @@ public class GeoTiffWriterTest extends TestCase {
 		params.parameter(
 				AbstractGridFormat.GEOTOOLS_WRITE_PARAMS.getName().toString())
 				.setValue(wp);
-
-		GeneralEnvelope sourceEnv, targetEnv;
-		CoordinateReferenceSystem sourceCRS, targetCRS;
-		GridCoverageReader reader = null;
-		GridCoverageWriter writer = null;
-		GridCoverage2D gc = null;
 		for (int i = 0; i < numFiles; i++) {
 
 			// /////////////////////////////////////////////////////////////////////
@@ -171,7 +165,7 @@ public class GeoTiffWriterTest extends TestCase {
 				logger.info(files[i].getAbsolutePath());
 
 			// getting a reader
-			reader = new GeoTiffReader(files[i], null);
+			GeoTiffReader reader = new GeoTiffReader(files[i], null);
 			// dumping metadata
 			IIOMetadataDumper metadataDumper = new IIOMetadataDumper(
 					((GeoTiffReader) reader).getMetadata().getRootNode());
@@ -189,7 +183,7 @@ public class GeoTiffWriterTest extends TestCase {
 				//
 				//
 				// /////////////////////////////////////////////////////////////////////
-				gc = (GridCoverage2D) reader.read(null);
+				GridCoverage2D gc = (GridCoverage2D) reader.read(null);
 				if (TestData.isInteractiveTest()) {
 					logger.info(new StringBuffer("Coverage before: ").append(
 							"\n").append(
@@ -204,13 +198,13 @@ public class GeoTiffWriterTest extends TestCase {
 					//
 					//
 					// /////////////////////////////////////////////////////////////////////
-					sourceEnv = (GeneralEnvelope) gc.getEnvelope();
-					sourceCRS = gc.getCoordinateReferenceSystem2D();
+					GeneralEnvelope sourceEnv = (GeneralEnvelope) gc.getEnvelope();
+					CoordinateReferenceSystem sourceCRS = gc.getCoordinateReferenceSystem2D();
 					final File writeFile = new File(new StringBuffer(writedir
 							.getAbsolutePath()).append(File.separatorChar)
 							.append(gc.getName().toString()).append(".tiff")
 							.toString());
-					writer = format.getWriter(writeFile);
+					GridCoverageWriter writer = format.getWriter(writeFile);
 					writer.write(gc, (GeneralParameterValue[]) params.values()
 							.toArray(new GeneralParameterValue[1]));
 
@@ -230,8 +224,8 @@ public class GeoTiffWriterTest extends TestCase {
 					} else
 						metadataDumper.getMetadata();
 					gc = (GridCoverage2D) reader.read(null);
-					targetCRS = gc.getCoordinateReferenceSystem2D();
-					targetEnv = (GeneralEnvelope) gc.getEnvelope();
+					CoordinateReferenceSystem targetCRS = gc.getCoordinateReferenceSystem2D();
+					GeneralEnvelope targetEnv = (GeneralEnvelope) gc.getEnvelope();
 					MathTransform tr = CRS.findMathTransform(targetCRS, sourceCRS, true);
 
 					// TODO: THE TEST BELOW IS TEMPORARILY DISABLED.

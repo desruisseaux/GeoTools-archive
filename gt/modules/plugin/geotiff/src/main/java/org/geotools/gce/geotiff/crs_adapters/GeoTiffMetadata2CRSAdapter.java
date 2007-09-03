@@ -68,6 +68,7 @@ import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.factory.AllAuthoritiesFactory;
 import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.referencing.factory.ReferencingFactoryContainer;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
@@ -131,9 +132,6 @@ public final class GeoTiffMetadata2CRSAdapter {
 	private final static Logger LOGGER = Logger
 			.getLogger("org.geotools.gce.geotiff.crs_adapters");
 
-	/** code from GeoTIFFWritingUtilities spec section 6.3.2.4. */
-	private static PrimeMeridian PM_Greenwich;
-
 	/**
 	 * This {@link AffineTransform} can be used when the underlying geotiff
 	 * declares to work with {@link GeoTiffConstants#RasterPixelIsArea} pixel
@@ -174,7 +172,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 			.synchronizedMap(new SoftValueHashMap(DEFAULT_MAX));
 
 	/** Group Factory for creating {@link ProjectedCRS} objects. */
-	private final FactoryGroup factories;
+	private final ReferencingFactoryContainer factories;
 
 	/** CS Factory for creating {@link CoordinateSystem} objects. */
 	private final CSFactory csFactory;
@@ -205,7 +203,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 		tempHints.put(Hints.CS_FACTORY, csFactory);
 		tempHints.put(Hints.CRS_FACTORY, crsFactory);
 		tempHints.put(Hints.MATH_TRANSFORM_FACTORY, mtFactory);
-		factories = new FactoryGroup(tempHints);
+		factories = ReferencingFactoryContainer.instance(tempHints);
 	}
 
 	/**

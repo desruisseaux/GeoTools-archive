@@ -80,12 +80,8 @@ public class GeoTiffReaderTest extends TestCase {
 		final File files[] = file.listFiles();
 		final int numFiles = files.length;
 		final AbstractGridFormat format = new GeoTiffFormat();
-		StringBuffer buffer;
-		GridCoverage2D coverage;
-		GridCoverageReader reader;
-		IIOMetadataDumper iIOMetadataDumper;
 		for (int i = 0; i < numFiles; i++) {
-			buffer = new StringBuffer();
+			StringBuffer buffer = new StringBuffer();
 			final String path = files[i].getAbsolutePath().toLowerCase();
 			if (!path.endsWith("tif") && !path.endsWith("tiff"))
 				continue;
@@ -102,13 +98,13 @@ public class GeoTiffReaderTest extends TestCase {
 				buffer.append("ACCEPTED").append("\n");
 
 				// getting a reader
-				reader = new GeoTiffReader(o, new Hints(
+				GeoTiffReader reader = new GeoTiffReader(o, new Hints(
 						Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE));
 
 				if (reader != null) {
 
 					// reading the coverage
-					coverage = (GridCoverage2D) reader.read(null);
+					GridCoverage2D coverage = (GridCoverage2D) reader.read(null);
 
 					// Crs and envelope
 					if (TestData.isInteractiveTest()) {
@@ -119,7 +115,7 @@ public class GeoTiffReaderTest extends TestCase {
 								coverage.getEnvelope().toString()).append("\n");
 					}
 					// display metadata
-					iIOMetadataDumper = new IIOMetadataDumper(
+					IIOMetadataDumper iIOMetadataDumper = new IIOMetadataDumper(
 							((GeoTiffReader) reader).getMetadata()
 									.getRootNode());
 					buffer.append("TIFF metadata: ").append(
