@@ -311,16 +311,6 @@ public class SLDStyleFactory {
                 }
             }
         }
-        //DJB: with the Environmental variables, we can have a large number of symbolizers
-        //    comming through here.  So, top it at 10,000 instead of having java's GC handle
-        //    the weakhash for us.
-        // also read the weakHashMap javadoc, we maybe using it a bit wrong!
-        
-        if (staticSymbolizers.size() > 10000)
-        	staticSymbolizers = new WeakHashMap();
-        if (dynamicSymbolizers.size() > 10000)
-        	dynamicSymbolizers = new WeakHashMap();
-        
         return style;
     }
 
