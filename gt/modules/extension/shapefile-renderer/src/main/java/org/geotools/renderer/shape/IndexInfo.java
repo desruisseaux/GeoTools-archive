@@ -109,14 +109,12 @@ public class IndexInfo {
         Collection tmp = null;
 
         try {
-            if ((qtree != null) && !bbox.contains(qtree.getRoot().getBounds())) {
-                tmp = qtree.search(bbox);
-                
-                if( tmp!=null && !tmp.isEmpty())
-                	return tmp;
-        }
-            if( qtree!=null )
-            	qtree.close();
+            // old code was checking the resulting collection wasn't empty and it that
+            // case it closed the qtree straight away. qtree gets closed anyways with
+            // this code path, but it's quite a bit faster because it avoid one disk access
+            // just to check the collection is not empty
+            if ((qtree != null) && !bbox.contains(qtree.getRoot().getBounds()))
+                return qtree.search(bbox);
         }catch (Exception e) {
         	ShapefileRenderer.LOGGER.warning(e.getLocalizedMessage());
 		}
