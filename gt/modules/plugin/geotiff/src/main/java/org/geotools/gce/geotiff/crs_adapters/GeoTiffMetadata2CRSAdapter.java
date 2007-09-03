@@ -73,7 +73,7 @@ import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
-import org.geotools.util.LRULinkedHashMap;
+import org.geotools.util.SoftValueHashMap;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchIdentifierException;
@@ -132,7 +132,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 			.getLogger("org.geotools.gce.geotiff.crs_adapters");
 
 	/** code from GeoTIFFWritingUtilities spec section 6.3.2.4. */
-	private static final String PM_Greenwich = "8901";
+	private static PrimeMeridian PM_Greenwich;
 
 	/**
 	 * This {@link AffineTransform} can be used when the underlying geotiff
@@ -171,7 +171,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 	 * The pool of cached objects.
 	 */
 	private final static Map pool = Collections
-			.synchronizedMap(new LRULinkedHashMap(50, 0.75f, true, 100));
+			.synchronizedMap(new SoftValueHashMap(DEFAULT_MAX));
 
 	/** Group Factory for creating {@link ProjectedCRS} objects. */
 	private final FactoryGroup factories;
@@ -610,7 +610,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 		if (projectedCrsName == null)
 			projectedCrsName = "unnamed".intern();
 		else
-			projectedCrsName=cleanName(projectedCrsName);
+			projectedCrsName = cleanName(projectedCrsName);
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -742,15 +742,15 @@ public final class GeoTiffMetadata2CRSAdapter {
 		// $
 		int index = tiffName.lastIndexOf('$');
 		if (index != -1)
-			tiffName= tiffName.substring(index + 1);
+			tiffName = tiffName.substring(index + 1);
 		// \n
 		index = tiffName.lastIndexOf('\n');
 		if (index != -1)
-			tiffName= tiffName.substring(index + 1);
+			tiffName = tiffName.substring(index + 1);
 		// \r
 		index = tiffName.lastIndexOf('\r');
 		if (index != -1)
-			tiffName= tiffName.substring(index + 1);
+			tiffName = tiffName.substring(index + 1);
 		return tiffName;
 	}
 
@@ -813,7 +813,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 						final String pmValue = metadata
 								.getGeoKey(GeoTiffGCSCodes.GeogPrimeMeridianLongGeoKey);
 						final double pmNumeric = Double.parseDouble(pmValue);
-						// is it greewich?
+						// is it Greenwich?
 						if (pmNumeric == 0)
 							return DefaultPrimeMeridian.GREENWICH;
 						final Map props = new HashMap();
@@ -833,8 +833,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 							+ pmCode);
 				}
 			} else {
-				pm = this.allAuthoritiesFactory
-						.createPrimeMeridian(PM_Greenwich);
+				pm = DefaultPrimeMeridian.GREENWICH;
 			}
 		} catch (FactoryException fe) {
 			final IOException io = new GeoTiffException(metadata, fe
@@ -1575,7 +1574,8 @@ public final class GeoTiffMetadata2CRSAdapter {
 			origin = metadata
 					.getGeoKey(GeoTiffPCSCodes.ProjNatOriginLongGeoKey);
 		if (origin == null)
-			origin = metadata.getGeoKey(GeoTiffPCSCodes.ProjFalseOriginLongGeoKey);
+			origin = metadata
+					.getGeoKey(GeoTiffPCSCodes.ProjFalseOriginLongGeoKey);
 		if (origin == null)
 			origin = metadata
 					.getGeoKey(GeoTiffPCSCodes.ProjFalseNorthingGeoKey);
@@ -1599,7 +1599,8 @@ public final class GeoTiffMetadata2CRSAdapter {
 		if (origin == null)
 			origin = metadata.getGeoKey(GeoTiffPCSCodes.ProjNatOriginLatGeoKey);
 		if (origin == null)
-			origin = metadata.getGeoKey(GeoTiffPCSCodes.ProjFalseOriginLatGeoKey);
+			origin = metadata
+					.getGeoKey(GeoTiffPCSCodes.ProjFalseOriginLatGeoKey);
 		if (origin == null)
 			return 0.0;
 
@@ -1703,8 +1704,6 @@ public final class GeoTiffMetadata2CRSAdapter {
 			if (object == null) {
 				object = new GeoTiffMetadata2CRSAdapter((Hints) key);
 				put(key, object);
-				return object;
-
 			}
 			return object;
 		}

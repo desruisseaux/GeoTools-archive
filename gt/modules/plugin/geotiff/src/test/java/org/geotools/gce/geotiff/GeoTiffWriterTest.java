@@ -39,7 +39,7 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.coverage.grid.GridRange;
@@ -471,7 +471,7 @@ public class GeoTiffWriterTest extends TestCase {
 				.getCoordinateReferenceSystem2D();
 		assertTrue(
 				"Source and Target coordinate reference systems do not match",
-				CRSUtilities.equalsIgnoreMetadata(sourceCRS, targetCRS));
+				CRS.equalsIgnoreMetadata(sourceCRS, targetCRS));
 		assertEquals("Read-back and Cropped envelopes do not match", cropped
 				.getEnvelope(), croppedEnvelope);
 

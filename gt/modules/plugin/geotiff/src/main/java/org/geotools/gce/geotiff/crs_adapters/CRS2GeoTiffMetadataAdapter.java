@@ -19,7 +19,6 @@ import java.lang.ref.Reference;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,14 +43,14 @@ import org.geotools.referencing.operation.projection.MapProjection;
 import org.geotools.referencing.operation.projection.Mercator;
 import org.geotools.referencing.operation.projection.ObliqueMercator;
 import org.geotools.referencing.operation.projection.Orthographic;
-import org.geotools.referencing.operation.projection.Stereographic;
 import org.geotools.referencing.operation.projection.PolarStereographic;
+import org.geotools.referencing.operation.projection.Stereographic;
 import org.geotools.referencing.operation.projection.TransverseMercator;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
-import org.geotools.util.LRULinkedHashMap;
+import org.geotools.util.SoftValueHashMap;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.ParameterValueGroup;
@@ -78,7 +77,7 @@ import org.opengis.referencing.operation.OperationMethod;
  * would allow to avoid parsing the same {@link CoordinateReferenceSystem} more
  * than once.
  * 
- * @author simone giannecchini
+ * @author Simone Giannecchini
  * 
  * @since 2.2
  * 
@@ -95,7 +94,7 @@ public final class CRS2GeoTiffMetadataAdapter {
 	 * The pool of cached objects.
 	 */
 	private final static Map pool = Collections
-			.synchronizedMap(new LRULinkedHashMap(50, 0.75f, true, 100));
+			.synchronizedMap(new SoftValueHashMap(DEFAULT_MAX));
 
 	/**
 	 * The {@link CoordinateReferenceSystem} to be get the metadata from:
@@ -117,8 +116,6 @@ public final class CRS2GeoTiffMetadataAdapter {
 				object = new CRS2GeoTiffMetadataAdapter(
 						(CoordinateReferenceSystem) key);
 				put(key, object);
-				return object;
-
 			}
 			return object;
 		}

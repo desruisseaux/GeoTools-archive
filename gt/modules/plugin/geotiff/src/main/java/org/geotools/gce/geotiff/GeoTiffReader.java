@@ -63,17 +63,17 @@ import org.geotools.gce.geotiff.IIOMetadataAdpaters.GeoTiffIIOMetadataDecoder;
 import org.geotools.gce.geotiff.crs_adapters.GeoTiffMetadata2CRSAdapter;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.Parameter;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
-import org.geotools.resources.CRSUtilities;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.geometry.Envelope;
-import org.opengis.geometry.MismatchedDimensionException;
 
 import com.sun.media.imageioimpl.plugins.tiff.TIFFImageReaderSpi;
 
@@ -285,7 +285,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		final AffineTransform tempTransform = new AffineTransform(
 				(AffineTransform) raster2Model);
 		tempTransform.translate(-0.5, -0.5);
-		originalEnvelope = CRSUtilities.transform(ProjectiveTransform
+		originalEnvelope = CRS.transform(ProjectiveTransform
 				.create(tempTransform), new GeneralEnvelope(actualDim));
 		originalEnvelope.setCoordinateReferenceSystem(crs);
 
