@@ -20,6 +20,7 @@ import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.security.acl.LastOwnerException;
 import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
@@ -209,12 +210,19 @@ public class IndexedFidReader implements FIDReader {
      *
      * @throws IOException
      */
+    private long lastRecNo = Long.MIN_VALUE;
+    private long bufferStart = Long.MIN_VALUE;
     public void goTo(long recno) throws IOException {
         if (readChannel instanceof FileChannel) {
-            FileChannel fc = (FileChannel) readChannel;
-            fc.position(IndexedFidWriter.HEADER_SIZE + (recno * IndexedFidWriter.RECORD_SIZE));
-            buffer.limit(buffer.capacity());
-            buffer.position(buffer.limit());
+            long newPosition = IndexedFidWriter.HEADER_SIZE + (recno * IndexedFidWriter.RECORD_SIZE);
+            if(newPosition >= bufferStart + buffer.limit() || newPosition < bufferStart) {
+                FileChannel fc = (FileChannel) readChannel;
+                fc.position(newPosition);
+                buffer.limit(buffer.capacity());
+                buffer.position(buffer.limit());
+            } else {
+                buffer.position((int) (newPosition - bufferStart));
+            }
         } else {
             throw new IOException(
                 "Read Channel is not a File Channel so this is not possible.");
@@ -244,6 +252,8 @@ public class IndexedFidReader implements FIDReader {
         if (buffer.position() == buffer.limit()) {
             buffer.position(0);
 
+            FileChannel fc = (FileChannel) readChannel;
+            bufferStart = fc.position();
             int read = ShapefileReader.fill(buffer, readChannel);
 
             if (read != 0) {
