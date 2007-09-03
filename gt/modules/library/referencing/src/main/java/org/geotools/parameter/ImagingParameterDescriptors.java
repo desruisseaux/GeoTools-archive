@@ -389,7 +389,7 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
     {
         /*
          * Creates the list of JAI descriptor to be replaced by user-supplied parameters.
-         * Note that this map will be modified again in the remainding of this method.
+         * Note that this map will be modified again in the remaining of this method.
          */
         ensureNonNull("descriptor", descriptor);
         final Map/*<String,ParameterDescriptor>*/ replacements = new LinkedHashMap();

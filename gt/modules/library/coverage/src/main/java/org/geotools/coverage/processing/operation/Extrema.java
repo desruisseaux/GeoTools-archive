@@ -24,14 +24,11 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.media.jai.JAI;
-import javax.media.jai.OperationDescriptor;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.operator.ExtremaDescriptor;
 
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.processing.AbstractOperationJAIDecorator;
 import org.geotools.coverage.processing.AbstractStatisticsOperationJAI;
-import org.geotools.parameter.ImagingParameterDescriptors;
 import org.opengis.coverage.processing.OperationNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -99,30 +96,11 @@ public class Extrema extends AbstractStatisticsOperationJAI {
 	 * Constructs a default {@code "Extrema"} operation.
 	 */
 	public Extrema() throws OperationNotFoundException {
-		super(getOperationDescriptor("Extrema"), prepareParams("Extrema"));
+		super(getOperationDescriptor("Extrema"));
 
 	}
 
-	/**
-	 * Constructs a default {@code "Extrema"} operation.
-	 * @param operationDescriptor
-	 * @param decorator
-	 */
-	public Extrema(OperationDescriptor operationDescriptor,
-			ImagingParameterDescriptors decorator) {
-		super(operationDescriptor, decorator);
 
-	}
-
-	public Extrema(OperationDescriptor operation) {
-		super(operation);
-
-	}
-
-	public Extrema(String name) {
-		super(name);
-		
-	}
 
 	/**
 	 * This operation MUST be performed on the geophysics data for this

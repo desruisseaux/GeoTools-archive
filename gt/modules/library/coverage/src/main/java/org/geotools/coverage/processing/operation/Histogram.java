@@ -23,14 +23,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.media.jai.JAI;
-import javax.media.jai.OperationDescriptor;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.operator.HistogramDescriptor;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.processing.AbstractStatisticsOperationJAI;
-import org.geotools.coverage.processing.OperationJAI;
-import org.geotools.parameter.ImagingParameterDescriptors;
 import org.opengis.coverage.processing.OperationNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -76,19 +73,7 @@ import org.opengis.util.InternationalString;
  */
 public class Histogram extends AbstractStatisticsOperationJAI {
 
-	public Histogram(OperationDescriptor operationDescriptor,
-			ImagingParameterDescriptors decorator) {
-		super(operationDescriptor, decorator);
-	}
 
-	public Histogram(OperationDescriptor operation) {
-		super(operation);
-	}
-
-	public Histogram(String name) {
-		super(name);
-		
-	}
 
 	/**
 	 * 
@@ -107,7 +92,7 @@ public class Histogram extends AbstractStatisticsOperationJAI {
 	 * @throws OperationNotFoundException
 	 */
 	public Histogram() throws OperationNotFoundException {
-		super(getOperationDescriptor("Histogram"), prepareParams("Histogram"));
+		super(getOperationDescriptor("Histogram"));
 	}
 
 	/**

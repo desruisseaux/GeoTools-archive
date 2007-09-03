@@ -20,9 +20,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Rectangle2D;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.media.jai.JAI;
@@ -30,6 +29,7 @@ import javax.media.jai.OperationDescriptor;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.ROIShape;
 import javax.media.jai.StatisticsOpImage;
+import javax.media.jai.registry.RenderedRegistryMode;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
@@ -42,6 +42,7 @@ import org.geotools.parameter.ImagingParameterDescriptors;
 import org.geotools.parameter.ImagingParameters;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.opengis.metadata.spatial.PixelOrientation;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -56,14 +57,15 @@ import com.vividsolutions.jts.geom.Polygon;
 /**
  * This class is the root class for the Statistics operations based on
  * {@link JAI}'s {@link StatisticsOpImage} like Extrema and Histogram. It
- * provides basica capabilities for management of geospatial parameters like
+ * provides basic capabilities for management of geospatial parameters like
  * {@link javax.media.jai.ROI}s and subsampling factors.
  * 
  * @author Simone Giannecchini
+ * @since 2.4.x
  * 
  */
 public abstract class AbstractStatisticsOperationJAI extends
-		AbstractOperationJAIDecorator {
+		OperationJAI {
 	//
 	/** {@link Logger} for this class. */
 	public final static Logger LOGGER = Logger
@@ -73,7 +75,7 @@ public abstract class AbstractStatisticsOperationJAI extends
 	 * The parameter descriptor for the SPATIAL_SUBSAMPLING_X
 	 */
 	public static final ParameterDescriptor SPATIAL_SUBSAMPLING_X = new DefaultParameterDescriptor(
-			Citations.OGC, "xPeriod", Double.class, // Value class (mandatory)
+			Citations.JAI, "xPeriod", Double.class, // Value class (mandatory)
 			null, // Array of valid values
 			null, // Default value
 			null, // Minimal value
@@ -85,7 +87,7 @@ public abstract class AbstractStatisticsOperationJAI extends
 	 * The parameter descriptor for the SPATIAL_SUBSAMPLING_Y
 	 */
 	public static final ParameterDescriptor SPATIAL_SUBSAMPLING_Y = new DefaultParameterDescriptor(
-			Citations.OGC, "yPeriod", Double.class, // Value class (mandatory)
+			Citations.JAI, "yPeriod", Double.class, // Value class (mandatory)
 			null, // Array of valid values
 			null, // Default value
 			null, // Minimal value
@@ -97,7 +99,7 @@ public abstract class AbstractStatisticsOperationJAI extends
 	 * The parameter descriptor for the coordinate reference system.
 	 */
 	public static final ParameterDescriptor ROI = new DefaultParameterDescriptor(
-			Citations.OGC, "roi", Polygon.class, // Value class (mandatory)
+			Citations.JAI, "roi", Polygon.class, // Value class (mandatory)
 			null, // Array of valid values
 			null, // Default value
 			null, // Minimal value
@@ -105,35 +107,60 @@ public abstract class AbstractStatisticsOperationJAI extends
 			null, // Unit of measure
 			true);
 
+	private static Set REPLACED_DESCRIPTORS;
+
 	static {
-		final Map replacedDescriptors = new HashMap(2);
-		replacedDescriptors.put("xPeriod", SPATIAL_SUBSAMPLING_X);
-		replacedDescriptors.put("yPeriod", SPATIAL_SUBSAMPLING_Y);
-		replacedDescriptors.put("roi", ROI);
-		REPLACED_DESCRIPTORS = Collections.unmodifiableMap(replacedDescriptors);
+		final Set replacedDescriptors = new HashSet(3,1.0f);
+		replacedDescriptors.add( SPATIAL_SUBSAMPLING_X);
+		replacedDescriptors.add( SPATIAL_SUBSAMPLING_Y);
+		replacedDescriptors.add( ROI);
+		REPLACED_DESCRIPTORS = Collections.unmodifiableSet(replacedDescriptors);
 	}
 
 	/**
-	 * @param operation
-	 */
-	public AbstractStatisticsOperationJAI(OperationDescriptor operation) {
-		super(operation);
-	}
-
-	/**
+	 * Constructor for {@link AbstractStatisticsOperationJAI}.
+	 * 
 	 * @param operationDescriptor
-	 * @param decorator
+	 *            {@link OperationDescriptor} for the underlying JAI operation.
+	 */
+	public AbstractStatisticsOperationJAI(OperationDescriptor operationDescriptor) {
+		super(operationDescriptor, new ImagingParameterDescriptors(
+				getOperationDescriptor(operationDescriptor.getName()),
+				REPLACED_DESCRIPTORS));
+	}
+
+	/**
+	 * Constructor for {@link AbstractStatisticsOperationJAI}.
+	 * 
+	 * @param operationDescriptor
+	 *            {@link OperationDescriptor} for the underlying JAI operation.
+	 * @param replacements
+	 *            {@link ImagingParameterDescriptors} that should replace the
+	 *            correspondent {@link ImagingParameters} in order to change the
+	 *            default behaviour they have inside JAI.
 	 */
 	public AbstractStatisticsOperationJAI(
 			OperationDescriptor operationDescriptor,
-			ImagingParameterDescriptors decorator) {
-		super(operationDescriptor, decorator);
+			ImagingParameterDescriptors replacements) {
+		super(operationDescriptor, new ImagingParameterDescriptors(
+				ImagingParameterDescriptors.properties(operationDescriptor),
+				operationDescriptor, RenderedRegistryMode.MODE_NAME,
+				ImagingParameterDescriptors.DEFAULT_SOURCE_TYPE_MAP, REPLACED_DESCRIPTORS));
 	}
-
+    /**
+	 * Constructor for {@link AbstractStatisticsOperationJAI}.
+	 * @param name of the underlying JAI operation.
+	 */
 	public AbstractStatisticsOperationJAI(String name) {
-		super(name);
+		super(getOperationDescriptor(name),new ImagingParameterDescriptors(
+				getOperationDescriptor(name),
+				new HashSet(REPLACED_DESCRIPTORS)));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.geotools.coverage.processing.OperationJAI#prepareParameters(org.opengis.parameter.ParameterValueGroup)
+	 */
 	protected ParameterBlockJAI prepareParameters(ParameterValueGroup parameters) {
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -148,7 +175,7 @@ public abstract class AbstractStatisticsOperationJAI extends
 			// /////////////////////////////////////////////////////////////////////
 			//
 			//
-			// Now trancode the parameters as needed by this operation.
+			// Now transcode the parameters as needed by this operation.
 			//
 			//
 			// ///////////////////////////////////////////////////////////////////
@@ -156,21 +183,25 @@ public abstract class AbstractStatisticsOperationJAI extends
 			final GridCoverage2D source = (GridCoverage2D) parameters
 					.parameter(operation.getSourceNames()[PRIMARY_SOURCE_INDEX])
 					.getValue();
-			final AffineTransform gridToWorldTransform = new AffineTransform(
+			final AffineTransform gridToWorldTransformCorrected = new AffineTransform(
 					(AffineTransform) ((GridGeometry2D) source
-							.getGridGeometry()).getGridToCRS2D());
-			gridToWorldTransform.translate(-0.5, -0.5);
+							.getGridGeometry())
+							.getGridToCRS2D(PixelOrientation.UPPER_LEFT));
 			final MathTransform worldToGridTransform;
 			try {
 				worldToGridTransform = ProjectiveTransform
-						.create(gridToWorldTransform.createInverse());
+						.create(gridToWorldTransformCorrected.createInverse());
 			} catch (NoninvertibleTransformException e) {
-				if (LOGGER.isLoggable(Level.WARNING))
-					LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-				// fallback block settings in case something bad happened
-				block.setParameter("xPeriod", new Integer(1));
-				block.setParameter("yPeriod", new Integer(1));
-				return block;
+				// //
+				//
+				// Something bad happened here, namely the transformation to go
+				// from grid to world was not invertible. Let's wrap and
+				// propagate the error.
+				//
+				// //
+				final CoverageProcessingException ce = new CoverageProcessingException(
+						e);
+				throw ce;
 			}
 
 			// /////////////////////////////////////////////////////////////////////
@@ -238,10 +269,15 @@ public abstract class AbstractStatisticsOperationJAI extends
 			}
 			return block;
 		} catch (Exception e) {
-			if (LOGGER.isLoggable(Level.WARNING))
-				LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-			// return defaults
-			return block;
+			// //
+			//
+			// Something bad happened here Let's wrap and
+			// propagate the error.
+			//
+			// //
+			final CoverageProcessingException ce = new CoverageProcessingException(
+					e);
+			throw ce;
 		}
 	}
 
