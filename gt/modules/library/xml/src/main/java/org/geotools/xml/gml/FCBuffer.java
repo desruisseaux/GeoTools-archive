@@ -147,17 +147,17 @@ public class FCBuffer extends Thread implements FeatureReader {
         
         synchronized (this) {
             notify();
+        
+
+	        features[end] = f;
+	        end++;
+	
+	        if (end == features.length) {
+	            end = 0;
+	        }
+	
+	        size++;
         }
-
-        features[end] = f;
-        end++;
-
-        if (end == features.length) {
-            end = 0;
-        }
-
-        size++;
-
         return true;
     }
 
@@ -250,19 +250,17 @@ public class FCBuffer extends Thread implements FeatureReader {
             throw e;
         }
 
-        size--;
-
-        Feature f = features[head++];
-
-
+        Feature f = null;
         synchronized (this) {
+	        size--;
+	         f = features[head++];
             notify();
-        }
         
-        if (head == features.length) {
-            head = 0;
+        
+	        if (head == features.length) {
+	            head = 0;
+	        }
         }
-
         return f;
     }
 
