@@ -36,7 +36,7 @@ import org.apache.xerces.jaxp.SAXParserFactoryImpl;
 import org.apache.xerces.parsers.SAXParser;
 import org.eclipse.xsd.XSDSchema;
 import org.geotools.xml.impl.ParserHandler;
-import org.geotools.xs.bindings.XS;
+import org.geotools.xs.XS;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 

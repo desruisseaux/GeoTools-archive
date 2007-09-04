@@ -24,15 +24,8 @@ import org.geotools.xml.Configuration;
 
 public class TestConfiguration extends Configuration {
     public TestConfiguration() {
+        super(TEST.getInstance());
         addDependency(new GMLConfiguration());
-    }
-
-    public String getNamespaceURI() {
-        return TEST.NAMESPACE;
-    }
-
-    public String getSchemaFileURL() {
-        return getClass().getResource("test.xsd").toString();
     }
 
     public BindingConfiguration getBindingConfiguration() {

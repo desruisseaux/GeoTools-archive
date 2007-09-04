@@ -41,7 +41,7 @@ import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Parser;
 import org.geotools.xml.SchemaIndex;
 import org.geotools.xml.Schemas;
-import org.geotools.xs.bindings.XS;
+import org.geotools.xs.XS;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.defaults.DefaultPicoContainer;
 import org.xml.sax.Attributes;
@@ -297,7 +297,7 @@ public class ParserHandler extends DefaultHandler {
                 }
             } else {
                 //could not find a schemaLocation attribute, use the locators
-                //look for schmea with locators
+                //look for schema with locators
                 for (int i = 0; i < locators.length; i++) {
                     XSDSchema schema = locators[i].locateSchema(null, uri,
                             null, null);
@@ -509,7 +509,7 @@ public class ParserHandler extends DefaultHandler {
     public void endDocument() throws SAXException {
         //only the document handler should be left on the stack
         documentHandler = (DocumentHandler) handlers.pop();
-
+        schemas = null;
         synchronized (this) {
             notifyAll();
         }

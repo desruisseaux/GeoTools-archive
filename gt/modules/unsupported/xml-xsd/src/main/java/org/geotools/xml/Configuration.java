@@ -15,6 +15,7 @@
  */
 package org.geotools.xml;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -199,17 +200,15 @@ import org.picocontainer.defaults.DuplicateComponentKeyRegistrationException;
  * @see org.geotools.xml.BindingConfiguration
  */
 public abstract class Configuration {
-	
+	/**
+	 * XSD instance
+	 */
+    protected XSD xsd;
+    
 	/**
 	 * List of configurations depended on.
 	 */
 	private List dependencies;
-	
-    /**
-     * Holds the schema locator instance for this configuration, which
-     * in turn caches the parsed XSDSchema
-     */
-    private XSDSchemaLocator schemaLocator;
     
     /**
      * List of parser properties.
@@ -224,7 +223,8 @@ public abstract class Configuration {
 	 * </p>
 	 *
 	 */
-	public Configuration() {
+	public Configuration(XSD xsd) {
+	    this.xsd = xsd;
 		dependencies = new ArrayList();
 		
 		//bootstrap check
@@ -235,6 +235,13 @@ public abstract class Configuration {
 		properties = new ArrayList();
 	}
 	
+	/**
+	 * The XSD instance representing the schema for which the schema works 
+	 * against.
+	 */
+	public XSD getXSD() {
+        return xsd;
+    }
 	/**
 	 * 	@return a list of direct dependencies of the configuration.
 	 * 
@@ -301,7 +308,9 @@ public abstract class Configuration {
 	/**
 	 * @return The namespace of the configuration schema.
 	 */
-	abstract public String getNamespaceURI();
+	public final String getNamespaceURI() {
+	    return getXSD().getNamespaceURI();
+	}
 	
 	/**
 	 * Returns the url to the file definiing hte schema.
@@ -309,9 +318,11 @@ public abstract class Configuration {
 	 * For schema which are defined by multiple files, this method should return the base schema 
 	 * which includes all other files that define the schema.
 	 * </p>
-	 * TODO: rename this to getSchemaLocation()
+	 * @deprecated use {@link XSD#getSchemaLocation()}.
 	 */
-	abstract public String getSchemaFileURL();
+	public final String getSchemaFileURL() {
+	    return getXSD().getSchemaLocation(); 
+	}
 	
 	/**
 	 * @return The binding set for types, elements, attributes of the configuration schema.
@@ -326,9 +337,10 @@ public abstract class Configuration {
 	 * implemntation returns <code>null</code>
 	 * </p>
 	 * @return The schema location resolver, or <code>null</code>
+	 * 
 	 */
 	public XSDSchemaLocationResolver getSchemaLocationResolver() {
-		return new SchemaLocationResolver( this );
+		return new SchemaLocationResolver( xsd );
 	}
 	
 	/**
@@ -340,37 +352,26 @@ public abstract class Configuration {
 	 * may return <code>null</code> to indicate that no such locator should be used.
 	 * </p>
 	 * @return The schema locator, or <code>null</code>
-	 */
-	public XSDSchemaLocator getSchemaLocator() {
-        if(schemaLocator == null){
-            synchronized(this){
-                if(schemaLocator == null){
-                    schemaLocator = createSchemaLocator();
-                }
-            }
-        }
-        return schemaLocator;
-	}
-	
-	/**
-	 * Template method for creating a new instance of {@link XSDSchemaLocator}.
-	 * <p>
-	 * Subclasses may override this method, the default implementation returns 
-	 * a new instance of {@link SchemaLocator}.
-	 * </p>
 	 * 
 	 */
-	protected XSDSchemaLocator createSchemaLocator() {
-		return new SchemaLocator( this );
+	public XSDSchemaLocator getSchemaLocator() {
+        return new SchemaLocator(xsd);
 	}
+	
 	
 	/**
 	 * Convenience method for creating an instance of the schema for this configuration.
 	 * 
 	 * @return The schema for this configuration.
+	 * @deprecated use {@link #getXSD()} and {@link XSD#getSchema()}.
 	 */
 	public XSDSchema schema() {
-		return getSchemaLocator().locateSchema( null, getNamespaceURI(), null, null );
+	    try {
+            return getXSD().getSchema();
+        } 
+	    catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 	}
 	
 	/**

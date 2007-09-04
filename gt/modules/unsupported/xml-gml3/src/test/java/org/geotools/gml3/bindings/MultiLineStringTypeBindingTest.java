@@ -17,6 +17,7 @@ package org.geotools.gml3.bindings;
 
 import org.w3c.dom.Document;
 import com.vividsolutions.jts.geom.MultiLineString;
+import org.geotools.gml3.GML;
 import org.geotools.gml3.GML3TestSupport;
 
 

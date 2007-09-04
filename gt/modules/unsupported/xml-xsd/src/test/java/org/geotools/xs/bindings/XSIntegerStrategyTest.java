@@ -20,6 +20,7 @@ import java.math.BigInteger;
 import javax.xml.namespace.QName;
 
 import org.geotools.xs.TestSchema;
+import org.geotools.xs.XS;
 
 
 public class XSIntegerStrategyTest extends TestSchema {

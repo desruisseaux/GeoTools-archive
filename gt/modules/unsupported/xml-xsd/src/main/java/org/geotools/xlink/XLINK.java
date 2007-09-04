@@ -13,9 +13,11 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.xlink.bindings;
+package org.geotools.xlink;
 
 import javax.xml.namespace.QName;
+
+import org.geotools.xml.XSD;
 
 
 /**
@@ -24,7 +26,38 @@ import javax.xml.namespace.QName;
  *
  * @generated
  */
-public interface XLINK {
+public final class XLINK extends XSD {
+    
+    /**
+     * singleton instance
+     */
+    private static XLINK instance = new XLINK();
+    /**
+     * The single instance.
+     */
+    public static XLINK getInstance() {
+        return instance;
+    }
+    
+    /**
+     * Private constructor.
+     */
+    private XLINK() {};
+    
+    /**
+     * Returns 'http://www.w3.org/1999/xlink'
+     */
+    public String getNamespaceURI() {
+        return NAMESPACE;
+    }
+    
+    /**
+     * Returns location of 'xlinks.xsd'.
+     */
+    public String getSchemaLocation() {
+        return getClass().getResource("xlinks.xsd").toString();
+    }
+    
     /** @generated */
     public static final String NAMESPACE = "http://www.w3.org/1999/xlink";
 

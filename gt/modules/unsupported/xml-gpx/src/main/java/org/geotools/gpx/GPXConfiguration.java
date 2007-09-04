@@ -13,10 +13,11 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.gpx.binding;
+package org.geotools.gpx;
 
 import org.picocontainer.MutablePicoContainer;
 import org.geotools.gpx.bean.ObjectFactory;
+import org.geotools.gpx.binding.GPXBindingConfiguration;
 import org.geotools.xml.BindingConfiguration;
 import org.geotools.xml.Configuration;
 
@@ -33,30 +34,11 @@ public class GPXConfiguration extends Configuration {
      * @generated
      */
     public GPXConfiguration() {
-        super();
-
-        //TODO: add dependencies here
+        super(GPX.getInstance());
     }
 
-    @Override
     protected void configureContext(MutablePicoContainer container) {
         container.registerComponentImplementation(ObjectFactory.class);
-    }
-
-    /**
-     * @return the schema namespace uri: http://www.topografix.com/GPX/1/1.
-     * @generated
-     */
-    public String getNamespaceURI() {
-        return GPX.NAMESPACE;
-    }
-
-    /**
-     * @return the uri to the the gpx.xsd .
-     * @generated
-     */
-    public String getSchemaFileURL() {
-        return getSchemaLocationResolver().resolveSchemaLocation(null, getNamespaceURI(), "gpx.xsd");
     }
 
     /**

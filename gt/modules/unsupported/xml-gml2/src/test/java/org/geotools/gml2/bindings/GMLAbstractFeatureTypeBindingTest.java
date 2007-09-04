@@ -19,6 +19,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import com.vividsolutions.jts.geom.Point;
 import org.geotools.feature.Feature;
+import org.geotools.gml2.GML;
 import org.geotools.gml2.TEST;
 import org.geotools.gml2.TestConfiguration;
 import org.geotools.xml.Binding;

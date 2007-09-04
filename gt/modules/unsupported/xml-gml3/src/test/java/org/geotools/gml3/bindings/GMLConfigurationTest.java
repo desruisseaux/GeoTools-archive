@@ -22,6 +22,7 @@ import org.picocontainer.PicoContainer;
 import org.picocontainer.defaults.DefaultPicoContainer;
 import java.lang.reflect.Constructor;
 import java.util.Iterator;
+import org.geotools.gml3.GML;
 import org.geotools.gml3.GMLConfiguration;
 import org.geotools.xml.Binding;
 

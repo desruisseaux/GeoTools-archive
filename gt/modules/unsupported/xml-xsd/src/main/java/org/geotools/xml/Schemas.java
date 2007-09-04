@@ -1115,6 +1115,7 @@ public class Schemas {
                 }
             }
 
+            LOGGER.fine( "Could not locate schema for: " + rawSchemaLocationURI + "." );
             return null;
         }
     }
@@ -1161,7 +1162,7 @@ public class Schemas {
                 }
             }
 
-            LOGGER.warning( "Could not resolve schema location: " + rawSchemaLocationURI + " to physical location." );	
+            LOGGER.fine( "Could not resolve schema location: " + rawSchemaLocationURI + " to physical location." );	
             return null;
         }
     }

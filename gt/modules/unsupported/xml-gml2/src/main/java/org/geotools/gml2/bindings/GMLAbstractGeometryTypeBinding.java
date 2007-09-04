@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Geometry;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.gml2.GML;
 import org.geotools.referencing.CRS;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;

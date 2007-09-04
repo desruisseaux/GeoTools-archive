@@ -19,6 +19,7 @@ import javax.xml.namespace.QName;
 
 import org.geotools.xml.InstanceComponent;
 import org.geotools.xml.SimpleBinding;
+import org.geotools.xs.XS;
 
 
 /**

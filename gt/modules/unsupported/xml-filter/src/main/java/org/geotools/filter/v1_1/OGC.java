@@ -15,7 +15,10 @@
  */
 package org.geotools.filter.v1_1;
 
+import java.util.Set;
 import javax.xml.namespace.QName;
+import org.geotools.gml3.GML;
+import org.geotools.xml.XSD;
 
 
 /**
@@ -24,7 +27,12 @@ import javax.xml.namespace.QName;
  *
  * @generated
  */
-public interface OGC {
+public final class OGC extends XSD {
+    /**
+     * singleton instance.
+     */
+    private static OGC instance = new OGC();
+
     /** @generated */
     public static final String NAMESPACE = "http://www.opengis.net/ogc";
 
@@ -349,6 +357,37 @@ public interface OGC {
 
     /** @generated */
     public static final QName Within = new QName("http://www.opengis.net/ogc", "Within");
+
+    /**
+     * private constructor.
+     */
+    private OGC() {
+    }
+
+    /**
+     * The singleton instance.
+     */
+    public static OGC getInstance() {
+        return instance;
+    }
+
+    protected void addDependencies(Set dependencies) {
+        dependencies.add(GML.getInstance());
+    }
+
+    /**
+     * Returns 'http://www.opengis.net/ogc'.
+     */
+    public String getNamespaceURI() {
+        return NAMESPACE;
+    }
+
+    /**
+     * Returns the location of 'filter.xsd'.
+     */
+    public String getSchemaLocation() {
+        return getClass().getResource("filter.xsd").toString();
+    }
 
     /* Attributes */
 }

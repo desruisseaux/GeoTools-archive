@@ -21,7 +21,6 @@ import javax.xml.namespace.QName;
 
 import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.geotools.xml.ElementInstance;
-import org.geotools.xs.bindings.XS;
 
 
 public class TestSchemaTest extends TestSchema {

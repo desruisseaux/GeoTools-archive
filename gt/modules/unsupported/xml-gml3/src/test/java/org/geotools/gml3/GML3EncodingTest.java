@@ -44,8 +44,7 @@ public class GML3EncodingTest extends TestCase {
                 .getResourceAsStream("test.xml"));
         assertNotNull(fc);
 
-        SchemaLocator locator = new SchemaLocator(configuration);
-        XSDSchema schema = locator.locateSchema(null, TEST.NAMESPACE, null, null);
+        XSDSchema schema = TEST.getInstance().getSchema();
         assertNotNull(schema);
 
         Encoder encoder = new Encoder(configuration, schema);
@@ -98,8 +97,7 @@ public class GML3EncodingTest extends TestCase {
                 .getResourceAsStream("test.xml"));
         assertNotNull(fc);
 
-        SchemaLocator locator = new SchemaLocator(configuration);
-        XSDSchema schema = locator.locateSchema(null, TEST.NAMESPACE, null, null);
+        XSDSchema schema = TEST.getInstance().getSchema();
         assertNotNull(schema);
 
         Encoder encoder = new Encoder(configuration, schema);

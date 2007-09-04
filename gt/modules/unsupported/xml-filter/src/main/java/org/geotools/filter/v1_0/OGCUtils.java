@@ -25,7 +25,7 @@ import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
-import org.geotools.gml2.bindings.GML;
+import org.geotools.gml2.GML;
 import org.geotools.xml.Node;
 
 

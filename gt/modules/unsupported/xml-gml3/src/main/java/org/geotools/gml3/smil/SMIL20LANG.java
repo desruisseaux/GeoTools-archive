@@ -13,9 +13,12 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.gml3.bindings.smil;
+package org.geotools.gml3.smil;
 
+import java.util.Set;
 import javax.xml.namespace.QName;
+import org.geotools.xml.SchemaLocator;
+import org.geotools.xml.XSD;
 
 
 /**
@@ -24,7 +27,12 @@ import javax.xml.namespace.QName;
  *
  * @generated
  */
-public interface SMIL20LANG {
+public final class SMIL20LANG extends XSD {
+    /**
+     * singleton instance
+     */
+    private static SMIL20LANG instance = new SMIL20LANG();
+
     /** @generated */
     public static final String NAMESPACE = "http://www.w3.org/2001/SMIL20/Language";
 
@@ -60,6 +68,38 @@ public interface SMIL20LANG {
 
     /** @generated */
     public static final QName SET = new QName("http://www.w3.org/2001/SMIL20/Language", "set");
+
+    /**
+     * private constructor.
+     */
+    private SMIL20LANG() {
+    }
+
+    public static SMIL20LANG getInstance() {
+        return instance;
+    }
+
+    protected void addDependencies(Set dependencies) {
+        dependencies.add(SMIL20.getInstance());
+    }
+
+    /**
+     * Returns 'http://www.w3.org/2001/SMIL20/'.
+     */
+    public String getNamespaceURI() {
+        return NAMESPACE;
+    }
+
+    /**
+     * Returns the location of 'smil20-language.xsd'.
+     */
+    public String getSchemaLocation() {
+        return getClass().getResource("smil20-language.xsd").toString();
+    }
+
+    protected SchemaLocator createSchemaLocator() {
+        return null;
+    }
 
     /* Attributes */
 }

@@ -9,18 +9,18 @@ import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 /**
  * Resolves a physical schema location from a namespace uri.
  * <p>
- * This class works from a {@link org.geotools.xml.Configuration} which defines information about
- * the schema. 
+ * This class works from a {@link org.geotools.xml.XSD} instance from which it
+ * resolves location on disk relative to.
  * </p>
  * <p>
  * Example usage:
  *  
  * <code>
  * 	<pre>
- * 	Configuration myConfig = ...
- * 	String namespaceURI = myConfig.getNamesapceURI();
+ * 	XSD xsd = ...
+ * 	String namespaceURI = xsd.getNamesapceURI();
  * 
- * 	SchemaLocationResolver resolver = new SchemaLocationResolver( myConfig );
+ * 	SchemaLocationResolver resolver = new SchemaLocationResolver( xsd );
  * 	String schemaLocation = locator.resolveSchemaLocation( null, namespaceURI, "mySchema.xsd" ); 
  * 	</pre>
  * </code>
@@ -29,27 +29,27 @@ import org.eclipse.xsd.util.XSDSchemaLocationResolver;
  * @author Justin Deoliveira, The Open Planning Project
  *
  */
-public class SchemaLocationResolver implements XSDSchemaLocationResolver {
+public final class SchemaLocationResolver implements XSDSchemaLocationResolver {
 
 	/**
-	 * The Configuration
+	 * the xsd instance
 	 */
-	Configuration configuration;
+	protected XSD xsd;
 	
 	/**
 	 * Creates the new schema location resolver.
 	 * 
-	 * @param configuration The schema configuration
+	 * @param xsd The xsd to resolve filenames relative to.
 	 */
-	public SchemaLocationResolver( Configuration configuration ) {
-		this.configuration = configuration;
+	public SchemaLocationResolver( XSD xsd ) {
+		this.xsd = xsd;
 	}
 	
 	/**
 	 * Resolves <param>location<param> to a physical location.
 	 * <p>
 	 * Resolution is performed by stripping the filename off of <param>location</param>
-	 * and looking up a resource located in the same package as the class of the configuration.
+	 * and looking up a resource located in the same package as the xsd.
 	 * </p>
 	 */
 	public String resolveSchemaLocation( XSDSchema schema, String uri, String location ) {
@@ -65,16 +65,21 @@ public class SchemaLocationResolver implements XSDSchemaLocationResolver {
         
 
         //namespace match?
-        if ( configuration.getNamespaceURI().equals( uri )) {
+        if ( xsd.getNamespaceURI().equals( uri )) {
         	//strip off the filename and do a resource lookup
            String fileName = new File( location ).getName();
-           URL xsd = configuration.getClass().getResource( fileName );
-           if ( xsd != null ) {
-        	   return xsd.toString();
+           URL xsdLocation =  xsd.getClass().getResource( fileName );
+           if ( xsdLocation != null ) {
+        	   return xsdLocation.toString();
            }
         }
         
+        
         return null;
 	}
+	
+	public String toString() {
+       return xsd.toString();
+   }
 
 }

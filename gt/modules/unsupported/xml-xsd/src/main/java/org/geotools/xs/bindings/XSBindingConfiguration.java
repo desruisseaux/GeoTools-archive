@@ -16,6 +16,7 @@
 package org.geotools.xs.bindings;
 
 import org.geotools.xml.BindingConfiguration;
+import org.geotools.xs.XS;
 import org.picocontainer.MutablePicoContainer;
 
 

@@ -13,9 +13,12 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.gml2.bindings;
+package org.geotools.gml2;
 
+import java.util.Set;
 import javax.xml.namespace.QName;
+import org.geotools.xlink.XLINK;
+import org.geotools.xml.XSD;
 
 
 /**
@@ -24,7 +27,12 @@ import javax.xml.namespace.QName;
  *
  * @generated
  */
-public interface GML {
+public final class GML extends XSD {
+    /**
+     * singleton instance.
+     */
+    private static GML instance = new GML();
+
     /** @generated*/
     public static final String NAMESPACE = "http://www.opengis.net/gml";
 
@@ -545,4 +553,36 @@ public interface GML {
 
     /** @generated */
     public static final QName remoteSchema = new QName("http://www.opengis.net/gml", "remoteSchema");
+
+    /**
+     * Private constructor.
+     */
+    private GML() {
+    }
+
+    /**
+     * The singleton instance;
+     */
+    public static GML getInstance() {
+        return instance;
+    }
+
+    protected void addDependencies(Set dependencies) {
+        //add xlink dependency
+        dependencies.add(XLINK.getInstance());
+    }
+
+    /**
+     * Returns 'http://www.opengis.net/gml'.
+     */
+    public String getNamespaceURI() {
+        return NAMESPACE;
+    }
+
+    /**
+     * Returns The location of 'feature.xsd'.
+     */
+    public String getSchemaLocation() {
+        return getClass().getResource("feature.xsd").toString();
+    }
 }

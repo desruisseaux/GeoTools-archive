@@ -21,6 +21,7 @@ import java.net.URI;
 import javax.units.BaseUnit;
 import javax.units.Unit;
 import javax.xml.namespace.QName;
+import org.geotools.gml3.GML;
 import org.geotools.measure.Measure;
 import org.geotools.xml.*;
 

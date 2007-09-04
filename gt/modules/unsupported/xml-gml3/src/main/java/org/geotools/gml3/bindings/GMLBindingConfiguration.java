@@ -19,6 +19,7 @@ import org.picocontainer.MutablePicoContainer;
 import sun.java2d.loops.SurfaceType;
 import org.geotools.gml2.bindings.GMLCoordTypeBinding;
 import org.geotools.gml2.bindings.GMLCoordinatesTypeBinding;
+import org.geotools.gml3.GML;
 import org.geotools.xml.BindingConfiguration;
 
 

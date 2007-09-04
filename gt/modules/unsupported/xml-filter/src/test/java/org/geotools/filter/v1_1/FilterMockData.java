@@ -52,7 +52,7 @@ import org.opengis.filter.spatial.Overlaps;
 import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.gml3.bindings.GML;
+import org.geotools.gml3.GML;
 
 
 /**

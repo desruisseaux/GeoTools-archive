@@ -16,6 +16,7 @@
 package org.geotools.gml2.bindings;
 
 import com.vividsolutions.jts.geom.GeometryCollection;
+import org.geotools.gml2.GML;
 import org.geotools.xml.Binding;
 
 

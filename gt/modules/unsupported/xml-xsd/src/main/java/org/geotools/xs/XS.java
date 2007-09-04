@@ -13,9 +13,11 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.xs.bindings;
+package org.geotools.xs;
 
 import javax.xml.namespace.QName;
+
+import org.geotools.xml.XSD;
 
 
 /**
@@ -24,7 +26,33 @@ import javax.xml.namespace.QName;
  *
  * @generated
  */
-public interface XS {
+public final class XS extends XSD {
+    
+    /**
+     * singleton instance.
+     */
+    private static XS instance = new XS();
+    
+    /**
+     * The singleton instance.
+     */
+    public static XSD getInstance() {
+        return instance;
+    }
+    
+    private XS() {}
+    
+    /**
+     * Returns 'http://www.w3.org/2001/XMLSchema'.
+     */
+    public String getNamespaceURI() {
+        return NAMESPACE;
+    }
+    
+    public String getSchemaLocation() {
+        return getClass().getResource("XMLSchema.xsd").toString();
+    }
+    
     public static final String NAMESPACE = "http://www.w3.org/2001/XMLSchema";
     public static final QName ALL = new QName("http://www.w3.org/2001/XMLSchema",
             "all");

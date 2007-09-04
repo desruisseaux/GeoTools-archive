@@ -20,6 +20,7 @@ import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import org.geotools.gml.GMLException;
+import org.geotools.gml3.GML;
 import org.geotools.xml.*;
 
 

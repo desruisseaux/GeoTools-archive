@@ -22,6 +22,7 @@ import javax.xml.transform.stream.StreamResult;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
+import org.geotools.gml3.GML;
 import org.geotools.gml3.GML3TestSupport;
 
 

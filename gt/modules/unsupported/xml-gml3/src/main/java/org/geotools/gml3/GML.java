@@ -13,9 +13,14 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.gml3.bindings;
+package org.geotools.gml3;
 
+import java.util.Set;
 import javax.xml.namespace.QName;
+import org.geotools.gml3.smil.SMIL20;
+import org.geotools.gml3.smil.SMIL20LANG;
+import org.geotools.xlink.XLINK;
+import org.geotools.xml.XSD;
 
 
 /**
@@ -24,7 +29,12 @@ import javax.xml.namespace.QName;
  *
  * @generated
  */
-public interface GML {
+public final class GML extends XSD {
+    /**
+     * singleton instance.
+     */
+    private static GML instance = new GML();
+
     /** @generated */
     public static final String NAMESPACE = "http://www.opengis.net/gml";
 
@@ -3350,4 +3360,40 @@ public interface GML {
 
     /** @generated */
     public static final QName uom = new QName("http://www.opengis.net/gml", "uom");
+
+    /**
+     * Private constructor.
+     */
+    private GML() {
+    }
+
+    /**
+     * The singleton instance;
+     */
+    public static GML getInstance() {
+        return instance;
+    }
+
+    protected void addDependencies(Set dependencies) {
+        //add xlink dependency
+        dependencies.add(XLINK.getInstance());
+
+        //add smil dependency
+        dependencies.add(SMIL20.getInstance());
+        dependencies.add(SMIL20LANG.getInstance());
+    }
+
+    /**
+     * Returns 'http://www.opengis.net/gml'.
+     */
+    public String getNamespaceURI() {
+        return NAMESPACE;
+    }
+
+    /**
+     * Returns The location of 'gml.xsd'.
+     */
+    public String getSchemaLocation() {
+        return getClass().getResource("gml.xsd").toString();
+    }
 }

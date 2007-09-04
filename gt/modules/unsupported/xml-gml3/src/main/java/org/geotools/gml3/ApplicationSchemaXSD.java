@@ -13,31 +13,28 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.gml3.bindings;
+package org.geotools.gml3;
 
 import java.util.Set;
-import javax.xml.namespace.QName;
-import org.geotools.gml3.GML;
 import org.geotools.xml.XSD;
 
 
-public final class TEST extends XSD {
-    private static TEST instance = new TEST();
-    public static String NAMESPACE = "http://www.geotools.org/test";
+/**
+ * XSD instance for an application schema.
+ *
+ * @author Justin Deoliveira, The Open Planning Project
+ *
+ */
+public class ApplicationSchemaXSD extends XSD {
+    /** application schema namespace */
+    private String namespaceURI;
 
-    //types
-    public static QName TestFeatureType = new QName(NAMESPACE, "TestFeatureType");
-    public static QName TestFeatureCollectionType = new QName(NAMESPACE, "TestFeatureCollectionType");
+    /** location of the application schema itself */
+    private String schemaLocation;
 
-    //elements
-    public static QName TestFeature = new QName(NAMESPACE, "TestFeature");
-    public static QName TestFeatureCollection = new QName(NAMESPACE, "TestFeatureCollection");
-
-    private TEST() {
-    }
-
-    public static TEST getInstance() {
-        return instance;
+    public ApplicationSchemaXSD(String namespaceURI, String schemaLocation) {
+        this.namespaceURI = namespaceURI;
+        this.schemaLocation = schemaLocation;
     }
 
     protected void addDependencies(Set dependencies) {
@@ -45,10 +42,10 @@ public final class TEST extends XSD {
     }
 
     public String getNamespaceURI() {
-        return NAMESPACE;
+        return namespaceURI;
     }
 
     public String getSchemaLocation() {
-        return getClass().getResource("test.xsd").toString();
+        return schemaLocation;
     }
 }

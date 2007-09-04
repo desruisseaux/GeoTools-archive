@@ -18,6 +18,7 @@ package org.geotools.gml2.bindings;
 import org.w3c.dom.Document;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
+import org.geotools.gml2.GML;
 import org.geotools.xml.Binding;
 
 

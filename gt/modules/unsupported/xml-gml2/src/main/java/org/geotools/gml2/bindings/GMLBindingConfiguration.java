@@ -16,6 +16,7 @@
 package org.geotools.gml2.bindings;
 
 import org.picocontainer.MutablePicoContainer;
+import org.geotools.gml2.GML;
 import org.geotools.xml.BindingConfiguration;
 
 

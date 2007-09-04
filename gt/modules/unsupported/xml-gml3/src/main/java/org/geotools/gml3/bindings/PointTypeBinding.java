@@ -25,6 +25,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import org.opengis.geometry.DirectPosition;
 import org.geotools.geometry.DirectPosition2D;
+import org.geotools.gml3.GML;
 import org.geotools.xml.*;
 
 

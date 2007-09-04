@@ -38,62 +38,47 @@ import org.geotools.xs.XSConfiguration;
  * @since 2.4
  */
 public class ApplicationSchemaConfiguration extends Configuration {
-    /** application schema namespace */
-    private String namespace;
-
-    /** location of the application schema itself */
-    private String schemaLocation;
-
     public ApplicationSchemaConfiguration(String namespace, String schemaLocation) {
-        this.namespace = namespace;
-        this.schemaLocation = schemaLocation;
+        super(new ApplicationSchemaXSD(namespace, schemaLocation));
         addDependency(new XSConfiguration());
         addDependency(new GMLConfiguration());
-    }
-
-    public String getNamespaceURI() {
-        return namespace;
-    }
-
-    public String getSchemaFileURL() {
-        return schemaLocation;
     }
 
     public BindingConfiguration getBindingConfiguration() {
         return null;
     }
 
+    /**
+     * Uses the <code>schema.getSchemaLocation()</code>'s parent
+     * folder as the base folder to resolve <code>location</code> as a
+     * relative URI of.
+     * <p>
+     * This way, application schemas splitted over multiple files can be
+     * resolved based on the relative location of a given import or
+     * include.
+     * </p>
+     *
+     * @param schema
+     *            the schema being resolved
+     * @param uri
+     *            not used as it might be an empty string when location
+     *            refers to an include
+     * @param location
+     *            the xsd location, either of <code>schema</code>, an
+     *            import or an include, for which to try resolving it as
+     *            a relative path of the <code>schema</code> location.
+     * @return a file: style uri with the resolved schema location for
+     *         the given one, or <code>null</code> if
+     *         <code>location</code> can't be resolved as a relative
+     *         path of the <code>schema</code> location.
+     */
     public XSDSchemaLocationResolver getSchemaLocationResolver() {
         return new XSDSchemaLocationResolver() {
-                /**
-                 * Uses the <code>schema.getSchemaLocation()</code>'s parent
-                 * folder as the base folder to resolve <code>location</code> as a
-                 * relative URI of.
-                 * <p>
-                 * This way, application schemas splitted over multiple files can be
-                 * resolved based on the relative location of a given import or
-                 * include.
-                 * </p>
-                 *
-                 * @param schema
-                 *            the schema being resolved
-                 * @param uri
-                 *            not used as it might be an empty string when location
-                 *            refers to an include
-                 * @param location
-                 *            the xsd location, either of <code>schema</code>, an
-                 *            import or an include, for which to try resolving it as
-                 *            a relative path of the <code>schema</code> location.
-                 * @return a file: style uri with the resolved schema location for
-                 *         the given one, or <code>null</code> if
-                 *         <code>location</code> can't be resolved as a relative
-                 *         path of the <code>schema</code> location.
-                 */
                 public String resolveSchemaLocation(XSDSchema schema, String uri, String location) {
                     String schemaLocation;
 
                     if (schema == null) {
-                        schemaLocation = ApplicationSchemaConfiguration.this.schemaLocation;
+                        schemaLocation = getXSD().getSchemaLocation();
                     } else {
                         schemaLocation = schema.getSchemaLocation();
                     }

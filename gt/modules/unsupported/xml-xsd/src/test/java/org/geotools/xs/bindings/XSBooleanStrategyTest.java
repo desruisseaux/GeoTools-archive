@@ -19,6 +19,7 @@ import javax.xml.bind.ValidationException;
 import javax.xml.namespace.QName;
 
 import org.geotools.xs.TestSchema;
+import org.geotools.xs.XS;
 
 
 public class XSBooleanStrategyTest extends TestSchema {

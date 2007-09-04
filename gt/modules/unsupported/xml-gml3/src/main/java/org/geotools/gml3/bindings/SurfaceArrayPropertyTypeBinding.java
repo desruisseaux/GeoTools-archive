@@ -18,6 +18,7 @@ package org.geotools.gml3.bindings;
 import java.util.List;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Polygon;
+import org.geotools.gml3.GML;
 import org.geotools.xml.*;
 
 

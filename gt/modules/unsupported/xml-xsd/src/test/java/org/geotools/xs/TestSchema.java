@@ -39,7 +39,6 @@ import org.geotools.xml.Schemas;
 import org.geotools.xml.SimpleBinding;
 import org.geotools.xml.impl.BindingLoader;
 import org.geotools.xml.impl.ElementImpl;
-import org.geotools.xs.bindings.XS;
 import org.geotools.xs.bindings.XSBindingConfiguration;
 import org.picocontainer.defaults.DefaultPicoContainer;
 

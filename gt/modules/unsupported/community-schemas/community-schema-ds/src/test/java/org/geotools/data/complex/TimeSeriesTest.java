@@ -41,7 +41,7 @@ import org.geotools.data.feature.FeatureSource2;
 import org.geotools.feature.iso.Types;
 import org.geotools.filter.AttributeExpressionImpl;
 import org.geotools.filter.FilterFactoryImplNamespaceAware;
-import org.geotools.xlink.bindings.XLINK;
+import org.geotools.xlink.XLINK;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureCollection;

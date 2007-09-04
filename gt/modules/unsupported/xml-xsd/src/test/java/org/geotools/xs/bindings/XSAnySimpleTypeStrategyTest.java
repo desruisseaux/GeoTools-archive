@@ -20,6 +20,7 @@ import javax.xml.namespace.QName;
 import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.geotools.xml.SimpleBinding;
 import org.geotools.xs.TestSchema;
+import org.geotools.xs.XS;
 
 
 public class XSAnySimpleTypeStrategyTest extends TestSchema {

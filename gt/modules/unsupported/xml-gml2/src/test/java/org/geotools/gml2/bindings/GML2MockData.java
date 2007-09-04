@@ -40,6 +40,7 @@ import org.geotools.feature.simple.SimpleFeatureFactoryImpl;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.feature.simple.SimpleTypeFactoryImpl;
 import org.geotools.feature.type.DefaultFeatureTypeBuilder;
+import org.geotools.gml2.GML;
 import org.geotools.gml2.TEST;
 
 

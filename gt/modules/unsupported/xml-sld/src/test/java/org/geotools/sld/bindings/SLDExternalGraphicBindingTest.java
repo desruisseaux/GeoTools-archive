@@ -17,7 +17,7 @@ package org.geotools.sld.bindings;
 
 import org.w3c.dom.Element;
 import org.geotools.styling.ExternalGraphic;
-import org.geotools.xlink.bindings.XLINK;
+import org.geotools.xlink.XLINK;
 
 
 public class SLDExternalGraphicBindingTest extends SLDTestSupport {

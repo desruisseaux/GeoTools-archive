@@ -43,7 +43,7 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.iso.TypeBuilder;
 import org.geotools.feature.iso.Types;
 import org.geotools.filter.FilterFactoryImplNamespaceAware;
-import org.geotools.gml3.bindings.GML;
+import org.geotools.gml3.GML;
 import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureCollection;
 import org.opengis.feature.simple.SimpleFeature;

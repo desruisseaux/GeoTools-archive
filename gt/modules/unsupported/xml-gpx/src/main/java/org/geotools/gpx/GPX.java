@@ -13,9 +13,11 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.gpx.binding;
+package org.geotools.gpx;
 
 import javax.xml.namespace.QName;
+
+import org.geotools.xml.XSD;
 
 
 /**
@@ -24,7 +26,34 @@ import javax.xml.namespace.QName;
  *
  * @generated
  */
-public interface GPX {
+public class GPX extends XSD {
+    
+    /**
+     * singleton instance
+     */
+    private static GPX instance = new GPX();
+    
+    /**
+     * Returns the singleton instance.
+     */
+    public static GPX getInstance() {
+        return instance;
+    }
+    
+    /**
+     * Returns 'http://www.topografix.com/GPX/1/1'.
+     */
+    public String getNamespaceURI() {
+        return NAMESPACE;
+    }
+    
+    /**
+     * Returns the location of 'gpx.xsd'.
+     */
+    public String getSchemaLocation() {
+        return getClass().getResource("gpx.xsd").toString();
+    }
+    
     /** @generated */
     public static final String NAMESPACE = "http://www.topografix.com/GPX/1/1";
 

@@ -238,9 +238,7 @@ public abstract class XMLTestSupport extends TestCase {
      */
     protected Document encode( Object object, QName element ) throws Exception {
     	Configuration configuration = createConfiguration();
-    	XSDSchema schema = configuration.getSchemaLocator().locateSchema( 
-			null, configuration.getNamespaceURI(), null, null
-    	);
+    	XSDSchema schema = configuration.getXSD().getSchema();
     	
     	Encoder encoder = new Encoder( configuration, schema );
     	ByteArrayOutputStream output = new ByteArrayOutputStream();

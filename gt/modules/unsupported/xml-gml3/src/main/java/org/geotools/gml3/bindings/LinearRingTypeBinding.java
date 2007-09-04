@@ -27,6 +27,7 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
 import org.opengis.geometry.DirectPosition;
+import org.geotools.gml3.GML;
 import org.geotools.xml.*;
 
 

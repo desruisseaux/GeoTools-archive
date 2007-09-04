@@ -16,29 +16,19 @@
 package org.geotools.gml3.smil;
 
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
+import org.eclipse.xsd.util.XSDSchemaLocator;
 import java.net.MalformedURLException;
 import java.net.URL;
-import org.geotools.gml3.bindings.smil.SMIL20LANG;
 import org.geotools.gml3.bindings.smil.SMIL20LANGBindingConfiguration;
 import org.geotools.gml3.bindings.smil.SMIL20SchemaLocationResolver;
 import org.geotools.xml.BindingConfiguration;
 import org.geotools.xml.Configuration;
+import org.geotools.xml.XSD;
 
 
 public class SMIL20LANGConfiguration extends Configuration {
-    /**
-     * @return {@link SMIL20LANG#NAMESPACE}
-     */
-    public String getNamespaceURI() {
-        return SMIL20LANG.NAMESPACE;
-    }
-
-    /**
-     * @return URL to smil20-language.xsd file of schema.
-     */
-    public String getSchemaFileURL() {
-        return getSchemaLocationResolver()
-                   .resolveSchemaLocation(null, getNamespaceURI(), "smil20-language.xsd");
+    public SMIL20LANGConfiguration() {
+        super(SMIL20LANG.getInstance());
     }
 
     /**
@@ -48,10 +38,7 @@ public class SMIL20LANGConfiguration extends Configuration {
         return new SMIL20LANGBindingConfiguration();
     }
 
-    /**
-     * @return A new instance of {@link SMIL20SchemaLocationResolver}
-     */
-    public XSDSchemaLocationResolver getSchemaLocationResolver() {
-        return new SMIL20SchemaLocationResolver();
+    public XSDSchemaLocator getSchemaLocator() {
+        return null;
     }
 }

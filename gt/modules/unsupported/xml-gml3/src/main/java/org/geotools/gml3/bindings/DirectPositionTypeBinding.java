@@ -24,6 +24,7 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.geometry.DirectPosition1D;
 import org.geotools.geometry.DirectPosition2D;
+import org.geotools.gml3.GML;
 import org.geotools.referencing.CRS;
 import org.geotools.xml.*;
 

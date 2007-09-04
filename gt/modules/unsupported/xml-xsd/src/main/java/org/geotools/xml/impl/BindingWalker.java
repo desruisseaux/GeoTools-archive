@@ -31,7 +31,7 @@ import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.eclipse.xsd.XSDTypeDefinition;
 import org.geotools.xml.Binding;
 import org.geotools.xml.Schemas;
-import org.geotools.xs.bindings.XS;
+import org.geotools.xs.XS;
 import org.picocontainer.MutablePicoContainer;
 
 public class BindingWalker implements TypeWalker.Visitor {

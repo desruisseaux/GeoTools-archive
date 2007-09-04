@@ -19,6 +19,7 @@ import javax.xml.namespace.QName;
 import org.geotools.feature.DefaultFeatureCollections;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.gml3.GML;
 import org.geotools.xml.*;
 
 

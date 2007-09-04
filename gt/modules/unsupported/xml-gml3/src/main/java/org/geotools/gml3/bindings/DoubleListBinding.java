@@ -17,6 +17,7 @@ package org.geotools.gml3.bindings;
 
 import java.util.List;
 import javax.xml.namespace.QName;
+import org.geotools.gml3.GML;
 import org.geotools.xml.AbstractSimpleBinding;
 import org.geotools.xml.InstanceComponent;
 

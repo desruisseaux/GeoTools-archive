@@ -19,6 +19,7 @@ import java.util.Calendar;
 
 import javax.xml.namespace.QName;
 
+import org.geotools.gpx.GPX;
 import org.geotools.gpx.bean.CopyrightType;
 import org.geotools.gpx.bean.ObjectFactory;
 import org.geotools.xml.AbstractComplexBinding;

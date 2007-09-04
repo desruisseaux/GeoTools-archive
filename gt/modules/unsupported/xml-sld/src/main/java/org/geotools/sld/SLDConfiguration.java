@@ -15,16 +15,14 @@
  */
 package org.geotools.sld;
 
-import org.eclipse.xsd.util.XSDSchemaLocationResolver;
-import org.picocontainer.MutablePicoContainer;
 import org.geotools.filter.v1_0.OGCConfiguration;
 import org.geotools.sld.bindings.SLD;
 import org.geotools.sld.bindings.SLDBindingConfiguration;
-import org.geotools.sld.bindings.SLDSchemaLocationResolver;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryImpl;
 import org.geotools.xml.BindingConfiguration;
 import org.geotools.xml.Configuration;
+import org.picocontainer.MutablePicoContainer;
 
 
 /**
@@ -38,7 +36,7 @@ public class SLDConfiguration extends Configuration {
      * Adds a dependency on {@link OGCConfiguration}
      */
     public SLDConfiguration() {
-        super();
+        super(SLD.getInstance());
 
         addDependency(new OGCConfiguration());
     }
@@ -48,28 +46,6 @@ public class SLDConfiguration extends Configuration {
      */
     public BindingConfiguration getBindingConfiguration() {
         return new SLDBindingConfiguration();
-    }
-
-    /**
-     * @return {@link SLD#NAMESPACE}, http://www.opengis.net/sld
-     */
-    public String getNamespaceURI() {
-        return SLD.NAMESPACE;
-    }
-
-    /**
-     * @return the StyledLayerDescriptor.xsd file of the schema.
-     */
-    public String getSchemaFileURL() {
-        return getSchemaLocationResolver()
-                   .resolveSchemaLocation(null, getNamespaceURI(), "StyledLayerDescriptor.xsd");
-    }
-
-    /**
-     * @return A new instance of {@link SLDSchemaLocationResolver}.
-     */
-    public XSDSchemaLocationResolver getSchemaLocationResolver() {
-        return new SLDSchemaLocationResolver();
     }
 
     /**

@@ -28,7 +28,7 @@ import org.geotools.metadata.iso.citation.Citations;
  *
  */
 public class GML2EncodingUtils {
-    public static String crs(CoordinateReferenceSystem crs) {
+    public static String epsgCode(CoordinateReferenceSystem crs) {
         if (crs == null) {
             return null;
         }
@@ -37,9 +37,20 @@ public class GML2EncodingUtils {
             Identifier id = (Identifier) i.next();
 
             //return "EPSG:" + id.getCode();
-            if ((id.getAuthority() != null) && id.getAuthority().equals(Citations.EPSG)) {
-                return "http://www.opengis.net/gml/srs/epsg.xml#" + id.getCode();
+            if ((id.getAuthority() != null)
+                    && id.getAuthority().getTitle().equals(Citations.EPSG.getTitle())) {
+                return id.getCode();
             }
+        }
+
+        return null;
+    }
+
+    public static String crs(CoordinateReferenceSystem crs) {
+        String code = epsgCode(crs);
+
+        if (code != null) {
+            return "http://www.opengis.net/gml/srs/epsg.xml#" + code;
         }
 
         return null;

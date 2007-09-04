@@ -19,6 +19,7 @@ import org.w3c.dom.Element;
 import java.util.Iterator;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.gml3.GML;
 import org.geotools.gml3.GML3TestSupport;
 import org.geotools.xml.Configuration;
 

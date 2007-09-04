@@ -20,7 +20,6 @@ import java.io.InputStream;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Point;
 import org.geotools.feature.Feature;
-import org.geotools.gml2.bindings.GML;
 import org.geotools.xml.StreamingParser;
 
 

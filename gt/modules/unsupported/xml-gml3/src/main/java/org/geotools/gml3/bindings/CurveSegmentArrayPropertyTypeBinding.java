@@ -18,6 +18,7 @@ package org.geotools.gml3.bindings;
 import java.util.List;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.LineString;
+import org.geotools.gml3.GML;
 import org.geotools.xml.*;
 
 

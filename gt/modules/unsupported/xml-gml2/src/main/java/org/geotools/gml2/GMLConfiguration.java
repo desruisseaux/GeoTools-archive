@@ -20,7 +20,6 @@ import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
 import org.geotools.feature.DefaultFeatureCollections;
-import org.geotools.gml2.bindings.GML;
 import org.geotools.gml2.bindings.GMLBindingConfiguration;
 import org.geotools.xlink.XLINKConfiguration;
 import org.geotools.xml.BindingConfiguration;
@@ -40,7 +39,7 @@ public class GMLConfiguration extends Configuration {
      * on {@link XLINKConfiguration}
      */
     public GMLConfiguration() {
-        super();
+        super(GML.getInstance());
 
         //add xlink cdependency
         addDependency(new XLINKConfiguration());
@@ -56,21 +55,6 @@ public class GMLConfiguration extends Configuration {
      */
     public BindingConfiguration getBindingConfiguration() {
         return new GMLBindingConfiguration();
-    }
-
-    /**
-     * @return {@link GML#NAMESPACE}
-     */
-    public String getNamespaceURI() {
-        return GML.NAMESPACE;
-    }
-
-    /**
-     * @return URL to the gml2 feauture.xsd file.
-     */
-    public String getSchemaFileURL() {
-        return getSchemaLocationResolver()
-                   .resolveSchemaLocation(null, getNamespaceURI(), "feature.xsd");
     }
 
     /**

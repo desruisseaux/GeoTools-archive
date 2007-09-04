@@ -19,6 +19,7 @@ import javax.xml.namespace.QName;
 
 import org.geotools.xml.ElementInstance;
 import org.geotools.xs.TestSchema;
+import org.geotools.xs.XS;
 
 
 public class XSDoubleStrategyTest extends TestSchema {

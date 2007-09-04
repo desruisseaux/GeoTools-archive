@@ -28,7 +28,7 @@ import org.opengis.filter.spatial.Intersects;
 import org.opengis.filter.spatial.Overlaps;
 import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
-import org.geotools.gml3.bindings.GML;
+import org.geotools.gml3.GML;
 
 
 public class BinarySpatialOpTypeBindingTest extends FilterTestSupport {

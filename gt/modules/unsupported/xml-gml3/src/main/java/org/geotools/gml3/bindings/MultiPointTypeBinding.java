@@ -20,6 +20,7 @@ import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Point;
+import org.geotools.gml3.GML;
 import org.geotools.xml.*;
 
 

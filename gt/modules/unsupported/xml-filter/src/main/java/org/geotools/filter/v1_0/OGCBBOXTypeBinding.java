@@ -21,7 +21,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.BBOX;
-import org.geotools.gml2.bindings.GML;
+import org.geotools.gml2.GML;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;

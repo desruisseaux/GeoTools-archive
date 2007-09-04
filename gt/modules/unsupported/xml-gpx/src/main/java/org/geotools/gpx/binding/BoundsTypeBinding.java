@@ -17,6 +17,7 @@ package org.geotools.gpx.binding;
 
 import javax.xml.namespace.QName;
 
+import org.geotools.gpx.GPX;
 import org.geotools.gpx.bean.BoundsType;
 import org.geotools.gpx.bean.ObjectFactory;
 import org.geotools.xml.AbstractComplexBinding;

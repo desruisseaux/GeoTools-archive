@@ -17,6 +17,7 @@ package org.geotools.gml3.bindings;
 
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.LinearRing;
+import org.geotools.gml3.GML;
 import org.geotools.xml.*;
 
 

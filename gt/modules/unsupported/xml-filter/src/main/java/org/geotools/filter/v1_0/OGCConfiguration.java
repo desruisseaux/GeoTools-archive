@@ -35,23 +35,8 @@ public class OGCConfiguration extends Configuration {
      * Adds a dependency on {@link GMLConfiguration}
      */
     public OGCConfiguration() {
-        super();
+        super(OGC.getInstance());
         addDependency(new GMLConfiguration());
-    }
-
-    /**
-     * @return {@link OGC#NAMESPACE}, http://www.opengis.net/ogc
-     */
-    public String getNamespaceURI() {
-        return OGC.NAMESPACE;
-    }
-
-    /**
-     * @return the filter.xsd file of the schema.
-     */
-    public String getSchemaFileURL() {
-        return getSchemaLocationResolver()
-                   .resolveSchemaLocation(null, getNamespaceURI(), "filter.xsd");
     }
 
     /**
@@ -59,13 +44,6 @@ public class OGCConfiguration extends Configuration {
      */
     public BindingConfiguration getBindingConfiguration() {
         return new OGCBindingConfiguration();
-    }
-
-    /**
-     * @return A new instance of {@link OGCSchemaLocationResolver}.
-     */
-    public XSDSchemaLocationResolver getSchemaLocationResolver() {
-        return new OGCSchemaLocationResolver();
     }
 
     /**

@@ -1,9 +1,6 @@
 package org.geotools.xlink;
 
-import org.eclipse.xsd.util.XSDSchemaLocationResolver;
-import org.geotools.xlink.bindings.XLINK;
 import org.geotools.xlink.bindings.XLINKBindingConfiguration;
-import org.geotools.xlink.bindings.XLINKSchemaLocationResolver;
 import org.geotools.xml.BindingConfiguration;
 import org.geotools.xml.Configuration;
 
@@ -15,32 +12,14 @@ import org.geotools.xml.Configuration;
  */
 public class XLINKConfiguration extends Configuration {
 
-	/**
-	 * @return {@link XLINK#NAMESPACE}, http://www.w3.org/1999/xlink
-	 */
-	public String getNamespaceURI() {
-		return XLINK.NAMESPACE;
-	}
+	public XLINKConfiguration() {
+        super(XLINK.getInstance());
+    }
 
-	/**
-	 * @return The xlinks.xsd of the xlink schema.
-	 */
-	public String getSchemaFileURL() {
-		return getSchemaLocationResolver().resolveSchemaLocation( null, getNamespaceURI(), "xlinks.xsd" );
-	}
-
-	/**
+    /**
 	 * @return A new instance of {@link XLINKBindingConfiguration}
 	 */
 	public BindingConfiguration getBindingConfiguration() {
 		return new XLINKBindingConfiguration();
 	}
-
-	/**
-	 * @return A new instance of {@link XLINKSchemaLocationResolver}
-	 */
-	public XSDSchemaLocationResolver getSchemaLocationResolver() {
-		return new XLINKSchemaLocationResolver();
-	}
-
 }

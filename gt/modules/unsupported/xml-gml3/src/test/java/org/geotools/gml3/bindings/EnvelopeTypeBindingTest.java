@@ -18,6 +18,7 @@ package org.geotools.gml3.bindings;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import com.vividsolutions.jts.geom.Envelope;
+import org.geotools.gml3.GML;
 import org.geotools.gml3.GML3TestSupport;
 
 

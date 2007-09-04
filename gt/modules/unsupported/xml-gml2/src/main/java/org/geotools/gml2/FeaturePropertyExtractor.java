@@ -24,7 +24,6 @@ import javax.xml.namespace.QName;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
-import org.geotools.gml2.bindings.GML;
 import org.geotools.xml.PropertyExtractor;
 import org.geotools.xml.SchemaIndex;
 import org.geotools.xml.Schemas;

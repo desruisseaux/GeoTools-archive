@@ -20,6 +20,7 @@ import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Geometry;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.gml3.GML;
 import org.geotools.xml.*;
 
 

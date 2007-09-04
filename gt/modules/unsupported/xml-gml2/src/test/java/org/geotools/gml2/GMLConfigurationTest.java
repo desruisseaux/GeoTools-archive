@@ -21,7 +21,6 @@ import org.picocontainer.defaults.DefaultPicoContainer;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.geotools.feature.FeatureCollections;
-import org.geotools.gml2.bindings.GML;
 import org.geotools.xlink.XLINKConfiguration;
 
 

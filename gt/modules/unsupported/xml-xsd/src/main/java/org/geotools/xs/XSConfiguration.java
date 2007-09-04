@@ -2,7 +2,7 @@ package org.geotools.xs;
 
 import org.geotools.xml.BindingConfiguration;
 import org.geotools.xml.Configuration;
-import org.geotools.xs.bindings.XS;
+import org.geotools.xml.XSD;
 import org.geotools.xs.bindings.XSBindingConfiguration;
 
 /**
@@ -13,15 +13,12 @@ import org.geotools.xs.bindings.XSBindingConfiguration;
  */
 public class XSConfiguration extends Configuration {
 
-	public String getNamespaceURI() {
-		return XS.NAMESPACE;
-	}
+	public XSConfiguration() {
+        super(XS.getInstance());
+        
+    }
 
-	public String getSchemaFileURL() {
-		return getClass().getResource("XMLSchema.xsd").toString();
-	}
-	
-	public BindingConfiguration getBindingConfiguration() {
+    public BindingConfiguration getBindingConfiguration() {
 		return new XSBindingConfiguration();
 	}
 }

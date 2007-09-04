@@ -20,6 +20,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.LineString;
+import org.geotools.gml3.GML;
 import org.geotools.xml.*;
 
 

@@ -15,7 +15,10 @@
  */
 package org.geotools.sld.bindings;
 
+import java.util.Set;
 import javax.xml.namespace.QName;
+import org.geotools.filter.v1_0.OGC;
+import org.geotools.xml.XSD;
 
 
 /**
@@ -24,7 +27,12 @@ import javax.xml.namespace.QName;
  *
  * @generated
  */
-public interface SLD {
+public final class SLD extends XSD {
+    /**
+     * singleton instance
+     */
+    private static SLD instance = new SLD();
+
     /** @generated */
     public static final String NAMESPACE = "http://www.opengis.net/sld";
 
@@ -310,6 +318,34 @@ public interface SLD {
     /** @generated */
     public static final QName WELLKNOWNNAME = new QName("http://www.opengis.net/sld",
             "WellKnownName");
+
+    /**
+     * private constructor
+     */
+    private SLD() {
+    }
+
+    public static SLD getInstance() {
+        return instance;
+    }
+
+    protected void addDependencies(Set dependencies) {
+        dependencies.add(OGC.getInstance());
+    }
+
+    /**
+     * Returns 'http://www.opengis.net/sld'
+     */
+    public String getNamespaceURI() {
+        return NAMESPACE;
+    }
+
+    /**
+     * Returns the location of 'StyledLayerDescriptor.xsd'.
+     */
+    public String getSchemaLocation() {
+        return getClass().getResource("StyledLayerDescriptor.xsd").toString();
+    }
 
     /* Attributes */
 }

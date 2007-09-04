@@ -25,9 +25,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import junit.framework.TestCase;
 
 import org.geotools.TestData;
+import org.geotools.gpx.GPX;
+import org.geotools.gpx.GPXConfiguration;
 import org.geotools.gpx.bean.GpxType;
-import org.geotools.gpx.binding.GPX;
-import org.geotools.gpx.binding.GPXConfiguration;
 import org.geotools.xml.Encoder;
 import org.geotools.xml.Parser;
 import org.xml.sax.SAXException;
