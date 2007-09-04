@@ -16,7 +16,6 @@
  */
 package org.geotools.legend;
 
-import com.sun.media.jai.codec.PNGEncodeParam.RGB;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiLineString;
@@ -26,13 +25,12 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
+
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.image.BufferedImage;
-import org.geotools.feature.Feature;
+
 import org.geotools.feature.FeatureType;
 import org.geotools.styling.Rule;
  
