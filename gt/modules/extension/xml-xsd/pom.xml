@@ -80,7 +80,7 @@
     <module>gml3</module>
     <module>filter</module>
     <module>sld</module>
-    <module>kml</module>
+    <!--module>kml</module-->
   </modules>
 
 </project>
