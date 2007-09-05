@@ -59,7 +59,7 @@
     <module>shapefile-renderer</module>
     <module>validation</module>
     <module>widgets-swing</module>
-    <module>xml-xsd</module>
+    <module>xsd</module>
   </modules>
 
 
