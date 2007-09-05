@@ -32,6 +32,12 @@ public class LiteCoordinateSequence extends PackedCoordinateSequence{
      * The packed coordinate array
      */
     private double[] coords;
+    
+    /**
+     * Cached size, getSize() gets called an incredible number of times during rendering
+     * (a profile shows 2 million calls when rendering 90.000 linear features)
+     */
+    private int size;
 
     /**
      * Builds a new packed coordinate sequence
@@ -40,12 +46,13 @@ public class LiteCoordinateSequence extends PackedCoordinateSequence{
      * 
      */
     public LiteCoordinateSequence(double[] coords) {
-    	this.dimension=2;
+      this.dimension=2;
       if (coords.length % dimension != 0) {
         throw new IllegalArgumentException("Packed array does not contain "
             + "an integral number of coordinates");
       }
       this.coords = coords;
+      this.size = coords.length / dimension;
     }
 
     /**
@@ -55,7 +62,8 @@ public class LiteCoordinateSequence extends PackedCoordinateSequence{
      */
     public LiteCoordinateSequence(float[] coordinates) {
       this.coords = new double[coordinates.length];
-  	this.dimension=2;
+      this.dimension=2;
+      this.size = coords.length / dimension;
       for (int i = 0; i < coordinates.length; i++) {
         this.coords[i] = coordinates[i];
       }
@@ -69,7 +77,7 @@ public class LiteCoordinateSequence extends PackedCoordinateSequence{
     public LiteCoordinateSequence(Coordinate[] coordinates) {
       if (coordinates == null)
         coordinates = new Coordinate[0];
-  	this.dimension=2;
+      this.dimension=2;
 
       coords = new double[coordinates.length * this.dimension];
       for (int i = 0; i < coordinates.length; i++) {
@@ -77,6 +85,7 @@ public class LiteCoordinateSequence extends PackedCoordinateSequence{
         if (this.dimension >= 2)
           coords[i * this.dimension + 1] = coordinates[i].y;
       }
+      this.size = coordinates.length;
     }
 
     /**
@@ -91,6 +100,8 @@ public class LiteCoordinateSequence extends PackedCoordinateSequence{
     		throw new IllegalArgumentException("This type of sequence is always 2 dimensional");
     	this.dimension=2;
     	coords = new double[size * this.dimension];
+    	this.size = coords.length / dimension;
+    	
     }
     
     /**
@@ -101,6 +112,7 @@ public class LiteCoordinateSequence extends PackedCoordinateSequence{
         // a trivial benchmark can show that cloning arrays like this is actually faster
         // than calling clone on the array.
         this.dimension = seq.dimension;
+        this.size = seq.size;
         double[] orig = seq.getArray();
         this.coords = new double[orig.length];
         System.arraycopy(orig, 0, coords, 0, coords.length);
@@ -121,7 +133,7 @@ public class LiteCoordinateSequence extends PackedCoordinateSequence{
      * @see com.vividsolutions.jts.geom.CoordinateSequence#size()
      */
     public int size() {
-   		return coords.length/dimension;
+   		return size;
     }
 
     /**
@@ -141,6 +153,20 @@ public class LiteCoordinateSequence extends PackedCoordinateSequence{
      */
     public double getOrdinate(int index, int ordinate) {
       return coords[index * dimension + ordinate];
+    }
+    
+    /**
+     * @see com.vividsolutions.jts.geom.CoordinateSequence#getX(int)
+     */
+    public double getX(int index) {
+        return coords[index * dimension];
+    }
+
+    /**
+     * @see com.vividsolutions.jts.geom.CoordinateSequence#getY(int)
+     */
+    public double getY(int index) {
+        return coords[index * dimension + 1];
     }
 
     /**
@@ -171,6 +197,7 @@ public class LiteCoordinateSequence extends PackedCoordinateSequence{
 	 */
 	public void setArray(double[] coords2) {
 		coords = coords2;
+		size = coords.length / dimension;
 		coordRef = null;
 	}
 	
