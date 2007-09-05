@@ -589,6 +589,24 @@ public class ComplexElementHandler extends XMLElementHandler {
     public String getName() {
         return elem.getName();
     }
+    
+    /**
+     * Remove the given XMLElementHandler from the Child-List
+     * @param handler
+     */
+    public void removeElement(XMLElementHandler handler){
+		if (elements != null){
+			elements.remove(handler);
+		}
+	}
+    
+    /**
+     * returns the Type of the Elementhandler
+	 * @return type
+	 */
+	public ComplexType getType() {
+		return type;
+	}
 
     /**
      * <p>

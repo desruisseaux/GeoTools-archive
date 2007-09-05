@@ -27,6 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.xml.gml.FCBuffer.StopException;
+import org.geotools.xml.handlers.ComplexElementHandler;
 import org.geotools.xml.handlers.DocumentHandler;
 import org.geotools.xml.handlers.ElementHandlerFactory;
 import org.geotools.xml.handlers.IgnoreHandler;
@@ -256,10 +257,10 @@ public class XMLSAXHandler extends DefaultHandler {
         throws SAXException {
     	handleCharacters();
         logger.fine("END: " + qName);
-
+        XMLElementHandler handler = null;
         try {
         	
-            XMLElementHandler handler = (XMLElementHandler) handlers.peek();
+            handler = (XMLElementHandler) handlers.peek();
             URI uri = new URI(namespaceURI);
             handler.endElement(uri, localName, hints);            
         } catch (Exception e) {
@@ -276,6 +277,17 @@ public class XMLSAXHandler extends DefaultHandler {
         }
         finally {
             handlers.pop(); // we must do this or leak memory
+            if (handler != null && !handlers.isEmpty()){
+	        	XMLElementHandler parent = ((XMLElementHandler)handlers.peek());
+	        	if (parent instanceof ComplexElementHandler){
+	        	    ComplexElementHandler complexParent = (ComplexElementHandler)parent;
+		        	String typename = complexParent.getType().getClass().getName();
+		        	// TODO: HACK The required Type is not in this Module
+		        	if(typename.equals("org.geotools.xml.wfs.WFSBasicComplexTypes$FeatureCollectionType")){
+		        		complexParent.removeElement(handler);
+		        	}
+	        	}
+        	}
         }
     }
 
