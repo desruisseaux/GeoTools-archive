@@ -15,6 +15,7 @@
  */
 package org.geotools.sld;
 
+import org.picocontainer.MutablePicoContainer;
 import org.geotools.filter.v1_0.OGCConfiguration;
 import org.geotools.sld.bindings.SLD;
 import org.geotools.sld.bindings.SLDBindingConfiguration;
@@ -22,7 +23,6 @@ import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryImpl;
 import org.geotools.xml.BindingConfiguration;
 import org.geotools.xml.Configuration;
-import org.picocontainer.MutablePicoContainer;
 
 
 /**
