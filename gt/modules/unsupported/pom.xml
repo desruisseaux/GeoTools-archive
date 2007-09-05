@@ -91,11 +91,6 @@
     <module>postgis-versioned</module>
     <module>tiger</module>
     <module>tile</module>
-    <module>xml-sld</module>
-    <module>xml-xsd</module>
-    <module>xml-gml2</module>
-    <module>xml-gml3</module>
-    <module>xml-filter</module>
     <module>mappane</module>
     <module>coveragetools</module>
     <module>xml-gpx</module>
