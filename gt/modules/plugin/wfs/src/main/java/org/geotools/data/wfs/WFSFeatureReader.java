@@ -136,6 +136,12 @@ public class WFSFeatureReader extends FCBuffer {
                 state = STOP;
                 is.close();
                 yield();
+            }  catch (RuntimeException e) {
+            	exception = new SAXException(e.getMessage());
+            	exception.initCause(e);
+                state = STOP;
+                is.close();
+                yield();
             }
         } catch (IOException e) {
             logger.warning(e.toString());
