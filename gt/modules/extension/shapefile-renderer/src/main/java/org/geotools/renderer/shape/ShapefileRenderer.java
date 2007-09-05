@@ -276,7 +276,7 @@ public class ShapefileRenderer implements GTRenderer {
         FeatureType type;
 
         try {
-            type = createFeatureType(query, style, datastore.getSchema());
+            type = createFeatureType(query, style, datastore);
         } catch (Exception e) {
             fireErrorEvent(e);
 
@@ -476,10 +476,13 @@ public class ShapefileRenderer implements GTRenderer {
             throws IOException {
         IndexedDbaseFileReader dbfreader = null;
 
-        try {
-            dbfreader = ShapefileRendererUtil.getDBFReader(datastore);
-        } catch (Exception e) {
-            fireErrorEvent(e);
+        // don't waste time processing the dbf file if the only attribute loades is the geometry
+        if(type.getAttributeCount() > 1) {
+            try {
+                dbfreader = ShapefileRendererUtil.getDBFReader(datastore);
+            } catch (Exception e) {
+                fireErrorEvent(e);
+            }
         }
 
         OpacityFinder opacityFinder = new OpacityFinder(getAcceptableSymbolizers(type
@@ -529,11 +532,11 @@ public class ShapefileRenderer implements GTRenderer {
                     String nextFid = fidReader.next();
                     if (modifiedFIDs.contains(nextFid)) {
                         shpreader.next();
-                        if( !dbfreader.IsRandomAccessEnabled() )
+                        if( dbfreader != null && !dbfreader.IsRandomAccessEnabled() )
                             dbfreader.skip();
                         continue;
                     }
-                    if( dbfreader.IsRandomAccessEnabled() )
+                    if( dbfreader != null && dbfreader.IsRandomAccessEnabled() )
                         dbfreader.goTo(shpreader.getRecordNumber());
                     ShapefileReader.Record record = shpreader.next();
 
@@ -541,7 +544,7 @@ public class ShapefileRenderer implements GTRenderer {
 
                     if (geom == null) {
                         LOGGER.finest("skipping geometry");
-                        if( !dbfreader.IsRandomAccessEnabled() )
+                        if( dbfreader != null && !dbfreader.IsRandomAccessEnabled() )
                             dbfreader.skip();
                         continue;
                     }
@@ -709,21 +712,27 @@ public class ShapefileRenderer implements GTRenderer {
      * @throws FactoryConfigurationError
      * @throws SchemaException
      */
-    FeatureType createFeatureType( Query query, Style style, FeatureType schema )
-            throws SchemaException {
+    FeatureType createFeatureType( Query query, Style style, ShapefileDataStore ds)
+            throws SchemaException, IOException {
+        FeatureType schema = ds.getSchema();
         String[] attributes = findStyleAttributes((query == null) ? Query.ALL : query, style,
                 schema);
         AttributeType[] types = new AttributeType[attributes.length];
         attributeIndexing = new int[attributes.length];
-
-        for( int i = 0; i < types.length; i++ ) {
-            types[i] = schema.getAttributeType(attributes[i]);
-
-            for( int j = 0; j < dbfheader.getNumFields(); j++ ) {
-                if (dbfheader.getFieldName(j).equals(attributes[i])) {
-                    attributeIndexing[i] = j;
-
-                    break;
+        
+        if(attributes.length == 1 && attributes[0].equals(schema.getPrimaryGeometry().getLocalName())) {
+            types[0] = schema.getAttributeType(attributes[0]);
+        } else {
+            dbfheader = getDBFHeader(ds);
+            for( int i = 0; i < types.length; i++ ) {
+                types[i] = schema.getAttributeType(attributes[i]);
+    
+                for( int j = 0; j < dbfheader.getNumFields(); j++ ) {
+                    if (dbfheader.getFieldName(j).equals(attributes[i])) {
+                        attributeIndexing[i] = j;
+    
+                        break;
+                    }
                 }
             }
         }
@@ -1299,7 +1308,6 @@ public class ShapefileRenderer implements GTRenderer {
 
                 // dbfheader must be set so that the attributes required for theming can be read in.
                 ShapefileDataStore ds = (ShapefileDataStore) currLayer.getFeatureSource().getDataStore();
-                dbfheader = getDBFHeader(ds);
 
                 // graphics.setTransform(transform);
                 // extract the feature type stylers from the style object

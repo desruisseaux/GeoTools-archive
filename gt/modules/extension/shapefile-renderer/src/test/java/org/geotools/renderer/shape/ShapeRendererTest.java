@@ -164,8 +164,7 @@ public class ShapeRendererTest extends TestCase {
         IndexedDbaseFileReader reader = ShapefileRendererUtil
                         .getDBFReader(ds);
         renderer.dbfheader = reader.getHeader();
-        FeatureType type = renderer.createFeatureType(null, style, ds
-                .getSchema());
+        FeatureType type = renderer.createFeatureType(null, style, ds);
         assertEquals("NAME", type.getAttributeType(0).getLocalName());
         assertEquals(2, type.getAttributeCount());
         Envelope bounds = ds.getFeatureSource().getBounds();
