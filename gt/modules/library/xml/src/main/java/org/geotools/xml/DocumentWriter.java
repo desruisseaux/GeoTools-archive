@@ -86,6 +86,11 @@ public class DocumentWriter {
      * TargetNamespaces
      */
     public static final String SCHEMA_ORDER = "DocumentWriter_SCHEMA_ORDER";
+    
+    /**
+     * The Encoding which should be used for the Document which should be created.
+     */
+    public static final String ENCODING = "DocumentWriter_ENCODING";
 
     // TODO implement this searchOrder
 
@@ -1365,11 +1370,20 @@ public class DocumentWriter {
         private Schema schema;
         protected Map hints;
         private Schema[] searchOrder = null;
+        private String encoding = "UTF-8";
 
         WriterContentHandler(Schema schema, Writer writer, Map hints) {
             this.writer = writer;
             this.schema = schema;
             this.hints = hints;
+            
+            if (this.hints != null){
+	            Object encodingValue = this.getHint(DocumentWriter.ENCODING);
+	            if (encodingValue != null){
+	            	this.encoding = encodingValue.toString();
+	            }
+            }
+            
             prefixMappings = new HashMap();
             prefixMappings.put(schema.getTargetNamespace(), "");
 
@@ -1633,7 +1647,7 @@ public class DocumentWriter {
          * @see PrintHandler#startDocument()
          */
         public void startDocument() throws IOException {
-            writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        	 writer.write("<?xml version=\"1.0\" encoding=\""+encoding+"\"?>");
 
             // TODO format here
             writer.write("\n");
