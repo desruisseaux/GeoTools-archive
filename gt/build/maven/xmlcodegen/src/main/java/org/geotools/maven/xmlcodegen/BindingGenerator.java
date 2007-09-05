@@ -15,16 +15,18 @@
  */
 package org.geotools.maven.xmlcodegen;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.xsd.XSDAttributeDeclaration;
 import org.eclipse.xsd.XSDElementDeclaration;
+import org.eclipse.xsd.XSDInclude;
 import org.eclipse.xsd.XSDNamedComponent;
 import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.XSDTypeDefinition;
@@ -52,15 +54,11 @@ import org.geotools.xml.Schemas;
  */
 public class BindingGenerator extends AbstractGenerator {
     static Logger logger = Logger.getLogger("org.geotools.xml");
-    boolean generatingBindingInterface = true;
-    boolean generatingBindingConfiguration = true;
+    boolean generateXsd = true;
     boolean generateAttributes = true;
     boolean generateElements = true;
     boolean generateTypes = true;
     boolean generateConfiguration = true;
-    boolean generateSchemaLocationResolver = true;
-    
-    Set included = null;
     
     /**
      * Map of string, class which define the name and type of binding constructor
@@ -73,15 +71,9 @@ public class BindingGenerator extends AbstractGenerator {
         this.bindingConstructorArguments = bindingConstructorArguments;
     }
 
-    
-    public void setGeneratingBindingConfiguration(
-        boolean generatingBindingConfiguration) {
-        this.generatingBindingConfiguration = generatingBindingConfiguration;
-    }
-
-    public void setGeneratingBindingInterface(
-        boolean generatingBindingInterface) {
-        this.generatingBindingInterface = generatingBindingInterface;
+   public void setGenerateXsd(
+        boolean generateXsd) {
+        this.generateXsd = generateXsd;
     }
 
     public void setGenerateAttributes(boolean generateAttributes) {
@@ -95,11 +87,11 @@ public class BindingGenerator extends AbstractGenerator {
     public void setGenerateTypes(boolean generateTypes) {
         this.generateTypes = generateTypes;
     }
-
-    public void setIncluded(Set included) {
-		this.included = included;
-	}
     
+    public void setGenerateConfiguration(boolean generateConfiguration) {
+        this.generateConfiguration = generateConfiguration;
+    }
+
     public void generate(XSDSchema schema) {
         List components = new ArrayList();
 
@@ -143,32 +135,77 @@ public class BindingGenerator extends AbstractGenerator {
             }
         }
 
-        if (generatingBindingConfiguration) {
+        if (generateXsd) {
             try {
-                String result = execute("BindingConfigurationTemplate",
-                        new Object[] { schema, components });
-                write(result,
-                    prefix(schema).toUpperCase() + "BindingConfiguration");
-            } catch (Exception e) {
-                String msg = "Error generating binding configuration";
-                logger.log(Level.WARNING, msg, e);
-            }
-        }
-
-        if (generatingBindingInterface) {
-            try {
-                String result = execute("BindingInterfaceTemplate", schema);
+                String result = execute("XSDTemplate", schema);
                 write(result, prefix(schema).toUpperCase());
             } catch (Exception e) {
                 String msg = "Error generating binding interface";
                 logger.log(Level.WARNING, msg, e);
             }
         }
+        
+        if (generateConfiguration) {
+            try {
+                String result = execute("ConfigurationTemplate", new Object[]{schema,components} );
+                        
+                String prefix = Schemas.getTargetPrefix(schema).toUpperCase();
+                write(result, prefix + "Configuration");
+
+            }
+            catch( Exception e ) {
+                logger.log( Level.SEVERE, "Error generating resolver", e );
+            }
+            
+            //copy over all included schemas
+            ArrayList includes = new ArrayList();
+           
+            File file = null;
+            try {
+                file = findSchemaFile( schema.getSchemaLocation() );
+            } 
+            catch (IOException e) {
+                logger.log(Level.SEVERE, "", e );
+            }
+            
+            if ( file != null ) {
+                includes.add( file );
+            }
+            else {
+                logger.log( Level.SEVERE, "Could not find: " + schema.getSchemaLocation() + " to copy." );          
+            }
+            
+            for (Iterator i = Schemas.getIncludes(schema).iterator(); i.hasNext();) {
+                XSDInclude include = (XSDInclude) i.next();
+                
+                file = null;
+                try {
+                    file = findSchemaFile( include.getSchemaLocation() );
+                } 
+                catch (IOException e) {
+                    logger.log(Level.SEVERE, "", e );
+                }
+                
+                if ( file != null ) {
+                    includes.add( file );
+                }
+                else {
+                    logger.log( Level.SEVERE, "Could not find: " + include.getSchemaLocation() + " to copy." );         
+                }
+            }
+
+            for (Iterator i = includes.iterator(); i.hasNext();) {
+                File include = (File) i.next();
+                try {
+                    copy(include);
+                } 
+                catch (IOException e) {
+                    logger.log( Level.WARNING, "Could not copy file " + include , e );
+                }
+            }
+        }
     }
 
-    boolean included( XSDNamedComponent c ) {
-    	return included != null ? included.contains( c.getName() ) : true;
-    }
     
     boolean target(XSDNamedComponent c, XSDSchema schema) {
     	return c.getTargetNamespace().equals(schema.getTargetNamespace());

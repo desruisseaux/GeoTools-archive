@@ -24,10 +24,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.util.Set;
 import java.util.logging.Logger;
 
+import org.eclipse.xsd.XSDNamedComponent;
 import org.eclipse.xsd.XSDSchema;
 import org.geotools.xml.Schemas;
+
+import com.sun.org.apache.xml.internal.utils.URI.MalformedURIException;
 
 
 /**
@@ -55,9 +62,15 @@ public abstract class AbstractGenerator {
     boolean overwriting = false;
 
     /**
+     * Schema source directory
+     */
+    File schemaSourceDirectory;
+    /**
      * lookup directories for schemas
      */
     File[] schemaLookupDirectories;
+
+    Set included = null;
     
     /**
      * Sets the base package for generated classes.
@@ -101,6 +114,15 @@ public abstract class AbstractGenerator {
         this.overwriting = overwriting;
     }
 
+    /**
+     * Sets the single directory to lookup schemas.
+     * 
+     * @param schemaSourceDirectory A directory.
+     */
+    public void setSchemaSourceDirectory(File schemaSourceDirectory) {
+        this.schemaSourceDirectory = schemaSourceDirectory;
+    }
+    
     /**
      * Sets the directories to use when attempting to locate a schema via a 
      * relative reference.
@@ -191,9 +213,23 @@ public abstract class AbstractGenerator {
      * 
      */
     protected File findSchemaFile( String path ) throws IOException {
-    	File file = new File( path );
+        File file = null;
+        try {
+            file = new File(new URL(path).getFile());
+        }
+        catch( MalformedURLException e ) {
+            file = new File( path );
+        }
+    	
     	if ( file.isAbsolute() ) {
     		return file;
+    	}
+    	
+    	if ( schemaSourceDirectory != null ) {
+    	    file = new File( schemaSourceDirectory, path );
+            if ( file.exists() ) {
+                return file;
+            }
     	}
     	
     	if ( schemaLookupDirectories != null ) {
@@ -268,5 +304,13 @@ public abstract class AbstractGenerator {
 
     String prefix(XSDSchema schema) {
        return Schemas.getTargetPrefix( schema );
+    }
+
+    public void setIncluded(Set included) {
+    	this.included = included;
+    }
+
+    protected boolean included(XSDNamedComponent c) {
+    	return included != null ? included.contains( c.getName() ) : true;
     }
 }

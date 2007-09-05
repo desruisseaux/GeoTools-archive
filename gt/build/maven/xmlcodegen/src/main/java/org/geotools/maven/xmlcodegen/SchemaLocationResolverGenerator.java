@@ -89,10 +89,10 @@ public class SchemaLocationResolverGenerator extends AbstractGenerator {
         }
 
         try {
-			String result = execute("SchemaLocationResolverTemplate",
-			        new Object[] { schema, includes, namespaces });
-			String prefix = Schemas.getTargetPrefix(schema).toUpperCase();
-			write(result, prefix + "SchemaLocationResolver");
+//			String result = execute("SchemaLocationResolverTemplate",
+//			        new Object[] { schema, includes, namespaces });
+//			String prefix = Schemas.getTargetPrefix(schema).toUpperCase();
+//			write(result, prefix + "SchemaLocationResolver");
 
 			//copy over all the schemas
 			for (Iterator i = includes.iterator(); i.hasNext();) {

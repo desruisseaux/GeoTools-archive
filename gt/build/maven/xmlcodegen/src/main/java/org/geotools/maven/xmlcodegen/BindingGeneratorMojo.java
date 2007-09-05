@@ -27,31 +27,6 @@ import org.eclipse.xsd.util.XSDSchemaLocator;
 public class BindingGeneratorMojo extends AbstractGeneratorMojo {
 
 	/**
-	 * Flag controlling wether an interface containg all the element, attribute, and 
-	 * type names from the schema should be generated. Inclusion / exclusion filters 
-	 * do not apply.
-	 * 
-	 * @parameter expression="true"
-	 */
-    boolean generateNames;
-    
-    /**
-	 * Flag controlling wether the binding configuration ( {@link org.geotools.xml.BindingConfiguration} ) 
-	 * should be generated, default is true.
-	 * 
-	 * @parameter expression="true"
-	 */
-    boolean generateBindingConfiguration;
-    
-    /**
-     * Flag controlling wether a schema locator ( {@link XSDSchemaLocator} ) 
-     * should be generated, the default is false.
-     * 
-     * @parameter expression="false"
-     */
-    boolean generateSchemaLocationResolver;
-    
-    /**
      * Flag controlling wether a parser configuration ( {@link org.geotools.xml.Configuration} ) 
      * the default is true.
      * 
@@ -115,13 +90,17 @@ public class BindingGeneratorMojo extends AbstractGeneratorMojo {
     	}
 		
 		BindingGenerator generator = new BindingGenerator();
-		generator.setGeneratingBindingConfiguration( generateBindingConfiguration );
-		generator.setGeneratingBindingInterface( generateNames );
 		generator.setGenerateAttributes( generateAttributeBindings );
 		generator.setGenerateElements( generateElementBindings );
 		generator.setGenerateTypes( generateTypeBindings );
+		generator.setGenerateConfiguration( generateConfiguration );
 		generator.setOverwriting( overwriteExistingFiles );
 		generator.setLocation( outputDirectory.getAbsolutePath() );
+		generator.setSchemaSourceDirectory(schemaSourceDirectory);
+		
+		if ( schemaLookupDirectories != null ) {
+		    generator.setSchemaLookupDirectories(schemaLookupDirectories);
+		}
 	
 		if ( destinationPackage != null ) {
 			generator.setPackageBase( destinationPackage );
@@ -174,28 +153,6 @@ public class BindingGeneratorMojo extends AbstractGeneratorMojo {
 		
 		getLog().info( "Generating bindings...");
 		generator.generate( xsdSchema );
-		
-		//schema location resolver
-		if ( generateSchemaLocationResolver ) {
-			SchemaLocationResolverGenerator slrg = new SchemaLocationResolverGenerator();
-			getLog().info( "Generating schema location resolver to " + outputDirectory.getAbsolutePath() );
-			slrg.setLocation( outputDirectory.getAbsolutePath() );
-			slrg.setOverwriting( overwriteExistingFiles );
-			slrg.setPackageBase( destinationPackage );
-			slrg.setSchemaLookupDirectories(schemaLookupDirectories);
-			slrg.generate( xsdSchema );
-		}
-		
-		//parser configuration
-		if ( generateConfiguration ) {
-			getLog().info( "Generating parser configuration...");
-			ConfigurationGenerator cg = new ConfigurationGenerator();
-			cg.setLocation( outputDirectory.getAbsolutePath() );
-			cg.setOverwriting( overwriteExistingFiles );
-			cg.setPackageBase( destinationPackage );
-			cg.setSchemaLookupDirectories(schemaLookupDirectories);
-			cg.generate( xsdSchema );
-		}
 	}
 
 }

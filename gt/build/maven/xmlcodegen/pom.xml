@@ -44,7 +44,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.geotools</groupId>
-			<artifactId>gt2-xml-xsd</artifactId>
+			<artifactId>gt2-xml-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
