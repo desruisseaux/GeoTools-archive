@@ -117,6 +117,8 @@ public class WFSDataStore extends AbstractDataStore {
     private int timeout = 10000;
     private final boolean tryGZIP;
     protected WFSStrategy strategy;
+    
+    protected String encoding = "UTF-8";
 
     private boolean lenient;
 
@@ -129,6 +131,16 @@ public class WFSDataStore extends AbstractDataStore {
     	// not called
     	tryGZIP=true;
     }
+    
+    protected WFSDataStore(URL host, Boolean protocol, String username,
+            String password, int timeout, int buffer, boolean tryGZIP, boolean lenient,String encoding) 
+    	throws SAXException, IOException {
+    	 this( host, protocol, username, password, timeout, buffer, tryGZIP, lenient);
+    	 if (encoding != null){
+         	this.encoding = encoding;
+         }
+	}
+    
     /**
      * Construct <code>WFSDataStore</code>.
      *
@@ -517,6 +529,7 @@ public class WFSDataStore extends AbstractDataStore {
         if(uri!=null)
             hints.put(DocumentWriter.SCHEMA_ORDER, new String[]{WFSSchema.NAMESPACE.toString(), uri.toString()});
         
+        hints.put(DocumentWriter.ENCODING, encoding);
         try {
             DocumentWriter.writeDocument(new String[] { typeName },
                 WFSSchema.getInstance(), osw, hints);
@@ -581,7 +594,7 @@ public class WFSDataStore extends AbstractDataStore {
                 if ( Filters.getFilterType(request.getFilter()) == FilterType.GEOMETRY_BBOX) {
                     String bb = printBBoxGet(((GeometryFilter) request.getFilter()),request.getTypeName());
                     if(bb!=null)
-                        url += ("&BBOX=" + URLEncoder.encode(bb, "UTF-8"));
+                        url += ("&BBOX=" + URLEncoder.encode(bb, this.encoding));
                 } else {
                     if (Filters.getFilterType(request.getFilter()) == FilterType.FID) {
                         FidFilter ff = (FidFilter) request.getFilter();
@@ -597,14 +610,14 @@ public class WFSDataStore extends AbstractDataStore {
                         // rest
                         if (request.getFilter() != Filter.INCLUDE && request.getFilter() != Filter.EXCLUDE) {
                             url += "&FILTER=" + URLEncoder.encode(
-                                    printFilter(request.getFilter()), "UTF-8");
+                                    printFilter(request.getFilter()), this.encoding);
                         }
                     }
                 }
             }
         }
 
-        url += ("&TYPENAME=" + URLEncoder.encode(request.getTypeName(), "UTF-8"));
+        url += ("&TYPENAME=" + URLEncoder.encode(request.getTypeName(), this.encoding));
 
         Logger.getLogger("org.geotools.data.wfs").fine(url);
         Logger.getLogger("org.geotools.data.communication").fine("Output: "+url);
@@ -762,7 +775,7 @@ public class WFSDataStore extends AbstractDataStore {
         Map hints = new HashMap();
         hints.put(DocumentWriter.BASE_ELEMENT,
             WFSSchema.getInstance().getElements()[2]); // GetFeature
-        
+        hints.put(DocumentWriter.ENCODING, encoding);
         try {
             DocumentWriter.writeDocument(query, WFSSchema.getInstance(), w,
                 hints);

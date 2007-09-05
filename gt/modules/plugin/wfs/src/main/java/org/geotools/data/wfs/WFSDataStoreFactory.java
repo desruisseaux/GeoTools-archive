@@ -69,6 +69,14 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
             String.class,
             "This allows the user to specify a username. This param should not be used without the USERNAME param.",
             false);
+    
+    /**
+     * String
+     */
+    public static final Param ENCODING = new Param("WFSDataStoreFactory:ENCODING",
+            String.class,
+            "This allows the user to specify the Encoding of the XML of the XML-Requests sent to the Server.",
+            false);
 
     // timeout -- optional
     /**
@@ -153,6 +161,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         int buffer = 10;
         boolean tryGZIP=true;
         boolean lenient=false;
+        String encoding = null;
 
         if (params.containsKey(TIMEOUT.key)) {
             Integer i = (Integer) TIMEOUT.lookUp(params);
@@ -185,6 +194,10 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         if (params.containsKey(PASSWORD.key)) {
             pass = (String) PASSWORD.lookUp(params);
         }
+        
+        if (params.containsKey(ENCODING.key)) {
+            encoding = (String) ENCODING.lookUp(params);
+        }
 
         if (((user == null) && (pass != null))
                 || ((pass == null) && (user != null))) {
@@ -197,7 +210,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         DataStore ds = null;
 
         try {
-            ds = new WFSDataStore(host, protocol, user, pass, timeout, buffer, tryGZIP, lenient);
+            ds = new WFSDataStore(host, protocol, user, pass, timeout, buffer, tryGZIP, lenient,encoding);
             cache.put(params, ds);
         } catch (SAXException e) {
             logger.warning(e.toString());
