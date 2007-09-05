@@ -40,13 +40,13 @@ import org.apache.commons.cli2.util.HelpFormatter;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.WildcardFilter;
 import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
+import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.coverage.grid.io.GridFormatFinder;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
-import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
-import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.geotools.data.coverage.grid.GridFormatFinder;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
@@ -57,8 +57,12 @@ import org.geotools.feature.type.GeometricAttributeType;
 import org.geotools.feature.type.TextualAttributeType;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.CRS;
 import org.geotools.resources.CRSUtilities;
+import org.opengis.geometry.Envelope;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -108,8 +112,8 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 	private int numFiles;
 
 	/** Default Logger * */
-	private final static Logger LOG = Logger.getLogger(MosaicIndexBuilder.class
-			.toString());
+	private final static Logger LOG = Logger
+			.getLogger("it.geosolutions.utils.imagemosaic");
 
 	/** Program Version */
 	private final static String versionNumber = "0.2";
@@ -165,12 +169,10 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 		FileFilter fileFilter = new WildcardFilter(wildcardString);
 		File[] files = dir.listFiles(fileFilter);
 		File[] dirs = dir.listFiles((FileFilter) DirectoryFileFilter.INSTANCE);
-		final int filesLength = files.length;
-		for (int i = 0; i < filesLength; i++) {
+		for (int i = 0; i < files.length; i++) {
 			allFiles.add(files[i]);
 		}
-		final int dirsLength = dirs.length;
-		for (int i = 0; i < dirsLength; i++) {
+		for (int i = 0; i < dirs.length; i++) {
 			recurse(allFiles, locationPath + '/' + dirs[i].getName());
 		}
 	}
@@ -214,10 +216,10 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
         // our metadata files
         //
         // /////////////////////////////////////////////////////////////////////
-        Set skipFiles = new HashSet(Arrays.asList(new String[] {indexName + ".shp", 
-                indexName + ".dbf", indexName + ".shx", indexName + ".prj", "error.txt", 
-                "error.txt.lck", indexName + ".properties"      
-        }));
+		final Set skipFiles = new HashSet(Arrays.asList(new String[] {
+				indexName + ".shp", indexName + ".dbf", indexName + ".shx",
+				indexName + ".prj", "error.txt", "error.txt.lck",
+				indexName + ".properties" }));
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -225,8 +227,6 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 		//
 		// /////////////////////////////////////////////////////////////////////
 		ShapefileDataStore index = null;
-		FeatureWriter fw = null;
-		Feature feature = null;
 		Transaction t = new DefaultTransaction();
 		// declaring a preciosion model to adhere the java double type
 		// precision
@@ -238,27 +238,15 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 		} catch (MalformedURLException ex) {
 			if (LOG.isLoggable(Level.SEVERE))
 				LOG.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
-            fireException(ex);
+			fireException(ex);
 			return;
 		}
 
 		/** Fixed local variables * */
-		AbstractGridCoverage2DReader reader;
-		ImageInputStream inStream;
-		ImageTypeSpecifier its;
-		Iterator it;
-		ImageReader r;
-		double[] res;
-		boolean skipFeature = false;
-		double resX = 0, resY = 0;
-		boolean doneSomething = false;
-
 		// final File dir = new File(locationPath);
-		List files = new ArrayList(25);
+		final List files = new ArrayList(25);
 		recurse(files, locationPath);
 
-		StringBuffer message;
-		File fileBeingProcessed;
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Cycling over the features
@@ -267,8 +255,11 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 		numFiles = files.size();
 		String validFileName = null;
 		final Iterator filesIt = files.iterator();
+		FeatureWriter fw = null;
+		boolean doneSomething = false;
 		for (int i = 0; i < numFiles; i++) {
-			fileBeingProcessed = ((File) filesIt.next());
+			final File fileBeingProcessed = ((File) filesIt.next());
+			StringBuffer message;
 			// //
 			//
 			// Anyone has asked us to stop?
@@ -311,14 +302,29 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 				//
 				//
 				// ////////////////////////////////////////////////////////
-				inStream = ImageIO.createImageInputStream(fileBeingProcessed);
+				final ImageInputStream inStream = ImageIO
+						.createImageInputStream(fileBeingProcessed);
 				inStream.mark();
-				it = ImageIO.getImageReaders(inStream);
+				final Iterator it = ImageIO.getImageReaders(inStream);
 
+				ImageReader r = null;
 				if (it.hasNext()) {
 					r = (ImageReader) it.next();
 					r.setInput(inStream);
 				} else {
+					//release resources
+					try {
+						inStream.close();
+					} catch (Exception e) {
+						// ignore exception
+					}
+					try {
+						r.dispose();
+					} catch (Exception e) {
+						// ignore exception
+					}
+					
+					//send a message
 					message = new StringBuffer("Skipped file ").append(
 							files.get(i)).append(
 							":No ImageIO readeres avalaible.");
@@ -340,9 +346,21 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 				// ////////////////////////////////////////////////////////
 				if (LOG.isLoggable(Level.FINE))
 					LOG.fine(new StringBuffer("Getting a reader").toString());
-				AbstractGridFormat format = (AbstractGridFormat) GridFormatFinder
+				final AbstractGridFormat format = (AbstractGridFormat) GridFormatFinder
 						.findFormat(files.get(i));
 				if (format == null) {
+					//release resources
+					try {
+						inStream.close();
+					} catch (Exception e) {
+						// ignore exception
+					}
+					try {
+						r.dispose();
+					} catch (Exception e) {
+						// ignore exception
+					}
+					
 					message = new StringBuffer("Skipped file ").append(
 							files.get(i)).append(
 							": File format is not supported.");
@@ -351,9 +369,8 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 					fireEvent(message.toString(), ((i * 99.0) / numFiles));
 					continue;
 				}
-				reader = (AbstractGridCoverage2DReader) format.getReader(files
-						.get(i));
-
+				final AbstractGridCoverage2DReader reader = (AbstractGridCoverage2DReader) format
+						.getReader(files.get(i));
 				envelope = (GeneralEnvelope) reader.getOriginalEnvelope();
 				actualCRS = reader.getCrs();
 
@@ -366,7 +383,9 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 				// eveything.
 				//
 				// /////////////////////////////////////////////////////////////////////
-				its = ((ImageTypeSpecifier) r.getImageTypes(0).next());
+				final ImageTypeSpecifier its = ((ImageTypeSpecifier) r
+						.getImageTypes(0).next());
+				boolean skipFeature = false;
 				if (globEnvelope == null) {
 					// /////////////////////////////////////////////////////////////////////
 					//
@@ -404,16 +423,14 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 					// computing the resolution
 					// //
 					// resetting reader and recreating stream, turnarounf for a
-					// strange iamgeio bug
+					// strange imageio bug
 					r.reset();
 					inStream.reset();
 					r.setInput(inStream);
 					numberOfLevels = r.getNumImages(true);
 					resolutionLevels = new double[2][numberOfLevels];
-					res = getResolution(envelope, new Rectangle(r.getWidth(0),
-							r.getHeight(0)), defaultCRS);
-					resX = res[0];
-					resY = res[1];
+					double[] res = getResolution(envelope, new Rectangle(r
+							.getWidth(0), r.getHeight(0)), defaultCRS);
 					resolutionLevels[0][0] = res[0];
 					resolutionLevels[1][0] = res[1];
 
@@ -443,7 +460,7 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 					builder.setDefaultGeometry(refGeom);
 					builder.addType(locationAttribute);
 
-					FeatureType ftType = null;
+					final FeatureType ftType;
 					try {
 						ftType = builder.getFeatureType();
 					} catch (SchemaException e) {
@@ -467,7 +484,7 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 					globEnvelope.add(envelope);
 					actualCM = its.getColorModel();
 					actualSM = its.getSampleModel();
-					skipFeature = (i > 0 ? !(CRSUtilities.equalsIgnoreMetadata(
+					skipFeature = (i > 0 ? !(CRS.equalsIgnoreMetadata(
 							defaultCRS, actualCRS)) : false);
 					if (skipFeature)
 						LOG.warning(new StringBuffer("Skipping image ").append(
@@ -494,16 +511,17 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 					// .append(
 					// " because cm or sm does not match.")
 					// .toString());
-					res = getResolution(envelope, new Rectangle(r.getWidth(0),
-							r.getHeight(0)), defaultCRS);
-					if (Math.abs((resX - res[0]) / resX) > EPS
-							|| Math.abs(resY - res[1]) > EPS) {
-						LOG.warning(new StringBuffer("Skipping image ").append(
-								files.get(i)).append(
-								" because resolutions does not match.")
-								.toString());
-						skipFeature = true;
-					}
+					// res = getResolution(envelope, new
+					// Rectangle(r.getWidth(0),
+					// r.getHeight(0)), defaultCRS);
+					// if (Math.abs((resX - res[0]) / resX) > EPS
+					// || Math.abs(resY - res[1]) > EPS) {
+					// LOG.warning(new StringBuffer("Skipping image ").append(
+					// files.get(i)).append(
+					// " because resolutions does not match.")
+					// .toString());
+					// skipFeature = true;
+					// }
 				}
 
 				// ////////////////////////////////////////////////////////
@@ -515,10 +533,10 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 				// ////////////////////////////////////////////////////////
 				if (!skipFeature) {
 
-					feature = fw.next();
+					final Feature feature = fw.next();
 					feature.setAttribute(0, geomFactory
-							.toGeometry(new ReferencedEnvelope(envelope,
-									actualCRS)));
+							.toGeometry(new ReferencedEnvelope(
+									(Envelope) envelope)));
 
 					feature.setAttribute(1, validFileName);
 					fw.write();
@@ -533,6 +551,27 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 					doneSomething = true;
 				} else
 					skipFeature = false;
+				
+				// ////////////////////////////////////////////////////////
+				//
+				// STEP 5
+				//
+				// release resources
+				//
+				// ////////////////////////////////////////////////////////
+				try {
+					inStream.close();
+				} catch (Exception e) {
+					// ignore exception
+				}
+				try {
+					r.dispose();
+				} catch (Exception e) {
+					// ignore exception
+				}
+				//release resources
+				reader.dispose();
+
 
 			} catch (IOException e) {
 				fireException(e);
@@ -704,9 +743,9 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 			// get the palette for this color model
 			int numBands = actualICM.getNumColorComponents();
 			byte[][] actualPalette = new byte[3][actualICM.getMapSize()];
-			actualICM.getReds(defaultPalette[0]);
-			actualICM.getGreens(defaultPalette[0]);
-			actualICM.getBlues(defaultPalette[0]);
+			actualICM.getReds(actualPalette[0]);
+			actualICM.getGreens(actualPalette[0]);
+			actualICM.getBlues(actualPalette[0]);
 			if (numBands == 4)
 				actualICM.getAlphas(defaultPalette[0]);
 			// compare them
@@ -885,13 +924,15 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 	 * <p>
 	 * TODO use orthodromic distance?
 	 * 
-	 * @param requestedEnvelope
+	 * @param envelope
+	 *            the GeneralEnvelope
 	 * @param dim
-	 * @param requestedRes
+	 * @param crs
 	 * @throws DataSourceException
 	 */
-	private double[] getResolution(GeneralEnvelope envelope, Rectangle2D dim,
-			CoordinateReferenceSystem crs) throws DataSourceException {
+	protected final double[] getResolution(GeneralEnvelope envelope,
+			Rectangle2D dim, CoordinateReferenceSystem crs)
+			throws DataSourceException {
 		double[] requestedRes = null;
 		try {
 			if (dim != null && envelope != null) {
@@ -899,20 +940,21 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 				final CoordinateReferenceSystem crs2D = CRSUtilities
 						.getCRS2D(envelope.getCoordinateReferenceSystem());
 
-				final boolean longitudeFirst = !GridGeometry2D.swapXY(crs2D
-						.getCoordinateSystem());
-
+				if (crs != null && !CRS.equalsIgnoreMetadata(crs, crs2D)) {
+					final MathTransform tr = CRS.findMathTransform(crs2D, crs);
+					if (!tr.isIdentity())
+						envelope = CRS.transform(tr, envelope);
+				}
 				requestedRes = new double[2];
-				requestedRes[0] = envelope.getLength(longitudeFirst ? 0 : 1)
-						/ dim.getWidth();
-				requestedRes[1] = envelope.getLength(longitudeFirst ? 1 : 0)
-						/ dim.getHeight();
+				requestedRes[0] = envelope.getLength(0) / dim.getWidth();
+				requestedRes[1] = envelope.getLength(1) / dim.getHeight();
 			}
 			return requestedRes;
 		} catch (TransformException e) {
 			throw new DataSourceException("Unable to get the resolution", e);
+		} catch (FactoryException e) {
+			throw new DataSourceException("Unable to get the resolution", e);
 		}
-
 	}
 
 	/**
