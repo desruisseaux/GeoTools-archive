@@ -46,6 +46,7 @@ import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.data.DataSourceException;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.BufferedCoordinateOperationFactory;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.resources.CRSUtilities;
@@ -595,11 +596,11 @@ public abstract class AbstractGridCoverage2DReader implements
 						.getCRS2D(envelope.getCoordinateReferenceSystem());
 
 				if (crs != null
-						&& !CRSUtilities.equalsIgnoreMetadata(crs, crs2D)) {
+						&& !CRS.equalsIgnoreMetadata(crs, crs2D)) {
 					final MathTransform tr = operationFactory.createOperation(
 							crs2D, crs).getMathTransform();
 					if (!tr.isIdentity())
-						envelope = CRSUtilities.transform(tr, envelope);
+						envelope = CRS.transform(tr, envelope);
 				}
 				requestedRes = new double[2];
 				requestedRes[0] = envelope.getLength(0) / dim.getWidth();
