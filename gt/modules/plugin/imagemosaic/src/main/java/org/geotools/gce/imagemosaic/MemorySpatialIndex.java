@@ -76,11 +76,9 @@ public final class MemorySpatialIndex {
 					"The provided FeatureCollection  or empty, it's impossible to create an index!");
 		}
 		index = new com.vividsolutions.jts.index.strtree.STRtree();
-		Feature f;
-		Geometry g;
 		while (it.hasNext()) {
-			f = it.next();
-			g = f.getPrimaryGeometry();
+			final Feature f = it.next();
+			final Geometry g = f.getPrimaryGeometry();
 			index.insert(g.getEnvelopeInternal(), f);
 		}
 		// closing he iterator to free some resources.

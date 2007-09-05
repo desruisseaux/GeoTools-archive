@@ -43,12 +43,12 @@ import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.GridFormatFinder;
 import org.geotools.coverage.grid.io.UnknownFormat;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
+import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
-import org.opengis.geometry.MismatchedDimensionException;
 
 /**
  * Testing {@link ImageMosaicReader}.
@@ -558,7 +558,7 @@ public class ImageMosaicReaderTest extends TestCase {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		TestRunner.run(ImageMosaicReaderTest.class);
+		TestRunner.run(ImageMosaicReaderTest.suite());
 
 	}
 
