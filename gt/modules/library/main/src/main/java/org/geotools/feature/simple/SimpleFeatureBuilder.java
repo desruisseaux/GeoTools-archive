@@ -150,7 +150,7 @@ public class SimpleFeatureBuilder  {
     	}
     	
     	//add it
-		attributes().add(attribute);
+    	attributes().add(attributes().size(),attribute);
 	}
     
     public void add(Object[] values ) {
@@ -160,6 +160,23 @@ public class SimpleFeatureBuilder  {
     	for ( int i = 0; i < values.length; i++) {
     		add( values[ i ] );
     	}
+    }
+    
+    public void set(String name, Object value) {
+        int index = featureType.indexOf(name);
+        if (index < attributes().size()) {
+            //already an attribute for this index
+            Attribute attribute = (Attribute) attributes().get(index);
+            attribute.setValue(value);
+        }
+        else {
+            //expand the list of attributes up to the index
+            while(attributes.size() < index ) {
+                add((Object)null);
+            }
+            
+            add(value);
+        }
     }
     
     public Object build( String id ){
@@ -193,6 +210,13 @@ public class SimpleFeatureBuilder  {
     }
     
     public SimpleFeature feature(String id) {
+        //ensure they specified enough values
+        int n = featureType.getAttributeCount();
+        while( attributes().size() < n ) {
+            add((Object)null);
+        }
+        
+        //build the feature
     	SimpleFeature feature = factory.createSimpleFeature( attributes, featureType, id );
     	feature.setDefaultGeometry(defaultGeometry);
     	
