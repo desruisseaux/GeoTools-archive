@@ -7,9 +7,11 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.util.Map;
 import java.util.Properties;
@@ -69,7 +71,7 @@ public class PostGIS2Example {
 			if (!file.exists()){
 				throw new FileNotFoundException( file.getAbsolutePath() );
 			}
-			Reader reader = new FileReader( file );
+			InputStream reader = new FileInputStream( file );
 			Properties config = new Properties();			
 			config.load(reader);
 			
