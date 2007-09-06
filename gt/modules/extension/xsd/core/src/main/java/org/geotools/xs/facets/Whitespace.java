@@ -91,9 +91,7 @@ public abstract class Whitespace implements Comparable {
 
                 for (; i < collapse.length(); i++) {
                     if (' ' == collapse.charAt(i)) {
-                        for (i++;
-                                (i < collapse.length())
-                                && (' ' == collapse.charAt(i));) {
+                        for (i++; (i < collapse.length()) && (' ' == collapse.charAt(i));) {
                             collapse.deleteCharAt(i);
                         }
                     }

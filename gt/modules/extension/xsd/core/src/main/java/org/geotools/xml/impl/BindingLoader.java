@@ -15,13 +15,12 @@
  */
 package org.geotools.xml.impl;
 
-import javax.xml.namespace.QName;
-
-import org.geotools.xml.Binding;
 import org.picocontainer.ComponentAdapter;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.defaults.DefaultPicoContainer;
 import org.picocontainer.defaults.DuplicateComponentKeyRegistrationException;
+import javax.xml.namespace.QName;
+import org.geotools.xml.Binding;
 
 
 public class BindingLoader {
@@ -81,12 +80,12 @@ public class BindingLoader {
     public MutablePicoContainer getContainer() {
         return container;
     }
-    
+
     /**
      * Sets the container which houses bindings.
-     * 
+     *
      */
     public void setContainer(MutablePicoContainer container) {
-		this.container = container;
-	}
+        this.container = container;
+    }
 }

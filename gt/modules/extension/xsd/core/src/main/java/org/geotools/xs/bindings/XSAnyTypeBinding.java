@@ -15,19 +15,17 @@
  */
 package org.geotools.xs.bindings;
 
+import org.picocontainer.MutablePicoContainer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import javax.xml.namespace.QName;
-
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 import org.geotools.xs.XS;
-import org.picocontainer.MutablePicoContainer;
 
 
 /**
@@ -88,8 +86,7 @@ public class XSAnyTypeBinding extends AbstractComplexBinding {
      *
      * @generated modifiable
      */
-    public void initialize(ElementInstance instance, Node node,
-        MutablePicoContainer context) {
+    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
     }
 
     /**
@@ -110,42 +107,40 @@ public class XSAnyTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-    	
-    	String text = null;
-    	if ((value != null) && value instanceof String) {
+        String text = null;
+
+        if ((value != null) && value instanceof String) {
             text = ((String) value).trim();
-            if ( "".equals( text ) ) {
-            	text = null;
+
+            if ("".equals(text)) {
+                text = null;
             }
         }
-    	
-    	//if there is just some text, return it
-    	if ( node.getChildren().isEmpty() && node.getAttributes().isEmpty() 
-			&& text != null ) {
-    		return text;
-    	}
-    		
-    	//if there is only a single child, return it
-    	if ( node.getChildren().size() == 1 && node.getAttributes().isEmpty() 
-			&& text == null ) {
-    		return node.getChildValue( 0 );
-    	}
-    	
-    	//if there is a single attribute, return it
-    	if ( node.getAttributes().size() == 1 && node.getChildren().isEmpty()
-			&& text == null ) {
-    		return ((Node)node.getAttributes().get( 0 )).getValue();
-    	}
-    	
-    	//create a map of the elements and attributes
+
+        //if there is just some text, return it
+        if (node.getChildren().isEmpty() && node.getAttributes().isEmpty() && (text != null)) {
+            return text;
+        }
+
+        //if there is only a single child, return it
+        if ((node.getChildren().size() == 1) && node.getAttributes().isEmpty() && (text == null)) {
+            return node.getChildValue(0);
+        }
+
+        //if there is a single attribute, return it
+        if ((node.getAttributes().size() == 1) && node.getChildren().isEmpty() && (text == null)) {
+            return ((Node) node.getAttributes().get(0)).getValue();
+        }
+
+        //create a map of the elements and attributes
         Map map = new HashMap();
         List attributes = node.getAttributes();
         List children = node.getChildren();
         mapBinding(map, attributes);
         mapBinding(map, children);
 
-        if (text != null && !"".equals( text.trim() ) ) {
-            map.put(null, text.trim() );
+        if ((text != null) && !"".equals(text.trim())) {
+            map.put(null, text.trim());
         }
 
         return map;

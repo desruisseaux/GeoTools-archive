@@ -15,6 +15,13 @@
  */
 package org.geotools.xs;
 
+import junit.framework.TestCase;
+import org.eclipse.xsd.XSDElementDeclaration;
+import org.eclipse.xsd.XSDFactory;
+import org.eclipse.xsd.XSDSchema;
+import org.eclipse.xsd.XSDSimpleTypeDefinition;
+import org.eclipse.xsd.util.XSDParser;
+import org.picocontainer.defaults.DefaultPicoContainer;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -23,23 +30,13 @@ import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.Map;
-
 import javax.xml.namespace.QName;
-
-import junit.framework.TestCase;
-
-import org.eclipse.xsd.XSDElementDeclaration;
-import org.eclipse.xsd.XSDFactory;
-import org.eclipse.xsd.XSDSchema;
-import org.eclipse.xsd.XSDSimpleTypeDefinition;
-import org.eclipse.xsd.util.XSDParser;
 import org.geotools.xml.Binding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Schemas;
 import org.geotools.xml.SimpleBinding;
 import org.geotools.xml.impl.BindingLoader;
 import org.geotools.xml.impl.ElementImpl;
-import org.picocontainer.defaults.DefaultPicoContainer;
 
 
 public abstract class TestSchema extends TestCase {
@@ -111,8 +108,7 @@ public abstract class TestSchema extends TestCase {
 
     public ElementInstance element(String text, QName qname) {
         // create a fake element declaration and element instance
-        XSDElementDeclaration declaration = XSDFactory.eINSTANCE
-            .createXSDElementDeclaration();
+        XSDElementDeclaration declaration = XSDFactory.eINSTANCE.createXSDElementDeclaration();
         declaration.setTypeDefinition(xsdSimple(qname.getLocalPart()));
 
         ElementInstance element = new ElementImpl(declaration);
@@ -131,8 +127,8 @@ public abstract class TestSchema extends TestCase {
                 + "  <xsd:schema xmlns:my=\"http://mails/refractions/net\""
                 + "              xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
                 + "              targetNamespace=\"http://localhost//test\">"
-                + "  <xsd:element name=\"" + name + "\" type=\"xsd:"
-                + original.getLocalPart() + "\"/>" + "</xsd:schema>");
+                + "  <xsd:element name=\"" + name + "\" type=\"xsd:" + original.getLocalPart()
+                + "\"/>" + "</xsd:schema>");
 
             URL url = temp.toURL();
             XSDParser parser = new XSDParser();

@@ -15,12 +15,12 @@
  */
 package org.geotools.xml.impl;
 
+import org.picocontainer.MutablePicoContainer;
 import org.geotools.xml.Binding;
 import org.geotools.xml.ComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 import org.geotools.xml.impl.BindingWalker.Visitor;
-import org.picocontainer.MutablePicoContainer;
 
 
 public class ContextInitializer implements Visitor {
@@ -28,17 +28,16 @@ public class ContextInitializer implements Visitor {
     Node node;
     MutablePicoContainer context;
 
-    public ContextInitializer(ElementInstance childInstance, Node node,
-        MutablePicoContainer context) {
+    public ContextInitializer(ElementInstance childInstance, Node node, MutablePicoContainer context) {
         this.childInstance = childInstance;
         this.node = node;
         this.context = context;
     }
 
     public void visit(Binding binding) {
-        if ( binding instanceof ComplexBinding ) {
+        if (binding instanceof ComplexBinding) {
             ComplexBinding cStrategy = (ComplexBinding) binding;
-            cStrategy.initializeChildContext( childInstance, node, context);
+            cStrategy.initializeChildContext(childInstance, node, context);
         }
     }
 }

@@ -15,13 +15,11 @@
  */
 package org.geotools.xml.impl.jxpath;
 
-import java.util.Iterator;
-
 import junit.framework.TestCase;
-
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathContextFactory;
 import org.apache.commons.jxpath.JXPathIntrospector;
+import java.util.Iterator;
 import org.geotools.xml.impl.ElementHandlerImpl;
 import org.geotools.xml.impl.ElementImpl;
 import org.geotools.xml.impl.NodeImpl;
@@ -36,30 +34,27 @@ public class JXPathTest extends TestCase {
     protected void setUp() throws Exception {
         ElementImpl e = new ElementImpl(null);
         e.setName("root");
-        root = new NodeImpl( e );
-        
+        root = new NodeImpl(e);
+
         e = new ElementImpl(null);
         e.setName("child");
-        child1 = new NodeImpl( e );
+        child1 = new NodeImpl(e);
         //root.addChild( child1 );
-
         e = new ElementImpl(null);
         e.setName("child");
-        child2 = new NodeImpl(e );
+        child2 = new NodeImpl(e);
         //root.addChild( child2 );
+        JXPathIntrospector.registerDynamicClass(NodeImpl.class, NodePropertyHandler.class);
 
-        JXPathIntrospector.registerDynamicClass(NodeImpl.class,
-            NodePropertyHandler.class);
-        
         context = JXPathContextFactory.newInstance().newContext(null, root);
     }
 
     public void testIterate() {
-//        root.getChildHandlers().add(child1);
-//        root.getChildHandlers().add(child2);
-    	root.addChild( child1 );
-    	root.addChild( child2 );
-    	
+        //        root.getChildHandlers().add(child1);
+        //        root.getChildHandlers().add(child2);
+        root.addChild(child1);
+        root.addChild(child2);
+
         Iterator itr = context.iterate("child");
         assertTrue(itr.hasNext());
         assertEquals(child1, itr.next());

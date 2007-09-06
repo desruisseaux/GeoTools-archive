@@ -16,7 +16,6 @@
 package org.geotools.xlink;
 
 import javax.xml.namespace.QName;
-
 import org.geotools.xml.XSD;
 
 
@@ -27,37 +26,11 @@ import org.geotools.xml.XSD;
  * @generated
  */
 public final class XLINK extends XSD {
-    
     /**
      * singleton instance
      */
     private static XLINK instance = new XLINK();
-    /**
-     * The single instance.
-     */
-    public static XLINK getInstance() {
-        return instance;
-    }
-    
-    /**
-     * Private constructor.
-     */
-    private XLINK() {};
-    
-    /**
-     * Returns 'http://www.w3.org/1999/xlink'
-     */
-    public String getNamespaceURI() {
-        return NAMESPACE;
-    }
-    
-    /**
-     * Returns location of 'xlinks.xsd'.
-     */
-    public String getSchemaLocation() {
-        return getClass().getResource("xlinks.xsd").toString();
-    }
-    
+
     /** @generated */
     public static final String NAMESPACE = "http://www.w3.org/1999/xlink";
 
@@ -68,38 +41,56 @@ public final class XLINK extends XSD {
     /* Attributes */
 
     /** @generated */
-    public static final QName ACTUATE = new QName("http://www.w3.org/1999/xlink",
-            "actuate");
+    public static final QName ACTUATE = new QName("http://www.w3.org/1999/xlink", "actuate");
 
     /** @generated */
-    public static final QName ARCROLE = new QName("http://www.w3.org/1999/xlink",
-            "arcrole");
+    public static final QName ARCROLE = new QName("http://www.w3.org/1999/xlink", "arcrole");
 
     /** @generated */
-    public static final QName FROM = new QName("http://www.w3.org/1999/xlink",
-            "from");
+    public static final QName FROM = new QName("http://www.w3.org/1999/xlink", "from");
 
     /** @generated */
-    public static final QName HREF = new QName("http://www.w3.org/1999/xlink",
-            "href");
+    public static final QName HREF = new QName("http://www.w3.org/1999/xlink", "href");
 
     /** @generated */
-    public static final QName LABEL = new QName("http://www.w3.org/1999/xlink",
-            "label");
+    public static final QName LABEL = new QName("http://www.w3.org/1999/xlink", "label");
 
     /** @generated */
-    public static final QName ROLE = new QName("http://www.w3.org/1999/xlink",
-            "role");
+    public static final QName ROLE = new QName("http://www.w3.org/1999/xlink", "role");
 
     /** @generated */
-    public static final QName SHOW = new QName("http://www.w3.org/1999/xlink",
-            "show");
+    public static final QName SHOW = new QName("http://www.w3.org/1999/xlink", "show");
 
     /** @generated */
-    public static final QName TITLE = new QName("http://www.w3.org/1999/xlink",
-            "title");
+    public static final QName TITLE = new QName("http://www.w3.org/1999/xlink", "title");
 
     /** @generated */
-    public static final QName TO = new QName("http://www.w3.org/1999/xlink",
-            "to");
+    public static final QName TO = new QName("http://www.w3.org/1999/xlink", "to");
+
+    /**
+     * Private constructor.
+     */
+    private XLINK() {
+    }
+
+    /**
+     * The single instance.
+     */
+    public static XLINK getInstance() {
+        return instance;
+    }
+
+    /**
+     * Returns 'http://www.w3.org/1999/xlink'
+     */
+    public String getNamespaceURI() {
+        return NAMESPACE;
+    }
+
+    /**
+     * Returns location of 'xlinks.xsd'.
+     */
+    public String getSchemaLocation() {
+        return getClass().getResource("xlinks.xsd").toString();
+    }
 }

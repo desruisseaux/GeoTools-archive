@@ -15,13 +15,11 @@
  */
 package org.geotools.xml;
 
-import java.util.List;
-
-import javax.xml.namespace.QName;
-
 import org.picocontainer.MutablePicoContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import java.util.List;
+import javax.xml.namespace.QName;
 
 
 /**
@@ -48,44 +46,43 @@ public abstract class AbstractComplexBinding implements ComplexBinding {
     public int getExecutionMode() {
         return OVERRIDE;
     }
-    
+
     /**
-     * Subclasses should ovverride this method if need be, the default implementation 
+     * Subclasses should ovverride this method if need be, the default implementation
      * returns <param>value</param>.
-     * 
+     *
      * @see ComplexBinding#encode(Object, Document, Element).
      */
-    public Element encode(Object object, Document document, Element value) 
-    	throws Exception {
-    	
-    	return value;
+    public Element encode(Object object, Document document, Element value)
+        throws Exception {
+        return value;
     }
 
     /**
-     * Subclasses should override this method if need be, the default implementation 
+     * Subclasses should override this method if need be, the default implementation
      * returns <code>null</code>.
-     * 
+     *
      * @see ComplexBinding#getProperty(Object, QName)
      */
-    public Object getProperty(Object object, QName name) throws Exception {
-    	//do nothing, subclasses should override
-    	return null;
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        //do nothing, subclasses should override
+        return null;
     }
-    
+
     /**
-     * Subclasses should override this method if need be, the default implementation 
+     * Subclasses should override this method if need be, the default implementation
      * returns <code>null</code>.
      * <p>
-     * Note that this method only needs to be implemented for schema types which 
-     * are open-ended in which the contents are not specifically specified by 
+     * Note that this method only needs to be implemented for schema types which
+     * are open-ended in which the contents are not specifically specified by
      * the schema.
      * </p>
-     * 
+     *
      * @see ComplexBinding#getProperties(Object)
      */
     public List getProperties(Object object) throws Exception {
-    	// do nothing, subclasses should override.
-    	return null;
+        // do nothing, subclasses should override.
+        return null;
     }
-    
 }

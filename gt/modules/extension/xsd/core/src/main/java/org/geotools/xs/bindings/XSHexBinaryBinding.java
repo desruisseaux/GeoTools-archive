@@ -15,14 +15,12 @@
  */
 package org.geotools.xs.bindings;
 
+import com.sun.xml.bind.DatatypeConverterImpl;
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.namespace.QName;
-
 import org.geotools.xml.InstanceComponent;
 import org.geotools.xml.SimpleBinding;
 import org.geotools.xs.XS;
-
-import com.sun.xml.bind.DatatypeConverterImpl;
 
 
 /**
@@ -59,11 +57,10 @@ import com.sun.xml.bind.DatatypeConverterImpl;
  * @generated
  */
 public class XSHexBinaryBinding implements SimpleBinding {
-	
-	public XSHexBinaryBinding() {
-		DatatypeConverter.setDatatypeConverter(DatatypeConverterImpl.theInstance);
-	}
-	
+    public XSHexBinaryBinding() {
+        DatatypeConverter.setDatatypeConverter(DatatypeConverterImpl.theInstance);
+    }
+
     /**
      * @generated
      */
@@ -99,8 +96,7 @@ public class XSHexBinaryBinding implements SimpleBinding {
      */
     public Object parse(InstanceComponent instance, Object value)
         throws Exception {
-        
-    	return DatatypeConverter.parseHexBinary((String) value);
+        return DatatypeConverter.parseHexBinary((String) value);
     }
 
     /**
@@ -110,6 +106,6 @@ public class XSHexBinaryBinding implements SimpleBinding {
      * @generated modifiable
      */
     public String encode(Object object, String value) {
-        return DatatypeConverter.printHexBinary( (byte[]) object );
+        return DatatypeConverter.printHexBinary((byte[]) object);
     }
 }

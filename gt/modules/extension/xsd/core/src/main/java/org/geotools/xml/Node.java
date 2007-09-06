@@ -141,14 +141,14 @@ public interface Node {
      * </p>
      *
      * @param name The name of the child which parsed content is to be retrived.
-     * 
+     *
      * @return the value of the child with the given name, or <code>null</code>
      * if the child does not exist.
      */
     Object getChildValue(String name);
 
     /**
-     * Helper method for access to child's parsed contents by element name.returning 
+     * Helper method for access to child's parsed contents by element name.returning
      * a <tt>defaultValue</tt> when no such value is present
      * <p>
      * In the event that the node has multiple children mathing <code>name</name>
@@ -158,7 +158,7 @@ public interface Node {
      *
      * @param name The name of the child which parsed content is to be retrived.
      * @param defaultValue A defaultValue to return, if no such child found.
-     * 
+     *
      * @return the value of the child with the given name, or
      * <code>defaultValue</code> if the child does not exist.
      */
@@ -181,7 +181,7 @@ public interface Node {
     Object getChildValue(Class clazz);
 
     /**
-     * Helper method for access to child's parsed contents by class, returning a 
+     * Helper method for access to child's parsed contents by class, returning a
      * <tt>defaultValue</tt> when no such value is present
      * <p>
      * In the event that the node has multiple children which are instances of
@@ -192,7 +192,7 @@ public interface Node {
      *
      * @param clazz The class of parsed child value.
      * @param defaultValue A defaultValue to return, if no such child found.
-     * 
+     *
      * @return the value of the child which is an instance of <code>clazz</code>,
      * or <code>defaultValue</code> if no such child exists.
      */
@@ -228,8 +228,8 @@ public interface Node {
      *
      * @return <code>true</code> if am attribute exists with the name, otehrwise <code>false</code>.
      */
-    boolean hasAttribute( String name );
-    
+    boolean hasAttribute(String name);
+
     /**
      * Determines if the node has an attribute whose value is of the specified class.
      *
@@ -237,8 +237,8 @@ public interface Node {
      *
      * @return <code>true</code> if an attribute exists with the class, otherwise <code>false</code>.
      */
-    boolean hasAttribute( Class clazz );
-    
+    boolean hasAttribute(Class clazz);
+
     /**
      * Returns all nodes corresponding to attributes.
      *
@@ -295,7 +295,7 @@ public interface Node {
 
     /**
      * Helper method for access to the parsed value of the attribute with
-     * the specified name, returning a <code>defaultValue</code> when no such 
+     * the specified name, returning a <code>defaultValue</code> when no such
      * attribute is present
      *
      * @param name The name of the attribute in which to retreive the parsed
@@ -324,9 +324,9 @@ public interface Node {
 
     /**
      * Helper method for access to the parsed value of the attribute whose
-     * parsed value is an instance of <code>clazz</code>, returning a 
-     * <code>defaultValue</code> when no such attribute is present. In the event 
-     * that the node contains multple attributes matching the above criteria, the 
+     * parsed value is an instance of <code>clazz</code>, returning a
+     * <code>defaultValue</code> when no such attribute is present. In the event
+     * that the node contains multple attributes matching the above criteria, the
      * first encountered is returned, with no guaratnee of order. For all values
      * matching this criteria use {@link #getAttributeValues(Class)}.
      *

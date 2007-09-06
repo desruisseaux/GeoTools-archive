@@ -16,10 +16,8 @@
 package org.geotools.xs.bindings;
 
 import java.math.BigInteger;
-
 import javax.xml.bind.ValidationException;
 import javax.xml.namespace.QName;
-
 import org.geotools.xml.InstanceComponent;
 import org.geotools.xml.SimpleBinding;
 import org.geotools.xs.XS;
@@ -95,8 +93,8 @@ public class XSPositiveIntegerBinding implements SimpleBinding {
             throw new ValidationException("positiveInteger value '" + number
                 + "' must be positive.");
         }
-        
-        return BigInteger.valueOf( number.longValue() );
+
+        return BigInteger.valueOf(number.longValue());
     }
 
     /**

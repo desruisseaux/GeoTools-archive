@@ -15,12 +15,10 @@
  */
 package org.geotools.xs.bindings;
 
-import javax.xml.namespace.QName;
-
 import junit.framework.TestCase;
-
-import org.geotools.xml.impl.NamespaceSupportWrapper;
 import org.xml.sax.helpers.NamespaceSupport;
+import javax.xml.namespace.QName;
+import org.geotools.xml.impl.NamespaceSupportWrapper;
 
 
 public class XSQNameBindingTest extends TestCase {
@@ -30,7 +28,7 @@ public class XSQNameBindingTest extends TestCase {
         NamespaceSupport ns = new NamespaceSupport();
         ns.declarePrefix("foo", "http://foo");
 
-        binding = new XSQNameBinding( new NamespaceSupportWrapper( ns ) );
+        binding = new XSQNameBinding(new NamespaceSupportWrapper(ns));
     }
 
     public void testWithPrefix() throws Exception {

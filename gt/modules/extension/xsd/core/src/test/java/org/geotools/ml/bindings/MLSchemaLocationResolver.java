@@ -1,10 +1,25 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.ml.bindings;
 
 import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 
-public class MLSchemaLocationResolver implements XSDSchemaLocationResolver {
 
+public class MLSchemaLocationResolver implements XSDSchemaLocationResolver {
     public String resolveSchemaLocation(XSDSchema xsdSchema, String namespaceURI,
         String schemaLocationURI) {
         if (schemaLocationURI == null) {
@@ -21,7 +36,7 @@ public class MLSchemaLocationResolver implements XSDSchemaLocationResolver {
                 return getClass().getResource("mails.xsd").toString();
             }
         }
-     
+
         return null;
     }
 }

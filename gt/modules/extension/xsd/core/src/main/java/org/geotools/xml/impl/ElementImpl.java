@@ -23,8 +23,7 @@ import org.geotools.xml.AttributeInstance;
 import org.geotools.xml.ElementInstance;
 
 
-public class ElementImpl extends InstanceComponentImpl
-    implements ElementInstance {
+public class ElementImpl extends InstanceComponentImpl implements ElementInstance {
     /** declaration **/
     XSDElementDeclaration declaration;
 

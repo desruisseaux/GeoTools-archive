@@ -16,9 +16,7 @@
 package org.geotools.xs.bindings;
 
 import java.math.BigInteger;
-
 import javax.xml.namespace.QName;
-
 import org.geotools.xs.TestSchema;
 import org.geotools.xs.XS;
 

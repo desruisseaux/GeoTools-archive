@@ -15,15 +15,13 @@
  */
 package org.geotools.xs.bindings;
 
+import org.picocontainer.MutablePicoContainer;
 import java.util.Map;
-
 import javax.xml.namespace.QName;
-
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 import org.geotools.xs.XS;
-import org.picocontainer.MutablePicoContainer;
 
 
 /**
@@ -99,8 +97,7 @@ public class XSComplexTypeBinding extends AbstractComplexBinding {
      *
      * @generated modifiable
      */
-    public void initialize(ElementInstance instance, Node node,
-        MutablePicoContainer context) {
+    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
     }
 
     /**
@@ -115,5 +112,4 @@ public class XSComplexTypeBinding extends AbstractComplexBinding {
         throws Exception {
         return value; //all work done by super type
     }
-
 }

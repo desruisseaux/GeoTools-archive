@@ -22,5 +22,6 @@ public interface DocumentHandler extends Handler {
      *
      * @return An element handler, or null.
      */
+
     //ElementHandler getDocumentElementHandler();
 }

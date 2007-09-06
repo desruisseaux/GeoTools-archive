@@ -15,14 +15,12 @@
  */
 package org.geotools.xml.impl;
 
-import java.util.List;
-
-import javax.xml.namespace.QName;
-
 import org.eclipse.xsd.XSDSchemaContent;
+import org.picocontainer.MutablePicoContainer;
+import java.util.List;
+import javax.xml.namespace.QName;
 import org.geotools.xml.InstanceComponent;
 import org.geotools.xml.Node;
-import org.picocontainer.MutablePicoContainer;
 
 
 /**
@@ -60,11 +58,12 @@ public interface Handler {
      * @return The parse tree for the handler.
      */
     Node getParseNode();
-    
+
     /**
      * @return A value which corresponds to an instance of the entity of the
      * handler.
      */
+
     //Object getValue();
 
     /**
@@ -84,7 +83,7 @@ public interface Handler {
      * @see Handler#getChildHandler(QName, SchemaBuilder)
      */
     Handler getParentHandler();
-    
+
     /**
      * Returns a handler for a component in the schema which is a child of
      * this component.
@@ -105,20 +104,21 @@ public interface Handler {
     /**
      * @return The current list of child handlers executing.
      */
+
     //List getChildHandlers();
 
     /**
-     * Called when a child handler is started, on the leading edge of the 
+     * Called when a child handler is started, on the leading edge of the
      * child element.
-     * 
+     *
      * @param child The executing child handler.
      */
     void startChildHandler(Handler child);
-    
+
     /**
-     * Called when a child handler is finished, on the trailing edge of the 
+     * Called when a child handler is finished, on the trailing edge of the
      * child element.
-     * 
+     *
      * @param child The executing child handler.
      */
     void endChildHandler(Handler child);

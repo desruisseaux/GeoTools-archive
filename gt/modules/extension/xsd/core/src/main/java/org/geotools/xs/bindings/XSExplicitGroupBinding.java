@@ -15,13 +15,12 @@
  */
 package org.geotools.xs.bindings;
 
+import org.picocontainer.MutablePicoContainer;
 import javax.xml.namespace.QName;
-
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 import org.geotools.xs.XS;
-import org.picocontainer.MutablePicoContainer;
 
 
 /**
@@ -87,8 +86,7 @@ public class XSExplicitGroupBinding extends AbstractComplexBinding {
      *
      * @generated modifiable
      */
-    public void initialize(ElementInstance instance, Node node,
-        MutablePicoContainer context) {
+    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
     }
 
     /**
@@ -102,6 +100,4 @@ public class XSExplicitGroupBinding extends AbstractComplexBinding {
         //TODO: implement
         return null;
     }
-
-   
 }

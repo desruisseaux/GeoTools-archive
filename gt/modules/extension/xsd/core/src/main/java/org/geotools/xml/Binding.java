@@ -234,12 +234,12 @@ public interface Binding {
      * @return The qualified name of the target for the binding.
      */
     QName getTarget();
-    
+
     /**
      * @return The java type this binding maps to.
      */
     Class getType();
-    
+
     /**
      * @return The execution mode of the binding, one of the constants AFTER,
      * BEFORE, or OVERRIDE.

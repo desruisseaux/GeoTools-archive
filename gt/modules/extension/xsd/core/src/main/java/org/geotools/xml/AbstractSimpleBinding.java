@@ -15,9 +15,10 @@
  */
 package org.geotools.xml;
 
+
 /**
  * Base class for simple bindings.
- * 
+ *
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  *
  */
@@ -31,7 +32,7 @@ public abstract class AbstractSimpleBinding implements SimpleBinding {
     public int getExecutionMode() {
         return AFTER;
     }
-    
+
     /**
      * Performs the encoding of the object as a String.
      *
@@ -42,7 +43,7 @@ public abstract class AbstractSimpleBinding implements SimpleBinding {
      * @return A String representing the object.
      */
     public String encode(Object object, String value) throws Exception {
-    	//just return the value passed in, subclasses should override to provide new value
-    	return value;
+        //just return the value passed in, subclasses should override to provide new value
+        return value;
     }
 }

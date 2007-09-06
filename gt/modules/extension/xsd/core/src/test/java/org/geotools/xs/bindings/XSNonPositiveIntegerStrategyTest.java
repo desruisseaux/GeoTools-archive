@@ -16,10 +16,8 @@
 package org.geotools.xs.bindings;
 
 import java.math.BigInteger;
-
 import javax.xml.bind.ValidationException;
 import javax.xml.namespace.QName;
-
 import org.geotools.xs.TestSchema;
 import org.geotools.xs.XS;
 
@@ -51,8 +49,7 @@ public class XSNonPositiveIntegerStrategyTest extends TestSchema {
 
     public BigInteger integer(Object value) {
         return (value instanceof BigInteger) ? ((BigInteger) value)
-                                             : BigInteger.valueOf(((Number) value)
-            .longValue());
+                                             : BigInteger.valueOf(((Number) value).longValue());
     }
 
     public Number number(String number) {

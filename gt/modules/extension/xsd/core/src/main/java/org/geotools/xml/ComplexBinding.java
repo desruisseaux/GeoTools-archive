@@ -15,13 +15,11 @@
  */
 package org.geotools.xml;
 
-import java.util.List;
-
-import javax.xml.namespace.QName;
-
 import org.picocontainer.MutablePicoContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import java.util.List;
+import javax.xml.namespace.QName;
 
 
 /**
@@ -55,25 +53,27 @@ public interface ComplexBinding extends Binding {
      * @param context The container to be used as context for child strategies.
      *
      */
-//    void initialize(ElementInstance instance, Node node,
-//        MutablePicoContainer context);
+
+    //    void initialize(ElementInstance instance, Node node,
+    //        MutablePicoContainer context);
 
     /**
      * Initializes the context for a child element.
      * <p>
      * This method is called on the leading edge of a child element. It is used
-     * to create context for the binding of a child element. It is important to 
+     * to create context for the binding of a child element. It is important to
      * note that each time this method is called, the <param>node</param> parse
-     * tree will contain different, ie child nodes for those previous elements 
+     * tree will contain different, ie child nodes for those previous elements
      * parsed.
      * </p>
-     * 
+     *
      * @param childinstance The child element instance
      * @param node The parse node for the parent element.
      * @param context the context in which the child element will be parsed.
      */
-    void initializeChildContext( ElementInstance childInstance, Node node,
-            MutablePicoContainer context);
+    void initializeChildContext(ElementInstance childInstance, Node node,
+        MutablePicoContainer context);
+
     /**
      * Parses a complex element from an instance document into an object
      * representation.
@@ -101,30 +101,30 @@ public interface ComplexBinding extends Binding {
      *
      * <p>
      * Complex objects are encoded as elements in a document. The <param>value</param>
-     * parameter is the encoded element, created by the parent binding. For the 
-     * first binding in the execution chain this is just an empty element ( no 
+     * parameter is the encoded element, created by the parent binding. For the
+     * first binding in the execution chain this is just an empty element ( no
      * children or attributes ). The binding has the choice to return <param>value</param>
      * or to create a new element to return.
      * </p>
      *
-     *	<p>
-     * This method may choose to create child elements and attributes for the element. 
-     * Or as an alternative return the object values for these contructs in 
-     * {@link #getProperty(Object, QName)}. 
-     *	</p>
+     *        <p>
+     * This method may choose to create child elements and attributes for the element.
+     * Or as an alternative return the object values for these contructs in
+     * {@link #getProperty(Object, QName)}.
+     *        </p>
      *
      * @param object The object being encoded.
      * @param document The document containing the encoded element.
      * @param value The object as encoded by the parent binding.
-     * 
+     *
      * @return The element for the objcet being encoded, or <code>null</code>
      *
      */
-    Element encode(Object object, Document document, Element value) 
-    	throws Exception;
+    Element encode(Object object, Document document, Element value)
+        throws Exception;
 
     /**
-     * Returns a property of a particular object which corresponds to the 
+     * Returns a property of a particular object which corresponds to the
      * specified name.
      *
      * </p>
@@ -132,8 +132,8 @@ public interface ComplexBinding extends Binding {
      * encoded is an leaf in its object model.</p>
      *
      * <p>
-     * For multi-values properties ( maxOccurs > 0 ), this method may return an 
-     * instance of {@link java.util.Collection}, {@link java.util.Iterator}, or 
+     * For multi-values properties ( maxOccurs > 0 ), this method may return an
+     * instance of {@link java.util.Collection}, {@link java.util.Iterator}, or
      * an array.
      * </p>
      *
@@ -143,7 +143,7 @@ public interface ComplexBinding extends Binding {
      * @return The value of the property, or <code>null</code>.
      */
     Object getProperty(Object object, QName name) throws Exception;
-    
+
     /**
      * Returns a list of properties of the specified object.
      * <p>
@@ -151,14 +151,14 @@ public interface ComplexBinding extends Binding {
      * each as a two element object array.
      * </p>
      * <p>
-     * This method should only be implemented in the case where the encoder 
+     * This method should only be implemented in the case where the encoder
      * can not determine what the properties of the object are from the schema.
      * </p>
      * <p>
-     * An example would be an object which corresponds to an element in the 
+     * An example would be an object which corresponds to an element in the
      * schema which has a the type <code>xs:anyType</code>. Since the content
-     * of this type can be anything the schema has no way to determine what 
-     * the properties are. So in this case this method must specify the 
+     * of this type can be anything the schema has no way to determine what
+     * the properties are. So in this case this method must specify the
      * properties manually as a set of name, object tuples.
      * </p>
      * <p>
@@ -167,9 +167,10 @@ public interface ComplexBinding extends Binding {
      * containing all of the instances.
      * </p>
      * @param object the object being encoded.
-     * 
+     *
      * @return A list of the properties for the object.
      *
      */
-    List/*Object[QName,Object]*/ getProperties( Object object ) throws Exception;
+    List /*Object[QName,Object]*/ getProperties(Object object)
+        throws Exception;
 }

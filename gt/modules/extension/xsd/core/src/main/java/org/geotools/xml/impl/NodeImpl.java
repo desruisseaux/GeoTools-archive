@@ -19,9 +19,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
 import org.geotools.xml.InstanceComponent;
 import org.geotools.xml.Node;
+
 
 public class NodeImpl implements Node {
     private InstanceComponent component;
@@ -182,27 +182,27 @@ public class NodeImpl implements Node {
     }
 
     public boolean hasAttribute(Class clazz) {
-    	 if (clazz == null) {
-             return false;
-         }
+        if (clazz == null) {
+            return false;
+        }
 
-         for (Iterator itr = attributes.iterator(); itr.hasNext();) {
-             Node att = (Node) itr.next();
+        for (Iterator itr = attributes.iterator(); itr.hasNext();) {
+            Node att = (Node) itr.next();
 
-             if (att.getValue() == null) {
-                 continue;
-             }
+            if (att.getValue() == null) {
+                continue;
+            }
 
-             if (clazz.isAssignableFrom(att.getValue().getClass())) {
-                 return true;
-             }
-         }
+            if (clazz.isAssignableFrom(att.getValue().getClass())) {
+                return true;
+            }
+        }
 
-         return false;
+        return false;
     }
-    
+
     public boolean hasAttribute(String name) {
-    	if (name == null) {
+        if (name == null) {
             return false;
         }
 
@@ -216,7 +216,7 @@ public class NodeImpl implements Node {
 
         return false;
     }
-    
+
     public List getAttributes() {
         return new ArrayList(attributes);
     }
@@ -403,69 +403,77 @@ public class NodeImpl implements Node {
 
         return matches;
     }
-    
+
     public Object getAttributeValue(String name, Object defaultValue) {
         Object o = getAttributeValue(name);
-        if ( o == null ) {
+
+        if (o == null) {
             o = defaultValue;
         }
+
         return o;
     }
 
     public Object getAttributeValue(Class clazz, Object defaultValue) {
         Object o = getAttributeValue(clazz);
-        if ( o == null ) {
+
+        if (o == null) {
             o = defaultValue;
         }
+
         return o;
     }
 
     public Object getChildValue(String name, Object defaultValue) {
         Object o = getChildValue(name);
-        if ( o == null ) {
+
+        if (o == null) {
             o = defaultValue;
         }
+
         return o;
     }
 
     public Object getChildValue(Class clazz, Object defaultValue) {
         Object o = getChildValue(clazz);
-        if ( o == null ) {
+
+        if (o == null) {
             o = defaultValue;
         }
+
         return o;
     }
-    
+
     //additional methods, not part of public api
     public void addChild(Node child) {
         children.add(child);
     }
 
-    public Node removeChild( String name ) {
-    	Node child = getChild( name );
-    	if ( child != null ) {
-    		children.remove( child );
-    	}
-    	
-    	return child;
+    public Node removeChild(String name) {
+        Node child = getChild(name);
+
+        if (child != null) {
+            children.remove(child);
+        }
+
+        return child;
     }
-    
-    public void removeChild( Node child ) {
-    	children.remove( child );
+
+    public void removeChild(Node child) {
+        children.remove(child);
     }
-    
+
     public void addAttribute(Node attribute) {
         attributes.add(attribute);
     }
-    
-    public Node removeAttribute( String name ) {
-    	Node attribute = getAttribute( name );
-    	if ( attribute != null ) {
-    		attributes.remove( attribute );
-    	}
-    	
-    	return attribute;
-    }
 
-    
+    public Node removeAttribute(String name) {
+        Node attribute = getAttribute(name);
+
+        if (attribute != null) {
+            attributes.remove(attribute);
+        }
+
+        return attribute;
+    }
 }

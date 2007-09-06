@@ -16,7 +16,6 @@
 package org.geotools.xs.bindings;
 
 import javax.xml.namespace.QName;
-
 import org.geotools.xml.AbstractSimpleBinding;
 import org.geotools.xml.InstanceComponent;
 import org.geotools.xml.SimpleBinding;
@@ -93,5 +92,4 @@ public class XSNameBinding extends AbstractSimpleBinding {
         //TODO need to implement a pattern facet. Simply return string value for now    
         return value;
     }
-
 }

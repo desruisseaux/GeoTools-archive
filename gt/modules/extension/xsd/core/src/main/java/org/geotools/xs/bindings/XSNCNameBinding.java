@@ -16,7 +16,6 @@
 package org.geotools.xs.bindings;
 
 import javax.xml.namespace.QName;
-
 import org.geotools.xml.AbstractSimpleBinding;
 import org.geotools.xml.InstanceComponent;
 import org.geotools.xml.SimpleBinding;

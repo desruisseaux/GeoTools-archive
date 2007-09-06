@@ -16,7 +16,6 @@
 package org.geotools.xs.bindings;
 
 import javax.xml.namespace.QName;
-
 import org.geotools.xml.AbstractSimpleBinding;
 import org.geotools.xml.InstanceComponent;
 import org.geotools.xml.SimpleBinding;
@@ -85,6 +84,4 @@ public class XSNormalizedStringBinding extends AbstractSimpleBinding {
         //Simply return string value, Whitespace facet is already handled		
         return value;
     }
-
-   
 }

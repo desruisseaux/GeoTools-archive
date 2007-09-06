@@ -15,15 +15,13 @@
  */
 package org.geotools.xs.bindings;
 
+import com.sun.xml.bind.DatatypeConverterImpl;
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
-
 import org.geotools.xml.InstanceComponent;
 import org.geotools.xml.SimpleBinding;
 import org.geotools.xs.XS;
-
-import com.sun.xml.bind.DatatypeConverterImpl;
 
 
 /**
@@ -60,12 +58,11 @@ import com.sun.xml.bind.DatatypeConverterImpl;
  * @generated
  */
 public class XSQNameBinding implements SimpleBinding {
-    
     NamespaceContext namespaceContext;
 
     public XSQNameBinding(NamespaceContext namespaceContext) {
         this.namespaceContext = namespaceContext;
-        
+
         DatatypeConverter.setDatatypeConverter(DatatypeConverterImpl.theInstance);
     }
 
@@ -106,9 +103,7 @@ public class XSQNameBinding implements SimpleBinding {
      */
     public Object parse(InstanceComponent instance, Object value)
         throws Exception {
-        
-    	QName qName = DatatypeConverter.parseQName((String) value,
-                namespaceContext);
+        QName qName = DatatypeConverter.parseQName((String) value, namespaceContext);
 
         if (qName != null) {
             return qName;
@@ -132,8 +127,6 @@ public class XSQNameBinding implements SimpleBinding {
     }
 
     public String encode(Object object, String value) throws Exception {
-    	return DatatypeConverter.printQName( (QName) object, namespaceContext );
+        return DatatypeConverter.printQName((QName) object, namespaceContext);
     }
-    
-   
 }

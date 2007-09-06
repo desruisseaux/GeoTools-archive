@@ -16,10 +16,8 @@
 package org.geotools.xs.bindings;
 
 import java.math.BigInteger;
-
 import javax.xml.bind.ValidationException;
 import javax.xml.namespace.QName;
-
 import org.geotools.xml.InstanceComponent;
 import org.geotools.xml.SimpleBinding;
 import org.geotools.xs.XS;
@@ -80,7 +78,7 @@ public class XSNonPositiveIntegerBinding implements SimpleBinding {
 
     /**
      * <!-- begin-user-doc -->
-     * @param instance 
+     * @param instance
      * @param value    a BigInteger (after processing by parent)
      * @return a Number that is not positive
      * <!-- end-user-doc -->

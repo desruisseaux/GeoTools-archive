@@ -1,9 +1,25 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.xml.impl.jxpath;
 
 import org.apache.commons.jxpath.ri.QName;
 import org.apache.commons.jxpath.ri.model.NodePointer;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
+
 
 /**
  * Pointer to a single attribute of a feature type.
@@ -12,79 +28,78 @@ import org.geotools.feature.FeatureType;
  *
  */
 public class FeatureTypeAttributePointer extends NodePointer {
+    /**
+     * the feature type
+     */
+    FeatureType featureType;
 
-	/**
-	 * the feature type
-	 */
-	FeatureType featureType;
-	/**
-	 * The parent pointer
-	 */
-	FeatureTypePointer parent;
-	/**
-	 * the indedx of hte property being pointed at
-	 */
-	int index;
-	
-	/**
-	 * Creates the pointer.
-	 * 
-	 * @param parent The parent pointer, pointer at the feature type.
-	 * @param index The index of hte property to point to
-	 */
-	public FeatureTypeAttributePointer( FeatureTypePointer parent, int index ) {
-		super( parent );
-		this.index = index;
-		this.featureType = (FeatureType) parent.getImmediateNode();
-	}
-	
-	/**
-	 * Return <code>true</code>.
-	 */
-	public boolean isLeaf() {
-		return true;
-	}
+    /**
+     * The parent pointer
+     */
+    FeatureTypePointer parent;
 
-	/**
-	 * Return <code>false</code>. 
-	 */
-	public boolean isCollection() {
-		return false;
-	}
+    /**
+     * the indedx of hte property being pointed at
+     */
+    int index;
 
-	/**
-	 * Return <code>1</code>
-	 */
-	public int getLength() {
-		return 1;
-	}
+    /**
+     * Creates the pointer.
+     *
+     * @param parent The parent pointer, pointer at the feature type.
+     * @param index The index of hte property to point to
+     */
+    public FeatureTypeAttributePointer(FeatureTypePointer parent, int index) {
+        super(parent);
+        this.index = index;
+        this.featureType = (FeatureType) parent.getImmediateNode();
+    }
 
-	/**
-	 * Returns the qname with prefix as <code>null</code>, and local part the name of the 
-	 * feature attribute.
-	 */
-	public QName getName() {
-		return new QName( null, featureType.getAttributeType( index ).getLocalName() );
-	}
+    /**
+     * Return <code>true</code>.
+     */
+    public boolean isLeaf() {
+        return true;
+    }
 
-	public Object getBaseValue() {
-		return featureType;
-	}
+    /**
+     * Return <code>false</code>.
+     */
+    public boolean isCollection() {
+        return false;
+    }
 
-	public Object getImmediateNode() {
-		return featureType.getAttributeType( index );
-	}
+    /**
+     * Return <code>1</code>
+     */
+    public int getLength() {
+        return 1;
+    }
 
-	public void setValue(Object value) {
-		throw new UnsupportedOperationException( "Feautre types are immutable" );
-	}
+    /**
+     * Returns the qname with prefix as <code>null</code>, and local part the name of the
+     * feature attribute.
+     */
+    public QName getName() {
+        return new QName(null, featureType.getAttributeType(index).getLocalName());
+    }
 
-	/**
-	 * Always return <code>0</code>, can never have child pointers.
-	 */
-	public int compareChildNodePointers(NodePointer pointer1,
-			NodePointer pointer2) {
-		return 0;
-	}
+    public Object getBaseValue() {
+        return featureType;
+    }
 
+    public Object getImmediateNode() {
+        return featureType.getAttributeType(index);
+    }
+
+    public void setValue(Object value) {
+        throw new UnsupportedOperationException("Feautre types are immutable");
+    }
+
+    /**
+     * Always return <code>0</code>, can never have child pointers.
+     */
+    public int compareChildNodePointers(NodePointer pointer1, NodePointer pointer2) {
+        return 0;
+    }
 }

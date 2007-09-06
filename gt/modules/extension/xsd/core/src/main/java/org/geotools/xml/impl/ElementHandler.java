@@ -15,11 +15,10 @@
  */
 package org.geotools.xml.impl;
 
-import javax.xml.namespace.QName;
-
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import javax.xml.namespace.QName;
 
 
 /**
@@ -43,43 +42,42 @@ import org.xml.sax.SAXException;
  *
  */
 public interface ElementHandler extends Handler {
-	/**
-	 * Callback on leading edge of an element.
-	 * 
-	 * @param qName The qualified name of the element being handled.
-	 * @param attributes The attributes of hte elmenent being handled.
-	 * 
-	 * @throws SAXException Any xml errors that occur.
-	 * 
-	 * @see org.xml.sax.ContentHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
-	 */
+    /**
+     * Callback on leading edge of an element.
+     *
+     * @param qName The qualified name of the element being handled.
+     * @param attributes The attributes of hte elmenent being handled.
+     *
+     * @throws SAXException Any xml errors that occur.
+     *
+     * @see org.xml.sax.ContentHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     */
     void startElement(QName qName, Attributes attributes)
         throws SAXException;
 
     /**
      * Callback when characters of an element are encountered.
-     * 
+     *
      * @param ch Array containing characters.
      * @param start The starting index of the characters.
      * @param length The number of characters.
-     * 
+     *
      * @throws SAXException Any xml errors.
-     * 
+     *
      * @see org.xml.sax.ContentHandler#characters(char[], int, int)
      */
     void characters(char[] ch, int start, int length) throws SAXException;
 
     /**
      * Callback on trailing edge of element.
-     * 
+     *
      * @param qName The qualified name of the element being handled.
-     * 
+     *
      * @throws SAXException Any xml errors.
-     * 
+     *
      * @see org.xml.sax.ContentHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
      */
-    void endElement(QName qName)
-        throws SAXException;
+    void endElement(QName qName) throws SAXException;
 
     /**
      * @return The declaration of hte element being handled.

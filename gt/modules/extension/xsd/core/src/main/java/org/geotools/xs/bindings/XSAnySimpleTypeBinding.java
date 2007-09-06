@@ -16,7 +16,6 @@
 package org.geotools.xs.bindings;
 
 import javax.xml.namespace.QName;
-
 import org.geotools.xml.InstanceComponent;
 import org.geotools.xml.SimpleBinding;
 import org.geotools.xs.XS;
@@ -90,6 +89,6 @@ public class XSAnySimpleTypeBinding implements SimpleBinding {
      * @generated modifiable
      */
     public String encode(Object object, String value) {
-        return object == null? null : String.valueOf(object);
+        return (object == null) ? null : String.valueOf(object);
     }
 }

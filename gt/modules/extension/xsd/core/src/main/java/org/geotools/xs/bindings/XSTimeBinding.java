@@ -15,16 +15,13 @@
  */
 package org.geotools.xs.bindings;
 
+import com.sun.xml.bind.DatatypeConverterImpl;
 import java.util.Calendar;
-
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.namespace.QName;
-
 import org.geotools.xml.InstanceComponent;
 import org.geotools.xml.SimpleBinding;
 import org.geotools.xs.XS;
-
-import com.sun.xml.bind.DatatypeConverterImpl;
 
 
 /**

@@ -15,8 +15,9 @@
  */
 package org.geotools.xml;
 
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 import java.io.IOException;
-
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -25,10 +26,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
-
 import org.geotools.xml.impl.ParserHandler;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 
 /**
@@ -61,7 +59,7 @@ public class DOMParser {
      * @return The object representation of the root element of the document.
      *
      */
-    public Object parse() throws IOException, SAXException, ParserConfigurationException  {
+    public Object parse() throws IOException, SAXException, ParserConfigurationException {
         //Prepare the DOM source
         Source source = new DOMSource(document);
 

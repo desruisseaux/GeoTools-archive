@@ -15,12 +15,11 @@
  */
 package org.geotools.xml.impl;
 
-import org.geotools.xml.Configuration;
 import org.xml.sax.SAXException;
+import org.geotools.xml.Configuration;
 
 
 public class StreamingParserHandler extends ParserHandler {
-   
     /** stream buffer **/
     Buffer buffer;
 
@@ -33,24 +32,25 @@ public class StreamingParserHandler extends ParserHandler {
     protected void endElementInternal(ElementHandler handler) {
         super.endElementInternal(handler);
 
-        if ( stream( handler ) ) {
-        	//throw value into buffer
+        if (stream(handler)) {
+            //throw value into buffer
             buffer.put(handler.getParseNode().getValue());
 
             //remove this node from parse tree
             if (handler.getParentHandler() instanceof ElementHandler) {
-            	ElementHandler parent = (ElementHandler) handler
+                ElementHandler parent = (ElementHandler) handler
                     .getParentHandler();
-                ((NodeImpl)parent.getParseNode()).removeChild( handler.getParseNode() );
-            	//parent.endChildHandler(handler);
-            } 	
+                ((NodeImpl) parent.getParseNode()).removeChild(handler.getParseNode());
+
+                //parent.endChildHandler(handler);
+            }
         }
     }
 
-    protected boolean stream( ElementHandler handler ) {
-    	return false;
+    protected boolean stream(ElementHandler handler) {
+        return false;
     }
-    
+
     public void endDocument() throws SAXException {
         super.endDocument();
         buffer.close();

@@ -22,8 +22,7 @@ import org.eclipse.xsd.XSDTypeDefinition;
 import org.geotools.xml.AttributeInstance;
 
 
-public class AttributeImpl extends InstanceComponentImpl
-    implements AttributeInstance {
+public class AttributeImpl extends InstanceComponentImpl implements AttributeInstance {
     XSDAttributeDeclaration decl;
 
     public AttributeImpl(XSDAttributeDeclaration decl) {

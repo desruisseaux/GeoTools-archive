@@ -16,7 +16,6 @@
 package org.geotools.xs.bindings;
 
 import javax.xml.namespace.QName;
-
 import org.geotools.xml.AbstractSimpleBinding;
 import org.geotools.xml.InstanceComponent;
 import org.geotools.xs.XS;
@@ -75,9 +74,7 @@ public class XSNMTOKENBinding extends AbstractSimpleBinding {
      */
     public Object parse(InstanceComponent instance, Object value)
         throws Exception {
-    
-    	//just return the value passed in
-    	return value;
+        //just return the value passed in
+        return value;
     }
-
 }

@@ -15,10 +15,7 @@
  */
 package org.geotools.xs.bindings;
 
-import java.math.BigDecimal;
-
 import junit.framework.TestCase;
-
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDMaxExclusiveFacet;
 import org.eclipse.xsd.XSDMaxInclusiveFacet;
@@ -33,6 +30,7 @@ import org.eclipse.xsd.impl.XSDMinExclusiveFacetImpl;
 import org.eclipse.xsd.impl.XSDMinInclusiveFacetImpl;
 import org.eclipse.xsd.impl.XSDSimpleTypeDefinitionImpl;
 import org.eclipse.xsd.impl.XSDTotalDigitsFacetImpl;
+import java.math.BigDecimal;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 import org.geotools.xml.impl.ElementImpl;
@@ -89,14 +87,12 @@ public class XSDecimalStrategyTest extends TestCase {
         //		}
     }
 
-    public void validateValues(String elementText, int totalDigits,
-        double minExc, double minInc, double maxInc, double maxExc)
-        throws Exception {
+    public void validateValues(String elementText, int totalDigits, double minExc, double minInc,
+        double maxInc, double maxExc) throws Exception {
         XSDecimalBinding strat = new XSDecimalBinding();
 
-        XSDElementDeclaration declaration = makeDeclaration(totalDigits,
-                new BigDecimal(minExc), new BigDecimal(minInc),
-                new BigDecimal(maxInc), new BigDecimal(maxExc));
+        XSDElementDeclaration declaration = makeDeclaration(totalDigits, new BigDecimal(minExc),
+                new BigDecimal(minInc), new BigDecimal(maxInc), new BigDecimal(maxExc));
 
         ElementInstance element = new ElementImpl(declaration);
         element.setText(elementText);
@@ -104,15 +100,13 @@ public class XSDecimalStrategyTest extends TestCase {
         Node[] children = new Node[] {  };
         Object value = null;
 
-        BigDecimal decimal = (BigDecimal) strat.parse(element,
-                element.getText().trim());
+        BigDecimal decimal = (BigDecimal) strat.parse(element, element.getText().trim());
 
         assertNotNull(decimal);
     }
 
-    private XSDElementDeclaration makeDeclaration(final int digits,
-        final BigDecimal minExc, final BigDecimal minInc,
-        final BigDecimal maxInc, final BigDecimal maxExc) {
+    private XSDElementDeclaration makeDeclaration(final int digits, final BigDecimal minExc,
+        final BigDecimal minInc, final BigDecimal maxInc, final BigDecimal maxExc) {
         return new XSDElementDeclarationImpl() {
                 public XSDTypeDefinition getTypeDefinition() {
                     return new XSDSimpleTypeDefinitionImpl() {

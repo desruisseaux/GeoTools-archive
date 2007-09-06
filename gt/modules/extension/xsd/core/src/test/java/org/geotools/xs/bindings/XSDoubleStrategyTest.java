@@ -16,7 +16,6 @@
 package org.geotools.xs.bindings;
 
 import javax.xml.namespace.QName;
-
 import org.geotools.xml.ElementInstance;
 import org.geotools.xs.TestSchema;
 import org.geotools.xs.XS;
@@ -40,8 +39,7 @@ public class XSDoubleStrategyTest extends TestSchema {
         validateValues("0", new Double(0));
 
         ElementInstance element = element("INF", XS.DOUBLE);
-        assertEquals(new Double(Double.POSITIVE_INFINITY),
-            strategy.parse(element, "INF"));
+        assertEquals(new Double(Double.POSITIVE_INFINITY), strategy.parse(element, "INF"));
     }
 
     public void testIntegerParse() throws Exception {

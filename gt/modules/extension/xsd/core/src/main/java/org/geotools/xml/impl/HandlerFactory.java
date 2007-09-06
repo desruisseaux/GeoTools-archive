@@ -15,10 +15,9 @@
  */
 package org.geotools.xml.impl;
 
-import javax.xml.namespace.QName;
-
 import org.eclipse.xsd.XSDAttributeDeclaration;
 import org.eclipse.xsd.XSDElementDeclaration;
+import javax.xml.namespace.QName;
 
 
 /**
@@ -32,7 +31,7 @@ public interface HandlerFactory {
     /**
      * Creates a handler for the root element of a document.
      */
-    DocumentHandler createDocumentHandler( ParserHandler parser );
+    DocumentHandler createDocumentHandler(ParserHandler parser);
 
     /**
      * Creates an element hander for a global or top level element in a document.
@@ -43,7 +42,7 @@ public interface HandlerFactory {
      *
      * @return A new element handler, or null if one could not be created.
      */
-    ElementHandler createElementHandler(QName qName, Handler parent, ParserHandler parser );
+    ElementHandler createElementHandler(QName qName, Handler parent, ParserHandler parser);
 
     /**
      * Creates a handler for a particular element in a document.
@@ -55,7 +54,8 @@ public interface HandlerFactory {
      *
      * @return A new element handler, or null if one could not be created.
      */
-    ElementHandler createElementHandler(XSDElementDeclaration element, Handler parent, ParserHandler parser );
+    ElementHandler createElementHandler(XSDElementDeclaration element, Handler parent,
+        ParserHandler parser);
 
     /**
      * Creates a handler for a particular element in a document.
@@ -67,5 +67,6 @@ public interface HandlerFactory {
      *
      * @return A new attribute handler, or null if one could not be created.
      */
+
     //AttributeHandler createAttributeHandler(XSDAttributeDeclaration attribute, Handler parent, ParserHandler parser );
 }

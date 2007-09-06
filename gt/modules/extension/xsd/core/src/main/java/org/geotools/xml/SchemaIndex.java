@@ -15,10 +15,6 @@
  */
 package org.geotools.xml;
 
-import java.util.List;
-
-import javax.xml.namespace.QName;
-
 import org.eclipse.xsd.XSDAttributeDeclaration;
 import org.eclipse.xsd.XSDAttributeGroupDefinition;
 import org.eclipse.xsd.XSDComplexTypeDefinition;
@@ -26,6 +22,8 @@ import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.eclipse.xsd.XSDTypeDefinition;
+import java.util.List;
+import javax.xml.namespace.QName;
 
 
 public interface SchemaIndex {
@@ -92,32 +90,32 @@ public interface SchemaIndex {
      * @return The type definition, or null if no such type definition exists.
      */
     XSDTypeDefinition getTypeDefinition(QName qName);
-    
+
     /**
      * Returns a child element specified by name of a parent element.
-     * 
+     *
      * @param parent The parent element.
      * @param childName The name of the child.
-     * 
+     *
      * @return The element declaration, or null if no such child exists.
      */
-    XSDElementDeclaration getChildElement( XSDElementDeclaration parent, QName childName );
-    
+    XSDElementDeclaration getChildElement(XSDElementDeclaration parent, QName childName);
+
     /**
      * Returns a list of the particles which correspond to child element declarations.
-     * 
+     *
      * @param parent The parent element.
-     * 
+     *
      * @return A list of {@link org.eclipse.xsd.XSDParticle}.
      */
-    List getChildElementParticles( XSDElementDeclaration parent );
-    
+    List getChildElementParticles(XSDElementDeclaration parent);
+
     /**
      * Returns the attributes of a specified elements.
-     * 
+     *
      * @param element The element.
-     * 
+     *
      * @return The list of attributed definied for the element.
      */
-    List getAttributes( XSDElementDeclaration element );
+    List getAttributes(XSDElementDeclaration element);
 }

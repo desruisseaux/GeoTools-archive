@@ -15,20 +15,18 @@
  */
 package org.geotools.xml.impl;
 
-import javax.xml.namespace.QName;
-
 import org.eclipse.xsd.XSDAttributeDeclaration;
 import org.eclipse.xsd.XSDElementDeclaration;
+import javax.xml.namespace.QName;
 import org.geotools.xml.SchemaIndex;
 
 
 public class HandlerFactoryImpl implements HandlerFactory {
-
-    public DocumentHandler createDocumentHandler( ParserHandler parser ) {
+    public DocumentHandler createDocumentHandler(ParserHandler parser) {
         return new DocumentHandlerImpl(this, parser);
     }
 
-    public ElementHandler createElementHandler(QName qName, Handler parent, ParserHandler parser ) {
+    public ElementHandler createElementHandler(QName qName, Handler parent, ParserHandler parser) {
         SchemaIndex index = parser.getSchemaIndex();
 
         //look up the element in the schema
@@ -41,8 +39,8 @@ public class HandlerFactoryImpl implements HandlerFactory {
         return null;
     }
 
-    public ElementHandler createElementHandler(XSDElementDeclaration element,
-        Handler parent, ParserHandler parser ) {
+    public ElementHandler createElementHandler(XSDElementDeclaration element, Handler parent,
+        ParserHandler parser) {
         return new ElementHandlerImpl(element, parent, parser);
     }
 }
