@@ -201,7 +201,9 @@ public class SimpleFeatureTypeBuilder {
 		restrictions = null;
 		restrictions().addAll(type.getRestrictions());
 
-		attributes = newList((List) type.attributes());
+		attributes = null;
+		attributes().addAll(type.attributes());
+		
 		isAbstract = type.isAbstract();
 		superType = (SimpleFeatureType) type.getSuper();
 	}
