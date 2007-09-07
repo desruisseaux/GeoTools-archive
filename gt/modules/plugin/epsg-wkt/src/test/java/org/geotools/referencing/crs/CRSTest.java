@@ -23,6 +23,7 @@ import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperation;
@@ -43,7 +44,21 @@ import com.vividsolutions.jts.geom.Polygon;
  * @source $URL$
  */
 public class CRSTest extends TestCase {
-	
+    /**
+     * Makes sure that the transform between two EPSG:4326 is the identity transform.
+     */
+    public void testFindMathTransformIdentity() throws FactoryException {
+        CoordinateReferenceSystem crs1default = CRS.decode("EPSG:4326",false);
+        CoordinateReferenceSystem crs2default = CRS.decode("EPSG:4326",false);
+        MathTransform tDefault = CRS.findMathTransform(crs1default, crs2default);
+        assertTrue("WSG84 transformed to WSG84 should be Identity", tDefault.isIdentity());
+        
+        CoordinateReferenceSystem crs1force = CRS.decode("EPSG:4326",true);
+        CoordinateReferenceSystem crs2force = CRS.decode("EPSG:4326",true);
+        MathTransform tForce = CRS.findMathTransform(crs1force, crs2force);
+        assertTrue("WSG84 transformed to WSG84 should be Identity", tForce.isIdentity());
+    }
+    
     public void testEPSG42102() throws Exception {
 	    CoordinateReferenceSystem bc = CRS.decode("EPSG:42102");
 		assertNotNull( "bc", bc );

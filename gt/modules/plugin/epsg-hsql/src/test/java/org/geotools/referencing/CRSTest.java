@@ -197,10 +197,15 @@ public class CRSTest extends TestCase {
      * Makes sure that the transform between two EPSG:4326 is the identity transform.
      */
     public void testFindMathTransformIdentity() throws FactoryException {
-        CoordinateReferenceSystem crs1 = CRS.decode("EPSG:4326");
-        CoordinateReferenceSystem crs2 = CRS.decode("EPSG:4326");
-        MathTransform t = CRS.findMathTransform(crs1, crs2);
-        assertTrue("WSG84 transformed to WSG84 should be Identity", t.isIdentity());
+        CoordinateReferenceSystem crs1default = CRS.decode("EPSG:4326");
+        CoordinateReferenceSystem crs2default = CRS.decode("EPSG:4326");
+        MathTransform tDefault = CRS.findMathTransform(crs1default, crs2default);
+        assertTrue("WSG84 transformed to WSG84 should be Identity", tDefault.isIdentity());
+        
+        CoordinateReferenceSystem crs1force = CRS.decode("EPSG:4326",true);
+        CoordinateReferenceSystem crs2force = CRS.decode("EPSG:4326",true);
+        MathTransform tForce = CRS.findMathTransform(crs1force, crs2force);
+        assertTrue("WSG84 transformed to WSG84 should be Identity", tForce.isIdentity());
     }
 
     // -------------------------------------------------------------------------
