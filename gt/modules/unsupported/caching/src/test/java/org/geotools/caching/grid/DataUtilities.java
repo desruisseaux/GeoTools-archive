@@ -15,16 +15,40 @@
  */
 package org.geotools.caching.grid;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import org.opengis.filter.Filter;
+import org.geotools.caching.AbstractFeatureCache;
 import org.geotools.caching.util.Generator;
 import org.geotools.feature.DefaultFeatureCollection;
+import org.geotools.filter.FilterFactoryImpl;
+import org.geotools.filter.spatial.BBOXImpl;
 
 
 public class DataUtilities {
+    static FilterFactoryImpl ff = new FilterFactoryImpl();
+
     public static DefaultFeatureCollection createUnitsquareDataSet(int numdata) {
         Generator gen = new Generator(1, 1);
+        DefaultFeatureCollection dataset = new DefaultFeatureCollection("Test", Generator.type);
+
+        for (int i = 0; i < numdata; i++) {
+            dataset.add(gen.createFeature(i));
+        }
+
+        return dataset;
+    }
+
+    public static DefaultFeatureCollection createUnitsquareDataSet(int numdata, long seed) {
+        Generator gen = new Generator(1, 1, seed);
         DefaultFeatureCollection dataset = new DefaultFeatureCollection("Test", Generator.type);
 
         for (int i = 0; i < numdata; i++) {
@@ -48,5 +72,47 @@ public class DataUtilities {
         }
 
         return filterset;
+    }
+
+    public static Filter convert(Envelope e) {
+        return ff.bbox("", e.getMinX(), e.getMinY(), e.getMaxX(), e.getMaxY(), "");
+    }
+
+    public static void saveFilters(List<Filter> filterset, File f)
+        throws Exception {
+        FileOutputStream fos = new FileOutputStream(f);
+        ObjectOutputStream oos = new ObjectOutputStream(fos);
+        dumpFilterSet(oos, filterset);
+        oos.close();
+        fos.close();
+    }
+
+    public static List<Filter> loadFilters(File f) throws Exception {
+        System.out.println("Loading existing filters.");
+
+        FileInputStream fis = new FileInputStream(f);
+        ObjectInputStream ois = new ObjectInputStream(fis);
+        int n = ois.readInt();
+        List<Filter> filterset = new ArrayList<Filter>();
+
+        for (int i = 0; i < n; i++) {
+            Envelope e = (Envelope) ois.readObject();
+            filterset.add(DataUtilities.convert(e));
+        }
+
+        ois.close();
+        fis.close();
+
+        return filterset;
+    }
+
+    public static void dumpFilterSet(ObjectOutputStream oos, List<Filter> filterset)
+        throws Exception {
+        oos.writeInt(filterset.size());
+
+        for (Iterator<Filter> it = filterset.iterator(); it.hasNext();) {
+            Envelope e = AbstractFeatureCache.extractEnvelope((BBOXImpl) it.next());
+            oos.writeObject(e);
+        }
     }
 }

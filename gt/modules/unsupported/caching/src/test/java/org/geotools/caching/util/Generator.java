@@ -42,12 +42,12 @@ import org.geotools.referencing.crs.DefaultEngineeringCRS;
 public class Generator {
     public static final FeatureType type;
     private static final GeometryFactory gfact;
-    private static final Random rand;
+    private final static Random srand;
     private static final FilterFactory filterFactory;
 
     static {
         gfact = new GeometryFactory();
-        rand = new Random();
+        srand = new Random();
         filterFactory = new FilterFactoryImpl();
 
         FeatureTypeBuilder builder = FeatureTypeBuilder.newInstance("test");
@@ -67,16 +67,27 @@ public class Generator {
         }
     }
 
+    private final Random rand;
     private final double xrange;
     private final double yrange;
     double meansize;
     int max_vertices;
 
     public Generator(double xrange, double yrange) {
+        this(xrange, yrange, 0);
+    }
+
+    public Generator(double xrange, double yrange, long seed) {
         this.xrange = xrange;
         this.yrange = yrange;
         this.max_vertices = 10;
         this.meansize = Math.min(xrange, yrange) / 20;
+
+        if (seed == 0) {
+            this.rand = new Random();
+        } else {
+            this.rand = new Random(seed);
+        }
     }
 
     static LineString createRectangle(double x1, double y1, double x2, double y2) {
@@ -159,8 +170,8 @@ public class Generator {
     }
 
     public static Coordinate pickRandomPoint(Coordinate center, double xrange, double yrange) {
-        double x = (center.x - (xrange / 2)) + (xrange * rand.nextDouble());
-        double y = (center.y - (yrange / 2)) + (yrange * rand.nextDouble());
+        double x = (center.x - (xrange / 2)) + (xrange * srand.nextDouble());
+        double y = (center.y - (yrange / 2)) + (yrange * srand.nextDouble());
 
         return new Coordinate(x, y);
     }

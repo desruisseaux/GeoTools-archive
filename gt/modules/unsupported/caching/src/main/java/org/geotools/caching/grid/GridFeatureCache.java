@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
+import java.util.logging.Level;
 import com.vividsolutions.jts.geom.Envelope;
 import org.opengis.filter.Filter;
 import org.geotools.caching.AbstractFeatureCache;
@@ -156,12 +157,15 @@ public class GridFeatureCache extends AbstractFeatureCache {
 
     public void put(FeatureCollection fc, Envelope e) throws CacheOversizedException {
         isOversized(fc);
+        writeLog(Thread.currentThread().getName() + " : Asking W lock, putting data");
         lock.writeLock().lock();
+        writeLog(Thread.currentThread().getName() + " : Got W lock, putting data");
 
         try {
             register(e);
             put(fc);
         } finally {
+            writeLog(Thread.currentThread().getName() + " : Released W lock, data inserted (put)");
             lock.writeLock().unlock();
         }
     }
@@ -175,11 +179,14 @@ public class GridFeatureCache extends AbstractFeatureCache {
 
     public void remove(Envelope e) {
         InvalidatingVisitor v = new InvalidatingVisitor();
+        writeLog(Thread.currentThread().getName() + " : Asking W lock, removing data");
         lock.writeLock().lock();
+        writeLog(Thread.currentThread().getName() + " : Got W lock, removing data");
 
         try {
             this.tracker.intersectionQuery(convert(e), v);
         } finally {
+            writeLog(Thread.currentThread().getName() + " : Released W lock, data removed");
             lock.writeLock().unlock();
         }
     }
@@ -201,10 +208,13 @@ public class GridFeatureCache extends AbstractFeatureCache {
 
         isOversized(fc);
         //puts++ ;
+        writeLog(Thread.currentThread().getName() + " : Asking W lock, putting data");
         lock.writeLock().lock();
+        writeLog(Thread.currentThread().getName() + " : Got W lock, putting data");
 
         try {
             while (tracker.getStatistics().getNumberOfData() > (capacity - size)) { // was capacity - fc.size()
+                writeLog(Thread.currentThread().getName() + " : evicting");
                 tracker.policy.evict();
 
                 //evictions++ ;
@@ -220,6 +230,7 @@ public class GridFeatureCache extends AbstractFeatureCache {
 
             fc.close(it);
         } finally {
+            writeLog(Thread.currentThread().getName() + " : Released W lock, data inserted (put)");
             lock.writeLock().unlock();
         }
     }
@@ -231,7 +242,16 @@ public class GridFeatureCache extends AbstractFeatureCache {
     protected void register(Envelope e) {
         Region r = convert(e);
         ValidatingVisitor v = new ValidatingVisitor(r);
-        this.tracker.containmentQuery(r, v);
+
+        try {
+            writeLog(Thread.currentThread().getName() + " : Asking W lock, registering");
+            lock.writeLock().lock();
+            writeLog(Thread.currentThread().getName() + " : Got W lock, registering");
+            this.tracker.containmentQuery(r, v);
+        } finally {
+            writeLog(Thread.currentThread().getName() + " : Released W lock, registered envelope");
+            lock.writeLock().unlock();
+        }
     }
 
     public String toString() {

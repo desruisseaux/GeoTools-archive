@@ -66,15 +66,15 @@ public class CacheDisplayPanel extends JPanel {
 
         DrawingVisitor v = new DrawingVisitor(g2d);
 
-        //		cache.writeLock();
+        cache.readLock();
+
         try {
             cache.tracker.setDoRecordAccess(false);
             cache.tracker.intersectionQuery(new Region(new double[] { 0, 0 }, new double[] { 1, 1 }),
                 v);
         } finally {
             cache.tracker.setDoRecordAccess(true);
-
-            //			cache.writeUnLock();
+            cache.readUnLock();
         }
 
         if (query != null) {

@@ -48,7 +48,7 @@ import org.geotools.filter.spatial.BBOXImpl;
 
 public abstract class AbstractFeatureCache implements FeatureCache, FeatureListener {
     public static FilterCapabilities caps;
-    static Logger logger;
+    protected static Logger logger;
     static FilterFactory ff;
 
     static {
@@ -76,30 +76,30 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
      *
      *
     
-               public Set addFeatures(FeatureCollection collection)
-                   throws IOException {
-                   return this.fs.addFeatures(collection);
-               }
-               public Transaction getTransaction() {
-                   return this.fs.getTransaction();
-               }
-               public void modifyFeatures(AttributeType[] type, Object[] value, Filter filter)
-                   throws IOException {
-                   this.fs.modifyFeatures(type, value, filter);
-               }
-               public void modifyFeatures(AttributeType type, Object value, Filter filter)
-                   throws IOException {
-                   this.fs.modifyFeatures(type, value, filter);
-               }
-               public void removeFeatures(Filter filter) throws IOException {
-                   this.fs.removeFeatures(filter);
-               }
-               public void setFeatures(FeatureReader reader) throws IOException {
-                   this.fs.setFeatures(reader);
-               }
-               public void setTransaction(Transaction transaction) {
-                   this.fs.setTransaction(transaction);
-               } */
+                 public Set addFeatures(FeatureCollection collection)
+                     throws IOException {
+                     return this.fs.addFeatures(collection);
+                 }
+                 public Transaction getTransaction() {
+                     return this.fs.getTransaction();
+                 }
+                 public void modifyFeatures(AttributeType[] type, Object[] value, Filter filter)
+                     throws IOException {
+                     this.fs.modifyFeatures(type, value, filter);
+                 }
+                 public void modifyFeatures(AttributeType type, Object value, Filter filter)
+                     throws IOException {
+                     this.fs.modifyFeatures(type, value, filter);
+                 }
+                 public void removeFeatures(Filter filter) throws IOException {
+                     this.fs.removeFeatures(filter);
+                 }
+                 public void setFeatures(FeatureReader reader) throws IOException {
+                     this.fs.setFeatures(reader);
+                 }
+                 public void setTransaction(Transaction transaction) {
+                     this.fs.setTransaction(transaction);
+                 } */
     public void addFeatureListener(FeatureListener listener) {
         this.fs.addFeatureListener(listener);
     }
@@ -237,7 +237,9 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
         String srs = fs.getSchema().getPrimaryGeometry().getCoordinateSystem().toString();
 
         //      acquire R-lock
+        writeLog(Thread.currentThread().getName() + " : Asking R lock, matching filter");
         lock.readLock().lock();
+        writeLog(Thread.currentThread().getName() + " : Got R lock, matching filter");
 
         List notcached = match(e);
 
@@ -245,25 +247,35 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
                                    // return result from cache
             fromCache = peek(e);
             // release R-lock
+            writeLog(Thread.currentThread().getName() + " : Released R lock, got answer");
             lock.readLock().unlock();
 
             return fromCache;
         }
 
         // release R-lock
+        writeLog(Thread.currentThread().getName() + " : Released R lock, missing data");
         lock.readLock().unlock();
         // got a miss from cache, need to get more data
         // acquire W-lock
+        writeLog(Thread.currentThread().getName() + " : Asking W lock, getting data");
         lock.writeLock().lock();
+        writeLog(Thread.currentThread().getName() + " : Got W lock, getting data");
         notcached = match(e); // check again because another thread may have inserted data in between
 
         if (notcached.isEmpty()) {
             // acquire R-lock
+            writeLog(Thread.currentThread().getName()
+                + " : Asking R lock, data inserted in between");
             lock.readLock().lock();
+            writeLog(Thread.currentThread().getName() + " : Got R lock, data inserted in between");
             // release W-lock
+            writeLog(Thread.currentThread().getName()
+                + " : Released W lock, data inserted in between");
             lock.writeLock().unlock();
             fromCache = peek(e);
             // release R-lock
+            writeLog(Thread.currentThread().getName() + " : Released R lock, got answer from cache");
             lock.readLock().unlock();
 
             return fromCache;
@@ -288,6 +300,7 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
                 }
 
                 // release W-lock
+                writeLog(Thread.currentThread().getName() + " : Released W lock, inserted new data");
                 lock.writeLock().unlock();
 
                 return fromSource;
@@ -324,6 +337,7 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
         }
 
         // release W-lock
+        writeLog(Thread.currentThread().getName() + " : Released W lock, inserted new data");
         lock.writeLock().unlock();
         // merge result sets before returning
         fromCache.addAll(fromSource);
@@ -409,5 +423,9 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
 
     public void writeUnLock() {
         lock.writeLock().unlock();
+    }
+
+    public void writeLog(String msg) {
+        //    	System.out.println(msg);
     }
 }

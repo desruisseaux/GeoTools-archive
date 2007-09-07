@@ -169,9 +169,9 @@ public class DiskStorage implements Storage {
         }
 
         byte[] data = new byte[e.length];
-        int page;
+        int page = 0;
         int rem = data.length;
-        int len;
+        int len = 0;
         int next = 0;
         int index = 0;
 
@@ -212,6 +212,9 @@ public class DiskStorage implements Storage {
         } catch (ClassNotFoundException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
+        } catch (NullPointerException e1) {
+            e1.printStackTrace();
+            Runtime.getRuntime().exit(1);
         }
 
         return node;
@@ -242,20 +245,21 @@ public class DiskStorage implements Storage {
 
             if (oldEntry == null) {
                 // problem
+                throw new IllegalStateException("oldEntry null");
             }
 
-            e.length = data.length;
             //pageIndex.remove(n.getIdentifier()) ;
             write(data, e, oldEntry);
         } else {
-            e.length = data.length;
             write(data, e, null);
         }
 
         pageIndex.put(n.getIdentifier(), e);
     }
 
-    void write(byte[] data, Entry e, Entry old) {
+    synchronized void write(byte[] data, Entry e, Entry old) {
+        e.length = data.length;
+
         int rem = data.length;
         int page;
         int len;
@@ -386,5 +390,20 @@ class Entry implements Serializable {
 
     Entry(NodeIdentifier id) {
         this.id = id;
+    }
+
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("Id : " + id);
+        sb.append(", Length : " + length);
+
+        int i = 0;
+
+        for (Iterator<Integer> it = pages.iterator(); it.hasNext();) {
+            sb.append("\n    page [" + (1000 * i) + "," + (1000 * (i + 1)) + "] = " + it.next());
+            i++;
+        }
+
+        return sb.toString();
     }
 }

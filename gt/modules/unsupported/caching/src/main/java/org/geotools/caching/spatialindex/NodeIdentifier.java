@@ -31,19 +31,18 @@ import java.io.Serializable;
  *
  */
 public abstract class NodeIdentifier implements Serializable {
-    transient boolean visited = false;
+    //    transient boolean visited = false;
     boolean valid = false;
 
     public abstract Shape getShape();
 
-    public void setVisited(boolean visited) {
-        this.visited = visited;
-    }
-
-    public boolean isVisited() {
-        return visited;
-    }
-
+    //    public void setVisited(boolean visited) {
+    //        this.visited = visited;
+    //    }
+    //
+    //    public boolean isVisited() {
+    //        return visited;
+    //    }
     public boolean isValid() {
         return valid;
     }

@@ -106,55 +106,39 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
      * @param query
      * @param v
      *
-     * TODO: remember child index where to search from on next passage
      */
     protected void rangeQuery(int type, Shape query, Visitor v) {
-        NodeIdentifier current = this.root;
-        Node currentNode = null;
-        current.setVisited(false);
+        NodePointer current = null;
 
-        Stack<Node> nodes = new Stack<Node>();
+        Stack<NodePointer> notYetVisitedNodes = new Stack<NodePointer>();
+        Stack<NodePointer> visitedNodes = new Stack<NodePointer>();
 
-        if (query.intersects(current.getShape())) {
-            currentNode = readNode(current);
-            nodes.push(currentNode);
+        if (query.intersects(this.root.getShape())) {
+            current = new NodePointer(readNode(this.root));
+            notYetVisitedNodes.push(current);
         }
 
-        while (!nodes.isEmpty()) {
-            currentNode = (Node) nodes.pop();
-            current = currentNode.getIdentifier();
-
-            if (!current.isVisited()) {
-                v.visitNode(currentNode);
-
-                for (int i = 0; i < currentNode.getChildrenCount(); i++) {
-                    currentNode.getChildIdentifier(i).setVisited(false);
-                }
+        while (!notYetVisitedNodes.isEmpty() || !visitedNodes.isEmpty()) {
+            if (!notYetVisitedNodes.isEmpty()) {
+                current = notYetVisitedNodes.pop();
+                v.visitNode(current.node);
 
                 if (v.isDataVisitor()) { // skip if visitor does nothing with data
                                          // visitData check for actual containement or intersection
-                    visitData(currentNode, v, query, type);
+                    visitData(current.node, v, query, type);
                 }
-
-                current.setVisited(true);
+            } else {
+                current = visitedNodes.pop();
             }
 
-            // TODO: start from last child + 1 rather than from 0
-            for (int i = 0; i < currentNode.getChildrenCount(); i++) {
-                NodeIdentifier child = currentNode.getChildIdentifier(i);
+            while (current.hasNext()) {
+                NodeIdentifier child = current.next();
 
-                if (!child.isVisited()) {
-                    if (query.intersects(child.getShape())) {
-                        // we will go back to this one later to examine other children
-                        nodes.push(currentNode);
-                        // meanwhile, we put one child at a time into stack, so we do not waste space
-                        nodes.push(readNode(child));
+                if (query.intersects(child.getShape())) {
+                    notYetVisitedNodes.push(new NodePointer(readNode(child)));
+                    visitedNodes.push(current);
 
-                        break;
-                    } else {
-                        // we won't have to compute intersection again and again
-                        child.setVisited(true);
-                    }
+                    break;
                 }
             }
         }
@@ -302,6 +286,30 @@ public abstract class AbstractSpatialIndex implements SpatialIndex {
         }
 
         store.flush();
+    }
+
+    class NodePointer {
+        Node node;
+        int nextidx = 0;
+
+        NodePointer(Node n) {
+            this.node = n;
+        }
+
+        boolean hasNext() {
+            return (nextidx < node.getChildrenCount());
+        }
+
+        NodeIdentifier next() {
+            if (hasNext()) {
+                NodeIdentifier next = node.getChildIdentifier(nextidx);
+                nextidx++;
+
+                return next;
+            } else {
+                return null;
+            }
+        }
     }
 
     /** Data structure to store statistics about the index.

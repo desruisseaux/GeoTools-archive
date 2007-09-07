@@ -109,6 +109,7 @@ public class GridTracker extends Grid implements EvictableTree {
         int ret = nodeToEvict.getDataCount();
         nodeToEvict.clear();
         nodeToEvict.getIdentifier().setValid(false);
+        writeNode(nodeToEvict);
         this.stats.addToDataCounter(-ret);
         this.stats.addToEvictionCounter(1);
     }

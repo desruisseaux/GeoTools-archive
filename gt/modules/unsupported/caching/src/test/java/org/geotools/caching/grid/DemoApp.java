@@ -29,6 +29,8 @@ import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.caching.FeatureCacheException;
 import org.geotools.caching.grid.GridFeatureCache;
 import org.geotools.caching.spatialindex.store.BufferedDiskStorage;
+import org.geotools.caching.spatialindex.store.DiskStorage;
+import org.geotools.caching.spatialindex.store.MemoryStorage;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.feature.FeatureCollection;
 
@@ -36,34 +38,36 @@ import org.geotools.feature.FeatureCollection;
 public class DemoApp extends JFrame {
     MemoryDataStore ds;
     GridFeatureCache cache;
+    volatile boolean task_wait = false;
     JPanel jContentPane = null;
     JPanel statsPanel = null;
     JPanel graphPanel = null;
     CacheDisplayPanel panel = null;
     JButton runQueryButton = null;
+    JButton pauseButton = null;
     JLabel lblNumData = null;
     JLabel lblNumReads = null;
     JLabel lblNumWrites = null;
     JLabel lblNumEvictions = null;
 
-    DemoApp() {
-        initDataStore();
+    DemoApp(long seed) {
+        initDataStore(seed);
         initDataCache();
         panel = new CacheDisplayPanel(cache);
         this.setContentPane(getJContentPane());
     }
 
-    void initDataStore() {
+    void initDataStore(long seed) {
         ds = new MemoryDataStore();
 
-        FeatureCollection fc = DataUtilities.createUnitsquareDataSet(500);
+        FeatureCollection fc = DataUtilities.createUnitsquareDataSet(500, seed);
         ds.addFeatures(fc);
     }
 
     void initDataCache() {
         try {
             cache = new GridFeatureCache(ds.getFeatureSource(ds.getTypeNames()[0]), 100, 100,
-                    BufferedDiskStorage.createInstance());
+                    MemoryStorage.createInstance());
         } catch (FeatureCacheException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -157,12 +161,49 @@ public class DemoApp extends JFrame {
         return runQueryButton;
     }
 
+    JButton getPauseButton() {
+        if (pauseButton == null) {
+            pauseButton = new JButton("Pause");
+            pauseButton.addMouseListener(new MouseListener() {
+                    public void mouseClicked(MouseEvent e) {
+                        if (task_wait) {
+                            pauseButton.setText("Pause");
+                        } else {
+                            pauseButton.setText("Resume");
+                        }
+
+                        task_wait = !task_wait;
+                    }
+
+                    public void mouseEntered(MouseEvent arg0) {
+                        // TODO Auto-generated method stub
+                    }
+
+                    public void mouseExited(MouseEvent arg0) {
+                        // TODO Auto-generated method stub
+                    }
+
+                    public void mousePressed(MouseEvent arg0) {
+                        // TODO Auto-generated method stub
+                    }
+
+                    public void mouseReleased(MouseEvent arg0) {
+                        // TODO Auto-generated method stub
+                    }
+                });
+        }
+
+        return pauseButton;
+    }
+
     JPanel getGraphPanel() {
         if (graphPanel == null) {
             graphPanel = new JPanel();
             graphPanel.setSize(300, 100);
             graphPanel.add(new JLabel("GraphPanel"));
             graphPanel.add(getRunQueryButton());
+            graphPanel.add(getPauseButton());
+            getPauseButton().setEnabled(false);
         }
 
         return graphPanel;
@@ -170,11 +211,20 @@ public class DemoApp extends JFrame {
 
     void runQueries() {
         runQueryButton.setEnabled(false);
+        pauseButton.setEnabled(true);
 
         //		cache.clear();
         for (int j = 0; j < 10; j++) {
             for (int i = 0; i < 10; i++) {
                 try {
+                    while (task_wait) {
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
                     //System.out.print("i = " + i + ", j = " + j);
                     Envelope query = new Envelope(i * .1, (i + 1) * .1, j * .1, (j + 1) * .1);
                     cache.get(query);
@@ -205,10 +255,25 @@ public class DemoApp extends JFrame {
         }
 
         runQueryButton.setEnabled(true);
+        pauseButton.setEnabled(false);
     }
 
     public static void main(String[] args) {
-        DemoApp thisClass = new DemoApp();
+        if (args.length < 1) {
+            System.err.println("Usage: DemoApp seed");
+            System.exit(0);
+        }
+
+        long seed = 0;
+
+        try {
+            seed = Long.parseLong(args[0]);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(
+                "Error : seed argument must be numeric ; input was : " + args[0]);
+        }
+
+        DemoApp thisClass = new DemoApp(seed);
         thisClass.setSize(600, 400);
         thisClass.setTitle("Google SoC : Feature Cache Demo Application");
         thisClass.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

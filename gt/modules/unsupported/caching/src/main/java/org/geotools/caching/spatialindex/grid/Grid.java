@@ -222,18 +222,18 @@ public class Grid extends AbstractSpatialIndex {
          * are inserted at root node, because they are likely to fall between two tiles,
          * rather thant in one and only one tile.
          *
-                           int[] cursor = new int[this.dimension];
-                           for (int i = 0; i < this.dimension; i++) {
-                               cursor[i] = (int) ((shape.getMBR().getLow(i) - node.mbr.getLow(i)) / node.tiles_size);
-                           }
-                           int nextid = node.gridIndexToNodeId(cursor);
-                           Node nextnode = node.getSubNode(nextid);
-                           if (nextnode.getShape().contains(shape)) {
-                               insertData(nextnode, data, shape, id);
-                           } else {
-                               insertData(this.root, data, shape, id);
-                               root_insertions++;
-                           }
+                             int[] cursor = new int[this.dimension];
+                             for (int i = 0; i < this.dimension; i++) {
+                                 cursor[i] = (int) ((shape.getMBR().getLow(i) - node.mbr.getLow(i)) / node.tiles_size);
+                             }
+                             int nextid = node.gridIndexToNodeId(cursor);
+                             Node nextnode = node.getSubNode(nextid);
+                             if (nextnode.getShape().contains(shape)) {
+                                 insertData(nextnode, data, shape, id);
+                             } else {
+                                 insertData(this.root, data, shape, id);
+                                 root_insertions++;
+                             }
          */
 
         /* so we prefer this version :

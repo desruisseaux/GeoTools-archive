@@ -15,6 +15,7 @@
  */
 package org.geotools.caching;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import java.util.List;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import org.opengis.filter.Filter;
+import org.geotools.caching.grid.DataUtilities;
 import org.geotools.caching.grid.GridFeatureCache;
 import org.geotools.caching.grid.GridInspector;
 import org.geotools.caching.spatialindex.store.BufferedDiskStorage;
@@ -51,7 +53,7 @@ public class BenchMark {
     double[] windows_real = new double[] {  };
 
     void createUnitsquareDataSet() {
-        Generator gen = new Generator(1, 1);
+        Generator gen = new Generator(1, 1, 1025);
         dataset = new DefaultFeatureCollection("Test", Generator.type);
 
         for (int i = 0; i < numdata; i++) {
@@ -187,15 +189,16 @@ public class BenchMark {
                 }
             }
 
-            //List<Filter> errors = new ArrayList<Filter>();
+            List<Filter> errors = new ArrayList<Filter>();
+
             if (ds_stats[i].getNumberOfFeatures() != control_stats[i].getNumberOfFeatures()) {
                 conform = false;
 
-                //                errors.add(filterset.get(i));
+                errors.add(filterset.get(i));
                 System.err.println("Query " + i + " : Got " + ds_stats[i].getNumberOfFeatures()
                     + " features, expected " + control_stats[i].getNumberOfFeatures());
 
-                //                runErrorsAgain(errors);
+                runErrorsAgain(errors);
             }
 
             /*System.out.println("Test: " + ds_stats[i].getNumberOfFeatures() + " features ; "
@@ -243,7 +246,8 @@ public class BenchMark {
                         for (Iterator<Envelope> eit = list.iterator(); eit.hasNext();) {
                             Envelope e = eit.next();
                             Envelope against = AbstractFeatureCache.extractEnvelope((BBOXImpl) next);
-                            System.out.println("query enlarged : " + e.contains(against));
+                            System.out.println("query enlarged : " + e.contains(against) + " = "
+                                + e);
 
                             FilterFactoryImpl ff = new FilterFactoryImpl();
                             BBOXImpl tr = (BBOXImpl) ff.bbox("", e.getMinX(), e.getMinY(),
@@ -252,12 +256,13 @@ public class BenchMark {
                             compare(dblco, co);
                         }
 
-                        while (true) {
-                            sample[0].clear();
-                            inspector.findFeature(f);
-                            sample[0].getFeatures(next);
-                            inspector.findFeature(f);
-                        }
+                        //                        while (true) {
+                        sample[0].clear();
+                        inspector.findFeature(f);
+                        sample[0].getFeatures(next);
+                        inspector.findFeature(f);
+
+                        //                        }
                     }
 
                     System.out.println(sample[0].sourceAccessStats());
@@ -304,7 +309,7 @@ public class BenchMark {
         return ret;
     }
 
-    public void localSetup() throws IOException {
+    public void localSetup() throws Exception {
         System.out.print("DataSet : ");
         createUnitsquareDataSet();
         System.out.println("OK");
@@ -312,7 +317,16 @@ public class BenchMark {
         initLocalControl();
         System.out.println("OK");
         System.out.print("FilterSet : ");
-        createUnitsquareFilterSet();
+
+        File f = new File("benchfilters.data");
+
+        if (f.exists()) {
+            filterset = DataUtilities.loadFilters(f);
+        } else {
+            createUnitsquareFilterSet();
+            DataUtilities.saveFilters(filterset, f);
+        }
+
         System.out.println("OK");
     }
 
@@ -372,7 +386,11 @@ public class BenchMark {
             e.printStackTrace();
         } catch (FeatureCacheException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
+        System.out.println(thisClass.filterset.get(8));
     }
 
     class QueryStatistics {

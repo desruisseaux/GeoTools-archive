@@ -87,6 +87,13 @@
       <artifactId>gt2-mappane</artifactId>
       <version>2.5-SNAPSHOT</version>
     </dependency>
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>net.sourceforge.groboutils</groupId>
+      <artifactId>groboutils-core</artifactId>
+      <version>5</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <!-- =========================================================== -->
