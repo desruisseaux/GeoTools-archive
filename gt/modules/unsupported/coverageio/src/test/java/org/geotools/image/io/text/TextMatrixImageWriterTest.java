@@ -106,7 +106,7 @@ public class TextMatrixImageWriterTest extends TestCase {
      * Tests the number format.
      */
     public void testCreateNumberFormat() {
-        assertEquals(Locale.CANADA, writer.getDataLocale());
+        assertEquals(Locale.CANADA, writer.getDataLocale(null));
 
         final NumberFormat format = writer.createNumberFormat(image, null);
         assertEquals(2, format.getMinimumFractionDigits());

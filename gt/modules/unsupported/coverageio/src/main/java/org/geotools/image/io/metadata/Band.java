@@ -19,9 +19,6 @@ package org.geotools.image.io.metadata;
 // Geotools dependencies
 import org.geotools.util.NumberRange;
 
-// OpenGIS dependencies
-import org.opengis.coverage.SampleDimension;  // For javadoc
-
 
 /**
  * A {@code <SampleDimension>} element in
@@ -32,7 +29,7 @@ import org.opengis.coverage.SampleDimension;  // For javadoc
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @see SampleDimension
+ * @see org.opengis.coverage.SampleDimension
  */
 public class Band extends MetadataAccessor {
     /**
@@ -83,8 +80,14 @@ public class Band extends MetadataAccessor {
      * {@code "SampleDimensions/SampleDimension"} element.
      */
     public NumberRange getValidRange() {
-        Number minimum = getInteger("minValue");
-        Number maximum = getInteger("maxValue");
+        Number minimum, maximum;
+        final boolean enabled = setWarningsEnabled(false);
+        try {
+            minimum = getInteger("minValue");
+            maximum = getInteger("maxValue");
+        } finally {
+            setWarningsEnabled(enabled);
+        }
         final Class type;
         if (minimum == null || maximum == null) {
             minimum = getDouble("minValue");

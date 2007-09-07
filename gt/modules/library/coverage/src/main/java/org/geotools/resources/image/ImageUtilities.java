@@ -18,22 +18,12 @@ package org.geotools.resources.image;
 
 import java.awt.Dimension;
 import java.awt.RenderingHints;
-import java.awt.Transparency;
-import java.awt.color.ColorSpace;
-import java.awt.image.ColorModel;
-import java.awt.image.ComponentColorModel;
-import java.awt.image.DataBuffer;
-import java.awt.image.DirectColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
-import java.awt.image.SampleModel;
-import java.awt.image.renderable.ParameterBlock;
-import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.spi.IIORegistry;
 import javax.imageio.spi.ImageReaderSpi;
@@ -42,30 +32,19 @@ import javax.imageio.spi.ImageWriterSpi;
 import javax.media.jai.BorderExtender;
 import javax.media.jai.BorderExtenderCopy;
 import javax.media.jai.BorderExtenderReflect;
-import javax.media.jai.ColorCube;
-import javax.media.jai.IHSColorSpace;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.Interpolation;
 import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
-import javax.media.jai.KernelJAI;
-import javax.media.jai.LookupTableJAI;
 import javax.media.jai.OpImage;
 import javax.media.jai.ParameterBlockJAI;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.ROI;
 import javax.media.jai.RenderedOp;
-import javax.media.jai.operator.BandCombineDescriptor;
-import javax.media.jai.operator.BandSelectDescriptor;
-import javax.media.jai.operator.NullDescriptor;
 
-import org.geotools.image.ImageWorker;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 
 import com.sun.media.jai.operator.ImageReadDescriptor;
-import com.sun.media.jai.util.ImageUtil;
 
 
 /**
@@ -111,7 +90,7 @@ public final class ImageUtilities {
                     JAI.KEY_TILE_CACHE, null);
 
     /**
-     * Cached instance of a {@link RenderingHints} for controlling border extension on 
+     * Cached instance of a {@link RenderingHints} for controlling border extension on
      * {@link JAI} operations. It contains an instance of a {@link BorderExtenderCopy}.
      */
     public final static RenderingHints EXTEND_BORDER_BY_COPYING = new RenderingHints(
@@ -119,7 +98,7 @@ public final class ImageUtilities {
                     .createInstance(BorderExtender.BORDER_COPY));
 
     /**
-     * Cached instance of a {@link RenderingHints} for controlling border extension on 
+     * Cached instance of a {@link RenderingHints} for controlling border extension on
      * {@link JAI} operations. It contains an instance of a {@link BorderExtenderReflect}.
      */
     public final static RenderingHints EXTEND_BORDER_BY_REFLECT = new RenderingHints(
@@ -346,7 +325,7 @@ public final class ImageUtilities {
          * and 'rmax' is the amount of non-empty pixels using this tile size. We will use this
          * "optimal" tile size only if it fill at least 75% of the tile. Otherwise, we arbitrarily
          * consider that it doesn't worth to use a "non-standard" tile size. The purpose of this
-         * arbitrary test is again to avoid too many small tiles (assuming that 
+         * arbitrary test is again to avoid too many small tiles (assuming that
          */
         return (rmax >= tileSize - tileSize/4) ? sopt : 0;
     }
@@ -508,13 +487,13 @@ public final class ImageUtilities {
 
     /**
      * Tiles the specified image.
-     * <p>
-     * Usually, the tiling doesn't need to be performed as a separated operation. The
+     *
+     * @todo Usually, the tiling doesn't need to be performed as a separated operation. The
      * {@link ImageLayout} hint with tile information can be provided to most JAI operators.
      * The {@link #getRenderingHints} method provides such tiling information only if the
      * image was not already tiled, so it should not be a cause of tile size mismatch in an
      * operation chain. The mean usage for a separated "tile" operation is to tile an image
-     * before to save it on disk in some format supporting tiling. 
+     * before to save it on disk in some format supporting tiling.
      *
      * @throws IOException If an I/O operation were required (in order to check if the image
      *         were tiled on disk) and failed.

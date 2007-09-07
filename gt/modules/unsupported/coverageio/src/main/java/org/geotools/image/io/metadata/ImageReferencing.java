@@ -16,9 +16,6 @@
  */
 package org.geotools.image.io.metadata;
 
-// J2SE dependencies
-import java.util.Date;
-
 // OpenGIS dependencies
 import org.opengis.referencing.datum.Datum;                     // For javadoc
 import org.opengis.referencing.datum.TemporalDatum;             // For javadoc

@@ -35,7 +35,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 // Geotools dependencies
-import org.geotools.util.LoggedFormat;
 import org.geotools.resources.XMath;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
@@ -124,6 +123,11 @@ public class MetadataAccessor {
      * @see #currentElement()
      */
     private transient Element current;
+
+    /**
+     * {@code true} if warnings are enabled.
+     */
+    private transient boolean warningsEnabled = true;
 
     /**
      * Creates an accessor with the same parent and childs than the specified one. The two
@@ -481,7 +485,7 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
      * Every {@code set} methods in this class except {@link #setUserObject setUserObject}
      * invoke this method last. Consequently, this method provides a single point for
      * overriding if subclasses want to process the attribute after formatting.
-     * 
+     *
      * @param attribute The attribute name.
      * @param value     The attribute value.
      */
@@ -499,7 +503,7 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
     /**
      * Set the attribute to the specified enumeration value,
      * or remove the attribute if the value is null.
-     * 
+     *
      * @param attribute The attribute name.
      * @param value     The attribute value.
      * @param enums     The set of allowed values, or {@code null} if unknown.
@@ -529,15 +533,7 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
     protected Integer getInteger(final String attribute) {
         String value = getString(attribute);
         if (value != null) {
-            // Remove the trailing ".0", if any.
-            for (int i=value.length(); --i>=0;) {
-                switch (value.charAt(i)) {
-                    case '0': continue;
-                    case '.': value = value.substring(0, i); break;
-                    default : break;
-                }
-                break;
-            }
+            value = trimFractionalPart(value);
             try {
                 return Integer.valueOf(value);
             } catch (NumberFormatException e) {
@@ -721,8 +717,9 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
      * @return The attribute value, or {@code null} if none or unparseable.
      */
     protected Date getDate(final String attribute) {
-        final String value = getString(attribute);
+        String value = getString(attribute);
         if (value != null) {
+            value = trimFractionalPart(value);
             // TODO: remove the cast with J2SE 1.5.
             return (Date) metadata.dateFormat().parse(value);
         }
@@ -744,15 +741,38 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
     }
 
     /**
+     * Trims the factional part of the given string, provided that it doesn't change the value.
+     * More specifically, this method removes the trailing {@code ".0"} characters if any. This
+     * method is automatically invoked before to {@linkplain #getInteger parse an integer} or to
+     * {@linkplain #getDate parse a date} (for simplifying fractional seconds).
+     *
+     * @param  value The value to trim.
+     * @return The value without the trailing {@code ".0"} part.
+     */
+    public static String trimFractionalPart(String value) {
+        value = value.trim();
+        for (int i=value.length(); --i>=0;) {
+            switch (value.charAt(i)) {
+                case '0': continue;
+                case '.': return value.substring(0, i);
+                default : return value;
+            }
+        }
+        return value;
+    }
+
+    /**
      * Convenience method for logging a warning. Do not allow overriding, because
      * it would not work for warnings emitted by the {@link #getDate} method.
      */
     final void warning(final String method, final int key, final Object value) {
-        final LogRecord record = Errors.getResources(metadata.getLocale()).
-                getLogRecord(Level.WARNING, key, value);
-        record.setSourceClassName(MetadataAccessor.class.getName());
-        record.setSourceMethodName(method);
-        warningOccurred(record);
+        if (warningsEnabled) {
+            final LogRecord record = Errors.getResources(metadata.getLocale()).
+                    getLogRecord(Level.WARNING, key, value);
+            record.setSourceClassName(MetadataAccessor.class.getName());
+            record.setSourceMethodName(method);
+            warningOccurred(record);
+        }
     }
 
     /**
@@ -761,7 +781,25 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
      * to {@link GeographicMetadata#warningOccurred}.
      */
     protected void warningOccurred(final LogRecord record) {
-        metadata.warningOccurred(record);
+        if (warningsEnabled) {
+            metadata.warningOccurred(record);
+        }
+    }
+
+    /**
+     * Enables or disables the warnings. Warnings are enabled by default. Subclasses way want
+     * to temporarily disable the warnings when failures are expected as the normal behavior.
+     * For example a subclass may invokes {@link #getInteger} and fallbacks on {@link #getDouble}
+     * if the former failed. In such case, the warnings should be disabled for the integer parsing,
+     * but not for the floating point parsing.
+     *
+     * @param  enabled {@code true} for enabling warnings, or {@code false} for disabling.
+     * @return The previous state before this method has been invoked.
+     */
+    protected boolean setWarningsEnabled(final boolean enabled) {
+        final boolean old = warningsEnabled;
+        warningsEnabled = enabled;
+        return old;
     }
 
     /**

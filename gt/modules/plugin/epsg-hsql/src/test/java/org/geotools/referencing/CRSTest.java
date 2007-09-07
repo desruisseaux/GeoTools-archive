@@ -41,12 +41,11 @@ import org.geotools.factory.GeoTools;
 import org.geotools.resources.Arguments;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.OrderedAxisAuthorityFactory;
-import org.geotools.referencing.operation.transform.IdentityTransform;
 
 
 /**
  * Tests if the CRS utility class is functioning correctly when using HSQL datastore.
- * 
+ *
  * @source $URL$
  * @version $Id$
  * @author Jody Garnett
@@ -127,26 +126,26 @@ public class CRSTest extends TestCase {
 
     /**
      * Tests again EPSG:4326, but forced to (longitude, latitude) axis order.
-     *
-     * @todo Uncomment when we will be allowed to compile for J2SE 1.5.
-     *       Call to {@link System#clearProperty} is mandatory for this test.
+     * 
+     * @todo Partially uncomment since we are allowed to compile for J2SE 1.5, but doesn't work
+     *       as it did prior some changes in the referencing module. Need to investigate why.
      */
     public void testSystemPropertyToForceXY() throws NoSuchAuthorityCodeException, FactoryException {
         assertNull(System.getProperty(GeoTools.FORCE_LONGITUDE_FIRST_AXIS_ORDER));
-//        System.setProperty(GeoTools.FORCE_LONGITUDE_FIRST_AXIS_ORDER, "true");
-//        try {
-//            CoordinateReferenceSystem crs = CRS.decode("EPSG:4326");
-//            final CoordinateSystem cs = crs.getCoordinateSystem();
-//            assertEquals(2, cs.getDimension());
-//
-//            CoordinateSystemAxis axis0  = cs.getAxis(0);
+        System.setProperty(GeoTools.FORCE_LONGITUDE_FIRST_AXIS_ORDER, "true");
+        try {
+            CoordinateReferenceSystem crs = CRS.decode("EPSG:4326");
+            final CoordinateSystem cs = crs.getCoordinateSystem();
+            assertEquals(2, cs.getDimension());
+
+            CoordinateSystemAxis axis0  = cs.getAxis(0);
 //            assertEquals("forceXY did not work", "Long", axis0.getAbbreviation());
-//
-//            CoordinateSystemAxis axis1  = cs.getAxis(1);
+
+            CoordinateSystemAxis axis1  = cs.getAxis(1);
 //            assertEquals("forceXY did not work", "Lat", axis1.getAbbreviation());
-//        } finally {
-//            System.clearProperty(GeoTools.FORCE_LONGITUDE_FIRST_AXIS_ORDER);
-//        }
+        } finally {
+            System.clearProperty(GeoTools.FORCE_LONGITUDE_FIRST_AXIS_ORDER);
+        }
     }
 
     /**
@@ -178,26 +177,32 @@ public class CRSTest extends TestCase {
         return CRS.parseWKT(wkt);
     }
 
-    public void testWKT() throws Exception {
-        String wkt = "GEOGCS[" + "\"WGS 84\"," + "  DATUM[" + "    \"WGS_1984\","
-                + "    SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],"
-                + "    TOWGS84[0,0,0,0,0,0,0]," + "    AUTHORITY[\"EPSG\",\"6326\"]],"
-                + "  PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],"
-                + "  UNIT[\"DMSH\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9108\"]],"
-                + "  AXIS[\"Lat\",NORTH]," + "  AXIS[\"Long\",EAST],"
-                + "  AUTHORITY[\"EPSG\",\"4326\"]]";
+    /**
+     * Tests the {@link CRS#parseWKT} method.
+     */
+    public void testWKT() throws FactoryException {
+        String wkt = "GEOGCS[\"WGS 84\",\n"
+                   + "  DATUM[\"WGS_1984\",\n"
+                   + "    SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],\n"
+                   + "    TOWGS84[0,0,0,0,0,0,0], AUTHORITY[\"EPSG\",\"6326\"]],\n"
+                   + "  PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],\n"
+                   + "  UNIT[\"DMSH\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9108\"]],\n"
+                   + "  AXIS[\"Lat\",NORTH], AXIS[\"Long\",EAST],\n"
+                   + "  AUTHORITY[\"EPSG\",\"4326\"]]";
         CoordinateReferenceSystem crs = CRS.parseWKT(wkt);
         assertNotNull(crs);
     }
 
-
-    public void testFindMathTransformIdenity() throws Exception {
+    /**
+     * Makes sure that the transform between two EPSG:4326 is the identity transform.
+     */
+    public void testFindMathTransformIdentity() throws FactoryException {
         CoordinateReferenceSystem crs1 = CRS.decode("EPSG:4326");
         CoordinateReferenceSystem crs2 = CRS.decode("EPSG:4326");
-        MathTransform t = CRS.findMathTransform( crs1, crs2 );
-        assertTrue( "WSG84 transformed to WSG84 should be Identity", t.isIdentity() );
+        MathTransform t = CRS.findMathTransform(crs1, crs2);
+        assertTrue("WSG84 transformed to WSG84 should be Identity", t.isIdentity());
     }
-    
+
     // -------------------------------------------------------------------------
     // The following tests are copied from the legacy plugin/epsg-wkt test suite
     // -------------------------------------------------------------------------
@@ -282,7 +287,7 @@ public class CRSTest extends TestCase {
      */
     public void test26910Lower() throws FactoryException {
         CoordinateReferenceSystem crs = CRS.decode("epsg:26910");
-        assertNotNull(crs);                
+        assertNotNull(crs);
     }
 
     /**
@@ -290,7 +295,7 @@ public class CRSTest extends TestCase {
      */
     public void test26986Lower() throws FactoryException {
         CoordinateReferenceSystem crs = CRS.decode("epsg:26986");
-        assertNotNull(crs);                
+        assertNotNull(crs);
     }
 
     /**
@@ -338,7 +343,7 @@ public class CRSTest extends TestCase {
                 count++;
             } catch (FactoryException e) {
                 System.err.println("WARNING (CRS: "+code+" ):" + e.getMessage());
-            }            
+            }
         }
         System.out.println("Success: " + count + "/" + total + " (" + (count*100)/total + "%)");
     }

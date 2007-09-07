@@ -94,7 +94,7 @@ final class VariableMetadata {
      *        (which is a violation of CF convention), or {@code false} in order to autodetect
      *        using the UCAR heuristic rule.
      */
-    public VariableMetadata(final Variable variable, final boolean forceRangePacking) {
+    public VariableMetadata(final Variable variable, boolean forceRangePacking) {
         final DataType dataType, scaleType, rangeType;
         /*
          * Gets the scale factors, if present. Also remember its type
@@ -131,10 +131,14 @@ final class VariableMetadata {
         }
         rangeType  = widestType;
         widestType = dataType; // Reset before we scan the other attributes.
-        if (forceRangePacking ||
-                (rangeType.equals(scaleType) && rangeType.equals(widest(rangeType, dataType))))
-        {
+        if (!forceRangePacking) {
             // Heuristic rule defined in UCAR documentation (see EnhanceScaleMissing interface)
+            forceRangePacking = rangeType.equals(scaleType) &&
+                                rangeType.equals(widest(rangeType, dataType));
+        }
+        if (forceRangePacking) {
+            final double offset = Double.isNaN(this.offset) ? 0 : this.offset;
+            final double scale  = Double.isNaN(this.scale ) ? 1 : this.scale;
             minimum = (minimum - offset) / scale;
             maximum = (maximum - offset) / scale;
             if (!isFloatingPoint(rangeType)) {

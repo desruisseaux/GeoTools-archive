@@ -97,9 +97,12 @@ public abstract class TextImageWriter extends StreamImageWriter {
      * <p>
      * <b>Note:</b> This locale should not be confused with {@link #getLocale}.
      *
+     * @param  parameters The write parameters, or {@code null} for the defaults.
+     * @return The locale to use for parsing numbers in the image file.
+     *
      * @see Spi#locale
      */
-    protected Locale getDataLocale() {
+    protected Locale getDataLocale(final ImageWriteParam parameters) {
         return (originatingProvider instanceof Spi) ? ((Spi)originatingProvider).locale : null;        
     }
 
@@ -110,13 +113,13 @@ public abstract class TextImageWriter extends StreamImageWriter {
      * Subclasses can override this method if they want to specify the character encoding in
      * some other way.
      *
-     * @param  output The output stream.
+     * @param  parameters The write parameters, or {@code null} for the defaults.
      * @return The character encoding, or {@code null} for the platform default encoding.
      * @throws IOException If reading from the output stream failed.
      *
      * @see Spi#charset
      */
-    protected Charset getCharset(final OutputStream output) throws IOException {
+    protected Charset getCharset(final ImageWriteParam parameters) throws IOException {
         return (originatingProvider instanceof Spi) ? ((Spi)originatingProvider).charset : null;
     }
 
@@ -126,9 +129,12 @@ public abstract class TextImageWriter extends StreamImageWriter {
      * to the {@link Spi} object given to this {@code TextImageWriter} constructor. Subclasses
      * can override this method if they want to specify the line separator in some other way.
      *
+     * @param  parameters The write parameters, or {@code null} for the defaults.
+     * @return The line separator to use for writting the image.
+     *
      * @see Spi#lineSeparator
      */
-    protected String getLineSeparator() {
+    protected String getLineSeparator(final ImageWriteParam parameters) {
         if (originatingProvider instanceof Spi) {
             final String lineSeparator = ((Spi)originatingProvider).lineSeparator;
             if (lineSeparator != null) {
@@ -151,6 +157,7 @@ public abstract class TextImageWriter extends StreamImageWriter {
      * when {@link #setOutput setOutput(Object)}, {@link #reset() reset()} or {@link #dispose()
      * dispose()} methods are invoked.
      *
+     * @param  parameters The write parameters, or {@code null} for the defaults.
      * @return {@link #getOutput} as a {@link BufferedWriter}.
      * @throws IllegalStateException if the {@linkplain #output output} is not set.
      * @throws IOException If the output stream can't be created for an other reason.
@@ -158,7 +165,9 @@ public abstract class TextImageWriter extends StreamImageWriter {
      * @see #getOutput
      * @see #getOutputStream
      */
-    protected BufferedWriter getWriter() throws IllegalStateException, IOException {
+    protected BufferedWriter getWriter(final ImageWriteParam parameters)
+            throws IllegalStateException, IOException
+    {
         if (writer == null) {
             final Object output = getOutput();
             if (output instanceof BufferedWriter) {
@@ -169,7 +178,9 @@ public abstract class TextImageWriter extends StreamImageWriter {
                 closeOnReset = null; // We don't own the underlying writer, so don't close it.
             } else {
                 final OutputStream stream = getOutputStream();
-                writer = new BufferedWriter(getOutputStreamWriter(stream));
+                final Charset charset = getCharset(parameters);
+                writer = new BufferedWriter((charset != null) ?
+                        new OutputStreamWriter(stream, charset) : new OutputStreamWriter(stream));
                 if (closeOnReset == stream) {
                     closeOnReset = writer;
                 }
@@ -179,24 +190,16 @@ public abstract class TextImageWriter extends StreamImageWriter {
     }
 
     /**
-     * Returns the specified {@link OutputStream} as a {@link Writer}.
-     */
-    final Writer getOutputStreamWriter(final OutputStream stream) throws IOException {
-        final Charset charset = getCharset(stream);
-        return (charset != null) ? new OutputStreamWriter(stream, charset) : new OutputStreamWriter(stream);
-    }
-
-    /**
      * Returns a number format to be used for formatting the sample values in the given image.
      *
      * @param image The image or raster to be written.
-     * @param parameters The write parameters, or null if the whole image will be written.
+     * @param parameters The write parameters, or {@code null} if the whole image will be written.
      * @return A number format appropriate for the given image.
      */
     protected strictfp NumberFormat createNumberFormat(final IIOImage        image,
                                                        final ImageWriteParam parameters)
     {
-        final Locale locale = getDataLocale();
+        final Locale locale = getDataLocale(parameters);
         final int type = image.hasRaster() ? image.getRaster().getTransferType() :
                          image.getRenderedImage().getSampleModel().getDataType();
         if (type != DataBuffer.TYPE_FLOAT && type != DataBuffer.TYPE_DOUBLE) {

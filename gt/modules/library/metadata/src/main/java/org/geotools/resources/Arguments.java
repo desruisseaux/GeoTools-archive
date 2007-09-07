@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
@@ -422,6 +423,18 @@ public class Arguments {
                                         exception);
         }
         return new OutputStreamWriter(out);
+    }
+
+    /**
+     * Gets a print writer for the specified print stream. If the user specified an encoding
+     * in some previous run of {@link Arguments}, then this encoding will be used.
+     *
+     * @param  out The print stream to wrap.
+     * @return A {@link PrintWriter} wrapping the specified print stream with the user's
+     *         prefered encoding.
+     */
+    public static PrintWriter getPrintWriter(final PrintStream out) {
+        return new PrintWriter(getWriter(out), true);
     }
 
     /**

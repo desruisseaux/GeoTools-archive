@@ -68,8 +68,8 @@ public class TextMatrixImageWriter extends TextImageWriter {
                       final ImageWriteParam parameters) throws IOException
     {
         processImageStarted();
-        final BufferedWriter   out = getWriter();
-        final String lineSeparator = getLineSeparator();
+        final BufferedWriter   out = getWriter(parameters);
+        final String lineSeparator = getLineSeparator(parameters);
         final NumberFormat  format = createNumberFormat(image, parameters);
         final FieldPosition    pos = getExpectedFractionPosition(format);
         final int    fractionWidth = pos.getEndIndex() - pos.getBeginIndex();

@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2007, GeoTools Project Managment Committee (PMC)
  *    (C) 2007, Geomatys
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 import javax.imageio.ImageReader;
 
@@ -49,6 +48,7 @@ import ucar.nc2.dataset.VariableDS;
 import org.geotools.image.io.metadata.Axis;
 import org.geotools.image.io.metadata.ImageGeometry;
 import org.geotools.image.io.metadata.ImageReferencing;
+import org.geotools.image.io.metadata.MetadataAccessor;
 import org.geotools.image.io.metadata.GeographicMetadata;
 import org.geotools.image.io.metadata.GeographicMetadataFormat;
 import org.geotools.util.LoggedFormat;
@@ -238,6 +238,7 @@ public class NetcdfMetadata extends GeographicMetadata {
             }
             Date epoch = null;
             if (origin != null) {
+                origin = MetadataAccessor.trimFractionalPart(origin);
                 epoch = (Date) parse(type, origin, Date.class, "addCoordinateAxis");
             }
             axisNode.setTimeOrigin(epoch);
@@ -284,7 +285,7 @@ public class NetcdfMetadata extends GeographicMetadata {
 
     /**
      * Parses the given string as a value along the specified axis.
-     * 
+     *
      * @param  type     The type of the axis.
      * @param  value    The value along that axis.
      * @param  expected The expected type.
@@ -308,20 +309,23 @@ public class NetcdfMetadata extends GeographicMetadata {
      * <ul>
      *   <li>For {@linkplain AxisType#Time time axis}, a {@link DateFormat} using the
      *       {@code "yyyy-MM-dd HH:mm:ss"} pattern in UTC {@linkplain TimeZone timezone}.</li>
-     *   <li>For all other kind of axis, a {@link NumberFormat} for
-     *       {@linkplain Locale#US US locale}.</li>
+     *   <li>For all other kind of axis, a {@link NumberFormat}.</li>
      * </ul>
-     * 
+     * <p>
+     * The {@linkplain Locale#CANADA Canada locale} is used by default for all formats because
+     * it is relatively close to ISO (for example regarding days and months order in dates) while
+     * using the English symbols.
+     *
      * @param  type The type of the axis.
      * @return The format for parsing values along the axis.
      */
     protected Format getAxisFormat(final AxisType type) {
         if (type.equals(AxisType.Time)) {
-            final DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+            final DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CANADA);
             format.setTimeZone(TimeZone.getTimeZone("UTC"));
             return format;
         } else {
-            return NumberFormat.getNumberInstance(Locale.US);
+            return NumberFormat.getNumberInstance(Locale.CANADA);
         }
     }
 

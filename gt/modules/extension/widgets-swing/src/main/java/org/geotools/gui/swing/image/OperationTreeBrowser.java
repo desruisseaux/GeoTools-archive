@@ -16,14 +16,12 @@
  */
 package org.geotools.gui.swing.image;
 
-// J2SE dependencies
 import java.util.List;
 import java.util.Locale;
 import javax.swing.Icon;
 import javax.swing.JTree;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
-import javax.swing.ImageIcon;
 import javax.swing.JSplitPane;
 import javax.swing.JScrollPane;
 import javax.swing.BorderFactory;
@@ -45,7 +43,6 @@ import java.awt.Dimension;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 import javax.imageio.ImageIO;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.RenderableOp;
@@ -55,15 +52,14 @@ import javax.media.jai.ParameterList;
 import javax.media.jai.ParameterListDescriptor;
 import javax.media.jai.LookupTableJAI;
 import javax.media.jai.KernelJAI;
-import javax.media.jai.RegistryElementDescriptor;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.SwingUtilities;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.gui.swing.IconFactory;
 import org.geotools.gui.swing.ParameterEditor;
+import org.geotools.gui.swing.tree.Trees;
 import org.geotools.gui.swing.tree.TreeNode;
 import org.geotools.gui.swing.tree.NamedTreeNode;
 import org.geotools.gui.swing.tree.MutableTreeNode;
@@ -103,7 +99,7 @@ import org.geotools.resources.i18n.Errors;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Lionel Flahaut 
+ * @author Lionel Flahaut
  *
  * @see ImageProperties
  * @see ParameterEditor
@@ -207,6 +203,26 @@ public class OperationTreeBrowser extends JPanel {
             return image.toString();
         }
         return Utilities.getShortClassName(image);
+    }
+
+    /**
+     * Prints to the {@linkplain System#out standard output stream} the operation chain for
+     * the specified image. This convenience method is used mostly for debugging purpose.
+     *
+     * @since 2.4
+     */
+    public static void print(final RenderedImage image) {
+        Trees.print(getTree(image, Locale.getDefault()));
+    }
+
+    /**
+     * Prints to the {@linkplain System#out standard output stream} the operation chain for
+     * the specified image. This convenience method is used mostly for debugging purpose.
+     *
+     * @since 2.4
+     */
+    public static void print(final RenderableImage image) {
+        Trees.print(getTree(image, Locale.getDefault()));
     }
 
     /**
@@ -321,7 +337,7 @@ public class OperationTreeBrowser extends JPanel {
      * @author Martin Desruisseaux
      */
     private final class Listeners implements TreeSelectionListener {
-        /** 
+        /**
          * Called whenever the value of the selection changes. This method uses the
          * {@link TreeNode#getAllowsChildren} in order to determines if the selection
          * is a source (allows children = {@code true}) or a parameter
@@ -457,7 +473,7 @@ public class OperationTreeBrowser extends JPanel {
         frame.pack();
         frame.setVisible(true);
     }
-    
+
     /**
      * Display the properties for the images specified on the command line.
      *

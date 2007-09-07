@@ -16,7 +16,6 @@
  */
 package org.geotools.image.io.netcdf;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.awt.Rectangle;
@@ -29,7 +28,6 @@ import java.io.FileNotFoundException;
 import javax.imageio.IIOException;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageReadParam;
-import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.metadata.IIOMetadata;
 
 import ucar.ma2.Array;
@@ -45,7 +43,6 @@ import ucar.nc2.Dimension;
 import ucar.nc2.Variable;
 import ucar.nc2.VariableIF;
 
-import org.geotools.image.io.PaletteFactory;
 import org.geotools.image.io.FileImageReader;
 import org.geotools.image.io.SampleConverter;
 import org.geotools.math.Statistics;
@@ -557,7 +554,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
          */
         processImageStarted(imageIndex);
         final float toPercent = 100f / numDstBands;
-        final int type = raster.getTransferType();
+        final int type = raster.getSampleModel().getDataType();
         final int xmin = destRegion.x;
         final int ymin = destRegion.y;
         final int xmax = destRegion.width  + xmin;

@@ -26,6 +26,7 @@ import org.w3c.dom.Node;
 
 // Geotools dependencies
 import org.geotools.resources.XArray;
+import org.geotools.resources.Arguments;
 import org.geotools.resources.OptionalDependencies;
 
 
@@ -128,5 +129,25 @@ public final class Trees {
      */
     public static String toString(final TreeNode node) {
         return OptionalDependencies.toString(node);
+    }
+
+    /**
+     * Prints the specified tree model to the {@linkplain System#out standard output stream}.
+     * This method is mostly a convenience for debugging purpose.
+     *
+     * @since 2.4
+     */
+    public static void print(final TreeModel tree) {
+        Arguments.getPrintWriter(System.out).println(toString(tree));
+    }
+
+    /**
+     * Prints the specified tree to the {@linkplain System#out standard output stream}.
+     * This method is mostly a convenience for debugging purpose.
+     *
+     * @since 2.4
+     */
+    public static void print(final TreeNode node) {
+        Arguments.getPrintWriter(System.out).println(toString(node));
     }
 }
