@@ -15,6 +15,8 @@
  */
 package org.geotools.kml;
 
+import org.picocontainer.MutablePicoContainer;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.kml.bindings.BoundaryTypeBinding;
 import org.geotools.kml.bindings.ColorBinding;
@@ -47,9 +49,6 @@ import org.geotools.kml.bindings.StyleTypeBinding;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
 import org.geotools.xml.Configuration;
-import org.picocontainer.MutablePicoContainer;
-
-import com.vividsolutions.jts.geom.GeometryFactory;
 
 
 /**
@@ -165,6 +164,7 @@ public class KMLConfiguration extends Configuration {
         //    StyleSelectorTypeBinding.class);
         //container.registerComponentImplementation(KML.styleStateEnum, StyleStateEnumBinding.class);
         container.registerComponentImplementation(KML.StyleType, StyleTypeBinding.class);
+
         //container.registerComponentImplementation(KML.TimePrimitiveType,
         //    TimePrimitiveTypeBinding.class);
         //container.registerComponentImplementation(KML.TimeSpanType, TimeSpanTypeBinding.class);

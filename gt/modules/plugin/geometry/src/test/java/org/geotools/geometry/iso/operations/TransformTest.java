@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import org.geotools.geometry.Geometry;
+import org.geotools.geometry.GeometryBuilder;
 import org.geotools.geometry.iso.PositionFactoryImpl;
 import org.geotools.geometry.iso.PrecisionModel;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
@@ -17,9 +19,12 @@ import org.geotools.geometry.iso.primitive.RingImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.ReferencingFactoryFinder;
+import org.geotools.referencing.factory.OrderedAxisAuthorityFactory;
 import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.geometry.coordinate.LineString;
+import org.opengis.geometry.coordinate.PointArray;
 import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.coordinate.Triangle;
 import org.opengis.geometry.primitive.OrientableCurve;
@@ -28,7 +33,10 @@ import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.primitive.Surface;
 import org.opengis.geometry.primitive.SurfaceBoundary;
 import org.opengis.geometry.primitive.SurfacePatch;
+import org.opengis.metadata.citation.Citation;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 
 import junit.framework.TestCase;
 
@@ -222,8 +230,44 @@ public class TransformTest extends TestCase {
 		assertEqualsWithinTolerance(ring2, expectedRing, 0.9);
 	}
 	
+	/**
+	 * We need to ensure that an IdentityTransform is recognized
+	 * and the result is *equals* (although perhaps not *equalsExact*.
+	 * <p>
+	 * Note I am using GeometryBuilder here as I am interested in testing
+	 * functionality rather than factories.
+	 * <p>
+	 * Thanks to SriPuligundla for the bug report.
+	 * @throws Exception
+	 */
+	public void testSurfaceIdentityTransform() throws Exception {
+	    CoordinateReferenceSystem crs1 = CRS.decode("EPSG:4326");
+        CoordinateReferenceSystem crs2 = CRS.decode("EPSG:4326");
+        MathTransform t = CRS.findMathTransform( crs1, crs2 );
+        assertTrue( "WSG84 transformed to WSG84 should be Identity", t.isIdentity() );
+        
+        GeometryBuilder builder = new GeometryBuilder( crs1 );
+        
+        double array[] = new double[]{
+                -123.47009555832284,48.543261561072285,
+                -123.46972894676578,48.55009592117936,
+                -123.45463828850829,48.54973520267305,
+                -123.4550070827961,48.54290089070186,
+                -123.47009555832284,48.543261561072285
+        };
+        PointArray points = builder.createPointArray(array);
+        SurfaceBoundary boundary = builder.createSurfaceBoundary(points);
+        Surface surface = builder.createSurface(boundary);
+        assertNotNull( surface );
+        
+        Surface surface2 = (Surface) surface.transform( crs2, t );
+        assertNotNull( surface2 );
+        
+        assertTrue( "object equals", surface.equals( (Object) surface2 ));
+        assertTrue( "geometry equals", surface.equals( surface2 ));
+	}
+	
 	public void testSurface() throws Exception {
-
 		PositionFactory positionFactory = new PositionFactoryImpl(crs1, new PrecisionModel());
 		PrimitiveFactory primitiveFactory = new PrimitiveFactoryImpl(crs1, positionFactory);
 		GeometryFactory geometryFactory = new GeometryFactoryImpl(crs1, positionFactory);

@@ -62,7 +62,7 @@
   <!--     manner relevant to the purpose of the "site" goal.      -->
   <!-- =========================================================== -->
   <properties>
-    <oracle.jdbc>false</oracle.jdbc>
+    <oracle>false</oracle>
     <allow.test.skip>true</allow.test.skip>
     <allow.test.failure.ignore>false</allow.test.failure.ignore>
     <extensive.tests>false</extensive.tests>
@@ -750,7 +750,7 @@
       <dependency>
         <artifactId>ojdbc14</artifactId>
         <groupId>com.oracle</groupId>
-        <version>10.2.0</version>
+        <version>10.2.0.3.0</version>
       </dependency>
       <dependency>
         <artifactId>sdoapi</artifactId>

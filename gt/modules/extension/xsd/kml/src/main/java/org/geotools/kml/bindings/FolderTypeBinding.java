@@ -16,9 +16,7 @@
 package org.geotools.kml.bindings;
 
 import java.util.Collection;
-
 import javax.xml.namespace.QName;
-
 import org.geotools.feature.DefaultFeatureBuilder;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
@@ -54,6 +52,7 @@ import org.geotools.xml.Node;
  */
 public class FolderTypeBinding extends AbstractComplexBinding {
     static final FeatureType featureType;
+
     static {
         DefaultFeatureTypeBuilder tb = new DefaultFeatureTypeBuilder();
         tb.init(FeatureTypeBinding.featureType);
@@ -64,6 +63,7 @@ public class FolderTypeBinding extends AbstractComplexBinding {
 
         featureType = tb.buildFeatureType();
     }
+
     /**
      * @generated
      */
@@ -80,7 +80,6 @@ public class FolderTypeBinding extends AbstractComplexBinding {
     public Class getType() {
         return Feature.class;
     }
-    
 
     public int getExecutionMode() {
         return Binding.AFTER;
@@ -94,7 +93,6 @@ public class FolderTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        
         DefaultFeatureBuilder b = new DefaultFeatureBuilder();
 
         Feature feature = (Feature) value;

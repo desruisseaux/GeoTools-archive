@@ -57,7 +57,7 @@ public class DocumentTypeBinding extends AbstractComplexBinding {
         DefaultFeatureTypeBuilder tb = new DefaultFeatureTypeBuilder();
         tb.init(FeatureTypeBinding.featureType);
         tb.setName("document");
-        
+
         //&lt;element maxOccurs="unbounded" minOccurs="0" ref="kml:Feature"/&gt;
         tb.add("Feature", Collection.class);
 

@@ -174,6 +174,9 @@ public class GeometryBuilder {
         return getPositionFactory().createPointArray();
     }
 
+    public PointArray createPointArray( double[] array ) {
+        return getPositionFactory().createPointArray(array, 0, array.length / crs.getCoordinateSystem().getDimension() );
+    }
     public PointArray createPointArray( double[] array, int start, int end ) {
         return getPositionFactory().createPointArray(array, start, end );
     }
@@ -184,13 +187,31 @@ public class GeometryBuilder {
 
 	public Curve createCurve(List segments) throws MismatchedReferenceSystemException, MismatchedDimensionException {
 		if (segments == null)
-			throw new NullPointerException();
+			throw new NullPointerException("Segments are required to create a curve");
 
 		// A curve will be created
 		// - The curve will be set as parent curves for the Curve segments
 		// - Start and end params for the CurveSegments will be set
 		return getPrimitiveFactory().createCurve(segments);
 	}
+    public Curve createCurve(PointArray points) throws MismatchedReferenceSystemException, MismatchedDimensionException {
+        if (points == null)
+            throw new NullPointerException("Points are required to create a curve");
+
+        // A curve will be created
+        // - The curve will be set as parent curves for the Curve segments
+        // - Start and end params for the CurveSegments will be set
+        List<LineSegment> segmentList = new ArrayList<LineSegment>();
+        for( int i=0; i<points.length();i++){
+            int start = i;
+            int end = (i+1)%points.size();
+            DirectPosition point1 = points.getDirectPosition( start, null );
+            DirectPosition point2 = points.getDirectPosition( end, null );
+            LineSegment segment = createLineSegment( point1, point2 );
+            segmentList.add( segment );
+        }
+        return getPrimitiveFactory().createCurve( segmentList );
+    }
 
 	/**
 	 * Create a point with the provided ordinates.
@@ -339,6 +360,10 @@ public class GeometryBuilder {
 		return getPrimitiveFactory().createSolid(boundary);
 	}
 
+    public SurfaceBoundary createSurfaceBoundary(PointArray points ) throws MismatchedReferenceSystemException, MismatchedDimensionException {
+        Curve curve = createCurve( points );
+        return createSurfaceBoundary( curve);
+    }
 	public Surface createSurface(List surfaces) throws MismatchedReferenceSystemException, MismatchedDimensionException {
 		return getPrimitiveFactory().createSurface(surfaces);
 	}
@@ -350,7 +375,18 @@ public class GeometryBuilder {
 	public SurfaceBoundary createSurfaceBoundary(Ring exterior, List interiors) throws MismatchedReferenceSystemException, MismatchedDimensionException {
 		return getPrimitiveFactory().createSurfaceBoundary(exterior, interiors);
 	}
+	
+	public SurfaceBoundary createSurfaceBoundary(Ring exterior) throws MismatchedReferenceSystemException, MismatchedDimensionException {
+        return createSurfaceBoundary( exterior, new ArrayList<Ring>() );
+    }
 
+	public SurfaceBoundary createSurfaceBoundary(OrientableCurve curve) throws MismatchedReferenceSystemException, MismatchedDimensionException {
+	    List<OrientableCurve> exterior = new ArrayList<OrientableCurve>(1);
+	    exterior.add( curve );
+	    Ring ring = createRing( exterior );
+        return createSurfaceBoundary( ring );
+    }
+	
 	/* not implemented in GeometryFactory yet
 	public Arc createArc(Position startPoint, Position midPoint, Position endPoint) throws MismatchedReferenceSystemException, MismatchedDimensionException {
 		// TODO Auto-generated method stub
@@ -413,7 +449,9 @@ public class GeometryBuilder {
 	public LineString createLineString(List points) throws MismatchedReferenceSystemException, MismatchedDimensionException {
 		return getGeometryFactory().createLineString(points);
 	}
-
+	public LineString createLineString(PointArray points) throws MismatchedReferenceSystemException, MismatchedDimensionException {
+	    return getGeometryFactory().createLineString(points);
+    }
 	public MultiPrimitive createMultiPrimitive() {
 		return getGeometryFactory().createMultiPrimitive();
 	}

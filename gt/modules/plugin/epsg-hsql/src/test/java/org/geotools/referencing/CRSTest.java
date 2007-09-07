@@ -33,6 +33,7 @@ import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
@@ -40,6 +41,7 @@ import org.geotools.factory.GeoTools;
 import org.geotools.resources.Arguments;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.OrderedAxisAuthorityFactory;
+import org.geotools.referencing.operation.transform.IdentityTransform;
 
 
 /**
@@ -189,6 +191,13 @@ public class CRSTest extends TestCase {
     }
 
 
+    public void testFindMathTransformIdenity() throws Exception {
+        CoordinateReferenceSystem crs1 = CRS.decode("EPSG:4326");
+        CoordinateReferenceSystem crs2 = CRS.decode("EPSG:4326");
+        MathTransform t = CRS.findMathTransform( crs1, crs2 );
+        assertTrue( "WSG84 transformed to WSG84 should be Identity", t.isIdentity() );
+    }
+    
     // -------------------------------------------------------------------------
     // The following tests are copied from the legacy plugin/epsg-wkt test suite
     // -------------------------------------------------------------------------
