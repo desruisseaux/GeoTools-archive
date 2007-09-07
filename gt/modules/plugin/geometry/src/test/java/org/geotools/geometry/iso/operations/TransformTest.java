@@ -46,13 +46,13 @@ public class TransformTest extends TestCase {
 	private CoordinateReferenceSystem crs2;
 	
 	public void setUp() throws Exception {
-		this.crs1 = CRS.decode("EPSG:4326");
-		this.crs2 = CRS.decode("EPSG:3005");
+		this.crs1 = CRS.decode("EPSG:4326",true);
+		this.crs2 = CRS.decode("EPSG:3005",true);
 	}
 	
 	// test that two points, curves, rings, or surfaces are equal within a tolerance
 	// (equals means same CRS and same ordinates within tolerance)
-	private void assertEqualsWithinTolerance(GeometryImpl geom1, GeometryImpl geom2, double epsilon) {
+	private void assertEquals(GeometryImpl geom1, GeometryImpl geom2, double epsilon) {
 		if ( !CRS.equalsIgnoreMetadata(geom1.getCoordinateReferenceSystem(), geom2.getCoordinateReferenceSystem()) ) {
 			assertTrue("CRS of two objects do not match", false);
 		}	
@@ -78,7 +78,7 @@ public class TransformTest extends TestCase {
 			while (iterator1.hasNext() && iterator2.hasNext()) {
 				PointImpl p1 = new PointImpl((DirectPositionImpl) iterator1.next());
 				PointImpl p2 = new PointImpl((DirectPositionImpl) iterator2.next());
-				assertEqualsWithinTolerance(p1, p2, epsilon);
+				assertEquals(p1, p2, epsilon);
 			}
 		}
 		else if (geom1 instanceof RingImpl && geom2 instanceof RingImpl) {
@@ -91,7 +91,7 @@ public class TransformTest extends TestCase {
 			while (iterator1.hasNext() && iterator2.hasNext()) {
 				PointImpl p1 = new PointImpl((DirectPositionImpl) iterator1.next());
 				PointImpl p2 = new PointImpl((DirectPositionImpl) iterator2.next());
-				assertEqualsWithinTolerance(p1, p2, epsilon);
+				assertEquals(p1, p2, epsilon);
 			}
 		}
 		else if (geom1 instanceof SurfaceImpl && geom2 instanceof SurfaceImpl) {
@@ -104,7 +104,7 @@ public class TransformTest extends TestCase {
 			while (iterator1.hasNext() && iterator2.hasNext()) {
 				RingImpl r1 = (RingImpl) iterator1.next();
 				RingImpl r2 = (RingImpl) iterator2.next();
-				assertEqualsWithinTolerance(r1, r2, epsilon);
+				assertEquals(r1, r2, epsilon);
 			}
 		}
 		else {
@@ -132,7 +132,7 @@ public class TransformTest extends TestCase {
 		//System.out.println(expectedPoint2);
 		
 		//assertTrue(point2.equals(expectedPoint2));
-		assertEqualsWithinTolerance(point2, expectedPoint2, 0.9);
+		assertEquals(expectedPoint2, point2, 0.9);
 		
 	}
 
@@ -173,7 +173,7 @@ public class TransformTest extends TestCase {
 		//System.out.println(expectedCurve);
 		
 		//assertTrue(curve2.equals(expectedCurve));
-		assertEqualsWithinTolerance(curve2, expectedCurve, 0.9);
+		assertEquals(curve2, expectedCurve, 0.9);
 	}
 	
 	public void testRing() throws Exception {
@@ -227,7 +227,7 @@ public class TransformTest extends TestCase {
 		//System.out.println(expectedRing);
 		
 		//assertTrue(ring2.equals(expectedRing));
-		assertEqualsWithinTolerance(ring2, expectedRing, 0.9);
+		assertEquals(ring2, expectedRing, 0.9);
 	}
 	
 	/**
@@ -241,12 +241,12 @@ public class TransformTest extends TestCase {
 	 * @throws Exception
 	 */
 	public void testSurfaceIdentityTransform() throws Exception {
-	    CoordinateReferenceSystem crs1 = CRS.decode("EPSG:4326");
-        CoordinateReferenceSystem crs2 = CRS.decode("EPSG:4326");
-        MathTransform t = CRS.findMathTransform( crs1, crs2 );
+	    CoordinateReferenceSystem wsg1 = CRS.decode("EPSG:4326");
+        CoordinateReferenceSystem wsg2 = CRS.decode("EPSG:4326");
+        MathTransform t = CRS.findMathTransform( wsg1, wsg2 );
         assertTrue( "WSG84 transformed to WSG84 should be Identity", t.isIdentity() );
         
-        GeometryBuilder builder = new GeometryBuilder( crs1 );
+        GeometryBuilder builder = new GeometryBuilder( wsg1 );
         
         double array[] = new double[]{
                 -123.47009555832284,48.543261561072285,
@@ -260,7 +260,7 @@ public class TransformTest extends TestCase {
         Surface surface = builder.createSurface(boundary);
         assertNotNull( surface );
         
-        Surface surface2 = (Surface) surface.transform( crs2, t );
+        Surface surface2 = (Surface) surface.transform( wsg2, t );
         assertNotNull( surface2 );
         
         assertTrue( "object equals", surface.equals( (Object) surface2 ));
@@ -325,6 +325,6 @@ public class TransformTest extends TestCase {
 		//System.out.println(expectedSurface);
 		
 		//assertTrue(surface2.equals(expectedSurface));
-		assertEqualsWithinTolerance((SurfaceImpl) surface2, (SurfaceImpl) expectedSurface, 0.9);
+		assertEquals((SurfaceImpl) surface2, (SurfaceImpl) expectedSurface, 0.9);
 	}
 }

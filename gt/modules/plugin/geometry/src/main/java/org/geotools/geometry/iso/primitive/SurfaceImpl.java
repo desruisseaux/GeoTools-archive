@@ -480,10 +480,10 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 			
 			// exterior Ring should be first element in the list
 			if (newExterior == null) {
-				newExterior = (RingImpl) thisRing.transform(newCRS);
+				newExterior = (RingImpl) thisRing.transform(newCRS, transform );
 			}
 			else {
-				newInteriors.add((RingImpl) thisRing.transform(newCRS));
+				newInteriors.add((RingImpl) thisRing.transform(newCRS, transform));
 			}
 		}
 		
