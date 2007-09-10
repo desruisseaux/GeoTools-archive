@@ -1,6 +1,11 @@
 package org.geotools.geometry.iso.primitive;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -12,11 +17,17 @@ import org.geotools.geometry.iso.primitive.RingImpl;
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.hsqldb.lib.StopWatch;
 import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.coordinate.LineString;
 import org.opengis.geometry.coordinate.Triangle;
+import org.opengis.geometry.primitive.Curve;
+import org.opengis.geometry.primitive.Point;
 import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.primitive.Surface;
+import org.opengis.geometry.primitive.SurfaceBoundary;
 import org.opengis.geometry.primitive.SurfacePatch;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * @author sanjay
@@ -144,7 +155,60 @@ public class SurfaceTest extends TestCase {
 		
 	}
 
-
+//    public void testSlowGeometry() throws FileNotFoundException {
+//        String fname = System.getenv("ESP_HOME") + "\\resources\\users\\petritis\\zzzPoints.bin";
+//        CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
+//        GeometryBuilder builder = new GeometryBuilder(crs);
+//		GeometryFactoryImpl tGeomFactory = (GeometryFactoryImpl) builder.getGeometryFactory();
+//		PrimitiveFactoryImpl tPrimFactory = (PrimitiveFactoryImpl) builder.getPrimitiveFactory();
+//
+//        double[] imagePoints = null;
+//        RandomAccessFile in = new RandomAccessFile(fname, "r");
+//
+//        ArrayList<Double> list = new ArrayList<Double>();
+//        double d;
+//        while (true) {
+//            try {
+//                d = in.readDouble();
+//            } catch (IOException e) {
+//                break;
+//            }
+//            list.add(d);
+//        }
+//
+//        imagePoints = new double[list.size()];
+//        int at = 0;
+//        for (Double dv : list) {
+//            imagePoints[at] = dv.doubleValue();
+//            at++;
+//        }
+//
+//        int numPoints = imagePoints.length / 2;
+//        Point[] points = new Point[numPoints + 1];
+//        for (int i = 0; i < numPoints; i++) {
+//            double[] coord = new double[2];
+//            coord[0] = imagePoints[i * 2];
+//            coord[1] = imagePoints[i * 2 + 1];
+//            points[i] = tPrimFactory.createPoint(coord);
+//        }
+//        points[numPoints] = points[0];
+//
+//        //StopWatch timer = new StopWatch();
+//        
+//        LineString lineString = tGeomFactory.createLineString(new ArrayList(Arrays.asList(points)));        
+//        List curveSegmentList = Collections.singletonList(lineString);
+//        List curveList = Collections.singletonList(tPrimFactory.createCurve(curveSegmentList));
+//        Ring exteriorRing = tPrimFactory.createRing(curveList);
+//        SurfaceBoundary surfaceBoundary = tPrimFactory
+//                .createSurfaceBoundary(exteriorRing, Collections.EMPTY_LIST);
+//        Surface polygon = tPrimFactory.createSurface(surfaceBoundary);
+//        //timer.stop();
+//
+//        System.out.println("numpoints=" + numPoints
+//                + "  time to create polygon: " );
+//
+//        assertNotNull(polygon);
+//    }
 	
 
 }
