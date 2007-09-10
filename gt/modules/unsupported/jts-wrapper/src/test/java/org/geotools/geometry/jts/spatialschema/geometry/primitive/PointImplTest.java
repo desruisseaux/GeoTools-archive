@@ -66,7 +66,9 @@ public class PointImplTest extends TestCase {
 				.getComponentInstanceOfType(CoordinateReferenceSystem.class));
 		try {
 			container.getComponentInstanceOfType(PositionFactory.class);
-			fail("We should not be able to make a position factory yet - we do not have a CRS");
+			//fail("We should not be able to make a position factory yet - we do not have a CRS");
+			// we need to work with out a crs on the grounds that FactorySPI
+			// has to be able to find our class :-(
 		} catch (Exception expected) {
 		}
 		// let's provide a CRS now and confirm everything works

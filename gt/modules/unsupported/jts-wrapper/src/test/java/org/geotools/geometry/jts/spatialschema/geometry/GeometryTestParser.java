@@ -37,6 +37,7 @@ import org.opengis.geometry.Geometry;
 import org.opengis.geometry.PositionFactory;
 import org.geotools.geometry.jts.spatialschema.geometry.geometry.GeometryFactoryImpl;
 import org.geotools.geometry.jts.spatialschema.geometry.primitive.PrimitiveFactoryImpl;
+import org.geotools.geometry.text.WKTParser;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 
 
@@ -50,7 +51,7 @@ public class GeometryTestParser {
     private DocumentBuilderFactory documentBuilderFactory;
     private DocumentBuilder documentBuilder;
 
-    private GeometryWKTFactory wktFactory;
+    private WKTParser wktFactory;
 
     /**
      * Constructor
@@ -66,7 +67,7 @@ public class GeometryTestParser {
         GeometryFactory geomFact = new GeometryFactoryImpl(DefaultGeographicCRS.WGS84);
         PrimitiveFactory primFact = new PrimitiveFactoryImpl(DefaultGeographicCRS.WGS84);
         PositionFactory posFact = null;
-        wktFactory = new GeometryWKTFactory(geomFact, primFact, posFact );
+        wktFactory = new WKTParser(geomFact, primFact, posFact, null );
     }
 
     /**
@@ -198,7 +199,7 @@ public class GeometryTestParser {
             expectedResult = Boolean.FALSE;
         } else {
             try {
-                expectedResult = wktFactory.parseWKTString(expectedString);
+                expectedResult = wktFactory.parse(expectedString);
             } catch (ParseException e) {
                 LOG.debug("Couldn't parse [" + expectedString + "]", e);
                 throw new RuntimeException("Couldn't parse [" + expectedString + "]", e);
@@ -213,7 +214,7 @@ public class GeometryTestParser {
         String wktString = getNodeText(node);
         Geometry geom = null;
         try {
-            geom = wktFactory.parseWKTString(wktString);
+            geom = wktFactory.parse(wktString);
         } catch (ParseException e) {
             LOG.debug("Can't parse [" + wktString + "]", e);
             throw new RuntimeException("Can't parse [" + wktString + "]", e);

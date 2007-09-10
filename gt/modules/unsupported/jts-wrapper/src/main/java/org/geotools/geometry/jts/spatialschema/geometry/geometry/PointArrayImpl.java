@@ -44,13 +44,13 @@ import org.geotools.geometry.jts.JTSUtils;
  * @author <A HREF="http://www.opengis.org">OpenGIS&reg; consortium</A>
  * @version 2.0
  */
-public class PointArrayImpl extends ArrayList implements PointArray, JTSGeometry {
+public class PointArrayImpl extends NotifyingArrayList implements PointArray, JTSGeometry {
     private static final long serialVersionUID = -9202900942004287122L;
 
     //*************************************************************************
     //  Fields
     //*************************************************************************    
-    private List pointList;
+    //private List pointList;
     
     private CoordinateReferenceSystem crs;
 
@@ -58,7 +58,7 @@ public class PointArrayImpl extends ArrayList implements PointArray, JTSGeometry
     // to let that geometry know that we have been modified so that it can
     // invalidate its cached JTS object.  So we have this member which points
     // to an object having that method.
-    private JTSGeometry parent;
+    //private JTSGeometry parent;
 
     //*************************************************************************
     //  Constructor
@@ -69,14 +69,13 @@ public class PointArrayImpl extends ArrayList implements PointArray, JTSGeometry
     }
 
     public PointArrayImpl(CoordinateReferenceSystem crs) {
+        this( null, crs );
+    }
+    public PointArrayImpl(JTSGeometry parent,CoordinateReferenceSystem crs) {
+        super( parent );
         this.crs = crs;
-        pointList = new NotifyingArrayList(this);
     }
-
-    public void setJTSParent(JTSGeometry parent) {
-        this.parent = parent;
-    }
-
+    
     //*************************************************************************
     //  implement the PointArray interface
     //*************************************************************************
@@ -91,7 +90,7 @@ public class PointArrayImpl extends ArrayList implements PointArray, JTSGeometry
      * @see PointGrid#width
      */
     public int length() {
-        return pointList.size();
+        return size();
     }
 
     /**
@@ -135,7 +134,7 @@ public class PointArrayImpl extends ArrayList implements PointArray, JTSGeometry
      *          to this array, or should we left the decision to the implementor?
      */
     public Object get(int column) throws IndexOutOfBoundsException {
-        return (DirectPosition) ((DirectPosition)pointList.get(column)).clone();
+        return (DirectPosition) ((DirectPosition)super.get(column)).clone();
     }
 
     /**
@@ -152,7 +151,7 @@ public class PointArrayImpl extends ArrayList implements PointArray, JTSGeometry
      * @see #get(int)
      */
     public DirectPosition getDirectPosition(int column, DirectPosition dest) throws IndexOutOfBoundsException {
-        DirectPosition position = (DirectPosition)pointList.get(column);
+        DirectPosition position = (DirectPosition) get(column);
         if (dest == null) {
             dest = new DirectPositionImpl(position.getCoordinateReferenceSystem());
         }
@@ -176,12 +175,12 @@ public class PointArrayImpl extends ArrayList implements PointArray, JTSGeometry
      * @see List#set
      */
     public void setDirectPosition(int column, DirectPosition position) throws IndexOutOfBoundsException {
-        DirectPosition thisPosition = (DirectPosition)pointList.get(column);
+        DirectPosition thisPosition = (DirectPosition) get(column);
         DirectPosition otherPosition = position.getPosition();
         for (int i = 0; i < thisPosition.getDimension(); i++) {
             thisPosition.setOrdinate(i, otherPosition.getOrdinate(i));
         }
-        if (parent != null) parent.invalidateCachedJTSPeer();
+        invalidateCachedJTSPeer();
     }
     
     /**
@@ -196,10 +195,10 @@ public class PointArrayImpl extends ArrayList implements PointArray, JTSGeometry
      *          into this array, or should we left the decision to the implementor?
      */
     public Object[] toArray() {
-        int n = pointList.size();
+        int n = size();
         DirectPosition [] result = new DirectPosition[n];
         for (int i=0; i<n; i++) {
-            result[i] = (DirectPosition) ((DirectPosition)pointList.get(i)).clone();
+            result[i] = (DirectPosition) ((DirectPosition)get(i)).clone();
         }
         return result;
     }
@@ -213,21 +212,17 @@ public class PointArrayImpl extends ArrayList implements PointArray, JTSGeometry
      * @UML mandatory column
      */
     public List/*<Position>*/ positions() {
-        return pointList;
+        return this;
     }
 
     public com.vividsolutions.jts.geom.Geometry getJTSGeometry() {
-        int n = pointList.size();
+        int n = super.size();
         com.vividsolutions.jts.geom.Coordinate [] coords =
             new com.vividsolutions.jts.geom.Coordinate[n];
         for (int i=0; i<n; i++) {
             coords[i] = JTSUtils.directPositionToCoordinate(
-                (DirectPosition) pointList.get(i));
+                (DirectPosition) super.get(i));
         }
         return JTSUtils.GEOMETRY_FACTORY.createMultiPoint(coords);
-    }
-
-    public void invalidateCachedJTSPeer() {
-        if (parent != null) parent.invalidateCachedJTSPeer();
     }
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.geotools.geometry.jts.spatialschema.geometry.DirectPositionImpl;
 import org.geotools.geometry.jts.spatialschema.geometry.geometry.PointArrayImpl;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.geometry.PositionFactory;
@@ -14,7 +15,13 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class PositionFactoryImpl implements PositionFactory {
 	private CoordinateReferenceSystem crs;
-
+	
+	/**
+	 * No argument constructor for the plugin system.
+	 */
+	public PositionFactoryImpl(){
+	    this( DefaultGeographicCRS.WGS84);
+	}
 	public PositionFactoryImpl( CoordinateReferenceSystem crs ){
 		this.crs = crs;
 	}

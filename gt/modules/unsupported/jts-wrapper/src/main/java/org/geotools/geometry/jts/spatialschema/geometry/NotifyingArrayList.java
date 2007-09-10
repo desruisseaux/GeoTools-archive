@@ -12,10 +12,21 @@ import java.util.Collection;
 public class NotifyingArrayList extends ArrayList {
     private JTSGeometry parent;
 
+    public NotifyingArrayList() {
+        this( null );
+    }
     public NotifyingArrayList(JTSGeometry parent) {
         this.parent = parent;
     }
-
+    public void setJTSParent( JTSGeometry parent ){
+        this.parent = parent;
+    }
+    public JTSGeometry getJTSParent(){
+        return parent;
+    }
+    public void invalidateCachedJTSPeer(){
+        if (parent != null) parent.invalidateCachedJTSPeer();
+    }
     public void add(int index, Object element) {
         super.add(index, element);
         if (parent != null) parent.invalidateCachedJTSPeer();

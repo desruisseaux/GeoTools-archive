@@ -39,6 +39,8 @@ import org.opengis.geometry.primitive.SurfaceBoundary;
 
 //geotools dependencies
 import org.geotools.factory.BasicFactories;
+import org.geotools.factory.Hints;
+import org.geotools.geometry.GeometryFactoryFinder;
 
 /**
  * Class with static methods to help the conversion process between JTS
@@ -60,26 +62,15 @@ public final class JTSUtils {
     	GEOMETRY_FACTORY = new com.vividsolutions.jts.geom.GeometryFactory();
 
     /**
-     * The object that gets us all the factories we need to create GO-1 objects.
-     */
-    private static CommonFactory commonFactory;
-
-    private static CommonFactory getCommonFactory() {
-        if (commonFactory == null) {
-            commonFactory = BasicFactories.getDefault();
-        }
-        return commonFactory;
-    }
-
-    /**
      * Creates a 19107 primitive geometry from the given JTS geometry.
      */
     public static Geometry jtsToGo1(
             final com.vividsolutions.jts.geom.Geometry jtsGeom,
             final CoordinateReferenceSystem crs) {
 
-        PrimitiveFactory pf = getCommonFactory().getPrimitiveFactory(crs);
-        GeometryFactory gf = getCommonFactory().getGeometryFactory(crs);
+        Hints hints = new Hints( Hints.CRS, crs );
+        PrimitiveFactory pf = GeometryFactoryFinder.getPrimitiveFactory(hints);
+        GeometryFactory gf = GeometryFactoryFinder.getGeometryFactory(hints);
 
         String geomType = jtsGeom.getGeometryType();
         if (geomType.equalsIgnoreCase("Point")) {
@@ -214,7 +205,10 @@ public final class JTSUtils {
     public static DirectPosition coordinateToDirectPosition(
             com.vividsolutions.jts.geom.Coordinate c,
             CoordinateReferenceSystem crs) {
-        GeometryFactory gf = getCommonFactory().getGeometryFactory(crs);
+        
+        Hints hints = new Hints( Hints.CRS, crs );
+        GeometryFactory gf = GeometryFactoryFinder.getGeometryFactory(hints);        
+         
         double [] vertices;
         if (crs == null)
             vertices = new double[3];
@@ -282,8 +276,10 @@ public final class JTSUtils {
         if (! jtsLinearRing.getCoordinateN(0).equals(jtsLinearRing.getCoordinateN(numPoints-1))) {
             throw new IllegalArgumentException("LineString must be a ring");
         }
-        GeometryFactory gf = getCommonFactory().getGeometryFactory(crs);
-        PrimitiveFactory pf = getCommonFactory().getPrimitiveFactory(crs);
+        Hints hints = new Hints( Hints.CRS, crs );
+        PrimitiveFactory pf = GeometryFactoryFinder.getPrimitiveFactory(hints);
+        GeometryFactory gf = GeometryFactoryFinder.getGeometryFactory(hints);
+        
         LineString ls = gf.createLineString(new ArrayList());
         List pointList = ls.getControlPoints().positions();
         for (int i=0; i<numPoints; i++) {
