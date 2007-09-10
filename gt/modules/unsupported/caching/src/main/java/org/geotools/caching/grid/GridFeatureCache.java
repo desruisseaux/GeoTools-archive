@@ -105,7 +105,7 @@ public class GridFeatureCache extends AbstractFeatureCache {
      * @param e
      * @return list of envelopes not in cache
      */
-    protected List match(Envelope e) {
+    protected List<Envelope> match(Envelope e) {
         Region search = convert(e);
         ArrayList<Envelope> missing = new ArrayList<Envelope>();
 
@@ -261,11 +261,20 @@ public class GridFeatureCache extends AbstractFeatureCache {
         sb.append(" Capacity = " + this.capacity);
         sb.append(" Nodes = " + this.tracker.stats.getNumberOfNodes());
         sb.append(" ]");
+        sb.append("\n" + tracker.getIndexProperties());
 
         return sb.toString();
     }
 
     public Set getSupportedHints() {
         return new HashSet();
+    }
+
+    public String getStats() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(tracker.getStatistics().toString());
+        sb.append("\n" + sourceAccessStats());
+
+        return sb.toString();
     }
 }

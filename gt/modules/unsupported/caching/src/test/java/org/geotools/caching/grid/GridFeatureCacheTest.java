@@ -19,7 +19,10 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import org.opengis.filter.Filter;
 import org.geotools.caching.AbstractFeatureCache;
 import org.geotools.caching.AbstractFeatureCacheTest;
@@ -29,6 +32,8 @@ import org.geotools.caching.FeatureCollectingVisitor;
 import org.geotools.caching.spatialindex.store.MemoryStorage;
 import org.geotools.caching.util.Generator;
 import org.geotools.data.FeatureStore;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureIterator;
 
 
 public class GridFeatureCacheTest extends AbstractFeatureCacheTest {
@@ -85,7 +90,12 @@ public class GridFeatureCacheTest extends AbstractFeatureCacheTest {
         cache.tracker.intersectionQuery(AbstractFeatureCache.convert(unitsquare), v);
 
         //assertEquals(0, v.getCollection().size());
-        cache.register(unitsquare);
+        List<Envelope> matches = cache.match(unitsquare);
+
+        for (Iterator<Envelope> it = matches.iterator(); it.hasNext();) {
+            cache.register(it.next());
+        }
+
         cache.put(dataset);
 
         v = new FeatureCollectingVisitor(dataset.getFeatureType());

@@ -15,6 +15,7 @@
  */
 package org.geotools.caching;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -76,30 +77,30 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
      *
      *
     
-                 public Set addFeatures(FeatureCollection collection)
-                     throws IOException {
-                     return this.fs.addFeatures(collection);
-                 }
-                 public Transaction getTransaction() {
-                     return this.fs.getTransaction();
-                 }
-                 public void modifyFeatures(AttributeType[] type, Object[] value, Filter filter)
-                     throws IOException {
-                     this.fs.modifyFeatures(type, value, filter);
-                 }
-                 public void modifyFeatures(AttributeType type, Object value, Filter filter)
-                     throws IOException {
-                     this.fs.modifyFeatures(type, value, filter);
-                 }
-                 public void removeFeatures(Filter filter) throws IOException {
-                     this.fs.removeFeatures(filter);
-                 }
-                 public void setFeatures(FeatureReader reader) throws IOException {
-                     this.fs.setFeatures(reader);
-                 }
-                 public void setTransaction(Transaction transaction) {
-                     this.fs.setTransaction(transaction);
-                 } */
+                   public Set addFeatures(FeatureCollection collection)
+                       throws IOException {
+                       return this.fs.addFeatures(collection);
+                   }
+                   public Transaction getTransaction() {
+                       return this.fs.getTransaction();
+                   }
+                   public void modifyFeatures(AttributeType[] type, Object[] value, Filter filter)
+                       throws IOException {
+                       this.fs.modifyFeatures(type, value, filter);
+                   }
+                   public void modifyFeatures(AttributeType type, Object value, Filter filter)
+                       throws IOException {
+                       this.fs.modifyFeatures(type, value, filter);
+                   }
+                   public void removeFeatures(Filter filter) throws IOException {
+                       this.fs.removeFeatures(filter);
+                   }
+                   public void setFeatures(FeatureReader reader) throws IOException {
+                       this.fs.setFeatures(reader);
+                   }
+                   public void setTransaction(Transaction transaction) {
+                       this.fs.setTransaction(transaction);
+                   } */
     public void addFeatureListener(FeatureListener listener) {
         this.fs.addFeatureListener(listener);
     }
@@ -351,7 +352,7 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
      */
     protected abstract Filter match(BBOXImpl sr);
 
-    protected abstract List match(Envelope e);
+    protected abstract List<Envelope> match(Envelope e);
 
     protected abstract void register(BBOXImpl f);
 
@@ -409,6 +410,8 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
         return sb.toString();
     }
 
+    public abstract String getStats();
+
     public void readLock() {
         lock.readLock().lock();
     }
@@ -427,5 +430,12 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
 
     public void writeLog(String msg) {
         //    	System.out.println(msg);
+        try {
+            FileWriter log = new FileWriter("log/threads.log", true);
+            log.write(msg + "\n");
+            log.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

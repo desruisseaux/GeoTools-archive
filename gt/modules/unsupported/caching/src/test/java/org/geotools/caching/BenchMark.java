@@ -343,13 +343,16 @@ public class BenchMark {
 
         try {
             thisClass.localSetup();
+
+            final int nodes = 500;
+            final int capacity = 500;
             System.out.print("Sample (init) : ");
             thisClass.sample = new AbstractFeatureCache[3];
-            thisClass.sample[0] = new GridFeatureCache(thisClass.control, 500, 1000,
+            thisClass.sample[0] = new GridFeatureCache(thisClass.control, nodes, capacity,
                     MemoryStorage.createInstance());
-            thisClass.sample[1] = new GridFeatureCache(thisClass.control, 500, 2500,
+            thisClass.sample[1] = new GridFeatureCache(thisClass.control, nodes, capacity,
                     DiskStorage.createInstance());
-            thisClass.sample[2] = new GridFeatureCache(thisClass.control, 500, 2500,
+            thisClass.sample[2] = new GridFeatureCache(thisClass.control, nodes, capacity,
                     BufferedDiskStorage.createInstance());
 
             //            DiskStorage storage = new DiskStorage(File.createTempFile("cache", ".tmp"), 1000);
@@ -369,7 +372,7 @@ public class BenchMark {
                 sample_stats[i] = thisClass.runQueries(thisClass.sample[i]);
                 System.out.println(thisClass.sample[i]);
                 thisClass.printResults(control_stats, sample_stats[i], System.out);
-                System.out.println(thisClass.sample[i].sourceAccessStats());
+                System.out.println(thisClass.sample[i].getStats());
             }
 
             //            for (int i = thisClass.sample.length - 1; i >= 0; i--) {
@@ -389,8 +392,6 @@ public class BenchMark {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        System.out.println(thisClass.filterset.get(8));
     }
 
     class QueryStatistics {

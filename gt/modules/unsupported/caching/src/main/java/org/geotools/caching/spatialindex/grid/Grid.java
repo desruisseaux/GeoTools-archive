@@ -16,7 +16,6 @@
 package org.geotools.caching.spatialindex.grid;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Properties;
 import org.geotools.caching.spatialindex.AbstractSpatialIndex;
@@ -51,7 +50,7 @@ public class Grid extends AbstractSpatialIndex {
     public static final String ROOT_MBR_MAXX_PROPERTY = "Grid.RootMbrMaxX";
     public static final String ROOT_MBR_MAXY_PROPERTY = "Grid.RootMbrMaxY";
     private int capacity;
-    private Region mbr;
+    protected Region mbr;
     public int root_insertions = 0;
     protected int MAX_INSERTION = 4;
 
@@ -222,18 +221,18 @@ public class Grid extends AbstractSpatialIndex {
          * are inserted at root node, because they are likely to fall between two tiles,
          * rather thant in one and only one tile.
          *
-                             int[] cursor = new int[this.dimension];
-                             for (int i = 0; i < this.dimension; i++) {
-                                 cursor[i] = (int) ((shape.getMBR().getLow(i) - node.mbr.getLow(i)) / node.tiles_size);
-                             }
-                             int nextid = node.gridIndexToNodeId(cursor);
-                             Node nextnode = node.getSubNode(nextid);
-                             if (nextnode.getShape().contains(shape)) {
-                                 insertData(nextnode, data, shape, id);
-                             } else {
-                                 insertData(this.root, data, shape, id);
-                                 root_insertions++;
-                             }
+                               int[] cursor = new int[this.dimension];
+                               for (int i = 0; i < this.dimension; i++) {
+                                   cursor[i] = (int) ((shape.getMBR().getLow(i) - node.mbr.getLow(i)) / node.tiles_size);
+                               }
+                               int nextid = node.gridIndexToNodeId(cursor);
+                               Node nextnode = node.getSubNode(nextid);
+                               if (nextnode.getShape().contains(shape)) {
+                                   insertData(nextnode, data, shape, id);
+                               } else {
+                                   insertData(this.root, data, shape, id);
+                                   root_insertions++;
+                               }
          */
 
         /* so we prefer this version :
@@ -285,12 +284,14 @@ public class Grid extends AbstractSpatialIndex {
         }
     }
 
-    /** Moves cursor between mins and maxs, from mins to maxs.
+    /**
+     * Moves cursor between mins and maxs, from mins to maxs.
      *
      * @param cursor
      * @param mins
      * @param maxs
-     * @return <code>false</code> if cursor has reached maxs, <code>true</code> otherwise.
+     * @return <code>false</code> if cursor has reached maxs,
+     *         <code>true</code> otherwise.
      */
     protected static boolean increment(int[] cursor, int[] mins, int[] maxs) {
         int dims = cursor.length;

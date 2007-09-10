@@ -185,4 +185,17 @@ public class GridNode implements Node, Serializable {
 
         return sb.toString();
     }
+
+    public String toReadableText() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("GridNode ******");
+        sb.append("\tMBR= " + mbr + "\n");
+        sb.append("\t#Data= " + num_data + "\n");
+
+        for (Iterator<GridData> it = data.iterator(); it.hasNext();) {
+            sb.append("\t\t" + it.next().data.toString() + "\n");
+        }
+
+        return sb.toString();
+    }
 }

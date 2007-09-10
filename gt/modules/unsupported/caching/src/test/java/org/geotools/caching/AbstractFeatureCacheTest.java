@@ -56,7 +56,7 @@ public abstract class AbstractFeatureCacheTest extends TestCase {
     protected static int numfilters = 100;
 
     static {
-        Generator gen = new Generator(1, 1);
+        Generator gen = new Generator(1, 1); // seed 1029 for a set registering outside of unitsquare
         dataset = new DefaultFeatureCollection("Test", Generator.type);
 
         for (int i = 0; i < numdata; i++) {
@@ -126,8 +126,14 @@ public abstract class AbstractFeatureCacheTest extends TestCase {
         cache.put(dataset);
 
         FeatureCollection fc = cache.peek(unitsquare);
+
         //        assertEquals(0, fc.size());
-        cache.register(unitsquare);
+        List<Envelope> matches = cache.match(unitsquare);
+
+        for (Iterator<Envelope> it = matches.iterator(); it.hasNext();) {
+            cache.register(it.next());
+        }
+
         cache.put(dataset);
         fc = cache.peek(unitsquare);
         assertEquals(dataset.size(), fc.size());

@@ -73,4 +73,11 @@ public final class RegionNodeIdentifier extends NodeIdentifier {
             return false;
         }
     }
+
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(shape.toString());
+
+        return sb.toString();
+    }
 }

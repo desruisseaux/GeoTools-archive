@@ -35,6 +35,7 @@ public class GridTracker extends Grid implements EvictableTree {
     boolean doRecordAccess = true;
 
     public GridTracker(Region mbr, int capacity, Storage store) {
+        this.mbr = mbr;
         this.dimension = mbr.getDimension();
         this.store = store;
         store.setParent(this);
@@ -105,6 +106,7 @@ public class GridTracker extends Grid implements EvictableTree {
     }
 
     public void evict(NodeIdentifier node) {
+        //    	System.out.println("evicting : " + node);
         GridNode nodeToEvict = (GridNode) readNode(node); // FIXME: avoid to read node before eviction
         int ret = nodeToEvict.getDataCount();
         nodeToEvict.clear();

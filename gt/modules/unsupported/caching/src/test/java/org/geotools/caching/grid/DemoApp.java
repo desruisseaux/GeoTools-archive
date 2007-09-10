@@ -38,7 +38,7 @@ import org.geotools.feature.FeatureCollection;
 public class DemoApp extends JFrame {
     MemoryDataStore ds;
     GridFeatureCache cache;
-    volatile boolean task_wait = false;
+    volatile boolean task_wait = true;
     JPanel jContentPane = null;
     JPanel statsPanel = null;
     JPanel graphPanel = null;
@@ -49,6 +49,7 @@ public class DemoApp extends JFrame {
     JLabel lblNumReads = null;
     JLabel lblNumWrites = null;
     JLabel lblNumEvictions = null;
+    int threads = 0;
 
     DemoApp(long seed) {
         initDataStore(seed);
@@ -128,7 +129,7 @@ public class DemoApp extends JFrame {
 
     JButton getRunQueryButton() {
         if (runQueryButton == null) {
-            runQueryButton = new JButton("Run queries");
+            runQueryButton = new JButton("New thread");
             runQueryButton.addMouseListener(new MouseListener() {
                     public void mouseClicked(MouseEvent ev) {
                         Runnable task = new Runnable() {
@@ -137,7 +138,7 @@ public class DemoApp extends JFrame {
                                 }
                             };
 
-                        new Thread(task, "RunQueriesThread").start();
+                        new Thread(task, new Integer(++threads).toString()).start();
                     }
 
                     public void mouseEntered(MouseEvent arg0) {
@@ -163,7 +164,7 @@ public class DemoApp extends JFrame {
 
     JButton getPauseButton() {
         if (pauseButton == null) {
-            pauseButton = new JButton("Pause");
+            pauseButton = new JButton("Start");
             pauseButton.addMouseListener(new MouseListener() {
                     public void mouseClicked(MouseEvent e) {
                         if (task_wait) {
@@ -203,15 +204,17 @@ public class DemoApp extends JFrame {
             graphPanel.add(new JLabel("GraphPanel"));
             graphPanel.add(getRunQueryButton());
             graphPanel.add(getPauseButton());
-            getPauseButton().setEnabled(false);
         }
 
         return graphPanel;
     }
 
     void runQueries() {
-        runQueryButton.setEnabled(false);
-        pauseButton.setEnabled(true);
+        JFrame frame = new JFrame("Thread " + Thread.currentThread().getName());
+        QueryDisplayPanel display = new QueryDisplayPanel();
+        frame.setContentPane(display);
+        frame.setSize(200, 200);
+        frame.setVisible(true);
 
         //		cache.clear();
         for (int j = 0; j < 10; j++) {
@@ -227,14 +230,14 @@ public class DemoApp extends JFrame {
 
                     //System.out.print("i = " + i + ", j = " + j);
                     Envelope query = new Envelope(i * .1, (i + 1) * .1, j * .1, (j + 1) * .1);
-                    cache.get(query);
+                    display.setResult(cache.get(query));
                     lblNumData.setText(new Long(cache.tracker.getStatistics().getNumberOfData())
                         .toString());
                     lblNumReads.setText(new Long(cache.tracker.getStatistics().getReads()).toString());
                     lblNumWrites.setText(new Long(cache.tracker.getStatistics().getWrites())
                         .toString());
                     lblNumEvictions.setText(new Integer(cache.tracker.getEvictions()).toString());
-                    panel.setCurrentQuery(query);
+                    panel.setCurrentQuery(Thread.currentThread().getName(), query);
                     panel.repaint();
 
                     Object waiter = new Object();
@@ -254,23 +257,25 @@ public class DemoApp extends JFrame {
             }
         }
 
-        runQueryButton.setEnabled(true);
-        pauseButton.setEnabled(false);
+        frame.setVisible(false);
+        frame.dispose();
+        panel.removeWorker(Thread.currentThread().getName());
+        panel.repaint();
     }
 
     public static void main(String[] args) {
+        long seed = 1025;
+
         if (args.length < 1) {
-            System.err.println("Usage: DemoApp seed");
-            System.exit(0);
-        }
-
-        long seed = 0;
-
-        try {
-            seed = Long.parseLong(args[0]);
-        } catch (Exception e) {
-            throw new IllegalArgumentException(
-                "Error : seed argument must be numeric ; input was : " + args[0]);
+            System.out.println("Usage: DemoApp seed");
+            System.out.println("Using default for seed value : " + seed);
+        } else {
+            try {
+                seed = Long.parseLong(args[0]);
+            } catch (Exception e) {
+                throw new IllegalArgumentException(
+                    "Error : seed argument must be numeric ; input was : " + args[0]);
+            }
         }
 
         DemoApp thisClass = new DemoApp(seed);
@@ -279,6 +284,6 @@ public class DemoApp extends JFrame {
         thisClass.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         thisClass.setVisible(true);
 
-        //thisClass.runQueries();
+        thisClass.runQueries();
     }
 }

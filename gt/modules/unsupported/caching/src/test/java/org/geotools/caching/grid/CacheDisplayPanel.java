@@ -22,7 +22,11 @@ import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 import javax.swing.JPanel;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -37,14 +41,18 @@ import org.geotools.caching.spatialindex.Visitor;
 
 public class CacheDisplayPanel extends JPanel {
     GridFeatureCache cache;
-    Envelope query = null;
+    HashMap<String, Envelope> queries = new HashMap<String, Envelope>();
 
     CacheDisplayPanel(GridFeatureCache cache) {
         this.cache = cache;
     }
 
-    void setCurrentQuery(Envelope query) {
-        this.query = query;
+    void setCurrentQuery(String worker, Envelope query) {
+        queries.put(worker, query);
+    }
+
+    void removeWorker(String worker) {
+        queries.remove(worker);
     }
 
     @Override
@@ -77,11 +85,25 @@ public class CacheDisplayPanel extends JPanel {
             cache.readUnLock();
         }
 
-        if (query != null) {
-            g2d.setColor(Color.BLUE);
-            g2d.setStroke(new BasicStroke(0.005f));
-            g2d.draw(new Rectangle2D.Double(query.getMinX(), query.getMinY(), query.getWidth(),
-                    query.getHeight()));
+        if (!queries.isEmpty()) {
+            for (Iterator<Entry<String, Envelope>> it = queries.entrySet().iterator();
+                    it.hasNext();) {
+                Entry<String, Envelope> next = it.next();
+                Envelope query = next.getValue();
+                g2d.setColor(Color.BLUE);
+                g2d.setStroke(new BasicStroke(0.005f));
+
+                Rectangle2D.Double window = new Rectangle2D.Double(query.getMinX(),
+                        query.getMinY(), query.getWidth(), query.getHeight());
+                g2d.draw(window);
+                g2d.setTransform(saveAT);
+
+                Point2D.Double p = new Point2D.Double(window.x + (0.5 * window.width),
+                        window.y + (0.5 * window.height));
+                Point2D pt = trans.transform(p, new Point2D.Double(0, 0));
+                g2d.drawString(next.getKey(), (int) pt.getX(), (int) pt.getY());
+                g2d.setTransform(trans);
+            }
         }
 
         g2d.setTransform(saveAT);

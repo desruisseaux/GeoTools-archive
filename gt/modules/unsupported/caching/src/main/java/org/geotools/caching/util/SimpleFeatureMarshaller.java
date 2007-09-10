@@ -159,7 +159,13 @@ public class SimpleFeatureMarshaller {
         SimpleFeatureType type = typeLookUp(typeHash, typeName);
 
         if (type != null) {
-            return unmarshall(s, type);
+            SimpleFeature f = unmarshall(s, type);
+
+            if (f == null) {
+                System.err.println("Returning null feature");
+            }
+
+            return f;
         } else {
             throw new IllegalStateException(typeName + " is not a registered type.");
         }

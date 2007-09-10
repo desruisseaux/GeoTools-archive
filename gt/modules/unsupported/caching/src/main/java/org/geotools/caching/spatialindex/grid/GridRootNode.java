@@ -224,4 +224,12 @@ public class GridRootNode extends GridNode {
 
         super.clear();
     }
+
+    public String toReadableText() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("RootNode *****");
+        sb.append(super.toReadableText());
+
+        return sb.toString();
+    }
 }

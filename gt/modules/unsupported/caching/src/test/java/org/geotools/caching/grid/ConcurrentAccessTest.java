@@ -38,12 +38,14 @@ import org.opengis.filter.Filter;
 import org.geotools.caching.AbstractFeatureCache;
 import org.geotools.caching.spatialindex.store.BufferedDiskStorage;
 import org.geotools.caching.spatialindex.store.DiskStorage;
+import org.geotools.caching.spatialindex.store.MemoryStorage;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.filter.spatial.BBOXImpl;
 
 
 public class ConcurrentAccessTest extends TestCase {
+    boolean hardest = false;
     GridFeatureCache grid;
     FeatureCollection dataset;
     List<Filter> filterset1;
@@ -54,7 +56,15 @@ public class ConcurrentAccessTest extends TestCase {
     protected void setUp() {
         try {
             MemoryDataStore ds = new MemoryDataStore();
-            dataset = DataUtilities.createUnitsquareDataSet(100, 1025);
+            int numdata;
+
+            if (hardest) {
+                numdata = 1000;
+            } else {
+                numdata = 100;
+            }
+
+            dataset = DataUtilities.createUnitsquareDataSet(numdata, 1025);
             ds.createSchema(dataset.getSchema());
             ds.addFeatures(dataset);
 
@@ -63,8 +73,14 @@ public class ConcurrentAccessTest extends TestCase {
             pset.setProperty(DiskStorage.DATA_FILE_PROPERTY, "cache.tmp");
             pset.setProperty(DiskStorage.INDEX_FILE_PROPERTY, "cache.idx");
             pset.setProperty(DiskStorage.PAGE_SIZE_PROPERTY, "1000");
-            grid = new GridFeatureCache(ds.getFeatureSource(ds.getTypeNames()[0]), 100, 500,
-                    BufferedDiskStorage.createInstance());
+
+            if (hardest) {
+                grid = new GridFeatureCache(ds.getFeatureSource(ds.getTypeNames()[0]), 100, 500,
+                        DiskStorage.createInstance(pset));
+            } else {
+                grid = new GridFeatureCache(ds.getFeatureSource(ds.getTypeNames()[0]), 100, 500,
+                        BufferedDiskStorage.createInstance());
+            }
 
             File filtersrc = new File("filters.data");
 
@@ -139,12 +155,26 @@ public class ConcurrentAccessTest extends TestCase {
     }
 
     public void testConcurrentAccessAndClear() throws Throwable {
-        TestRunnable client1 = new CacheClient(filterset1);
-        TestRunnable client2 = new CacheClient(filterset2);
-        TestRunnable client3 = new CacheClient(filterset1);
-        TestRunnable cleaner1 = new LazyCacheCleaner(50, 5);
-        TestRunnable cleaner2 = new LazyCacheCleaner(100, 2);
-        TestRunnable[] trs = new TestRunnable[] { client1, client2, client3, cleaner1, cleaner2 };
+        int nthreads;
+
+        if (hardest) {
+            nthreads = 8;
+        } else {
+            nthreads = 5;
+        }
+
+        TestRunnable[] trs = new TestRunnable[nthreads];
+        trs[0] = new CacheClient(filterset1);
+
+        trs[1] = new CacheClient(filterset2);
+        trs[2] = new CacheClient(filterset1);
+        trs[3] = new LazyCacheCleaner(50, 5);
+        trs[4] = new LazyCacheCleaner(100, 2);
+        if (hardest) {
+        	trs[5] = new CacheClient(filterset2);
+        	trs[6] = new CacheClient(filterset1);
+        	trs[7] = new CacheClient(filterset2);
+        }
         MultiThreadedTestRunner mttr = new MultiThreadedTestRunner(trs);
         mttr.runTestRunnables();
     }
@@ -202,7 +232,7 @@ public class ConcurrentAccessTest extends TestCase {
                     throw new InterruptedException();
                 }
 
-                System.out.println(Thread.currentThread().getName() + " : cleared cache");
+                //                System.out.println(Thread.currentThread().getName() + " : cleared cache");
                 grid.clear();
                 count++;
             }
