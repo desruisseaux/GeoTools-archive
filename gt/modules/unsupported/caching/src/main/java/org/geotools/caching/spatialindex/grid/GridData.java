@@ -83,17 +83,31 @@ public class GridData implements Data, Externalizable {
     }
 
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        this.id = in.readInt();
-        this.shape = (Shape) in.readObject();
+    	try {
+    		this.id = in.readInt();
+    		this.shape = (Shape) in.readObject();
+    	} catch (IOException e) {
+    		e.printStackTrace();
+    		throw e;
+    	}
 
         if (in.readBoolean()) {
             try {
                 this.data = marshaller.unmarshall(in);
             } catch (IllegalAttributeException e) {
+            	e.printStackTrace();
                 throw (IOException) new IOException().initCause(e);
+            } catch (IOException e) {
+            	e.printStackTrace();
+            	throw e;
             }
         } else {
-            this.data = in.readObject();
+        	try {
+        		this.data = in.readObject();
+        	} catch (IOException e) {
+        		e.printStackTrace();
+        		throw e;
+        	}
         }
     }
 

@@ -429,13 +429,13 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
     }
 
     public void writeLog(String msg) {
-        //    	System.out.println(msg);
-        try {
-            FileWriter log = new FileWriter("log/threads.log", true);
-            log.write(msg + "\n");
-            log.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//    	System.out.println(msg);
+//        try {
+//            FileWriter log = new FileWriter("log/threads.log", true);
+//            log.write(msg + "\n");
+//            log.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 }

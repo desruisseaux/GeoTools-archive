@@ -44,6 +44,14 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.filter.spatial.BBOXImpl;
 
 
+/** Multithreaded test for concurrent access to GridFeatureCache.
+ * If variable <code>hardest</code> is set to true, test will use different settings
+ * and run more threads at the same time, to increase concurrency, so the test
+ * is harder to pass.
+ * 
+ * @author Christophe Rousson <christophe.rousson@gmail.com>, Google SoC 2007 
+ *
+ */
 public class ConcurrentAccessTest extends TestCase {
     boolean hardest = false;
     GridFeatureCache grid;
@@ -68,13 +76,12 @@ public class ConcurrentAccessTest extends TestCase {
             ds.createSchema(dataset.getSchema());
             ds.addFeatures(dataset);
 
-            Properties pset = new Properties();
-            pset.setProperty(BufferedDiskStorage.BUFFER_SIZE_PROPERTY, "10");
-            pset.setProperty(DiskStorage.DATA_FILE_PROPERTY, "cache.tmp");
-            pset.setProperty(DiskStorage.INDEX_FILE_PROPERTY, "cache.idx");
-            pset.setProperty(DiskStorage.PAGE_SIZE_PROPERTY, "1000");
-
             if (hardest) {
+            	Properties pset = new Properties();
+                pset.setProperty(BufferedDiskStorage.BUFFER_SIZE_PROPERTY, "10");
+                pset.setProperty(DiskStorage.DATA_FILE_PROPERTY, "cache.tmp");
+                pset.setProperty(DiskStorage.INDEX_FILE_PROPERTY, "cache.idx");
+                pset.setProperty(DiskStorage.PAGE_SIZE_PROPERTY, "1000");
                 grid = new GridFeatureCache(ds.getFeatureSource(ds.getTypeNames()[0]), 100, 500,
                         DiskStorage.createInstance(pset));
             } else {

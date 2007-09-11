@@ -76,8 +76,8 @@ public class Region implements Shape, Serializable {
     }
 
     public boolean equals(Object o) {
-        if (o == null) {
-            return false;
+        if (o == this) {
+            return true;
         }
 
         if (o instanceof Region) {

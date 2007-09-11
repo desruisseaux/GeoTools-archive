@@ -28,11 +28,9 @@ import java.io.RandomAccessFile;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Properties;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -44,6 +42,14 @@ import org.geotools.caching.spatialindex.Storage;
 import org.geotools.caching.spatialindex.grid.GridNode;
 
 
+/** A storage that stores data in a file on disk.
+ * 
+ * Create new instances with static factory method <code>DiskStorage.createInstance()</code>
+ * or <code>DiskStorage.createInstance(PropertySet)</code>
+ * 
+ * @author Christophe Rousson <christophe.rousson@gmail.com>, Google SoC 2007 
+ *
+ */
 public class DiskStorage implements Storage {
     public final static String DATA_FILE_PROPERTY = "DiskStorage.DataFile";
     public final static String INDEX_FILE_PROPERTY = "DiskStorage.IndexFile";
@@ -59,9 +65,6 @@ public class DiskStorage implements Storage {
     private int nextPage = 0;
     private TreeSet<Integer> emptyPages;
     private HashMap<NodeIdentifier, Entry> pageIndex;
-
-    //    private byte[] buffer;
-    //    private ByteBuffer buffer;
     protected SpatialIndex parent;
 
     private DiskStorage(File f, int page_size) throws IOException {
@@ -77,9 +80,6 @@ public class DiskStorage implements Storage {
         this.page_size = page_size;
         emptyPages = new TreeSet<Integer>();
         pageIndex = new HashMap<NodeIdentifier, Entry>();
-
-        //        buffer = new byte[page_size];
-        //        buffer = ByteBuffer.allocate(page_size);
     }
 
     private DiskStorage(File f, File index_file) throws IOException {
@@ -90,15 +90,13 @@ public class DiskStorage implements Storage {
 
         if (index_file.exists()) {
             initializeFromIndex();
-
-            //            buffer = new byte[page_size];
-            //            buffer = ByteBuffer.allocate(page_size);
         } else {
             throw new IOException(index_file + " does not exist !");
         }
     }
 
     /** Factory method : create a new Storage of type DiskStorage.
+     * 
      * Valid properties are :
      * <ul>
      *   <li>DiskStorage.DATA_FILE_PROPERTY : filename (mandatory) ; overrides given file if index is not provided.
@@ -159,164 +157,111 @@ public class DiskStorage implements Storage {
         this.parent = parent;
     }
 
-    public void clear() {
+    public synchronized void clear() {
         for (Iterator<java.util.Map.Entry<NodeIdentifier, Entry>> it = pageIndex.entrySet()
                                                                                 .iterator();
                 it.hasNext();) {
             java.util.Map.Entry<NodeIdentifier, Entry> next = it.next();
             Entry e = next.getValue();
 
-            synchronized (next.getKey()) {
-                int n = 0;
+//            synchronized (next.getKey()) {
+            int n = 0;
 
-                while (n < e.pages.size()) {
-                    emptyPages.add(e.pages.get(n));
-                    n++;
-                }
-
-                it.remove();
+            while (n < e.pages.size()) {
+            	emptyPages.add(e.pages.get(n));
+            	n++;
             }
+
+            it.remove();
+//            }
         }
     }
 
-    public Node get(NodeIdentifier id) {
+    public synchronized Node get(NodeIdentifier id) {
         Node node = null;
         byte[] data;
         Entry e;
-        ByteBuffer buffer = ByteBuffer.allocate(page_size);
 
-        synchronized (findUniqueInstance(id)) {
-            //        	try {
-            //				logGet();
-            //			} catch (IOException e1) {
-            //				// TODO Auto-generated catch block
-            //				e1.printStackTrace();
-            //			}
-            e = pageIndex.get(id);
+//        synchronized (findUniqueInstance(id)) {
+        e = pageIndex.get(id);
 
-            if (e == null) {
-                return null;
-            }
-
-            data = new byte[e.length];
-
-            int page = 0;
-            int rem = data.length;
-            int len = 0;
-            int next = 0;
-            int index = 0;
-
-            while (next < e.pages.size()) {
-                page = e.pages.get(next);
-                len = (rem > page_size) ? page_size : rem;
-
-                try {
-                    //        			data_file.seek(page * page_size);
-                    data_channel.position(page * page_size);
-
-                    //        			int bytes_read = data_file.read(buffer);
-                    buffer.position(0);
-
-                    int bytes_read = data_channel.read(buffer);
-
-                    if (bytes_read != page_size) {
-                        System.out.println(bytes_read);
-                        throw new IllegalStateException("Data file might be corrupted.");
-                    }
-
-                    //        			System.arraycopy(buffer.array(), 0, data, index, len);
-                    buffer.position(0);
-                    buffer.get(data, index, len);
-                    rem -= bytes_read;
-                    index += bytes_read;
-                    next++;
-                } catch (IOException io) {
-                    throw new IllegalStateException(io);
-                }
-            }
+        if (e == null) {
+        	return null;
         }
+
+        data = new byte[e.length];
+        readData(data, e);
+//        }
 
         try {
-            ByteArrayInputStream bais = new ByteArrayInputStream(data);
-            ObjectInputStream ois = new ObjectInputStream(bais);
-            node = (Node) ois.readObject();
-            node.init(parent);
-            ois.close();
-            bais.close();
+            node = readNode(data);
         } catch (IOException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
+        	throw new IllegalStateException(e1);
         } catch (ClassNotFoundException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        } catch (NullPointerException e1) {
-            System.out.println(Thread.currentThread().getName() + " : fatal exception at "
-                + System.currentTimeMillis());
-
-            Map<Thread, StackTraceElement[]> m = Thread.getAllStackTraces();
-
-            for (Iterator<java.util.Map.Entry<Thread, StackTraceElement[]>> it = m.entrySet()
-                                                                                  .iterator();
-                    it.hasNext();) {
-                java.util.Map.Entry<Thread, StackTraceElement[]> entry = it.next();
-                System.out.println(entry.getKey().getName());
-
-                for (int i = 0; i < entry.getValue().length; i++) {
-                    System.out.println("   " + entry.getValue()[i]);
-                }
-            }
-
-            System.out.println(e);
-            System.out.println(pageIndex.get(id));
-            //Runtime.getRuntime().exit(1);
-            e1.printStackTrace();
-            // find pages that may been used by other
-            System.err.println("Involved NodeIdentifier : " + id);
-
-            if (e.pages.isEmpty()) {
-                System.err.println("No pages in current entry");
-            }
-
-            for (Iterator<Integer> it = e.pages.iterator(); it.hasNext();) {
-                Integer p = it.next();
-
-                for (Iterator<Entry> itpi = pageIndex.values().iterator(); itpi.hasNext();) {
-                    Entry n = itpi.next();
-
-                    if (n != e) {
-                        for (Iterator<Integer> itn = n.pages.iterator(); itn.hasNext();) {
-                            if (p.equals(itn.next())) {
-                                System.err.println("Page " + p + " used by other entry : " + n);
-                            }
-                        }
-                    }
-                }
-
-                for (Iterator<Integer> itep = emptyPages.iterator(); itep.hasNext();) {
-                    if (p.equals(itep.next())) {
-                        System.err.println("Page " + p + " in recycle bin");
-                    }
-                }
-            }
-
-            Runtime.getRuntime().exit(1);
+        	throw new IllegalStateException(e1);
         }
+        return node;
+    }
+    
+    void readData(byte[] data, Entry e) {
+    	ByteBuffer buffer = ByteBuffer.allocate(page_size);
+    	int page = 0;
+        int rem = data.length;
+        int len = 0;
+        int next = 0;
+        int index = 0;
 
+        while (next < e.pages.size()) {
+        	page = e.pages.get(next);
+        	len = (rem > page_size) ? page_size : rem;
+
+        	try {
+        		buffer.clear();
+        		// synchronized(data_channel) {
+        		data_channel.position(page * page_size);
+        		int bytes_read = data_channel.read(buffer);
+        		// }
+        		if (bytes_read != page_size) {
+        			System.out.println(bytes_read);
+        			throw new IllegalStateException("Data file might be corrupted.");
+        		}
+
+        		buffer.rewind();
+        		buffer.get(data, index, len);
+        		rem -= bytes_read;
+        		index += bytes_read;
+        		next++;
+        	} catch (IOException io) {
+        		throw new IllegalStateException(io);
+        	}
+        }
+    }
+    
+    /** This method appears to be not thread safe,
+     * and thus should be used inside some synchronized statement.
+     * TODO: find why it is not thread safe : this has probably to do with
+     *       SimpleFeatureMarshaller, used to deserialize externalized GridData
+     *       
+     * @param data byte stream
+     * @return node deserialized from data stream
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    Node readNode(byte[] data) throws IOException, ClassNotFoundException {
+    	ByteArrayInputStream bais = new ByteArrayInputStream(data);
+        ObjectInputStream ois = new ObjectInputStream(bais);
+        Node node = (Node) ois.readObject();
+        node.init(parent);
+        ois.close();
+        bais.close();
         return node;
     }
 
-    public void put(Node n) {
+    public synchronized void put(Node n) {
         byte[] data = null;
 
         try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(n);
-            data = baos.toByteArray();
-            stats_bytes += data.length;
-            stats_n++;
-            oos.close();
-            baos.close();
+            data = writeNode(n);
         } catch (IOException e1) {
             logger.log(Level.SEVERE, "Cannot put data in DiskStorage : " + e1);
 
@@ -334,23 +279,34 @@ public class DiskStorage implements Storage {
                 throw new IllegalStateException("old entry null");
             }
         } else {
-            synchronized (pageIndex) {
-                if (!pageIndex.containsKey(e.id)) {
-                    pageIndex.put(e.id, null); // advertise we created a new entry
-                } else {
-                    old = pageIndex.get(e.id);
-                }
-            }
+//            synchronized (pageIndex) {
+        	if (!pageIndex.containsKey(e.id)) {
+        		pageIndex.put(e.id, null); // advertise we created a new entry
+        	} else {
+        		old = pageIndex.get(e.id);
+        	}
+//            }
         }
 
-        synchronized (e.id) {
-            write(data, e, old);
-            //        	writeReadable(n, e.pages.get(0));
-            pageIndex.put(e.id, e);
-        }
+//        synchronized (e.id) {
+        writeData(data, e, old);
+        pageIndex.put(e.id, e);
+//        }
+    }
+    
+    byte[] writeNode(Node n) throws IOException {
+    	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(n);
+        byte[] data = baos.toByteArray();
+        stats_bytes += data.length;
+        stats_n++;
+        oos.close();
+        baos.close();
+        return data;
     }
 
-    void write(byte[] data, Entry e, Entry old) {
+    void writeData(byte[] data, Entry e, Entry old) {
         ByteBuffer buffer = ByteBuffer.allocate(page_size);
         e.length = data.length;
 
@@ -360,65 +316,53 @@ public class DiskStorage implements Storage {
         int index = 0;
         int next = 0;
 
-        FileLock fl;
+        while (rem > 0) {
+        	if ((old != null) && (next < old.pages.size())) {
+        		page = old.pages.get(next);
+        		next++;
+        	} else if (!emptyPages.isEmpty()) {
+        		synchronized (emptyPages) {
+        			Integer i = emptyPages.first();
+        			page = i.intValue();
 
-        try {
-            fl = data_channel.lock();
+        			if (!emptyPages.remove(i)) {
+        				throw new RuntimeException("buggy here !!!!");
+        			}
+        		}
+        	} else {
+        		page = nextPage++;
+        	}
 
-            while (rem > 0) {
-                if ((old != null) && (next < old.pages.size())) {
-                    page = old.pages.get(next);
-                    next++;
-                } else if (!emptyPages.isEmpty()) {
-                    synchronized (emptyPages) {
-                        Integer i = emptyPages.first();
-                        page = i.intValue();
+        	len = (rem > page_size) ? page_size : rem;
+        	buffer.clear();
+        	buffer.put(data, index, len);
 
-                        if (!emptyPages.remove(i)) {
-                            throw new RuntimeException("buggy here !!!!");
-                        }
-                    }
-                } else {
-                    page = nextPage++;
-                }
+        	try {
+        		buffer.rewind();
+        		// synchronized(data_channel) {
+        		data_channel.position(page * page_size);
+        		data_channel.write(buffer);
+        		// }
+        	} catch (IOException io) {
+        		throw new IllegalStateException(io);
+        	}
 
-                len = (rem > page_size) ? page_size : rem;
-                buffer.position(0);
-                buffer.put(data, index, len);
-
-                //      		System.arraycopy(data, index, buffer, 0, len);
-                try {
-                    //        			logPageAccess(page, len);
-                    //      			data_file.seek(page * page_size);
-                    data_channel.position(page * page_size);
-                    //      			data_file.write(buffer);
-                    buffer.position(0);
-                    data_channel.write(buffer);
-                } catch (IOException io) {
-                    // TODO
-                    throw new IllegalStateException(io);
-                }
-
-                rem -= len;
-                index += len;
-                e.pages.add(new Integer(page));
-            }
-
-            fl.release();
-        } catch (IOException e1) {
-            e1.printStackTrace();
+        	rem -= len;
+        	index += len;
+        	e.pages.add(new Integer(page));
         }
 
         if (old != null) { // don't forget to recycle pages
 
-            while (next < old.pages.size()) {
-                emptyPages.add(new Integer(old.pages.get(next)));
-                next++;
-            }
+        	while (next < old.pages.size()) {
+        		emptyPages.add(new Integer(old.pages.get(next)));
+        		next++;
+        	}
         }
+        
     }
 
-    public void remove(NodeIdentifier id) {
+    public synchronized void remove(NodeIdentifier id) {
         Entry e = pageIndex.get(id);
 
         if (e == null) {
@@ -426,19 +370,19 @@ public class DiskStorage implements Storage {
             throw new IllegalArgumentException("Invalid identifier " + id.toString());
         }
 
-        synchronized (findUniqueInstance(id)) {
-            int next = 0;
+//        synchronized (findUniqueInstance(id)) {
+        int next = 0;
 
-            while (next < e.pages.size()) {
-                emptyPages.add(new Integer(e.pages.get(next)));
-                next++;
-            }
-
-            pageIndex.remove(id);
+        while (next < e.pages.size()) {
+        	emptyPages.add(new Integer(e.pages.get(next)));
+        	next++;
         }
+
+        pageIndex.remove(id);
+//        }
     }
 
-    public void flush() {
+    public synchronized void flush() {
         try {
             FileOutputStream os = new FileOutputStream(indexFile);
             ObjectOutputStream oos = new ObjectOutputStream(os);
@@ -487,6 +431,11 @@ public class DiskStorage implements Storage {
         return pset;
     }
 
+    /* NOT THREAD SAFE.
+     * 
+     * (non-Javadoc)
+     * @see org.geotools.caching.spatialindex.Storage#findUniqueInstance(org.geotools.caching.spatialindex.NodeIdentifier)
+     */
     public NodeIdentifier findUniqueInstance(NodeIdentifier id) {
         if (pageIndex.containsKey(id)) {
             return pageIndex.get(id).id;
