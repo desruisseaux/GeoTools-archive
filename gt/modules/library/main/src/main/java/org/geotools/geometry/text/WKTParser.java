@@ -21,6 +21,7 @@ import org.opengis.geometry.Geometry;
 import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.aggregate.AggregateFactory;
 import org.opengis.geometry.aggregate.MultiPrimitive;
+import org.opengis.geometry.complex.ComplexFactory;
 import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.geometry.coordinate.LineString;
 import org.opengis.geometry.primitive.Curve;
@@ -94,6 +95,7 @@ public class WKTParser {
     private GeometryFactory geometryFactory;
     private PrimitiveFactory primitiveFactory;
     private PositionFactory positionFactory;
+    private AggregateFactory aggregateFactory;
 
 
     /**
@@ -110,6 +112,7 @@ public class WKTParser {
         this.geometryFactory = geometryFactory;
         this.primitiveFactory = primitiveFactory;
         this.positionFactory = positionFactory;
+        this.aggregateFactory = aggregateFactory;
     }
     /**
      * Provide a GeometryFactory for the parser.
@@ -587,7 +590,7 @@ public class WKTParser {
         if (nextToken.equals(EMPTY)) {
         	return null;
         }
-        MultiPrimitive multi = geometryFactory.createMultiPrimitive();
+        MultiPrimitive multi = geometryFactory.createMultiPrimitive();        
         Point point = primitiveFactory.createPoint(getPreciseCoordinate(tokenizer));
         multi.getElements().add(point);
         nextToken = getNextCloserOrComma(tokenizer);

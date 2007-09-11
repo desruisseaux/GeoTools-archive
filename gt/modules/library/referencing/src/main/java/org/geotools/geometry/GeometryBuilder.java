@@ -101,6 +101,12 @@ public class GeometryBuilder {
     public GeometryBuilder( Hints hints ){
         this.crs = (CoordinateReferenceSystem) hints.get( Hints.CRS );
         this.hints = hints;
+        getPositionFactory();
+        getPrecision();
+        getPrimitiveFactory();
+        getAggregateFactory();
+        getGeometryFactory();
+        getComplexFactory();
     }
     
     public CoordinateReferenceSystem getCoordinateReferenceSystem() {
@@ -109,26 +115,37 @@ public class GeometryBuilder {
 
     public void setCoordianteReferenceSystem( CoordinateReferenceSystem crs ) {
         if( this.crs != crs ){
+            hints.remove(Hints.CRS);
+            hints.put( Hints.CRS, crs );
+            this.crs = crs;
             positionFactory = null;
             primitiveFactory = null;
             aggregateFactory = null;
             complexFactory = null;
             geometryFactory = null;
+            getPositionFactory();
+            getPrecision();
+            getPrimitiveFactory();
+            getAggregateFactory();
+            getGeometryFactory();
+            getComplexFactory();
         }
-        this.crs = crs;      
-        hints.remove(Hints.CRS);
-        hints.put( Hints.CRS, crs );
     }
 
     public Precision getPrecision() {
-        if( precision == null ){
-            precision = GeometryFactoryFinder.getPrecision( hints );
-        }
-        return precision;        
+        return getPositionFactory().getPrecision();
     }
     
     public PositionFactory getPositionFactory() {
         if( positionFactory == null ){
+            if( hints.containsKey(Hints.POSITION_FACTORY)){
+                // check the hints for something explicit
+                Object factory = hints.get(Hints.POSITION_FACTORY);
+                if( factory instanceof PositionFactory){
+                    positionFactory = (PositionFactory) factory;
+                    return positionFactory;
+                }
+            }
             positionFactory = GeometryFactoryFinder.getPositionFactory( hints);
         }
         return positionFactory;
@@ -136,6 +153,14 @@ public class GeometryBuilder {
 
     public PrimitiveFactory getPrimitiveFactory() {
         if( primitiveFactory == null ){
+            if( hints.containsKey(Hints.PRIMITIVE_FACTORY)){
+                // check the hints for something explicit
+                Object factory = hints.get(Hints.PRIMITIVE_FACTORY);
+                if( factory instanceof PrimitiveFactory){
+                    primitiveFactory = (PrimitiveFactory) factory;
+                    return primitiveFactory;
+                }
+            } 
             primitiveFactory = GeometryFactoryFinder.getPrimitiveFactory(  hints);
         }
         return primitiveFactory;
@@ -143,20 +168,44 @@ public class GeometryBuilder {
     
     public AggregateFactory getAggregateFactory() {
         if( aggregateFactory == null ){
-        	aggregateFactory = GeometryFactoryFinder.getAggregateFactory(  hints);
+            if( hints.containsKey(Hints.AGGREGATE_FACTORY)){
+                // check the hints for something explicit
+                Object factory = hints.get(Hints.AGGREGATE_FACTORY);
+                if( factory instanceof AggregateFactory){
+                    aggregateFactory = (AggregateFactory) factory;
+                    return aggregateFactory;
+                }
+            }            
+        	aggregateFactory = GeometryFactoryFinder.getAggregateFactory( hints);
         }
         return aggregateFactory;
     }
     
     public GeometryFactory getGeometryFactory() {
         if( geometryFactory == null ){
-        	geometryFactory = GeometryFactoryFinder.getGeometryFactory(  hints);
+            if( hints.containsKey(Hints.GEOMETRY_FACTORY)){
+                // check the hints for something explicit
+                Object factory = hints.get(Hints.GEOMETRY_FACTORY);
+                if( factory instanceof GeometryFactory){
+                    geometryFactory = (GeometryFactory) factory;
+                    return geometryFactory;
+                }
+            }            
+            geometryFactory = GeometryFactoryFinder.getGeometryFactory(  hints);
         }
         return geometryFactory;
     }
     
     public ComplexFactory getComplexFactory() {
         if( complexFactory == null ){
+            if( hints.containsKey(Hints.COMPLEX_FACTORY)){
+                // check the hints for something explicit
+                Object factory = hints.get(Hints.COMPLEX_FACTORY);
+                if( factory instanceof ComplexFactory){
+                    complexFactory = (ComplexFactory) factory;
+                    return complexFactory;
+                }
+            } 
         	complexFactory = GeometryFactoryFinder.getComplexFactory(  hints);
         }
         return complexFactory;

@@ -45,6 +45,7 @@ import org.geotools.factory.Hints;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.AbstractIdentifiedObject;
+import org.geotools.referencing.crs.AbstractCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.operation.AbstractCoordinateOperation;
@@ -841,5 +842,34 @@ public class DefaultFactoryTest extends TestCase {
         assertEquals("The CRS should still in the cache.",
                      "EPSG:2442", finder.findIdentifier(crs));
         
+    }
+    
+    /**
+     * We are supposed to be able to get back identical CoordinateReferenceSystem
+     * objects when we create using the same definition.
+     * This test case ensures that we do get back identical objects when
+     * using an EPSG code and when using WKT.
+     * <p>
+     * The same definition is used in each case - will it work?
+     * Answer is no; however two instances created with the same wkt
+     * work out okay.
+     */
+    public void testIntern() throws Exception {
+        AbstractCRS epsgCrs = (AbstractCRS) CRS.decode("EPSG:4326");
+        String wkt = epsgCrs.toWKT();
+        
+        AbstractCRS wktCrs = (AbstractCRS) CRS.parseWKT(wkt);
+        
+        assertTrue( "equals ignore metadata", epsgCrs.equals( wktCrs, false ));
+        assertFalse( "equals comapre metadata", epsgCrs.equals( wktCrs, true ));        
+        //assertEquals( "equals", epsgCrs, wktCrs );
+        //assertSame( "idenitity", epsgCrs, wktCrs );
+        
+        // parsing the same thing twice?
+        AbstractCRS wktCrs2 = (AbstractCRS) CRS.parseWKT(wkt);
+        assertEquals( "equals", wktCrs, wktCrs2);
+        assertTrue( "equals ignore metadata", wktCrs.equals( wktCrs2, false ));
+        assertTrue( "equals comapre metadata", wktCrs.equals( wktCrs2, true ));
+        assertSame( wktCrs, wktCrs2 );
     }
 }
