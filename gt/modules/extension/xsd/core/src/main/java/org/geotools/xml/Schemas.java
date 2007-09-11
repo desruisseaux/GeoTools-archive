@@ -65,6 +65,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 import org.geotools.resources.Utilities;
@@ -106,7 +107,10 @@ public class Schemas {
 
         for (Iterator it = configurations.iterator(); it.hasNext();) {
             Configuration conf = (Configuration) it.next();
-            LOGGER.fine("looking up schema for " + conf.getNamespaceURI());
+
+            if (LOGGER.isLoggable(Level.FINE)) {
+                LOGGER.fine("looking up schema for " + conf.getNamespaceURI());
+            }
 
             XSDSchemaLocator locator = conf.getSchemaLocator();
 
@@ -126,7 +130,9 @@ public class Schemas {
                 throw new RuntimeException(e);
             }
 
-            LOGGER.fine("schema location: " + schemaLocation);
+            if (LOGGER.isLoggable(Level.FINE)) {
+                LOGGER.fine("schema location: " + schemaLocation);
+            }
 
             XSDSchema schema = locator.locateSchema(null, namespaceURI, schemaLocation, null);
 
@@ -865,7 +871,9 @@ public class Schemas {
                         if (include.getIncorporatedSchema() != null) {
                             queue.addLast(include.getIncorporatedSchema());
                         } else {
-                            LOGGER.fine("include: " + include + " resulted in null schema");
+                            if (LOGGER.isLoggable(Level.FINE)) {
+                                LOGGER.fine("include: " + include + " resulted in null schema");
+                            }
                         }
                     }
                 }
@@ -1102,7 +1110,9 @@ public class Schemas {
                 }
             }
 
-            LOGGER.fine("Could not locate schema for: " + rawSchemaLocationURI + ".");
+            if (LOGGER.isLoggable(Level.FINE)) {
+                LOGGER.fine("Could not locate schema for: " + rawSchemaLocationURI + ".");
+            }
 
             return null;
         }
@@ -1148,8 +1158,10 @@ public class Schemas {
                 }
             }
 
-            LOGGER.fine("Could not resolve schema location: " + rawSchemaLocationURI
-                + " to physical location.");
+            if (LOGGER.isLoggable(Level.FINE)) {
+                LOGGER.fine("Could not resolve schema location: " + rawSchemaLocationURI
+                    + " to physical location.");
+            }
 
             return null;
         }

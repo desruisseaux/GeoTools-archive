@@ -20,11 +20,9 @@ import org.eclipse.xsd.XSDFactory;
 import org.eclipse.xsd.XSDImport;
 import org.eclipse.xsd.XSDParticle;
 import org.eclipse.xsd.XSDSchema;
-import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.eclipse.xsd.XSDTypeDefinition;
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.eclipse.xsd.util.XSDSchemaLocator;
-import org.eclipse.xsd.util.XSDUtil;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.defaults.DefaultPicoContainer;
 import org.xml.sax.Attributes;
@@ -33,7 +31,6 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.NamespaceSupport;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
@@ -43,7 +40,6 @@ import javax.xml.namespace.QName;
 import org.geotools.xml.BindingFactory;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.ElementInstance;
-import org.geotools.xml.Parser;
 import org.geotools.xml.SchemaIndex;
 import org.geotools.xml.Schemas;
 import org.geotools.xs.XS;
@@ -214,7 +210,9 @@ public class ParserHandler extends DefaultHandler {
 
     public void startElement(String uri, String localName, String qName, Attributes attributes)
         throws SAXException {
-        logger.finest("startElement(" + uri + "," + localName + "," + qName);
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("startElement(" + uri + "," + localName + "," + qName);
+        }
 
         if (schemas == null) {
             //root element, parse the schema
@@ -333,8 +331,8 @@ O:
             if (!found) {
                 //add it if not operating in strict mode
                 if (!isStrict()) {
-                    String msg = "schema specified by parser configuration not found, supplementing...";
-                    logger.fine(msg);
+                    logger.fine(
+                        "schema specified by parser configuration not found, supplementing...");
 
                     XSDSchema[] copy = new XSDSchema[schemas.length + 1];
                     System.arraycopy(schemas, 0, copy, 0, schemas.length);
@@ -397,9 +395,10 @@ O:
             // the element is of that type
             //if( context.getComponentInstance( Parser.Properties.PARSE_UNKNOWN_ELEMENTS ) != null) {
             if (!isStrict()) {
-                String msg = "Could not find declaration for: " + qualifiedName
-                    + ". Checking if containing type declares a single particle.";
-                logger.fine(msg);
+                if (logger.isLoggable(Level.FINE)) {
+                    logger.fine("Could not find declaration for: " + qualifiedName
+                        + ". Checking if containing type declares a single particle.");
+                }
 
                 if (parent.getComponent() instanceof ElementInstance) {
                     ElementInstance parentElement = (ElementInstance) parent.getComponent();

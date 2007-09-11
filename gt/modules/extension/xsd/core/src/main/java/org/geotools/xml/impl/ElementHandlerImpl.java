@@ -28,6 +28,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 import org.geotools.xml.AttributeInstance;
@@ -122,7 +123,9 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
             if (decl == null) {
                 //check wether unknown attributes should be parsed
                 if (!parser.isStrict()) {
-                    parser.getLogger().fine("Parsing unknown attribute: " + attQName);
+                    if (parser.getLogger().isLoggable(Level.FINE)) {
+                        parser.getLogger().fine("Parsing unknown attribute: " + attQName);
+                    }
 
                     //create a mock attribute and continue
                     decl = XSDFactory.eINSTANCE.createXSDAttributeDeclaration();
@@ -227,8 +230,9 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
             //TODO: instead of continuuing, just remove the element from 
             // the parent, or figure out if the element is 'optional' and 
             // remove
-            String msg = "Binding for " + element.getName() + " returned null";
-            parser.getLogger().fine(msg);
+            if (parser.getLogger().isLoggable(Level.FINE)) {
+                parser.getLogger().fine("Binding for " + element.getName() + " returned null");
+            }
         }
 
         //set the value for this node in the parse tree

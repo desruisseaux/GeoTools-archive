@@ -20,6 +20,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.geotools.util.Converters;
 import org.geotools.xml.Binding;
@@ -69,7 +70,9 @@ public class ElementEncodeExecutor implements BindingWalker.Visitor {
         //ensure that the type of the object being encoded matches the type 
         // of the binding
         if (binding.getType() == null) {
-            logger.fine("Binding: " + binding.getTarget() + " does not declare a target type");
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine("Binding: " + binding.getTarget() + " does not declare a target type");
+            }
 
             return;
         }
@@ -81,8 +84,11 @@ public class ElementEncodeExecutor implements BindingWalker.Visitor {
             if (converted != null) {
                 object = converted;
             } else {
-                logger.fine(object + "[ " + object.getClass() + " ] is not of type "
-                    + binding.getType());
+                if (logger.isLoggable(Level.FINE)) {
+                    // do not log the object, may be a multi-megabyte feature collection
+                    // that can trigger an OOM toStringing itself
+                    logger.fine("[ " + object.getClass() + " ] is not of type " + binding.getType());
+                }
 
                 return;
             }
