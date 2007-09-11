@@ -35,6 +35,7 @@ import org.geotools.geometry.iso.coordinate.LineStringImpl;
 import org.geotools.geometry.iso.coordinate.PointArrayImpl;
 import org.geotools.geometry.iso.coordinate.PositionImpl;
 import org.geotools.geometry.iso.coordinate.SurfacePatchImpl;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
@@ -282,8 +283,8 @@ public class PrimitiveFactoryImpl implements Serializable, Factory, PrimitiveFac
 			if (this.getDimension() != orientableCurve.getCoordinateDimension()) {
 				throw new MismatchedDimensionException();
 			}
-			if (this.getCoordinateReferenceSystem() != orientableCurve
-					.getCoordinateReferenceSystem()) {
+			if (!CRSEqualsIgnoreMetadata(this.getCoordinateReferenceSystem(), orientableCurve
+					.getCoordinateReferenceSystem()) ) {
 				throw new MismatchedReferenceSystemException();
 			}
 		}
@@ -318,8 +319,8 @@ public class PrimitiveFactoryImpl implements Serializable, Factory, PrimitiveFac
 					if (this.getDimension() != ring.getCoordinateDimension()) {
 						throw new MismatchedDimensionException();
 					}
-					if (this.getCoordinateReferenceSystem() != ring
-							.getCoordinateReferenceSystem()) {
+					if (!CRSEqualsIgnoreMetadata(this.getCoordinateReferenceSystem(), ring
+							.getCoordinateReferenceSystem()) ) {
 						throw new MismatchedReferenceSystemException();
 					}
 				}
@@ -649,5 +650,28 @@ public class PrimitiveFactoryImpl implements Serializable, Factory, PrimitiveFac
 		SurfaceBoundary sfb = this.createSurfaceBoundary(extRing, intRings);
 		return this.createSurface(sfb);
 	}
+	
+    /**
+     * Compares the specified CRS objects for equality. If both objects are Geotools
+     * implementations of class {@link AbstractIdentifiedObject}, then this method
+     * will ignore the metadata during the comparaison.
+     *
+     * @param  object1 The first object to compare (may be null).
+     * @param  object2 The second object to compare (may be null).
+     * @return {@code true} if both objects are equals.
+     *
+     */
+    private static boolean CRSEqualsIgnoreMetadata(final Object object1, final Object object2) {
+        if (object1 == object2) {
+            return true;
+        }
+        if (object1 instanceof AbstractIdentifiedObject &&
+            object2 instanceof AbstractIdentifiedObject)
+        {
+            return ((AbstractIdentifiedObject) object1).equals(
+                   ((AbstractIdentifiedObject) object2), false);
+        }
+        return object1!=null && object1.equals(object2);
+    }
 
 }

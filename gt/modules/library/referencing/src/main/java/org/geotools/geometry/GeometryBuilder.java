@@ -338,25 +338,10 @@ public class GeometryBuilder {
 		 * which each represent a future Curve. Each array contain an array of
 		 * positions, which each represent a future lineString)
 		 */
-		for (OrientableCurve orientableCurve : orientableCurves) {
-			if (this.getCoordinateReferenceSystem().getCoordinateSystem().getDimension() != orientableCurve.getCoordinateDimension()) {
-				throw new MismatchedDimensionException();
-			}
-			if (this.getCoordinateReferenceSystem() != orientableCurve
-					.getCoordinateReferenceSystem()) {
-				throw new MismatchedReferenceSystemException();
-			}
-		}
 		return getPrimitiveFactory().createRing(orientableCurves);
 	}
 
 	public Solid createSolid(SolidBoundary boundary) throws MismatchedReferenceSystemException, MismatchedDimensionException {
-		if (this.getCoordinateReferenceSystem().getCoordinateSystem().getDimension() != boundary.getCoordinateDimension()) {
-			throw new MismatchedDimensionException();
-		}
-		if (this.getCoordinateReferenceSystem() != boundary.getCoordinateReferenceSystem()) {
-				throw new MismatchedReferenceSystemException();
-		}
 		return getPrimitiveFactory().createSolid(boundary);
 	}
 
