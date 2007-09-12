@@ -69,6 +69,8 @@ public abstract class AbstractGetFeatureInfoRequest extends AbstractWMSRequest i
         }
 
         setProperty(QUERY_LAYERS, queryLayerString);
+        //need to add the querylayers to the LAYERS tag as well.
+        setProperty(GetMapRequest.LAYERS, queryLayerString);
         URL url = super.getFinalURL();
         
         setProperty(QUERY_LAYERS, initialQueryLayerString);
