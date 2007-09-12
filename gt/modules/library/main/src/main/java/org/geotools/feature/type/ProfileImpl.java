@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -132,7 +133,7 @@ public class ProfileImpl implements Schema {
 	}
 	private synchronized Map contents(){
 		if( contents == null){
-			contents = new HashMap();
+			contents = new LinkedHashMap();
 			for( Iterator i=profile.iterator();i.hasNext();){
 				Object key = i.next();
 				contents.put( key, parent.get(key));
