@@ -486,6 +486,9 @@ public class GeometryBuilder {
 	public LineString createLineString(PointArray points) throws MismatchedReferenceSystemException, MismatchedDimensionException {
 	    return getGeometryFactory().createLineString(points);
     }
+	public LineSegment createLineSegment( DirectPosition from, DirectPosition to ) {
+        return getGeometryFactory().createLineSegment( from, to );
+    }
 	public MultiPrimitive createMultiPrimitive() {
 		return getGeometryFactory().createMultiPrimitive();
 	}
