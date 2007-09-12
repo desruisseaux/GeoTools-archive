@@ -44,6 +44,7 @@ import org.geotools.geometry.iso.topograph2D.index.SimpleMonotoneChainSweepLineI
 import org.geotools.geometry.iso.topograph2D.util.CoordinateArrays;
 import org.geotools.geometry.iso.util.Assert;
 import org.geotools.geometry.iso.util.algorithm2D.LineIntersector;
+import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.aggregate.MultiPrimitive;
 import org.opengis.geometry.aggregate.MultiSurface;
 import org.opengis.geometry.primitive.Primitive;
@@ -308,8 +309,7 @@ public class GeometryGraph extends PlanarGraph {
 	 */
 	private void addRing(RingImpl aRing, int cwLeft, int cwRight) {
 
-		List<DirectPositionImpl> tDPList = aRing.asDirectPositions();
-
+		List<DirectPosition> tDPList = aRing.asDirectPositions();
 		Coordinate[] coord = CoordinateArrays.toCoordinateArray(tDPList);
 
 		// Remove neighboured identical points
@@ -385,10 +385,11 @@ public class GeometryGraph extends PlanarGraph {
 	 */
 	private void addCurve(CurveImpl aCurve) {
 
-		Coordinate[] coord = CoordinateArrays
-				.removeRepeatedPoints(CoordinateArrays.toCoordinateArray(aCurve
-						.asDirectPositions()));
-
+		List<DirectPosition> directPositions = aCurve
+        		.asDirectPositions();
+        Coordinate[] coordinateArray = CoordinateArrays.toCoordinateArray(directPositions);
+        Coordinate[] coord = CoordinateArrays.removeRepeatedPoints(coordinateArray);
+        
 		if (coord.length < 2) {
 			hasTooFewPoints = true;
 			invalidPoint = coord[0];

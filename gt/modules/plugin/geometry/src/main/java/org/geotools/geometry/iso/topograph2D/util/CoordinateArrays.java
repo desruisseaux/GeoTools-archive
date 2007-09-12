@@ -406,7 +406,7 @@ public class CoordinateArrays {
 	 * @return
 	 */
 	public static Coordinate[] toCoordinateArray(
-			List<DirectPositionImpl> aPositions) {
+			List<DirectPosition> aPositions) {
 
 		Coordinate[] rCoords = new Coordinate[aPositions.size()];
 

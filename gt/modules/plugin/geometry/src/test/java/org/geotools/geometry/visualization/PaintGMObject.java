@@ -17,6 +17,7 @@ import org.geotools.geometry.iso.primitive.PointImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
+import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.primitive.SurfaceBoundary;
@@ -220,15 +221,15 @@ public class PaintGMObject {
     
 
     private Coords getCoordsFromCurve(CurveImpl curve) {
-    	List<DirectPositionImpl> dps = curve.asDirectPositions();
+    	List<DirectPosition> dps = curve.asDirectPositions();
     	
         int xCoordsOut[] = new int[dps.size()];
         int yCoordsOut[] = new int[dps.size()];
 
         for (int j=0; j<dps.size(); j++) {
-            DirectPositionImpl pos = dps.get(j);
-            xCoordsOut[j] = (int) pos.getX();
-            yCoordsOut[j] = (int) pos.getY();
+            DirectPosition pos = dps.get(j);
+            xCoordsOut[j] = (int) pos.getOrdinate(0);
+            yCoordsOut[j] = (int) pos.getOrdinate(1);
         }
         
         return new Coords(xCoordsOut, yCoordsOut);
@@ -259,6 +260,12 @@ public class PaintGMObject {
     public class Line {
     	private int x1, x2, y1, y2;
     	
+    	public Line( double x1, double y1, double x2, double y2) {
+            this.x1 = (int) x1;
+            this.x2 = (int) x2;
+            this.y1 = (int) y1;
+            this.y2 = (int) y2;
+        }
     	public Line(int x1, int y1, int x2, int y2) {
     		this.x1 = x1;
     		this.x2 = x2;
@@ -293,6 +300,11 @@ public class PaintGMObject {
     		this.list = new ArrayList<Line>();
     	}
     	
+    	public void add(DirectPosition p1, DirectPosition p2 ) {
+    	    Line line = new Line( p1.getOrdinate(0), p1.getOrdinate(1),
+    	              p2.getOrdinate(0), p2.getOrdinate(1));
+            this.list.add( line );
+        }
     	public void add(int x1, int y1, int x2, int y2) {
     		this.list.add(new Line(x1, y1, x2, y2));
     	}
@@ -320,14 +332,13 @@ public class PaintGMObject {
     	
         public void addRingToCoords(RingImpl ring) {
         	
-        	List<DirectPositionImpl> dps = ring.asDirectPositions();
+        	List<DirectPosition> dps = ring.asDirectPositions();
         	
             for (int j=0; j<dps.size()-1; j++) {
-                DirectPositionImpl pos = dps.get(j);
-                DirectPositionImpl nextpos = dps.get(j+1);
-                this.add((int)pos.getX(), (int)pos.getY(), (int)nextpos.getX(), (int)nextpos.getY());
-            }
-            
+                DirectPosition pos = dps.get(j);
+                DirectPosition nextpos = dps.get(j+1);
+                this.add( pos, nextpos );
+            }            
             return;
         }
 

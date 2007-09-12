@@ -16,11 +16,16 @@
 
 package org.geotools.geometry.iso.coordinate;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.geotools.geometry.iso.util.DoubleOperation;
+import org.geotools.referencing.CRS;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.PointArray;
 import org.opengis.geometry.coordinate.Position;
@@ -35,9 +40,10 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * </p>
  * @author Jody
  */
-public class DoublePointArray extends AbstractList<Position> implements PointArray {
+public class DoublePointArray extends AbstractList<Position> implements PointArray, Serializable {
+    private static final long serialVersionUID = 1250362674574138318L;
     
-	/** This is the array we are "wrapping" */
+    /** This is the array we are "wrapping" */
     double[] array;
     /**
      * This is the start index into array, each DirectPosition
@@ -56,6 +62,21 @@ public class DoublePointArray extends AbstractList<Position> implements PointArr
         this.start = start;
         this.end = end;
     }
+    /*
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+        out.writeObject(array);
+        out.writeInt(start);
+        out.writeInt(end);
+        out.writeObject(crs);
+    }
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        array = (double[]) in.readObject();
+        start = in.readInt();
+        end = in.readInt();
+        crs = (CoordinateReferenceSystem) in.readObject();
+    }
+    */
+    
     @Override
     public List<Position> subList(int fromIndex, int toIndex) {
     	int subStart = start+(fromIndex*getDimension());
@@ -168,7 +189,6 @@ public class DoublePointArray extends AbstractList<Position> implements PointArr
 	public void setDirectPosition(int index, DirectPosition position) throws IndexOutOfBoundsException, UnsupportedOperationException {
 		this.setPosition(index, position);
 	}	
-	
 }
 /**
  * Represents a DirectPosition wrapper of a secion of a double array.
@@ -178,7 +198,9 @@ public class DoublePointArray extends AbstractList<Position> implements PointArr
  * </p>
  * @author Jody Garnett
  */
-class DoubleDirectPosition implements DirectPosition {
+class DoubleDirectPosition implements DirectPosition, Serializable {
+    private static final long serialVersionUID = 1927101537353796968L;
+    
     int index;
     double array[];
     CoordinateReferenceSystem crs;
@@ -193,10 +215,31 @@ class DoubleDirectPosition implements DirectPosition {
         this.index = index;
         this.array = array;
         this.crs = crs;
-    }    
+    }
+    
     public CoordinateReferenceSystem getCoordinateReferenceSystem() {
         return crs;
     }
+    /**
+     * Override to "disconnect" this DoubleDirectPosition from
+     * being a simple view on a wider array.
+     * 
+     * @param oos
+     * @throws IOException
+     */
+    /*
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+        if( index != 0 || array.length != getDimension() ){
+            array = getCoordinates();
+            index = 0;
+        }
+        out.defaultWriteObject();
+    }
+    
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+    }
+    */
     public double[] getCoordinates() {
         double coords[] = new double[ crs.getCoordinateSystem().getDimension() ];
         System.arraycopy(array, index, coords, 0, crs.getCoordinateSystem().getDimension() );
@@ -219,5 +262,61 @@ class DoubleDirectPosition implements DirectPosition {
     }
     public Object clone() {
         return new DoubleDirectPosition( crs, getCoordinates() );                                
+    }
+    @Override
+    public int hashCode() {
+        final int PRIME = 31;
+        int result = 1;
+        double coord[] = this.getCoordinates();
+        result = PRIME * result + Arrays.hashCode(coord);
+        result = PRIME * result + ((crs == null) ? 0 : crs.hashCode());
+        return result;
+    }
+    @Override
+    public boolean equals( Object o ) {
+        if (o instanceof DirectPosition)
+            return this.equals((DirectPosition) o, 0);
+        else if (o instanceof Position)
+            return ((Position)o).equals(this);
+        else
+            return false;
+    }
+    /**
+     * Compares coodinates of Direct Positions and allows a tolerance value in
+     * the comparison
+     * 
+     * @param position
+     *            Direct Position to compare with
+     * @param tol Epsilon tolerance value
+     * @return TRUE, if coordinates accord concording to the tolerance value, FALSE if they dont.
+     */
+    public boolean equals(DirectPosition position, double tol) {
+        int D = position.getCoordinateReferenceSystem().getCoordinateSystem().getDimension();
+        if( D != crs.getCoordinateSystem().getDimension() ) return false;
+        
+        // use CRS.equalsIgnoreMetadata for effeciency and to avoid various issues with comparing
+        // CRS such as coordinate order.
+        if ( !CRS.equalsIgnoreMetadata(getCoordinateReferenceSystem(), position.getCoordinateReferenceSystem()) ) {
+            return false;
+        }
+        
+        // comparing a NaN ordinate to a non-NaN ordinate should return false, but two
+        // ordinates that are both NaN should considered equal.
+        for (int i = 0; i < D; ++i) {
+            if (Double.isNaN(position.getOrdinate(i)) && Double.isNaN(array[index+i]))
+                continue;
+            if (Math.abs(DoubleOperation.subtract(position.getOrdinate(i), array[index+i])) > tol)
+                return false;
+        }
+        return true;
+    }       
+    public String toString() {
+        double coord[] = this.getCoordinates();
+        int D = crs.getCoordinateSystem().getDimension();        
+        String str = "(" + array[index];        
+        for (int i = 1; i < coord.length; ++i) {
+            str += " " + array[index+i];
+        }
+        return str + ")";
     }
 }

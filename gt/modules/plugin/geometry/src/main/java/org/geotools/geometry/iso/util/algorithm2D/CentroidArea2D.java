@@ -28,6 +28,7 @@ import org.geotools.geometry.iso.primitive.RingImpl;
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
+import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.primitive.OrientableSurface;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -45,6 +46,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class CentroidArea2D {
 
+    static final int X = 0;
+    static final int Y = 1;
+    static final int Z = 2;
 	//private FeatGeomFactoryImpl factory = null;
 	private CoordinateReferenceSystem crs = null;
 	
@@ -111,27 +115,27 @@ public class CentroidArea2D {
 		}
 	}
 
-	private void addShell(List<DirectPositionImpl> pts) {
+	private void addShell(List<DirectPosition> pts) {
 		boolean isPositiveArea = !CGAlgorithms.isCCW(pts);
 		for (int i = 0; i < pts.size() - 1; i++) {
 			addTriangle(basePt, pts.get(i), pts.get(i+1), isPositiveArea);
 		}
 	}
 
-	private void addHole(List<DirectPositionImpl> pts) {
+	private void addHole(List<DirectPosition> pts) {
 		boolean isPositiveArea = CGAlgorithms.isCCW(pts);
 		for (int i = 0; i < pts.size() - 1; i++) {
 			addTriangle(basePt, pts.get(i), pts.get(i+1), isPositiveArea);
 		}
 	}
 
-	private void addTriangle(DirectPositionImpl p0, DirectPositionImpl p1, DirectPositionImpl p2,
+	private void addTriangle(DirectPosition p0, DirectPosition p1, DirectPosition p2,
 			boolean isPositiveArea) {
 		double sign = (isPositiveArea) ? 1.0 : -1.0;
 
 		//this.centroid3(p0, p1, p2);
-		double tempSumX = p0.getX() + p1.getX() + p2.getX();
-		double tempSumY = p0.getY() + p1.getY() + p2.getY();
+		double tempSumX = p0.getOrdinate(X) + p1.getOrdinate(X) + p2.getOrdinate(X);
+		double tempSumY = p0.getOrdinate(Y) + p1.getOrdinate(Y)+ p2.getOrdinate(Y);
 		//double tempSumZ = 0.0;
 
 		double area2 = area2(p0, p1, p2);
@@ -143,9 +147,10 @@ public class CentroidArea2D {
 	/**
 	 * Returns twice the signed area of the triangle p1-p2-p3, positive if a,b,c
 	 * are oriented ccw, and negative if cw.
-	 */
-	private static double area2(DirectPositionImpl p1, DirectPositionImpl p2, DirectPositionImpl p3) {
-		return (p2.getX() - p1.getX()) * (p3.getY() - p1.getY()) - (p3.getX() - p1.getX()) * (p2.getY() - p1.getY());
+	 */	
+	private static double area2(DirectPosition p1, DirectPosition p2, DirectPosition  p3) {
+		return (p2.getOrdinate(X) - p1.getOrdinate(X)) * (p3.getOrdinate(Y) - p1.getOrdinate(Y))
+		    - (p3.getOrdinate(X) - p1.getOrdinate(X)) * (p2.getOrdinate(Y) - p1.getOrdinate(Y));
 	}
 
 }

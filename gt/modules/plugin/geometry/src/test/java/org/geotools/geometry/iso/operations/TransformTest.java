@@ -21,6 +21,7 @@ import org.geotools.geometry.iso.root.GeometryImpl;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.factory.OrderedAxisAuthorityFactory;
+import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.geometry.coordinate.LineString;
@@ -71,26 +72,26 @@ public class TransformTest extends TestCase {
 		else if (geom1 instanceof CurveImpl && geom2 instanceof CurveImpl) {
 			CurveImpl curve1 = (CurveImpl) geom1;
 			CurveImpl curve2 = (CurveImpl) geom2;
-			List<DirectPositionImpl> list1 = curve1.asDirectPositions();
-			List<DirectPositionImpl> list2 = curve2.asDirectPositions();
-			Iterator<DirectPositionImpl> iterator1 = list1.iterator();
-			Iterator<DirectPositionImpl> iterator2 = list2.iterator();
+			List<DirectPosition> list1 = curve1.asDirectPositions();
+			List<DirectPosition> list2 = curve2.asDirectPositions();
+			Iterator<DirectPosition> iterator1 = list1.iterator();
+			Iterator<DirectPosition> iterator2 = list2.iterator();
 			while (iterator1.hasNext() && iterator2.hasNext()) {
-				PointImpl p1 = new PointImpl((DirectPositionImpl) iterator1.next());
-				PointImpl p2 = new PointImpl((DirectPositionImpl) iterator2.next());
+				PointImpl p1 = new PointImpl( iterator1.next());
+				PointImpl p2 = new PointImpl( iterator2.next());
 				assertEquals(p1, p2, epsilon);
 			}
 		}
 		else if (geom1 instanceof RingImpl && geom2 instanceof RingImpl) {
 			RingImpl ring1 = (RingImpl) geom1;
 			RingImpl ring2 = (RingImpl) geom2;
-			List<DirectPositionImpl> list1 = ring1.asDirectPositions();
-			List<DirectPositionImpl> list2 = ring2.asDirectPositions();
-			Iterator<DirectPositionImpl> iterator1 = list1.iterator();
-			Iterator<DirectPositionImpl> iterator2 = list2.iterator();
+			List<DirectPosition> list1 = ring1.asDirectPositions();
+			List<DirectPosition> list2 = ring2.asDirectPositions();
+			Iterator<DirectPosition> iterator1 = list1.iterator();
+			Iterator<DirectPosition> iterator2 = list2.iterator();
 			while (iterator1.hasNext() && iterator2.hasNext()) {
-				PointImpl p1 = new PointImpl((DirectPositionImpl) iterator1.next());
-				PointImpl p2 = new PointImpl((DirectPositionImpl) iterator2.next());
+				PointImpl p1 = new PointImpl(iterator1.next());
+				PointImpl p2 = new PointImpl(iterator2.next());
 				assertEquals(p1, p2, epsilon);
 			}
 		}

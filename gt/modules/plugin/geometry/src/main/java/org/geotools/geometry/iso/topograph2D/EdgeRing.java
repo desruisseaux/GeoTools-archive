@@ -33,6 +33,7 @@ import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.geometry.iso.util.Assert;
 import org.geotools.geometry.iso.util.algorithm2D.CGAlgorithms;
+import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.primitive.CurveSegment;
 import org.opengis.geometry.primitive.OrientableCurve;
@@ -87,7 +88,7 @@ public abstract class EdgeRing {
 		//this.computeRing();
 		
 		// build list of direct positions and calculate hole
-		List<DirectPositionImpl> dpList = new LinkedList<DirectPositionImpl>();
+		List<DirectPosition> dpList = new LinkedList<DirectPosition>();
 
 		for (int i = 0; i < this.pts.size(); i++) {
 			double[] doubleCoords = ((Coordinate) this.pts.get(i))
@@ -97,8 +98,7 @@ public abstract class EdgeRing {
 		}
 		
 		// See if the Ring is counterclockwise oriented
-		this.isHole = this.cga.isCCW(dpList);
-		
+		this.isHole = this.cga.isCCW(dpList);		
 	}
 
 	abstract public DirectedEdge getNext(DirectedEdge de);

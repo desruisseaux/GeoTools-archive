@@ -286,10 +286,10 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 	public CurveImpl clone() throws CloneNotSupportedException {
 		// Test OK
 		// Create a new Curve by cloning the direct positions which define the control points of this curve 
-		List<DirectPositionImpl> dPList = this.asDirectPositions();
+		List<DirectPosition> dPList = this.asDirectPositions();
 		List<DirectPosition> newDPList = new ArrayList<DirectPosition>();
 		for (int i=0; i<dPList.size(); i++) {
-			newDPList.add(dPList.get(i).clone());
+			newDPList.add( new DirectPositionImpl( dPList.get(i) ));
 		}
 
 		List<Position> rPositions = new LinkedList<Position>();
@@ -851,9 +851,9 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 	 * 
 	 * @return
 	 */
-	public List<DirectPositionImpl> asDirectPositions() {
+	public List<DirectPosition> asDirectPositions() {
 
-		List<DirectPositionImpl> rList = new ArrayList<DirectPositionImpl>();
+		List<DirectPosition> rList = new ArrayList<DirectPosition>();
 
 		CurveSegment tSegment = null;
 
@@ -870,13 +870,11 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 				LineSegment tLineSegment = tLineSegmentIter.next();
 				// Add new Coordinate, which is the start point of the actual
 				// LineSegment
-				rList.add((DirectPositionImpl) tLineSegment.getStartPoint());
+				rList.add( tLineSegment.getStartPoint().getPosition() );
 			}
-
 		}
 		// Add new Coordinate, which is the end point of the last curveSegment
-		rList.add((DirectPositionImpl) tSegment.getEndPoint());
-
+		rList.add( tSegment.getEndPoint() );
 		return rList;
 	}
 
@@ -949,11 +947,11 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 		GeometryFactory geometryFactory = new GeometryFactoryImpl(newCRS, getPositionFactory());
 		
 		DirectPositionImpl dp1 = null;
-		List<DirectPositionImpl> currentpositions = this.asDirectPositions();
-		Iterator<DirectPositionImpl> iter = currentpositions.iterator();
+		List<DirectPosition> currentpositions = asDirectPositions();
+		Iterator<DirectPosition> iter = currentpositions.iterator();
 		List<Position> newpositions = new ArrayList<Position>();
 		while (iter.hasNext()) {
-			DirectPositionImpl thispos = (DirectPositionImpl) iter.next();
+			DirectPosition thispos = (DirectPosition) iter.next();
 			dp1 = new DirectPositionImpl(newCRS);
 			dp1 = (DirectPositionImpl) transform.transform(thispos, dp1);
 			newpositions.add(dp1);

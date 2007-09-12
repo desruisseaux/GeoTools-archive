@@ -23,6 +23,7 @@ import java.util.List;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.topograph2D.Coordinate;
 import org.geotools.geometry.iso.topograph2D.util.CoordinateArrays;
+import org.opengis.geometry.DirectPosition;
 
 
 /**
@@ -181,7 +182,7 @@ public class CGAlgorithms {
 	 *            a list of direct positions forming a ring
 	 * @return <code>true</code> if the ring is oriented counter-clockwise.
 	 */
-	public static boolean isCCW(List<DirectPositionImpl> ring) {
+	public static boolean isCCW(List<DirectPosition> ring) {
 		Coordinate[] coords = CoordinateArrays.toCoordinateArray(ring);
 		return isCCW(coords);
 	}

@@ -25,6 +25,7 @@ import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.LineStringImpl;
 import org.geotools.geometry.iso.coordinate.PointArrayImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
+import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.primitive.CurveSegment;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -126,9 +127,9 @@ public class Merger {
 		int i=0;
 		int j=0;
 		for (i=0; i<curves.size(); i++) {
-			List<DirectPositionImpl> dPList = curves.get(i).asDirectPositions();
+			List<DirectPosition> dPList = curves.get(i).asDirectPositions();
 			for (j=0; j<dPList.size()-1; j++) {
-				positionList.add(dPList.get(j).clone());
+				positionList.add( new DirectPositionImpl( dPList.get(j) ));
 			}
 		}		
 		positionList.add(curves.get(curves.size()-1).getEndPoint());

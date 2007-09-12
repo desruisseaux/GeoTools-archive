@@ -26,6 +26,7 @@ import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
+import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -90,25 +91,24 @@ public class CentroidLine {
 	 * @param pts
 	 *            an array of {@link Coordinate}s
 	 */
-	public void addPointSequence(List<DirectPositionImpl> pts) {
+	public void addPointSequence(List<DirectPosition> pts) {
 		
-		DirectPositionImpl dpAct = pts.get(0);
-		DirectPositionImpl dpNext;
+		DirectPositionImpl dpAct = new DirectPositionImpl( pts.get(0) );
+		DirectPositionImpl directPositionNext;
 
 		for (int i = 0; i < pts.size()-1; i++) {
+			directPositionNext = new DirectPositionImpl( pts.get(i+1) );
 			
-			dpNext = pts.get(i+1);
-			
-			double segmentLen = dpAct.distance(dpNext);
+			double segmentLen = dpAct.distance(directPositionNext);
 			this.totalLength += segmentLen;
 			
 			DirectPositionImpl tempMid = dpAct.clone();
-			tempMid.add(dpNext);
+			tempMid.add( directPositionNext);
 			tempMid.divideBy(2);
 			tempMid.scale(segmentLen);
 			this.centSum.add(tempMid);
 			
-			dpAct = dpNext;
+			dpAct = directPositionNext;
 		}
 	}
 	
