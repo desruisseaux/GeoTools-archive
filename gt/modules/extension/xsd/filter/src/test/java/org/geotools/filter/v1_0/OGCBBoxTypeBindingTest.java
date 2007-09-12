@@ -40,6 +40,7 @@ public class OGCBBoxTypeBindingTest extends FilterTestSupport {
         assertEquals(0, box.getMinY(), 0.0);
         assertEquals(1, box.getMaxX(), 0.0);
         assertEquals(1, box.getMaxY(), 0.0);
+        assertEquals("EPSG:4326", box.getSRS());
     }
 
     public void testEncode() throws Exception {

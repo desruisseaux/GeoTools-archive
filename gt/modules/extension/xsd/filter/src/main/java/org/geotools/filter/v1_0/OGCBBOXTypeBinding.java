@@ -85,9 +85,11 @@ public class OGCBBOXTypeBinding extends AbstractComplexBinding {
         //TODO: crs
         PropertyName propertyName = (PropertyName) node.getChildValue(PropertyName.class);
         Envelope box = (Envelope) node.getChildValue(Envelope.class);
+        Node srsNode = node.getChild(Envelope.class).getAttribute("srsName");
+        String srs = (srsNode != null) ? srsNode.getValue().toString() : null;
 
         return factory.bbox(propertyName.getPropertyName(), box.getMinX(), box.getMinY(),
-            box.getMaxX(), box.getMaxY(), null);
+            box.getMaxX(), box.getMaxY(), srs);
     }
 
     public Object getProperty(Object object, QName name)

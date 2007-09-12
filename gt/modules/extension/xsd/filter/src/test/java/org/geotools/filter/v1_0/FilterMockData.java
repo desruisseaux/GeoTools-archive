@@ -375,6 +375,8 @@ public class FilterMockData {
         y = element(document, upper, new QName(GML.NAMESPACE, "Y"));
         y.appendChild(document.createTextNode("1"));
 
+        envelope.setAttribute("srsName", "EPSG:4326");
+
         return envelope;
     }
 
@@ -444,7 +446,7 @@ public class FilterMockData {
     }
 
     static BBOX bbox() {
-        return f.bbox("foo", 0, 0, 1, 1, null);
+        return f.bbox("foo", 0, 0, 1, 1, "EPSG:4326");
     }
 
     static Element bbox(Document document, Node parent) {
