@@ -58,7 +58,7 @@ import org.geotools.xs.XS;
  * @generated
  */
 public class XSQNameBinding implements SimpleBinding {
-    NamespaceContext namespaceContext;
+    protected NamespaceContext namespaceContext;
 
     public XSQNameBinding(NamespaceContext namespaceContext) {
         this.namespaceContext = namespaceContext;
