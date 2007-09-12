@@ -164,22 +164,22 @@ public class GeometryFactoryImpl implements Factory, GeometryFactory {
 	/* (non-Javadoc)
 	 * @see org.opengis.geometry.coordinate.Factory#createDirectPosition()
 	 */
-	public DirectPositionImpl createDirectPosition() {
+	public DirectPosition createDirectPosition() {
 		// Test ok
-		return (DirectPositionImpl) positionFactory.createDirectPosition(null);
+		return (DirectPosition) positionFactory.createDirectPosition(null);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.opengis.geometry.coordinate.Factory#createDirectPosition(double[])
 	 */
-	public DirectPositionImpl createDirectPosition(double[] coord) {
+	public DirectPosition createDirectPosition(double[] coord) {
 		// Test ok
 		if (coord == null)
 			throw new IllegalArgumentException("Parameter coord is null"); //$NON-NLS-1$
 		if (coord.length != this.getDimension())
 			throw new MismatchedDimensionException();
 		// Create a DirectPosition which references to a COPY of the given double array
-		return (DirectPositionImpl) positionFactory.createDirectPosition(coord);
+		return (DirectPosition) positionFactory.createDirectPosition(coord);
 	}
 
 	/* (non-Javadoc)
@@ -269,8 +269,8 @@ public class GeometryFactoryImpl implements Factory, GeometryFactory {
 	 * @param dp
 	 * @return DirectPositionImpl
 	 */
-	public DirectPositionImpl createDirectPosition(DirectPosition dp) {
-		return (DirectPositionImpl) positionFactory.createDirectPosition(dp.getCoordinates() );
+	public DirectPosition createDirectPosition(DirectPosition dp) {
+		return (DirectPosition) positionFactory.createDirectPosition(dp.getCoordinates() );
 	}
 
 	/**

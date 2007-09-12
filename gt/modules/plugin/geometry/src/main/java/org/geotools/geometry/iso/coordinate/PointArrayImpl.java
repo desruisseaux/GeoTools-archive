@@ -316,7 +316,7 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 	/* (non-Javadoc)
 	 * @see org.opengis.geometry.coordinate.PointArray#get(int, org.opengis.geometry.coordinate.DirectPosition)
 	 */
-	public DirectPositionImpl getPosition(int col, DirectPosition dest)
+	public DirectPosition getPosition(int col, DirectPosition dest)
 			throws IndexOutOfBoundsException {
 		// Test ok (SJ)
 		Position pos = get(col);
@@ -334,9 +334,9 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
                 }
             }			
 		} else {
-            dest = new DirectPositionImpl( pos );			
+            dest = pos.getPosition();			
 		}		
-		return (DirectPositionImpl) dest;
+		return dest;
 	}
 
 	/* (non-Javadoc)
@@ -489,9 +489,9 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 		/**
 		 * @param arg0
 		 * @param dp
-		 * @return DirectPositionImpl
+		 * @return DirectPosition
 		 */
-		public DirectPositionImpl getStartDirectPositionCoordinate(int arg0,
+		public DirectPosition getStartDirectPositionCoordinate(int arg0,
 				DirectPosition dp) {
 			return this.pointArray.getPosition(arg0, dp);
 		}
@@ -501,7 +501,7 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 		 * @param dp
 		 * @return DirectPositionImpl
 		 */
-		public DirectPositionImpl getEndDirectPositionCoordinate(int arg0,
+		public DirectPosition getEndDirectPositionCoordinate(int arg0,
 				DirectPosition dp) {
 			return this.pointArray.getPosition(arg0 + 1, dp);
 		}

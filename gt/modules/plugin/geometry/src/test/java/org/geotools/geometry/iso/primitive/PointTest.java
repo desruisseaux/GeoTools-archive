@@ -11,6 +11,7 @@ import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.PositionFactory;
 import org.opengis.geometry.complex.Complex;
 import org.opengis.geometry.complex.CompositePoint;
@@ -62,7 +63,7 @@ public class PointTest extends TestCase {
 		assertTrue(dp[0] == 10);
 		assertTrue(dp[1] == 32000);
 		
-		DirectPositionImpl dp1 = tCoordFactory.createDirectPosition(coord);
+		DirectPosition dp1 = tCoordFactory.createDirectPosition(coord);
 		
 		Point p2 = tPrimFactory.createPoint(dp1);
 		

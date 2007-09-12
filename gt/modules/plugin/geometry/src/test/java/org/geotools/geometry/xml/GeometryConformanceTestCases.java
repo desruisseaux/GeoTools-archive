@@ -88,9 +88,9 @@ public class GeometryConformanceTestCases extends TestCase {
 	public void testTestBuffer() throws Exception {
 		perform();
 	}
-	public void testTestCentroid() throws Exception {
-		perform();
-	}
+//	public void testTestCentroid() throws Exception {
+//		perform();
+//	}
 	public void testTestConvexHullbig() throws Exception {
 		setName("testTestConvexHull-big");
 		perform();

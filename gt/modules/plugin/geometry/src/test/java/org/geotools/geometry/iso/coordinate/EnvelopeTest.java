@@ -8,6 +8,7 @@ import org.geotools.geometry.iso.coordinate.GeometryFactoryImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.opengis.geometry.DirectPosition;
 
 /**
  * @author sanjay
@@ -28,10 +29,10 @@ public class EnvelopeTest extends TestCase {
 
 		
 		// CoordinateFactory.createDirectPosition(double[])
-		DirectPositionImpl dp1 = tCoordFactory.createDirectPosition(new double[] {0, 0});
-		DirectPositionImpl dp2 = tCoordFactory.createDirectPosition(new double[] {100, 100});
+		DirectPosition dp1 = tCoordFactory.createDirectPosition(new double[] {0, 0});
+		DirectPosition dp2 = tCoordFactory.createDirectPosition(new double[] {100, 100});
 
-		DirectPositionImpl dp0 = tCoordFactory.createDirectPosition(new double[] {100, 100});
+		DirectPosition dp0 = tCoordFactory.createDirectPosition(new double[] {100, 100});
 		
 		// DirectPosition.equals(DirectPosition)
 		assertTrue(dp2.equals(dp0));
@@ -58,11 +59,11 @@ public class EnvelopeTest extends TestCase {
 		assertTrue(env1.equals(env2));
 		
 		
-		DirectPositionImpl dp3 = tCoordFactory.createDirectPosition(new double[] {0,0});
-		DirectPositionImpl dp4 = tCoordFactory.createDirectPosition(new double[] {100,50});
-		DirectPositionImpl dp5 = tCoordFactory.createDirectPosition(new double[] {100.01,50});
-		DirectPositionImpl dp6 = tCoordFactory.createDirectPosition(new double[] {50,100});
-		DirectPositionImpl dp7 = tCoordFactory.createDirectPosition(new double[] {50,100.01});
+		DirectPosition dp3 = tCoordFactory.createDirectPosition(new double[] {0,0});
+		DirectPosition dp4 = tCoordFactory.createDirectPosition(new double[] {100,50});
+		DirectPosition dp5 = tCoordFactory.createDirectPosition(new double[] {100.01,50});
+		DirectPosition dp6 = tCoordFactory.createDirectPosition(new double[] {50,100});
+		DirectPosition dp7 = tCoordFactory.createDirectPosition(new double[] {50,100.01});
 		
 		// Envelope.contains(DirectPosition)
 		//System.outprintln("Contains Method for " + env1);
@@ -95,7 +96,7 @@ public class EnvelopeTest extends TestCase {
 		
 		// Test other envelope methods
 		env1.setValues(env2);
-		DirectPositionImpl[] dpArray = new DirectPositionImpl[2];
+		DirectPosition[] dpArray = new DirectPositionImpl[2];
 		dpArray[0] = dp0;
 		dpArray[1] = dp4;
 		EnvelopeImpl impl = env1.createEnvelope(dpArray);

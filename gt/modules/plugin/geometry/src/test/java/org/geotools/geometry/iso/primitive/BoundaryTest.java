@@ -46,8 +46,8 @@ public class BoundaryTest extends TestCase {
 		GeometryFactoryImpl tCoordFactory = (GeometryFactoryImpl) builder.getGeometryFactory();
 		PrimitiveFactoryImpl tPrimitiveFactory = (PrimitiveFactoryImpl) builder.getPrimitiveFactory();
 		
-		DirectPositionImpl dp1 = tCoordFactory.createDirectPosition(new double[] {0, 0});
-		DirectPositionImpl dp2 = tCoordFactory.createDirectPosition(new double[] {100, 100});
+		DirectPosition dp1 = tCoordFactory.createDirectPosition(new double[] {0, 0});
+		DirectPosition dp2 = tCoordFactory.createDirectPosition(new double[] {100, 100});
 		
 		CurveBoundary curveBoundary1 = tPrimitiveFactory.createCurveBoundary(dp1, dp2);
 		
@@ -101,7 +101,7 @@ public class BoundaryTest extends TestCase {
 		assertTrue(b2.equals((Object) b2));
 		assertFalse(b2.equals((Object) dp1));
 		assertFalse(b2.equals((Object) null));
-		DirectPositionImpl dp3 = tCoordFactory.createDirectPosition(new double[] {3, 3});
+		DirectPosition dp3 = tCoordFactory.createDirectPosition(new double[] {3, 3});
 		PointImpl point3 = new PointImpl(dp3);
 		assertFalse(b2.equals((Object) new CurveBoundaryImpl(this.crs, point1, point3)));
 		

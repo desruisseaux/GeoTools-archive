@@ -8,6 +8,7 @@ import org.geotools.geometry.iso.io.CollectionFactoryMemoryImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.util.elem2D.Geo2DFactory;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Precision;
 import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -58,10 +59,10 @@ public class PicoEnvelopeTest extends TestCase {
 
 		
 		// CoordinateFactory.createDirectPosition(double[])
-		DirectPositionImpl dp1 = gf.createDirectPosition(new double[] {0, 0});
-		DirectPositionImpl dp2 = gf.createDirectPosition(new double[] {100, 100});
+		DirectPosition dp1 = gf.createDirectPosition(new double[] {0, 0});
+		DirectPosition dp2 = gf.createDirectPosition(new double[] {100, 100});
 
-		DirectPositionImpl dp0 = gf.createDirectPosition(new double[] {100, 100});
+		DirectPosition dp0 = gf.createDirectPosition(new double[] {100, 100});
 		
 		// DirectPosition.equals(DirectPosition)
 		assertTrue(dp2.equals(dp0));
@@ -88,11 +89,11 @@ public class PicoEnvelopeTest extends TestCase {
 		assertTrue(env1.equals(env2));
 		
 		
-		DirectPositionImpl dp3 = gf.createDirectPosition(new double[] {0,0});
-		DirectPositionImpl dp4 = gf.createDirectPosition(new double[] {100,50});
-		DirectPositionImpl dp5 = gf.createDirectPosition(new double[] {100.01,50});
-		DirectPositionImpl dp6 = gf.createDirectPosition(new double[] {50,100});
-		DirectPositionImpl dp7 = gf.createDirectPosition(new double[] {50,100.01});
+		DirectPosition dp3 = gf.createDirectPosition(new double[] {0,0});
+		DirectPosition dp4 = gf.createDirectPosition(new double[] {100,50});
+		DirectPosition dp5 = gf.createDirectPosition(new double[] {100.01,50});
+		DirectPosition dp6 = gf.createDirectPosition(new double[] {50,100});
+		DirectPosition dp7 = gf.createDirectPosition(new double[] {50,100.01});
 		
 		// Envelope.contains(DirectPosition)
 		//System.outprintln("Contains Method for " + env1);

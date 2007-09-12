@@ -230,8 +230,8 @@ public class CompositeCurveImpl extends CompositeImpl<OrientableCurveImpl>
 			return null;
 		else
 			return new CurveBoundaryImpl(getCoordinateReferenceSystem(),
-					new PointImpl((DirectPositionImpl) start.clone()),
-					new PointImpl((DirectPositionImpl) end.clone()));
+					new PointImpl((DirectPosition) start.clone()),
+					new PointImpl((DirectPosition) end.clone()));
 			//return this.getFeatGeometryFactory().getPrimitiveFactory().createCurveBoundary(start, end);
 	}
 

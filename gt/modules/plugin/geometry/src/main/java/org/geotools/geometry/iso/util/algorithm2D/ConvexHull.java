@@ -208,7 +208,7 @@ public class ConvexHull {
 			} else if (pos instanceof PointImpl) {
 				filter.filter(new Coordinate(((PointImpl)pos).getPosition().getCoordinates()));
 			} else
-				Assert.isTrue(false, "Unvalid coordinate type");
+				Assert.isTrue(false, "Invalid coordinate type");
 		}
 		
 		return filter.getCoordinates();

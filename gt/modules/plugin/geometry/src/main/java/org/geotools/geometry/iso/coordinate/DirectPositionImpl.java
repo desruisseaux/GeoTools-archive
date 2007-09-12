@@ -343,8 +343,7 @@ public class DirectPositionImpl implements DirectPosition, Serializable {
 	/**
 	 * Calculates the square of the distance to another direct position
 	 * 
-	 * @param p
-	 *            another direct Position
+	 * @param p another direct Position
 	 * @return Distance
 	 */
 	public double distanceSquare(DirectPosition p) {

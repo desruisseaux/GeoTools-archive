@@ -53,7 +53,7 @@ public class CentroidArea2D {
 	private CoordinateReferenceSystem crs = null;
 	
 	// the point all triangles are based at
-	private DirectPositionImpl basePt = null;
+	private DirectPosition basePt = null;
 
 	// partial area sum
 	private double areasum2 = 0;
@@ -86,7 +86,7 @@ public class CentroidArea2D {
 	public void add(GeometryImpl geom) {
 		if (geom instanceof SurfaceImpl) {
 			SurfaceBoundaryImpl sb = ((SurfaceImpl) geom).getBoundary();
-			this.setBasePoint((DirectPositionImpl) ((CurveImpl)sb.getExterior().getGenerators().get(0)).getStartPoint());
+			this.setBasePoint( ((CurveImpl)sb.getExterior().getGenerators().get(0)).getStartPoint());
 			this.addSurface(sb);
 		} else if (geom instanceof MultiSurfaceImpl) {
 			Iterator<OrientableSurface> surfaces = ((MultiSurfaceImpl) geom).getElements().iterator();
@@ -103,7 +103,7 @@ public class CentroidArea2D {
 		return centroid;
 	}
 
-	private void setBasePoint(DirectPositionImpl basePt) {
+	private void setBasePoint(DirectPosition basePt) {
 		if (this.basePt == null)
 			this.basePt = basePt;
 	}

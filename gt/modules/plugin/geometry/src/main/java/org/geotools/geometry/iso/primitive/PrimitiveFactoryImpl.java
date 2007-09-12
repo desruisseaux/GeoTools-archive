@@ -205,7 +205,7 @@ public class PrimitiveFactoryImpl implements Serializable, Factory, PrimitiveFac
 		if (position.getPosition().getDimension() != this.getDimension()) {
 			throw new MismatchedDimensionException();
 		}
-		DirectPositionImpl copy = (DirectPositionImpl) positionFactory.createDirectPosition(position.getPosition().getCoordinates());
+		DirectPosition copy = positionFactory.createDirectPosition(position.getPosition().getCoordinates());
 		return new PointImpl(copy);
 	}
 
@@ -223,8 +223,8 @@ public class PrimitiveFactoryImpl implements Serializable, Factory, PrimitiveFac
 			throw new NullPointerException(
 					"One or both of the parameters is NULL");
 		return new CurveBoundaryImpl(getCoordinateReferenceSystem(),
-				createPoint((DirectPositionImpl) dp0),
-				createPoint((DirectPositionImpl) dp1));
+				createPoint(dp0),
+				createPoint(dp1));
 	}
 
 	/**

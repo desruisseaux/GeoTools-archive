@@ -206,7 +206,7 @@ public class EnvelopeImpl implements Envelope, Serializable {
 	 * @param p
 	 * @return EnvelopeImpl
 	 */
-	public static EnvelopeImpl createEnvelope(DirectPositionImpl[] p) {
+	public static EnvelopeImpl createEnvelope(DirectPosition[] p) {
 		if (p.length == 0){
 			return null;
         }
