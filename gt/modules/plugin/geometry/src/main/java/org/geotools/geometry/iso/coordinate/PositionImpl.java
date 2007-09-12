@@ -38,6 +38,10 @@ import org.opengis.geometry.primitive.Point;
 
 public class PositionImpl implements Position, Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1588536548235183389L;
 	// The Position is either represented by a DirectPosition or Point
 	private Object position = null;
 
