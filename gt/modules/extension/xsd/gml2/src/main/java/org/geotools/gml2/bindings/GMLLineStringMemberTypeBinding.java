@@ -16,6 +16,7 @@
 package org.geotools.gml2.bindings;
 
 import javax.xml.namespace.QName;
+import com.vividsolutions.jts.geom.LineString;
 import org.geotools.gml2.GML;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
@@ -74,7 +75,7 @@ public class GMLLineStringMemberTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return LineString.class;
     }
 
     /**
