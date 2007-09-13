@@ -85,4 +85,19 @@ public class SortPropertyTypeBinding extends AbstractComplexBinding {
 
         return filterfactory.sort(name.getPropertyName(), order);
     }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        SortBy sortBy = (SortBy) object;
+
+        if (OGC.PropertyName.equals(name)) {
+            return sortBy.getPropertyName();
+        }
+
+        if ("SortOrder".equals(name.getLocalPart())) {
+            return sortBy.getSortOrder();
+        }
+
+        return null;
+    }
 }

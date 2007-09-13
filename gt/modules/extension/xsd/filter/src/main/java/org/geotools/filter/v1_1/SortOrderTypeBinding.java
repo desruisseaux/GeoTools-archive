@@ -19,6 +19,7 @@ import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.sort.SortOrder;
 import org.geotools.xml.AbstractSimpleBinding;
+import org.geotools.xml.Binding;
 import org.geotools.xml.InstanceComponent;
 
 
@@ -65,6 +66,10 @@ public class SortOrderTypeBinding extends AbstractSimpleBinding {
         return SortOrder.class;
     }
 
+    public int getExecutionMode() {
+        return Binding.OVERRIDE;
+    }
+
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -79,6 +84,20 @@ public class SortOrderTypeBinding extends AbstractSimpleBinding {
 
         if ("DESC".equals(value)) {
             return SortOrder.DESCENDING;
+        }
+
+        return null;
+    }
+
+    public String encode(Object object, String value) throws Exception {
+        SortOrder sortOrder = (SortOrder) object;
+
+        if (sortOrder == SortOrder.ASCENDING) {
+            return "ASC";
+        }
+
+        if (sortOrder == SortOrder.DESCENDING) {
+            return "DESC";
         }
 
         return null;
