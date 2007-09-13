@@ -56,6 +56,7 @@ import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 /**
@@ -421,12 +422,22 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 					.getCoordinateReferenceSystem(), this.crs)) {
 				try {
 					// transforming the envelope back to the data set crs
-					requestedEnvelope = CRSUtilities.transform(operationFactory
-							.createOperation(
-									requestedEnvelope
-											.getCoordinateReferenceSystem(),
-									crs).getMathTransform(), requestedEnvelope);
-					requestedEnvelope.setCoordinateReferenceSystem(this.crs);
+					final MathTransform transform = CRS.findMathTransform(
+							requestedEnvelope
+									.getCoordinateReferenceSystem(), crs);
+					if (!transform.isIdentity()) {
+						requestedEnvelope = CRS.transform(transform,
+								requestedEnvelope);
+						requestedEnvelope
+								.setCoordinateReferenceSystem(this.crs);
+
+						if (LOGGER.isLoggable(Level.FINE))
+							LOGGER.fine(new StringBuffer(
+									"Reprojected envelope ").append(
+											requestedEnvelope.toString())
+									.append(" crs ").append(crs.toWKT())
+									.toString());
+					}
 				} catch (TransformException e) {
 					throw new DataSourceException(
 							"Unable to create a coverage for this source", e);

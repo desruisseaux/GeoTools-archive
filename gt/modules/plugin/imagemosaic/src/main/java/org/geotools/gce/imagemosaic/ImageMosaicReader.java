@@ -532,14 +532,12 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 					// transforming the envelope back to the dataset crs in
 					// order to interact with the original envelope for this
 					// mosaic.
-					final MathTransform transform = operationFactory
-							.createOperation(
-									requestedOriginalEnvelope
-											.getCoordinateReferenceSystem(),
-									crs).getMathTransform();
+					final MathTransform transform = CRS.findMathTransform(
+							requestedOriginalEnvelope
+									.getCoordinateReferenceSystem(), crs);
 					if (!transform.isIdentity()) {
-						requestedOriginalEnvelope = CRSUtilities.transform(
-								transform, requestedOriginalEnvelope);
+						requestedOriginalEnvelope = CRS.transform(transform,
+								requestedOriginalEnvelope);
 						requestedOriginalEnvelope
 								.setCoordinateReferenceSystem(this.crs);
 
