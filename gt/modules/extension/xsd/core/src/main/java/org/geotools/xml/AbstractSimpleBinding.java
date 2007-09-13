@@ -34,6 +34,15 @@ public abstract class AbstractSimpleBinding implements SimpleBinding {
     }
 
     /**
+     * Subclasses need to override this method, this implementation returns
+     * <code>null</code>.
+     */
+    public Object parse(InstanceComponent instance, Object value)
+        throws Exception {
+        return null;
+    }
+
+    /**
      * Performs the encoding of the object as a String.
      *
      * @param object The object being encoded, never null.
