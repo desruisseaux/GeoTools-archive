@@ -22,6 +22,7 @@ import org.geotools.factory.Hints;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * This class can be used when a proper {@link Format} cannot be found for some
@@ -91,6 +92,24 @@ public class UnknownFormat extends AbstractGridFormat implements Format {
 	 */
 	public  boolean accepts(Object input) {
 		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.geotools.coverage.grid.io.AbstractGridFormat#getReadParameters()
+	 */
+	public ParameterValueGroup getReadParameters() {
+		throw new UnsupportedOperationException(
+		"Trying to get a reading parameters from an unknown format.");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.geotools.coverage.grid.io.AbstractGridFormat#getWriteParameters()
+	 */
+	public ParameterValueGroup getWriteParameters() {
+		throw new UnsupportedOperationException(
+		"Trying to get a writing parameters from an unknown format.");
 	}
 
 }

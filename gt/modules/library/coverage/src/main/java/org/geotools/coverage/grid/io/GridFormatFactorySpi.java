@@ -52,6 +52,7 @@ import org.opengis.coverage.grid.Format;
  * </p>
  *
  * @author Jody Garnett, Refractions Research
+ * @author Simone Giannecchini, GeoSolutions
  * @source $URL$
  */
 public interface GridFormatFactorySpi extends Factory, OptionalFactory {

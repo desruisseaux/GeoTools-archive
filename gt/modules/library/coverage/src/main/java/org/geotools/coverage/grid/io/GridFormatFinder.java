@@ -50,7 +50,7 @@ import org.opengis.coverage.grid.GridCoverage;
  * <p>
  * Example:<br/><code>org.geotools.data.mytype.MyTypeDataStoreFacotry</code>
  * </p>
- * 
+ * @author Simone Giannecchini, GeoSolutions
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/module/main/src/org/geotools/data/coverage/grid/GridFormatFinder.java $
  */
@@ -80,12 +80,11 @@ public final class GridFormatFinder {
 	public static synchronized Set getAvailableFormats() {
 		// get all GridFormatFactorySpi implementations
 		scanForPlugins();
-		Iterator it = getServiceRegistry().
+		final Iterator it = getServiceRegistry().
 			getServiceProviders(GridFormatFactorySpi.class, true);
-		final Set formats= new HashSet(5);
-		GridFormatFactorySpi spi;
+		final Set formats= new HashSet(5,1.0f);
 		while (it.hasNext()) {
-			spi = (GridFormatFactorySpi) it.next();
+			final GridFormatFactorySpi spi = (GridFormatFactorySpi) it.next();
 			if (spi.isAvailable())
 				formats.add(spi);
 
@@ -140,11 +139,10 @@ public final class GridFormatFinder {
 	 *         implementations.
 	 */
 	public static Format[] getFormatArray() {
-		GridFormatFactorySpi element;
-		Set formats = GridFormatFinder.getAvailableFormats();
-		List formatSet = new ArrayList(formats.size());
+		final Set formats = GridFormatFinder.getAvailableFormats();
+		final List formatSet = new ArrayList(formats.size());
 		for (Iterator iter = formats.iterator(); iter.hasNext();) {
-			element = (GridFormatFactorySpi) iter.next();
+			final GridFormatFactorySpi element = (GridFormatFactorySpi) iter.next();
 			formatSet.add(element.createFormat());
 		}
 		return (Format[]) formatSet.toArray(new Format[formatSet.size()]);
@@ -163,13 +161,11 @@ public final class GridFormatFinder {
 		final Set availaibleFormats = getAvailableFormats();
 		final Set formats=new HashSet();
 		final Iterator it = availaibleFormats.iterator();
-		Format retVal = null;
-		GridFormatFactorySpi spi = null;
 		while (it.hasNext()) {
 			// get the factory
-			spi = (GridFormatFactorySpi) it.next();
+			final GridFormatFactorySpi spi = (GridFormatFactorySpi) it.next();
 			// create a format for it
-			retVal = spi.createFormat();
+			final Format retVal = spi.createFormat();
 			// check if we can accept it
 			if (retVal instanceof AbstractGridFormat) {
 				if (((AbstractGridFormat) retVal).accepts(o))

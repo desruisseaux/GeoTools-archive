@@ -231,7 +231,7 @@ public abstract class AbstractGridFormat implements Format {
 	 * @see org.opengis.coverage.grid.Format#getReadParameters()
 	 */
 	public ParameterValueGroup getReadParameters() {
-		return this.readParameters;
+		return (ParameterValueGroup) this.readParameters.clone();
 	}
 
 	/*
@@ -240,7 +240,7 @@ public abstract class AbstractGridFormat implements Format {
 	 * @see org.opengis.coverage.grid.Format#getWriteParameters()
 	 */
 	public ParameterValueGroup getWriteParameters() {
-		return this.writeParameters;
+		return (ParameterValueGroup) this.writeParameters.clone();
 	}
 
 	/**
