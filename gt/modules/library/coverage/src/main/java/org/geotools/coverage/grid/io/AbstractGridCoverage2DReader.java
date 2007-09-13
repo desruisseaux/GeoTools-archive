@@ -75,7 +75,7 @@ import org.opengis.referencing.operation.TransformException;
  * This really impacts the ability to exploit raster datasets in a desktop
  * environment where caching is crucial.
  * 
- * @author Simone Giannecchini
+ * @author Simone Giannecchini, GeoSolutions
  * @since 2.3
  * @version 0.2
  */
@@ -91,10 +91,6 @@ public abstract class AbstractGridCoverage2DReader implements
 			.getGridCoverageFactory(null);
 
 	protected static final double EPS = 1E-6;
-
-	/** Buffered factory for coordinate operations. */
-	protected final static CoordinateOperationFactory operationFactory = new BufferedCoordinateOperationFactory(
-			new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE));
 
 	/**
 	 * Default color ramp. Preset colors used to generate an Image from the raw
@@ -128,7 +124,7 @@ public abstract class AbstractGridCoverage2DReader implements
 	protected Object source = null;
 
 	/** Hints used by the {@link AbstractGridCoverage2DReader} subclasses. */
-	protected Hints hints = new Hints(new HashMap(5));
+	protected Hints hints = new Hints(new HashMap(5,1.0f));
 
 	/**
 	 * Highest resolution availaible for this reader.
@@ -597,8 +593,8 @@ public abstract class AbstractGridCoverage2DReader implements
 
 				if (crs != null
 						&& !CRS.equalsIgnoreMetadata(crs, crs2D)) {
-					final MathTransform tr = operationFactory.createOperation(
-							crs2D, crs).getMathTransform();
+					final MathTransform tr = CRS.findMathTransform(
+							crs2D, crs);
 					if (!tr.isIdentity())
 						envelope = CRS.transform(tr, envelope);
 				}
