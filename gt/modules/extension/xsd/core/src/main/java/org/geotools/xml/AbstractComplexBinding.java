@@ -48,6 +48,15 @@ public abstract class AbstractComplexBinding implements ComplexBinding {
     }
 
     /**
+     * Subclasses should override this method, the default implementation
+     * return <code>null</code>.
+     */
+    public Object parse(ElementInstance instance, Node node, Object value)
+        throws Exception {
+        return null;
+    }
+
+    /**
      * Subclasses should ovverride this method if need be, the default implementation
      * returns <param>value</param>.
      *
