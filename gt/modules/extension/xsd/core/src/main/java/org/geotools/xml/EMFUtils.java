@@ -102,6 +102,14 @@ public class EMFUtils {
      * <code>false</code>
      */
     public static boolean isCollection(EObject eobject, String property) {
+        Object o = get(eobject, property);
+
+        //first check the actual value
+        if (o != null) {
+            return o instanceof Collection;
+        }
+
+        //value was null, try checking the class
         EStructuralFeature feature = feature(eobject, property);
 
         if (feature == null) {
