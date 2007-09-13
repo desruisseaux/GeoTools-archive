@@ -584,8 +584,9 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		//
 		// /////////////////////////////////////////////////////////////////////
 		final ReferencedEnvelope intersectionJTSEnvelope = new ReferencedEnvelope(
-			intersectionEnvelope.getMinimum(0), intersectionEnvelope.getMaximum(0), 
-			intersectionEnvelope.getMinimum(1), intersectionEnvelope.getMaximum(1), crs);
+				intersectionEnvelope.getMinimum(0), intersectionEnvelope
+						.getMaximum(0), intersectionEnvelope.getMinimum(1),
+				intersectionEnvelope.getMaximum(1), crs);
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -1224,16 +1225,18 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				gridToEnvelopeMapper.setGridType(PixelInCell.CELL_CORNER);
 				final MathTransform transform = gridToEnvelopeMapper
 						.createTransform().inverse();
-				final GeneralGridRange finalRange = new GeneralGridRange(
-						CRSUtilities.transform(transform, intersection));
+				final GeneralGridRange finalRange = new GeneralGridRange(CRS
+						.transform(transform, intersection));
 				// CROP
 				finalLayout.intersect(new Area(finalRange.toRectangle()));
-				Rectangle tempRect = finalLayout.getBounds();
-
+				final Rectangle tempRect = finalLayout.getBounds();
 				preparationImage = JAI.create("Mosaic", pbjMosaic,
 						new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
 								new ImageLayout(tempRect.x, tempRect.y,
-										tempRect.width, tempRect.height)));
+										tempRect.width, tempRect.height, 0, 0,
+										JAI.getDefaultTileSize().width, JAI
+												.getDefaultTileSize().height,
+										null, null)));
 
 				finalenvelope = intersection;
 
