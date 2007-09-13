@@ -27,13 +27,13 @@
   <artifactId>gt2-xml-gml3</artifactId>
   <packaging>jar</packaging>
   <name>GML3 XML Support</name>
-  <url>http://maven.geotools.fr/reports/modules/extension/xml-xsd/gml3/</url>
+  <url>http://maven.geotools.fr/reports/modules/extension/xsd/gml3/</url>
   
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/xml-xsd/gml3/
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/xsd/gml3/
     </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/xml-xsd/gml3/</url>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/xsd/gml3/</url>
   </scm>
   
   <description>
@@ -119,7 +119,7 @@
           <schemaLocation>gml.xsd</schemaLocation>
 	  <schemaSourceDirectory>${basedir}/src/main/resources/org/geotools/gml3/bindings</schemaSourceDirectory>
           <schemaLookupDirectories>
-            <schemaLookupDirectory>/home/jdeolive/devel/geotools/trunk/modules/unsupported/xml-xsd/src/main/resources/org/geotools/xlink/bindings/</schemaLookupDirectory>
+            <schemaLookupDirectory>/home/jdeolive/devel/geotools/trunk/modules/unsupported/xsd/src/main/resources/org/geotools/xlink/bindings/</schemaLookupDirectory>
             <schemaLookupDirectory>/home/jdeolive/devel/geotools/trunk/modules/unsupported/xml-gml3/src/main/resources/org/geotools/gml3/bindings/smil</schemaLookupDirectory>
           </schemaLookupDirectories>
           <generateConfiguration>false</generateConfiguration>
