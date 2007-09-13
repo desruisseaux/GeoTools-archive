@@ -21,6 +21,7 @@ import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.defaults.DefaultPicoContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.logging.Logger;
@@ -303,5 +304,47 @@ public abstract class XMLTestSupport extends TestCase {
         docFactory.setNamespaceAware(true);
 
         document = docFactory.newDocumentBuilder().parse(new ByteArrayInputStream(xml.getBytes()));
+    }
+
+    /**
+     * Convenience method for finding a node in a document which matches the
+     * specified name.
+     *
+     */
+    protected Element getElementByQName(Document dom, QName name) {
+        return getElementByQName(dom.getDocumentElement(), name);
+    }
+
+    /**
+     * Convenience method for finding a single descendant of a particular node
+     * which matches the specified name.
+     *
+     */
+    protected Element getElementByQName(Element parent, QName name) {
+        NodeList nodes = parent.getElementsByTagNameNS(name.getNamespaceURI(), name.getLocalPart());
+
+        if (nodes.getLength() == 0) {
+            return null;
+        }
+
+        return (Element) nodes.item(0);
+    }
+
+    /**
+     * Convenience method for finding nodes in a document which matche the
+     * specified name.
+     *
+     */
+    protected NodeList getElementsByQName(Document dom, QName name) {
+        return getElementsByQName(dom.getDocumentElement(), name);
+    }
+
+    /**
+     * Convenience method for finding decendants of a particular node which match
+     * the specified name.
+     *
+     */
+    protected NodeList getElementsByQName(Element parent, QName name) {
+        return parent.getElementsByTagNameNS(name.getNamespaceURI(), name.getLocalPart());
     }
 }
