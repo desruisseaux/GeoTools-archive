@@ -60,16 +60,18 @@ import org.geotools.gce.imageio.asciigrid.AsciiGridsImageMetadata;
 import org.geotools.gce.imageio.asciigrid.spi.AsciiGridsImageReaderSpi;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.Parameter;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.util.NumberRange;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.geometry.Envelope;
-import org.opengis.geometry.MismatchedDimensionException;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -518,15 +520,26 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 			//
 			// ///////////////////////////////////////////////////////////////////
 			Unit uom = null;
-			final Category values = new Category("values", demColors,
-					new NumberRange(1, 255), new NumberRange(0, 8849));
 			final Category nan;
-			if (Double.isNaN(inNoData))
-				nan = new Category("No Data", new Color(0, 0, 0, 0), 0);
-			else
-				nan = new Category("No Data", new Color[] { new Color(0, 0, 0,
-						0) }, new NumberRange(0, 0), new NumberRange(inNoData,
-						inNoData));
+			final Category values;
+			if (Double.isNaN(inNoData)) {
+				nan = new Category(Vocabulary
+						.formatInternational(VocabularyKeys.NODATA), new Color(
+						0, 0, 0, 0), 0);
+				values = new Category("values", demColors, new NumberRange(1,
+						255), new NumberRange(0, 9000));
+
+			} else {
+				nan = new Category(Vocabulary
+						.formatInternational(VocabularyKeys.NODATA),
+						new Color[] { new Color(0, 0, 0, 0) }, new NumberRange(
+								0, 0), new NumberRange(inNoData, inNoData));
+				values = new Category("values", demColors, new NumberRange(1,
+						255), new NumberRange(inNoData + Math.abs(inNoData)
+						* 0.1, inNoData + Math.abs(inNoData) * 10));
+
+			}
+
 
 			//
 			// ///////////////////////////////////////////////////////////////////
