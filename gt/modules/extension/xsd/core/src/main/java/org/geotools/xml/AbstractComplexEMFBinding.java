@@ -92,14 +92,13 @@ public abstract class AbstractComplexEMFBinding extends AbstractComplexBinding {
             for (Iterator c = node.getChildren().iterator(); c.hasNext();) {
                 Node child = (Node) c.next();
                 String property = child.getComponent().getName();
+                setProperty(eObject, property, child.getValue());
+            }
 
-                if (EMFUtils.has(eObject, property)) {
-                    if (EMFUtils.isCollection(eObject, property)) {
-                        EMFUtils.add(eObject, property, child.getValue());
-                    } else {
-                        EMFUtils.set(eObject, property, child.getValue());
-                    }
-                }
+            for (Iterator a = node.getAttributes().iterator(); a.hasNext();) {
+                Node att = (Node) a.next();
+                String property = att.getComponent().getName();
+                setProperty(eObject, property, att.getValue());
             }
 
             return eObject;
@@ -107,6 +106,22 @@ public abstract class AbstractComplexEMFBinding extends AbstractComplexBinding {
 
         //could not do it, just return whatever was passed in
         return value;
+    }
+
+    /**
+     * Internal method for reflectively setting the property of an eobject.
+     * <p>
+     * Subclasses may override.
+     * </p>
+     */
+    protected void setProperty(EObject eObject, String property, Object value) {
+        if (EMFUtils.has(eObject, property)) {
+            if (EMFUtils.isCollection(eObject, property)) {
+                EMFUtils.add(eObject, property, value);
+            } else {
+                EMFUtils.set(eObject, property, value);
+            }
+        }
     }
 
     /**
