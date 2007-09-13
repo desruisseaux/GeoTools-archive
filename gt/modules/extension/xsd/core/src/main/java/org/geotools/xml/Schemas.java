@@ -593,8 +593,9 @@ public class Schemas {
                     //enque all particles in the group
                     List parts = grp.getParticles();
 
-                    for (Iterator itr = parts.iterator(); itr.hasNext();) {
-                        queue.addLast(itr.next());
+                    //add in reverse order to front of queue to maintain order
+                    for (int i = parts.size() - 1; i >= 0; i--) {
+                        queue.addFirst(parts.get(i));
                     }
                 }
             }
