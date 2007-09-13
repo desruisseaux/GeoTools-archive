@@ -16,6 +16,7 @@
 package org.geotools.xml.impl;
 
 import org.eclipse.xsd.XSDNamedComponent;
+import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 import org.geotools.xml.Binding;
 import org.geotools.xml.ComplexBinding;
@@ -29,6 +30,11 @@ import org.geotools.xml.ComplexBinding;
  *
  */
 public class GetPropertyExecutor implements BindingWalker.Visitor {
+    /**
+     * logger
+     */
+    static Logger LOGGER = Logger.getLogger("org.geotools.xml");
+
     /** parent + child objects **/
     Object parent;
     Object child;
@@ -54,6 +60,16 @@ public class GetPropertyExecutor implements BindingWalker.Visitor {
 
         if (binding instanceof ComplexBinding) {
             ComplexBinding complex = (ComplexBinding) binding;
+
+            if (binding.getType() == null) {
+                LOGGER.warning("Binding for: " + binding.getTarget() + " does not declare type");
+            }
+            if (binding.getType() != null && 
+                    !binding.getType().isAssignableFrom(parent.getClass())) {
+                //TODO: try to convert?
+                LOGGER.warning(parent + " (" + parent.getClass().getName() + ") "
+                    + " is not of type " + parent.getClass().getName());
+            }
 
             try {
                 child = complex.getProperty(parent, name);
