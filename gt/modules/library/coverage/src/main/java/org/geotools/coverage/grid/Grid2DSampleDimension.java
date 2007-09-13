@@ -339,7 +339,7 @@ final class Grid2DSampleDimension extends GridSampleDimension {
             } else {
                 categories[0] = new Category(n, c, targetRange, LinearTransform1D.IDENTITY);
             }
-            dst[b] = new GridSampleDimension(categories, units).geophysics(true);
+            dst[b] = new GridSampleDimension(name,categories, units).geophysics(true);
         }
     }
 
