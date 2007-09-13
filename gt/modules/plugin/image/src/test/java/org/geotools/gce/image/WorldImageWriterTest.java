@@ -148,13 +148,13 @@ public class WorldImageWriterTest extends WorldImageBaseTestCase {
 
 		// writing parameters for png
 		final Format writerFormat = wiWriter.getFormat();
-		writerFormat.getWriteParameters().parameter("Format").setValue(format);
+		
 
 		// setting write parameters
-		ParameterValueGroup params = wiWriter.getFormat().getWriteParameters();
+		final ParameterValueGroup params = writerFormat.getWriteParameters();
 		params.parameter(WorldImageFormat.FORMAT.getName().toString())
 				.setValue(format);
-		GeneralParameterValue[] gpv = { params
+		final GeneralParameterValue[] gpv = { params
 				.parameter(WorldImageFormat.FORMAT.getName().toString()) };
 		// writing
 		wiWriter.write(coverage, gpv);
@@ -171,7 +171,7 @@ public class WorldImageWriterTest extends WorldImageBaseTestCase {
 		else
 			coverage.getRenderedImage().getData();
 		wiReader.dispose();
-        coverage.dispose();
+        coverage.dispose(true);
 	}
 
     

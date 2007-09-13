@@ -298,7 +298,7 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 	 */
 	public static Set getWorldExtension(String fileExtension) {
 		if (fileExtension == null) {
-			return null;
+			throw new NullPointerException("Provided input is null");
 		}
 
 		if (fileExtension.equalsIgnoreCase("png")) {
@@ -323,7 +323,7 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 			return BMP_WFILE_EXT;
 		}
 
-		return null;
+		throw new IllegalArgumentException("Unsupported file format");
 	}
 
 	/**

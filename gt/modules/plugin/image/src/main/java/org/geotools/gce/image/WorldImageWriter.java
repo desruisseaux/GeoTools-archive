@@ -300,8 +300,7 @@ public final class WorldImageWriter extends AbstractGridCoverageWriter
 		// ////////////////////////////////////////////////////////////////////
 		final StringBuffer buff = new StringBuffer(baseFile);
 //		 looking for another extension
-		final Set ext=WorldImageFormat.getWorldExtension(format
-				.getWriteParameters().parameter("format").stringValue());
+		final Set ext=WorldImageFormat.getWorldExtension(extension);
 		final Iterator it=ext.iterator();
 		if(!it.hasNext())
 			throw new DataSourceException("Unable to parse extension "+extension);
