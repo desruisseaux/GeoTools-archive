@@ -28,7 +28,6 @@ import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -261,60 +260,71 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 	 * geographic extent and overviews.
 	 * 
 	 * @param sourceFile
-	 * @throws IOException
+	 * @throws IOException 
 	 * @throws FileNotFoundException
 	 */
-	private void parseMainFile(final File sourceFile) throws IOException,
-			FileNotFoundException {
-		final Properties properties = new Properties();
-		properties
-				.load(new BufferedInputStream(new FileInputStream(sourceFile)));
+	private void parseMainFile(final File sourceFile) throws IOException {
+		BufferedInputStream propertyStream = null;
+		try {
+			propertyStream = new BufferedInputStream(
+			new FileInputStream(sourceFile));
+			final Properties properties = new Properties();
+			properties.load(propertyStream);
 
-		// load the envelope
-		final String envelope = properties.getProperty("Envelope2D");
-		String[] pairs = envelope.split(" ");
-		final double cornersV[][] = new double[2][2];
-		String pair[];
-		for (int i = 0; i < 2; i++) {
-			pair = pairs[i].split(",");
-			cornersV[i][0] = Double.parseDouble(pair[0]);
-			cornersV[i][1] = Double.parseDouble(pair[1]);
+			// load the envelope
+			final String envelope = properties.getProperty("Envelope2D");
+			String[] pairs = envelope.split(" ");
+			final double cornersV[][] = new double[2][2];
+			String pair[];
+			for (int i = 0; i < 2; i++) {
+				pair = pairs[i].split(",");
+				cornersV[i][0] = Double.parseDouble(pair[0]);
+				cornersV[i][1] = Double.parseDouble(pair[1]);
+			}
+			this.originalEnvelope = new GeneralEnvelope(cornersV[0],
+					cornersV[1]);
+			this.originalEnvelope.setCoordinateReferenceSystem(crs);
+			// overviews dir
+			numOverviews = Integer
+					.parseInt(properties.getProperty("LevelsNum")) - 1;
+			levelsDirs = properties.getProperty("LevelsDirs").split(" ");
+
+			// readers soft map
+			final int readersCacheSize = (numOverviews + 1) / 3;
+			readers = new SoftValueHashMap(
+					readersCacheSize == 0 ? numOverviews + 1 : readersCacheSize);
+
+			// resolutions levels
+			final String levels = properties.getProperty("Levels");
+			pairs = levels.split(" ");
+			overViewResolutions = numOverviews >= 1 ? new double[numOverviews][2]
+					: null;
+			pair = pairs[0].split(",");
+			highestRes = new double[2];
+			highestRes[0] = Double.parseDouble(pair[0]);
+			highestRes[1] = Double.parseDouble(pair[1]);
+			for (int i = 1; i < numOverviews + 1; i++) {
+				pair = pairs[i].split(",");
+				overViewResolutions[i - 1][0] = Double.parseDouble(pair[0]);
+				overViewResolutions[i - 1][1] = Double.parseDouble(pair[1]);
+			}
+
+			// name
+			coverageName = properties.getProperty("Name");
+
+			// original gridrange (estimated)
+			originalGridRange = new GeneralGridRange(new Rectangle((int) Math
+					.round(originalEnvelope.getLength(0) / highestRes[0]),
+					(int) Math.round(originalEnvelope.getLength(1)
+							/ highestRes[1])));
+		} catch (IOException e) {
+			//close input stream
+			if(propertyStream!=null)
+				propertyStream.close();
+			//re-throw exception
+			throw e;
 		}
-		this.originalEnvelope = new GeneralEnvelope(cornersV[0], cornersV[1]);
-		this.originalEnvelope.setCoordinateReferenceSystem(crs);
-		// overviews dir
-		numOverviews = Integer.parseInt(properties.getProperty("LevelsNum")) - 1;
-		levelsDirs = properties.getProperty("LevelsDirs").split(" ");
 
-		// readers soft map
-		final int readersCacheSize = (numOverviews + 1) / 3;
-		readers = Collections.synchronizedMap(new SoftValueHashMap(
-				readersCacheSize == 0 ? numOverviews + 1 : readersCacheSize));
-
-		// resolutions levels
-		final String levels = properties.getProperty("Levels");
-		pairs = levels.split(" ");
-		overViewResolutions = numOverviews > 1 ? new double[numOverviews][2]
-				: null;
-		pair = pairs[0].split(",");
-		highestRes = new double[2];
-		highestRes[0] = Double.parseDouble(pair[0]);
-		highestRes[1] = Double.parseDouble(pair[1]);
-		for (int i = 1; i < numOverviews + 1; i++) {
-			pair = pairs[i].split(",");
-			overViewResolutions[i - 1][0] = Double.parseDouble(pair[0]);
-			overViewResolutions[i - 1][1] = Double.parseDouble(pair[1]);
-		}
-
-		// name
-		coverageName = properties.getProperty("Name");
-
-		// original gridrange (estimated)
-		originalGridRange = new GeneralGridRange(
-				new Rectangle((int) Math.round(originalEnvelope.getLength(0)
-						/ highestRes[0]), (int) Math.round(originalEnvelope
-						.getLength(1)
-						/ highestRes[1])));
 	}
 
 	/**
@@ -522,7 +532,7 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 	 * 
 	 * @see org.opengis.coverage.grid.GridCoverageReader#dispose()
 	 */
-	public void dispose()  {
+	public void dispose() {
 		super.dispose();
 		readers.clear();
 

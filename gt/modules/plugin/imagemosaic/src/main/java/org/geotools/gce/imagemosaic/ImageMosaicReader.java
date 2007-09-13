@@ -338,7 +338,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		numOverviews = Integer.parseInt(properties.getProperty("LevelsNum")) - 1;
 		final String levels = properties.getProperty("Levels");
 		pairs = levels.split(" ");
-		overViewResolutions = numOverviews > 1 ? new double[numOverviews][2]
+		overViewResolutions = numOverviews >= 1 ? new double[numOverviews][2]
 				: null;
 		pair = pairs[0].split(",");
 		highestRes = new double[2];

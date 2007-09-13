@@ -206,10 +206,14 @@ public final class ImagePyramidFormat extends AbstractGridFormat implements
 			// ///////////////////////////////////////////////////////////////////
 			// property file
 			final Properties properties = new Properties();
+			BufferedInputStream propertyStream = null;
 			try {
-				properties.load(new BufferedInputStream(new FileInputStream(
-						sourceFile)));
+				propertyStream = new BufferedInputStream(
+				new FileInputStream(sourceFile));
+				properties.load(propertyStream);
 			} catch (Exception e) {
+				if(propertyStream!=null)
+					propertyStream.close();
 				return false;
 			}
 
