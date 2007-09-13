@@ -57,19 +57,19 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-example</artifactId>
+  <artifactId>widgets-swing-pending</artifactId>
   <packaging>jar</packaging>
-  <name>Example</name>
-  <url>http://maven.geotools.fr/reports/example/</url>
+  <name>widgets-swing-pending</name>
+  <url>http://docs.codehaus.org/display/GEOTOOLS/widgets-swing-pending/</url>
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/unsupported/example/
+      scm:http://docs.codehaus.org/display/GEOTOOLS/widgets-swing-pending/
     </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/unsupported/example/</url>
+    <url>http://svn.geotools.org/geotools/trunk/gt/unsupported/widgets-swing-pending/</url>
   </scm>
   
   <description>
-    Supply a quick description here.
+     Swing widgets, coming from project AlterSIG. Will be added in module swing widgets once cleaned up.
   </description>
   
   <organization>
@@ -78,7 +78,7 @@
   </organization>
   
   <!-- for your project. -->
-  <inceptionYear></inceptionYear>
+  <inceptionYear>2007</inceptionYear>
 
   <!-- Pick your license. -->
   <!--
@@ -97,10 +97,10 @@
   <!-- =========================================================== -->
   <developers>
     <developer>
-      <id>YOURID</id>
-      <name>YOUR NAME</name>
-      <email>you@server.org</email>
-      <organization>University, Organization or Company</organization>
+      <id>johann.sorel</id>
+      <name>Johann Sorel</name>
+      <email>sorel.johann@inbox.com</email>
+      <organization></organization>
       <roles>
         <role>Module Maintainer</role>
         <role>Java Developer</role>
