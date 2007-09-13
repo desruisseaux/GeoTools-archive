@@ -5,15 +5,20 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.project.MavenProject;
@@ -21,6 +26,7 @@ import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.eclipse.xsd.util.XSDSchemaLocator;
 import org.geotools.xml.Schemas;
+import org.geotools.xml.XSD;
 
 /**
  * Generates the bindings and utility classes used to parse xml documents 
@@ -121,6 +127,20 @@ public abstract class AbstractGeneratorMojo extends AbstractMojo {
      */
     ArtifactResolver artifactResolver;
     
+    /**
+     * @component
+     */
+    ArtifactMetadataSource artifactMetadataSource;
+    
+    /**
+     * The classpath elements of the project.
+     *
+     * @parameter expression="${project.runtimeClasspathElements}"
+     * @required
+     * @readonly
+     */
+    List classpathElements; 
+    
     protected XSDSchema schema() {
     
     	getLog().info( artifactFactory.toString() );
@@ -145,31 +165,40 @@ public abstract class AbstractGeneratorMojo extends AbstractMojo {
 		List artifacts = new ArrayList();
 		artifacts.add( 
 			artifactFactory.createArtifact( 
-				"org.geotools", "gt2-xml-gml2", project.getVersion(), null, "jar"
+				"org.geotools", "gt2-xml-gml2", project.getVersion(), "compile", "jar"
 			) 
 		);
 		artifacts.add( 
 			artifactFactory.createArtifact( 
-				"org.geotools", "gt2-xml-gml3", project.getVersion(), null, "jar"
+				"org.geotools", "gt2-xml-gml3", project.getVersion(), "compile", "jar"
 			) 
 		);
 		artifacts.add( 
 			artifactFactory.createArtifact( 
-				"org.geotools", "gt2-xml-filter", project.getVersion(), null, "jar"
+				"org.geotools", "gt2-xml-filter", project.getVersion(), "compile", "jar"
 			) 
 		);
 		artifacts.add( 
 			artifactFactory.createArtifact( 
-				"org.geotools", "gt2-xml-sld", project.getVersion(), null, "jar"
+				"org.geotools", "gt2-xml-sld", project.getVersion(), "compile", "jar"
 			) 
 		);
 	
-		List urls = new ArrayList();
+		Set urls = new HashSet();
 		for ( Iterator a = artifacts.iterator(); a.hasNext(); ) {
 			Artifact artifact = (Artifact) a.next();
+			
 			try {
-				artifactResolver.resolve( artifact, remoteRepositories, localRepository );
-				urls.add( artifact.getFile().toURL() );
+			    Set resolvedArtifacts = project.createArtifacts( artifactFactory, null, null);
+			    //artifactResolver.resolve( artifact, remoteRepositories, localRepository );
+				ArtifactResolutionResult result = artifactResolver.resolveTransitively(resolvedArtifacts, artifact, remoteRepositories, localRepository, artifactMetadataSource);
+				resolvedArtifacts = result.getArtifacts();
+				
+				for ( Iterator ra = resolvedArtifacts.iterator(); ra.hasNext(); ) {
+				    Artifact resolvedArtifact = (Artifact) ra.next();
+				    urls.add( resolvedArtifact.getFile().toURL() );    
+				}
+				
 			} 
 			catch( Exception e ) {
 				getLog().warn( "Unable to resolve " + artifact.getId() );
@@ -181,25 +210,51 @@ public abstract class AbstractGeneratorMojo extends AbstractMojo {
 	
 		//use extended classloader to load up configuration classes to load schema files
 		// with
-		final List resolvers = new ArrayList();
-		resolvers.add( "org.geotools.xlink.bindings.XLINKSchemaLocationResolver" );
-		resolvers.add( "org.geotools.gml2.bindings.GMLSchemaLocationResolver" );
-		resolvers.add( "org.geotools.gml3.bindings.GMLSchemaLocationResolver" );
-		resolvers.add( "org.geotools.gml3.bindings.smil.SMIL20SchemaLocationResolver" );
-		resolvers.add( "org.geotools.filter.v1_0.OGCSchemaLocationResolver" );
-		resolvers.add( "org.geotools.filter.v1_1.OGCSchemaLocationResolver" );
+		final List xsds = new ArrayList();
+		xsds.add( "org.geotools.xlink.XLINK" );
+		xsds.add( "org.geotools.gml2.GML" );
+		xsds.add( "org.geotools.gml3.GML" );
+		xsds.add( "org.geotools.filter.v1_0.OGC" );
+		xsds.add( "org.geotools.filter.v1_1.OGC" );
 		
-		for ( int i = 0; i < resolvers.size(); i++ ) {
-			String className = (String) resolvers.get( i );
+		for ( int i = 0; i < xsds.size(); i++ ) {
+			String className = (String) xsds.get( i );
 			try {
 				Class clazz = ext.loadClass( className );
-				resolvers.set( i, clazz );
+				Method m = clazz.getMethod("getInstance", null);
+				Object xsd = m.invoke(null, null);
+				xsds.set( i, xsd );
 			} 
-			catch (ClassNotFoundException e) {
-				getLog().debug( "Unable to load " + className );
-				resolvers.set( i , null );
+			catch (Exception e) {
+				getLog().warn( "Unable to load " + className);
+				getLog().debug(e);
+				xsds.set( i , null );
 			}
 		}
+		
+		//add a schema locator which uses the xsd objects to get at the schemas
+		XSDSchemaLocator locator = new XSDSchemaLocator() {
+
+            public XSDSchema locateSchema(XSDSchema schema, String namespaceURI,
+                String rawSchemaLocationURI, String resolvedSchemaLocationURI) {
+                
+                for ( Iterator x = xsds.iterator(); x.hasNext(); ) {
+                    XSD xsd = (XSD) x.next();
+                    if ( xsd.getNamespaceURI().equals( namespaceURI ) ) {
+                        try {
+                            return xsd.getSchema();
+                        } 
+                        catch (IOException e) {
+                            getLog().warn("Error occured locating schema: " + namespaceURI, e);
+                        }
+                    }
+                }
+             
+                getLog().warn( "Could not locate schema for: " + namespaceURI );
+                return null;
+            }
+		    
+		};
 		
 		//add a location resolver which checks the schema source directory
 		XSDSchemaLocationResolver locationResolver = new XSDSchemaLocationResolver() {
@@ -237,45 +292,6 @@ public abstract class AbstractGeneratorMojo extends AbstractMojo {
 					}
 				}
 				
-				//check for well known 
-				for ( Iterator i = resolvers.iterator(); i.hasNext(); ) {
-					Class configClass = (Class) i.next();
-					if ( configClass == null ) {
-						continue;
-					}
-					
-					if ( configClass.getResource( fileName ) != null ) {
-						//copy stream to a temp file
-						try {
-							file = File.createTempFile( "xmlcodegen", "xsd" );
-							file.deleteOnExit();
-							
-							getLog().debug( "Copying " + configClass.getResource( fileName ) + " " + file );
-							
-							BufferedOutputStream output = 
-								new BufferedOutputStream( new FileOutputStream ( file ) );
-							InputStream input = configClass.getResourceAsStream( fileName );
-							
-							int b = -1;
-							while ( ( b = input.read() ) != -1 ) {
-								output.write( b );
-							}
-							
-							input.close();
-							output.close();
-							
-							getLog().debug( "Resolving " + schemaLocation + " to " + file.getAbsolutePath() );
-							return file.getAbsolutePath();
-							
-						} 
-						catch (IOException e) {
-							getLog().debug( e );
-							continue;
-						}
-						
-					}
-				}
-				
 				getLog().warn( "Could not resolve location for: " + fileName );
 				return null;
 			}
@@ -289,7 +305,7 @@ public abstract class AbstractGeneratorMojo extends AbstractMojo {
 			xsdSchema = 
 				Schemas.parse( 
 					schemaLocation.getAbsolutePath(),
-					(XSDSchemaLocator[]) null, new XSDSchemaLocationResolver[]{ locationResolver }
+					new XSDSchemaLocator[]{ locator } , new XSDSchemaLocationResolver[]{ locationResolver }
 				);
 			
 			if ( xsdSchema == null ) {

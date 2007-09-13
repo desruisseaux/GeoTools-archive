@@ -9,7 +9,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.eclipse.xsd.XSDSchema;
@@ -59,7 +63,12 @@ public class BindingGeneratorMojo extends AbstractGeneratorMojo {
     boolean generateTypeBindings;
 	
     /**
-     * List of constructor arguments that should be supplied to generated bindings
+     * List of constructor arguments that should be supplied to generated bindings.
+     * Each argument is a 'name','type','mode' triplet. 'name' and 'type' declare 
+     * the name and class of the argument respectivley. 'mode' can be set to 
+     * "member", or "parent". If set to "member" the argument will be set to a 
+     * member of the binding. If set to "parent" the argument will passed through
+     * to the call to the super constructor. The default is "member"
      * 
      * @parameter
      */
@@ -69,18 +78,18 @@ public class BindingGeneratorMojo extends AbstractGeneratorMojo {
      * The base class for complex bindings. If unspecified {@link org.geotools.xml.AbstractComplexBinding}
      * is used.
      * 
-     * @parameter default="org.geotools.xml.AbstractComplexBinding"
+     * @parameter expression="org.geotools.xml.AbstractComplexBinding"
      * 
      */
-    Class complexBindingBaseClass;
+    String complexBindingBaseClass;
     
     /**
      * The base class for simple bindings. If unspecified {@link org.geotools.xml.AbstractSimpleBinding}
      * is used.
      * 
-     * @parameter default="org.geotools.xml.AbstractSimpleBinding"
+     * @parameter expression="org.geotools.xml.AbstractSimpleBinding"
      */
-    Class simpleBindingBaseClass;
+    String simpleBindingBaseClass;
     
     public void execute() throws MojoExecutionException, MojoFailureException {
 		
@@ -98,6 +107,23 @@ public class BindingGeneratorMojo extends AbstractGeneratorMojo {
 		generator.setLocation( outputDirectory.getAbsolutePath() );
 		generator.setSchemaSourceDirectory(schemaSourceDirectory);
 		
+		try {
+		    Class c = Class.forName(complexBindingBaseClass);
+		    generator.setComplexBindingBaseClass(c);
+		}
+		catch( ClassNotFoundException e ) {
+		    getLog().error("Could not load class: " + complexBindingBaseClass);
+		    return;
+		}
+		try {
+            Class c = Class.forName(simpleBindingBaseClass);
+            generator.setSimpleBindingBaseClass(c);
+        }
+        catch( ClassNotFoundException e ) {
+            getLog().error("Could not load class: " + simpleBindingBaseClass);
+            return;
+        }
+		
 		if ( schemaLookupDirectories != null ) {
 		    generator.setSchemaLookupDirectories(schemaLookupDirectories);
 		}
@@ -107,8 +133,10 @@ public class BindingGeneratorMojo extends AbstractGeneratorMojo {
 		}
 		
 		//list of urls to use as class loading locations
-		List urls = new ArrayList();
+		Set urls = new HashSet();
+		
 		try {
+		    //get the ones from the project
 			List l = project.getCompileClasspathElements();
 			for ( Iterator i = l.iterator(); i.hasNext(); ) {
 				String element = (String) i.next();
@@ -118,6 +146,29 @@ public class BindingGeneratorMojo extends AbstractGeneratorMojo {
 					urls.add( d.toURL() );
 				}
 			}
+			
+			//get the ones from project dependencies
+			List d = project.getDependencies();
+			
+			for ( Iterator i = d.iterator(); i.hasNext(); ) {
+			    Dependency dep = (Dependency) i.next();
+			    if ( "jar".equals( dep.getType() ) ) {
+			        Artifact artifact = artifactFactory.createArtifact( 
+	                    dep.getGroupId(), dep.getArtifactId(), dep.getVersion(), 
+	                    dep.getScope(), dep.getType()
+	                );
+			        Set artifacts = project.createArtifacts( artifactFactory, null, null);
+			        ArtifactResolutionResult result = 
+			            artifactResolver.resolveTransitively(artifacts, artifact, remoteRepositories, localRepository, artifactMetadataSource);
+			        artifacts = result.getArtifacts();
+			        for ( Iterator a = artifacts.iterator(); a.hasNext(); ) {
+			            Artifact dartifact = (Artifact) a.next();
+			            urls.add(dartifact.getFile().toURL());
+			        }
+			        
+			    }
+			}
+			
 		} catch (Exception e) {
 			getLog().error( e );
 			return;
@@ -130,19 +181,16 @@ public class BindingGeneratorMojo extends AbstractGeneratorMojo {
 			for ( int i = 0; i < bindingConstructorArguments.length; i++) {
 				String name = bindingConstructorArguments[i].getName();
 				String type = bindingConstructorArguments[i].getType();
-				Class clazz = null;
 				
 				try {
-					clazz = cl.loadClass( type );
+				    bindingConstructorArguments[i].clazz = cl.loadClass( type );
 				} catch (ClassNotFoundException e) {
 					getLog().error( "Could not locate class:" + type );
 					return;
 				}
-				
-				map.put( name, clazz );
 			}
 			
-			generator.setBindingConstructorArguments( map );
+			generator.setBindingConstructorArguments( bindingConstructorArguments );
 		}
 		
 		if ( includes != null && includes.length > 0 ) {

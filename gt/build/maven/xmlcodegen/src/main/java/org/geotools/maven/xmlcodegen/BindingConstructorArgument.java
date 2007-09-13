@@ -8,9 +8,13 @@ package org.geotools.maven.xmlcodegen;
  */
 public class BindingConstructorArgument {
 
-	String name;
+    String name;
 	
 	String type;
+	
+	String mode = "member";
+	
+	public Class clazz;
 	
 	public void setName(String name) {
 		this.name = name;
@@ -27,4 +31,12 @@ public class BindingConstructorArgument {
 	public String getType() {
 		return type;
 	}
+	
+	public String getMode() {
+        return mode;
+    }
+	
+	public void setMode(String mode) {
+        this.mode = mode;
+    }
 }

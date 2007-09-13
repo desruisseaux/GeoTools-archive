@@ -25,6 +25,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.xsd.XSDAttributeDeclaration;
+import org.eclipse.xsd.XSDComplexTypeContent;
+import org.eclipse.xsd.XSDComplexTypeDefinition;
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDInclude;
 import org.eclipse.xsd.XSDNamedComponent;
@@ -59,15 +61,13 @@ public class BindingGenerator extends AbstractGenerator {
     boolean generateElements = true;
     boolean generateTypes = true;
     boolean generateConfiguration = true;
+    Class complexBindingBaseClass;
+    Class simpleBindingBaseClass;
     
-    /**
-     * Map of string, class which define the name and type of binding constructor
-     * arguments.
-     */
-    Map/*<String,Class>*/ bindingConstructorArguments;
+    BindingConstructorArgument[] bindingConstructorArguments;
     
     public void setBindingConstructorArguments(
-        Map bindingConstructorArguments) {
+            BindingConstructorArgument[] bindingConstructorArguments ) {
         this.bindingConstructorArguments = bindingConstructorArguments;
     }
 
@@ -92,6 +92,14 @@ public class BindingGenerator extends AbstractGenerator {
         this.generateConfiguration = generateConfiguration;
     }
 
+    public void setComplexBindingBaseClass(Class complexBindingBaseClass) {
+        this.complexBindingBaseClass = complexBindingBaseClass;
+    }
+    
+    public void setSimpleBindingBaseClass(Class simpleBindingBaseClass) {
+        this.simpleBindingBaseClass = simpleBindingBaseClass;
+    }
+    
     public void generate(XSDSchema schema) {
         List components = new ArrayList();
 
@@ -220,10 +228,15 @@ public class BindingGenerator extends AbstractGenerator {
         	return;
         }
         
+        Class bindingBaseClass = simpleBindingBaseClass;
+        if ( c instanceof XSDComplexTypeDefinition ) {
+            bindingBaseClass = complexBindingBaseClass;
+        }
+        
         logger.info( "Generating binding for " + c.getName() );
         try {
             String result = execute("CLASS",
-                    new Object[] { c, bindingConstructorArguments });
+                    new Object[] { c, bindingConstructorArguments, bindingBaseClass });
             write(result, name(c));
         } catch (Exception ioe) {
             String msg = "Unable to generate binding for " + c;
