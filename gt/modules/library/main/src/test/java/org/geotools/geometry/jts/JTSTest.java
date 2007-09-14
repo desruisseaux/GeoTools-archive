@@ -34,6 +34,7 @@ import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultProjectedCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
+import org.geotools.referencing.operation.projection.PointOutsideEnvelopeException;
 
 // JUnit dependencies
 import junit.framework.Test;
@@ -178,5 +179,29 @@ public class JTSTest extends TestCase {
                                            new Coordinate(1389481.3104009738, 641990.9430108378), crs);
         double realValue = 16451.33114;
         assertEquals(realValue, d, 0.1);
+    }
+    
+    public void testCheckCoordinateRange() throws Exception {
+       DefaultGeographicCRS crs = DefaultGeographicCRS.WGS84;
+       
+       // valid
+       JTS.checkCoordinatesRange(JTS.toGeometry(new Envelope(-10, 10, -10, 10)),crs);
+       
+       // invalid lat
+       try {
+           JTS.checkCoordinatesRange(JTS.toGeometry(new Envelope(-10, 10, -100, 10)), crs);
+           fail("Provided invalid coordinates, yet check did not throw an exception");
+       } catch(PointOutsideEnvelopeException e) {
+           // fine
+       }
+       
+       // invalid lon
+       try {
+           JTS.checkCoordinatesRange(JTS.toGeometry(new Envelope(-190, 10, -10, 10)), crs);
+           fail("Provided invalid coordinates, yet check did not throw an exception");
+       } catch(PointOutsideEnvelopeException e) {
+           // fine
+       }
+       
     }
 }

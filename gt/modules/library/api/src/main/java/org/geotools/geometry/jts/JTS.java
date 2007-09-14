@@ -34,6 +34,7 @@ import com.vividsolutions.jts.geom.Polygon;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.geotools.geometry.Envelope2D;
@@ -42,6 +43,7 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.GeodeticCalculator;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.TransformPathNotFoundException;
+import org.geotools.referencing.operation.projection.PointOutsideEnvelopeException;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.geometry.ShapeUtilities;
@@ -569,5 +571,50 @@ public final class JTS {
                     new Coordinate(e.getMinX(), e.getMaxY()),
                     new Coordinate(e.getMinX(), e.getMinY())
                 }), null);
+    }
+
+    /**
+     * Checks a Geometry coordinates are within the area of validity of the
+     * specified reference system. If a coordinate falls outside the area of
+     * validity a {@link PointOutsideEnvelopeException} is thrown
+     *
+     * @param geom
+     *            the geometry to check
+     * @param the
+     *            crs that defines the are of validity (must not be null)
+     * @throws PointOutsideEnvelopeException
+     * @since 2.4
+     */
+    public static void checkCoordinatesRange(Geometry geom, CoordinateReferenceSystem crs)
+        throws PointOutsideEnvelopeException {
+        // named x,y, but could be anything
+        CoordinateSystemAxis x = crs.getCoordinateSystem().getAxis(0);
+        CoordinateSystemAxis y = crs.getCoordinateSystem().getAxis(1);
+
+        // check if unbounded, many projected systems are, in this case no check
+        // is needed
+        boolean xUnbounded = Double.isInfinite(x.getMinimumValue())
+            && Double.isInfinite(x.getMaximumValue());
+        boolean yUnbounded = Double.isInfinite(y.getMinimumValue())
+            && Double.isInfinite(y.getMaximumValue());
+
+        if (xUnbounded && yUnbounded) {
+            return;
+        }
+
+        // check each coordinate
+        Coordinate[] c = geom.getCoordinates();
+
+        for (int i = 0; i < c.length; i++) {
+            if (!xUnbounded && ((c[i].x < x.getMinimumValue()) || (c[i].x > x.getMaximumValue()))) {
+                throw new PointOutsideEnvelopeException(c[i].x + " outside of ("
+                    + x.getMinimumValue() + "," + x.getMaximumValue() + ")");
+            }
+
+            if (!yUnbounded && ((c[i].y < y.getMinimumValue()) || (c[i].y > y.getMaximumValue()))) {
+                throw new PointOutsideEnvelopeException(c[i].y + " outside of ("
+                    + y.getMinimumValue() + "," + y.getMaximumValue() + ")");
+            }
+        }
     }
 }
