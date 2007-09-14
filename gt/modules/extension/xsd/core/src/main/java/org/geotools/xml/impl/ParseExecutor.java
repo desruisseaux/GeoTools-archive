@@ -15,18 +15,15 @@
  */
 package org.geotools.xml.impl;
 
-import org.eclipse.xsd.XSDAttributeDeclaration;
 import org.eclipse.xsd.XSDComplexTypeDefinition;
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDEnumerationFacet;
 import org.eclipse.xsd.XSDFacet;
 import org.eclipse.xsd.XSDFactory;
-import org.eclipse.xsd.XSDFeature;
 import org.eclipse.xsd.XSDLengthFacet;
 import org.eclipse.xsd.XSDMaxLengthFacet;
 import org.eclipse.xsd.XSDMinLengthFacet;
 import org.eclipse.xsd.XSDNamedComponent;
-import org.eclipse.xsd.XSDSchemaContent;
 import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.eclipse.xsd.XSDTypeDefinition;
 import org.eclipse.xsd.XSDVariety;
@@ -79,8 +76,7 @@ public class ParseExecutor implements Visitor {
         binding = (Binding) context.getComponentInstanceOfType(binding.getClass());
 
         if (binding == null) {
-            context.registerComponentImplementation(bindingClass);
-            binding = (Binding) context.getComponentInstanceOfType(bindingClass);
+            binding = parser.getBindingLoader().loadBinding(bindingClass, context);
         }
 
         //execute the binding
