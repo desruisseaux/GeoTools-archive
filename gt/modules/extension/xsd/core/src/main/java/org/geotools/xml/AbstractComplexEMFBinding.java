@@ -19,11 +19,10 @@ import org.eclipse.emf.ecore.EFactory;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.xsd.XSDTypeDefinition;
-import org.geotools.util.Converters;
-
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import javax.xml.namespace.QName;
+import org.geotools.util.Converters;
 
 
 /**
@@ -104,13 +103,12 @@ public abstract class AbstractComplexEMFBinding extends AbstractComplexBinding {
                 String property = att.getComponent().getName();
                 setProperty(eObject, property, att.getValue());
             }
-            
+
             //check for a complex type with simpleContent, in this case use 
             // the string value (if any) to set the value property
-            if ( instance.getElementDeclaration().getTypeDefinition().getBaseType() 
-                    instanceof XSDTypeDefinition ) {
-                if ( value != null && EMFUtils.has(eObject, "value") ) {
-                    setProperty( eObject, "value", value );
+            if (instance.getElementDeclaration().getTypeDefinition().getBaseType() instanceof XSDTypeDefinition) {
+                if ((value != null) && EMFUtils.has(eObject, "value")) {
+                    setProperty(eObject, "value", value);
                 }
             }
 
@@ -134,23 +132,22 @@ public abstract class AbstractComplexEMFBinding extends AbstractComplexBinding {
                     EMFUtils.add(eObject, property, value);
                 } else {
                     EMFUtils.set(eObject, property, value);
-                }    
-            }
-            catch( ClassCastException e ) {
+                }
+            } catch (ClassCastException e) {
                 //convert to the correct type
                 EStructuralFeature feature = EMFUtils.feature(eObject, property);
                 Class target = feature.getEType().getInstanceClass();
-                if ( value != null && !value.getClass().isAssignableFrom(target)) {
+
+                if ((value != null) && !value.getClass().isAssignableFrom(target)) {
                     //TODO: log this
                     value = Converters.convert(value, target);
                 }
-                
-                if ( value == null ) {
+
+                if (value == null) {
                     //just throw the oringinal exception
                     throw e;
                 }
             }
-            
         }
     }
 
