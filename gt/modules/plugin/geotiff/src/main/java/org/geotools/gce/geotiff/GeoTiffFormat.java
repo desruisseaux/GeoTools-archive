@@ -249,7 +249,7 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 			}
 		}
 		try {
-			return new GeoTiffReader(source, null);
+			return new GeoTiffReader(source, hints);
 		} catch (DataSourceException e) {
 			if (LOGGER.isLoggable(Level.WARNING))
 				LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
