@@ -15,38 +15,89 @@
  */
 package org.geotools.coverage.processing.operation;
 
+import java.awt.Polygon;
 import java.awt.geom.AffineTransform;
+
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.processing.CannotCropException;
 import org.geotools.coverage.processing.Operation2D;
 import org.geotools.factory.Hints;
+import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
-import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.processing.OperationNotFoundException;
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.ParameterValue;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.Envelope;
-
+import org.opengis.metadata.spatial.PixelOrientation;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
- * The crop operation is responsible for selecting geographic subareas of the
- * source coverage.
- *
- * @todo Consider refactoring as a {@code OperationJAI} subclass. We could get ride of the
- *       {@code CroppedGridCoverage2D} class. The main feature to add is the
- *       copy of interpolation and border extender parameters to the hints.
- *
+ * The crop operation is responsible for selecting geographic subarea of the
+ * source coverage. The CoverageCrop operation does not merely wrap the JAI Crop
+ * operation but it goes beyond that as far as capabilities.
+ * 
+ * <p>
+ * The key point is that the CoverageCrop operation aims to perform a spatial
+ * crop, i.e. cropping the underlying raster by providing a spatial
+ * {@link Envelope} (if the envelope is not 2D only the 2D part of it will be
+ * used). This means that, depending on the grid-to-world transformation
+ * existing for the raster we want to crop the crop area in the raster space
+ * might not be a rectangle, hence JAI's crop may not suffice in order to shrink
+ * the raster area we would obtain. For this purpose this operation make use of
+ * either the JAI's Crop or Mosaic operations depending on the conditions in
+ * which we are working.
+ * 
+ * 
+ * <p>
+ * <strong>Meaning of the ROI_OPTIMISATION_TOLERANCE parameter</strong> <br>
+ * In general if the grid-to-world transform is a simple scale and translate
+ * using JAI's crop should suffice, but when the g2w transform contains
+ * rotations or skew then we need something more elaborate since a rectangle in
+ * model space may not map to a rectangle in raster space. We would still be
+ * able to crop using JAI's crop on this polygon bounds but, depending on how
+ * this rectangle is built, we would be highly inefficient. In order to overcome
+ * this problems we use a combination of JAI's crop and mosaic since the mosaic
+ * can be used to crop a raster using a general ROI instead of a simple
+ * rectangle. There is a negative effect though. Crop would not create a new
+ * raster but simply forwards requests back to the origina one (it basically
+ * create a viewport on the source raster) while the mosaic operation creates a
+ * new raster. We try to address this trade-off by providing the parameter
+ * {@link Crop#ROI_OPTIMISATION_TOLERANCE}, which basically tells this
+ * operation "Use the mosaic operation only if the area that we would load with
+ * the Mosaic is strictly smaller then (ROI_OPTIMISATION_TOLERANCE)* A' where A'
+ * is the area of the polygon resulting from converting the crop area from the
+ * model space to the raster space.
+ * 
+ * <p>
+ * <strong>Meaning of the CONSERVE_ENVELOPE parameter</strong> <br>
+ * When we crop a coverage using a spatial envelope we may incur in a few issues
+ * with approximations when applying the grid-to-world transform and its
+ * inverse. Goal of this parameter is to suggest this operation to conserve the
+ * input crop envelope, if possible, instead of conserving the original
+ * grid-to-world transform. This would help when doing something like building a
+ * mosaic from a single coverage.
+ * 
+ * <p>
+ * <strong>NOTE</strong> that in case we will use the Mosaic operation with a
+ * ROI, such a ROI will be added as a synthetic property to the resulting
+ * coverage. The key for this property will be GC_ROI and the type of the object
+ * {@link Polygon}.
+ * 
  * @source $URL$
+ * @todo make this operation work with a general polygon. instead of an
+ *       envelope.
+ * @todo make this operation work when having a shear
+ * @todo make the tolerance for rotations parametric
  * @version $Id$
  * @author Simone Giannecchini
  * @since 2.3
@@ -60,19 +111,39 @@ public class Crop extends Operation2D {
 	private static final long serialVersionUID = 4466072819239413456L;
 
 	/**
-	 * The parameter descriptor for the sample dimension indices.
+	 * The parameter descriptor used to pass this operation the envelope to use
+	 * when doing the spatial crop.
 	 */
 	public static final ParameterDescriptor CROP_ENVELOPE = new DefaultParameterDescriptor(
-			Citations.GEOTOOLS, "Envelope", GeneralEnvelope.class, // Value class
+			Citations.GEOTOOLS, "Envelope", Envelope.class, // Value
+			// class
 			null, // Array of valid values
 			null, // Default value
 			null, // Minimal value
 			null, // Maximal value
 			null, // Unit of measure
 			false); // Parameter is optional
-	
+
 	/**
-	 * The parameter descriptor for the sample dimension indices.
+	 * The parameter descriptor use to tell this operation to optimize the crop
+	 * using a Mosaic in where the are of the image we would not load is smaller
+	 * than ROI_OPTIMISATION_TOLERANCE*FULL_CROP.
+	 */
+	public static final ParameterDescriptor ROI_OPTIMISATION_TOLERANCE = new DefaultParameterDescriptor(
+			Citations.GEOTOOLS, "ROITolerance", Double.class, // Value class
+			null, // Array of valid values
+			new Double(0.6), // Default value
+			new Double(0), // Minimal value
+			new Double(1.0), // Maximal value
+			null, // Unit of measure
+			true); // Parameter is optional
+
+	/**
+	 * The parameter descriptor is basically a simple boolean that tells this
+	 * operation to conserve the envelope that it gets as input.
+	 * 
+	 * <p>
+	 * See this class javadocs for an explanation.
 	 */
 	public static final ParameterDescriptor CONSERVE_ENVELOPE = new DefaultParameterDescriptor(
 			Citations.GEOTOOLS, "ConserveEnvelope", Boolean.class, // Value
@@ -91,16 +162,24 @@ public class Crop extends Operation2D {
 	public Crop() {
 		super(new DefaultParameterDescriptorGroup(Citations.GEOTOOLS,
 				"CoverageCrop", new ParameterDescriptor[] { SOURCE_0,
-						CROP_ENVELOPE,CONSERVE_ENVELOPE }));
+						CROP_ENVELOPE, CONSERVE_ENVELOPE,
+						ROI_OPTIMISATION_TOLERANCE }));
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.geotools.coverage.processing.AbstractOperation#doOperation(org.opengis.parameter.ParameterValueGroup,
+	 *      org.geotools.factory.Hints)
+	 */
 	public Coverage doOperation(ParameterValueGroup parameters, Hints hints) {
 		// /////////////////////////////////////////////////////////////////////
 		//
-		// Checking input parameteres
+		// Checking input parameters
 		//
 		// ///////////////////////////////////////////////////////////////////
+		// source coverage
 		final ParameterValue sourceParameter = parameters.parameter("Source");
 		if (sourceParameter == null
 				|| !(sourceParameter.getValue() instanceof GridCoverage2D)) {
@@ -108,6 +187,7 @@ public class Crop extends Operation2D {
 					ErrorKeys.NULL_PARAMETER_$2, "Source", GridCoverage2D.class
 							.toString()));
 		}
+		// crop envelope
 		final ParameterValue envelopeParameter = parameters
 				.parameter("Envelope");
 		if (envelopeParameter == null
@@ -115,8 +195,9 @@ public class Crop extends Operation2D {
 			throw new CannotCropException(Errors.format(
 					ErrorKeys.NULL_PARAMETER_$2, "Envelope",
 					GeneralEnvelope.class.toString()));
+		// should we conserve the crop envelope
 		final ParameterValue conserveEnvelopeParameter = parameters
-		.parameter("ConserveEnvelope");
+				.parameter("ConserveEnvelope");
 		if (conserveEnvelopeParameter == null
 				|| !(conserveEnvelopeParameter.getValue() instanceof Boolean))
 			throw new CannotCropException(Errors.format(
@@ -127,54 +208,91 @@ public class Crop extends Operation2D {
 		//
 		// Initialization
 		//
+		// We take the crop envelope and the source envelope then we check their
+		// crs and we also check if they ever overlap.
+		//
 		// /////////////////////////////////////////////////////////////////////
 		final GridCoverage2D source = (GridCoverage2D) sourceParameter
 				.getValue();
-		final Envelope sourceEnvelope = source.getEnvelope();
-		Envelope destinationEnvelope = (Envelope) envelopeParameter.getValue();
+		// envelope of the source coverage
+		final Envelope2D sourceEnvelope = source.getEnvelope2D();
+		// crop envelope
+		Envelope2D destinationEnvelope = new Envelope2D(
+				(Envelope) envelopeParameter.getValue());
 		CoordinateReferenceSystem sourceCRS, destinationCRS;
-        sourceCRS = sourceEnvelope.getCoordinateReferenceSystem();
-        destinationCRS = destinationEnvelope.getCoordinateReferenceSystem();
+		sourceCRS = sourceEnvelope.getCoordinateReferenceSystem();
+		destinationCRS = destinationEnvelope.getCoordinateReferenceSystem();
 		if (destinationCRS == null) {
-            // Do not change the user provided object - clone it first.
-            final GeneralEnvelope ge = new GeneralEnvelope(destinationEnvelope);
-            destinationCRS = source.getCoordinateReferenceSystem2D();
+			// Do not change the user provided object - clone it first.
+			final Envelope2D ge = new Envelope2D(destinationEnvelope);
+			destinationCRS = source.getCoordinateReferenceSystem2D();
 			ge.setCoordinateReferenceSystem(destinationCRS);
-            destinationEnvelope = ge;
-        }
+			destinationEnvelope = ge;
+		}
 
-		// /////////////////////////////////////////////////////////////////////
+		// //
 		//
-		// crs have to be equals
+		// Source and destination crs must to be equals
 		//
-		// /////////////////////////////////////////////////////////////////////
+		// //
 		if (!CRS.equalsIgnoreMetadata(sourceCRS, destinationCRS)) {
-			throw new CannotCropException(Errors.format(ErrorKeys.MISMATCHED_ENVELOPE_CRS_$2,
-                    sourceCRS.getName().getCode(), destinationCRS.getName().getCode()));
-        }
-		// /////////////////////////////////////////////////////////////////////
+			throw new CannotCropException(Errors.format(
+					ErrorKeys.MISMATCHED_ENVELOPE_CRS_$2, sourceCRS.getName()
+							.getCode(), destinationCRS.getName().getCode()));
+		}
+		// //
 		//
-		// check the intersection and, if needed, do the operation.
+		// Check the intersection and, if needed, do the crop operation.
 		//
-		// /////////////////////////////////////////////////////////////////////
+		// //
 		final GeneralEnvelope intersectionEnvelope = new GeneralEnvelope(
-				destinationEnvelope);
+				(Envelope) destinationEnvelope);
 		intersectionEnvelope.setCoordinateReferenceSystem(source
 				.getCoordinateReferenceSystem());
 		// intersect the envelopes
 		intersectionEnvelope.intersect(sourceEnvelope);
 		if (intersectionEnvelope.isEmpty())
-			return null;
-		// do we need to do something
-		if (!intersectionEnvelope.equals(sourceEnvelope, XAffineTransform
-				.getScale((AffineTransform)((GridGeometry2D) source.getGridGeometry())
-						.getGridToCRS2D()) / 2.0, false)) {
+			throw new CannotCropException(Errors
+					.format(ErrorKeys.CANT_CROP));
+		// //
+		//
+		// Get the grid-to-world transform by keeping into account translation
+		// of grid geometry constructor for respecting OGC PIXEL-IS-CENTER
+		// ImageDatum assumption.
+		//
+		// //
+		final AffineTransform sourceGridToWorld = (AffineTransform) ((GridGeometry2D) source
+				.getGridGeometry()).getGridToCRS2D(PixelOrientation.UPPER_LEFT);
+		// //
+		//
+		// I set the tolerance as half the scale factor of the grid-to-world
+		// transform. This should more or less means in most cases "don't bother
+		// to crop if the new envelope is as close to the old one that we go
+		// deep under pixel size."
+		//
+		// //
+		final double tolerance = XAffineTransform.getScale(sourceGridToWorld);
+		if (!intersectionEnvelope
+				.equals(sourceEnvelope, tolerance / 2.0, false)) {
 			envelopeParameter.setValue(intersectionEnvelope.clone());
 			return CroppedCoverage2D
 					.create(parameters,
 							(hints instanceof Hints) ? (Hints) hints
-									: new Hints(hints));
+									: new Hints(hints), source,
+							sourceGridToWorld, tolerance);
 		} else {
+			// //
+			//
+			// Note that in case we don't crop at all, WE DO NOT UPDATE the
+			// envelope. If we did we might end up doing multiple successive
+			// crop without actually cropping the image but, still, we would
+			// shrink the envelope each time. Just think about having a loop
+			// that crops recursively the same coverage specifying each time an
+			// envelope whose URC is only a a scale quarter close to the LLC of
+			// the old one. We would never crop the raster but we would modify
+			// the grid-to-world trasnform each time.
+			//
+			// //
 			return source;
 		}
 	}

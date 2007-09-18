@@ -15,14 +15,13 @@
  */
 package org.geotools.resources.coverage;
 
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-
-import org.opengis.coverage.grid.GridCoverage;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.TransformException;
+import java.util.List;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
+import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.DefaultFeatureType;
@@ -34,9 +33,16 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.type.GeometricAttributeType;
 import org.geotools.resources.CRSUtilities;
+import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
@@ -120,32 +126,173 @@ public final class FeatureUtilities {
      * @param  reader the grid coverage reader.
      * @return a feature with the grid coverage envelope as the geometry and the
      *         grid coverage itself in the "grid" attribute.
+     *
+     * @deprecated Please use FeatureUtilities#wrapGridCoverageReader(final AbstractGridCoverage2DReader gridCoverageReader, GeneralParameterValue[] params)
      */
-    public static FeatureCollection wrapGridCoverageReader(final AbstractGridCoverage2DReader reader)
-            throws TransformException, SchemaException, IllegalAttributeException
-    {
-        // create surrounding polygon
-        final Polygon bounds = getPolygon(reader.getOriginalEnvelope().toRectangle2D());
-        final CoordinateReferenceSystem sourceCRS = CRSUtilities.getCRS2D(reader.getCrs());
+    public static FeatureCollection wrapGridCoverageReader(final AbstractGridCoverage2DReader gridCoverageReader) 
+    	throws TransformException, FactoryConfigurationError, SchemaException, IllegalAttributeException {
+				// create surrounding polygon
+				final PrecisionModel pm = new PrecisionModel();
+				final GeometryFactory gf = new GeometryFactory(pm, 0);
+				final Rectangle2D rect = gridCoverageReader.getOriginalEnvelope()
+						.toRectangle2D();
+				final CoordinateReferenceSystem sourceCrs = CRSUtilities
+						.getCRS2D(gridCoverageReader.getCrs());
+		
+				final Coordinate[] coord = new Coordinate[5];
+				coord[0] = new Coordinate(rect.getMinX(), rect.getMinY());
+				coord[1] = new Coordinate(rect.getMaxX(), rect.getMinY());
+				coord[2] = new Coordinate(rect.getMaxX(), rect.getMaxY());
+				coord[3] = new Coordinate(rect.getMinX(), rect.getMaxY());
+				coord[4] = new Coordinate(rect.getMinX(), rect.getMinY());
+		
+				// }
+				final LinearRing ring = gf.createLinearRing(coord);
+				final Polygon bounds = new Polygon(ring, null, gf);
+		
+				// create the feature type
+				final GeometricAttributeType geom = new GeometricAttributeType("geom",
+						Polygon.class, true, 1, 1, null, sourceCrs, null);
+				final AttributeType grid = AttributeTypeFactory.newAttributeType(
+						"grid", AbstractGridCoverage2DReader.class);
+		
+				final AttributeType[] attTypes = { geom, grid };
+				// Fix the schema name
+				final String typeName = "GridCoverage";
+				final DefaultFeatureType schema = (DefaultFeatureType) FeatureTypeBuilder
+						.newFeatureType(attTypes, typeName);
+		
+				// create the feature
+				Feature feature = schema.create(new Object[] { bounds,
+						gridCoverageReader });
+		
+				final FeatureCollection collection = FeatureCollections.newCollection();
+				collection.add(feature);
+		
+				return collection;
+		}
+				
+    /**
+     * Wraps a grid coverage into a Feature. Code lifted from ArcGridDataSource
+     * (temporary).
+     *
+     * @param  reader the grid coverage reader.
+     * @return a feature with the grid coverage envelope as the geometry and the
+     *         grid coverage itself in the "grid" attribute.
+     */
+    public static FeatureCollection wrapGridCoverageReader(final AbstractGridCoverage2DReader gridCoverageReader,
+			GeneralParameterValue[] params) throws TransformException,
+			FactoryConfigurationError, SchemaException,
+			IllegalAttributeException {
 
-        // create the feature type
-        final GeometricAttributeType geom = new GeometricAttributeType("geom",
-                        Polygon.class, true, 1, 1, null, sourceCRS, null);
-        final AttributeType grid = AttributeTypeFactory.newAttributeType(
-                        "grid", AbstractGridCoverage2DReader.class);
+		// create surrounding polygon
+		final PrecisionModel pm = new PrecisionModel();
+		final GeometryFactory gf = new GeometryFactory(pm, 0);
+		final Rectangle2D rect = gridCoverageReader.getOriginalEnvelope()
+				.toRectangle2D();
+		final CoordinateReferenceSystem sourceCrs = CRSUtilities
+				.getCRS2D(gridCoverageReader.getCrs());
 
-        final AttributeType[] attTypes = { geom, grid };
-        // Fix the schema name
-        final String typeName = "GridCoverageReader";
-        final DefaultFeatureType schema = (DefaultFeatureType) FeatureTypeBuilder
-                        .newFeatureType(attTypes, typeName);
+		final Coordinate[] coord = new Coordinate[5];
+		coord[0] = new Coordinate(rect.getMinX(), rect.getMinY());
+		coord[1] = new Coordinate(rect.getMaxX(), rect.getMinY());
+		coord[2] = new Coordinate(rect.getMaxX(), rect.getMaxY());
+		coord[3] = new Coordinate(rect.getMinX(), rect.getMaxY());
+		coord[4] = new Coordinate(rect.getMinX(), rect.getMinY());
 
-        // create the feature
-        Feature feature = schema.create(new Object[] { bounds, reader });
+		// }
+		final LinearRing ring = gf.createLinearRing(coord);
+		final Polygon bounds = new Polygon(ring, null, gf);
 
-        final FeatureCollection collection = FeatureCollections.newCollection();
-        collection.add(feature);
+		// create the feature type
+		final GeometricAttributeType geom = new GeometricAttributeType("geom",
+				Polygon.class, true, 1, 1, null, sourceCrs, null);
+		final AttributeType grid = AttributeTypeFactory.newAttributeType(
+				"grid", AbstractGridCoverage2DReader.class);
+		final AttributeType paramsAttr = AttributeTypeFactory.newAttributeType(
+				"params", GeneralParameterValue[].class);
 
-        return collection;
-    }
+		final AttributeType[] attTypes = { geom, grid, paramsAttr };
+		// Fix the schema name
+		final String typeName = "GridCoverage";
+		final DefaultFeatureType schema = (DefaultFeatureType) FeatureTypeBuilder
+				.newFeatureType(attTypes, typeName);
+
+		// create the feature
+		Feature feature = schema.create(new Object[] { bounds,
+				gridCoverageReader,params });
+
+		final FeatureCollection collection = FeatureCollections.newCollection();
+		collection.add(feature);
+
+		return collection;
+	}
+
+	/**
+	 * Converts a JTS {@link Polygon}, which represents a ROI, int an AWT
+	 * {@link java.awt.Polygon} by means of the provided {@link MathTransform}.
+	 * 
+	 * @param roiInput
+	 *            the input ROI as a JTS {@link Polygon}.
+	 * @param worldToGridTransform
+	 *            the {@link MathTransform} to apply to the input ROI.
+	 * @return an AWT {@link java.awt.Polygon}.
+	 * @throws TransformException
+	 *             in case the provided {@link MathTransform} chokes.
+	 */
+	public static java.awt.Polygon convertPolygon(final Polygon roiInput,
+			MathTransform worldToGridTransform) throws TransformException {
+		return convertPolygonToPointArray(roiInput, worldToGridTransform, null);
+	}
+	
+	/**
+	 * Converts a JTS {@link Polygon}, which represents a ROI, int an AWT
+	 * {@link java.awt.Polygon} by means of the provided {@link MathTransform}.
+	 * 
+	 * <p>
+	 * It also stores the points for this polygon into the provided {@link List}.
+	 * 
+	 * @param roiInput
+	 *            the input ROI as a JTS {@link Polygon}.
+	 * @param worldToGridTransform
+	 *            the {@link MathTransform} to apply to the input ROI.
+	 * @param points
+	 *            a {@link List} that should hold the transformed points.
+	 * @return an AWT {@link java.awt.Polygon}.
+	 * @throws TransformException
+	 *             in case the provided {@link MathTransform} chokes.
+	 */
+	public static java.awt.Polygon convertPolygonToPointArray(final Polygon roiInput,
+			MathTransform worldToGridTransform, List/*<Double>*/ points)
+			throws TransformException {
+		final boolean isIdentity = worldToGridTransform.isIdentity();
+		final double coords[] = new double[2];
+		final LineString exteriorRing = roiInput.getExteriorRing();
+		final CoordinateSequence exteriorRingCS = exteriorRing
+				.getCoordinateSequence();
+		final int numCoords = exteriorRingCS.size();
+		final java.awt.Polygon retValue = new java.awt.Polygon();
+		for (int i = 0; i < numCoords; i++) {
+			// get the actual coord
+			coords[0] = exteriorRingCS.getX(i);
+			coords[1] = exteriorRingCS.getY(i);
+
+			// transform it
+			if (!isIdentity)
+				worldToGridTransform.transform(coords, 0, coords, 0, 1);
+
+			// send it back to the returned polygon
+			final int x = (int) (coords[0] + 0.5d);
+			final int y = (int) (int) (coords[1] + 0.5d);
+			if(points!=null)
+				points.add(new Point2D.Double(x, y));
+
+			// send it back to the returned polygon
+			retValue.addPoint(x, y);
+
+		}
+
+		// return the created polygon.
+		return retValue;
+	}
 }
