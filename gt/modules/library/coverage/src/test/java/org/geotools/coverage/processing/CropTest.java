@@ -27,23 +27,19 @@ import javax.media.jai.RenderedOp;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageExamples;
 import org.geotools.coverage.grid.GridCoverageTest;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.InvalidGridGeometryException;
 import org.geotools.coverage.grid.Viewer;
-import org.geotools.coverage.processing.operation.Crop;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultDerivedCRS;
 import org.geotools.referencing.operation.DefaultOperationMethod;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
@@ -98,7 +94,7 @@ public class CropTest extends GridCoverageTest {
 	public static Test suite() {
 		final TestSuite ts = new TestSuite();
 		 ts.addTest(new CropTest("testCrop"));
-//		ts.addTest(new CropTest("testCropRotated"));
+		ts.addTest(new CropTest("testCropRotated"));
 		return ts;
 	}
 
