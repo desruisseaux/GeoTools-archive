@@ -25,8 +25,10 @@ import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 /**
- * A builder for simple feature and feature collection types.
+ * A builder for simple feature types.
  * <p>
  * Simple Usage:
  * <pre>
@@ -60,12 +62,6 @@ import org.opengis.util.InternationalString;
  * <p>
  * Global state is reset after a call to {@link #buildFeatureType()}. Per 
  * attribute state is reset after a call to {@link #add}.
- * <p>
- * This class maintains a set of {@link Class},{@link AttributeType} mappings
- * which are used to build attributes by specifying classes. By default these 
- * mappings are defined by {@link org.geotools.feature.simple.SimpleSchema}. The
- * methods {@link #addBinding(AttributeType)},{@link #addBindings(Schema)}, and 
- * {@link #setBindings(Schema)} can be used to change the defaults.
  * </p>
  * <p>
  * A default geometry for the feature type can be specified explictly via 
@@ -321,14 +317,12 @@ public class SimpleFeatureTypeBuilder {
 	 * Sets the coordinate reference system of the built type by specifying its
 	 * srs.
 	 * 
+	 * @throws IllegalArgumentException When the srs specified can be decored 
+	 * into a crs.
+	 * 
 	 */
-	public void setSRS(String SRS) {
-		try {
-			setCRS(CRS.decode(SRS));
-		} catch (Exception  e) {
-			String msg = "SRS '" + SRS + "' unknown:" + e.getLocalizedMessage(); 
-			throw (IllegalArgumentException) new IllegalArgumentException( msg ).initCause( e );
-		}
+	public void setSRS(String srs) {
+		setCRS(decode(srs));	
 	}
 	
 	/**
@@ -489,6 +483,23 @@ public class SimpleFeatureTypeBuilder {
 	}
 	
 	/**
+	 * Sets the srs of the next attribute added to the feature type.
+	 * <p>
+	 * This only applies if the attribute added is geometric.
+	 * </p>
+	 * <p>
+     * This value is reset after a call to {@link #add(String, Class)}
+     * </p>
+	 */
+	public SimpleFeatureTypeBuilder srs( String srs ) {
+	    if ( srs == null ) {
+	        return crs( null );
+	    }
+	    
+	    return crs(decode(srs));
+	}
+	
+	/**
 	 * Adds a new attribute w/ provided name and class.
 	 * 
 	 * <p>
@@ -505,21 +516,46 @@ public class SimpleFeatureTypeBuilder {
 	 */
 	public void add(String name, Class binding) {
 
+	    AttributeDescriptor descriptor = null;
+	    
+	    attributeBuilder.setBinding(binding);
+        attributeBuilder.setName(name);
+        
 		//check if this is the name of the default geomtry, in that case we 
 		// better make it a geometry type
-		if ( defaultGeometry != null && defaultGeometry.equals( name ) ) {
-			add( name, binding, crs );
-			return;
-		}
+		//also check for jts geometry, if we ever actually get to a point where a
+        // feature can be backed by another geometry model (like iso), we need 
+        // to remove this check
+        if ( ( defaultGeometry != null && defaultGeometry.equals( name ) ) 
+            || Geometry.class.isAssignableFrom(binding) ) {
 		
-		attributeBuilder.setBinding(binding);
-		attributeBuilder.setName(name);
-
-		AttributeType type = attributeBuilder.buildType();
-		AttributeDescriptor descriptor = attributeBuilder.buildDescriptor(name,type);
+            //if no crs was set, set to the global
+            if ( !attributeBuilder.isCRSSet() ) {
+                attributeBuilder.setCRS(crs);
+            }
+            
+            GeometryType type = attributeBuilder.buildGeometryType();
+            descriptor = attributeBuilder.buildDescriptor(name, type);
+		}
+        else {
+            AttributeType type = attributeBuilder.buildType();
+            descriptor = attributeBuilder.buildDescriptor(name, type );
+        }
+		
+        
 		attributes().add(descriptor);
 	}
 	
+	/**
+	 * Adds a new geometric attribute w/ provided name, class, and coordinate 
+	 * reference system.
+	 * <p>
+	 * The <tt>crs</tt> parameter may be <code>null</code>.
+	 * </p>
+	 * @param name The name of the attribute.
+	 * @param binding The class that the attribute is bound to.
+	 * @param crs The crs of of the geometry, may be <code>null</code>.
+	 */
 	public void add(String name, Class binding, CoordinateReferenceSystem crs ) {
 		attributeBuilder.setBinding(binding);
 		attributeBuilder.setName(name);
@@ -529,6 +565,25 @@ public class SimpleFeatureTypeBuilder {
 		GeometryDescriptor descriptor = attributeBuilder.buildDescriptor(name,type);
 		attributes().add(descriptor);
 	}
+	
+	/**
+     * Adds a new geometric attribute w/ provided name, class, and spatial 
+     * reference system identifier
+     * <p>
+     * The <tt>srs</tt> parameter may be <code>null</code>.
+     * </p>
+     * @param name The name of the attribute.
+     * @param binding The class that the attribute is bound to.
+     * @param srs The srs of of the geometry, may be <code>null</code>.
+     */
+	public void add(String name, Class binding, String srs) {
+	    if ( srs == null ) {
+	        add(name,binding,(CoordinateReferenceSystem)null);
+	    }
+	
+	    add(name,binding,decode(srs));
+	}
+	
 	
 	/**
 	 * Builds a feature type from compiled state.
@@ -549,7 +604,9 @@ public class SimpleFeatureTypeBuilder {
 					//ensure the attribute is a geometry attribute
 					if ( !(att instanceof GeometryDescriptor ) ) {
 						attributeBuilder.init( att );
+						attributeBuilder.setCRS(crs);
 						GeometryType type = attributeBuilder.buildGeometryType();
+						
 						att = attributeBuilder.buildDescriptor(att.getName(),type);
 						atts.set( i, att );
 					}
@@ -576,16 +633,6 @@ public class SimpleFeatureTypeBuilder {
 			}
 		}
 		
-		//check the crs
-		CoordinateReferenceSystem crs = this.crs;
-		if ( crs == null ) {
-		    //derive from defaultGeometry
-		    if ( defaultGeometry != null ) {
-		        crs = ((GeometryType)defaultGeometry.getType()).getCRS();
-		    }
-		}
-		
-		
 		SimpleFeatureType built = factory.createSimpleFeatureType(
 			name(), attributes(), defaultGeometry, isAbstract, 
 			restrictions(), superType, description);
@@ -595,72 +642,6 @@ public class SimpleFeatureTypeBuilder {
 	}
 	
 	// Internal api available for subclasses to override
-//	//
-//	/**
-//	 * Determines if the attribute descriptor represents a geometric attribute.
-//	 * 
-//	 * @param descriptor The attribute descriptor.
-//	 */
-//	protected boolean isGeometry(Class binding) {
-//		return false;
-//	}
-	
-	/**
-	 * Creates a descriptor from the name/binding of an attribute.
-	 * 
-	 * @param name The name of the attribute.
-	 * @param binding The binding of the attribute.
-	 * 
-	 */
-//	protected final AttributeDescriptor createAttributeDescriptor(String name,Class binding,boolean isNillable,Set restrictions) {
-//		TypeName typeName = new org.geotools.feature.type.TypeName(name);
-//		
-//		AttributeType type = getBinding(binding); 
-//		if ( type != null ) {
-//			//we need to actually prototype the attribute type beacuse for simple
-//			// content we need to ensure the the descriptor name == type name
-//			type = createPrototype(typeName, type );
-//		}
-//		else {
-//			//create one on the fly
-//			type = typeFactory.createAttributeType(
-//				typeName,binding,false,false,restrictions,null,null);
-//		}
-//		
-//		return typeFactory.createAttributeDescriptor(type,typeName,1,1,isNillable);
-//	}
-	
-	/**
-	 * Prototypes an attribute type, overriding only the name of hte resulting
-	 * attribute type.
-	 * 
-	 * @param typeName The new name of the attribute type.
-	 * @param proto The prototype.
-	 * 
-	 */
-//	protected final AttributeType createPrototype( TypeName typeName, AttributeType proto ){
-//		if ( proto instanceof GeometryType ) {
-//			GeometryType gProto = (GeometryType) proto;
-//			
-//			//if a crs set, override the crs as well as the name
-//			CoordinateReferenceSystem crs = null;
-//			if ( this.crs != null ) {
-//				crs = this.crs;
-//			}
-//			else {
-//				crs = gProto.getCRS();
-//			}
-//			
-//			return typeFactory.createGeometryType( typeName, proto.getBinding(), 
-//				crs, proto.isIdentified(), proto.isAbstract(), proto.getRestrictions(), 
-//				proto.getSuper(), proto.getDescription()); 
-//		}
-//		
-//		return typeFactory.createAttributeType( typeName, proto.getBinding(), 
-//			proto.isIdentified(), proto.isAbstract(), proto.getRestrictions(), 
-//			proto.getSuper(), proto.getDescription()); 
-//	}
-	
 	/**
 	 * Creates a new set instance, this default implementation returns {@link HashSet}.
 	 */
@@ -750,5 +731,15 @@ public class SimpleFeatureTypeBuilder {
 		return bindings;
 	}
 	
-	
+	/**
+	 * Decodes a srs, supplying a useful error message if there is a problem.
+	 */
+	protected CoordinateReferenceSystem decode( String srs ) {
+	    try {
+            return CRS.decode(srs);
+        } catch (Exception  e) {
+            String msg = "SRS '" + srs + "' unknown:" + e.getLocalizedMessage(); 
+            throw (IllegalArgumentException) new IllegalArgumentException( msg ).initCause( e );
+        }
+	}
 }
