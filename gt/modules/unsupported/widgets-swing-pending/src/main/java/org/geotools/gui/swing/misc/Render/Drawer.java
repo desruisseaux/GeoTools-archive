@@ -173,7 +173,7 @@ public class Drawer {
     }
     
     public static Symbolizer[] getSymbolizers(Feature feature) {
-        return getSymbolizers(feature.getPrimaryGeometry().getClass(), Color.RED);
+        return getSymbolizers(feature.getDefaultGeometry().getClass(), Color.RED);
     }
     
     public static Symbolizer[] getSymbolizers(Class<? extends Geometry> type, Color baseColor) {
@@ -384,7 +384,7 @@ public class Drawer {
         // get the geometry
         com.vividsolutions.jts.geom.Geometry geom;
         if (geomName == null) {
-            geom = f.getPrimaryGeometry();
+            geom = f.getDefaultGeometry();
         } else {
             geom = (com.vividsolutions.jts.geom.Geometry) f.getAttribute(geomName);
         }

@@ -32,7 +32,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,7 +46,6 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.propertyedit.ContextCRSPropertyPanel;
 import org.geotools.gui.swing.propertyedit.JPropertyDialog;
@@ -755,11 +753,11 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
         
         
         
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
+        //java.awt.EventQueue.invokeLater(new Runnable() {
+         //   public void run() {
                 new DemoSwingGeowidgets().setVisible(true);
-            }
-        });
+          //  }
+        //});
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables

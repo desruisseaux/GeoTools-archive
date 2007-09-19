@@ -20,62 +20,58 @@ import org.geotools.gui.swing.i18n.TextBundle;
 import com.vividsolutions.jts.geom.Geometry;
 import java.awt.Color;
 import java.awt.Component;
-import java.io.IOException;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.SwingUtilities;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
-import org.geotools.data.Query;
-import org.geotools.gui.swing.propertyedit.model.FeatureSourceModel;
 import org.geotools.gui.swing.propertyedit.model.GeometryCellEditor;
 import org.geotools.gui.swing.propertyedit.model.GeometryCellRenderer;
 import org.geotools.map.MapLayer;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
-import org.opengis.feature.FeatureCollection;
 
 /**
  *
  * @author  johann sorel
  */
-public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements PropertyPanel{
-    
+public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements PropertyPanel {
+
     private MapLayer layer = null;
     private FeatureSource source = null;
     private FeatureStore store = null;
     private boolean editable = false;
-    
-    
+
     /** Creates new form DefaultMapLayerTablePanel */
     public LayerFeaturePropertyPanel() {
-        
+
         //netbeans JPanel components init
         initComponents();
-        
-        tab_data.setDefaultRenderer(Geometry.class,new GeometryCellRenderer());
-        tab_data.setDefaultEditor(Geometry.class,new GeometryCellEditor());
+
+        tab_data.setDefaultRenderer(Geometry.class, new GeometryCellRenderer());
+        tab_data.setDefaultEditor(Geometry.class, new GeometryCellEditor());
         tab_data.setEditable(false);
         tab_data.setColumnControlVisible(true);
         tab_data.setHorizontalScrollEnabled(true);
         tab_data.setAutoResizeMode(JXTable.AUTO_RESIZE_OFF);
-        
-        tab_data.setHighlighters( new Highlighter[]{HighlighterFactory.createAlternateStriping(Color.white,HighlighterFactory.QUICKSILVER,5) } );
-        tab_data.setShowGrid(true,true);
+
+        tab_data.setHighlighters(new Highlighter[]{HighlighterFactory.createAlternateStriping(Color.white, HighlighterFactory.QUICKSILVER, 5)});
+        tab_data.setShowGrid(true, true);
         tab_data.setGridColor(Color.GRAY.brighter());
-        
+
         SwingUtilities.invokeLater(new Runnable() {
+
             public void run() {
                 tab_data.packAll();
             }
         });
-        
-        
-        jcb_collection.addItem( TextBundle.getResource().getString("filter")  );
-        jcb_collection.addItem( TextBundle.getResource().getString("all")  );        
+
+
+        jcb_collection.addItem(TextBundle.getResource().getString("filter"));
+        jcb_collection.addItem(TextBundle.getResource().getString("all"));
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -146,31 +142,25 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
-    
+
     private void actionCollection(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionCollection
-        
-        if(layer != null){
-            FeatureSource fs = layer.getFeatureSource();
-            
-            try {
-                
-                if(jcb_collection.getSelectedIndex() == 0){
-                    ((FeatureSourceModel)tab_data.getModel()).reset(fs.getFeatures(layer.getQuery()));
-                } else if (jcb_collection.getSelectedIndex() == 1){
-                    ((FeatureSourceModel)tab_data.getModel()).reset(fs.getFeatures(Query.ALL));
-                }
-                
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+        /*if(layer != null){
+        FeatureSource fs = layer.getFeatureSource();
+        try {
+        if(jcb_collection.getSelectedIndex() == 0){
+        ((FeatureSourceModel)tab_data.getModel()).reset(fs.getFeatures(layer.getQuery()));
+        } else if (jcb_collection.getSelectedIndex() == 1){
+        ((FeatureSourceModel)tab_data.getModel()).reset(fs.getFeatures(Query.ALL));
         }
+        } catch (IOException ex) {
+        ex.printStackTrace();
+        }
+        }*/
     }//GEN-LAST:event_actionCollection
-    
+
     private void actionEditer(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionEditer
-        tab_data.setEditable( ((JCheckBox)evt.getSource()).isSelected()  );
+        tab_data.setEditable(((JCheckBox) evt.getSource()).isSelected());
     }//GEN-LAST:event_actionEditer
-    
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton jbu_action;
@@ -178,31 +168,26 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
     private javax.swing.JCheckBox jcb_edit;
     private org.jdesktop.swingx.JXTable tab_data;
     // End of variables declaration//GEN-END:variables
-    
+
     public void setTarget(Object target) {
-        store = null;        
-        
+        /* store = null;
         layer = (MapLayer)target;
-        
         source = layer.getFeatureSource();
-        
         if( source instanceof FeatureStore ){
-            store = (FeatureStore) source;
-            editable = true;
+        store = (FeatureStore) source;
+        editable = true;
         } else {
-            editable = false;
+        editable = false;
         }
-                
         setEditable(editable);
-        
         try {
-            FeatureCollection col = source.getFeatures(layer.getQuery());
-            tab_data.setModel(new FeatureSourceModel(tab_data,col,source));
+        FeatureCollection col = source.getFeatures(layer.getQuery());
+        tab_data.setModel(new FeatureSourceModel(tab_data,col,source));
         } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        ex.printStackTrace();
+        }*/
     }
-    
+
     public void apply() {
 //        DefaultTransaction transaction = new DefaultTransaction("Example1");
 //        FeatureStore store = (FeatureStore) source.getFeatureSource();
@@ -214,22 +199,19 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
 //            transaction.rollback();
 //        }
     }
-    
-    
-    
-    
+
     public String getTitle() {
         return "FeatureTable (In Work)";
     }
-    
+
     public ImageIcon getIcon() {
         return null;
     }
-    
+
     public String getToolTip() {
         return "";
     }
-    
+
     public Component getPanel() {
         return this;
     }
@@ -242,5 +224,4 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
 
     public void revert() {
     }
-    
 }

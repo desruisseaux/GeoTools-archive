@@ -18,26 +18,15 @@ package org.geotools.gui.swing.datachooser;
 
 import org.geotools.gui.swing.extended.JButtonPanel;
 import org.geotools.gui.swing.i18n.TextBundle;
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Graphics;
 import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.awt.image.FilteredImageSource;
-import java.awt.image.ImageFilter;
-import java.awt.image.ImageProducer;
-import java.awt.image.ReplicateScaleFilter;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
-import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import org.geotools.gui.swing.datachooser.model.DataModel;
@@ -81,6 +70,8 @@ public class JDataChooser extends javax.swing.JPanel implements DataListener{
         
         panel.setLayout(new GridLayout(1,1));
                 
+        split.setResizeWeight(0);
+        
         if(state == STATE.BUTTONED){
             
             pan_source = new JPanel();
@@ -110,6 +101,7 @@ public class JDataChooser extends javax.swing.JPanel implements DataListener{
         
         if(state == STATE.BUTTONED){
             for(DataPanel pan : type){
+                panel.add(pan_source);
                 final DataPanel typ = pan;
                 JToggleButton b = new JToggleButton(typ.getTitle(),typ.getIcon48());
                 b.addActionListener(new ActionListener() {
@@ -158,7 +150,7 @@ public class JDataChooser extends javax.swing.JPanel implements DataListener{
     }
     
     public void addLayers(MapLayer[] layers) {
-        ((DataModel)tab_data.getModel()).addLayer(layers);
+        //((DataModel)tab_data.getModel()).addLayer(layers);
     }
    
     

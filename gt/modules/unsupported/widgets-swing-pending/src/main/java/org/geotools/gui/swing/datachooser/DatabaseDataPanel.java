@@ -33,6 +33,17 @@ public class DatabaseDataPanel extends javax.swing.JPanel implements DataPanel{
     /** Creates new form DefaultShapeTypeChooser */
     public DatabaseDataPanel() {
         initComponents();
+        
+        lbl_dbtype.setText( TextBundle.getResource().getString("dbtype"));
+        lbl_host.setText( TextBundle.getResource().getString("host"));
+        lbl_port.setText( TextBundle.getResource().getString("port"));
+        lbl_schema.setText( TextBundle.getResource().getString("schema"));
+        lbl_database.setText( TextBundle.getResource().getString("database"));
+        lbl_user.setText( TextBundle.getResource().getString("user"));
+        lbl_password.setText( TextBundle.getResource().getString("password"));
+        but_refresh.setText( TextBundle.getResource().getString("refresh"));
+        
+        tab_table.setTableHeader(null);
     }
     
     /** This method is called from within the constructor to
@@ -43,16 +54,150 @@ public class DatabaseDataPanel extends javax.swing.JPanel implements DataPanel{
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        lbl_dbtype = new javax.swing.JLabel();
+        txt_host = new javax.swing.JTextField();
+        lbl_host = new javax.swing.JLabel();
+        lbl_port = new javax.swing.JLabel();
+        lbl_schema = new javax.swing.JLabel();
+        lbl_database = new javax.swing.JLabel();
+        lbl_user = new javax.swing.JLabel();
+        lbl_password = new javax.swing.JLabel();
+        txt_port = new javax.swing.JTextField();
+        txt_schema = new javax.swing.JTextField();
+        txt_database = new javax.swing.JTextField();
+        txt_user = new javax.swing.JTextField();
+        but_refresh = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tab_table = new org.jdesktop.swingx.JXTable();
+        jcb_dbtype = new javax.swing.JComboBox();
+        txt_password = new javax.swing.JPasswordField();
+
+        lbl_dbtype.setText("jLabel1");
+
+        txt_host.setText("localhost");
+
+        lbl_host.setText("jLabel2");
+
+        lbl_port.setText("jLabel3");
+
+        lbl_schema.setText("jLabel4");
+
+        lbl_database.setText("jLabel5");
+
+        lbl_user.setText("jLabel6");
+
+        lbl_password.setText("jLabel7");
+
+        txt_port.setText("5432");
+
+        txt_schema.setText("default");
+
+        but_refresh.setText("jButton1");
+
+        tab_table.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane1.setViewportView(tab_table);
+
+        jcb_dbtype.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "postgis" }));
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 606, Short.MAX_VALUE)
+            .add(layout.createSequentialGroup()
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                    .add(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .add(but_refresh))
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                        .addContainerGap()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                            .add(layout.createSequentialGroup()
+                                .add(lbl_dbtype)
+                                .add(18, 18, 18)
+                                .add(jcb_dbtype, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(layout.createSequentialGroup()
+                                .add(lbl_host)
+                                .add(18, 18, 18)
+                                .add(txt_host, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(layout.createSequentialGroup()
+                                .add(lbl_database)
+                                .add(18, 18, 18)
+                                .add(txt_database, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(layout.createSequentialGroup()
+                                .add(lbl_user)
+                                .add(18, 18, 18)
+                                .add(txt_user, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(layout.createSequentialGroup()
+                                .add(lbl_password)
+                                .add(18, 18, 18)
+                                .add(txt_password, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(layout.createSequentialGroup()
+                                .add(lbl_port)
+                                .add(18, 18, 18)
+                                .add(txt_port, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(layout.createSequentialGroup()
+                                .add(lbl_schema)
+                                .add(18, 18, 18)
+                                .add(txt_schema, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))))
+                .add(18, 18, 18)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE)
+                .addContainerGap())
         );
+
+        layout.linkSize(new java.awt.Component[] {jcb_dbtype, txt_database, txt_host, txt_password, txt_port, txt_schema, txt_user}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+
+        layout.linkSize(new java.awt.Component[] {lbl_database, lbl_dbtype, lbl_host, lbl_password, lbl_port, lbl_schema, lbl_user}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 397, Short.MAX_VALUE)
+            .add(layout.createSequentialGroup()
+                .addContainerGap()
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 202, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(lbl_dbtype)
+                            .add(jcb_dbtype, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(lbl_host)
+                            .add(txt_host, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(lbl_port)
+                            .add(txt_port, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(lbl_schema)
+                            .add(txt_schema, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(lbl_database)
+                            .add(txt_database, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(lbl_user)
+                            .add(txt_user, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(lbl_password)
+                            .add(txt_password, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(but_refresh)))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        layout.linkSize(new java.awt.Component[] {jcb_dbtype, txt_database, txt_host, txt_password, txt_port, txt_schema, txt_user}, org.jdesktop.layout.GroupLayout.VERTICAL);
+
+        layout.linkSize(new java.awt.Component[] {lbl_database, lbl_dbtype, lbl_host, lbl_password, lbl_port, lbl_schema, lbl_user}, org.jdesktop.layout.GroupLayout.VERTICAL);
+
     }// </editor-fold>//GEN-END:initComponents
 
     public ImageIcon getIcon16() {
@@ -86,6 +231,23 @@ public class DatabaseDataPanel extends javax.swing.JPanel implements DataPanel{
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton but_refresh;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JComboBox jcb_dbtype;
+    private javax.swing.JLabel lbl_database;
+    private javax.swing.JLabel lbl_dbtype;
+    private javax.swing.JLabel lbl_host;
+    private javax.swing.JLabel lbl_password;
+    private javax.swing.JLabel lbl_port;
+    private javax.swing.JLabel lbl_schema;
+    private javax.swing.JLabel lbl_user;
+    private org.jdesktop.swingx.JXTable tab_table;
+    private javax.swing.JTextField txt_database;
+    private javax.swing.JTextField txt_host;
+    private javax.swing.JPasswordField txt_password;
+    private javax.swing.JTextField txt_port;
+    private javax.swing.JTextField txt_schema;
+    private javax.swing.JTextField txt_user;
     // End of variables declaration//GEN-END:variables
     
 }
