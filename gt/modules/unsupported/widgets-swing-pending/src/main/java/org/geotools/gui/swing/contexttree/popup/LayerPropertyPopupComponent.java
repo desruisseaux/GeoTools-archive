@@ -59,7 +59,7 @@ public class LayerPropertyPopupComponent extends JMenuItem implements PopupCompo
                 ArrayList<PropertyPanel> lst = new ArrayList<PropertyPanel>();
                 lst.add(new LayerFilterPropertyPanel());
                 lst.add(new LayerStylePropertyPanel());
-                lst.add(new LayerFeaturePropertyPanel());
+                //lst.add(new LayerFeaturePropertyPanel());
                 JPropertyDialog.showDialog(lst, layer);
                 
             }

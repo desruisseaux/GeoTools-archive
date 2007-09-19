@@ -62,7 +62,7 @@ public class FeatureSourceModel implements TableModel{
         columns.clear();
         features.clear();
         
-        Collection<Attribute> col = collection.attributes();
+        /*Collection<Attribute> col = collection.attributes();
                 
         Iterator<Attribute> ite = col.iterator();            
         while (ite.hasNext()){
@@ -76,7 +76,7 @@ public class FeatureSourceModel implements TableModel{
         while (it.hasNext()){
             FeatureType att = it.next();
             System.out.println( att.getDefaultGeometry() );
-        }
+        }*/
         
         /* TEST
         FeatureCollectionType type = collection.getType();

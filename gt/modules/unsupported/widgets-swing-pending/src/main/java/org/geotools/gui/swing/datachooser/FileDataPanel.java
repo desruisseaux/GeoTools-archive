@@ -16,67 +16,50 @@
 
 package org.geotools.gui.swing.datachooser;
 
+import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
 import org.geotools.gui.swing.misc.GridCoverageFinder;
-import org.geotools.gui.swing.datachooser.model.RasterTableModel;
-import org.geotools.gui.swing.datachooser.model.VectorTableModel;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
 import org.geotools.gui.swing.misc.filtre.raster.FiltreTIF;
 import org.geotools.gui.swing.misc.filtre.vecteur.FiltreShape;
-import java.awt.Color;
 import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.event.EventListenerList;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.Style;
-import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.referencing.operation.TransformException;
 
 /**
  *
  * @author  johann sorel
  */
-public class FileDataPanel extends javax.swing.JPanel implements DataPanel{
-    
+public class FileDataPanel extends javax.swing.JPanel implements DataPanel {
+
     private static File LASTPATH = null;
-    private VectorTableModel model_vector ;
-    private RasterTableModel model_raster ;
-    
+    private EventListenerList listeners = new EventListenerList();
+
     /** Creates new form DefaultShapeTypeChooser */
     public FileDataPanel() {
         initComponents();
-        model_vector = new VectorTableModel(tab_vector);
-        tab_vector.setModel( model_vector );
-        tab_vector.setHighlighters();
-        tab_vector.setHighlighters( new Highlighter[]{HighlighterFactory.createAlternateStriping(Color.white,HighlighterFactory.QUICKSILVER,1) } );
-        tab_vector.setBackground(Color.WHITE);
-        titledpane_vector.setTitle(TextBundle.getResource().getString("vector"));
-        
-        model_raster = new RasterTableModel(tab_raster);
-        tab_raster.setModel( model_raster );
-        tab_raster.setHighlighters();
-        tab_raster.setHighlighters( new Highlighter[]{HighlighterFactory.createAlternateStriping(Color.white,HighlighterFactory.QUICKSILVER,1) } );
-        tab_raster.setBackground(Color.WHITE);
-        titledpane_raster.setTitle(TextBundle.getResource().getString("raster"));
-        
-        
+       
         but_nouveau.setText(TextBundle.getResource().getString("new"));
-        but_supprimer.setText(TextBundle.getResource().getString("delete"));
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -86,14 +69,7 @@ public class FileDataPanel extends javax.swing.JPanel implements DataPanel{
     private void initComponents() {
 
         but_nouveau = new javax.swing.JButton();
-        but_supprimer = new javax.swing.JButton();
-        titledpane_vector = new org.jdesktop.swingx.JXTitledPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        tab_vector = new org.jdesktop.swingx.JXTable();
         jtf_error = new javax.swing.JTextField();
-        titledpane_raster = new org.jdesktop.swingx.JXTitledPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        tab_raster = new org.jdesktop.swingx.JXTable();
 
         but_nouveau.setText("Nouveau");
         but_nouveau.addActionListener(new java.awt.event.ActionListener() {
@@ -102,61 +78,7 @@ public class FileDataPanel extends javax.swing.JPanel implements DataPanel{
             }
         });
 
-        but_supprimer.setText("Supprimer");
-        but_supprimer.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                actionSupprimer(evt);
-            }
-        });
-
-        titledpane_vector.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        titledpane_vector.setTitleFont(new java.awt.Font("Tahoma", 1, 11));
-
-        tab_vector.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-
-            }
-        ));
-        tab_vector.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
-        tab_vector.setEditable(false);
-        jScrollPane1.setViewportView(tab_vector);
-
-        org.jdesktop.layout.GroupLayout titledpane_vectorLayout = new org.jdesktop.layout.GroupLayout(titledpane_vector.getContentContainer());
-        titledpane_vector.getContentContainer().setLayout(titledpane_vectorLayout);
-        titledpane_vectorLayout.setHorizontalGroup(
-            titledpane_vectorLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 528, Short.MAX_VALUE)
-        );
-        titledpane_vectorLayout.setVerticalGroup(
-            titledpane_vectorLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 93, Short.MAX_VALUE)
-        );
-
         jtf_error.setEditable(false);
-
-        tab_raster.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-
-            }
-        ));
-        jScrollPane2.setViewportView(tab_raster);
-
-        org.jdesktop.layout.GroupLayout titledpane_rasterLayout = new org.jdesktop.layout.GroupLayout(titledpane_raster.getContentContainer());
-        titledpane_raster.getContentContainer().setLayout(titledpane_rasterLayout);
-        titledpane_rasterLayout.setHorizontalGroup(
-            titledpane_rasterLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 528, Short.MAX_VALUE)
-        );
-        titledpane_rasterLayout.setVerticalGroup(
-            titledpane_rasterLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 93, Short.MAX_VALUE)
-        );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -164,170 +86,150 @@ public class FileDataPanel extends javax.swing.JPanel implements DataPanel{
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, titledpane_raster, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, titledpane_vector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(layout.createSequentialGroup()
-                        .add(jtf_error, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(but_nouveau)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(but_supprimer)))
+                .add(jtf_error, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(but_nouveau)
                 .addContainerGap())
         );
-
-        layout.linkSize(new java.awt.Component[] {but_nouveau, but_supprimer}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
-
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jtf_error, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(but_nouveau)
-                    .add(but_supprimer))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(titledpane_vector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(titledpane_raster, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                    .add(jtf_error, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-    
+
     private void actionNouveau(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionNouveau
+        ArrayList<MapLayer> layers = new ArrayList<MapLayer>();
+        
         JFileChooser jfc = new JFileChooser();
         jfc.setCurrentDirectory(LASTPATH);
         //Filtres vecteurs
-        jfc.addChoosableFileFilter( new FiltreShape() );
-        
+        jfc.addChoosableFileFilter(new FiltreShape());
+
         //Filtres rasters
-        jfc.addChoosableFileFilter( new FiltreTIF() );
-        
+        jfc.addChoosableFileFilter(new FiltreTIF());
+
         jfc.setMultiSelectionEnabled(true);
-        
+
         int retour = jfc.showOpenDialog(this);
-        
-        if(retour == JFileChooser.APPROVE_OPTION){
+
+        if (retour == JFileChooser.APPROVE_OPTION) {
             File[] files = jfc.getSelectedFiles();
-            for(File f : files){
-                
+            for (File f : files) {
+
                 Object source = getDataStore(f);
-                if( source != null ){
-                    model_vector.addSource( (DataStore)source, f.getAbsolutePath(),f.getName());
-                } else{
-                    
+                if (source != null) {
+                    try {
+                        FeatureSource fs = ((DataStore) source).getFeatureSource(((DataStore) source).getTypeNames()[0]);
+                        Style style = RandomStyleFactory.createRandomVectorStyle(fs);
+                        MapLayer layer = new DefaultMapLayer(fs, style);
+                        layer.setTitle(f.getName());
+                        layers.add(layer);
+                    } catch (IOException ex) {
+                        jtf_error.setText(TextBundle.getResource().getString("DefaultFileTypeChooser_error"));
+                    }
+                } else {
+
                     source = getGridCoverage(f);
-                    if( source != null ){
-                        model_raster.addSource((GridCoverage) source, f.getAbsolutePath(),f.getName() );
-                    }else{
+                    if (source != null) {
+                        try {
+                            Style style = RandomStyleFactory.createRasterStyle();
+                            MapLayer layer = new DefaultMapLayer((GridCoverage) source, style);
+                            layer.setTitle(f.getName());
+                            layers.add(layer);
+                        } catch (TransformException ex) {
+                            jtf_error.setText(TextBundle.getResource().getString("DefaultFileTypeChooser_error"));
+                        } catch (FactoryConfigurationError ex) {
+                            jtf_error.setText(TextBundle.getResource().getString("DefaultFileTypeChooser_error"));
+                        } catch (SchemaException ex) {
+                            jtf_error.setText(TextBundle.getResource().getString("DefaultFileTypeChooser_error"));
+                        } catch (IllegalAttributeException ex) {
+                            jtf_error.setText(TextBundle.getResource().getString("DefaultFileTypeChooser_error"));
+                        }
+                    } else {
                         jtf_error.setText(TextBundle.getResource().getString("DefaultFileTypeChooser_error"));
                     }
                 }
                 LASTPATH = f;
             }
+            
+            if(layers.size()>0)
+                fireEvent( (MapLayer[])layers.toArray());
+            
         }
     }//GEN-LAST:event_actionNouveau
-    
-    private void actionSupprimer(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionSupprimer
-        model_vector.removeSelected();
-    }//GEN-LAST:event_actionSupprimer
-    
+
     public ImageIcon getIcon16() {
         return IconBundle.getResource().getIcon("16_geofile");
     }
-    
+
     public ImageIcon getIcon48() {
         return IconBundle.getResource().getIcon("48_geofile");
     }
-    
+
     public String getTitle() {
         return TextBundle.getResource().getString("files");
     }
-    
+
     public Component getChooserComponent() {
         return this;
     }
-    
-    private DataStore getDataStore(File f){
-        Map<String,Object> map = new HashMap<String,Object>();
+
+    private DataStore getDataStore(File f) {
+        Map<String, Object> map = new HashMap<String, Object>();
         DataStore dataStore = null;
         try {
-            map.put( "url", f.toURI().toURL() );
-            dataStore = DataStoreFinder.getDataStore( map );
-        }catch (MalformedURLException ex) {
+            map.put("url", f.toURI().toURL());
+            dataStore = DataStoreFinder.getDataStore(map);
+        } catch (MalformedURLException ex) {
             ex.printStackTrace();
             return null;
-        }catch (IOException ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
             return null;
         }
-        
+
         return dataStore;
     }
-    
-    private GridCoverage getGridCoverage(File f){
-        Map<String,Object> map = new HashMap<String,Object>();
+
+    private GridCoverage getGridCoverage(File f) {
+        Map<String, Object> map = new HashMap<String, Object>();
         GridCoverage cover = null;
         try {
-            map.put( "url", f.toURI().toURL() );
-            cover = GridCoverageFinder.getGridCoverage( map );
-        }catch (MalformedURLException ex) {
+            map.put("url", f.toURI().toURL());
+            cover = GridCoverageFinder.getGridCoverage(map);
+        } catch (MalformedURLException ex) {
             ex.printStackTrace();
             return null;
-        }catch (IOException ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
             return null;
         }
         return cover;
     }
-    
-    public List<MapLayer> read() {
-        ArrayList<MapLayer> lst = new ArrayList<MapLayer>();
-        
-        //vectors
-        for(int i=0;i<model_vector.getRowCount();i++){
-            DataStore data = (model_vector.getDataStore(i));
-            FeatureSource fs;
-            try {
-                fs = data.getFeatureSource(data.getTypeNames()[0]);
-                Style style = RandomStyleFactory.createRandomVectorStyle(fs);
-                MapLayer layer = new DefaultMapLayer(fs,style);
-                layer.setTitle( model_vector.getName(i));
-                
-                lst.add(layer);
-            } catch (Exception ex) {                
-                ex.printStackTrace();
-            }            
+
+    private void fireEvent(MapLayer[] layers){
+        for( DataListener lst : listeners.getListeners(DataListener.class)){
+            lst.addLayers(layers);
         }
         
-        //rasters
-        for(int i=0;i<model_raster.getRowCount();i++){
-            GridCoverage data = (model_raster.getGridCoverage(i));
-            FeatureSource fs;
-            try {
-                Style style = RandomStyleFactory.createRasterStyle();                
-                MapLayer layer = new DefaultMapLayer(data,style);
-                layer.setTitle( model_raster.getName(i));
-                
-                lst.add(layer);
-            } catch (Exception ex) {                
-                ex.printStackTrace();
-            }            
-        }
-        return lst;
     }
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton but_nouveau;
-    private javax.swing.JButton but_supprimer;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextField jtf_error;
-    private org.jdesktop.swingx.JXTable tab_raster;
-    private org.jdesktop.swingx.JXTable tab_vector;
-    private org.jdesktop.swingx.JXTitledPanel titledpane_raster;
-    private org.jdesktop.swingx.JXTitledPanel titledpane_vector;
     // End of variables declaration//GEN-END:variables
-    
+
+    public void addListener(DataListener listener) {
+        listeners.add(DataListener.class, listener);
+    }
+
+    public void removeListener(DataListener listener) {
+        listeners.remove(DataListener.class, listener);
+    }
 }

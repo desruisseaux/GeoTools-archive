@@ -40,13 +40,14 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
+import org.geotools.gui.swing.datachooser.model.DataModel;
 import org.geotools.map.MapLayer;
 
 /**
  *
  * @author  johann sorel
  */
-public class JDataChooser extends javax.swing.JPanel {
+public class JDataChooser extends javax.swing.JPanel implements DataListener{
     
     public static enum STATE{
         TABBED,
@@ -64,7 +65,6 @@ public class JDataChooser extends javax.swing.JPanel {
     private JButtonPanel pan_button;
     private JTabbedPane tabbedpane;
     private JPanel pan_source;
-    private JSplitPane split;
     
     /** Creates new form JDataChooser 
      * @param dia 
@@ -77,12 +77,11 @@ public class JDataChooser extends javax.swing.JPanel {
         
         but_ajouter.setText( TextBundle.getResource().getString("add")  ) ;
         but_fermer.setText( TextBundle.getResource().getString("cancel")  ) ;
+        but_remove.setText( TextBundle.getResource().getString("remove") );
         
         panel.setLayout(new GridLayout(1,1));
-        
-        
+                
         if(state == STATE.BUTTONED){
-            split = new JSplitPane();
             
             pan_source = new JPanel();
             pan_source.setLayout(new GridLayout(1,1));
@@ -91,14 +90,17 @@ public class JDataChooser extends javax.swing.JPanel {
             pan_button = new JButtonPanel();
             
             split.setLeftComponent(pan_button);
-            split.setRightComponent(pan_source);
             split.setDividerLocation(140);
             split.setDividerSize(1);
             
             panel.setLayout(new GridLayout(1,1));
         } else if(state == STATE.TABBED){
+            split.setDividerLocation(0);
+            split.setDividerSize(0);
             tabbedpane = new JTabbedPane();
         }
+        
+        tab_data.setModel( new DataModel(tab_data));
     }
     
     
@@ -107,15 +109,13 @@ public class JDataChooser extends javax.swing.JPanel {
         types.addAll(type);
         
         if(state == STATE.BUTTONED){
-            panel.add(split);
             for(DataPanel pan : type){
                 final DataPanel typ = pan;
                 JToggleButton b = new JToggleButton(typ.getTitle(),typ.getIcon48());
                 b.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         activetype = typ;
-                        setPanel(typ.getChooserComponent());
-                        
+                        setPanel(typ.getChooserComponent());                        
                     }
                 });
                 group.add(b);
@@ -134,32 +134,16 @@ public class JDataChooser extends javax.swing.JPanel {
         
         
     }
-    
-    private BufferedImage scaleImage(Image sourceImage, int width, int height)
-    {
-        ImageFilter filter = new ReplicateScaleFilter(width,height);
-        ImageProducer producer = new FilteredImageSource
-        (sourceImage.getSource(),filter);
-        Image resizedImage = Toolkit.getDefaultToolkit().createImage(producer);
-
-        return this.toBufferedImage(resizedImage);
-    }
-
-    private BufferedImage toBufferedImage(Image image)
-    {
-        image = new ImageIcon(image).getImage();
-        BufferedImage bufferedImage = new BufferedImage(image.getWidth(null)
-        ,image.getHeight(null),BufferedImage.TYPE_INT_RGB);
-        Graphics g = bufferedImage.createGraphics();
-        g.setColor(Color.white);
-        g.fillRect(0,0,image.getWidth(null),image.getHeight(null));
-        g.drawImage(image,0,0,null);
-        g.dispose();
-
-        return bufferedImage;
+     
+    public void addData(MapLayer layer){
+        if(layer!=null)
+            ((DataModel)tab_data.getModel()).addLayer(layer);        
     }
     
-    
+    private void removeselected(){
+        ((DataModel)tab_data.getModel()).removeSelected();
+    }
+             
     private void setPanel(Component comp){
         if(pan_source != null){
             pan_source.removeAll();
@@ -168,18 +152,15 @@ public class JDataChooser extends javax.swing.JPanel {
             pan_source.repaint();
         }
     }
-    
-    
+        
     private List<MapLayer> getLayers() {
-        return layers;
+        return ((DataModel)tab_data.getModel()).getLayers();
     }
     
-    private void buildLayers(){
-        layers = new ArrayList<MapLayer>();
-        for( DataPanel type : types){
-            layers.addAll(type.read());
-        }
+    public void addLayers(MapLayer[] layers) {
+        ((DataModel)tab_data.getModel()).addLayer(layers);
     }
+   
     
     /** This method is called from within the constructor to
      * initialize the form.
@@ -189,13 +170,57 @@ public class JDataChooser extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        but_fermer = new javax.swing.JButton();
-        but_ajouter = new javax.swing.JButton();
+        split = new javax.swing.JSplitPane();
+        jPanel1 = new javax.swing.JPanel();
         panel = new javax.swing.JPanel();
+        jXTitledPanel1 = new org.jdesktop.swingx.JXTitledPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tab_data = new org.jdesktop.swingx.JXTable();
+        but_remove = new javax.swing.JButton();
+        but_ajouter = new javax.swing.JButton();
+        but_fermer = new javax.swing.JButton();
 
-        but_fermer.addActionListener(new java.awt.event.ActionListener() {
+        split.setDividerLocation(0);
+        split.setDividerSize(0);
+
+        org.jdesktop.layout.GroupLayout panelLayout = new org.jdesktop.layout.GroupLayout(panel);
+        panel.setLayout(panelLayout);
+        panelLayout.setHorizontalGroup(
+            panelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 615, Short.MAX_VALUE)
+        );
+        panelLayout.setVerticalGroup(
+            panelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 201, Short.MAX_VALUE)
+        );
+
+        tab_data.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane1.setViewportView(tab_data);
+
+        org.jdesktop.layout.GroupLayout jXTitledPanel1Layout = new org.jdesktop.layout.GroupLayout(jXTitledPanel1.getContentContainer());
+        jXTitledPanel1.getContentContainer().setLayout(jXTitledPanel1Layout);
+        jXTitledPanel1Layout.setHorizontalGroup(
+            jXTitledPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE)
+        );
+        jXTitledPanel1Layout.setVerticalGroup(
+            jXTitledPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
+        );
+
+        but_remove.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                actionFermer(evt);
+                actionRemove(evt);
             }
         });
 
@@ -205,41 +230,57 @@ public class JDataChooser extends javax.swing.JPanel {
             }
         });
 
-        org.jdesktop.layout.GroupLayout panelLayout = new org.jdesktop.layout.GroupLayout(panel);
-        panel.setLayout(panelLayout);
-        panelLayout.setHorizontalGroup(
-            panelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 460, Short.MAX_VALUE)
+        but_fermer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                actionFermer(evt);
+            }
+        });
+
+        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(panel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(but_remove)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 490, Short.MAX_VALUE)
+                .add(but_ajouter)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(but_fermer)
+                .addContainerGap())
+            .add(jXTitledPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        panelLayout.setVerticalGroup(
-            panelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 295, Short.MAX_VALUE)
+
+        jPanel1Layout.linkSize(new java.awt.Component[] {but_ajouter, but_fermer, but_remove}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
+                .add(panel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jXTitledPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(but_ajouter)
+                    .add(but_fermer)
+                    .add(but_remove))
+                .addContainerGap())
         );
+
+        jPanel1Layout.linkSize(new java.awt.Component[] {but_ajouter, but_fermer, but_remove}, org.jdesktop.layout.GroupLayout.VERTICAL);
+
+        split.setRightComponent(jPanel1);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(378, Short.MAX_VALUE)
-                .add(but_ajouter)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(but_fermer)
-                .addContainerGap())
-            .add(panel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(split, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 617, Short.MAX_VALUE)
         );
-
-        layout.linkSize(new java.awt.Component[] {but_ajouter, but_fermer}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
-
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(panel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(but_ajouter)
-                    .add(but_fermer))
-                .addContainerGap())
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, split, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
     
@@ -248,9 +289,12 @@ public class JDataChooser extends javax.swing.JPanel {
     }//GEN-LAST:event_actionFermer
     
     private void actionAjouter(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionAjouter
-        buildLayers();
         dia.dispose();
     }//GEN-LAST:event_actionAjouter
+
+    private void actionRemove(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionRemove
+        removeselected();
+    }//GEN-LAST:event_actionRemove
     
     
     
@@ -258,7 +302,13 @@ public class JDataChooser extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton but_ajouter;
     private javax.swing.JButton but_fermer;
+    private javax.swing.JButton but_remove;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private org.jdesktop.swingx.JXTitledPanel jXTitledPanel1;
     private javax.swing.JPanel panel;
+    private javax.swing.JSplitPane split;
+    private org.jdesktop.swingx.JXTable tab_data;
     // End of variables declaration//GEN-END:variables
     
     
@@ -306,4 +356,6 @@ public class JDataChooser extends javax.swing.JPanel {
         }
         
     }
+
+
 }

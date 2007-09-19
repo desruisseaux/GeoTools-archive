@@ -87,6 +87,13 @@ public class ServerDataPanel extends javax.swing.JPanel implements DataPanel{
     }
 
 
+    public void addListener( DataListener listener){
+        
+    }
+    
+    public void removeListener( DataListener listener){
+        
+    }
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -13,77 +13,79 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
+
 package org.geotools.gui.swing.datachooser.model;
 
 import java.util.ArrayList;
+import java.util.List;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
+import org.geotools.map.MapLayer;
 import org.jdesktop.swingx.JXTable;
-import org.opengis.coverage.grid.GridCoverage;
 
 /**
  * @author johann sorel
  */
-public class RasterTableModel implements TableModel{
+public class DataModel implements TableModel{
     
     
-    private ArrayList<String> columns = new ArrayList<String>();
-    private ArrayList<Class> classes = new ArrayList<Class>();
-    private ArrayList<GridCoverage> stores = new ArrayList<GridCoverage>();
-    private ArrayList<String> names = new ArrayList<String>();
-    private ArrayList<String> adresses = new ArrayList<String>();
+    private ArrayList<MapLayer> datas = new ArrayList<MapLayer>();
     private JXTable tab;
     
     /** Creates a new instance of BasicTableModel 
      * @param tab 
      */
-    public RasterTableModel(JXTable tab) {
+    public DataModel(JXTable tab) {
         super();
         this.tab = tab;
         init();
     }
     
     private void init(){
-        columns.add("Nom");
-        columns.add("Adresse");
-        classes.add(String.class);
-        classes.add(String.class);
         tab.revalidate();
     }
     
     
     public void removeSelected(){
-        for(int i=tab.getSelectedRows().length-1; i>=0; i--){
-            stores.remove(tab.getSelectedRows()[i]);
-            adresses.remove(tab.getSelectedRows()[i]);
-            names.remove(tab.getSelectedRows()[i]);
+        for(int i=tab.getSelectedRows().length-1; i>=0; i--){            
+            datas.remove(tab.getSelectedRows()[i]);
         }
         tab.revalidate();
         tab.repaint();
     }
     
-    public void addSource(GridCoverage cover,String adresse,String name){
-        stores.add(cover);
-        adresses.add(adresse);
-        names.add(name);
+    public void addLayer(MapLayer layer){
+        datas.add(layer);
         tab.revalidate();
         tab.repaint();
     }
     
+    public void addLayer(MapLayer[] layer){
+        for(int i=0;i<layer.length;i++)
+            datas.add(layer[i]);
+        
+        tab.revalidate();
+        tab.repaint();
+    }
+    
+    public List<MapLayer> getLayers(){
+        return datas;
+    }
+    
     public int getColumnCount(){
-        return columns.size();
+        return 1;
     }
     
     public Class getColumnClass(int i){
-        return classes.get(i);
+        return String.class;
     }
     
     public String getColumnName(int column) {
-        return columns.get(column);
+        return "";
     }
     
     public int getRowCount() {
-        return adresses.size();
+        return datas.size();
     }
     
     public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -91,21 +93,9 @@ public class RasterTableModel implements TableModel{
     }
     
     public Object getValueAt(int rowIndex, int columnIndex) {
-        switch (columnIndex){
-            case 0 : return names.get(rowIndex);
-            case 1 : return adresses.get(rowIndex);
-            default : return "n/a";
-        }
+        return datas.get(rowIndex).getTitle();
     }
-    
-    public GridCoverage getGridCoverage(int rowIndex){
-        return stores.get(rowIndex);
-    }
-    
-    public String getName(int rowIndex){
-        return names.get(rowIndex);
-    }
-    
+            
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {}
     public void addTableModelListener(TableModelListener l) {}
     public void removeTableModelListener(TableModelListener l) {}

@@ -17,9 +17,7 @@
 package org.geotools.gui.swing.datachooser;
 
 import java.awt.Component;
-import java.util.List;
 import javax.swing.ImageIcon;
-import org.geotools.map.MapLayer;
 
 /**
  * @author johann sorel
@@ -30,6 +28,7 @@ public interface DataPanel {
     public ImageIcon getIcon48();    
     public String getTitle();    
     public Component getChooserComponent();    
-    public List<MapLayer> read();
+    public void addListener( DataListener listener);
+    public void removeListener( DataListener listener);
     
 }

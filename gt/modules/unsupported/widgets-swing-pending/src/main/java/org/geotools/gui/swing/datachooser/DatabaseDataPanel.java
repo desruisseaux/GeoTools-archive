@@ -43,25 +43,15 @@ public class DatabaseDataPanel extends javax.swing.JPanel implements DataPanel{
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-
-        jLabel1.setText("database connexion");
-
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(134, 134, 134)
-                .add(jLabel1)
-                .addContainerGap(375, Short.MAX_VALUE))
+            .add(0, 606, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(93, 93, 93)
-                .add(jLabel1)
-                .addContainerGap(290, Short.MAX_VALUE))
+            .add(0, 397, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -86,11 +76,16 @@ public class DatabaseDataPanel extends javax.swing.JPanel implements DataPanel{
         return lst;
     }
 
+    public void addListener(DataListener listener) {
+    }
+
+    public void removeListener(DataListener listener) {
+    }
+
 
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
     
 }
