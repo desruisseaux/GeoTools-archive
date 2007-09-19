@@ -316,10 +316,11 @@ public class JTSGeometryFactory implements GeometryFactory {
      * @inheritDoc
      * @see org.opengis.geometry.coordinate.Factory#createPolyhedralSurface(java.util.List)
      */
-    public PolyhedralSurface createPolyhedralSurface(final List/*<Polygon>*/ polygons)
+    public PolyhedralSurface createPolyhedralSurface(final List<Polygon> polygons)
             throws MismatchedReferenceSystemException, MismatchedDimensionException {
-        PolyhedralSurface result = new PolyhedralSurfaceImpl(crs);
-        result.getPatches().addAll(polygons);
+        PolyhedralSurfaceImpl result = new PolyhedralSurfaceImpl(crs);
+        List<?> cast = (List<?>) polygons;
+        result.getPatches().addAll( (List<PolygonImpl>) cast);
         return result;
     }
 

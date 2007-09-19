@@ -43,7 +43,8 @@ import com.vividsolutions.jts.geom.Coordinate;  // For javadoc only
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class CompressionLevel extends CodeList {
+public final class CompressionLevel extends CodeList<CompressionLevel> {
+
     /**
      * Serial number for interoperability with different versions.
      */

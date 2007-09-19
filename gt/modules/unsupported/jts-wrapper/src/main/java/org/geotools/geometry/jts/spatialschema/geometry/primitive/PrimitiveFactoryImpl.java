@@ -10,7 +10,9 @@ package org.geotools.geometry.jts.spatialschema.geometry.primitive;
 // J2SE direct dependencies
 import org.geotools.geometry.jts.spatialschema.geometry.DirectPositionImpl;
 import org.geotools.geometry.jts.spatialschema.geometry.geometry.GeometryFactoryImpl;
+import org.geotools.geometry.jts.spatialschema.geometry.geometry.PolygonImpl;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -139,9 +141,11 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
      * implementation since there are no implementations of the SurfacePatch
      * interface. Returns null.
      */
-    public Surface createSurface(final List/* <SurfacePatch> */patches) {
-        Surface result = new SurfaceImpl(crs);
-        result.getPatches().addAll(patches);
+    @SuppressWarnings("unchecked")
+    public Surface createSurface(final List<SurfacePatch> patches) {
+        SurfaceImpl result = new SurfaceImpl(crs);
+        List<?> cast = (List<?>) patches;   
+        result.getPatches().addAll( (List<SurfacePatchImpl>) cast );
         return result;
     }
 
@@ -197,10 +201,11 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
      * @inheritDoc
      * @see org.opengis.geometry.coordinate.Factory#createPolyhedralSurface(java.util.List)
      */
-    public PolyhedralSurface createPolyhedralSurface(List patches)
+    public PolyhedralSurface createPolyhedralSurface(List<Polygon> patches)
             throws MismatchedReferenceSystemException, MismatchedDimensionException {
-        PolyhedralSurface result = new PolyhedralSurfaceImpl(crs);
-        result.getPatches().addAll(patches);
+        PolyhedralSurfaceImpl result = new PolyhedralSurfaceImpl(crs);
+        List<?> cast = (List<?>) patches;
+        result.getPatches().addAll((List<PolygonImpl>) cast );
         return result;
     }
 }

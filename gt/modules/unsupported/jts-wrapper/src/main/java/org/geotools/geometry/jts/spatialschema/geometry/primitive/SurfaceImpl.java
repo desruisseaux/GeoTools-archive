@@ -11,6 +11,7 @@ package org.geotools.geometry.jts.spatialschema.geometry.primitive;
 
 // J2SE direct dependencies
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -21,6 +22,7 @@ import org.opengis.geometry.complex.CompositeSurface;
 import org.opengis.geometry.primitive.OrientablePrimitive;
 import org.opengis.geometry.primitive.Primitive;
 import org.opengis.geometry.primitive.Surface;
+import org.opengis.geometry.primitive.SurfacePatch;
 
 import org.geotools.geometry.jts.spatialschema.geometry.GeometryImpl;
 import org.geotools.geometry.jts.JTSGeometry;
@@ -53,7 +55,7 @@ import org.geotools.geometry.jts.JTSUtils;
  * @see PrimitiveFactory#createSurface(SurfaceBoundary)
  */
 public class SurfaceImpl extends GeometryImpl implements Surface {
-    private List patches;
+    protected List<SurfacePatchImpl> patches;
 
     public SurfaceImpl() {
         this(null);
@@ -64,7 +66,8 @@ public class SurfaceImpl extends GeometryImpl implements Surface {
         patches = new ArrayList();
     }
 
-    public List/*<SurfacePatch>*/ getPatches() {
+    @SuppressWarnings("unchecked")
+    public List<SurfacePatchImpl> getPatches() {
         return patches;
     }
 

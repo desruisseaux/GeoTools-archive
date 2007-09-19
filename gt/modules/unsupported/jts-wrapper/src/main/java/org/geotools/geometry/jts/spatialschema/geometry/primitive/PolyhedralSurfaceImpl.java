@@ -1,7 +1,19 @@
 package org.geotools.geometry.jts.spatialschema.geometry.primitive;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import org.geotools.geometry.jts.JTSGeometry;
+import org.geotools.geometry.jts.JTSUtils;
+import org.geotools.geometry.jts.spatialschema.geometry.GeometryImpl;
+import org.geotools.geometry.jts.spatialschema.geometry.geometry.PolygonImpl;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.complex.CompositeSurface;
 import org.opengis.geometry.coordinate.PolyhedralSurface;
+import org.opengis.geometry.primitive.OrientablePrimitive;
+import org.opengis.geometry.primitive.Primitive;
 
 /**
  * The {@code PolyhedralSurfaceImpl} class/interface...
@@ -10,13 +22,83 @@ import org.opengis.geometry.coordinate.PolyhedralSurface;
  * @author dillard
  * @version $Revision $
  */
-public class PolyhedralSurfaceImpl extends SurfaceImpl implements PolyhedralSurface {
+public class PolyhedralSurfaceImpl extends GeometryImpl implements PolyhedralSurface {
     
+    protected List<PolygonImpl> patches;
+
     /**
      * Creates a new {@code PolyhedralSurfaceImpl}.
      * @param crs
      */
     public PolyhedralSurfaceImpl(CoordinateReferenceSystem crs) {
         super(crs);
+        patches = new ArrayList();
+    }
+    
+    public PolyhedralSurfaceImpl() {
+        this(null);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<PolygonImpl> getPatches() {
+        return patches;
+    }
+
+    public double [] getUpNormal(DirectPosition point) {
+        return new double [] { 0, 0, 1 };
+    }
+
+    public double getPerimeter() {
+        return getJTSGeometry().getBoundary().getLength();
+    }
+
+    public double getArea() {
+        return getJTSGeometry().getArea();
+    }
+
+    public CompositeSurface getComposite() {
+        return null;
+    }
+
+    public int getOrientation() {
+        return 0;
+    }
+
+    public Primitive getPrimitive() {
+        return this;
+    }
+
+    public Set getComplexes() {
+        return null;
+    }
+
+    public Set getContainingPrimitives() {
+        return null;
+    }
+
+    public OrientablePrimitive[] getProxy() {
+        return null;
+    }
+
+    public Set getContainedPrimitives() {
+        return null;
+    }
+
+    /**
+     * @return
+     * @see com.polexis.lite.spatialschema.geometry.GeometryImpl#computeJTSPeer()
+     */
+    protected com.vividsolutions.jts.geom.Geometry computeJTSPeer() {
+        if (patches.size() > 1) {
+            //throw new UnsupportedOperationException("This implementation does not support surfaces with multiple patches.");
+            final com.vividsolutions.jts.geom.Polygon[] polygons = 
+                new com.vividsolutions.jts.geom.Polygon[patches.size()];
+            for (int i = 0; i < patches.size(); i++) {
+                final JTSGeometry jtsGeometry = (JTSGeometry) patches.get(i);
+                polygons[i] = (com.vividsolutions.jts.geom.Polygon) jtsGeometry.getJTSGeometry();
+            }
+            return JTSUtils.GEOMETRY_FACTORY.createMultiPolygon(polygons);
+        }
+        return ((JTSGeometry) patches.get(0)).getJTSGeometry();
     }
 }

@@ -38,7 +38,7 @@ import org.opengis.util.CodeList;
  *
  * @see BufferedCanvas2D#setOffscreenBuffered
  */
-public final class ImageType extends CodeList/*<ImageType>*/ {
+public final class ImageType extends CodeList<ImageType> {
     /**
      * Serial number for interoperability with different versions.
      */
