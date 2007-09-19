@@ -91,17 +91,17 @@ public abstract class JDBCConformanceTestSupport extends TestCase {
 		fb.setType( point );
 		fb.add( gf.createPoint( new Coordinate( 0, 0 ) )  );
 		fb.add( new Integer( 0 ) );
-		points.add( fb.build("fid.0"));
+		points.add( fb.buildFeature("fid.0"));
 		
 		fb.init();
 		fb.add( gf.createPoint( new Coordinate( 1, 1 ) )  );
 		fb.add( new Integer( 1 ) );
-		points.add( fb.build("fid.1"));
+		points.add( fb.buildFeature("fid.1"));
 		
 		fb.init();
 		fb.add( gf.createPoint( new Coordinate( 2,2 ) )  );
 		fb.add( new Integer( 2 ) );
-		points.add( fb.build("fid.2"));
+		points.add( fb.buildFeature("fid.2"));
 		
 		lines = new DefaultFeatureCollection(null,null){};
 		
@@ -110,17 +110,17 @@ public abstract class JDBCConformanceTestSupport extends TestCase {
 		fb.init();
 		fb.add( gf.createLineString(new Coordinate[]{ new Coordinate(0,0),new Coordinate(1,1)}));
 		fb.add( new Double( 0.0 ) );
-		lines.add( fb.build("fid.0"));
+		lines.add( fb.buildFeature("fid.0"));
 		
 		fb.init();
 		fb.add( gf.createLineString(new Coordinate[]{ new Coordinate(1,1),new Coordinate(2,2)}));
 		fb.add( new Double( 1.1 ) );
-		lines.add( fb.build("fid.1"));
+		lines.add( fb.buildFeature("fid.1"));
 		
 		fb.init();
 		fb.add( gf.createLineString(new Coordinate[]{ new Coordinate(2,2),new Coordinate(3,3)}));
 		fb.add( new Double( 2.2 ) );
-		lines.add( fb.build("fid.2"));
+		lines.add( fb.buildFeature("fid.2"));
 		
 		//create the tables
 		SQLBuilder sql = dataStore.createSQLBuilder();

@@ -234,7 +234,7 @@ public class DefaultFeatureType extends SimpleFeatureTypeImpl implements Feature
         	builder.setType( this );
         	builder.add( attributes );
         	
-        	return (Feature) builder.build(featureID);	
+        	return (Feature) builder.buildFeature(featureID);	
     	}
     	catch( Exception e ) {
     		throw (IllegalAttributeException) new IllegalAttributeException("illegal attribute").initCause(e);
@@ -255,7 +255,7 @@ public class DefaultFeatureType extends SimpleFeatureTypeImpl implements Feature
     		DefaultFeatureBuilder builder = new DefaultFeatureBuilder();
         	builder.init( original );
         	
-        	return (Feature) builder.build(original.getID());	
+        	return (Feature) builder.buildFeature(original.getID());	
     	}
     	catch( Exception e ) {
     		throw (IllegalAttributeException) new IllegalAttributeException("illegal attribute").initCause(e);

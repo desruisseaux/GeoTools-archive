@@ -104,6 +104,6 @@ public class PlacemarkTypeBinding extends AbstractComplexBinding {
         //&lt;element minOccurs="0" ref="kml:Geometry"/&gt;
         b.set("Geometry", node.getChildValue(Geometry.class));
 
-        return b.build(feature.getID());
+        return b.buildFeature(feature.getID());
     }
 }

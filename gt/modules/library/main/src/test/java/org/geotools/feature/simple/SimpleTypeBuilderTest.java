@@ -40,7 +40,7 @@ public class SimpleTypeBuilderTest extends TestCase {
 	public void testSanity() {
 		builder.setName( "testName" );
 		builder.setNamespaceURI( "testNamespaceURI" );
-		builder.add( "point", Point.class, null );
+		builder.add( "point", Point.class );
 		builder.add( "integer", Integer.class );
 		
 		SimpleFeatureType type = builder.buildFeatureType();
@@ -66,7 +66,7 @@ public class SimpleTypeBuilderTest extends TestCase {
 		builder.setNamespaceURI( "testNamespaceURI" );
 		
 		builder.setCRS(DefaultGeographicCRS.WGS84);
-		builder.add( "point", Point.class );
+		builder.crs(null).add( "point", Point.class );
 		builder.add( "point2", Point.class, DefaultGeographicCRS.WGS84 );
 		builder.setDefaultGeometry("point");
 		SimpleFeatureType type = builder.buildFeatureType();

@@ -179,6 +179,6 @@ public class FeatureTypeBinding extends AbstractComplexBinding {
         b.set("Region", node.getChildValue("Region"));
 
         //&lt;element minOccurs="0" name="Metadata" type="kml:MetadataType"/&gt;
-        return b.build((String) node.getAttributeValue("id"));
+        return b.buildFeature((String) node.getAttributeValue("id"));
     }
 }

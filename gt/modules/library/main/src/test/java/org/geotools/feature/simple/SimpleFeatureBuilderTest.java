@@ -35,7 +35,7 @@ public class SimpleFeatureBuilderTest extends TestCase {
 		builder.add( new Integer( 1 ) );
 		builder.add( new Float( 2.0 ) );
 		
-		SimpleFeature feature = builder.build( "fid" );
+		SimpleFeature feature = builder.buildFeature( "fid" );
 		assertNotNull( feature );
 		
 		assertEquals( 3, feature.getAttributeCount() );
@@ -50,7 +50,7 @@ public class SimpleFeatureBuilderTest extends TestCase {
         builder.add( gf.createPoint( new Coordinate( 0, 0 ) ) );
         builder.add( new Integer( 1 ) );
         
-        SimpleFeature feature = builder.build( "fid" );
+        SimpleFeature feature = builder.buildFeature( "fid" );
         assertNotNull( feature );
         
         assertEquals( 3, feature.getAttributeCount() );
@@ -66,7 +66,7 @@ public class SimpleFeatureBuilderTest extends TestCase {
         builder.set( "integer", new Integer( 1 ) );
         builder.set( "float",  new Float( 2.0 ) );
         
-        SimpleFeature feature = builder.build( "fid" );
+        SimpleFeature feature = builder.buildFeature( "fid" );
         assertNotNull( feature );
         
         assertEquals( 3, feature.getAttributeCount() );
@@ -82,7 +82,7 @@ public class SimpleFeatureBuilderTest extends TestCase {
 	    builder.set( "point", gf.createPoint( new Coordinate( 0, 0 ) ) );
         builder.set( "integer", new Integer( 1 ) );
         
-        SimpleFeature feature = builder.build( "fid" );
+        SimpleFeature feature = builder.buildFeature( "fid" );
         assertNotNull( feature );
         
         assertEquals( 3, feature.getAttributeCount() );
@@ -94,7 +94,7 @@ public class SimpleFeatureBuilderTest extends TestCase {
 	
 	public void testSetTooFew() throws Exception {
 	    builder.set("integer", new Integer(1));
-	    SimpleFeature feature = builder.build( "fid" );
+	    SimpleFeature feature = builder.buildFeature( "fid" );
         assertNotNull( feature );
         
         assertEquals( 3, feature.getAttributeCount() );

@@ -29,7 +29,7 @@ public class SimpleFeaturePropertyAccessorTest extends TestCase {
 		builder.add( new Integer( 1 ) );
 		builder.add( new Double( 2.0 ) );
 
-		feature = (Feature) builder.build( "fid" );
+		feature = (Feature) builder.buildFeature( "fid" );
 		accessor = SimpleFeaturePropertyAccessorFactory.ATTRIBUTE_ACCESS;
 	}
 	

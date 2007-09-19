@@ -102,6 +102,6 @@ public class DocumentTypeBinding extends AbstractComplexBinding {
         //&lt;element maxOccurs="unbounded" minOccurs="0" ref="kml:Feature"/&gt;
         b.set("Feature", node.getChildValues(Feature.class));
 
-        return b.build(feature.getID());
+        return b.buildFeature(feature.getID());
     }
 }

@@ -246,7 +246,7 @@ public class GML3MockData {
         builder.add(new Integer(1));
         builder.add(new Date());
 
-        return (Feature) builder.build("fid.1");
+        return (Feature) builder.buildFeature("fid.1");
     }
 
     static Element featureMember(Document document, Node parent) {

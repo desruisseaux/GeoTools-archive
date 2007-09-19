@@ -20,7 +20,7 @@ public class DefaultFeatureTypeBuilderTest extends TestCase {
 	public void testSanity() {
 		builder.setName( "testName" );
 		builder.setNamespaceURI( "testNamespaceURI" );
-		builder.add( "point", Point.class, null );
+		builder.add( "point", Point.class );
 		builder.add( "integer", Integer.class );
 		
 		DefaultFeatureType type = (DefaultFeatureType) builder.buildFeatureType();

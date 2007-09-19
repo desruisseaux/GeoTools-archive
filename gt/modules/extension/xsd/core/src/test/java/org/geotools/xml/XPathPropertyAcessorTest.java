@@ -45,7 +45,7 @@ public class XPathPropertyAcessorTest extends TestCase {
         builder.add("theName");
         builder.add("theDescription");
         builder.add(new GeometryFactory().createPoint(new Coordinate(0, 0)));
-        target = (Feature) builder.build("fid");
+        target = (Feature) builder.buildFeature("fid");
     }
 
     public void testSimpleXpath() {

@@ -55,7 +55,7 @@ public class FeatureCollectionWrapperTestSupport extends TestCase {
 			line.setUserData( crs );
 			builder.add( line );
 			
-			delegate.add( builder.build( i + "" ) );
+			delegate.add( builder.buildFeature( i + "" ) );
 		}
 	}
 }

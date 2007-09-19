@@ -25,7 +25,7 @@ public class AttributeExpressionTest extends TestCase {
 		builder.add( new Integer( 1 ) );
 		builder.add( new Double( 2.0 ) );
 
-		SimpleFeature feature = builder.build( "fid" );
+		SimpleFeature feature = builder.buildFeature( "fid" );
 		
 		AttributeExpressionImpl ex = new AttributeExpressionImpl( "foo" );
 		assertEquals( new Integer( 1 ), ex.evaluate( feature ) );

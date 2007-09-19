@@ -14,23 +14,20 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
-import org.opengis.feature.type.GeometryType;
 
 /**
- * A builder used to construct an instanceof {@link org.opengis.feature.simple.SimpleFeature}.
+ * A builder for features.
  * <p>
- * Usage:
+ * Simple Usage:
  * <code>
  * 	<pre>
  *  //type of features we would like to build ( assume schema = (geom:Point,name:String) )
  *  SimpleFeatureType featureType = ...  
  * 
- *  SimpleFeatureFactory simpleFactory = ...  //factory used to build feature instances
- * 
- *  //create the builder
- *  SimpleFeatureBuilder builder = new SimpleFeatureBuilder( simpleFactory );
+ *   //create the builder
+ *  SimpleFeatureBuilder builder = new SimpleFeatureBuilder();
  *  
- *  //set hte type of created features
+ *  //set the type of created features
  *  builder.setType( featureType );
  *  
  *  //add the attributes
@@ -38,11 +35,65 @@ import org.opengis.feature.type.GeometryType;
  *  builder.add( "theName" );
  *  
  *  //build the feature
- *  SimpleFeature feature = builder.build( "fid" );
+ *  SimpleFeature feature = builder.buildFeature( "fid" );
  * 	</pre>
  * </code>
  * </p>
+ * <p>
+ * This builder builds a feature by maintaining state. Each call to {@link #add(Object)}
+ * creates a new attribute for the feature and stores it locally. When using the 
+ * add method to add attributes to the feature, values added must be added in the 
+ * same order as the attributes as defined by the feature type. The methods 
+ * {@link #set(String, Object)} and {@link #set(int, Object)} are used to add 
+ * attributes out of order.
+ * </p>
+ * <p>
+ * Each time the builder builds a feature with a call to {@link #buildFeature(String)}
+ * the internal state is reset. 
+ * </p>
+ * <p>
+ * This builder can be used to copy features as well. The following code sample
+ * demonstrates:
+ * <code>
+ * <pre>
+ *  //original feature
+ *  SimpleFeature original = ...;
  * 
+ *  //create and initialize the builder
+ *  SimpleFeatureBuilder builder = new SimpleFeatureBuilder();
+ *  builder.init(original);
+ * 
+ *  //create the new feature
+ *  SimpleFeature copy = builder.buildFeature( original.getID() );
+ * 
+ *  </pre>
+ * </code>
+ * </p>
+ * <p>
+ * The builder also provides a number of static "short-hand" methods which can 
+ * be used when its not ideal to instantiate a new builder.
+ * <code>
+ *   <pre>
+ *   SimpleFeatureType type = ..;
+ *   Object[] values = ...;
+ *   
+ *   //build a new feature
+ *   SimpleFeature feature = SimpleFeatureBuilder.build( type, values, "fid" );
+ *   
+ *   ...
+ *   
+ *   SimpleFeature original = ...;
+ *   
+ *   //copy the feature
+ *   SimpleFeature feature = SimpleFeatureBuilder.copy( original );
+ *   </pre>
+ * </code>
+ * </p>
+ * <p>
+ * This class is not thread safe nor should instances be shared across multiple 
+ * threads.
+ * </p>
+ *  
  * @author Justin Deoliveira
  * @author Jody Garnett
  */
@@ -61,17 +112,13 @@ public class SimpleFeatureBuilder {
 	 */
 	protected List attributes = new ArrayList();
 	/**
-	 * feaure type
+	 * feature type
 	 */
 	protected SimpleFeatureType featureType;
 	/**
 	 * default geometry
 	 */
 	protected GeometryAttribute defaultGeometry;
-	/**
-	 * coordinate reference system
-	 */
-	//protected CoordinateReferenceSystem crs;
 	
 	/**
 	 * Constructs the builder.
@@ -94,21 +141,19 @@ public class SimpleFeatureBuilder {
 		this.factory = factory;
 	}
 
+	/**
+	 * Sets the type of features created by the builder.
+	 */
     public void setType( SimpleFeatureType featureType ){
     	this.featureType = featureType; 
     }
     
-//    public void setCRS(CoordinateReferenceSystem crs) {
-//        this.crs = crs;
-//    }
-
     /**
      * Initialize the builder with the provided feature.
      * <p>
-     * This is used to quickly create a "clone", can be used to change
-     * between one SimpleFeatureImplementation and another.
+     * This method adds all the attributes from the provided feature. It is 
+     * useful when copying a feature. 
      * </p>
-     * @param feature
      */
     public void init( SimpleFeature feature ) {
 		init();
@@ -120,10 +165,20 @@ public class SimpleFeatureBuilder {
 		//crs = feature.getType().getCRS();
 	}
     
+    /**
+     * Internal method which initializes builder state.
+     */
     protected void init() {
     	attributes = null;
     }
     
+    /**
+     * Adds an attribute.
+     * <p>
+     * This method should be called repeatedly for the number of attributes as 
+     * specified by the type of the feature.
+     * </p>
+     */
     public void add(Object value) {
     	//get the descriptor from the type
     	AttributeDescriptor descriptor = featureType.getAttribute(attributes().size());
@@ -158,6 +213,19 @@ public class SimpleFeatureBuilder {
     	attributes().add(attributes().size(),attribute);
 	}
     
+    /**
+     * Adds an array of attributes.
+     * <p>
+     * This method is convenience for: 
+     * <code>
+     *   <pre>
+     *   for (int i = 0; i < values.length; i++ ) {
+     *      add( values[i] );
+     *   }
+     *   </pre>
+     * </code>
+     * </p>
+     */
     public void add(Object[] values ) {
     	if ( values == null ) {
     		return;
@@ -167,8 +235,34 @@ public class SimpleFeatureBuilder {
     	}
     }
     
+    /**
+     * Adds an attribute value by name.
+     * <p>
+     * This method can be used to add attribute values out of order.
+     * </p>
+     * @param name The name of the attribute.
+     * @param value The value of the attribute.
+     * 
+     * @throws IllegalArgumentException If no such attribute with teh specified
+     * name exists.
+     */
     public void set(String name, Object value) {
         int index = featureType.indexOf(name);
+        if (index == -1 ) {
+            throw new IllegalArgumentException("No such attribute:" + name);
+        }
+        set(index,value);
+    }
+    
+    /**
+     * Adds an attribute value by index.
+     * * <p>
+     * This method can be used to add attribute values out of order.
+     * </p>
+     * @param index The index of the attribute.
+     * @param value The value of the attribute.
+     */
+    public void set(int index, Object value) {
         if (index < attributes().size()) {
             //already an attribute for this index
             Attribute attribute = (Attribute) attributes().get(index);
@@ -181,28 +275,23 @@ public class SimpleFeatureBuilder {
             }
             
             add(value);
-        }
+        } 
     }
-    
-    protected boolean isGeometry( AttributeDescriptor value ) {
-    	return value instanceof GeometryDescriptor;
-    }
-    
-    protected String createDefaultFeatureId() {
-    	  // According to GML and XML schema standards, FID is a XML ID
-        // (http://www.w3.org/TR/xmlschema-2/#ID), whose acceptable values are those that match an
-        // NCNAME production (http://www.w3.org/TR/1999/REC-xml-names-19990114/#NT-NCName):
-        // NCName ::= (Letter | '_') (NCNameChar)* /* An XML Name, minus the ":" */
-        // NCNameChar ::= Letter | Digit | '.' | '-' | '_' | CombiningChar | Extender
-        // We have to fix the generated UID replacing all non word chars with an _ (it seems
-        // they area all ":")
-        //return "fid-" + NON_WORD_PATTERN.matcher(new UID().toString()).replaceAll("_");
-        // optimization, since the UID toString uses only ":" and converts long and integers
-        // to strings for the rest, so the only non word character is really ":"
-        return "fid-" + new UID().toString().replace(':', '_');
-    }
-    
-    public SimpleFeature build(String id) {
+  
+    /**
+     * Builds the feature.
+     * <p>
+     * The specified <tt>id</tt> may be <code>null</code>. In this case an id
+     * will be generated internally by the builder.
+     * </p>
+     * <p>
+     * After this method returns, all internal builder state is reset.
+     * </p>
+     * @param id The id of the feature, or <code>null</code>.
+     * 
+     * @return The new feature.
+     */
+    public SimpleFeature buildFeature(String id) {
         //ensure id
         if ( id == null ) {
             id = createDefaultFeatureId();
@@ -224,6 +313,27 @@ public class SimpleFeatureBuilder {
     	return feature;
     }
     
+    /**
+     * Internal method for creating feature id's when none is specified.
+     */
+    protected String createDefaultFeatureId() {
+          // According to GML and XML schema standards, FID is a XML ID
+        // (http://www.w3.org/TR/xmlschema-2/#ID), whose acceptable values are those that match an
+        // NCNAME production (http://www.w3.org/TR/1999/REC-xml-names-19990114/#NT-NCName):
+        // NCName ::= (Letter | '_') (NCNameChar)* /* An XML Name, minus the ":" */
+        // NCNameChar ::= Letter | Digit | '.' | '-' | '_' | CombiningChar | Extender
+        // We have to fix the generated UID replacing all non word chars with an _ (it seems
+        // they area all ":")
+        //return "fid-" + NON_WORD_PATTERN.matcher(new UID().toString()).replaceAll("_");
+        // optimization, since the UID toString uses only ":" and converts long and integers
+        // to strings for the rest, so the only non word character is really ":"
+        return "fid-" + new UID().toString().replace(':', '_');
+    }
+    
+    /**
+     * Internal accessor for attribute list.
+     * @return
+     */
     protected List attributes() {
 		if ( attributes == null ) {
 			attributes = newList();
@@ -234,5 +344,40 @@ public class SimpleFeatureBuilder {
 	
 	protected List newList() {
 		return new ArrayList();
+	}
+	
+	/**
+	 * Static method to build a new feature.
+	 * <p>
+	 * If multiple features need to be created, this method should not be used
+	 * and instead an instance should be instantiated directly.
+	 * </p>
+	 * <p>
+	 * This method is a short-hand convenience which creates a builder instance
+	 * internally and adds all the specified attributes.
+	 * </p>
+	 */
+	public static SimpleFeature build( SimpleFeatureType type, Object[] values, String id ) {
+	    SimpleFeatureBuilder builder = new SimpleFeatureBuilder();
+	    builder.setType(type);
+	    builder.add(values);
+	    return builder.buildFeature(id);
+	}
+	
+	/**
+     * Static method to copy an existing feature.
+     * <p>
+     * If multiple features need to be copied, this method should not be used
+     * and instead an instance should be instantiated directly.
+     * </p>
+     * <p>
+     * This method is a short-hand convenience which creates a builder instance
+     * and initializes it with the attributes from the specified feature.
+     * </p>
+     */
+	public static SimpleFeature copy( SimpleFeature original ) {
+	    SimpleFeatureBuilder builder = new SimpleFeatureBuilder();
+	    builder.init(original);
+	    return builder.buildFeature(original.getID());
 	}
 }

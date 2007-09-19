@@ -110,6 +110,7 @@ public class AttributeTypeBuilder {
 	//GeometryType
 	//
 	protected CoordinateReferenceSystem crs;
+	protected boolean isCrsSet = false;
 	
 	//AttributeDescriptor
 	//
@@ -161,6 +162,7 @@ public class AttributeTypeBuilder {
 		binding = null;
 		superType = null;
 		crs = null;
+		isCrsSet = false;
 	}
 	
 	protected void resetDescriptorState() {
@@ -223,8 +225,13 @@ public class AttributeTypeBuilder {
 	
 	public void setCRS(CoordinateReferenceSystem crs) {
 		this.crs = crs;
+		isCrsSet = true;
 	}
 
+	public boolean isCRSSet() {
+        return isCrsSet;
+    }
+	
 	public void setDescription(String description) {
 		this.description = description;
 	}
